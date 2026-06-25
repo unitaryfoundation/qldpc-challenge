@@ -238,7 +238,7 @@ text-decoration:none;font-size:14px;font-weight:600;
 border:1px solid rgba(255,255,255,.28);border-radius:9px;padding:8px 14px;
 background:rgba(255,255,255,.08)}}
 .ghlink:hover{{background:rgba(255,255,255,.18)}}
-header.hero h1{{font-size:44px;margin:0;letter-spacing:-1px}}
+header.hero h1{{font-size:clamp(30px,6vw,44px);margin:0;letter-spacing:-1px}}
 header.hero h1 a{{color:#fff}}
 header.hero p{{font-size:18px;max-width:640px;margin:0;color:#dbeafe}}
 header.hero p a{{color:#fff;text-decoration:underline}}
@@ -251,15 +251,14 @@ background:rgba(255,255,255,.06)}}
 .stats{{display:flex;gap:40px;margin-top:30px;flex-wrap:wrap}}
 .stat .v{{font-size:30px;font-weight:700}}.stat .l{{color:#c7d2fe;font-size:13px;
 text-transform:uppercase;letter-spacing:.05em}}
-.progress{{margin:28px 0 8px;border:1px solid var(--ln);border-radius:14px;
-padding:20px 22px;background:var(--soft)}}
-.ph{{font-size:13px;margin:0 0 16px;color:var(--mut);letter-spacing:.6px;
-text-transform:uppercase;font-weight:700}}
-.pmetrics{{display:flex;flex-wrap:wrap;gap:14px 40px;margin-bottom:18px}}
-.pm{{display:flex;flex-direction:column}}
-.pmn{{font-size:26px;font-weight:700;line-height:1.1}}
-.pmsub{{font-size:17px;color:var(--mut);font-weight:600}}
-.pml{{font-size:12px;color:var(--mut);margin-top:5px}}
+.statsbar{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:14px;margin:28px 0 8px}}
+.stat-card{{border:1px solid var(--ln);border-radius:14px;padding:18px 20px;
+background:var(--soft)}}
+.stat-card.hero{{border-color:var(--ac);background:#f5f3ff}}
+.stat-card .v{{font-size:34px;font-weight:700;line-height:1.05}}
+.stat-card.hero .v{{color:var(--ac)}}
+.stat-card .l{{font-size:13px;color:var(--mut);margin-top:6px}}
 .lb{{margin:18px 0 8px;border:1px solid var(--ln);border-radius:14px;
 background:#fff;overflow:hidden}}
 .lbhead{{display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -284,18 +283,6 @@ flex:0 0 auto}}
 .lbm b{{font-size:17px;font-variant-numeric:tabular-nums}}
 .lbml{{font-size:11px;color:var(--mut);margin-top:1px;white-space:nowrap}}
 @media(max-width:680px){{.lbm:nth-child(n+5){{display:none}}.lbm{{width:64px}}}}
-.pm.hero{{border-left:3px solid var(--ac);padding-left:13px;cursor:default}}
-.pm.hero .pmn{{color:var(--ac)}}
-.ptracks{{border-collapse:collapse;width:100%;table-layout:fixed;
-font-size:13px;background:#fff;border:1px solid var(--ln);border-radius:8px}}
-.ptracks td .mono{{font-size:12px}}
-.ptracks th,.ptracks td{{padding:.45rem .7rem;border-bottom:1px solid var(--ln)}}
-.ptracks tr:last-child td{{border-bottom:none}}
-.ptracks th{{background:var(--soft);color:var(--mut);font-weight:600;
-text-align:left}}
-.ptracks td:not(:first-child),.ptracks th:not(:first-child){{text-align:center;
-font-variant-numeric:tabular-nums}}
-.ptracks td:first-child{{font-weight:600}}
 .how{{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:40px 0}}
 .how .card{{border:1px solid var(--ln);border-radius:12px;padding:20px;
 background:var(--soft)}}
@@ -320,11 +307,15 @@ margin-right:3px;background:#f5f3ff;border-left:3px solid var(--ac)}}
 h2.track{{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}}
 .tcount{{color:var(--mut);font-size:14px;font-weight:400}}
-.plots{{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0 4px;
-position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 6px;
-box-shadow:0 8px 8px -8px rgba(15,23,42,.18)}}
-.plot{{flex:1 1 0;min-width:0;max-width:520px;align-self:flex-start;
-border:1px solid var(--ln);border-radius:12px;background:#fff;padding:8px}}
+.plots{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:16px;margin:14px 0 4px}}
+.plot{{min-width:0;border:1px solid var(--ln);border-radius:12px;
+background:#fff;padding:8px}}
+.chartlegend{{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
+padding:12px 16px;background:var(--soft);border:1px solid var(--ln);
+border-radius:10px;font-size:13px;color:var(--mut)}}
+.chartlegend .ci{{display:inline-flex;align-items:center;gap:7px}}
+.cdot{{width:12px;height:12px;border-radius:50%;flex:0 0 auto}}
 /* full width (matching the panels above) with fixed, evenly distributed
    columns so the slack isn't dumped into one column as a stray gap. */
 table.board{{border-collapse:collapse;width:100%;table-layout:fixed;
@@ -441,9 +432,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}}
 .refcited a:hover{{color:var(--ac);border-color:var(--ac)}}
 @media(max-width:680px){{.ref{{flex-direction:column;gap:4px}}
 .refkey{{width:auto}}}}
-@media(max-width:880px){{.how{{grid-template-columns:1fr}}
-.plot{{flex-basis:auto;width:100%;
-position:static}}header.hero h1{{font-size:34px}}}}
+@media(max-width:880px){{.how{{grid-template-columns:1fr}}}}
 """
 
 JS = """
@@ -474,15 +463,18 @@ document.querySelectorAll('table.board').forEach(t=>{
 document.querySelectorAll('tr[data-href]').forEach(r=>{
  r.addEventListener('click',()=>{location.href=r.dataset.href;});
 });
-document.querySelectorAll('.tracksec').forEach(sec=>{
- const mark=(code,on)=>sec.querySelectorAll('[data-code="'+code+'"]')
+// Cross-highlight a code's table row and its chart dot together. Global (not
+// scoped to one section) because the charts and the table now live in separate
+// parts of the page.
+(function(){
+ const mark=(code,on)=>document.querySelectorAll('[data-code="'+code+'"]')
   .forEach(el=>el.classList.toggle('xh',on));
- sec.querySelectorAll('[data-code]').forEach(el=>{
+ document.querySelectorAll('[data-code]').forEach(el=>{
   const code=el.dataset.code;
   el.addEventListener('mouseenter',()=>mark(code,true));
   el.addEventListener('mouseleave',()=>mark(code,false));
  });
-});
+})();
 const tip=document.getElementById('tip');
 if(tip)document.querySelectorAll('circle.hit').forEach(c=>{
  c.addEventListener('mouseenter',()=>{tip.textContent=c.dataset.tip;
@@ -521,14 +513,12 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
   rows.forEach(r=>{const ok=toks.every(t=>term(r,t));
    r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
   if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
-  document.querySelectorAll('#board svg.plot circle[data-code]').forEach(c=>{
+  document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
    c.style.display=vis.has(c.dataset.code)?'':'none';});
  }
  q.addEventListener('input',apply);
  document.querySelectorAll('.typepill').forEach(p=>{
   p.addEventListener('click',()=>{q.value=p.dataset.q;apply();q.focus();});});
- document.querySelectorAll('.tracklink').forEach(a=>{
-  a.addEventListener('click',()=>{q.value=a.dataset.q;apply();});});
  apply();
 })();
 """
@@ -629,8 +619,8 @@ def scatter(te, front, yacc, ylabel):
     Suppressed below a handful of distinct (n, y) points (nothing to show)."""
     if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
         return ""
-    W, H = 520, 340
-    pad_l, pad_r, pad_b, pad_t = 54, 10, 58, 78
+    W, H = 520, 300
+    pad_l, pad_r, pad_b, pad_t = 54, 12, 52, 22
     nhi = max(e["n"] for e in te) or 1
     yhi = max(yacc(e) for e in te) or 1
 
@@ -656,27 +646,6 @@ def scatter(te, front, yacc, ylabel):
                     f'font-size="12" fill="#475569" text-anchor="end">{gy:g}</text>')
         gy += ystep
 
-    # Legend row 1: tier colours; row 2: filled (record) vs open (non-frontier)
-    leg_fs, leg_ink = 11, "#334155"
-    leg = []
-    for (col, label), lx in zip(
-        [(EXACT, "Certified exact"), (CORR, "Corroborated"), (ACCENT, "Upper bound")],
-        [75, 215, 360],
-    ):
-        leg += [
-            f'<circle cx="{lx}" cy="18" r="5" fill="{col}" stroke="{col}" stroke-width="1.5"/>',
-            f'<text x="{lx + 11}" y="22" font-size="{leg_fs}" fill="{leg_ink}">{label}</text>',
-        ]
-    for (filled, label), lx in zip(
-        [(True, "Pareto record (filled)"), (False, "Non-frontier (open)")],
-        [75, 270],
-    ):
-        fill = ACCENT if filled else "#fff"
-        leg += [
-            f'<circle cx="{lx}" cy="46" r="5" fill="{fill}" stroke="{ACCENT}" stroke-width="1.5"/>',
-            f'<text x="{lx + 11}" y="50" font-size="{leg_fs}" fill="{leg_ink}">{label}</text>',
-        ]
-
     pts = []
     for i, e in enumerate(te):
         f = i in front
@@ -697,7 +666,6 @@ def scatter(te, front, yacc, ylabel):
     x_mid = pad_l + (W - pad_l - pad_r) / 2
     y_mid = pad_t + (H - pad_t - pad_b) / 2
     return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img">'
-            + "".join(leg)
             + "".join(grid)
             + f'<text x="{x_mid:.0f}" y="{H - 10}" font-size="13" fill="#334155" '
             f'text-anchor="middle">Physical Qubits (n)</text>'
@@ -937,11 +905,10 @@ def references_page(entries):
 
 
 
-def progress_panel(entries, tracks, n_exact, best_eff):
-    """A distinct status-of-progress panel: headline diagnostics plus a
-    per-track breakdown. This is the single home for the board's numbers (the
-    hero carries none). Contributors counts GitHub-handle authors only (the
-    paper baseline source is not a contributor)."""
+def progress_panel(entries, n_exact, best_eff):
+    """The prominent stats bar at the top of the board: the headline numbers as
+    big cards. This is the single home for the board's numbers (the hero carries
+    none). The 'new codes' count is contributed (non-baseline) codes only."""
     n_base = sum(1 for e in entries if e["origin"] == "baseline")
     n_contrib = len(entries) - n_base
     metrics = [
@@ -953,26 +920,12 @@ def progress_panel(entries, tracks, n_exact, best_eff):
          "distance proven exact by server-side certification (d =)"),
         (f"{best_eff:g}", "best kd&sup2;/n", ""),
     ]
-    mhtml = "".join(f'<div class="pm{" hero" if i == 0 else ""}"'
+    cards = "".join(f'<div class="stat-card{" hero" if i == 0 else ""}"'
                     f'{f" title=\"{t}\"" if t else ""}>'
-                    f'<span class=pmn>{v}</span>'
-                    f'<span class=pml>{lab}</span></div>'
+                    f'<div class=v>{v}</div>'
+                    f'<div class=l>{lab}</div></div>'
                     for i, (v, lab, t) in enumerate(metrics))
-    rows = []
-    for t in sorted(tracks):
-        te = [entries[i] for i in tracks[t]]
-        fr = len(pareto(te))
-        ex = sum(1 for e in te if e["tier"] == "exact")
-        rows.append('<tr><td><a class=tracklink href="#board" '
-                    f'data-q="{html.escape(type_term(t))}">{html.escape(t)}</a>'
-                    f'</td><td>{len(te)}</td>'
-                    f'<td>{fr}</td><td>{ex}</td></tr>')
-    return ('<section class=progress><h2 class=ph>Progress</h2>'
-            f'<div class=pmetrics>{mhtml}</div>'
-            '<table class=ptracks><thead><tr><th>track</th>'
-            '<th>codes</th><th>on frontier</th>'
-            '<th>certified exact</th></tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table></section>')
+    return f'<section class=statsbar>{cards}</section>'
 
 
 def contributors_panel(entries, tracks):
@@ -1137,22 +1090,74 @@ def type_term(t):
     return TYPE_TERM.get(t, t)
 
 
-def unified_board(entries, tracks):
-    """One searchable, sortable table of every code, with the track type as a
-    column (chips) instead of a section heading. A code is a record (starred,
-    shaded) if it is on the Pareto frontier of at least one of its tracks."""
+def compute_records(entries, tracks):
+    """Indices of codes that sit on the Pareto frontier of at least one of their
+    tracks (over n, k, d). These are the 'records' (starred, shaded)."""
     record_in = {}
     for t, idxs in tracks.items():
         te = [entries[i] for i in idxs]
         for j in pareto(te):
             record_in.setdefault(te[j]["slug"], set()).add(t)
-    records = {i for i, e in enumerate(entries) if e["slug"] in record_in}
+    return {i for i, e in enumerate(entries) if e["slug"] in record_in}
 
+
+def board_controls(entries, tracks, records):
+    """The board heading plus the search box, type-filter pills, and filter help.
+    Lives above the charts so filtering and the landscape view stay together; the
+    JS finds the table by id, so its position relative to the table is free."""
     pills = "".join(
         f'<button type=button class=typepill data-q="{html.escape(type_term(t))}" '
         f'title="filter to {html.escape(t)}">{html.escape(type_label(t))}</button>'
         for t in sorted(tracks))
+    return ('<section id=board>'
+            '<h2 class=track>Codes '
+            f'<span class=tcount>&middot; {len(entries)} total, '
+            f'{len(records)} records</span></h2>'
+            '<div class=searchbar>'
+            '<input id=boardsearch type=text autocomplete=off '
+            'placeholder="search, e.g.  weight-6 k&gt;=10 d&gt;=8  or  '
+            'eff&gt;5  or  farlab" aria-label="search codes">'
+            '<span id=boardcount class=searchcount></span></div>'
+            f'<div class=typepills>{pills}'
+            '<button type=button class="typepill clearpill" data-q="">'
+            'clear</button></div>'
+            '<p class=searchhelp>Filter by typing terms (all must match): a '
+            'type or author name, or a comparison on <b>n</b>, <b>k</b>, '
+            '<b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), e.g. '
+            '<code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
+            'The word <code>record</code> keeps only frontier records.</p>'
+            '</section>')
 
+
+def charts_block(entries, records):
+    """The two landscape scatters side by side (stacked on narrow screens) with a
+    shared HTML legend below them. The legend is HTML, not drawn into the SVG, so
+    it keeps real font sizes and reflows on mobile."""
+    d_plot = scatter(entries, records, lambda e: e["d"], "Code Distance (d)")
+    eff_plot = scatter(entries, records, lambda e: e["eff"], "kd²/n")
+    if not d_plot and not eff_plot:
+        return ""
+    legend = (
+        '<div class=chartlegend>'
+        f'<span class=ci><span class=cdot style="background:{EXACT}"></span>'
+        'Certified exact</span>'
+        f'<span class=ci><span class=cdot style="background:{CORR}"></span>'
+        'Corroborated</span>'
+        f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
+        'Upper bound</span>'
+        f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
+        'Filled = Pareto record</span>'
+        '<span class=ci><span class=cdot '
+        f'style="background:#fff;border:2px solid {ACCENT}"></span>'
+        'Open = non-frontier</span>'
+        '</div>')
+    return f'<div class=plots>{d_plot}{eff_plot}</div>{legend}'
+
+
+def board_table(entries, records):
+    """The searchable, sortable table of every code, with the track type as a
+    column of chips. Search and charts are rendered separately, above; this is
+    the table itself."""
     def chips(e):
         return "".join(
             f'<span class=tchip title="{html.escape(t)}">'
@@ -1204,29 +1209,8 @@ def unified_board(entries, tracks):
             f'<td class=num>{e["eff"]}</td><td class=num>{e["w"]}</td>'
             f'<td class=auth>{authors_html(e["authors_list"])}</td></tr>')
 
-    return ('<section class=tracksec id=board>'
-            '<h2 class=track>Codes '
-            f'<span class=tcount>&middot; {len(entries)} total, '
-            f'{len(records)} records</span></h2>'
-            '<div class=searchbar>'
-            '<input id=boardsearch type=text autocomplete=off '
-            'placeholder="search, e.g.  weight-6 k&gt;=10 d&gt;=8  or  '
-            'eff&gt;5  or  farlab" aria-label="search codes">'
-            '<span id=boardcount class=searchcount></span></div>'
-            f'<div class=typepills>{pills}'
-            '<button type=button class="typepill clearpill" data-q="">'
-            'clear</button></div>'
-            '<p class=searchhelp>Filter by typing terms (all must match): a '
-            'type or author name, or a comparison on <b>n</b>, <b>k</b>, '
-            '<b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), e.g. '
-            '<code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
-            'The word <code>record</code> keeps only frontier records.</p>'
-            '<div class=plots>'
-            f'{scatter(entries, records, lambda e: e["d"], "Code Distance (d)")}'
-            f'{scatter(entries, records, lambda e: e["eff"], "kd²/n")}'
-            '</div>'
-            f'<table class=board id=mainboard>{cols}{head}'
-            f'<tbody>{"".join(rows)}</tbody></table></section>')
+    return (f'<table class=board id=mainboard>{cols}{head}'
+            f'<tbody>{"".join(rows)}</tbody></table>')
 
 
 def build():
@@ -1237,6 +1221,7 @@ def build():
             tracks.setdefault(t, []).append(i)
     n_exact = sum(1 for e in entries if e["tier"] == "exact")
     best_eff = max((e["eff"] for e in entries), default=0)
+    records = compute_records(entries, tracks)
 
     P = [head("qLDPC Challenge")]
     P.append('<header class=hero><div class=wrap>'
@@ -1257,7 +1242,10 @@ def build():
              '</nav>'
              '</div></header>')
     P.append('<div class=wrap>')
-    P.append(progress_panel(entries, tracks, n_exact, best_eff))
+    P.append(progress_panel(entries, n_exact, best_eff))
+    P.append(board_controls(entries, tracks, records))
+    P.append(charts_block(entries, records))
+    P.append(contributors_panel(entries, tracks))
     P.append('<div class=how>'
              '<div class=card><span class=n>1</span><h3>Build a code</h3>'
              '<p>A CSS qLDPC code, written as one JSON file with its parity '
@@ -1269,7 +1257,6 @@ def build():
              '<p>If it advances a track&rsquo;s frontier it is highlighted. '
              'Click any row for the witness, certificate, and checks.</p>'
              '</div></div>')
-    P.append(contributors_panel(entries, tracks))
     P.append('<div class=legend>'
              '<span class=legbreak><span class=swatch></span>&#9733; '
              '<b>record</b> (shaded rows): on the Pareto frontier of at least '
@@ -1279,7 +1266,6 @@ def build():
              '(<span class="b exact">d =</span>)</span>'
              '<span><span class="dot ac"></span> upper bound '
              '(<span class="b ub">d &le;</span>)</span>'
-             '<span><span class="dot ho"></span> open point = dominated</span>'
              f'<span><span class=hexwrap style="margin-left:0">{HEX_MARK}</span> '
              'found through the challenge (unmarked = literature baseline)</span>'
              '<span class=collegend><b>columns:</b> '
@@ -1288,7 +1274,7 @@ def build():
              '&middot; <b>kd&sup2;/n</b> figure of merit, higher is better '
              '&middot; <b>w</b> max check weight</span>'
              '</div>')
-    P.append(unified_board(entries, tracks))
+    P.append(board_table(entries, records))
     P.append('</div>')  # close the main content wrap; footer is full-width
     P.append(
         '<footer class=foot><div class=footmain>'
