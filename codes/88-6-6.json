@@ -608,7 +608,9 @@
  },
  "provenance": {
   "authors": [
-   "Liang, Eberhardt, Chen"
+   "Liang, Zijian",
+   "Eberhardt, Jens Niklas",
+   "Chen, Yu-An"
   ],
   "origin": "baseline",
   "construction": "Liang-Eberhardt-Chen k=6 family f=1+x+x^-1y^-2, g=1+y+xy^-1; notched (6,8).",

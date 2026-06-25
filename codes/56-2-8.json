@@ -491,7 +491,8 @@
  },
  "provenance": {
   "authors": [
-   "Wang, Pryadko"
+   "Wang, Renren",
+   "Pryadko, Leonid P."
   ],
   "origin": "baseline",
   "construction": "Generalized bicycle code, circulant size 28, a(x) = 1 + x^1 + x^2 + x^4, b(x) = 1 + x^19.",

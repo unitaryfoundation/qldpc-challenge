@@ -255,7 +255,7 @@
  },
  "provenance": {
   "authors": [
-   "Kitaev"
+   "Kitaev, A. Yu."
   ],
   "origin": "baseline",
   "construction": "Rotated toric code on an 6x6 torus, distance 6.",

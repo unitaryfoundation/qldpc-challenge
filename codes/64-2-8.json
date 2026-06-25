@@ -427,7 +427,7 @@
  },
  "provenance": {
   "authors": [
-   "Kitaev"
+   "Kitaev, A. Yu."
   ],
   "origin": "baseline",
   "construction": "Rotated toric code on an 8x8 torus, distance 8.",

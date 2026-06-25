@@ -742,7 +742,7 @@ def authors_html(lst):
             out.append(f'<a href="https://github.com/{h[1:]}">{h}</a>')
         else:
             out.append(html.escape(h))
-    return ", ".join(out)
+    return " and ".join(out)
 
 
 def detail_page(e):
