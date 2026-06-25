@@ -19,8 +19,11 @@ What "verified" means per field:
               the claimed Pauli type and weight -> certifies d_side <= value
               as an UPPER BOUND. 'exact' claims are downgraded to upper_bound
               here and flagged for server certification.
-  locality    coordinates present for all n qubits; measured interaction
-              radius (max check diameter) <= claim.
+  locality    for a 2d-local-* track: a layout (coordinates for all n qubits)
+              is required; at most `layers` qubits per site and distinct sites
+              >= 1 apart (no cramming a small radius); measured interaction
+              radius (max check diameter) within the track cap. Reports layout
+              diagnostics (radius, qubits/site, spacing, density, bbox).
 """
 
 import json
@@ -239,26 +242,85 @@ def _verify_semantic(doc, report, record, refute=False):
         except Exception as e:
             record("distance_not_refuted", True, f"skipped ({type(e).__name__}: {e})")
 
-    # 9. locality (optional)
-    if "locality" in doc:
-        loc = doc["locality"]
+    # 9. locality / geometric 2D embedding. The 2d-local-* tracks rank codes by
+    #    how short-range their checks are, so membership has to be *proven*, not
+    #    asserted. Three things make a locality claim honest:
+    #      (a) a layout: a coordinate for every qubit;
+    #      (b) no cramming: at most `layers` qubits may share a site (the
+    #          flip-chip stack) and any two distinct sites are >= 1 apart, so a
+    #          check of diameter r genuinely spans r grid units and a small
+    #          radius cannot be faked by collapsing qubits onto a point;
+    #      (c) short range: the measured interaction radius (largest check
+    #          diameter) is within the track's cap.
+    #    A code that claims a 2d-local track with no layout, or whose layout
+    #    fails (b)/(c), is rejected -- it does not sit on the 2D-local frontier
+    #    for free. Radius caps are calibrated above the seeded planar baselines
+    #    (max measured 4.472 on bilayer) with margin; see TRACKS.md.
+    LOCAL_TRACKS = {
+        "2d-local-single":  {"max_layers": 1, "radius_cap": 4.0},
+        "2d-local-bilayer": {"max_layers": 2, "radius_cap": 6.0},
+    }
+    claimed_local = [t for t in doc.get("tracks", []) if t in LOCAL_TRACKS]
+    loc = doc.get("locality")
+    if claimed_local and loc is None:
+        record("locality_block_present", False,
+               f"tracks {claimed_local} require a `locality` block with a qubit "
+               f"layout; none provided, so 2D-locality is unproven")
+    elif loc is not None:
         coords = loc["coordinates"]
-        record("coordinates_cover_all_qubits", len(coords) == n,
+        layers = loc.get("layers", 1)
+        cover = len(coords) == n
+        record("coordinates_cover_all_qubits", cover,
                f"{len(coords)} coords, n={n}")
-        if len(coords) == n:
+        if cover:
+            pts = [tuple(c) for c in coords]
+
             def diam(sup):
-                pts = [coords[q] for q in sup]
-                return max((math.dist(a, b) for a in pts for b in pts),
+                ps = [coords[q] for q in sup]
+                return max((math.dist(a, b) for a in ps for b in ps),
                            default=0.0)
             radius = max((diam(s) for s in doc["checks"]["X"]
                           + doc["checks"]["Z"]), default=0.0)
-            report["computed"]["interaction_radius"] = round(radius, 4)
+
+            from collections import Counter
+            mult = Counter(pts)
+            max_mult = max(mult.values())
+            sites = sorted(mult)
+            min_spacing = min((math.dist(a, b)
+                               for i, a in enumerate(sites)
+                               for b in sites[i + 1:]), default=float("inf"))
+            xs = [p[0] for p in pts]
+            ys = [p[1] for p in pts]
+            bbox = [round(max(xs) - min(xs), 4), round(max(ys) - min(ys), 4)]
+            area = bbox[0] * bbox[1]
+            report["computed"]["locality"] = {
+                "interaction_radius": round(radius, 4),
+                "layers": layers,
+                "max_qubits_per_site": max_mult,
+                "min_site_spacing": (round(min_spacing, 4)
+                                     if min_spacing != float("inf") else None),
+                "qubits_per_unit_area": round(len(pts) / area, 4) if area else None,
+                "bbox": bbox,
+            }
             if "interaction_radius" in loc:
                 record("interaction_radius_within_claim",
                        radius <= loc["interaction_radius"] + 1e-9,
                        f"measured {radius:.4f} <= claim "
                        f"{loc['interaction_radius']}")
-            report["computed"]["layers"] = loc.get("layers")
+            # strict track rules bite only when a 2d-local track is claimed.
+            for t in claimed_local:
+                spec = LOCAL_TRACKS[t]
+                record(f"{t}_layers_within_cap", layers <= spec["max_layers"],
+                       f"layers={layers} <= {spec['max_layers']}")
+                record(f"{t}_no_qubit_cramming",
+                       max_mult <= layers and min_spacing >= 1.0 - 1e-9,
+                       f"<= {layers} qubits/site (measured {max_mult}); "
+                       f"distinct sites >= 1 apart (measured "
+                       f"{min_spacing:.4f})")
+                record(f"{t}_radius_within_cap",
+                       radius <= spec["radius_cap"] + 1e-9,
+                       f"interaction radius {radius:.4f} <= cap "
+                       f"{spec['radius_cap']}")
 
     return report
 

@@ -105,6 +105,35 @@ def main():
               not r["ok"]
               and "interaction_radius_within_claim" in failed_checks(r))
 
+    # 7a. claims a 2d-local track but ships no layout: 2D-locality is unproven
+    if any(t.startswith("2d-local") for t in GOOD.get("tracks", [])):
+        d = copy.deepcopy(GOOD)
+        d.pop("locality", None)
+        r = rep(d)
+        check("2d-local track without a locality block rejected",
+              not r["ok"] and "locality_block_present" in failed_checks(r))
+
+        # 7b. crammed layout: collapse qubits onto a sub-unit-spaced line so the
+        #     radius looks tiny -- the spacing rule must catch the fake
+        d = copy.deepcopy(GOOD)
+        d["locality"]["coordinates"] = [[0.001 * i, 0.0] for i in range(d["n"])]
+        d["locality"].pop("interaction_radius", None)
+        r = rep(d)
+        check("crammed (sub-unit spacing) layout rejected",
+              not r["ok"]
+              and any("no_qubit_cramming" in c for c in failed_checks(r)))
+
+        # 7c. honest spacing but long range: spread qubits on a unit line so a
+        #     check spans far beyond the track radius cap
+        d = copy.deepcopy(GOOD)
+        d["locality"]["coordinates"] = [[float(i), 0.0] for i in range(d["n"])]
+        d["locality"]["layers"] = 1
+        d["locality"].pop("interaction_radius", None)
+        r = rep(d)
+        check("over-radius (non-local) layout rejected",
+              not r["ok"]
+              and any("radius_within_cap" in c for c in failed_checks(r)))
+
     # 8. malformed: missing a required field, must not crash
     d = copy.deepcopy(GOOD)
     del d["checks"]
