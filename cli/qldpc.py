@@ -28,6 +28,7 @@ Input:
 """
 
 import argparse
+import datetime
 import json
 import os
 import subprocess
@@ -146,7 +147,8 @@ def build_submission(HX, HZ, args):
     }
     prov = {"authors": args.authors,
             "construction": args.construction or "contributed via qldpc submit",
-            "origin": "submission"}
+            "origin": "submission",
+            "date": args.date or datetime.date.today().isoformat()}
     if args.model:
         prov["model"] = args.model
     if args.notes:
@@ -261,6 +263,8 @@ def main(argv=None):
                    help="self-reported model that produced it, e.g. 'Opus 4.8' "
                         "or 'human' (claimed, not verified)")
     s.add_argument("--notes", default="")
+    s.add_argument("--date", default="",
+                   help="submission date (YYYY-MM-DD); defaults to today")
     s.add_argument("--name", default="")
     s.add_argument("--tracks", nargs="*",
                    help="track ids (default: auto by weight, + 2d-local if "
