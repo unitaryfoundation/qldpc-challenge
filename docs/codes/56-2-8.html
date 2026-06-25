@@ -162,6 +162,14 @@ font-size:11px}
 .auth{color:var(--mut);font-size:13px}
 .board td.date{color:var(--mut);font-size:13px;white-space:nowrap}
 .board td.model{color:var(--mut);font-size:13px;white-space:nowrap}
+/* Let the wide board scroll instead of crushing columns, and progressively
+   drop the secondary metadata columns (model, then date) on smaller screens.
+   Under the breakpoints the table sizes to content so freed space redistributes
+   cleanly. */
+.boardscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:880px){table.board{table-layout:auto;min-width:600px}
+.board .model{display:none}}
+@media(max-width:680px){.board .date{display:none}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
 .submithint{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
 font-size:14px}
@@ -267,7 +275,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=kv><b>authors</b> Wang, Renren and Pryadko, Leonid P.</div>
 <div class=kv><b>construction</b> Generalized bicycle code, circulant size 28, a(x) = 1 + x<sup>1</sup> + x<sup>2</sup> + x<sup>4</sup>, b(x) = 1 + x<sup>19</sup>.</div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2203.17216">arXiv:2203.17216</a></div>
-<div class=kv><b>date</b> 2022</div>
+<div class=kv><b>date</b> 2022-03-31</div>
 <div class=kv><b>notes</b> Distance d=8 from arXiv:2203.17216; witness here is a decoder-found logical operator of that weight (upper bound).</div>
 <div class=kv><b>tracks</b> generalized bicycle</div>
 </section>

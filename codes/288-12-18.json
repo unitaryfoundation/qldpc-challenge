@@ -2376,7 +2376,7 @@
   ],
   "origin": "baseline",
   "construction": "Bivariate bicycle code, orders (12, 12), A=x**3 + y**7 + y**2, B=x**2 + x + y**3 (periodic boundary conditions).",
-  "date": "2024",
+  "date": "2023-08-15",
   "references": [
    "arXiv:2308.07915"
   ],
