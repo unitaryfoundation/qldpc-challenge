@@ -1294,9 +1294,11 @@ def board_table(entries, records):
             'the code; self-reported, not verified">model</th>'
             '<th class=date data-c=date title="publication date for literature, '
             'submission date for contributions">date</th></tr></thead>')
+    # Default ordering: the headline kd^2/n efficiency, highest first, with
+    # (k, d, n) as tiebreakers. Clicking a header re-sorts from here.
     order = sorted(range(len(entries)),
-                   key=lambda i: (-entries[i]["k"], -entries[i]["d"],
-                                  entries[i]["n"]))
+                   key=lambda i: (-entries[i]["eff"], -entries[i]["k"],
+                                  -entries[i]["d"], entries[i]["n"]))
     rows = []
     for i in order:
         e = entries[i]
