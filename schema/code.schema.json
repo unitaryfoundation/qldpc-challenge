@@ -58,7 +58,7 @@
         },
         "construction": {"type": "string", "minLength": 1, "description": "how the code was built (family, polynomials, search, reference)"},
         "references": {"type": "array", "items": {"type": "string"}},
-        "date": {"type": "string", "format": "date"},
+        "date": {"type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}-[0-9]{2})?$", "description": "publication date for a literature baseline (a year is enough) or submission date (YYYY-MM-DD) for a contribution"},
         "notes": {"type": "string"}
       }
     },
