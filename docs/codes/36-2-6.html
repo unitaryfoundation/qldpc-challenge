@@ -1,27 +1,28 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[36,2,6]] · qLDPC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel=stylesheet><style>
-:root{--ink:#0f172a;--mut:#64748b;--ln:#e2e8f0;--ac:#4f46e5;--ex:#059669;
---corr:#d97706;--exb:#34d399;--dark:#0b1020;--bg:#fff;--soft:#f8fafc}
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[36,2,6]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><style>
+:root{--ink:#0f172a;--mut:#64748b;--ln:#e2e8f0;--ac:#36006c;--ex:#059669;
+--corr:#d97706;--exb:#ffff00;--dark:#111111;--bg:#fff;--soft:#f8fafc}
 *{box-sizing:border-box}
-/* Use a locally-installed Blippo if present (no font file is shipped, so no
-   redistribution of a commercial font); fall back to Inter otherwise. */
-@font-face{font-family:'Blippo';font-display:swap;
-src:local('Blippo Black'),local('Blippo-Black'),local('BlippoBlack'),
-local('Blippo')}
-body{font-family:'Blippo','Inter',system-ui,-apple-system,sans-serif;
+/* Unitary Foundation type stack: Space Grotesk for display/headings, Manrope
+   for body, Space Mono for code. Loaded from Google Fonts in head(). */
+body{font-family:'Manrope',system-ui,-apple-system,sans-serif;
 color:var(--ink);margin:0;background:var(--bg);line-height:1.55}
-.mono{font-family:'Blippo',ui-monospace,'SF Mono',Menlo,monospace;
-font-weight:600}
+h1,h2,h3,.brand h1,.codehead .big,.lbh,.ph{font-family:'Space Grotesk',
+'Manrope',system-ui,sans-serif;letter-spacing:-.01em}
+.mono{font-family:'Space Mono',ui-monospace,'SF Mono',Menlo,monospace;
+font-weight:700}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
 header.hero{background:
-radial-gradient(115% 130% at 50% -25%,rgba(79,70,229,.5),transparent 62%),
+radial-gradient(115% 130% at 50% -25%,rgba(255,255,0,.18),transparent 60%),
 repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
 repeating-linear-gradient(90deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
-var(--dark);color:#fff;padding:62px 0 54px;
-border-bottom:1px solid rgba(255,255,255,.08)}
+var(--dark);color:#fff;padding:54px 0 50px;
+border-bottom:4px solid #ffff00}
 .brand{display:flex;align-items:center;justify-content:space-between;
-gap:16px;margin:0 0 8px}
+gap:16px;margin:0 0 18px}
 .brandmark{display:flex;align-items:center;gap:16px}
-.brand .brandmark svg{flex:0 0 auto;filter:drop-shadow(0 4px 14px rgba(0,0,0,.35))}
+.brand .brandmark svg{flex:0 0 auto}
+.uflogo{height:38px;width:auto;display:block;
+filter:drop-shadow(0 4px 14px rgba(0,0,0,.35))}
 .ghlink{display:inline-flex;align-items:center;gap:8px;color:#fff;
 text-decoration:none;font-size:14px;font-weight:600;
 border:1px solid rgba(255,255,255,.28);border-radius:9px;padding:8px 14px;
@@ -29,14 +30,14 @@ background:rgba(255,255,255,.08)}
 .ghlink:hover{background:rgba(255,255,255,.18)}
 header.hero h1{font-size:clamp(30px,6vw,44px);margin:0;letter-spacing:-1px}
 header.hero h1 a{color:#fff}
-header.hero p{font-size:18px;max-width:640px;margin:0;color:#dbeafe}
-header.hero p a{color:#fff;text-decoration:underline}
+header.hero p{font-size:18px;max-width:640px;margin:0;color:#e4e4e7}
+header.hero p a{color:#ffff00;text-decoration:underline}
 .topnav{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
-.topnav a{display:inline-flex;align-items:center;gap:7px;color:#dbeafe;
+.topnav a{display:inline-flex;align-items:center;gap:7px;color:#e4e4e7;
 font-size:14px;font-weight:600;padding:7px 14px;
 border:1px solid rgba(255,255,255,.18);border-radius:8px;
 background:rgba(255,255,255,.06)}
-.topnav a:hover{background:rgba(255,255,255,.16);color:#fff}
+.topnav a:hover{background:#ffff00;color:#111;border-color:#ffff00}
 .stats{display:flex;gap:40px;margin-top:30px;flex-wrap:wrap}
 .stat .v{font-size:30px;font-weight:700}.stat .l{color:#c7d2fe;font-size:13px;
 text-transform:uppercase;letter-spacing:.05em}
@@ -44,7 +45,7 @@ text-transform:uppercase;letter-spacing:.05em}
 gap:14px;margin:28px 0 8px}
 .stat-card{border:1px solid var(--ln);border-radius:14px;padding:18px 20px;
 background:var(--soft)}
-.stat-card.hero{border-color:var(--ac);background:#f5f3ff}
+.stat-card.hero{border-color:var(--ac);background:#fffbe0}
 .stat-card .v{font-size:34px;font-weight:700;line-height:1.05}
 .stat-card.hero .v{color:var(--ac)}
 .stat-card .l{font-size:13px;color:var(--mut);margin-top:6px}
@@ -92,7 +93,7 @@ vertical-align:-1px;margin-right:2px}
 .dot.ex{background:var(--ex)}.dot.ac{background:var(--ac)}
 .dot.ho{background:#fff;border:2px solid var(--ac)}
 .swatch{display:inline-block;width:18px;height:11px;vertical-align:-1px;
-margin-right:3px;background:#f5f3ff;border-left:3px solid var(--ac)}
+margin-right:3px;background:#fffbe0;border-left:3px solid var(--ac)}
 h2.track{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}
 .tcount{color:var(--mut);font-size:14px;font-weight:400}
@@ -118,10 +119,10 @@ font-variant-numeric:tabular-nums}
 .board td.auth{white-space:normal}
 .hexwrap{display:inline-flex;align-items:center;margin-left:8px}
 .hexmark{color:var(--ac);vertical-align:-2px}
-.board tbody tr{cursor:pointer}.board tbody tr:hover{background:#eef2ff}
-.board tr.fr{background:#f5f3ff}.board tr.fr td:first-child{
+.board tbody tr{cursor:pointer}.board tbody tr:hover{background:#f6f3fb}
+.board tr.fr{background:#fffbe0}.board tr.fr td:first-child{
 box-shadow:inset 3px 0 0 var(--ac)}
-.board tr.fr:hover{background:#ecebff}
+.board tr.fr:hover{background:#fff6c4}
 .board tbody tr.xh,.board tbody tr.fr.xh{background:#fef3c7}
 .board tbody tr.xh td:first-child{box-shadow:inset 3px 0 0 #f59e0b}
 .typecell{white-space:normal!important}
@@ -133,7 +134,7 @@ border:1px solid var(--ln);white-space:nowrap}
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
 font-family:inherit}
 #boardsearch:focus{outline:none;border-color:var(--ac);
-box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+box-shadow:0 0 0 3px rgba(54,0,108,.15)}
 .searchcount{font-size:13px;color:var(--mut);white-space:nowrap}
 .typepills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
 .typepill{font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;
@@ -233,7 +234,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=cell title="figure of merit, higher is better"><div class=l>kd&sup2;/n</div><div class=v>2.0</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>4</div></div>
 </div>
-<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B36%2C2%2C6%5D%5D%20quantum%20LDPC%20code%20on%20the%20qLDPC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B36%2C2%2C6%5D%5D%20quantum%20LDPC%20code%20on%20the%20qLDPC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B36%2C2%2C6%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B36%2C2%2C6%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/36-2-6.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
 <section class=blk><h3>Distance</h3>
 <div class=kv><b>d_X</b> 6 &middot; witness weight 6 (claimed exact)</div>
 <details><summary>witness operator (support, 6 qubits)</summary><div class=wit>[3, 9, 14, 20, 26, 32]</div></details>

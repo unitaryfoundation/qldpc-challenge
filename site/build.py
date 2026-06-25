@@ -123,13 +123,16 @@ REPO = REPO_ROOT + "/blob/main"
 SITE_URL = "https://unitaryfoundation.github.io/qldpc-challenge"
 
 # Palette (single source of truth; the CSS :root and the inline SVGs all draw
-# from these). Greens have two intentional roles: EXACT (deep) for text/marks
-# on light backgrounds, GREEN_BRIGHT for marks on the dark surface.
-ACCENT = "#4f46e5"        # brand indigo (links, accents, hero glow)
+# from these). Adopts the Unitary Foundation brand: deep purple as the readable
+# primary accent, signature bright yellow as the highlight (records, hero glow,
+# logo node), near-black surfaces. Green/amber are kept as functional tier
+# signals (certified exact / corroborated) for chart and badge legibility.
+ACCENT = "#36006c"        # UF deep purple (links, accents, stars) — reads on white
+HILITE = "#ffff00"        # UF signature yellow (highlight node, hero glow, records)
 EXACT = "#059669"         # certified-exact green, on light backgrounds
 CORR = "#d97706"          # heuristically-corroborated amber (between exact and ub)
-GREEN_BRIGHT = "#34d399"  # green on the dark surface (logo highlight)
-DARK = "#0b1020"          # deep surface: hero background + logo/UI tiles
+GREEN_BRIGHT = HILITE     # marks on the dark surface (logo highlight) — now yellow
+DARK = "#111111"          # near-black surface: hero background + logo/UI tiles
 
 # Logo mark: a six-node cyclic graph (the node-and-edge structure associated
 # with qLDPC / Tanner graphs) on a dark tile, one node highlighted. Used for
@@ -149,6 +152,41 @@ stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
 
 FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
            + MARK + "</svg>")
+
+# The Unitary Foundation wordmark (yellow notched block + black lettering), used
+# in the hero to co-brand the challenge as a UF project. Sized via CSS (.uflogo);
+# the black text reads on the yellow block against any background.
+UF_LOGO = (
+    '<svg class=uflogo viewBox="0 0 295 69" fill="none" '
+    'xmlns="http://www.w3.org/2000/svg" role="img" '
+    'aria-label="Unitary Foundation">'
+    '<path fill-rule="evenodd" clip-rule="evenodd" d="M197.618 0.5H0.166016V68.5'
+    'H294.833V35.2556H197.618V0.5Z" fill="#FFFF00"/>'
+    '<path d="M30.4623 32.9741H0.166992V2.67886H6.36507V27.0078H24.4959V2.67886'
+    'H30.4623V32.9741ZM60.977 8.87694V32.9741H55.0106V14.8433H42.8462V32.9741'
+    'H36.8798V8.87694H60.977ZM73.1668 1.11486V5.80686H67.2004V1.11486H73.1668Z'
+    'M67.2004 9.22449H73.1668V32.9741H67.2004V9.22449ZM85.329 14.8433V27.0078'
+    'H97.4934V32.9741H79.3626V0.999007H85.329V8.87694H97.4934V14.8433H85.329Z'
+    'M127.959 8.81901V32.9162H103.63V18.4347H121.761V14.4958H103.63V8.81901'
+    'H127.959ZM121.761 27.5291V23.3584H109.828V27.5291H121.761ZM153.007 8.87694'
+    'V20.8097H146.809V14.8433H140.206V32.9741H134.008V8.87694H153.007ZM182.542 '
+    '32.9741L172.463 42.9374H167.771V39.0563L174.085 32.9741H158.445V8.87694'
+    'H164.411V27.0078H176.576V8.87694H182.542V32.9741Z" fill="black"/>'
+    '<path d="M6.13336 44.4082V50.6062H30.2306V56.5726H6.13336V68.7371H0.166992'
+    'V38.4418H30.2306V44.4082H6.13336ZM61.2087 44.6399V68.7371H36.8798V44.6399'
+    'H61.2087ZM55.0106 50.6062H43.0779V62.7707H55.0106V50.6062ZM91.5239 68.7371'
+    'H67.4267V44.6399H73.3931V62.7707H85.5575V44.6399H91.5239V68.7371ZM121.731 '
+    '44.6399V68.7371H115.765V50.6062H103.601V68.7371H97.6342V44.6399H121.731Z'
+    'M152.284 36.5882V68.7371H127.955V44.6399H146.086V36.5882H152.284ZM146.086 '
+    '62.7707V50.6062H133.921V62.7707H146.086ZM182.604 44.5819V68.6791H158.275'
+    'V54.1977H176.406V50.2587H158.275V44.5819H182.604ZM176.406 63.292V59.1214'
+    'H164.473V63.292H176.406ZM194.619 50.6062V62.7707H206.783V68.7371H188.653'
+    'V36.7619H194.619V44.6399H206.783V50.6062H194.619ZM218.887 36.8778V41.5698'
+    'H212.92V36.8778H218.887ZM212.92 44.9874H218.887V68.7371H212.92V44.9874Z'
+    'M249.411 44.6399V68.7371H225.083V44.6399H249.411ZM243.213 50.6062H231.281'
+    'V62.7707H243.213V50.6062ZM279.727 44.6399V68.7371H273.76V50.6062H261.596'
+    'V68.7371H255.629V44.6399H279.727Z" fill="black"/>'
+    '</svg>')
 
 # Small inline copy of the site mark (the hexagon graph), without the dark
 # tile and recoloured to the accent so it reads on a light row. Used to flag a
@@ -213,26 +251,27 @@ CSS = f"""
 :root{{--ink:#0f172a;--mut:#64748b;--ln:#e2e8f0;--ac:{ACCENT};--ex:{EXACT};
 --corr:{CORR};--exb:{GREEN_BRIGHT};--dark:{DARK};--bg:#fff;--soft:#f8fafc}}
 *{{box-sizing:border-box}}
-/* Use a locally-installed Blippo if present (no font file is shipped, so no
-   redistribution of a commercial font); fall back to Inter otherwise. */
-@font-face{{font-family:'Blippo';font-display:swap;
-src:local('Blippo Black'),local('Blippo-Black'),local('BlippoBlack'),
-local('Blippo')}}
-body{{font-family:'Blippo','Inter',system-ui,-apple-system,sans-serif;
+/* Unitary Foundation type stack: Space Grotesk for display/headings, Manrope
+   for body, Space Mono for code. Loaded from Google Fonts in head(). */
+body{{font-family:'Manrope',system-ui,-apple-system,sans-serif;
 color:var(--ink);margin:0;background:var(--bg);line-height:1.55}}
-.mono{{font-family:'Blippo',ui-monospace,'SF Mono',Menlo,monospace;
-font-weight:600}}
+h1,h2,h3,.brand h1,.codehead .big,.lbh,.ph{{font-family:'Space Grotesk',
+'Manrope',system-ui,sans-serif;letter-spacing:-.01em}}
+.mono{{font-family:'Space Mono',ui-monospace,'SF Mono',Menlo,monospace;
+font-weight:700}}
 .wrap{{max-width:1080px;margin:0 auto;padding:0 24px}}
 header.hero{{background:
-radial-gradient(115% 130% at 50% -25%,rgba(79,70,229,.5),transparent 62%),
+radial-gradient(115% 130% at 50% -25%,rgba(255,255,0,.18),transparent 60%),
 repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
 repeating-linear-gradient(90deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
-var(--dark);color:#fff;padding:62px 0 54px;
-border-bottom:1px solid rgba(255,255,255,.08)}}
+var(--dark);color:#fff;padding:54px 0 50px;
+border-bottom:4px solid {HILITE}}}
 .brand{{display:flex;align-items:center;justify-content:space-between;
-gap:16px;margin:0 0 8px}}
+gap:16px;margin:0 0 18px}}
 .brandmark{{display:flex;align-items:center;gap:16px}}
-.brand .brandmark svg{{flex:0 0 auto;filter:drop-shadow(0 4px 14px rgba(0,0,0,.35))}}
+.brand .brandmark svg{{flex:0 0 auto}}
+.uflogo{{height:38px;width:auto;display:block;
+filter:drop-shadow(0 4px 14px rgba(0,0,0,.35))}}
 .ghlink{{display:inline-flex;align-items:center;gap:8px;color:#fff;
 text-decoration:none;font-size:14px;font-weight:600;
 border:1px solid rgba(255,255,255,.28);border-radius:9px;padding:8px 14px;
@@ -240,14 +279,14 @@ background:rgba(255,255,255,.08)}}
 .ghlink:hover{{background:rgba(255,255,255,.18)}}
 header.hero h1{{font-size:clamp(30px,6vw,44px);margin:0;letter-spacing:-1px}}
 header.hero h1 a{{color:#fff}}
-header.hero p{{font-size:18px;max-width:640px;margin:0;color:#dbeafe}}
-header.hero p a{{color:#fff;text-decoration:underline}}
+header.hero p{{font-size:18px;max-width:640px;margin:0;color:#e4e4e7}}
+header.hero p a{{color:{HILITE};text-decoration:underline}}
 .topnav{{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}}
-.topnav a{{display:inline-flex;align-items:center;gap:7px;color:#dbeafe;
+.topnav a{{display:inline-flex;align-items:center;gap:7px;color:#e4e4e7;
 font-size:14px;font-weight:600;padding:7px 14px;
 border:1px solid rgba(255,255,255,.18);border-radius:8px;
 background:rgba(255,255,255,.06)}}
-.topnav a:hover{{background:rgba(255,255,255,.16);color:#fff}}
+.topnav a:hover{{background:{HILITE};color:#111;border-color:{HILITE}}}
 .stats{{display:flex;gap:40px;margin-top:30px;flex-wrap:wrap}}
 .stat .v{{font-size:30px;font-weight:700}}.stat .l{{color:#c7d2fe;font-size:13px;
 text-transform:uppercase;letter-spacing:.05em}}
@@ -255,7 +294,7 @@ text-transform:uppercase;letter-spacing:.05em}}
 gap:14px;margin:28px 0 8px}}
 .stat-card{{border:1px solid var(--ln);border-radius:14px;padding:18px 20px;
 background:var(--soft)}}
-.stat-card.hero{{border-color:var(--ac);background:#f5f3ff}}
+.stat-card.hero{{border-color:var(--ac);background:#fffbe0}}
 .stat-card .v{{font-size:34px;font-weight:700;line-height:1.05}}
 .stat-card.hero .v{{color:var(--ac)}}
 .stat-card .l{{font-size:13px;color:var(--mut);margin-top:6px}}
@@ -303,7 +342,7 @@ vertical-align:-1px;margin-right:2px}}
 .dot.ex{{background:var(--ex)}}.dot.ac{{background:var(--ac)}}
 .dot.ho{{background:#fff;border:2px solid var(--ac)}}
 .swatch{{display:inline-block;width:18px;height:11px;vertical-align:-1px;
-margin-right:3px;background:#f5f3ff;border-left:3px solid var(--ac)}}
+margin-right:3px;background:#fffbe0;border-left:3px solid var(--ac)}}
 h2.track{{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}}
 .tcount{{color:var(--mut);font-size:14px;font-weight:400}}
@@ -329,10 +368,10 @@ font-variant-numeric:tabular-nums}}
 .board td.auth{{white-space:normal}}
 .hexwrap{{display:inline-flex;align-items:center;margin-left:8px}}
 .hexmark{{color:var(--ac);vertical-align:-2px}}
-.board tbody tr{{cursor:pointer}}.board tbody tr:hover{{background:#eef2ff}}
-.board tr.fr{{background:#f5f3ff}}.board tr.fr td:first-child{{
+.board tbody tr{{cursor:pointer}}.board tbody tr:hover{{background:#f6f3fb}}
+.board tr.fr{{background:#fffbe0}}.board tr.fr td:first-child{{
 box-shadow:inset 3px 0 0 var(--ac)}}
-.board tr.fr:hover{{background:#ecebff}}
+.board tr.fr:hover{{background:#fff6c4}}
 .board tbody tr.xh,.board tbody tr.fr.xh{{background:#fef3c7}}
 .board tbody tr.xh td:first-child{{box-shadow:inset 3px 0 0 #f59e0b}}
 .typecell{{white-space:normal!important}}
@@ -344,7 +383,7 @@ border:1px solid var(--ln);white-space:nowrap}}
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
 font-family:inherit}}
 #boardsearch:focus{{outline:none;border-color:var(--ac);
-box-shadow:0 0 0 3px rgba(79,70,229,.12)}}
+box-shadow:0 0 0 3px rgba(54,0,108,.15)}}
 .searchcount{{font-size:13px;color:var(--mut);white-space:nowrap}}
 .typepills{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}}
 .typepill{{font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;
@@ -532,8 +571,9 @@ def head(title, rel=""):
         f'<link rel=icon type="image/svg+xml" href="{rel}favicon.svg">',
         '<link rel=preconnect href="https://fonts.googleapis.com">',
         '<link rel=preconnect href="https://fonts.gstatic.com" crossorigin>',
-        '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;'
-        '600;700&display=swap" rel=stylesheet>',
+        '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;'
+        '600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;'
+        '700&display=swap" rel=stylesheet>',
         f"<style>{CSS}</style></head><body>"]))
 
 
@@ -708,7 +748,7 @@ def authors_html(lst):
 def detail_page(e):
     doc, cert = e["doc"], e["cert"]
     n, k, d = e["n"], e["k"], e["d"]
-    P = [head(f"[[{n},{k},{d}]] · qLDPC Challenge", rel="../")]
+    P = [head(f"[[{n},{k},{d}]] · QEC Challenge", rel="../")]
     P.append('<div class=wrap>')
     P.append('<a class=back href="../index.html">&larr; back to the board</a>')
     P.append(f'<div class=codehead><span class="mono big">[[{n},{k},{d}]]</span> '
@@ -736,7 +776,7 @@ def detail_page(e):
 
     # share: a link back to this entry plus pre-filled posts
     url = f"{SITE_URL}/codes/{e['slug']}.html"
-    msg = f"[[{n},{k},{d}]] quantum LDPC code on the qLDPC Challenge"
+    msg = f"[[{n},{k},{d}]] quantum LDPC code on the QEC Challenge"
     q = urllib.parse.quote
     x_url = f"https://twitter.com/intent/tweet?text={q(msg)}&url={q(url)}"
     bsky_url = f"https://bsky.app/intent/compose?text={q(msg + ' ' + url)}"
@@ -881,7 +921,7 @@ def references_page(entries):
             if k and ent["slug"] not in [c[0] for c in citers.get(k, [])]:
                 citers.setdefault(k, []).append(
                     (ent["slug"], ent["n"], ent["k"], ent["d"]))
-    P = [head("References | qLDPC Challenge", rel="")]
+    P = [head("References | QEC Challenge", rel="")]
     P.append('<div class=wrap>')
     P.append('<a class=back href="index.html">&larr; back to the board</a>')
     P.append('<h1 style="margin:.4rem 0 0">References</h1>')
@@ -1059,7 +1099,7 @@ FAQ = [
 
 
 def faq_page():
-    P = [head("FAQ | qLDPC Challenge", rel="")]
+    P = [head("FAQ | QEC Challenge", rel="")]
     P.append('<div class=wrap>')
     P.append('<a class=back href="index.html">&larr; back to the board</a>')
     P.append('<h1 style="margin:.4rem 0 0">FAQ</h1>')
@@ -1223,13 +1263,14 @@ def build():
     best_eff = max((e["eff"] for e in entries), default=0)
     records = compute_records(entries, tracks)
 
-    P = [head("qLDPC Challenge")]
+    P = [head("QEC Challenge")]
     P.append('<header class=hero><div class=wrap>'
              '<div class=brand>'
              '<span class=brandmark>'
-             f'<svg width=52 height=52 viewBox="0 0 64 64" '
-             f'aria-label="qLDPC Challenge logo">{MARK}</svg>'
-             '<h1>qLDPC Challenge</h1></span></div>'
+             '<a href="https://unitary.foundation" '
+             f'aria-label="Unitary Foundation">{UF_LOGO}</a>'
+             '</span></div>'
+             '<h1>QEC Challenge</h1>'
              '<p>Find better quantum LDPC codes. '
              '<a href="planar_code_challenge.pdf">Read the whitepaper.</a></p>'
              '<nav class=topnav>'
@@ -1280,7 +1321,7 @@ def build():
         '<footer class=foot><div class=footmain>'
         '<div class=footbrand><div class=fb>'
         f'<svg width=34 height=34 viewBox="0 0 64 64" aria-hidden="true">{MARK}'
-        '</svg><span>qLDPC Challenge</span></div>'
+        '</svg><span>QEC Challenge</span></div>'
         '<p>An open, automatically verified leaderboard for quantum '
         'low-density parity-check codes.</p></div>'
         '<nav class=footlinks>'
