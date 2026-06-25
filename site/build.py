@@ -298,6 +298,18 @@ background:var(--soft)}}
 .stat-card .v{{font-size:34px;font-weight:700;line-height:1.05}}
 .stat-card.hero .v{{color:var(--ac)}}
 .stat-card .l{{font-size:13px;color:var(--mut);margin-top:6px}}
+.challenges{{margin:20px 0}}
+.chalh{{margin:0 0 2px;font-size:20px}}
+.chalsub{{margin:0 0 12px;color:var(--mut);font-size:14px}}
+.chalsub code{{background:var(--soft);border:1px solid var(--ln);
+border-radius:6px;padding:2px 6px;font-size:13px}}
+.chalgrid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:14px}}
+.chal{{border:1px solid var(--ln);border-radius:12px;padding:14px 16px;
+background:var(--soft)}}
+.chaltitle{{font-weight:700;margin-bottom:6px}}
+.chalnow{{font-size:13px;color:var(--mut)}}
+.chalgoal{{font-size:14px;margin-top:6px}}
 .lb{{margin:18px 0 8px;border:1px solid var(--ln);border-radius:14px;
 background:#fff;overflow:hidden}}
 .lbhead{{display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -960,6 +972,35 @@ def references_page(entries):
 
 
 
+def open_challenges_panel(entries):
+    """Bars to beat, stated up front so the board reads as a live competition.
+    The current-best figures are derived from the board; the targets are
+    external references (see TRACKS.md)."""
+    loc = [e for e in entries if "2d-local-bilayer" in e["tracks"]]
+    best = max(loc, key=lambda e: e["eff"], default=None)
+    cur2d = (f'best on board kd&sup2;/n {best["eff"]:g} '
+             f'(<a href="codes/{best["slug"]}.html">'
+             f'[[{best["n"]},{best["k"]},{best["d"]}]]</a>)'
+             if best else "no entries yet")
+    cards = [
+        ("2D-local efficiency", cur2d,
+         "reach kd&sup2;/n 9.75, the [[323,14,15]] tile code "
+         "(arXiv:2504.09171), with a verified flip-chip layout."),
+        ("High-rate / large-block", "no verified entries yet",
+         "land a high-rate code with a checkable distance witness. Bars: "
+         "[[9216,4612,&le;48]] and [[16384,4142,&le;40]] "
+         "(Kasai et al, arXiv:2601.08824 / 2604.20838)."),
+    ]
+    body = "".join(f'<div class=chal><div class=chaltitle>{t}</div>'
+                   f'<div class=chalnow>{now}</div>'
+                   f'<div class=chalgoal>{goal}</div></div>'
+                   for t, now, goal in cards)
+    return ('<section class=challenges><h2 class=chalh>Open challenges</h2>'
+            '<p class=chalsub>Bars to beat. Found a better code? '
+            '<code>./qldpc submit mycode.npz --authors @you</code></p>'
+            f'<div class=chalgrid>{body}</div></section>')
+
+
 def progress_panel(entries, n_exact, best_eff):
     """The prominent stats bar at the top of the board: the headline numbers as
     big cards. This is the single home for the board's numbers (the hero carries
@@ -1313,6 +1354,7 @@ def build():
              '</div></header>')
     P.append('<div class=wrap>')
     P.append(progress_panel(entries, n_exact, best_eff))
+    P.append(open_challenges_panel(entries))
     P.append(board_controls(entries, tracks, records))
     P.append(charts_block(entries, records))
     P.append(contributors_panel(entries, tracks))
