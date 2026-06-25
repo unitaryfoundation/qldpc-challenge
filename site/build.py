@@ -398,7 +398,7 @@ font-family:inherit}}
 #boardsearch:focus{{outline:none;border-color:var(--ac);
 box-shadow:0 0 0 3px rgba(54,0,108,.15)}}
 .searchcount{{font-size:13px;color:var(--mut);white-space:nowrap}}
-.typepills{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}}
+.typepills{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}}
 .typepill{{font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;
 border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}}
 .typepill:hover{{border-color:var(--ac);color:var(--ac)}}
@@ -406,28 +406,33 @@ border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}
 .searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px;max-width:80ch}}
 .searchhelp code{{background:var(--soft);padding:1px 5px;border-radius:4px;
 font-size:11px}}
-/* Dual-handle weight range slider: two range inputs share one track, each with
-   only its thumb interactive so both handles stay draggable while overlapping. */
-.wfilter{{display:flex;align-items:center;gap:12px;margin:0 0 10px;
-font-size:13px;color:var(--mut);flex-wrap:wrap}}
-.wflabel{{white-space:nowrap}}
-.wfslider{{position:relative;flex:1 1 180px;max-width:280px;height:24px}}
+/* Weight range slider, styled as a filter pill that sits inline with the type
+   pills. Two overlapping range inputs share one visual track; the native track
+   is full height and transparent so each 16px thumb stays centred on the line
+   (rather than riding above it as a top-aligned thumb would). */
+.wfilter{{display:inline-flex;align-items:center;gap:9px;
+border:1px solid var(--ln);border-radius:999px;padding:4px 12px;background:#fff;
+font-size:12px;color:var(--mut)}}
+.wflabel{{font-weight:600;color:var(--ink);white-space:nowrap}}
+.wfslider{{position:relative;width:118px;height:16px;flex:0 0 auto}}
 .wftrack,.wffill{{position:absolute;top:50%;height:4px;
 transform:translateY(-50%);border-radius:3px}}
 .wftrack{{left:0;right:0;background:var(--ln)}}
 .wffill{{background:var(--ac)}}
-.wfrange{{position:absolute;top:0;left:0;width:100%;height:24px;margin:0;
+.wfrange{{position:absolute;top:0;left:0;width:100%;height:16px;margin:0;
 background:none;pointer-events:none;-webkit-appearance:none;appearance:none}}
 #whi{{z-index:2}}
+.wfrange::-webkit-slider-runnable-track{{-webkit-appearance:none;background:none;
+height:16px}}
 .wfrange::-webkit-slider-thumb{{-webkit-appearance:none;pointer-events:auto;
 width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--ac);
-cursor:pointer}}
+cursor:pointer;box-shadow:0 1px 2px rgba(17,17,17,.25)}}
+.wfrange::-moz-range-track{{background:none;height:16px}}
 .wfrange::-moz-range-thumb{{pointer-events:auto;width:16px;height:16px;
-border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer}}
-.wfrange::-webkit-slider-runnable-track{{background:none;height:24px}}
-.wfrange::-moz-range-track{{background:none}}
+border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer;
+box-shadow:0 1px 2px rgba(17,17,17,.25)}}
 .wfval{{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
-color:var(--ink)}}
+color:var(--ink);min-width:2.4em;text-align:right}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -614,7 +619,12 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  }
  q.addEventListener('input',apply);
  document.querySelectorAll('.typepill').forEach(p=>{
-  p.addEventListener('click',()=>{q.value=p.dataset.q;apply();q.focus();});});
+  p.addEventListener('click',()=>{q.value=p.dataset.q;
+   // 'clear' resets every filter, including the weight slider, since it lives
+   // in this same filter row.
+   if(p.classList.contains('clearpill')&&wlo&&whi){
+    wlo.value=WMIN;whi.value=WMAX;wpaint();}
+   apply();q.focus();});});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
  apply();
@@ -1259,21 +1269,21 @@ def board_controls(entries, tracks, records):
         for t in sorted(tracks))
     weights = [e["w"] for e in entries if e["w"] is not None]
     wmin, wmax = (min(weights), max(weights)) if weights else (0, 0)
-    # Dual-handle range slider over the check weight w (two overlapping range
-    # inputs, styled to share one track). Replaces the old weight-N filter tags;
-    # weight is a plain integer property now, so it is filtered by range.
+    # Dual-handle range slider over the check weight w, styled as a pill so it
+    # sits inline with the type-filter pills as one filter group. Two overlapping
+    # range inputs share one visual track; replaces the old weight-N filter tags.
     wslider = (
-        '<div class=wfilter>'
-        '<span class=wflabel>Check weight <b>w</b></span>'
-        '<div class=wfslider>'
-        '<div class=wftrack></div><div class=wffill id=wffill></div>'
+        '<span class=wfilter title="filter by maximum check weight w">'
+        '<span class=wflabel>weight</span>'
+        '<span class=wfslider>'
+        '<span class=wftrack></span><span class=wffill id=wffill></span>'
         f'<input type=range id=wlo class=wfrange min={wmin} max={wmax} '
         f'value={wmin} step=1 aria-label="minimum check weight">'
         f'<input type=range id=whi class=wfrange min={wmin} max={wmax} '
         f'value={wmax} step=1 aria-label="maximum check weight">'
-        '</div>'
+        '</span>'
         f'<span class=wfval id=wfval>{wmin}&ndash;{wmax}</span>'
-        '</div>')
+        '</span>')
     return ('<section id=board>'
             '<h2 class=track>Codes '
             f'<span class=tcount>&middot; {len(entries)} total, '
@@ -1283,10 +1293,9 @@ def board_controls(entries, tracks, records):
             'placeholder="search, e.g.  w&lt;=6 k&gt;=10 d&gt;=8  or  '
             'eff&gt;5  or  farlab" aria-label="search codes">'
             '<span id=boardcount class=searchcount></span></div>'
-            f'<div class=typepills>{pills}'
+            f'<div class=typepills>{pills}{wslider}'
             '<button type=button class="typepill clearpill" data-q="">'
             'clear</button></div>'
-            f'{wslider}'
             '<p class=searchhelp>Filter with the weight slider, or type terms '
             '(all must match): a type or author name, or a comparison on '
             '<b>n</b>, <b>k</b>, <b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), '
