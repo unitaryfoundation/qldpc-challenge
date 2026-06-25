@@ -18,6 +18,7 @@ The result is a dict you can write to ``codes/your-code.json`` and submit.
     save_submission(doc, "codes/my-code.json")
     # then: uv run python verify/qldpc_verify.py codes/my-code.json
 """
+import datetime
 import json
 import math
 import os
@@ -127,7 +128,7 @@ def make_submission(HX, HZ, *, name, construction, authors, tracks,
             "authors": list(authors),
             "construction": construction,
             "references": list(references) if references else [],
-            "date": date or "",
+            "date": date or datetime.date.today().isoformat(),
             "notes": notes or "",
         },
         "tracks": list(tracks),
