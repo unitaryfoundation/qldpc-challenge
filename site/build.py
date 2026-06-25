@@ -390,6 +390,7 @@ box-shadow:inset 3px 0 0 var(--ac)}}
 .tchip{{display:inline-block;font-size:11px;line-height:1;padding:3px 7px;
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}}
+.tnone{{color:var(--mut)}}
 .searchbar{{display:flex;align-items:center;gap:12px;margin:14px 0 8px}}
 #boardsearch{{flex:1 1 0;min-width:0;font-size:14px;padding:10px 13px;
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
@@ -405,6 +406,28 @@ border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}
 .searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px;max-width:80ch}}
 .searchhelp code{{background:var(--soft);padding:1px 5px;border-radius:4px;
 font-size:11px}}
+/* Dual-handle weight range slider: two range inputs share one track, each with
+   only its thumb interactive so both handles stay draggable while overlapping. */
+.wfilter{{display:flex;align-items:center;gap:12px;margin:0 0 10px;
+font-size:13px;color:var(--mut);flex-wrap:wrap}}
+.wflabel{{white-space:nowrap}}
+.wfslider{{position:relative;flex:1 1 180px;max-width:280px;height:24px}}
+.wftrack,.wffill{{position:absolute;top:50%;height:4px;
+transform:translateY(-50%);border-radius:3px}}
+.wftrack{{left:0;right:0;background:var(--ln)}}
+.wffill{{background:var(--ac)}}
+.wfrange{{position:absolute;top:0;left:0;width:100%;height:24px;margin:0;
+background:none;pointer-events:none;-webkit-appearance:none;appearance:none}}
+#whi{{z-index:2}}
+.wfrange::-webkit-slider-thumb{{-webkit-appearance:none;pointer-events:auto;
+width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--ac);
+cursor:pointer}}
+.wfrange::-moz-range-thumb{{pointer-events:auto;width:16px;height:16px;
+border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer}}
+.wfrange::-webkit-slider-runnable-track{{background:none;height:24px}}
+.wfrange::-moz-range-track{{background:none}}
+.wfval{{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
+color:var(--ink)}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -557,6 +580,9 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  if(!board||!q)return;
  const count=document.getElementById('boardcount');
  const rows=[...board.querySelectorAll('tbody tr')];
+ const wlo=document.getElementById('wlo'),whi=document.getElementById('whi');
+ const wfill=document.getElementById('wffill'),wval=document.getElementById('wfval');
+ const WMIN=wlo?+wlo.min:0,WMAX=wlo?+wlo.max:0,wspan=(WMAX-WMIN)||1;
  const cmp=/^(n|k|d|w|eff)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
@@ -567,10 +593,20 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
   const hay=(r.dataset.name+' '+r.dataset.tracks+' '+r.dataset.auth+' '+(r.dataset.model||'')+' '+(r.dataset.date||'')).toLowerCase();
   return hay.indexOf(t)>=0;
  }
+ // dual-handle weight slider: bounds are the lower/upper of the two handles
+ // (taken symmetrically so the handles may cross without sticking).
+ function wbounds(){if(!wlo||!whi)return[-Infinity,Infinity];
+  return[Math.min(+wlo.value,+whi.value),Math.max(+wlo.value,+whi.value)];}
+ function wpaint(){const b=wbounds();
+  if(wfill){wfill.style.left=((b[0]-WMIN)/wspan*100)+'%';
+   wfill.style.width=((b[1]-b[0])/wspan*100)+'%';}
+  if(wval)wval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
+  const wb=wbounds();
   const vis=new Set();let shown=0;
-  rows.forEach(r=>{const ok=toks.every(t=>term(r,t));
+  rows.forEach(r=>{const w=+r.dataset.w;
+   const ok=(w>=wb[0]&&w<=wb[1])&&toks.every(t=>term(r,t));
    r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
   if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
   document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
@@ -579,6 +615,8 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  q.addEventListener('input',apply);
  document.querySelectorAll('.typepill').forEach(p=>{
   p.addEventListener('click',()=>{q.value=p.dataset.q;apply();q.focus();});});
+ if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
+  whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
  apply();
 })();
 """
@@ -657,11 +695,16 @@ def load_entries():
 
 
 def pareto(te):
+    """Pareto frontier over (n, k, d, w): a code is on it when no other code
+    beats it on all four axes (n and w lower-is-better, k and d higher-is-
+    better) with at least one strict. Check weight w is a ranking axis now that
+    it is a plain code property rather than a track."""
     front = set()
     for i, a in enumerate(te):
         if not any(i != j and b["n"] <= a["n"] and b["k"] >= a["k"]
-                   and b["d"] >= a["d"] and (b["n"] < a["n"] or b["k"] > a["k"]
-                                             or b["d"] > a["d"])
+                   and b["d"] >= a["d"] and b["w"] <= a["w"]
+                   and (b["n"] < a["n"] or b["k"] > a["k"]
+                        or b["d"] > a["d"] or b["w"] < a["w"])
                    for j, b in enumerate(te)):
             front.add(i)
     return front
@@ -863,7 +906,9 @@ def detail_page(e):
         P.append(f'<div class=kv><b>date</b> {html.escape(pr["date"])}</div>')
     if pr.get("notes"):
         P.append(f'<div class=kv><b>notes</b> {html.escape(pr["notes"])}</div>')
-    P.append(f'<div class=kv><b>tracks</b> {html.escape(", ".join(doc["tracks"]))}</div>')
+    P.append('<div class=kv><b>tracks</b> '
+             f'{html.escape(", ".join(doc["tracks"])) or "none (filtered by check weight w)"}'
+             '</div>')
     P.append('</section>')
 
     # parity checks
@@ -1029,11 +1074,7 @@ def contributors_panel(entries, tracks):
     authors of contributed (non-baseline) codes by how many they have on the
     board, then by how many sit on a track frontier, then by best kd2/n. The
     seeded literature authors are not contributors and are excluded."""
-    front_slugs = set()
-    for idxs in tracks.values():
-        te = [entries[i] for i in idxs]
-        for j in pareto(te):
-            front_slugs.add(te[j]["slug"])
+    front_slugs = {entries[i]["slug"] for i in compute_records(entries, tracks)}
     stats = {}
     for e in entries:
         if e["origin"] == "baseline":
@@ -1193,14 +1234,19 @@ def type_term(t):
 
 
 def compute_records(entries, tracks):
-    """Indices of codes that sit on the Pareto frontier of at least one of their
-    tracks (over n, k, d). These are the 'records' (starred, shaded)."""
-    record_in = {}
+    """Indices of codes on a Pareto frontier over (n, k, d, w): the frontier of
+    one of their tracks, or the global frontier across all codes. These are the
+    'records' (starred, shaded). The global pass keeps track-less codes (e.g.
+    entries whose only category was a weight track before weight became a plain
+    property) eligible, and guarantees an overall-best code is always a record."""
+    records = set()
     for t, idxs in tracks.items():
         te = [entries[i] for i in idxs]
         for j in pareto(te):
-            record_in.setdefault(te[j]["slug"], set()).add(t)
-    return {i for i, e in enumerate(entries) if e["slug"] in record_in}
+            records.add(idxs[j])
+    for j in pareto(entries):
+        records.add(j)
+    return records
 
 
 def board_controls(entries, tracks, records):
@@ -1211,22 +1257,40 @@ def board_controls(entries, tracks, records):
         f'<button type=button class=typepill data-q="{html.escape(type_term(t))}" '
         f'title="filter to {html.escape(t)}">{html.escape(type_label(t))}</button>'
         for t in sorted(tracks))
+    weights = [e["w"] for e in entries if e["w"] is not None]
+    wmin, wmax = (min(weights), max(weights)) if weights else (0, 0)
+    # Dual-handle range slider over the check weight w (two overlapping range
+    # inputs, styled to share one track). Replaces the old weight-N filter tags;
+    # weight is a plain integer property now, so it is filtered by range.
+    wslider = (
+        '<div class=wfilter>'
+        '<span class=wflabel>Check weight <b>w</b></span>'
+        '<div class=wfslider>'
+        '<div class=wftrack></div><div class=wffill id=wffill></div>'
+        f'<input type=range id=wlo class=wfrange min={wmin} max={wmax} '
+        f'value={wmin} step=1 aria-label="minimum check weight">'
+        f'<input type=range id=whi class=wfrange min={wmin} max={wmax} '
+        f'value={wmax} step=1 aria-label="maximum check weight">'
+        '</div>'
+        f'<span class=wfval id=wfval>{wmin}&ndash;{wmax}</span>'
+        '</div>')
     return ('<section id=board>'
             '<h2 class=track>Codes '
             f'<span class=tcount>&middot; {len(entries)} total, '
             f'{len(records)} records</span></h2>'
             '<div class=searchbar>'
             '<input id=boardsearch type=text autocomplete=off '
-            'placeholder="search, e.g.  weight-6 k&gt;=10 d&gt;=8  or  '
+            'placeholder="search, e.g.  w&lt;=6 k&gt;=10 d&gt;=8  or  '
             'eff&gt;5  or  farlab" aria-label="search codes">'
             '<span id=boardcount class=searchcount></span></div>'
             f'<div class=typepills>{pills}'
             '<button type=button class="typepill clearpill" data-q="">'
             'clear</button></div>'
-            '<p class=searchhelp>Filter by typing terms (all must match): a '
-            'type or author name, or a comparison on <b>n</b>, <b>k</b>, '
-            '<b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), e.g. '
-            '<code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
+            f'{wslider}'
+            '<p class=searchhelp>Filter with the weight slider, or type terms '
+            '(all must match): a type or author name, or a comparison on '
+            '<b>n</b>, <b>k</b>, <b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), '
+            'e.g. <code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
             'The word <code>record</code> keeps only frontier records.</p>'
             '</section>')
 
@@ -1264,7 +1328,7 @@ def board_table(entries, records):
         return "".join(
             f'<span class=tchip title="{html.escape(t)}">'
             f'{html.escape(type_label(t))}</span>'
-            for t in sorted(e["tracks"]))
+            for t in sorted(e["tracks"])) or '<span class=tnone>&middot;</span>'
 
     cols = ('<colgroup><col style="width:3%"><col style="width:16%">'
             '<col style="width:16%"><col style="width:7%"><col style="width:7%">'

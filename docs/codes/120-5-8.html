@@ -141,6 +141,7 @@ box-shadow:inset 3px 0 0 var(--ac)}
 .tchip{display:inline-block;font-size:11px;line-height:1;padding:3px 7px;
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}
+.tnone{color:var(--mut)}
 .searchbar{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
 #boardsearch{flex:1 1 0;min-width:0;font-size:14px;padding:10px 13px;
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
@@ -156,6 +157,28 @@ border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}
 .searchhelp{font-size:12px;color:var(--mut);margin:0 0 14px;max-width:80ch}
 .searchhelp code{background:var(--soft);padding:1px 5px;border-radius:4px;
 font-size:11px}
+/* Dual-handle weight range slider: two range inputs share one track, each with
+   only its thumb interactive so both handles stay draggable while overlapping. */
+.wfilter{display:flex;align-items:center;gap:12px;margin:0 0 10px;
+font-size:13px;color:var(--mut);flex-wrap:wrap}
+.wflabel{white-space:nowrap}
+.wfslider{position:relative;flex:1 1 180px;max-width:280px;height:24px}
+.wftrack,.wffill{position:absolute;top:50%;height:4px;
+transform:translateY(-50%);border-radius:3px}
+.wftrack{left:0;right:0;background:var(--ln)}
+.wffill{background:var(--ac)}
+.wfrange{position:absolute;top:0;left:0;width:100%;height:24px;margin:0;
+background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+#whi{z-index:2}
+.wfrange::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
+width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--ac);
+cursor:pointer}
+.wfrange::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;
+border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer}
+.wfrange::-webkit-slider-runnable-track{background:none;height:24px}
+.wfrange::-moz-range-track{background:none}
+.wfval{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
+color:var(--ink)}
 .plot circle.pt.xh{stroke:#f59e0b;stroke-width:4;r:7}
 .plot circle.hit{cursor:pointer}
 .star{color:var(--ac);width:18px}
@@ -268,7 +291,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=kv><b>construction</b> Generalized weight-6, notched (8,8).</div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2504.08887">arXiv:2504.08887</a></div>
 <div class=kv><b>date</b> 2026-06-16</div>
-<div class=kv><b>tracks</b> weight-6</div>
+<div class=kv><b>tracks</b> none (filtered by check weight w)</div>
 </section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 55 &middot; <b style="min-width:auto">Z-checks</b> 63</div>

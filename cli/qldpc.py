@@ -102,15 +102,15 @@ def _supports(H):
 # ----------------------------------------------------------------------------
 # building the submission
 # ----------------------------------------------------------------------------
-def auto_tracks(wmax, has_coords, layers):
+def auto_tracks(has_coords, layers):
+    """Tracks a code is auto-entered into. Check weight is a plain property now
+    (filtered by the w slider on the board), not a track, so only the
+    geometric-locality tracks are auto-assigned; a code may have none."""
     tracks = []
-    if wmax <= 8:
-        tracks.append("weight-4" if wmax <= 4 else
-                      "weight-6" if wmax <= 6 else "weight-8")
     if has_coords:
         tracks.append("2d-local-bilayer" if layers and layers >= 2
                       else "2d-local-single")
-    return tracks or ["weight-8"]
+    return tracks
 
 
 def build_submission(HX, HZ, args):
@@ -162,7 +162,7 @@ def build_submission(HX, HZ, args):
         "checks": {"X": _supports(HX), "Z": _supports(HZ)},
         "distance": dist,
         "provenance": prov,
-        "tracks": args.tracks or auto_tracks(wmax, args._coords is not None,
+        "tracks": args.tracks or auto_tracks(args._coords is not None,
                                              args.layers),
     }
     if args._coords is not None:

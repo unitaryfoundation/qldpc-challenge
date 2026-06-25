@@ -14,7 +14,7 @@ The result is a dict you can write to ``codes/your-code.json`` and submit.
 
     from submit import make_submission, save_submission
     doc = make_submission(HX, HZ, name="...", construction="...",
-                          authors=["you"], tracks=["weight-6"])
+                          authors=["you"], tracks=["bivariate bicycle (periodic)"])
     save_submission(doc, "codes/my-code.json")
     # then: uv run python verify/qldpc_verify.py codes/my-code.json
 """

@@ -65,9 +65,9 @@
     },
     "tracks": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "items": {"type": "string"},
-      "description": "track ids this code is entered into; see TRACKS.md"
+      "description": "track ids this code is entered into (may be empty; check weight is filtered by the w property, not a track); see TRACKS.md"
     }
   },
   "$defs": {

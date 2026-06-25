@@ -1865,7 +1865,5 @@
     "date": "2026-06-22",
     "notes": "Distance is an UPPER BOUND (d<=14): witnesses are explicit decoder-found logical operators of weight 14 (syndrome-decoder method), cross-checked by randomized minimum-weight search (QDistRnd-style); both saturate at 14 over 6e5 trials, and the sub-threshold logical-error slope corroborates d~14. NOT certified exact. This is a coset 2BGA on a non-abelian metacyclic group -- a generalization of bivariate bicycle, not standard BB on a torus. Three more variants with identical [[180,16,14]] parameters exist. See docs/distance_via_simulation.tex for the estimation method. These codes are NOT 2D-local (no planar layout) and enter only the weight-8 any-connectivity track -- unlike the planar weight-8 codes of arXiv:2504.08887, which also occupy the 2d-local tracks. The comparison is on (n,k,d) at check weight <= 8 only. PROVISIONAL: d=14 here is an UNVERIFIED upper bound (the witness only proves d<=14); exact certification is pending. A prior Gurobi ILP + LP-decoding-cut attempt on this code stalled with the per-generator lower bound at 8, but the source paper certified comparable n<=168 weight-8 coset codes by integer programming, so certification may yet succeed. Independent residual-weight and QDistRnd searches find NO logical below weight 14. If the true distance is below 14 the kd^2/n figure drops accordingly; treat any top-of-board ranking as provisional until certified."
   },
-  "tracks": [
-    "weight-8"
-  ]
+  "tracks": []
 }

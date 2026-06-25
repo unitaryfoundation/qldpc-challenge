@@ -868,7 +868,6 @@
   "notes": "Reference baseline (Liang, Eberhardt, Chen)."
  },
  "tracks": [
-  "weight-6",
   "2d-local-bilayer"
  ],
  "locality": {

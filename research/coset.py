@@ -3,8 +3,8 @@
 A strict generalization of the regular 2BGA (``group_algebra.py``): qubits are
 indexed by the COSET space G/H for a subgroup H <= G (record codes use a
 NON-normal H), rather than by G itself. This escapes the abelian-BB design space
-and reaches the highest verified efficiencies. This family seeds the
-``weight-8`` track.
+and reaches the highest verified efficiencies, at check weight 8 (filtered by
+the w slider on the board, not a track).
 
 Construction:
   m := [G:H] = number of cosets;  n = 2m;  each block is m x m.

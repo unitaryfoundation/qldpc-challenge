@@ -36,11 +36,14 @@ Every constructor returns two parity-check matrices `HX, HZ` (numpy int arrays,
 shape `(num_checks, n)`) for a CSS code. Pick by the track you're aiming at
 (see `../TRACKS.md`):
 
-| Module | Family | Good for tracks | CSS holds because |
+Check weight is not a track — it is the `w` property (filtered by the board's
+weight slider), shown below as the typical check weight each family produces.
+
+| Module | Family | Track / weight | CSS holds because |
 |---|---|---|---|
-| `bb.py` | bivariate bicycle on a torus Z_l × Z_m (the "gross code" family) | `bivariate bicycle (periodic)`, `weight-6` | abelian circulants commute |
-| `group_algebra.py` | two-block group-algebra (2BGA) on **any** finite group | `weight-6`, `generalized bicycle` | left/right multiplication commute |
-| `coset.py` | coset 2BGA on G/H (record efficiencies; non-normal H) | `weight-8` | left action commutes with right action by the normalizer |
+| `bb.py` | bivariate bicycle on a torus Z_l × Z_m (the "gross code" family) | `bivariate bicycle (periodic)`, w 6 | abelian circulants commute |
+| `group_algebra.py` | two-block group-algebra (2BGA) on **any** finite group | `generalized bicycle`, w 6 | left/right multiplication commute |
+| `coset.py` | coset 2BGA on G/H (record efficiencies; non-normal H) | no track, w 8 | left action commutes with right action by the normalizer |
 
 `bb.py` is the place to start — it's the simplest and any choice of monomials is
 a valid code. `group_algebra.py` generalizes it to non-abelian groups (which can
@@ -126,7 +129,7 @@ doc = make_submission(
     name="[[72,12,6]] my BB code",
     construction="Bivariate bicycle on Z_6 x Z_6, A = x^3+y+y^2, B = y^3+x+x^2.",
     authors=["your-handle"],
-    tracks=["bivariate bicycle (periodic)", "weight-6"],
+    tracks=["bivariate bicycle (periodic)"],
     references=["arXiv:2308.07915"],
     confidence="upper_bound",
 )

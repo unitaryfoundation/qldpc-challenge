@@ -620,7 +620,5 @@
   "date": "2025",
   "notes": "Reference baseline (Liang, Eberhardt, Chen)."
  },
- "tracks": [
-  "weight-6"
- ]
+ "tracks": []
 }

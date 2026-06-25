@@ -59,8 +59,7 @@ doc = make_submission(
     construction=f"Bivariate bicycle on Z_{s['l']} x Z_{s['m']}, "
                  f"A={s['A']}, B={s['B']} (found by random search over the BB family).",
     authors=["your-handle"],
-    tracks=["bivariate bicycle (periodic)"]
-           + (["weight-6"] if max(len(s["A"]), len(s["B"])) * 2 <= 6 else []),
+    tracks=["bivariate bicycle (periodic)"],
     confidence="upper_bound",
     trials=4000,
 )

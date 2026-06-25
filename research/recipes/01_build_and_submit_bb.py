@@ -47,7 +47,7 @@ doc = make_submission(
     construction=("Periodic bivariate-bicycle code on Z_6 x Z_6, "
                   "A = x^3 + y + y^2, B = y^3 + x + x^2 (Bravyi et al.)."),
     authors=["your-handle"],
-    tracks=["bivariate bicycle (periodic)", "weight-6"],
+    tracks=["bivariate bicycle (periodic)"],
     references=["arXiv:2308.07915"],
     confidence="upper_bound",
 )

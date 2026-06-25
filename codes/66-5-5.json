@@ -451,7 +451,5 @@
   ],
   "notes": "Distance proven exact by cutoff MILP (scipy/HiGHS); no lighter logical exists on either side."
  },
- "tracks": [
-  "weight-6"
- ]
+ "tracks": []
 }

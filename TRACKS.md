@@ -10,9 +10,13 @@ each track the ranking is a Pareto frontier, not a single winner.
 
 Two views of the same data:
 
-- Frontier view: the set of Pareto-optimal codes over (n, k, d). A code is on
-  the frontier if no other code in the track dominates it (no other has n' <=
-  n, k' >= k, d' >= d with at least one strict). There can be many co-leaders.
+- Frontier view: the set of Pareto-optimal codes over (n, k, d, w). A code is on
+  the frontier if no other code in the track dominates it (no other has n' <= n,
+  k' >= k, d' >= d, w' <= w with at least one strict). Check weight w is a
+  frontier axis (lower is better) now that it is a plain property, not a track.
+  There can be many co-leaders. A code is also a record if it is on the global
+  (n, k, d, w) frontier across all codes, so a code in no track can still earn
+  the star.
 - Cell view (the code-tables style): a grid keyed by (k, d); each cell holds
   the smallest known n, with a challenger history. This is the view people
   usually screenshot.
@@ -29,14 +33,13 @@ shown distinctly; an exact record outranks an equal upper-bound one.
 
 These are where we have data and verification today. More can be proposed by PR.
 
-- `weight-6`: CSS codes with all stabilizer checks of weight <= 6, any
-  connectivity. The headline frontier. Sub-thresholds `weight-4`, `weight-8`
-  exist as separate tracks. The `weight-8` track is seeded with coset
-  two-block (2BGA) codes (arXiv:2606.17268), currently carried as distance
-  upper bounds (d<=) pending exact certification. Further reference targets
-  that could be added as baselines: the Liang-Eberhardt-Chen weight-8 k=12
-  family (arXiv:2504.08887, Sec. IV D) [[240,12,12]], [[292,12,14]],
-  [[399,12,18]], and the published 2BGA codes of arXiv:2606.17268.
+- Check weight is **not a track**. It is a plain code property `w` (the maximum
+  stabilizer check weight), recomputed by the verifier, filtered on the board
+  with the weight-range slider, and counted as a Pareto axis (lower is better).
+  Reference targets at check weight 8: the Liang-Eberhardt-Chen k=12 family
+  (arXiv:2504.08887, Sec. IV D) [[240,12,12]], [[292,12,14]], [[399,12,18]], and
+  the coset two-block (2BGA) codes of arXiv:2606.17268 (carried as d<= upper
+  bounds pending exact certification).
 - `2d-local-bilayer`: geometrically 2D-local on up to 2 physical layers
   (the flip-chip regime of the bivariate-bicycle planar codes), with a stated
   `locality` block. Ranked within a maximum interaction radius (cap 7.0; see
@@ -64,10 +67,12 @@ These are where we have data and verification today. More can be proposed by PR.
   (arXiv:2604.20838). The challenge here is to land a code in this regime with
   a checkable distance witness; until then the bars stand as references, not
   board records.
-A code may enter multiple tracks (list them all in `tracks`). It only appears
-on a track's board if it satisfies that track's constraints, which the
-verifier checks (for example, `weight-6` requires measured max check weight
-<= 6).
+A code may enter multiple tracks (list them all in `tracks`), or none — a
+track-less code still appears in the table and on the global frontier; it is
+just filtered by the `w` slider and property comparisons. A code only appears
+on a track's board if it satisfies that track's constraints, which the verifier
+checks (for example, `2d-local-bilayer` requires a `locality` block within the
+radius cap).
 
 ### 2D-locality is proven, not asserted
 

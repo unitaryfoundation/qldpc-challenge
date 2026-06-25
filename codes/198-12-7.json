@@ -1384,7 +1384,6 @@
   "notes": "Distance certified exact by cutoff MILP."
  },
  "tracks": [
-  "weight-6",
   "2d-local-bilayer"
  ],
  "locality": {

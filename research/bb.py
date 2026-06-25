@@ -16,8 +16,8 @@ group-algebra qubits (index = i*m + j for cell (i mod l, j mod m)).
   B = sum_{(c,d) in B_terms} x^c y^d
   H_X = [A | B],  H_Z = [B^T | A^T],   n = 2*l*m
 
-Targets the ``bivariate bicycle (periodic)`` and (since checks are weight
-|A_terms| + |B_terms|) the ``weight-6`` tracks.
+Targets the ``bivariate bicycle (periodic)`` track; checks have weight
+|A_terms| + |B_terms| (filtered by the w slider on the board, not a track).
 """
 import numpy as np
 
