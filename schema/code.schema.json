@@ -57,6 +57,7 @@
           "description": "baseline: a published code seeded for comparison. submission: a code contributed through the challenge. Defaults to submission when omitted."
         },
         "construction": {"type": "string", "minLength": 1, "description": "how the code was built (family, polynomials, search, reference)"},
+        "model": {"type": "string", "maxLength": 80, "description": "optional, self-reported: the AI model (e.g. 'Opus 4.8') or 'human' that produced the code. Claimed, not verified -- there is no way to certify which model generated a result."},
         "references": {"type": "array", "items": {"type": "string"}},
         "date": {"type": "string", "format": "date"},
         "notes": {"type": "string"}
