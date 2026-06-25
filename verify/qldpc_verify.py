@@ -254,11 +254,15 @@ def _verify_semantic(doc, report, record, refute=False):
     #          diameter) is within the track's cap.
     #    A code that claims a 2d-local track with no layout, or whose layout
     #    fails (b)/(c), is rejected -- it does not sit on the 2D-local frontier
-    #    for free. Radius caps are calibrated above the seeded planar baselines
-    #    (max measured 4.472 on bilayer) with margin; see TRACKS.md.
+    #    for free. "Short range" means a bounded, n-independent check diameter,
+    #    not a specific tiny number. The bilayer cap admits the weight-8 planar
+    #    (tile-code) family the track exists to chase: bulk checks span ~5.83,
+    #    and open-boundary corner stabilizers reach ~6.71; both are constant in
+    #    n, so 7.0 covers the family while still rejecting layouts whose range
+    #    grows with the code. See TRACKS.md.
     LOCAL_TRACKS = {
         "2d-local-single":  {"max_layers": 1, "radius_cap": 4.0},
-        "2d-local-bilayer": {"max_layers": 2, "radius_cap": 6.0},
+        "2d-local-bilayer": {"max_layers": 2, "radius_cap": 7.0},
     }
     claimed_local = [t for t in doc.get("tracks", []) if t in LOCAL_TRACKS]
     loc = doc.get("locality")

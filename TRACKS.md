@@ -73,9 +73,12 @@ enforces:
   and distinct sites are >= 1 apart, so a check of diameter `r` genuinely spans
   `r` grid units and a small radius cannot be faked by collapsing qubits;
 - short range: the measured interaction radius (largest check diameter) is
-  within the track cap, `4.0` for `2d-local-single` (`layers <= 1`) and `6.0`
-  for `2d-local-bilayer` (`layers <= 2`). The caps sit above the seeded planar
-  baselines (max measured radius 4.472 on bilayer) with margin.
+  within the track cap, `4.0` for `2d-local-single` (`layers <= 1`) and `7.0`
+  for `2d-local-bilayer` (`layers <= 2`). "Short range" means a bounded,
+  n-independent diameter, not a specific tiny number. The bilayer cap admits
+  the weight-8 planar (tile-code) family this track exists to chase: its bulk
+  checks span about 5.83 and open-boundary corner stabilizers reach about 6.71,
+  both constant in n. The cap rejects layouts whose range grows with the code.
 
 The verifier also reports layout diagnostics (interaction radius, qubits per
 site, minimum site spacing, qubits per unit area, bounding box) so a code's
