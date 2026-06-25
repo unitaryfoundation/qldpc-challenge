@@ -148,6 +148,14 @@ font-size:11px}
 .plot circle.hit{cursor:pointer}
 .star{color:var(--ac);width:18px}
 .auth{color:var(--mut);font-size:13px}
+.board td.model{color:var(--mut);font-size:13px;white-space:nowrap}
+.claimed{color:var(--mut);font-size:12px;font-style:italic}
+.submithint{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
+font-size:14px}
+.submithint code{display:inline-block;margin-top:6px;padding:4px 8px;
+background:var(--soft);border:1px solid var(--ln);border-radius:6px;
+font-size:13px}
+.submitsub{display:block;margin-top:6px;color:var(--mut);font-size:13px}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}
 .b.exact{background:#d1fae5;color:var(--ex)}.b.ub{background:#eef2f7;
@@ -245,7 +253,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; scipy/HiGHS cutoff IP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 10 exists</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
-<div class=kv><b>authors</b> <a href="https://github.com/FarLab">@FarLab</a>, <a href="https://github.com/vprusso">@vprusso</a></div>
+<div class=kv><b>authors</b> <a href="https://github.com/FarLab">@FarLab</a> and <a href="https://github.com/vprusso">@vprusso</a></div>
 <div class=kv><b>construction</b> f = 1 + xy + x<sup>-1</sup> y<sup>2</sup>, g = 1 + x<sup>-1</sup> y + x<sup>-2</sup> y<sup>-1</sup>; annulus-type boundary engine, (8,10) lattice.</div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2504.08887">arXiv:2504.08887</a></div>
 <div class=kv><b>date</b> 2026-06-16</div>
