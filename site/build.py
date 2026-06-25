@@ -399,6 +399,12 @@ font-size:11px}}
 .auth{{color:var(--mut);font-size:13px}}
 .board td.model{{color:var(--mut);font-size:13px;white-space:nowrap}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
+.submithint{{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
+font-size:14px}}
+.submithint code{{display:inline-block;margin-top:6px;padding:4px 8px;
+background:var(--soft);border:1px solid var(--ln);border-radius:6px;
+font-size:13px}}
+.submitsub{{display:block;margin-top:6px;color:var(--mut);font-size:13px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
@@ -1032,6 +1038,12 @@ def contributors_panel(entries, tracks):
             'through the challenge</p></div>'
             f'<a class=lbcta href="{REPO}/CONTRIBUTING.md">Add yours</a>'
             '</div>'
+            '<div class=submithint>One command turns your H_X / H_Z into a '
+            'verified submission:<br>'
+            '<code>./qldpc submit mycode.npz --authors @you</code>'
+            '<span class=submitsub> builds it, finds the distance witness, '
+            'runs the verifier, and stages the PR. '
+            f'<a href="{REPO}/CONTRIBUTING.md">full guide</a></span></div>'
             f'<div class=lblist>{"".join(rows)}</div></section>')
 
 
