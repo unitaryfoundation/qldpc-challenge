@@ -29,6 +29,36 @@ weight, geometric locality). So the
 boards are stratified into tracks, and within a track the ranking is a Pareto
 frontier rather than one winner. See `TRACKS.md`.
 
+## Installation
+
+This repo uses [uv](https://docs.astral.sh/uv/) to manage the Python environment. No explicit install step is needed — `uv run` sets up the environment on first use.
+
+**Install uv** (one-time):
+
+```bash
+brew install uv        # macOS
+# or: pip install uv   # any platform
+```
+
+**Verify a code locally:**
+
+```bash
+uv run python verify/qldpc_verify.py codes/your-code.json
+```
+
+**Build the leaderboard site:**
+
+```bash
+uv run python site/build.py
+# then open docs/index.html
+```
+
+**Run research tools** (requires scipy + ldpc):
+
+```bash
+uv run --extra research python research/recipes/01_build_and_submit_bb.py
+```
+
 ## Submitting
 
 A submission is one JSON file in `codes/`, following `schema/code.schema.json`
