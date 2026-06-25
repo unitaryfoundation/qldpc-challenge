@@ -39,12 +39,12 @@ These are where we have data and verification today. More can be proposed by PR.
   [[399,12,18]], and the published 2BGA codes of arXiv:2606.17268.
 - `2d-local-bilayer`: geometrically 2D-local on up to 2 physical layers
   (the flip-chip regime of the bivariate-bicycle planar codes), with a stated
-  `locality` block. Ranked within a maximum interaction radius. Current best
-  known 2D-local efficiency is kd^2/n ~ 9.75, the [[323,14,15]] tile code
-  (arXiv:2606.19482; tile-code construction arXiv:2504.09171), which is the bar
-  to beat. Reaching it on the board needs a tile-code generator (planar
-  open-boundary BB with tile truncation), a possible follow-on to the existing
-  boundary engine.
+  `locality` block. Ranked within a maximum interaction radius (cap 7.0; see
+  the locality section). Best on the board: kd^2/n ~ 8.0, [[294,12,14]] from
+  the boundary engine (tile family). Open target: the published bar is
+  kd^2/n ~ 9.75, the [[323,14,15]] tile code (arXiv:2606.19482; construction
+  arXiv:2504.09171). Closing that gap needs the genuine tile-code truncation
+  (planar open-boundary BB), a follow-on to the boundary engine.
 - `bivariate bicycle (periodic)`: bivariate bicycle codes on a torus
   (periodic boundary conditions), no 2D-local layout. Seeded with the
   canonical codes of Bravyi et al (arXiv:2308.07915).
@@ -55,6 +55,15 @@ These are where we have data and verification today. More can be proposed by PR.
   whose distance is exact by construction. The surface-code baseline.
 - `2d-local-single`: 2D-local on a single layer (surface-code-like
   connectivity). Stricter; mostly a baseline track.
+- `high-rate` (large-block): high-rate qLDPC codes (large n, high k/n), ranked
+  by kd^2/n in their own board so large codes do not dominate the small-code
+  tracks. No verified entries yet. Open targets, cited as bars to beat rather
+  than seeded as entries (their distance witnesses are not published and our
+  verifier does not certify distance at these sizes): the Kasai-group codes
+  [[9216,4612,<=48]] (arXiv:2601.08824) and [[16384,4142,<=40]]
+  (arXiv:2604.20838). The challenge here is to land a code in this regime with
+  a checkable distance witness; until then the bars stand as references, not
+  board records.
 A code may enter multiple tracks (list them all in `tracks`). It only appears
 on a track's board if it satisfies that track's constraints, which the
 verifier checks (for example, `weight-6` requires measured max check weight
