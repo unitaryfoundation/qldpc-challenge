@@ -629,31 +629,54 @@ def scatter(te, front, yacc, ylabel):
     Suppressed below a handful of distinct (n, y) points (nothing to show)."""
     if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
         return ""
-    W, H, pad = 520, 300, 50
+    W, H = 520, 340
+    pad_l, pad_r, pad_b, pad_t = 54, 10, 58, 78
     nhi = max(e["n"] for e in te) or 1
     yhi = max(yacc(e) for e in te) or 1
 
     def sx(n):
-        return pad + n / nhi * (W - 2 * pad - 10)
+        return pad_l + n / nhi * (W - pad_l - pad_r)
 
     def sy(v):
-        return H - pad - v / yhi * (H - 2 * pad)
+        return H - pad_b - v / yhi * (H - pad_t - pad_b)
 
     grid = []
     xstep = max(1, round(nhi / 4 / 50) * 50 or 50)
     for gx in range(0, int(nhi) + 1, xstep):
         x = sx(gx)
-        grid.append(f'<line x1="{x:.0f}" y1="{pad}" x2="{x:.0f}" y2="{H-pad}" '
-                    f'stroke="#eef2f7"/><text x="{x:.0f}" y="{H-pad+16}" '
-                    f'font-size="10" fill="#94a3b8" text-anchor="middle">{gx}</text>')
+        grid.append(f'<line x1="{x:.0f}" y1="{pad_t}" x2="{x:.0f}" y2="{H-pad_b}" '
+                    f'stroke="#eef2f7"/><text x="{x:.0f}" y="{H-pad_b+18}" '
+                    f'font-size="12" fill="#475569" text-anchor="middle">{gx}</text>')
     ystep = _axis_step(yhi)
     gy = 0
     while gy <= yhi + 1e-9:
         y = sy(gy)
-        grid.append(f'<line x1="{pad}" y1="{y:.0f}" x2="{W-pad}" y2="{y:.0f}" '
-                    f'stroke="#eef2f7"/><text x="{pad-8}" y="{y+3:.0f}" '
-                    f'font-size="10" fill="#94a3b8" text-anchor="end">{gy:g}</text>')
+        grid.append(f'<line x1="{pad_l}" y1="{y:.0f}" x2="{W-pad_r}" y2="{y:.0f}" '
+                    f'stroke="#eef2f7"/><text x="{pad_l-8}" y="{y+4:.0f}" '
+                    f'font-size="12" fill="#475569" text-anchor="end">{gy:g}</text>')
         gy += ystep
+
+    # Legend row 1: tier colours; row 2: filled (record) vs open (non-frontier)
+    leg_fs, leg_ink = 11, "#334155"
+    leg = []
+    for (col, label), lx in zip(
+        [(EXACT, "Certified exact"), (CORR, "Corroborated"), (ACCENT, "Upper bound")],
+        [75, 215, 360],
+    ):
+        leg += [
+            f'<circle cx="{lx}" cy="18" r="5" fill="{col}" stroke="{col}" stroke-width="1.5"/>',
+            f'<text x="{lx + 11}" y="22" font-size="{leg_fs}" fill="{leg_ink}">{label}</text>',
+        ]
+    for (filled, label), lx in zip(
+        [(True, "Pareto record (filled)"), (False, "Non-frontier (open)")],
+        [75, 270],
+    ):
+        fill = ACCENT if filled else "#fff"
+        leg += [
+            f'<circle cx="{lx}" cy="46" r="5" fill="{fill}" stroke="{ACCENT}" stroke-width="1.5"/>',
+            f'<text x="{lx + 11}" y="50" font-size="{leg_fs}" fill="{leg_ink}">{label}</text>',
+        ]
+
     pts = []
     for i, e in enumerate(te):
         f = i in front
@@ -671,12 +694,15 @@ def scatter(te, front, yacc, ylabel):
         pts.append(f'<circle class=hit data-code="{e["slug"]}" cx="{cx:.1f}" '
                    f'cy="{cy:.1f}" r="12" '
                    f'fill="transparent" data-tip="{html.escape(tip)}"/>')
+    x_mid = pad_l + (W - pad_l - pad_r) / 2
+    y_mid = pad_t + (H - pad_t - pad_b) / 2
     return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img">'
+            + "".join(leg)
             + "".join(grid)
-            + f'<text x="{W/2}" y="{H-4}" font-size="11" fill="#475569" '
-            f'text-anchor="middle">n (physical qubits)</text>'
-            f'<text x="14" y="{H/2}" font-size="11" fill="#475569" '
-            f'text-anchor="middle" transform="rotate(-90 14 {H/2})">{ylabel}</text>'
+            + f'<text x="{x_mid:.0f}" y="{H - 10}" font-size="13" fill="#334155" '
+            f'text-anchor="middle">Physical Qubits (n)</text>'
+            f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
+            f'text-anchor="middle" transform="rotate(-90 14 {y_mid:.0f})">{ylabel}</text>'
             + "".join(pts) + "</svg>")
 
 
@@ -1196,8 +1222,8 @@ def unified_board(entries, tracks):
             '<code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
             'The word <code>record</code> keeps only frontier records.</p>'
             '<div class=plots>'
-            f'{scatter(entries, records, lambda e: e["d"], "d")}'
-            f'{scatter(entries, records, lambda e: e["eff"], "kd&sup2;/n")}'
+            f'{scatter(entries, records, lambda e: e["d"], "Code Distance (d)")}'
+            f'{scatter(entries, records, lambda e: e["eff"], "kd²/n")}'
             '</div>'
             f'<table class=board id=mainboard>{cols}{head}'
             f'<tbody>{"".join(rows)}</tbody></table></section>')
