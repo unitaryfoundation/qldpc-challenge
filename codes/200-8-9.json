@@ -1389,7 +1389,9 @@
  },
  "provenance": {
   "authors": [
-   "Liang, Eberhardt, Chen"
+   "Liang, Zijian",
+   "Eberhardt, Jens Niklas",
+   "Chen, Yu-An"
   ],
   "origin": "baseline",
   "construction": "Liang-Eberhardt-Chen [[288,8,12]] family, (10,10) lattice.",

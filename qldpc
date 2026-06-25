@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Thin launcher so `./qldpc submit code.npz --authors @me` works without
+# installing the package. Runs the CLI in the repo's uv environment.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec uv run --quiet python "$here/cli/qldpc.py" "$@"

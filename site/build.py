@@ -398,6 +398,14 @@ font-size:11px}}
 .star{{color:var(--ac);width:18px}}
 .auth{{color:var(--mut);font-size:13px}}
 .board td.date{{color:var(--mut);font-size:13px;white-space:nowrap}}
+.board td.model{{color:var(--mut);font-size:13px;white-space:nowrap}}
+.claimed{{color:var(--mut);font-size:12px;font-style:italic}}
+.submithint{{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
+font-size:14px}}
+.submithint code{{display:inline-block;margin-top:6px;padding:4px 8px;
+background:var(--soft);border:1px solid var(--ln);border-radius:6px;
+font-size:13px}}
+.submitsub{{display:block;margin-top:6px;color:var(--mut);font-size:13px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
@@ -544,7 +552,7 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
    switch(m[2]){case'>=':return x>=v;case'<=':return x<=v;
     case'>':return x>v;case'<':return x<v;default:return x===v;}}
   if(t==='record'||t==='frontier')return r.dataset.record==='1';
-  const hay=(r.dataset.name+' '+r.dataset.tracks+' '+r.dataset.auth+' '+(r.dataset.date||'')).toLowerCase();
+  const hay=(r.dataset.name+' '+r.dataset.tracks+' '+r.dataset.auth+' '+(r.dataset.model||'')+' '+(r.dataset.date||'')).toLowerCase();
   return hay.indexOf(t)>=0;
  }
  function apply(){
@@ -628,6 +636,7 @@ def load_entries():
             "origin": doc["provenance"].get("origin", "submission"),
             "authors": ", ".join(doc["provenance"]["authors"]),
             "authors_list": doc["provenance"]["authors"],
+            "model": doc["provenance"].get("model", ""),
             "date": doc["provenance"].get("date", ""),
             "construction": doc["provenance"].get("construction", ""),
             "doc": doc, "cert": cert, "hcert": hcert,
@@ -744,7 +753,7 @@ def authors_html(lst):
             out.append(f'<a href="https://github.com/{h[1:]}">{h}</a>')
         else:
             out.append(html.escape(h))
-    return ", ".join(out)
+    return " and ".join(out)
 
 
 def detail_page(e):
@@ -828,6 +837,10 @@ def detail_page(e):
     P.append('<section class=blk><h3>Construction &amp; provenance</h3>')
     P.append(f'<div class=kv><b>authors</b> {authors_html(pr["authors"])}</div>')
     P.append(f'<div class=kv><b>construction</b> {mathfmt(pr.get("construction",""))}</div>')
+    if pr.get("model"):
+        P.append('<div class=kv><b>model</b> '
+                 f'{html.escape(pr["model"])} '
+                 '<span class=claimed>(claimed, not verified)</span></div>')
     if pr.get("references"):
         refs = [cite(r, rel="../") for r in pr["references"]]
         # A baseline IS the cited paper's code; a submission only builds on the
@@ -1027,6 +1040,12 @@ def contributors_panel(entries, tracks):
             'through the challenge</p></div>'
             f'<a class=lbcta href="{REPO}/CONTRIBUTING.md">Add yours</a>'
             '</div>'
+            '<div class=submithint>One command turns your H_X / H_Z into a '
+            'verified submission:<br>'
+            '<code>./qldpc submit mycode.npz --authors @you</code>'
+            '<span class=submitsub> builds it, finds the distance witness, '
+            'runs the verifier, and stages the PR. '
+            f'<a href="{REPO}/CONTRIBUTING.md">full guide</a></span></div>'
             f'<div class=lblist>{"".join(rows)}</div></section>')
 
 
@@ -1221,6 +1240,8 @@ def board_table(entries, records):
             'kd&sup2;/n</th>'
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=auth title="who submitted it">authors</th>'
+            '<th data-c=model title="claimed model that produced the code; '
+            'self-reported, not verified">model</th>'
             '<th data-c=date title="publication date for literature, submission '
             'date for contributions">date</th></tr></thead>')
     order = sorted(range(len(entries)),
@@ -1240,6 +1261,7 @@ def board_table(entries, records):
             f'data-type="{html.escape(", ".join(type_label(t) for t in ts))}" '
             f'data-tracks="{html.escape(" ".join(t.lower() for t in ts))}" '
             f'data-record="{1 if fr else 0}" '
+            f'data-model="{html.escape(e["model"].lower())}" '
             f'data-date="{html.escape(e["date"])}" '
             f'data-auth="{html.escape(e["authors"])}">'
             f'<td class=star title="{"record on its type frontier" if fr else ""}">'
@@ -1253,6 +1275,7 @@ def board_table(entries, records):
             f'<td class=num>{badge(e["tier"])} {e["d"]}</td>'
             f'<td class=num>{e["eff"]}</td><td class=num>{e["w"]}</td>'
             f'<td class=auth>{authors_html(e["authors_list"])}</td>'
+            f'<td class=model>{html.escape(e["model"]) if e["model"] else "&middot;"}</td>'
             f'<td class=date>{html.escape(e["date"]) if e["date"] else "&middot;"}</td></tr>')
 
     return (f'<table class=board id=mainboard>{cols}{head}'

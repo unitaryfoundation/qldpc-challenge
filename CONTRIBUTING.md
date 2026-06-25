@@ -1,29 +1,54 @@
 # Contributing a code
 
-1. Build your code and write one JSON file following `schema/code.schema.json`
-   (see `schema/SCHEMA.md` for each field). Name it descriptively and put it in
-   `codes/`, e.g. `codes/my-128-6-8.json`.
+You bring `H_X` and `H_Z`; one command turns them into a verified, PR-ready
+submission.
 
-   New to this? The `research/` starter kit builds the code, estimates its
-   distance (producing the witness you need), and writes the JSON for you — see
-   `research/GETTING_STARTED.md` and run
-   `uv run python research/recipes/01_build_and_submit_bb.py`.
+## One command
 
-2. Include a distance witness: an explicit logical operator of the claimed
-   weight for each side you report. This is what lets the verifier certify your
-   distance upper bound without trusting you. A code claiming a distance with
-   no valid witness is rejected.
+```
+./qldpc submit mycode.npz --authors @yourhandle
+```
 
-3. Verify locally before opening the PR:
+(or, without the launcher shim: `uv run python cli/qldpc.py submit ...`)
 
-   ```
-   uv run python verify/qldpc_verify.py codes/my-128-6-8.json
-   ```
+`mycode.npz` holds your parity checks under keys `hx` and `hz` (dense 0/1
+arrays or scipy sparse). The tool:
 
-   Exit 0 and an `earned_distance` block means it will pass CI.
+- computes n, k (= n - rank H_X - rank H_Z) and the max check weight;
+- searches for the lightest logical on each side and records it as a
+  self-certifying distance witness, so you never hand-write a witness;
+- assembles the schema-valid JSON;
+- runs the full verifier locally, the same gate CI runs; and
+- writes `codes/<n>-<k>-<d>.json` and prints the steps to open the PR.
 
-4. Open a pull request adding only your file(s) under `codes/`. CI runs the
-   verifier on every submission. A green check is required to merge.
+If verification fails, nothing is written and you see exactly which check
+failed before anything leaves your machine.
+
+Useful flags:
+
+- `--model "Opus 4.8"` what produced the code (self-reported, shown on the
+  board as a claim, not verified);
+- `--construction "..."` how it was built (family, polynomials, search);
+- `--coords coords.npz --layers 2` a 2D layout to enter the `2d-local` tracks
+  (the verifier proves the locality; see TRACKS.md);
+- `--open-pr` create the branch, commit, push, and open the PR for you;
+- `--dry-run` build and verify without writing.
+
+Then open a pull request adding only your file under `codes/`. CI re-runs the
+verifier; a green check is required to merge.
+
+## By hand
+
+If you would rather write the JSON yourself, follow `schema/code.schema.json`
+(`schema/SCHEMA.md` documents each field), include a distance witness (an
+explicit logical operator of the claimed weight for each side, or the verifier
+rejects the claim), put the file in `codes/`, and verify locally before the PR:
+
+```
+uv run python verify/qldpc_verify.py codes/my-128-6-8.json
+```
+
+Exit 0 with an `earned_distance` block means it will pass CI.
 
 ## Confidence tiers
 

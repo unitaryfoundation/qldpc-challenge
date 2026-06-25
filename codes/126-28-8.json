@@ -1555,7 +1555,8 @@
  },
  "provenance": {
   "authors": [
-   "Panteleev, Kalachev"
+   "Panteleev, Pavel",
+   "Kalachev, Gleb"
   ],
   "origin": "baseline",
   "construction": "Generalized bicycle code, circulant size 63, a(x) = 1 + x + x^14 + x^16 + x^22, b(x) = 1 + x^3 + x^13 + x^20 + x^42.",

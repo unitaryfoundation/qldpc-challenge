@@ -911,7 +911,12 @@
  },
  "provenance": {
   "authors": [
-   "Bravyi, Cross, Gambetta, Maslov, Rall, Yoder"
+   "Bravyi, Sergey",
+   "Cross, Andrew W.",
+   "Gambetta, Jay M.",
+   "Maslov, Dmitri",
+   "Rall, Patrick",
+   "Yoder, Theodore J."
   ],
   "origin": "baseline",
   "construction": "Bivariate bicycle code, orders (9, 6), A=x**3 + y**2 + y, B=x**2 + x + y**3 (periodic boundary conditions).",

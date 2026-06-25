@@ -58,7 +58,28 @@ These are where we have data and verification today. More can be proposed by PR.
 A code may enter multiple tracks (list them all in `tracks`). It only appears
 on a track's board if it satisfies that track's constraints, which the
 verifier checks (for example, `weight-6` requires measured max check weight
-<= 6; `2d-local-bilayer` requires a `locality` block with `layers <= 2`).
+<= 6).
+
+### 2D-locality is proven, not asserted
+
+Claiming a `2d-local-*` track requires a `locality` block with a coordinate for
+every qubit, and the verifier proves the claim rather than trusting it. A bare
+distance/efficiency number is not enough: a code that is not actually
+short-range would otherwise sit on the 2D-local frontier unfairly. The verifier
+enforces:
+
+- a layout: one coordinate per qubit (`coordinates` covers all `n`);
+- no cramming: at most `layers` qubits may share a site (the flip-chip stack),
+  and distinct sites are >= 1 apart, so a check of diameter `r` genuinely spans
+  `r` grid units and a small radius cannot be faked by collapsing qubits;
+- short range: the measured interaction radius (largest check diameter) is
+  within the track cap, `4.0` for `2d-local-single` (`layers <= 1`) and `6.0`
+  for `2d-local-bilayer` (`layers <= 2`). The caps sit above the seeded planar
+  baselines (max measured radius 4.472 on bilayer) with margin.
+
+The verifier also reports layout diagnostics (interaction radius, qubits per
+site, minimum site spacing, qubits per unit area, bounding box) so a code's
+geometric "dimension" is visible, not just its [[n, k, d]].
 
 ## Baselines and provenance
 
