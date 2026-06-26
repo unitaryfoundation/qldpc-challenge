@@ -1604,9 +1604,8 @@ def build():
     P.append(charts_block(entries, records))
     P.append('<div class=legend>'
              '<span class=legbreak><span class=swatch></span>&#9733; '
-             '<b>record</b> (shaded rows): on the Pareto frontier of at least '
-             'one of its types, i.e. no other code of that type beats it on all '
-             'of (n, k, d). Plain (unshaded) rows are dominated everywhere.</span>'
+             '<b>record</b> (shaded rows): on the (n, k, d) Pareto frontier of '
+             'at least one type; unshaded rows are dominated.</span>'
              '<span><span class="dot ex"></span> certified exact '
              '(<span class="b exact">d =</span>)</span>'
              '<span><span class="dot corr"></span> corroborated '
