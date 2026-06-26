@@ -1215,7 +1215,11 @@ def contributors_panel(entries, tracks):
             '<code>./qldpc submit mycode.npz --authors @you</code>'
             '<span class=submitsub> builds it, finds the distance witness, '
             'runs the verifier, and stages the PR. '
-            f'<a href="{REPO}/CONTRIBUTING.md">full guide</a></span></div>'
+            f'<a href="{REPO}/CONTRIBUTING.md">full guide</a>'
+            ' &middot; have an LLM or agent? '
+            f'<a href="{REPO}/blob/main/CONTRIBUTING.md#contribute-with-an-llm">'
+            'paste the research prompt</a> and it searches and submits for you.'
+            '</span></div>'
             f'<div class=lblist>{"".join(rows)}</div></section>')
 
 
