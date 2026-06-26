@@ -153,6 +153,18 @@ stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
 FAVICON = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
            + MARK + "</svg>")
 
+# Decorative flow-line layer for the hero background, drifting trails along smooth
+# ribbons (opt-in via ?bg=1; CSS animates dashoffset, off under reduced-motion).
+HERO_FLOW = (
+    '<svg class=heroflow viewBox="0 0 1200 360" '
+    'preserveAspectRatio="xMidYMid slice" aria-hidden="true">'
+    '<path d="M-60,90 C250,20 450,260 760,150 S1160,40 1300,120"/>'
+    '<path d="M-60,205 C200,300 500,80 790,225 S1110,265 1300,180"/>'
+    '<path d="M-60,300 C300,180 520,360 820,255 S1130,120 1300,300"/>'
+    '<path d="M-60,40 C220,140 480,-20 760,90 S1090,180 1300,50"/>'
+    '<path d="M-60,260 C280,360 540,200 800,320 S1190,220 1300,260"/>'
+    '</svg>')
+
 # The Unitary Foundation wordmark (yellow notched block + black lettering), used
 # in the hero to co-brand the challenge as a UF project. Sized via CSS (.uflogo);
 # the black text reads on the yellow block against any background.
@@ -306,7 +318,20 @@ radial-gradient(115% 130% at 50% -25%,rgba(255,255,0,.18),transparent 60%),
 repeating-linear-gradient(0deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
 repeating-linear-gradient(90deg,transparent 0 27px,rgba(255,255,255,.05) 27px 28px),
 var(--dark);color:#fff;padding:54px 0 50px;
+position:relative;overflow:hidden;
 border-bottom:4px solid {HILITE}}}
+header.hero>.wrap{{position:relative;z-index:1}}
+.heroflow{{position:absolute;inset:0;width:100%;height:100%;z-index:0;
+pointer-events:none}}
+.heroflow path{{fill:none;stroke:{HILITE};stroke-width:1.5;opacity:.10;
+stroke-linecap:round;stroke-dasharray:130 420;
+animation:flowtrail 15s linear infinite}}
+.heroflow path:nth-child(2){{opacity:.07;animation-duration:21s;animation-delay:-4s}}
+.heroflow path:nth-child(3){{opacity:.08;animation-duration:26s;animation-delay:-9s}}
+.heroflow path:nth-child(4){{opacity:.06;animation-duration:18s;animation-delay:-2s}}
+.heroflow path:nth-child(5){{opacity:.05;animation-duration:30s;animation-delay:-13s}}
+@keyframes flowtrail{{to{{stroke-dashoffset:-1100}}}}
+@media (prefers-reduced-motion:reduce){{.heroflow path{{animation:none;opacity:.06}}}}
 .brand{{display:flex;align-items:center;justify-content:space-between;
 gap:16px;margin:0 0 18px}}
 .brandmark{{display:flex;align-items:center;gap:16px}}
@@ -1538,7 +1563,7 @@ def build():
     records = compute_records(entries, tracks)
 
     P = [head("QEC Challenge")]
-    P.append('<header class=hero><div class=wrap>'
+    P.append('<header class=hero>' + HERO_FLOW + '<div class=wrap>'
              '<div class=brand>'
              '<span class=brandmark>'
              '<a href="https://unitary.foundation" '
