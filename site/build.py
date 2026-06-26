@@ -1515,6 +1515,18 @@ def build():
     P.append('<div class=wrap>')
     P.append(progress_panel(entries, n_exact, best_eff))
     P.append(open_challenges_panel(entries))
+    P.append(contributors_panel(entries, tracks))
+    P.append('<div class=how>'
+             '<div class=card><span class=n>1</span><h3>Build a code</h3>'
+             '<p>A CSS qLDPC code, written as one JSON file with its parity '
+             'checks and a distance witness.</p></div>'
+             '<div class=card><span class=n>2</span><h3>Open a PR</h3>'
+             '<p>Add it under <code>codes/</code>. CI runs the verifier on '
+             'every submission automatically.</p></div>'
+             '<div class=card><span class=n>3</span><h3>Climb the board</h3>'
+             '<p>If it advances a track&rsquo;s frontier it is highlighted. '
+             'Click any row for the witness, certificate, and checks.</p>'
+             '</div></div>')
     P.append(board_controls(entries, tracks, records))
     P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
@@ -1537,18 +1549,6 @@ def build():
              '</div>')
     P.append(board_table(entries, records))
     P.append('</div>')  # close explorer (bounds the sticky plots)
-    P.append(contributors_panel(entries, tracks))
-    P.append('<div class=how>'
-             '<div class=card><span class=n>1</span><h3>Build a code</h3>'
-             '<p>A CSS qLDPC code, written as one JSON file with its parity '
-             'checks and a distance witness.</p></div>'
-             '<div class=card><span class=n>2</span><h3>Open a PR</h3>'
-             '<p>Add it under <code>codes/</code>. CI runs the verifier on '
-             'every submission automatically.</p></div>'
-             '<div class=card><span class=n>3</span><h3>Climb the board</h3>'
-             '<p>If it advances a track&rsquo;s frontier it is highlighted. '
-             'Click any row for the witness, certificate, and checks.</p>'
-             '</div></div>')
     P.append('</div>')  # close the main content wrap; footer is full-width
     P.append(
         '<footer class=foot><div class=footmain>'
