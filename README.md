@@ -31,15 +31,7 @@ frontier rather than one winner. See `TRACKS.md`.
 
 ## Installation
 
-This repo uses [uv](https://docs.astral.sh/uv/) to manage the Python environment. No explicit install step is needed — `uv run` sets up the environment on first use.
-
-**Install uv** (one-time):
-
-```bash
-pip install uv
-```
-
-(or any method from the [uv install docs](https://docs.astral.sh/uv/getting-started/installation/))
+This repo uses [uv](https://docs.astral.sh/uv/) to manage the Python environment. Install it from the [uv docs](https://docs.astral.sh/uv/getting-started/installation/); after that `uv run` sets up the environment on first use, so there is no separate install step here.
 
 **Verify a code locally:**
 
@@ -81,25 +73,6 @@ Verify locally before opening a PR (uv handles the environment):
 
 ```
 uv run python verify/qldpc_verify.py codes/your-code.json
-```
-
-The [qLDPC library](https://github.com/qLDPCOrg/qLDPC) is a convenient way to
-construct codes and export the parity checks a submission needs.
-
-## Layout
-
-```
-schema/    the submission format (JSON Schema + human spec)
-research/  starter kit for BUILDING codes (constructors, distance surrogate,
-           submission packager) + GETTING_STARTED.md
-verify/    the verifier (gf2.py is the GF(2) core; qldpc_verify.py is the checker)
-examples/  worked examples that pass verification
-codes/     accepted submissions (the leaderboard data)
-certs/     server-side exact-distance certificates, one per certified code
-site/      build.py, which generates the static site into docs/
-docs/      the generated site (index, per-code pages, references, badges)
-refs.bib   bibliography; references.html is generated from it
-TRACKS.md  the tracks and how ranking works
 ```
 
 The boards are seeded with the codes of Liang, Eberhardt, Chen
