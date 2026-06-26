@@ -1041,7 +1041,7 @@ def detail_page(e):
     P.append(f'<div class=kv><b>authors</b> {authors_html(pr["authors"])}</div>')
     P.append(f'<div class=kv><b>construction</b> {mathfmt(pr.get("construction",""))}</div>')
     if pr.get("model"):
-        mark = f'{CLAUDE_MARK} ' if pr["model"] == "Claude" else ""
+        mark = f'{CLAUDE_MARK} ' if pr["model"].startswith("Claude") else ""
         P.append('<div class=kv><b>model</b> '
                  f'<span class=modelmark>{mark}</span>{html.escape(pr["model"])} '
                  '<span class=claimed>(claimed, not verified)</span></div>')
@@ -1658,8 +1658,7 @@ def build():
              '<span class=collegend><b>columns:</b> '
              '<b>n</b> physical qubits &middot; <b>k</b> logical qubits '
              '&middot; <b>d</b> distance (smallest undetectable error) '
-             '&middot; <b>kd&sup2;/n</b> encoding-efficiency ratio, compared '
-             'within a track at comparable n (see the FAQ) '
+             '&middot; <b>kd&sup2;/n</b> encoding efficiency (per track) '
              '&middot; <b>w</b> max check weight</span>'
              '</div>')
     P.append(board_table(entries, records))
