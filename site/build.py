@@ -973,7 +973,7 @@ def detail_page(e):
         ("n", n, "physical qubits"),
         ("k", k, "logical qubits"),
         ("d", d, "distance (smallest undetectable error)"),
-        ("kd&sup2;/n", e["eff"], "figure of merit, higher is better"),
+        ("kd&sup2;/n", e["eff"], "encoding-efficiency ratio (BPT), compared within a track at comparable n"),
         ("w", e["w"], "max check weight"),
     ]
     if "locality" in doc:
@@ -1182,8 +1182,9 @@ def open_challenges_panel(entries):
              if best else "no entries yet")
     cards = [
         ("2D-local efficiency", cur2d,
-         "reach kd&sup2;/n 9.75, the [[323,14,15]] tile code "
-         "(arXiv:2504.09171), with a verified flip-chip layout."),
+         "reach kd&sup2;/n 12.7, the [[512,18,19]] tile code "
+         "(arXiv:2504.09171, exact, check weight 8), with a verified flip-chip "
+         "layout."),
         ("High-rate / large-block", "no verified entries yet",
          "land a high-rate code with a checkable distance witness. Bars: "
          "[[9216,4612,&le;48]] and [[16384,4142,&le;40]] "
@@ -1212,7 +1213,11 @@ def progress_panel(entries, n_exact, best_eff):
          "published codes seeded as the bar to beat"),
         (str(n_exact), "certified exact",
          "distance proven exact by server-side certification (d =)"),
-        (f"{best_eff:g}", "best kd&sup2;/n", ""),
+        (f"{best_eff:g}", "best kd&sup2;/n on the board",
+         "kd^2/n is the Bravyi-Poulin-Terhal saturation ratio. It is bounded and "
+         "meaningful for 2D-local / bounded-weight codes at comparable n, but "
+         "grows with n for high-rate codes, so it is compared within tracks, not "
+         "as a global record. This is the best among the codes on this board."),
     ]
     cards = "".join(f'<div class="stat-card{" hero" if i == 0 else ""}"'
                     f'{f" title=\"{t}\"" if t else ""}>'
@@ -1368,6 +1373,18 @@ FAQ = [
      "scale, so large codes carry a tight upper bound while small and moderate "
      "codes are certified exact. A d&le; record is provisional: if the true "
      "distance turns out lower, the entry is corrected."),
+    ("What does kd&sup2;/n mean, and is bigger always better?",
+     "It is an encoding-efficiency ratio: logical qubits times distance squared, "
+     "per physical qubit. It comes from the Bravyi-Poulin-Terhal bound, which "
+     "says a 2D-local code obeys kd&sup2; &le; O(n), so under a locality or "
+     "bounded-check-weight constraint kd&sup2;/n is bounded and measures how "
+     "close a code gets to that ceiling (the surface code sits near 1). It is "
+     "not a global record to chase: for high-rate codes with k and d both "
+     "growing like n, kd&sup2;/n grows like n&sup2; without bound, so a large "
+     "code trivially scores higher (the cited large-block codes reach the "
+     "hundreds). So kd&sup2;/n is compared within a track, among codes of "
+     "comparable size and check weight, not across the whole field. The "
+     "headline number is the best among the codes on this board."),
     ("What do I get if I find a new code?",
      "Bragging rights, chiefly. Your code lands on the board under your GitHub "
      "handle with a permanent link you can wave around, and if it advances a "
@@ -1641,7 +1658,8 @@ def build():
              '<span class=collegend><b>columns:</b> '
              '<b>n</b> physical qubits &middot; <b>k</b> logical qubits '
              '&middot; <b>d</b> distance (smallest undetectable error) '
-             '&middot; <b>kd&sup2;/n</b> figure of merit, higher is better '
+             '&middot; <b>kd&sup2;/n</b> encoding-efficiency ratio, compared '
+             'within a track at comparable n (see the FAQ) '
              '&middot; <b>w</b> max check weight</span>'
              '</div>')
     P.append(board_table(entries, records))

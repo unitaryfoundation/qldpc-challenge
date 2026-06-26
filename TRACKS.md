@@ -36,18 +36,23 @@ These are where we have data and verification today. More can be proposed by PR.
 - Check weight is **not a track**. It is a plain code property `w` (the maximum
   stabilizer check weight), recomputed by the verifier, filtered on the board
   with the weight-range slider, and counted as a Pareto axis (lower is better).
-  Reference targets at check weight 8: the Liang-Eberhardt-Chen k=12 family
-  (arXiv:2504.08887, Sec. IV D) [[240,12,12]], [[292,12,14]], [[399,12,18]], and
-  the coset two-block (2BGA) codes of arXiv:2606.17268 (carried as d<= upper
-  bounds pending exact certification).
+  Reference targets at check weight 8: the tile codes (arXiv:2504.09171), e.g.
+  [[512,18,19]] (kd^2/n 12.7) and [[288,18,13]] (kd^2/n 10.6), both ILP-certified
+  exact; and the coset two-block (2BGA) codes of arXiv:2606.17268 (carried as
+  d<= upper bounds pending exact certification). The Liang-Eberhardt-Chen planar
+  family (arXiv:2504.08887) is a weight-6 reference, e.g. the exact [[386,12,12]],
+  not a weight-8 one.
 - `2d-local-bilayer`: geometrically 2D-local on up to 2 physical layers
   (the flip-chip regime of the bivariate-bicycle planar codes), with a stated
   `locality` block. Ranked within a maximum interaction radius (cap 7.0; see
   the locality section). Best on the board: kd^2/n ~ 8.0, [[294,12,14]] from
-  the boundary engine (tile family). Open target: the published bar is
-  kd^2/n ~ 9.75, the [[323,14,15]] tile code (arXiv:2606.19482; construction
-  arXiv:2504.09171). Closing that gap needs the genuine tile-code truncation
-  (planar open-boundary BB), a follow-on to the boundary engine.
+  the boundary engine (tile family), and that distance is an upper bound, not
+  yet certified exact. Open target: the published weight-<=8 2D-local bar is
+  kd^2/n ~ 12.7, the [[512,18,19]] tile code (arXiv:2504.09171, ILP-exact); the
+  strictly nearest-neighbour directional-tile [[323,14,15]] (arXiv:2606.19482)
+  reaches kd^2/n ~ 9.75 at the higher check weight 11. Closing that gap needs
+  the genuine tile-code truncation (planar open-boundary BB), a follow-on to the
+  boundary engine.
 - `bivariate bicycle (periodic)`: bivariate bicycle codes on a torus
   (periodic boundary conditions), no 2D-local layout. Seeded with the
   canonical codes of Bravyi et al (arXiv:2308.07915).
