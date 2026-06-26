@@ -454,6 +454,7 @@ background:#fff;padding:8px}}
 padding:12px 16px;background:var(--soft);border:1px solid var(--ln);
 border-radius:10px;font-size:13px;color:var(--mut)}}
 .chartlegend .ci{{display:inline-flex;align-items:center;gap:7px}}
+.plotx{{text-align:center;font-size:13px;color:#334155;margin:2px 0 0}}
 .cdot{{width:12px;height:12px;border-radius:50%;flex:0 0 auto}}
 /* full width (matching the panels above) with fixed, evenly distributed
    columns so the slack isn't dumped into one column as a stray gap. */
@@ -837,8 +838,10 @@ def scatter(te, front, yacc, ylabel):
     Suppressed below a handful of distinct (n, y) points (nothing to show)."""
     if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
         return ""
-    W, H = 520, 300
-    pad_l, pad_r, pad_b, pad_t = 54, 12, 52, 22
+    W, H = 520, 274
+    # x-axis label is shared below both plots, so the bottom pad only needs room
+    # for the tick numbers (drawn at H-pad_b+18), not a per-plot axis title.
+    pad_l, pad_r, pad_b, pad_t = 54, 12, 26, 22
     nhi = max(e["n"] for e in te) or 1
     yhi = max(yacc(e) for e in te) or 1
 
@@ -881,13 +884,10 @@ def scatter(te, front, yacc, ylabel):
         pts.append(f'<circle class=hit data-code="{e["slug"]}" cx="{cx:.1f}" '
                    f'cy="{cy:.1f}" r="12" '
                    f'fill="transparent" data-tip="{html.escape(tip)}"/>')
-    x_mid = pad_l + (W - pad_l - pad_r) / 2
     y_mid = pad_t + (H - pad_t - pad_b) / 2
     return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img">'
             + "".join(grid)
-            + f'<text x="{x_mid:.0f}" y="{H - 10}" font-size="13" fill="#334155" '
-            f'text-anchor="middle">Physical Qubits (n)</text>'
-            f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
+            + f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
             f'text-anchor="middle" transform="rotate(-90 14 {y_mid:.0f})">{ylabel}</text>'
             + "".join(pts) + "</svg>")
 
@@ -1473,7 +1473,8 @@ def charts_block(entries, records):
         'style="background:#fff;border:2px solid #475569"></span>'
         'Open = non-frontier</span>'
         '</div>')
-    return f'<div class=plots>{d_plot}{eff_plot}</div>{legend}'
+    xlabel = '<div class=plotx>Physical Qubits (n)</div>'
+    return f'<div class=plots>{d_plot}{eff_plot}</div>{xlabel}{legend}'
 
 
 def board_table(entries, records):
