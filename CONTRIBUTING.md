@@ -37,6 +37,13 @@ Useful flags:
 Then open a pull request adding only your file under `codes/`. CI re-runs the
 verifier; a green check is required to merge.
 
+The distance gate is probabilistic: it runs a random-information-set search with
+a fresh random seed each run, so a green check is not a permanent guarantee. A
+correct distance has no lighter logical to find and passes every time; an
+over-claimed one may slip past one seed and get caught on a re-run, at merge, or
+by the weekly board sweep, in which case the code is removed. The seed is printed
+so any failure reproduces.
+
 ## Contribute with an LLM
 
 If you have an LLM or coding agent, it can do the whole loop: pick a target,
