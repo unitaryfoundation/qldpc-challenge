@@ -401,13 +401,6 @@ border-top:1px solid var(--ln);scroll-margin-top:16px}}
 .tcount{{color:var(--mut);font-size:14px;font-weight:400}}
 .plots{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:16px;margin:14px 0 4px}}
-/* Keep the scatters pinned while scrolling the long table below, so the
-   row-hover -> point highlight stays visible. Only when the two plots sit
-   side by side (wide screens); on narrow screens they stack tall and pinning
-   would swallow the viewport. */
-@media(min-width:760px){{.plots{{position:sticky;top:0;z-index:5;
-background:var(--bg);padding-top:8px;
-box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}}}
 .plot{{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}}
 .chartlegend{{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
@@ -496,6 +489,13 @@ color:var(--ink);min-width:2.4em;text-align:right}}
    Under the breakpoints the table sizes to content so freed space redistributes
    cleanly. */
 .boardscroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+/* The table sits directly below the plots; pin the plots while the table
+   scrolls so the row-hover -> point highlight stays usable for every row. The
+   explorer wrapper bounds the sticky so the plots release at the leaderboard
+   instead of pinning over it. Wide screens only (narrow stacks the plots tall). */
+@media(min-width:760px){{.explorer .plots{{position:sticky;top:0;z-index:5;
+background:var(--bg);padding-top:8px;
+box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}}}
 @media(max-width:880px){{table.board{{table-layout:auto;min-width:600px}}
 .board .model{{display:none}}}}
 @media(max-width:680px){{.board .date{{display:none}}}}
@@ -1516,19 +1516,8 @@ def build():
     P.append(progress_panel(entries, n_exact, best_eff))
     P.append(open_challenges_panel(entries))
     P.append(board_controls(entries, tracks, records))
+    P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
-    P.append(contributors_panel(entries, tracks))
-    P.append('<div class=how>'
-             '<div class=card><span class=n>1</span><h3>Build a code</h3>'
-             '<p>A CSS qLDPC code, written as one JSON file with its parity '
-             'checks and a distance witness.</p></div>'
-             '<div class=card><span class=n>2</span><h3>Open a PR</h3>'
-             '<p>Add it under <code>codes/</code>. CI runs the verifier on '
-             'every submission automatically.</p></div>'
-             '<div class=card><span class=n>3</span><h3>Climb the board</h3>'
-             '<p>If it advances a track&rsquo;s frontier it is highlighted. '
-             'Click any row for the witness, certificate, and checks.</p>'
-             '</div></div>')
     P.append('<div class=legend>'
              '<span class=legbreak><span class=swatch></span>&#9733; '
              '<b>record</b> (shaded rows): on the Pareto frontier of at least '
@@ -1547,6 +1536,19 @@ def build():
              '&middot; <b>w</b> max check weight</span>'
              '</div>')
     P.append(board_table(entries, records))
+    P.append('</div>')  # close explorer (bounds the sticky plots)
+    P.append(contributors_panel(entries, tracks))
+    P.append('<div class=how>'
+             '<div class=card><span class=n>1</span><h3>Build a code</h3>'
+             '<p>A CSS qLDPC code, written as one JSON file with its parity '
+             'checks and a distance witness.</p></div>'
+             '<div class=card><span class=n>2</span><h3>Open a PR</h3>'
+             '<p>Add it under <code>codes/</code>. CI runs the verifier on '
+             'every submission automatically.</p></div>'
+             '<div class=card><span class=n>3</span><h3>Climb the board</h3>'
+             '<p>If it advances a track&rsquo;s frontier it is highlighted. '
+             'Click any row for the witness, certificate, and checks.</p>'
+             '</div></div>')
     P.append('</div>')  # close the main content wrap; footer is full-width
     P.append(
         '<footer class=foot><div class=footmain>'
