@@ -1,0 +1,21 @@
+name: refute-weekly
+
+# Whole-board distance refutation with a fresh RANDOM seed each run. The per-PR
+# gate (verify.yml -> gate_changed.py) is deterministic; this weekly job varies
+# the seed on purpose, so over time it accumulates search coverage and can catch
+# an over-claim that any single fixed-seed run missed. Runs on a schedule and
+# on-demand.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"      # every Monday 06:00 UTC
+  workflow_dispatch: {}        # allow manual runs
+
+jobs:
+  refute-board:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: refute every board entry (random seed)
+        run: uv run --frozen python verify/refute_board.py

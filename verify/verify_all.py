@@ -1,6 +1,11 @@
 """Verify every submission under codes/ and examples/, and flag possible
 duplicates by permutation-invariant signature. Used by CI. Exit 0 only if all
-pass and no two codes/ entries share a signature."""
+pass and no two codes/ entries share a signature.
+
+This runs the cheap structural checks (schema, n/k/CSS/weight, witness validity,
+duplicates) on every entry. Distance refutation is NOT run here -- it is the
+per-submission job of gate_changed.py (changed files) and the weekly job of
+refute_board.py (whole board, random seed)."""
 
 import glob
 import json
@@ -24,7 +29,7 @@ if __name__ == "__main__":
     for p in paths:
         with open(p) as f:
             doc = json.load(f)
-        rep = verify(doc)
+        rep = verify(doc)   # structural checks; refutation lives in gate_changed / refute_board
         rel = os.path.relpath(p, ROOT)
         if rep["ok"]:
             ed = rep["earned_distance"].get("d", {})

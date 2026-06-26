@@ -224,13 +224,19 @@ def _verify_semantic(doc, report, record, refute=False):
         report["earned_distance"]["d"] = {"value": dist["d"],
                                           "tier": "upper_bound"}
 
-    # 8. independent distance refutation (the CI gate). A bounded, fixed-seed RIS
-    #    search must not find a logical lighter than the claimed distance. This is
-    #    SOUND -- any hit is a checkable lighter logical, so a real over-claim -- but
-    #    not complete (a clean pass is "no over-claim found at this budget", not a
-    #    proof). Deterministic; tooling errors skip rather than block. Opt-in
-    #    (`refute=True`): the per-submission CLI gate runs it, bulk re-verification
-    #    of the whole board (test_verifier, verify_all, build) does not.
+    # 8. independent distance refutation. A bounded, fixed-seed RIS search must not
+    #    find a logical lighter than the claimed distance. This is SOUND -- any hit
+    #    is a checkable lighter logical, so a real over-claim -- but not complete (a
+    #    clean pass is "no over-claim found at this budget", not a proof).
+    #    Deterministic. Opt-in (`refute=True`): the per-submission CLI gate runs it,
+    #    and so does whole-board re-verification (verify_all) -- the safety net for
+    #    any over-claim that bypassed the changed-file gate. Fast/non-gate callers
+    #    (site build, research recipes) pass refute=False.
+    #
+    #    FAILS CLOSED: if the refuter cannot run, that is recorded as a FAILURE, not
+    #    a silent pass -- a gate that fails open is no gate. The refuter is pure
+    #    Python and deterministic, so an error here means a real tooling problem
+    #    that must be fixed (or the input quarantined), never waved through.
     if refute and earned_d:
         try:
             import heuristic_distance
@@ -240,7 +246,9 @@ def _verify_semantic(doc, report, record, refute=False):
                     f"witness={wit}" if refuted
                     else f"no lighter logical in {ntr} RIS trials"))
         except Exception as e:
-            record("distance_not_refuted", True, f"skipped ({type(e).__name__}: {e})")
+            record("distance_not_refuted", False,
+                   f"refutation could not run ({type(e).__name__}: {e}); failing "
+                   f"closed -- manual review required before this claim is trusted")
 
     # 9. locality / geometric 2D embedding. The 2d-local-* tracks rank codes by
     #    how short-range their checks are, so membership has to be *proven*, not

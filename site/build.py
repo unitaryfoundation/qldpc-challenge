@@ -736,7 +736,7 @@ def load_entries():
         slug = os.path.splitext(os.path.basename(p))[0]
         with open(p) as f:
             doc = json.load(f)
-        rep = verify(doc)
+        rep = verify(doc)   # site render: structural checks only, refutation is a CI/cron job
         if not rep["ok"]:
             continue
         cert = cert_info(slug)
