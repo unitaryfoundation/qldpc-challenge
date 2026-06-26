@@ -496,7 +496,7 @@
   ],
   "origin": "baseline",
   "construction": "Generalized bicycle code, circulant size 28, a(x) = 1 + x^1 + x^2 + x^4, b(x) = 1 + x^19.",
-  "date": "2022",
+  "date": "2022-03-31",
   "references": [
    "arXiv:2203.17216"
   ],

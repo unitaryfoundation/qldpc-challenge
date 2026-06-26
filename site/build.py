@@ -439,6 +439,14 @@ color:var(--ink);min-width:2.4em;text-align:right}}
 .auth{{color:var(--mut);font-size:13px}}
 .board td.date{{color:var(--mut);font-size:13px;white-space:nowrap}}
 .board td.model{{color:var(--mut);font-size:13px;white-space:nowrap}}
+/* Let the wide board scroll instead of crushing columns, and progressively
+   drop the secondary metadata columns (model, then date) on smaller screens.
+   Under the breakpoints the table sizes to content so freed space redistributes
+   cleanly. */
+.boardscroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+@media(max-width:880px){{table.board{{table-layout:auto;min-width:600px}}
+.board .model{{display:none}}}}
+@media(max-width:680px){{.board .date{{display:none}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .submithint{{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
 font-size:14px}}
@@ -1339,10 +1347,11 @@ def board_table(entries, records):
             f'{html.escape(type_label(t))}</span>'
             for t in sorted(e["tracks"])) or '<span class=tnone>&middot;</span>'
 
-    cols = ('<colgroup><col style="width:3%"><col style="width:16%">'
-            '<col style="width:16%"><col style="width:7%"><col style="width:7%">'
-            '<col style="width:9%"><col style="width:10%"><col style="width:6%">'
-            '<col style="width:26%"></colgroup>')
+    cols = ('<colgroup><col style="width:3%"><col style="width:15%">'
+            '<col style="width:13%"><col style="width:6%"><col style="width:6%">'
+            '<col style="width:7%"><col style="width:9%"><col style="width:5%">'
+            '<col style="width:16%"><col style="width:10%">'
+            '<col style="width:10%"></colgroup>')
     head = ('<thead><tr><th></th>'
             '<th data-c=codekey data-num title="the code, written [[n,k,d]]; '
             'sorts by n, then k, then d">code</th>'
@@ -1354,13 +1363,15 @@ def board_table(entries, records):
             'kd&sup2;/n</th>'
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=auth title="who submitted it">authors</th>'
-            '<th data-c=model title="claimed model that produced the code; '
-            'self-reported, not verified">model</th>'
-            '<th data-c=date title="publication date for literature, submission '
-            'date for contributions">date</th></tr></thead>')
+            '<th class=model data-c=model title="claimed model that produced '
+            'the code; self-reported, not verified">model</th>'
+            '<th class=date data-c=date title="publication date for literature, '
+            'submission date for contributions">date</th></tr></thead>')
+    # Default ordering: the headline kd^2/n efficiency, highest first, with
+    # (k, d, n) as tiebreakers. Clicking a header re-sorts from here.
     order = sorted(range(len(entries)),
-                   key=lambda i: (-entries[i]["k"], -entries[i]["d"],
-                                  entries[i]["n"]))
+                   key=lambda i: (-entries[i]["eff"], -entries[i]["k"],
+                                  -entries[i]["d"], entries[i]["n"]))
     rows = []
     for i in order:
         e = entries[i]
@@ -1392,8 +1403,8 @@ def board_table(entries, records):
             f'<td class=model>{html.escape(e["model"]) if e["model"] else "&middot;"}</td>'
             f'<td class=date>{html.escape(e["date"]) if e["date"] else "&middot;"}</td></tr>')
 
-    return (f'<table class=board id=mainboard>{cols}{head}'
-            f'<tbody>{"".join(rows)}</tbody></table>')
+    return (f'<div class=boardscroll><table class=board id=mainboard>{cols}{head}'
+            f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
 def build():
