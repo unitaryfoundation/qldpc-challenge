@@ -111,6 +111,13 @@ border-top:1px solid var(--ln);scroll-margin-top:16px}
 .tcount{color:var(--mut);font-size:14px;font-weight:400}
 .plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:16px;margin:14px 0 4px}
+/* Keep the scatters pinned while scrolling the long table below, so the
+   row-hover -> point highlight stays visible. Only when the two plots sit
+   side by side (wide screens); on narrow screens they stack tall and pinning
+   would swallow the viewport. */
+@media(min-width:760px){.plots{position:sticky;top:0;z-index:5;
+background:var(--bg);padding-top:8px;
+box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}
 .plot{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}
 .chartlegend{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
