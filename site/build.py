@@ -1367,7 +1367,7 @@ def board_controls(entries, tracks, records):
             '<div class=searchbar>'
             '<input id=boardsearch type=text autocomplete=off '
             'placeholder="search, e.g.  w&lt;=6 k&gt;=10 d&gt;=8  or  '
-            'eff&gt;5  or  farlab" aria-label="search codes">'
+            'eff&gt;5" aria-label="search codes">'
             '<span id=boardcount class=searchcount></span></div>'
             f'<div class=typepills>{pills}{wslider}'
             '<button type=button class="typepill clearpill" data-q="">'
