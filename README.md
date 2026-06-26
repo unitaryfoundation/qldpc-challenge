@@ -36,9 +36,10 @@ This repo uses [uv](https://docs.astral.sh/uv/) to manage the Python environment
 **Install uv** (one-time):
 
 ```bash
-brew install uv        # macOS
-# or: pip install uv   # any platform
+pip install uv
 ```
+
+(or any method from the [uv install docs](https://docs.astral.sh/uv/getting-started/installation/))
 
 **Verify a code locally:**
 
