@@ -1467,10 +1467,10 @@ def charts_block(entries, records):
         'Corroborated</span>'
         f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
         'Upper bound</span>'
-        f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
+        '<span class=ci><span class=cdot style="background:#475569"></span>'
         'Filled = Pareto record</span>'
         '<span class=ci><span class=cdot '
-        f'style="background:#fff;border:2px solid {ACCENT}"></span>'
+        'style="background:#fff;border:2px solid #475569"></span>'
         'Open = non-frontier</span>'
         '</div>')
     return f'<div class=plots>{d_plot}{eff_plot}</div>{legend}'
