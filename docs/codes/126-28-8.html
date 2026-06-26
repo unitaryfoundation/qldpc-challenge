@@ -68,8 +68,27 @@ padding:16px 20px;background:var(--soft);border-bottom:1px solid var(--ln)}
 .lbh{font-size:18px;margin:0}
 .lbsub{margin:4px 0 0;font-size:13px;color:var(--mut)}
 .lbcta{flex:0 0 auto;font-size:13px;font-weight:600;color:#fff;
-background:var(--ac);border-radius:8px;padding:8px 14px;text-decoration:none}
+background:var(--ac);border:none;border-radius:8px;padding:8px 14px;
+text-decoration:none;cursor:pointer}
 .lbcta:hover{filter:brightness(1.08)}
+.modal{position:relative;border:none;border-radius:14px;padding:22px 24px;
+max-width:520px;width:92%;box-shadow:0 20px 60px rgba(17,17,17,.25)}
+.modal::backdrop{background:rgba(17,17,17,.45)}
+.modalx{position:absolute;top:10px;right:12px;border:none;background:none;
+font-size:24px;line-height:1;color:var(--mut);cursor:pointer}
+.modalh{margin:0 0 2px;font-size:20px}
+.modalsub{margin:0 0 14px;color:var(--mut);font-size:14px}
+.codeblock{position:relative;background:var(--dark);border-radius:10px;
+padding:14px 16px;overflow-x:auto}
+.codeblock pre{margin:0}
+.codeblock code{color:#e4e4e7;font-size:13px;line-height:1.7;
+white-space:pre-wrap;overflow-wrap:anywhere}
+.codeblock .cmt{color:#8a8f98}
+.copybtn{position:absolute;top:8px;right:8px;border:1px solid #3a3f4a;
+background:#1c2230;color:#cbd5e1;font-size:12px;padding:3px 8px;
+border-radius:6px;cursor:pointer}
+.modalfoot{margin:12px 0 0;font-size:13px;color:var(--mut)}
+.modalfoot a{color:var(--ac)}
 .lblist{max-height:232px;overflow-y:auto}
 .lbrow{display:flex;align-items:center;gap:14px;padding:11px 20px;
 border-bottom:1px solid var(--ln);text-decoration:none;color:var(--ink)}
@@ -212,12 +231,6 @@ box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}
 .board .model{display:none}}
 @media(max-width:680px){.board .date{display:none}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
-.submithint{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
-font-size:14px}
-.submithint code{display:inline-block;margin-top:6px;padding:4px 8px;
-background:var(--soft);border:1px solid var(--ln);border-radius:6px;
-font-size:13px}
-.submitsub{display:block;margin-top:6px;color:var(--mut);font-size:13px}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}
 .b.exact{background:#d1fae5;color:var(--ex)}.b.ub{background:#eef2f7;

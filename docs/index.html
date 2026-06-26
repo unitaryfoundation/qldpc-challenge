@@ -68,8 +68,27 @@ padding:16px 20px;background:var(--soft);border-bottom:1px solid var(--ln)}
 .lbh{font-size:18px;margin:0}
 .lbsub{margin:4px 0 0;font-size:13px;color:var(--mut)}
 .lbcta{flex:0 0 auto;font-size:13px;font-weight:600;color:#fff;
-background:var(--ac);border-radius:8px;padding:8px 14px;text-decoration:none}
+background:var(--ac);border:none;border-radius:8px;padding:8px 14px;
+text-decoration:none;cursor:pointer}
 .lbcta:hover{filter:brightness(1.08)}
+.modal{position:relative;border:none;border-radius:14px;padding:22px 24px;
+max-width:520px;width:92%;box-shadow:0 20px 60px rgba(17,17,17,.25)}
+.modal::backdrop{background:rgba(17,17,17,.45)}
+.modalx{position:absolute;top:10px;right:12px;border:none;background:none;
+font-size:24px;line-height:1;color:var(--mut);cursor:pointer}
+.modalh{margin:0 0 2px;font-size:20px}
+.modalsub{margin:0 0 14px;color:var(--mut);font-size:14px}
+.codeblock{position:relative;background:var(--dark);border-radius:10px;
+padding:14px 16px;overflow-x:auto}
+.codeblock pre{margin:0}
+.codeblock code{color:#e4e4e7;font-size:13px;line-height:1.7;
+white-space:pre-wrap;overflow-wrap:anywhere}
+.codeblock .cmt{color:#8a8f98}
+.copybtn{position:absolute;top:8px;right:8px;border:1px solid #3a3f4a;
+background:#1c2230;color:#cbd5e1;font-size:12px;padding:3px 8px;
+border-radius:6px;cursor:pointer}
+.modalfoot{margin:12px 0 0;font-size:13px;color:var(--mut)}
+.modalfoot a{color:var(--ac)}
 .lblist{max-height:232px;overflow-y:auto}
 .lbrow{display:flex;align-items:center;gap:14px;padding:11px 20px;
 border-bottom:1px solid var(--ln);text-decoration:none;color:var(--ink)}
@@ -212,12 +231,6 @@ box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}
 .board .model{display:none}}
 @media(max-width:680px){.board .date{display:none}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
-.submithint{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
-font-size:14px}
-.submithint code{display:inline-block;margin-top:6px;padding:4px 8px;
-background:var(--soft);border:1px solid var(--ln);border-radius:6px;
-font-size:13px}
-.submitsub{display:block;margin-top:6px;color:var(--mut);font-size:13px}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}
 .b.exact{background:#d1fae5;color:var(--ex)}.b.ub{background:#eef2f7;
@@ -298,7 +311,12 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=wrap>
 <section class=statsbar><div class="stat-card hero" title="new codes found and submitted through the challenge"><div class=v>21</div><div class=l>new codes</div></div><div class="stat-card" title="published codes seeded as the bar to beat"><div class=v>19</div><div class=l>literature baselines</div></div><div class="stat-card" title="distance proven exact by server-side certification (d =)"><div class=v>27</div><div class=l>certified exact</div></div><div class="stat-card"><div class=v>21.778</div><div class=l>best kd&sup2;/n</div></div></section>
 <section class=challenges><h2 class=chalh>Open challenges</h2><p class=chalsub>Bars to beat. Found a better code? <code>./qldpc submit mycode.npz --authors @you</code></p><div class=chalgrid><div class=chal><div class=chaltitle>2D-local efficiency</div><div class=chalnow>best on board kd&sup2;/n 8 (<a href="codes/294-12-14.html">[[294,12,14]]</a>)</div><div class=chalgoal>reach kd&sup2;/n 9.75, the [[323,14,15]] tile code (arXiv:2504.09171), with a verified flip-chip layout.</div></div><div class=chal><div class=chaltitle>High-rate / large-block</div><div class=chalnow>no verified entries yet</div><div class=chalgoal>land a high-rate code with a checkable distance witness. Bars: [[9216,4612,&le;48]] and [[16384,4142,&le;40]] (Kasai et al, arXiv:2601.08824 / 2604.20838).</div></div></div></section>
-<section class=lb id=leaderboard><div class=lbhead><div><h2 class=lbh>Leaderboard</h2><p class=lbsub>2 contributors &middot; 21 codes found through the challenge</p></div><a class=lbcta href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/CONTRIBUTING.md">Add yours</a></div><div class=submithint>One command turns your H_X / H_Z into a verified submission:<br><code>./qldpc submit mycode.npz --authors @you</code><span class=submitsub> builds it, finds the distance witness, runs the verifier, and stages the PR. <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/CONTRIBUTING.md">full guide</a> &middot; have an LLM or agent? <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/blob/main/CONTRIBUTING.md#contribute-with-an-llm">paste the research prompt</a> and it searches and submits for you.</span></div><div class=lblist><a class=lbrow href="https://github.com/FarLab"><span class=lbrank>1</span><img class=lbav loading=lazy alt="" src="https://github.com/FarLab.png?size=64"><span class=lbname>@FarLab <span class=lbcrown title="top contributor">&#128081;</span></span><span class=lbm><b>20</b><span class=lbml>codes</span></span><span class=lbm><b>14</b><span class=lbml>on frontier</span></span><span class=lbm><b>16</b><span class=lbml>exact</span></span><span class=lbm><b>21.778</b><span class=lbml>best kd&sup2;/n</span></span></a><a class=lbrow href="https://github.com/vprusso"><span class=lbrank>2</span><img class=lbav loading=lazy alt="" src="https://github.com/vprusso.png?size=64"><span class=lbname>@vprusso</span><span class=lbm><b>18</b><span class=lbml>codes</span></span><span class=lbm><b>13</b><span class=lbml>on frontier</span></span><span class=lbm><b>16</b><span class=lbml>exact</span></span><span class=lbm><b>8</b><span class=lbml>best kd&sup2;/n</span></span></a></div></section>
+<section class=lb id=leaderboard><div class=lbhead><div><h2 class=lbh>Leaderboard</h2><p class=lbsub>2 contributors &middot; 21 codes found through the challenge</p></div><button class=lbcta type=button onclick="document.getElementById(&quot;participate&quot;).showModal()">Participate</button></div><div class=lblist><a class=lbrow href="https://github.com/FarLab"><span class=lbrank>1</span><img class=lbav loading=lazy alt="" src="https://github.com/FarLab.png?size=64"><span class=lbname>@FarLab <span class=lbcrown title="top contributor">&#128081;</span></span><span class=lbm><b>20</b><span class=lbml>codes</span></span><span class=lbm><b>14</b><span class=lbml>on frontier</span></span><span class=lbm><b>16</b><span class=lbml>exact</span></span><span class=lbm><b>21.778</b><span class=lbml>best kd&sup2;/n</span></span></a><a class=lbrow href="https://github.com/vprusso"><span class=lbrank>2</span><img class=lbav loading=lazy alt="" src="https://github.com/vprusso.png?size=64"><span class=lbname>@vprusso</span><span class=lbm><b>18</b><span class=lbml>codes</span></span><span class=lbm><b>13</b><span class=lbml>on frontier</span></span><span class=lbm><b>16</b><span class=lbml>exact</span></span><span class=lbm><b>8</b><span class=lbml>best kd&sup2;/n</span></span></a></div><dialog id=participate class=modal><form method=dialog><button class=modalx aria-label="close">&times;</button></form><h3 class=modalh>Participate</h3><p class=modalsub>Run it yourself, or point a coding agent at it.</p><div class=codeblock><button class=copybtn type=button data-copy="git clone https://github.com/unitaryfoundation/qldpc-challenge
+cd qldpc-challenge
+./qldpc submit mycode.npz --authors @you">copy</button><pre><code>git clone https://github.com/unitaryfoundation/qldpc-challenge
+cd qldpc-challenge
+<span class=cmt># bring your H_X / H_Z as mycode.npz (keys hx, hz)</span>
+./qldpc submit mycode.npz --authors @you</code></pre></div><p class=modalfoot>It finds the distance witness, runs the verifier, and opens the PR for you.</p><p class=modalfoot>Have an LLM or coding agent? <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/CONTRIBUTING.md#contribute-with-an-llm">paste the research prompt</a> and it runs the whole loop. <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/CONTRIBUTING.md">full guide</a></p><script>(function(){var d=document.getElementById("participate");if(!d)return;d.addEventListener("click",function(e){if(e.target===d)d.close();});var c=d.querySelector(".copybtn");if(c)c.addEventListener("click",function(){navigator.clipboard.writeText(c.dataset.copy);var o=c.textContent;c.textContent="copied";setTimeout(function(){c.textContent=o;},1200);});})();</script></dialog></section>
 <div class=how><div class=card><span class=n>1</span><h3>Build a code</h3><p>A CSS qLDPC code, written as one JSON file with its parity checks and a distance witness.</p></div><div class=card><span class=n>2</span><h3>Open a PR</h3><p>Add it under <code>codes/</code>. CI runs the verifier on every submission automatically.</p></div><div class=card><span class=n>3</span><h3>Climb the board</h3><p>If it advances a track&rsquo;s frontier it is highlighted. Click any row for the witness, certificate, and checks.</p></div></div>
 <section id=board><h2 class=track>Codes <span class=tcount>&middot; 40 total, 32 records</span></h2><div class=searchbar><input id=boardsearch type=text autocomplete=off placeholder="search, e.g.  w&lt;=6 k&gt;=10 d&gt;=8  or  eff&gt;5" aria-label="search codes"><span id=boardcount class=searchcount></span></div><div class=typepills><button type=button class=typepill data-q="2d-local" title="filter to 2d-local-bilayer">2D-local</button><button type=button class=typepill data-q="bivariate" title="filter to bivariate bicycle (periodic)">BB (periodic)</button><button type=button class=typepill data-q="generalized" title="filter to generalized bicycle">GB</button><button type=button class=typepill data-q="topological" title="filter to topological">topological</button><button type=button class=typepill data-q="weight-6" title="filter to weight-6">weight-6</button><span class=wfilter title="filter by maximum check weight w"><span class=wflabel>weight</span><span class=wfslider><span class=wftrack></span><span class=wffill id=wffill></span><input type=range id=wlo class=wfrange min=4 max=10 value=4 step=1 aria-label="minimum check weight"><input type=range id=whi class=wfrange min=4 max=10 value=10 step=1 aria-label="maximum check weight"></span><span class=wfval id=wfval>4&ndash;10</span></span><button type=button class="typepill clearpill" data-q="">clear</button></div><p class=searchhelp>Filter with the weight slider, or type terms (all must match): a type or author name, or a comparison on <b>n</b>, <b>k</b>, <b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), e.g. <code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. The word <code>record</code> keeps only frontier records.</p></section>
 <div class=explorer>

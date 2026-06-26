@@ -358,8 +358,27 @@ padding:16px 20px;background:var(--soft);border-bottom:1px solid var(--ln)}}
 .lbh{{font-size:18px;margin:0}}
 .lbsub{{margin:4px 0 0;font-size:13px;color:var(--mut)}}
 .lbcta{{flex:0 0 auto;font-size:13px;font-weight:600;color:#fff;
-background:var(--ac);border-radius:8px;padding:8px 14px;text-decoration:none}}
+background:var(--ac);border:none;border-radius:8px;padding:8px 14px;
+text-decoration:none;cursor:pointer}}
 .lbcta:hover{{filter:brightness(1.08)}}
+.modal{{position:relative;border:none;border-radius:14px;padding:22px 24px;
+max-width:520px;width:92%;box-shadow:0 20px 60px rgba(17,17,17,.25)}}
+.modal::backdrop{{background:rgba(17,17,17,.45)}}
+.modalx{{position:absolute;top:10px;right:12px;border:none;background:none;
+font-size:24px;line-height:1;color:var(--mut);cursor:pointer}}
+.modalh{{margin:0 0 2px;font-size:20px}}
+.modalsub{{margin:0 0 14px;color:var(--mut);font-size:14px}}
+.codeblock{{position:relative;background:var(--dark);border-radius:10px;
+padding:14px 16px;overflow-x:auto}}
+.codeblock pre{{margin:0}}
+.codeblock code{{color:#e4e4e7;font-size:13px;line-height:1.7;
+white-space:pre-wrap;overflow-wrap:anywhere}}
+.codeblock .cmt{{color:#8a8f98}}
+.copybtn{{position:absolute;top:8px;right:8px;border:1px solid #3a3f4a;
+background:#1c2230;color:#cbd5e1;font-size:12px;padding:3px 8px;
+border-radius:6px;cursor:pointer}}
+.modalfoot{{margin:12px 0 0;font-size:13px;color:var(--mut)}}
+.modalfoot a{{color:var(--ac)}}
 .lblist{{max-height:232px;overflow-y:auto}}
 .lbrow{{display:flex;align-items:center;gap:14px;padding:11px 20px;
 border-bottom:1px solid var(--ln);text-decoration:none;color:var(--ink)}}
@@ -502,12 +521,6 @@ box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}}}}
 .board .model{{display:none}}}}
 @media(max-width:680px){{.board .date{{display:none}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
-.submithint{{margin:0;padding:12px 20px;border-bottom:1px solid var(--ln);
-font-size:14px}}
-.submithint code{{display:inline-block;margin-top:6px;padding:4px 8px;
-background:var(--soft);border:1px solid var(--ln);border-radius:6px;
-font-size:13px}}
-.submitsub{{display:block;margin-top:6px;color:var(--mut);font-size:13px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
@@ -1203,24 +1216,48 @@ def contributors_panel(entries, tracks):
             + metric(s["exact"], "exact")
             + metric(f'{s["eff"]:g}', "best kd&sup2;/n")
             + '</a>')
+    cmd = (f"git clone {REPO_ROOT}\n"
+           "cd qldpc-challenge\n"
+           "./qldpc submit mycode.npz --authors @you")
+    modal = (
+        '<dialog id=participate class=modal>'
+        '<form method=dialog><button class=modalx aria-label="close">'
+        '&times;</button></form>'
+        '<h3 class=modalh>Participate</h3>'
+        '<p class=modalsub>Run it yourself, or point a coding agent at it.</p>'
+        '<div class=codeblock>'
+        f'<button class=copybtn type=button data-copy="{html.escape(cmd)}">'
+        'copy</button>'
+        f'<pre><code>git clone {REPO_ROOT}\n'
+        'cd qldpc-challenge\n'
+        '<span class=cmt># bring your H_X / H_Z as mycode.npz (keys hx, hz)'
+        '</span>\n'
+        './qldpc submit mycode.npz --authors @you</code></pre></div>'
+        '<p class=modalfoot>It finds the distance witness, runs the verifier, '
+        'and opens the PR for you.</p>'
+        '<p class=modalfoot>Have an LLM or coding agent? '
+        f'<a href="{REPO}/CONTRIBUTING.md#contribute-with-an-llm">paste the '
+        'research prompt</a> and it runs the whole loop. '
+        f'<a href="{REPO}/CONTRIBUTING.md">full guide</a></p>'
+        '<script>(function(){var d=document.getElementById("participate");'
+        'if(!d)return;'
+        'd.addEventListener("click",function(e){if(e.target===d)d.close();});'
+        'var c=d.querySelector(".copybtn");if(c)c.addEventListener("click",'
+        'function(){navigator.clipboard.writeText(c.dataset.copy);'
+        'var o=c.textContent;c.textContent="copied";'
+        'setTimeout(function(){c.textContent=o;},1200);});})();</script>'
+        '</dialog>')
     return ('<section class=lb id=leaderboard><div class=lbhead>'
             '<div><h2 class=lbh>Leaderboard</h2>'
             f'<p class=lbsub>{len(order)} contributor'
             f'{"" if len(order) == 1 else "s"} &middot; {n_codes} codes found '
             'through the challenge</p></div>'
-            f'<a class=lbcta href="{REPO}/CONTRIBUTING.md">Add yours</a>'
+            '<button class=lbcta type=button onclick="document.getElementById('
+            '&quot;participate&quot;).showModal()">Participate</button>'
             '</div>'
-            '<div class=submithint>One command turns your H_X / H_Z into a '
-            'verified submission:<br>'
-            '<code>./qldpc submit mycode.npz --authors @you</code>'
-            '<span class=submitsub> builds it, finds the distance witness, '
-            'runs the verifier, and stages the PR. '
-            f'<a href="{REPO}/CONTRIBUTING.md">full guide</a>'
-            ' &middot; have an LLM or agent? '
-            f'<a href="{REPO}/blob/main/CONTRIBUTING.md#contribute-with-an-llm">'
-            'paste the research prompt</a> and it searches and submits for you.'
-            '</span></div>'
-            f'<div class=lblist>{"".join(rows)}</div></section>')
+            f'<div class=lblist>{"".join(rows)}</div>'
+            + modal +
+            '</section>')
 
 
 FAQ = [
