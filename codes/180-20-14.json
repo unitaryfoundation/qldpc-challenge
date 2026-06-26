@@ -1859,7 +1859,7 @@
     ],
     "origin": "submission",
     "construction": "Coset-based two-block (2BGA) code. Group G = metacyclic C30 |x C6 (action r=11, order 180); non-normal subgroup H=C2; qubits indexed by cosets G/H. H_X=[L(a)|R(b)], H_Z=[R(b)^T|L(a)^T] with left/right coset actions; a,b element supports [0, 50, 146, 172] / [0, 18, 55, 147] found by simulated annealing. Weight-8 checks. A generalization of bivariate bicycle codes.",
-    "model": "Claude",
+    "model": "Claude Opus 4.8",
     "references": [
       "arXiv:2606.17268"
     ],

@@ -1104,7 +1104,7 @@
   ],
   "origin": "submission",
   "construction": "Generalized weight-6, notched (9,9). New instance of the Liang-Eberhardt-Chen open-boundary family (arXiv:2504.08887); the paper has no k=5 family.",
-  "model": "Claude",
+  "model": "Claude Opus 4.8",
   "date": "2026-06-19",
   "references": [
    "arXiv:2504.08887"

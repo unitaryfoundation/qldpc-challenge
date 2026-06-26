@@ -2795,7 +2795,7 @@
   ],
   "origin": "submission",
   "construction": "Generalized weight-6 form f = 1 + xy + x^-1 y^2, g = 1 + x^-1 y + x^-2 y^-1; open boundaries via annulus-type boundary engine, (10,12) lattice. New instance of the Liang-Eberhardt-Chen open-boundary family (arXiv:2504.08887), outside the paper's enumerated form; the paper's k=6 family stops at [[221,6,10]].",
-  "model": "Claude",
+  "model": "Claude Opus 4.8",
   "date": "2026-06-19",
   "references": [
    "arXiv:2504.08887"

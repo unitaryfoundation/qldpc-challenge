@@ -483,7 +483,9 @@ color:var(--ink);min-width:2.4em;text-align:right}}
 .board td.date{{color:var(--mut);font-size:13px;white-space:nowrap}}
 .board td.model{{color:var(--mut);font-size:13px;white-space:nowrap}}
 .nomodel{{color:#94a3b8;display:inline-flex;vertical-align:middle}}
-.modelmark,.modelicon{{display:inline-flex;vertical-align:middle}}
+.modelmark,.modelicon{{display:inline-flex;align-items:center;gap:5px;
+vertical-align:middle}}
+.board td.model .modelname{{font-size:13px;color:var(--ink)}}
 /* Let the wide board scroll instead of crushing columns, and progressively
    drop the secondary metadata columns (model, then date) on smaller screens.
    Under the breakpoints the table sizes to content so freed space redistributes
@@ -1415,11 +1417,11 @@ def board_table(entries, records):
             f'{html.escape(type_label(t))}</span>'
             for t in sorted(e["tracks"])) or '<span class=tnone>&middot;</span>'
 
-    cols = ('<colgroup><col style="width:3%"><col style="width:15%">'
-            '<col style="width:12%"><col style="width:6%"><col style="width:6%">'
-            '<col style="width:7%"><col style="width:9%"><col style="width:5%">'
-            '<col style="width:19%"><col style="width:8%">'
-            '<col style="width:10%"></colgroup>')
+    cols = ('<colgroup><col style="width:3%"><col style="width:14%">'
+            '<col style="width:9%"><col style="width:6%"><col style="width:6%">'
+            '<col style="width:7%"><col style="width:8%"><col style="width:5%">'
+            '<col style="width:17%"><col style="width:16%">'
+            '<col style="width:9%"></colgroup>')
     head = ('<thead><tr><th></th>'
             '<th data-c=codekey data-num title="the code, written [[n,k,d]]; '
             'sorts by n, then k, then d">code</th>'
@@ -1471,9 +1473,10 @@ def board_table(entries, records):
             f'<td class=auth title="{html.escape(e["authors"])}">'
             f'{authors_compact(e["authors_list"])}</td>'
             '<td class=model>'
-            + (f'<span class=modelmark title="Claude">{CLAUDE_MARK}</span>'
-               if e["model"] == "Claude"
-               else html.escape(e["model"]) if e["model"]
+            + (f'<span class=modelmark title="{html.escape(e["model"])}">'
+               f'{CLAUDE_MARK if e["model"].startswith("Claude") else ""}'
+               f'<span class=modelname>{html.escape(e["model"])}</span></span>'
+               if e["model"]
                else f'<span class=nomodel title="classical construction, no AI '
                     f'model">{HUMAN_MARK}</span>')
             + '</td>'

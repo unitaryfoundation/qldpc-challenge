@@ -634,7 +634,7 @@
   ],
   "origin": "submission",
   "construction": "Generalized weight-6, notched (7,7).",
-  "model": "Claude",
+  "model": "Claude Opus 4.8",
   "references": [
    "arXiv:2504.08887"
   ],
