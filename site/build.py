@@ -372,8 +372,10 @@ font-size:24px;line-height:1;color:var(--mut);cursor:pointer}}
 padding:14px 16px;overflow-x:auto}}
 .codeblock pre{{margin:0}}
 .codeblock code{{color:#e4e4e7;font-size:13px;line-height:1.7;
-white-space:pre-wrap;overflow-wrap:anywhere}}
-.codeblock .cmt{{color:#8a8f98}}
+white-space:pre-wrap;overflow-wrap:anywhere;background:none;padding:0;
+border:none}}
+.codeblock ::selection{{background:#4f46e5;color:#fff}}
+.codeblock .cmt{{color:#8a8f98;background:none}}
 .copybtn{{position:absolute;top:8px;right:8px;border:1px solid #3a3f4a;
 background:#1c2230;color:#cbd5e1;font-size:12px;padding:3px 8px;
 border-radius:6px;cursor:pointer}}
@@ -1221,7 +1223,7 @@ def contributors_panel(entries, tracks):
            "./qldpc submit mycode.npz --authors @you")
     modal = (
         '<dialog id=participate class=modal>'
-        '<form method=dialog><button class=modalx aria-label="close">'
+        '<form method=dialog><button class=modalx autofocus aria-label="close">'
         '&times;</button></form>'
         '<h3 class=modalh>Participate</h3>'
         '<p class=modalsub>Run it yourself, or point a coding agent at it.</p>'
@@ -1302,7 +1304,7 @@ FAQ = [
      "weight. That certifies the distance as an upper bound (d &le;) with no "
      "trust required. A code shows d= (certified exact) only when an "
      "independent certificate proves no shorter logical operator exists."),
-    ("What do d= and d&le; mean, and how is the distance found?",
+    ("What do d= and d≤ mean, and how is the distance found?",
      "Distance d is the weight of the lightest nontrivial logical operator. "
      "d&le; (upper bound) means a submission exhibits an explicit logical "
      "operator of that weight, found by a decoder-based search (BP+OSD random "
@@ -1324,9 +1326,7 @@ FAQ = [
      "Add one JSON file under <code>codes/</code> following the schema and open "
      "a pull request; CI verifies it automatically. See "
      f"<a href=\"{REPO}/CONTRIBUTING.md\">CONTRIBUTING</a> and "
-     f"<a href=\"{REPO}/schema/SCHEMA.md\">the schema</a>. The "
-     "<a href=\"https://github.com/qLDPCOrg/qLDPC\">qLDPC library</a> is a "
-     "convenient way to build a code and export its parity checks."),
+     f"<a href=\"{REPO}/schema/SCHEMA.md\">the schema</a>."),
 ]
 
 
