@@ -87,6 +87,13 @@ def main():
     check("out-of-range qubit index rejected",
           not r["ok"] and "qubit_indices_in_range" in failed_checks(r))
 
+    # 5b. a claimed model must name a version, not a bare vendor name
+    d = copy.deepcopy(GOOD)
+    d.setdefault("provenance", {})["model"] = "Claude"
+    r = rep(d)
+    check("underspecified model (no version) rejected",
+          not r["ok"] and "model_version_specified" in failed_checks(r))
+
     # 6. inflated distance: claim d larger than the witness actually achieves
     d = copy.deepcopy(GOOD)
     d["distance"]["X"]["value"] += 3

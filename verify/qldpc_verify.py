@@ -198,6 +198,18 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                default=0)
     report["computed"]["max_check_weight"] = wmax
 
+    # The model field is self-reported and unverifiable, but if one is claimed it
+    # must name a specific version, not a bare vendor name: "Claude" tells a reader
+    # nothing reproducible, "Claude Opus 4.8" does. Omitting it (a human or unknown
+    # author) is fine; "human" is the explicit non-model sentinel.
+    model = (doc.get("provenance") or {}).get("model")
+    if model and model.strip() and model.strip().lower() != "human":
+        specific = any(ch.isdigit() for ch in model)
+        record("model_version_specified", specific,
+               model if specific else
+               f"'{model}' names no version; give the exact model, e.g. "
+               "'Claude Opus 4.8', or omit the field")
+
     # 6. distance witnesses (self-certifying upper bounds)
     dist = doc["distance"]
     earned_d = []

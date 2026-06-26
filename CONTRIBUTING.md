@@ -26,8 +26,9 @@ failed before anything leaves your machine.
 
 Useful flags:
 
-- `--model "Opus 4.8"` what produced the code (self-reported, shown on the
-  board as a claim, not verified);
+- `--model "Claude Opus 4.8"` what produced the code, named to a specific
+  version, not a bare vendor name (self-reported, shown on the board as a claim,
+  not verified; if you name a model the verifier requires a version);
 - `--construction "..."` how it was built (family, polynomials, search);
 - `--coords coords.npz --layers 2` a 2D layout to enter the `2d-local` tracks
   (the verifier proves the locality; see TRACKS.md);
@@ -82,8 +83,9 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    under deeper search (e.g. [[390,8,<=26]] fell to 24, [[1080,60,<=116]] to
    18). Keep only a distance that holds.
 
-5. Submit: ./qldpc submit yourcode.npz --authors @yourhandle --model "<model>".
-   It finds the witness, runs the verifier, and opens the PR. CI re-verifies.
+5. Submit: ./qldpc submit yourcode.npz --authors @yourhandle --model "<exact
+   model version, e.g. Claude Opus 4.8>". It finds the witness, runs the
+   verifier, and opens the PR. CI re-verifies.
 
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.

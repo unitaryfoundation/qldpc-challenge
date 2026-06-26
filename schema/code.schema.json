@@ -57,7 +57,7 @@
           "description": "baseline: a published code seeded for comparison. submission: a code contributed through the challenge. Defaults to submission when omitted."
         },
         "construction": {"type": "string", "minLength": 1, "description": "how the code was built (family, polynomials, search, reference)"},
-        "model": {"type": "string", "maxLength": 80, "description": "optional, self-reported: the AI model (e.g. 'Opus 4.8') or 'human' that produced the code. Claimed, not verified -- there is no way to certify which model generated a result."},
+        "model": {"type": "string", "maxLength": 80, "description": "optional, self-reported: the AI model that produced the code, named to a specific version (e.g. 'Claude Opus 4.8', not a bare 'Claude'), or 'human'. Claimed, not verified -- there is no way to certify which model generated a result, but if one is named the verifier requires a version so the claim is reproducible."},
         "references": {"type": "array", "items": {"type": "string"}},
         "date": {"type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}-[0-9]{2})?$", "description": "publication date for a literature baseline (a year is enough) or submission date (YYYY-MM-DD) for a contribution"},
         "notes": {"type": "string"}

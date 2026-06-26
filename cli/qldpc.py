@@ -260,8 +260,10 @@ def main(argv=None):
     s.add_argument("--construction", default="",
                    help="how the code was built (family, polynomials, search)")
     s.add_argument("--model", default="",
-                   help="self-reported model that produced it, e.g. 'Opus 4.8' "
-                        "or 'human' (claimed, not verified)")
+                   help="self-reported model that produced it, named to a specific "
+                        "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'), or "
+                        "'human' (claimed, not verified; the verifier requires a "
+                        "version if a model is named)")
     s.add_argument("--notes", default="")
     s.add_argument("--date", default="",
                    help="submission date (YYYY-MM-DD); defaults to today")
