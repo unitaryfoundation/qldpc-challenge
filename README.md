@@ -74,6 +74,3 @@ Verify locally before opening a PR (uv handles the environment):
 ```
 uv run python verify/qldpc_verify.py codes/your-code.json
 ```
-
-The boards are seeded with the codes of Liang, Eberhardt, Chen
-(arXiv:2504.08887) as the reference baseline.
