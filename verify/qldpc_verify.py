@@ -29,6 +29,7 @@ What "verified" means per field:
 import json
 import math
 import os
+import secrets
 import sys
 
 import numpy as np
@@ -119,7 +120,13 @@ def _vec(support, n):
     return v
 
 
-def verify(doc, refute=False):
+def verify(doc, refute=False, seed=None):
+    """Verify a submission. If ``refute`` is set, run the distance refutation with
+    ``seed`` -- when ``seed is None`` a fresh RANDOM seed is drawn, so the gate is
+    non-deterministic by design (an over-claim cannot reliably evade one fixed
+    search). The seed used is reported in the ``distance_not_refuted`` detail, so a
+    failing run is reproducible (re-run with that seed). Pass an explicit ``seed``
+    to reproduce a run or for a deterministic test."""
     report = {"name": doc.get("name") if isinstance(doc, dict) else None,
               "checks": [], "ok": True, "computed": {}, "earned_distance": {}}
 
@@ -147,13 +154,13 @@ def verify(doc, refute=False):
         return report
     try:
         report["signature"] = signature(doc)
-        return _verify_semantic(doc, report, record, refute)
+        return _verify_semantic(doc, report, record, refute, seed)
     except Exception as e:  # never crash on a hostile submission
         record("verifier_ran", False, f"{type(e).__name__}: {e}")
         return report
 
 
-def _verify_semantic(doc, report, record, refute=False):
+def _verify_semantic(doc, report, record, refute=False, seed=None):
 
     n = doc["n"]
     # index bounds already gated in verify(); safe to build matrices.
@@ -224,31 +231,34 @@ def _verify_semantic(doc, report, record, refute=False):
         report["earned_distance"]["d"] = {"value": dist["d"],
                                           "tier": "upper_bound"}
 
-    # 8. independent distance refutation. A bounded, fixed-seed RIS search must not
-    #    find a logical lighter than the claimed distance. This is SOUND -- any hit
-    #    is a checkable lighter logical, so a real over-claim -- but not complete (a
-    #    clean pass is "no over-claim found at this budget", not a proof).
-    #    Deterministic. Opt-in (`refute=True`): the per-submission CLI gate runs it,
-    #    and so does whole-board re-verification (verify_all) -- the safety net for
-    #    any over-claim that bypassed the changed-file gate. Fast/non-gate callers
-    #    (site build, research recipes) pass refute=False.
+    # 8. independent distance refutation. A bounded RIS search must not find a
+    #    logical lighter than the claimed distance. This is SOUND -- any hit is a
+    #    checkable lighter logical, so a real over-claim -- but not complete (a
+    #    clean pass is "no over-claim found at this budget", not a proof). Opt-in
+    #    (`refute=True`): the per-submission gate runs it; fast/non-gate callers
+    #    (site build, verify_all, research recipes) pass refute=False.
+    #
+    #    NON-DETERMINISTIC BY DESIGN: the seed is random unless one is passed, so an
+    #    over-claim cannot reliably evade a single fixed search -- a re-run draws a
+    #    new seed and gets another chance to catch it. The trade-off is that a
+    #    re-run can change the verdict; the seed is always reported so a failing run
+    #    is reproducible (verify(doc, refute=True, seed=<that seed>)).
     #
     #    FAILS CLOSED: if the refuter cannot run, that is recorded as a FAILURE, not
-    #    a silent pass -- a gate that fails open is no gate. The refuter is pure
-    #    Python and deterministic, so an error here means a real tooling problem
-    #    that must be fixed (or the input quarantined), never waved through.
+    #    a silent pass -- a gate that fails open is no gate.
     if refute and earned_d:
+        run_seed = seed if seed is not None else secrets.randbelow(2**31)
         try:
             import heuristic_distance
-            refuted, d_found, wit, ntr = heuristic_distance.refute_check(doc, seed=0)
+            refuted, d_found, wit, ntr = heuristic_distance.refute_check(doc, seed=run_seed)
             record("distance_not_refuted", not refuted,
-                   (f"found weight-{d_found} logical < claimed {dist['d']}; "
-                    f"witness={wit}" if refuted
-                    else f"no lighter logical in {ntr} RIS trials"))
+                   (f"found weight-{d_found} logical < claimed {dist['d']} "
+                    f"(seed {run_seed}); witness={wit}" if refuted
+                    else f"no lighter logical in {ntr} RIS trials (seed {run_seed})"))
         except Exception as e:
             record("distance_not_refuted", False,
-                   f"refutation could not run ({type(e).__name__}: {e}); failing "
-                   f"closed -- manual review required before this claim is trusted")
+                   f"refutation could not run ({type(e).__name__}: {e}; seed "
+                   f"{run_seed}); failing closed -- manual review required")
 
     # 9. locality / geometric 2D embedding. The 2d-local-* tracks rank codes by
     #    how short-range their checks are, so membership has to be *proven*, not

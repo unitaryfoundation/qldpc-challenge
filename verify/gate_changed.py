@@ -15,6 +15,7 @@ Usage:
 """
 import json
 import os
+import secrets
 import subprocess
 import sys
 
@@ -47,13 +48,27 @@ def changed_codes(base):
 
 
 def main(argv):
+    rest = [a for a in argv if not a.endswith(".json")]
+    seed = None
+    if "--seed" in rest:
+        i = rest.index("--seed")
+        seed = int(rest[i + 1])
+        rest = rest[:i] + rest[i + 2:]
     files = [a for a in argv if a.endswith(".json")]
-    base = next((a for a in argv if not a.endswith(".json")), "origin/main")
+    base = next((a for a in rest), "origin/main")
     if not files:
         files = changed_codes(base)
     if not files:
         print("no changed code submissions to gate")
         return 0
+
+    # Random seed by design: a re-run draws a new search, so an over-claim cannot
+    # reliably evade one fixed seed. The trade-off is that re-running can change the
+    # verdict (a merge can fail later) -- the seed is printed so any run reproduces.
+    if seed is None:
+        seed = secrets.randbelow(2**31)
+    print(f"refutation seed = {seed}  "
+          f"(reproduce: python verify/gate_changed.py --seed {seed} <files>)\n")
 
     SD = _load_syndrome()
     if SD is None:
@@ -69,9 +84,9 @@ def main(argv):
         if "distance" not in doc or "d" not in doc.get("distance", {}):
             continue
         # two independent mechanisms; a hit from EITHER refutes the claim.
-        results = {"RIS": H.refute_check(doc, seed=0)}
+        results = {"RIS": H.refute_check(doc, seed=seed)}
         if SD is not None:
-            results["syndrome-decoder"] = SD.refute_check(doc, seed=0)
+            results["syndrome-decoder"] = SD.refute_check(doc, seed=seed + 1)
         hits = {m: (dh, wit) for m, (ref, dh, wit, _) in results.items() if ref}
         if hits:
             refuted += 1

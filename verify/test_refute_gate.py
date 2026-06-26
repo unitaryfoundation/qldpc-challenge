@@ -9,6 +9,10 @@ GATE  An over-claimed distance (genuine but artificially heavy witnesses, so the
 F2    If the refuter cannot run, verify(refute=True) must FAIL CLOSED (ok False),
       never silently pass.
 
+SEED  The refutation seed is random by default (so an over-claim can't reliably
+      evade one fixed search); the seed is reported for reproducibility, and an
+      explicit seed makes a run deterministic. Tests pass seed=0 to stay stable.
+
 Run: uv run python verify/test_refute_gate.py  (or pytest)
 """
 import copy
@@ -81,10 +85,12 @@ def main():
     r_off = qldpc_verify.verify(over, refute=False)
     check("refute=False ACCEPTS the over-claim (the gap F1 closes)", r_off["ok"])
 
-    r_on = qldpc_verify.verify(over, refute=True)
+    # explicit seed -> deterministic test (the gate is random by default)
+    r_on = qldpc_verify.verify(over, refute=True, seed=0)
     nd = next((c for c in r_on["checks"] if c["check"] == "distance_not_refuted"), None)
     check("refute=True REJECTS the over-claim", not r_on["ok"])
     check("distance_not_refuted is the failing check", nd is not None and not nd["ok"])
+    check("the seed is reported (reproducible)", nd is not None and "seed 0" in nd["detail"])
 
     print("\nF2: a refuter error fails CLOSED")
     good = json.load(open(os.path.join(ROOT, "examples", "72-6-6.json")))
@@ -93,7 +99,7 @@ def main():
         def boom(*a, **k):
             raise RuntimeError("simulated refuter failure")
         heuristic_distance.refute_check = boom
-        r = qldpc_verify.verify(good, refute=True)
+        r = qldpc_verify.verify(good, refute=True, seed=0)
     finally:
         heuristic_distance.refute_check = orig
     nd = next((c for c in r["checks"] if c["check"] == "distance_not_refuted"), None)
@@ -102,7 +108,14 @@ def main():
           nd is not None and not nd["ok"] and "failing closed" in nd["detail"])
     # sanity: the same code passes cleanly when the refuter works
     check("valid code still passes with a working refuter",
-          qldpc_verify.verify(good, refute=True)["ok"])
+          qldpc_verify.verify(good, refute=True, seed=0)["ok"])
+
+    print("\nrandom-by-default: two no-seed runs draw different seeds")
+    d1 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"]
+              if c["check"] == "distance_not_refuted")["detail"]
+    d2 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"]
+              if c["check"] == "distance_not_refuted")["detail"]
+    check("no-seed runs are non-deterministic (different seeds reported)", d1 != d2)
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
     return 1 if _fail else 0
