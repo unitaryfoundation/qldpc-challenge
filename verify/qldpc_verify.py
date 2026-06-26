@@ -3,7 +3,7 @@ qldpc-challenge submission verifier (Phase 0: structural + cheap semantic +
 self-certifying distance upper bounds).
 
 Usage:
-    python verify/qldpc_verify.py examples/72-6-6.json
+    python verify/qldpc_verify.py codes/your-code.json
 
 Exit code 0 if every required check passes, 1 otherwise. Prints a JSON report
 to stdout. This covers the *trustless* tier: everything here is either a hard

@@ -38,7 +38,7 @@ def _load_syndrome():
 def changed_codes(base):
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", f"{base}...HEAD", "--", "codes", "examples"],
+            ["git", "diff", "--name-only", f"{base}...HEAD", "--", "codes", "verify/fixtures"],
             cwd=ROOT, text=True)
     except Exception as e:
         print(f"(could not compute diff vs {base}: {e}); gating nothing")

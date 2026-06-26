@@ -1,4 +1,4 @@
-"""Verify every submission under codes/ and examples/, and flag possible
+"""Verify every submission under codes/ and the verify/fixtures/ test inputs, and flag possible
 duplicates by permutation-invariant signature. Used by CI. Exit 0 only if all
 pass and no two codes/ entries share a signature."""
 
@@ -14,7 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if __name__ == "__main__":
     code_paths = sorted(glob.glob(os.path.join(ROOT, "codes", "*.json")))
-    paths = code_paths + sorted(glob.glob(os.path.join(ROOT, "examples", "*.json")))
+    paths = code_paths + sorted(glob.glob(os.path.join(ROOT, "verify", "fixtures", "*.json")))
     if not paths:
         print("no submissions found")
         sys.exit(0)

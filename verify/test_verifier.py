@@ -4,7 +4,7 @@ ACCEPT a valid submission and REJECT every way a bad one can be wrong.
 
 Run: uv run python verify/test_verifier.py   (or: pytest verify/test_verifier.py)
 
-Each tamper takes the known-good examples/72-6-6.json, breaks exactly one
+Each tamper takes the known-good verify/fixtures/72-6-6.json, breaks exactly one
 thing, and asserts the verifier flags it (report["ok"] is False, and ideally
 the specific check fails). A green run means a hostile or mistaken submission
 cannot slip a false claim onto the board.
@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from qldpc_verify import verify
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GOOD = json.load(open(os.path.join(ROOT, "examples", "72-6-6.json")))
+GOOD = json.load(open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")))
 
 _fail = []
 
@@ -173,7 +173,7 @@ def main():
     # every shipped example/code still verifies
     print("\nshipped submissions still verify:")
     for p in (sorted(glob.glob(os.path.join(ROOT, "codes", "*.json")))
-              + sorted(glob.glob(os.path.join(ROOT, "examples", "*.json")))):
+              + sorted(glob.glob(os.path.join(ROOT, "verify", "fixtures", "*.json")))):
         ok = verify(json.load(open(p)))["ok"]
         if not ok:
             check(f"{os.path.basename(p)} verifies", False)
