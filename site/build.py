@@ -384,7 +384,9 @@ border-bottom:1px solid var(--ln)}}
 color:var(--mut);cursor:pointer;user-select:none;border-bottom:2px solid var(--ln)}}
 .board th:hover{{color:var(--ink)}}.board td.num,.board th.num{{text-align:center;
 font-variant-numeric:tabular-nums}}
-.board td.auth{{white-space:normal}}
+.board td.auth{{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+max-width:220px}}
+.etal{{color:var(--mut)}}
 .hexwrap{{display:inline-flex;align-items:center;margin-left:8px}}
 .hexmark{{color:var(--ac);vertical-align:-2px}}
 .board tbody tr{{cursor:pointer}}.board tbody tr:hover{{background:#f6f3fb}}
@@ -834,6 +836,17 @@ def authors_html(lst):
         else:
             out.append(html.escape(h))
     return " and ".join(out)
+
+
+def authors_compact(lst):
+    """Compact author display for the board so every row is one line: GitHub
+    handles (short) and single authors render in full; multi-author literature
+    collapses to 'Surname et al.'. The full list is on the detail page and in
+    the cell's hover title."""
+    if len(lst) == 1 or all(a.strip().startswith("@") for a in lst):
+        return authors_html(lst)
+    surname = html.escape(lst[0].split(",")[0].strip())
+    return f'{surname} <span class=etal>et al.</span>'
 
 
 def detail_page(e):
@@ -1355,9 +1368,9 @@ def board_table(entries, records):
             for t in sorted(e["tracks"])) or '<span class=tnone>&middot;</span>'
 
     cols = ('<colgroup><col style="width:3%"><col style="width:15%">'
-            '<col style="width:13%"><col style="width:6%"><col style="width:6%">'
+            '<col style="width:12%"><col style="width:6%"><col style="width:6%">'
             '<col style="width:7%"><col style="width:9%"><col style="width:5%">'
-            '<col style="width:16%"><col style="width:10%">'
+            '<col style="width:19%"><col style="width:8%">'
             '<col style="width:10%"></colgroup>')
     head = ('<thead><tr><th></th>'
             '<th data-c=codekey data-num title="the code, written [[n,k,d]]; '
@@ -1406,7 +1419,8 @@ def board_table(entries, records):
             f'<td class=num>{e["n"]}</td><td class=num>{e["k"]}</td>'
             f'<td class=num>{badge(e["tier"])} {e["d"]}</td>'
             f'<td class=num>{e["eff"]}</td><td class=num>{e["w"]}</td>'
-            f'<td class=auth>{authors_html(e["authors_list"])}</td>'
+            f'<td class=auth title="{html.escape(e["authors"])}">'
+            f'{authors_compact(e["authors_list"])}</td>'
             f'<td class=model>{html.escape(e["model"]) if e["model"] else "&middot;"}</td>'
             f'<td class=date>{html.escape(e["date"]) if e["date"] else "&middot;"}</td></tr>')
 

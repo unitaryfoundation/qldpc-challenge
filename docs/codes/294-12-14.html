@@ -135,7 +135,9 @@ border-bottom:1px solid var(--ln)}
 color:var(--mut);cursor:pointer;user-select:none;border-bottom:2px solid var(--ln)}
 .board th:hover{color:var(--ink)}.board td.num,.board th.num{text-align:center;
 font-variant-numeric:tabular-nums}
-.board td.auth{white-space:normal}
+.board td.auth{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+max-width:220px}
+.etal{color:var(--mut)}
 .hexwrap{display:inline-flex;align-items:center;margin-left:8px}
 .hexmark{color:var(--ac);vertical-align:-2px}
 .board tbody tr{cursor:pointer}.board tbody tr:hover{background:#f6f3fb}
