@@ -199,6 +199,7 @@ color:var(--ink);min-width:2.4em;text-align:right}
 .auth{color:var(--mut);font-size:13px}
 .board td.date{color:var(--mut);font-size:13px;white-space:nowrap}
 .board td.model{color:var(--mut);font-size:13px;white-space:nowrap}
+.nomodel{color:#94a3b8;display:inline-flex;vertical-align:middle}
 /* Let the wide board scroll instead of crushing columns, and progressively
    drop the secondary metadata columns (model, then date) on smaller screens.
    Under the breakpoints the table sizes to content so freed space redistributes
@@ -311,6 +312,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/FarLab">@FarLab</a></div>
 <div class=kv><b>construction</b> Coset-based two-block (2BGA) code. Group G = metacyclic C30 |x C6 (action r=11, order 180); non-normal subgroup H=C2; qubits indexed by cosets G/H. H_X=[L(a)|R(b)], H_Z=[R(b)^T|L(a)^T] with left/right coset actions; a,b element supports [0, 8, 34, 82] / [0, 54, 76, 162] found by simulated annealing. Weight-8 checks. A generalization of bivariate bicycle codes.</div>
+<div class=kv><b>model</b> Claude <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2606.17268">arXiv:2606.17268</a></div>
 <div class=kv><b>date</b> 2026-06-22</div>
 <div class=kv><b>notes</b> Distance is an UPPER BOUND (d&lt;=14): witnesses are explicit decoder-found logical operators of weight 14 (syndrome-decoder method), cross-checked by randomized minimum-weight search (QDistRnd-style); both saturate at 14 over 6e5 trials, and the sub-threshold logical-error slope corroborates d~14. NOT certified exact. This is a coset 2BGA on a non-abelian metacyclic group -- a generalization of bivariate bicycle, not standard BB on a torus. Three more variants with identical [[180,16,14]] parameters exist. See docs/distance_via_simulation.tex for the estimation method. These codes are NOT 2D-local (no planar layout) and enter only the weight-8 any-connectivity track -- unlike the planar weight-8 codes of arXiv:2504.08887, which also occupy the 2d-local tracks. The comparison is on (n,k,d) at check weight &lt;= 8 only. PROVISIONAL: d=14 here is an UNVERIFIED upper bound (the witness only proves d&lt;=14); exact certification is pending. A prior Gurobi ILP + LP-decoding-cut attempt on this code stalled with the per-generator lower bound at 8, but the source paper certified comparable n&lt;=168 weight-8 coset codes by integer programming, so certification may yet succeed. Independent residual-weight and QDistRnd searches find NO logical below weight 14. If the true distance is below 14 the kd^2/n figure drops accordingly; treat any top-of-board ranking as provisional until certified.</div>

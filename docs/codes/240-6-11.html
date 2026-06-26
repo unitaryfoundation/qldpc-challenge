@@ -199,6 +199,7 @@ color:var(--ink);min-width:2.4em;text-align:right}
 .auth{color:var(--mut);font-size:13px}
 .board td.date{color:var(--mut);font-size:13px;white-space:nowrap}
 .board td.model{color:var(--mut);font-size:13px;white-space:nowrap}
+.nomodel{color:#94a3b8;display:inline-flex;vertical-align:middle}
 /* Let the wide board scroll instead of crushing columns, and progressively
    drop the secondary metadata columns (model, then date) on smaller screens.
    Under the breakpoints the table sizes to content so freed space redistributes
@@ -313,6 +314,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/FarLab">@FarLab</a> and <a href="https://github.com/vprusso">@vprusso</a></div>
 <div class=kv><b>construction</b> Generalized weight-6 form f = 1 + xy + x<sup>-1</sup> y<sup>2</sup>, g = 1 + x<sup>-1</sup> y + x<sup>-2</sup> y<sup>-1</sup>; open boundaries via annulus-type boundary engine, (10,12) lattice. New instance of the Liang-Eberhardt-Chen open-boundary family (arXiv:2504.08887), outside the paper&#x27;s enumerated form; the paper&#x27;s k=6 family stops at [[221,6,10]].</div>
+<div class=kv><b>model</b> Claude <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2504.08887">arXiv:2504.08887</a></div>
 <div class=kv><b>date</b> 2026-06-19</div>
 <div class=kv><b>notes</b> Distance proven exact by cutoff MILP (scipy/HiGHS); no lighter logical exists on either side.</div>

@@ -203,6 +203,15 @@ HEX_MARK = (
     '<circle cx="48" cy="41" r="6"/><circle cx="48" cy="23" r="6"/></g>'
     f'<circle cx="32" cy="14" r="6.5" fill="{GREEN_BRIGHT}"/></svg>')
 
+# a person glyph, shown in the model column for classical (human) constructions
+# that were not produced by an AI model.
+HUMAN_MARK = (
+    '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" '
+    'fill="none" stroke="currentColor" stroke-width="1.4" '
+    'stroke-linecap="round" stroke-linejoin="round">'
+    '<circle cx="8" cy="5" r="2.6"/>'
+    '<path d="M2.8 14c0-3 2.4-4.6 5.2-4.6S13.2 11 13.2 14"/></svg>')
+
 
 # GitHub mark (official octocat silhouette), inherits the link color.
 GH_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" '
@@ -448,6 +457,7 @@ color:var(--ink);min-width:2.4em;text-align:right}}
 .auth{{color:var(--mut);font-size:13px}}
 .board td.date{{color:var(--mut);font-size:13px;white-space:nowrap}}
 .board td.model{{color:var(--mut);font-size:13px;white-space:nowrap}}
+.nomodel{{color:#94a3b8;display:inline-flex;vertical-align:middle}}
 /* Let the wide board scroll instead of crushing columns, and progressively
    drop the secondary metadata columns (model, then date) on smaller screens.
    Under the breakpoints the table sizes to content so freed space redistributes
@@ -934,6 +944,10 @@ def detail_page(e):
         P.append('<div class=kv><b>model</b> '
                  f'{html.escape(pr["model"])} '
                  '<span class=claimed>(claimed, not verified)</span></div>')
+    elif pr.get("origin") == "baseline":
+        P.append('<div class=kv><b>model</b> '
+                 '<span class=claimed>classical construction (no AI model)</span>'
+                 '</div>')
     if pr.get("references"):
         refs = [cite(r, rel="../") for r in pr["references"]]
         # A baseline IS the cited paper's code; a submission only builds on the
@@ -1384,7 +1398,8 @@ def board_table(entries, records):
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=auth title="who submitted it">authors</th>'
             '<th class=model data-c=model title="claimed model that produced '
-            'the code; self-reported, not verified">model</th>'
+            'the code (self-reported, not verified); person icon = classical '
+            'construction, no AI model">model</th>'
             '<th class=date data-c=date title="publication date for literature, '
             'submission date for contributions">date</th></tr></thead>')
     # Default ordering: the headline kd^2/n efficiency, highest first, with
@@ -1421,7 +1436,11 @@ def board_table(entries, records):
             f'<td class=num>{e["eff"]}</td><td class=num>{e["w"]}</td>'
             f'<td class=auth title="{html.escape(e["authors"])}">'
             f'{authors_compact(e["authors_list"])}</td>'
-            f'<td class=model>{html.escape(e["model"]) if e["model"] else "&middot;"}</td>'
+            '<td class=model>'
+            + (html.escape(e["model"]) if e["model"]
+               else f'<span class=nomodel title="classical construction, no AI '
+                    f'model">{HUMAN_MARK}</span>')
+            + '</td>'
             f'<td class=date>{html.escape(e["date"]) if e["date"] else "&middot;"}</td></tr>')
 
     return (f'<div class=boardscroll><table class=board id=mainboard>{cols}{head}'

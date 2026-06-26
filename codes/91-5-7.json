@@ -634,6 +634,7 @@
   ],
   "origin": "submission",
   "construction": "Generalized weight-6, notched (7,7).",
+  "model": "Claude",
   "references": [
    "arXiv:2504.08887"
   ],

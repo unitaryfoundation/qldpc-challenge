@@ -4242,6 +4242,7 @@
   ],
   "origin": "submission",
   "construction": "Weight-8 planar open-boundary bivariate-bicycle code (tile-code family) from the boundary engine; f=[(0, 0), (1, 0), (2, 3), (2, -2)], g=[(0, 0), (0, 1), (-1, -1), (-1, 3)] on a 9x20 lattice.",
+  "model": "Claude",
   "references": [
    "arXiv:2504.09171",
    "arXiv:2606.19482"
