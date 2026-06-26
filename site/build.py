@@ -480,7 +480,6 @@ box-shadow:inset 3px 0 0 var(--ac)}}
 .tchip{{display:inline-block;font-size:11px;line-height:1;padding:3px 7px;
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}}
-.tnone{{color:var(--mut)}}
 .searchbar{{display:flex;align-items:center;gap:12px;margin:14px 0 8px}}
 #boardsearch{{flex:1 1 0;min-width:0;font-size:14px;padding:10px 13px;
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
@@ -1485,7 +1484,7 @@ def board_table(entries, records):
         return "".join(
             f'<span class=tchip title="{html.escape(t)}">'
             f'{html.escape(type_label(t))}</span>'
-            for t in sorted(e["tracks"])) or '<span class=tnone>&middot;</span>'
+            for t in sorted(e["tracks"]))
 
     cols = ('<colgroup><col style="width:3%"><col style="width:14%">'
             '<col style="width:9%"><col style="width:6%"><col style="width:6%">'
