@@ -46,7 +46,7 @@ uv run python site/build.py
 # then open docs/index.html
 ```
 
-**Run research tools** (requires scipy + ldpc):
+**Run research tools:**
 
 ```bash
 uv run --extra research python research/recipes/01_build_and_submit_bb.py
