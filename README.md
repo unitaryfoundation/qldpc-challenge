@@ -25,9 +25,10 @@ regenerated and re-committed to keep them in sync.
 
 Unlike a single-number competition, a quantum code trades several quantities
 against each other (physical qubits n, logical qubits k, distance d, check
-weight, geometric locality). So the
-boards are stratified into tracks, and within a track the ranking is a Pareto
-frontier rather than one winner. See `TRACKS.md`.
+weight, geometric locality). So the boards are a computed grid of locality class
+by check weight (membership derived from the parity checks and the layout, not
+self-declared), and within each cell the ranking is a Pareto frontier rather than
+one winner. Construction family is a separate filter tag. See `TRACKS.md`.
 
 ## Installation
 

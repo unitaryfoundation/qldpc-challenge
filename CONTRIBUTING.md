@@ -29,9 +29,11 @@ Useful flags:
 - `--model "Claude Opus 4.8"` what produced the code, named to a specific
   version, not a bare vendor name (self-reported, shown on the board as a claim,
   not verified; if you name a model the verifier requires a version);
-- `--construction "..."` how it was built (family, polynomials, search);
-- `--coords coords.npz --layers 2` a 2D layout to enter the `2d-local` tracks
-  (the verifier proves the locality; see TRACKS.md);
+- `--construction "..."` how it was built (polynomials, group, search);
+- `--family bivariate-bicycle` the construction family, a filterable tag from a
+  fixed vocabulary (see TRACKS.md); it is never used for ranking;
+- `--coords coords.npz --layers 2` a 2D layout; the verifier derives the locality
+  class (single / bilayer / unrestricted) from it, you do not declare a track;
 - `--open-pr` create the branch, commit, push, and open the PR for you;
 - `--dry-run` build and verify without writing.
 
@@ -67,7 +69,8 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    polynomials / group / lattice / exponents), keeping an archive of the best
    non-dominated candidates binned by (n, k). Families, roughly most-headroom
    first:
-     - weight-8 planar / tile codes (2d-local): real room toward kd^2/n ~ 9.75.
+     - weight-8 planar / tile codes (2d-local): the published exact bar is
+       kd^2/n ~ 12.7 ([[512,18,19]], arXiv:2504.09171).
      - lifted product over non-abelian groups (dihedral, dicyclic): less mined.
      - bivariate bicycle, generalized bicycle: strong but largely mined out by
        the published frontier; random search there mostly re-finds dominated
@@ -83,9 +86,10 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    under deeper search (e.g. [[390,8,<=26]] fell to 24, [[1080,60,<=116]] to
    18). Keep only a distance that holds.
 
-5. Submit: ./qldpc submit yourcode.npz --authors @yourhandle --model "<exact
-   model version, e.g. Claude Opus 4.8>". It finds the witness, runs the
-   verifier, and opens the PR. CI re-verifies.
+5. Submit: ./qldpc submit yourcode.npz --authors @yourhandle --family <family>
+   --model "<exact model version, e.g. Claude Opus 4.8>". It finds the witness,
+   runs the verifier (which computes the locality and weight classes), and opens
+   the PR. CI re-verifies.
 
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.

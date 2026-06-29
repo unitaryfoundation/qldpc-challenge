@@ -102,17 +102,6 @@ def _supports(H):
 # ----------------------------------------------------------------------------
 # building the submission
 # ----------------------------------------------------------------------------
-def auto_tracks(has_coords, layers):
-    """Tracks a code is auto-entered into. Check weight is a plain property now
-    (filtered by the w slider on the board), not a track, so only the
-    geometric-locality tracks are auto-assigned; a code may have none."""
-    tracks = []
-    if has_coords:
-        tracks.append("2d-local-bilayer" if layers and layers >= 2
-                      else "2d-local-single")
-    return tracks
-
-
 def build_submission(HX, HZ, args):
     n = HX.shape[1]
     if HZ.shape[1] != n:
@@ -162,9 +151,12 @@ def build_submission(HX, HZ, args):
         "checks": {"X": _supports(HX), "Z": _supports(HZ)},
         "distance": dist,
         "provenance": prov,
-        "tracks": args.tracks or auto_tracks(args._coords is not None,
-                                             args.layers),
     }
+    # Layer-2 family tag (optional). Track membership is computed by the verifier
+    # from H and the layout, so the CLI no longer writes a self-declared tracks
+    # field; provide a layout below and the locality class is derived.
+    if args.family:
+        doc["family"] = args.family
     if args._coords is not None:
         if len(args._coords) != n:
             raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
@@ -268,12 +260,15 @@ def main(argv=None):
     s.add_argument("--date", default="",
                    help="submission date (YYYY-MM-DD); defaults to today")
     s.add_argument("--name", default="")
-    s.add_argument("--tracks", nargs="*",
-                   help="track ids (default: auto by weight, + 2d-local if "
-                        "coords given)")
+    s.add_argument("--family", choices=[
+                       "bivariate-bicycle", "generalized-bicycle", "2bga-coset",
+                       "hypergraph-product", "lifted-product", "balanced-product",
+                       "quantum-tanner", "tile", "topological", "other"],
+                   help="construction family tag (a filter, not a ranking; "
+                        "track membership is computed from H and the layout)")
     s.add_argument("--coords", default="",
-                   help="coordinates file (.npz key coords, or whitespace .txt) "
-                        "for the 2d-local tracks")
+                   help="coordinates file (.npz key coords, or whitespace .txt); "
+                        "the verifier derives the 2d-local class from it")
     s.add_argument("--layers", type=int, default=0,
                    help="physical layers for a 2d-local layout (2 = bilayer)")
     s.add_argument("--trials", type=int, default=20000,

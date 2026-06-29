@@ -1366,11 +1366,21 @@ FAQ = [
      "them per track on a Pareto frontier, so it is easy to see the current "
      "state of the art and where there is room to do better."),
     ("What counts as a better code?",
-     "Each track ranks codes on a Pareto frontier over (n, k, d). A submission "
-     "earns a place by beating that frontier: fewer physical qubits n, more "
-     "logical qubits k, or a higher distance d than the codes currently on it. "
-     "The board holds the best we know of in each track so you know what to aim "
-     "past; it is the bar to beat, not a catalog of every code."),
+     "The primary tracks are a computed grid of locality class by check-weight "
+     "class. Within each cell, codes rank on a Pareto frontier over (n, k, d, w): "
+     "a submission earns a record by beating that cell&rsquo;s frontier with "
+     "fewer physical qubits n, more logical qubits k, higher distance d, or lower "
+     "check weight. Tighter cells nest into looser ones, so a strong 2D-local "
+     "low-weight code also competes on the looser boards. The board holds the "
+     "best we know of so you know what to aim past."),
+    ("How are a code&rsquo;s tracks decided?",
+     "You do not pick them. The verifier computes each code&rsquo;s locality "
+     "class (single, bilayer, or unrestricted, derived from the layout) and its "
+     "weight class (from the max check weight), so track membership cannot be "
+     "gamed by relabeling. The construction family (bivariate bicycle, "
+     "generalized bicycle, 2BGA, tile, and so on) is a separate self-declared "
+     "tag, used only as a filter and never for ranking, because it cannot be "
+     "recovered from the parity-check matrix."),
     ("Why is it hard to find good qLDPC codes?",
      "The checks have to commute (the CSS condition) and stay sparse, which "
      "constrains the construction. You want high k, high d, and low n at the "
