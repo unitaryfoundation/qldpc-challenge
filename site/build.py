@@ -508,7 +508,7 @@ box-shadow:0 0 0 3px rgba(54,0,108,.15)}}
 border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}}
 .typepill:hover{{border-color:var(--ac);color:var(--ac)}}
 .clearpill{{color:var(--mut)}}
-.searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px;max-width:80ch}}
+.searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px}}
 .searchhelp code{{background:var(--soft);padding:1px 5px;border-radius:4px;
 font-size:11px}}
 /* Weight range slider, styled as a filter pill that sits inline with the type
@@ -1605,11 +1605,10 @@ def board_controls(entries, records):
             f'<div class=typepills>{pills}{wslider}'
             '<button type=button class="typepill clearpill" data-q="">'
             'clear</button></div>'
-            '<p class=searchhelp>Filter with the weight slider, or type terms '
-            '(all must match): a type or author name, or a comparison on '
-            '<b>n</b>, <b>k</b>, <b>d</b>, <b>w</b>, or <b>eff</b> (kd&sup2;/n), '
-            'e.g. <code>k&gt;=10</code> <code>d&gt;8</code> <code>eff&gt;=5</code>. '
-            'The word <code>record</code> keeps only frontier records.</p>'
+            '<p class=searchhelp>Type terms (all must match): a family, author, '
+            'or a comparison like <code>k&gt;=10</code> <code>d&gt;8</code> '
+            '<code>eff&gt;=5</code>; <code>record</code> keeps only frontier '
+            'rows.</p>'
             '</section>')
 
 
