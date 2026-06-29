@@ -481,10 +481,9 @@ border:1px solid var(--ln);white-space:nowrap}}
 .tchip.loc{{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}}
 /* Primary-tracks grid (locality x weight). */
 .ptgrid{{margin:8px 0 4px}}
-.ptbars{{font-size:12px;color:var(--mut);margin:10px 0 0}}
 .ptsub{{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}}
 .ptscroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
-table.grid{{border-collapse:collapse;font-size:13px}}
+table.grid{{border-collapse:collapse;font-size:13px;margin:0 auto}}
 table.grid th,table.grid td{{border:1px solid var(--ln);padding:8px 12px;
 text-align:left;vertical-align:top}}
 table.grid thead th,table.grid tr:first-child th{{background:var(--soft);
@@ -1006,9 +1005,6 @@ def detail_page(e):
         loc = doc["locality"]
         params.append(("layers", loc.get("layers", "?"),
                        "physical layers (e.g. 2 for a flip-chip bilayer)"))
-        if "interaction_radius" in loc:
-            params.append(("radius", f'{loc["interaction_radius"]:.2f}',
-                           "interaction radius: max check diameter in the layout"))
     for lab, val, tip in params:
         P.append(f'<div class=cell title="{html.escape(tip)}">'
                  f'<div class=l>{lab}</div><div class=v>{val}</div></div>')
@@ -1556,17 +1552,12 @@ def primary_tracks_grid(entries, records):
         body.append(f'<tr><th class=grow>{html.escape(LOCALITY_LABEL[L])}</th>'
                     + "".join(cellshtml) + '</tr>')
     return ('<section class=ptgrid><h2 class=track>Primary tracks</h2>'
-            '<p class=ptsub>The leaderboards are the computed grid of locality '
-            '&times; check weight. Membership is derived from <code>H</code> and '
-            'the layout, not self-declared, and nests: a tighter cell&rsquo;s '
-            'codes also compete in the looser ones. Each cell shows its size and '
-            'its kd&sup2;/n leader.</p>'
+            '<p class=ptsub>Computed grid of locality &times; check weight, '
+            'derived from <code>H</code> and the layout, not self-declared. '
+            'Membership nests: a tighter cell&rsquo;s codes also compete in the '
+            'looser ones.</p>'
             f'<div class=ptscroll><table class=grid>{head}'
-            f'{"".join(body)}</table></div>'
-            '<p class=ptbars>Bars to beat (external): 2D-local kd&sup2;/n 12.7, '
-            'the [[512,18,19]] tile code (arXiv:2504.09171); high-rate '
-            '[[9216,4612,&le;48]] and [[16384,4142,&le;40]] '
-            '(Kasai et al, arXiv:2601.08824 / 2604.20838).</p></section>')
+            f'{"".join(body)}</table></div></section>')
 
 
 def board_controls(entries, records):
