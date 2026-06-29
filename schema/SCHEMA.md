@@ -52,6 +52,13 @@ Two principles drive the format:
     `measured <= claim`.
 - `provenance`: `authors`, `construction` (how it was built), optional
   `references`, `date`, `notes`, `model`.
+  - `origin`: `"baseline"` for a literature seed or `"submission"` for a code
+    contributed through the challenge. This is provenance, not a novelty claim.
+  - `novelty`: optional literature status for submissions:
+    `"unknown"` (not audited), `"known_parameters"` (the `[[n,k,d]]` parameter
+    set exists in the literature, though this entry may improve weight, layout,
+    or construction details), or `"new_parameters"` (claimed novel after review;
+    not a verifier-proved fact).
 - `family` (optional): the construction family, a Layer-2 tag from a fixed
   vocabulary (`bivariate-bicycle`, `generalized-bicycle`, `2bga-coset`,
   `hypergraph-product`, `lifted-product`, `balanced-product`, `quantum-tanner`,

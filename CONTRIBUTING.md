@@ -132,5 +132,9 @@ accepted and recorded but will not sit on the frontier. See `TRACKS.md`.
 - Store `interaction_radius` as the exact measured max check diameter, not a
   rounded value.
 - Do not repeat a qubit index within a single check.
-- If you believe your code is equivalent to an existing entry under a code
-  symmetry, say so in `provenance.notes`; novelty is part of review.
+- Use `provenance.origin` only for provenance (`baseline` vs `submission`), not
+  novelty. If the same `[[n,k,d]]` parameter set exists in the literature, set
+  `provenance.novelty` to `known_parameters` and cite it in
+  `provenance.notes`. If you believe your code is equivalent to an existing
+  entry under a code symmetry, say so in `provenance.notes`; novelty is part of
+  review.

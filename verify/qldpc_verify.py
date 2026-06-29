@@ -57,6 +57,7 @@ _REQUIRED = ["schema_version", "name", "code_type", "n", "k", "checks",
 _FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
              "hypergraph-product", "lifted-product", "balanced-product",
              "quantum-tanner", "tile", "topological", "other"}
+_NOVELTY = {"unknown", "known_parameters", "new_parameters"}
 
 
 def structure_errors(doc):
@@ -230,6 +231,13 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                family if family in _FAMILIES
                else f"'{family}' is not a known family; use one of "
                f"{sorted(_FAMILIES)}")
+
+    novelty = (doc.get("provenance") or {}).get("novelty")
+    if novelty is not None:
+        record("novelty_in_vocabulary", novelty in _NOVELTY,
+               novelty if novelty in _NOVELTY
+               else f"'{novelty}' is not a known novelty status; use one of "
+               f"{sorted(_NOVELTY)}")
 
     # 6. distance witnesses (self-certifying upper bounds)
     dist = doc["distance"]

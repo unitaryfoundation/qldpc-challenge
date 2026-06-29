@@ -202,7 +202,7 @@ UF_LOGO = (
 
 # Small inline copy of the site mark (the hexagon graph), without the dark
 # tile and recoloured to the accent so it reads on a light row. Used to flag a
-# code as found through the challenge, the way the star flags the frontier.
+# code as submitted through the challenge, the way the star flags the frontier.
 HEX_MARK = (
     '<svg class=hexmark viewBox="0 0 64 64" width="15" height="15" '
     'aria-hidden="true">'
@@ -465,6 +465,9 @@ max-width:220px}}
 .etal{{color:var(--mut)}}
 .hexwrap{{display:inline-flex;align-items:center;margin-left:8px}}
 .hexmark{{color:var(--ac);vertical-align:-2px}}
+.novelty{{display:inline-block;margin-left:7px;font-size:10px;line-height:1;
+padding:3px 6px;border-radius:5px;background:#fef3c7;color:#92400e;
+border:1px solid #fde68a;vertical-align:2px;white-space:nowrap}}
 .board tbody tr{{cursor:pointer}}.board tbody tr:hover{{background:#f6f3fb}}
 .board tr.fr{{background:#fffbe0}}.board tr.fr td:first-child{{
 box-shadow:inset 3px 0 0 var(--ac)}}
@@ -844,6 +847,7 @@ def load_entries():
             "locality_class": rep["computed"].get("locality_class", "unrestricted"),
             "weight_class": rep["computed"].get("weight_class", "weight-9plus"),
             "origin": doc["provenance"].get("origin", "submission"),
+            "novelty": doc["provenance"].get("novelty", "unknown"),
             "authors": ", ".join(doc["provenance"]["authors"]),
             "authors_list": doc["provenance"]["authors"],
             "model": doc["provenance"].get("model", ""),
@@ -1061,6 +1065,14 @@ def detail_page(e):
     pr = doc["provenance"]
     P.append('<section class=blk><h3>Construction &amp; provenance</h3>')
     P.append(f'<div class=kv><b>authors</b> {authors_html(pr["authors"])}</div>')
+    if pr.get("origin") == "baseline":
+        provenance_status = "literature baseline"
+    else:
+        provenance_status = "submitted through the challenge"
+    P.append(f'<div class=kv><b>provenance</b> {provenance_status}</div>')
+    if pr.get("origin") != "baseline":
+        P.append(f'<div class=kv><b>novelty</b> '
+                 f'{html.escape(novelty_label(pr.get("novelty", "unknown")))}</div>')
     P.append(f'<div class=kv><b>construction</b> {mathfmt(pr.get("construction",""))}</div>')
     if pr.get("model"):
         mark = f'{CLAUDE_MARK} ' if pr["model"].startswith("Claude") else ""
@@ -1201,12 +1213,13 @@ def references_page(entries):
 def progress_panel(entries, n_exact, best_eff):
     """The prominent stats bar at the top of the board: the headline numbers as
     big cards. This is the single home for the board's numbers (the hero carries
-    none). The 'new codes' count is contributed (non-baseline) codes only."""
+    none). The contributed count is non-baseline codes only; it is not a novelty
+    claim."""
     n_base = sum(1 for e in entries if e["origin"] == "baseline")
     n_contrib = len(entries) - n_base
     metrics = [
-        (str(n_contrib), "new codes",
-         "new codes found and submitted through the challenge"),
+        (str(n_contrib), "submitted codes",
+         "codes submitted through the challenge; not necessarily novel parameter sets"),
         (str(n_base), "literature baselines",
          "published codes seeded as the bar to beat"),
         (str(n_exact), "certified exact",
@@ -1226,7 +1239,7 @@ def progress_panel(entries, n_exact, best_eff):
 
 
 def contributors_panel(entries):
-    """A leaderboard of who has found the codes on the board. Ranks GitHub-handle
+    """A leaderboard of who submitted the codes on the board. Ranks GitHub-handle
     authors of contributed (non-baseline) codes by how many they have on the
     board, then by how many sit on a track frontier, then by best kd2/n. The
     seeded literature authors are not contributors and are excluded."""
@@ -1305,7 +1318,7 @@ def contributors_panel(entries):
     return ('<section class=lb id=leaderboard><div class=lbhead>'
             '<div><h2 class=lbh>Leaderboard</h2>'
             f'<p class=lbsub>{len(order)} contributor'
-            f'{"" if len(order) == 1 else "s"} &middot; {n_codes} codes found '
+            f'{"" if len(order) == 1 else "s"} &middot; {n_codes} codes submitted '
             'through the challenge</p></div>'
             '<button class=lbcta type=button onclick="document.getElementById('
             '&quot;participate&quot;).showModal()">Participate</button>'
@@ -1457,6 +1470,17 @@ FAMILY_TERM = {
 
 def family_label(f):
     return FAMILY_LABEL.get(f, f)
+
+
+NOVELTY_LABEL = {
+    "known_parameters": "known parameter set; see provenance notes",
+    "new_parameters": "new parameter set claimed by submitter",
+    "unknown": "novelty not audited",
+}
+
+
+def novelty_label(v):
+    return NOVELTY_LABEL.get(v, NOVELTY_LABEL["unknown"])
 
 
 def locality_members(cls):
@@ -1671,9 +1695,14 @@ def board_table(entries, records):
         search_terms = " ".join([
             e["family"], family_label(e["family"]),
             FAMILY_TERM.get(e["family"], ""),
-            e["locality_class"], e["weight_class"],
+            e["locality_class"], e["weight_class"], e["novelty"],
             "2d-local" if e["locality_class"] != "unrestricted" else "",
         ]).lower()
+        novelty = (
+            '<span class=novelty title="known parameter set in the literature; '
+            'this entry may still improve weight or construction details">'
+            'known params</span>'
+            if e["novelty"] == "known_parameters" else "")
         rows.append(
             f'<tr class="{"fr" if fr else ""}" data-href="codes/{e["slug"]}.html" '
             f'data-code="{e["slug"]}" data-name="[[{e["n"]},{e["k"]},{e["d"]}]]" '
@@ -1688,9 +1717,10 @@ def board_table(entries, records):
             f'<td class=star title="{"record: best in a computed cell on (n, k, d)" if fr else ""}">'
             f'{"&#9733;" if fr else ""}</td>'
             f'<td><span class=mono>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
-            + ('<span class=hexwrap title="found and submitted through the '
-               f'challenge">{HEX_MARK}</span>'
+            + ('<span class=hexwrap title="submitted through the challenge; '
+               f'not a novelty claim">{HEX_MARK}</span>'
                if e["origin"] != "baseline" else "")
+            + novelty
             + f'</td><td class=typecell>{chips(e)}</td>'
             f'<td class=num>{e["n"]}</td><td class=num>{e["k"]}</td>'
             f'<td class=num>{badge(e["tier"])} {e["d"]}</td>'
@@ -1763,7 +1793,10 @@ def build():
              '<span><span class="dot ac"></span> upper bound '
              '(<span class="b ub">d &le;</span>)</span>'
              f'<span><span class=hexwrap style="margin-left:0">{HEX_MARK}</span> '
-             'found through the challenge (unmarked = literature baseline)</span>'
+             'submitted through the challenge (not a novelty claim; '
+             'unmarked = literature baseline)</span>'
+             '<span><span class=novelty style="margin-left:0">known params</span> '
+             'parameter set exists in the literature; see provenance notes</span>'
              '<span class=collegend><b>columns:</b> '
              '<b>n</b> physical qubits &middot; <b>k</b> logical qubits '
              '&middot; <b>d</b> distance (smallest undetectable error) '
