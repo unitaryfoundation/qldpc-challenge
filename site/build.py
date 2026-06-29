@@ -364,18 +364,6 @@ background:var(--soft)}}
 .stat-card .v{{font-size:34px;font-weight:700;line-height:1.05}}
 .stat-card.hero .v{{color:var(--ac)}}
 .stat-card .l{{font-size:13px;color:var(--mut);margin-top:6px}}
-.challenges{{margin:20px 0}}
-.chalh{{margin:0 0 2px;font-size:20px}}
-.chalsub{{margin:0 0 12px;color:var(--mut);font-size:14px}}
-.chalsub code{{background:var(--soft);border:1px solid var(--ln);
-border-radius:6px;padding:2px 6px;font-size:13px}}
-.chalgrid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:14px}}
-.chal{{border:1px solid var(--ln);border-radius:12px;padding:14px 16px;
-background:var(--soft)}}
-.chaltitle{{font-weight:700;margin-bottom:6px}}
-.chalnow{{font-size:13px;color:var(--mut)}}
-.chalgoal{{font-size:14px;margin-top:6px}}
 .lb{{margin:18px 0 8px;border:1px solid var(--ln);border-radius:14px;
 background:#fff;overflow:hidden}}
 .lbhead{{display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -488,14 +476,9 @@ box-shadow:inset 3px 0 0 var(--ac)}}
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}}
 .tchip.loc{{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}}
-/* Open challenges beside the primary-tracks grid, one row to save height. */
-.toprow{{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin:20px 0}}
-.toprow>.challenges{{flex:1 1 300px;margin:0;min-width:0}}
-.toprow>.ptgrid{{flex:2 1 460px;margin:0;min-width:0}}
-.toprow .challenges .chalgrid{{grid-template-columns:1fr}}
-.toprow .ptgrid h2.track{{margin:0 0 4px;padding-top:0}}
 /* Primary-tracks grid (locality x weight). */
 .ptgrid{{margin:8px 0 4px}}
+.ptbars{{font-size:12px;color:var(--mut);margin:10px 0 0}}
 .ptsub{{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}}
 .ptscroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
 table.grid{{border-collapse:collapse;font-size:13px}}
@@ -694,9 +677,22 @@ document.querySelectorAll('tr[data-href]').forEach(r=>{
 (function(){
  const mark=(code,on)=>document.querySelectorAll('[data-code="'+code+'"]')
   .forEach(el=>el.classList.toggle('xh',on));
+ const plots=document.querySelector('.explorer .plots');
+ // Hovering a chart point brings its table row into view (only when the row is
+ // hidden behind the pinned plots or below the fold, so a small sweep over
+ // visible points does not yank the page around).
+ const reveal=code=>{
+  const r=document.querySelector('tr[data-code="'+code+'"]');
+  if(!r||r.offsetParent===null)return;
+  const rect=r.getBoundingClientRect();
+  const top=plots?plots.getBoundingClientRect().bottom:0;
+  if(rect.top<top+8||rect.bottom>innerHeight-8)
+   r.scrollIntoView({block:'center'});
+ };
  document.querySelectorAll('[data-code]').forEach(el=>{
   const code=el.dataset.code;
-  el.addEventListener('mouseenter',()=>mark(code,true));
+  const isPoint=el.tagName.toLowerCase()==='circle';
+  el.addEventListener('mouseenter',()=>{mark(code,true); if(isPoint)reveal(code);});
   el.addEventListener('mouseleave',()=>mark(code,false));
  });
 })();
@@ -1202,37 +1198,6 @@ def references_page(entries):
 
 
 
-def open_challenges_panel(entries):
-    """Bars to beat, stated up front so the board reads as a live competition.
-    The current-best figures are derived from the board; the targets are
-    external references (see TRACKS.md)."""
-    loc = [e for e in entries
-           if e["locality_class"] in ("local-2d-single", "local-2d-bilayer")]
-    best = max(loc, key=lambda e: e["eff"], default=None)
-    cur2d = (f'best on board kd&sup2;/n {best["eff"]:g} '
-             f'(<a href="codes/{best["slug"]}.html">'
-             f'[[{best["n"]},{best["k"]},{best["d"]}]]</a>)'
-             if best else "no entries yet")
-    cards = [
-        ("2D-local efficiency", cur2d,
-         "reach kd&sup2;/n 12.7, the [[512,18,19]] tile code "
-         "(arXiv:2504.09171, exact, check weight 8), with a verified flip-chip "
-         "layout."),
-        ("High-rate / large-block", "no verified entries yet",
-         "land a high-rate code with a checkable distance witness. Bars: "
-         "[[9216,4612,&le;48]] and [[16384,4142,&le;40]] "
-         "(Kasai et al, arXiv:2601.08824 / 2604.20838)."),
-    ]
-    body = "".join(f'<div class=chal><div class=chaltitle>{t}</div>'
-                   f'<div class=chalnow>{now}</div>'
-                   f'<div class=chalgoal>{goal}</div></div>'
-                   for t, now, goal in cards)
-    return ('<section class=challenges><h2 class=chalh>Open challenges</h2>'
-            '<p class=chalsub>Bars to beat. Found a better code? '
-            '<code>./qldpc submit mycode.npz --authors @you</code></p>'
-            f'<div class=chalgrid>{body}</div></section>')
-
-
 def progress_panel(entries, n_exact, best_eff):
     """The prominent stats bar at the top of the board: the headline numbers as
     big cards. This is the single home for the board's numbers (the hero carries
@@ -1573,7 +1538,11 @@ def primary_tracks_grid(entries, records):
             'codes also compete in the looser ones. Each cell shows its size and '
             'its kd&sup2;/n leader.</p>'
             f'<div class=ptscroll><table class=grid>{head}'
-            f'{"".join(body)}</table></div></section>')
+            f'{"".join(body)}</table></div>'
+            '<p class=ptbars>Bars to beat (external): 2D-local kd&sup2;/n 12.7, '
+            'the [[512,18,19]] tile code (arXiv:2504.09171); high-rate '
+            '[[9216,4612,&le;48]] and [[16384,4142,&le;40]] '
+            '(Kasai et al, arXiv:2601.08824 / 2604.20838).</p></section>')
 
 
 def board_controls(entries, records):
@@ -1766,12 +1735,7 @@ def build():
              '</div></header>')
     P.append('<div class=wrap>')
     P.append(progress_panel(entries, n_exact, best_eff))
-    # Open challenges and the primary-tracks grid sit side by side to save
-    # vertical space (they stack on narrow screens).
-    P.append('<div class=toprow>')
-    P.append(open_challenges_panel(entries))
     P.append(primary_tracks_grid(entries, records))
-    P.append('</div>')
     P.append(contributors_panel(entries))
     P.append('<div class=how>'
              '<div class=card><span class=n>1</span><h3>Build a code</h3>'
