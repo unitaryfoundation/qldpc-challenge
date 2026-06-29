@@ -488,6 +488,12 @@ box-shadow:inset 3px 0 0 var(--ac)}}
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}}
 .tchip.loc{{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}}
+/* Open challenges beside the primary-tracks grid, one row to save height. */
+.toprow{{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin:20px 0}}
+.toprow>.challenges{{flex:1 1 300px;margin:0;min-width:0}}
+.toprow>.ptgrid{{flex:2 1 460px;margin:0;min-width:0}}
+.toprow .challenges .chalgrid{{grid-template-columns:1fr}}
+.toprow .ptgrid h2.track{{margin:0 0 4px;padding-top:0}}
 /* Primary-tracks grid (locality x weight). */
 .ptgrid{{margin:8px 0 4px}}
 .ptsub{{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}}
@@ -1760,9 +1766,13 @@ def build():
              '</div></header>')
     P.append('<div class=wrap>')
     P.append(progress_panel(entries, n_exact, best_eff))
+    # Open challenges and the primary-tracks grid sit side by side to save
+    # vertical space (they stack on narrow screens).
+    P.append('<div class=toprow>')
     P.append(open_challenges_panel(entries))
-    P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
+    P.append('</div>')
+    P.append(contributors_panel(entries))
     P.append('<div class=how>'
              '<div class=card><span class=n>1</span><h3>Build a code</h3>'
              '<p>A CSS qLDPC code, written as one JSON file with its parity '

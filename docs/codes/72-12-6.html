@@ -186,6 +186,12 @@ box-shadow:inset 3px 0 0 var(--ac)}
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}
 .tchip.loc{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}
+/* Open challenges beside the primary-tracks grid, one row to save height. */
+.toprow{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin:20px 0}
+.toprow>.challenges{flex:1 1 300px;margin:0;min-width:0}
+.toprow>.ptgrid{flex:2 1 460px;margin:0;min-width:0}
+.toprow .challenges .chalgrid{grid-template-columns:1fr}
+.toprow .ptgrid h2.track{margin:0 0 4px;padding-top:0}
 /* Primary-tracks grid (locality x weight). */
 .ptgrid{margin:8px 0 4px}
 .ptsub{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}
