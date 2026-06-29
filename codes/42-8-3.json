@@ -380,7 +380,5 @@
   ],
   "notes": "Distance d=3 from arXiv:2203.17216; witness here is a decoder-found logical operator of that weight (upper bound)."
  },
- "tracks": [
-  "generalized bicycle"
- ]
+ "family": "generalized-bicycle"
 }

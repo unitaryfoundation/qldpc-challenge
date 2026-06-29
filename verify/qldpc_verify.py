@@ -49,7 +49,14 @@ except Exception:
 
 # minimal required structure, used when jsonschema is unavailable
 _REQUIRED = ["schema_version", "name", "code_type", "n", "k", "checks",
-             "distance", "provenance", "tracks"]
+             "distance", "provenance"]
+
+# Layer-2 family vocabulary. Self-declared (not recoverable from H), used only as
+# a filterable tag. Validated here too, so enforcement holds even when jsonschema
+# is unavailable and the minimal structure check runs instead.
+_FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
+             "hypergraph-product", "lifted-product", "balanced-product",
+             "quantum-tanner", "tile", "topological", "other"}
 
 
 def structure_errors(doc):
@@ -197,6 +204,12 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     wmax = max((len(s) for s in doc["checks"]["X"] + doc["checks"]["Z"]),
                default=0)
     report["computed"]["max_check_weight"] = wmax
+    # Layer-1 weight class (computed, nested: weight-4 < weight-6 < weight-8).
+    # The tightest cap the max check weight fits under; ">8" for anything heavier
+    # so every code still has a home on the weight axis.
+    report["computed"]["weight_class"] = (
+        "weight-4" if wmax <= 4 else "weight-6" if wmax <= 6
+        else "weight-8" if wmax <= 8 else "weight-9plus")
 
     # The model field is self-reported and unverifiable, but if one is claimed it
     # must name a specific version, not a bare vendor name: "Claude" tells a reader
@@ -209,6 +222,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                model if specific else
                f"'{model}' names no version; give the exact model, e.g. "
                "'Claude Opus 4.8', or omit the field")
+
+    # Layer-2 family tag: optional, but if present must be from the vocabulary.
+    family = doc.get("family")
+    if family is not None:
+        record("family_in_vocabulary", family in _FAMILIES,
+               family if family in _FAMILIES
+               else f"'{family}' is not a known family; use one of "
+               f"{sorted(_FAMILIES)}")
 
     # 6. distance witnesses (self-certifying upper bounds)
     dist = doc["distance"]
@@ -272,35 +293,31 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                    f"refutation could not run ({type(e).__name__}: {e}; seed "
                    f"{run_seed}); failing closed -- manual review required")
 
-    # 9. locality / geometric 2D embedding. The 2d-local-* tracks rank codes by
-    #    how short-range their checks are, so membership has to be *proven*, not
-    #    asserted. Three things make a locality claim honest:
-    #      (a) a layout: a coordinate for every qubit;
+    # 9. locality / geometric 2D embedding. The locality CLASS is computed from
+    #    the layout, never trusted from a self-declared track. A class is earned
+    #    only by an honest layout:
+    #      (a) a coordinate for every qubit;
     #      (b) no cramming: at most `layers` qubits may share a site (the
     #          flip-chip stack) and any two distinct sites are >= 1 apart, so a
     #          check of diameter r genuinely spans r grid units and a small
     #          radius cannot be faked by collapsing qubits onto a point;
     #      (c) short range: the measured interaction radius (largest check
-    #          diameter) is within the track's cap.
-    #    A code that claims a 2d-local track with no layout, or whose layout
-    #    fails (b)/(c), is rejected -- it does not sit on the 2D-local frontier
-    #    for free. "Short range" means a bounded, n-independent check diameter,
-    #    not a specific tiny number. The bilayer cap admits the weight-8 planar
-    #    (tile-code) family the track exists to chase: bulk checks span ~5.83,
-    #    and open-boundary corner stabilizers reach ~6.71; both are constant in
-    #    n, so 7.0 covers the family while still rejecting layouts whose range
-    #    grows with the code. See TRACKS.md.
-    LOCAL_TRACKS = {
-        "2d-local-single":  {"max_layers": 1, "radius_cap": 4.0},
-        "2d-local-bilayer": {"max_layers": 2, "radius_cap": 7.0},
-    }
-    claimed_local = [t for t in doc.get("tracks", []) if t in LOCAL_TRACKS]
+    #          diameter) is within the class cap.
+    #    Codes that fail (b)/(c), or carry no layout, are simply `unrestricted`
+    #    (no 2D-local class), not rejected. "Short range" means a bounded,
+    #    n-independent check diameter. The bilayer cap admits the weight-8 planar
+    #    (tile-code) family: bulk checks span ~5.83, open-boundary corners ~6.71,
+    #    both constant in n; 7.0 covers the family while rejecting layouts whose
+    #    range grows with the code. Nesting: local-2d-single < local-2d-bilayer <
+    #    unrestricted (the tighter class also qualifies for the looser ones; the
+    #    site derives that). See TRACKS.md.
+    LOCALITY_CLASSES = [   # tightest first
+        ("local-2d-single",  1, 4.0),
+        ("local-2d-bilayer", 2, 7.0),
+    ]
+    locality_class = "unrestricted"
     loc = doc.get("locality")
-    if claimed_local and loc is None:
-        record("locality_block_present", False,
-               f"tracks {claimed_local} require a `locality` block with a qubit "
-               f"layout; none provided, so 2D-locality is unproven")
-    elif loc is not None:
+    if loc is not None:
         coords = loc["coordinates"]
         layers = loc.get("layers", 1)
         cover = len(coords) == n
@@ -341,20 +358,22 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                        radius <= loc["interaction_radius"] + 1e-9,
                        f"measured {radius:.4f} <= claim "
                        f"{loc['interaction_radius']}")
-            # strict track rules bite only when a 2d-local track is claimed.
-            for t in claimed_local:
-                spec = LOCAL_TRACKS[t]
-                record(f"{t}_layers_within_cap", layers <= spec["max_layers"],
-                       f"layers={layers} <= {spec['max_layers']}")
-                record(f"{t}_no_qubit_cramming",
-                       max_mult <= layers and min_spacing >= 1.0 - 1e-9,
-                       f"<= {layers} qubits/site (measured {max_mult}); "
-                       f"distinct sites >= 1 apart (measured "
-                       f"{min_spacing:.4f})")
-                record(f"{t}_radius_within_cap",
-                       radius <= spec["radius_cap"] + 1e-9,
-                       f"interaction radius {radius:.4f} <= cap "
-                       f"{spec['radius_cap']}")
+            honest = max_mult <= layers and min_spacing >= 1.0 - 1e-9
+            if honest:
+                for cls, max_layers, cap in LOCALITY_CLASSES:
+                    if layers <= max_layers and radius <= cap + 1e-9:
+                        locality_class = cls
+                        break
+    # Layer-1 locality class (computed) + Layer-3 flags (verifier-proven only;
+    # the exact-d flag is added at site-build time from certs/, since exactness
+    # is certified separately, not by this trustless check).
+    report["computed"]["locality_class"] = locality_class
+    report["computed"]["flags"] = {
+        "css": bool(report["checks"] and
+                    all(c["ok"] for c in report["checks"]
+                        if c["check"] == "css_commutation")),
+        "locality_class": locality_class,
+    }
 
     return report
 

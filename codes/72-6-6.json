@@ -516,9 +516,7 @@
   ],
   "date": "2026-06-16"
  },
- "tracks": [
-  "2d-local-bilayer"
- ],
+ "family": "bivariate-bicycle",
  "locality": {
   "coordinates": [
    [

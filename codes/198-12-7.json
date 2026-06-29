@@ -1384,9 +1384,7 @@
   "date": "2026-06-16",
   "notes": "Distance certified exact by cutoff MILP."
  },
- "tracks": [
-  "2d-local-bilayer"
- ],
+ "family": "bivariate-bicycle",
  "locality": {
   "coordinates": [
    [

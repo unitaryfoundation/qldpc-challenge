@@ -42,15 +42,24 @@ Two principles drive the format:
   - `witness`: support of a logical operator of that Pauli type and weight
     `value`. An X-witness must lie in `ker(H_Z)` and outside `rowspace(H_X)`;
     the Z-witness mirrors it. This is what makes the upper bound trustless.
-- `locality` (optional, required for the `2d-local-*` tracks):
+- `locality` (optional): provide a layout and the verifier derives the locality
+  class (`local-2d-single`, `local-2d-bilayer`, or `unrestricted`); omit it and
+  the code is `unrestricted`.
   - `coordinates`: one `[x, y]` per qubit, indexed `0..n-1`.
   - `layers`: physical layers (2 for a flip-chip bilayer, for example).
   - `interaction_radius`: claimed max check diameter in the layout; the
     verifier recomputes the true max check diameter and requires
     `measured <= claim`.
 - `provenance`: `authors`, `construction` (how it was built), optional
-  `references`, `date`, `notes`.
-- `tracks`: which tracks this code competes in (see `../TRACKS.md`).
+  `references`, `date`, `notes`, `model`.
+- `family` (optional): the construction family, a Layer-2 tag from a fixed
+  vocabulary (`bivariate-bicycle`, `generalized-bicycle`, `2bga-coset`,
+  `hypergraph-product`, `lifted-product`, `balanced-product`, `quantum-tanner`,
+  `tile`, `topological`, `other`). It cannot be recovered from `H`, so it is a
+  filter only, never a ranking. See `../TRACKS.md`.
+- `tracks`: deprecated and ignored for ranking. Track membership (the locality
+  and weight classes) is computed by the verifier from `H` and the layout; this
+  self-declared field is kept only for backward compatibility. See `../TRACKS.md`.
 
 ## What the verifier reports
 

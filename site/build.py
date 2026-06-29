@@ -487,6 +487,24 @@ box-shadow:inset 3px 0 0 var(--ac)}}
 .tchip{{display:inline-block;font-size:11px;line-height:1;padding:3px 7px;
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}}
+.tchip.loc{{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}}
+/* Primary-tracks grid (locality x weight). */
+.ptgrid{{margin:8px 0 4px}}
+.ptsub{{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}}
+.ptscroll{{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+table.grid{{border-collapse:collapse;font-size:13px}}
+table.grid th,table.grid td{{border:1px solid var(--ln);padding:8px 12px;
+text-align:left;vertical-align:top}}
+table.grid thead th,table.grid tr:first-child th{{background:var(--soft);
+font-weight:600;color:var(--ink);white-space:nowrap}}
+.grow{{background:var(--soft);font-weight:600;color:var(--ink);white-space:nowrap}}
+.gcorner{{background:var(--soft)}}
+.gcell .gcount{{font-size:11px;color:var(--mut)}}
+.gcell .gbest{{font-family:'Space Mono',ui-monospace,monospace;font-size:12px;
+color:var(--ac);text-decoration:none;font-weight:700}}
+.gcell .gbest:hover{{text-decoration:underline}}
+.gcell .geff{{font-size:11px;color:var(--mut);margin-top:1px}}
+.gempty{{background:repeating-linear-gradient(45deg,#fafafa 0 6px,#fff 6px 12px)}}
 .searchbar{{display:flex;align-items:center;gap:12px;margin:14px 0 8px}}
 #boardsearch{{flex:1 1 0;min-width:0;font-size:14px;padding:10px 13px;
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
@@ -820,7 +838,9 @@ def load_entries():
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "eff": round(k * d * d / n, 3), "tier": tier,
             "w": rep["computed"].get("max_check_weight"),
-            "tracks": doc["tracks"],
+            "family": doc.get("family", "other"),
+            "locality_class": rep["computed"].get("locality_class", "unrestricted"),
+            "weight_class": rep["computed"].get("weight_class", "weight-9plus"),
             "origin": doc["provenance"].get("origin", "submission"),
             "authors": ", ".join(doc["provenance"]["authors"]),
             "authors_list": doc["provenance"]["authors"],
@@ -1059,9 +1079,15 @@ def detail_page(e):
         P.append(f'<div class=kv><b>date</b> {html.escape(pr["date"])}</div>')
     if pr.get("notes"):
         P.append(f'<div class=kv><b>notes</b> {html.escape(pr["notes"])}</div>')
-    P.append('<div class=kv><b>tracks</b> '
-             f'{html.escape(", ".join(doc["tracks"])) or "none (filtered by check weight w)"}'
-             '</div>')
+    P.append('<div class=kv><b>family</b> '
+             f'{html.escape(family_label(e["family"]))} '
+             '<span class=claimed>(a tag, not a ranking)</span></div>')
+    P.append('<div class=kv><b>locality</b> '
+             f'{html.escape(LOCALITY_LABEL[e["locality_class"]])} '
+             '<span class=claimed>(computed from the layout)</span></div>')
+    P.append('<div class=kv><b>weight class</b> '
+             f'{html.escape(WEIGHT_LABEL.get(e["weight_class"], "weight > 8"))} '
+             '<span class=claimed>(computed)</span></div>')
     P.append('</section>')
 
     # parity checks
@@ -1174,7 +1200,8 @@ def open_challenges_panel(entries):
     """Bars to beat, stated up front so the board reads as a live competition.
     The current-best figures are derived from the board; the targets are
     external references (see TRACKS.md)."""
-    loc = [e for e in entries if "2d-local-bilayer" in e["tracks"]]
+    loc = [e for e in entries
+           if e["locality_class"] in ("local-2d-single", "local-2d-bilayer")]
     best = max(loc, key=lambda e: e["eff"], default=None)
     cur2d = (f'best on board kd&sup2;/n {best["eff"]:g} '
              f'(<a href="codes/{best["slug"]}.html">'
@@ -1227,12 +1254,12 @@ def progress_panel(entries, n_exact, best_eff):
     return f'<section class=statsbar>{cards}</section>'
 
 
-def contributors_panel(entries, tracks):
+def contributors_panel(entries):
     """A leaderboard of who has found the codes on the board. Ranks GitHub-handle
     authors of contributed (non-baseline) codes by how many they have on the
     board, then by how many sit on a track frontier, then by best kd2/n. The
     seeded literature authors are not contributors and are excluded."""
-    front_slugs = {entries[i]["slug"] for i in compute_records(entries, tracks)}
+    front_slugs = {entries[i]["slug"] for i in compute_records(entries)}
     stats = {}
     for e in entries:
         if e["origin"] == "baseline":
@@ -1411,35 +1438,81 @@ def faq_page():
     return "\n".join(P)
 
 
-# Compact chip label and a short search token for each track type.
-TYPE_LABEL = {
-    "bivariate bicycle (periodic)": "BB (periodic)",
-    "generalized bicycle": "GB",
-    "2d-local-bilayer": "2D-local",
+# Layer-1 primary tracks: two nested, computed axes (locality and check weight).
+# Membership is derived from H and the layout, never self-declared. A code in a
+# tighter class also belongs to the looser ones (the grid nests).
+LOCALITY_ORDER = ["local-2d-single", "local-2d-bilayer", "unrestricted"]
+WEIGHT_ORDER = ["weight-4", "weight-6", "weight-8", "weight-any"]  # caps 4,6,8,inf
+LOCALITY_LABEL = {"local-2d-single": "2D-local single",
+                  "local-2d-bilayer": "2D-local bilayer",
+                  "unrestricted": "unrestricted"}
+WEIGHT_LABEL = {"weight-4": "weight ≤ 4", "weight-6": "weight ≤ 6",
+                "weight-8": "weight ≤ 8", "weight-any": "any weight"}
+
+# Layer-2 family tags (filterable, never ranked).
+FAMILY_LABEL = {
+    "bivariate-bicycle": "bivariate bicycle",
+    "generalized-bicycle": "generalized bicycle",
+    "2bga-coset": "2BGA coset",
+    "hypergraph-product": "hypergraph product",
+    "lifted-product": "lifted product",
+    "balanced-product": "balanced product",
+    "quantum-tanner": "quantum Tanner",
+    "tile": "tile",
+    "topological": "topological",
+    "other": "other",
 }
-TYPE_TERM = {
-    "bivariate bicycle (periodic)": "bivariate",
-    "generalized bicycle": "generalized",
-    "2d-local-bilayer": "2d-local",
+
+
+# A short, distinctive search token per family, used by the filter pills.
+FAMILY_TERM = {
+    "bivariate-bicycle": "bivariate", "generalized-bicycle": "generalized",
+    "2bga-coset": "2bga", "hypergraph-product": "hypergraph",
+    "lifted-product": "lifted", "balanced-product": "balanced",
+    "quantum-tanner": "tanner", "tile": "tile", "topological": "topological",
+    "other": "other",
 }
 
 
-def type_label(t):
-    return TYPE_LABEL.get(t, t)
+def family_label(f):
+    return FAMILY_LABEL.get(f, f)
 
 
-def type_term(t):
-    return TYPE_TERM.get(t, t)
+def locality_members(cls):
+    """The locality boards a code of this class qualifies for (tighter nests into
+    looser): single -> single/bilayer/unrestricted, etc."""
+    i = LOCALITY_ORDER.index(cls) if cls in LOCALITY_ORDER else len(LOCALITY_ORDER) - 1
+    return LOCALITY_ORDER[i:]
 
 
-def compute_records(entries, tracks):
-    """Indices of codes on a Pareto frontier over (n, k, d, w): the frontier of
-    one of their tracks, or the global frontier across all codes. These are the
-    'records' (starred, shaded). The global pass keeps track-less codes (e.g.
-    entries whose only category was a weight track before weight became a plain
-    property) eligible, and guarantees an overall-best code is always a record."""
+def weight_members(wc):
+    """The weight boards a code qualifies for, from its tightest weight class."""
+    start = {"weight-4": 0, "weight-6": 1, "weight-8": 2}.get(wc, 3)
+    return WEIGHT_ORDER[start:]
+
+
+def cells(e):
+    """Every (locality, weight) primary-track cell this code belongs to."""
+    return [(L, W) for L in locality_members(e["locality_class"])
+            for W in weight_members(e["weight_class"])]
+
+
+def cells_by_key(entries):
+    """Map each populated (locality, weight) cell to the indices of its members."""
+    by_cell = {}
+    for i, e in enumerate(entries):
+        for cell in cells(e):
+            by_cell.setdefault(cell, []).append(i)
+    return by_cell
+
+
+def compute_records(entries):
+    """Indices of codes on a Pareto frontier (over n, k, d, w) of any primary-track
+    cell they belong to, or of the global frontier. These are the records (starred,
+    shaded): a record is a within-cell claim, so a code only stars where no other
+    code in the SAME computed cell beats it."""
     records = set()
-    for t, idxs in tracks.items():
+    for idxs in cells_by_key(entries).values():
         te = [entries[i] for i in idxs]
         for j in pareto(te):
             records.add(idxs[j])
@@ -1448,14 +1521,61 @@ def compute_records(entries, tracks):
     return records
 
 
-def board_controls(entries, tracks, records):
-    """The board heading plus the search box, type-filter pills, and filter help.
-    Lives above the charts so filtering and the landscape view stay together; the
-    JS finds the table by id, so its position relative to the table is free."""
-    pills = "".join(
-        f'<button type=button class=typepill data-q="{html.escape(type_term(t))}" '
-        f'title="filter to {html.escape(t)}">{html.escape(type_label(t))}</button>'
-        for t in sorted(tracks))
+def primary_tracks_grid(entries, records):
+    """The Layer-1 primary tracks: the computed locality x check-weight grid. Each
+    populated cell is a board; membership is derived from H and the layout (never
+    self-declared) and nests, so a tighter cell's codes also compete in the looser
+    ones. Shows each cell's size and its kd^2/n leader; the table below filters to
+    any class via the pills."""
+    by_cell = cells_by_key(entries)
+    if not by_cell:
+        return ""
+    head = ('<tr><th class=gcorner></th>'
+            + "".join(f'<th>{html.escape(WEIGHT_LABEL[w])}</th>'
+                      for w in WEIGHT_ORDER) + '</tr>')
+    body = []
+    for L in LOCALITY_ORDER:
+        cellshtml = []
+        for W in WEIGHT_ORDER:
+            idxs = by_cell.get((L, W), [])
+            if not idxs:
+                cellshtml.append('<td class=gempty></td>')
+                continue
+            be = entries[max(idxs, key=lambda i: entries[i]["eff"])]
+            cellshtml.append(
+                f'<td class=gcell><div class=gcount>{len(idxs)} '
+                f'code{"s" if len(idxs) != 1 else ""}</div>'
+                f'<a class=gbest href="codes/{be["slug"]}.html">'
+                f'[[{be["n"]},{be["k"]},{be["d"]}]]</a>'
+                f'<div class=geff>kd&sup2;/n {be["eff"]:g}</div></td>')
+        body.append(f'<tr><th class=grow>{html.escape(LOCALITY_LABEL[L])}</th>'
+                    + "".join(cellshtml) + '</tr>')
+    return ('<section class=ptgrid><h2 class=track>Primary tracks</h2>'
+            '<p class=ptsub>The leaderboards are the computed grid of locality '
+            '&times; check weight. Membership is derived from <code>H</code> and '
+            'the layout, not self-declared, and nests: a tighter cell&rsquo;s '
+            'codes also compete in the looser ones. Each cell shows its size and '
+            'its kd&sup2;/n leader.</p>'
+            f'<div class=ptscroll><table class=grid>{head}'
+            f'{"".join(body)}</table></div></section>')
+
+
+def board_controls(entries, records):
+    """The board heading plus the search box, filter pills, and filter help. Lives
+    above the charts so filtering and the landscape view stay together; the JS
+    finds the table by id, so its position relative to the table is free. Filters:
+    a 2D-local pill (locality is computed), a family-tag pill per family present,
+    and the check-weight slider."""
+    pills = ""
+    if any(e["locality_class"] != "unrestricted" for e in entries):
+        pills += ('<button type=button class=typepill data-q="2d-local" '
+                  'title="filter to 2D-local codes">2D-local</button>')
+    families = sorted({e["family"] for e in entries})
+    pills += "".join(
+        f'<button type=button class=typepill data-q="{html.escape(FAMILY_TERM.get(f, f))}" '
+        f'title="filter to the {html.escape(family_label(f))} family">'
+        f'{html.escape(family_label(f))}</button>'
+        for f in families)
     weights = [e["w"] for e in entries if e["w"] is not None]
     wmin, wmax = (min(weights), max(weights)) if weights else (0, 0)
     # Dual-handle range slider over the check weight w, styled as a pill so it
@@ -1524,10 +1644,12 @@ def board_table(entries, records):
     column of chips. Search and charts are rendered separately, above; this is
     the table itself."""
     def chips(e):
-        return "".join(
-            f'<span class=tchip title="{html.escape(t)}">'
-            f'{html.escape(type_label(t))}</span>'
-            for t in sorted(e["tracks"]))
+        out = [f'<span class=tchip title="construction family (a tag, not a '
+               f'ranking)">{html.escape(family_label(e["family"]))}</span>']
+        if e["locality_class"] != "unrestricted":
+            out.append('<span class="tchip loc" title="computed locality class">'
+                       f'{html.escape(LOCALITY_LABEL[e["locality_class"]])}</span>')
+        return "".join(out)
 
     cols = ('<colgroup><col style="width:3%"><col style="width:14%">'
             '<col style="width:9%"><col style="width:6%"><col style="width:6%">'
@@ -1559,20 +1681,26 @@ def board_table(entries, records):
     for i in order:
         e = entries[i]
         fr = i in records
-        ts = sorted(e["tracks"])
+        # searchable terms (family + computed locality/weight class) so the
+        # filter pills, which set the search box, can match a row.
+        search_terms = " ".join([
+            e["family"], family_label(e["family"]),
+            FAMILY_TERM.get(e["family"], ""),
+            e["locality_class"], e["weight_class"],
+            "2d-local" if e["locality_class"] != "unrestricted" else "",
+        ]).lower()
         rows.append(
             f'<tr class="{"fr" if fr else ""}" data-href="codes/{e["slug"]}.html" '
             f'data-code="{e["slug"]}" data-name="[[{e["n"]},{e["k"]},{e["d"]}]]" '
             f'data-n="{e["n"]}" data-k="{e["k"]}" data-d="{e["d"]}" '
             f'data-codekey="{e["n"]*1000000 + e["k"]*1000 + e["d"]}" '
             f'data-eff="{e["eff"]}" data-w="{e["w"]}" '
-            f'data-type="{html.escape(", ".join(type_label(t) for t in ts))}" '
-            f'data-tracks="{html.escape(" ".join(t.lower() for t in ts))}" '
+            f'data-tracks="{html.escape(search_terms)}" '
             f'data-record="{1 if fr else 0}" '
             f'data-model="{html.escape(e["model"].lower())}" '
             f'data-date="{html.escape(e["date"])}" '
             f'data-auth="{html.escape(e["authors"])}">'
-            f'<td class=star title="{"record on its type frontier" if fr else ""}">'
+            f'<td class=star title="{"record: best in a computed cell on (n, k, d)" if fr else ""}">'
             f'{"&#9733;" if fr else ""}</td>'
             f'<td><span class=mono>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
             + ('<span class=hexwrap title="found and submitted through the '
@@ -1600,13 +1728,9 @@ def board_table(entries, records):
 
 def build():
     entries = load_entries()
-    tracks = {}
-    for i, e in enumerate(entries):
-        for t in e["tracks"]:
-            tracks.setdefault(t, []).append(i)
     n_exact = sum(1 for e in entries if e["tier"] == "exact")
     best_eff = max((e["eff"] for e in entries), default=0)
-    records = compute_records(entries, tracks)
+    records = compute_records(entries)
 
     P = [head("QEC Challenge")]
     P.append('<header class=hero>' + HERO_FLOW + '<div class=wrap>'
@@ -1627,7 +1751,8 @@ def build():
     P.append('<div class=wrap>')
     P.append(progress_panel(entries, n_exact, best_eff))
     P.append(open_challenges_panel(entries))
-    P.append(contributors_panel(entries, tracks))
+    P.append(contributors_panel(entries))
+    P.append(primary_tracks_grid(entries, records))
     P.append('<div class=how>'
              '<div class=card><span class=n>1</span><h3>Build a code</h3>'
              '<p>A CSS qLDPC code, written as one JSON file with its parity '
@@ -1639,13 +1764,13 @@ def build():
              '<p>If it advances a track&rsquo;s frontier it is highlighted. '
              'Click any row for the witness, certificate, and checks.</p>'
              '</div></div>')
-    P.append(board_controls(entries, tracks, records))
+    P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
     P.append('<div class=legend>'
              '<span class=legbreak><span class=swatch></span>&#9733; '
-             '<b>record</b> (shaded rows): on the (n, k, d) Pareto frontier of '
-             'at least one type; unshaded rows are dominated.</span>'
+             '<b>record</b> (shaded rows): best on (n, k, d) within at least one '
+             'computed cell; unshaded rows are dominated in every cell.</span>'
              '<span><span class="dot ex"></span> certified exact '
              '(<span class="b exact">d =</span>)</span>'
              '<span><span class="dot corr"></span> corroborated '
@@ -1709,13 +1834,14 @@ def build():
     # machine-readable stats; the README badges (shields.io dynamic JSON) read
     # this file from the live site, so there is no committed badge image to fall
     # out of sync.
+    n_cells = len(cells_by_key(entries))
     stats = {"verified_codes": len(entries), "certified_exact": n_exact,
-             "tracks": len(tracks), "best_kd2_over_n": best_eff}
+             "tracks": n_cells, "best_kd2_over_n": best_eff}
     with open(os.path.join(DOCS, "stats.json"), "w") as f:
         json.dump(stats, f, indent=2)
     print(f"wrote docs/index.html + {len(entries)} detail pages + "
           f"references.html ({len(REFS)} refs), "
-          f"{len(tracks)} tracks, {n_exact} certified exact")
+          f"{n_cells} primary-track cells, {n_exact} certified exact")
 
 
 if __name__ == "__main__":

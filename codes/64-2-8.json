@@ -437,7 +437,5 @@
   ],
   "notes": "Distance is exact by construction."
  },
- "tracks": [
-  "topological"
- ]
+ "family": "topological"
 }

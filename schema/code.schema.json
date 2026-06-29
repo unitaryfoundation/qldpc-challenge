@@ -4,7 +4,7 @@
   "title": "qLDPC code submission",
   "description": "A single CSS qLDPC code submission. Parity checks are given as sparse supports (lists of qubit indices). Distance claims must carry a self-certifying witness operator for the upper-bound tier.",
   "type": "object",
-  "required": ["schema_version", "name", "code_type", "n", "k", "checks", "distance", "provenance", "tracks"],
+  "required": ["schema_version", "name", "code_type", "n", "k", "checks", "distance", "provenance"],
   "additionalProperties": false,
   "properties": {
     "schema_version": {"const": "0.1"},
@@ -63,11 +63,16 @@
         "notes": {"type": "string"}
       }
     },
+    "family": {
+      "type": "string",
+      "enum": ["bivariate-bicycle", "generalized-bicycle", "2bga-coset", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "description": "construction family (Layer 2). Self-declared, since it cannot be recovered from H, and used only as a filterable tag, never for ranking. Topological covers surface/toric/color (say which in provenance.construction). See TRACKS.md."
+    },
     "tracks": {
       "type": "array",
       "minItems": 0,
       "items": {"type": "string"},
-      "description": "track ids this code is entered into (may be empty; check weight is filtered by the w property, not a track); see TRACKS.md"
+      "description": "deprecated and ignored for ranking. Track membership (the locality and weight classes) is computed by the verifier from H and the layout; this self-declared field is retained only for backward compatibility. See TRACKS.md."
     }
   },
   "$defs": {

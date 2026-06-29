@@ -1021,8 +1021,5 @@
     "notes": "",
     "model": "Claude Opus 4.8"
   },
-  "tracks": [
-    "bivariate bicycle (periodic)",
-    "weight-6"
-  ]
+  "family": "bivariate-bicycle"
 }

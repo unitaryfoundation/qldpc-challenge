@@ -1709,5 +1709,5 @@
   ],
   "notes": "Distance proven exact by cutoff MILP (scipy/HiGHS); no lighter logical exists on either side."
  },
- "tracks": []
+ "family": "bivariate-bicycle"
 }

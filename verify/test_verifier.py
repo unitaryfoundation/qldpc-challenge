@@ -112,34 +112,38 @@ def main():
               not r["ok"]
               and "interaction_radius_within_claim" in failed_checks(r))
 
-    # 7a. claims a 2d-local track but ships no layout: 2D-locality is unproven
-    if any(t.startswith("2d-local") for t in GOOD.get("tracks", [])):
+    # 7a. computed locality class: a valid layout earns a 2d-local class, and
+    #     the class is derived from the layout, never from a self-declared track.
+    if GOOD.get("locality"):
+        check("valid layout earns its computed locality class",
+              rep(GOOD)["computed"]["locality_class"].startswith("local-2d"))
+
+        # no layout -> unrestricted (membership is computed, not rejected)
         d = copy.deepcopy(GOOD)
         d.pop("locality", None)
         r = rep(d)
-        check("2d-local track without a locality block rejected",
-              not r["ok"] and "locality_block_present" in failed_checks(r))
+        check("no layout computes as unrestricted, still valid",
+              r["ok"] and r["computed"]["locality_class"] == "unrestricted")
 
         # 7b. crammed layout: collapse qubits onto a sub-unit-spaced line so the
-        #     radius looks tiny -- the spacing rule must catch the fake
+        #     radius looks tiny -- cramming must DENY the 2d-local class, not earn
+        #     it (a fake short range cannot buy membership)
         d = copy.deepcopy(GOOD)
         d["locality"]["coordinates"] = [[0.001 * i, 0.0] for i in range(d["n"])]
         d["locality"].pop("interaction_radius", None)
         r = rep(d)
-        check("crammed (sub-unit spacing) layout rejected",
-              not r["ok"]
-              and any("no_qubit_cramming" in c for c in failed_checks(r)))
+        check("crammed layout does not earn a 2d-local class",
+              r["computed"]["locality_class"] == "unrestricted")
 
-        # 7c. honest spacing but long range: spread qubits on a unit line so a
-        #     check spans far beyond the track radius cap
+        # 7c. honest spacing but long range: a check spans far beyond any cap, so
+        #     the layout earns no 2d-local class
         d = copy.deepcopy(GOOD)
         d["locality"]["coordinates"] = [[float(i), 0.0] for i in range(d["n"])]
         d["locality"]["layers"] = 1
         d["locality"].pop("interaction_radius", None)
         r = rep(d)
-        check("over-radius (non-local) layout rejected",
-              not r["ok"]
-              and any("radius_within_cap" in c for c in failed_checks(r)))
+        check("over-radius layout does not earn a 2d-local class",
+              r["computed"]["locality_class"] == "unrestricted")
 
     # 8. malformed: missing a required field, must not crash
     d = copy.deepcopy(GOOD)

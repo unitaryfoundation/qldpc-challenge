@@ -867,9 +867,7 @@
   "date": "2025-04-11",
   "notes": "Reference baseline (Liang, Eberhardt, Chen)."
  },
- "tracks": [
-  "2d-local-bilayer"
- ],
+ "family": "bivariate-bicycle",
  "locality": {
   "coordinates": [
    [

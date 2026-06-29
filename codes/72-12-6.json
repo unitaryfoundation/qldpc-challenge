@@ -630,7 +630,5 @@
   ],
   "notes": "Distance d=6 established in arXiv:2308.07915 (Table 3); witness here is a decoder-found logical operator of that weight (upper bound)."
  },
- "tracks": [
-  "bivariate bicycle (periodic)"
- ]
+ "family": "bivariate-bicycle"
 }

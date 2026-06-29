@@ -185,6 +185,24 @@ box-shadow:inset 3px 0 0 var(--ac)}
 .tchip{display:inline-block;font-size:11px;line-height:1;padding:3px 7px;
 margin:2px 4px 2px 0;border-radius:999px;background:var(--soft);color:var(--mut);
 border:1px solid var(--ln);white-space:nowrap}
+.tchip.loc{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}
+/* Primary-tracks grid (locality x weight). */
+.ptgrid{margin:8px 0 4px}
+.ptsub{font-size:13px;color:var(--mut);margin:2px 0 12px;max-width:760px}
+.ptscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.grid{border-collapse:collapse;font-size:13px}
+table.grid th,table.grid td{border:1px solid var(--ln);padding:8px 12px;
+text-align:left;vertical-align:top}
+table.grid thead th,table.grid tr:first-child th{background:var(--soft);
+font-weight:600;color:var(--ink);white-space:nowrap}
+.grow{background:var(--soft);font-weight:600;color:var(--ink);white-space:nowrap}
+.gcorner{background:var(--soft)}
+.gcell .gcount{font-size:11px;color:var(--mut)}
+.gcell .gbest{font-family:'Space Mono',ui-monospace,monospace;font-size:12px;
+color:var(--ac);text-decoration:none;font-weight:700}
+.gcell .gbest:hover{text-decoration:underline}
+.gcell .geff{font-size:11px;color:var(--mut);margin-top:1px}
+.gempty{background:repeating-linear-gradient(45deg,#fafafa 0 6px,#fff 6px 12px)}
 .searchbar{display:flex;align-items:center;gap:12px;margin:14px 0 8px}
 #boardsearch{flex:1 1 0;min-width:0;font-size:14px;padding:10px 13px;
 border:1px solid var(--ln);border-radius:10px;background:#fff;color:var(--ink);
@@ -358,7 +376,9 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2308.07915">arXiv:2308.07915</a></div>
 <div class=kv><b>date</b> 2023-08-15</div>
 <div class=kv><b>notes</b> Distance d=6 established in arXiv:2308.07915 (Table 3); witness here is a decoder-found logical operator of that weight (upper bound).</div>
-<div class=kv><b>tracks</b> bivariate bicycle (periodic)</div>
+<div class=kv><b>family</b> bivariate bicycle <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 36 &middot; <b style="min-width:auto">Z-checks</b> 36</div>

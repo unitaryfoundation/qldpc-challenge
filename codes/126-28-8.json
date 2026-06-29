@@ -1566,7 +1566,5 @@
   ],
   "notes": "Distance certified exact by MILP (HiGHS); every logical-generator coset proven minimal."
  },
- "tracks": [
-  "generalized bicycle"
- ]
+ "family": "generalized-bicycle"
 }
