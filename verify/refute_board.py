@@ -21,6 +21,7 @@ Usage:
 """
 import glob
 import json
+import hashlib
 import os
 import secrets
 import sys
@@ -49,9 +50,11 @@ def main(argv):
         if "distance" not in doc or "d" not in doc.get("distance", {}):
             continue
         checked += 1
-        # per-file seed varies but is derived from the run seed, so the whole run
+        # per-file seed varies but is derived from the run seed with a STABLE
+        # hash (Python's hash() is salted per process), so the whole run
         # reproduces from one number.
-        file_seed = (seed + hash(rel)) % (2**31)
+        rel_hash = int.from_bytes(hashlib.sha256(rel.encode()).digest()[:4], "big")
+        file_seed = (seed + rel_hash) % (2**31)
         try:
             is_refuted, d_found, wit, trials = H.refute_check(doc, seed=file_seed)
         except Exception as e:                 # FAIL CLOSED

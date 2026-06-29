@@ -93,7 +93,7 @@ def main():
     check("the seed is reported (reproducible)", nd is not None and "seed 0" in nd["detail"])
 
     print("\nF2: a refuter error fails CLOSED")
-    good = json.load(open(os.path.join(ROOT, "examples", "72-6-6.json")))
+    good = json.load(open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")))
     orig = heuristic_distance.refute_check
     try:
         def boom(*a, **k):
