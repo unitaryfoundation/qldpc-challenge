@@ -532,7 +532,7 @@ transform:translateY(-50%);border-radius:3px}}
 .wffill{{background:var(--ac)}}
 .wfrange{{position:absolute;top:0;left:0;width:100%;height:16px;margin:0;
 background:none;pointer-events:none;-webkit-appearance:none;appearance:none}}
-#whi,#dhi{{z-index:2}}
+#whi,#dhi,#nhi,#khi{{z-index:2}}
 .wfrange::-webkit-slider-runnable-track{{-webkit-appearance:none;background:none;
 height:16px}}
 .wfrange::-webkit-slider-thumb{{-webkit-appearance:none;pointer-events:auto;
@@ -737,6 +737,12 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  const dlo=document.getElementById('dlo'),dhi=document.getElementById('dhi');
  const dfill=document.getElementById('dffill'),dval=document.getElementById('dfval');
  const DMIN=dlo?+dlo.min:0,DMAX=dlo?+dlo.max:0,dspan=(DMAX-DMIN)||1;
+ const nlo=document.getElementById('nlo'),nhi=document.getElementById('nhi');
+ const nfill=document.getElementById('nffill'),nval=document.getElementById('nfval');
+ const NMIN=nlo?+nlo.min:0,NMAX=nlo?+nlo.max:0,nspan=(NMAX-NMIN)||1;
+ const klo=document.getElementById('klo'),khi=document.getElementById('khi');
+ const kfill=document.getElementById('kffill'),kval=document.getElementById('kfval');
+ const KMIN=klo?+klo.min:0,KMAX=klo?+klo.max:0,kspan=(KMAX-KMIN)||1;
  const cmp=/^(n|k|d|w|eff)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
@@ -761,12 +767,25 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
   if(dfill){dfill.style.left=((b[0]-DMIN)/dspan*100)+'%';
    dfill.style.width=((b[1]-b[0])/dspan*100)+'%';}
   if(dval)dval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
+ function nbounds(){if(!nlo||!nhi)return[-Infinity,Infinity];
+  return[Math.min(+nlo.value,+nhi.value),Math.max(+nlo.value,+nhi.value)];}
+ function npaint(){const b=nbounds();
+  if(nfill){nfill.style.left=((b[0]-NMIN)/nspan*100)+'%';
+   nfill.style.width=((b[1]-b[0])/nspan*100)+'%';}
+  if(nval)nval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
+ function kbounds(){if(!klo||!khi)return[-Infinity,Infinity];
+  return[Math.min(+klo.value,+khi.value),Math.max(+klo.value,+khi.value)];}
+ function kpaint(){const b=kbounds();
+  if(kfill){kfill.style.left=((b[0]-KMIN)/kspan*100)+'%';
+   kfill.style.width=((b[1]-b[0])/kspan*100)+'%';}
+  if(kval)kval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
-  const wb=wbounds(),db=dbounds();
+  const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
   const vis=new Set();let shown=0;
-  rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d;
-   const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])&&toks.every(t=>term(r,t));
+  rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d,nn=+r.dataset.n,kk=+r.dataset.k;
+   const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])
+    &&(nn>=nb[0]&&nn<=nb[1])&&(kk>=kb[0]&&kk<=kb[1])&&toks.every(t=>term(r,t));
    r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
   if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
   document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
@@ -782,14 +801,20 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
    document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
    p.classList.add('active');
    q.value=p.dataset.q;
-   // the All tab (empty filter) also resets the weight and distance sliders.
+   // the All tab (empty filter) also resets every range slider.
    if(p.dataset.q===''){if(wlo&&whi){wlo.value=WMIN;whi.value=WMAX;wpaint();}
-    if(dlo&&dhi){dlo.value=DMIN;dhi.value=DMAX;dpaint();}}
+    if(dlo&&dhi){dlo.value=DMIN;dhi.value=DMAX;dpaint();}
+    if(nlo&&nhi){nlo.value=NMIN;nhi.value=NMAX;npaint();}
+    if(klo&&khi){klo.value=KMIN;khi.value=KMAX;kpaint();}}
    apply();});});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
  if(dlo&&dhi){dlo.addEventListener('input',()=>{dpaint();apply();});
   dhi.addEventListener('input',()=>{dpaint();apply();});dpaint();}
+ if(nlo&&nhi){nlo.addEventListener('input',()=>{npaint();apply();});
+  nhi.addEventListener('input',()=>{npaint();apply();});npaint();}
+ if(klo&&khi){klo.addEventListener('input',()=>{kpaint();apply();});
+  khi.addEventListener('input',()=>{kpaint();apply();});kpaint();}
  apply();
 })();
 
@@ -1640,6 +1665,29 @@ def board_controls(entries, records):
         '</span>'
         f'<span class=wfval id=dfval>{dmin}&ndash;{dmax}</span>'
         '</span>')
+
+    def rslider(label, pre, lo, hi, what):
+        # dual-handle range slider; the generated ids ({pre}lo/{pre}hi/{pre}ffill/
+        # {pre}fval) follow the same convention the JS wires up for w and d.
+        return (
+            f'<span class=wfilter title="filter by {what}">'
+            f'<span class=wflabel>{label}</span>'
+            '<span class=wfslider>'
+            f'<span class=wftrack></span><span class=wffill id={pre}ffill></span>'
+            f'<input type=range id={pre}lo class=wfrange min={lo} max={hi} '
+            f'value={lo} step=1 aria-label="minimum {what}">'
+            f'<input type=range id={pre}hi class=wfrange min={lo} max={hi} '
+            f'value={hi} step=1 aria-label="maximum {what}">'
+            '</span>'
+            f'<span class=wfval id={pre}fval>{lo}&ndash;{hi}</span>'
+            '</span>')
+
+    ns = [e["n"] for e in entries]
+    ks = [e["k"] for e in entries]
+    nmin, nmax = (min(ns), max(ns)) if ns else (0, 0)
+    kmin, kmax = (min(ks), max(ks)) if ks else (0, 0)
+    nslider = rslider("n", "n", nmin, nmax, "physical qubits n")
+    kslider = rslider("k", "k", kmin, kmax, "logical qubits k")
     return ('<section id=board>'
             '<h2 class=track>Codes '
             f'<span class=tcount>&middot; {len(entries)} total, '
@@ -1650,7 +1698,7 @@ def board_controls(entries, records):
             'eff&gt;5" aria-label="search codes">'
             '<span id=boardcount class=searchcount></span></div>'
             f'<nav class=tracktabs>{tabs}</nav>'
-            f'<div class=filterrow>{wslider}{dslider}</div>'
+            f'<div class=filterrow>{wslider}{dslider}{nslider}{kslider}</div>'
             '<p class=searchhelp>Type terms (all must match): a family, author, '
             'or a comparison like <code>k&gt;=10</code> <code>d&gt;8</code> '
             '<code>eff&gt;=5</code>; <code>record</code> keeps only frontier '
