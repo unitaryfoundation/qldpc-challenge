@@ -201,11 +201,17 @@ font-family:inherit}
 #boardsearch:focus{outline:none;border-color:var(--ac);
 box-shadow:0 0 0 3px rgba(54,0,108,.15)}
 .searchcount{font-size:13px;color:var(--mut);white-space:nowrap}
-.typepills{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}
-.typepill{font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;
-border:1px solid var(--ln);background:#fff;color:var(--mut);font-family:inherit}
-.typepill:hover{border-color:var(--ac);color:var(--ac)}
-.clearpill{color:var(--mut)}
+/* Track tabs (OpenRouter-rankings style): a horizontal strip for picking the
+   view; the active tab is filled. Scrolls horizontally on narrow screens. */
+.tracktabs{display:flex;gap:6px;margin:6px 0 10px;overflow-x:auto;
+-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tracktabs::-webkit-scrollbar{display:none}
+.ttab{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
+cursor:pointer;border:1px solid var(--ln);background:#fff;color:var(--mut);
+font-family:inherit;white-space:nowrap}
+.ttab:hover{border-color:var(--ac);color:var(--ac)}
+.ttab.active{background:var(--ac);border-color:var(--ac);color:#fff}
+.filterrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}
 .searchhelp{font-size:12px;color:var(--mut);margin:0 0 14px}
 .searchhelp code{background:var(--soft);padding:1px 5px;border-radius:4px;
 font-size:11px}
@@ -265,6 +271,11 @@ box-shadow:0 10px 10px -10px rgba(17,17,17,.18)}
 @media(max-width:880px){table.board{table-layout:auto;min-width:600px}
 .board .model{display:none}}
 @media(max-width:680px){.board .date{display:none}}
+/* phones: reclaim horizontal space and shrink oversized headers */
+@media(max-width:560px){.wrap{padding:0 14px}
+header.hero{padding:34px 0 30px}
+.statsbar{grid-template-columns:repeat(2,1fr);gap:10px}
+.stat-card{padding:14px 16px}.stat-card .v{font-size:27px}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}
