@@ -532,7 +532,7 @@ transform:translateY(-50%);border-radius:3px}}
 .wffill{{background:var(--ac)}}
 .wfrange{{position:absolute;top:0;left:0;width:100%;height:16px;margin:0;
 background:none;pointer-events:none;-webkit-appearance:none;appearance:none}}
-#whi{{z-index:2}}
+#whi,#dhi{{z-index:2}}
 .wfrange::-webkit-slider-runnable-track{{-webkit-appearance:none;background:none;
 height:16px}}
 .wfrange::-webkit-slider-thumb{{-webkit-appearance:none;pointer-events:auto;
@@ -734,6 +734,9 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  const wlo=document.getElementById('wlo'),whi=document.getElementById('whi');
  const wfill=document.getElementById('wffill'),wval=document.getElementById('wfval');
  const WMIN=wlo?+wlo.min:0,WMAX=wlo?+wlo.max:0,wspan=(WMAX-WMIN)||1;
+ const dlo=document.getElementById('dlo'),dhi=document.getElementById('dhi');
+ const dfill=document.getElementById('dffill'),dval=document.getElementById('dfval');
+ const DMIN=dlo?+dlo.min:0,DMAX=dlo?+dlo.max:0,dspan=(DMAX-DMIN)||1;
  const cmp=/^(n|k|d|w|eff)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
@@ -752,12 +755,18 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
   if(wfill){wfill.style.left=((b[0]-WMIN)/wspan*100)+'%';
    wfill.style.width=((b[1]-b[0])/wspan*100)+'%';}
   if(wval)wval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
+ function dbounds(){if(!dlo||!dhi)return[-Infinity,Infinity];
+  return[Math.min(+dlo.value,+dhi.value),Math.max(+dlo.value,+dhi.value)];}
+ function dpaint(){const b=dbounds();
+  if(dfill){dfill.style.left=((b[0]-DMIN)/dspan*100)+'%';
+   dfill.style.width=((b[1]-b[0])/dspan*100)+'%';}
+  if(dval)dval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
-  const wb=wbounds();
+  const wb=wbounds(),db=dbounds();
   const vis=new Set();let shown=0;
-  rows.forEach(r=>{const w=+r.dataset.w;
-   const ok=(w>=wb[0]&&w<=wb[1])&&toks.every(t=>term(r,t));
+  rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d;
+   const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])&&toks.every(t=>term(r,t));
    r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
   if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
   document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
@@ -773,11 +782,14 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
    document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
    p.classList.add('active');
    q.value=p.dataset.q;
-   // the All tab (empty filter) also resets the weight slider.
-   if(p.dataset.q===''&&wlo&&whi){wlo.value=WMIN;whi.value=WMAX;wpaint();}
+   // the All tab (empty filter) also resets the weight and distance sliders.
+   if(p.dataset.q===''){if(wlo&&whi){wlo.value=WMIN;whi.value=WMAX;wpaint();}
+    if(dlo&&dhi){dlo.value=DMIN;dhi.value=DMAX;dpaint();}}
    apply();});});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
+ if(dlo&&dhi){dlo.addEventListener('input',()=>{dpaint();apply();});
+  dhi.addEventListener('input',()=>{dpaint();apply();});dpaint();}
  apply();
 })();
 
@@ -1613,6 +1625,21 @@ def board_controls(entries, records):
         '</span>'
         f'<span class=wfval id=wfval>{wmin}&ndash;{wmax}</span>'
         '</span>')
+    dists = [e["d"] for e in entries]
+    dmin, dmax = (min(dists), max(dists)) if dists else (0, 0)
+    # Same dual-handle range slider over the code distance d.
+    dslider = (
+        '<span class=wfilter title="filter by code distance d">'
+        '<span class=wflabel>distance</span>'
+        '<span class=wfslider>'
+        '<span class=wftrack></span><span class=wffill id=dffill></span>'
+        f'<input type=range id=dlo class=wfrange min={dmin} max={dmax} '
+        f'value={dmin} step=1 aria-label="minimum distance">'
+        f'<input type=range id=dhi class=wfrange min={dmin} max={dmax} '
+        f'value={dmax} step=1 aria-label="maximum distance">'
+        '</span>'
+        f'<span class=wfval id=dfval>{dmin}&ndash;{dmax}</span>'
+        '</span>')
     return ('<section id=board>'
             '<h2 class=track>Codes '
             f'<span class=tcount>&middot; {len(entries)} total, '
@@ -1623,7 +1650,7 @@ def board_controls(entries, records):
             'eff&gt;5" aria-label="search codes">'
             '<span id=boardcount class=searchcount></span></div>'
             f'<nav class=tracktabs>{tabs}</nav>'
-            f'<div class=filterrow>{wslider}</div>'
+            f'<div class=filterrow>{wslider}{dslider}</div>'
             '<p class=searchhelp>Type terms (all must match): a family, author, '
             'or a comparison like <code>k&gt;=10</code> <code>d&gt;8</code> '
             '<code>eff&gt;=5</code>; <code>record</code> keeps only frontier '
