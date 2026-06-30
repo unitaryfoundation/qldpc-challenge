@@ -860,6 +860,22 @@ def cert_info(slug):
     return None
 
 
+def cert_consistent(cert, doc):
+    """An exact certificate may only be honored if it agrees with the code's
+    current distance (overall and per side). Guards against a stale cert left
+    behind when a code's distance is edited without re-certifying."""
+    dist = doc["distance"]
+    if cert.get("d") is not None and cert["d"] != dist["d"]:
+        return False
+    sides = cert.get("sides") or {}
+    for side in ("X", "Z"):
+        cv = (sides.get(side) or {}).get("value")
+        dv = (dist.get(side) or {}).get("value")
+        if cv is not None and dv is not None and cv != dv:
+            return False
+    return True
+
+
 def heuristic_cert_info(slug):
     """Heuristic distance result (certs/heuristic/<slug>.json), if any. Carries a
     `verdict` of corroborated / refuted / inconclusive (see verify/heuristic_*)."""
@@ -884,9 +900,16 @@ def load_entries():
             continue
         cert = cert_info(slug)
         hcert = heuristic_cert_info(slug)
-        if cert and cert.get("d_exact"):
+        corroborated = hcert and hcert.get("verdict") == "corroborated"
+        if cert and cert.get("d_exact") and cert_consistent(cert, doc):
             tier = "exact"
-        elif hcert and hcert.get("verdict") == "corroborated":
+        elif cert and cert.get("d_exact"):
+            # cert claims exact but disagrees with the code's current distance
+            # (e.g. the code was edited without re-certifying); do not honor it.
+            print(f"  warning: {slug}: exact cert disagrees with the code's "
+                  f"distance; not labeling it d= (re-run verify/certify.py)")
+            tier = "corroborated" if corroborated else "ub"
+        elif corroborated:
             tier = "corroborated"
         else:
             tier = "ub"

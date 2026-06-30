@@ -3,10 +3,15 @@
  "solver": "scipy/HiGHS MILP",
  "sides": {
   "X": {
-   "note": "min over 2 Z-logical cosets = 6, all proven"
+   "note": "min over 2 Z-logical cosets = 6, all proven",
+   "value": 6,
+   "exact": true
   },
   "Z": {
-   "note": "min over 2 X-logical cosets = 6, all proven"
+   "note": "min over 2 X-logical cosets = 6, all proven",
+   "value": 6,
+   "exact": true
   }
- }
+ },
+ "d": 6
 }
