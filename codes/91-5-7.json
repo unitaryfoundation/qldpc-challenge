@@ -1,6 +1,6 @@
 {
  "schema_version": "0.1",
- "name": "[[91,5,7]] weight-6 planar (notched, our k=5 family)",
+ "name": "[[91,5,7]] weight-6 planar (open-boundary, our k=5 family)",
  "code_type": "CSS",
  "n": 91,
  "k": 5,
@@ -633,7 +633,7 @@
    "@vprusso"
   ],
   "origin": "submission",
-  "construction": "Generalized weight-6, notched (7,7).",
+  "construction": "Generalized weight-6, (7,7) open-boundary lattice.",
   "model": "Claude Opus 4.8",
   "references": [
    "arXiv:2504.08887"

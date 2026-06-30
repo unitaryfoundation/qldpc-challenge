@@ -613,7 +613,7 @@
    "Chen, Yu-An"
   ],
   "origin": "baseline",
-  "construction": "Liang-Eberhardt-Chen k=6 family f=1+x+x^-1y^-2, g=1+y+xy^-1; notched (6,8).",
+  "construction": "Liang-Eberhardt-Chen k=6 family f=1+x+x^-1y^-2, g=1+y+xy^-1; (6,8) open-boundary lattice.",
   "references": [
    "arXiv:2504.08887"
   ],

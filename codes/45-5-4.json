@@ -1,6 +1,6 @@
 {
  "schema_version": "0.1",
- "name": "[[45,5,4]] generalized weight-6 notched planar BB code",
+ "name": "[[45,5,4]] generalized weight-6 open-boundary planar BB code",
  "code_type": "CSS",
  "n": 45,
  "k": 5,
@@ -303,7 +303,7 @@
    "@vprusso"
   ],
   "origin": "submission",
-  "construction": "Generalized weight-6, notched (5,5). New instance of the Liang-Eberhardt-Chen open-boundary family (arXiv:2504.08887); the paper has no k=5 family.",
+  "construction": "Generalized weight-6, (5,5) open-boundary lattice. New instance of the Liang-Eberhardt-Chen open-boundary family (arXiv:2504.08887); the paper has no k=5 family.",
   "model": "Claude Opus 4.8",
   "date": "2026-06-19",
   "references": [
