@@ -26,3 +26,6 @@ jobs:
         run: uv run --frozen python verify/verify_all.py
       - name: distance refutation gate (changed submissions only)
         run: uv run --frozen --with ldpc python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
+      - name: authorship check (PR author must be a listed @handle author)
+        if: github.event_name == 'pull_request'
+        run: uv run --frozen python verify/check_authorship.py --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}

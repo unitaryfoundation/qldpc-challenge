@@ -200,6 +200,10 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     report["computed"].update(n=n, rank_HX=rx, rank_HZ=rz, k=k_computed)
     record("k_matches_claim", k_computed == doc["k"],
            f"computed k={k_computed}, claimed {doc['k']}")
+    # A code must encode at least one logical qubit; k<=0 is degenerate (nothing
+    # to protect) and has no distance, so reject it outright.
+    record("k_at_least_1", k_computed >= 1,
+           f"computed k={k_computed}; a submission must encode >= 1 logical qubit")
 
     # 5. check weights (for the weight-bounded tracks)
     wmax = max((len(s) for s in doc["checks"]["X"] + doc["checks"]["Z"]),

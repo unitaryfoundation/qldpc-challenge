@@ -38,7 +38,9 @@ Useful flags:
 - `--dry-run` build and verify without writing.
 
 Then open a pull request adding only your file under `codes/`. CI re-runs the
-verifier; a green check is required to merge.
+verifier; a green check is required to merge. Open the PR from your own account:
+CI checks that the PR author is one of the code's `@handle` authors, so list
+yourself (literature baselines with no `@handle` are exempt).
 
 The distance gate is probabilistic: it runs a random-information-set search with
 a fresh random seed each run, so a green check is not a permanent guarantee. A
