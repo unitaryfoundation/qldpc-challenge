@@ -215,6 +215,12 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     report["computed"]["weight_class"] = (
         "weight-4" if wmax <= 4 else "weight-6" if wmax <= 6
         else "weight-8" if wmax <= 8 else "weight-9plus")
+    # Sparsity backstop: LDPC means a bounded, small check weight. The cap is far
+    # above any plausible qLDPC code on this board (weights run to ~10), so it
+    # only rejects a dense matrix submitted as a "code", not a real entry.
+    record("check_weight_is_ldpc", wmax <= 40,
+           f"max check weight {wmax} far exceeds LDPC sparsity (cap 40)"
+           if wmax > 40 else f"max check weight {wmax}")
 
     # The model field is self-reported and unverifiable, but if one is claimed it
     # must name a specific version, not a bare vendor name: "Claude" tells a reader

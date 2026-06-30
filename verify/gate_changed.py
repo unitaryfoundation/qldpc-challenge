@@ -13,6 +13,7 @@ Usage:
     BASE     git ref to diff against (default origin/main); ignored if files given
     files    explicit code JSONs to gate (otherwise computed from the diff)
 """
+import glob
 import json
 import os
 import secrets
@@ -47,6 +48,31 @@ def changed_codes(base):
     return [f for f in out.split() if f.endswith(".json")]
 
 
+def board_record_slugs():
+    """Slugs on the board's global (n, k, d, w) Pareto frontier. A code that
+    claims to advance the frontier gets deeper refutation than a dominated one,
+    so over-claims pay extra scrutiny exactly where gaming would matter."""
+    rows = []
+    for p in sorted(glob.glob(os.path.join(ROOT, "codes", "*.json"))):
+        try:
+            d = json.load(open(p))
+            ck = d.get("checks", {})
+            w = max((len(s) for s in ck.get("X", []) + ck.get("Z", [])), default=0)
+            rows.append((os.path.splitext(os.path.basename(p))[0],
+                         d["n"], d["k"], d["distance"]["d"], w))
+        except Exception:
+            continue
+    rec = set()
+    for i, a in enumerate(rows):
+        dominated = any(
+            j != i and b[1] <= a[1] and b[2] >= a[2] and b[3] >= a[3] and b[4] <= a[4]
+            and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])
+            for j, b in enumerate(rows))
+        if not dominated:
+            rec.add(a[0])
+    return rec
+
+
 def main(argv):
     rest = [a for a in argv if not a.endswith(".json")]
     seed = None
@@ -76,6 +102,7 @@ def main(argv):
               "running RIS only\n")
 
     refuted = 0
+    records = board_record_slugs()
     for f in files:
         p = f if os.path.isabs(f) else os.path.join(ROOT, f)
         if not os.path.exists(p):                 # deleted/renamed away
@@ -83,19 +110,28 @@ def main(argv):
         doc = json.load(open(p))
         if "distance" not in doc or "d" not in doc.get("distance", {}):
             continue
-        # two independent mechanisms; a hit from EITHER refutes the claim.
-        results = {"RIS": H.refute_check(doc, seed=seed)}
+        # A code that advances the frontier is checked harder: several independent
+        # RIS seeds, not one, so an over-claim cannot lean on a single search
+        # missing the lighter logical. Dominated codes pay only the standard pass.
+        slug = os.path.splitext(os.path.basename(f))[0]
+        deep = slug in records
+        seeds = [seed, seed + 2, seed + 3, seed + 5] if deep else [seed]
+        # two independent mechanisms; a hit from EITHER (any seed) refutes.
+        results = {}
+        for si, s in enumerate(seeds):
+            results[f"RIS#{si}"] = H.refute_check(doc, seed=s)
         if SD is not None:
             results["syndrome-decoder"] = SD.refute_check(doc, seed=seed + 1)
         hits = {m: (dh, wit) for m, (ref, dh, wit, _) in results.items() if ref}
+        tag = f"deep, {len(seeds)} RIS seeds" if deep else "standard"
         if hits:
             refuted += 1
             for m, (dh, wit) in hits.items():
                 print(f"REFUTED  {f} [{m}]: weight-{dh} logical < claimed distance "
                       f"{doc['distance']['d']}\n         witness = {wit}")
         else:
-            print(f"ok       {f}: no logical lighter than {doc['distance']['d']} "
-                  f"({' + '.join(results)})")
+            print(f"ok       {f} ({tag}): no logical lighter than "
+                  f"{doc['distance']['d']}")
     if refuted:
         print(f"\n{refuted} submission(s) refuted: claimed distance is not supported "
               f"by an independent search. See witnesses above.")
