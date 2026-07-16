@@ -124,11 +124,12 @@ attributed to their authors, so a submission is measured against known codes
 rather than an empty board: the bivariate-bicycle codes of Bravyi et al
 (arXiv:2308.07915), the planar codes of Liang, Eberhardt, Chen (arXiv:2504.08887),
 the generalized-bicycle codes of Panteleev-Kalachev (arXiv:1904.02703) and
-Wang-Pryadko (arXiv:2203.17216), and the Kitaev surface / toric and Steane codes.
+Wang-Pryadko (arXiv:2203.17216), the twisted-torus / generalized-toric codes of
+Liang, Liu, Song, Chen (arXiv:2503.03827), and the Kitaev surface / toric and
+Steane codes.
 
 This seed set is not an exhaustive snapshot of the literature. Notable families
-not yet seeded include the twisted-torus / generalized-toric codes
-(arXiv:2503.03827), the LLM-search CSS catalog of arXiv:2606.02418, and the
+not yet seeded include the LLM-search CSS catalog of arXiv:2606.02418 and the
 two-block group-algebra database (arXiv:2306.16400). So the on-board frontier is
 a repo-local frontier, and a code that leads a cell here may still be matched or
 beaten by a published code that has not been seeded yet. Seeding these is tracked

@@ -1,0 +1,145 @@
+{
+  "schema_version": "0.1",
+  "name": "[[12,4,2]] twisted-torus BB code (arXiv:2503.03827)",
+  "code_type": "CSS",
+  "n": 12,
+  "k": 4,
+  "checks": {
+    "X": [
+      [
+        0,
+        1,
+        4,
+        6,
+        8,
+        10
+      ],
+      [
+        0,
+        1,
+        3,
+        6,
+        7,
+        10
+      ],
+      [
+        2,
+        4,
+        5,
+        8,
+        9,
+        11
+      ],
+      [
+        1,
+        3,
+        5,
+        6,
+        7,
+        9
+      ],
+      [
+        0,
+        2,
+        4,
+        8,
+        10,
+        11
+      ],
+      [
+        2,
+        3,
+        5,
+        7,
+        9,
+        11
+      ]
+    ],
+    "Z": [
+      [
+        0,
+        1,
+        3,
+        6,
+        7,
+        10
+      ],
+      [
+        1,
+        3,
+        5,
+        6,
+        7,
+        9
+      ],
+      [
+        0,
+        2,
+        4,
+        8,
+        10,
+        11
+      ],
+      [
+        2,
+        3,
+        5,
+        7,
+        9,
+        11
+      ],
+      [
+        0,
+        1,
+        4,
+        6,
+        8,
+        10
+      ],
+      [
+        2,
+        4,
+        5,
+        8,
+        9,
+        11
+      ]
+    ]
+  },
+  "distance": {
+    "d": 2,
+    "X": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        4,
+        8
+      ]
+    },
+    "Z": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        5,
+        9
+      ]
+    }
+  },
+  "provenance": {
+    "authors": [
+      "Zijian Liang",
+      "Ke Liu",
+      "Hao Song",
+      "Yu-An Chen"
+    ],
+    "construction": "Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+xy, g(x,y)=1+y+xy on the abelian quotient group Z^2/L with twist basis a_1=[0, 3], a_2=[2, 1] (n=2|det[a_1,a_2]|=2*6). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].",
+    "references": [
+      "arXiv:2503.03827"
+    ],
+    "date": "2025",
+    "notes": "Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d>20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery.",
+    "origin": "baseline",
+    "novelty": "known_parameters"
+  },
+  "family": "bivariate-bicycle"
+}
