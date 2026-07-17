@@ -7073,7 +7073,11 @@
   "authors": [
    "@MathysRennela"
   ],
-  "construction": "contributed via qldpc submit",
+  "construction": "Two-block group algebra (2BGA) over the affine group of F_19: metacyclic(q, q-1, primitive_root) with left-support a=[294, 208, 142, 284] and right-support b=[6, 323, 76, 217]. Built via the research/kit group_algebra build_2bga sampler (sample_kasai_affine, seed=17).",
+  "references": [
+   "arXiv:2601.08824",
+   "arXiv:2604.20838"
+  ],
   "origin": "submission",
   "date": "2026-07-16",
   "model": "Hy3"
