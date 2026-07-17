@@ -792,7 +792,7 @@ document.querySelectorAll('circle.hit[data-code]').forEach(c=>{
  const kfill=document.getElementById('kffill'),kval=document.getElementById('kfval');
  const KMIN=klo?+klo.min:0,KMAX=klo?+klo.max:0,kspan=(KMAX-KMIN)||1;
  const lit=document.getElementById('littoggle');
- const cmp=/^(n|k|d|w|eff)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
+ const cmp=/^(n|k|d|w|effw|eff)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
   if(m){const x=parseFloat(r.dataset[m[1]]),v=parseFloat(m[3]);
@@ -956,10 +956,16 @@ def load_entries():
                       f"distance; not labeling it d= (re-run verify/certify.py)")
             tier = "ub"
         n, k, d = doc["n"], doc["k"], earned["value"]
+        w = rep["computed"].get("max_check_weight")
         entries.append({
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "eff": round(k * d * d / n, 3), "tier": tier,
-            "w": rep["computed"].get("max_check_weight"),
+            "w": w,
+            # Weight-aware global figure of merit (issue #165): kd^2/n
+            # normalized by w^2, the dimension-free limit of the BPT
+            # check-weight penalty w^(2+2/(D-1)). Charges for check weight;
+            # display-only -- records and cells still rank by kd^2/n.
+            "effw": round(k * d * d / (n * w * w), 3) if w else None,
             "family": doc.get("family", "other"),
             "locality_class": rep["computed"].get("locality_class", "unrestricted"),
             "weight_class": rep["computed"].get("weight_class", "weight-9plus"),
@@ -1115,6 +1121,9 @@ def detail_page(e):
         ("k", k, "logical qubits"),
         ("d", d, "distance (smallest undetectable error)"),
         ("kd&sup2;/n", e["eff"], "encoding-efficiency ratio (BPT), compared within a track at comparable n"),
+        ("kd&sup2;/nw&sup2;", e["effw"] if e["effw"] is not None else "n/a",
+         "weight-aware figure of merit: kd²/n divided by w², the "
+         "dimension-free BPT check-weight penalty (issue #165); display-only"),
         ("w", e["w"], "max check weight"),
     ]
     if "locality" in doc:
@@ -1523,6 +1532,19 @@ FAQ = [
      "hundreds). So kd&sup2;/n is compared within a track, among codes of "
      "comparable size and check weight, not across the whole field. The "
      "headline number is the best among the codes on this board."),
+    ("What is the kd&sup2;/nw&sup2; column?",
+     "A weight-aware version of kd&sup2;/n. Plain kd&sup2;/n rewards distance "
+     "and rate but ignores check weight, the resource this challenge is really "
+     "about, so a code can inflate it just by using heavier checks. This "
+     "column divides by w&sup2;, charging for check weight. The exponent 2 is "
+     "the dimension-free limit of the Bravyi-Poulin-Terhal check-weight "
+     "penalty w<sup>2+2/(D-1)</sup> (which is w&sup4; for a 2D-local code and "
+     "falls to w&sup2; as the dimension grows); every high-rate code on this "
+     "board is an expander with no fixed geometric dimension, so w&sup2; is "
+     "the honest convention for them. It reshuffles the ranking rather than "
+     "rescaling it: a lighter code can overtake a heavier one that scored "
+     "higher on plain kd&sup2;/n. It is display-only; records, cells, and "
+     "frontiers still rank by kd&sup2;/n."),
     ("What do I get if I find a new code?",
      "Bragging rights, chiefly. Your code lands on the board under your GitHub "
      "handle with a permanent link you can wave around, and if it advances a "
@@ -1957,10 +1979,10 @@ def board_table(entries, records):
                        f'{html.escape(LOCALITY_LABEL[e["locality_class"]])}</span>')
         return "".join(out)
 
-    cols = ('<colgroup><col style="width:3%"><col style="width:13%">'
-            '<col style="width:13%"><col style="width:6%"><col style="width:6%">'
-            '<col style="width:7%"><col style="width:8%"><col style="width:5%">'
-            '<col style="width:16%"><col style="width:14%">'
+    cols = ('<colgroup><col style="width:3%"><col style="width:12%">'
+            '<col style="width:12%"><col style="width:5%"><col style="width:5%">'
+            '<col style="width:6%"><col style="width:7%"><col style="width:8%">'
+            '<col style="width:5%"><col style="width:14%"><col style="width:14%">'
             '<col style="width:9%"></colgroup>')
     head = ('<thead><tr><th></th>'
             '<th data-c=codekey data-num title="the code, written [[n,k,d]]; '
@@ -1972,6 +1994,10 @@ def board_table(entries, records):
             '<th data-c=d class="num col-d" title="distance">d</th>'
             '<th data-c=eff class=num title="k&middot;d&sup2;/n, higher is better">'
             'kd&sup2;/n</th>'
+            '<th data-c=effw class=num title="weight-aware figure of merit: '
+            'kd&sup2;/n divided by w&sup2;, the dimension-free BPT check-weight '
+            'penalty (issue #165). Charges for check weight; display-only, '
+            'records and cells still rank by kd&sup2;/n.">kd&sup2;/nw&sup2;</th>'
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=auth class=col-auth title="who submitted it">authors</th>'
             '<th class=model data-c=model title="claimed model that produced '
@@ -2011,7 +2037,9 @@ def board_table(entries, records):
             f'data-code="{e["slug"]}" data-name="[[{e["n"]},{e["k"]},{e["d"]}]]" '
             f'data-n="{e["n"]}" data-k="{e["k"]}" data-d="{e["d"]}" '
             f'data-codekey="{e["n"]*1000000 + e["k"]*1000 + e["d"]}" '
-            f'data-eff="{e["eff"]}" data-w="{e["w"]}" '
+            f'data-eff="{e["eff"]}" '
+            f'data-effw="{e["effw"] if e["effw"] is not None else 0}" '
+            f'data-w="{e["w"]}" '
             f'data-tracks="{html.escape(search_terms)}" '
             f'data-cells="{html.escape(cell_keys)}" '
             f'data-record="{1 if fr else 0}" '
@@ -2030,7 +2058,10 @@ def board_table(entries, records):
             f'<td class="num col-n">{e["n"]}</td>'
             f'<td class="num col-k">{e["k"]}</td>'
             f'<td class="num col-d">{badge(e["tier"])} {e["d"]}</td>'
-            f'<td class=num>{e["eff"]}</td><td class=num>{e["w"]}</td>'
+            f'<td class=num>{e["eff"]}</td>'
+            f'<td class=num title="kd&sup2;/(n&middot;w&sup2;)">'
+            f'{e["effw"] if e["effw"] is not None else "n/a"}</td>'
+            f'<td class=num>{e["w"]}</td>'
             f'<td class="auth col-auth" title="{html.escape(e["authors"])}">'
             f'{authors_compact(e["authors_list"])}</td>'
             '<td class=model>'
