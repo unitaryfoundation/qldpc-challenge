@@ -961,10 +961,11 @@ def load_entries():
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "eff": round(k * d * d / n, 3), "tier": tier,
             "w": w,
-            # Weight-aware global figure of merit (issue #165): kd^2/n
-            # normalized by w^2, the dimension-free limit of the BPT
-            # check-weight penalty w^(2+2/(D-1)). Charges for check weight;
-            # display-only -- records and cells still rank by kd^2/n.
+            # Weight-aware sort key (issue #165): kd^2/n divided by w^2 to
+            # charge for check weight. A heuristic penalty, not a BPT saturation
+            # ratio -- it borrows the large-D check-weight exponent but keeps
+            # d^2, so it is not dimensionally consistent (the consistent metric
+            # is the locality score f, issue #168). Display-only.
             "effw": round(k * d * d / (n * w * w), 3) if w else None,
             "family": doc.get("family", "other"),
             "locality_class": rep["computed"].get("locality_class", "unrestricted"),
@@ -1122,8 +1123,9 @@ def detail_page(e):
         ("d", d, "distance (smallest undetectable error)"),
         ("kd&sup2;/n", e["eff"], "encoding-efficiency ratio (BPT), compared within a track at comparable n"),
         ("kd&sup2;/nw&sup2;", e["effw"] if e["effw"] is not None else "n/a",
-         "weight-aware figure of merit: kd²/n divided by w², the "
-         "dimension-free BPT check-weight penalty (issue #165); display-only"),
+         "weight-aware sort key: kd²/n divided by w² to charge for check "
+         "weight (issue #165, a heuristic; the dimensionally consistent metric "
+         "is the locality score f, issue #168); display-only"),
         ("w", e["w"], "max check weight"),
     ]
     if "locality" in doc:
@@ -1533,18 +1535,19 @@ FAQ = [
      "comparable size and check weight, not across the whole field. The "
      "headline number is the best among the codes on this board."),
     ("What is the kd&sup2;/nw&sup2; column?",
-     "A weight-aware version of kd&sup2;/n. Plain kd&sup2;/n rewards distance "
-     "and rate but ignores check weight, the resource this challenge is really "
-     "about, so a code can inflate it just by using heavier checks. This "
-     "column divides by w&sup2;, charging for check weight. The exponent 2 is "
-     "the dimension-free limit of the Bravyi-Poulin-Terhal check-weight "
-     "penalty w<sup>2+2/(D-1)</sup> (which is w&sup4; for a 2D-local code and "
-     "falls to w&sup2; as the dimension grows); every high-rate code on this "
-     "board is an expander with no fixed geometric dimension, so w&sup2; is "
-     "the honest convention for them. It reshuffles the ranking rather than "
-     "rescaling it: a lighter code can overtake a heavier one that scored "
-     "higher on plain kd&sup2;/n. It is display-only; records, cells, and "
-     "frontiers still rank by kd&sup2;/n."),
+     "A weight-aware sort key: the efficiency kd&sup2;/n divided by w&sup2; to "
+     "charge for check weight, which plain kd&sup2;/n ignores (a code can raise "
+     "kd&sup2;/n just by using heavier checks). The w&sup2; is a heuristic "
+     "penalty, not a saturation ratio. It takes the check-weight exponent from "
+     "the large-dimension limit of the Bravyi-Poulin-Terhal tradeoff "
+     "(w<sup>2+2/(D-1)</sup>, which is w&sup4; at D=2 and falls to w&sup2; as D "
+     "grows) but keeps d&sup2;, so it is not dimensionally consistent: the "
+     "consistent quantity is the locality score f, which fixes one dimension "
+     "and needs a layout (see docs/locality-score.md and issue #168). Its job "
+     "here is to reorder the sort so lighter-weight codes surface: a lighter "
+     "code can overtake a heavier one that scored higher on plain kd&sup2;/n. "
+     "It is display-only; records, cells, and frontiers still rank by "
+     "kd&sup2;/n."),
     ("What do I get if I find a new code?",
      "Bragging rights, chiefly. Your code lands on the board under your GitHub "
      "handle with a permanent link you can wave around, and if it advances a "
@@ -1994,10 +1997,11 @@ def board_table(entries, records):
             '<th data-c=d class="num col-d" title="distance">d</th>'
             '<th data-c=eff class=num title="k&middot;d&sup2;/n, higher is better">'
             'kd&sup2;/n</th>'
-            '<th data-c=effw class=num title="weight-aware figure of merit: '
-            'kd&sup2;/n divided by w&sup2;, the dimension-free BPT check-weight '
-            'penalty (issue #165). Charges for check weight; display-only, '
-            'records and cells still rank by kd&sup2;/n.">kd&sup2;/nw&sup2;</th>'
+            '<th data-c=effw class=num title="weight-aware sort key: kd&sup2;/n '
+            'divided by w&sup2; to charge for check weight (issue #165, a '
+            'heuristic; the layout-based locality score f is the consistent '
+            'one, issue #168). Display-only; records and cells still rank by '
+            'kd&sup2;/n.">kd&sup2;/nw&sup2;</th>'
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=auth class=col-auth title="who submitted it">authors</th>'
             '<th class=model data-c=model title="claimed model that produced '
