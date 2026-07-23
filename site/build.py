@@ -733,6 +733,14 @@ text-decoration:none;line-height:0}}
 .wit{{font-family:ui-monospace,monospace;font-size:12px;background:var(--soft);
 border:1px solid var(--ln);border-radius:8px;padding:10px;
 white-space:pre-wrap;word-break:break-word}}
+.notebody{{font-size:14px;line-height:1.55}}
+.notebody h3,.notebody h4,.notebody h5{{margin:14px 0 6px}}
+.notebody pre{{font-family:ui-monospace,monospace;font-size:12px;
+background:var(--soft);border:1px solid var(--ln);border-radius:8px;
+padding:10px;overflow-x:auto}}
+.notebody code{{font-family:ui-monospace,monospace;font-size:12.5px;
+background:var(--soft);padding:1px 4px;border-radius:4px}}
+.notebody ul{{margin:6px 0 6px 20px}}
 details{{margin:8px 0}}summary{{cursor:pointer;color:var(--ac);font-size:14px}}
 .cert-ok{{color:var(--ex);font-weight:600}}.cert-no{{color:var(--mut)}}
 .ref{{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--ln);
@@ -1041,6 +1049,7 @@ def load_entries():
             "model": doc["provenance"].get("model", ""),
             "date": doc["provenance"].get("date", ""),
             "construction": doc["provenance"].get("construction", ""),
+            "note_md": load_note(slug),
             "doc": doc, "cert": cert,
         })
     return entries
@@ -1144,6 +1153,163 @@ def mathfmt(s):
     be negative. Variables are left in normal text on purpose (the strings mix
     in prose, so blanket italics would catch letters inside words)."""
     return re.sub(r"(?:\*\*|\^)(-?\d+)", r"<sup>\1</sup>", html.escape(s))
+
+
+def md_to_html(md):
+    """Render the deliberately small markdown subset allowed in research notes
+    and fieldnotes (headings, bold, inline code, fenced code, lists, links,
+    paragraphs). Everything is HTML-escaped first, so a note can never inject
+    markup; anything outside the subset renders as literal text."""
+    out, in_code, in_list, para = [], False, False, []
+
+    def flush_para():
+        if para:
+            out.append("<p>" + " ".join(para) + "</p>")
+            para.clear()
+
+    def close_list():
+        nonlocal in_list
+        if in_list:
+            out.append("</ul>")
+            in_list = False
+
+    def inline(s):
+        s = html.escape(s)
+        s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+        s = re.sub(r"`([^`]+)`", r"<code>\1</code>", s)
+        s = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)",
+                   r'<a href="\2">\1</a>', s)
+        return s
+
+    for line in md.splitlines():
+        if line.strip().startswith("```"):
+            flush_para(); close_list()
+            out.append("<pre>" if not in_code else "</pre>")
+            in_code = not in_code
+            continue
+        if in_code:
+            out.append(html.escape(line))
+            continue
+        m = re.match(r"(#{1,4})\s+(.*)", line)
+        if m:
+            flush_para(); close_list()
+            lvl = min(len(m.group(1)) + 2, 5)   # note h1 -> page h3
+            out.append(f"<h{lvl}>{inline(m.group(2))}</h{lvl}>")
+            continue
+        if re.match(r"\s*[-*]\s+", line):
+            flush_para()
+            if not in_list:
+                out.append("<ul>")
+                in_list = True
+            out.append("<li>" + inline(re.sub(r"\s*[-*]\s+", "", line, count=1))
+                       + "</li>")
+            continue
+        if not line.strip():
+            flush_para(); close_list()
+            continue
+        para.append(inline(line.strip()))
+    flush_para(); close_list()
+    if in_code:
+        out.append("</pre>")
+    return "\n".join(out)
+
+
+NOTE_CAP = 10 * 1024
+
+
+def load_note(slug):
+    """The research note staged beside a submission: notes/<slug>.md.
+    Absent file -> None (notes are requested, not yet mandatory)."""
+    p = os.path.join(ROOT, "notes", slug + ".md")
+    if not os.path.exists(p):
+        return None
+    with open(p) as f:
+        md = f.read()
+    if len(md.encode()) > NOTE_CAP:
+        print(f"  warning: notes/{slug}.md exceeds {NOTE_CAP} bytes; "
+              f"truncating on render")
+        md = md.encode()[:NOTE_CAP].decode(errors="ignore")
+    return md
+
+
+def load_fieldnotes():
+    """fieldnotes/*.md with a minimal front-matter block (title/date/author/
+    model/topics). Malformed front matter degrades to filename-derived
+    metadata rather than failing the build."""
+    notes = []
+    for p in sorted(glob.glob(os.path.join(ROOT, "fieldnotes", "*.md"))):
+        base = os.path.basename(p)
+        if base.upper() == "README.MD":
+            continue
+        with open(p) as f:
+            raw = f.read()
+        meta = {"title": os.path.splitext(base)[0], "date": "", "author": "",
+                "model": "", "topics": ""}
+        body = raw
+        m = re.match(r"\s*---\n(.*?)\n---\n(.*)", raw, re.S)
+        if m:
+            body = m.group(2)
+            for line in m.group(1).splitlines():
+                kv = re.match(r"(\w+)\s*:\s*(.*)", line)
+                if kv and kv.group(1) in meta:
+                    meta[kv.group(1)] = kv.group(2).strip().strip('"')
+        if not meta["date"]:
+            dm = re.match(r"(\d{4}-\d{2}-\d{2})", base)
+            meta["date"] = dm.group(1) if dm else ""
+        notes.append({**meta, "file": base, "md": body})
+    return notes
+
+
+def research_log_page(entries, fieldnotes):
+    """docs/research-log.html: every submission note and fieldnote, newest
+    first — the board's shared record of what was tried, what worked, and
+    what is known not to work."""
+    items = []
+    for e in entries:
+        if e.get("note_md"):
+            items.append({
+                "date": e["date"], "kind": "submission note",
+                "title": f'[[{e["n"]},{e["k"]},{e["d"]}]] — {e["slug"]}',
+                "link": f'codes/{e["slug"]}.html',
+                "src": f'{REPO}/notes/{e["slug"]}.md',
+                "author": e["authors"], "model": e["model"],
+                "md": e["note_md"]})
+    for fn in fieldnotes:
+        items.append({
+            "date": fn["date"], "kind": "fieldnote", "title": fn["title"],
+            "link": None, "src": f'{REPO}/fieldnotes/{fn["file"]}',
+            "author": fn["author"], "model": fn["model"], "md": fn["md"]})
+    items.sort(key=lambda i: i["date"], reverse=True)
+
+    P = [head("Research log · QEC Challenge")]
+    P.append('<div class=wrap>')
+    P.append('<a class=back href="index.html">&larr; back to the board</a>')
+    P.append('<h1>Research log</h1>')
+    P.append(
+        '<p class=sub>The search behind the board: every submission ships a '
+        'public research note (how the code was found, what was swept, what '
+        'collapsed), and negative results land as stand-alone '
+        f'<a href="{REPO}/fieldnotes">fieldnotes</a>. Newest first. '
+        f'See <a href="{REPO}/notes">notes/</a> for the contract.</p>')
+    if not items:
+        P.append('<p class=sub>No notes yet.</p>')
+    for i, it in enumerate(items):
+        title = (f'<a href="{it["link"]}">{html.escape(it["title"])}</a>'
+                 if it["link"] else html.escape(it["title"]))
+        byline = " &middot; ".join(x for x in (
+            html.escape(it["date"]), html.escape(it["kind"]),
+            authors_html([a.strip() for a in it["author"].split(",")])
+            if it["author"] else "",
+            html.escape(it["model"])) if x)
+        P.append(f'<section class=blk><h3>{title}</h3>'
+                 f'<div class=kv style="color:var(--mut)">{byline}</div>'
+                 f'<details {"open" if i < 3 else ""}>'
+                 f'<summary>note</summary>'
+                 f'<div class=notebody>{md_to_html(it["md"])}</div>'
+                 f'<div class=kv><a href="{it["src"]}">raw markdown</a></div>'
+                 f'</details></section>')
+    P.append('</div></body></html>')
+    return "\n".join(P)
 
 
 def authors_html(lst):
@@ -1286,6 +1452,23 @@ def detail_page(e):
              f'{html.escape(WEIGHT_LABEL.get(e["weight_class"], "weight > 8"))} '
              '<span class=claimed>(computed)</span></div>')
     P.append('</section>')
+
+    # research note: how the code was found (notes/<slug>.md, staged with the
+    # submission PR — see notes/README.md for the contract)
+    if e.get("note_md"):
+        P.append('<section class=blk><h3>How this code was found</h3>'
+                 '<div class=kv style="color:var(--mut)">the research note '
+                 'submitted with this code &middot; '
+                 f'<a href="{REPO}/notes/{e["slug"]}.md">raw markdown</a> '
+                 '&middot; <a href="../research-log.html">all notes</a></div>'
+                 f'<div class=notebody>{md_to_html(e["note_md"])}</div>'
+                 '</section>')
+    else:
+        P.append('<section class=blk><h3>How this code was found</h3>'
+                 '<div class=kv style="color:var(--mut)">no research note was '
+                 'staged with this submission &mdash; notes are requested for '
+                 f'new submissions (<a href="{REPO}/notes">notes/README.md</a>)'
+                 '</div></section>')
 
     # parity checks
     X, Z = doc["checks"]["X"], doc["checks"]["Z"]
@@ -2348,6 +2531,7 @@ def build():
              '<a href="whitepaper.html">Read the whitepaper.</a></p>'
              '<nav class=topnav>'
              '<a href="faq.html">FAQ</a>'
+             '<a href="research-log.html">Research log</a>'
              '<a href="references.html">References</a>'
              f'<a href="{REPO_ROOT}">{GH_ICON}GitHub</a>'
              '</nav>'
@@ -2410,6 +2594,7 @@ def build():
         f'<a href="{REPO}/schema/SCHEMA.md">Schema</a>'
         f'<a href="{REPO}/TRACKS.md">Tracks</a>'
         '<a href="faq.html">FAQ</a>'
+        '<a href="research-log.html">Research log</a>'
         '<a href="references.html">References</a>'
         '<a href="qec_challenge.pdf">Whitepaper</a>'
         '</nav></div>'
@@ -2432,6 +2617,8 @@ def build():
         f.write(references_page(entries))
     with open(os.path.join(DOCS, "faq.html"), "w") as f:
         f.write(faq_page())
+    with open(os.path.join(DOCS, "research-log.html"), "w") as f:
+        f.write(research_log_page(entries, load_fieldnotes()))
     # Wrapper so the whitepaper opens with the site favicon and a proper tab
     # title (a raw PDF tab shows the browser's PDF-viewer icon instead).
     with open(os.path.join(DOCS, "whitepaper.html"), "w") as f:

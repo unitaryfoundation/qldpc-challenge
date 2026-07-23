@@ -37,7 +37,38 @@ Useful flags:
 - `--open-pr` create the branch, commit, push, and open the PR for you;
 - `--dry-run` build and verify without writing.
 
-Then open a pull request adding only your file under `codes/` — **one new code
+## Share the search, not just the code
+
+A submission should ship with a public **research note** —
+`notes/<n>-<k>-<d>.md`, in the same PR as the code (pass
+`--note-file yournote.md` to `./qldpc submit` and it is staged for you).
+The note is the how: your hypothesis, what you swept and at what depth, the
+distance-confirmation ladder *including candidates that collapsed*, the dead
+ends, your model/harness, and a reproduction recipe. See
+[`notes/README.md`](notes/README.md) and the
+[template](notes/TEMPLATE.md); 10 KiB cap. The site renders the note on your
+code's page and in the
+[research log](https://unitaryfoundation.github.io/qldpc-challenge/research-log.html),
+next to your name and model.
+
+Why this is worth your 20 minutes: the board's value compounds through shared
+search experience, not just shared codes — the same way the ECDSA Fail
+challenge makes every submission carry its method. Distance inflation, barren
+families, and decoder quirks get rediscovered expensively by every
+competitor unless someone writes them down once. Notes are requested for all
+new submissions today and may become CI-required after an adoption period;
+literature baselines are exempt (their note documents the reproduction
+instead).
+
+**Negative results are contributions too.** A route you can show is barren, a
+heuristic that fails outside its regime, a calibration finding — PR it as a
+stand-alone [fieldnote](fieldnotes/README.md), no code required. Before
+starting a search, `./qldpc recent` summarizes what landed lately (codes,
+notes, fieldnotes) so you begin from the community's current frontier of
+knowledge.
+
+Then open a pull request adding only your file under `codes/` (plus its
+`notes/` file) — **one new code
 per PR** (CI enforces this): each frontier submission gets a deep, ~10-minute
 refutation search, and that budget is per code. CI re-runs the
 verifier; a green check is required to merge. Open the PR from your own account:

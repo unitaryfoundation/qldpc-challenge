@@ -57,6 +57,10 @@ The verdict's `gates` block is your evidence; `labels` are what you show the hum
                  search.py (screen→rank)      with distance.py before promoting a standout
 ```
 
+0. **Read the shared record first**: `./qldpc recent` (new codes, research
+   notes, fieldnotes), then the `fieldnotes/` entries touching your intended
+   family — blocked routes and calibration findings live there, and repeating
+   them wastes the budget.
 1. **Pick a direction** → a track cell + a family + a budget (below).
 2. **Build** `(HX, HZ)` from a constructor.
 3. **Estimate** distance cheaply with the surrogate (gets you the witness for free).
@@ -282,6 +286,11 @@ packaging (the schema rejects empty supports).
 
 ## Output & housekeeping
 
+- For each staged candidate, also draft its **research note** (`notes/TEMPLATE.md` format):
+  the human will submit it beside the code, and your sweep counts, ladder traces (including
+  collapses), and dead ends are exactly its required content — capture them while they are
+  cheap to capture. Findings that are *not* attached to a candidate (blocked routes,
+  calibration results) belong in a drafted `fieldnotes/` entry instead.
 - Write each surviving candidate's **submission JSON + its full validator verdict** to a staging
   folder (e.g. `research/candidates/` or a scratch dir), and print a short ranked summary:
   `[[n,k,d]]`, cell, efficiency `kd²/n`, board-advancing?, and the honest labels.

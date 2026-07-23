@@ -211,11 +211,33 @@ def cmd_submit(args):
         f.write("\n")
     print(f"  wrote {out}")
 
+    # the public research note (notes/<slug>.md): how the code was found —
+    # search narrative, sweep sizes, confirmation ladder, dead ends. Requested
+    # for every submission; rendered on the code's site page and in the
+    # research log. See notes/README.md and notes/TEMPLATE.md.
+    note_out = None
+    if args.note_file:
+        with open(args.note_file) as f:
+            note_md = f.read()
+        if len(note_md.encode()) > 10 * 1024:
+            print(f"\n{args.note_file} exceeds the 10 KiB note cap; trim it.")
+            return 1
+        note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
+        os.makedirs(os.path.dirname(note_out), exist_ok=True)
+        with open(note_out, "w") as f:
+            f.write(note_md)
+        print(f"  wrote {note_out}")
+    else:
+        print("\n  note: no --note-file given. Submissions should ship a "
+              "research note\n  (notes/{}.md) — the search story, sweep "
+              "sizes, ladder, dead ends.\n  See notes/TEMPLATE.md; the site "
+              "renders it beside your code.".format(slug))
+
     if args.open_pr:
-        return open_pr(slug, out)
+        return open_pr(slug, out, note_out)
     print("\nnext: open a PR with this file")
     print(f"  git checkout -b submit-{slug}")
-    print(f"  git add {out}")
+    print(f"  git add {out}" + (f" {note_out}" if note_out else ""))
     print(f"  git commit -m 'Add [[{n},{k},{d}]]'")
     print(f"  git push -u origin submit-{slug}")
     print("  gh pr create --fill        (or use the link git push prints)")
@@ -223,12 +245,13 @@ def cmd_submit(args):
     return 0
 
 
-def open_pr(slug, out):
+def open_pr(slug, out, note_out=None):
     n_k_d = slug.replace("-", ",")
     branch = f"submit-{slug}"
+    add = ["git", "add", out] + ([note_out] if note_out else [])
     cmds = [
         ["git", "checkout", "-b", branch],
-        ["git", "add", out],
+        add,
         ["git", "commit", "-m", f"Add [[{n_k_d}]]"],
         ["git", "push", "-u", "origin", branch],
         ["gh", "pr", "create", "--fill"],
@@ -240,6 +263,52 @@ def open_pr(slug, out):
             print(f"  command failed ({r.returncode}); finish the remaining "
                   f"steps by hand.")
             return r.returncode
+    return 0
+
+
+def cmd_recent(args):
+    """What moved on the board recently: codes merged, research notes, and
+    fieldnotes, from git history. The 'stay current' step — read this (and
+    the linked notes) before spending compute, so a new search starts from
+    the community's frontier of knowledge, not just the frontier of scores."""
+    since = f"--since={args.days} days ago"
+
+    def added(path):
+        r = subprocess.run(
+            ["git", "log", "--diff-filter=A", since, "--name-only",
+             "--pretty=format:%as", "--", path],
+            cwd=_ROOT, capture_output=True, text=True)
+        out, date = [], ""
+        for line in r.stdout.splitlines():
+            if not line.strip():
+                continue
+            if len(line) == 10 and line[4] == line[7] == "-":
+                date = line
+            else:
+                out.append((date, line.strip()))
+        return out
+
+    codes = added("codes/")
+    notes = {os.path.basename(f)[:-3] for _, f in added("notes/")
+             if f.endswith(".md")}
+    fnotes = [f for _, f in added("fieldnotes/")
+              if f.endswith(".md") and not f.endswith("README.md")]
+
+    print(f"board activity, last {args.days} days:")
+    if not codes:
+        print("  no new codes")
+    for date, f in codes:
+        slug = os.path.splitext(os.path.basename(f))[0]
+        has_note = (slug in notes
+                    or os.path.exists(os.path.join(_ROOT, "notes",
+                                                   slug + ".md")))
+        tag = "note: notes/%s.md" % slug if has_note else "no research note"
+        print(f"  {date}  [[{slug.replace('-', ',')}]]  ({tag})")
+    if fnotes:
+        print("fieldnotes (negative results / calibration):")
+        for f in fnotes:
+            print(f"  {f}")
+    print("full log: docs research-log page, or ls notes/ fieldnotes/")
     return 0
 
 
@@ -261,6 +330,11 @@ def main(argv=None):
                         "'human' (claimed, not verified; the verifier requires a "
                         "version if a model is named)")
     s.add_argument("--notes", default="")
+    s.add_argument("--note-file", default="",
+                   help="markdown research note staged as notes/<slug>.md and "
+                        "rendered publicly beside the code: the search story "
+                        "— hypothesis, sweep sizes, confirmation ladder, dead "
+                        "ends (see notes/TEMPLATE.md; 10 KiB cap)")
     s.add_argument("--date", default="",
                    help="submission date (YYYY-MM-DD); defaults to today")
     s.add_argument("--name", default="")
@@ -286,6 +360,12 @@ def main(argv=None):
     s.add_argument("--open-pr", action="store_true",
                    help="create the branch, commit, push, and open the PR")
     s.set_defaults(func=cmd_submit)
+
+    r = sub.add_parser("recent", help="what landed recently: codes, research "
+                                      "notes, fieldnotes (read before you "
+                                      "search)")
+    r.add_argument("--days", type=int, default=14)
+    r.set_defaults(func=cmd_recent)
 
     args = p.parse_args(argv)
     return args.func(args)
