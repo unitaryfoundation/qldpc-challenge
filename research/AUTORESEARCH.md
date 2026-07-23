@@ -225,56 +225,16 @@ The constructors, surrogate, search, and packaging stay numpy-only.
 - **`upper_bound` is not `exact`.** The gate certifies an upper bound (`d<=`); an exact (`d=`)
   claim needs server certification (step 6). Only pursue it for a standout the human wants.
 
-## Field notes from past campaigns (2026-06 → 2026-07)
+## Field notes from past campaigns
 
-The sections above are the mechanics; this is what actually happened across the first months
-of campaigns, so you don't re-learn it at compute cost.
-
-**Trial-depth floors — the failure mode that repeats every campaign.** Every inflated claim
-so far died the same way: a high surrogate d at low trials that collapsed as trials rose.
-[[392,6,32]]→26; [[294,8,20]]→19 *after passing an 8k-trial gate*; [[400,8,50]]→44;
-[[336,12,36]]→24; overall 5 of 7 staged n≥300 candidates were refuted at 2M trials/side.
-Support-5 2BGA (weight-9plus) inflates 8–30% at 30–60k-trial depth. The discipline that fixed it:
-
-- Screen at low trials, but confirm on a **rising ladder** (e.g. 2k→8k→60k→1M trials) and keep
-  only candidates whose d is *flat* across the ladder — a value still descending is not a value.
-- For n≥300, treat **~1M+ trials/side as the packaging floor**. With the `gf2_fast` extension
-  (`make fast`, ~30–170× over pure Python) that is minutes, so there is no excuse to skip it.
-- Package claimed d = **the lightest logical you yourself witnessed** in deep self-refutation,
-  never "the best value I failed to refute" — leave the gate nothing left to find.
-- Distance floors/records established in low-trial eras are suspect (one d≥14 "floor" fell at
-  200k trials). Re-refute an old claim before building on it.
-
-**Lit-check before you fall in love.** Random sweeps rediscover the literature: an A5
-[[120,12,10]] "find" turned out to be a known W≤8 optimum from Lin–Pryadko's *exhaustive*
-nonabelian 2BGA enumeration (n≤200, github.com/QEC-pages/2BGA-codes). Check that, the BB
-papers (arXiv:2308.07915 and follow-ons), and the Aydin–Tamo–Barg coset tables *before* the
-expensive deep-confirmation runs, not after.
-
-**Confirmation is the bottleneck, not generation.** Screening covers hundreds of candidates in
-seconds; deep confirmation takes minutes–hours per survivor, and exact MILP can run >15 min at
-n≈126 without finishing. Budget a sweep around how many survivors you can *confirm*, and never
-block the sweep on exact certification. Also: one code per PR (CI-enforced) at ~12 min of gate
-time each — promote selectively, best-settled first.
-
-**Directions that produced the recent wins (still open):**
-
-- **Nonabelian 2BGA beyond n=200** — outside the exhaustive enumeration, so novelty is real.
-  S5 gave odd-k [[240,13,15]] (odd k is unreachable by abelian BB — a niche only nonabelian
-  constructions can enter); PSL(2,7) gave [[336,20,20]], a board-best efficiency. Untried
-  neighbors: PSL(2,8), PSL(2,11), SL(2,7), other simple/Hurwitz groups — simple groups compete
-  with metacyclic at equal weight.
-- **The weight-9plus cell is thin.** Support-5 2BGA opens it; apply the 1M-trial floor from
-  the start (this family is the worst inflater).
-- **2D-local grafts:** codes dominated on the unrestricted board still set locality records
-  ([[216,15,11]] is a bilayer k-record only because of its layout). Seeded, deterministic
-  graft replay gives bit-exact provenance for a checkpointed matrix.
-- **Re-mining old low-trial sweep artifacts at honest trial counts** is cheap and productive.
-- **Annealing (screen-then-confirm) beats blind sampling** once a fertile group is chosen —
-  but tune acceptance first (T_HI=2.0 ran at ~0.1% acceptance, far too cold).
-
-**Small landmines:** `reduce_weights` can zero out redundant rows — drop empty rows before
-packaging (the schema rejects empty supports).
+Operational field experience lives in [`../fieldnotes/`](../fieldnotes/) —
+PR-able entries rendered in the site's research log. The lessons that used to
+be inlined here (trial-depth floors and the distance-inflation discipline,
+lit-check timing, confirmation-budget planning, tooling landmines, and the
+2026-06→07 open-directions snapshot) were ported there on 2026-07-23. Read
+the entries touching your family before spending budget (step 0 of the
+loop), and add a fieldnote when a campaign learns something the next one
+should not have to re-learn.
 
 ## Definition of done (a candidate you may surface)
 

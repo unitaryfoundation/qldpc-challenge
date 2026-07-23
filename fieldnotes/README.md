@@ -39,9 +39,10 @@ Guidelines:
   [[390,82,39]] → [[390,82,38]] correction is the model.
 - Cap: 10 KiB, same as submission notes.
 
-## Curation
+## Relationship to AUTORESEARCH.md
 
-`research/AUTORESEARCH.md`'s "field notes from past campaigns" section is
-the curated digest of hard-won operational lessons; entries here that prove
-load-bearing get distilled into it (with a link back). Adding a fieldnote
-does not require touching AUTORESEARCH.md.
+This directory *is* the record of operational field experience;
+`research/AUTORESEARCH.md` keeps the mechanics of the research loop and
+points here (its former "field notes from past campaigns" section was
+ported into the `2026-07-01-*` entries). Adding a fieldnote does not
+require touching AUTORESEARCH.md.
