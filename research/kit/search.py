@@ -40,6 +40,37 @@ def efficiency(n, k, d):
     return (k * d * d / n) if n else 0.0
 
 
+def load_skip_fingerprints(path):
+    """Load fingerprints from a JSON list or a newline-delimited text file."""
+    if not path or not os.path.exists(path):
+        return set()
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except json.JSONDecodeError:
+        with open(path) as f:
+            data = [line.strip() for line in f if line.strip()]
+    if isinstance(data, dict):
+        if "fingerprints" in data:
+            data = data["fingerprints"]
+        elif "skip_fingerprints" in data:
+            data = data["skip_fingerprints"]
+        else:
+            data = []
+    if isinstance(data, list):
+        return {str(fp) for fp in data}
+    return set()
+
+
+def save_skip_fingerprints(path, fingerprints):
+    """Persist a checkpoint set of fingerprints to disk."""
+    if not path:
+        return
+    os.makedirs(os.path.dirname(path), exist_ok=True) if os.path.dirname(path) else None
+    with open(path, "w") as f:
+        json.dump(sorted(fingerprints), f, indent=2)
+
+
 def fingerprint(HX, HZ):
     """Exact-duplicate key: the reduced row echelon forms pin the stabilizer
     group. Equal fingerprint => identical code (same convention as the
@@ -51,7 +82,8 @@ def fingerprint(HX, HZ):
 
 
 def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
-           metric=efficiency, keep=None, verbose=False):
+           metric=efficiency, keep=None, verbose=False,
+           skip_fingerprints=None, checkpoint_path=None):
     """Screen an iterable of ``(spec, HX, HZ)`` candidates.
 
     ``spec`` is any JSON-serializable description of how the code was built (a
@@ -63,6 +95,9 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
     deduplicated by fingerprint, truncated to ``keep`` if given.
     """
     seen = {}
+    completed = set(skip_fingerprints or [])
+    if checkpoint_path:
+        completed.update(load_skip_fingerprints(checkpoint_path))
     for spec, HX, HZ in candidates:
         if not verify_css(HX, HZ):          # constructors guarantee this; stay safe
             continue
@@ -70,7 +105,9 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
         if k < min_k:
             continue
         fp = fingerprint(HX, HZ)
-        if fp in seen:
+        if fp in seen or fp in completed:
+            if verbose and fp not in seen:
+                print(f"  skip {fp} (resume checkpoint)")
             continue
         n = int(HX.shape[1])
         d = distance_rand(HX, HZ, trials=trials, seed=seed + int(fp, 16))
@@ -81,6 +118,9 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
         rec = {"spec": spec, "n": n, "k": int(k), "d": int(d), "w": w,
                "efficiency": round(float(metric(n, k, d)), 4), "fingerprint": fp}
         seen[fp] = rec
+        completed.add(fp)
+        if checkpoint_path:
+            save_skip_fingerprints(checkpoint_path, completed)
         if verbose:
             print(f"  [[{n},{k},{d}]] eff={rec['efficiency']:.3f}  {spec}")
     out = sorted(seen.values(), key=lambda r: r["efficiency"], reverse=True)
