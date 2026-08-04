@@ -3006,9 +3006,9 @@
  },
  "provenance": {
   "authors": [
-   "Antigravity",
    "@FarLab"
   ],
+  "model": "Gemini 3.1 Pro",
   "construction": "Generalized Bicycle code on Metacyclic group (n=49, k=3, r=18).",
   "references": [
    "Autoresearch"
