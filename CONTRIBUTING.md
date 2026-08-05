@@ -185,6 +185,41 @@ Exit 0 with an `earned_distance` block means it will pass CI.
   `verify/certify.py` (a bounded exact solver) and confirms it. We never
   silently upgrade a claim.
 
+### What exact certification currently costs, and where it stops
+
+`verify/certify.py` decides, for each side, whether any logical lighter than the
+claimed distance exists. It does this with one MILP per logical-basis row, so
+**k solves per side**, and `--tlim` is the budget for a *single* MILP rather than
+for the whole run. The wall-clock worst case is therefore roughly
+
+    2 * k * tlim          (default tlim = 600s)
+
+which is about 20 minutes at k = 1 and about 6.7 hours at k = 20. Raising
+`--tlim` multiplies the whole run, so it is not a cheap knob.
+
+Measured envelope, from the codes that actually carry certificates today: all of
+them have **d <= 13 and k <= 12**. Both k (which sets the number of solves) and
+the weight cap d-1 (which sets how hard each solve is) drive the cost, so a code
+can be small in n and still be out of reach.
+
+Just past that envelope the problem is hard rather than merely slow. On
+[[180,18,14]] and [[180,20,14]] (n = 180, k = 18 and 20, d = 14):
+
+- scipy/HiGHS MILP hits the time limit on every side, and giving a single solve
+  5x the budget changes nothing;
+- an independent RC2 MaxSAT encoding of the minimum-weight-logical problem ran
+  4.4 CPU-hours on one instance without returning an answer.
+
+Two standard methods failing the same way is evidence about the instance, not
+about the solver choice. Blocklength alone is not the obstruction: certified
+codes exist at n = 180, 198, 200, 231, 240, 264 and 299, all at low k.
+
+**So the rule is:** a code beyond that envelope stays a witness-backed upper
+bound, refutation-tested at PR time and in the weekly sweeps. That is not a
+lesser result, it is the honest one, and `d <=` is what the board displays. If
+you have a certification approach that closes these, please open an issue; the
+two n = 180 codes above are a good regression test.
+
 ## What makes a submission interesting
 
 A code only matters if it advances a track's Pareto frontier over (n, k, d)
