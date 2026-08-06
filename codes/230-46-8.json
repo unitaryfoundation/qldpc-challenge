@@ -2077,7 +2077,8 @@
   ],
   "date": "2026-08-05",
   "notes": "",
-  "model": "Jukebox (Claude Opus 4.8)"
+  "model": "Claude Opus 4.8",
+  "agent": "Jukebox"
  },
  "family": "lifted-product"
 }
