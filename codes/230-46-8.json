@@ -2076,9 +2076,8 @@
    "arXiv:2607.28795"
   ],
   "date": "2026-08-05",
-  "notes": "",
-  "model": "Claude Opus 4.8",
-  "agent": "Jukebox"
+  "notes": "Found with Jukebox",
+  "model": "Claude Opus 4.8"
  },
  "family": "lifted-product"
 }
