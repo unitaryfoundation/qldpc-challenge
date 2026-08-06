@@ -2069,14 +2069,15 @@
  },
  "provenance": {
   "authors": [
-   "jukebox-autoresearch"
+   "@yhu1996"
   ],
   "construction": "Mitten lifted product LP(A,B) (Bhardwaj et al arXiv:2607.28795, Def.4/8) on non-abelian group D23 (order 46): a0=[6, 12, 43], a1=[0, 28, 45], b0=[2, 5, 14], b1=[0, 10, 41] over F2[G]. n=5|G|, k=|G|, weight-9.",
   "references": [
    "arXiv:2607.28795"
   ],
   "date": "2026-08-05",
-  "notes": ""
+  "notes": "",
+  "model": "Jukebox (Claude Opus 4.8)"
  },
  "family": "lifted-product"
 }
