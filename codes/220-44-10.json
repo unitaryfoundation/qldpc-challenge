@@ -1983,14 +1983,15 @@
  },
  "provenance": {
   "authors": [
-   "jukebox-autoresearch"
+   "@yhu1996"
   ],
   "construction": "Mitten lifted product LP(A,B) (Bhardwaj et al arXiv:2607.28795, Def.4/8) on non-abelian group metacyclic(C11:C4,r=10) (order 44): a0=[10, 23, 42], a1=[0, 15, 33], b0=[16, 22, 29], b1=[0, 4, 43] over F2[G]. n=5|G|, k=|G|, weight-9.",
   "references": [
    "arXiv:2607.28795"
   ],
   "date": "2026-08-05",
-  "notes": ""
+  "notes": "",
+  "model": "Jukebox (Claude Opus 4.8)"
  },
  "family": "lifted-product"
 }
