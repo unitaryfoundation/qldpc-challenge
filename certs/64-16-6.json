@@ -1,0 +1,18 @@
+{
+ "name": "[[64,16,6]]",
+ "d": 6,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "sides": {
+  "X": {
+   "value": 6,
+   "exact": true,
+   "note": "no logical < 6 exists (CryptoMiniSat, XOR + sequential-counter cardinality)"
+  },
+  "Z": {
+   "value": 6,
+   "exact": true,
+   "note": "no logical < 6 exists (CryptoMiniSat, XOR + sequential-counter cardinality)"
+  }
+ },
+ "d_exact": true
+}

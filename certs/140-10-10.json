@@ -1,0 +1,18 @@
+{
+ "name": "[[140,10,10]] 2BGA on metacyclic Z_35 |x Z_2 (arXiv:2306.16400)",
+ "d": 10,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "sides": {
+  "X": {
+   "value": 10,
+   "exact": true,
+   "note": "no logical < 10 exists (CryptoMiniSat, XOR + sequential-counter cardinality)"
+  },
+  "Z": {
+   "value": 10,
+   "exact": true,
+   "note": "no logical < 10 exists (CryptoMiniSat, XOR + sequential-counter cardinality)"
+  }
+ },
+ "d_exact": true
+}
