@@ -81,6 +81,7 @@ def _board_entries_cached(_stamp):
                 "fingerprint": rep.get("fingerprint"),
                 "sig": rep.get("signature", {}).get("hash"),
                 "weight_class": comp.get("weight_class"),
+                "w": comp.get("max_check_weight"),
                 "locality_class": comp.get("locality_class"),
             })
         except Exception:
@@ -155,15 +156,28 @@ def validate_candidate(doc, *, seed=None):
         verdict["labels"].append(f"possibly equivalent (same WL signature) to {wl_equiv}")
 
     # 4. NOVELTY (label only) -- non-dominated within the candidate's own track cell?
+    #
+    # The comparison is over all four axes (n lower, k higher, d higher, w
+    # lower), matching TRACKS.md and site/build.py:pareto. Weight enters twice
+    # and the two roles are distinct: the weight CLASS selects which cell a
+    # code competes in, and the raw max check weight is a ranking axis inside
+    # it. Comparing on class alone treated a w = 32 code as dominating a w = 7
+    # one whenever n, k and d allowed, which the site's own frontier does not,
+    # so a code could be labelled "does not advance its board cell" while
+    # starring on the rendered board.
     n, k, d = doc["n"], doc["k"], claimed_d
+    w = comp.get("max_check_weight")
     dominators = []
     for b in board:
         # a board code shares the candidate's cell iff it is stricter-or-equal on both axes
         if (_WEIGHT_ORDER.get(b["weight_class"], 9) <= _WEIGHT_ORDER.get(wc, 9)
                 and _LOCAL_ORDER.get(b["locality_class"], 9) <= _LOCAL_ORDER.get(lc, 9)):
-            if (b["n"] <= n and b["k"] >= k and b["d"] >= d
-                    and (b["n"] < n or b["k"] > k or b["d"] > d)):
-                dominators.append(f"[[{b['n']},{b['k']},{b['d']}]] {b['name']}")
+            bw = b.get("w")
+            if bw is None:                     # pre-fix cache entry; skip the w axis
+                bw = w
+            if (b["n"] <= n and b["k"] >= k and b["d"] >= d and bw <= w
+                    and (b["n"] < n or b["k"] > k or b["d"] > d or bw < w)):
+                dominators.append(f"[[{b['n']},{b['k']},{b['d']}]] w={bw} {b['name']}")
     board_advancing = not dominators and not exact_dup
     g["novelty"] = {"cell": [wc, lc], "board_advancing": board_advancing,
                     "dominated_by": dominators, "literature_novelty": "unverified"}
