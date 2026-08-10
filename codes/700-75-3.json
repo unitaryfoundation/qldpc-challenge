@@ -3681,12 +3681,13 @@
   },
   "provenance": {
     "authors": [
-      "aarontrowbridge"
+      "@aarontrowbridge"
     ],
     "construction": "Irregular holey rotated surface code on 28x25 vertex grid, 74 holes margin3 irregular lattice seed15 (uniform 56). Max independent set Chebyshev>=3 same-parity Manhattan>=3 any pair.",
     "references": [],
     "date": "2026-08-10",
-    "notes": ""
+    "notes": "",
+    "model": "Muse Spark 1.2"
   },
   "family": "topological",
   "locality": {
