@@ -843,7 +843,7 @@
   },
   "provenance": {
     "authors": [
-      "aarontrowbridge"
+      "@aarontrowbridge"
     ],
     "construction": "quantum-tanner (Leverrier-Zemor 2022) LP {'order': 40, 'group_order': 40, 'a': [np.int64(9), np.int64(12), np.int64(17), np.int64(25)], 'b': [np.int64(14), np.int64(19), np.int64(36), np.int64(37)]} \u2014 lifted product Ramanujan expander, family quantum-tanner",
     "references": [
@@ -851,7 +851,8 @@
       "Panteleev-Kalachev 2021"
     ],
     "date": "2026-08-10",
-    "notes": "quick saver {'order': 40, 'group_order': 40, 'a': [np.int64(9), np.int64(12), np.int64(17), np.int64(25)], 'b': [np.int64(14), np.int64(19), np.int64(36), np.int64(37)]}"
+    "notes": "quick saver {'order': 40, 'group_order': 40, 'a': [np.int64(9), np.int64(12), np.int64(17), np.int64(25)], 'b': [np.int64(14), np.int64(19), np.int64(36), np.int64(37)]}",
+    "model": "Muse Spark 1.2"
   },
   "family": "quantum-tanner"
 }
