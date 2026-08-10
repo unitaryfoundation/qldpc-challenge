@@ -3789,9 +3789,10 @@
   },
   "provenance": {
     "authors": [
-      "aarontrowbridge"
+      "@aarontrowbridge"
     ],
     "construction": "Rotated surface code on 28x25 vertex grid, period-3 hole lattice margin 3 (rectangular extension of [[625,50,3]])",
+    "model": "Muse Spark 1.2",
     "references": [],
     "date": "2026-08-09",
     "notes": ""
