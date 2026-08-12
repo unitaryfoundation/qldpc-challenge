@@ -14608,12 +14608,17 @@
  },
  "provenance": {
   "authors": [
-   "Magic State Labs"
+   "@npdeep"
   ],
   "construction": "Designed-divisor generalized-bicycle CSS code (lift 241).",
   "origin": "submission",
   "date": "2026-08-12",
-  "notes": "Witness-backed upper bound; no exact-distance claim."
+  "notes": "Witness-backed upper bound; no exact-distance claim.",
+  "model": "Magic State Labs (Custom) v0.1",
+  "references": [
+   "arXiv:2308.07915",
+   "arXiv:2306.16400"
+  ]
  },
  "family": "generalized-bicycle"
 }
