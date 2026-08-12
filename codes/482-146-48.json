@@ -14610,15 +14610,14 @@
   "authors": [
    "@npdeep"
   ],
-  "construction": "Designed-divisor generalized-bicycle CSS code (lift 241).",
-  "origin": "submission",
-  "date": "2026-08-12",
-  "notes": "Witness-backed upper bound; no exact-distance claim.",
-  "model": "Magic State Labs (Custom) v0.1",
+  "construction": "Designed-divisor generalized-bicycle CSS code over F_2[Z_241]. With A=circ(a) and B=circ(b), H_X=[A|B] and H_Z=[B^T|A^T], where supp(a)=[0,2,9,55,62,84,87,138,141,163,170,216,223,225] and supp(b)=[14,29,34,49,68,76,96,129,150,154,175,208,228,236]. Both check matrices have rank 168, giving n=482 and k=146, with maximum stabilizer weight 28.",
   "references": [
    "arXiv:2308.07915",
    "arXiv:2306.16400"
-  ]
+  ],
+  "date": "2026-08-12",
+  "notes": "Advances the weight-9plus x unrestricted frontier with kd^2/n = 697.892 at the submitted distance bound. Explicit valid X- and Z-logical witnesses have weights 48 and 73, establishing d <= 48 only; no exact-distance claim is made.",
+  "model": "Magic State Labs (Custom) v0.1"
  },
  "family": "generalized-bicycle"
 }
