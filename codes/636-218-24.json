@@ -6077,13 +6077,12 @@
   "authors": [
    "@npdeep"
   ],
-  "construction": "Pair-partition CPM CSS code (J=4, L=12, P=53; arXiv:2607.14091)",
-  "origin": "submission",
+  "construction": "Okada-Kasai pair-partition CPM CSS code with (J,L,P)=(4,12,53), generated from kasaikenta/pair-partition-cpm-css-codes commit 9c2a6f212025d2dc5decbf264ce2a24ba6924101 using target pp_j4_l12_p53, adapter seed 132219545, and sample index 0. Let C(s)[(a+s) mod 53,a]=1. Then H_X=[C(E[j,l])] and H_Z=[C(D[j,l])], where E=[[10,37,40,29,41,8,50,37,9,27,52,13],[19,51,48,36,40,38,40,3,29,48,45,37],[27,28,9,35,49,45,33,23,19,19,13,3],[11,21,17,51,28,5,24,52,43,45,8,37]] and D=[[32,16,2,15,35,39,19,16,24,13,46,44],[22,15,36,2,31,45,28,10,46,39,48,3],[9,33,51,44,15,33,22,11,24,38,48,12],[22,24,14,8,33,27,29,49,1,14,18,40]]. The 212x636 checks have rank 209 per side, row weight 12, column weight 4, and girth 6, giving n=636 and k=218.",
   "references": [
    "arXiv:2607.14091"
   ],
   "date": "2026-08-12",
-  "notes": "Witness-backed upper bound; no exact-distance claim.",
+  "notes": "Frontier candidate in the weight-9plus/unrestricted cell (kd^2/n=197.434). The supplied X/Z logical witnesses have weights 24/88 and certify only d<=24; no lower-bound or exact-distance claim.",
   "model": "Magic State Labs (Custom) v0.1"
  },
  "family": "lifted-product"
