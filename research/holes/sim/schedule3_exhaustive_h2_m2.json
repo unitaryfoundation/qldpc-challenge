@@ -1,0 +1,35 @@
+{
+ "best": 6,
+ "done": 16384,
+ "exhaustive": true,
+ "assign": {
+  "bulk": [
+   0,
+   0
+  ],
+  "corrH": [
+   1,
+   0
+  ],
+  "corrV": [
+   0,
+   0
+  ],
+  "ringXEW": [
+   1,
+   0
+  ],
+  "ringXNS": [
+   0,
+   0
+  ],
+  "ringZEW": [
+   0,
+   0
+  ],
+  "ringZNS": [
+   0,
+   0
+  ]
+ }
+}

@@ -127,3 +127,22 @@ Locked stack (uv.lock): stim 1.16, pymatching 2.4, sinter 1.16, CPython 3.13.
 The results in this note were produced on stim 1.14 / pymatching 2.3.1 /
 sinter 1.14 (system CPython 3.10); key certificates ([[368,8,8]] exact
 distances, patch d_circ=8) re-validated identically under the locked stack.
+
+## Schedule campaign: closed (2026-08-15)
+
+Syndrome-extraction schedules for the m=2 planar instance, 4 CX layers,
+region classes {bulk, corrH, corrV, ringX-NS/EW, ringZ-NS/EW} with
+per-class (sigma_X, sigma_Z) from the two conflict-free orders:
+
+- X side (memory-X): d_circ = 8 = d, certified.
+- Z side (memory-Z): d_circ = 6, **certified optimal over the entire
+  16,384-assignment class space** (exhaustive enumeration, monotone
+  rounds-3 triage + basis short-circuit; sim/schedule3_exhaustive_h2_m2.json).
+- Measured (224M shots, p=1e-3): X side ~380x better per logical than the
+  matched surface patch; Z side within 1.4-3x of the patch at p>=1e-3.
+- The certificate is relative to this schedule family; richer families
+  (finer-than-class assignments, >4 layers, flags, moved ancillas) are
+  open. The designed repair for the Z side is the 1D yoke (YOKE-SCOPE.md).
+- Chebyshev path freedom is the obstruction mechanism: minimal strings
+  wiggle at zero cost and defeat any orientation fence -- the same metric
+  property that doubles the packing density. Feature of the paper.
