@@ -38,7 +38,7 @@ Verified instances (all CSS, commuting, weights ≤ 4, every check in a 2×2 box
 | instance | parameters | d method | ratio |
 |---|---|---|---|
 | torus h=2, m=2 | **[[368, 8, 8]]** | graph-exact **and** MILP-exact (HiGHS), both sides | 0.08696 = 2/23 |
-| torus h=2, m=3 | **[[828, 18, 8]]** | graph-exact | 2/23 |
+| torus h=2, m=3 | **[[828, 18, 8]]** | graph-exact **and** MILP-exact, both sides | 2/23 |
 | torus h=4, m=2 | **[[1472, 8, 16]]** | graph-exact | 2/23 |
 | planar h=2, m=2..3 windows | [[1069,6,8]], [[1797,14,8]] | graph-exact | rim-diluted; **d = 8 persists with open boundary** |
 
