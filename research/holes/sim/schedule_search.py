@@ -15,11 +15,12 @@ from holey import build_greedy
 from sim.circuits import prepare, circuit_distance
 
 # the four patch-optimal (sigma_X, sigma_Z) pairs found by the d=5/d=8 scans
-P1 = ({'SW': 0, 'SE': 2, 'NW': 1, 'NE': 3}, {'SW': 0, 'SE': 1, 'NW': 2, 'NE': 3})
-P2 = ({'SW': 0, 'SE': 1, 'NW': 2, 'NE': 3}, {'SW': 0, 'SE': 2, 'NW': 1, 'NE': 3})
-P3 = ({'SW': 3, 'SE': 1, 'NW': 2, 'NE': 0}, {'SW': 3, 'SE': 2, 'NW': 1, 'NE': 0})
-P4 = ({'SW': 3, 'SE': 2, 'NW': 1, 'NE': 0}, {'SW': 3, 'SE': 1, 'NW': 2, 'NE': 0})
-CANDS = [P1, P2, P3, P4]
+A = {'SW': 0, 'SE': 1, 'NW': 2, 'NE': 3}   # hook pair = top edge (horizontal)
+B = {'SW': 0, 'SE': 2, 'NW': 1, 'NE': 3}   # hook pair = right edge (vertical)
+# all four forward combos are mutually seam-compatible; the patch-suboptimal
+# (A,A)/(B,B) can be exactly right inside a corridor of matching orientation
+D = {'NW': 0, 'SE': 1, 'SW': 2, 'NE': 3}   # hook pair = main diagonal
+CANDS = [(B, A), (A, B), (A, A), (B, B), (D, A), (A, D)]
 
 
 def dual_grid(h, R, off, mX, pad):
@@ -48,13 +49,14 @@ def classify_cells(code, holes, h, R, pad, mX):
         c = 'bulk'
         for (x0, y0, x1, y1, T) in holes:
             if x0 - 2 <= cx <= x1 and y0 - 2 <= cy <= y1:
-                c = 'ring' + T
+                ns = cy >= y1 - 1 or cy <= y0 - 1
+                c = 'ring' + T + ('NS' if ns else 'EW')
                 break
         if c == 'bulk':
-            in_xrow = any(y0 <= cy < y0 + h for y0 in xrow) or \
-                      any(y0 <= cy < y0 + h for y0 in zrow)
-            in_xcol = any(x0 <= cx < x0 + h for x0 in xrow) or \
-                      any(x0 <= cx < x0 + h for x0 in zrow)
+            in_xrow = any(y0 - 1 <= cy < y0 + h for y0 in xrow) or \
+                      any(y0 - 1 <= cy < y0 + h for y0 in zrow)
+            in_xcol = any(x0 - 1 <= cx < x0 + h for x0 in xrow) or \
+                      any(x0 - 1 <= cx < x0 + h for x0 in zrow)
             if in_xrow and not in_xcol:
                 c = 'corrH'
             elif in_xcol and not in_xrow:
@@ -92,6 +94,7 @@ def search(h=2, mX=2, rounds=None):
 
     best = evaluate(assign)
     print(f'start: d_circ={best} (code d={d_code}) assign={assign}', flush=True)
+    plateau_budget = 14
     improved = True
     while improved and best < d_code:
         improved = False
@@ -108,6 +111,12 @@ def search(h=2, mX=2, rounds=None):
                 if d is not None and d > best:
                     best, assign, improved = d, trial, True
                     print(f'  IMPROVED: {best} {assign}', flush=True)
+                    break
+                if d is not None and d == best and plateau_budget > 0:
+                    plateau_budget -= 1
+                    assign, improved = trial, True
+                    print(f'  plateau move ({plateau_budget} left): {assign}',
+                          flush=True)
                     break
             if improved:
                 break
