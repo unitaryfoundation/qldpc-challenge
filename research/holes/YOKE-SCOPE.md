@@ -49,6 +49,21 @@ yoked patches pay area for surgery workspace, yoked holes may pay ~none.
 This is the concrete reason the composition could beat 1.39×-times-yoke
 rather than lose overhead to it.
 
+## Update (post Stage-1/2): the asymmetry aligns with 1D yoking
+
+The schedule campaign left the family asymmetric: X-side circuit
+distance certified at the full 8, Z-side at 6, with Stage-2 measuring
+the Z side ~1.4–3× behind the patch at p ≥ 10⁻³ (and worse at deeper
+sub-threshold). A 1D yoke protects exactly ONE basis — so the yoke
+basis choice should be aimed at the weak Z side: the outer distance-2
+code squares the Z-side inner error, converting the family's one
+deficit into the protected direction while the certified-full-distance
+X side rides free. In other words, 1D yoked dual-grid doesn't merely
+tolerate the d_circ = 6 shortfall — it is the natural repair for it,
+potentially recovering deep-sub-threshold scaling without ever solving
+the Z-side schedule problem. This raises Phase B's priority relative
+to further schedule search.
+
 ## Research questions, ranked by risk
 
 1. **(Highest risk) Corridor-surgery primitive fidelity:** does the
