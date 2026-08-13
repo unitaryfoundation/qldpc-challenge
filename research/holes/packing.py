@@ -25,10 +25,15 @@ def fast_logical_basis(HA, HB):
     piv_origin = []
     for c in range(cols):
         piv = None
-        for i in range(r, rows):
-            if M[i, c]:
+        for i in range(r, rows):          # prefer stabilizer-origin pivots
+            if M[i, c] and origin[i] == 0:
                 piv = i
                 break
+        if piv is None:
+            for i in range(r, rows):
+                if M[i, c]:
+                    piv = i
+                    break
         if piv is None:
             continue
         M[[r, piv]] = M[[piv, r]]
