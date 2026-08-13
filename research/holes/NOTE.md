@@ -119,3 +119,11 @@ measurement (2), which is why prior "holes are inefficient" folklore
 `holey.py` (constructors), `distance.py` (MILP), `graphdist.py`
 (graph-exact distances; soundness/completeness argument in docstring),
 `calibrate.py` + `calibration.json` (metric laws), `packing.py` (packings).
+
+## Environment
+
+Managed with uv: `cd research/holes && uv run python sim/<script>.py`.
+Locked stack (uv.lock): stim 1.16, pymatching 2.4, sinter 1.16, CPython 3.13.
+The results in this note were produced on stim 1.14 / pymatching 2.3.1 /
+sinter 1.14 (system CPython 3.10); key certificates ([[368,8,8]] exact
+distances, patch d_circ=8) re-validated identically under the locked stack.

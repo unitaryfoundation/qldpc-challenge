@@ -20,3 +20,4 @@ build/
 .DS_Store
 # conference / paper material lives outside this repo (issue #325)
 talks/
+.venv/

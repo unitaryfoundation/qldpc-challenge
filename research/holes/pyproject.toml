@@ -1,0 +1,16 @@
+[project]
+name = "hole-packing"
+version = "0.1.0"
+description = "Dual-grid hole packing research: constructors, exact distances, circuit-level simulations"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.26,<2",
+    "scipy>=1.15",
+    "stim>=1.14",
+    "pymatching>=2.3",
+    "sinter>=1.14",
+    "matplotlib>=3.8",
+]
+
+[tool.uv]
+package = false
