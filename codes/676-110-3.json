@@ -3332,10 +3332,12 @@
    "@npdeep"
   ],
   "construction": "Holey rotated surface code on a 26x26 unit-grid vertex layout, retaining 566 local plaquette and boundary stabilizers.",
-  "origin": "submission",
+  "references": [
+   "https://github.com/unitaryfoundation/qldpc-challenge/blob/6821fc34ca5074b54801ac38624531417f5ad61c/codes/700-85-3.json"
+  ],
   "date": "2026-08-12",
-  "model": "Magic State Labs (Custom) v0.1",
-  "notes": "All 676 qubits have distinct unit-grid coordinates; rho=1, r=sqrt(2), and exact distance 3 on both CSS sides."
+  "notes": "All 676 qubits have distinct unit-grid coordinates. The layout has rho=1 and r=sqrt(2). Distance three is exact on both CSS sides.",
+  "model": "Magic State Labs (Custom) v0.1"
  },
  "family": "topological",
  "locality": {
