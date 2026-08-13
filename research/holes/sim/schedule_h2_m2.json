@@ -4,7 +4,9 @@
   "bulk": 1,
   "corrH": 0,
   "corrV": 0,
-  "ringX": 0,
-  "ringZ": 0
+  "ringXEW": 0,
+  "ringXNS": 0,
+  "ringZEW": 0,
+  "ringZNS": 0
  }
 }
