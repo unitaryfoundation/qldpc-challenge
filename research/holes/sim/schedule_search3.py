@@ -22,16 +22,41 @@ SIGMAS = [A, B]
 _CTX = {}
 
 
+def classify_v3(code, holes, h, R, pad, mX):
+    """Junction-aware classifier: per-side rings + corridor-crossing class."""
+    cls = {}
+    xrow = [pad + i * R for i in range(mX)]
+    zrow = [pad + i * R + R // 2 for i in range(mX - 1)]
+    for typ, ci, (cx, cy), roles in code['_cells']:
+        c = 'bulk'
+        for (x0, y0, x1, y1, T) in holes:
+            if x0 - 2 <= cx <= x1 and y0 - 2 <= cy <= y1:
+                ns = cy >= y1 - 1 or cy <= y0 - 1
+                c = 'ring' + T + ('NS' if ns else 'EW')
+                break
+        if c == 'bulk':
+            in_r = any(y0 - 1 <= cy < y0 + h for y0 in xrow + zrow)
+            in_c = any(x0 - 1 <= cx < x0 + h for x0 in xrow + zrow)
+            if in_r and in_c:
+                c = 'junction'
+            elif in_r:
+                c = 'corrH'
+            elif in_c:
+                c = 'corrV'
+        cls[(typ, ci)] = c
+    return cls
+
+
 def _init(h, mX):
     from holey import build_greedy
     from sim.circuits import prepare
-    from sim.schedule_search import dual_grid, classify_cells
+    from sim.schedule_search import dual_grid
     R, off, pad = 5 * h, 5 * h // 2, 5 * h
     W, holes = dual_grid(h, R, off, mX, pad)
     code = prepare(build_greedy(W, W, 0, 1, 0, 0, 1, holes=holes))
     code['holes'] = holes
     _CTX['code'] = code
-    _CTX['cls'] = classify_cells(code, holes, h, R, pad, mX)
+    _CTX['cls'] = classify_v3(code, holes, h, R, pad, mX)
     _CTX['d'] = 4 * h
 
 
@@ -71,7 +96,8 @@ def _worker(args):
     return assign_items, full, True
 
 
-def search(h=2, mX=2, budget_hours=8.0, workers=7, seed=20260814):
+def search(h=2, mX=2, budget_hours=8.0, workers=7, seed=20260814,
+           init_assign=None):
     random.seed(seed)
     _init(h, mX)                              # parent context for classes
     cls = _CTX['cls']
@@ -90,6 +116,9 @@ def search(h=2, mX=2, budget_hours=8.0, workers=7, seed=20260814):
     while time.time() < t_end and best < d_code:
         restart += 1
         assign = {c: random.choice(combos) for c in classes}
+        if restart == 1 and init_assign:
+            assign.update({c: tuple(v) for c, v in init_assign.items()
+                           if c in assign})
         cur_items = tuple(sorted(assign.items()))
         r = pool.apply(_worker, ((cur_items, 0, d_code),))
         cur = r[1] or 0
