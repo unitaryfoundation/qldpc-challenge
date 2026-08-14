@@ -23,6 +23,34 @@ Never run an ad-hoc `python -c` that calls a witness/distance search and only pr
 The `research/candidates/` directory is gitignored working output, so writes there are safe and never pollute the board. If a search finds a valid logical but the save fails, that is a hard
 error — stop and report it, do not just print.
 
+## Writing the submission (the PR body and the note)
+
+The board's durable value is the evidence trail, and an evidence trail that cites a file
+nobody else has is not one. `verify/check_prose.py` enforces this on every changed
+`notes/`/`fieldnotes/` file and on the PR body:
+
+**Every path you name must resolve in the PR's own tree.** If the artifact lives somewhere
+else, name the source and pin it — "taken from github.com/a7b/yarn @ 82fb695,
+`processor_codes/mitten/[[300,60,14]]/Hx.npy`" — or do not cite it. Never write "available
+on request", and never point at a private checkout (`~/…`, `/Users/…`) or a machine name.
+
+**`research/candidates/` is gitignored working output; it can never be the audit trail.**
+It is the right place to *stage* a candidate (see above) and the wrong place to *cite*. If
+a search script matters to the result, either commit it or describe the method in the note
+so someone can rewrite it.
+
+Two more, same reason:
+
+- What you claim in the body must match the file in the diff. A distance is `upper_bound`
+  until a certificate says otherwise — do not call a witnessed bound "certified", and do
+  not put a distance in the filename that the JSON does not support.
+- Delete the drafting scaffolding before asking for review: the `qldpc submit` footer, HTML
+  comments, unticked checklist boxes, session URLs. If a checklist box is not true, make it
+  true or say why.
+
+A note named `<n>-<k>-<d>.md` must state its own `[[n,k,d]]` first. Follow
+`notes/TEMPLATE.md`; its sections are what a later searcher reads.
+
 ## Working on the repo itself
 
 - `verify/` is the trust anchor and is hash-pinned in CI (`verify/check_validator_integrity.py`).

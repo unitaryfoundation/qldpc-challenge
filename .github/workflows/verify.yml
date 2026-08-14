@@ -99,6 +99,13 @@ jobs:
         if: github.event_name != 'pull_request' || steps.changes.outputs.codes_changed != 'true'
         working-directory: submitted
         run: uv run --frozen python verify/verify_all.py
+      # Cheap metadata checks run BEFORE the ~15-minute refutation gate: a PR that
+      # fails one of them should not first burn a full gate run (PR #278 spent the
+      # whole gate on 18 valid layouts and then died on one authorship mismatch).
+      - name: authorship check (PR author must be a listed @handle author)
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: trusted
+        run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}
       - name: distance refutation gate (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
@@ -107,7 +114,3 @@ jobs:
         if: github.event_name != 'pull_request'
         working-directory: submitted
         run: uv run --frozen --with ldpc python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
-      - name: authorship check (PR author must be a listed @handle author)
-        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
-        working-directory: trusted
-        run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}

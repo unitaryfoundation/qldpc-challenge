@@ -1,0 +1,45 @@
+name: prose
+
+# Runs on every PR, including docs-only ones (verify.yml deliberately skips those,
+# but a note is exactly what needs checking here). Stdlib-only and seconds long.
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+
+jobs:
+  prose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out submitted tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: submitted
+      # The checker runs from the base branch, like every other check here: a PR
+      # must not be able to weaken the check that judges it.
+      - name: check out trusted tree (base branch)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          fetch-depth: 0
+          path: trusted
+      # The PR body is untrusted input: it reaches the checker as a FILE via the
+      # environment, never interpolated into a shell command.
+      - name: capture PR body
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr_body.md"
+      - name: prose check (cited paths must resolve; no scaffolding left in)
+        working-directory: trusted
+        run: |
+          if [ -f verify/check_prose.py ]; then
+            python3 verify/check_prose.py \
+              --root ../submitted \
+              --base origin/${{ github.base_ref }} \
+              --body-file "$RUNNER_TEMP/pr_body.md"
+          else
+            echo "base branch has no verify/check_prose.py yet; skipping"
+          fi

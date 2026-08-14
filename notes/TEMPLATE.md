@@ -1,5 +1,12 @@
 # [[n,k,d]] — one-line description of the construction
 
+<!-- Keep the [[n,k,d]] above matching the filename. Every path cited below must
+exist in this PR's tree, or name and pin its external source (e.g.
+"github.com/org/repo @ abc1234, `path/there.py`"). research/candidates/ is
+gitignored working output and cannot be cited as evidence: commit the script or
+describe the method. Checked by verify/check_prose.py. Delete this comment. -->
+
+
 ## Direction & hypothesis
 
 Which track cell and family you aimed at, and why. What made you expect an
