@@ -90,7 +90,7 @@ def changed_codes(base, code_root=ROOT):
     return [f for f in out.split() if f.endswith(".json")]
 
 
-def changed_codes_status(base, code_root=ROOT):
+def changed_codes_status(base: str, code_root: str = ROOT) -> dict | None:
     """{path: status} for codes changed vs base (A/M/D), rename-split like
     check_authorship.changed_codes so a refutation's rename stays visible."""
     try:
@@ -98,7 +98,7 @@ def changed_codes_status(base, code_root=ROOT):
             ["git", "diff", "--name-status", "--no-renames", f"{base}...HEAD",
              "--", "codes"],
             cwd=code_root, text=True)
-    except Exception:
+    except (subprocess.CalledProcessError, OSError):
         return None
     changes = {}
     for line in out.splitlines():
@@ -116,18 +116,18 @@ def changed_codes_status(base, code_root=ROOT):
     return changes
 
 
-def load_base_doc(base, path, code_root):
+def load_base_doc(base: str, path: str, code_root: str) -> dict | None:
     """Base-revision content of path, or None if unavailable."""
     try:
         out = subprocess.check_output(["git", "show", f"{base}:{path}"],
                                       cwd=code_root, text=True,
                                       stderr=subprocess.DEVNULL)
         return json.loads(out)
-    except Exception:
+    except (subprocess.CalledProcessError, OSError, json.JSONDecodeError):
         return None
 
 
-def base_doc_for(f, doc, base, code_root):
+def base_doc_for(f: str, doc: dict, base: str, code_root: str) -> dict | None:
     """The base doc this file revises: itself when modified, or the deleted
     codes/<n>-<k>-*.json a refutation renamed away. None for new codes or on
     any ambiguity (which downstream fails closed to the full gate)."""
@@ -144,7 +144,16 @@ def base_doc_for(f, doc, base, code_root):
     return None
 
 
-def _survival_raised(base_doc, new_doc):
+def layout_entered_tighter_class(base_doc: dict | None, new_doc: dict) -> bool:
+    """True when the diff's layout moves the code into a tighter locality
+    class than it had at base. For a layout-only diff this is the only way
+    the code can become a NEW record of a 2d-local cell (its n, k, d, w are
+    unchanged, so record status in cells it already occupied cannot change);
+    such a claim has never faced the deep battery and must not skip it."""
+    return _locality_rank(new_doc) < _locality_rank(base_doc or {"n": new_doc.get("n"), "checks": new_doc.get("checks")})
+
+
+def _survival_raised(base_doc: dict | None, new_doc: dict | None) -> bool:
     """True if any side adds or raises witness_provenance.survived_samples."""
     bd = (base_doc or {}).get("distance") or {}
     nd = (new_doc or {}).get("distance") or {}
@@ -160,7 +169,7 @@ def _survival_raised(base_doc, new_doc):
     return False
 
 
-def classify_diff(base_doc, new_doc):
+def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
     """Classify a changed code's diff for refutation pricing. Returns
     (cls, reason) with cls in {'new', 'stamp', 'layout-only', 'tightening',
     'full'}. Structural facts only -- witness validity is the verifier's job
@@ -208,7 +217,9 @@ def classify_diff(base_doc, new_doc):
             return "full", "distance.d is not min(dX, dZ)"
         return "tightening", (f"{tightened} side(s) strictly decreased with "
                               "matching witnesses")
-    except Exception as e:
+    except (KeyError, TypeError, AttributeError, ValueError) as e:
+        # every malformed-document shape fails closed; a genuine bug in this
+        # function should raise and surface in CI, not silently price full
         return "full", f"unclassifiable ({type(e).__name__}: {e})"
 
 
@@ -444,27 +455,46 @@ def main(argv):
         base_doc = base_doc_for(f, doc, base, code_root)
         cls, why = classify_diff(base_doc, doc)
         if cls == "layout-only":
-            print(f"ok       {f} (layout-only diff: {why}; refutation "
-                  f"deferred to the weekly board sweep)")
-            if receipt_dir:
-                verdict = validate_candidate(doc, seed=seed, refute=False)
-                verdict["gates"]["refute"] = {
-                    "refuted": False, "seed": seed,
-                    "detail": f"skipped: {why}; distance claim identical to "
-                              f"base and covered by the weekly refute sweep",
-                }
-                receipt = make_receipt(
-                    doc, p, verdict,
-                    gate={"refuted": False, "seed": seed, "seeds": [],
-                          "trials": 0, "budget_seconds": 0.0, "deep": False,
-                          "fast_trials": 0, "methods": [],
-                          "diff_class": cls, "diff_reason": why},
-                    repo_root=code_root, pr_number=pr_number,
-                    pr_author=pr_author, base_sha=base_sha, head_sha=head_sha)
-                write_receipt(receipt, receipt_dir, slug)
-            continue
-        if cls == "stamp":
-            deep = True       # the survival claim itself is being vetted
+            # The structural verdict (schema, witnesses, layout honesty) is
+            # authoritative here even though verify_all also runs it: the
+            # gate's stdout and receipt must not say ok about a file the
+            # verifier rejects.
+            verdict = validate_candidate(doc, seed=seed, refute=False)
+            if not verdict.get("passed"):
+                failed += 1
+                print(f"FAIL     {f}: structural checks failed "
+                      f"(layout-only diff; see verify_all for details)")
+            elif slug in records and layout_entered_tighter_class(base_doc, doc):
+                # The layout moves the code into a tighter locality class
+                # where it claims a cell record it has never defended: the
+                # one layout-only shape that must not skip the deep battery.
+                cls, why = "layout-record", (
+                    "layout enters a tighter locality class and claims a "
+                    "cell record; deep battery required before it stands")
+            else:
+                print(f"ok       {f} (layout-only diff: {why}; refutation "
+                      f"deferred to the weekly board sweep)")
+            if cls == "layout-only":
+                if receipt_dir:
+                    verdict["gates"]["refute"] = {
+                        "refuted": False, "seed": seed,
+                        "detail": f"skipped: {why}; distance claim identical "
+                                  f"to base and covered by the weekly refute "
+                                  f"sweep",
+                    }
+                    receipt = make_receipt(
+                        doc, p, verdict,
+                        gate={"refuted": False, "seed": seed, "seeds": [],
+                              "trials": 0, "budget_seconds": 0.0,
+                              "deep": False, "fast_trials": 0, "methods": [],
+                              "diff_class": cls, "diff_reason": why},
+                        repo_root=code_root, pr_number=pr_number,
+                        pr_author=pr_author, base_sha=base_sha,
+                        head_sha=head_sha)
+                    write_receipt(receipt, receipt_dir, slug)
+                continue
+        if cls in ("stamp", "layout-record"):
+            deep = True       # the new claim itself is what is being vetted
         elif cls == "tightening":
             deep = False      # strictly-less-wrong claim; weekly sweep has depth
         else:

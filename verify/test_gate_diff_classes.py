@@ -4,10 +4,8 @@ alone, and anything else must fail closed to the full gate. Pure unit tests
 on document dicts -- no git, no search."""
 
 import copy
-import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate_changed as G
 
 BASE = {
@@ -222,3 +220,29 @@ def test_base_doc_pairing(tmp_path):
     git("add", "codes")
     git("commit", "-q", "-m", "new")
     assert G.base_doc_for("codes/61-8-6.json", new, "main", td) is None
+
+
+def _grid_layout(n=60, layers=2, spacing=1.0):
+    return {"coordinates": [[spacing * (i % 10), spacing * (i // 10)]
+                            for i in range(n)],
+            "layers": layers}
+
+
+def test_tighter_class_guard_fires_on_honest_layout():
+    doc = copy.deepcopy(BASE)
+    doc["locality"] = _grid_layout()          # honest bilayer grid, small radius
+    assert G.layout_entered_tighter_class(BASE, doc)
+
+
+def test_tighter_class_guard_ignores_dishonest_layout():
+    doc = copy.deepcopy(BASE)
+    doc["locality"] = _grid_layout(spacing=0.1)   # violates unit spacing
+    assert not G.layout_entered_tighter_class(BASE, doc)
+
+
+def test_tighter_class_guard_ignores_unchanged_class():
+    base = copy.deepcopy(BASE)
+    base["locality"] = _grid_layout()
+    doc = copy.deepcopy(base)
+    doc["locality"]["coordinates"] = list(reversed(doc["locality"]["coordinates"]))
+    assert not G.layout_entered_tighter_class(base, doc)
