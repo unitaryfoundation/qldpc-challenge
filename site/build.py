@@ -1351,6 +1351,10 @@ def load_entries():
             "novelty": doc["provenance"].get("novelty", "unknown"),
             "authors": ", ".join(doc["provenance"]["authors"]),
             "authors_list": doc["provenance"]["authors"],
+            # layout credit (issue #648): who retrofitted the layout, when the
+            # layout was contributed by someone other than the code's authors
+            # (the #643 binding). None for self-laid-out and layout-less codes.
+            "layout_cb": (doc.get("locality") or {}).get("contributed_by"),
             "model": _model_str(doc["provenance"].get("model", "")),
             "date": doc["provenance"].get("date", ""),
             "construction": doc["provenance"].get("construction", ""),
@@ -1919,6 +1923,17 @@ def detail_page(e):
         P.append('<div class=kv style="color:var(--mut)">as measured by the '
                  'verifier: every check drawn over the submitted coordinates; '
                  'the interaction radius is the longest dashed pair</div>')
+        # layout credit (issue #648): mirrors the witness_provenance line on
+        # the distance block -- credit shown beside the artifact it is for,
+        # never in the authors line (see check_authorship's layout binding).
+        cb = doc["locality"].get("contributed_by")
+        if cb:
+            parts = ['layout contributed by ' + authors_html(cb["by"])]
+            if cb.get("method"):
+                parts.append(html.escape(cb["method"]))
+            parts.append(html.escape(cb["date"]))
+            P.append('<div class=kv style="color:var(--mut)">'
+                     + " &middot; ".join(parts) + '</div>')
         P.append(fig)
         P.append('</section>')
 
@@ -2225,36 +2240,72 @@ def contributors_panel(entries):
         (stats, eff_order, geo_order, n_codes, n_geo)."""
         stats = {}
         for e in entries:
-            if e["origin"] == "baseline":
-                continue
             if cap is not None and (e["w"] is None or e["w"] > cap):
                 continue
-            for a in e["authors_list"]:
-                h = a.strip()
-                if not (h.startswith("@") and re.fullmatch(r"@[A-Za-z0-9-]+", h)):
-                    continue
-                s = stats.setdefault(h.casefold(),
-                                     {"codes": 0, "front": 0, "exact": 0,
-                                      "eff": 0.0, "slug": None, "handle": h,
-                                      "geo": None, "geo_slug": None,
-                                      "geo_tier": None, "list": []})
-                s["codes"] += 1
-                s["front"] += e["slug"] in front_slugs
-                s["exact"] += e["tier"] == "exact"
-                s["list"].append({"name": f'[[{e["n"]},{e["k"]},{e["d"]}]]',
-                                  "slug": e["slug"], "eff": e["eff"],
-                                  "geo": (geo_disp(e["geo"], e["tier"])
-                                          if e["geo"] is not None else None),
-                                  "w": e["w"], "date": e["date"],
-                                  "front": e["slug"] in front_slugs})
-                if e["eff"] > s["eff"]:
-                    s["eff"] = e["eff"]
-                    s["slug"] = e["slug"]   # the code achieving the best kd^2/n
+
+            def contributor(h):
+                return stats.setdefault(h.casefold(),
+                                        {"codes": 0, "front": 0, "exact": 0,
+                                         "eff": 0.0, "slug": None, "handle": h,
+                                         "geo": None, "geo_slug": None,
+                                         "geo_tier": None, "list": []})
+
+            def credit_geo(s):
                 if (e["geo"] is not None and e["d"] >= GEO_MIN_D
                         and (s["geo"] is None or e["geo"] > s["geo"])):
                     s["geo"] = e["geo"]
                     s["geo_slug"] = e["slug"]
                     s["geo_tier"] = e["tier"]
+
+            own = set()
+            if e["origin"] != "baseline":
+                for a in e["authors_list"]:
+                    h = a.strip()
+                    if not (h.startswith("@")
+                            and re.fullmatch(r"@[A-Za-z0-9-]+", h)):
+                        continue
+                    own.add(h.casefold())
+                    s = contributor(h)
+                    s["codes"] += 1
+                    s["front"] += e["slug"] in front_slugs
+                    s["exact"] += e["tier"] == "exact"
+                    s["list"].append({"name": f'[[{e["n"]},{e["k"]},{e["d"]}]]',
+                                      "slug": e["slug"], "eff": e["eff"],
+                                      "geo": (geo_disp(e["geo"], e["tier"])
+                                              if e["geo"] is not None else None),
+                                      "w": e["w"], "date": e["date"],
+                                      "front": e["slug"] in front_slugs})
+                    if e["eff"] > s["eff"]:
+                        s["eff"] = e["eff"]
+                        s["slug"] = e["slug"]   # the code achieving the best kd^2/n
+                    credit_geo(s)
+            # Layout credit (issue #648): locality.contributed_by names who
+            # retrofitted the layout (the #643 binding keeps them out of
+            # provenance.authors by design). The layout is a challenge
+            # contribution even when the code is a literature baseline, so
+            # baselines are NOT skipped here -- only the code-authorship
+            # counting above excludes them. A layout earns its contributor the
+            # g credit (g exists because of the layout) and a row in their
+            # modal list; it never counts toward codes/frontier/exact/kd^2/n,
+            # which belong to the code's own authors.
+            for a in (e["layout_cb"] or {}).get("by", []):
+                h = a.strip()
+                if not (h.startswith("@")
+                        and re.fullmatch(r"@[A-Za-z0-9-]+", h)):
+                    continue
+                if h.casefold() in own:
+                    continue        # laid out their own code: counted above
+                s = contributor(h)
+                s["list"].append({"name": f'[[{e["n"]},{e["k"]},{e["d"]}]]',
+                                  "slug": e["slug"], "eff": e["eff"],
+                                  "geo": (geo_disp(e["geo"], e["tier"])
+                                          if e["geo"] is not None else None),
+                                  "w": e["w"],
+                                  "date": e["layout_cb"].get("date",
+                                                             e["date"]),
+                                  "front": e["slug"] in front_slugs,
+                                  "layout": True})
+                credit_geo(s)
         eff_order = sorted(stats.items(),
                            key=lambda kv: (-kv[1]["eff"], -kv[1]["front"],
                                            -kv[1]["codes"], kv[1]["handle"]))
@@ -2398,8 +2449,9 @@ def contributors_panel(entries):
                 f'{"" if nk == 1 else "s"} &middot; {nc} code'
                 f'{"" if nc == 1 else "s"} submitted through the challenge</span>'
                 f'<span class=lbsgeo>{ng} of {nk} contributor'
-                f'{"" if nk == 1 else "s"} have a code with a verified '
-                f'layout and d &ge; {GEO_MIN_D}</span>')
+                f'{"" if nk == 1 else "s"} have a verified layout and d &ge; '
+                f'{GEO_MIN_D} (their own code, or a layout they '
+                'contributed)</span>')
 
     hero = heroes(order, geo_order)
     # One ranking per integer check weight W. Position W ranks each contributor
@@ -2481,7 +2533,9 @@ def contributors_panel(entries):
         'return "<a class=cmrow href=\\"codes/"+c.slug+".html\\">"'
         '+"<span class=cmname>"+c.name+(c.front?" \\u2605":"")+"</span>"'
         '+"<span class=cmeff>"+c.eff+" \\u00b7 w="+c.w'
-        '+(c.geo!=null?" \\u00b7 g="+c.geo:"")+" \\u00b7 "+c.date+"</span></a>";'
+        '+(c.geo!=null?" \\u00b7 g="+c.geo:"")'
+        '+(c.layout?" \\u00b7 contributed the layout":"")'
+        '+" \\u00b7 "+c.date+"</span></a>";'
         '}).join("");'
         'dlg.showModal();});});})();</script>')
     # metric toggle (issue #356): same contributors, ranked by the other score.
@@ -3446,6 +3500,11 @@ def board_table(entries, records):
             "with-layout" if e["geo"] is not None else "no-layout",
             "literature" if e["origin"] == "baseline" else "submitted",
         ]).lower()
+        # layout contributors are searchable like authors (issue #648), so the
+        # leaderboard's ?q=@handle deep links also surface the codes whose
+        # layout the handle contributed.
+        lb_terms = ("" if not e["layout_cb"] else
+                    " " + " ".join(e["layout_cb"].get("by", [])))
         # every (locality x weight) cell this code competes in, so the grid's
         # cell links can filter with nesting (a weight-4 code shows in weight-6/8
         # cells too), which the raw w slider cannot express.
@@ -3468,7 +3527,7 @@ def board_table(entries, records):
             f'data-origin="{"literature" if e["origin"] == "baseline" else "submitted"}" '
             f'data-model="{html.escape(e["model"].lower())}" '
             f'data-date="{html.escape(e["date"])}" '
-            f'data-auth="{html.escape(e["authors"])}">'
+            f'data-auth="{html.escape(e["authors"] + lb_terms)}">'
             f'<td class=star title="{"record: Pareto-best in a computed cell among listed codes (board-relative, not a literature record)" if fr else ""}">'
             f'{"&#9733;" if fr else ""}</td>'
             f'<td class=codecell><span class=mono>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
