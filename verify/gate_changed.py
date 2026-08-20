@@ -17,6 +17,23 @@ size, so a small code gets near-exhaustive coverage and a large one a
 proportionate search; frontier-advancing codes get several independent deep
 seeds (tens of thousands of trials each) before they earn the record.
 
+The gate prices the DIFF, not just the code (issue #654): each changed file
+is classified against its base-revision counterpart, because what changed
+determines what could newly be over-claimed. A layout-only diff (checks and
+distance byte-identical to base) skips refutation entirely -- the claim
+already survived the gate when it merged and the weekly board sweep keeps
+attacking it; everything a layout adds is recomputed deterministically by the
+verifier. A tightening diff (a refutation-shaped correction: values strictly
+down, new witnesses of exactly the new weights, upper_bound confidence,
+nothing else touched) gets the standard shallow pass -- the entry just became
+strictly less wrong, and the weekly sweep provides depth. A diff that adds or
+raises witness_provenance.survived_samples gets the deep battery regardless
+of record status: a survival stamp claims a deep null result and deters
+future refuters, so it is itself the claim being vetted. Anything else --
+new codes, edited checks, raised values, unclassifiable diffs -- fails closed
+to the full existing behavior. Classification is recomputed from the git
+diff, never taken from the PR's framing.
+
 Usage:
   python verify/gate_changed.py [--code-root PATH] [BASE] [files...]
     --code-root PATH  repository tree containing the submitted codes
@@ -71,6 +88,128 @@ def changed_codes(base, code_root=ROOT):
         print(f"could not compute diff vs {base}: {e}; failing closed")
         return None
     return [f for f in out.split() if f.endswith(".json")]
+
+
+def changed_codes_status(base, code_root=ROOT):
+    """{path: status} for codes changed vs base (A/M/D), rename-split like
+    check_authorship.changed_codes so a refutation's rename stays visible."""
+    try:
+        out = subprocess.check_output(
+            ["git", "diff", "--name-status", "--no-renames", f"{base}...HEAD",
+             "--", "codes"],
+            cwd=code_root, text=True)
+    except Exception:
+        return None
+    changes = {}
+    for line in out.splitlines():
+        parts = line.split("\t")
+        if len(parts) < 2:
+            continue
+        status = parts[0][:1]
+        if status == "R" and len(parts) >= 3:
+            if parts[1].endswith(".json"):
+                changes[parts[1]] = "D"
+            if parts[2].endswith(".json"):
+                changes[parts[2]] = "A"
+        elif parts[1].endswith(".json"):
+            changes[parts[1]] = status
+    return changes
+
+
+def load_base_doc(base, path, code_root):
+    """Base-revision content of path, or None if unavailable."""
+    try:
+        out = subprocess.check_output(["git", "show", f"{base}:{path}"],
+                                      cwd=code_root, text=True,
+                                      stderr=subprocess.DEVNULL)
+        return json.loads(out)
+    except Exception:
+        return None
+
+
+def base_doc_for(f, doc, base, code_root):
+    """The base doc this file revises: itself when modified, or the deleted
+    codes/<n>-<k>-*.json a refutation renamed away. None for new codes or on
+    any ambiguity (which downstream fails closed to the full gate)."""
+    changes = changed_codes_status(base, code_root)
+    if changes is None:
+        return None
+    if changes.get(f) == "M":
+        return load_base_doc(base, f, code_root)
+    prefix = os.path.join(os.path.dirname(f),
+                          f"{doc.get('n')}-{doc.get('k')}-")
+    dels = [p for p, s in changes.items() if s == "D" and p.startswith(prefix)]
+    if len(dels) == 1:
+        return load_base_doc(base, dels[0], code_root)
+    return None
+
+
+def _survival_raised(base_doc, new_doc):
+    """True if any side adds or raises witness_provenance.survived_samples."""
+    bd = (base_doc or {}).get("distance") or {}
+    nd = (new_doc or {}).get("distance") or {}
+    for side in ("X", "Z"):
+        bs = ((bd.get(side) or {}).get("witness_provenance") or {})
+        ns = ((nd.get(side) or {}).get("witness_provenance") or {})
+        nv = ns.get("survived_samples")
+        if nv is None:
+            continue
+        bv = bs.get("survived_samples")
+        if bv is None or nv > bv:
+            return True
+    return False
+
+
+def classify_diff(base_doc, new_doc):
+    """Classify a changed code's diff for refutation pricing. Returns
+    (cls, reason) with cls in {'new', 'stamp', 'layout-only', 'tightening',
+    'full'}. Structural facts only -- witness validity is the verifier's job
+    (verify_all runs before this gate in CI); anything unclassifiable is
+    'full' (fail closed)."""
+    try:
+        if base_doc is None:
+            return "new", "no base counterpart"
+        if _survival_raised(base_doc, new_doc):
+            return "stamp", ("witness_provenance.survived_samples added or "
+                             "raised: the survival claim is what needs vetting")
+        frozen = ("checks", "n", "k", "code_type")
+        for key in frozen:
+            if base_doc.get(key) != new_doc.get(key):
+                return "full", f"field '{key}' changed"
+        if base_doc.get("distance") == new_doc.get("distance"):
+            if base_doc.get("locality") != new_doc.get("locality"):
+                return "layout-only", "checks and distance unchanged from base"
+            return "layout-only", ("checks and distance unchanged from base "
+                                   "(metadata-only diff)")
+        if base_doc.get("locality") != new_doc.get("locality"):
+            return "full", "distance and locality both changed (mixed diff)"
+        bd, nd = base_doc.get("distance") or {}, new_doc.get("distance") or {}
+        tightened = 0
+        for side in ("X", "Z"):
+            bs, ns = bd.get(side), nd.get(side)
+            if bs is None or ns is None:
+                return "full", f"distance.{side} missing"
+            if bs == ns:
+                continue
+            bv, nv = bs.get("value"), ns.get("value")
+            if not (isinstance(bv, int) and isinstance(nv, int) and nv < bv):
+                return "full", (f"distance.{side}.value did not strictly "
+                                "decrease")
+            if len(ns.get("witness") or []) != nv:
+                return "full", (f"distance.{side} witness weight does not "
+                                "equal the new value")
+            if ns.get("confidence") != "upper_bound":
+                return "full", (f"distance.{side}.confidence is not "
+                                "upper_bound at the corrected value")
+            tightened += 1
+        if tightened == 0:
+            return "full", "distance changed without a side strictly decreasing"
+        if nd.get("d") != min(nd[s].get("value") for s in ("X", "Z")):
+            return "full", "distance.d is not min(dX, dZ)"
+        return "tightening", (f"{tightened} side(s) strictly decreased with "
+                              "matching witnesses")
+    except Exception as e:
+        return "full", f"unclassifiable ({type(e).__name__}: {e})"
 
 
 def _locality_rank(doc):
@@ -300,7 +439,36 @@ def main(argv):
         # Trials and wall-clock both scale with code size (see _budget).
         # Dominated codes pay only the standard, size-scaled pass.
         slug = os.path.splitext(os.path.basename(f))[0]
-        deep = slug in records
+        # Price the diff, not just the code: what changed determines what could
+        # newly be over-claimed (see module docstring).
+        base_doc = base_doc_for(f, doc, base, code_root)
+        cls, why = classify_diff(base_doc, doc)
+        if cls == "layout-only":
+            print(f"ok       {f} (layout-only diff: {why}; refutation "
+                  f"deferred to the weekly board sweep)")
+            if receipt_dir:
+                verdict = validate_candidate(doc, seed=seed, refute=False)
+                verdict["gates"]["refute"] = {
+                    "refuted": False, "seed": seed,
+                    "detail": f"skipped: {why}; distance claim identical to "
+                              f"base and covered by the weekly refute sweep",
+                }
+                receipt = make_receipt(
+                    doc, p, verdict,
+                    gate={"refuted": False, "seed": seed, "seeds": [],
+                          "trials": 0, "budget_seconds": 0.0, "deep": False,
+                          "fast_trials": 0, "methods": [],
+                          "diff_class": cls, "diff_reason": why},
+                    repo_root=code_root, pr_number=pr_number,
+                    pr_author=pr_author, base_sha=base_sha, head_sha=head_sha)
+                write_receipt(receipt, receipt_dir, slug)
+            continue
+        if cls == "stamp":
+            deep = True       # the survival claim itself is being vetted
+        elif cls == "tightening":
+            deep = False      # strictly-less-wrong claim; weekly sweep has depth
+        else:
+            deep = slug in records
         trials, budget, nseeds = _budget(int(doc["n"]), deep, fast=GF is not None)
         seeds = [seed, seed + 2, seed + 3][:nseeds]
         # two independent mechanisms; a hit from EITHER (any seed) refutes.
@@ -326,6 +494,7 @@ def main(argv):
         fast_tag = (f" + fast x {ftrials}" if ftrials else "")
         tag = (f"deep, {len(seeds)} RIS seeds x {trials} trials (<={budget:.0f}s each)"
                f"{fast_tag}" if deep else f"standard, {trials} trials (<={budget:.0f}s)")
+        tag += f"; diff: {cls}"
         gate = {
             "refuted": bool(hits),
             "seed": seed,
@@ -335,6 +504,8 @@ def main(argv):
             "deep": deep,
             "fast_trials": ftrials,
             "methods": list(results),
+            "diff_class": cls,
+            "diff_reason": why,
         }
         if receipt_dir:
             # The distance search above is authoritative for this run. Reuse the
