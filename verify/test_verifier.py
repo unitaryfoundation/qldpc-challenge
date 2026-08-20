@@ -177,6 +177,13 @@ def main():
         check("no layout computes as unrestricted, still valid",
               r["ok"] and r["computed"]["locality_class"] == "unrestricted")
 
+        # 7a'. a layout must declare its layer count (schema requirement)
+        d = copy.deepcopy(GOOD)
+        d["locality"].pop("layers", None)
+        r = rep(d)
+        check("layout without layers rejected",
+              not r["ok"] and "schema_valid" in failed_checks(r))
+
         # 7b. crammed layout: collapse qubits onto a sub-unit-spaced line so the
         #     radius looks tiny -- cramming must DENY the 2d-local class, not earn
         #     it (a fake short range cannot buy membership)

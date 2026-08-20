@@ -78,7 +78,8 @@ weight, not as a global record.
 The locality class is computed from the layout, never trusted. A class is earned
 only by an honest layout:
 
-- a coordinate for every qubit (`coordinates` covers all `n`);
+- a coordinate for every qubit (`coordinates` covers all `n`) and a declared
+  number of physical `layers` (1 or 2; required whenever a layout is given);
 - no cramming: at most `layers` qubits may share a site (the flip-chip stack),
   and distinct sites are >= 1 apart, so a check of diameter `r` genuinely spans
   `r` grid units and a small radius cannot be faked by collapsing qubits;

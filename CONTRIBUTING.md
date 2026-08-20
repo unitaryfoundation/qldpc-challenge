@@ -33,7 +33,8 @@ Useful flags:
 - `--family bivariate-bicycle` the construction family, a filterable tag from a
   fixed vocabulary (see TRACKS.md); it is never used for ranking;
 - `--coords coords.npz --layers 2` a 2D layout; the verifier derives the locality
-  class (single / bilayer / unrestricted) from it, you do not declare a track;
+  class (single / bilayer / unrestricted) from it, you do not declare a track.
+  `layers` is required alongside the coordinates (the CLI defaults it to 1);
 - `--open-pr` create the branch, commit, push, and open the PR for you;
 - `--dry-run` build and verify without writing.
 

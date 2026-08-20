@@ -172,10 +172,10 @@ def build_submission(HX, HZ, args):
     if args._coords is not None:
         if len(args._coords) != n:
             raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
-        loc = {"coordinates": [[float(x), float(y)] for x, y in args._coords]}
-        if args.layers:
-            loc["layers"] = int(args.layers)
-        doc["locality"] = loc
+        doc["locality"] = {
+            "coordinates": [[float(x), float(y)] for x, y in args._coords],
+            "layers": int(args.layers),
+        }
     return doc
 
 
@@ -546,8 +546,9 @@ def main(argv=None):
     s.add_argument("--coords", default="",
                    help="coordinates file (.npz key coords, or whitespace .txt); "
                         "the verifier derives the 2d-local class from it")
-    s.add_argument("--layers", type=int, default=0,
-                   help="physical layers for a 2d-local layout (2 = bilayer)")
+    s.add_argument("--layers", type=int, default=1,
+                   help="physical layers for a 2d-local layout "
+                        "(1 = single layer, 2 = bilayer); default 1")
     s.add_argument("--trials", type=int, default=20000,
                    help="RIS trials for the distance witness search")
     s.add_argument("--seed", type=int, default=0)
