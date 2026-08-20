@@ -86,7 +86,8 @@
       "type": "object",
       "description": "optional; required only for the 2d-local tracks",
       "required": [
-        "coordinates"
+        "coordinates",
+        "layers"
       ],
       "additionalProperties": false,
       "properties": {
@@ -106,7 +107,7 @@
         "layers": {
           "type": "integer",
           "minimum": 1,
-          "description": "physical layers (e.g. 2 for flip-chip bilayer)"
+          "description": "physical layers (1 for a single layer, 2 for flip-chip bilayer); required whenever a layout is given"
         },
         "interaction_radius": {
           "type": "number",

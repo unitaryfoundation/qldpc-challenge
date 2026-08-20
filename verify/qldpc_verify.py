@@ -19,8 +19,9 @@ What "verified" means per field:
               the claimed Pauli type and weight -> certifies d_side <= value
               as an UPPER BOUND. 'exact' claims are downgraded to upper_bound
               here and flagged for server certification.
-  locality    for a 2d-local-* track: a layout (coordinates for all n qubits)
-              is required; at most `layers` qubits per site and distinct sites
+  locality    for a 2d-local-* track: a layout (coordinates for all n qubits
+              plus the number of physical `layers`) is required; at most
+              `layers` qubits per site and distinct sites
               >= 1 apart (no cramming a small radius); measured interaction
               radius (max check diameter) within the track cap. Reports layout
               diagnostics (radius, qubits/site, spacing, density, bbox).
@@ -141,6 +142,10 @@ def structure_errors(doc):
         if "distance" in doc and not (isinstance(doc["distance"], dict)
                                       and all(k in doc["distance"] for k in ("d", "X", "Z"))):
             errs.append("distance must have d, X, and Z witness blocks")
+        if "locality" in doc and not (isinstance(doc["locality"], dict)
+                                      and "coordinates" in doc["locality"]
+                                      and "layers" in doc["locality"]):
+            errs.append("locality must have coordinates and layers")
     if errs:
         return errs
     return resource_errors(doc)

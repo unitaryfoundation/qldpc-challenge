@@ -266,7 +266,7 @@ def test_gpu_pair_stage_matters():
     binary = os.path.join(ROOT, "build", "ris_gpu")
     if not gpu_available(binary):
         pytest.skip("no ris_gpu binary or no GPU")
-    with open(os.path.join(ROOT, "codes", "514-162-41.json")) as f:
+    with open(os.path.join(ROOT, "codes", "514-162-29.json")) as f:
         doc = json.load(f)
     n = doc["n"]
     HX = ris_gpu.checks_matrix(doc["checks"]["X"], n)
