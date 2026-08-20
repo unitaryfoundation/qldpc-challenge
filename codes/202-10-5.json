@@ -1113,8 +1113,7 @@
  },
  "provenance": {
   "authors": [
-   "@Xo1otl",
-   "QunaSys"
+   "@Xo1otl"
   ],
   "construction": "contributed via qldpc submit",
   "origin": "submission",
@@ -1932,6 +1931,7 @@
     13.5,
     13.5
    ]
-  ]
+  ],
+  "layers": 1
  }
 }
