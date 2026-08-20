@@ -144,6 +144,17 @@ def base_doc_for(f: str, doc: dict, base: str, code_root: str) -> dict | None:
     return None
 
 
+def structural_ok(verdict: dict) -> bool:
+    """The structural soundness of a board edit, from a validate_candidate
+    verdict. validate_candidate is the NEW-candidate pipeline: its overall
+    'passed' includes gates that are meaningless for an in-place edit of a
+    file already on the board -- dedup flags the code as an exact duplicate
+    of itself, and novelty judges board advancement. What the gate must not
+    say ok about is a file the VERIFIER rejects, so only gates.verify.ok is
+    authoritative here."""
+    return bool(((verdict.get("gates") or {}).get("verify") or {}).get("ok"))
+
+
 def layout_entered_tighter_class(base_doc: dict | None, new_doc: dict) -> bool:
     """True when the diff's layout moves the code into a tighter locality
     class than it had at base. For a layout-only diff this is the only way
@@ -460,7 +471,7 @@ def main(argv):
             # gate's stdout and receipt must not say ok about a file the
             # verifier rejects.
             verdict = validate_candidate(doc, seed=seed, refute=False)
-            if not verdict.get("passed"):
+            if not structural_ok(verdict):
                 failed += 1
                 print(f"FAIL     {f}: structural checks failed "
                       f"(layout-only diff; see verify_all for details)")
@@ -476,11 +487,16 @@ def main(argv):
                       f"deferred to the weekly board sweep)")
             if cls == "layout-only":
                 if receipt_dir:
+                    # The receipt's headline verdict must reflect structural
+                    # soundness of the edit, not the new-candidate gates
+                    # (dedup self-matches by construction on an in-place edit).
+                    verdict["passed"] = structural_ok(verdict)
                     verdict["gates"]["refute"] = {
                         "refuted": False, "seed": seed,
                         "detail": f"skipped: {why}; distance claim identical "
                                   f"to base and covered by the weekly refute "
-                                  f"sweep",
+                                  f"sweep; dedup self-match is expected for "
+                                  f"an in-place edit",
                     }
                     receipt = make_receipt(
                         doc, p, verdict,

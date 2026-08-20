@@ -246,3 +246,18 @@ def test_tighter_class_guard_ignores_unchanged_class():
     doc = copy.deepcopy(base)
     doc["locality"]["coordinates"] = list(reversed(doc["locality"]["coordinates"]))
     assert not G.layout_entered_tighter_class(base, doc)
+
+
+def test_structural_ok_ignores_candidate_pipeline_gates():
+    """An in-place board edit self-matches dedup and advances nothing; only
+    the verifier gate decides structural soundness (#674 regression)."""
+    self_dup = {"passed": False,
+                "gates": {"verify": {"ok": True, "failed_checks": []},
+                          "dedup": {"exact_duplicate_of": "40-10-4.json"},
+                          "novelty": {"board_advancing": False}}}
+    assert G.structural_ok(self_dup)
+    rejected = {"passed": False,
+                "gates": {"verify": {"ok": False,
+                                     "failed_checks": ["coordinates_cover_all_qubits"]}}}
+    assert not G.structural_ok(rejected)
+    assert not G.structural_ok({})
