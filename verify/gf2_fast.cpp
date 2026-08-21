@@ -1,12 +1,10 @@
 /**
  * gf2_fast.cpp — Bit-packed GF(2) linear algebra for quantum code search.
  *
- * OPTIONAL research accelerator for the RIS hot path in verify/gf2.py /
- * verify/heuristic_distance.py (which auto-uses it when importable, weights
- * only -- witnesses are always re-found and validated by the pinned Python
- * engine). NOT part of the trusted validation stack: the CI gate's
- * refute_check runs with fast_trials=0 and never imports this, and CI does
- * not build it, so gate verdicts are identical with or without it.
+ * OPTIONAL accelerator for the RIS hot path in verify/heuristic_distance.py
+ * and the CI deep-refutation gate. CI builds it best-effort from the trusted
+ * tree; a missing build falls back to the full Python battery. Fast-pass hits
+ * count only after their witnesses are validated by the pinned Python engine.
  *
  * Build:  make fast        (or: python verify/setup_gf2_fast.py build_ext
  *                           --build-lib verify)

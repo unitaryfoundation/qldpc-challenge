@@ -13,12 +13,15 @@
 
 # The verifier stack, the schema, and the site builder that renders verdicts.
 /verify/                        @FarLab @vprusso @MathysRennela
+/decode/                        @FarLab @vprusso @MathysRennela
 /schema/                        @FarLab @vprusso @MathysRennela
 /site/build.py                  @FarLab @vprusso @MathysRennela
 
-# Dependency set the verifier runs under.
+# Dependency and build inputs the verifier runs under.
+/Makefile                       @FarLab @vprusso @MathysRennela
 /pyproject.toml                 @FarLab @vprusso @MathysRennela
 /uv.lock                        @FarLab @vprusso @MathysRennela
+/run_tests.py                   @FarLab @vprusso @MathysRennela
 
 # The pinned hashes of the trusted validation stack. A re-pin is the loud,
 # reviewable signal that verifier semantics changed; owner review is what

@@ -1,10 +1,30 @@
 {
-  "_comment": "Pinned SHA-256 of the trusted autoresearch validation stack. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
+  "_comment": "Pinned SHA-256 of the repo-local production validation and policy-gate execution closure. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
   "files": {
-    "validate_candidate.py": "54cc54f6282506baafe1ac8f97c9f479a017a25c66b0426172ca1a4799fa2892",
-    "qldpc_verify.py": "1281f4ae9f5662585905a9666e9bcab200908b1ec535d7783167c882162c9f37",
-    "heuristic_distance.py": "ec313b3aa64327de717a333182f5d3d7eae4e7a2c6ab2448fca86f2770f8a9c7",
-    "gf2.py": "47e8999a4e22a12a852d81ce0f5a9e0248cd04a9d8940b9cb3edba7e85ad5508",
-    "check_validator_integrity.py": "36c248ca70d0a64fdad5548a36b15e326ee4b24e60a20e08d37499428882a195"
+    ".github/workflows/prose.yml": "c07a2339ee92c5eb7b5297a37ac5be7e9ca3e655ab3f2f199acc31995bef1f18",
+    ".github/workflows/refute-weekly.yml": "d3fb677fd381c397f2b1f60474ad8b86cefc512d2d38ce930ece20498470d7a1",
+    ".github/workflows/verify.yml": "db5a42d532013a2e322ad13542e035d37f3ddd95b36287cde7e2081c6a459c5b",
+    "Makefile": "af9f938ff3ee63196def23a1a2bf40e1378146ba91203d2deea9639f97eabe66",
+    "pyproject.toml": "7a337465fbcba839bdaed80cfc3fcc34247548ec1c9d6658dfa4e48db9b6a8ca",
+    "uv.lock": "b8b51c94f091f42f77b8ef6399e89240e59da0fc70548ad20ee9bb5c356cbee6",
+    "verify/setup_gf2_fast.py": "5d8e5c08a0745353b8a98ace8e87cbe6c0e04b75c6f78ad7f9430e3098a5dac0",
+    "verify/gf2_fast.cpp": "3e7e45de9b8885d49ce0cd6b8c38bb2b9ea474ec55a0ba9017d44fba9ff34ad2",
+    "decode/distance.py": "7e266f8ad50d55fa44e34a5e0bf0005e91de19f24c35c27bf8f9bad796f56076",
+    "schema/code.schema.json": "fe268de096f12276973dd2d996ae1a72cc66689968ff79907aaf4a968672474e",
+    "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
+    "verify/check_authorship.py": "5c504a2d70b2d6dd1d3dd074e32a2a3664752a0984dca09d56ef50b492fe73b9",
+    "verify/check_prose.py": "af9fc3b72c7723cd0aa6309a5a0162acbf1e4ac0bd18722179633802c30df9d0",
+    "verify/check_submission_scope.py": "04945a2ef6b0cabd7b8c3998aa33aa8c66cac158dd4955272742dbaa8c850bf1",
+    "verify/check_validator_integrity.py": "de04f4fce3ed65142eb99f84d8419172652a5f4242b0587529e1f36a8669f4cf",
+    "verify/circuit_tools.py": "16ee28f60df4208e203307c52647ea6191b1e80e6597e274d16eee66794823d9",
+    "verify/circuit_verify.py": "1919dd46ba636deff662bc74692aa807d61cfe078cfbe7bb87743dd3e2834a86",
+    "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
+    "verify/gate_changed.py": "744286a978639fcac000deb9491cdab58e9e9490a6c16c969805b0733e50d265",
+    "verify/gf2.py": "47e8999a4e22a12a852d81ce0f5a9e0248cd04a9d8940b9cb3edba7e85ad5508",
+    "verify/heuristic_distance.py": "ec313b3aa64327de717a333182f5d3d7eae4e7a2c6ab2448fca86f2770f8a9c7",
+    "verify/qldpc_verify.py": "1281f4ae9f5662585905a9666e9bcab200908b1ec535d7783167c882162c9f37",
+    "verify/refute_board.py": "d45c3d4475acd77dac0e6da7854c8d9dd142d1d077b75a166d6d3e5f729ef20d",
+    "verify/validate_candidate.py": "54cc54f6282506baafe1ac8f97c9f479a017a25c66b0426172ca1a4799fa2892",
+    "verify/verify_all.py": "fc1b93b168ba8860711e4963ee755ee0211936d2a36ce0ef104fdfede9d7e640"
   }
 }

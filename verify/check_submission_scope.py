@@ -20,10 +20,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CRITICAL_PREFIXES = (
     ".github/workflows/",
+    "decode/",
     "schema/",
     "verify/",
 )
 CRITICAL_FILES = {
+    "Makefile",         # builds the optional refutation accelerator
     "site/build.py",
     "pyproject.toml",
     "uv.lock",
