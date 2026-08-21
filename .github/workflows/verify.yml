@@ -90,15 +90,15 @@ jobs:
       - name: self-tests (every verify/ and research/ test_*.py; skipped for codes-only PRs)
         if: github.event_name != 'pull_request' || steps.changes.outputs.only_codes != 'true'
         working-directory: submitted
-        run: uv run --frozen python run_tests.py
+        run: uv run --frozen --extra research python run_tests.py
       - name: verify all submissions (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
-        run: uv run --frozen python verify/verify_all.py --root ../submitted
+        run: uv run --frozen --extra research python verify/verify_all.py --root ../submitted
       - name: verify all submissions
         if: github.event_name != 'pull_request' || steps.changes.outputs.codes_changed != 'true'
         working-directory: submitted
-        run: uv run --frozen python verify/verify_all.py
+        run: uv run --frozen --extra research python verify/verify_all.py
       # Cheap metadata checks run BEFORE the ~15-minute refutation gate: a PR that
       # fails one of them should not first burn a full gate run (PR #278 spent the
       # whole gate on 18 valid layouts and then died on one authorship mismatch).

@@ -135,6 +135,133 @@
         "notes": {
           "type": "string",
           "description": "schedule provenance, optional"
+        },
+        "ler": {
+          "type": "object",
+          "description": "optional measured logical-error-rate tier: the same committed memory circuits, sampled under the canonical noise recipe and decoded with the pinned decoder. Distance is a floor; this is the measured rate a device-like simulation actually sees, prefactors included.",
+          "required": [
+            "X",
+            "Z"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "X": {
+              "type": "object",
+              "description": "one basis's measured rate: the committed memory circuit sampled at the canonical reference rate and decoded with the pinned decoder. Self-reported measurement; CI re-measures with an independent seed and rejects claims outside sampling error (verify/ler_verify.py).",
+              "required": [
+                "p",
+                "shots",
+                "failures",
+                "seed",
+                "decoder",
+                "ler_per_round",
+                "ci95"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "p": {
+                  "const": 0.001,
+                  "description": "physical rate of the canonical noise recipe; fixed so rates are comparable across entries"
+                },
+                "shots": {
+                  "type": "integer",
+                  "minimum": 10000,
+                  "description": "sampled shots; the floor keeps a claim statistically meaningful"
+                },
+                "failures": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "description": "shots where the decoder's predicted observable flips disagreed with the sampled ones; at least 100, so the claim carries ~10% statistical error and prefactor comparisons between schedules are resolvable (raise shots until the count is reached)"
+                },
+                "seed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "stim sampler seed; with shots and the pinned stim version this determines the sample"
+                },
+                "decoder": {
+                  "enum": [
+                    "bposd-cs-10"
+                  ],
+                  "description": "the pinned decoder (BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior)"
+                },
+                "ler_per_round": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 0.5,
+                  "description": "per-round logical error rate via the parity-aware conversion from failures/shots and circuit.rounds"
+                },
+                "ci95": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
+                  },
+                  "description": "Wilson 95% interval on ler_per_round, from the same conversion"
+                }
+              }
+            },
+            "Z": {
+              "type": "object",
+              "description": "one basis's measured rate: the committed memory circuit sampled at the canonical reference rate and decoded with the pinned decoder. Self-reported measurement; CI re-measures with an independent seed and rejects claims outside sampling error (verify/ler_verify.py).",
+              "required": [
+                "p",
+                "shots",
+                "failures",
+                "seed",
+                "decoder",
+                "ler_per_round",
+                "ci95"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "p": {
+                  "const": 0.001,
+                  "description": "physical rate of the canonical noise recipe; fixed so rates are comparable across entries"
+                },
+                "shots": {
+                  "type": "integer",
+                  "minimum": 10000,
+                  "description": "sampled shots; the floor keeps a claim statistically meaningful"
+                },
+                "failures": {
+                  "type": "integer",
+                  "minimum": 100,
+                  "description": "shots where the decoder's predicted observable flips disagreed with the sampled ones; at least 100, so the claim carries ~10% statistical error and prefactor comparisons between schedules are resolvable (raise shots until the count is reached)"
+                },
+                "seed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "stim sampler seed; with shots and the pinned stim version this determines the sample"
+                },
+                "decoder": {
+                  "enum": [
+                    "bposd-cs-10"
+                  ],
+                  "description": "the pinned decoder (BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior)"
+                },
+                "ler_per_round": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 0.5,
+                  "description": "per-round logical error rate via the parity-aware conversion from failures/shots and circuit.rounds"
+                },
+                "ci95": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 0.5
+                  },
+                  "description": "Wilson 95% interval on ler_per_round, from the same conversion"
+                }
+              }
+            }
+          }
         }
       }
     },

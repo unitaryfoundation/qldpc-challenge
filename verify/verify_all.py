@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 from qldpc_verify import file_size_error, verify
 from circuit_verify import verify_circuit
+from ler_verify import verify_ler
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -52,13 +53,27 @@ if __name__ == "__main__":
         circ = ""
         if rep["ok"] and is_code and doc.get("circuit"):
             slug = os.path.splitext(os.path.basename(p))[0]
-            crep = verify_circuit(doc, os.path.join(code_root, "circuits", slug))
+            circuits_dir = os.path.join(code_root, "circuits", slug)
+            crep = verify_circuit(doc, circuits_dir)
             if crep["ok"]:
                 circ = (f", d_circ<="
                         f"{crep['earned_d_circ']['d_circ']['value']}")
             else:
                 rep["ok"] = False
                 rep["checks"] += [c for c in crep["checks"] if not c["ok"]]
+            # measured-rate tier: an ler claim is re-measured,
+            # never trusted; a missing decoder fails the claim rather than
+            # skipping it, so an unverifiable number cannot merge.
+            if rep["ok"] and (doc["circuit"] or {}).get("ler"):
+                lrep = verify_ler(doc, circuits_dir)
+                if lrep["ok"]:
+                    lers = [doc["circuit"]["ler"][s]["ler_per_round"]
+                            for s in ("X", "Z")]
+                    circ += f", ler/round<={max(lers):.3g}"
+                else:
+                    rep["ok"] = False
+                    rep["checks"] += [c for c in lrep["checks"]
+                                      if not c["ok"]]
         if rep["ok"]:
             ed = rep["earned_distance"].get("d", {})
             print(f"PASS  {rel}  -> d{ed.get('value','?')} "
