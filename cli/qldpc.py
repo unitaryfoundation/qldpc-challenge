@@ -47,6 +47,7 @@ sys.path.insert(0, os.path.join(_ROOT, "site"))
 
 import gf2                       # noqa: E402
 import heuristic_distance as hd  # noqa: E402
+from check_authorship import HANDLE  # noqa: E402
 from qldpc_verify import verify  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
@@ -356,7 +357,45 @@ def frontier_summary(doc, report):
 # ----------------------------------------------------------------------------
 # submit command
 # ----------------------------------------------------------------------------
+def validate_authors(authors, anonymous=False):
+    """Fail fast when submit would produce an unbound authorship record."""
+    normalized = [str(author).strip() for author in authors]
+    malformed = [
+        author for author in normalized
+        if author.startswith("@") and HANDLE.fullmatch(author) is None
+    ]
+    if malformed:
+        values = ", ".join(repr(author) for author in malformed)
+        raise SystemExit(
+            f"Invalid author {values}. GitHub authors must use @yourhandle "
+            "with letters, numbers, or hyphens only."
+        )
+
+    has_handle = any(HANDLE.fullmatch(author) for author in normalized)
+    if has_handle and anonymous:
+        raise SystemExit(
+            "--anonymous cannot be combined with a GitHub @handle; remove "
+            "--anonymous to keep the submission bound to that account."
+        )
+    if has_handle:
+        return
+
+    if not anonymous:
+        raise SystemExit(
+            "No GitHub @handle found in --authors. Add @yourhandle (the @ is "
+            "required), or pass --anonymous to confirm that the submission "
+            "will not be bound to a GitHub account."
+        )
+
+    print(
+        "  WARNING: no GitHub @handle was provided. This submission will be "
+        "recorded as anonymous and will not be bound to a GitHub account.",
+        flush=True,
+    )
+
+
 def cmd_submit(args):
+    validate_authors(args.authors, args.anonymous)
     HX, HZ, coords, _draft = load_checks(args.code)
     if args.coords:                      # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
@@ -521,6 +560,9 @@ def main(argv=None):
                                 ".json draft")
     s.add_argument("--authors", nargs="+", required=True,
                    help="one or more: @github-handle and/or 'First Last'")
+    s.add_argument("--anonymous", action="store_true",
+                   help="explicitly submit without a GitHub @handle; the "
+                        "entry will not be bound to an account")
     s.add_argument("--construction", default="",
                    help="how the code was built (family, polynomials, search)")
     s.add_argument("--model", default="",

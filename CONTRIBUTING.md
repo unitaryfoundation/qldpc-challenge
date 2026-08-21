@@ -11,6 +11,13 @@ submission.
 
 (or, without the launcher shim: `uv run python cli/qldpc.py submit ...`)
 
+The `@` in `@yourhandle` is required: it is what binds the submission to
+your GitHub account and prevents another account from editing the entry as its
+author. Plain names are still valid for co-authors without GitHub accounts,
+provided at least one author is an `@handle`. To intentionally submit with no
+GitHub handle, pass `--anonymous`; the CLI warns that the resulting entry will
+not be bound to an account.
+
 `mycode.npz` holds your parity checks under keys `hx` and `hz` (dense 0/1
 arrays or scipy sparse). The tool:
 
@@ -36,6 +43,8 @@ Useful flags:
   class (single / bilayer / unrestricted) from it, you do not declare a track.
   `layers` is required alongside the coordinates (the CLI defaults it to 1);
 - `--open-pr` create the branch, commit, push, and open the PR for you;
+- `--anonymous` explicitly proceed without an `@handle` (the submission will
+  not be bound to a GitHub account);
 - `--dry-run` build and verify without writing.
 
 Either way — `--open-pr`, or the commands it prints for you to run — the PR
