@@ -1,12 +1,14 @@
 /**
  * gf2_fast.cpp — Bit-packed GF(2) linear algebra for quantum code search.
  *
- * OPTIONAL research accelerator for the RIS hot path in verify/gf2.py /
- * verify/heuristic_distance.py (which auto-uses it when importable, weights
- * only -- witnesses are always re-found and validated by the pinned Python
- * engine). NOT part of the trusted validation stack: the CI gate's
- * refute_check runs with fast_trials=0 and never imports this, and CI does
- * not build it, so gate verdicts are identical with or without it.
+ * OPTIONAL accelerator for the RIS hot paths (code-tier heuristic_distance,
+ * circuit-tier circuit_tools.ris_dem). NOT part of the trusted validation
+ * stack: everything here only PROPOSES candidates -- a find counts as a
+ * refutation or witness only after the pinned Python stack validates it
+ * (gate_changed._fast_refute, circuit_tools.witness_errors), and every gate
+ * degrades to the pure-Python search when this extension is absent (CI
+ * builds it via `make fast`, but a missing or broken build can only make
+ * the gate shallower-and-warned, never wrong).
  *
  * Build:  make fast        (or: python verify/setup_gf2_fast.py build_ext
  *                           --build-lib verify)
@@ -555,6 +557,49 @@ WitnessResult distance_rand_witness_cpp(const GF2Matrix& HX, const GF2Matrix& HZ
     return res;
 }
 
+// Circuit-tier (DEM) variant, RFC 0001 issue #505: min |e| with H e = 0 and
+// L e != 0, where H is a detector error model's detectors-by-mechanisms
+// parity-check matrix and L its observables-by-mechanisms matrix. This is the
+// SAME search as the CSS side: "flips a logical observable" (some row of L
+// has odd inner product with e) is the identical predicate the CSS
+// nontriviality check computes against a logical basis, so the trials core is
+// reused verbatim with L in the LZ seat. The kernel of H is computed and
+// packed once, shared read-only across threads; rref_perm randomizes the
+// information set by visiting columns in permuted PIVOT order, so nothing is
+// ever physically permuted or repacked per trial (the numpy path paid an
+// m x m column gather each trial -- ~130 MB at m~12k -- for the same effect).
+WitnessResult dem_rand_witness_cpp(const GF2Matrix& H, const GF2Matrix& L,
+                                   int trials, uint64_t seed, int pair_depth,
+                                   int n_threads) {
+    if (n_threads < 1) n_threads = 1;
+    int m = H.cols_;
+    WitnessResult res;
+    res.n = m;
+    GF2Matrix K = kernel_basis(H);        // hoisted: once, shared read-only
+    int per = (trials + n_threads - 1) / n_threads;
+    std::vector<int> results(n_threads, m + 1);
+    std::vector<std::vector<uint64_t>> wits(n_threads);
+    std::vector<std::thread> pool;
+    pool.reserve(n_threads);
+    for (int t = 0; t < n_threads; ++t) {
+        uint64_t s = seed + 0x9e3779b97f4a7c15ULL * (uint64_t)(t + 1);
+        pool.emplace_back([&, t, s]() {
+            results[t] = min_logical_weight_rand_core(m, K, L, per, s,
+                                                      pair_depth, &wits[t]);
+        });
+    }
+    for (auto& th : pool) th.join();
+    res.weight = m + 1;
+    res.side = -1;
+    for (int t = 0; t < n_threads; ++t)
+        if (results[t] < res.weight) {
+            res.weight = results[t];
+            res.side = 0;
+            res.witness = wits[t];
+        }
+    return res;
+}
+
 int compute_k_cpp(const GF2Matrix& HX, const GF2Matrix& HZ) {
     int n = (HX.rows_ > 0) ? HX.cols_ :
             (HZ.rows_ > 0) ? HZ.cols_ : 0;
@@ -635,6 +680,32 @@ static py::tuple py_distance_rand_witness(py::array_t<int8_t> HX_np,
     return py::make_tuple(res.weight, py::str(side), support);
 }
 
+static py::tuple py_dem_rand_witness(py::array_t<int8_t> H_np,
+                                     py::array_t<int8_t> L_np,
+                                     int trials, uint64_t seed,
+                                     int pair_depth, int threads) {
+    if (H_np.size() == 0 || L_np.size() == 0)
+        return py::make_tuple(py::none(), py::none());
+    auto H = GF2Matrix::from_numpy(H_np);
+    auto L = GF2Matrix::from_numpy(L_np);
+    if (H.cols_ != L.cols_)
+        throw std::runtime_error("dem_rand_witness: H and L must have the "
+                                 "same number of columns (mechanisms)");
+    WitnessResult res;
+    {   // workers touch no Python objects -> drop the GIL so they run in parallel
+        py::gil_scoped_release release;
+        res = dem_rand_witness_cpp(H, L, trials, seed, pair_depth, threads);
+    }
+    if (res.side < 0)
+        return py::make_tuple(py::none(), py::none());
+    py::list support;
+    for (int c = 0; c < res.n; ++c)
+        if ((res.witness[c / 64] >> (c % 64)) & 1)
+            support.append(c);
+    return py::make_tuple(res.weight, support);
+}
+
+
 static int py_compute_k(py::array_t<int8_t> HX_np, py::array_t<int8_t> HZ_np) {
     GF2Matrix HX = (HX_np.size() > 0) ? GF2Matrix::from_numpy(HX_np)
                                        : GF2Matrix(0, (HZ_np.ndim() == 2) ? (int)HZ_np.shape(1) : 0);
@@ -683,6 +754,15 @@ PYBIND11_MODULE(gf2_fast, m) {
           py::arg("HX"), py::arg("HZ"),
           py::arg("trials") = 300, py::arg("seed") = 0,
           py::arg("pair_depth") = 8, py::arg("threads") = 8);
+
+    m.def("dem_rand_witness", &py_dem_rand_witness,
+          py::arg("H"), py::arg("L"), py::arg("trials"),
+          py::arg("seed") = 0, py::arg("pair_depth") = 24,
+          py::arg("threads") = 4,
+          "Circuit-tier RIS (RFC 0001): min |e| with H e = 0, L e != 0 over "
+          "a DEM's parity-check and observable matrices. Returns (weight, "
+          "sorted mechanism indices) or (None, None). Proposes only -- "
+          "callers validate with circuit_tools.witness_errors.");
 
     m.def("compute_k", &py_compute_k,
           "Number of logical qubits: n - rank(HX) - rank(HZ).",

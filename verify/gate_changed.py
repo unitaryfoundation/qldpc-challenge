@@ -372,16 +372,20 @@ def _budget(n, deep, fast=False):
 
 
 # Circuit-tier refutation budget (RFC 0001 step 6). Per-trial RIS cost on
-# ker(H_dem) fits ~cost * mechanisms^3 (dominated by the packed RREF; measured
-# 2026-08-20 with gf2_fast: 8.4 ms at m=1651, 26 ms at m=2845, 3.9 s at
-# m=15800; python fallback ~10x). The budget targets a wall-clock per basis
-# and converts it to trials through that fit; the hard time cap inside
-# ris_dem bounds CI even where the fit is off. At MAX_DEM_MECHANISMS the
-# floor of 12 trials costs ~2 minutes per basis, which is what sized the cap.
-CIRCUIT_TRIAL_COST = 1.2e-12          # seconds per trial per mechanisms^3
-CIRCUIT_PY_FACTOR = 10                # python fallback slowdown, measured
+# ker(H_dem) fits ~cost * mechanisms^3, dominated by the packed RREF. With
+# the in-C++ DEM trial loop (gf2_fast.dem_rand_witness: kernel packed once,
+# pivot-order permutation instead of physical column moves, 4 threads;
+# measured 2026-08-21: 0.76 ms at m=1687, 10.8 ms at m=5353, 330 ms at
+# m=12411) the asymptotic constant is ~2e-13; the pure numpy fallback loop
+# measured ~1.9e-11 (85 ms at m=1651), hence the 100x factor. The budget
+# targets a wall-clock per basis and converts it to trials through the fit;
+# the hard time cap inside ris_dem bounds CI even where the fit is off. At
+# MAX_DEM_MECHANISMS (~3.1 s/trial) the 120 s target buys ~38 trials, so the
+# cap is genuinely searchable at full depth.
+CIRCUIT_TRIAL_COST = 2.0e-13          # seconds per trial per mechanisms^3
+CIRCUIT_PY_FACTOR = 100               # numpy-loop fallback slowdown, measured
 CIRCUIT_SECONDS = 120.0               # wall-clock target per basis
-CIRCUIT_MAX_TRIALS = 2000
+CIRCUIT_MAX_TRIALS = 20_000
 CIRCUIT_MIN_TRIALS = 12
 
 
@@ -439,7 +443,10 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
             raise ValueError(f"{side}: {m} mechanisms exceeds the tier cap "
                              f"{MAX_DEM_MECHANISMS}")
         Hd, L = CT.dem_matrices(dem)
-        trials, cap = _circuit_budget(m, CT._GF is not None)
+        # `fast` keys on the DEM entry point specifically: a stale extension
+        # without it drops ris_dem to the numpy loop and must be budgeted so.
+        trials, cap = _circuit_budget(
+            m, CT._GF is not None and hasattr(CT._GF, "dem_rand_witness"))
         if trials_override:
             trials = trials_override
         w, wit = CT.ris_dem(Hd, L, trials, seed=seed, max_seconds=cap)

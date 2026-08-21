@@ -57,12 +57,13 @@ MAX_CIRCUIT_FILE_BYTES = 5_000_000
 
 # Verification-budget cap for the circuit tier (the RFC's "cap the tier by
 # n*rounds", enforced on the actual cost driver): the refutation gate searches
-# ker(H_dem) by RIS, and per-trial cost fits ~1.2e-12 * mechanisms^3 seconds
-# with the gf2_fast extension (measured 2026-08-20: 8.4 ms at m=1651, 3.9 s at
-# m=15800, 25 s at m=34530). At this cap a basis costs the gate ~2 minutes at
-# minimum depth, keeping a circuit entry within the same ~10-minute budget a
-# deep code claim gets. Raise-only, as the search stack improves (GPU RIS /
-# sparse RREF are the known routes up).
+# ker(H_dem) by RIS, and per-trial cost fits ~2e-13 * mechanisms^3 seconds
+# with the in-C++ trial loop (gf2_fast.dem_rand_witness, measured 2026-08-21;
+# the 2026-08-20 numpy-orchestrated loop this cap was first sized against was
+# ~6x slower). At the cap a trial is ~3.1 s, so the gate's 120 s/basis target
+# buys ~38 trials -- searchable at full depth, keeping a circuit entry within
+# the same ~10-minute budget a deep code claim gets. Raise-only, as the
+# search stack improves (GPU RIS is the known route up).
 MAX_DEM_MECHANISMS = 25_000
 
 SIDE_FILES = {"X": "memory_x", "Z": "memory_z"}
