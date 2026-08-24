@@ -145,3 +145,31 @@ def test_budget_shape():
     assert t_small == gc.CIRCUIT_MAX_TRIALS      # small DEMs get full depth
     assert t_cap >= gc.CIRCUIT_MIN_TRIALS        # cap sized to stay feasible
     assert 0 < t_py < t_mid <= t_small           # fallback shallower, never zero
+
+
+def test_dem_wall_cap_stops_after_opener(monkeypatch):
+    """#684 review regression, load-independent form (the first version
+    asserted wall-clock seconds, which asserts the speed of the box and
+    flaked on a loaded machine with the fix working correctly): a C++ chunk
+    cannot be aborted, so when the opener chunk reveals the cap is already
+    unaffordable the loop must stop after that single small chunk -- no
+    second chunk, ever. The pre-fix loop issued a blind 64-trial first
+    chunk, so this fails against it deterministically, in milliseconds."""
+    import time
+    import types
+    import numpy as np
+    calls = []
+
+    def stub(H, L, trials, seed, pair_depth, threads):
+        calls.append(trials)
+        time.sleep(0.05)              # any nonzero cost blows a 1 ms cap
+        return None, None
+
+    monkeypatch.setattr(ct, "_GF",
+                        types.SimpleNamespace(dem_rand_witness=stub))
+    H = np.zeros((2, 8), dtype=np.int8)
+    H[0, 0] = H[1, 1] = 1
+    L = np.zeros((1, 8), dtype=np.int8)
+    L[0, 7] = 1
+    ct.ris_dem(H, L, trials=20000, seed=3, max_seconds=0.001)
+    assert calls == [8], f"expected only the opener chunk, got {calls}"

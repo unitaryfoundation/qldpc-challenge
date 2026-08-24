@@ -146,23 +146,3 @@ def test_dem_rand_witness_parity():
     w2, wit2 = ct.ris_dem(H, L, trials=200, seed=7)
     assert w2 == 3 and ct.witness_errors(dem, wit2, w2) == []
 
-
-def test_dem_wall_cap_binds_on_large_dem():
-    """#684 review regression: a chunk of C++ trials cannot be aborted, so a
-    blind 64-trial chunk overshot a 0.5 s cap by ~140x at m~12k (one trial is
-    ~0.3-1 s there). With projection sizing the overshoot is bounded by the
-    small 8-trial opener: the wall must stay within a small multiple of the
-    cap, where the pre-fix behavior took 21-70 s."""
-    import time
-    import circuit_tools as ct
-    from qldpc_verify import _matrix as _m
-    ROOT = os.path.dirname(_HERE)
-    doc = json.load(open(os.path.join(ROOT, "codes", "81-1-9.json")))
-    n = doc["n"]
-    skel = ct.build_css_memory(_m(doc["checks"]["X"], n),
-                               _m(doc["checks"]["Z"], n), rounds=9, basis="Z")
-    H, L = ct.dem_matrices(ct.derive_dem(ct.apply_noise(skel, n)))
-    t0 = time.monotonic()
-    w, wit = ct.ris_dem(H, L, trials=200, seed=3, max_seconds=0.5)
-    wall = time.monotonic() - t0
-    assert wall < 15.0, f"wall {wall:.1f}s for a 0.5s cap: projection broken"
