@@ -419,8 +419,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     #          radius cannot be faked by collapsing qubits onto a point;
     #      (c) short range: the measured interaction radius (largest check
     #          diameter) is within the class cap.
-    #    Codes that fail (b)/(c), or carry no layout, are simply `unrestricted`
-    #    (no 2D-local class), not rejected. "Short range" means a bounded,
+    #    A layout that fails (b) FAILS VERIFICATION: attaching coordinates is a
+    #    locality claim, and a dishonest layout that merges green while earning
+    #    nothing is a silent footgun for batch layout submissions. Codes that
+    #    pass (b) but miss every cap in (c), or carry no layout at all, are
+    #    simply `unrestricted` (an honest long-range layout is legitimate --
+    #    unrestricted g is well defined); the computed class is surfaced as a
+    #    named check either way, so demotion is never silent.
+    #    "Short range" means a bounded,
     #    n-independent check diameter. The bilayer cap admits the weight-8 planar
     #    (tile-code) family: bulk checks span ~5.83, open-boundary corners ~6.71,
     #    both constant in n; 7.0 covers the family while rejecting layouts whose
@@ -474,12 +480,25 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                        radius <= loc["interaction_radius"] + 1e-9,
                        f"measured {radius:.4f} <= claim "
                        f"{loc['interaction_radius']}")
+            record("site_occupancy_within_layers", max_mult <= layers,
+                   f"max {max_mult} qubit(s) per site, layers={layers}")
+            record("site_spacing_at_least_one",
+                   min_spacing >= 1.0 - 1e-9,
+                   "single occupied site" if min_spacing == float("inf")
+                   else f"min spacing between distinct sites "
+                        f"{min_spacing:.4f} (>= 1.0 required)")
             honest = max_mult <= layers and min_spacing >= 1.0 - 1e-9
             if honest:
                 for cls, max_layers, cap in LOCALITY_CLASSES:
                     if layers <= max_layers and radius <= cap + 1e-9:
                         locality_class = cls
                         break
+                caps = ", ".join(f"{c} <= {cap} at <= {ml} layer(s)"
+                                 for c, ml, cap in LOCALITY_CLASSES)
+                record("locality_class_computed", True,
+                       locality_class if locality_class != "unrestricted"
+                       else f"unrestricted: radius {radius:.4f} at {layers} "
+                            f"layer(s) meets no class cap ({caps})")
     # Layer-1 locality class (computed) + Layer-3 flags (verifier-proven only;
     # the exact-d flag is added at site-build time from certs/, since exactness
     # is certified separately, not by this trustless check).

@@ -185,24 +185,43 @@ def main():
               not r["ok"] and "schema_valid" in failed_checks(r))
 
         # 7b. crammed layout: collapse qubits onto a sub-unit-spaced line so the
-        #     radius looks tiny -- cramming must DENY the 2d-local class, not earn
-        #     it (a fake short range cannot buy membership)
+        #     radius looks tiny -- a dishonest layout must FAIL verification,
+        #     not silently demote to unrestricted and merge green
         d = copy.deepcopy(GOOD)
         d["locality"]["coordinates"] = [[0.001 * i, 0.0] for i in range(d["n"])]
         d["locality"].pop("interaction_radius", None)
         r = rep(d)
-        check("crammed layout does not earn a 2d-local class",
-              r["computed"]["locality_class"] == "unrestricted")
+        check("crammed layout fails verification",
+              not r["ok"]
+              and "site_spacing_at_least_one" in failed_checks(r)
+              and r["computed"]["locality_class"] == "unrestricted")
 
-        # 7c. honest spacing but long range: a check spans far beyond any cap, so
-        #     the layout earns no 2d-local class
+        # 7b'. over-occupancy: more qubits stacked on one site than declared
+        #      layers -- same dishonesty, same hard failure
+        d = copy.deepcopy(GOOD)
+        d["locality"]["coordinates"] = [[float(i // 3), 0.0]
+                                        for i in range(d["n"])]
+        d["locality"].pop("interaction_radius", None)
+        r = rep(d)
+        check("over-occupied sites fail verification",
+              not r["ok"]
+              and "site_occupancy_within_layers" in failed_checks(r)
+              and r["computed"]["locality_class"] == "unrestricted")
+
+        # 7c. honest spacing but long range: a check spans far beyond any cap.
+        #     That is a legitimate unrestricted submission, so it stays valid --
+        #     but the demotion is surfaced as a named check, never silent.
         d = copy.deepcopy(GOOD)
         d["locality"]["coordinates"] = [[float(i), 0.0] for i in range(d["n"])]
         d["locality"]["layers"] = 1
         d["locality"].pop("interaction_radius", None)
         r = rep(d)
-        check("over-radius layout does not earn a 2d-local class",
-              r["computed"]["locality_class"] == "unrestricted")
+        check("over-radius layout stays valid but is named unrestricted",
+              r["ok"]
+              and r["computed"]["locality_class"] == "unrestricted"
+              and any(c["check"] == "locality_class_computed"
+                      and "unrestricted" in c["detail"]
+                      for c in r["checks"]))
 
     # 8. malformed: missing a required field, must not crash
     d = copy.deepcopy(GOOD)
