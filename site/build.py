@@ -1130,6 +1130,12 @@ document.addEventListener('click',e=>{
   // ones a refutation could still move.
   if(t==='exact'||t==='certified')return r.dataset.tier==='exact';
   if(t==='upper-bound'||t==='unproven')return r.dataset.tier!=='exact';
+  // Circuit tier (issue #731). 'with-circuit' keeps the entries that ship
+  // verified syndrome-extraction memory circuits (the gear chip); the plain
+  // 'circuit' alias is what people type. Matched on the row's flag rather
+  // than the search blob so 'no-circuit' cannot substring-match the rest.
+  if(t==='with-circuit'||t==='circuit')return r.dataset.circ==='1';
+  if(t==='no-circuit')return r.dataset.circ!=='1';
   // cell:<locality>~<weight> keeps only the members of one primary-track cell,
   // honoring nesting via the row's precomputed data-cells list.
   if(t.slice(0,5)==='cell:')return (' '+(r.dataset.cells||'')+' ').indexOf(' '+t.slice(5)+' ')>=0;
@@ -3447,6 +3453,13 @@ def board_controls(entries, records):
     if any(e["locality_class"] != "unrestricted" for e in entries):
         tabs += ('<button type=button class=ttab data-q="2d-local" '
                  'title="2D-local codes">2D-local</button>')
+    # circuit tier (issue #731): only worth a tab once an entry ships circuits,
+    # like the 2D-local tab above. The gear matches the row chip.
+    if any(e["d_circ"] is not None for e in entries):
+        tabs += ('<button type=button class=ttab data-q="with-circuit" '
+                 'title="codes shipping verified syndrome-extraction memory '
+                 'circuits with a witnessed circuit-level distance">'
+                 '&#9881; circuit</button>')
     families = sorted({e["family"] for e in entries})
     tabs += "".join(
         f'<button type=button class=ttab data-q="{html.escape(FAMILY_TERM.get(f, f))}" '
@@ -3536,7 +3549,9 @@ def board_controls(entries, records):
             '<code>submitted</code> filter by origin; <code>with-layout</code> '
             '/ <code>no-layout</code> filter by layout status; '
             '<code>exact</code> / <code>upper-bound</code> filter by whether '
-            'the distance is proved.</p>'
+            'the distance is proved; <code>with-circuit</code> (alias '
+            '<code>circuit</code>) / <code>no-circuit</code> filter by whether '
+            'the entry ships verified memory circuits.</p>'
             '</section>')
 
 
@@ -3673,6 +3688,7 @@ def board_table(entries, records):
             f'data-cells="{html.escape(cell_keys)}" '
             f'data-record="{1 if fr else 0}" '
             f'data-tier="{e["tier"]}" '
+            f'data-circ="{1 if e["d_circ"] is not None else 0}" '
             f'data-origin="{"literature" if e["origin"] == "baseline" else "submitted"}" '
             f'data-model="{html.escape(e["model"].lower())}" '
             f'data-date="{html.escape(e["date"])}" '
