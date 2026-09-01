@@ -560,6 +560,29 @@
 <p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
 <h4>Reproduction</h4>
 <p><code>research/local2d/multiband.py::build(3, 10, 9, 4)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 10, m = 9, pitch = 4.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/621-85-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/63-3-5.html">[[63,3,5]] — 63-3-5</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[63,3,5]] — multi-band dense-packed code (rows=2, m=2, pitch=4)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 5 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 5; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(5, 2, 2, 4)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 5, rows = 2, m = 2, pitch = 4.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/63-3-5.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/630-86-3.html">[[630,86,3]] — 630-86-3</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[630,86,3]] — multi-band dense-packed code (rows=9, m=10, pitch=4)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
@@ -629,6 +652,29 @@
 <p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
 <h4>Reproduction</h4>
 <p><code>research/local2d/multiband.py::build(3, 3, 3, 4)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 3, m = 3, pitch = 4.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/64-8-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/65-9-3.html">[[65,9,3]] — 65-9-3</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[65,9,3]] — multi-band dense-packed code (rows=2, m=5, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 3; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(3, 2, 5, 2)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 2, m = 5, pitch = 2.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/65-9-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/676-4-13.html">[[676,4,13]] — 676-4-13</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[676,4,13]] — multi-band dense-packed code (rows=1, m=4, pitch=11)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 13 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
@@ -746,6 +792,75 @@
 </ul>
 <h4>8. Open problems left by the campaign</h4>
 <p>1. Closed-form characterization of the k validity boundary (why pitch = d + 1 holds at d = 5 and pitch = d + 2 partially collapses — the parity/phase structure behind 2⌊3d/4⌋). 2. Convergence of g in rows, m at pitch = pitch_min (not observed by rows = 24, m = 32). 3. The d = 15, 17 pitch_min measurements — confirm or break pitch_min(d) = 2⌊3d/4⌋. 4. Even-d behaviour of the family (untested; the stagger&#x27;s parity structure suggests it matters). 5. Certification of the small rungs (MILP, maintainer-run) — the family claim currently rests entirely on upper-bound distances.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-09-01-multiband-dense-packing-method.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/107-15-3.html">[[107,15,3]] — 107-15-3</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[107,15,3]] — multi-band dense-packed code (rows=2, m=8, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 3; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(3, 2, 8, 2)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 2, m = 8, pitch = 2.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/107-15-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/121-17-3.html">[[121,17,3]] — 121-17-3</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[121,17,3]] — multi-band dense-packed code (rows=2, m=9, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 3; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(3, 2, 9, 2)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 2, m = 9, pitch = 2.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/121-17-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/135-19-3.html">[[135,19,3]] — 135-19-3</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[135,19,3]] — multi-band dense-packed code (rows=2, m=10, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 3; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(3, 2, 10, 2)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 3, rows = 2, m = 10, pitch = 2.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/135-19-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/203-3-9.html">[[203,3,9]] — 203-3-9</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[203,3,9]] — multi-band dense-packed code (rows=2, m=2, pitch=8)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 9 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
@@ -769,6 +884,29 @@
 <p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
 <h4>Reproduction</h4>
 <p><code>research/local2d/multiband.py::build(9, 2, 2, 8)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 9, rows = 2, m = 2, pitch = 8.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/203-3-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/244-12-5.html">[[244,12,5]] — 244-12-5</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[244,12,5]] — multi-band dense-packed code (rows=8, m=2, pitch=6)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-4 × local-2d-single</code>, d = 5 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
+<h4>What was searched</h4>
+<p>Full enumeration of the multi-band parameter space: d in {3, 5, 7, 9, 11, 13}, rows 1-8, m 1-20, pitch in [d-2, d+3], n &lt;= 700 — 13,376 parameter points, each scored by exact GF(2) rank arithmetic (n, k) and filtered against the board Pareto front (local codes plus all nine open PRs from this account). 549 unique Pareto survivors were witness-screened at 4000 randomized trials each; this configuration is among the survivors.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>k computed exactly: n - rank(H_X) - rank(H_Z) over GF(2).</li>
+<li>d: witness-backed upper bound. The staging search ran 20,000 RIS</li>
+<p>trials/side finding no logical below 5; the trusted gate (<code>verify/validate_candidate.py</code>) re-searched independently and returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Claim tier: upper bound, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The g values from rank arithmetic alone (up to 5.5 at d = 13) are</li>
+<p>artifacts of degenerate masks; the witness screen refuted 213 of 549 unique survivors. Distance claims here are only as good as the witness budget.</p>
+<li>Configs duplicating or tying any open PR code were excluded from the</li>
+<p>survivor set before screening.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
+<h4>Reproduction</h4>
+<p><code>research/local2d/multiband.py::build(5, 8, 2, 6)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 5, rows = 8, m = 2, pitch = 6.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/244-12-5.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/261-37-3.html">[[261,37,3]] — 261-37-3</a></h3><div class=kv style="color:var(--mut)">2026-08-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[261,37,3]] — multi-band dense-packed code (rows=2, m=19, pitch=2)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
