@@ -443,6 +443,13 @@ def validate_authors(authors, anonymous=False):
 
 
 def cmd_submit(args):
+    if args.out.endswith(".json"):
+        raise SystemExit(
+            f"--out expects a directory, not a filename: {args.out!r}\n"
+            "The output filename is always <n>-<k>-<d>.json, computed after "
+            "verification, so it is not yours to choose. Pass the directory "
+            f"it should go in instead, e.g. --out {os.path.dirname(args.out) or '.'}"
+        )
     args.authors = validate_authors(args.authors, args.anonymous)
     HX, HZ, coords, _draft = load_checks(args.code)
     if args.coords:                      # explicit coords file overrides
@@ -700,7 +707,9 @@ def main(argv=None):
                         "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'), or "
                         "'human' (claimed, not verified; the verifier requires a "
                         "version if a model is named)")
-    s.add_argument("--notes", default="")
+    s.add_argument("--notes", default="",
+                   help="short free-text notes recorded on the submission "
+                        "(not the research note; see --note-file)")
     s.add_argument("--note-file", default="",
                    help="markdown research note staged as notes/<slug>.md and "
                         "rendered publicly beside the code: the search story "
@@ -708,7 +717,9 @@ def main(argv=None):
                         "ends (see notes/TEMPLATE.md; 10 KiB cap)")
     s.add_argument("--date", default="",
                    help="submission date (YYYY-MM-DD); defaults to today")
-    s.add_argument("--name", default="")
+    s.add_argument("--name", default="",
+                   help="display name for the construction; defaults to the "
+                        "auto-generated [[n,k,d]] name")
     s.add_argument("--family", choices=[
                        "bivariate-bicycle", "generalized-bicycle", "2bga-coset",
                        "hypergraph-product", "lifted-product", "balanced-product",
@@ -726,8 +737,13 @@ def main(argv=None):
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")
-    s.add_argument("--seed", type=int, default=0)
-    s.add_argument("--out", default=os.path.join(_ROOT, "codes"))
+    s.add_argument("--seed", type=int, default=0,
+                   help="seed for the RIS distance-witness search "
+                        "(default 0; pass a different value to search a "
+                        "fresh set of trials)")
+    s.add_argument("--out", default=os.path.join(_ROOT, "codes"),
+                   help="output DIRECTORY (default: codes/); the filename is "
+                        "always <n>-<k>-<d>.json and is not yours to choose")
     s.add_argument("--force", action="store_true",
                    help="overwrite an existing codes/<slug>.json")
     s.add_argument("--dry-run", action="store_true",
@@ -739,7 +755,8 @@ def main(argv=None):
     r = sub.add_parser("recent", help="what landed recently: codes, research "
                                       "notes, fieldnotes (read before you "
                                       "search)")
-    r.add_argument("--days", type=int, default=14)
+    r.add_argument("--days", type=int, default=14,
+                   help="look back this many days (default 14)")
     r.set_defaults(func=cmd_recent)
 
     g = sub.add_parser("targets", help="which track cells are open: occupancy "
