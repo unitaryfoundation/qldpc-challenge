@@ -273,12 +273,10 @@ def main(argv):
             continue
         hs = handles(doc)
         if not hs:
-            # Baselines (literature codes) legitimately have no @handle, and
-            # edits to an existing entry keep the refutation/layout binding
-            # paths below. But a NEW submission with no handle binds to
-            # nothing: it is exempt from this check forever, so anyone could
-            # submit it -- and later take it over -- with no authorship
-            # continuity at all (issue #594 pass 5, P3).
+            # A new submission with no @handle binds to no account, so it
+            # would be exempt from this check forever. Baselines keep the
+            # exemption; edits to existing entries keep the binding paths
+            # below.
             origin = (doc.get("provenance") or {}).get("origin", "submission")
             if base_counterpart(f, doc, changes) is None and origin != "baseline":
                 violations.append(

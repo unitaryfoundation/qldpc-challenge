@@ -401,31 +401,33 @@ def main():
             ["--author", "alice", "--root", td, "--base", "main"])
         check("new code by its author still accepted", rc == 0)
 
-    print("\nnew submissions must bind to a @handle (issue #594 pass 5, P3):")
+    print("\nnew submissions must bind to a @handle:")
 
-    def anonymous_submission():
+    # a genuinely new file (the base code stays, so nothing pairs it with a
+    # base counterpart the way a rename would)
+    def submit_new(td, authors, origin=None):
         doc = copy.deepcopy(BASE_DOC)
-        doc["provenance"]["authors"] = ["Jane Roe"]
-        return doc
+        doc["provenance"]["authors"] = authors
+        if origin:
+            doc["provenance"]["origin"] = origin
+        write_code(td, "60-8-7.json", doc)
+        git(td, "add", "codes")
+        git(td, "commit", "-q", "-m", "new")
+        return check_authorship.main(
+            ["--author", "bob", "--root", td, "--base", "main"])
 
-    run_case("new submission with no @handle rejected",
-             anonymous_submission, False)
-
-    def anonymous_baseline_submission():
-        doc = anonymous_submission()
-        doc["provenance"]["origin"] = "baseline"
-        return doc
-
-    run_case("new baseline submission with no @handle exempt",
-             anonymous_baseline_submission, True)
-
-    def malformed_handle_only():
-        doc = copy.deepcopy(BASE_DOC)
-        doc["provenance"]["authors"] = ["@bad!handle"]
-        return doc
-
-    run_case("new submission with only a malformed handle rejected",
-             malformed_handle_only, False)
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new submission with no @handle rejected",
+              submit_new(td, ["Jane Roe"]) == 1)
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new baseline submission with no @handle exempt",
+              submit_new(td, ["Jane Roe"], origin="baseline") == 0)
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new submission with only a malformed handle rejected",
+              submit_new(td, ["@bad!handle"]) == 1)
 
     print()
     if _fail:
