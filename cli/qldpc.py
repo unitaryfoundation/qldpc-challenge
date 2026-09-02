@@ -442,6 +442,49 @@ def validate_authors(authors, anonymous=False):
     return normalized
 
 
+def dry_run_summary(doc, report, out):
+    """Print a screen-sized preview of what submit would write.
+
+    The parameters and score, the distance claim per side, the computed track
+    cells, and the provenance the contributor chose. Replaces the old
+    truncated JSON prefix, which never reached the fields a contributor
+    actually wants to confirm (issue #637).
+    """
+    comp = report.get("computed", {})
+    entry = _entry_for(doc, report)
+    dist = doc["distance"]
+    per_side = []
+    for side in ("X", "Z"):
+        s = dist.get(side, {})
+        witness = "witness found" if s.get("witness") else "no witness"
+        per_side.append(f"{side}: <= {s.get('value')} ({s.get('confidence')}, {witness})")
+    track_cells = ", ".join(
+        f"{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}"
+        for L, W in cells(entry)
+    )
+    lines = [
+        f"  code         [[{doc['n']},{doc['k']},{dist['d']}]]",
+        f"  score        kd^2/n = {entry['eff']}",
+        f"  checks       max weight {entry['w']} ({comp.get('weight_class', '?')})",
+        f"  locality     {comp.get('locality_class', 'unrestricted')}",
+        f"  track cells  {track_cells or '(none computed)'}",
+        f"  distance     d <= {dist['d']} (upper_bound)",
+        "               " + "  |  ".join(per_side),
+    ]
+    prov = doc.get("provenance", {})
+    for label, value in (
+        ("authors", ", ".join(prov.get("authors", []))),
+        ("family", doc.get("family")),
+        ("model", prov.get("model")),
+        ("construction", prov.get("construction")),
+        ("notes", prov.get("notes")),
+    ):
+        if value:
+            lines.append(f"  {label:<12} {value}")
+    lines.append("  next         --json prints the full document; drop --dry-run to write")
+    return "\n".join(lines)
+
+
 def cmd_submit(args):
     args.authors = validate_authors(args.authors, args.anonymous)
     HX, HZ, coords, _draft = load_checks(args.code)
@@ -469,7 +512,10 @@ def cmd_submit(args):
     out = os.path.join(args.out, f"{slug}.json")
     if args.dry_run:
         print(f"\n--dry-run: would write {out}")
-        print(json.dumps(doc, indent=1)[:600] + " ...")
+        if args.json:
+            print(json.dumps(doc, indent=1))
+        else:
+            print(dry_run_summary(doc, report, out))
         return 0
     if os.path.exists(out) and not args.force:
         print(f"\n{out} already exists. Use --force to overwrite, or rename.")
@@ -732,6 +778,9 @@ def main(argv=None):
                    help="overwrite an existing codes/<slug>.json")
     s.add_argument("--dry-run", action="store_true",
                    help="build and verify but do not write the file")
+    s.add_argument("--json", action="store_true",
+                   help="with --dry-run, print the full submission JSON "
+                        "instead of the summary")
     s.add_argument("--open-pr", action="store_true",
                    help="create the branch, commit, push, and open the PR")
     s.set_defaults(func=cmd_submit)
