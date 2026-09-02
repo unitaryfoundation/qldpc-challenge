@@ -401,7 +401,7 @@ def main():
             ["--author", "alice", "--root", td, "--base", "main"])
         check("new code by its author still accepted", rc == 0)
 
-    print("fail closed on git failure (issue #594 pass 5, P2):")
+    print("fail closed on git failure:")
     with tempfile.TemporaryDirectory() as td:
         make_repo(td)
         # a base ref that cannot resolve makes the diff fail; the check must
