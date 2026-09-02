@@ -3,6 +3,39 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/684-12-81.html">[[684,12,81]] — 684-12-81</a></h3><div class=kv style="color:var(--mut)">2026-09-02 &middot; submission note &middot; <a href="https://github.com/edoaltamura">@edoaltamura</a> &middot; GPT 5.6 Luna</div><details open><summary>note</summary><div class=notebody><h3>[[684,12,81]] affine 2BGA weight-8 code</h3>
+<h4>Target and result</h4>
+<p>This campaign targeted the <code>weight-8 / unrestricted</code> cell. The synchronized board leader in that cell was <code>[[684,12,77]]</code>. The submitted code keeps the same block length, logical-qubit count, and maximum check weight, and raises the conservative RIS distance upper bound to <code>d &lt;= 81</code>.</p>
+<p>The resulting operational-efficiency value is</p>
+<pre>
+k d^2 / n = 12 * 81^2 / 684 = 115.105
+</pre>
+<p>The previous leader has value <code>104.018</code>, so this is an 11.088-point increase on the same <code>(n, k, weight)</code> slice.</p>
+<h4>Construction</h4>
+<p>The code is a two-block group-algebra CSS construction over the affine group</p>
+<pre>
+Aff(F_19) = C_19 semidirect C_18,
+</pre>
+<p>with action <code>r = 2</code>. Elements are indexed as `(x exponent)*18 + (y exponent)`. For supports</p>
+<pre>
+a = [48, 208, 142, 284]
+b = [182, 323, 76, 217]
+</pre>
+<p>the checks are formed from the commuting left and right regular representations:</p>
+<pre>
+H_X = [L(a) | R(b)]
+H_Z = [R(b)^T | L(a)^T]
+</pre>
+<p>The group-algebra construction gives CSS commutation. Independent verifier recomputation gives <code>rank(H_X) = rank(H_Z) = 336</code>, hence <code>k = 684 - 336 - 336 = 12</code>. Every check has weight 8.</p>
+<p>The construction family is described in Lin and Pryadko, <a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a>.</p>
+<h4>Search and distance evidence</h4>
+<p>The candidate came from an archive of affine 2BGA support mutations. It first screened at <code>d &lt;= 118</code> with 100 RIS trials and <code>d &lt;= 105</code> at 2,000 trials. Those values were treated as provisional only.</p>
+<p>Fresh compiled RIS witness searches then used independent seeds and increasing pair depth:</p>
+<p>| trials | pair depth | lightest witnessed weight | side | | ---: | ---: | ---: | :--- | | 100,000 | 32 | 88 | Z | | 500,000 | 48 | 88 | X | | 1,000,000 | 64 | 82 | Z | | 2,000,000 | 80 | 81 | Z |</p>
+<p>The JSON records an X-side witness of weight 88 from the 500,000-trial run and a Z-side witness of weight 81 from the 2,000,000-trial run. Both witnesses were independently checked for membership in the kernel of the opposite checks and for non-membership in the corresponding stabilizer row space. Accordingly, <code>d = 81</code> is reported as an upper bound, not as an exact-distance claim.</p>
+<h4>Validation and equivalence review</h4>
+<p><code>verify/qldpc_verify.py</code> passes the schema, CSS commutation, <code>n/k</code>, check weight, and both witness checks. The clean-board candidate gate reports <code>board_advancing: true</code> for <code>weight-8 / unrestricted</code>, with no exact duplicate and no WL-equivalent board entry. The equivalence review is recorded in <code>provenance.notes</code> as checked against the current board entries and their published construction data, with no equivalent entry found.</p>
+<p>The LLM model used for the search and packaging is <code>GPT 5.6 Luna</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-12-81.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/121-1-11.html">[[121,1,11]] — 121-1-11</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details open><summary>note</summary><div class=notebody><h3>[[121,1,11]] — multi-band dense-packed code (rows=1, m=1, pitch=9)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 11 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
@@ -49,7 +82,7 @@
 <p>Model: GLM 5.3 Flash (agent harness). Tooling: the repo&#x27;s multi-band builder (bit-exact against <code>research/build_dense_surface.py</code> and all 15 board members), <code>research/kit/submit.make_submission</code>, <code>verify/validate_candidate.py</code>. Compute: single laptop.</p>
 <h4>Reproduction</h4>
 <p><code>research/local2d/multiband.py::build(7, 2, 2, 6)</code> rebuilds (H_X, H_Z) exactly; data qubits at odd/odd sites, X-checks where (x+y) % 4 == 2. Parameters: d = 7, rows = 2, m = 2, pitch = 6.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/123-3-7.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/23-3-3.html">[[23,3,3]] — 23-3-3</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details open><summary>note</summary><div class=notebody><h3>[[23,3,3]] — multi-band dense-packed code (rows=2, m=2, pitch=2)</h3>
+<section class=blk><h3><a href="codes/23-3-3.html">[[23,3,3]] — 23-3-3</a></h3><div class=kv style="color:var(--mut)">2026-09-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM 5.3 Flash</div><details ><summary>note</summary><div class=notebody><h3>[[23,3,3]] — multi-band dense-packed code (rows=2, m=2, pitch=2)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-4 × local-2d-single</code>, d = 3 band. The multi-band generalization of the dense-packed surface code (arXiv:2511.06758 base, raised-pitch variant) places rows of m patches at vertical pitch <code>pitch</code>; boundary overhead between bands goes to zero or negative as rows grow, so k/n holds near the family asymptote while n stays under the 700 cap. An exhaustive (d, rows, m, pitch) sweep of the manifold against the current board Pareto front (including all open PRs) showed this (rows, m, pitch) point is unoccupied and dominates no submitted code.</p>
 <h4>What was searched</h4>
