@@ -10,7 +10,7 @@
 name: lint
 
 # The job only writes a step summary; least-privilege like verify.yml and
-# prose.yml (issue #594 pass 1, L2).
+# prose.yml.
 permissions:
   contents: read
 
