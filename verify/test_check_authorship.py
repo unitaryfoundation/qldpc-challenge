@@ -401,6 +401,32 @@ def main():
             ["--author", "alice", "--root", td, "--base", "main"])
         check("new code by its author still accepted", rc == 0)
 
+    print("\nnew submissions must bind to a @handle (issue #594 pass 5, P3):")
+
+    def anonymous_submission():
+        doc = copy.deepcopy(BASE_DOC)
+        doc["provenance"]["authors"] = ["Jane Roe"]
+        return doc
+
+    run_case("new submission with no @handle rejected",
+             anonymous_submission, False)
+
+    def anonymous_baseline_submission():
+        doc = anonymous_submission()
+        doc["provenance"]["origin"] = "baseline"
+        return doc
+
+    run_case("new baseline submission with no @handle exempt",
+             anonymous_baseline_submission, True)
+
+    def malformed_handle_only():
+        doc = copy.deepcopy(BASE_DOC)
+        doc["provenance"]["authors"] = ["@bad!handle"]
+        return doc
+
+    run_case("new submission with only a malformed handle rejected",
+             malformed_handle_only, False)
+
     print()
     if _fail:
         print(f"FAILED: {_fail}")
