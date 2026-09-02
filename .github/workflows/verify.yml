@@ -23,10 +23,8 @@ on:
   push:
     branches: [main]
 
-# Every push to a PR branch re-runs the full suite plus the ~15-minute
-# refutation gate, so without this N pushes cost N parallel full runs (issue
-# #594 pass 1, M1). Only the latest head of a PR matters; push-to-main runs
-# are never cancelled.
+# Only the latest head of a PR matters: cancel superseded runs so repeated
+# pushes cannot multiply CI cost. Push-to-main runs are never cancelled.
 concurrency:
   group: verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
