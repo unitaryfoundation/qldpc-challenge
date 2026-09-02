@@ -23,6 +23,14 @@ on:
   push:
     branches: [main]
 
+# Every push to a PR branch re-runs the full suite plus the ~15-minute
+# refutation gate, so without this N pushes cost N parallel full runs (issue
+# #594 pass 1, M1). Only the latest head of a PR matters; push-to-main runs
+# are never cancelled.
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Compile-only coverage for the optional CUDA accelerator.  This deliberately
   # does not require a GPU and is advisory until the hosted toolkit install is
