@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[45,5,4]] generalized weight-6 open-boundary planar BB code",
  "code_type": "CSS",
  "n": 45,
@@ -497,5 +497,32 @@
   ],
   "layers": 2,
   "interaction_radius": 3.0
+ },
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     100,
+     125,
+     180,
+     209
+    ]
+   },
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     2810,
+     2823,
+     2906,
+     3007
+    ]
+   }
+  },
+  "rounds": 4,
+  "stim_version": "1.16.0",
+  "notes": "Interleaved memory extraction with joint reset and measurement layers and 7 CX layers per round. Bulk (template) checks follow the Bravyi et al. depth-7 monomial pattern (arXiv:2308.07915 Table 5) applied edge-by-edge via the A/B grid labels (5x5 and 4x5 grids, check c = translate of the weight-6 template); the boundary-engine checks, which are not translates, were placed by a min-conflicts search enforcing layer parallelism and the X/Z overlap-parity condition that keeps the interleaved extraction a faithful stabilizer measurement, then by a witness-guided local search that re-permutes checks implicated in the lightest undetected fault set. Certificate beyond the witness: an exhaustive GF(2)-hash enumeration of all undetected logical fault sets of weight <= 3 in both committed DEMs finds none, so d_circ = 4 = d is exact for these circuits. First circuit-level result for the Liang-Eberhardt-Chen planar family (the paper has no circuit-level treatment)."
  }
 }
