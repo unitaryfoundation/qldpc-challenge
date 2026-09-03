@@ -277,7 +277,18 @@ def main(argv):
             continue
         hs = handles(doc)
         if not hs:
-            print(f"ok    {f}: no @handle authors (baseline/anonymous), exempt")
+            # A new submission with no @handle binds to no account, so it
+            # would be exempt from this check forever. Baselines keep the
+            # exemption; edits to existing entries keep the binding paths
+            # below.
+            origin = (doc.get("provenance") or {}).get("origin", "submission")
+            if base_counterpart(f, doc, changes) is None and origin != "baseline":
+                violations.append(
+                    (f, [], "no @handle author (new submissions must bind to "
+                     "a GitHub account; provenance.origin 'baseline' is for "
+                     "literature codes)"))
+                continue
+            print(f"ok    {f}: no @handle authors (baseline), exempt")
             continue
         base_path = base_counterpart(f, doc, changes)
         base_doc = load_base_doc(base, base_path, root) if base_path else None

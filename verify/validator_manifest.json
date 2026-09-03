@@ -3,7 +3,7 @@
   "files": {
     ".github/workflows/prose.yml": "c07a2339ee92c5eb7b5297a37ac5be7e9ca3e655ab3f2f199acc31995bef1f18",
     ".github/workflows/refute-weekly.yml": "d3fb677fd381c397f2b1f60474ad8b86cefc512d2d38ce930ece20498470d7a1",
-    ".github/workflows/verify.yml": "98382a5d2a1befa01ad1a991bc9164662cf35cee11b644fd0c7b794e58aa628a",
+    ".github/workflows/verify.yml": "99ab5b2af06a4add38e3661935fe1ccc15a55183043c4b26ac57830ceb15e146",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
     "pyproject.toml": "80042e2387ce95973d1abdc12435f09c0ebf27faff489195ed19c89f383b3a65",
     "uv.lock": "61ecdbd6e185ccb5a6a06a7cb589c5d144002a3eb281fbbf99c2659b6593bffb",
@@ -12,7 +12,7 @@
     "decode/distance.py": "7e266f8ad50d55fa44e34a5e0bf0005e91de19f24c35c27bf8f9bad796f56076",
     "schema/code.schema.json": "b1badf0ae7c83e6217db21266e6977e40689f6d114cb135e16c0f272d3eb174d",
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
-    "verify/check_authorship.py": "2390de3b34e0015f721c0ade85fdec82296ef7efa518e14d0c02618aae5aa064",
+    "verify/check_authorship.py": "61f63f43a3f692b516f392eba973a73b09dfdcdf67e7e8b907ea332d930b4216",
     "verify/check_prose.py": "af9fc3b72c7723cd0aa6309a5a0162acbf1e4ac0bd18722179633802c30df9d0",
     "verify/check_submission_scope.py": "04945a2ef6b0cabd7b8c3998aa33aa8c66cac158dd4955272742dbaa8c850bf1",
     "verify/check_validator_integrity.py": "d739db6680bd4c4b481e811234ed6abf470cbf09449825e1dbdb08261234ebd3",

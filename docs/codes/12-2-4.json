@@ -1,0 +1,122 @@
+{
+ "schema_version": "0.1",
+ "name": "[[12,2,4]]",
+ "code_type": "CSS",
+ "n": 12,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    0,
+    2,
+    3,
+    4,
+    5,
+    7
+   ],
+   [
+    0,
+    2,
+    3,
+    7,
+    9,
+    10
+   ],
+   [
+    3,
+    6,
+    7,
+    11
+   ],
+   [
+    1,
+    4,
+    5,
+    6,
+    8,
+    11
+   ],
+   [
+    0,
+    1,
+    3,
+    4,
+    10,
+    11
+   ]
+  ],
+  "Z": [
+   [
+    2,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   [
+    4,
+    5,
+    9,
+    10
+   ],
+   [
+    0,
+    3,
+    5,
+    7,
+    8,
+    9
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    7,
+    9
+   ],
+   [
+    0,
+    1,
+    3,
+    6,
+    9,
+    10
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1,
+    3,
+    6
+   ]
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    3,
+    6,
+    8
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "SAT code discovery (arXiv:2608.23460 Sec. VI adapted to CSS): Minisat22 CNF; even-overlap commutation chains, weight<=3 detection clauses (stabilizer-absorbed errors rejected post-hoc), Sinz row-weight bound w<=6; blocking-clause enumeration.",
+  "origin": "submission",
+  "date": "2026-08-25",
+  "model": "Ox Alpha 1.0"
+ },
+ "family": "other"
+}
