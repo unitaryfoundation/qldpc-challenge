@@ -23,6 +23,12 @@ on:
   push:
     branches: [main]
 
+# Only the latest head of a PR matters: cancel superseded runs so repeated
+# pushes cannot multiply CI cost. Push-to-main runs are never cancelled.
+concurrency:
+  group: verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Compile-only coverage for the optional CUDA accelerator.  This deliberately
   # does not require a GPU and is advisory until the hosted toolkit install is
