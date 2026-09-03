@@ -1462,6 +1462,58 @@ def load_entries():
     return entries
 
 
+INDEX_MANIFEST = "_index.json"
+
+
+def codes_index(entries):
+    """Return the download manifest for the board (issue #556).
+
+    Every code's ID with its parameters, so the JSON served at
+    codes/<id>.json can be found and fetched programmatically. The ID is the
+    slug: the codes/ filename stem, unique on the board and validated against
+    _SAFE_SLUG.
+    """
+    return {
+        "codes": [
+            {
+                "id": e["slug"],
+                "n": e["n"],
+                "k": e["k"],
+                "d": e["d"],
+                "tier": e["tier"],
+            }
+            for e in sorted(entries, key=lambda e: (e["n"], e["k"], e["d"], e["slug"]))
+        ]
+    }
+
+
+def write_code_artifacts(entries):
+    """Write the per-code detail pages and the download artifacts (#556).
+
+    Each code's verified submission JSON is served at codes/<id>.json,
+    addressed by its ID, plus the _index manifest. Orphan files left behind
+    when a code is removed are pruned. The manifest stem starts with an
+    underscore so _SAFE_SLUG can never match it: a code can never collide
+    with the manifest, and "index" stays available as a code ID.
+    """
+    os.makedirs(os.path.join(DOCS, "codes"), exist_ok=True)
+    slugs = {e["slug"] for e in entries}
+    for e in entries:
+        with open(os.path.join(DOCS, "codes", e["slug"] + ".html"), "w") as f:
+            f.write(detail_page(e))
+        with open(os.path.join(DOCS, "codes", e["slug"] + ".json"), "w") as f:
+            json.dump(e["doc"], f, indent=1)
+            f.write("\n")
+    with open(os.path.join(DOCS, "codes", INDEX_MANIFEST), "w") as f:
+        json.dump(codes_index(entries), f, indent=2)
+    for f in glob.glob(os.path.join(DOCS, "codes", "*")):
+        stem, ext = os.path.splitext(os.path.basename(f))
+        if ext not in (".html", ".json") or stem == INDEX_MANIFEST[:-len(".json")]:
+            continue
+        if stem not in slugs:
+            os.remove(f)
+
+
 def pareto(te):
     """Pareto frontier over (n, k, d, w): a code is on it when no other code
     beats it on all four axes (n and w lower-is-better, k and d higher-is-
@@ -2158,8 +2210,11 @@ def detail_page(e):
         body = "\n".join(str(s) for s in H)
         P.append(f'<details><summary>{nm} ({len(H)} checks, sparse supports)'
                  f'</summary><div class=wit>{body}</div></details>')
-    P.append(f'<div class=kv style="margin-top:10px"><a href="{REPO}/codes/'
-             f'{e["slug"]}.json">raw submission JSON</a></div>')
+    P.append(f'<div class=kv style="margin-top:10px">'
+             f'<b>Code ID</b> <code>{e["slug"]}</code> &middot; '
+             f'<a href="{e["slug"]}.json" download '
+             f'title="the verified submission, served by this site">download JSON</a>'
+             f' &middot; <a href="{REPO}/codes/{e["slug"]}.json">raw on GitHub</a></div>')
     P.append('</section>')
 
     P.append("<script>document.querySelectorAll('[data-copy]').forEach("
@@ -3929,14 +3984,7 @@ def build():
             'embed{width:100%;height:100%}</style></head><body>'
             '<embed src="qec_challenge.pdf" type="application/pdf">'
             '</body></html>')
-    slugs = {e["slug"] for e in entries}
-    for e in entries:
-        with open(os.path.join(DOCS, "codes", e["slug"] + ".html"), "w") as f:
-            f.write(detail_page(e))
-    # prune orphan detail pages left behind when a code is removed
-    for f in glob.glob(os.path.join(DOCS, "codes", "*.html")):
-        if os.path.splitext(os.path.basename(f))[0] not in slugs:
-            os.remove(f)
+    write_code_artifacts(entries)
     check_analytics_coverage()
 
     # machine-readable stats; the README badges (shields.io dynamic JSON) read
