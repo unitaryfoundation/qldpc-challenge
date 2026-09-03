@@ -3,6 +3,38 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/684-14-78.html">[[684,14,78]] — 684-14-78</a></h3><div class=kv style="color:var(--mut)">2026-09-03 &middot; submission note &middot; <a href="https://github.com/edoaltamura">@edoaltamura</a> &middot; GPT 5.6 Luna</div><details open><summary>note</summary><div class=notebody><h3>[[684,14,78]] affine 2BGA weight-8 code</h3>
+<h4>Target and result</h4>
+<p>This campaign targeted the <code>weight-8 / unrestricted</code> cell after the previous <code>[[684,12,81]]</code> entry became part of the live board. The new candidate has the same block length and check-weight cap, but increases the logical-qubit count to 14 while retaining a deep-RIS distance upper bound of 78.</p>
+<p>The operational-efficiency value is</p>
+<pre>
+k d^2 / n = 14 * 78^2 / 684 = 124.526
+</pre>
+<p>The current <code>[[684,12,81]]</code> leader has value <code>115.105</code>. The candidate is also not dominated in the Pareto comparison: it has more logical qubits than that entry, while the current <code>[[684,8,85]]</code> point has fewer logical qubits and a higher distance.</p>
+<h4>Construction</h4>
+<p>The code is a two-block group-algebra CSS construction over</p>
+<pre>
+Aff(F_19) = C_19 semidirect C_18,
+</pre>
+<p>with action <code>r = 2</code>. Elements are indexed as `(x exponent)*18 + (y exponent)`. For supports</p>
+<pre>
+a = [6, 289, 76, 217]
+b = [294, 337, 142, 284]
+</pre>
+<p>the checks use commuting left and right regular representations:</p>
+<pre>
+H_X = [L(a) | R(b)]
+H_Z = [R(b)^T | L(a)^T]
+</pre>
+<p>The construction gives CSS commutation. Independent verifier recomputation gives <code>rank(H_X) = rank(H_Z) = 335</code>, hence <code>k = 684 - 335 - 335 = 14</code>. Every check has weight 8.</p>
+<p>The construction family is described in Lin and Pryadko, <a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a>.</p>
+<h4>Search and distance evidence</h4>
+<p>The candidate was selected from an archive of affine support mutations. Its early screen reported <code>d &lt;= 109</code>; this was treated as a ranking signal only. The candidate was then rechecked with fresh compiled RIS searches at increasing budgets and pair depths:</p>
+<p>| trials | pair depth | lightest witnessed weight | side | | ---: | ---: | ---: | :--- | | 100,000 | 32 | 86 | X | | 500,000 | 48 | 82 | Z | | 1,000,000 | 64 | 84 | X | | 2,000,000 | 80 | 78 | X |</p>
+<p>The JSON records the X-side witness of weight 78 from the deepest run and a separate Z-side witness of weight 82 from the 500,000-trial run. Both witnesses were independently checked for membership in the kernel of the opposite checks and for non-membership in the corresponding stabilizer row space. The reported distance is therefore the honest upper bound <code>d &lt;= 78</code>, not an exact-distance claim.</p>
+<h4>Validation and equivalence review</h4>
+<p><code>verify/qldpc_verify.py</code> passes the schema, CSS commutation, <code>n/k</code>, check weight, and both witness checks. The clean-board candidate gate reports <code>board_advancing: true</code> for <code>weight-8 / unrestricted</code>, with no exact duplicate and no WL-equivalent board entry. The equivalence review is recorded in <code>provenance.notes</code> as checked against the current board entries and their published construction data, with no equivalent entry found.</p>
+<p>The LLM model used for the search and packaging is <code>GPT 5.6 Luna</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-14-78.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/154-6-11.html">[[154,6,11]] — 154-6-11</a></h3><div class=kv style="color:var(--mut)">2026-09-02 &middot; submission note &middot; <a href="https://github.com/willzeng">@willzeng</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h3>[[154,6,11]] — weight-5 cyclic generalized bicycle code on Z_77 with a two-layer 2D-local layout</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the check-weight-5 slice of the <code>weight-6</code> boards. The board has no weight-5 cell, so a weight-5 code competes on the weight-6 boards and earns its place on the Pareto frontier through its lower check weight. The best weight &lt;= 5 code before this campaign was <code>codes/40-10-4.json</code> at kd^2/n = 4.00. Hypothesis: two-block group-algebra codes with a 3-term and a 2-term generator (check weight 5) beat 4.00 when the group and supports are swept exhaustively.</p>
@@ -48,7 +80,7 @@
 <p>Claude Fable 5.1 driving Claude Code as one lane of a five-agent campaign sharing an append-only notes file. Repo tooling: <code>research/kit/css.py</code> (k, CSS check), the gf2_fast RIS backend through <code>research/kit/search.py</code>, <code>research/local2d/fold_layout.py::anneal</code> for the layout (2 layers, integer grid sites, 300,000 Metropolis iterations, box 12x8), <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. About 15 core-minutes for the sweep and under a minute for the layout.</p>
 <h4>Reproduction</h4>
 <p>G = Z_91 (as Z_1 x Z_91, element g at index g). Circulant shift matrices P_g[h + g, h] = 1. A = P_0 + P_1 + P_19, B = P_0 + P_7, H_X = [A | B], H_Z = [B^T | A^T]. Then n = 182, k = 6, every row has weight 5. Equivalently, `research/kit/group_algebra.build_2bga(mul, a=[0, 1, 19], b=[0, 7])<code> with </code>mul` the Z_91 multiplication table. The layout coordinates in the JSON were produced by `fold_layout.anneal(checks, 182, box_sites(12, 8), layers=2)` followed by the annealer&#x27;s own radius check; measured interaction radius sqrt(29) = 5.385, at most 2 qubits per site, unit spacing.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/182-6-12.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/60-4-8.html">[[60,4,8]] — 60-4-8</a></h3><div class=kv style="color:var(--mut)">2026-09-02 &middot; submission note &middot; <a href="https://github.com/willzeng">@willzeng</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h3>[[60,4,8]] — weight-5 two-block group-algebra code on the non-abelian metacyclic group C_3 x| C_10, two-layer 2D-local layout</h3>
+<section class=blk><h3><a href="codes/60-4-8.html">[[60,4,8]] — 60-4-8</a></h3><div class=kv style="color:var(--mut)">2026-09-02 &middot; submission note &middot; <a href="https://github.com/willzeng">@willzeng</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h3>[[60,4,8]] — weight-5 two-block group-algebra code on the non-abelian metacyclic group C_3 x| C_10, two-layer 2D-local layout</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the check-weight-5 slice of the <code>weight-6</code> boards at small n. The board has no weight-5 cell; a weight-5 code competes on the weight-6 boards and holds a Pareto position through its lower weight. Before this campaign no code on the board with max check weight &lt;= 5 exceeded kd^2/n = 4.00 (<code>codes/40-10-4.json</code>), and nothing in the 2D-local bilayer weight-6 cell with n &lt;= 60 had k &gt;= 4 and d &gt;= 8. Hypothesis: the abelian weight-(3,2) family saturates near 4.75 (see the [[182,6,12]] note), and non-abelian groups might reach the same efficiency at smaller n.</p>
 <h4>What was searched</h4>
