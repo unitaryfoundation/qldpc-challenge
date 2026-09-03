@@ -1,0 +1,345 @@
+{
+ "schema_version": "0.1",
+ "name": "[[24,6,4]] weight-6 generalized bicycle (2BGA) code",
+ "code_type": "CSS",
+ "n": 24,
+ "k": 6,
+ "checks": {
+  "X": [
+   [
+    0,
+    9,
+    12,
+    17,
+    21,
+    23
+   ],
+   [
+    1,
+    10,
+    12,
+    13,
+    18,
+    22
+   ],
+   [
+    2,
+    11,
+    13,
+    14,
+    19,
+    23
+   ],
+   [
+    0,
+    3,
+    12,
+    14,
+    15,
+    20
+   ],
+   [
+    1,
+    4,
+    13,
+    15,
+    16,
+    21
+   ],
+   [
+    2,
+    5,
+    14,
+    16,
+    17,
+    22
+   ],
+   [
+    3,
+    6,
+    15,
+    17,
+    18,
+    23
+   ],
+   [
+    4,
+    7,
+    12,
+    16,
+    18,
+    19
+   ],
+   [
+    5,
+    8,
+    13,
+    17,
+    19,
+    20
+   ],
+   [
+    6,
+    9,
+    14,
+    18,
+    20,
+    21
+   ],
+   [
+    7,
+    10,
+    15,
+    19,
+    21,
+    22
+   ],
+   [
+    8,
+    11,
+    16,
+    20,
+    22,
+    23
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    3,
+    7,
+    12,
+    15
+   ],
+   [
+    1,
+    2,
+    4,
+    8,
+    13,
+    16
+   ],
+   [
+    2,
+    3,
+    5,
+    9,
+    14,
+    17
+   ],
+   [
+    3,
+    4,
+    6,
+    10,
+    15,
+    18
+   ],
+   [
+    4,
+    5,
+    7,
+    11,
+    16,
+    19
+   ],
+   [
+    0,
+    5,
+    6,
+    8,
+    17,
+    20
+   ],
+   [
+    1,
+    6,
+    7,
+    9,
+    18,
+    21
+   ],
+   [
+    2,
+    7,
+    8,
+    10,
+    19,
+    22
+   ],
+   [
+    3,
+    8,
+    9,
+    11,
+    20,
+    23
+   ],
+   [
+    0,
+    4,
+    9,
+    10,
+    12,
+    21
+   ],
+   [
+    1,
+    5,
+    10,
+    11,
+    13,
+    22
+   ],
+   [
+    0,
+    2,
+    6,
+    11,
+    14,
+    23
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "exact",
+   "witness": [
+    1,
+    7,
+    13,
+    19
+   ]
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "exact",
+   "witness": [
+    1,
+    7,
+    13,
+    19
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "Lin, Hsiang-Ku",
+   "Pryadko, Leonid P."
+  ],
+  "origin": "baseline",
+  "construction": "Generalized bicycle (cyclic 2BGA) code over C_12: a(x) = 1 + x^3, b(x) = 1 + x + x^3 + x^7.",
+  "date": "2023-06-28",
+  "references": [
+   "arXiv:2306.16400",
+   "arXiv:2203.17216"
+  ],
+  "notes": "Parameters from the Lin-Pryadko 2BGA enumeration (arXiv:2306.16400, w=6 abelian/GB tier). Explicit polynomials reconstructed by exhaustive weight-6 GB search over C_12 with the repo research kit; distance proven exact by cutoff MILP (scipy/HiGHS). Seeded so the global frontier reflects the published state of the art (issue #52). 2D-local layout added 2026-07-27: simulated annealing over qubit-to-site assignments on a unit-spaced triangular grid (2 layers, capacity 1 per site per layer); measured interaction radius 2.645751 (bilayer); same code, same check matrices."
+ },
+ "family": "generalized-bicycle",
+ "locality": {
+  "coordinates": [
+   [
+    -0.5,
+    -0.8660254037844386
+   ],
+   [
+    -2.0,
+    0.0
+   ],
+   [
+    0.5,
+    0.8660254037844386
+   ],
+   [
+    0.0,
+    -1.7320508075688772
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    -1.0,
+    0.0
+   ],
+   [
+    -1.0,
+    0.0
+   ],
+   [
+    -2.0,
+    0.0
+   ],
+   [
+    0.5,
+    0.8660254037844386
+   ],
+   [
+    0.0,
+    -1.7320508075688772
+   ],
+   [
+    -0.5,
+    0.8660254037844386
+   ],
+   [
+    0.5,
+    -0.8660254037844386
+   ],
+   [
+    -0.5,
+    0.8660254037844386
+   ],
+   [
+    -1.5,
+    0.8660254037844386
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    -1.0,
+    -1.7320508075688772
+   ],
+   [
+    -1.5,
+    0.8660254037844386
+   ],
+   [
+    0.5,
+    -0.8660254037844386
+   ],
+   [
+    -1.5,
+    -0.8660254037844386
+   ],
+   [
+    -0.5,
+    -0.8660254037844386
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    -1.0,
+    -1.7320508075688772
+   ],
+   [
+    -1.5,
+    -0.8660254037844386
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "interaction_radius": 2.6457513110645907,
+  "layers": 2
+ }
+}

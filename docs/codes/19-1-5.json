@@ -1,0 +1,256 @@
+{
+ "schema_version": "0.1",
+ "name": "[[19,1,5]] triangular 6.6.6 colour code, single-layer 2D-local layout",
+ "code_type": "CSS",
+ "n": 19,
+ "k": 1,
+ "checks": {
+  "X": [
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    3,
+    4,
+    7,
+    8
+   ],
+   [
+    0,
+    1,
+    5,
+    9
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11
+   ],
+   [
+    5,
+    6,
+    9,
+    10,
+    12,
+    13
+   ],
+   [
+    7,
+    8,
+    11,
+    14
+   ],
+   [
+    10,
+    11,
+    13,
+    14,
+    15,
+    16
+   ],
+   [
+    12,
+    13,
+    15,
+    17
+   ],
+   [
+    15,
+    16,
+    17,
+    18
+   ]
+  ],
+  "Z": [
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    3,
+    4,
+    7,
+    8
+   ],
+   [
+    0,
+    1,
+    5,
+    9
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11
+   ],
+   [
+    5,
+    6,
+    9,
+    10,
+    12,
+    13
+   ],
+   [
+    7,
+    8,
+    11,
+    14
+   ],
+   [
+    10,
+    11,
+    13,
+    14,
+    15,
+    16
+   ],
+   [
+    12,
+    13,
+    15,
+    17
+   ],
+   [
+    15,
+    16,
+    17,
+    18
+   ]
+  ]
+ },
+ "distance": {
+  "d": 5,
+  "X": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    5,
+    13,
+    16,
+    17
+   ]
+  },
+  "Z": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    5,
+    13,
+    16,
+    17
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@FarLab"
+  ],
+  "construction": "Triangular 6.6.6 (hexagonal) colour code, m=2, d=2m+1=5, n=3m^2+3m+1=19. Self-dual CSS: H_X = H_Z = the face-incidence matrix of a triangular patch of the hexagonal lattice. The submitted artifact is the LAYOUT: a non-affine embedding reaching interaction radius r = 2*cos(15 deg) = sqrt(2+sqrt(3)) = 1.9318517, versus 2.0 for the natural hexagonal-lattice drawing.",
+  "origin": "submission",
+  "date": "2026-07-26",
+  "model": "Claude Opus 5",
+  "notes": "The CODE is textbook (Bombin & Martin-Delgado 2D colour codes); provenance.novelty is known_parameters. The contribution is the verified single-layer 2D-local LAYOUT, which is what the board's geometric efficiency g = 4kd^2/(n rho^2 r^4) measures. At r = 1.9318517, rho = 1 this scores g = 0.378, versus 0.329 for the same code on the hexagonal lattice at r = 2.0 and 0.0717 for the best qLDPC entry previously on the board. WHY THE LATTICE LAYOUT WAS STUCK AT EXACTLY 2.0, AND WHY THIS IS NOT: in a regular hexagonal face with vertices v_0..v_5 in cyclic order, v_3 - v_0 = 2 (v_2 - v_1) exactly -- a main diagonal is twice one of the face's own edges, and both pairs lie inside the same weight-6 check. So for ANY affine map M, r >= |M(v_3-v_0)| = 2|M(v_2-v_1)| >= 2 * (min site spacing) = 2. No shear, squeeze or rescale can beat 2.0; the previous layouts were class-optimal, not lazy. The improvement therefore requires leaving the lattice entirely. The optimum found is a 30-degree-quantized (snub-square / elongated-triangular) motif whose forced diameter is 2*cos(15 deg); it was reached by basin hopping seeded from the lattice layout, and independently by a separate agent optimizing a bilayer weight-8 code, which converged on the same constant. LOWER BOUND: the packing floor for a weight-6 check is D_6 = 2*sin(72 deg) = 1.9021130 (attained by a regular pentagon of circumradius 1 plus its centre -- notably not a hexagon), but 5-fold symmetry cannot tile a plane with shared face vertices, so 1.9021 is believed unreachable and 1.9318517 the true optimum for a tileable weight-6 layout. That is a well-supported conjecture, not a proof. Distance is filed as upper_bound; the witness is the CLI's own RIS search.",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:quant-ph/0605138 (Bombin & Martin-Delgado, Topological quantum distillation)",
+   "arXiv:1108.5738",
+   "errorcorrectionzoo.org/c/triangular_color"
+  ]
+ },
+ "family": "topological",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    1.461326780058224
+   ],
+   [
+    1.2513999275115582,
+    0.0
+   ],
+   [
+    2.645633609970326,
+    0.2369650583893439
+   ],
+   [
+    3.641280540085509,
+    0.14365272987798017
+   ],
+   [
+    5.208345087154212,
+    0.13357847446973903
+   ],
+   [
+    0.8343873094310867,
+    0.9089116989354201
+   ],
+   [
+    1.8300342395462699,
+    0.8155993704240562
+   ],
+   [
+    3.734592868596873,
+    1.139299659993163
+   ],
+   [
+    4.921525993680798,
+    1.587740182044174
+   ],
+   [
+    0.9276996379424514,
+    1.9045586290506027
+   ],
+   [
+    2.73894593848169,
+    1.2326119885045268
+   ],
+   [
+    3.3175802505164014,
+    2.048211358928583
+   ],
+   [
+    1.5063339499771629,
+    2.720157999474659
+   ],
+   [
+    2.321933320401219,
+    2.1415236874399466
+   ],
+   [
+    4.226491949451821,
+    2.4652239770090545
+   ],
+   [
+    2.415245648912583,
+    3.13717061755513
+   ],
+   [
+    3.4108925790277658,
+    3.043858289043766
+   ],
+   [
+    1.6116761205367411,
+    3.7334090549449033
+   ],
+   [
+    2.9313937888438164,
+    4.127071239341035
+   ]
+  ],
+  "layers": 1
+ }
+}

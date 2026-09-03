@@ -1,0 +1,195 @@
+{
+ "schema_version": "0.1",
+ "name": "[[15,7,3]] quantum Hamming code, single-layer 2D-local layout",
+ "code_type": "CSS",
+ "n": 15,
+ "k": 7,
+ "checks": {
+  "X": [
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    1,
+    2,
+    5,
+    6,
+    9,
+    10,
+    13,
+    14
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    11,
+    12,
+    13,
+    14
+   ],
+   [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    1,
+    2,
+    5,
+    6,
+    9,
+    10,
+    13,
+    14
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    11,
+    12,
+    13,
+    14
+   ],
+   [
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    8,
+    13
+   ]
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    8,
+    13
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@FarLab"
+  ],
+  "construction": "CSS quantum Hamming code (Steane construction) from the classical [15,11,3] Hamming code: H_X = H_Z = the 4x15 Hamming parity-check matrix, which is self-orthogonal over GF(2). The submitted artifact is the LAYOUT: 15 qubits placed in the plane by direct minimization of the maximum check diameter subject to unit minimum site spacing, reaching r = sqrt(7) = 2.6458.",
+  "origin": "submission",
+  "date": "2026-07-25",
+  "model": "Claude Opus 5",
+  "notes": "The CODE is textbook and its parameters are known (Steane 1996); provenance.novelty is known_parameters. The contribution is the verified single-layer 2D-local LAYOUT, which is what the board's geometric efficiency g = 4kd^2/(n rho^2 r^4) measures. At r = sqrt(7), rho = 1 this scores g = 0.3429 versus 0.0717 for the previous best qLDPC entry on the board, and it is the first native occupant of the weight-8 x local-2d-single cell. The radius appears optimal: the 11 qubits whose Hamming column has weight >= 2 form a core that alone requires sqrt(7), and two independent optimizers converged there. Distance is MILP-certified exact on both sides (verify/certify.py: no logical < 3 exists), though it is filed as upper_bound per board policy. Naive random multistart converges to a false optimum at r = 2.9093; basin hopping seeded from the incumbent is needed to reach sqrt(7).",
+  "novelty": "known_parameters",
+  "references": [
+   "quant-ph/9601029 (Steane, Multiple particle interference and quantum error correction, 1996)",
+   "errorcorrectionzoo.org/c/quantum_hamming"
+  ]
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    -1.892907924063519,
+    -0.9951049389496877
+   ],
+   [
+    1.935611183739798,
+    0.16353419433775884
+   ],
+   [
+    -0.4803538317847173,
+    1.2420120308099387
+   ],
+   [
+    1.707899026075811,
+    -0.8101943988811228
+   ],
+   [
+    -0.2063605278258469,
+    -1.3895139655248459
+   ],
+   [
+    1.2061935644529553,
+    0.8476030042347801
+   ],
+   [
+    0.7507692491249821,
+    -1.099854182202985
+   ],
+   [
+    -1.4374836087355463,
+    0.952352247488078
+   ],
+   [
+    -1.665195766399533,
+    -0.021376345730804144
+   ],
+   [
+    0.476775945166112,
+    1.5316718141318
+   ],
+   [
+    0.02135162983813943,
+    -0.41578537230596424
+   ],
+   [
+    -0.9357781471126899,
+    -0.7054451556278257
+   ],
+   [
+    -0.7080659894487034,
+    0.2682834375910562
+   ],
+   [
+    0.978481406788968,
+    -0.12612558898410195
+   ],
+   [
+    0.24906378750212488,
+    0.557943220912918
+   ]
+  ],
+  "layers": 1
+ }
+}
