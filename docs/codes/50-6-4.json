@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[50,6,4]] weight-6 planar (generalized BB, our record family)",
  "code_type": "CSS",
  "n": 50,
@@ -536,5 +536,32 @@
   ],
   "layers": 2,
   "interaction_radius": 2.23606797749979
+ },
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     1811,
+     1812,
+     3384,
+     3387
+    ]
+   },
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     851,
+     966,
+     1046,
+     1600
+    ]
+   }
+  },
+  "rounds": 4,
+  "stim_version": "1.16.0",
+  "notes": "Interleaved memory extraction with joint reset and measurement layers and 7 CX layers per round. Bulk (template) checks follow the Bravyi et al. depth-7 monomial pattern (arXiv:2308.07915 Table 5) applied edge-by-edge via the A/B grid labels (two 5x5 grids); boundary checks were placed by a min-conflicts search enforcing layer parallelism and the X/Z overlap-parity condition, then optimised by a local search whose objective is the exact count of undetected logical fault sets of weight <= 3 (GF(2)-hash enumeration): it reached zero in 374 moves. That count, re-run on the committed DEMs, is zero in both bases, so d_circ = 4 = d is exact for these circuits. The lightest fault sets before optimisation combined an X-check hook, a Z-check hook and a Y error on an X-degree-1 boundary qubit."
  }
 }
