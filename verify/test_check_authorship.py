@@ -401,6 +401,34 @@ def main():
             ["--author", "alice", "--root", td, "--base", "main"])
         check("new code by its author still accepted", rc == 0)
 
+    print("\nnew submissions must bind to a @handle:")
+
+    # a genuinely new file (the base code stays, so nothing pairs it with a
+    # base counterpart the way a rename would)
+    def submit_new(td, authors, origin=None):
+        doc = copy.deepcopy(BASE_DOC)
+        doc["provenance"]["authors"] = authors
+        if origin:
+            doc["provenance"]["origin"] = origin
+        write_code(td, "60-8-7.json", doc)
+        git(td, "add", "codes")
+        git(td, "commit", "-q", "-m", "new")
+        return check_authorship.main(
+            ["--author", "bob", "--root", td, "--base", "main"])
+
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new submission with no @handle rejected",
+              submit_new(td, ["Jane Roe"]) == 1)
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new baseline submission with no @handle exempt",
+              submit_new(td, ["Jane Roe"], origin="baseline") == 0)
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td)
+        check("new submission with only a malformed handle rejected",
+              submit_new(td, ["@bad!handle"]) == 1)
+
     print()
     if _fail:
         print(f"FAILED: {_fail}")

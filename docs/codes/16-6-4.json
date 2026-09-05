@@ -1,0 +1,221 @@
+{
+ "schema_version": "0.1",
+ "name": "[[16,6,4]] quantum Reed-Muller code, single-layer 2D-local layout",
+ "code_type": "CSS",
+ "n": 16,
+ "k": 6,
+ "checks": {
+  "X": [
+   [
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11,
+    14,
+    15
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ]
+  ],
+  "Z": [
+   [
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11,
+    14,
+    15
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6,
+    8,
+    15
+   ]
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6,
+    8,
+    15
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@FarLab"
+  ],
+  "construction": "CSS code from Reed-Muller RM(1,4): H_X = H_Z = the RM(1,4) generator with the all-ones row dropped, which halves the check weight from 16 to 8 while generating the same stabilizer group. The submitted artifact is the LAYOUT: 16 qubits placed in the plane by direct minimization of the maximum check diameter subject to unit minimum site spacing, reaching r = 2.8586.",
+  "origin": "submission",
+  "date": "2026-07-25",
+  "model": "Claude Opus 5",
+  "notes": "The CODE is textbook and its parameters are known (Steane 1996 / Reed-Muller CSS constructions); provenance.novelty is known_parameters. The contribution is the verified single-layer 2D-local LAYOUT, which is what the board's geometric efficiency g = 4kd^2/(n rho^2 r^4) measures. At r = 2.8586, rho = 1 this scores g = 0.3594 versus 0.0717 for the previous best qLDPC entry on the board. Distance is MILP-certified exact on both sides (verify/certify.py: no logical < 4 exists), filed as upper_bound per board policy. CAVEAT: this radius is NOT converged - independent seeds landed at 2.8586 / 2.8593 / 2.8693 / 2.8773 / 2.8794, so a better layout very likely exists. The per-check packing floor for weight-8 is 2.2470, which would give g = 0.944; the gap is open. RM(1,4) also has basis freedom (its stabilizer in GL(5,2) is only AGL(4,2), giving four basis classes with different check-pair graphs), worth roughly 0.09 of radius and not fully explored.",
+  "novelty": "known_parameters",
+  "references": [
+   "quant-ph/9601029 (Steane, 1996)",
+   "errorcorrectionzoo.org/c/quantum_reed_muller"
+  ]
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    1.526186417870993,
+    1.875053809410772
+   ],
+   [
+    -1.706985296555345,
+    -1.7633888914964146
+   ],
+   [
+    1.6987073819076643,
+    0.890047861729303
+   ],
+   [
+    1.0301873695280366,
+    -0.9401755089901863
+   ],
+   [
+    1.5762404938979484,
+    -0.1024248388228215
+   ],
+   [
+    -0.7074250817467929,
+    -1.821844133165135
+   ],
+   [
+    -0.16133328892713275,
+    0.8429663838916743
+   ],
+   [
+    0.26340767797545434,
+    -1.5820860203720597
+   ],
+   [
+    -0.3228671677909354,
+    1.83047398201544
+   ],
+   [
+    -1.7019146340563,
+    -0.09925350716605838
+   ],
+   [
+    0.7594067263184114,
+    1.2331432980288985
+   ],
+   [
+    -1.1598732135144645,
+    0.8969869263281995
+   ],
+   [
+    0.09088671393878306,
+    -0.5970800726905909
+   ],
+   [
+    -1.114177524472045,
+    -0.9083056006789288
+   ],
+   [
+    0.6369398383086948,
+    0.24067059747677375
+   ],
+   [
+    -0.7073864132970443,
+    0.005215713724309461
+   ]
+  ],
+  "layers": 1
+ }
+}
