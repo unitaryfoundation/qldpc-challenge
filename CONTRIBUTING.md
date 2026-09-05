@@ -19,7 +19,8 @@ GitHub handle, pass `--anonymous`; the CLI warns that the resulting entry will
 not be bound to an account.
 
 `mycode.npz` holds your parity checks under keys `hx` and `hz` (dense 0/1
-arrays or scipy sparse). The tool:
+arrays or scipy sparse). The tool also accepts `HX`/`H_X` and `HZ`/`H_Z` as
+alternate spellings for the same two arrays. The tool:
 
 - computes n, k (= n - rank H_X - rank H_Z) and the max check weight;
 - searches for the lightest logical on each side and records it as a
