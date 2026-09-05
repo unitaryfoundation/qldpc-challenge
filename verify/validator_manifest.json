@@ -12,7 +12,7 @@
     "decode/distance.py": "7e266f8ad50d55fa44e34a5e0bf0005e91de19f24c35c27bf8f9bad796f56076",
     "schema/code.schema.json": "b1badf0ae7c83e6217db21266e6977e40689f6d114cb135e16c0f272d3eb174d",
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
-    "verify/check_authorship.py": "61f63f43a3f692b516f392eba973a73b09dfdcdf67e7e8b907ea332d930b4216",
+    "verify/check_authorship.py": "adb22156e802b6b876a030b1d27fb1804733bf8dcf3f5a16a88f1873543794f2",
     "verify/check_prose.py": "af9fc3b72c7723cd0aa6309a5a0162acbf1e4ac0bd18722179633802c30df9d0",
     "verify/check_submission_scope.py": "04945a2ef6b0cabd7b8c3998aa33aa8c66cac158dd4955272742dbaa8c850bf1",
     "verify/check_validator_integrity.py": "d739db6680bd4c4b481e811234ed6abf470cbf09449825e1dbdb08261234ebd3",

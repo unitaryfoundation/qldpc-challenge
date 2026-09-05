@@ -255,7 +255,11 @@ def main(argv):
         changes = changes or {}
     else:
         if changes is None:
-            return 0
+            # A git failure means the check did not run; exit nonzero so a
+            # broken diff cannot silently pass authorship (mirrors
+            # gate_changed.py).
+            print("failing closed: authorship cannot be checked without the diff")
+            return 1
         files = [p for p, s in changes.items() if s in ("A", "M")]
     if not files:
         print("no added/changed code submissions to check")
