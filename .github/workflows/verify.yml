@@ -35,6 +35,7 @@ jobs:
   # proven stable.
   ris-compile:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +48,7 @@ jobs:
 
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4

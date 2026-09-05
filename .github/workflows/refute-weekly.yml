@@ -14,6 +14,7 @@ on:
 jobs:
   refute-board:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
