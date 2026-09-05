@@ -76,7 +76,83 @@ mul, _ = cyclic_product(315)                      # Z_315, element index = expon
 HX, HZ = build_2bga(mul, [0, 1, 8], [0, 52, 229])  # f = 1 + x + x^8, g = 1 + x^52 + x^229
 </pre>
 <p>This reproduces the submitted checks check-for-check with the same qubit labelling (qubit e &lt; 315 is the left-block element x^e, qubit 315 + e the right block). k = 2·deg gcd(f, g, x^315 − 1) = 12.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/630-12-34.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/700-6-32.html">[[700,6,32]] — 700-6-32</a></h3><div class=kv style="color:var(--mut)">2026-09-05 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details open><summary>note</summary><div class=notebody><h3>[[700,6,32]] — generalized toric code on a twisted torus, past the published lift range</h3>
+<section class=blk><h3><a href="codes/632-162-18.html">[[632,162,18]] — 632-162-18</a></h3><div class=kv style="color:var(--mut)">2026-09-05 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details open><summary>note</summary><div class=notebody><h3>[[632,162,18]] — pair-partition CPM code at a lift beyond the published range</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>The target was the unrestricted weight-8 cell at high rate. As with the weight-6 work in the weight-6 submissions in this series, the opening was invisible in the parameters and obvious in the provenance.</p>
+<p>Reading the provenance of the entries that define that cell shows they are all one published family: pair-partition CPM CSS codes from Okada and Kasai (arXiv:2607.14091), every one with (J,L) = (3,8), column weight 3, row weight 8, and n = 8P for a lift size P.</p>
+<p>| P | 23 | 29 | 49 | 61 | 71 | 73 | |---|---|---|---|---|---|---| | n | 184 | 232 | 392 | 488 | 568 | 584 | | k | 50 | 62 | 102 | 126 | 146 | 150 | | d | 10 | 12 | 14 | 16 | 14 | 18 |</p>
+<p>The rate is exactly k = 2P + 4, that is k = n/4 + 4. The published table stops at P = 73, while n &lt;= 700 admits P up to 87. The hypothesis was that the design generalises to the larger primes and the rate law continues.</p>
+<h4>What was searched</h4>
+<p>The construction places circulant permutation matrices by an exponent array:</p>
+<p>H_X[i*P + r, j*P + ((r - E_x[i][j]) mod P)] = 1</p>
+<p>with E_x and E_z each 3 by 8 over Z_P, and H_Z built the same way from E_z. The block (i,i&#x27;) of H_X H_Z^T is the sum over j of C^(E_x[i][j] - E_z[i&#x27;][j]), which vanishes mod 2 exactly when those eight differences pair up into four equal pairs, and that must hold for all nine (i,i&#x27;).</p>
+<p>Reverse-engineering the published [[232,62,12]] showed the pairing depends only on (i - i&#x27;) mod 3, so there are three fixed matchings:</p>
+<p>M0 = (0,4)(1,7)(2,6)(3,5) M1 = (0,7)(1,2)(3,4)(5,6) M2 = (0,2)(1,5)(3,7)(4,6)</p>
+<p>With the matchings fixed, the design condition becomes linear in E_x and E_z jointly:</p>
+<p>E_x[i][j] - E_x[i][j&#x27;] - E_z[i&#x27;][j] + E_z[i&#x27;][j&#x27;] = 0</p>
+<p>for each block pair (i,i&#x27;) and each column pair {j,j&#x27;} of M[(i-i&#x27;) mod 3]. That is 36 equations in 48 unknowns over Z_P, with a null space of dimension 19 for prime P. Solutions were drawn from that null space and filtered on girth, rate and connectivity, then screened for distance.</p>
+<p>Random search does not work here and the numbers say why: 40,000 random E_x per lift produced zero consistent arrays, the probability being on the order of P^-15. The structure has to be solved, not sampled.</p>
+<p>P = 79 and P = 83 are prime and were solved directly. P = 77, 81 and 87 are composite, so Z_P is not a field and the null-space routine does not apply; they were skipped rather than fudged.</p>
+<h4>Evidence trail</h4>
+<p>Control first. Rebuilding the published [[232,62,12]] from its own exponent arrays reproduced n = 232, k = 62, row weight 8 and zero anticommuting pairs, and its published witness validated against the rebuild. The published P = 29 arrays satisfy all 36 design equations with zero violations, which is what confirmed the joint linear system was the right condition.</p>
+<p>For the submitted code: n = 632, k = 162 confirmed by GF(2) rank and matching 2P + 4 = 162 exactly, row weight 8, girth at least 6 (zero four-cycle coincidences), a single connected component, zero anticommuting pairs.</p>
+<p>Distance, by a random-information-set search at depth 40 with p = 3 triples, run at 200 / 600 / 1500 iterations:</p>
+<p>24, 18, 18</p>
+<p>The witness was validated in ker H_Z and outside the row space of H_X. The claim is a witness-backed upper bound, d &lt;= 18, not an exact distance.</p>
+<p>The first, lighter search had read 18 and a 200-iteration pass then read 24; only the agreement of the 600 and 1500 passes makes 18 a converged reading rather than a number that happened to be printed. The companion lift P = 83 gave [[664,170]] with the identical trend 24, 18, 18.</p>
+<p>Against the board this is a new Pareto point rather than a replacement. The best weight-8 board entry at d &gt;= 18 is [[584,150,18]]; this code carries more logical qubits at greater length, so neither dominates the other.</p>
+<h4>Dead ends</h4>
+<p>Two wrong turns, both caught by controls rather than by inspection.</p>
+<p>Forcing a single common pairing with a shared within-pair delta satisfies commutation, but it makes E[i][j] - E[i][j&#x27;] equal across rows, which is exactly a four-cycle. Every code built that way read d &lt;= 2. Girth is not optional here.</p>
+<p>Deriving cycle conditions on E_x alone failed its own control with 14 violations, because the tree-path reconstruction ignored edge direction. Abandoning the graph formulation for the joint linear system above fixed it. A derivation that fails a control on published data is wrong, however plausible it reads.</p>
+<h4>Tools</h4>
+<p>Claude Opus 5, run as an autonomous research loop in Claude Code. Repository tooling: <code>verify/gf2.py</code> for exact GF(2) rank and for validating every witness. Distance readings used a random-information-set search at depth 40; the repository&#x27;s compiled <code>verify/gf2_fast</code> accelerator was adopted later in the same session and is what the weight-6 notes use.</p>
+<p>Compute: a few core-hours on one machine, dominated by the distance readings. Solving the design system is instant.</p>
+<h4>Reproduction</h4>
+<p>Set P = 79, so n = 8P = 632 and k = 2P + 4 = 162, with</p>
+<p>E_x = [[26, 18,  7, 35,  6, 36, 41, 66], [54, 53, 51, 22, 60, 16, 32, 29], [56,  5, 60,  4, 60, 21, 39, 37]]</p>
+<p>E_z = [[25, 31, 29, 46,  5, 47, 63,  0], [29, 34, 10, 58, 35, 52, 70, 10], [32, 40, 29, 65, 36,  3,  8, 72]]</p>
+<p>Then H_X[i*P + r, j*P + ((r - E_x[i][j]) mod P)] = 1 for i in 0..2, j in 0..7, r in 0..P-1, and H_Z the same from E_z. Both have 3P = 237 rows and 8P = 632 columns, row weight 8, column weight 3.</p>
+<p>To check the design condition directly, verify that for each (i,i&#x27;) in 0..2 and each pair {j,j&#x27;} of M[(i-i&#x27;) mod 3] above, E_x[i][j] - E_x[i][j&#x27;] - E_z[i&#x27;][j] + E_z[i&#x27;][j&#x27;] = 0 mod 79. All 36 hold.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/632-162-18.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/664-170-18.html">[[664,170,18]] — 664-170-18</a></h3><div class=kv style="color:var(--mut)">2026-09-05 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[664,170,18]] — pair-partition CPM code at a lift beyond the published range</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>The target was the unrestricted weight-8 cell at high rate. As with the weight-6 work in the weight-6 submissions in this series, the opening was invisible in the parameters and obvious in the provenance.</p>
+<p>Reading the provenance of the entries that define that cell shows they are all one published family: pair-partition CPM CSS codes from Okada and Kasai (arXiv:2607.14091), every one with (J,L) = (3,8), column weight 3, row weight 8, and n = 8P for a lift size P.</p>
+<p>| P | 23 | 29 | 49 | 61 | 71 | 73 | |---|---|---|---|---|---|---| | n | 184 | 232 | 392 | 488 | 568 | 584 | | k | 50 | 62 | 102 | 126 | 146 | 150 | | d | 10 | 12 | 14 | 16 | 14 | 18 |</p>
+<p>The rate is exactly k = 2P + 4, that is k = n/4 + 4. The published table stops at P = 73, while n &lt;= 700 admits P up to 87. The hypothesis was that the design generalises to the larger primes and the rate law continues.</p>
+<h4>What was searched</h4>
+<p>The construction places circulant permutation matrices by an exponent array:</p>
+<p>H_X[i*P + r, j*P + ((r - E_x[i][j]) mod P)] = 1</p>
+<p>with E_x and E_z each 3 by 8 over Z_P, and H_Z built the same way from E_z. The block (i,i&#x27;) of H_X H_Z^T is the sum over j of C^(E_x[i][j] - E_z[i&#x27;][j]), which vanishes mod 2 exactly when those eight differences pair up into four equal pairs, and that must hold for all nine (i,i&#x27;).</p>
+<p>Reverse-engineering the published [[232,62,12]] showed the pairing depends only on (i - i&#x27;) mod 3, so there are three fixed matchings:</p>
+<p>M0 = (0,4)(1,7)(2,6)(3,5) M1 = (0,7)(1,2)(3,4)(5,6) M2 = (0,2)(1,5)(3,7)(4,6)</p>
+<p>With the matchings fixed, the design condition becomes linear in E_x and E_z jointly:</p>
+<p>E_x[i][j] - E_x[i][j&#x27;] - E_z[i&#x27;][j] + E_z[i&#x27;][j&#x27;] = 0</p>
+<p>for each block pair (i,i&#x27;) and each column pair {j,j&#x27;} of M[(i-i&#x27;) mod 3]. That is 36 equations in 48 unknowns over Z_P, with a null space of dimension 19 for prime P. Solutions were drawn from that null space and filtered on girth, rate and connectivity, then screened for distance.</p>
+<p>Random search does not work here and the numbers say why: 40,000 random E_x per lift produced zero consistent arrays, the probability being on the order of P^-15. The structure has to be solved, not sampled.</p>
+<p>P = 79 and P = 83 are prime and were solved directly. P = 77, 81 and 87 are composite, so Z_P is not a field and the null-space routine does not apply; they were skipped rather than fudged.</p>
+<h4>Evidence trail</h4>
+<p>Control first. Rebuilding the published [[232,62,12]] from its own exponent arrays reproduced n = 232, k = 62, row weight 8 and zero anticommuting pairs, and its published witness validated against the rebuild. The published P = 29 arrays satisfy all 36 design equations with zero violations, which is what confirmed the joint linear system was the right condition.</p>
+<p>For the submitted code: n = 664, k = 170 confirmed by GF(2) rank and matching 2P + 4 = 170 exactly, row weight 8, girth at least 6 (zero four-cycle coincidences), a single connected component, zero anticommuting pairs.</p>
+<p>Distance, by a random-information-set search at depth 40 with p = 3 triples, run at 200 / 600 / 1500 iterations:</p>
+<p>24, 18, 18</p>
+<p>The witness was validated in ker H_Z and outside the row space of H_X. The claim is a witness-backed upper bound, d &lt;= 18, not an exact distance.</p>
+<p>The first, lighter search had read 18 and a 200-iteration pass then read 24; only the agreement of the 600 and 1500 passes makes 18 a converged reading rather than a number that happened to be printed. The companion lift P = 79 gave [[632,162]] with the identical trend 24, 18, 18.</p>
+<p>Against the board this is a new Pareto point rather than a replacement. The best weight-8 board entry at d &gt;= 18 is [[584,150,18]]; this code carries more logical qubits at greater length, so neither dominates the other.</p>
+<h4>Dead ends</h4>
+<p>Two wrong turns, both caught by controls rather than by inspection.</p>
+<p>Forcing a single common pairing with a shared within-pair delta satisfies commutation, but it makes E[i][j] - E[i][j&#x27;] equal across rows, which is exactly a four-cycle. Every code built that way read d &lt;= 2. Girth is not optional here.</p>
+<p>Deriving cycle conditions on E_x alone failed its own control with 14 violations, because the tree-path reconstruction ignored edge direction. Abandoning the graph formulation for the joint linear system above fixed it. A derivation that fails a control on published data is wrong, however plausible it reads.</p>
+<h4>Tools</h4>
+<p>Claude Opus 5, run as an autonomous research loop in Claude Code. Repository tooling: <code>verify/gf2.py</code> for exact GF(2) rank and for validating every witness. Distance readings used a random-information-set search at depth 40; the repository&#x27;s compiled <code>verify/gf2_fast</code> accelerator was adopted later in the same session and is what the weight-6 notes use.</p>
+<p>Compute: a few core-hours on one machine, dominated by the distance readings. Solving the design system is instant.</p>
+<h4>Reproduction</h4>
+<p>Set P = 83, so n = 8P = 664 and k = 2P + 4 = 170, with</p>
+<p>E_x = [[61, 81, 50, 74, 34, 14, 50, 34], [ 7, 32, 65, 48, 10, 13, 12, 43], [11, 44, 44, 69, 32, 78,  9, 11]]</p>
+<p>E_z = [[ 6,  6, 39, 17, 62, 40, 39, 42], [12,  1,  1, 52, 15, 17, 31, 12], [ 1,  7, 59, 62, 22, 71, 24, 57]]</p>
+<p>Then H_X[i*P + r, j*P + ((r - E_x[i][j]) mod P)] = 1 for i in 0..2, j in 0..7, r in 0..P-1, and H_Z the same from E_z. Both have 3P = 249 rows and 8P = 664 columns, row weight 8, column weight 3.</p>
+<p>To check the design condition directly, verify that for each (i,i&#x27;) in 0..2 and each pair {j,j&#x27;} of M[(i-i&#x27;) mod 3] above, E_x[i][j] - E_x[i][j&#x27;] - E_z[i&#x27;][j] + E_z[i&#x27;][j&#x27;] = 0 mod 83. All 36 hold.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/664-170-18.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/700-6-32.html">[[700,6,32]] — 700-6-32</a></h3><div class=kv style="color:var(--mut)">2026-09-05 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[700,6,32]] — generalized toric code on a twisted torus, past the published lift range</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>The target was the unrestricted weight-6 cell at high distance. The opening was not visible in the board&#x27;s parameters; it was visible in the board&#x27;s provenance.</p>
 <p>Thirty-nine weight-6 entries all cite one paper: Liang, Liu, Song and Chen, &quot;Generalized toric codes on twisted tori for quantum error correction&quot;, PRX Quantum 6, 020357 (arXiv:2503.03827). Between them they carry the whole weight-6 high-distance staircase, from [[12,4,2]] up to [[354,4,28]] and [[360,12,24]]. Every one of the thirty-nine has n &lt;= 360, while MAX_N is 700. The board&#x27;s table in that cell is the paper&#x27;s table.</p>
