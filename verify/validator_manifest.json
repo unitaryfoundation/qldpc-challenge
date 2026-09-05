@@ -1,14 +1,32 @@
 {
-  "comment": [
-    "Pins for the trusted validation stack: the scripts and fixtures the",
-    "board uses to decide what it accepts. verifier_requirements is a",
-    "verdict dependency. validator_manifest.json cannot hash itself without recursion."
-  ],
+  "_comment": "Pinned SHA-256 of the repo-local production validation and policy-gate execution closure. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
   "files": {
-    "verify/check_authorship.py": "adb22156e802b6b876a030b1d27fb1804733bf8dcf3f5a16a88f1873543794f2"
-  },
-  "verifier_requirements": [
-    "codes/validate.py",
-    "verify/gate_changed.py"
-  ]
+    ".github/workflows/prose.yml": "c07a2339ee92c5eb7b5297a37ac5be7e9ca3e655ab3f2f199acc31995bef1f18",
+    ".github/workflows/refute-weekly.yml": "d3fb677fd381c397f2b1f60474ad8b86cefc512d2d38ce930ece20498470d7a1",
+    ".github/workflows/verify.yml": "99ab5b2af06a4add38e3661935fe1ccc15a55183043c4b26ac57830ceb15e146",
+    "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
+    "pyproject.toml": "80042e2387ce95973d1abdc12435f09c0ebf27faff489195ed19c89f383b3a65",
+    "uv.lock": "61ecdbd6e185ccb5a6a06a7cb589c5d144002a3eb281fbbf99c2659b6593bffb",
+    "verify/setup_gf2_fast.py": "5d8e5c08a0745353b8a98ace8e87cbe6c0e04b75c6f78ad7f9430e3098a5dac0",
+    "verify/gf2_fast.cpp": "062a81654269074565d5b44a7c715d1652c9a7c320ce12d0905e2c7bac77f6dd",
+    "decode/distance.py": "7e266f8ad50d55fa44e34a5e0bf0005e91de19f24c35c27bf8f9bad796f56076",
+    "schema/code.schema.json": "b1badf0ae7c83e6217db21266e6977e40689f6d114cb135e16c0f272d3eb174d",
+    "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
+    "verify/check_authorship.py": "adb22156e802b6b876a030b1d27fb1804733bf8dcf3f5a16a88f1873543794f2",
+    "verify/check_prose.py": "af9fc3b72c7723cd0aa6309a5a0162acbf1e4ac0bd18722179633802c30df9d0",
+    "verify/check_submission_scope.py": "04945a2ef6b0cabd7b8c3998aa33aa8c66cac158dd4955272742dbaa8c850bf1",
+    "verify/check_validator_integrity.py": "d739db6680bd4c4b481e811234ed6abf470cbf09449825e1dbdb08261234ebd3",
+    "verify/circuit_tools.py": "37a3082aabc26d908bcf2612a6a2f5fb35788a5aa7e93249692f976aaa148106",
+    "verify/circuit_verify.py": "b55f03ebbc82c83b19abcbad2798b789c4aa1b9543cea47d6dba5199d124bbca",
+    "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
+    "verify/gate_changed.py": "e3c46ee834dff02d50224c06dd94fd26d33149081df0cdd95666405aab2dc26a",
+    "verify/gf2.py": "47e8999a4e22a12a852d81ce0f5a9e0248cd04a9d8940b9cb3edba7e85ad5508",
+    "verify/heuristic_distance.py": "57d9e56ce8a409e6cb1a63f48e98878624f0df611b8578c32839b7bfd00989fe",
+    "verify/ler_tools.py": "908d7e63ea6ed6e855e35768e51a269ce20ebeb5757c12e08e91a641cf353de2",
+    "verify/ler_verify.py": "3c75ba7dfdc0d7ddd4d12f05aa06c8b36301f2c13045a4f640c22158457e5650",
+    "verify/qldpc_verify.py": "71308665b86762335d71300e4a8507fff9466986ee68a5fcd1c4df72406f946f",
+    "verify/refute_board.py": "d45c3d4475acd77dac0e6da7854c8d9dd142d1d077b75a166d6d3e5f729ef20d",
+    "verify/validate_candidate.py": "e85d28612a9b798e4693c86bbaacc3fd84a674890fe6af4d8253cf07018183b1",
+    "verify/verify_all.py": "22411a86bee71f128d909b05199b3b0f97127f7dd73019422c187c914530b381"
+  }
 }
