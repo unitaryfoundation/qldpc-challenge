@@ -1,6 +1,6 @@
 {
  "schema_version": "0.1",
- "name": "[[240,6,24]] metacyclic 2BGA (Z_15 x| Z_8, r=4)",
+ "name": "[[240,6,22]] metacyclic 2BGA (Z_15 x| Z_8, r=4)",
  "code_type": "CSS",
  "n": 240,
  "k": 6,
@@ -2411,35 +2411,33 @@
   ]
  },
  "distance": {
-  "d": 24,
+  "d": 22,
   "X": {
-   "value": 24,
+   "value": 22,
    "confidence": "upper_bound",
    "witness": [
-    4,
+    2,
+    5,
+    8,
     16,
-    17,
-    19,
-    22,
-    28,
-    37,
-    49,
-    59,
-    60,
-    62,
-    84,
-    92,
-    101,
-    102,
-    105,
-    108,
-    128,
-    150,
-    158,
-    160,
-    191,
-    220,
-    224
+    21,
+    29,
+    45,
+    48,
+    64,
+    72,
+    80,
+    88,
+    90,
+    93,
+    98,
+    104,
+    106,
+    117,
+    129,
+    161,
+    202,
+    210
    ]
   },
   "Z": {
@@ -2477,14 +2475,14 @@
   "authors": [
    "@simsaidan"
   ],
-  "construction": "2BGA on metacyclic Z_15 x| Z_8 with r=4; supports a=[83, 21, 107, 116], b=[17, 20, 105, 97]. Found by sample_metacyclic sweep (order_range 40-150, weight 4, seed 44); see notes/240-6-24.md and research/build_240_6_24.py.",
+  "construction": "2BGA on metacyclic Z_15 x| Z_8 with r=4; supports a=[83, 21, 107, 116], b=[17, 20, 105, 97]. Found by sample_metacyclic sweep (order_range 40-150, weight 4, seed 44); see notes/240-6-22.md and research/build_240_6_24.py.",
   "references": [
    "arXiv:2306.16400"
   ],
   "origin": "submission",
   "date": "2026-09-05",
   "model": "Cursor Composer 2.5",
-  "notes": "Witness-backed upper bound (not exact-certified). Screen d<=26 collapsed to d<=24 at 12k RIS trials/side. Checked against the board: not an exact or WL duplicate of any existing entry."
+  "notes": "Witness-backed upper bound d<=22 (not exact-certified). Initial package claimed 24; CI refutation (seed 1806566679) found weight-22 X-logicals. Retightened to that witness. Checked: not an exact/WL board duplicate."
  },
  "family": "generalized-bicycle"
 }

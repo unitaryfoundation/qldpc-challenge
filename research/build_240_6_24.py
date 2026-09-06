@@ -1,9 +1,10 @@
-"""Rebuild the [[240,6,24]] metacyclic 2BGA code from its construction parameters.
+"""Rebuild the [[240,6,22]] metacyclic 2BGA code from its construction parameters.
 
 Two-block group-algebra (2BGA) on the metacyclic group Z_15 x| Z_8 with
 action r=4 (order 120, n=240). Weight-4 supports per block (check weight 8).
 Found by a random metacyclic sweep (`sample_metacyclic`); distance is a
-witness-backed upper bound (screen d<=26 collapsed to d<=24 under packaging).
+witness-backed upper bound (screen/package inflated to 26/24; CI tightened
+to d<=22).
 
 Run:  uv run python research/build_240_6_24.py
 """
