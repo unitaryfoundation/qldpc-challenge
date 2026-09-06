@@ -2441,33 +2441,31 @@
    ]
   },
   "Z": {
-   "value": 24,
+   "value": 22,
    "confidence": "upper_bound",
    "witness": [
-    36,
-    37,
-    40,
-    51,
-    55,
-    56,
-    60,
-    66,
-    70,
-    71,
-    80,
-    84,
-    103,
-    138,
-    139,
-    142,
-    147,
-    164,
-    175,
-    193,
-    201,
-    207,
+    5,
+    28,
+    116,
+    117,
+    124,
+    126,
+    129,
+    134,
+    137,
+    150,
+    153,
+    156,
+    161,
+    166,
+    180,
+    185,
+    188,
+    190,
+    209,
+    222,
     230,
-    239
+    238
    ]
   }
  },
@@ -2482,7 +2480,7 @@
   "origin": "submission",
   "date": "2026-09-05",
   "model": "Cursor Composer 2.5",
-  "notes": "Witness-backed upper bound d<=22 (not exact-certified). Initial package claimed 24; CI refutation (seed 1806566679) found weight-22 X-logicals. Retightened to that witness. Checked: not an exact/WL board duplicate."
+  "notes": "Witness-backed upper bound d<=22 (not exact-certified). Initial package claimed 24; CI refutation (seed 1806566679) found weight-22 X-logicals. Retightened both sides to weight-22 witnesses. Checked: not an exact/WL board duplicate."
  },
  "family": "generalized-bicycle"
 }
