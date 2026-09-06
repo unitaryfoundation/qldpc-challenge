@@ -2473,7 +2473,7 @@
   "authors": [
    "@simsaidan"
   ],
-  "construction": "2BGA on metacyclic Z_15 x| Z_8 with r=4; supports a=[83, 21, 107, 116], b=[17, 20, 105, 97]. Found by sample_metacyclic sweep (order_range 40-150, weight 4, seed 44); see notes/240-6-22.md and research/build_240_6_24.py.",
+  "construction": "2BGA on metacyclic Z_15 x| Z_8 with r=4; supports a=[83, 21, 107, 116], b=[17, 20, 105, 97]. Found by sample_metacyclic sweep (order_range 40-150, weight 4, seed 44); see notes/240-6-22.md.",
   "references": [
    "arXiv:2306.16400"
   ],
