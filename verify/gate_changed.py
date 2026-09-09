@@ -55,7 +55,9 @@ Usage:
 """
 import glob
 import json
+import multiprocessing as mp
 import os
+import queue
 import secrets
 import subprocess
 import sys
@@ -66,13 +68,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import circuit_tools as CT
 import gf2
 import heuristic_distance as H
+from build_receipt import make_receipt, write_receipt
 from circuit_verify import MAX_DEM_MECHANISMS, SIDE_FILES
 from qldpc_verify import file_size_error
 from validate_candidate import validate_candidate
-from build_receipt import make_receipt, write_receipt
 
 try:
-    import gf2_fast as GF          # optional C++ accelerator (make fast); the
+    import gf2_fast as GF  # optional C++ accelerator (make fast); the
 except ImportError:                # gate degrades to the python passes without it
     GF = None
 
@@ -81,6 +83,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Fixed thread count for the fast pass so its verdict is reproducible from the
 # printed seed alone (the per-thread RNG streams depend on the split).
 FAST_THREADS = 4
+SYNDROME_SECONDS = 10.0
+SYNDROME_GRACE_SECONDS = 5.0
 
 
 def _load_syndrome():
@@ -92,6 +96,57 @@ def _load_syndrome():
         return sd
     except Exception:
         return None
+
+
+def _syndrome_worker(doc, seed, max_seconds, out):
+    """Run the optional syndrome-decoder check in a killable child process."""
+    try:
+        sd = _load_syndrome()
+        if sd is None:
+            out.put({"kind": "missing"})
+            return
+        out.put({
+            "kind": "ok",
+            "result": sd.refute_check(
+                doc, seed=seed, max_seconds=max_seconds),
+        })
+    except BaseException as e:
+        out.put({"kind": "error", "error": f"{type(e).__name__}: {e}"})
+
+
+def _syndrome_refute_bounded(
+    doc, seed, max_seconds=SYNDROME_SECONDS,
+    grace_seconds=SYNDROME_GRACE_SECONDS, worker=_syndrome_worker,
+):
+    """Bound the optional BP+OSD cross-check even if one decode call stalls."""
+    ctx = mp.get_context("fork" if hasattr(os, "fork") else "spawn")
+    out = ctx.Queue()
+    proc = ctx.Process(target=worker, args=(doc, seed, max_seconds, out))
+    proc.start()
+    proc.join(max_seconds + grace_seconds)
+    if proc.is_alive():
+        proc.terminate()
+        proc.join(2)
+        print(
+            "note: syndrome-decoder cross-check timed out "
+            f"(budget {max_seconds:g}s + grace {grace_seconds:g}s); "
+            "continuing with RIS gates")
+        return False, None, None, 0
+    if proc.exitcode:
+        raise RuntimeError(
+            "syndrome-decoder cross-check exited with status "
+            f"{proc.exitcode}")
+    try:
+        msg = out.get_nowait()
+    except queue.Empty as e:
+        raise RuntimeError("syndrome-decoder cross-check produced no result") from e
+    if msg.get("kind") == "missing":
+        return False, None, None, 0
+    if msg.get("kind") == "error":
+        raise RuntimeError(
+            "syndrome-decoder cross-check failed: "
+            f"{msg.get('error')}")
+    return tuple(msg["result"])
 
 
 def map_changed(paths):
@@ -696,7 +751,8 @@ def main(argv):
             results[f"RIS#{si}"] = H.refute_check(doc, seed=s, max_seconds=budget,
                                                   trials=trials)
         if SD is not None:
-            results["syndrome-decoder"] = SD.refute_check(doc, seed=seed + 1)
+            results["syndrome-decoder"] = _syndrome_refute_bounded(
+                doc, seed=seed + 1)
         # Frontier claims additionally face the accelerated deep search when the
         # extension is built (CI builds it; see Makefile `fast`): ~150x the
         # python trial target in the wall-clock freed by dropping 2 of the 3

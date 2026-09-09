@@ -19,10 +19,12 @@ import copy
 import json
 import os
 import sys
-import numpy as np
+import time
+
 import gf2
-import qldpc_verify
 import heuristic_distance
+import numpy as np
+import qldpc_verify
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _fail = []
@@ -120,7 +122,9 @@ def main():
     # count as a record (and so face the deep refutation tier). Regression for
     # the locality-blind global frontier the gate used before.
     import tempfile
+
     import gate_changed
+
     with tempfile.TemporaryDirectory() as td:
         cd = os.path.join(td, "codes")
         os.makedirs(cd)
@@ -162,6 +166,36 @@ def test_refute_gate():
 def test_main():
     """pytest entry point; the suite body lives in main()."""
     assert main() == 0
+
+
+def _fake_syndrome_ok(doc, seed, max_seconds, out):
+    out.put({"kind": "ok", "result": (True, 3, [1, 2, 3], 99)})
+
+
+def _fake_syndrome_hangs(doc, seed, max_seconds, out):
+    time.sleep(60)
+
+
+def test_bounded_syndrome_decoder_returns_child_result():
+    import gate_changed
+
+    got = gate_changed._syndrome_refute_bounded(
+        {}, seed=7, max_seconds=0.1, grace_seconds=0.1,
+        worker=_fake_syndrome_ok,
+    )
+    assert got == (True, 3, [1, 2, 3], 99)
+
+
+def test_bounded_syndrome_decoder_times_out():
+    import gate_changed
+
+    t0 = time.monotonic()
+    got = gate_changed._syndrome_refute_bounded(
+        {}, seed=7, max_seconds=0.05, grace_seconds=0.05,
+        worker=_fake_syndrome_hangs,
+    )
+    assert got == (False, None, None, 0)
+    assert time.monotonic() - t0 < 5
 
 
 if __name__ == "__main__":
