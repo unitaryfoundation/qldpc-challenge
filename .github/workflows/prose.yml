@@ -8,6 +8,22 @@ permissions:
 
 on:
   pull_request:
+    # `edited` is not in the default set (opened, synchronize, reopened) and it is
+    # the one that matters here: the checker reads the body from
+    # `github.event.pull_request.body`, which is the body as of the triggering
+    # event. Without it, editing a PR body to fix a cited path reruns nothing, and
+    # re-running from the PR page replays the same stale payload -- so a body-only
+    # failure could not be cleared except by an unrelated push (issue #897).
+    # `edited` also fires on title and base changes; the job is stdlib-only and
+    # takes about ten seconds, so that is a fair price.
+    types: [opened, synchronize, reopened, edited]
+
+# A burst of body edits should settle on the last one rather than race: the newest
+# run for a PR wins and any older one still in flight is cancelled, so the check
+# status always reflects the current body.
+concurrency:
+  group: prose-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   prose:

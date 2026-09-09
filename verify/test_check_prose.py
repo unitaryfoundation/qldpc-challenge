@@ -96,6 +96,30 @@ def main():
               problems_for("# [[270,54,10]] code", tmp, slug=("270", "54", "10"))
               == [])
 
+    # A body-sourced problem must say so and point the reader at the PR
+    # description; a file-only failure must not mention the body (issue #897).
+    with tempfile.TemporaryDirectory() as tmp:
+        body = os.path.join(tmp, "body.md")
+        with open(body, "w") as f:
+            f.write("Research note: `notes/700-206-74.md`\n")
+        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
+                            "--root", tmp, "--files", "--body-file", body],
+                           cwd=ROOT, capture_output=True, text=True)
+        check("body-only problem fails", r.returncode == 1)
+        check("body problem is labelled as such", "PR body:" in r.stdout)
+        check("body problem points at the PR description",
+              "editing the PR body" in r.stdout, r.stdout.strip()[-80:])
+
+        note = os.path.join(tmp, "n.md")
+        with open(note, "w") as f:
+            f.write("Built with `evaluation/distance_milp.py`\n")
+        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
+                            "--root", tmp, "--files", note],
+                           cwd=ROOT, capture_output=True, text=True)
+        check("file-only problem fails", r.returncode == 1)
+        check("file-only problem does not blame the PR body",
+              "editing the PR body" not in r.stdout)
+
     # Against the real tree: the two behaviours the check exists to distinguish.
     real = os.path.join(ROOT, "notes", "300-60-14.md")
     if os.path.exists(real):

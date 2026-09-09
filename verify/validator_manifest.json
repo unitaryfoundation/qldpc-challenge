@@ -1,7 +1,7 @@
 {
   "_comment": "Pinned SHA-256 of the repo-local production validation and policy-gate execution closure. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
   "files": {
-    ".github/workflows/prose.yml": "19e41ce543fa45bde186afa4ea833d5660cbb91b0c2d2ed549238e28feeeebbb",
+    ".github/workflows/prose.yml": "371b8311ddc77dfb836e02ee0ef483eb08231a12258f4a187313f09d366a7f41",
     ".github/workflows/refute-weekly.yml": "5a3d9b6d6b0563f3b0259eb918ccfcf4f0a419d6b3fc74cdd321ce5dc3e95ff6",
     ".github/workflows/verify.yml": "b8294de4a8c1ccf38533dfe7c632812b91493f4b81d7c0f41434e28207483834",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
@@ -13,7 +13,7 @@
     "schema/code.schema.json": "b1badf0ae7c83e6217db21266e6977e40689f6d114cb135e16c0f272d3eb174d",
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
     "verify/check_authorship.py": "adb22156e802b6b876a030b1d27fb1804733bf8dcf3f5a16a88f1873543794f2",
-    "verify/check_prose.py": "af9fc3b72c7723cd0aa6309a5a0162acbf1e4ac0bd18722179633802c30df9d0",
+    "verify/check_prose.py": "59d0188146f81285b06016d9a942f67349e72e72bfe06085eb8831f3d49d8fbc",
     "verify/check_submission_scope.py": "04945a2ef6b0cabd7b8c3998aa33aa8c66cac158dd4955272742dbaa8c850bf1",
     "verify/check_validator_integrity.py": "d739db6680bd4c4b481e811234ed6abf470cbf09449825e1dbdb08261234ebd3",
     "verify/circuit_tools.py": "37a3082aabc26d908bcf2612a6a2f5fb35788a5aa7e93249692f976aaa148106",

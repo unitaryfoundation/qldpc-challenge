@@ -39,6 +39,11 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Label for problems that came from the PR description rather than a committed
+# file. Named once because the reporter prints it and the closing hint tests for
+# it: a body problem is fixed by editing the PR, not by touching the tree.
+BODY_LABEL = "PR body"
+
 # Directories the repo deliberately does not commit. Citing one as evidence is
 # unfalsifiable by construction -- AGENTS.md defines research/candidates/ as
 # gitignored working output.
@@ -222,7 +227,7 @@ def main(argv):
 
     if args.body_file and os.path.exists(args.body_file):
         with open(args.body_file, encoding="utf-8") as f:
-            check_text(f.read(), "PR body", root, problems)
+            check_text(f.read(), BODY_LABEL, root, problems)
 
     if not problems:
         print(f"prose check ok ({len(files)} file(s) checked)")
@@ -231,6 +236,11 @@ def main(argv):
     print("Prose check failed: the text points at things a reviewer cannot open.\n")
     for label, why, detail in problems:
         print(f"  {label}: {why}\n    {detail}")
+    if any(label == BODY_LABEL for label, _, _ in problems):
+        print(f"\nAnything labelled '{BODY_LABEL}' above is in the PR description, "
+              "not in a\ncommitted file: fix it by editing the PR body. Nothing in "
+              "the tree has to\nchange for it.")
+
     print("\nFix by pointing at something that exists in this PR, or by naming the")
     print("external source and pinning it (e.g. 'github.com/org/repo @ abc1234,")
     print("`path/in/that/repo.py`'). research/candidates/ is gitignored working")
