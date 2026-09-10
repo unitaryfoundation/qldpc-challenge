@@ -155,8 +155,57 @@ def main():
     return 1 if _fail else 0
 
 
+def _synthetic_gb_matrices(L=21, a=(0, 3, 6, 12), b=(0, 7)):
+    """A circulant GB code from its symbols: H_X = [circ(a)|circ(b)],
+    H_Z = [circ(b)^T|circ(a)^T]. Its lightest single-block logical is weight 3."""
+    def circ(sym):
+        M = np.zeros((L, L), dtype=np.int8)
+        for i in range(L):
+            for e in sym:
+                M[i, (e + i) % L] = 1
+        return M
+    A, B = circ(a), circ(b)
+    return np.hstack([A, B]).astype(np.int8), np.hstack([B.T, A.T]).astype(np.int8)
+
+
+def _synthetic_gb_doc(claim):
+    """A submittable circulant GB doc with genuine witnesses and a chosen claim.
+
+    Synthetic ON PURPOSE. These tests previously asserted against live board
+    entries that were over-stated at the time. Getting those entries corrected
+    is precisely what this mechanism is for, so the fixtures were guaranteed to
+    stop being over-stated -- and when the corrections merged they broke every
+    open submission PR. A fixture for this mechanism must not be board data the
+    mechanism is designed to change.
+
+    `claim` drives which path the gate takes: above weight 3 the structural
+    pass refutes it, at or below 1 nothing can, whatever else moves on the board.
+    """
+    HX, HZ = _synthetic_gb_matrices()
+    n = HX.shape[1]
+    sup = lambda M: [sorted(int(j) for j in np.nonzero(r)[0]) for r in M]
+    vx, wx = _heavy_logical(HX, HZ, n, target=max(claim, 4), seed=1)
+    vz, wz = _heavy_logical(HZ, HX, n, target=max(claim, 4), seed=2)
+    one = lambda v: sorted(int(j) for j in np.nonzero(v)[0])
+    return {
+        "schema_version": "0.2",
+        "name": f"[[{n},8,{claim}]] synthetic circulant GB test fixture",
+        "code_type": "CSS",
+        "n": n, "k": 8,
+        "checks": {"X": sup(HX), "Z": sup(HZ)},
+        "distance": {
+            "d": claim,
+            "X": {"value": claim, "confidence": "upper_bound", "witness": one(vx)},
+            "Z": {"value": claim, "confidence": "upper_bound", "witness": one(vz)},
+        },
+        "provenance": {"authors": ["@test"], "construction": "test fixture",
+                       "date": "2026-01-01"},
+        "family": "generalized-bicycle",
+    }
+
+
 def test_structural_gb_pass():
-    """The circulant-GB mechanism as the gate sees it (issue #942).
+    """The circulant-GB mechanism as the gate calls it (issue #942).
 
     Skipped when the optional accelerator is not built: without it the gate
     behaves exactly as it did before this mechanism existed, which is the whole
@@ -179,24 +228,27 @@ def test_structural_gb_pass():
     check("non-circulant code is not searched",
           (ref, found, wit, tr) == (False, None, None, 0))
 
-    # And a known over-stated circulant GB entry is refuted with a witness the
-    # pinned python stack validated (_structural_refute returns None otherwise).
-    path = os.path.join(ROOT, "codes", "390-68-28.json")
-    if os.path.exists(path):
-        doc = json.load(open(path))
-        ref, found, wit, tr = G._structural_refute(doc, seed=11,
-                                                   trials=G.STRUCT_TRIALS_STD)
-        claimed = int(doc["distance"]["d"])
-        check("over-stated circulant GB entry is refuted",
-              bool(ref and found is not None and found < claimed and wit))
-        if wit:
-            n = doc["n"]
-            v = np.zeros(n, dtype=np.int8)
-            v[list(wit)] = 1
-            HX = heuristic_distance._matrix(doc["checks"]["X"], n)
-            HZ = heuristic_distance._matrix(doc["checks"]["Z"], n)
-            in_ker = (not ((HX @ v) % 2).any()) or (not ((HZ @ v) % 2).any())
-            check("the returned witness is a real kernel vector", in_ker)
+    # An over-claimed circulant GB entry is refuted, with a witness the pinned
+    # python stack validated (_structural_refute returns None otherwise).
+    over = _synthetic_gb_doc(claim=8)
+    ref, found, wit, tr = G._structural_refute(over, seed=11,
+                                               trials=G.STRUCT_TRIALS_STD)
+    check("over-claimed circulant GB code is refuted",
+          bool(ref and found is not None and found < 8 and wit))
+    if wit:
+        n = over["n"]
+        v = np.zeros(n, dtype=np.int8)
+        v[list(wit)] = 1
+        HX, HZ = _synthetic_gb_matrices()
+        in_ker = (not ((HX @ v) % 2).any()) or (not ((HZ @ v) % 2).any())
+        check("the returned witness is a real kernel vector", in_ker)
+
+    # And a claim nothing can beat is left alone.
+    honest = _synthetic_gb_doc(claim=1)
+    ref, found, wit, tr = G._structural_refute(honest, seed=11,
+                                               trials=G.STRUCT_TRIALS_STD)
+    check("un-beatable claim is not refuted", not ref and tr > 0)
+
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
     assert not _fail, _fail
 
@@ -204,13 +256,13 @@ def test_structural_gb_pass():
 def test_structural_stage_ordering():
     """Stage 1 (circulant-GB) runs first and short-circuits ONLY on a hit.
 
-    Three paths, and the middle one is the one that matters most:
+    Three paths, and the middle one matters most:
       * circulant and over-claimed -> stage 1 refutes and the general battery
         is skipped, because a validated refutation cannot be undone by more
-        searching (and the battery is where the ~44 min goes);
-      * circulant and honest -> stage 1 clears it and the FULL battery still
-        runs, because a structural miss proves nothing: that search only sees
-        single-block logicals, and most real witnesses are mixed-support;
+        searching (and the battery is where the wall-clock goes);
+      * circulant and not beatable -> stage 1 clears it and the FULL battery
+        still runs, because a structural miss proves nothing: that search only
+        sees single-block logicals, and most real witnesses are mixed-support;
       * not circulant -> stage 1 is a no-op and the battery runs as before.
     """
     try:
@@ -223,10 +275,14 @@ def test_structural_stage_ordering():
     import subprocess
     import tempfile
 
-    def gate_receipt(src):
-        """Run the gate on a copy of `src` and return its receipt's gate block."""
+    def gate_receipt(doc=None, src=None):
+        """Run the gate on a temp code file and return its receipt gate block."""
         dst = os.path.join(ROOT, "codes", "zz-stage-probe.json")
-        shutil.copy(os.path.join(ROOT, src), dst)
+        if doc is not None:
+            with open(dst, "w") as f:
+                json.dump(doc, f)
+        else:
+            shutil.copy(os.path.join(ROOT, src), dst)
         try:
             with tempfile.TemporaryDirectory() as rd:
                 subprocess.run(
@@ -236,13 +292,12 @@ def test_structural_stage_ordering():
                 rp = os.path.join(rd, "zz-stage-probe.json")
                 if not os.path.exists(rp):
                     return None
-                r = json.load(open(rp))
-                return r["trusted_validation"]["distance_gate"]
+                return json.load(open(rp))["trusted_validation"]["distance_gate"]
         finally:
             if os.path.exists(dst):
                 os.remove(dst)
 
-    g = gate_receipt(os.path.join("codes", "674-170-76.json"))
+    g = gate_receipt(doc=_synthetic_gb_doc(claim=8))
     if g is not None:
         check("over-claimed circulant refutes at stage 1", bool(g["refuted"]))
         check("stage 1 hit short-circuits the battery",
@@ -251,16 +306,16 @@ def test_structural_stage_ordering():
               list(g["methods"]) == ["circulant-GB"])
         check("no general trials were spent", g["trials"] == 0 and not g["seeds"])
 
-    g = gate_receipt(os.path.join("codes", "42-8-3.json"))
+    g = gate_receipt(doc=_synthetic_gb_doc(claim=1))
     if g is not None:
-        check("honest circulant is not refuted", not g["refuted"])
+        check("un-beatable circulant is not refuted", not g["refuted"])
         check("stage 1 runs on it", "circulant-GB" in g["methods"])
         check("a stage 1 MISS still pays the full battery",
               any(m.startswith("RIS#") for m in g["methods"]))
         check("no short circuit on a miss", g.get("short_circuited_by") is None)
         check("general trials were spent", g["trials"] > 0)
 
-    g = gate_receipt(os.path.join("codes", "72-12-6.json"))
+    g = gate_receipt(src=os.path.join("verify", "fixtures", "72-6-6.json"))
     if g is not None:
         check("non-circulant code never reaches the structural search",
               "circulant-GB" not in g["methods"])
