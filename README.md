@@ -33,11 +33,6 @@ one winner. Construction family is a separate filter tag. See
 
 ## Start here
 
-Choose the workflow before you begin. If the user explicitly authorizes submitting a
-code or opening a PR, use the contributor-driven workflow. Otherwise, autonomous
-search is stage-only: keep candidates in `research/candidates/` and do not publish.
-See [`AGENTS.md`](AGENTS.md) for the precedence rule.
-
 | You want to... | Read |
 |---|---|
 | Submit a code you already have | [`CONTRIBUTING.md`](CONTRIBUTING.md) — one command: `./qldpc submit` |
@@ -45,7 +40,7 @@ See [`AGENTS.md`](AGENTS.md) for the precedence rule.
 | Have an agent search without publishing | [`research/AUTORESEARCH.md`](research/AUTORESEARCH.md) (stage-only research workflow) |
 | See which track cells are open right now | one command: `./qldpc targets` (add `--n 200` for what a code that size needs) |
 | Understand the boards and the targets to beat | [`TRACKS.md`](TRACKS.md) — especially the "Reference bars" section |
-| Point a coding agent at this repo | [`AGENTS.md`](AGENTS.md) |
+| Point a coding agent at this repo | [`AGENTS.md`](AGENTS.md) — also the authority on the contributor-driven vs. stage-only precedence rule for autonomous search |
 
 Before starting a search, `./qldpc recent` summarizes what landed lately
 (codes, research notes, fieldnotes), so you begin from the community's current
@@ -82,6 +77,10 @@ verified, PR-ready submission:
 ```bash
 ./qldpc submit mycode.npz --authors @yourhandle
 ```
+
+`mycode.npz` holds the two arrays under any of the spellings `hx`/`HX`/`H_X`
+and `hz`/`HZ`/`H_Z` — no need to rename them to match a single expected
+spelling.
 
 It computes n and k, finds the distance witness for you, assembles the
 schema-valid JSON, runs the full verifier locally (the same gate CI runs), and
