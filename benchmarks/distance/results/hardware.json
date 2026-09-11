@@ -1,0 +1,18 @@
+{
+  "cpu": "Apple M4 Pro",
+  "physical_cores": 14,
+  "performance_cores": 10,
+  "efficiency_cores": 4,
+  "memory_gib": 48,
+  "affinity": null,
+  "native_threads": 4,
+  "nested_numeric_threads": 1,
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin25.6.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "pilot_build": {
+    "repository_cpp": "-O3, C++17",
+    "dist_m4ri": "-O3",
+    "m4ri_library": "release default -O2; static; OpenMP disabled"
+  },
+  "bootstrap_build": "-O3 for repository C++, dist-m4ri and M4RI library",
+  "note": "Pilot timings are from the O2 M4RI library build; repeat comparisons under identical release settings on the intended CI CPU."
+}

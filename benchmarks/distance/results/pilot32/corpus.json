@@ -1,0 +1,2030 @@
+{
+  "sources": {
+    "repository_base": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+    "codedistance": {
+      "url": "https://github.com/m-webster/codeDistancePYPI",
+      "commit": "a4afe9c09bbf5790da9ecc05b65c5b62343979ad"
+    },
+    "dist_m4ri": {
+      "url": "https://github.com/QEC-pages/dist-m4ri",
+      "commit": "538d119f6e98b3782415eb78f7ce322a076f8101"
+    },
+    "m4ri": {
+      "url": "https://github.com/malb/m4ri/releases/download/20260122/m4ri-20260122.tar.gz",
+      "version": "20260122"
+    },
+    "yarn": {
+      "url": "https://github.com/a7b/yarn",
+      "commit": "e1cd5452dea871efab9f3fb2e63a94f8ffd6e3b7"
+    }
+  },
+  "cases": [
+    {
+      "id": "board-72-12-6",
+      "n": 72,
+      "k": 12,
+      "rate": 0.16666666666666666,
+      "matrix_sha256": "3c6319868cbce60d0e8c999aa4435bd3a0d171e601bc1d6ed750febeb212d844",
+      "file": "board-72-12-6.npz",
+      "rank_x": 30,
+      "rank_z": 30,
+      "shape_x": [
+        36,
+        72
+      ],
+      "shape_z": [
+        36,
+        72
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "board",
+      "family": "bivariate-bicycle",
+      "source": "codes/72-12-6.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 6,
+      "reference": {
+        "X": [
+          48,
+          52,
+          66,
+          67,
+          68,
+          71
+        ],
+        "Z": [
+          2,
+          16,
+          24,
+          40,
+          48,
+          62
+        ]
+      },
+      "expected_n": 72,
+      "expected_k": 12
+    },
+    {
+      "id": "board-144-12-12",
+      "n": 144,
+      "k": 12,
+      "rate": 0.08333333333333333,
+      "matrix_sha256": "b1ea870a931a2170ad34da8d9897f30db9f66a1b7fb8cc88463d0dedb7656d6b",
+      "file": "board-144-12-12.npz",
+      "rank_x": 66,
+      "rank_z": 66,
+      "shape_x": [
+        72,
+        144
+      ],
+      "shape_z": [
+        72,
+        144
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "board",
+      "family": "bivariate-bicycle",
+      "source": "codes/144-12-12.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 12,
+      "reference": {
+        "X": [
+          54,
+          56,
+          60,
+          64,
+          67,
+          71,
+          126,
+          127,
+          130,
+          131,
+          133,
+          137
+        ],
+        "Z": [
+          0,
+          10,
+          17,
+          72,
+          76,
+          78,
+          81,
+          82,
+          83,
+          84,
+          85,
+          138
+        ]
+      },
+      "expected_n": 144,
+      "expected_k": 12
+    },
+    {
+      "id": "board-300-4-27",
+      "n": 300,
+      "k": 4,
+      "rate": 0.013333333333333334,
+      "matrix_sha256": "d3817ef8a2191598b8ccde96e888b81b63574b42e0af1885a85136fceada4744",
+      "file": "board-300-4-27.npz",
+      "rank_x": 148,
+      "rank_z": 148,
+      "shape_x": [
+        150,
+        300
+      ],
+      "shape_z": [
+        150,
+        300
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "lifted-product",
+      "source": "codes/300-4-27.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 27,
+      "reference": {
+        "X": [
+          8,
+          14,
+          18,
+          30,
+          35,
+          58,
+          61,
+          67,
+          105,
+          108,
+          125,
+          127,
+          128,
+          147,
+          150,
+          179,
+          180,
+          193,
+          197,
+          218,
+          233,
+          260,
+          264,
+          271,
+          273,
+          274,
+          289
+        ],
+        "Z": [
+          12,
+          21,
+          43,
+          45,
+          70,
+          79,
+          81,
+          95,
+          124,
+          128,
+          134,
+          135,
+          138,
+          160,
+          177,
+          197,
+          204,
+          215,
+          219,
+          221,
+          222,
+          224,
+          231,
+          241,
+          259,
+          266,
+          298
+        ]
+      },
+      "expected_n": 300,
+      "expected_k": 4
+    },
+    {
+      "id": "board-450-8-16",
+      "n": 450,
+      "k": 8,
+      "rate": 0.017777777777777778,
+      "matrix_sha256": "149da1e9c587702c5a94bc54b3cdd243a7e761ba0235367c994acb880b180ca7",
+      "file": "board-450-8-16.npz",
+      "rank_x": 221,
+      "rank_z": 221,
+      "shape_x": [
+        221,
+        450
+      ],
+      "shape_z": [
+        221,
+        450
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "board",
+      "family": "bivariate-bicycle",
+      "source": "codes/450-8-16.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 16,
+      "reference": {
+        "X": [
+          18,
+          19,
+          79,
+          110,
+          111,
+          141,
+          143,
+          172,
+          173,
+          174,
+          175,
+          203,
+          207,
+          231,
+          259,
+          274
+        ],
+        "Z": [
+          103,
+          118,
+          131,
+          136,
+          142,
+          144,
+          151,
+          157,
+          170,
+          178,
+          330,
+          362,
+          369,
+          370,
+          393,
+          401
+        ]
+      },
+      "expected_n": 450,
+      "expected_k": 8
+    },
+    {
+      "id": "board-550-110-18",
+      "n": 550,
+      "k": 110,
+      "rate": 0.2,
+      "matrix_sha256": "661048f88f171025b1cf9eca123720c07b44e99392b36cbb97010207c245bbb1",
+      "file": "board-550-110-18.npz",
+      "rank_x": 220,
+      "rank_z": 220,
+      "shape_x": [
+        220,
+        550
+      ],
+      "shape_z": [
+        220,
+        550
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "balanced-product",
+      "source": "codes/550-110-18.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 18,
+      "reference": {
+        "X": [
+          220,
+          221,
+          225,
+          234,
+          260,
+          273,
+          276,
+          297,
+          300,
+          306,
+          319,
+          352,
+          358,
+          386,
+          392,
+          405,
+          436,
+          439
+        ],
+        "Z": [
+          1,
+          7,
+          13,
+          25,
+          35,
+          41,
+          47,
+          83,
+          224,
+          227,
+          243,
+          245,
+          261,
+          271,
+          277,
+          294,
+          295,
+          303
+        ]
+      },
+      "expected_n": 550,
+      "expected_k": 110
+    },
+    {
+      "id": "board-700-6-32",
+      "n": 700,
+      "k": 6,
+      "rate": 0.008571428571428572,
+      "matrix_sha256": "50bf8924ee0e9ae3906cabefdcc9b3d4ad37e92af161c663215f832037a31b88",
+      "file": "board-700-6-32.npz",
+      "rank_x": 347,
+      "rank_z": 347,
+      "shape_x": [
+        350,
+        700
+      ],
+      "shape_z": [
+        350,
+        700
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "board",
+      "family": "bivariate-bicycle",
+      "source": "codes/700-6-32.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 32,
+      "reference": {
+        "X": [
+          0,
+          9,
+          64,
+          65,
+          74,
+          130,
+          140,
+          141,
+          196,
+          197,
+          214,
+          215,
+          285,
+          350,
+          360,
+          375,
+          405,
+          421,
+          454,
+          485,
+          492,
+          493,
+          503,
+          549,
+          566,
+          567,
+          597,
+          612,
+          628,
+          646,
+          661,
+          676
+        ],
+        "Z": [
+          13,
+          43,
+          44,
+          52,
+          61,
+          107,
+          125,
+          156,
+          184,
+          189,
+          194,
+          205,
+          235,
+          259,
+          284,
+          299,
+          315,
+          332,
+          348,
+          395,
+          396,
+          404,
+          413,
+          414,
+          457,
+          467,
+          468,
+          469,
+          470,
+          480,
+          522,
+          545,
+          600,
+          665
+        ]
+      },
+      "expected_n": 700,
+      "expected_k": 6
+    },
+    {
+      "id": "board-700-140-22",
+      "n": 700,
+      "k": 140,
+      "rate": 0.2,
+      "matrix_sha256": "fd45dae3f6d0acd4f6fcdc0b895b47bddad06b10af8bd07867693f9355c20173",
+      "file": "board-700-140-22.npz",
+      "rank_x": 280,
+      "rank_z": 280,
+      "shape_x": [
+        280,
+        700
+      ],
+      "shape_z": [
+        280,
+        700
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "balanced-product",
+      "source": "codes/700-140-22.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 22,
+      "reference": {
+        "X": [
+          286,
+          315,
+          319,
+          323,
+          357,
+          364,
+          381,
+          390,
+          392,
+          411,
+          425,
+          436,
+          450,
+          471,
+          485,
+          497,
+          504,
+          521,
+          534,
+          541,
+          545,
+          551
+        ],
+        "Z": [
+          153,
+          155,
+          178,
+          185,
+          195,
+          202,
+          206,
+          207,
+          218,
+          226,
+          239,
+          257,
+          258,
+          259,
+          432,
+          458,
+          462,
+          482,
+          494,
+          497,
+          538,
+          545
+        ]
+      },
+      "expected_n": 700,
+      "expected_k": 140
+    },
+    {
+      "id": "board-700-222-28",
+      "n": 700,
+      "k": 222,
+      "rate": 0.3171428571428571,
+      "matrix_sha256": "068e67a4e8c57174264f9f22cb7cf55abe575f272c90270716f76b8b47d751c5",
+      "file": "board-700-222-28.npz",
+      "rank_x": 234,
+      "rank_z": 244,
+      "shape_x": [
+        234,
+        700
+      ],
+      "shape_z": [
+        244,
+        700
+      ],
+      "max_row_weight": 28,
+      "max_column_weight": 16,
+      "group": "board",
+      "family": "[[700,222,28]] check-deletion chain of codes/700-212-28.json",
+      "source": "codes/700-222-28.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 28,
+      "reference": {
+        "X": [
+          14,
+          19,
+          24,
+          43,
+          63,
+          73,
+          132,
+          159,
+          204,
+          208,
+          278,
+          307,
+          353,
+          360,
+          396,
+          403,
+          429,
+          445,
+          475,
+          480,
+          501,
+          506,
+          566,
+          588,
+          604,
+          686,
+          688,
+          690
+        ],
+        "Z": [
+          23,
+          39,
+          65,
+          72,
+          108,
+          115,
+          128,
+          130,
+          132,
+          214,
+          230,
+          252,
+          312,
+          317,
+          338,
+          343,
+          395,
+          405,
+          425,
+          444,
+          449,
+          454,
+          511,
+          540,
+          610,
+          614,
+          659,
+          686
+        ]
+      },
+      "expected_n": 700,
+      "expected_k": 222
+    },
+    {
+      "id": "board-674-128-80",
+      "n": 674,
+      "k": 128,
+      "rate": 0.18991097922848665,
+      "matrix_sha256": "c4f1c7e8d40e6ea17dea19fd7cc4d2e57652a754e485be86eebd5a416505f258",
+      "file": "board-674-128-80.npz",
+      "rank_x": 273,
+      "rank_z": 273,
+      "shape_x": [
+        337,
+        674
+      ],
+      "shape_z": [
+        337,
+        674
+      ],
+      "max_row_weight": 30,
+      "max_column_weight": 16,
+      "group": "board",
+      "family": "[[674,128,d<=80]] designed-divisor generalized-bicycle code",
+      "source": "codes/674-128-80.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 80,
+      "reference": {
+        "X": [
+          2,
+          3,
+          8,
+          12,
+          13,
+          14,
+          22,
+          26,
+          32,
+          35,
+          36,
+          43,
+          50,
+          51,
+          60,
+          63,
+          64,
+          71,
+          75,
+          76,
+          81,
+          88,
+          90,
+          97,
+          102,
+          106,
+          110,
+          111,
+          114,
+          134,
+          139,
+          148,
+          149,
+          150,
+          154,
+          173,
+          174,
+          178,
+          182,
+          183,
+          190,
+          193,
+          194,
+          201,
+          203,
+          204,
+          207,
+          210,
+          212,
+          217,
+          227,
+          230,
+          232,
+          234,
+          235,
+          237,
+          243,
+          244,
+          246,
+          248,
+          252,
+          255,
+          257,
+          259,
+          263,
+          264,
+          269,
+          321,
+          340,
+          342,
+          343,
+          387,
+          423,
+          460,
+          474,
+          492,
+          503,
+          550,
+          571,
+          655
+        ],
+        "Z": [
+          2,
+          6,
+          10,
+          14,
+          22,
+          23,
+          28,
+          29,
+          30,
+          31,
+          37,
+          43,
+          46,
+          50,
+          51,
+          54,
+          57,
+          62,
+          65,
+          69,
+          78,
+          80,
+          87,
+          102,
+          104,
+          109,
+          110,
+          112,
+          115,
+          121,
+          124,
+          126,
+          127,
+          129,
+          130,
+          147,
+          153,
+          157,
+          161,
+          165,
+          166,
+          169,
+          170,
+          176,
+          179,
+          183,
+          189,
+          194,
+          195,
+          205,
+          210,
+          211,
+          214,
+          217,
+          221,
+          226,
+          228,
+          246,
+          247,
+          248,
+          258,
+          261,
+          264,
+          267,
+          269,
+          271,
+          281,
+          324,
+          325,
+          362,
+          397,
+          405,
+          427,
+          433,
+          501,
+          538,
+          545,
+          576,
+          599,
+          618,
+          638,
+          658
+        ]
+      },
+      "expected_n": 674,
+      "expected_k": 128
+    },
+    {
+      "id": "board-682-172-79",
+      "n": 682,
+      "k": 172,
+      "rate": 0.25219941348973607,
+      "matrix_sha256": "580f8771ba9a0f149cf8d34deea8c5af34318a9599d836bd9a1824fe4439c0ba",
+      "file": "board-682-172-79.npz",
+      "rank_x": 255,
+      "rank_z": 255,
+      "shape_x": [
+        341,
+        682
+      ],
+      "shape_z": [
+        341,
+        682
+      ],
+      "max_row_weight": 32,
+      "max_column_weight": 16,
+      "group": "board",
+      "family": "generalized-bicycle",
+      "source": "codes/682-172-79.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 76,
+      "reference": {
+        "X": [
+          1,
+          8,
+          17,
+          30,
+          32,
+          33,
+          34,
+          35,
+          36,
+          41,
+          48,
+          51,
+          55,
+          57,
+          66,
+          77,
+          90,
+          97,
+          98,
+          101,
+          105,
+          107,
+          110,
+          113,
+          117,
+          120,
+          121,
+          123,
+          128,
+          129,
+          134,
+          136,
+          153,
+          160,
+          161,
+          172,
+          174,
+          179,
+          182,
+          187,
+          190,
+          191,
+          200,
+          213,
+          215,
+          216,
+          217,
+          218,
+          219,
+          221,
+          222,
+          223,
+          234,
+          238,
+          239,
+          241,
+          246,
+          251,
+          252,
+          253,
+          263,
+          275,
+          278,
+          283,
+          292,
+          296,
+          298,
+          300,
+          305,
+          307,
+          308,
+          310,
+          315,
+          323,
+          332,
+          338
+        ],
+        "Z": [
+          344,
+          350,
+          359,
+          367,
+          372,
+          374,
+          375,
+          377,
+          382,
+          384,
+          386,
+          390,
+          399,
+          404,
+          407,
+          419,
+          429,
+          430,
+          431,
+          436,
+          441,
+          443,
+          444,
+          448,
+          459,
+          460,
+          461,
+          463,
+          464,
+          465,
+          466,
+          467,
+          469,
+          482,
+          491,
+          492,
+          495,
+          500,
+          503,
+          508,
+          510,
+          521,
+          522,
+          529,
+          546,
+          548,
+          553,
+          554,
+          559,
+          561,
+          562,
+          565,
+          569,
+          572,
+          575,
+          577,
+          581,
+          584,
+          585,
+          592,
+          605,
+          616,
+          625,
+          627,
+          631,
+          634,
+          641,
+          646,
+          647,
+          648,
+          649,
+          650,
+          652,
+          665,
+          674,
+          681
+        ]
+      },
+      "expected_n": 682,
+      "expected_k": 172
+    },
+    {
+      "id": "board-576-294-12",
+      "n": 576,
+      "k": 294,
+      "rate": 0.5104166666666666,
+      "matrix_sha256": "767fa229fc0ab99671c372172575e46e6c48dc769420b33cb2fa4444b09c2dcf",
+      "file": "board-576-294-12.npz",
+      "rank_x": 141,
+      "rank_z": 141,
+      "shape_x": [
+        144,
+        576
+      ],
+      "shape_z": [
+        144,
+        576
+      ],
+      "max_row_weight": 16,
+      "max_column_weight": 4,
+      "group": "board",
+      "family": "pair-partition-cpm",
+      "source": "codes/576-294-12.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 12,
+      "reference": {
+        "X": [
+          26,
+          37,
+          38,
+          39,
+          153,
+          208,
+          222,
+          284,
+          372,
+          373,
+          433,
+          445
+        ],
+        "Z": [
+          34,
+          156,
+          157,
+          158,
+          326,
+          330,
+          357,
+          363,
+          398,
+          399,
+          487,
+          545
+        ]
+      },
+      "expected_n": 576,
+      "expected_k": 294
+    },
+    {
+      "id": "board-300-60-14",
+      "n": 300,
+      "k": 60,
+      "rate": 0.2,
+      "matrix_sha256": "476ab0a6e97ae463469c4f6ed9593f76b780048206da995cb94b4e1848c41a4f",
+      "file": "board-300-60-14.npz",
+      "rank_x": 120,
+      "rank_z": 120,
+      "shape_x": [
+        120,
+        300
+      ],
+      "shape_z": [
+        120,
+        300
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "lifted-product",
+      "source": "codes/300-60-14.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 14,
+      "reference": {
+        "X": [
+          1,
+          4,
+          19,
+          22,
+          23,
+          26,
+          40,
+          50,
+          62,
+          69,
+          76,
+          86,
+          114,
+          115
+        ],
+        "Z": [
+          11,
+          32,
+          33,
+          36,
+          49,
+          56,
+          120,
+          134,
+          139,
+          140,
+          142,
+          145,
+          170,
+          175
+        ]
+      },
+      "expected_n": 300,
+      "expected_k": 60
+    },
+    {
+      "id": "board-630-126-20",
+      "n": 630,
+      "k": 126,
+      "rate": 0.2,
+      "matrix_sha256": "070dfe707c3b1290b5f1ae36de6651a7613212aba623138fe0c72ee11b855847",
+      "file": "board-630-126-20.npz",
+      "rank_x": 252,
+      "rank_z": 252,
+      "shape_x": [
+        252,
+        630
+      ],
+      "shape_z": [
+        252,
+        630
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "lifted-product",
+      "source": "codes/630-126-20.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 20,
+      "reference": {
+        "X": [
+          281,
+          289,
+          299,
+          332,
+          335,
+          348,
+          383,
+          393,
+          414,
+          430,
+          432,
+          434,
+          438,
+          454,
+          458,
+          461,
+          463,
+          471,
+          487,
+          489
+        ],
+        "Z": [
+          5,
+          10,
+          31,
+          35,
+          41,
+          50,
+          82,
+          87,
+          93,
+          254,
+          290,
+          291,
+          315,
+          325,
+          333,
+          347,
+          353,
+          358,
+          359,
+          364
+        ]
+      },
+      "expected_n": 630,
+      "expected_k": 126
+    },
+    {
+      "id": "board-682-20-22",
+      "n": 682,
+      "k": 20,
+      "rate": 0.02932551319648094,
+      "matrix_sha256": "1b204c46549d7eba754ac3b682d349d6110a54116f79dd0aadd87902c33e233c",
+      "file": "board-682-20-22.npz",
+      "rank_x": 331,
+      "rank_z": 331,
+      "shape_x": [
+        341,
+        682
+      ],
+      "shape_z": [
+        341,
+        682
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "board",
+      "family": "generalized-bicycle",
+      "source": "codes/682-20-22.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 22,
+      "reference": {
+        "X": [
+          104,
+          132,
+          145,
+          186,
+          269,
+          308,
+          310,
+          351,
+          367,
+          390,
+          426,
+          452,
+          461,
+          487,
+          520,
+          553,
+          555,
+          572,
+          614,
+          640,
+          666,
+          673
+        ],
+        "Z": [
+          3,
+          62,
+          78,
+          97,
+          104,
+          130,
+          156,
+          198,
+          215,
+          250,
+          283,
+          309,
+          318,
+          339,
+          419,
+          460,
+          462,
+          501,
+          584,
+          625,
+          638,
+          640
+        ]
+      },
+      "expected_n": 682,
+      "expected_k": 20
+    },
+    {
+      "id": "tanner-144_2_13",
+      "n": 144,
+      "k": 2,
+      "rate": 0.013888888888888888,
+      "matrix_sha256": "2d6b0f1382f5080b774288cef38ba3b21b97edec579e4367eba7865c4274c07b",
+      "file": "tanner-144_2_13.npz",
+      "rank_x": 71,
+      "rank_z": 71,
+      "shape_x": [
+        72,
+        144
+      ],
+      "shape_z": [
+        72,
+        144
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 8,
+      "group": "literature",
+      "family": "quantum-tanner",
+      "source": "codedistance",
+      "expected_n": 144,
+      "expected_k": 2,
+      "paper_target": 13
+    },
+    {
+      "id": "tanner-432_8_33",
+      "n": 432,
+      "k": 8,
+      "rate": 0.018518518518518517,
+      "matrix_sha256": "22af2b322da62bc3f0946ab00bdb6dfcfb248ea091d6082f36292b6862e952fb",
+      "file": "tanner-432_8_33.npz",
+      "rank_x": 212,
+      "rank_z": 212,
+      "shape_x": [
+        216,
+        432
+      ],
+      "shape_z": [
+        216,
+        432
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 8,
+      "group": "literature",
+      "family": "quantum-tanner",
+      "source": "codedistance",
+      "expected_n": 432,
+      "expected_k": 8,
+      "paper_target": 33
+    },
+    {
+      "id": "tanner-684_2_29",
+      "n": 684,
+      "k": 2,
+      "rate": 0.0029239766081871343,
+      "matrix_sha256": "409a170cd72bace165926d742fc74ea70162841e20fa78e4c27dd58912cc0de4",
+      "file": "tanner-684_2_29.npz",
+      "rank_x": 341,
+      "rank_z": 341,
+      "shape_x": [
+        342,
+        684
+      ],
+      "shape_z": [
+        342,
+        684
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 8,
+      "group": "literature",
+      "family": "quantum-tanner",
+      "source": "codedistance",
+      "expected_n": 684,
+      "expected_k": 2,
+      "paper_target": 29
+    },
+    {
+      "id": "mitten-780-156",
+      "n": 780,
+      "k": 156,
+      "rate": 0.2,
+      "matrix_sha256": "475c859eb1c3aa7dae00d5fbe7084dccf4dbbb66b8da18c73aa8a420b3fd2660",
+      "file": "mitten-780-156.npz",
+      "rank_x": 312,
+      "rank_z": 312,
+      "shape_x": [
+        312,
+        780
+      ],
+      "shape_z": [
+        312,
+        780
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "literature",
+      "family": "mitten",
+      "source": "yarn:processor_codes/mitten/[[780,156,22]]",
+      "expected_n": 780,
+      "expected_k": 156,
+      "paper_target": 22
+    },
+    {
+      "id": "mitten-975-195",
+      "n": 975,
+      "k": 195,
+      "rate": 0.2,
+      "matrix_sha256": "a149ae2a82910f57646700fb4e5985e5b2599fa3c21947018963d9b55f710c34",
+      "file": "mitten-975-195.npz",
+      "rank_x": 390,
+      "rank_z": 390,
+      "shape_x": [
+        390,
+        975
+      ],
+      "shape_z": [
+        390,
+        975
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "literature",
+      "family": "mitten",
+      "source": "yarn:processor_codes/mitten/[[975,195,24]]",
+      "expected_n": 975,
+      "expected_k": 195,
+      "paper_target": 24
+    },
+    {
+      "id": "zsz-775-155",
+      "n": 775,
+      "k": 155,
+      "rate": 0.2,
+      "matrix_sha256": "7fed9af3cac721755d2931955773a91b64103677400bcbe9375c1657598a8357",
+      "file": "zsz-775-155.npz",
+      "rank_x": 310,
+      "rank_z": 310,
+      "shape_x": [
+        310,
+        775
+      ],
+      "shape_z": [
+        310,
+        775
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "literature",
+      "family": "zsz-lp",
+      "source": "arxiv:2607.27644v1, Tables 3 and 8",
+      "parameters": [
+        31,
+        5,
+        2
+      ],
+      "polynomials": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            26,
+            2
+          ],
+          [
+            18,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            13,
+            2
+          ],
+          [
+            7,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            28,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            22,
+            2
+          ]
+        ]
+      ],
+      "expected_n": 775,
+      "expected_k": 155,
+      "paper_target": 22
+    },
+    {
+      "id": "zsz-840-168",
+      "n": 840,
+      "k": 168,
+      "rate": 0.2,
+      "matrix_sha256": "e910e9cda7a2993adac6516125b50197213205630e89397bdda92f836addfd2a",
+      "file": "zsz-840-168.npz",
+      "rank_x": 336,
+      "rank_z": 336,
+      "shape_x": [
+        336,
+        840
+      ],
+      "shape_z": [
+        336,
+        840
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "literature",
+      "family": "zsz-lp",
+      "source": "arxiv:2607.27644v1, Tables 3 and 8",
+      "parameters": [
+        28,
+        6,
+        11
+      ],
+      "polynomials": [
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            19,
+            3
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            24,
+            1
+          ],
+          [
+            2,
+            2
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            26,
+            2
+          ],
+          [
+            27,
+            3
+          ]
+        ]
+      ],
+      "expected_n": 840,
+      "expected_k": 168,
+      "paper_target": 24
+    },
+    {
+      "id": "bb-756-16",
+      "n": 756,
+      "k": 16,
+      "rate": 0.021164021164021163,
+      "matrix_sha256": "ad72a746b97eb422334465e55654049a5a4573dd25d9f5c367610381081c693c",
+      "file": "bb-756-16.npz",
+      "rank_x": 370,
+      "rank_z": 370,
+      "shape_x": [
+        378,
+        756
+      ],
+      "shape_z": [
+        378,
+        756
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "literature",
+      "family": "bivariate-bicycle",
+      "source": "codedistance:examples/bivariate_bicycle.py",
+      "l": 21,
+      "m": 18,
+      "A": [
+        [
+          3,
+          0
+        ],
+        [
+          0,
+          10
+        ],
+        [
+          0,
+          17
+        ]
+      ],
+      "B": [
+        [
+          0,
+          5
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          19,
+          0
+        ]
+      ],
+      "expected_n": 756,
+      "expected_k": 16,
+      "paper_target": 34
+    },
+    {
+      "id": "bb-864-4",
+      "n": 864,
+      "k": 4,
+      "rate": 0.004629629629629629,
+      "matrix_sha256": "547a3c36ee8580d500374506d85ba27055fa362d4df91db04e42aeb257b6c38d",
+      "file": "bb-864-4.npz",
+      "rank_x": 430,
+      "rank_z": 430,
+      "shape_x": [
+        432,
+        864
+      ],
+      "shape_z": [
+        432,
+        864
+      ],
+      "max_row_weight": 6,
+      "max_column_weight": 3,
+      "group": "literature",
+      "family": "bivariate-bicycle",
+      "source": "codedistance:examples/bivariate_bicycle.py",
+      "l": 12,
+      "m": 36,
+      "A": [
+        [
+          7,
+          0
+        ],
+        [
+          0,
+          23
+        ],
+        [
+          0,
+          21
+        ]
+      ],
+      "B": [
+        [
+          0,
+          1
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "expected_n": 864,
+      "expected_k": 4,
+      "paper_target": 40
+    },
+    {
+      "id": "toric-720",
+      "n": 720,
+      "k": 2,
+      "rate": 0.002777777777777778,
+      "matrix_sha256": "38af5009bb01c5ae03cd7ac08d7bfcddbc80bef734d426b42269fc0f3dd23c83",
+      "file": "toric-720.npz",
+      "rank_x": 359,
+      "rank_z": 359,
+      "shape_x": [
+        360,
+        720
+      ],
+      "shape_z": [
+        360,
+        720
+      ],
+      "max_row_weight": 4,
+      "max_column_weight": 2,
+      "group": "control",
+      "family": "rectangular-toric",
+      "l": 18,
+      "m": 20,
+      "expected_n": 720,
+      "expected_k": 2,
+      "analytic_target": 18
+    },
+    {
+      "id": "toric-840",
+      "n": 840,
+      "k": 2,
+      "rate": 0.002380952380952381,
+      "matrix_sha256": "69ede6de088ac08dc1e9051db442e7f5b4ab2977d9974bcb8a05d7eebbaadc4a",
+      "file": "toric-840.npz",
+      "rank_x": 419,
+      "rank_z": 419,
+      "shape_x": [
+        420,
+        840
+      ],
+      "shape_z": [
+        420,
+        840
+      ],
+      "max_row_weight": 4,
+      "max_column_weight": 2,
+      "group": "control",
+      "family": "rectangular-toric",
+      "l": 20,
+      "m": 21,
+      "expected_n": 840,
+      "expected_k": 2,
+      "analytic_target": 20
+    },
+    {
+      "id": "toric-1000",
+      "n": 1000,
+      "k": 2,
+      "rate": 0.002,
+      "matrix_sha256": "1a387a57a0628ea40e7f0bda793f32cc6ee281c9e8daadf3fc6d4cfd169cb083",
+      "file": "toric-1000.npz",
+      "rank_x": 499,
+      "rank_z": 499,
+      "shape_x": [
+        500,
+        1000
+      ],
+      "shape_z": [
+        500,
+        1000
+      ],
+      "max_row_weight": 4,
+      "max_column_weight": 2,
+      "group": "control",
+      "family": "rectangular-toric",
+      "l": 20,
+      "m": 25,
+      "expected_n": 1000,
+      "expected_k": 2,
+      "analytic_target": 20
+    },
+    {
+      "id": "fresh-bb-768",
+      "n": 768,
+      "k": 2,
+      "rate": 0.0026041666666666665,
+      "matrix_sha256": "a6948f7f08aff46e84470d435c902e1bef149bc406c19e69c6507339b8405133",
+      "file": "fresh-bb-768.npz",
+      "rank_x": 383,
+      "rank_z": 383,
+      "shape_x": [
+        384,
+        768
+      ],
+      "shape_z": [
+        384,
+        768
+      ],
+      "max_row_weight": 8,
+      "max_column_weight": 4,
+      "group": "fresh",
+      "family": "bivariate-bicycle",
+      "seed": 101601,
+      "l": 24,
+      "m": 16,
+      "A": [
+        [
+          1,
+          8
+        ],
+        [
+          23,
+          9
+        ],
+        [
+          23,
+          0
+        ],
+        [
+          12,
+          6
+        ]
+      ],
+      "B": [
+        [
+          10,
+          0
+        ],
+        [
+          20,
+          5
+        ],
+        [
+          21,
+          3
+        ],
+        [
+          18,
+          2
+        ]
+      ],
+      "expected_n": 768
+    },
+    {
+      "id": "fresh-bb-864",
+      "n": 864,
+      "k": 4,
+      "rate": 0.004629629629629629,
+      "matrix_sha256": "46a3fd81a94e805bb5bbc8436089c6e9bae247d0a06f5423ecb1eb434deea752",
+      "file": "fresh-bb-864.npz",
+      "rank_x": 430,
+      "rank_z": 430,
+      "shape_x": [
+        432,
+        864
+      ],
+      "shape_z": [
+        432,
+        864
+      ],
+      "max_row_weight": 8,
+      "max_column_weight": 4,
+      "group": "fresh",
+      "family": "bivariate-bicycle",
+      "seed": 101602,
+      "l": 24,
+      "m": 18,
+      "A": [
+        [
+          5,
+          5
+        ],
+        [
+          22,
+          7
+        ],
+        [
+          3,
+          16
+        ],
+        [
+          11,
+          17
+        ]
+      ],
+      "B": [
+        [
+          2,
+          6
+        ],
+        [
+          3,
+          13
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          15,
+          0
+        ]
+      ],
+      "expected_n": 864
+    },
+    {
+      "id": "fresh-bb-960",
+      "n": 960,
+      "k": 6,
+      "rate": 0.00625,
+      "matrix_sha256": "34ded586fadcbd5c9b72be9e8ed59f8488972a62d8ef627e2ea166dc74d4c0e5",
+      "file": "fresh-bb-960.npz",
+      "rank_x": 477,
+      "rank_z": 477,
+      "shape_x": [
+        480,
+        960
+      ],
+      "shape_z": [
+        480,
+        960
+      ],
+      "max_row_weight": 8,
+      "max_column_weight": 4,
+      "group": "fresh",
+      "family": "bivariate-bicycle",
+      "seed": 101603,
+      "l": 24,
+      "m": 20,
+      "A": [
+        [
+          10,
+          1
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          9,
+          15
+        ],
+        [
+          11,
+          4
+        ]
+      ],
+      "B": [
+        [
+          15,
+          3
+        ],
+        [
+          16,
+          10
+        ],
+        [
+          6,
+          17
+        ],
+        [
+          21,
+          10
+        ]
+      ],
+      "expected_n": 960
+    },
+    {
+      "id": "fresh-hgp-720",
+      "n": 720,
+      "k": 144,
+      "rate": 0.2,
+      "matrix_sha256": "8c17182033930e4513441dc6b754b4ebf37f4aa83c17a292adcb6109418c9619",
+      "file": "fresh-hgp-720.npz",
+      "rank_x": 288,
+      "rank_z": 288,
+      "shape_x": [
+        288,
+        720
+      ],
+      "shape_z": [
+        288,
+        720
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "fresh",
+      "family": "hypergraph-product",
+      "seed": 101611,
+      "classical_columns": 24,
+      "classical_rows": 12,
+      "expected_n": 720
+    },
+    {
+      "id": "fresh-hgp-845",
+      "n": 845,
+      "k": 169,
+      "rate": 0.2,
+      "matrix_sha256": "b56b122e025fc91d155439400edeb253bce70d8268efd7bfc5b92d2c2e555fed",
+      "file": "fresh-hgp-845.npz",
+      "rank_x": 338,
+      "rank_z": 338,
+      "shape_x": [
+        338,
+        845
+      ],
+      "shape_z": [
+        338,
+        845
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "fresh",
+      "family": "hypergraph-product",
+      "seed": 101612,
+      "classical_columns": 26,
+      "classical_rows": 13,
+      "expected_n": 845
+    },
+    {
+      "id": "fresh-hgp-980",
+      "n": 980,
+      "k": 196,
+      "rate": 0.2,
+      "matrix_sha256": "ab125992f03d542eb68edbb731870f828fa3945a6ed2c8ee2f2aefc1c24e14d6",
+      "file": "fresh-hgp-980.npz",
+      "rank_x": 392,
+      "rank_z": 392,
+      "shape_x": [
+        392,
+        980
+      ],
+      "shape_z": [
+        392,
+        980
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "fresh",
+      "family": "hypergraph-product",
+      "seed": 101613,
+      "classical_columns": 28,
+      "classical_rows": 14,
+      "expected_n": 980
+    }
+  ],
+  "excluded": [
+    {
+      "case": "staged-666-8-26",
+      "reason": "Matrices unavailable; issue witness has 26 indices but is labeled weight 24."
+    }
+  ]
+}

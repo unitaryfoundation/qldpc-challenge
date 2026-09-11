@@ -1,0 +1,133 @@
+{
+  "sources": {
+    "repository_base": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+    "codedistance": {
+      "url": "https://github.com/m-webster/codeDistancePYPI",
+      "commit": "a4afe9c09bbf5790da9ecc05b65c5b62343979ad"
+    },
+    "dist_m4ri": {
+      "url": "https://github.com/QEC-pages/dist-m4ri",
+      "commit": "538d119f6e98b3782415eb78f7ce322a076f8101"
+    },
+    "m4ri": {
+      "url": "https://github.com/malb/m4ri/releases/download/20260122/m4ri-20260122.tar.gz",
+      "version": "20260122",
+      "sha256": "7e033ca1fd36be8861e2f67d9d124c398fc0d830209bb0226462485876346404"
+    },
+    "yarn": {
+      "url": "https://github.com/a7b/yarn",
+      "commit": "e1cd5452dea871efab9f3fb2e63a94f8ffd6e3b7"
+    }
+  },
+  "cases": [
+    {
+      "id": "board-700-140-22",
+      "n": 700,
+      "k": 140,
+      "rate": 0.2,
+      "matrix_sha256": "fd45dae3f6d0acd4f6fcdc0b895b47bddad06b10af8bd07867693f9355c20173",
+      "file": "board-700-140-22.npz",
+      "rank_x": 280,
+      "rank_z": 280,
+      "shape_x": [
+        280,
+        700
+      ],
+      "shape_z": [
+        280,
+        700
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 6,
+      "group": "board",
+      "family": "balanced-product",
+      "source": "codes/700-140-22.json",
+      "source_commit": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+      "claimed_distance": 22,
+      "reference": {
+        "X": [
+          286,
+          315,
+          319,
+          323,
+          357,
+          364,
+          381,
+          390,
+          392,
+          411,
+          425,
+          436,
+          450,
+          471,
+          485,
+          497,
+          504,
+          521,
+          534,
+          541,
+          545,
+          551
+        ],
+        "Z": [
+          153,
+          155,
+          178,
+          185,
+          195,
+          202,
+          206,
+          207,
+          218,
+          226,
+          239,
+          257,
+          258,
+          259,
+          432,
+          458,
+          462,
+          482,
+          494,
+          497,
+          538,
+          545
+        ]
+      },
+      "expected_n": 700,
+      "expected_k": 140
+    },
+    {
+      "id": "tanner-432_8_33",
+      "n": 432,
+      "k": 8,
+      "rate": 0.018518518518518517,
+      "matrix_sha256": "22af2b322da62bc3f0946ab00bdb6dfcfb248ea091d6082f36292b6862e952fb",
+      "file": "tanner-432_8_33.npz",
+      "rank_x": 212,
+      "rank_z": 212,
+      "shape_x": [
+        216,
+        432
+      ],
+      "shape_z": [
+        216,
+        432
+      ],
+      "max_row_weight": 9,
+      "max_column_weight": 8,
+      "group": "literature",
+      "family": "quantum-tanner",
+      "source": "codedistance",
+      "expected_n": 432,
+      "expected_k": 8,
+      "paper_target": 33
+    }
+  ],
+  "excluded": [
+    {
+      "case": "staged-666-8-26",
+      "reason": "Matrices unavailable; issue witness has 26 indices but is labeled weight 24."
+    }
+  ]
+}

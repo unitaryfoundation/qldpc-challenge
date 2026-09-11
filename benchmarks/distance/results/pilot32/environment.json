@@ -1,0 +1,54 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.12.13 (main, Aug  7 2026, 02:15:23) [Clang 22.1.3 ]",
+  "workers": 4,
+  "seconds_per_side": 5.0,
+  "seed_start": 11,
+  "seeds": 1,
+  "methods": [
+    "cpp",
+    "cpp-no-pairs",
+    "m4ri",
+    "qdistevol",
+    "numpy",
+    "cpp-circulant"
+  ],
+  "corpus_manifest_sha256": "af748fb98709d98e9a918eafa21ac59198096d9f9e1ad910eca96c105114c1b3",
+  "source_pins": {
+    "repository_base": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+    "codedistance": {
+      "url": "https://github.com/m-webster/codeDistancePYPI",
+      "commit": "a4afe9c09bbf5790da9ecc05b65c5b62343979ad"
+    },
+    "dist_m4ri": {
+      "url": "https://github.com/QEC-pages/dist-m4ri",
+      "commit": "538d119f6e98b3782415eb78f7ce322a076f8101"
+    },
+    "m4ri": {
+      "url": "https://github.com/malb/m4ri/releases/download/20260122/m4ri-20260122.tar.gz",
+      "version": "20260122"
+    },
+    "yarn": {
+      "url": "https://github.com/a7b/yarn",
+      "commit": "e1cd5452dea871efab9f3fb2e63a94f8ffd6e3b7"
+    }
+  },
+  "reference_policy": "frozen supplied references; paper targets labeled separately",
+  "native_source_sha256": "f98cb2fb3c0107f8c050ed1023275e042e73e0d06e7aba11c694742a80432d67",
+  "adapter_sha256": "672e4769f2b7b09ca35b864c9df72b76d5c5c5070801dce102c746b7ca740208",
+  "runner_sha256": "22d58ecd86f3181d77aa16749be593d18d03b7fd6e52da72fc35607daf902f10",
+  "workers_sha256": "d70cab8fcfbf53d92d46a8a71a0ad839194c6691725c18ea23df795ef715a78e",
+  "submit_source_sha256": "0e16902bbd3a28a48ba2131b0e6cd24efd65557b215fb53cf0d8b87b28be0277",
+  "m4ri_binary_sha256": "9ec762aa341045e04bdb8a4821f6a13137cbd4a38a6f4c728557f3e56ad50c02",
+  "affinity": null,
+  "dependencies": {
+    "numpy": "2.2.6",
+    "numba": "0.62.1",
+    "scipy": "1.16.1",
+    "codedistance": "0.0.6",
+    "pybind11": "3.0.1",
+    "threadpoolctl": "3.6.0"
+  },
+  "worker_startup_seconds": 4.906799791031517
+}

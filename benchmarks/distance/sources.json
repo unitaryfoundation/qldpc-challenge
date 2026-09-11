@@ -1,0 +1,20 @@
+{
+  "repository_base": "f62a5ae7af1a4372fcaa3e5b8f26d11779b747d9",
+  "codedistance": {
+    "url": "https://github.com/m-webster/codeDistancePYPI",
+    "commit": "a4afe9c09bbf5790da9ecc05b65c5b62343979ad"
+  },
+  "dist_m4ri": {
+    "url": "https://github.com/QEC-pages/dist-m4ri",
+    "commit": "538d119f6e98b3782415eb78f7ce322a076f8101"
+  },
+  "m4ri": {
+    "url": "https://github.com/malb/m4ri/releases/download/20260122/m4ri-20260122.tar.gz",
+    "version": "20260122",
+    "sha256": "7e033ca1fd36be8861e2f67d9d124c398fc0d830209bb0226462485876346404"
+  },
+  "yarn": {
+    "url": "https://github.com/a7b/yarn",
+    "commit": "e1cd5452dea871efab9f3fb2e63a94f8ffd6e3b7"
+  }
+}

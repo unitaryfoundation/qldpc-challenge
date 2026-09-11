@@ -8,7 +8,7 @@ Given the two parity-check matrices and a little provenance, this:
     checks, outside the rowspace of its own checks, weight == claimed value);
   * fills an optional ``locality`` block (computing the true interaction radius
     as the max check diameter) when you pass per-qubit coordinates;
-  * validates the whole document against ``schema/code.schema.json``.
+  * lets ``save_submission`` report violations of ``schema/code.schema.json``.
 
 The result is a dict you can write to ``codes/your-code.json`` and submit.
 
@@ -25,12 +25,11 @@ import os
 import sys
 
 import numpy as np
-
-from css import compute_k, verify_css, commutes, in_rowspace
+from css import commutes, compute_k, in_rowspace, verify_css
 from surrogate import lightest_logical
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_SCHEMA_PATH = os.path.join(_HERE, "..", "schema", "code.schema.json")
+_SCHEMA_PATH = os.path.join(_HERE, "..", "..", "schema", "code.schema.json")
 
 
 def _supports(H):
@@ -44,8 +43,7 @@ def _vec(support, n):
 
 
 def _interaction_radius(checks, coordinates):
-    """Max check diameter under the given 2D coordinates (the quantity the
-    verifier recomputes for the locality tracks)."""
+    """Compute the max check diameter used by the locality-track verifier."""
     def diam(sup):
         pts = [coordinates[q] for q in sup]
         return max((math.dist(a, b) for a in pts for b in pts), default=0.0)
@@ -53,14 +51,17 @@ def _interaction_radius(checks, coordinates):
 
 
 def validate(doc):
-    """Return a list of schema violations ([] means valid). Uses jsonschema if
-    available, else returns [] (the verifier will do the authoritative check)."""
+    """Return a list of schema violations ([] means valid).
+
+    Uses jsonschema if available, else returns [] (the verifier will do the
+    authoritative check). Missing or unreadable schema files are errors.
+    """
     try:
         import jsonschema
-        with open(_SCHEMA_PATH) as f:
-            schema = json.load(f)
-    except Exception:
+    except ImportError:
         return []
+    with open(_SCHEMA_PATH) as f:
+        schema = json.load(f)
     v = jsonschema.Draft202012Validator(schema)
     return [f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
             for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))]
@@ -69,7 +70,7 @@ def validate(doc):
 def make_submission(HX, HZ, *, name, construction, authors, family=None,
                     references=None, notes=None, date=None, tracks=(),
                     confidence="upper_bound", coordinates=None, layers=None,
-                    trials=8000, seed=0):
+                    trials=8000, seed=0, witnesses=None):
     """Build a submission dict for the CSS code (HX, HZ).
 
     Parameters
@@ -98,11 +99,16 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
         compatibility. Track membership is computed by the verifier. Leave unset.
     trials, seed : int
         Budget/seed for the witness search.
+    witnesses : optional dict with keys "X" and "Z"
+        Already-found logical supports. Each is checked using the same GF(2)
+        routines as searched witnesses. Supplying both avoids a second search
+        that could fail to rediscover an expensive accelerator result.
 
     Returns
     -------
-    dict : a schema-valid submission. Witnesses are pre-checked against the
-    verifier's own criteria, so the doc passes the trustless distance gate.
+    dict : a submission with individually validated logical witnesses.
+    ``save_submission`` reports schema errors; the full candidate gate remains
+    necessary and can refute the claimed bound by finding a lighter logical.
     """
     HX = np.asarray(HX, dtype=np.int8) % 2
     HZ = np.asarray(HZ, dtype=np.int8) % 2
@@ -110,15 +116,32 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     n = HX.shape[1]
     k = compute_k(HX, HZ)
 
-    wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
-    wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
+    if witnesses is None:
+        wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
+        wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
+    else:
+        if set(witnesses) != {"X", "Z"}:
+            raise ValueError("witnesses must contain both X and Z supports")
+        supports = {}
+        for side in ("X", "Z"):
+            support = list(witnesses[side])
+            if (not support or any(not isinstance(q, (int, np.integer))
+                                   or isinstance(q, (bool, np.bool_))
+                                   or q < 0 or q >= n for q in support)
+                    or len(set(support)) != len(support)):
+                raise ValueError(f"{side} witness must have distinct qubit indices in [0, n)")
+            supports[side] = sorted(int(q) for q in support)
+        xwit, zwit = supports["X"], supports["Z"]
+        wx, wz = len(xwit), len(zwit)
     if not xwit or not zwit:
         raise ValueError("no nontrivial logical found on some side "
                          f"(k={k}); is this a valid encoding code?")
-    # Mirror the verifier's witness criteria so the doc is guaranteed to pass.
+    # Check individual witnesses; this does not certify the distance claim.
     xv, zv = _vec(xwit, n), _vec(zwit, n)
-    assert commutes(xv, HZ) and not in_rowspace(xv, HX), "X witness invalid"
-    assert commutes(zv, HX) and not in_rowspace(zv, HZ), "Z witness invalid"
+    if not (commutes(xv, HZ) and not in_rowspace(xv, HX)):
+        raise ValueError("X witness invalid")
+    if not (commutes(zv, HX) and not in_rowspace(zv, HZ)):
+        raise ValueError("Z witness invalid")
     dval = min(wx, wz)
 
     doc = {
@@ -157,8 +180,10 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
 
 
 def save_submission(doc, path):
-    """Write ``doc`` to ``path`` (pretty JSON) after a schema check; returns the
-    list of schema violations (empty on success)."""
+    """Write ``doc`` to ``path`` (pretty JSON) after a schema check.
+
+    Return the list of schema violations (empty on success).
+    """
     errs = validate(doc)
     with open(path, "w") as f:
         json.dump(doc, f, indent=2)
