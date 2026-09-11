@@ -83,6 +83,20 @@ Two principles drive the format:
   - `ancilla_coordinates` (optional): one `[x, y]` per non-data qubit in
     circuit index order; required only for the geometric circuit tier
     (Phase B, not yet checked).
+  - `contributed_by` (optional): `{by, date, method?}` crediting who
+    contributed these circuits. Schedule credit lives here, beside the
+    artifact, not in `provenance.authors` — the same separation
+    `witness_provenance` and `locality.contributed_by` use — so adding a
+    circuit tier to an existing entry never changes its author list. It is
+    what binds a contributor who is not a listed author of the code:
+    `verify/check_authorship.py` admits such a PR only when it adds a FIRST
+    circuit block and credits the PR author here. Replacing an existing one
+    stays with the code's listed authors, which matters more here than for a
+    layout because the tier is penalty-only — a donated schedule can lower
+    the entry's recorded `d_circ`, so leaving replacement to the authors
+    leaves a mediocre donated schedule theirs to beat. The committed files
+    under `circuits/<slug>/` are part of the same claim, so editing them is
+    an edit to the entry whether or not the JSON moves.
   - Circuits must be memory experiments with the canonical noise recipe
     (`verify/circuit_verify.py` documents and enforces it mechanically);
     noise placement is not a submitter degree of freedom, the schedule is.
@@ -153,7 +167,9 @@ Two principles drive the format:
     who contributed this layout. Layout credit lives here, beside the
     artifact, not in `provenance.authors` — the same separation
     `witness_provenance` uses for refutation credit — so adding a layout to
-    an existing entry never changes its author list.
+    an existing entry never changes its author list, and it is what binds a
+    first-layout contribution by someone who is not a listed author (see
+    `circuit.contributed_by` for the same rule on circuits).
 - `provenance`: `authors`, `construction` (how it was built), optional
   `references`, `date`, `notes`, `model`.
   - `origin`: `"baseline"` for a literature seed or `"submission"` for a code

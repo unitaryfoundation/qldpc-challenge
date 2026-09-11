@@ -136,6 +136,10 @@
           "type": "string",
           "description": "schedule provenance, optional"
         },
+        "contributed_by": {
+          "$ref": "#/$defs/contributedBy",
+          "description": "who contributed these circuits, and when. Schedule credit lives here, on the artifact contributed, not in provenance.authors, so contributing a circuit tier to an existing entry never changes its author list (issue #611). Required when the contributor is not a listed author of the code: verify/check_authorship.py binds such a PR through this field."
+        },
         "ler": {
           "type": "object",
           "description": "optional measured logical-error-rate tier: the same committed memory circuits, sampled under the canonical noise recipe and decoded with the pinned decoder. Distance is a floor; this is the measured rate a device-like simulation actually sees, prefactors included.",
@@ -298,33 +302,8 @@
           "description": "claimed max check diameter in the layout; verifier recomputes"
         },
         "contributed_by": {
-          "type": "object",
-          "description": "who contributed this layout, and when. Layout credit lives here, on the artifact contributed, not in provenance.authors -- the same separation witness_provenance uses for refutation credit, so contributing a layout never widens edit rights over the code (issue #611).",
-          "required": [
-            "by",
-            "date"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "by": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^@[A-Za-z0-9-]+$"
-              },
-              "minItems": 1,
-              "description": "@handles of the people who contributed this layout"
-            },
-            "date": {
-              "type": "string",
-              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-            },
-            "method": {
-              "type": "string",
-              "maxLength": 400,
-              "description": "optionally, how the layout was found (tool, model, search method)"
-            }
-          }
+          "$ref": "#/$defs/contributedBy",
+          "description": "who contributed this layout, and when. Layout credit lives here, on the artifact contributed, not in provenance.authors, so contributing a layout never widens edit rights over the code (issue #611)."
         }
       }
     },
@@ -502,6 +481,35 @@
     }
   ],
   "$defs": {
+    "contributedBy": {
+      "type": "object",
+      "description": "credit for one contributed artifact (a layout, a circuit tier). It sits on the artifact rather than in provenance.authors -- the same separation witness_provenance uses for refutation credit -- so a contribution never widens the contributor's edit rights over the code (issue #611).",
+      "required": [
+        "by",
+        "date"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^@[A-Za-z0-9-]+$"
+          },
+          "minItems": 1,
+          "description": "@handles of the people who contributed this artifact"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "method": {
+          "type": "string",
+          "maxLength": 400,
+          "description": "optionally, how the artifact was found (tool, model, search method)"
+        }
+      }
+    },
     "circuitSideDistance": {
       "type": "object",
       "required": [
