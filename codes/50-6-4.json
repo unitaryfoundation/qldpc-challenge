@@ -562,6 +562,32 @@
   },
   "rounds": 4,
   "stim_version": "1.16.0",
-  "notes": "Interleaved memory extraction with joint reset and measurement layers and 7 CX layers per round. Bulk (template) checks follow the Bravyi et al. depth-7 monomial pattern (arXiv:2308.07915 Table 5) applied edge-by-edge via the A/B grid labels (two 5x5 grids); boundary checks were placed by a min-conflicts search enforcing layer parallelism and the X/Z overlap-parity condition, then optimised by a local search whose objective is the exact count of undetected logical fault sets of weight <= 3 (GF(2)-hash enumeration): it reached zero in 374 moves. That count, re-run on the committed DEMs, is zero in both bases, so d_circ = 4 = d is exact for these circuits. The lightest fault sets before optimisation combined an X-check hook, a Z-check hook and a Y error on an X-degree-1 boundary qubit."
+  "notes": "Interleaved memory extraction with joint reset and measurement layers and 7 CX layers per round. Bulk (template) checks follow the Bravyi et al. depth-7 monomial pattern (arXiv:2308.07915 Table 5) applied edge-by-edge via the A/B grid labels (two 5x5 grids); boundary checks were placed by a min-conflicts search enforcing layer parallelism and the X/Z overlap-parity condition, then optimised by a local search whose objective is the exact count of undetected logical fault sets of weight <= 3 (GF(2)-hash enumeration): it reached zero in 374 moves. That count, re-run on the committed DEMs, is zero in both bases, so d_circ = 4 = d is exact for these circuits. The lightest fault sets before optimisation combined an X-check hook, a Z-check hook and a Y error on an X-degree-1 boundary qubit.",
+  "ler": {
+   "X": {
+    "p": 0.001,
+    "shots": 40000,
+    "failures": 296,
+    "seed": 7,
+    "decoder": "bposd-cs-10",
+    "ler_per_round": 0.001860357,
+    "ci95": [
+     0.001659778,
+     0.002085127
+    ]
+   },
+   "Z": {
+    "p": 0.001,
+    "shots": 40000,
+    "failures": 421,
+    "seed": 7,
+    "decoder": "bposd-cs-10",
+    "ler_per_round": 0.002652279,
+    "ci95": [
+     0.002410088,
+     0.002918741
+    ]
+   }
+  }
  }
 }
