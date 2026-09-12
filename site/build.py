@@ -366,8 +366,8 @@ LI_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" 
            '23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>')
 
 CSS = f"""
-:root{{--ink:#0f172a;--mut:#64748b;--ln:#e2e8f0;--ac:{ACCENT};--ex:{EXACT};
---exb:{GREEN_BRIGHT};--dark:{DARK};--bg:#fff;--soft:#f8fafc}}
+:root{{--ink:#0f172a;--mut:#64748b;--ln:#d9dfe9;--ac:{ACCENT};--ex:{EXACT};
+--exb:{GREEN_BRIGHT};--dark:{DARK};--bg:#fbfbfd;--soft:#f8fafc}}
 *{{box-sizing:border-box}}
 /* Unitary Foundation type stack: Manrope for body and page-level headings
    (H1/H2, per UF homepage), Space Grotesk for in-container display text,
