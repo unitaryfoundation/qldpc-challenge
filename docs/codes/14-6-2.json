@@ -241,6 +241,32 @@
   },
   "rounds": 2,
   "stim_version": "1.16.0",
-  "notes": "Interleaved two-block extraction (Bravyi et al. arXiv:2308.07915 Table 5 style): joint reset and measurement layers, 7 data CX layers per round; X-check term slots [6, 1, 5, 2, 3, 4], Z-check term slots [1, 5, 0, 3, 4, 2] over terms A_0..A_2, B_0..B_2; terms recovered from H alone by a commuting permutation decomposition. Order screened by RIS among the 1248 slot assignments satisfying the overlap-parity criterion (first one tried); the claim then survived 2 seeds x 1000 RIS trials per basis and an observable-constrained seeded BP+OSD search over symmetric seeds, whose lightest undetected logical fault set is weight 2 in both bases."
+  "notes": "Interleaved two-block extraction (Bravyi et al. arXiv:2308.07915 Table 5 style): joint reset and measurement layers, 7 data CX layers per round; X-check term slots [6, 1, 5, 2, 3, 4], Z-check term slots [1, 5, 0, 3, 4, 2] over terms A_0..A_2, B_0..B_2; terms recovered from H alone by a commuting permutation decomposition. Order screened by RIS among the 1248 slot assignments satisfying the overlap-parity criterion (first one tried); the claim then survived 2 seeds x 1000 RIS trials per basis and an observable-constrained seeded BP+OSD search over symmetric seeds, whose lightest undetected logical fault set is weight 2 in both bases.",
+  "ler": {
+   "X": {
+    "p": 0.001,
+    "shots": 40000,
+    "failures": 2358,
+    "seed": 7,
+    "decoder": "bposd-cs-10",
+    "ler_per_round": 0.030399106,
+    "ci95": [
+     0.029194261,
+     0.031652262
+    ]
+   },
+   "Z": {
+    "p": 0.001,
+    "shots": 40000,
+    "failures": 2527,
+    "seed": 7,
+    "decoder": "bposd-cs-10",
+    "ler_per_round": 0.032653769,
+    "ci95": [
+     0.031402421,
+     0.033953477
+    ]
+   }
+  }
  }
 }
