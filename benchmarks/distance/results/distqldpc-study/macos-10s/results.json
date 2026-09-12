@@ -1,0 +1,562 @@
+[
+  {
+    "case": "board-72-12-6",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.000212749931961298,
+    "delivery_seconds": 0.07825679203961045,
+    "within_budget": true,
+    "cpu_seconds": 0.07413800000000001,
+    "validation_and_save_seconds": 0.032548165996558964,
+    "initialization_bound": 6,
+    "initialization_within_budget": true,
+    "evaluation_target": 6,
+    "result": {
+      "status": "solver_optimal_claim",
+      "returncode": 0,
+      "setup_seconds": 0.001587415928952396,
+      "elapsed_seconds": 0.07786879094783217,
+      "delivery_seconds": 0.07786879094783217,
+      "within_budget": true,
+      "cpu_seconds": 0.073926,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [
+        {
+          "solver_cost": 6,
+          "x": "000000000000000000000000000000000000000000000000000000000000000000000000",
+          "z": "101000000000000000110011000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "ub",
+          "value": 6
+        },
+        {
+          "kind": "lb",
+          "value": 6
+        }
+      ],
+      "reported_optimum": 6,
+      "validated_witnesses": [
+        {
+          "pauli_weight": 6,
+          "components": {
+            "Z": [
+              0,
+              2,
+              18,
+              19,
+              22,
+              23
+            ]
+          }
+        }
+      ],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "0d08f8e75c2c40efe0f9595e8493ad83c3b05ca7edf3728f5814f8e5a7c5f451"
+        },
+        {
+          "file": "candidates/witness-0-Z.json",
+          "sha256": "64e62e9889c2cfd14fe04e73b9546871a75ae9a307e1ba22ddc18a3f4897e0bd"
+        }
+      ],
+      "solver_best_weight": 6
+    }
+  },
+  {
+    "case": "board-144-12-12",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.00025533302687108517,
+    "delivery_seconds": 10.000929667032324,
+    "within_budget": false,
+    "cpu_seconds": 9.988231999999996,
+    "validation_and_save_seconds": 0.02407050004694611,
+    "initialization_bound": 12,
+    "initialization_within_budget": true,
+    "evaluation_target": 12,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.0021547500509768724,
+      "elapsed_seconds": 10.00049895804841,
+      "delivery_seconds": 10.00049895804841,
+      "within_budget": false,
+      "cpu_seconds": 9.987976999999997,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [
+        {
+          "solver_cost": 14,
+          "x": "000000000000001100000000100001101100101000100000000000000000000000000000000000000000000010010000000000001000100000000000000000000000000000000000",
+          "z": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "solver_cost": 12,
+          "x": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "z": "000000100000000000000000000011000000000000001000000000000000110000000000000000000000000000000000000000000000000010000010010010000010010000000000"
+        }
+      ],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 8
+        },
+        {
+          "kind": "ub",
+          "value": 14
+        },
+        {
+          "kind": "ub",
+          "value": 12
+        },
+        {
+          "kind": "lb",
+          "value": 8
+        },
+        {
+          "kind": "ub",
+          "value": 12
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [
+        {
+          "pauli_weight": 14,
+          "components": {
+            "X": [
+              14,
+              15,
+              24,
+              29,
+              30,
+              32,
+              33,
+              36,
+              38,
+              42,
+              88,
+              91,
+              104,
+              108
+            ]
+          }
+        },
+        {
+          "pauli_weight": 12,
+          "components": {
+            "Z": [
+              6,
+              28,
+              29,
+              44,
+              60,
+              61,
+              112,
+              118,
+              121,
+              124,
+              130,
+              133
+            ]
+          }
+        }
+      ],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "04500613190497881d5375667c5c59ef270a67cd08a6d8b444503ff907b355f9"
+        },
+        {
+          "file": "candidates/witness-0-X.json",
+          "sha256": "939b975bc954ee1db6e2f4058d4f5a77cd5490e978dcbd6d729450404d5b36aa"
+        },
+        {
+          "file": "candidates/witness-1-Z.json",
+          "sha256": "ac1f47236264b204dbdebfd43a56b88e54e54ccc8ba9208f006198042ee7ce28"
+        }
+      ],
+      "solver_best_weight": 12
+    }
+  },
+  {
+    "case": "board-700-222-28",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.028827083995565772,
+    "delivery_seconds": 10.015849083894864,
+    "within_budget": false,
+    "cpu_seconds": 9.983515000000002,
+    "validation_and_save_seconds": 0.10764050006400794,
+    "initialization_bound": 96,
+    "initialization_within_budget": true,
+    "evaluation_target": 28,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.031007624929770827,
+      "elapsed_seconds": 9.986811624956317,
+      "delivery_seconds": 9.986811624956317,
+      "within_budget": false,
+      "cpu_seconds": 9.954688000000003,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "4d8bd13c29ff769ea08fa19c649fdb4cf58147367ff88a9957de7eaf4357dc99"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "board-682-172-79",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.022622750024311244,
+    "delivery_seconds": 10.026792125077918,
+    "within_budget": false,
+    "cpu_seconds": 9.989283999999998,
+    "validation_and_save_seconds": 0.17181470897048712,
+    "initialization_bound": 116,
+    "initialization_within_budget": true,
+    "evaluation_target": 72,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.03772183391265571,
+      "elapsed_seconds": 10.003945458913222,
+      "delivery_seconds": 10.003945458913222,
+      "within_budget": false,
+      "cpu_seconds": 9.966679999999998,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "c1220f8e34fe944ceb6e2bf9bb880af0df79c3f32da5f4981ae55ca750c3372e"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "regression-690-182",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.02383770910091698,
+    "delivery_seconds": 10.02214062504936,
+    "within_budget": false,
+    "cpu_seconds": 9.995398000000002,
+    "validation_and_save_seconds": 0.1798723340034485,
+    "initialization_bound": 112,
+    "initialization_within_budget": true,
+    "evaluation_target": 28,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.03535608295351267,
+      "elapsed_seconds": 9.998078958014958,
+      "delivery_seconds": 9.998078958014958,
+      "within_budget": false,
+      "cpu_seconds": 9.971560000000002,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "23b8ec47fbe780d91dd4969646a44d6b9b86579159bdef7be2784714d93038d1"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "tanner-432_8_33",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.0017089579487219453,
+    "delivery_seconds": 10.012809540960006,
+    "within_budget": false,
+    "cpu_seconds": 9.989284000000008,
+    "validation_and_save_seconds": 0.039907457889057696,
+    "initialization_bound": 36,
+    "initialization_within_budget": true,
+    "evaluation_target": 32,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.009949374943971634,
+      "elapsed_seconds": 10.010913125006482,
+      "delivery_seconds": 10.010913125006482,
+      "within_budget": false,
+      "cpu_seconds": 9.987576000000008,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "625a05fcf45b179b4f76fdbd3af4a495ee5745f609c7ab36f2007510e53b0125"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "mitten-975-195",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.04729079199023545,
+    "delivery_seconds": 10.028270874987356,
+    "within_budget": false,
+    "cpu_seconds": 9.990927999999998,
+    "validation_and_save_seconds": 0.1163801250513643,
+    "initialization_bound": 86,
+    "initialization_within_budget": true,
+    "evaluation_target": 24,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.05872112500946969,
+      "elapsed_seconds": 9.980727125075646,
+      "delivery_seconds": 9.980727125075646,
+      "within_budget": false,
+      "cpu_seconds": 9.943667999999999,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "d93fae6d00f9cce31c8c3f3433892d7660ec6cf0fc85068083268564fb8079ec"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "toric-1000",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.002284083981066942,
+    "delivery_seconds": 10.016386791947298,
+    "within_budget": false,
+    "cpu_seconds": 9.988059999999997,
+    "validation_and_save_seconds": 0.1647894160123542,
+    "initialization_bound": 20,
+    "initialization_within_budget": true,
+    "evaluation_target": 20,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.05006216699257493,
+      "elapsed_seconds": 10.013912541908212,
+      "delivery_seconds": 10.013912541908212,
+      "within_budget": false,
+      "cpu_seconds": 9.985775999999998,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 8
+        },
+        {
+          "kind": "lb",
+          "value": 8
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "c961ab68e38ec5ee67ccbca045f22fda71da34c7a8a28b50a4967150e6471aa6"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "fresh-bb-960",
+    "repeat": 0,
+    "budget_seconds": 10,
+    "preparation_seconds": 0.008513957960531116,
+    "delivery_seconds": 10.018268625019118,
+    "within_budget": false,
+    "cpu_seconds": 9.992363000000017,
+    "validation_and_save_seconds": 0.23349570797290653,
+    "initialization_bound": 60,
+    "initialization_within_budget": true,
+    "evaluation_target": 152,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.04631841694936156,
+      "elapsed_seconds": 10.009552166913636,
+      "delivery_seconds": 10.009552166913636,
+      "within_budget": false,
+      "cpu_seconds": 9.983849000000017,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "5da808acb3d268c55c3569e84f72636f09e005a803d7a98a83e3c012480d4e47"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  }
+]

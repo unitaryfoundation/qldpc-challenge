@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "configurations": 3,
+  "raw_pauli_witnesses": 2,
+  "candidate_documents": 5,
+  "late_configurations": 0,
+  "scope": "Hash, matrix, witness identity and validity audit; no optimality proof or candidate gate"
+}

@@ -1,0 +1,9 @@
+# Keep portable summaries and compressed raw evidence in Git.
+macos-*/**
+!macos-*/REPORT.md
+!macos-*/environment.json
+!macos-*/manifest.json
+!macos-*/results.json
+!macos-*/evidence.json
+!macos-*/audit.json
+!macos-*/raw.tar.gz

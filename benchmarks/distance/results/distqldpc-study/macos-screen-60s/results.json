@@ -1,0 +1,230 @@
+[
+  {
+    "case": "board-144-12-12",
+    "repeat": 0,
+    "budget_seconds": 60.0,
+    "preparation_seconds": 0.00031895795837044716,
+    "delivery_seconds": 19.655321166967042,
+    "within_budget": true,
+    "cpu_seconds": 19.619255000000006,
+    "validation_and_save_seconds": 0.05773779097944498,
+    "initialization_bound": 12,
+    "initialization_within_budget": true,
+    "evaluation_target": 12,
+    "result": {
+      "status": "solver_optimal_claim",
+      "returncode": 0,
+      "setup_seconds": 0.002111000008881092,
+      "elapsed_seconds": 19.654772499925457,
+      "delivery_seconds": 19.654772499925457,
+      "within_budget": true,
+      "cpu_seconds": 19.618936000000005,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [
+        {
+          "solver_cost": 14,
+          "x": "000000000000001100000000100001101100101000100000000000000000000000000000000000000000000010010000000000001000100000000000000000000000000000000000",
+          "z": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "solver_cost": 12,
+          "x": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "z": "000000100000000000000000000011000000000000001000000000000000110000000000000000000000000000000000000000000000000010000010010010000010010000000000"
+        }
+      ],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 8
+        },
+        {
+          "kind": "ub",
+          "value": 14
+        },
+        {
+          "kind": "ub",
+          "value": 12
+        },
+        {
+          "kind": "lb",
+          "value": 12
+        }
+      ],
+      "reported_optimum": 12,
+      "validated_witnesses": [
+        {
+          "pauli_weight": 14,
+          "components": {
+            "X": [
+              14,
+              15,
+              24,
+              29,
+              30,
+              32,
+              33,
+              36,
+              38,
+              42,
+              88,
+              91,
+              104,
+              108
+            ]
+          }
+        },
+        {
+          "pauli_weight": 12,
+          "components": {
+            "Z": [
+              6,
+              28,
+              29,
+              44,
+              60,
+              61,
+              112,
+              118,
+              121,
+              124,
+              130,
+              133
+            ]
+          }
+        }
+      ],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "c9f810d1a73f8d9f13f05df927522fed699f2565db2fcb944aa316bc59b163fe"
+        },
+        {
+          "file": "candidates/witness-0-X.json",
+          "sha256": "88a74f18aae6ba3632c3ea2f45d849d812a4f372e3c11e55f50822abee46dca3"
+        },
+        {
+          "file": "candidates/witness-1-Z.json",
+          "sha256": "2ff6f1627979cff91a7f75759b45097f8c2a63cf3fab8c27faca05299f5c7d88"
+        }
+      ],
+      "solver_best_weight": 12
+    }
+  },
+  {
+    "case": "board-700-222-28",
+    "repeat": 0,
+    "budget_seconds": 60.0,
+    "preparation_seconds": 0.030233458033762872,
+    "delivery_seconds": 59.91066816600505,
+    "within_budget": true,
+    "cpu_seconds": 59.852329999999995,
+    "validation_and_save_seconds": 0.10889816598501056,
+    "initialization_bound": 96,
+    "initialization_within_budget": true,
+    "evaluation_target": 28,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.031846041907556355,
+      "elapsed_seconds": 59.880217582918704,
+      "delivery_seconds": 59.880217582918704,
+      "within_budget": true,
+      "cpu_seconds": 59.822095999999995,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "91b1a4aff4852a87deaee836843641a8a56a5fc86fb2d04ae517689cbc76422e"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  },
+  {
+    "case": "regression-690-182",
+    "repeat": 0,
+    "budget_seconds": 60.0,
+    "preparation_seconds": 0.024306041072122753,
+    "delivery_seconds": 59.95622525003273,
+    "within_budget": true,
+    "cpu_seconds": 59.94150499999999,
+    "validation_and_save_seconds": 0.18794049997814,
+    "initialization_bound": 112,
+    "initialization_within_budget": true,
+    "evaluation_target": 28,
+    "result": {
+      "status": "timeout",
+      "returncode": 1,
+      "setup_seconds": 0.03618125000502914,
+      "elapsed_seconds": 59.93174041702878,
+      "delivery_seconds": 59.93174041702878,
+      "within_budget": true,
+      "cpu_seconds": 59.91719799999999,
+      "cpu_accounting_complete": true,
+      "raw_witnesses": [],
+      "partial_tail_bytes": 0,
+      "bounds": [
+        {
+          "kind": "lb",
+          "value": 1
+        },
+        {
+          "kind": "lb",
+          "value": 2
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        },
+        {
+          "kind": "lb",
+          "value": 4
+        }
+      ],
+      "reported_optimum": null,
+      "validated_witnesses": [],
+      "candidate_documents": [
+        {
+          "file": "candidates/initialization.json",
+          "sha256": "0bae6e89510deab29ae738c91850ffc6cf987f7e7d6ef22c9baf7e25f2f62326"
+        }
+      ],
+      "solver_best_weight": null
+    }
+  }
+]
