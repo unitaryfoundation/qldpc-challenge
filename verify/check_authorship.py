@@ -23,14 +23,28 @@ refutation binding exists to avoid. A refuted 'exact' claim must demote to
 upper_bound, and no correction may claim 'exact' at the new value without going
 through certification. New submissions are unaffected.
 
-One more binding exists for layouts, and it mirrors the refutation binding's
-credit model exactly: a change that ONLY adds a first `locality` block (the
-code had none) binds when the block's `contributed_by.by` lists the PR author.
-`provenance` must be byte-identical apart from an append to notes -- in
-particular `authors` and `model` never change, so layout credit lives beside
-the artifact (like witness_provenance.found_by) and can never widen the
-contributor's edit rights over the code: they are still not a listed author
-on the next PR, and any later change must itself pass a binding.
+Two more bindings exist for contributed artifacts, and they mirror the
+refutation binding's credit model exactly: a change that ONLY adds a first
+`locality` block, or ONLY a first `circuit` block (the code had neither),
+binds when that block's `contributed_by.by` lists the PR author. `provenance`
+must be byte-identical apart from an append to notes -- in particular
+`authors` and `model` never change, so the credit lives beside the artifact
+(like witness_provenance.found_by) and can never widen the contributor's edit
+rights over the code: they are still not a listed author on the next PR, and
+any later change must itself pass a binding.
+
+Replacing an existing artifact stays with the code's listed authors either
+way, which matters more for circuits than for layouts: the circuit tier is
+penalty-only (d_circ is clamped to <= d), so a donated schedule can lower an
+entry's score where a donated layout can only improve its class. Reserving
+replacement means a mediocre donated schedule is always the authors' to beat
+with a better one.
+
+The artifacts under `circuits/<slug>/` are part of that entry's claim surface,
+so a diff there counts as a change to `codes/<slug>.json` -- the same mapping
+gate_changed.py prices the circuit search on. Otherwise someone's committed
+.stim/.dem files could be swapped with their JSON left untouched, and this
+gate, which diffs only `codes/`, would never see it.
 
 Fails CLOSED only on a definite author/PR-author mismatch. Anything ambiguous
 (no author info, git/parse error) fails OPEN with a warning -- a bug here must
@@ -63,25 +77,42 @@ def changed_codes(base, root=ROOT):
     try:
         out = subprocess.check_output(
             ["git", "diff", "--name-status", "--no-renames",
-             f"{base}...HEAD", "--", "codes"],
+             f"{base}...HEAD", "--", "codes", "circuits"],
             cwd=root, text=True)
     except Exception as e:
         print(f"(could not diff vs {base}: {e}); skipping authorship check")
         return None
-    changes = {}
+    changes, from_circuits = {}, set()
     for line in out.splitlines():
         parts = line.split("\t")
         if len(parts) < 2:
             continue
         status = parts[0][:1]
         if status == "R" and len(parts) >= 3:
+            paths = parts[1:3]
             if parts[1].endswith(".json"):
                 changes[parts[1]] = "D"
             if parts[2].endswith(".json"):
                 changes[parts[2]] = "A"
-        elif parts[1].endswith(".json"):
-            changes[parts[1]] = status
+        else:
+            paths = parts[1:2]
+            if parts[1].endswith(".json"):
+                changes[parts[1]] = status
+        from_circuits.update(p for p in map(code_for_circuit_path, paths) if p)
+    # A diff under circuits/<slug>/ is a change to that entry's circuit-tier
+    # claim, so bind it to the code even when the JSON is untouched: swapping
+    # someone's committed circuits is an edit to their entry. An explicit
+    # status on the JSON always wins (a rename's D/A, a real modification).
+    for path in from_circuits:
+        changes.setdefault(path, "M")
     return changes
+
+
+def code_for_circuit_path(path):
+    """codes/<slug>.json for a path under circuits/<slug>/, else None."""
+    if path.startswith("circuits/") and path.count("/") >= 2:
+        return f"codes/{path.split('/')[1]}.json"
+    return None
 
 
 def handles(doc):
@@ -179,8 +210,9 @@ def refutation_binding(author, base_doc, new_doc):
     return True, ""
 
 
-def contributed_by_handles(loc):
-    cb = (loc or {}).get("contributed_by") or {}
+def contributed_by_handles(block):
+    """@handles credited in a contributed artifact's contributed_by block."""
+    cb = (block or {}).get("contributed_by") or {}
     out = []
     for a in cb.get("by") or []:
         m = HANDLE.match(str(a).strip())
@@ -189,43 +221,86 @@ def contributed_by_handles(loc):
     return out
 
 
-def layout_binding(author, base_doc, new_doc):
+def addition_binding(author, base_doc, new_doc, field, noun):
     """Does new_doc differ from base_doc by exactly the addition of a first
-    layout credited to author? Returns (ok, reason-if-not).
+    `field` artifact credited to author? Returns (ok, reason-if-not).
 
-    Allowed: add `locality` where none existed, with the PR author listed in
-    locality.contributed_by.by; append to provenance.notes; change `name` and
+    Allowed: add `field` where none existed, with the PR author listed in
+    <field>.contributed_by.by; append to provenance.notes; change `name` and
     `schema_version`. Everything else -- checks, distance, and ALL other
     provenance including authors and model -- must be byte-identical. Credit
     lives beside the artifact (as witness_provenance.found_by does for
     refutations), so the binding never widens the contributor's edit rights
-    over the code (issue #611). The layout's own validity (spacing, layers,
-    radius, class) is the verifier's job, not this gate's."""
-    if "locality" in (base_doc or {}):
-        return False, ("the entry already has a layout; replacing one is "
+    over the code (issue #611). The artifact's own validity -- a layout's
+    spacing, layers, radius and class; a circuit's noise recipe, parallelism
+    and witnesses -- is the verifier's job, not this gate's."""
+    if field in (base_doc or {}):
+        return False, (f"the entry already has {noun}; replacing one is "
                        "reserved to its listed authors")
-    if "locality" not in new_doc:
-        return False, "no locality block was added"
-    for key in (set(base_doc) | set(new_doc)) - {"locality", "name",
+    if field not in new_doc:
+        return False, f"no {field} block was added"
+    for key in (set(base_doc) | set(new_doc)) - {field, "name",
                                                  "schema_version",
                                                  "provenance"}:
         if base_doc.get(key) != new_doc.get(key):
-            return False, (f"field '{key}' changed (a layout addition may "
-                           "only add locality)")
+            return False, (f"field '{key}' changed (adding {noun} may "
+                           f"only add {field})")
 
     bp, np_ = base_doc.get("provenance") or {}, new_doc.get("provenance") or {}
     for key in (set(bp) | set(np_)) - {"notes"}:
         if bp.get(key) != np_.get(key):
-            return False, (f"provenance.{key} changed (layout credit lives in "
-                           "locality.contributed_by, not in provenance)")
+            return False, (f"provenance.{key} changed (credit for {noun} "
+                           f"lives in {field}.contributed_by, not in "
+                           "provenance)")
     old_notes, new_notes = bp.get("notes", ""), np_.get("notes", "")
     if not new_notes.startswith(old_notes):
         return False, "provenance.notes may only be appended to"
 
-    if author not in contributed_by_handles(new_doc.get("locality")):
-        return False, ("locality.contributed_by.by does not list the PR "
+    if author not in contributed_by_handles(new_doc.get(field)):
+        return False, (f"{field}.contributed_by.by does not list the PR "
                        f"author @{author}")
     return True, ""
+
+
+def layout_binding(author, base_doc, new_doc):
+    """Exactly a first `locality` block credited to author (addition_binding).
+    A contributed layout can only sharpen the entry's locality class."""
+    return addition_binding(author, base_doc, new_doc, "locality", "a layout")
+
+
+def circuit_binding(author, base_doc, new_doc):
+    """Exactly a first `circuit` block credited to author (addition_binding).
+
+    The tier is penalty-only -- d_circ is clamped to <= d and can only
+    discount a score -- so unlike a layout, a donated schedule can lower the
+    entry's standing. It is still a true fact about the code (the same
+    principle that lets a non-author refute a distance), and reserving
+    REPLACEMENT to the listed authors leaves a mediocre donated schedule
+    theirs to beat. The committed circuits/<slug>/ artifacts are checked by
+    verify/circuit_verify.py and re-gated by gate_changed.py, so a donated
+    tier cannot under-claim d_circ without a valid witness at that weight."""
+    return addition_binding(author, base_doc, new_doc, "circuit",
+                            "a circuit tier")
+
+
+# The bindings a PR author who is not a listed author may still pass, with the
+# phrase each prints on success. Declaration order is report order, except for
+# the one `evident_binding` says the change was aiming for.
+BINDINGS = (
+    ("refutation", refutation_binding, "witness_provenance credit, refuting"),
+    ("layout", layout_binding, "adding a first locality block to"),
+    ("circuit", circuit_binding, "adding a first circuit block to"),
+)
+
+
+def evident_binding(base_doc, new_doc):
+    """Which binding a rejected change was evidently aiming for, so the report
+    leads with one relevant rejection instead of three."""
+    if "circuit" in new_doc and "circuit" not in base_doc:
+        return "circuit"
+    if "locality" in new_doc and "locality" not in base_doc:
+        return "layout"
+    return "refutation"
 
 
 def main(argv):
@@ -306,25 +381,28 @@ def main(argv):
                 print(f"ok    {f}: PR author @{author} is listed")
                 continue
         if base_doc is not None:
-            ok, why = refutation_binding(author, base_doc, doc)
-            if ok:
-                print(f"ok    {f}: @{author} binds via witness_provenance "
-                      f"(refutation of {base_path})")
+            if doc == base_doc:
+                # Nothing in the JSON moved, so the diff that brought this
+                # entry here is in its other committed artifacts (its
+                # circuits/<slug>/ files). No binding describes that: every
+                # one of them is a change TO the JSON.
+                violations.append(
+                    (f, hs, "the JSON is unchanged, so the diff is in this "
+                     "entry's committed circuits/ artifacts; replacing those "
+                     "is reserved to its listed authors"))
                 continue
-            ok2, why2 = layout_binding(author, base_doc, doc)
-            if ok2:
-                print(f"ok    {f}: @{author} binds via layout addition "
-                      f"(first locality block on {base_path})")
-                continue
-            # Lead with the binding the change was evidently aiming for, so a
-            # plain unauthorized edit reads one relevant rejection, not two.
-            layoutish = ("locality" in doc) and ("locality" not in base_doc)
-            first, second = ((f"layout binding failed: {why2}",
-                              f"refutation binding failed: {why}")
-                             if layoutish else
-                             (f"refutation binding failed: {why}",
-                              f"layout binding failed: {why2}"))
-            violations.append((f, hs, f"{first} ({second})"))
+            attempts = []
+            for label, bind, phrase in BINDINGS:
+                ok, why = bind(author, base_doc, doc)
+                if ok:
+                    print(f"ok    {f}: @{author} binds by {phrase} {base_path}")
+                    break
+                attempts.append((f"{label} binding failed: {why}",
+                                 label != evident_binding(base_doc, doc)))
+            else:
+                attempts.sort(key=lambda a: a[1])  # stable: evident one first
+                first, *rest = [why for why, _ in attempts]
+                violations.append((f, hs, f"{first} ({'; '.join(rest)})"))
         else:
             violations.append((f, hs, None))
 
@@ -333,7 +411,8 @@ def main(argv):
               "@handle authors, or the change must be exactly a refutation "
               "credited to them in witness_provenance.found_by (issue #611), "
               "or exactly a first-layout addition credited to them in "
-              "locality.contributed_by.by.")
+              "locality.contributed_by.by, or exactly a first-circuit-tier "
+              "addition credited to them in circuit.contributed_by.by.")
         for f, hs, extra in violations:
             print(f"  {f}: authors {['@' + h for h in hs]} do not include "
                   f"@{author}" + (f"; {extra}" if extra else ""))

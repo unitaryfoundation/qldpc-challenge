@@ -46,7 +46,6 @@ def test_free_form_schema_fields_are_deliberately_covered():
 
     assert unrestricted_string_paths(schema) == {
         "properties/circuit/properties/notes",
-        "properties/locality/properties/contributed_by/properties/method",
         "properties/name",
         "properties/provenance/properties/authors/items",
         "properties/provenance/properties/construction",
@@ -57,6 +56,9 @@ def test_free_form_schema_fields_are_deliberately_covered():
         # Deprecated and ignored by the site, but intentionally classified.
         "properties/tracks/items",
         "$defs/sideDistance/properties/witness_provenance/properties/tool",
+        # One entry covers both use sites of the shared credit block
+        # (locality.contributed_by and circuit.contributed_by).
+        "$defs/contributedBy/properties/method",
     }
 
 
@@ -130,6 +132,11 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
         "rounds": 6,
         "stim_version": "1.15.0",
         "notes": f"circuit notes {close_script}",
+        "contributed_by": {
+            "by": ["@safe-author"],
+            "date": "2026-09-11",
+            "method": f"schedule method {attr_breakout}",
+        },
     }
     doc["tracks"] = [close_script]
     doc["schema_version"] = "0.2"

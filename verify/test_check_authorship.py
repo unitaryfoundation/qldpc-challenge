@@ -1,10 +1,11 @@
-"""Tests for check_authorship.py, including the refutation binding (#611).
+"""Tests for check_authorship.py and its bindings (#611).
 
 Builds a throwaway git repo, commits a code owned by @alice, then checks which
 edits @bob can and cannot land: a clean refutation (rename + strictly lighter
-witness credited to him in witness_provenance) binds; anything that also
+witness credited to him in witness_provenance) binds, as does a first layout
+or a first circuit tier credited to him in contributed_by; anything that also
 touches the construction, authorship, or credit does not. The gate does no
-code math, so the fixture code is synthetic.
+code or circuit math, so the fixtures are synthetic.
 """
 
 import copy
@@ -46,16 +47,25 @@ def git(td, *args):
                     *args], cwd=td, check=True, capture_output=True)
 
 
+def write_file(td, rel, content):
+    path = os.path.join(td, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        f.write(content)
+
+
 def write_code(td, fname, doc):
     os.makedirs(os.path.join(td, "codes"), exist_ok=True)
     with open(os.path.join(td, "codes", fname), "w") as f:
         json.dump(doc, f, indent=1)  # multi-line, like real board files
 
 
-def make_repo(td, base_doc=None):
+def make_repo(td, base_doc=None, extra=()):
     git(td, "init", "-q", "-b", "main")
     write_code(td, "60-8-6.json", base_doc or BASE_DOC)
-    git(td, "add", "codes")
+    for rel, content in extra:
+        write_file(td, rel, content)
+    git(td, "add", "-A")
     git(td, "commit", "-q", "-m", "base")
     git(td, "checkout", "-q", "-b", "change")
 
@@ -75,16 +85,24 @@ def refuted(with_wp=True, found_by="@bob"):
 
 
 def run_case(name, edit, expect_ok, author="bob", rename=True,
-             base_doc=None):
+             base_doc=None, base_files=(), files=()):
+    """edit() returns the new doc, or None to leave codes/ untouched -- which
+    is the interesting shape for circuits/, where the claim surface moves
+    outside the JSON. base_files/files are (relpath, content) written on the
+    base commit and on the change."""
     with tempfile.TemporaryDirectory() as td:
-        make_repo(td, base_doc=base_doc)
-        doc = edit()
-        if rename:
+        make_repo(td, base_doc=base_doc, extra=base_files)
+        doc = edit() if edit is not None else None
+        if doc is None:
+            pass
+        elif rename:
             git(td, "rm", "-q", "codes/60-8-6.json")
             write_code(td, "60-8-5.json", doc)
         else:
             write_code(td, "60-8-6.json", doc)
-        git(td, "add", "codes")
+        for rel, content in files:
+            write_file(td, rel, content)
+        git(td, "add", "-A")
         git(td, "commit", "-q", "-m", "change")
         rc = check_authorship.main(
             ["--author", author, "--root", td, "--base", "main"])
@@ -334,6 +352,132 @@ def main():
     run_case("replacing an existing layout rejected",
              layout_replaces, False, rename=False, base_doc=HAS_LAYOUT)
 
+    print("\ncircuit binding (first circuit block):")
+    CIRCUIT = {
+        "d_circ": {"X": {"value": 6, "confidence": "upper_bound",
+                         "witness": [0, 1, 2, 3, 4, 5]},
+                   "Z": {"value": 6, "confidence": "upper_bound",
+                         "witness": [1, 2, 3, 4, 5, 6]}},
+        "rounds": 6, "stim_version": "1.16.0",
+        "contributed_by": {"by": ["@bob"], "date": "2026-09-11",
+                           "method": "hand-scheduled, depth 7"},
+    }
+    STIM = [("circuits/60-8-6/memory_x.stim", "# synthetic\n"),
+            ("circuits/60-8-6/memory_z.stim", "# synthetic\n")]
+
+    def adds_circuit(base=BASE_DOC, credit=True):
+        doc = copy.deepcopy(base)
+        doc["circuit"] = copy.deepcopy(CIRCUIT)
+        if not credit:
+            del doc["circuit"]["contributed_by"]
+        doc["schema_version"] = "0.2"
+        doc["name"] += ", d_circ = 6"
+        doc["provenance"]["notes"] += " Circuit tier added."
+        return doc
+    run_case("circuit addition credited in contributed_by binds",
+             adds_circuit, True, rename=False, files=STIM)
+    run_case("circuit addition on a no-handle baseline binds",
+             lambda: adds_circuit(base=BASELINE), True, rename=False,
+             base_doc=BASELINE, files=STIM)
+
+    def circuit_no_credit():
+        return adds_circuit(credit=False)
+    run_case("circuit addition without contributed_by credit rejected",
+             circuit_no_credit, False, rename=False, files=STIM)
+
+    def circuit_wrong_credit():
+        doc = adds_circuit()
+        doc["circuit"]["contributed_by"]["by"] = ["@carol"]
+        return doc
+    run_case("circuit addition crediting someone else rejected",
+             circuit_wrong_credit, False, rename=False, files=STIM)
+
+    def circuit_appends_author():
+        doc = adds_circuit()
+        doc["provenance"]["authors"] = (
+            list(doc["provenance"]["authors"]) + ["@bob"])
+        return doc
+    run_case("circuit addition that also appends to authors rejected",
+             circuit_appends_author, False, rename=False, files=STIM)
+
+    def circuit_sets_model():
+        doc = adds_circuit()
+        doc["provenance"]["model"] = "TestModel 1.0"
+        return doc
+    run_case("circuit addition that also sets model rejected",
+             circuit_sets_model, False, rename=False, files=STIM)
+
+    def circuit_touches_checks():
+        doc = adds_circuit()
+        doc["checks"]["X"] = [[0, 1, 3]]
+        return doc
+    run_case("circuit addition that also edits checks rejected",
+             circuit_touches_checks, False, rename=False, files=STIM)
+
+    def circuit_touches_distance():
+        doc = adds_circuit()
+        doc["distance"]["X"]["value"] = 5
+        doc["distance"]["X"]["witness"] = [0, 1, 2, 3, 4]
+        doc["distance"]["d"] = 5
+        return doc
+    run_case("circuit addition that also edits distance rejected",
+             circuit_touches_distance, False, rename=False, files=STIM)
+
+    def circuit_rewrites_notes():
+        doc = adds_circuit()
+        doc["provenance"]["notes"] = "Mine now."
+        return doc
+    run_case("circuit addition that rewrites notes rejected",
+             circuit_rewrites_notes, False, rename=False, files=STIM)
+
+    def circuit_and_layout():
+        doc = adds_circuit()
+        doc["locality"] = copy.deepcopy(LAYOUT)
+        return doc
+    run_case("circuit addition that also adds a layout rejected (one "
+             "artifact per binding)", circuit_and_layout, False,
+             rename=False, files=STIM)
+
+    HAS_CIRCUIT = copy.deepcopy(BASE_DOC)
+    HAS_CIRCUIT["schema_version"] = "0.2"
+    HAS_CIRCUIT["circuit"] = {k: v for k, v in CIRCUIT.items()
+                              if k != "contributed_by"}
+
+    def circuit_replaces():
+        doc = copy.deepcopy(HAS_CIRCUIT)
+        doc["circuit"] = copy.deepcopy(CIRCUIT)
+        doc["circuit"]["rounds"] = 8
+        doc["provenance"]["notes"] += " Better schedule."
+        return doc
+    run_case("replacing an existing circuit tier rejected", circuit_replaces,
+             False, rename=False, base_doc=HAS_CIRCUIT, files=STIM)
+    run_case("a listed author may replace the circuit tier", circuit_replaces,
+             True, author="alice", rename=False, base_doc=HAS_CIRCUIT,
+             files=STIM)
+
+    print("\ncircuits/<slug>/ is part of the entry's claim surface:")
+    run_case("swapping committed circuits with the JSON untouched rejected",
+             None, False, base_files=STIM,
+             files=[("circuits/60-8-6/memory_x.stim", "# tampered\n")],
+             base_doc=HAS_CIRCUIT)
+    run_case("a listed author may swap the committed circuits",
+             None, True, author="alice", base_files=STIM,
+             files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")],
+             base_doc=HAS_CIRCUIT)
+
+    OTHER = copy.deepcopy(BASE_DOC)
+    OTHER["n"], OTHER["k"] = 70, 4
+    OTHER["schema_version"] = "0.2"
+    OTHER["provenance"] = {"authors": ["@carol"], "construction": "synthetic",
+                           "notes": "carol's."}
+    OTHER["circuit"] = {k: v for k, v in CIRCUIT.items()
+                        if k != "contributed_by"}
+    run_case("a bound circuit addition may not also touch another entry's "
+             "circuits", adds_circuit, False, rename=False,
+             base_files=STIM + [("codes/70-4-8.json", json.dumps(OTHER)),
+                                ("circuits/70-4-8/memory_x.stim", "# c\n")],
+             files=[("circuits/70-4-8/memory_x.stim", "# tampered\n")])
+
     print("\nmerged-state escalation (the author list is the privilege "
           "boundary;\na merged binding must not widen the contributor's "
           "rights on the next PR):")
@@ -377,6 +521,15 @@ def main():
         return doc
     merged_state_case("after a merged layout binding, a clean refutation "
                       "by @bob still binds", bob_refutes_after_merge, True)
+
+    def bob_rewrites_after_circuit_merge():
+        doc = adds_circuit()
+        doc["checks"]["Z"] = [[3, 4, 6]]
+        doc["provenance"]["construction"] = "bob's construction"
+        return doc
+    merged_state_case("after a merged circuit binding, @bob still cannot "
+                      "edit the code", bob_rewrites_after_circuit_merge,
+                      False, merged_doc=adds_circuit())
 
     print("\nmalformed input:")
     missing_side = copy.deepcopy(BASE_DOC)
