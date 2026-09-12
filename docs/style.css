@@ -1,6 +1,6 @@
 
-:root{--ink:#0f172a;--mut:#64748b;--ln:#e2e8f0;--ac:#36006c;--ex:#059669;
---exb:#ffff00;--dark:#111111;--bg:#fff;--soft:#f8fafc}
+:root{--ink:#0f172a;--mut:#64748b;--ln:#d9dfe9;--ac:#36006c;--ex:#059669;
+--exb:#ffff00;--dark:#111111;--bg:#fbfbfd;--soft:#f8fafc}
 *{box-sizing:border-box}
 /* Unitary Foundation type stack: Manrope for body and page-level headings
    (H1/H2, per UF homepage), Space Grotesk for in-container display text,
