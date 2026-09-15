@@ -1,0 +1,246 @@
+{
+ "schema_version": "0.1",
+ "name": "[[32,12,4]] adversarial CI probe: direct sum of two copies of [[16,6,4]] quantum Reed-Muller code, single-layer 2D-local layout",
+ "code_type": "CSS",
+ "n": 32,
+ "k": 12,
+ "checks": {
+  "X": [
+   [
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11,
+    14,
+    15
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31
+   ],
+   [
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    30
+   ],
+   [
+    18,
+    19,
+    22,
+    23,
+    26,
+    27,
+    30,
+    31
+   ],
+   [
+    20,
+    21,
+    22,
+    23,
+    28,
+    29,
+    30,
+    31
+   ],
+   [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+   ]
+  ],
+  "Z": [
+   [
+    1,
+    3,
+    5,
+    7,
+    9,
+    11,
+    13,
+    15
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    10,
+    11,
+    14,
+    15
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31
+   ],
+   [
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    30
+   ],
+   [
+    18,
+    19,
+    22,
+    23,
+    26,
+    27,
+    30,
+    31
+   ],
+   [
+    20,
+    21,
+    22,
+    23,
+    28,
+    29,
+    30,
+    31
+   ],
+   [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    24,
+    27,
+    28,
+    31
+   ]
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    24,
+    27,
+    28,
+    31
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@FarLab"
+  ],
+  "construction": "Block-diagonal direct sum of two copies of codes/16-6-4.json.",
+  "origin": "submission",
+  "date": "2026-09-15",
+  "notes": "ADVERSARIAL TEST SUBMISSION: deliberately a direct sum of two existing board codes, opened to check that the CI connectivity gate rejects it. Not a discovery. Do not merge.",
+  "model": "Claude Fable 5.1"
+ }
+}
