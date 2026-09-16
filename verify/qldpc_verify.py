@@ -27,6 +27,8 @@ What "verified" means per field:
               diagnostics (radius, qubits/site, spacing, density, bbox).
 """
 
+import functools
+import glob
 import json
 import re
 import math
@@ -611,6 +613,51 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
 
     return report
 
+
+
+def _board_stamp(code_dir):
+    """Return a cheap key that changes iff the board files change (name/mtime/size)."""
+    return tuple((os.path.basename(p), os.path.getmtime(p), os.path.getsize(p))
+                 for p in sorted(glob.glob(os.path.join(code_dir, "*.json"))))
+
+
+@functools.lru_cache(maxsize=4)
+def _board_reports_cached(code_dir, stamp):
+    out = []
+    for p in sorted(glob.glob(os.path.join(code_dir, "*.json"))):
+        entry = {"path": p, "slug": os.path.splitext(os.path.basename(p))[0],
+                 "doc": None, "report": None,
+                 "size_error": file_size_error(p) or None, "load_error": None}
+        if entry["size_error"] is None:
+            try:
+                with open(p) as f:
+                    entry["doc"] = json.load(f)
+                entry["report"] = verify(entry["doc"])
+            except Exception as e:                  # noqa: BLE001 -- recorded, caller decides
+                entry["load_error"] = f"{type(e).__name__}: {e}"
+        out.append(entry)
+    return tuple(out)
+
+
+def board_reports(code_dir):
+    """Verify every <code_dir>/*.json structurally, memoized per board state.
+
+    One process pays for the pass once, whoever asks.
+
+    The site builder, the candidate validator and several tests each used to
+    rescan and re-verify the whole board (~15-20 s per pass locally, two to
+    three passes per pytest session, all producing identical reports). The
+    memo key is the board stamp (file names, mtimes, sizes), so an edited or
+    added file re-verifies the board while nothing can serve a stale report.
+    Structural verification (refute=False) is deterministic, so the cached
+    report is exactly what a fresh call would compute.
+
+    Returns a tuple of dicts {path, slug, doc, report, size_error,
+    load_error}: doc/report are None when size_error (file_size_error) or
+    load_error (a parse or verify exception, recorded as text) is set. The
+    entries are SHARED between callers: treat doc and report as read-only.
+    """
+    return _board_reports_cached(os.path.abspath(code_dir), _board_stamp(code_dir))
 
 def main(path):
     ferr = file_size_error(path)

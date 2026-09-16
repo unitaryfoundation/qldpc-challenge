@@ -448,3 +448,38 @@ def test_main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+def test_board_reports_memoized_per_board_state(tmp_path, monkeypatch):
+    """Share one structural pass per board state across callers in the process.
+
+    Any change to the files re-verifies; broken files are recorded, not
+    raised, so one bad entry cannot take the whole board down.
+    """
+    import shutil
+
+    import qldpc_verify as Q
+
+    src = os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")
+    d = tmp_path / "codes"
+    d.mkdir()
+    shutil.copy(src, d / "72-6-6.json")
+    calls = []
+    real = Q.verify
+    monkeypatch.setattr(Q, "verify",
+                        lambda doc, *a, **k: (calls.append(1), real(doc, *a, **k))[1])
+
+    r1 = Q.board_reports(str(d))
+    r2 = Q.board_reports(str(d))
+    assert r1 is r2 and len(calls) == 1
+    assert r1[0]["slug"] == "72-6-6" and r1[0]["report"]["ok"]
+
+    shutil.copy(src, d / "99-9-9.json")               # board changed -> fresh pass
+    r3 = Q.board_reports(str(d))
+    assert r3 is not r1 and len(calls) == 3 and [e["slug"] for e in r3] == ["72-6-6", "99-9-9"]
+
+    (d / "broken.json").write_text("{")
+    r4 = Q.board_reports(str(d))
+    bad = next(e for e in r4 if e["slug"] == "broken")
+    assert bad["doc"] is None and bad["report"] is None and "JSONDecodeError" in bad["load_error"]
+    assert sum(e["report"] is not None for e in r4) == 2

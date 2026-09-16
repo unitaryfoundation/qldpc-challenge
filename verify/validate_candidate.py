@@ -34,8 +34,6 @@ The gate, per candidate (a schema-shaped submission ``doc``):
 refuted, and it is not an exact board duplicate. Novelty is a label, not a pass
 condition.
 """
-import functools
-import glob
 import hashlib
 import json
 import os
@@ -60,23 +58,19 @@ def source_sha256():
         return hashlib.sha256(f.read()).hexdigest()
 
 
-def _board_stamp():
-    """A cheap key that changes iff the board files change (name/mtime/size), so the
-    scan below can be cached within a session but never goes stale."""
-    return tuple((os.path.basename(p), os.path.getmtime(p), os.path.getsize(p))
-                 for p in sorted(glob.glob(os.path.join(_CODES, "*.json"))))
-
-
-@functools.lru_cache(maxsize=4)
-def _board_entries_cached(_stamp):
+def _board_entries():
+    """Trusted read of the current board via verify/, memoized per board state
+    (qldpc_verify.board_reports) so validating many candidates in a session --
+    or the site build and the tests in the same process -- rescans once."""
     out = []
-    for p in sorted(glob.glob(os.path.join(_CODES, "*.json"))):
+    for e in qldpc_verify.board_reports(_CODES):
+        doc, rep = e["doc"], e["report"]
+        if doc is None or rep is None:
+            continue                            # a broken board file never blocks a candidate
         try:
-            doc = json.load(open(p))
-            rep = qldpc_verify.verify(doc, refute=False)   # structural only; fast
             comp = rep.get("computed", {})
             out.append({
-                "name": os.path.basename(p),
+                "name": os.path.basename(e["path"]),
                 "n": doc["n"], "k": doc["k"], "d": doc["distance"]["d"],
                 "fingerprint": rep.get("fingerprint"),
                 "sig": rep.get("signature", {}).get("hash"),
@@ -85,14 +79,8 @@ def _board_entries_cached(_stamp):
                 "locality_class": comp.get("locality_class"),
             })
         except Exception:
-            continue                            # a broken board file never blocks a candidate
+            continue
     return out
-
-
-def _board_entries():
-    """Trusted read of the current board via verify/, cached per board state so
-    validating many candidates in a session does not rescan every time."""
-    return _board_entries_cached(_board_stamp())
 
 
 def validate_candidate(doc, *, seed=None, refute=True):

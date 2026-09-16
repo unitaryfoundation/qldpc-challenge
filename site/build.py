@@ -21,7 +21,7 @@ import urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
-from qldpc_verify import file_size_error, verify
+from qldpc_verify import board_reports
 
 DOCS = os.path.join(ROOT, "docs")
 CERTS = os.path.join(ROOT, "certs")
@@ -1399,17 +1399,19 @@ def _model_str(m):
 
 def load_entries():
     entries = []
-    for p in sorted(glob.glob(os.path.join(ROOT, "codes", "*.json"))):
-        slug = os.path.splitext(os.path.basename(p))[0]
+    # One memoized structural pass over the board (qldpc_verify.board_reports),
+    # shared with the candidate validator and the tests in the same process.
+    # Site render: structural checks only, refutation is a CI/cron job.
+    for e in board_reports(os.path.join(ROOT, "codes")):
+        slug = e["slug"]
         if not _SAFE_SLUG.fullmatch(slug):
             raise ValueError(f"unsafe code filename: {slug!r}")
-        ferr = file_size_error(p)
-        if ferr:
-            print(f"  warning: {slug}: {ferr}; skipping")
+        if e["size_error"]:
+            print(f"  warning: {slug}: {e['size_error']}; skipping")
             continue
-        with open(p) as f:
-            doc = json.load(f)
-        rep = verify(doc)   # site render: structural checks only, refutation is a CI/cron job
+        if e["load_error"]:
+            raise ValueError(f"{slug}: {e['load_error']}")
+        doc, rep = e["doc"], e["report"]
         if not rep["ok"]:
             continue
         earned = rep["earned_distance"].get("d")
