@@ -480,7 +480,7 @@ def test_board_reports_memoized_per_board_state(tmp_path, monkeypatch):
 
     # Same-size edit with the mtime restored (cp -p / rsync -t / touch -r
     # shape): metadata is unchanged, the content is not, and the memo must
-    # not serve the old report. Reviewer-supplied case on the PR.
+    # not serve the old report.
     p = d / "99-9-9.json"
     st = p.stat()
     text = p.read_text()
