@@ -3,7 +3,9 @@
 Runs independent bounded, fixed-seed refutation searches -- python RIS
 (heuristic_distance), the syndrome decoder (decode/distance, needs ldpc), and,
 for frontier-advancing claims, a ~150x-deeper accelerated RIS pass (gf2_fast,
-built via `make fast`) whose finds only count after the pinned python stack
+built via `make fast`; capped at FAST_SECONDS wall-clock or its trial target,
+whichever binds first, with the completed count in the receipt) whose finds
+only count after the pinned python stack
 validates the witness -- only on the code/example submissions changed in this
 PR, and exits non-zero if ANY finds a logical lighter than the claimed distance
 (an over-claim). With the extension built, deep claims get 1 python RIS seed
@@ -59,6 +61,7 @@ import os
 import secrets
 import subprocess
 import sys
+import time
 
 import numpy as np
 
@@ -81,6 +84,26 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Fixed thread count for the fast pass so its verdict is reproducible from the
 # printed seed alone (the per-thread RNG streams depend on the split).
 FAST_THREADS = 4
+
+# Wall-clock cap on the fast pass alone (issue: the 8M-trial target has no time
+# bound of its own, and per-trial cost grows with n -- ~0.17 ms at n=630 vs
+# ~0.34 ms at n=924 on 4 threads -- so at n~900+ the pass alone outgrew the
+# whole CI job: [[924,18,31]] was killed by the job limit 69 min into the gate
+# with nothing printed and no receipt). The pass now stops at the trial target
+# OR this many seconds, whichever binds first; the receipt records the trials
+# actually completed, so "no refutation within budget" is an explicit, audited
+# verdict rather than a job kill. 90 min is calibrated to the blocklength cap:
+# the hosted runner reaches ~8M trials at n=1000 in about that long
+# (CONTRIBUTING.md), so codes under the cap still get the full target and only
+# the very largest are trimmed. The verify job's timeout-minutes must leave this
+# plus the fixed ~30 min of self-tests, verify_all and python passes.
+FAST_SECONDS = 90 * 60.0
+# The accelerator is called in slices so the deadline can be checked between
+# them; the slice is re-sized to ~FAST_SLICE_SECONDS from the measured rate so
+# the overshoot past the deadline is bounded regardless of n.
+FAST_SLICE_SECONDS = 60.0
+FAST_SLICE_MIN, FAST_SLICE_MAX = 10_000, 1_000_000
+FAST_PROGRESS_SECONDS = 300.0
 
 # Structural (circulant generalized-bicycle) pass, issue #942. Trials are cheap
 # here because the search space is one circulant block rather than the whole
@@ -467,31 +490,74 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
     return hits, notes
 
 
-def _fast_refute(doc, seed, trials):
+def _fast_refute(doc, seed, trials, max_seconds=None):
     """Deep RIS via the optional C++ accelerator, kept SOUND the same way the
     python passes are: the accelerator only proposes (weight, side, support);
     the find counts as a refutation only after the pinned python stack confirms
     the support is a genuine nontrivial logical of that weight, lighter than
     the claim. An invalid or non-improving find is reported as a miss, never
-    trusted. Returns the refute_check tuple shape: (refuted, d, witness, trials)."""
+    trusted.
+
+    Stops after `trials` permutations or `max_seconds` wall-clock, whichever
+    comes first. The accelerator is driven in slices (each with its own
+    derived seed, so the permutation streams stay independent) and the
+    deadline is checked between slices; a re-run with the same seed and enough
+    time replays the same slices in the same order, so a time-trimmed run is a
+    prefix of the full one. Returns the refute_check tuple shape
+    (refuted, d, witness, trials_completed) -- the LAST field is the count
+    actually searched, which is what the receipt must record."""
     n = doc["n"]
     HX = H._matrix(doc["checks"]["X"], n)
     HZ = H._matrix(doc["checks"]["Z"], n)
-    w, side, support = GF.distance_rand_witness(
-        HX, HZ, trials=trials, seed=seed, pair_depth=8, threads=FAST_THREADS)
     claimed = int(doc["distance"]["d"])
-    if not side or w >= claimed:
-        return False, (w if side else None), None, trials
+    t0 = time.monotonic()
+    deadline = (t0 + max_seconds) if max_seconds else None
+    done, best_w, best_side, best_sup = 0, None, None, None
+    slice_n = FAST_SLICE_MIN
+    last_report = t0
+    i = 0
+    while done < trials:
+        t = min(slice_n, trials - done)
+        w, side, support = GF.distance_rand_witness(
+            HX, HZ, trials=t, seed=seed + i * 1_000_003, pair_depth=8,
+            threads=FAST_THREADS)
+        done += t
+        i += 1
+        if side and (best_w is None or w < best_w):
+            best_w, best_side, best_sup = w, side, support
+        now = time.monotonic()
+        elapsed = now - t0
+        if deadline and now >= deadline:
+            break
+        # Re-size the next slice to ~FAST_SLICE_SECONDS at the measured rate.
+        if elapsed > 0 and done > 0:
+            per_trial = elapsed / done
+            slice_n = int(min(FAST_SLICE_MAX,
+                              max(FAST_SLICE_MIN, FAST_SLICE_SECONDS / per_trial)))
+            if deadline:
+                left = deadline - now
+                slice_n = max(FAST_SLICE_MIN, min(slice_n, int(left / per_trial) + 1))
+        if now - last_report >= FAST_PROGRESS_SECONDS:
+            print(f"  RIS-fast: {done:,}/{trials:,} trials, {elapsed:.0f}s, "
+                  f"best w={best_w} ({best_side})", flush=True)
+            last_report = now
+    elapsed = time.monotonic() - t0
+    if done < trials:
+        print(f"  RIS-fast: wall-clock cap reached after {done:,}/{trials:,} "
+              f"trials ({elapsed:.0f}s); best w={best_w} ({best_side})",
+              flush=True)
+    if not best_side or best_w >= claimed:
+        return False, best_w, None, done
     v = np.zeros(n, dtype=np.int8)
-    v[list(support)] = 1
-    Hcheck = HZ if side == "X" else HX
-    L = gf2.logical_basis(HX, HZ) if side == "X" else gf2.logical_basis(HZ, HX)
-    valid = (int(v.sum()) == w
+    v[list(best_sup)] = 1
+    Hcheck = HZ if best_side == "X" else HX
+    L = gf2.logical_basis(HX, HZ) if best_side == "X" else gf2.logical_basis(HZ, HX)
+    valid = (int(v.sum()) == best_w
              and not ((Hcheck @ v) % 2).any()
              and bool(((L @ v) % 2).any()))
     if not valid:
-        return False, None, None, trials
-    return True, w, sorted(int(q) for q in support), trials
+        return False, None, None, done
+    return True, best_w, sorted(int(q) for q in best_sup), done
 
 
 def _structural_refute(doc, seed, trials):
@@ -598,7 +664,9 @@ def main(argv):
     if seed is None:
         seed = secrets.randbelow(2**31)
     print(f"refutation seed = {seed}  "
-          f"(reproduce: python verify/gate_changed.py --seed {seed} <files>)\n")
+          f"(reproduce: python verify/gate_changed.py --seed {seed} <files>; "
+          f"the fast pass is also wall-clock capped, see fast_trials in the "
+          f"receipt)\n")
 
     SD = _load_syndrome()
     if SD is None:
@@ -768,7 +836,7 @@ def main(argv):
         # logicals (86+96 of 427 kernel dimensions on the [[682,172]] entry).
         # 52 of the board's 56 circulant GB entries have a mixed-support
         # witness, so a code that survives stage 1 still owes the full battery.
-        ftrials = 0
+        ftrials = ftarget = 0
         if not struct_refuted:
             # two independent mechanisms; a hit from EITHER (any seed) refutes.
             for si, s in enumerate(seeds):
@@ -787,8 +855,10 @@ def main(argv):
             # would surface a false-negative extension bug by finding what the
             # fast pass missed.
             if GF is not None and deep:
-                ftrials = min(8_000_000, 150 * trials)
-                results["RIS-fast"] = _fast_refute(doc, seed + 7, ftrials)
+                ftarget = min(8_000_000, 150 * trials)
+                results["RIS-fast"] = _fast_refute(doc, seed + 7, ftarget,
+                                                   max_seconds=FAST_SECONDS)
+                ftrials = results["RIS-fast"][3]     # trials actually searched
         hits = {m: (dh, wit) for m, (ref, dh, wit, _) in results.items() if ref}
         # Circuit tier (RFC 0001 step 6): entries shipping syndrome circuits
         # additionally face a bounded RIS search on each memory DEM when the
@@ -802,7 +872,12 @@ def main(argv):
                    f"general battery cannot change a validated refutation and "
                    f"was skipped)")
         else:
-            fast_tag = (f" + fast x {ftrials}" if ftrials else "")
+            fast_tag = ""
+            if ftrials:
+                fast_tag = f" + fast x {ftrials}"
+                if ftrials < ftarget:
+                    fast_tag += (f" of {ftarget} (wall-clock cap "
+                                 f"{FAST_SECONDS / 60:g} min reached)")
             tag = (f"deep, {len(seeds)} RIS seeds x {trials} trials "
                    f"(<={budget:.0f}s each){fast_tag}" if deep else
                    f"standard, {trials} trials (<={budget:.0f}s)")
@@ -819,7 +894,11 @@ def main(argv):
             "trials": 0 if struct_refuted else trials,
             "budget_seconds": 0.0 if struct_refuted else budget,
             "deep": deep,
+            # Trials the fast pass actually completed; equal to fast_target
+            # unless the wall-clock cap (fast_seconds) ended it first.
             "fast_trials": ftrials,
+            "fast_target": ftarget,
+            "fast_seconds": FAST_SECONDS if ftrials else 0.0,
             "structural_trials": struct_trials,
             # Names the mechanism that ended the run early, so a receipt with a
             # short method list is self-explaining rather than looking truncated.

@@ -137,7 +137,11 @@ at the sparse end (per-trial cost grows as roughly `n^2` and never depends on
 weight, about 87 CI minutes for the gate's 8M-trial pass at `n = 1000` against
 38 at `n = 700`), and the distance bound is the depth that pass actually
 reaches: a deeper claim would pass unrefuted without ever being reached. The
-cap is raise-only and rises as the tooling improves.
+pass is also wall-clock capped at 90 minutes on its own (8M trials or 90
+minutes, whichever comes first), so a code at the blocklength cap still gets
+essentially the full target while the CI job stays bounded; the receipt's
+`fast_trials` records how many trials were actually searched. The cap is
+raise-only and rises as the tooling improves.
 
 ## Contribute with an LLM
 

@@ -48,7 +48,18 @@ jobs:
 
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Budget: the refutation gate's accelerated pass is wall-clock capped at 90
+    # min on its own (gate_changed.FAST_SECONDS; a deep claim near the n=1000
+    # blocklength cap fills it), and the fixed steps around it -- self-tests
+    # (~8 min), verify_all (~13 min), python RIS seeds + decoder + structural
+    # pass (~5 min), checkouts and builds (~2 min) -- take ~30 min. Hitting this
+    # limit therefore means a hang or a bug, never a large legitimate code: the
+    # gate owns its own time-box and reports what it searched.
+    timeout-minutes: 130
+    env:
+      # The gate prints its seed and per-mechanism results as it goes; without
+      # this, a killed step leaves an empty log (block-buffered stdout).
+      PYTHONUNBUFFERED: "1"
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
@@ -131,7 +142,7 @@ jobs:
         if: github.event_name != 'pull_request' || steps.changes.outputs.codes_changed != 'true'
         working-directory: submitted
         run: uv run --frozen --extra research python verify/verify_all.py
-      # Cheap metadata checks run BEFORE the ~15-minute refutation gate: a PR that
+      # Cheap metadata checks run BEFORE the (up to ~95-minute) refutation gate: a PR that
       # fails one of them should not first burn a full gate run (PR #278 spent the
       # whole gate on 18 valid layouts and then died on one authorship mismatch).
       - name: authorship check (PR author must be a listed @handle author)
