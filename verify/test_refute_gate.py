@@ -343,12 +343,12 @@ if __name__ == "__main__":
 def test_fast_pass_wall_clock_cap(monkeypatch):
     """The fast pass stops at its trial target or wall-clock cap, whichever first.
 
-    It reports the trials it actually completed. Regression for the [[924,18,31]] CI kill: the 8M-trial fast pass had no time
-    bound of its own, so at n~900+ it outgrew the whole job and the run died
-    with no output and no receipt. Uses a fake accelerator so the test needs
-    neither gf2_fast nor real wall-clock; the pass is driven in slices, so the
-    fake also checks that the slices add up to exactly what is reported and
-    that a hit surfaced in a later slice is still validated by the python stack.
+    It reports the trials it actually completed, its slice schedule depends on
+    the target alone (so a trimmed run is a prefix of the full one under the
+    same seed, on any machine), and a bogus lighter proposal can never hide a
+    genuine one. Regression for the [[924,18,31]] CI kill and for the review
+    findings on PR #1098. Uses a fake accelerator so the test needs neither
+    gf2_fast nor real wall-clock.
     """
     import time as _time
 
@@ -360,33 +360,40 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
     HZ = gc.H._matrix(doc["checks"]["Z"], n)
 
     class FakeGF:
-        def __init__(self, sleep=0.0, hit_on_call=None, hit=None):
-            self.calls, self.sleep, self.hit_on_call, self.hit = [], sleep, hit_on_call, hit
+        def __init__(self, sleep=0.0, hits=None):
+            self.calls, self.sleep, self.hits = [], sleep, hits or {}
 
         def distance_rand_witness(self, HX, HZ, trials, seed, pair_depth, threads):
             self.calls.append((trials, seed))
             if self.sleep:
                 _time.sleep(self.sleep)
-            if self.hit_on_call is not None and len(self.calls) == self.hit_on_call:
-                return self.hit
-            return n + 1, None, ()
+            return self.hits.get(len(self.calls), (n + 1, None, ()))
+
+    # Schedule: a function of the target only, summing to it exactly.
+    assert gc.fast_slices(45_000) == [10_000, 20_000, 15_000]
+    assert sum(gc.fast_slices(8_000_000)) == 8_000_000
+    assert max(gc.fast_slices(8_000_000)) == gc.FAST_SLICE_MAX
 
     # Ample time: the full target is searched, in slices that sum exactly to it.
     fake = FakeGF()
     monkeypatch.setattr(gc, "GF", fake)
     ref, w, wit, done = gc._fast_refute(doc, 7, 45_000, max_seconds=None)
-    assert (ref, wit) == (False, None)
-    assert done == 45_000 and sum(t for t, _ in fake.calls) == 45_000
+    assert (ref, w, wit) == (False, None, None)
+    assert done == 45_000 and [t for t, _ in fake.calls] == [10_000, 20_000, 15_000]
     assert len({sd for _, sd in fake.calls}) == len(fake.calls), "slice seeds must differ"
 
-    # Tight cap: stops early, and the reported count is exactly what was run.
-    fake = FakeGF(sleep=0.02)
-    monkeypatch.setattr(gc, "GF", fake)
-    monkeypatch.setattr(gc, "FAST_SLICE_MIN", 1_000)
-    monkeypatch.setattr(gc, "FAST_SLICE_MAX", 1_000)
+    # Tight cap: stops early with the count it actually ran, and the slices it
+    # ran are a PREFIX of the untrimmed schedule -- same sizes, same seeds --
+    # even though this run is slower per trial (the fake sleeps).
+    slow = FakeGF(sleep=0.02)
+    monkeypatch.setattr(gc, "GF", slow)
     ref, w, wit, done = gc._fast_refute(doc, 7, 10_000_000, max_seconds=0.05)
-    assert not ref and done < 10_000_000
-    assert done == sum(t for t, _ in fake.calls) and 1 <= len(fake.calls) <= 5
+    assert not ref and 0 < done < 10_000_000 == sum(gc.fast_slices(10_000_000))
+    assert done == sum(t for t, _ in slow.calls) and 1 <= len(slow.calls) <= 5
+    full = FakeGF()
+    monkeypatch.setattr(gc, "GF", full)
+    gc._fast_refute(doc, 7, sum(t for t, _ in slow.calls) + 10_000, max_seconds=None)
+    assert full.calls[:len(slow.calls)] == slow.calls
 
     # A genuine lighter logical proposed in a LATER slice is validated and
     # counted, with the completed trials still reported truthfully.
@@ -394,14 +401,29 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
     sup = [int(q) for q in np.flatnonzero(L[0])]
     claim = copy.deepcopy(doc)
     claim["distance"]["d"] = len(sup) + 1
-    fake = FakeGF(hit_on_call=3, hit=(len(sup), "Z", sup))
+    fake = FakeGF(hits={3: (len(sup), "Z", sup)})
     monkeypatch.setattr(gc, "GF", fake)
-    ref, w, wit, done = gc._fast_refute(claim, 7, 3_000, max_seconds=None)
-    assert ref and w == len(sup) and wit == sorted(sup) and done == 3_000
+    ref, w, wit, done = gc._fast_refute(claim, 7, 45_000, max_seconds=None)
+    assert ref and w == len(sup) and wit == sorted(sup) and done == 45_000
 
     # A proposed support that is NOT a logical is rejected, never trusted.
     bogus = sorted(sup)[:-1]
-    fake = FakeGF(hit_on_call=1, hit=(len(bogus), "Z", bogus))
+    fake = FakeGF(hits={1: (len(bogus), "Z", bogus)})
     monkeypatch.setattr(gc, "GF", fake)
-    ref, w, wit, done = gc._fast_refute(claim, 7, 2_000, max_seconds=None)
-    assert (ref, w, wit, done) == (False, None, None, 2_000)
+    ref, w, wit, done = gc._fast_refute(claim, 7, 30_000, max_seconds=None)
+    assert (ref, w, wit, done) == (False, None, None, 30_000)
+
+    # The review case: a genuine weight-w find in slice 2 followed by a BOGUS
+    # lighter proposal in slice 3. The bogus one must not become "best" and
+    # mask the real refutation.
+    fake = FakeGF(hits={2: (len(sup), "Z", sup), 3: (len(bogus), "Z", bogus)})
+    monkeypatch.setattr(gc, "GF", fake)
+    ref, w, wit, done = gc._fast_refute(claim, 7, 45_000, max_seconds=None)
+    assert ref and w == len(sup) and wit == sorted(sup)
+
+    # A valid but non-improving proposal is reported as the found weight.
+    heavy = copy.deepcopy(doc)
+    heavy["distance"]["d"] = len(sup)             # claim equals the find: not lighter
+    fake = FakeGF(hits={1: (len(sup), "Z", sup)})
+    monkeypatch.setattr(gc, "GF", fake)
+    assert gc._fast_refute(heavy, 7, 10_000, max_seconds=None) == (False, len(sup), None, 10_000)

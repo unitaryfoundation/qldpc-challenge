@@ -99,11 +99,23 @@ FAST_THREADS = 4
 # plus the fixed ~30 min of self-tests, verify_all and python passes.
 FAST_SECONDS = 90 * 60.0
 # The accelerator is called in slices so the deadline can be checked between
-# them; the slice is re-sized to ~FAST_SLICE_SECONDS from the measured rate so
-# the overshoot past the deadline is bounded regardless of n.
-FAST_SLICE_SECONDS = 60.0
-FAST_SLICE_MIN, FAST_SLICE_MAX = 10_000, 1_000_000
+# them. The slice schedule is a function of the TARGET only (a geometric
+# ladder from FAST_SLICE_MIN doubling to FAST_SLICE_MAX, then flat), never of
+# the measured rate: the same seed then yields the same slice boundaries and
+# per-slice seeds on any machine, so a time-trimmed run is a prefix of the
+# full one and "reproduce with --seed N" stays true. Overshoot past the
+# deadline is at most one FAST_SLICE_MAX slice (~2 min at n~900 on the runner).
+FAST_SLICE_MIN, FAST_SLICE_MAX = 10_000, 200_000
 FAST_PROGRESS_SECONDS = 300.0
+
+
+def fast_slices(trials):
+    """Deterministic slice sizes summing to `trials` (see FAST_SLICE_MIN)."""
+    out, size = [], FAST_SLICE_MIN
+    while sum(out) < trials:
+        out.append(min(size, trials - sum(out)))
+        size = min(size * 2, FAST_SLICE_MAX)
+    return out
 
 # Structural (circulant generalized-bicycle) pass, issue #942. Trials are cheap
 # here because the search space is one circulant block rather than the whole
@@ -490,20 +502,37 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
     return hits, notes
 
 
+def _validated_logical(HX, HZ, n, w, side, support):
+    """Confirm an accelerator proposal under the pinned python stack.
+
+    True iff (weight w, side, support) is a genuine nontrivial logical of
+    exactly that weight; anything else is never trusted.
+    """
+    v = np.zeros(n, dtype=np.int8)
+    v[list(support)] = 1
+    Hcheck = HZ if side == "X" else HX
+    L = gf2.logical_basis(HX, HZ) if side == "X" else gf2.logical_basis(HZ, HX)
+    return (int(v.sum()) == w
+            and not ((Hcheck @ v) % 2).any()
+            and bool(((L @ v) % 2).any()))
+
+
 def _fast_refute(doc, seed, trials, max_seconds=None):
     """Deep RIS via the optional C++ accelerator, kept SOUND the same way the
     python passes are: the accelerator only proposes (weight, side, support);
-    the find counts as a refutation only after the pinned python stack confirms
+    a find counts as a refutation only after the pinned python stack confirms
     the support is a genuine nontrivial logical of that weight, lighter than
-    the claim. An invalid or non-improving find is reported as a miss, never
-    trusted.
+    the claim. Invalid proposals are never trusted -- and never allowed to
+    hide a valid one: every proposal below the claim is kept and validated in
+    ascending weight until one holds, so a bogus lighter proposal from a later
+    slice cannot mask a genuine refutation from an earlier one.
 
     Stops after `trials` permutations or `max_seconds` wall-clock, whichever
-    comes first. The accelerator is driven in slices (each with its own
-    derived seed, so the permutation streams stay independent) and the
-    deadline is checked between slices; a re-run with the same seed and enough
-    time replays the same slices in the same order, so a time-trimmed run is a
-    prefix of the full one. Returns the refute_check tuple shape
+    comes first. The accelerator is driven in slices whose sizes depend only on
+    `trials` (fast_slices), each with its own derived seed, and the deadline is
+    checked between slices; a re-run with the same seed replays the same slices
+    in the same order on any machine, so a time-trimmed run is a prefix of the
+    full one. Returns the refute_check tuple shape
     (refuted, d, witness, trials_completed) -- the LAST field is the count
     actually searched, which is what the receipt must record."""
     n = doc["n"]
@@ -512,52 +541,36 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
     claimed = int(doc["distance"]["d"])
     t0 = time.monotonic()
     deadline = (t0 + max_seconds) if max_seconds else None
-    done, best_w, best_side, best_sup = 0, None, None, None
-    slice_n = FAST_SLICE_MIN
+    done, proposals = 0, []                     # proposals: (w, side, support)
     last_report = t0
-    i = 0
-    while done < trials:
-        t = min(slice_n, trials - done)
+    for i, t in enumerate(fast_slices(trials)):
         w, side, support = GF.distance_rand_witness(
             HX, HZ, trials=t, seed=seed + i * 1_000_003, pair_depth=8,
             threads=FAST_THREADS)
         done += t
-        i += 1
-        if side and (best_w is None or w < best_w):
-            best_w, best_side, best_sup = w, side, support
+        if side:
+            proposals.append((int(w), side, tuple(sorted(int(q) for q in support))))
         now = time.monotonic()
-        elapsed = now - t0
         if deadline and now >= deadline:
             break
-        # Re-size the next slice to ~FAST_SLICE_SECONDS at the measured rate.
-        if elapsed > 0 and done > 0:
-            per_trial = elapsed / done
-            slice_n = int(min(FAST_SLICE_MAX,
-                              max(FAST_SLICE_MIN, FAST_SLICE_SECONDS / per_trial)))
-            if deadline:
-                left = deadline - now
-                slice_n = max(FAST_SLICE_MIN, min(slice_n, int(left / per_trial) + 1))
         if now - last_report >= FAST_PROGRESS_SECONDS:
-            print(f"  RIS-fast: {done:,}/{trials:,} trials, {elapsed:.0f}s, "
-                  f"best w={best_w} ({best_side})", flush=True)
+            best = min(proposals, default=None)
+            print(f"  RIS-fast: {done:,}/{trials:,} trials, {now - t0:.0f}s, "
+                  f"best w={best[0] if best else None}", flush=True)
             last_report = now
-    elapsed = time.monotonic() - t0
     if done < trials:
+        best = min(proposals, default=None)
         print(f"  RIS-fast: wall-clock cap reached after {done:,}/{trials:,} "
-              f"trials ({elapsed:.0f}s); best w={best_w} ({best_side})",
-              flush=True)
-    if not best_side or best_w >= claimed:
-        return False, best_w, None, done
-    v = np.zeros(n, dtype=np.int8)
-    v[list(best_sup)] = 1
-    Hcheck = HZ if best_side == "X" else HX
-    L = gf2.logical_basis(HX, HZ) if best_side == "X" else gf2.logical_basis(HZ, HX)
-    valid = (int(v.sum()) == best_w
-             and not ((Hcheck @ v) % 2).any()
-             and bool(((L @ v) % 2).any()))
-    if not valid:
-        return False, None, None, done
-    return True, best_w, sorted(int(q) for q in best_sup), done
+              f"trials ({time.monotonic() - t0:.0f}s); best proposal "
+              f"w={best[0] if best else None}", flush=True)
+    # Lightest first; the first proposal the python stack validates wins.
+    for w, side, support in sorted(set(p for p in proposals if p[0] < claimed)):
+        if _validated_logical(HX, HZ, n, w, side, support):
+            return True, w, list(support), done
+    # No validated refutation. Report the lightest non-improving proposal as
+    # the found weight (as before); an invalid sub-claim proposal reports None.
+    above = min((p[0] for p in proposals if p[0] >= claimed), default=None)
+    return False, above, None, done
 
 
 def _structural_refute(doc, seed, trials):

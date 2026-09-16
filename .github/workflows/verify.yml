@@ -48,18 +48,11 @@ jobs:
 
   verify:
     runs-on: ubuntu-latest
-    # Budget: the refutation gate's accelerated pass is wall-clock capped at 90
-    # min on its own (gate_changed.FAST_SECONDS; a deep claim near the n=1000
-    # blocklength cap fills it), and the fixed steps around it -- self-tests
-    # (~8 min), verify_all (~13 min), python RIS seeds + decoder + structural
-    # pass (~5 min), checkouts and builds (~2 min) -- take ~30 min. Hitting this
-    # limit therefore means a hang or a bug, never a large legitimate code: the
-    # gate owns its own time-box and reports what it searched.
+    # 90 min fast-pass cap (gate_changed.FAST_SECONDS) + ~30 min of fixed steps
+    # + margin. Hitting this means a hang or a bug, not a large code.
     timeout-minutes: 130
     env:
-      # The gate prints its seed and per-mechanism results as it goes; without
-      # this, a killed step leaves an empty log (block-buffered stdout).
-      PYTHONUNBUFFERED: "1"
+      PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
