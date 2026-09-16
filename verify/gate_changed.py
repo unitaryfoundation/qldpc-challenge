@@ -85,26 +85,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # printed seed alone (the per-thread RNG streams depend on the split).
 FAST_THREADS = 4
 
-# Wall-clock cap on the fast pass alone (issue: the 8M-trial target has no time
-# bound of its own, and per-trial cost grows with n -- ~0.17 ms at n=630 vs
-# ~0.34 ms at n=924 on 4 threads -- so at n~900+ the pass alone outgrew the
-# whole CI job: [[924,18,31]] was killed by the job limit 69 min into the gate
-# with nothing printed and no receipt). The pass now stops at the trial target
-# OR this many seconds, whichever binds first; the receipt records the trials
-# actually completed, so "no refutation within budget" is an explicit, audited
-# verdict rather than a job kill. 90 min is calibrated to the blocklength cap:
-# the hosted runner reaches ~8M trials at n=1000 in about that long
-# (CONTRIBUTING.md), so codes under the cap still get the full target and only
-# the very largest are trimmed. The verify job's timeout-minutes must leave this
-# plus the fixed ~30 min of self-tests, verify_all and python passes.
+# Wall-clock cap on the fast pass alone: it stops at its trial target or after
+# this long, whichever comes first, and the receipt records the trials it
+# completed. Per-trial cost grows with n, so an uncapped 8M-trial target
+# outgrows the CI job at n~900+. 90 min matches the blocklength cap: the hosted
+# runner reaches ~8M trials at n=1000 in about that long (CONTRIBUTING.md).
 FAST_SECONDS = 90 * 60.0
-# The accelerator is called in slices so the deadline can be checked between
-# them. The slice schedule is a function of the TARGET only (a geometric
-# ladder from FAST_SLICE_MIN doubling to FAST_SLICE_MAX, then flat), never of
-# the measured rate: the same seed then yields the same slice boundaries and
-# per-slice seeds on any machine, so a time-trimmed run is a prefix of the
-# full one and "reproduce with --seed N" stays true. Overshoot past the
-# deadline is at most one FAST_SLICE_MAX slice (~2 min at n~900 on the runner).
+# Slices let the deadline be checked between accelerator calls. Sizes depend on
+# the target only (10k doubling to 200k, then flat), so the same seed replays
+# the same slices on any machine and a trimmed run is a prefix of the full one.
+# Overshoot past the deadline is at most one slice.
 FAST_SLICE_MIN, FAST_SLICE_MAX = 10_000, 200_000
 FAST_PROGRESS_SECONDS = 300.0
 

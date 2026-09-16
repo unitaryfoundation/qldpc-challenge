@@ -346,9 +346,8 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
     It reports the trials it actually completed, its slice schedule depends on
     the target alone (so a trimmed run is a prefix of the full one under the
     same seed, on any machine), and a bogus lighter proposal can never hide a
-    genuine one. Regression for the [[924,18,31]] CI kill and for the review
-    findings on PR #1098. Uses a fake accelerator so the test needs neither
-    gf2_fast nor real wall-clock.
+    genuine one. Uses a fake accelerator so the test needs neither gf2_fast
+    nor real wall-clock.
     """
     import time as _time
 
@@ -413,9 +412,8 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
     ref, w, wit, done = gc._fast_refute(claim, 7, 30_000, max_seconds=None)
     assert (ref, w, wit, done) == (False, None, None, 30_000)
 
-    # The review case: a genuine weight-w find in slice 2 followed by a BOGUS
-    # lighter proposal in slice 3. The bogus one must not become "best" and
-    # mask the real refutation.
+    # A genuine weight-w find in slice 2 followed by a BOGUS lighter proposal
+    # in slice 3: the bogus one must not become "best" and mask the real one.
     fake = FakeGF(hits={2: (len(sup), "Z", sup), 3: (len(bogus), "Z", bogus)})
     monkeypatch.setattr(gc, "GF", fake)
     ref, w, wit, done = gc._fast_refute(claim, 7, 45_000, max_seconds=None)
