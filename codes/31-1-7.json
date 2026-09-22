@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[31,1,7]]",
  "code_type": "CSS",
  "n": 31,
@@ -251,7 +251,7 @@
   "origin": "submission",
   "date": "2026-09-21",
   "model": "GLM 5.3 Flash",
-  "notes": "Reproduction of the published triangular 4.8.8 color code family (arXiv:2609.21376v1, Appendix D); parameters known in the literature. Checked against the board: no exact or WL-equivalent match to an existing entry. The paper proves circuit distance d_circ = d at d = 7 under superdense extraction; the code distance here is a witness-backed upper bound."
+  "notes": "Reproduction of the published triangular 4.8.8 color code family (arXiv:2609.21376v1, Appendix D); parameters known in the literature. Checked against the board: no exact or WL-equivalent match to an existing entry. The paper proves circuit distance d_circ = d at d = 7 under superdense extraction; the code distance here is a witness-backed upper bound. Circuit tier (Shutty's superdense 12-CNOT-layer extraction adapted to the board recipe) added 2026-09-22, PR #1770; see circuit.notes and fieldnotes/2026-09-22-shutty-488-circuit-adapter.md."
  },
  "family": "topological",
  "locality": {
@@ -383,5 +383,179 @@
   ],
   "layers": 1,
   "interaction_radius": 3.605551275463989
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 7,
+    "confidence": "upper_bound",
+    "witness": [
+     7464,
+     7465,
+     7474,
+     7475,
+     7476,
+     7482,
+     7486
+    ]
+   },
+   "Z": {
+    "value": 7,
+    "confidence": "upper_bound",
+    "witness": [
+     7405,
+     7406,
+     7415,
+     7416,
+     7417,
+     7423,
+     7427
+    ]
+   }
+  },
+  "rounds": 7,
+  "stim_version": "1.16.0",
+  "ancilla_coordinates": [
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    5.0,
+    1.0
+   ],
+   [
+    6.0,
+    1.0
+   ],
+   [
+    7.0,
+    1.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    5.0,
+    3.0
+   ],
+   [
+    6.0,
+    3.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    3.0,
+    5.0
+   ],
+   [
+    4.0,
+    5.0
+   ],
+   [
+    5.0,
+    5.0
+   ],
+   [
+    6.0,
+    5.0
+   ],
+   [
+    7.0,
+    5.0
+   ],
+   [
+    0.0,
+    7.0
+   ],
+   [
+    1.0,
+    7.0
+   ],
+   [
+    2.0,
+    7.0
+   ],
+   [
+    3.0,
+    7.0
+   ],
+   [
+    4.0,
+    7.0
+   ],
+   [
+    5.0,
+    7.0
+   ],
+   [
+    6.0,
+    7.0
+   ],
+   [
+    4.0,
+    9.0
+   ],
+   [
+    5.0,
+    9.0
+   ],
+   [
+    6.0,
+    9.0
+   ],
+   [
+    7.0,
+    9.0
+   ],
+   [
+    4.0,
+    11.0
+   ],
+   [
+    5.0,
+    11.0
+   ],
+   [
+    6.0,
+    11.0
+   ]
+  ],
+  "notes": "Superdense 12-CNOT-layer extraction of Shutty, 'Denser Planar Color Codes' (arXiv:2609.21376), starting phase 0 with forward/backward cycle alternation, 33 ancillas (64 qubits total), 7 cycles. Reproduced from the noiseless CNOT circuits planar_488_d7_r7_{X,Z}_phase0.stim in the Zenodo bundle 10.5281/zenodo.22820614 (Apache-2.0); gates and layers unchanged. Two convention adaptations: (1) X memory prepares/reads data with RX/MX in place of R;H / H;M; (2) the bundle's observable carries Pauli-frame ancilla records, so it is re-expressed on the final readout alone by XORing in the detector combination that cancels them (same logical class in the DEM, so d_circ is unaffected); the result is the transversal all-31 logical. Noise is the board recipe, not the paper's SI1000/native-CZ model. Witnesses are seven final-readout flips along a weight-7 logical.",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-09-21",
+   "method": "adapter over the published circuits; GF(2) elimination for the observable; witness constructed, RIS on ker(H_dem) (1e7-trial cap, 240 s per basis) found nothing below 8; Claude Fable 5.1"
+  }
  }
 }
