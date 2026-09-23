@@ -33,7 +33,7 @@ def load_refs():
     BibTeX file is regular enough that a brace-aware scan handles it."""
     path = os.path.join(ROOT, "refs.bib")
     try:
-        text = open(path).read()
+        text = open(path, encoding="utf-8").read()
     except Exception:
         return []
     entries = []
@@ -1307,7 +1307,7 @@ def check_analytics_coverage():
     marker = PLAUSIBLE_SCRIPT_SRC
     failures = []
     for path in glob.glob(os.path.join(DOCS, "**", "*.html"), recursive=True):
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             count = f.read().count(marker)
         if count != 1:
             failures.append(f"{os.path.relpath(path, ROOT)} ({count} snippets)")
@@ -1335,7 +1335,7 @@ def cert_info(slug):
     p = os.path.join(CERTS, slug + ".json")
     if os.path.exists(p):
         try:
-            with open(p) as f:
+            with open(p, encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             return None
@@ -1515,12 +1515,12 @@ def write_code_artifacts(entries):
     os.makedirs(os.path.join(DOCS, "codes"), exist_ok=True)
     slugs = {e["slug"] for e in entries}
     for e in entries:
-        with open(os.path.join(DOCS, "codes", e["slug"] + ".html"), "w") as f:
+        with open(os.path.join(DOCS, "codes", e["slug"] + ".html"), "w", encoding="utf-8") as f:
             f.write(detail_page(e))
-        with open(os.path.join(DOCS, "codes", e["slug"] + ".json"), "w") as f:
+        with open(os.path.join(DOCS, "codes", e["slug"] + ".json"), "w", encoding="utf-8") as f:
             json.dump(e["doc"], f, indent=1)
             f.write("\n")
-    with open(os.path.join(DOCS, "codes", INDEX_MANIFEST), "w") as f:
+    with open(os.path.join(DOCS, "codes", INDEX_MANIFEST), "w", encoding="utf-8") as f:
         json.dump(codes_index(entries), f, indent=2)
     for f in glob.glob(os.path.join(DOCS, "codes", "*")):
         stem, ext = os.path.splitext(os.path.basename(f))
@@ -1699,7 +1699,7 @@ def load_note(slug):
     p = os.path.join(ROOT, "notes", slug + ".md")
     if not os.path.exists(p):
         return None
-    with open(p) as f:
+    with open(p, encoding="utf-8") as f:
         md = f.read()
     if len(md.encode()) > NOTE_CAP:
         print(f"  warning: notes/{slug}.md exceeds {NOTE_CAP} bytes; "
@@ -1717,7 +1717,7 @@ def load_fieldnotes():
         base = os.path.basename(p)
         if base.upper() == "README.MD":
             continue
-        with open(p) as f:
+        with open(p, encoding="utf-8") as f:
             raw = f.read()
         meta = {"title": os.path.splitext(base)[0], "date": "", "author": "",
                 "model": "", "topics": ""}
@@ -4018,24 +4018,24 @@ def build():
 
     os.makedirs(os.path.join(DOCS, "codes"), exist_ok=True)
     # serve the raw static files on GitHub Pages without Jekyll processing
-    open(os.path.join(DOCS, ".nojekyll"), "w").close()
-    with open(os.path.join(DOCS, "index.html"), "w") as f:
+    open(os.path.join(DOCS, ".nojekyll"), "w", encoding="utf-8").close()
+    with open(os.path.join(DOCS, "index.html"), "w", encoding="utf-8") as f:
         f.write("\n".join(P))
-    with open(os.path.join(DOCS, "favicon.svg"), "w") as f:
+    with open(os.path.join(DOCS, "favicon.svg"), "w", encoding="utf-8") as f:
         f.write(FAVICON)
-    with open(os.path.join(DOCS, "style.css"), "w") as f:
+    with open(os.path.join(DOCS, "style.css"), "w", encoding="utf-8") as f:
         f.write(CSS)
-    with open(os.path.join(DOCS, "references.html"), "w") as f:
+    with open(os.path.join(DOCS, "references.html"), "w", encoding="utf-8") as f:
         f.write(references_page(entries))
-    with open(os.path.join(DOCS, "faq.html"), "w") as f:
+    with open(os.path.join(DOCS, "faq.html"), "w", encoding="utf-8") as f:
         f.write(faq_page())
-    with open(os.path.join(DOCS, "research-log.html"), "w") as f:
+    with open(os.path.join(DOCS, "research-log.html"), "w", encoding="utf-8") as f:
         f.write(research_log_page(entries, load_fieldnotes()))
-    with open(os.path.join(DOCS, "404.html"), "w") as f:
+    with open(os.path.join(DOCS, "404.html"), "w", encoding="utf-8") as f:
         f.write(not_found_page())
     # Wrapper so the whitepaper opens with the site favicon and a proper tab
     # title (a raw PDF tab shows the browser's PDF-viewer icon instead).
-    with open(os.path.join(DOCS, "whitepaper.html"), "w") as f:
+    with open(os.path.join(DOCS, "whitepaper.html"), "w", encoding="utf-8") as f:
         f.write(
             '<!doctype html><html lang=en><head><meta charset=utf-8>'
             '<meta name=viewport content="width=device-width,initial-scale=1">'
@@ -4057,7 +4057,7 @@ def build():
              "tracks": n_cells, "best_kd2_over_n": best_eff,
              "best_geometric_efficiency":
                  best_geo_e["geo"] if best_geo_e else None}
-    with open(os.path.join(DOCS, "stats.json"), "w") as f:
+    with open(os.path.join(DOCS, "stats.json"), "w", encoding="utf-8") as f:
         json.dump(stats, f, indent=2)
     print(f"wrote docs/index.html + {len(entries)} detail pages + "
           f"references.html ({len(REFS)} refs), "
