@@ -1413,7 +1413,15 @@ def asym_detail(e):
 # locality caps decide the leaderboard cell, not score eligibility. A code
 # without a layout has no f -- that is a certification status, not a claim
 # that the code is an expander.
-# D = 2 only: the schema accepts planar coordinates; other D are reserved.
+# D = 3 (issue #1849): the BPT bound in D dimensions is k d^(2/(D-1)) = O(n),
+# so the ratio is kd/n, and the same coarse-graining that gives r^4 and rho^2
+# in the plane (a cell of side r holds rho r^D qubits, charged to the power
+# 2/(D-1)) gives r^3 and rho^1: g = 2 sqrt(2) k d / (n rho r^3). The constant
+# (sqrt 2)^3 fixes the reference at the same nearest-neighbor cubic-lattice
+# radius r = sqrt 2 as the surface code: a code saturating kd = n there scores
+# 1, the [[4,2,2]] code on one plaquette being the smallest (TRACKS.md). The
+# declared dimension is the priced dimension, and D = 2 scores are unchanged.
+GEO_CONST = {2: 4.0, 3: 2.0 * math.sqrt(2.0)}
 GEO_MIN_D = 3   # headline eligibility: d = 2 tilings (a [[4,2,2]] block on
                 # one plaquette scores g = 2) beat the surface code trivially,
                 # so the headline requires d >= GEO_MIN_D. All KNOWN d = 3..4
@@ -1431,11 +1439,23 @@ def geo_reference(e):
     return e["family"] == "topological" and e["origin"] == "baseline"
 
 
+def layout_dimension(doc):
+    """2 or 3 for a layout whose points all share that dimension, else None."""
+    loc = doc.get("locality")
+    if not loc or not loc.get("coordinates"):
+        return None
+    dims = {len(c) for c in loc["coordinates"]}
+    dim = next(iter(dims)) if len(dims) == 1 else None
+    return dim if dim in GEO_CONST else None
+
+
 def geo_score(doc, n, k, d, locality_class):
     """(f, r, rho) for a verifier-accepted layout, else (None, None, None).
     r is recomputed exactly from the stored coordinates (the report's value
-    is rounded for display)."""
-    if "locality" not in doc:
+    is rounded for display). The formula follows the layout's dimension:
+    4kd^2/(n rho^2 r^4) in the plane, 2 sqrt(2) kd/(n rho r^3) in 3D."""
+    dim = layout_dimension(doc)
+    if dim is None:
         return None, None, None
     loc = doc["locality"]
     coords = [tuple(c) for c in loc["coordinates"]]
@@ -1445,7 +1465,9 @@ def geo_score(doc, n, k, d, locality_class):
     if r <= 0:
         return None, None, None
     rho = loc.get("layers", 1)
-    return 4.0 * k * d * d / (n * rho * rho * r ** 4), r, rho
+    if dim == 2:
+        return GEO_CONST[2] * k * d * d / (n * rho * rho * r ** 4), r, rho
+    return GEO_CONST[3] * k * d / (n * rho * r ** 3), r, rho
 
 
 def _model_str(m):
@@ -1508,6 +1530,10 @@ def load_entries():
             "geo": round(geo, 4) if geo is not None else None,
             "geo_r": round(geo_r, 4) if geo_r is not None else None,
             "geo_rho": geo_rho,
+            # layout dimension (issue #1849): 2 or 3, None without a layout;
+            # the verifier's layout diagnostics travel with it for the page.
+            "geo_dim": layout_dimension(doc) if geo is not None else None,
+            "layout": rep["computed"].get("locality"),
             "w": rep["computed"].get("max_check_weight"),
             "family": doc.get("family", "other"),
             "locality_class": loc_cls,
@@ -1923,7 +1949,7 @@ def layout_svg(doc):
     drawn over `locality.coordinates`); it draws what the class was earned
     from, never a prettified abstraction."""
     loc = doc.get("locality")
-    if not loc or "coordinates" not in loc:
+    if not loc or "coordinates" not in loc or layout_dimension(doc) != 2:
         return None
     try:
         coords = [(float(c[0]), float(c[1])) for c in loc["coordinates"]]
@@ -2038,6 +2064,37 @@ def layout_svg(doc):
     return '<div class=layoutfig>' + "".join(parts) + "".join(legend) + '</div>'
 
 
+def layout3d_section(doc, lay):
+    """The layout block of a code page for a 3D layout (issue #1849): the
+    verifier's measurements, since the planar figure does not apply."""
+    P = ['<section class=blk><h3>Verified 3D layout</h3>',
+         '<div class=kv style="color:var(--mut)">as measured by the verifier '
+         'over the submitted [x, y, z] coordinates; a 3D layout earns no '
+         '2D-local class and is priced by the D = 3 geometric efficiency '
+         'g = 2&radic;2kd/(n&rho;r&sup3;)</div>',
+         f'<div class=kv><b>interaction radius</b> '
+         f'{lay["interaction_radius"]}</div>',
+         f'<div class=kv><b>bounding box</b> '
+         f'{" &times; ".join(str(v) for v in lay["bbox"])}</div>',
+         f'<div class=kv><b>min site spacing</b> '
+         f'{lay["min_site_spacing"]}</div>',
+         f'<div class=kv><b>max qubits per site</b> '
+         f'{lay["max_qubits_per_site"]} (layers {lay["layers"]})</div>']
+    if lay.get("qubits_per_unit_volume") is not None:
+        P.append(f'<div class=kv><b>qubits per unit volume</b> '
+                 f'{lay["qubits_per_unit_volume"]}</div>')
+    cb = doc["locality"].get("contributed_by")
+    if cb:
+        parts = ['layout contributed by ' + authors_html(cb["by"])]
+        if cb.get("method"):
+            parts.append(html.escape(cb["method"]))
+        parts.append(html.escape(cb["date"]))
+        P.append('<div class=kv style="color:var(--mut)">'
+                 + " &middot; ".join(parts) + '</div>')
+    P.append('</section>')
+    return "".join(P)
+
+
 def module_section(doc, m):
     """The modular-layout block of a code page (issue #1846): what the
     verifier read from `locality.modules`. Cross-module checks and ports per
@@ -2104,8 +2161,11 @@ def detail_page(e):
     ]
     if e.get("geo") is not None:
         params.append(("g", f'{e["geo"]:.3g}',
-                       "geometric efficiency 4kd²/(nρ²r⁴) "
-                       "from the verified layout; surface code = 1"
+                       ("geometric efficiency 4kd²/(nρ²r⁴) "
+                        "from the verified layout; surface code = 1"
+                        if e["geo_dim"] == 2 else
+                        "geometric efficiency 2√2kd/(nρr³) from the verified "
+                        "3D layout; kd = n at r = √2 scores 1")
                        + ("" if e["tier"] == "exact"
                           else "; inherits the upper-bound distance tier")))
         params.append(("r", e["geo_r"],
@@ -2246,6 +2306,8 @@ def detail_page(e):
     # verified 2D layout (issue #289): draw the layout the locality class was
     # earned from, not just its numbers
     fig = layout_svg(doc)
+    if e["geo_dim"] == 3 and e["layout"]:
+        P.append(layout3d_section(doc, e["layout"]))
     if fig:
         P.append('<section class=blk><h3>Verified 2D layout</h3>')
         P.append('<div class=kv style="color:var(--mut)">as measured by the '
@@ -3505,8 +3567,8 @@ def record_chart(entries):
         '<button class="rcbtn active" data-y=eff '
         'title="operational efficiency kd&sup2;/n">kd&sup2;/n</button>'
         '<button class=rcbtn data-y=geo title="geometric efficiency '
-        'g = 4kd&sup2;/(n&rho;&sup2;r&#8308;); only codes with a verified '
-        'layout">g</button></span>'
+        'g = 4kd&sup2;/(n&rho;&sup2;r&#8308;) (2&radic;2kd/(n&rho;r&sup3;) for '
+        'a 3D layout); only codes with a verified layout">g</button></span>'
         '</div>')
     return ('<section class=rcwrap id=progress>'
             '<h2 class=track>Record progress</h2>'
@@ -3879,7 +3941,8 @@ def board_table(entries, records):
             '<th data-c=geo class=num title="geometric efficiency '
             'g = 4kd&sup2;/(n&rho;&sup2;r&#8308;), priced by the verified '
             'layout&rsquo;s interaction radius r and layers &rho;; surface '
-            'code = 1; &middot; = no verified layout">g</th>'
+            'code = 1; 2&radic;2kd/(n&rho;r&sup3;) for a 3D layout; '
+            '&middot; = no verified layout">g</th>'
             '<th data-c=w class=num title="max check weight">w</th>'
             '<th data-c=asym class=num title="X/Z asymmetry '
             'max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally '
@@ -3961,6 +4024,7 @@ def board_table(entries, records):
             f'<td class="num m3" data-label="kd&sup2;/n">{e["eff"]}</td>'
             + (f'<td class="num m3" data-label="g" title="r = {e["geo_r"]}, {e["geo_rho"]} '
                f'layer{"s" if e["geo_rho"] != 1 else ""}'
+               f'{"; 3D layout, g = 2√2kd/(nρr³)" if e["geo_dim"] == 3 else ""}'
                f'{"; inherits the upper-bound distance tier" if e["tier"] != "exact" else ""}">'
                f'{e["geo"]:.3g}</td>'
                if e["geo"] is not None else
@@ -4062,7 +4126,9 @@ def build():
         '<p class=sdefbody>The same ratio priced by the layout the code ships '
         'with, normalized so the planar surface code scores exactly 1. Computed '
         'only for codes with a verifier-accepted layout; an upper-bound distance '
-        f'makes g an upper bound, and the headline requires d &ge; {GEO_MIN_D}.'
+        f'makes g an upper bound, and the headline requires d &ge; {GEO_MIN_D}. '
+        'A 3D layout is priced by the D = 3 form of the bound, '
+        'g = 2&radic;2kd/(n&rho;r&sup3;), with kd = n at r = &radic;2 scoring 1.'
         '</p></div>'
         '<div class=sgloss><b>n</b> physical qubits &middot; '
         '<b>k</b> logical qubits &middot; <b>d</b> code distance (smallest '
@@ -4103,7 +4169,8 @@ def build():
              '&middot; <b>kd&sup2;/n</b> operational efficiency (per track) '
              '&middot; <b>g</b> geometric efficiency 4kd&sup2;/(n&rho;&sup2;'
              'r&#8308;), priced by the layout&rsquo;s radius r and layers '
-             '&rho; (surface code = 1; &middot; = no verified layout) '
+             '&rho; (surface code = 1; 2&radic;2kd/(n&rho;r&sup3;) for a 3D '
+             'layout; &middot; = no verified layout) '
              '&middot; <b>w</b> max check weight '
              '&middot; <b>X/Z</b> distance asymmetry max(d_X,d_Z)/min(d_X,d_Z) '
              '(1 = symmetric; hover for the per-side distances and check '

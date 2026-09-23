@@ -79,8 +79,9 @@ weight, not as a global record.
 The locality class is computed from the layout, never trusted. A class is earned
 only by an honest layout:
 
-- a coordinate for every qubit (`coordinates` covers all `n`) and a declared
-  number of physical `layers` (1 or 2; required whenever a layout is given);
+- a coordinate for every qubit (`coordinates` covers all `n`, every point
+  `[x, y]` or every point `[x, y, z]`) and a declared number of physical
+  `layers` (1 or 2; required whenever a layout is given);
 - no cramming: at most `layers` qubits may share a site (the flip-chip stack),
   and distinct sites are >= 1 apart, so a check of diameter `r` genuinely spans
   `r` grid units and a small radius cannot be faked by collapsing qubits;
@@ -91,8 +92,31 @@ A crammed or long-range layout simply earns no 2D-local class (it falls to
 `unrestricted`); it is not rejected. "Short range" means a bounded, n-independent
 diameter. The bilayer cap admits the weight-8 planar (tile-code) family: bulk
 checks span about 5.83 and open-boundary corner stabilizers reach about 6.71,
-both constant in n. The verifier also reports layout diagnostics (interaction
-radius, qubits per site, minimum spacing, density, bounding box).
+both constant in n. The verifier also reports layout diagnostics (dimension,
+interaction radius, qubits per site, minimum spacing, density, bounding
+box). A 3D layout passes through the same cramming and spacing checks but
+earns no 2D-local class; it is scored by the D = 3 geometric efficiency
+below.
+
+## Modular layouts
+
+A layout may also assign every qubit to a hardware module
+(`locality.modules`, one integer per qubit): a chip in a multi-chip
+assembly, a flip-chip module joined to others by interconnects, a
+photonically linked or shuttling zone. The locality tracks cover monolithic
+2D and flip-chip bilayers; a modular machine falls to `unrestricted`, where
+the board cannot tell a code whose checks rarely cross a module boundary
+from an expander. Module membership is the same kind of cheap, checkable
+structure as the coordinates, so the verifier reads it the same way: an
+assignment must cover every qubit, and from it the verifier reports the
+checks spanning more than one module (count and which), the ports each
+module needs (the distinct other modules it shares a check with), and the
+qubits per module. A code with such an assignment earns the Layer-3 flag
+`modular`, and the site shows the diagnostics on its page. The module field
+is independent of the coordinates, so it does not tie the layout to two
+dimensions. Nothing else reads it: the locality class is computed from the
+coordinates as before, g is unchanged, and the primary-tracks grid gains no
+axis. Gate scheduling and routing cost across modules are out of scope.
 
 ## Modular layouts
 
@@ -152,9 +176,31 @@ surface code to 1, but they answer different questions.
     code with an honest layout comes near 1, but no theorem caps that band
     either; the threshold will be raised (or replaced by the d_min(w, rho)
     rule of the working notes) if a small-d packing exploit materializes.
-  - D = 2 only for now: the schema stores planar coordinates. The D > 2
-    generalization changes the exponents (kd^(2/(D-1)) per the BPT bound)
-    and is reserved.
+  - D = 3: a layout may carry `[x, y, z]` coordinates (one dimension per
+    layout; a mix is rejected). The BPT bound in D dimensions is
+    kd^(2/(D-1)) = O(n), so for D = 3 the ratio is kd/n. The exponents on r
+    and rho follow from the same coarse-graining that gives r^4 and rho^2 in
+    the plane: a cell of side r holds rho r^D qubits, and the bound for the
+    cell-level range-1 code charges that factor to the power 2/(D-1), so
+    D = 2 pays (rho r^2)^2 and D = 3 pays rho r^3. Folding into layers stays
+    score-neutral (r^3 shrinks by rho, rho grows by rho). The score is
+
+        g = 2 sqrt(2) k d / (n rho r^3)      (D = 3).
+
+    The constant (sqrt 2)^3 fixes the reference at the same nearest-neighbor
+    cubic-lattice radius r = sqrt 2 as the surface code: a code that
+    saturates kd = n at that radius scores exactly 1. The stated reference
+    is the [[4,2,2]] code on one plaquette (kd = n, r = sqrt 2, rho = 1),
+    the smallest such code; like the D = 2 normalization it sits below the
+    d >= 3 headline threshold. For orientation, the 3D toric code on an
+    L^3 periodic cubic lattice (edge qubits, scaled to unit spacing, so
+    r = sqrt 2) scores 1/L^2, which records that it does not saturate the
+    3D bound; layer codes (arXiv:2309.16503) do. The declared dimension is
+    the priced dimension: a planar code submitted with z = 0 is scored by
+    the D = 3 form, which for d >= 3 is the smaller number, so nothing is
+    gained by mis-declaring. A 3D layout earns no 2D-local class (the caps
+    are planar) and competes in `unrestricted` with its g; D = 2 scores are
+    unchanged, and g is compared within a dimension, not across.
   - The caps above stay what they are: coarse eligibility gates. g prices
     range continuously inside the class; a trivial sqrt(n)-range layout is
     not banned by g, just priced into irrelevance (g ~ n^-2).

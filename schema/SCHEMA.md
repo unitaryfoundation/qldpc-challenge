@@ -159,7 +159,12 @@ Two principles drive the format:
 - `locality` (optional): provide a layout and the verifier derives the locality
   class (`local-2d-single`, `local-2d-bilayer`, or `unrestricted`); omit it and
   the code is `unrestricted`.
-  - `coordinates`: one `[x, y]` per qubit, indexed `0..n-1`.
+  - `coordinates`: one `[x, y]` per qubit, indexed `0..n-1`, or one
+    `[x, y, z]` per qubit for a 3D layout; every point in a layout has the
+    same dimension (`coordinates_uniform_dimension`). The 2D-local classes
+    need planar coordinates; a 3D layout gets the same cramming and spacing
+    checks, lands in `unrestricted`, and is priced by the D = 3 geometric
+    efficiency `g = 2 sqrt(2) kd/(n rho r^3)` (see TRACKS.md).
   - `layers`: physical layers (2 for a flip-chip bilayer, for example).
   - `modules` (optional, schema 0.3): one module id per qubit, indexed
     `0..n-1`, a non-negative integer naming the hardware module (chip,

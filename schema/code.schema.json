@@ -272,7 +272,7 @@
     },
     "locality": {
       "type": "object",
-      "description": "optional; required only for the 2d-local tracks",
+      "description": "optional; required for the 2d-local tracks and for a geometric-efficiency score. Planar or 3D coordinates.",
       "required": [
         "coordinates",
         "layers"
@@ -281,7 +281,7 @@
       "properties": {
         "coordinates": {
           "type": "array",
-          "description": "one [x, y] per qubit, indexed 0..n-1",
+          "description": "one [x, y] (D = 2) or [x, y, z] (D = 3) per qubit, indexed 0..n-1; every point in a layout has the same dimension (the verifier rejects a mix). The declared dimension is the one the layout is checked and priced in: the 2D-local classes need planar coordinates, and a 3D layout is scored by the D = 3 geometric efficiency (TRACKS.md).",
           "maxItems": 5000,
           "items": {
             "type": "array",
@@ -289,7 +289,7 @@
               "type": "number"
             },
             "minItems": 2,
-            "maxItems": 2
+            "maxItems": 3
           }
         },
         "layers": {

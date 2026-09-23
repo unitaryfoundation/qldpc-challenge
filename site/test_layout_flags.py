@@ -83,3 +83,77 @@ def test_modular_flag_leaves_scores_alone(tmp_path):
     n, k, d = plain["n"], plain["k"], plain["distance"]["d"]
     assert (build.geo_score(plain, n, k, d, "x")
             == build.geo_score(modular, n, k, d, "x"))
+
+
+PLAQUETTE = {
+    "schema_version": "0.1",
+    "name": "[[4,2,2]] plaquette",
+    "code_type": "CSS",
+    "n": 4,
+    "k": 2,
+    "checks": {"X": [[0, 1, 2, 3]], "Z": [[0, 1, 2, 3]]},
+    "distance": {
+        "d": 2,
+        "X": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
+        "Z": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
+    },
+    "provenance": {"authors": ["@test"], "construction": "one plaquette"},
+    "locality": {"coordinates": [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]],
+                 "layers": 1},
+}
+
+
+def _lift_to_3d(doc):
+    d = copy.deepcopy(doc)
+    seen, coords = {}, []
+    for c in d["locality"]["coordinates"]:
+        z = seen.get(tuple(c), 0)
+        seen[tuple(c)] = z + 1
+        coords.append([float(c[0]), float(c[1]), float(z)])
+    d["locality"]["coordinates"] = coords
+    d["locality"]["layers"] = 1
+    d["locality"].pop("interaction_radius", None)
+    return d
+
+
+def test_geometric_efficiency_by_dimension():
+    """D = 3 (issue #1849): g = 2 sqrt(2) kd/(n rho r^3); the [[4,2,2]]
+    plaquette is the stated reference at 1, and D = 2 is unchanged."""
+    import math
+    build = load_site_build()
+    g, r, rho = build.geo_score(PLAQUETTE, 4, 2, 2, "unrestricted")
+    assert abs(g - 1.0) < 1e-12 and abs(r - math.sqrt(2)) < 1e-12 and rho == 1
+    # the same code with planar coordinates keeps its D = 2 value
+    flat = copy.deepcopy(PLAQUETTE)
+    flat["locality"]["coordinates"] = [c[:2] for c in flat["locality"]["coordinates"]]
+    g2, _, _ = build.geo_score(flat, 4, 2, 2, "unrestricted")
+    assert abs(g2 - 2.0) < 1e-12
+    assert build.layout_dimension(flat) == 2 and build.layout_dimension(PLAQUETTE) == 3
+
+    plain = _fixture()
+    n, k, d = plain["n"], plain["k"], plain["distance"]["d"]
+    g2, r2, rho2 = build.geo_score(plain, n, k, d, "x")
+    assert abs(g2 - 4.0 * k * d * d / (n * rho2 ** 2 * r2 ** 4)) < 1e-12
+    lifted = _lift_to_3d(plain)
+    g3, r3, rho3 = build.geo_score(lifted, n, k, d, "x")
+    assert rho3 == 1 and r3 > r2
+    assert abs(g3 - 2 * math.sqrt(2) * k * d / (n * r3 ** 3)) < 1e-12
+
+    mixed = copy.deepcopy(lifted)
+    mixed["locality"]["coordinates"][0] = mixed["locality"]["coordinates"][0][:2]
+    assert build.geo_score(mixed, n, k, d, "x") == (None, None, None)
+    assert build.layout_svg(lifted) is None and build.layout_svg(plain)
+
+
+def test_3d_layout_renders(tmp_path):
+    plain = _fixture()
+    lifted = _lift_to_3d(plain)
+    lifted["name"] = "3D copy"
+    build = _build(tmp_path, {"72-6-6": plain, "72-6-6-3d": lifted})
+    index = _read(build, "index.html")
+    assert index.count("3D layout, g = ") == 1
+    page = _read(build, "codes", "72-6-6-3d.html")
+    assert "<h3>Verified 3D layout</h3>" in page
+    assert "<b>bounding box</b> 5.0 &times; 5.0 &times; 1.0" in page
+    assert "Verified 2D layout" not in page
+    assert "Verified 2D layout" in _read(build, "codes", "72-6-6.html")

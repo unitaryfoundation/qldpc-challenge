@@ -190,7 +190,7 @@ doc = make_submission(
 `family` is a filterable Layer-2 tag, never ranked. You do **not** declare which tracks you
 enter: the verifier computes primary-track membership (the weight and locality classes) from `H`
 and the layout. To enter the `2d-local-*` tracks, give the code a layout — pass
-`coordinates=[[x,y], ...]` (one per qubit) and `layers=`; `submit.py` fills the `locality` block
+`coordinates=[[x,y], ...]` or `[[x,y,z], ...]` (one per qubit) and `layers=`; `submit.py` fills the `locality` block
 and computes the interaction radius, and the verifier derives the locality class from it.
 
 ## 5. Validate with the gate (do not skip)

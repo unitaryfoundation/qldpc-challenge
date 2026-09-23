@@ -23,8 +23,11 @@ What "verified" means per field:
               plus the number of physical `layers`) is required; at most
               `layers` qubits per site and distinct sites
               >= 1 apart (no cramming a small radius); measured interaction
-              radius (max check diameter) within the track cap. Reports layout
-              diagnostics (radius, qubits/site, spacing, density, bbox).
+              radius (max check diameter) within the track cap. Coordinates
+              are planar or 3D (one dimension per layout); a 3D layout gets
+              the same honesty checks but no 2D-local class. Reports layout
+              diagnostics (dimension, radius, qubits/site, spacing, density,
+              bbox).
   modules     optional per-qubit module ids in the layout: every qubit must
               carry one; reports the checks spanning more than one module,
               the ports (distinct neighboring modules) per module, and the
@@ -542,6 +545,12 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     #    range grows with the code. Nesting: local-2d-single < local-2d-bilayer <
     #    unrestricted (the tighter class also qualifies for the looser ones; the
     #    site derives that). See TRACKS.md.
+    #    Coordinates are planar or 3D (issue #1849), one dimension per layout;
+    #    a mixed layout is rejected. The honesty checks (a) and (b) and the
+    #    radius are dimension-free. The class caps are planar: a 3D layout is
+    #    checked the same way, reported with dimension 3, and lands in
+    #    `unrestricted`, where the site prices it by the D = 3 geometric
+    #    efficiency (TRACKS.md).
     LOCALITY_CLASSES = [   # tightest first
         ("local-2d-single",  1, 4.0),
         ("local-2d-bilayer", 2, 7.0),
@@ -554,7 +563,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
         cover = len(coords) == n
         record("coordinates_cover_all_qubits", cover,
                f"{len(coords)} coords, n={n}")
+        dims = {len(c) for c in coords}
+        dim = next(iter(dims)) if len(dims) == 1 else None
         if cover:
+            record("coordinates_uniform_dimension", dim in (2, 3),
+                   f"D = {dim}" if dim in (2, 3)
+                   else f"points of dimension {sorted(dims)}; every point in "
+                        "a layout must be [x, y] or [x, y, z]")
+        if cover and dim in (2, 3):
             pts = [tuple(c) for c in coords]
 
             def diam(sup):
@@ -571,17 +587,18 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             min_spacing = min((math.dist(a, b)
                                for i, a in enumerate(sites)
                                for b in sites[i + 1:]), default=float("inf"))
-            xs = [p[0] for p in pts]
-            ys = [p[1] for p in pts]
-            bbox = [round(max(xs) - min(xs), 4), round(max(ys) - min(ys), 4)]
-            area = bbox[0] * bbox[1]
+            bbox = [round(max(axis) - min(axis), 4) for axis in zip(*pts)]
+            extent = math.prod(bbox)
+            density_key = ("qubits_per_unit_area" if dim == 2
+                           else "qubits_per_unit_volume")
             report["computed"]["locality"] = {
+                "dimension": dim,
                 "interaction_radius": round(radius, 4),
                 "layers": layers,
                 "max_qubits_per_site": max_mult,
                 "min_site_spacing": (round(min_spacing, 4)
                                      if min_spacing != float("inf") else None),
-                "qubits_per_unit_area": round(len(pts) / area, 4) if area else None,
+                density_key: round(len(pts) / extent, 4) if extent else None,
                 "bbox": bbox,
             }
             if "interaction_radius" in loc:
@@ -597,7 +614,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                    else f"min spacing between distinct sites "
                         f"{min_spacing:.4f} (>= 1.0 required)")
             honest = max_mult <= layers and min_spacing >= 1.0 - 1e-9
-            if honest:
+            if honest and dim == 2:
                 for cls, max_layers, cap in LOCALITY_CLASSES:
                     if layers <= max_layers and radius <= cap + 1e-9:
                         locality_class = cls
@@ -608,6 +625,12 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                        locality_class if locality_class != "unrestricted"
                        else f"unrestricted: radius {radius:.4f} at {layers} "
                             f"layer(s) meets no class cap ({caps})")
+            elif honest:
+                record("locality_class_computed", True,
+                       f"unrestricted: 3D layout (radius {radius:.4f} at "
+                       f"{layers} layer(s)); the 2D-local classes need planar "
+                       "coordinates, and the layout is priced by the D = 3 "
+                       "geometric efficiency")
 
     # 10. module structure (issue #1846). `locality.modules` assigns every
     #     qubit to a hardware module (one integer per qubit). It is the same

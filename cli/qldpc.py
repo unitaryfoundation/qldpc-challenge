@@ -202,8 +202,11 @@ def build_submission(HX, HZ, args):
     if args._coords is not None:
         if len(args._coords) != n:
             raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
+        coords = [[float(v) for v in row] for row in args._coords]
+        if any(len(row) not in (2, 3) for row in coords):
+            raise SystemExit("coords rows must be [x, y] or [x, y, z]")
         doc["locality"] = {
-            "coordinates": [[float(x), float(y)] for x, y in args._coords],
+            "coordinates": coords,
             "layers": int(args.layers),
         }
     return doc
@@ -841,8 +844,9 @@ def main(argv=None):
                    help="construction family tag (a filter, not a ranking; "
                         "track membership is computed from H and the layout)")
     s.add_argument("--coords", default="",
-                   help="coordinates file (.npz key coords, or whitespace .txt); "
-                        "the verifier derives the 2d-local class from it")
+                   help="coordinates file (.npz key coords, or whitespace .txt), "
+                        "one [x, y] or [x, y, z] row per qubit; the verifier "
+                        "derives the 2d-local class from a planar layout")
     s.add_argument("--layers", type=int, default=1,
                    help="physical layers for a 2d-local layout "
                         "(1 = single layer, 2 = bilayer); default 1")

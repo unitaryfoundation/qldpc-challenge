@@ -585,3 +585,93 @@ def test_module_assignment_must_cover_every_qubit():
     d["locality"]["modules"][0] = -1
     r = rep(d)
     assert not r["ok"] and "schema_valid" in failed_checks(r)
+
+
+def _lift_to_3d(doc):
+    """The bilayer fixture unstacked into a genuine 3D layout: the two qubits
+    sharing a planar site go to z = 0 and z = 1, and layers drops to 1."""
+    d = copy.deepcopy(doc)
+    seen = {}
+    coords = []
+    for c in d["locality"]["coordinates"]:
+        z = seen.get(tuple(c), 0)
+        seen[tuple(c)] = z + 1
+        coords.append([float(c[0]), float(c[1]), float(z)])
+    d["locality"]["coordinates"] = coords
+    d["locality"]["layers"] = 1
+    d["locality"].pop("interaction_radius", None)
+    return d
+
+
+def test_3d_layout_checks():
+    """3D coordinates (issue #1849): the honesty checks and the radius carry
+    over, the report says D = 3, and no 2D-local class is earned."""
+    import math
+    base = rep(GOOD)
+    assert base["computed"]["locality"]["dimension"] == 2
+    assert "qubits_per_unit_area" in base["computed"]["locality"]
+
+    d = _lift_to_3d(GOOD)
+    r = rep(d)
+    assert r["ok"], failed_checks(r)
+    lay = r["computed"]["locality"]
+    assert lay["dimension"] == 3 and len(lay["bbox"]) == 3
+    assert lay["max_qubits_per_site"] == 1 and lay["min_site_spacing"] == 1.0
+    assert "qubits_per_unit_volume" in lay and "qubits_per_unit_area" not in lay
+    coords = d["locality"]["coordinates"]
+    radius = max(math.dist(coords[a], coords[b])
+                 for sup in d["checks"]["X"] + d["checks"]["Z"]
+                 for a in sup for b in sup)
+    assert lay["interaction_radius"] == round(radius, 4)
+    assert radius >= base["computed"]["locality"]["interaction_radius"]
+    assert r["computed"]["locality_class"] == "unrestricted"
+    assert any(c["check"] == "locality_class_computed" and "3D" in c["detail"]
+               for c in r["checks"])
+    assert any(c["check"] == "coordinates_uniform_dimension" and c["ok"]
+               for c in r["checks"])
+
+    # a claimed radius is still checked in 3D
+    d2 = copy.deepcopy(d)
+    d2["locality"]["interaction_radius"] = radius - 0.5
+    r2 = rep(d2)
+    assert not r2["ok"] and "interaction_radius_within_claim" in failed_checks(r2)
+
+    # cramming along z fails, as it does in the plane
+    d3 = copy.deepcopy(d)
+    d3["locality"]["coordinates"] = [[c[0], c[1], 0.25 * c[2]] for c in coords]
+    r3 = rep(d3)
+    assert not r3["ok"] and "site_spacing_at_least_one" in failed_checks(r3)
+
+    # stacking beyond the declared layers fails in 3D too
+    d4 = copy.deepcopy(d)
+    d4["locality"]["coordinates"] = [[c[0], c[1], 0.0] for c in coords]
+    r4 = rep(d4)
+    assert not r4["ok"] and "site_occupancy_within_layers" in failed_checks(r4)
+    # and passes when the layers are declared, but as a 3D layout it still
+    # earns no planar class
+    d4["locality"]["layers"] = 2
+    r4 = rep(d4)
+    assert r4["ok"] and r4["computed"]["locality_class"] == "unrestricted"
+    assert (r4["computed"]["locality"]["interaction_radius"]
+            == base["computed"]["locality"]["interaction_radius"])
+
+
+def test_mixed_or_higher_dimensions_rejected():
+    d = _lift_to_3d(GOOD)
+    d["locality"]["coordinates"][0] = d["locality"]["coordinates"][0][:2]
+    r = rep(d)
+    assert not r["ok"] and "coordinates_uniform_dimension" in failed_checks(r)
+    assert "locality" not in r["computed"]
+
+    d = _lift_to_3d(GOOD)
+    d["locality"]["coordinates"] = [c + [0.0] for c in d["locality"]["coordinates"]]
+    r = rep(d)
+    assert not r["ok"] and "schema_valid" in failed_checks(r)
+
+    # modules stay orthogonal to the dimension
+    d = _lift_to_3d(GOOD)
+    d["schema_version"] = "0.3"
+    d["locality"]["modules"] = [int(c[2]) for c in d["locality"]["coordinates"]]
+    r = rep(d)
+    assert r["ok"] and r["computed"]["flags"]["modular"]
+    assert r["computed"]["modules"]["count"] == 2

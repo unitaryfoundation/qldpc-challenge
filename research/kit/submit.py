@@ -44,8 +44,8 @@ def _vec(support, n):
 
 
 def _interaction_radius(checks, coordinates):
-    """Max check diameter under the given 2D coordinates (the quantity the
-    verifier recomputes for the locality tracks)."""
+    """Max check diameter under the given 2D or 3D coordinates (the quantity
+    the verifier recomputes for the locality tracks)."""
     def diam(sup):
         pts = [coordinates[q] for q in sup]
         return max((math.dist(a, b) for a in pts for b in pts), default=0.0)
@@ -88,7 +88,7 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     confidence : {"upper_bound", "exact"}
         Distance confidence. ``distance_rand``-derived witnesses are honest
         upper bounds; mark ``"exact"`` only if you intend server certification.
-    coordinates : optional list of [x, y], length n
+    coordinates : optional list of [x, y] or [x, y, z], length n
         Per-qubit layout; enables the locality block, from which the verifier
         derives the 2d-local track membership.
     layers : optional int
@@ -146,8 +146,10 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     if tracks:
         doc["tracks"] = list(tracks)      # deprecated; only if explicitly passed
     if coordinates is not None:
-        coords = [[float(x), float(y)] for x, y in coordinates]
+        coords = [[float(v) for v in row] for row in coordinates]
         assert len(coords) == n, f"need {n} coordinates, got {len(coords)}"
+        assert all(len(row) in (2, 3) for row in coords), \
+            "coordinates must be [x, y] or [x, y, z]"
         radius = _interaction_radius(doc["checks"]["X"] + doc["checks"]["Z"], coords)
         doc["locality"] = {"coordinates": coords,
                            "interaction_radius": radius}
