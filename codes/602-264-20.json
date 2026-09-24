@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[602,264,d<=20]] pair-partition CPM CSS code",
  "code_type": "CSS",
  "n": 602,
@@ -5517,34 +5517,42 @@
  "distance": {
   "d": 20,
   "X": {
-   "value": 24,
+   "value": 20,
    "confidence": "upper_bound",
    "witness": [
-    45,
-    68,
-    70,
-    86,
-    113,
-    133,
-    139,
-    162,
-    174,
-    198,
-    262,
-    291,
-    324,
-    367,
-    391,
-    412,
-    425,
-    435,
-    506,
-    523,
-    539,
-    549,
-    563,
-    573
-   ]
+    42,
+    57,
+    74,
+    103,
+    116,
+    132,
+    136,
+    149,
+    155,
+    166,
+    272,
+    314,
+    331,
+    336,
+    399,
+    429,
+    486,
+    514,
+    548,
+    557
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-24",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4101
+    ]
+   }
   },
   "Z": {
    "value": 20,
