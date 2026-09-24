@@ -3447,7 +3447,7 @@
  },
  "provenance": {
   "authors": [
-   "vprusso"
+   "@vprusso"
   ],
   "construction": "Cyclic generalized-bicycle code over Z_186 (n = 2m = 372): a(x) = 1 + x^59 + x^88, b(x) = 1 + x^23 + x^80 + x^132; H_X = [circ(a)|circ(b)], H_Z = [circ(b)^T|circ(a)^T], where circ(v) has first row v and row i = v rolled by i (research/cyclic_gb.py build_cyclic_gb(186, a, b) with a, b the 0/1 first rows). k = 2 deg gcd(a, b, x^186 + 1).",
   "date": "2026-09-24",
