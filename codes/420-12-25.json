@@ -3886,6 +3886,7 @@
   ],
   "construction": "Two-block group-algebra code (Lin and Pryadko, arXiv:2306.16400) on G = C35:C6(r=4) of order 210, Cayley table research/kit/group_algebra.metacyclic(35, 6, 4) with the identity at index 0 and elements indexed as that builder lists them: H_X = [L(a) | R(b)], H_Z = [R(b)^T | L(a)^T] with L(g)[g h, h] = 1 and R(g)[h g, h] = 1 (research/kit/group_algebra.py build_2bga(mul, a, b)); a = [0, 78, 195], b = [0, 1, 80, 144] (element indices). n = 2|G| = 420, check weight 7.",
   "date": "2026-09-24",
+  "model": "Claude Fable 5.1 (Claude Code)",
   "notes": "Found by the third LER-objective search (weight-6 and weight-7 two-block codes at 300 < n <= 420 with k >= 12): circuit-level logical error rate at 3 rounds under the board's depolarizing recipe, interleaved schedule, decoded with CUDA-Q QEC nv-qldpc-decoder (BP+OSD-CS order 10). At p = 0.002, 10,000 shots per basis: Z memory 2 failures, X memory 0 failures, against 12 copies of the distance-7 rotated surface code (1164 physical qubits, same builder and decoder) with 22 and 21 failures. Decoder-based d_circ estimate at 3 rounds: 44. Distance: RIS at 20,000 trials (gf2_fast) read 30 and a 300,000,000-trial verify/ris_gpu.py pass per side read 27 on both sides; the board's CI gate (verify/gate_changed.py RIS-fast, 8,000,000 trials, seed 1861579569) then found a weight-25 Z logical, which is the submitted Z witness. Upper bounds. Details in the accompanying note.",
   "origin": "submission",
   "novelty": "unknown"

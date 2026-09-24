@@ -3451,6 +3451,7 @@
   ],
   "construction": "Cyclic generalized-bicycle code over Z_186 (n = 2m = 372): a(x) = 1 + x^59 + x^88, b(x) = 1 + x^23 + x^80 + x^132; H_X = [circ(a)|circ(b)], H_Z = [circ(b)^T|circ(a)^T], where circ(v) has first row v and row i = v rolled by i (research/cyclic_gb.py build_cyclic_gb(186, a, b) with a, b the 0/1 first rows). k = 2 deg gcd(a, b, x^186 + 1).",
   "date": "2026-09-24",
+  "model": "Claude Fable 5.1 (Claude Code)",
   "notes": "Found by the third LER-objective search (weight-6 and weight-7 two-block codes at 300 < n <= 420 with k >= 12): circuit-level logical error rate at 3 rounds under the board's depolarizing recipe, interleaved schedule, decoded with CUDA-Q QEC nv-qldpc-decoder (BP+OSD-CS order 10). At p = 0.002, 60,000 shots per basis: Z memory 13 failures, X memory 10 failures, against 14 copies of the distance-7 rotated surface code (1358 physical qubits, same builder and decoder) with 145 and 173 failures. Decoder-based d_circ estimate at 3 rounds: 72. Distance: RIS at 20,000 trials (gf2_fast) and a 300,000,000-trial verify/ris_gpu.py pass per side; upper bounds. Details in the accompanying note.",
   "origin": "submission",
   "novelty": "unknown"
