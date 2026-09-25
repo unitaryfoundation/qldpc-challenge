@@ -2882,6 +2882,11 @@ def progress_panel(entries, best_geo_e):
     return f'<section class=statsbar>{cards}</section>'
 
 
+# Default cap of the leaderboard weight slider (issue #2125); see
+# contributors_panel.
+LB_DEFAULT_W = 8
+
+
 def contributors_panel(entries):
     """A leaderboard of who submitted the codes on the board. Ranks GitHub-handle
     authors of contributed (non-baseline) codes by the best kd2/n among their
@@ -2904,8 +2909,10 @@ def contributors_panel(entries):
     snapping to the same caps as the primary-track weight cells. kd^2/n climbs
     with check weight (it is a per-cell figure, not a global one -- TRACKS.md),
     so an uncapped headline quietly rewards whoever worked the highest-weight
-    region; the slider makes the cap you are reading explicit. Each cap is
-    ranked here and shipped precomputed, like the metric toggle."""
+    region; the slider makes the cap you are reading explicit, and it starts
+    at LB_DEFAULT_W (issue #2125), the cap that matters for early fault
+    tolerance, rather than at the board's heaviest code. Each cap is ranked
+    here and shipped precomputed, like the metric toggle."""
 
     def geo_disp(g, tier):
         """Same 3-significant-digit display as the headline card and the board.
@@ -3182,6 +3189,7 @@ def contributors_panel(entries):
     cw = [e["w"] for e in entries
           if e["origin"] != "baseline" and e["w"] is not None]
     wmin, wmax = (min(cw), max(cw)) if cw else (0, 0)
+    wdef = min(max(LB_DEFAULT_W, wmin), wmax)
     lbw, lbidx, seen = {}, [], {}
     for cap in range(wmin, wmax + 1):
         st, od, gd, fd, nc, ng, nf = (
@@ -3273,9 +3281,9 @@ def contributors_panel(entries):
         '<span class=wfslider>'
         '<span class=wftrack></span><span class=wffill id=lbwfill></span>'
         f'<input type=range id=lbwrange class=wfrange min={wmin} max={wmax} '
-        f'value={wmax} step=1 aria-label="maximum check weight">'
+        f'value={wdef} step=1 aria-label="maximum check weight">'
         '</span>'
-        f'<span class=wfval id=lbwval>{wmax}</span>'
+        f'<span class=wfval id=lbwval>{wdef}</span>'
         '</span>')
     subs = (f'<p class=lbsub id=lbsub>'
             f'{subs_html(len(order), n_codes, n_geo, n_front)}</p>')
@@ -4493,6 +4501,9 @@ def build():
         'as &rho;&sup2; so stacking must earn its density)</div>'
         '</section>')
     P.append(record_chart(entries))
+    # the leaderboard follows the record chart (issue #2125): the chart shows
+    # the records climbing, the leaderboard shows who set them
+    P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
@@ -4533,9 +4544,8 @@ def build():
              '</div>')
     P.append(board_table(entries, records))
     P.append('</div>')  # close explorer (the viewport-fitted plots+table column)
-    P.append(contributors_panel(entries))  # leaderboard sits below the table
-    # the three steps follow the leaderboard: 'climb the board' should be read
-    # after the board has been seen, not before
+    # the three steps follow the board: 'climb the board' should be read after
+    # the board has been seen, not before
     P.append('<div class=how>'
              f'<a class=card href="{REPO_ROOT}/blob/main/CONTRIBUTING.md">'
              '<span class=n>1</span><h3>Build a code</h3>'
