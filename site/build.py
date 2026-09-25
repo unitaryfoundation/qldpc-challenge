@@ -3530,15 +3530,16 @@ def compute_records(entries):
 
 
 def cell_frontier_ranked(entries, idxs):
-    """Indices of a cell's Pareto frontier, ranked leader-first by kd^2/n, then
-    d, then k (higher better), then n (lower better). Ties on kd^2/n no longer
-    pick an arbitrary single leader; the whole frontier is returned in order so
-    co-leaders and the runner-up are visible."""
+    """Indices of a cell's Pareto frontier, ranked leader-first by kd^2/n;
+    codes tied on kd^2/n rank by the lowest (n, k) pair, then the higher d
+    (issue #2125: at equal score the smallest code is the one to show). Ties
+    on kd^2/n no longer pick an arbitrary single leader; the whole frontier is
+    returned in order so co-leaders and the runner-up are visible."""
     te = [entries[i] for i in idxs]
     front = pareto(te)
     return sorted((idxs[j] for j in front),
-                  key=lambda i: (-entries[i]["eff"], -entries[i]["d"],
-                                 -entries[i]["k"], entries[i]["n"]))
+                  key=lambda i: (-entries[i]["eff"], entries[i]["n"],
+                                 entries[i]["k"], -entries[i]["d"]))
 
 
 RC_SERIES = [                       # label, weight cap, series color
@@ -3845,10 +3846,10 @@ def primary_tracks_grid(entries, records):
     """The Layer-1 primary tracks: the computed locality x check-weight grid. Each
     populated cell is a board; membership is derived from H and the layout (never
     self-declared) and nests, so a tighter cell's codes also compete in the looser
-    ones. Each cell lists its Pareto frontier (best kd^2/n first) with a distance-
-    confidence badge; the count and the 'see all' link filter the table below to
-    that exact cell, so the runner-up and the rest of the ranking are one click
-    away."""
+    ones. Each cell lists its Pareto frontier (best kd^2/n first, ties to the
+    lowest (n, k) pair) with a distance-confidence badge; the count and the
+    'see all' link filter the table below to that exact cell, so the runner-up
+    and the rest of the ranking are one click away."""
     by_cell = cells_by_key(entries)
     if not by_cell:
         return ""
@@ -3873,7 +3874,8 @@ def primary_tracks_grid(entries, records):
             by_geo = sorted((i for i in ranked
                              if entries[i]["geo"] is not None
                              and not geo_reference(entries[i])),
-                            key=lambda i: -entries[i]["geo"])
+                            key=lambda i: (-entries[i]["geo"], entries[i]["n"],
+                                           entries[i]["k"]))
             keep = set(ranked[:topn]) | set(by_geo[:topn])
             ranked = [i for i in ranked if i in keep]
             def gitem(i, pos):
@@ -3892,7 +3894,8 @@ def primary_tracks_grid(entries, records):
                     f'{" — reference tiling: the ceiling g is normalized to, not raced" if ref else ""}" '
                     f'data-eff="{e["eff"]}" data-effd="{e["eff"]:g}" '
                     f'data-geo="{"" if geo is None else geo}" '
-                    f'data-geod="{geod}"{" data-ref=1" if ref else ""}>'
+                    f'data-geod="{geod}"{" data-ref=1" if ref else ""} '
+                    f'data-n="{e["n"]}" data-k="{e["k"]}">'
                     f'{badge(e["tier"])}'
                     f'<span class=gcode>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
                     f'<span class=geff>{e["eff"]:g}</span></a>')
@@ -3909,7 +3912,8 @@ def primary_tracks_grid(entries, records):
             'derived from <code>H</code> and the layout, not self-declared. '
             'Each cell lists its Pareto frontier, ranked by the selected score '
             '(kd&sup2;/n, or geometric efficiency g for codes with a verified '
-            'layout). The code count filters the table below to that cell. '
+            'layout); codes tied on the score rank by the lowest (n, k) pair. '
+            'The code count filters the table below to that cell. '
             'Membership nests: a tighter cell&rsquo;s codes also compete in the '
             'looser ones. In the g view, the seeded surface/toric tilings are '
             'not raced; they set the ceiling g is normalized to '
@@ -3927,7 +3931,8 @@ def primary_tracks_grid(entries, records):
             f'<div class=ptscroll><table class=grid>{head}'
             f'{"".join(body)}</table></div>'
             # the toggle re-ranks every cell by the chosen metric and shows its
-            # top 3; members without a g sort last and display a dot
+            # top 3; members without a g sort last and display a dot. Ties on
+            # the metric rank by the lowest (n, k) pair, as in Python.
             '<script>(function(){'
             'var grid=document.querySelector(".ptgrid");if(!grid)return;'
             'function apply(m){'
@@ -3938,7 +3943,8 @@ def primary_tracks_grid(entries, records):
             'if(isNaN(v))return -2e9;'
             'if(m==="geo"&&el.dataset.ref)return v-1e9;'
             'return v;}'
-            'items.sort(function(a,b){return sv(b)-sv(a);});'
+            'items.sort(function(a,b){return (sv(b)-sv(a))'
+            '||(+a.dataset.n-+b.dataset.n)||(+a.dataset.k-+b.dataset.k);});'
             'items.forEach(function(el,i){'
             'el.classList.toggle("ghide",i>=3);'
             'el.querySelector(".geff").innerHTML='
