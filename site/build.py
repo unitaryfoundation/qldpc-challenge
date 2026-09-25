@@ -2783,15 +2783,30 @@ def references_page(entries):
 
 
 
-def progress_panel(entries, best_eff_e, best_geo_e):
+# Check-weight caps of the headline kd^2/n cards (issue #2125). kd^2/n climbs
+# with check weight, so an uncapped "best on the board" card rewards whoever
+# mined the highest-weight region and invites bloating the board with heavy
+# codes; each card is the best within a cap instead, the caps that matter for
+# early fault tolerance.
+HERO_CAPS = (6, 8, 12)
+
+
+def best_eff_at(entries, cap):
+    """The entry with the best kd^2/n among codes of check weight <= cap;
+    ties go to the smallest n, then the smallest k. None when the cap holds
+    no code."""
+    pool = [e for e in entries if e["w"] is not None and e["w"] <= cap]
+    return max(pool, key=lambda e: (e["eff"], -e["n"], -e["k"]), default=None)
+
+
+def progress_panel(entries, best_geo_e):
     """The prominent stats bar at the top of the board: the headline numbers as
     big cards. This is the single home for the board's numbers (the hero carries
-    none). The contributed count is non-baseline codes only; it is not a novelty
-    claim. best_eff_e / best_geo_e are the entries ACHIEVING the two headline
-    efficiencies (geo: among eligible codes -- verified layout, d >= GEO_MIN_D);
-    each card names its code so the parameters behind the number are visible."""
-    n_base = sum(1 for e in entries if e["origin"] == "baseline")
-    n_contrib = len(entries) - n_base
+    none). Four cards: the best kd^2/n within each HERO_CAPS check-weight cap,
+    and the best geometric efficiency g (among eligible codes -- verified
+    layout, d >= GEO_MIN_D). Each card names the code achieving its number so
+    the parameters behind it are visible. There is no code-count card and no
+    uncapped kd^2/n card (issue #2125: both reward volume over quality)."""
 
     def by_line(e, geo=False):
         """The achieving code, linked: [[n,k,d]] plus the layout facts that
@@ -2807,18 +2822,19 @@ def progress_panel(entries, best_eff_e, best_geo_e):
     # of them upper bounds. Marking only g implied the other was firmer than it
     # is; the distance column already carries the one d <= that governs both.
     geo_v = "&middot;" if best_geo_e is None else f"{best_geo_e['geo']:.3g}"
-    best_eff = best_eff_e["eff"] if best_eff_e else 0
-    metrics = [
-        (str(n_contrib), "submitted codes",
-         "codes submitted through the challenge; not necessarily novel parameter sets"),
-        (str(n_base), "literature baselines",
-         "published codes seeded as the bar to beat"),
-        (f"{best_eff:g}" + by_line(best_eff_e), "best operational efficiency",
-         "Best kd^2/n on the board (surface code = 1). Full definition below."),
+    metrics = []
+    for cap in HERO_CAPS:
+        be = best_eff_at(entries, cap)
+        eff_v = "&middot;" if be is None else f"{be['eff']:g}"
+        metrics.append(
+            (eff_v + by_line(be), f"best kd&sup2;/n at w &le; {cap}",
+             f"Best operational efficiency kd^2/n among codes of check "
+             f"weight at most {cap} (surface code = 1). Full definition "
+             "below."))
+    metrics.append(
         (geo_v + by_line(best_geo_e, geo=True), "best geometric efficiency",
          "Best geometric efficiency g among codes with a verified layout "
-         "(surface code = 1). Full definition below."),
-    ]
+         "(surface code = 1). Full definition below."))
     cards = "".join(f'<div class="stat-card"'
                     f'{f" title=\"{t}\"" if t else ""}>'
                     f'<div class=v>{v}</div>'
@@ -4356,7 +4372,6 @@ def build():
     entries = load_entries()
     n_exact = sum(1 for e in entries if e["tier"] == "exact")
     best_eff = max((e["eff"] for e in entries), default=0)
-    best_eff_e = max(entries, key=lambda e: (e["eff"], -e["n"]), default=None)
     geo_pool = [e for e in entries
                 if e["geo"] is not None and e["d"] >= GEO_MIN_D]
     best_geo_e = max(geo_pool, key=lambda e: (e["geo"], -e["n"]),
@@ -4388,7 +4403,7 @@ def build():
              '</nav>'
              '</div></header>')
     P.append('<div class=wrap>')
-    P.append(progress_panel(entries, best_eff_e, best_geo_e))
+    P.append(progress_panel(entries, best_geo_e))
     # plain-sight definitions of the two headline scores (issue #276 review:
     # tooltips are invisible on mobile and undiscoverable in general)
     P.append(
@@ -4546,10 +4561,15 @@ def build():
     # this file from the live site, so there is no committed badge image to fall
     # out of sync.
     n_cells = len(cells_by_key(entries))
+    # best_kd2_over_n stays for the README badge; the capped bests are the
+    # numbers the headline cards show (issue #2125).
     stats = {"verified_codes": len(entries), "certified_exact": n_exact,
              "tracks": n_cells, "best_kd2_over_n": best_eff,
              "best_geometric_efficiency":
                  best_geo_e["geo"] if best_geo_e else None}
+    for cap in HERO_CAPS:
+        be = best_eff_at(entries, cap)
+        stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None
     with open(os.path.join(DOCS, "stats.json"), "w") as f:
         json.dump(stats, f, indent=2)
     print(f"wrote docs/index.html + {len(entries)} detail pages + "
