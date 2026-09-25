@@ -19,6 +19,24 @@ What "verified" means per field:
               the claimed Pauli type and weight -> certifies d_side <= value
               as an UPPER BOUND. 'exact' claims are downgraded to upper_bound
               here and flagged for server certification.
+  stabilizer  (code_type "stabilizer", issue #2131) the generators are one
+              binary symplectic matrix S = (A | B), generator i being
+              X^{A_i} Z^{B_i} with a qubit in both supports carrying Y. The
+              checks are the general-stabilizer versions of the CSS ones:
+              isotropy A B^T + B A^T = 0 in place of CSS commutation,
+              k = n - rank S, check weight |A_i union B_i|, and one distance
+              side P whose witness is a Pauli operator (x | z) commuting with
+              every generator, outside the row space of S, of Pauli weight
+              |supp x union supp z| equal to the claim; d = P.value. A code
+              whose every generator is pure X or pure Z is CSS and is rejected
+              with the instruction to type it CSS, so the 500-plus CSS entries
+              keep their per-side semantics. The fingerprint is rref(S) and
+              the WL signature carries X/Z/Y edge labels. A stabilizer code
+              that is CSS up to a Hadamard on some qubit subset has that
+              subset found (is_css_up_to_local_hadamard) and the CSS code it
+              maps to fingerprinted, so the dedup gate can mark a relabeled
+              board entry as a duplicate. CSS and stabilizer codes rank on
+              separate leaderboards; nothing here compares across the two.
   locality    for a 2d-local-* track: a layout (coordinates for all n qubits
               plus the number of physical `layers`) is required; at most
               `layers` qubits per site and distinct sites
@@ -119,11 +137,176 @@ def file_size_error(path):
     return ""
 
 
+def is_stabilizer(doc):
+    """Report whether this is a general (non-CSS) stabilizer submission.
+
+    An absent code_type means CSS, the only type before schema 0.4.
+    """
+    return isinstance(doc, dict) and doc.get("code_type") == "stabilizer"
+
+
+def sides(doc):
+    """Return the distance sides a document carries.
+
+    ("X", "Z") for a CSS code; ("P",) for a general stabilizer code, whose
+    single side is the Pauli weight.
+    """
+    return ("P",) if is_stabilizer(doc) else ("X", "Z")
+
+
+def generator_supports(doc):
+    """Return one qubit-index list per check, whatever the code type.
+
+    The X rows then the Z rows of a CSS code, or the union of the X and Z
+    supports of every generator of a stabilizer code (so a Y factor counts
+    one qubit). This is the support every structural rule reads: check
+    weight, Tanner connectivity, layout radius, module crossings, routing
+    cost.
+    """
+    ck = doc["checks"]
+    if is_stabilizer(doc):
+        return [sorted(set(g["X"]) | set(g["Z"])) for g in ck["S"]]
+    return ck["X"] + ck["Z"]
+
+
+def stabilizer_matrices(doc):
+    """Return (A, B) of a stabilizer submission.
+
+    m x n int8 indicator matrices of the X and Z parts, so S = (A | B) is the
+    binary symplectic check matrix.
+    """
+    n = doc["n"]
+    S = doc["checks"]["S"]
+    A = _matrix([g["X"] for g in S], n)
+    B = _matrix([g["Z"] for g in S], n)
+    return A, B
+
+
+def witness_pauli(witness, n):
+    """Return the (x, z) int8 vectors of a Pauli witness {"X": [...], "Z": [...]}."""
+    return _vec(witness["X"], n), _vec(witness["Z"], n)
+
+
+def pauli_weight(x, z):
+    """Count the qubits a Pauli operator (x | z) acts on: a Y counts once."""
+    return int((np.asarray(x) | np.asarray(z)).sum())
+
+
+def symplectic_commutes(x, z, A, B):
+    """Report whether the Pauli operator (x | z) commutes with every generator.
+
+    The symplectic product of row i of S = (A | B) with (x | z) is
+    A_i . z + B_i . x over GF(2), so this is (B | A) (x | z)^T = 0.
+    """
+    return not bool(((B @ x + A @ z) % 2).any())
+
+
+def is_css_up_to_local_hadamard(A, B):
+    """Find the qubits whose Hadamard conjugation makes every generator pure.
+
+    Returns the sorted list of qubits whose Hadamard turns every generator of
+    S = (A | B) into a pure-X or pure-Z operator, or None when no such subset
+    exists (issue #2131).
+
+    A Hadamard on qubit q swaps the X and Z parts of every generator on q. A
+    Y factor (a qubit in both parts) stays Y, so any Y rules the map out at
+    once. Otherwise each qubit of a generator carries one type t in {X, Z},
+    and the generator is pure after the Hadamards h iff h_q xor h_r =
+    t_q xor t_r for every two qubits q, r in its support: a system of parity
+    constraints, solved exactly by union-find with parities in near-linear
+    time. The solution is unique up to complementing a connected component
+    (which swaps X and Z on that component's generators), so for a connected
+    code there are exactly two: the one returned and its complement.
+
+    Only a defense for the dedup gate: every CSS board code becomes a
+    "non-CSS" code with the same parameters under a Hadamard on some qubits,
+    and the stabilizer WL signature cannot see through that. The CSS code the
+    subset maps to is what gets fingerprinted and compared with the board.
+    """
+    A = _as_int8(A)
+    B = _as_int8(B)
+    if (A & B).any():
+        return None
+    n = A.shape[1]
+    parent = list(range(n))
+    parity = [0] * n           # h_q xor h_parent[q]
+
+    def find(q):
+        """Return (root, h_q xor h_root), compressing the path.
+
+        Iterative: n can be 1000 and the default recursion limit is not far
+        above that.
+        """
+        path = []
+        while parent[q] != q:
+            path.append(q)
+            q = parent[q]
+        root, acc = q, 0
+        for v in reversed(path):
+            acc ^= parity[v]
+            parity[v] = acc
+            parent[v] = root
+        return root, (parity[path[0]] if path else 0)
+
+    for i in range(A.shape[0]):
+        sup = np.nonzero(A[i] | B[i])[0]
+        if len(sup) < 2:
+            continue
+        q0 = int(sup[0])
+        t0 = int(B[i, q0])
+        for qq in sup[1:]:
+            q = int(qq)
+            want = t0 ^ int(B[i, q])          # h_q0 xor h_q
+            ra, pa = find(q0)
+            rb, pb = find(q)
+            if ra == rb:
+                if pa ^ pb != want:
+                    return None
+            else:
+                parent[rb] = ra
+                parity[rb] = pa ^ pb ^ want
+    # every root takes h = 0; the complement of a component is the other
+    # solution and is handled by the caller (hadamard_css_images)
+    return sorted(q for q in range(n) if find(q)[1])
+
+
+def hadamard_css_images(doc, hadamard_qubits):
+    """Return the CSS documents a stabilizer code maps to under local Hadamards.
+
+    `hadamard_qubits` comes from is_css_up_to_local_hadamard. The result is a
+    list of two shape-minimal CSS docs, the mapped code and its X/Z swap (the
+    complement subset gives exactly the swap), each carrying n, k, d, checks
+    so signature() and the fingerprint apply to it as to a board entry.
+    """
+    n = doc["n"]
+    h = set(hadamard_qubits)
+    X, Z = [], []
+    for g in doc["checks"]["S"]:
+        xs, zs = set(g["X"]), set(g["Z"])
+        xs, zs = (xs - h) | (zs & h), (zs - h) | (xs & h)
+        if xs and zs:
+            raise ValueError("Hadamard subset does not make every generator pure")
+        (X if xs else Z).append(sorted(xs or zs))
+    base = {"n": n, "k": doc["k"], "distance": {"d": doc["distance"]["d"]}}
+    return [dict(base, code_type="CSS", checks={"X": X, "Z": Z}),
+            dict(base, code_type="CSS", checks={"X": Z, "Z": X})]
+
+
+def css_fingerprint(HX, HZ):
+    """Exact-duplicate fingerprint of a CSS code (see _verify_semantic)."""
+    import hashlib
+    fp = (gf2.rref(HX)[0].tobytes() + b"|" + gf2.rref(HZ)[0].tobytes())
+    return hashlib.sha256(fp).hexdigest()[:16]
+
+
+def _as_int8(M):
+    return (np.asarray(M, dtype=np.int8) % 2).astype(np.int8)
+
+
 def resource_errors(doc):
     """Resource caps checked before dense matrices are allocated."""
     n = doc["n"]
-    X, Z = doc["checks"]["X"], doc["checks"]["Z"]
-    supports = X + Z
+    supports = generator_supports(doc)
     errs = []
     max_weight = max((len(s) for s in supports), default=0)
     claimed = (doc.get("distance") or {}).get("d")
@@ -136,24 +319,32 @@ def resource_errors(doc):
                         f"max check weight <= {EXT_MAX_CHECK_WEIGHT} and claimed "
                         f"d <= {EXT_MAX_D} (found weight {max_weight}, claimed "
                         f"d {claimed})")
-    if len(X) > MAX_CHECKS_PER_SIDE:
-        errs.append(f"checks.X has {len(X)} rows, limit is {MAX_CHECKS_PER_SIDE}")
-    if len(Z) > MAX_CHECKS_PER_SIDE:
-        errs.append(f"checks.Z has {len(Z)} rows, limit is {MAX_CHECKS_PER_SIDE}")
+    if is_stabilizer(doc):
+        # one matrix S = (A | B), m x 2n; isotropy is the m x m product
+        m = len(doc["checks"]["S"])
+        blocks = [("checks.S", m)]
+        dense = [("S", m * 2 * n)]
+        comm_label, comm_cells = "A B^T + B A^T isotropy", m * m
+    else:
+        X, Z = doc["checks"]["X"], doc["checks"]["Z"]
+        blocks = [("checks.X", len(X)), ("checks.Z", len(Z))]
+        dense = [("H_X", len(X) * n), ("H_Z", len(Z) * n)]
+        comm_label, comm_cells = "H_X H_Z^T commutation", len(X) * len(Z)
+    for label, rows in blocks:
+        if rows > MAX_CHECKS_PER_SIDE:
+            errs.append(f"{label} has {rows} rows, limit is {MAX_CHECKS_PER_SIDE}")
     total_support = sum(len(s) for s in supports)
     if total_support > MAX_TOTAL_SUPPORT:
         errs.append(f"total support entries {total_support} exceeds limit "
                     f"{MAX_TOTAL_SUPPORT}")
     if max_weight > MAX_CHECK_WEIGHT:
         errs.append(f"max check weight {max_weight} exceeds limit {MAX_CHECK_WEIGHT}")
-    for label, rows in (("H_X", len(X)), ("H_Z", len(Z))):
-        cells = rows * n
+    for label, cells in dense:
         if cells > MAX_DENSE_MATRIX_CELLS:
             errs.append(f"{label} dense allocation would have {cells} cells, "
                         f"limit is {MAX_DENSE_MATRIX_CELLS}")
-    comm_cells = len(X) * len(Z)
     if comm_cells > MAX_COMMUTATION_CELLS:
-        errs.append(f"H_X H_Z^T commutation check would have {comm_cells} cells, "
+        errs.append(f"{comm_label} check would have {comm_cells} cells, "
                     f"limit is {MAX_COMMUTATION_CELLS}")
     loc = doc.get("locality") or {}
     coords = loc.get("coordinates") or []
@@ -178,12 +369,22 @@ def structure_errors(doc):
                 for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))]
     else:
         errs = [f"missing field: {k}" for k in _REQUIRED if k not in doc]
-        if "checks" in doc and not (isinstance(doc["checks"], dict)
-                                    and "X" in doc["checks"] and "Z" in doc["checks"]):
-            errs.append("checks must have X and Z support lists")
-        if "distance" in doc and not (isinstance(doc["distance"], dict)
-                                      and all(k in doc["distance"] for k in ("d", "X", "Z"))):
-            errs.append("distance must have d, X, and Z witness blocks")
+        if is_stabilizer(doc):
+            if "checks" in doc and not (isinstance(doc["checks"], dict)
+                                        and "S" in doc["checks"]):
+                errs.append("checks must have an S generator list")
+            if "distance" in doc and not (isinstance(doc["distance"], dict)
+                                          and all(k in doc["distance"] for k in ("d", "P"))):
+                errs.append("distance must have d and a P witness block")
+            if "circuit" in doc:
+                errs.append("circuit is not accepted on a stabilizer entry")
+        else:
+            if "checks" in doc and not (isinstance(doc["checks"], dict)
+                                        and "X" in doc["checks"] and "Z" in doc["checks"]):
+                errs.append("checks must have X and Z support lists")
+            if "distance" in doc and not (isinstance(doc["distance"], dict)
+                                          and all(k in doc["distance"] for k in ("d", "X", "Z"))):
+                errs.append("distance must have d, X, and Z witness blocks")
         if "locality" in doc and not (isinstance(doc["locality"], dict)
                                       and "coordinates" in doc["locality"]
                                       and "layers" in doc["locality"]):
@@ -199,8 +400,13 @@ def signature(doc):
     qubit permutation must share this hash; differing hashes are provably
     inequivalent. A collision only FLAGS a possible duplicate (WL is a strong
     necessary condition, not a complete equivalence test). Much finer than a
-    plain degree multiset: it propagates neighborhood structure several hops."""
+    plain degree multiset: it propagates neighborhood structure several hops.
+
+    A stabilizer code takes the labeled variant (_signature_stabilizer); the
+    CSS path below is unchanged, so every existing entry keeps its hash."""
     import hashlib
+    if is_stabilizer(doc):
+        return _signature_stabilizer(doc)
     n = doc["n"]
     X, Z = doc["checks"]["X"], doc["checks"]["Z"]
     mx = len(X)
@@ -230,6 +436,50 @@ def signature(doc):
             "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
 
 
+def _signature_stabilizer(doc):
+    """Compute the WL signature of a stabilizer code.
+
+    The same color refinement on the graph of qubits and generators, with
+    every edge labeled X, Z, or Y by the Pauli the generator applies to that
+    qubit. Without the labels two codes with the same supports but different
+    Pauli letters (the toric code and XZZX, say) would share a hash; with
+    them, relabeling the letters changes the multiset a vertex sees. The
+    payload is tagged so a stabilizer hash can never equal a CSS one.
+    """
+    import hashlib
+    n = doc["n"]
+    gens = doc["checks"]["S"]
+    m = len(gens)
+    nbr = [[] for _ in range(n + m)]      # (edge label, neighbor)
+    for i, g in enumerate(gens):
+        xs, zs = set(g["X"]), set(g["Z"])
+        for q in xs | zs:
+            lab = 3 if (q in xs and q in zs) else 1 if q in xs else 2
+            nbr[q].append((lab, n + i))
+            nbr[n + i].append((lab, q))
+    color = [0] * n + [1] * m
+
+    def refine(color):
+        return [(color[v], tuple(sorted((lab, color[u]) for lab, u in nbr[v])))
+                for v in range(len(nbr))]
+    keyed = refine(color)
+    for _ in range(min(6, len(nbr))):
+        order = {k: idx for idx, k in enumerate(sorted(set(keyed)))}
+        newc = [order[k] for k in keyed]
+        if newc == color:
+            break
+        color = newc
+        keyed = refine(color)
+    # The certificate is the multiset of final labeled keys, not of color
+    # indices: on a vertex-transitive code (the [[5,1,3]] code, a toric
+    # lattice) refinement is stable after one round and the indices alone
+    # would be the same for every letter pattern on the same supports.
+    cert = sorted(keyed)
+    payload = json.dumps(["stabilizer", n, doc["k"], doc["distance"]["d"], cert])
+    return {"hash": hashlib.sha256(payload.encode()).hexdigest()[:16],
+            "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
+
+
 def _matrix(support_list, n):
     H = np.zeros((len(support_list), n), dtype=np.int8)
     for r, sup in enumerate(support_list):
@@ -246,8 +496,12 @@ def _vec(support, n):
 
 
 def _tanner_component_count(checks, n):
-    """Count connected components of the combined qubit/check Tanner graph."""
-    rows = checks["X"] + checks["Z"]
+    """Count connected components of the combined qubit/check Tanner graph.
+
+    `checks` is a CSS checks block ({"X": ..., "Z": ...}) or a plain list of
+    supports (a stabilizer code's generator supports).
+    """
+    rows = checks["X"] + checks["Z"] if isinstance(checks, dict) else checks
     neighbors = [[] for _ in range(n + len(rows))]
     for i, support in enumerate(rows):
         check_vertex = n + i
@@ -289,6 +543,23 @@ def _stabilizer_block_count(HX, HZ, n):
     for H in (HX, HZ):
         R, _ = gf2.rref(H)
         rows.extend([int(q) for q in np.nonzero(r)[0]] for r in np.asarray(R))
+    return _block_count_from_rows(rows, n)
+
+
+def _symplectic_block_count(S, n):
+    """Count the disjoint qubit blocks of a general stabilizer group.
+
+    _stabilizer_block_count for S = (A | B): the RREF of the symplectic
+    matrix is canonical for the stabilizer group, and a row's qubit support
+    is the union of its X and Z halves.
+    """
+    R, _ = gf2.rref(S)
+    R = np.asarray(R)
+    rows = [[int(q) for q in np.nonzero(r[:n] | r[n:])[0]] for r in R]
+    return _block_count_from_rows(rows, n)
+
+
+def _block_count_from_rows(rows, n):
     parent = list(range(n))
 
     def find(a):
@@ -620,7 +891,7 @@ def verify(doc, refute=False, seed=None):
     # matrix building) so an out-of-range index is reported here, cleanly,
     # rather than crashing into the generic guard below.
     n = doc["n"]
-    sup = doc["checks"]["X"] + doc["checks"]["Z"]
+    sup = generator_supports(doc)
     max_idx = max((max(s) for s in sup if s), default=-1)
     in_range = 0 <= max_idx < n
     record("qubit_indices_in_range", in_range, f"max index {max_idx}, n={n}")
@@ -637,49 +908,97 @@ def verify(doc, refute=False, seed=None):
 def _verify_semantic(doc, report, record, refute=False, seed=None):
 
     n = doc["n"]
+    stab = is_stabilizer(doc)
+    code_type = "stabilizer" if stab else "CSS"
+    report["computed"]["code_type"] = code_type
+    # the qubit support of every check, whatever the type (a Y counts once)
+    supports = generator_supports(doc)
     # index bounds already gated in verify(); safe to build matrices.
-    HX = _matrix(doc["checks"]["X"], n)
-    HZ = _matrix(doc["checks"]["Z"], n)
+    if stab:
+        A, B = stabilizer_matrices(doc)
+        S = np.concatenate([A, B], axis=1)          # m x 2n, S = (A | B)
+        HX = HZ = None
+    else:
+        HX = _matrix(doc["checks"]["X"], n)
+        HZ = _matrix(doc["checks"]["Z"], n)
 
     # exact-duplicate fingerprint: the reduced row echelon forms pin the
     # stabilizer GROUP (invariant to row recombination/reordering, sensitive
     # to qubit relabeling). Equal fingerprint => identical code, not just
     # equivalent. Permuted copies are caught by the WL signature instead.
+    # A stabilizer code has one matrix, so its fingerprint is rref(S).
     import hashlib
-    fp = (gf2.rref(HX)[0].tobytes() + b"|" + gf2.rref(HZ)[0].tobytes())
-    report["fingerprint"] = hashlib.sha256(fp).hexdigest()[:16]
+    if stab:
+        report["fingerprint"] = hashlib.sha256(
+            gf2.rref(S)[0].tobytes()).hexdigest()[:16]
+    else:
+        report["fingerprint"] = css_fingerprint(HX, HZ)
 
     # checks have distinct supports per row (no repeated qubit within a row
-    #    would have been XORed away; flag any that collapsed)
-    empty_rows = [i for i, s in enumerate(doc["checks"]["X"] + doc["checks"]["Z"])
-                  if len(set(s)) != len(s)]
+    #    would have been XORed away; flag any that collapsed). For a
+    #    stabilizer generator the X list and the Z list are each checked; a
+    #    qubit in both is a Y, not a repeat.
+    if stab:
+        empty_rows = [i for i, g in enumerate(doc["checks"]["S"])
+                      if len(set(g["X"])) != len(g["X"])
+                      or len(set(g["Z"])) != len(g["Z"])]
+    else:
+        empty_rows = [i for i, s in enumerate(supports) if len(set(s)) != len(s)]
     record("no_repeated_qubits_in_a_check", not empty_rows,
            f"rows with repeats: {empty_rows[:5]}")
 
     # The challenge rule applies to the combined X/Z Tanner graph. Count all
     # qubit and check vertices, including isolated vertices, so a disconnected
     # direct sum or an unused qubit cannot pass by construction.
-    ncomponents = _tanner_component_count(doc["checks"], n)
+    ncomponents = _tanner_component_count(supports, n)
     record("tanner_connected", ncomponents == 1,
            f"Tanner graph has {ncomponents} connected component(s)")
     # The same rule applied to the stabilizer group rather than the submitted
     # rows: a direct sum padded with a redundant cross-block check, or a qubit
     # frozen by a weight-1 stabilizer hiding in the row space, has a connected
     # Tanner graph but is still not one code.
-    nblocks, block_sizes = _stabilizer_block_count(HX, HZ, n)
+    if stab:
+        nblocks, block_sizes = _symplectic_block_count(S, n)
+    else:
+        nblocks, block_sizes = _stabilizer_block_count(HX, HZ, n)
     shown = ", ".join(map(str, block_sizes[:6])) + (", ..." if nblocks > 6 else "")
     record("stabilizer_group_connected", nblocks == 1,
            f"stabilizer group splits into {nblocks} independent block(s) on "
            f"disjoint qubit sets (sizes {shown})")
 
-    # 3. CSS commutation
-    css = not bool(((HX @ HZ.T) % 2).any())
-    record("css_commutation", css, "H_X H_Z^T = 0 over GF(2)")
+    # 3. commutation. CSS: H_X H_Z^T = 0. Stabilizer: the symplectic product
+    #    of every pair of generators vanishes, A B^T + B A^T = 0 (isotropy),
+    #    which is exactly the CSS commutation of the doubled code
+    #    H'_X = (A | B), H'_Z = (B | A) of arXiv:2609.30069, Sec. IV.A.
+    if stab:
+        css = not bool(((A @ B.T + B @ A.T) % 2).any())
+        record("stabilizer_commutation", css,
+               "A B^T + B A^T = 0 over GF(2) (every pair of generators commutes)")
+        # A stabilizer submission must genuinely need the general format. If
+        # every generator is pure X or pure Z the code is CSS, and typing it
+        # "stabilizer" would drop it out of the CSS board and its per-side
+        # semantics, so it is rejected with the fix spelled out.
+        pure = all(not g["X"] or not g["Z"] for g in doc["checks"]["S"])
+        record("stabilizer_code_is_not_css", not pure,
+               "every generator is pure X or pure Z, so this is a CSS code: "
+               "set code_type to \"CSS\" and give the generators as checks.X "
+               "and checks.Z with distance.X and distance.Z witnesses"
+               if pure else
+               f"{sum(1 for g in doc['checks']['S'] if g['X'] and g['Z'])} of "
+               f"{len(doc['checks']['S'])} generators mix X and Z")
+    else:
+        css = not bool(((HX @ HZ.T) % 2).any())
+        record("css_commutation", css, "H_X H_Z^T = 0 over GF(2)")
 
     # 4. logical dimension k
-    rx, rz = gf2.rank(HX), gf2.rank(HZ)
-    k_computed = n - rx - rz
-    report["computed"].update(n=n, rank_HX=rx, rank_HZ=rz, k=k_computed)
+    if stab:
+        rs = gf2.rank(S)
+        k_computed = n - rs
+        report["computed"].update(n=n, rank_S=rs, k=k_computed)
+    else:
+        rx, rz = gf2.rank(HX), gf2.rank(HZ)
+        k_computed = n - rx - rz
+        report["computed"].update(n=n, rank_HX=rx, rank_HZ=rz, k=k_computed)
     record("k_matches_claim", k_computed == doc["k"],
            f"computed k={k_computed}, claimed {doc['k']}")
     # A code must encode at least one logical qubit; k<=0 is degenerate (nothing
@@ -687,9 +1006,9 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     record("k_at_least_1", k_computed >= 1,
            f"computed k={k_computed}; a submission must encode >= 1 logical qubit")
 
-    # 5. check weights (for the weight-bounded tracks)
-    wmax = max((len(s) for s in doc["checks"]["X"] + doc["checks"]["Z"]),
-               default=0)
+    # 5. check weights (for the weight-bounded tracks); for a stabilizer
+    #    generator this is |A_i union B_i|, the number of qubits it acts on
+    wmax = max((len(s) for s in supports), default=0)
     report["computed"]["max_check_weight"] = wmax
     # Layer-1 weight class (computed, nested: weight-4 < weight-6 < weight-8).
     # The tightest cap the max check weight fits under; ">8" for anything heavier
@@ -709,11 +1028,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     #     Tanner graph: girth, weight profiles, and a bounded trapping-set
     #     census. Reported under computed.diagnostics; nothing here is ranked
     #     and no verdict depends on it. See tanner_girth and trapping_sets.
+    #     A stabilizer code has one Tanner graph, over the generator
+    #     supports, reported under the side key "S".
     diag = {"tanner_girth": {}, "weight_profile": {},
             "trapping_sets": {"max_size": TS_MAX_SIZE,
                               "candidate_cap": TS_MAX_CANDIDATES}}
-    for side in ("X", "Z"):
-        rows = doc["checks"][side]
+    diag_sides = (("S", supports),) if stab else (
+        ("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"]))
+    for side, rows in diag_sides:
         g = tanner_girth(rows, n)
         diag["tanner_girth"][side] = "acyclic" if g is None else g
         diag["weight_profile"][side] = weight_profile(rows, n)
@@ -764,20 +1086,40 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     dist = doc["distance"]
     earned_d = []
     earned_sides = set()
-    for side, opp_H, own_H in (("X", HZ, HX), ("Z", HX, HZ)):
+    if stab:
+        # One side, P. The witness is a Pauli operator (x | z); it must
+        # commute with every generator (lie in the normalizer N(S) =
+        # ker(B | A)), lie outside the row space of S (not a stabilizer), and
+        # have Pauli weight |supp x union supp z| equal to the claim. Hamming
+        # weight over the 2n bits is NOT the distance: a Y counts once.
+        side_specs = [("P", None, None)]
+    else:
+        side_specs = [("X", HZ, HX), ("Z", HX, HZ)]
+    for side, opp_H, own_H in side_specs:
         if side not in dist:
             record(f"distance_{side}_present", False,
+                   "a P distance witness is required" if stab else
                    "both X and Z distance witnesses are required")
             continue
         sd = dist[side]
-        v = _vec(sd["witness"], n)
-        wt = int(v.sum())
-        in_ker = gf2.commutes(v, opp_H)          # commutes with opposite checks
-        nontrivial = not gf2.in_rowspace(v, own_H)  # not a stabilizer product
+        if stab:
+            x, z = witness_pauli(sd["witness"], n)
+            wt = pauli_weight(x, z)
+            in_ker = symplectic_commutes(x, z, A, B)
+            nontrivial = not gf2.in_rowspace(np.concatenate([x, z]), S)
+            hamming = int(x.sum() + z.sum())
+            extra = (f", hamming={hamming} (Y factors: {hamming - wt})"
+                     if hamming != wt else "")
+        else:
+            v = _vec(sd["witness"], n)
+            wt = int(v.sum())
+            in_ker = gf2.commutes(v, opp_H)          # commutes with opposite checks
+            nontrivial = not gf2.in_rowspace(v, own_H)  # not a stabilizer product
+            extra = ""
         good = (wt == sd["value"]) and in_ker and nontrivial
         record(f"distance_{side}_witness", good,
                f"weight={wt} (claim {sd['value']}), in_ker={in_ker}, "
-               f"nontrivial={nontrivial}")
+               f"nontrivial={nontrivial}{extra}")
         if good:
             tier = "upper_bound"  # 'exact' must be earned by server cert
             report["earned_distance"][side] = {"value": sd["value"],
@@ -787,10 +1129,20 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             if sd["confidence"] == "exact":
                 record(f"distance_{side}_exact_flagged", True,
                        "exact claim accepted as upper_bound pending server "
-                       "certification")
+                       "certification" if not stab else
+                       "exact claim accepted as upper_bound: the Pauli-weight "
+                       "certifier (verify/certify.py for stabilizer codes) is "
+                       "not available yet")
 
     # 7. code distance consistency
-    if earned_sides == {"X", "Z"}:
+    if stab and earned_sides == {"P"}:
+        matches = dist["P"]["value"] == dist["d"]
+        record("d_matches_pauli_side", matches,
+               f"earned P = {dist['P']['value']}, claimed d = {dist['d']}")
+        if matches:
+            report["earned_distance"]["d"] = {"value": dist["d"],
+                                              "tier": "upper_bound"}
+    elif earned_sides == {"X", "Z"}:
         d_earned = min(earned_d)
         matches = d_earned == dist["d"]
         record("d_matches_min_side", matches,
@@ -800,7 +1152,34 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                                               "tier": "upper_bound"}
     else:
         record("distance_global_earned", False,
+               "a valid P witness is required to earn a distance" if stab else
                "valid X and Z witnesses are required to earn a global distance")
+
+    # 7a. local-Hadamard equivalence (issue #2131). A CSS board code with a
+    #     Hadamard on some qubits is a stabilizer code with the same
+    #     [[n, k, d]] and weight, and neither rref(S) nor the labeled WL
+    #     signature matches the original. When a Hadamard subset exists that
+    #     makes every generator pure, the CSS code it maps to (and its X/Z
+    #     swap, the complement subset) is fingerprinted and WL-signed here,
+    #     and the dedup gate (validate_candidate, verify_all) compares those
+    #     against the board and marks a hit as a duplicate of that entry, not
+    #     a rejection. Informational: the check never fails an entry.
+    if stab:
+        h = is_css_up_to_local_hadamard(A, B)
+        if h is not None:
+            images = hadamard_css_images(doc, h)
+            report["css_equivalent"] = {
+                "hadamard_qubits": h,
+                "fingerprints": [css_fingerprint(_matrix(im["checks"]["X"], n),
+                                                 _matrix(im["checks"]["Z"], n))
+                                 for im in images],
+                "signatures": [signature(im)["hash"] for im in images],
+            }
+            record("local_hadamard_css_equivalent", True,
+                   f"a Hadamard on {len(h)} qubit(s) makes every generator "
+                   f"pure: this code is locally Clifford equivalent to a CSS "
+                   f"code, whose fingerprint the dedup gate compares against "
+                   f"the CSS board")
 
     # 8. independent distance refutation. A bounded RIS search must not find a
     #    logical lighter than the claimed distance. This is SOUND -- any hit is a
@@ -887,8 +1266,9 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                 ps = [coords[q] for q in sup]
                 return max((math.dist(a, b) for a in ps for b in ps),
                            default=0.0)
-            radius = max((diam(s) for s in doc["checks"]["X"]
-                          + doc["checks"]["Z"]), default=0.0)
+            # radius over the generator supports (X and Z rows of a CSS
+            # code, the qubit support of each stabilizer generator otherwise)
+            radius = max((diam(s) for s in supports), default=0.0)
 
             from collections import Counter
             mult = Counter(pts)
@@ -917,8 +1297,10 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             # upper bound on how far the exhibited logicals spread, not a
             # minimum over all logicals (that would be a co-design search).
             ldiam = {}
-            for side in ("X", "Z"):
+            for side in sides(doc):
                 wit = (doc["distance"].get(side) or {}).get("witness") or []
+                if isinstance(wit, dict):        # Pauli witness: its qubit support
+                    wit = sorted(set(wit["X"]) | set(wit["Z"]))
                 if wit and all(0 <= q < n for q in wit):
                     ldiam[side] = round(support_diameter(coords, wit), 4)
             report["computed"]["diagnostics"]["logical_diameter"] = ldiam
@@ -944,8 +1326,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                 # site spacing (1.0 when only one site is occupied). A
                 # diagnostic, never a rank; a code without a layout gets none.
                 step = min_spacing if min_spacing != float("inf") else 1.0
-                total, worst = routing_cost(
-                    doc["checks"]["X"] + doc["checks"]["Z"], coords, step)
+                total, worst = routing_cost(supports, coords, step)
                 report["computed"]["routing_cost"] = {
                     "heuristic": "mst-lower-bound",
                     "total_swaps": total,
@@ -992,17 +1373,21 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             from collections import Counter
             ids = sorted(set(modules))
             per_module = Counter(modules)
-            crossing = {"X": [], "Z": []}
+            # crossings are reported by side for a CSS code (row index into
+            # checks.X / checks.Z) and under "S" for a stabilizer code
+            mod_sides = ((("S", supports),) if stab else
+                         (("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"])))
+            crossing = {side: [] for side, _ in mod_sides}
             neighbors = {m: set() for m in ids}
-            for side in ("X", "Z"):
-                for i, sup in enumerate(doc["checks"][side]):
+            for side, rows in mod_sides:
+                for i, sup in enumerate(rows):
                     touched = {modules[q] for q in sup}
                     if len(touched) > 1:
                         crossing[side].append(i)
                         for m in touched:
                             neighbors[m] |= touched - {m}
             ports = {m: len(neighbors[m]) for m in ids}
-            n_cross = len(crossing["X"]) + len(crossing["Z"])
+            n_cross = sum(len(v) for v in crossing.values())
             report["computed"]["modules"] = {
                 "count": len(ids),
                 "qubits_per_module": {str(m): per_module[m] for m in ids},
@@ -1026,20 +1411,26 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     #     and penalty-only: a verified gate is recorded in the computed block
     #     and listed on the code page, never ranked; a wrong claim fails the
     #     entry. Entries without the field are untouched.
-    import transversal_gates
-    gchecks, gcomputed = transversal_gates.verify_gates(doc, HX, HZ)
-    for label, ok, detail in gchecks:
-        record(label, ok, detail)
-    if gcomputed is not None:
-        report["computed"]["transversal_gates"] = gcomputed
+    #     The circuit block, and so the gate claims, is forbidden on stabilizer
+    #     entries by the schema; the per-basis machinery is CSS-only.
+    if not stab:
+        import transversal_gates
+        gchecks, gcomputed = transversal_gates.verify_gates(doc, HX, HZ)
+        for label, ok, detail in gchecks:
+            record(label, ok, detail)
+        if gcomputed is not None:
+            report["computed"]["transversal_gates"] = gcomputed
     # Layer-1 locality class (computed) + Layer-3 flags (verifier-proven only;
     # the exact-d flag is added at site-build time from certs/, since exactness
-    # is certified separately, not by this trustless check).
+    # is certified separately, not by this trustless check). `css` is the
+    # verified CSS commutation; a stabilizer code carries `stabilizer` (its
+    # verified isotropy) instead, and the two never share a board.
     report["computed"]["locality_class"] = locality_class
     report["computed"]["flags"] = {
-        "css": bool(report["checks"] and
+        "css": bool(not stab and report["checks"] and
                     all(c["ok"] for c in report["checks"]
                         if c["check"] == "css_commutation")),
+        "stabilizer": bool(stab and css),
         "locality_class": locality_class,
         "modular": modular,
     }
