@@ -1,4 +1,4 @@
-"""qldpc submit: one command from parity checks to a verified submission.
+r"""qldpc submit: one command from parity checks to a verified submission.
 
 The friction in contributing used to be "read CONTRIBUTING.md, learn the JSON
 schema, hand-write a distance witness, hope CI agrees." This collapses that into
@@ -26,7 +26,7 @@ before anything leaves your machine.
 
 Usage:
   uv run python cli/qldpc.py submit mycode.npz --authors @me
-  uv run python cli/qldpc.py submit mycode.npz --authors @me "Jane Roe" \\
+  uv run python cli/qldpc.py submit mycode.npz --authors @me "Jane Roe" \
       --construction "bivariate bicycle (x^3+y+y^2, ...)" --model "Opus 4.8"
   ./qldpc submit mycode.npz --authors @me        # via the launcher shim
   ./qldpc submit mycode.npz --authors @me --no-circuit   # code tier only
