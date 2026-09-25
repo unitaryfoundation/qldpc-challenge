@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/unitaryfoundation/qldpc-challenge/schema/code.schema.json",
   "title": "qLDPC code submission",
-  "description": "A single CSS qLDPC code submission. Parity checks are given as sparse supports (lists of qubit indices). Distance claims must carry a self-certifying witness operator for the upper-bound tier.",
+  "description": "A single qLDPC code submission: a CSS code given by its X and Z parity checks, or (schema 0.4) a general stabilizer code given by one list of Pauli generators. Parity checks are given as sparse supports (lists of qubit indices). Distance claims must carry a self-certifying witness operator for the upper-bound tier.",
   "type": "object",
   "required": [
     "schema_version",
@@ -20,7 +20,8 @@
       "enum": [
         "0.1",
         "0.2",
-        "0.3"
+        "0.3",
+        "0.4"
       ]
     },
     "name": {
@@ -30,8 +31,10 @@
     },
     "code_type": {
       "enum": [
-        "CSS"
-      ]
+        "CSS",
+        "stabilizer"
+      ],
+      "description": "CSS: checks.X and checks.Z, per-side distance witnesses. stabilizer (schema 0.4): checks.S, one list of Pauli generators, and a single Pauli-weight distance witness distance.P. A code whose every generator is pure X or pure Z is a CSS code and must be typed CSS; the verifier rejects it otherwise. The two types are ranked on separate leaderboards."
     },
     "n": {
       "type": "integer",
@@ -46,10 +49,7 @@
     },
     "checks": {
       "type": "object",
-      "required": [
-        "X",
-        "Z"
-      ],
+      "description": "CSS: X and Z (required, S forbidden). stabilizer: S (required, X and Z forbidden). The if/then rules below enforce the split by code_type.",
       "additionalProperties": false,
       "properties": {
         "X": {
@@ -57,35 +57,39 @@
         },
         "Z": {
           "$ref": "#/$defs/supportList"
+        },
+        "S": {
+          "$ref": "#/$defs/generatorList"
         }
       }
     },
     "distance": {
       "type": "object",
       "required": [
-        "d",
-        "X",
-        "Z"
+        "d"
       ],
       "additionalProperties": false,
-      "description": "a claimed d needs witnesses for both sides to certify the upper bound.",
+      "description": "CSS: a claimed d needs witnesses for both sides (X and Z) to certify the upper bound, and d = min(dX, dZ). stabilizer: one Pauli-weight side P, and d = P.value.",
       "properties": {
         "d": {
           "type": "integer",
           "minimum": 1,
-          "description": "claimed code distance = min(dX, dZ)"
+          "description": "claimed code distance: min(dX, dZ) for a CSS code, P.value for a stabilizer code"
         },
         "X": {
           "$ref": "#/$defs/sideDistance"
         },
         "Z": {
           "$ref": "#/$defs/sideDistance"
+        },
+        "P": {
+          "$ref": "#/$defs/pauliSideDistance"
         }
       }
     },
     "circuit": {
       "type": "object",
-      "description": "optional circuit tier (RFC 0001, issue #505): the entry ships syndrome-extraction memory circuits under circuits/<slug>/ (memory_x.stim, memory_z.stim, plus their derived .dem files), and claims a witness-backed circuit-level distance per basis. Penalty-only: the recorded d_circ is clamped to <= d and can only discount a score, never inflate it.",
+      "description": "optional circuit tier (RFC 0001, issue #505): the entry ships syndrome-extraction memory circuits under circuits/<slug>/ (memory_x.stim, memory_z.stim, plus their derived .dem files), and claims a witness-backed circuit-level distance per basis. Penalty-only: the recorded d_circ is clamped to <= d and can only discount a score, never inflate it. Forbidden on stabilizer entries: the memory experiments are per basis, and a general stabilizer code needs a schedule the tier does not yet build.",
       "required": [
         "d_circ",
         "rounds",
@@ -520,6 +524,18 @@
                     ]
                   }
                 }
+              },
+              {
+                "required": [
+                  "P"
+                ],
+                "properties": {
+                  "P": {
+                    "required": [
+                      "witness_provenance"
+                    ]
+                  }
+                }
               }
             ]
           }
@@ -533,7 +549,8 @@
           "schema_version": {
             "enum": [
               "0.2",
-              "0.3"
+              "0.3",
+              "0.4"
             ]
           }
         }
@@ -558,7 +575,8 @@
           "schema_version": {
             "enum": [
               "0.2",
-              "0.3"
+              "0.3",
+              "0.4"
             ]
           }
         }
@@ -576,14 +594,15 @@
           "schema_version": {
             "enum": [
               "0.2",
-              "0.3"
+              "0.3",
+              "0.4"
             ]
           }
         }
       }
     },
     {
-      "$comment": "locality.modules (a 0.3 feature) requires schema_version 0.3",
+      "$comment": "locality.modules (a 0.3 feature) requires schema_version 0.3 or later",
       "if": {
         "properties": {
           "locality": {
@@ -599,13 +618,16 @@
       "then": {
         "properties": {
           "schema_version": {
-            "const": "0.3"
+            "enum": [
+              "0.3",
+              "0.4"
+            ]
           }
         }
       }
     },
     {
-      "$comment": "provenance.search_budget (a 0.3 feature) requires schema_version 0.3",
+      "$comment": "provenance.search_budget (a 0.3 feature) requires schema_version 0.3 or later",
       "if": {
         "properties": {
           "provenance": {
@@ -621,8 +643,107 @@
       "then": {
         "properties": {
           "schema_version": {
-            "const": "0.3"
+            "enum": [
+              "0.3",
+              "0.4"
+            ]
           }
+        }
+      }
+    },
+    {
+      "$comment": "a CSS entry carries checks.X/checks.Z and distance.X/distance.Z, never checks.S or distance.P",
+      "if": {
+        "properties": {
+          "code_type": {
+            "const": "CSS"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "checks": {
+            "required": [
+              "X",
+              "Z"
+            ],
+            "not": {
+              "required": [
+                "S"
+              ]
+            }
+          },
+          "distance": {
+            "required": [
+              "X",
+              "Z"
+            ],
+            "not": {
+              "required": [
+                "P"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "a stabilizer entry (a 0.4 feature) carries checks.S and distance.P, never checks.X/Z or distance.X/Z, has no circuit block, and declares schema_version 0.4",
+      "if": {
+        "properties": {
+          "code_type": {
+            "const": "stabilizer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "schema_version": {
+            "const": "0.4"
+          },
+          "checks": {
+            "required": [
+              "S"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "X"
+                  ]
+                },
+                {
+                  "required": [
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          },
+          "distance": {
+            "required": [
+              "P"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "X"
+                  ]
+                },
+                {
+                  "required": [
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "circuit"
+          ]
         }
       }
     }
@@ -732,52 +853,7 @@
           "description": "support of a nontrivial logical operator of this Pauli type achieving `value`. X-witness lives in ker(H_Z) and outside rowspace(H_X); Z-witness mirrors."
         },
         "witness_provenance": {
-          "type": "object",
-          "description": "who found this witness, when, and at what search budget (issue #611). Refutation credit lives here, on the operator contributed, not in provenance.authors; the budget a bound has survived is what tells the next refuter what they need to beat.",
-          "required": [
-            "found_by",
-            "date",
-            "found_at_samples"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "found_by": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^@[A-Za-z0-9-]+$"
-              },
-              "minItems": 1,
-              "description": "@handles of the people who found (or, for a surviving bound, deep-tested) this witness"
-            },
-            "date": {
-              "type": "string",
-              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-            },
-            "found_at_samples": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "the search budget this witness was found at. Says nothing about whether something lighter exists."
-            },
-            "survived_samples": {
-              "type": "integer",
-              "minimum": 1,
-              "description": "the largest budget a deep search has spent on this side WITHOUT finding anything lighter than this witness. Only a null result may write this; it is the number that actually constrains the distance, and it is what a later refuter needs to beat."
-            },
-            "tool": {
-              "type": "string",
-              "maxLength": 80,
-              "description": "optional: the search tool used (e.g. 'ris_gpu')"
-            },
-            "seeds": {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              },
-              "maxItems": 16,
-              "description": "optional: RNG seeds, for reproducibility"
-            }
-          }
+          "$ref": "#/$defs/witnessProvenance"
         }
       }
     },
@@ -857,6 +933,169 @@
         "required": [
           "permutation"
         ]
+      }
+    },
+    "witnessProvenance": {
+      "type": "object",
+      "description": "who found this witness, when, and at what search budget (issue #611). Refutation credit lives here, on the operator contributed, not in provenance.authors; the budget a bound has survived is what tells the next refuter what they need to beat.",
+      "required": [
+        "found_by",
+        "date",
+        "found_at_samples"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "found_by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^@[A-Za-z0-9-]+$"
+          },
+          "minItems": 1,
+          "description": "@handles of the people who found (or, for a surviving bound, deep-tested) this witness"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "found_at_samples": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "the search budget this witness was found at. Says nothing about whether something lighter exists."
+        },
+        "survived_samples": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "the largest budget a deep search has spent on this side WITHOUT finding anything lighter than this witness. Only a null result may write this; it is the number that actually constrains the distance, and it is what a later refuter needs to beat."
+        },
+        "tool": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "optional: the search tool used (e.g. 'ris_gpu')"
+        },
+        "seeds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 16,
+          "description": "optional: RNG seeds, for reproducibility"
+        }
+      }
+    },
+    "generatorList": {
+      "type": "array",
+      "description": "one entry per stabilizer generator of a general stabilizer code: the generator X^{X} Z^{Z}, given by the sorted list of distinct qubit indices carrying an X factor and the sorted list carrying a Z factor. A qubit in both lists carries Y. Row i of the binary symplectic matrix S = (A | B) is (indicator of X | indicator of Z). At least one list is nonempty; the check weight is the size of the union of the two lists.",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "required": [
+          "X",
+          "Z"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "X": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxItems": 32
+          },
+          "Z": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maxItems": 32
+          }
+        },
+        "anyOf": [
+          {
+            "properties": {
+              "X": {
+                "minItems": 1
+              }
+            }
+          },
+          {
+            "properties": {
+              "Z": {
+                "minItems": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "pauliSideDistance": {
+      "type": "object",
+      "description": "the single distance side of a general stabilizer code. There are no X and Z sides: d is the minimum Pauli weight over the nontrivial logical operators, and the witness is one Pauli operator of that weight.",
+      "required": [
+        "value",
+        "confidence",
+        "witness"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "claimed minimum Pauli weight of a nontrivial logical operator"
+        },
+        "confidence": {
+          "enum": [
+            "upper_bound",
+            "exact"
+          ],
+          "description": "upper_bound: self-certified by the witness. exact: accepted as upper_bound; the Pauli-weight certifier is not yet available."
+        },
+        "witness": {
+          "type": "object",
+          "description": "a nontrivial logical Pauli operator X^{X} Z^{Z} of Pauli weight `value` (a qubit in both lists is Y and counts once). It must commute with every generator and lie outside the row space of S.",
+          "required": [
+            "X",
+            "Z"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "X": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "Z": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "anyOf": [
+            {
+              "properties": {
+                "X": {
+                  "minItems": 1
+                }
+              }
+            },
+            {
+              "properties": {
+                "Z": {
+                  "minItems": 1
+                }
+              }
+            }
+          ]
+        },
+        "witness_provenance": {
+          "$ref": "#/$defs/witnessProvenance"
+        }
       }
     }
   }

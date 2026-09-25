@@ -57,7 +57,10 @@ def test_free_form_schema_fields_are_deliberately_covered():
         "properties/provenance/properties/search_budget/properties/tool",
         # Deprecated and ignored by the site, but intentionally classified.
         "properties/tracks/items",
-        "$defs/sideDistance/properties/witness_provenance/properties/tool",
+        # One entry covers both use sites of the shared witness-provenance
+        # block (a CSS side's distance.X/Z and a stabilizer code's distance.P,
+        # schema 0.4).
+        "$defs/witnessProvenance/properties/tool",
         # One entry covers both use sites of the shared credit block
         # (locality.contributed_by and circuit.contributed_by).
         "$defs/contributedBy/properties/method",
