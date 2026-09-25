@@ -690,6 +690,12 @@ font-size:11px;color:var(--mut);border:1px solid var(--ln);
 border-radius:999px;padding:0 7px;line-height:16px;
 font-variant-numeric:tabular-nums}}
 .hexmark{{color:var(--ac);vertical-align:-2px}}
+/* (n, k, LER) frontier chip (issue #2125), on rows Pareto-best by measured
+   logical error rate; the frontier list above the board reuses .latestlist */
+.lerchip{{display:inline-block;margin-left:7px;font-size:10px;line-height:1;
+padding:3px 6px;border-radius:5px;background:#ecfdf5;color:#065f46;
+border:1px solid #a7f3d0;vertical-align:2px;white-space:nowrap}}
+.lerv{{font-variant-numeric:tabular-nums;font-weight:600;min-width:5.5em}}
 .novelty{{display:inline-block;margin-left:7px;font-size:10px;line-height:1;
 padding:3px 6px;border-radius:5px;background:#fef3c7;color:#92400e;
 border:1px solid #fde68a;vertical-align:2px;white-space:nowrap}}
@@ -1148,15 +1154,17 @@ document.addEventListener('click',e=>{
  // with a verified layout (f defined), 'without' = only codes with none.
  // Clicking the active button clears it back to 'all'.
  let geoMode='';
- const cmp=/^(n|k|d|w|eff|f|g|geo|swaps|route)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?)$/;
+ const cmp=/^(n|k|d|w|eff|f|g|geo|swaps|route|ler)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?(?:e-?\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
   if(m){const key=(m[1]==='f'||m[1]==='g')?'geo':(m[1]==='swaps'?'route':m[1]);
    const x=parseFloat(r.dataset[key]),v=parseFloat(m[3]);
-   if((key==='geo'||key==='route')&&x<0)return false;
+   if((key==='geo'||key==='route'||key==='ler')&&x<0)return false;
    switch(m[2]){case'>=':return x>=v;case'<=':return x<=v;
     case'>':return x>v;case'<':return x<v;default:return x===v;}}
   if(t==='record'||t==='frontier')return r.dataset.record==='1';
+  // the (n, k, LER) frontier (issue #2125), separate from the record star
+  if(t==='ler-record')return r.dataset.lrec==='1';
   // Distance provenance. 'exact' keeps only entries whose distance is proved
   // by a committed certificate; 'upper-bound' keeps the rest, which are the
   // ones a refutation could still move.
@@ -1633,6 +1641,13 @@ def load_entries():
                            (doc.get("circuit", {}).get("d_circ") or {}).values())
                        if doc.get("circuit") else None),
             "has_ler": bool((doc.get("circuit") or {}).get("ler")),
+            # measured logical error rate (issue #2125): the worse of the two
+            # per-round side rates, the same worst-side convention as d =
+            # min(d_X, d_Z). The schema pins p and the decoder, so the number
+            # is comparable across entries; ler_key carries both anyway so
+            # the frontier only ever compares like with like.
+            "ler": ler_worst(doc),
+            "ler_key": ler_setting(doc),
             # transversal gates (issue #1850): the verifier's per-gate results,
             # listed on the code page and never ranked.
             "gates": rep["computed"].get("transversal_gates") or [],
@@ -1717,6 +1732,50 @@ def pareto(te):
                         or b["d"] > a["d"] or b["w"] < a["w"])
                    for j, b in enumerate(te)):
             front.add(i)
+    return front
+
+
+def ler_worst(doc):
+    """The entry's measured per-round logical error rate as one number: the
+    larger of the X and Z rates (a memory fails when either side does).
+    None without a measured tier."""
+    ler = (doc.get("circuit") or {}).get("ler")
+    if not ler:
+        return None
+    return max(ler[s]["ler_per_round"] for s in ("X", "Z") if s in ler)
+
+
+def ler_setting(doc):
+    """(p, decoder) the rate was measured at, so rates are only ever compared
+    within one setting. The schema pins both today; this keeps the frontier
+    honest if either is ever widened."""
+    ler = (doc.get("circuit") or {}).get("ler")
+    if not ler:
+        return None
+    side = ler.get("X") or ler.get("Z")
+    return (side["p"], side["decoder"])
+
+
+def ler_frontier(entries):
+    """Indices on the Pareto frontier over (n, k, LER) among the codes with a
+    measured logical error rate: n and LER lower-is-better, k higher-is-
+    better, at least one strict (issue #2125). Decoupled from the (n, k, d, w)
+    frontier that awards the record star: d and w do not enter, so a code can
+    be an LER record without being a distance record and vice versa.
+    Computed per (p, decoder) setting."""
+    by_setting = {}
+    for i, e in enumerate(entries):
+        if e["ler"] is not None:
+            by_setting.setdefault(e["ler_key"], []).append(i)
+    def beats(b, a):
+        return (b["n"] <= a["n"] and b["k"] >= a["k"] and b["ler"] <= a["ler"]
+                and (b["n"] < a["n"] or b["k"] > a["k"] or b["ler"] < a["ler"]))
+
+    front = set()
+    for idxs in by_setting.values():
+        for i in idxs:
+            if not any(j != i and beats(entries[j], entries[i]) for j in idxs):
+                front.add(i)
     return front
 
 
@@ -4038,6 +4097,48 @@ def latest_codes_panel(entries, records, limit=10):
             f'<ol class=latestlist>{"".join(rows)}</ol></section>')
 
 
+def ler_frontier_panel(entries, lrec):
+    """The (n, k, LER) frontier as a list (issue #2125), lowest measured rate
+    first. Separate from the primary tracks: those rank by kd^2/n over the
+    (n, k, d, w) frontier, this one ignores d and w and ranks by what a
+    device-like simulation measured."""
+    if not lrec:
+        return ""
+    measured = [e for e in entries if e["ler"] is not None]
+    settings = sorted({e["ler_key"] for e in measured})
+    rows = []
+    for e in sorted((entries[i] for i in lrec),
+                    key=lambda e: (e["ler"], e["n"], -e["k"])):
+        ler = e["doc"]["circuit"]["ler"]
+        sides = " &middot; ".join(
+            f'{s} {ler[s]["ler_per_round"]:.3g}' for s in ("X", "Z") if s in ler)
+        circ = (f' &middot; d_circ &le; {e["d_circ"]}'
+                if e["d_circ"] is not None else "")
+        rows.append(
+            f'<li><a class="mono lnkd" href="codes/{e["slug"]}.html">'
+            f'[[{e["n"]},{e["k"]},{e["d"]}]]</a>'
+            f'<span class=lerv title="worse of the two per-round rates">'
+            f'{e["ler"]:.3g}</span>'
+            f'<span class=lfam>{sides}{circ} &middot; w={e["w"]}</span>'
+            f'<span class=lwho>{authors_compact(e["authors_list"])}</span></li>')
+    where = "; ".join(f'p = {p:g}, decoder {html.escape(dec)}'
+                      for p, dec in settings)
+    return ('<section class="latest lerfront" id=lerfront>'
+            '<h2 class=track>Logical error rate frontier '
+            f'<span class=tcount>&middot; {len(rows)} of {len(measured)} '
+            'codes with a measured rate</span></h2>'
+            '<p class=ptsub>Pareto frontier over (n, k, LER): no other '
+            'measured code has at most the qubits, at least the logical '
+            'qubits, and at most the per-round logical error rate, with one '
+            'strict. LER is the worse of the X and Z rates, measured on the '
+            f'committed memory circuits at {where} and re-measured by CI. '
+            'Distance and check weight do not enter: this frontier is '
+            'independent of the (n, k, d, w) frontier that awards the '
+            'record star, and the rows below carry the <span class=lerchip>'
+            'LER record</span> chip in the table.</p>'
+            f'<ol class=latestlist>{"".join(rows)}</ol></section>')
+
+
 # Default upper bound of the Codes weight slider (issue #2125); see
 # board_controls.
 BOARD_DEFAULT_W = 8
@@ -4166,8 +4267,9 @@ def board_controls(entries, records):
             '<p class=searchhelp>Type terms (all must match): a family, author, '
             'or a comparison like <code>k&gt;=10</code> <code>d&gt;8</code> '
             '<code>eff&gt;=5</code> <code>g&gt;=0.1</code> <code>swaps&lt;=50</code>; '
-            '<code>record</code> '
-            'keeps only frontier rows; <code>literature</code> / '
+            '<code>ler&lt;=0.005</code>; <code>record</code> '
+            'keeps only frontier rows and <code>ler-record</code> only the '
+            '(n, k, LER) frontier; <code>literature</code> / '
             '<code>submitted</code> filter by origin; <code>with-layout</code> '
             '/ <code>no-layout</code> filter by layout status; '
             '<code>exact</code> / <code>upper-bound</code> filter by whether '
@@ -4229,10 +4331,11 @@ def charts_block(entries, records):
             f'{xlabel}{legend}')
 
 
-def board_table(entries, records):
+def board_table(entries, records, lrec=frozenset()):
     """The searchable, sortable table of every code, with the track type as a
     column of chips. Search and charts are rendered separately, above; this is
-    the table itself."""
+    the table itself. lrec is the (n, k, LER) frontier (issue #2125), marked
+    with its own chip and searchable as ler-record."""
     def chips(e):
         out = [f'<span class=tchip title="construction family (a tag, not a '
                f'ranking)">{html.escape(family_label(e["family"]))}</span>']
@@ -4349,6 +4452,8 @@ def board_table(entries, records):
             f'data-tracks="{html.escape(search_terms)}" '
             f'data-cells="{html.escape(cell_keys)}" '
             f'data-record="{1 if fr else 0}" '
+            f'data-ler="{e["ler"] if e["ler"] is not None else -1}" '
+            f'data-lrec="{1 if i in lrec else 0}" '
             f'data-tier="{e["tier"]}" '
             f'data-circ="{1 if e["d_circ"] is not None else 0}" '
             f'data-origin="{"literature" if e["origin"] == "baseline" else "submitted"}" '
@@ -4367,6 +4472,10 @@ def board_table(entries, records):
                 f'{" + measured logical error rate" if e["has_ler"] else ""}'
                 f'">&#9881;{e["d_circ"]}</span>')
                if e["d_circ"] is not None else "")
+            + (f'<span class=lerchip title="LER record: Pareto-best on (n, k, '
+               f'measured logical error rate {e["ler"]:.3g}/round) among '
+               'codes with a measured rate; independent of the distance '
+               'record star">LER record</span>' if i in lrec else "")
             + f'</td><td class="typecell col-type" data-label="type">{chips(e)}</td>'
             f'<td class="num col-n" data-label="n">{e["n"]}</td>'
             f'<td class="num col-k" data-label="k">{e["k"]}</td>'
@@ -4441,6 +4550,7 @@ def build():
     best_geo_e = max(geo_pool, key=lambda e: (e["geo"], -e["n"]),
                      default=None)
     records = compute_records(entries)
+    lrec = ler_frontier(entries)
 
     P = [head("QEC Challenge",
               page_properties={"page_type": "leaderboard"})]
@@ -4505,6 +4615,7 @@ def build():
     # the records climbing, the leaderboard shows who set them
     P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
+    P.append(ler_frontier_panel(entries, lrec))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
@@ -4525,6 +4636,10 @@ def build():
              'unmarked = literature baseline)</span>'
              '<span><span class=novelty style="margin-left:0">known params</span> '
              'parameter set exists in the literature; see provenance notes</span>'
+             '<span><span class=lerchip style="margin-left:0">LER record</span> '
+             'Pareto-best on (n, k, measured logical error rate) among the '
+             'codes with a measured rate; independent of the (n, k, d, w) '
+             'record star</span>'
              '<span class=collegend><b>columns:</b> '
              '<b>n</b> physical qubits &middot; <b>k</b> logical qubits '
              '&middot; <b>d</b> distance (smallest undetectable error) '
@@ -4542,7 +4657,7 @@ def build():
              '(1 = symmetric; hover for the per-side distances and check '
              'weights)</span>'
              '</div>')
-    P.append(board_table(entries, records))
+    P.append(board_table(entries, records, lrec))
     P.append('</div>')  # close explorer (the viewport-fitted plots+table column)
     # the three steps follow the board: 'climb the board' should be read after
     # the board has been seen, not before
