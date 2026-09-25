@@ -5117,30 +5117,40 @@
    ]
   },
   "Z": {
-   "value": 20,
+   "value": 18,
    "confidence": "upper_bound",
    "witness": [
-    14,
-    15,
-    33,
-    73,
+    0,
+    9,
+    18,
+    39,
+    58,
+    66,
+    68,
     78,
-    89,
-    108,
-    114,
-    117,
-    131,
-    135,
-    141,
-    147,
-    155,
-    161,
+    80,
+    126,
+    127,
+    138,
+    146,
+    160,
+    176,
+    190,
     200,
-    228,
-    234,
-    237,
-    249
-   ]
+    229
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-25",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4101
+    ]
+   }
   }
  },
  "provenance": {
@@ -5157,7 +5167,8 @@
    "wall_clock_hours": 3.5,
    "tool": "research/cyclic_defining_set.py + gf2_fast",
    "notes": "One sweep over BCH-designed divisor ideals on Z_127 and Z_337 (29 records staged, 10 on the mutual Pareto frontier); per-code deep confirm at 100k RIS trials/side; wall clock shared across the batch and inflated by concurrent campaigns on this machine."
-  }
+  },
+  "notes": "The search_budget tool string names cyclic_defining_set.py under a research/ path; that script is kept in the authors' own repo and is not a file of this repository."
  },
  "family": "generalized-bicycle"
 }
