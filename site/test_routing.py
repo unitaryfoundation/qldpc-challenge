@@ -104,4 +104,4 @@ def test_board_has_an_optional_sortable_swaps_column(tmp_path):
             'undefined">&middot;</td>') in index
     # the swaps>=N search term is documented and parsed
     assert "swaps&lt;=50" in index
-    assert "|swaps|route|ler)" in index
+    assert "|swaps|route|ler|asym)" in index

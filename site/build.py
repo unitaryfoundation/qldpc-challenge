@@ -1154,7 +1154,10 @@ document.addEventListener('click',e=>{
  // with a verified layout (f defined), 'without' = only codes with none.
  // Clicking the active button clears it back to 'all'.
  let geoMode='';
- const cmp=/^(n|k|d|w|eff|f|g|geo|swaps|route|ler)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?(?:e-?\\d+)?)$/;
+ // asym (issue #2125): X/Z distance asymmetry, so biased-noise candidates can
+ // be pulled out by a threshold of the reader's choosing until the board
+ // defines a label for them.
+ const cmp=/^(n|k|d|w|eff|f|g|geo|swaps|route|ler|asym)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?(?:e-?\\d+)?)$/;
  function term(r,t){
   const m=t.match(cmp);
   if(m){const key=(m[1]==='f'||m[1]==='g')?'geo':(m[1]==='swaps'?'route':m[1]);
@@ -4267,7 +4270,8 @@ def board_controls(entries, records):
             '<p class=searchhelp>Type terms (all must match): a family, author, '
             'or a comparison like <code>k&gt;=10</code> <code>d&gt;8</code> '
             '<code>eff&gt;=5</code> <code>g&gt;=0.1</code> <code>swaps&lt;=50</code>; '
-            '<code>ler&lt;=0.005</code>; <code>record</code> '
+            '<code>ler&lt;=0.005</code> <code>asym&gt;=1.5</code> (X/Z distance '
+            'asymmetry); <code>record</code> '
             'keeps only frontier rows and <code>ler-record</code> only the '
             '(n, k, LER) frontier; <code>literature</code> / '
             '<code>submitted</code> filter by origin; <code>with-layout</code> '
