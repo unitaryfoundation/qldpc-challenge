@@ -105,6 +105,28 @@ confirmed:
 Claiming a distance is exact (not just an upper bound) additionally requires
 server certification, a separate and more expensive step.
 
+### General stabilizer codes
+
+The board also accepts non-CSS stabilizer codes (the [[5,1,3]] code, XZZX
+codes, the halved pair-partition codes of arXiv:2609.30069). Bring the binary
+symplectic matrix `S = (A | B)` instead of `H_X` and `H_Z` (key `s`, or `a` and
+`b`, in the `.npz`):
+
+```bash
+./qldpc submit mycode.npz --authors @yourhandle
+```
+
+The verifier checks the same things in their general form: the generators
+commute (`A B^T + B A^T = 0`), `k = n - rank S`, check weight is the number of
+qubits a generator acts on, and the distance witness is one Pauli operator
+whose Pauli weight (a `Y` counts once) equals the claim. A code whose
+generators are all pure `X` or pure `Z` is a CSS code and must be submitted as
+one. Stabilizer codes rank on their own leaderboard: they are never compared
+with CSS entries, in either direction. The circuit tier and exact
+certification are not yet available for them, so an `exact` claim is shown as
+an upper bound. Details in [`CONTRIBUTING.md`](CONTRIBUTING.md#general-stabilizer-codes)
+and [`schema/SCHEMA.md`](schema/SCHEMA.md#stabilizer-codes).
+
 Prefer to write the JSON yourself? Follow `schema/code.schema.json`
 (`schema/SCHEMA.md` documents each field — see the "By hand" section of
 [`CONTRIBUTING.md`](CONTRIBUTING.md)) and verify locally before opening a PR:

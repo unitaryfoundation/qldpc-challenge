@@ -36,6 +36,20 @@ beats it on all of (n lower, k higher, d higher, w lower), with at least one
 strict. There can be many co-leaders. `kd^2/n` is a sortable headline figure per
 cell (see the caveat below), and never collapses the frontier into one rank.
 
+Code type, from `code_type`, is a third cell dimension: CSS codes and general
+stabilizer codes (the [[5,1,3]] code, XZZX codes, the halved pair-partition
+codes of arXiv:2609.30069) are separate leaderboards. A stabilizer code is
+compared only with stabilizer codes, so it never dominates or is dominated by
+a CSS entry, and the CSS boards are unchanged by its presence. The reason is
+that the two families decode differently: how `kd^2/n` relates to a logical
+error rate is even less settled for non-CSS codes, and one board would
+reward inflating it across the two. The check-weight class of a stabilizer
+code is computed from the number of qubits each generator acts on (a `Y`
+counts once), the locality class from the generator supports, so the
+(locality, weight) grid is the same on both boards. Codes that are CSS up to a
+Hadamard on some qubits belong on the CSS board: the verifier detects them
+and the dedup gate marks them as duplicates of the CSS entry.
+
 A record whose only strict axis is `d` — the candidate ties an existing entry on
 n, k and w and raises nothing but the distance — is a different kind of claim
 from the rest of the frontier: both numbers are witness-backed *upper* bounds, so
@@ -67,9 +81,9 @@ color), `other`. On the board it is a filter, not a leaderboard.
 ## Layer 3: verified flags (earned badges)
 
 Only things the verifier or a certificate can prove: the distance-confidence
-tier, CSS commutation, the locality class (which doubles as Layer-1
-membership), and `modular` (the layout assigns every qubit to a hardware
-module; see below).
+tier, CSS commutation (or, for a general stabilizer code, that its generators
+commute), the locality class (which doubles as Layer-1 membership), and
+`modular` (the layout assigns every qubit to a hardware module; see below).
 
 Distance confidence is orthogonal to the tracks:
 
@@ -83,6 +97,8 @@ Distance confidence is orthogonal to the tracks:
   exists. This is NP-hard and does not scale, so large codes carry tight upper
   bounds while small and moderate codes are certified exact. The board shows an
   `exact` claim as an upper bound until a maintainer runs `verify/certify.py`.
+  For a general stabilizer code the distance is a Pauli weight and the
+  certifier does not yet minimize it, so every stabilizer entry is `d<=`.
 
 ## Diagnostics (displayed, never ranked)
 

@@ -1,7 +1,9 @@
-# Submission format (v0.1)
+# Submission format (v0.1 to v0.4)
 
-A submission is one JSON file describing one CSS qLDPC code, placed under
-`codes/`. The formal contract is `schema/code.schema.json`; this page explains
+A submission is one JSON file describing one qLDPC code, placed under
+`codes/`: a CSS code given by its X and Z checks, or (since 0.4) a general
+stabilizer code given by one list of Pauli generators (see "Stabilizer codes"
+below). The formal contract is `schema/code.schema.json`; this page explains
 the fields and, more importantly, what the verifier actually checks.
 
 ## Why this shape
@@ -24,11 +26,15 @@ Two principles drive the format:
 
 ## Fields
 
-- `schema_version`: `"0.1"`, `"0.2"` or `"0.3"` (0.2 added the optional
-  `witness_provenance` block, 0.3 the optional `provenance.search_budget`
-  block; 0.1 and 0.2 files remain valid unchanged).
+- `schema_version`: `"0.1"`, `"0.2"`, `"0.3"`, or `"0.4"` (0.2 added the
+  optional `witness_provenance` block, 0.3 the optional
+  `provenance.search_budget` and `locality.modules` blocks, 0.4 the
+  `stabilizer` code type; older files remain valid unchanged).
 - `name`: human-readable, e.g. `"[[72,6,6]] generalized weight-6 planar BB code"`.
-- `code_type`: `"CSS"` (the only type in v0.1).
+- `code_type`: `"CSS"` or `"stabilizer"` (0.4). The fields below describe a
+  CSS entry; a stabilizer entry replaces `checks.X`/`checks.Z` with
+  `checks.S` and `distance.X`/`distance.Z` with `distance.P`, and may not
+  carry `circuit`. The schema enforces the split by `code_type`.
 - `n`: physical qubit count. Must match the qubit indices used in `checks`.
 - `k`: claimed logical qubit count. The verifier recomputes
   `k = n - rank(H_X) - rank(H_Z)` over GF(2) and requires an exact match.
@@ -251,6 +257,62 @@ Two principles drive the format:
   and weight classes) is computed by the verifier from `H` and the layout; this
   self-declared field is kept only for backward compatibility. See `../TRACKS.md`.
 
+## Stabilizer codes
+
+A general stabilizer code (`code_type: "stabilizer"`, `schema_version:
+"0.4"`) has no X and Z sides. It is given by its binary symplectic matrix
+`S = (A | B)`, one row per generator, and one Pauli-weight distance side.
+
+- `checks.S`: the generators, each `{"X": [...], "Z": [...]}`: the sorted
+  qubit indices carrying an X factor and those carrying a Z factor, so
+  generator `i` is `X^{A_i} Z^{B_i}`. A qubit in both lists carries `Y`. At
+  least one list is nonempty; each list is capped at 32 entries and the
+  check weight, `|A_i union B_i|` (the qubits the generator acts on, a `Y`
+  once), at the same 32 as a CSS check. `checks.X` and `checks.Z` are
+  forbidden on a stabilizer entry, and `checks.S` on a CSS one.
+- The verifier checks isotropy, `A B^T + B A^T = 0` over GF(2)
+  (`stabilizer_commutation`, the general form of CSS commutation), computes
+  `k = n - rank S` (`k_matches_claim`), and rejects a submission whose every
+  generator is pure X or pure Z (`stabilizer_code_is_not_css`): that is a
+  CSS code and must be typed `CSS`, so the CSS entries keep their per-side
+  semantics.
+- `distance.P` (required; `distance.X` and `distance.Z` forbidden):
+  - `value`: the claimed minimum Pauli weight of a nontrivial logical
+    operator. `distance.d` must equal it (`d_matches_pauli_side`).
+  - `confidence`: `"upper_bound"` or `"exact"`. The Pauli-weight certifier
+    is not available yet, so `exact` is accepted as `upper_bound`
+    (`distance_P_exact_flagged`), as CSS claims were before certification
+    existed.
+  - `witness`: one Pauli operator `{"X": [...], "Z": [...]}`. It must
+    commute with every generator (lie in the normalizer, `ker (B | A)`), lie
+    outside the row space of `S`, and have Pauli weight
+    `|supp X union supp Z|` equal to `value` (`distance_P_witness`). The
+    Hamming weight over the `2n` symplectic bits is not the distance: a `Y`
+    counts once, and the report says how many `Y` factors the witness has.
+  - `witness_provenance`: as for a CSS side.
+- `circuit` is not accepted on a stabilizer entry: the memory experiments
+  and their `d_circ` witnesses are per basis, and a general code needs a
+  stabilizer measurement schedule the tier does not build yet.
+- `locality`, `provenance`, `family`, and the slug `n-k-d.json` are
+  unchanged. The locality class is computed over the generator supports.
+- Identity. The exact-duplicate fingerprint is `rref(S)`; the
+  permutation-invariant signature is the Weisfeiler-Leman refinement of the
+  qubit/generator graph with every edge labeled X, Z, or Y. If a Hadamard on
+  some qubit subset would make every generator pure, the verifier reports
+  that subset and the fingerprint and signature of the CSS code it maps to
+  (`css_equivalent`, `local_hadamard_css_equivalent`); the dedup gate then
+  marks a match with a board entry as a duplicate of it (not a rejection).
+- Refutation. The distance gate runs the random-information-set search on
+  the normalizer, scored by Pauli weight, and the accelerated pass on the
+  symplectic doubling `H'_X = (A | B)`, `H'_Z = (B | A)` (a CSS code on `2n`
+  qubits whose Hamming weight bounds the Pauli weight from above), re-scoring
+  every find by Pauli weight before it counts.
+- Ranking. Stabilizer codes form a separate leaderboard: novelty, dominance,
+  and records are computed among stabilizer codes only (`TRACKS.md`).
+
+`./qldpc submit` builds such an entry from an `.npz` holding `s` (an
+`m x 2n` array `(A | B)`) or `a` and `b`.
+
 ## What the verifier reports
 
 `python verify/qldpc_verify.py codes/your-code.json` prints a JSON report:
@@ -285,5 +347,6 @@ through a maintainer-run path until the verifier is sparse end-to-end.
   away and silently change the code).
 - Store `interaction_radius` as the exact measured value, not a rounded one;
   a value rounded down below the true diameter will fail the `<=` check.
-- Both distance sides are required. The verifier earns the global `d` only when
-  both witnesses validate and `distance.d = min(dX, dZ)`.
+- Both distance sides are required for a CSS code. The verifier earns the
+  global `d` only when both witnesses validate and `distance.d = min(dX, dZ)`.
+  A stabilizer code has the single side `P` and `distance.d = P.value`.
