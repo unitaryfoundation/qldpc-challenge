@@ -4807,7 +4807,8 @@
    "arXiv:2609.30069",
    "arXiv:2607.14091"
   ],
-  "novelty": "known_parameters"
+  "novelty": "known_parameters",
+  "model": "human"
  },
  "family": "lifted-product"
 }
