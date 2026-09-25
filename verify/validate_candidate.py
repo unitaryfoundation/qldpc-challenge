@@ -74,11 +74,17 @@ def _board_entries():
             continue                            # a broken board file never blocks a candidate
         try:
             comp = rep.get("computed", {})
+            ceq = rep.get("css_equivalent") or {}
             out.append({
                 "name": os.path.basename(e["path"]),
                 "n": doc["n"], "k": doc["k"], "d": doc["distance"]["d"],
+                "code_type": doc.get("code_type", "CSS"),
                 "fingerprint": rep.get("fingerprint"),
                 "sig": rep.get("signature", {}).get("hash"),
+                # a stabilizer entry that is CSS up to local Hadamards also
+                # carries the fingerprints and signatures of that CSS code
+                "css_fingerprints": list(ceq.get("fingerprints") or []),
+                "css_sigs": list(ceq.get("signatures") or []),
                 "weight_class": comp.get("weight_class"),
                 "w": comp.get("max_check_weight"),
                 "locality_class": comp.get("locality_class"),
@@ -86,6 +92,18 @@ def _board_entries():
         except Exception:
             continue
     return out
+
+
+def _identity_sets(rep):
+    """Return the (fingerprints, signatures) under which a verified code is recognized.
+
+    Its own, plus those of the CSS code it maps to under local Hadamards when
+    the verifier found one (report["css_equivalent"], issue #2131).
+    """
+    ceq = rep.get("css_equivalent") or {}
+    fps = {rep.get("fingerprint")} | set(ceq.get("fingerprints") or [])
+    sigs = {rep.get("signature", {}).get("hash")} | set(ceq.get("signatures") or [])
+    return fps - {None}, sigs - {None}
 
 
 def validate_candidate(doc, *, seed=None, refute=True):
@@ -143,15 +161,36 @@ def validate_candidate(doc, *, seed=None, refute=True):
         verdict["labels"].append(f"refuted (over-claimed distance): {nd['detail']}")
 
     # 3. DEDUP -- compare against the board by exact fingerprint and WL signature,
-    #    both already computed by the verifier above.
+    #    both already computed by the verifier above. A stabilizer candidate
+    #    that is a CSS code up to a Hadamard on some qubits (issue #2131) is
+    #    also compared through that CSS code's fingerprint and signature, in
+    #    both directions, so a relabeled copy of a board entry is marked a
+    #    duplicate of it rather than admitted as a new code. The CSS and
+    #    stabilizer boards are separate, so this is the ONE place the two
+    #    types meet, and only to recognize the same code.
     cand_fp = rep.get("fingerprint")
-    cand_sig = rep.get("signature", {}).get("hash")
+    cand_fps, cand_sigs = _identity_sets(rep)
     board = _board_entries()
-    exact_dup = next((b["name"] for b in board if b["fingerprint"] == cand_fp), None)
+
+    def fps_of(b):
+        return {b["fingerprint"]} | set(b.get("css_fingerprints") or [])
+
+    def sigs_of(b):
+        return {b["sig"]} | set(b.get("css_sigs") or [])
+
+    exact_dup = next((b["name"] for b in board if cand_fps & fps_of(b)), None)
     wl_equiv = next((b["name"] for b in board
-                     if b["sig"] == cand_sig and b["fingerprint"] != cand_fp), None)
+                     if cand_sigs & sigs_of(b) and not (cand_fps & fps_of(b))), None)
     g["dedup"] = {"exact_duplicate_of": exact_dup, "wl_equivalent_of": wl_equiv}
-    if exact_dup:
+    via_hadamard = exact_dup is not None and not any(
+        b["fingerprint"] == cand_fp for b in board if b["name"] == exact_dup)
+    if exact_dup and via_hadamard:
+        g["dedup"]["local_clifford"] = "hadamard"
+        verdict["labels"].append(
+            f"duplicate: identical to board entry {exact_dup} up to a Hadamard "
+            f"on {len(rep.get('css_equivalent', {}).get('hadamard_qubits', []))} "
+            f"qubit(s)")
+    elif exact_dup:
         verdict["labels"].append(f"duplicate: identical to board entry {exact_dup}")
     elif wl_equiv:
         verdict["labels"].append(f"possibly equivalent (same WL signature) to {wl_equiv}")
@@ -166,13 +205,20 @@ def validate_candidate(doc, *, seed=None, refute=True):
     # one whenever n, k and d allowed, which the site's own frontier does not,
     # so a code could be labelled "does not advance its board cell" while
     # starring on the rendered board.
+    #
+    # The code type is a third cell dimension (issue #2131): a stabilizer
+    # code is compared only with stabilizer codes and a CSS code only with
+    # CSS codes, so neither board's entries can dominate the other's.
     n, k, d = doc["n"], doc["k"], claimed_d
     w = comp.get("max_check_weight")
+    code_type = doc.get("code_type", "CSS")
     dominators = []
     dominated = []                            # (board entry, axes where the candidate is strictly better)
     for b in board:
-        # a board code shares the candidate's cell iff it is stricter-or-equal on both axes
-        if (_WEIGHT_ORDER.get(b["weight_class"], 9) <= _WEIGHT_ORDER.get(wc, 9)
+        # a board code shares the candidate's cell iff it is on the same
+        # board and stricter-or-equal on both axes
+        if (b.get("code_type", "CSS") == code_type
+                and _WEIGHT_ORDER.get(b["weight_class"], 9) <= _WEIGHT_ORDER.get(wc, 9)
                 and _LOCAL_ORDER.get(b["locality_class"], 9) <= _LOCAL_ORDER.get(lc, 9)):
             bw = b.get("w")
             if bw is None:                     # pre-fix cache entry; skip the w axis
@@ -205,7 +251,8 @@ def validate_candidate(doc, *, seed=None, refute=True):
     advances_by = sorted({ax for _, gains, _ in dominated for ax in gains})
     d_only_peers = [desc for _, gains, desc in dominated if gains == ["d"]]
     d_only_gain = bool(board_advancing) and advances_by == ["d"]
-    g["novelty"] = {"cell": [wc, lc], "board_advancing": board_advancing,
+    g["novelty"] = {"cell": [wc, lc], "board": code_type,
+                    "board_advancing": board_advancing,
                     "dominated_by": dominators, "advances_by": advances_by,
                     "d_only_gain": d_only_gain,
                     "d_only_peers": d_only_peers,
@@ -230,8 +277,8 @@ def validate_candidate(doc, *, seed=None, refute=True):
                 "(research/audits/leader_audit.py pair) before packaging")
     else:
         verdict["labels"].append(
-            f"advances the {wc} x {lc} board" if board_advancing
-            else "does not advance its board cell")
+            f"advances the {wc} x {lc} {code_type} board" if board_advancing
+            else f"does not advance its {code_type} board cell")
     verdict["labels"].append("literature novelty UNVERIFIED")
 
     verdict["passed"] = bool(verify_ok and not refuted and not exact_dup)

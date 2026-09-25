@@ -1591,6 +1591,14 @@ def load_entries():
         doc, rep = e["doc"], e["report"]
         if not rep["ok"]:
             continue
+        if doc.get("code_type") == "stabilizer":
+            # General stabilizer codes (issue #2131) rank on their own board,
+            # and their page (one d, generators as Pauli letters, no X/Z
+            # asymmetry) is not rendered yet; skip them so the CSS board
+            # neither shows nor compares against them.
+            print(f"  note: {slug}: stabilizer entry, not rendered yet "
+                  f"(separate leaderboard, issue #2131)")
+            continue
         earned = rep["earned_distance"].get("d")
         if not earned:
             print(f"  warning: {slug}: no earned distance; skipping board entry")
@@ -1628,6 +1636,7 @@ def load_entries():
         ldiams = list((diag.get("logical_diameter") or {}).values())
         entries.append({
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
+            "code_type": doc.get("code_type", "CSS"),
             "eff": round(k * d * d / n, 3), "tier": tier,
             "d_X": d_x, "d_Z": d_z,
             "tier_X": tiers["X"], "tier_Z": tiers["Z"],
@@ -3656,27 +3665,42 @@ def cells(e):
             for W in weight_members(e["weight_class"])]
 
 
+def cell_key(e, cell):
+    """Return the board key of a cell for entry e.
+
+    The code type is a cell dimension (issue #2131): a CSS entry's key is the
+    (locality, weight) pair the grid renders; a stabilizer entry's key
+    carries its type as a third element, so the two boards never share a
+    cell, a frontier, or a record.
+    """
+    ct = e.get("code_type", "CSS")
+    return cell if ct == "CSS" else cell + (ct,)
+
+
 def cells_by_key(entries):
-    """Map each populated (locality, weight) cell to the indices of its members."""
+    """Map each populated cell key (cell_key) to the indices of its members."""
     by_cell = {}
     for i, e in enumerate(entries):
         for cell in cells(e):
-            by_cell.setdefault(cell, []).append(i)
+            by_cell.setdefault(cell_key(e, cell), []).append(i)
     return by_cell
 
 
 def compute_records(entries):
     """Indices of codes on a Pareto frontier (over n, k, d, w) of any primary-track
-    cell they belong to, or of the global frontier. These are the records (starred,
-    shaded): a record is a within-cell claim, so a code only stars where no other
-    code in the SAME computed cell beats it."""
+    cell they belong to, or of the global frontier of their board. These are
+    the records (starred, shaded): a record is a within-cell claim, so a code
+    only stars where no other code in the SAME computed cell, on the same
+    board (code type), beats it."""
     records = set()
     for idxs in cells_by_key(entries).values():
         te = [entries[i] for i in idxs]
         for j in pareto(te):
             records.add(idxs[j])
-    for j in pareto(entries):
-        records.add(j)
+    for ct in sorted({e.get("code_type", "CSS") for e in entries}):
+        idxs = [i for i, e in enumerate(entries) if e.get("code_type", "CSS") == ct]
+        for j in pareto([entries[i] for i in idxs]):
+            records.add(idxs[j])
     return records
 
 
