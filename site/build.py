@@ -1019,7 +1019,7 @@ border-radius:5px;padding:1px 6px;white-space:nowrap;text-decoration:none}}
 @media(max-width:680px){{.ref{{flex-direction:column;gap:4px}}
 .refkey{{width:auto}}}}
 @media(max-width:880px){{.how{{grid-template-columns:1fr}}}}
-.latest{{margin:40px 0 0}}
+.latest{{margin:40px 0 24px}}
 .latestlist{{list-style:none;margin:10px 0 0;padding:0;
 border:1px solid var(--ln);border-radius:12px;overflow:hidden}}
 .latestlist li{{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
@@ -3961,7 +3961,8 @@ def primary_tracks_grid(entries, records):
 def latest_codes_panel(entries, records, limit=10):
     """A 'recently added' strip (issue #308): the newest codes by submission
     date, newest first, so a visitor can see the board is live. Each row links
-    to the code page and is starred if it currently holds a cell record."""
+    to the code page and is starred if it currently holds a cell record. It is
+    the last section of the page (issue #2125)."""
     rec_slugs = {entries[i]["slug"] for i in records}
     dated = [e for e in entries if e.get("date")]
     dated.sort(key=lambda e: (e["date"], e["slug"]), reverse=True)
@@ -4444,7 +4445,6 @@ def build():
         '</section>')
     P.append(record_chart(entries))
     P.append(primary_tracks_grid(entries, records))
-    P.append(latest_codes_panel(entries, records))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
@@ -4504,6 +4504,9 @@ def build():
              'Click any row for the witness, certificate, and checks. '
              '<span class=arrow>&rarr;</span></p>'
              '</a></div>')
+    # the newest submissions close the page (issue #2125): a liveness signal,
+    # lower priority than every ranking above it
+    P.append(latest_codes_panel(entries, records))
     P.append('</div>')  # close the main content wrap; footer is full-width
     P.append(
         '<footer class=foot><div class=footmain>'
