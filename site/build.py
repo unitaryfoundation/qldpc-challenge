@@ -1200,6 +1200,33 @@ document.addEventListener('click',e=>{
   if(kfill){kfill.style.left=((b[0]-KMIN)/kspan*100)+'%';
    kfill.style.width=((b[1]-b[0])/kspan*100)+'%';}
   if(kval)kval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
+ // Adaptive axes (issue #2125): fit each landscape scatter to the points the
+ // filter leaves visible. Mirrors scatter() in build.py (sx/sy, _axis_step,
+ // the x tick step); the server-rendered axes span every code and are the
+ // no-JS view.
+ function ystep(hi){for(const s of [1,2,5,10,20,50,100,200,500])if(hi/s<=6)return s;return 1000;}
+ function rescale(svg){
+  const W=+svg.dataset.w,H=+svg.dataset.h,pl=+svg.dataset.pl,pr=+svg.dataset.pr,
+   pb=+svg.dataset.pb,pt=+svg.dataset.pt,grid=svg.querySelector('g.grid');
+  if(!W||!grid)return;
+  const pts=[...svg.querySelectorAll('circle[data-x]')].filter(c=>c.style.display!=='none');
+  if(!pts.length)return;
+  let nhi=0,yhi=0;
+  pts.forEach(c=>{nhi=Math.max(nhi,+c.dataset.x);yhi=Math.max(yhi,+c.dataset.y);});
+  nhi=nhi||1;yhi=yhi||1;
+  const sx=n=>pl+n/nhi*(W-pl-pr),sy=v=>H-pb-v/yhi*(H-pt-pb);
+  pts.forEach(c=>{c.setAttribute('cx',sx(+c.dataset.x).toFixed(1));
+   c.setAttribute('cy',sy(+c.dataset.y).toFixed(1));});
+  let g='';const xs=Math.max(1,Math.round(nhi/4/50)*50||50);
+  for(let gx=0;gx<=nhi;gx+=xs){const x=sx(gx).toFixed(0);
+   g+='<line x1="'+x+'" y1="'+pt+'" x2="'+x+'" y2="'+(H-pb)+'" stroke="#eef2f7"/>'
+    +'<text x="'+x+'" y="'+(H-pb+18)+'" font-size="12" fill="#475569" text-anchor="middle">'+gx+'</text>';}
+  const ys=ystep(yhi);
+  for(let gy=0;gy<=yhi+1e-9;gy+=ys){const y=sy(gy);
+   g+='<line x1="'+pl+'" y1="'+y.toFixed(0)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(0)+'" stroke="#eef2f7"/>'
+    +'<text x="'+(pl-8)+'" y="'+(y+4).toFixed(0)+'" font-size="12" fill="#475569" text-anchor="end">'+(+gy.toFixed(6))+'</text>';}
+  grid.innerHTML=g;
+ }
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
   const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
@@ -1230,6 +1257,7 @@ document.addEventListener('click',e=>{
    if(f)chip.innerHTML='filtered: '+f.replace(/</g,'&lt;')+' <b>&times; clear</b>';}
   document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
    c.style.display=vis.has(c.dataset.code)?'':'none';});
+  document.querySelectorAll('.plots svg.plot').forEach(rescale);
   // 'with layout' swaps the efficiency chart from kd^2/n to f (issue #276)
   const pe=document.getElementById('ploteff'),pg=document.getElementById('plotgeo');
   if(pe&&pg){const g=(geoMode==='with');
@@ -1288,8 +1316,9 @@ document.addEventListener('click',e=>{
  if(klo&&khi){klo.addEventListener('input',()=>{kpaint();apply();});
   khi.addEventListener('input',()=>{kpaint();apply();});kpaint();}
  // ?q=... deep-links a search (used by the contributor leaderboard counts).
+ // A deep link names a set of codes; the default weight cap must not clip it.
  const uq=new URLSearchParams(location.search).get('q');
- if(uq){q.value=uq;
+ if(uq){q.value=uq;resetsliders();
   document.querySelectorAll('.ttab').forEach(t=>
    t.classList.toggle('active', t.dataset.q===uq));
   const bd=document.getElementById('board');
@@ -1703,7 +1732,14 @@ def scatter(te, front, yacc, ylabel):
     """A landscape scatter of every code: x = n, y = yacc(e) (e.g. distance or
     kd^2/n). Two complementary views are shown side by side, so codes that
     coincide in one (e.g. same n and d but different k) separate in the other.
-    Suppressed below a handful of distinct (n, y) points (nothing to show)."""
+    Suppressed below a handful of distinct (n, y) points (nothing to show).
+
+    The axes here span every code; the board filter then rescales them to the
+    points it leaves visible (the rescale() routine in JS mirrors sx/sy,
+    _axis_step, and the x tick step below), so a few very high kd^2/n codes
+    cannot flatten the rest of the board (issue #2125). Each point carries
+    its raw (n, y) as data-x/data-y for that, and the gridlines sit in their
+    own <g class=grid> so they can be redrawn without touching the points."""
     if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
         return ""
     W, H = 520, 274
@@ -1746,15 +1782,18 @@ def scatter(te, front, yacc, ylabel):
         tip = (f'[[{e["n"]},{e["k"]},{e["d"]}]]  kd2/n={e["eff"]}{_geo}\n'
                f'{_tlabel}{", record" if f else ""}')
         cx, cy = sx(e["n"]), sy(yacc(e))
-        pts.append(f'<circle class=pt data-code="{e["slug"]}" cx="{cx:.1f}" '
+        raw = f'data-x="{e["n"]}" data-y="{yacc(e):g}"'
+        pts.append(f'<circle class=pt data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
                    f'cy="{cy:.1f}" r="{r}" fill="{fill}" '
                    f'stroke="{col}" stroke-width="2" pointer-events="none"/>')
-        pts.append(f'<circle class=hit data-code="{e["slug"]}" cx="{cx:.1f}" '
+        pts.append(f'<circle class=hit data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
                    f'cy="{cy:.1f}" r="12" '
                    f'fill="transparent" data-tip="{html.escape(tip)}"/>')
     y_mid = pad_t + (H - pad_t - pad_b) / 2
-    return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img">'
-            + "".join(grid)
+    return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img" '
+            f'data-w="{W}" data-h="{H}" data-pl="{pad_l}" data-pr="{pad_r}" '
+            f'data-pb="{pad_b}" data-pt="{pad_t}">'
+            f'<g class=grid>{"".join(grid)}</g>'
             + f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
             f'text-anchor="middle" transform="rotate(-90 14 {y_mid:.0f})">{ylabel}</text>'
             + "".join(pts) + "</svg>")
@@ -3991,6 +4030,11 @@ def latest_codes_panel(entries, records, limit=10):
             f'<ol class=latestlist>{"".join(rows)}</ol></section>')
 
 
+# Default upper bound of the Codes weight slider (issue #2125); see
+# board_controls.
+BOARD_DEFAULT_W = 8
+
+
 def board_controls(entries, records):
     """The board heading plus the search box, filter pills, and filter help. Lives
     above the charts so filtering and the landscape view stay together; the JS
@@ -4025,6 +4069,11 @@ def board_controls(entries, records):
         for f in families)
     weights = [e["w"] for e in entries if e["w"] is not None]
     wmin, wmax = (min(weights), max(weights)) if weights else (0, 0)
+    # The upper handle starts at BOARD_DEFAULT_W (issue #2125): the heaviest
+    # codes carry kd^2/n values that dwarf the rest, and the low-weight region
+    # is the one that matters for early fault tolerance. "All" and "clear
+    # filters" open the range back up to the whole board.
+    wdef = min(max(BOARD_DEFAULT_W, wmin), wmax)
     # Dual-handle range slider over the check weight w, styled as a pill so it
     # sits inline with the type-filter pills as one filter group. Two overlapping
     # range inputs share one visual track; replaces the old weight-N filter tags.
@@ -4036,9 +4085,9 @@ def board_controls(entries, records):
         f'<input type=range id=wlo class=wfrange min={wmin} max={wmax} '
         f'value={wmin} step=1 aria-label="minimum check weight">'
         f'<input type=range id=whi class=wfrange min={wmin} max={wmax} '
-        f'value={wmax} step=1 aria-label="maximum check weight">'
+        f'value={wdef} step=1 aria-label="maximum check weight">'
         '</span>'
-        f'<span class=wfval id=wfval>{wmin}&ndash;{wmax}</span>'
+        f'<span class=wfval id=wfval>{wmin}&ndash;{wdef}</span>'
         '</span>')
     dists = [e["d"] for e in entries]
     dmin, dmax = (min(dists), max(dists)) if dists else (0, 0)
