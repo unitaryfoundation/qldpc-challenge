@@ -28,10 +28,12 @@ submission request selects the first workflow; otherwise use unattended autorese
 
 ## Doing autoresearch (finding new codes)
 
-Read **[`research/AUTORESEARCH.md`](research/AUTORESEARCH.md)** and follow it. That is the
-tool-agnostic operating manual for the research loop and the reference for the `research/` kit.
+Start from **[`research/QUICKSTART.md`](research/QUICKSTART.md)**: the minimal loop and the
+rules, on one page. **[`research/AUTORESEARCH.md`](research/AUTORESEARCH.md)** is the detailed
+manual and the reference for the `research/` kit — load the section you need rather than the
+whole file.
 
-The one rule, up front so it is never missed:
+The two rules, here so they are never missed:
 
 **No code is a "find" until `verify/validate_candidate.py` returns `passed: true` for it.**
 Never write your own distance/quality check or edit anything under `verify/` (the trusted,
@@ -39,13 +41,11 @@ CI-hash-pinned stack). In unattended autoresearch, stage candidates for human re
 contributor-driven workflow above is allowed to promote a validated candidate into `codes/`
 and open a PR when the user explicitly authorized that submission.
 
-A second rule, equally non-negotiable:
-
 **A found low-weight logical (witness) is the most expensive data we produce — never lose it.**
-Never run an ad-hoc `python -c` that calls a witness/distance search and only prints the result; that discards the data. Always persist the candidate through the kit's own path: call
-`research/kit/submit.make_submission` (which computes and embeds the witness) and then `research/kit/submit.save_submission(doc, "research/candidates/<n>-<k>-<d>.json")`. 
-The `research/candidates/` directory is gitignored working output, so writes there are safe and never pollute the board. If a search finds a valid logical but the save fails, that is a hard
-error — stop and report it, do not just print.
+Persist every candidate through `research/kit/submit.make_submission` and then
+`submit.save_submission(doc, "research/candidates/<n>-<k>-<d>.json")`, which embed the witness;
+an ad-hoc `python -c` that calls a distance search and prints the result discards it. If a
+search finds a valid logical but the save fails, that is a hard error — stop and report it.
 
 ## Writing the submission (the PR body and the note)
 

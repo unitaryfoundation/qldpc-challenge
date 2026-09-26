@@ -6,6 +6,9 @@ tool. It is both the **operating manual for the research loop** and the **refere
 `research/` starter kit**: constructing a code, estimating its distance, and packaging a
 verifiable submission.
 
+A run does not need all of it. [`QUICKSTART.md`](QUICKSTART.md) is the loop and the rules on
+one page; come back here for the section the run actually reaches.
+
 The default path in `research/` is pure NumPy. An optional bit-packed C++ RIS backend can be
 built with `make fast` for larger screens and confirmation runs; Python still validates its
 witnesses.
