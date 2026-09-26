@@ -58,17 +58,26 @@ The verdict's `gates` block is your evidence; `labels` are what you show the hum
                  search.py (screen→rank)      with distance.py before promoting a standout
 ```
 
-0. **Read the shared record first**: `./qldpc recent` (new codes, research
+0. **Load the campaign, if you were given one**: a campaign definition
+   (`research/campaigns/<id>/campaign.json`, see
+   [`campaigns/README.md`](campaigns/README.md)) carries the objective, the
+   search space, the budget and the stopping conditions as a checked file
+   instead of as prose, and its ledger records what was spent and which
+   condition fired. Without one, take the human's direction exactly as before:
+   everything below is unchanged either way. A campaign's constraints filter
+   the search and never decide a track cell, and it cannot skip the gate in
+   step 6.
+1. **Read the shared record first**: `./qldpc recent` (new codes, research
    notes, fieldnotes), then the `fieldnotes/` entries touching your intended
    family — blocked routes and calibration findings live there, and repeating
    them wastes the budget.
-1. **Pick a direction** → a track cell + a family + a budget (below).
-2. **Build** `(HX, HZ)` from a constructor.
-3. **Estimate** distance cheaply with the surrogate (gets you the witness for free).
-4. **Search** a whole family with `search.py` to find the best candidates.
-5. **Package** with `submit.make_submission`, then **validate** with the gate — keep only
+2. **Pick a direction** → a track cell + a family + a budget (below).
+3. **Build** `(HX, HZ)` from a constructor.
+4. **Estimate** distance cheaply with the surrogate (gets you the witness for free).
+5. **Search** a whole family with `search.py` to find the best candidates.
+6. **Package** with `submit.make_submission`, then **validate** with the gate — keep only
    `passed: true`.
-6. **Stage** survivors for review; loop until the budget is spent, then report.
+7. **Stage** survivors for review; loop until the budget is spent, then report.
 
 To watch the whole loop run once (build → package → the real verifier in-process):
 
