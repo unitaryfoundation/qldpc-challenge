@@ -84,6 +84,22 @@ def refuted(with_wp=True, found_by="@bob"):
     return doc
 
 
+def run_rename(name, base_fname, new_fname, expect_ok, author="bob"):
+    """Move codes/<base_fname> to <new_fname>, content byte-identical."""
+    with tempfile.TemporaryDirectory() as td:
+        git(td, "init", "-q", "-b", "main")
+        write_code(td, base_fname, BASE_DOC)
+        git(td, "add", "-A")
+        git(td, "commit", "-q", "-m", "base")
+        git(td, "checkout", "-q", "-b", "change")
+        git(td, "mv", f"codes/{base_fname}", f"codes/{new_fname}")
+        git(td, "add", "-A")
+        git(td, "commit", "-q", "-m", "rename")
+        rc = check_authorship.main(
+            ["--author", author, "--root", td, "--base", "main"])
+        check(name, (rc == 0) == expect_ok)
+
+
 def run_case(name, edit, expect_ok, author="bob", rename=True,
              base_doc=None, base_files=(), files=()):
     """edit() returns the new doc, or None to leave codes/ untouched -- which
@@ -602,6 +618,36 @@ def main():
         make_repo(td)
         check("new submission with only a malformed handle rejected",
               submit_new(td, ["@bad!handle"]) == 1)
+
+    # A stale slug is a path that disagrees with the file it holds, and the
+    # slug is derived from the JSON, so correcting it changes no claim and
+    # needs no binding (#1657). Renaming to anything else does move the
+    # board's canonical slug and stays the authors' to make.
+    # Same argument for the name's leading [[n,k,d]]: derived data, so putting
+    # it right binds nobody; writing anything else there is an edit.
+    def renamed_title():
+        doc = copy.deepcopy(BASE_DOC)
+        doc["name"] = "[[60,8,6]] synthetic test code"
+        return doc
+
+    def retitled():
+        doc = copy.deepcopy(BASE_DOC)
+        doc["name"] = "[[60,8,4]] synthetic test code"
+        return doc
+
+    stale = copy.deepcopy(BASE_DOC)
+    stale["name"] = "[[60,8,9]] synthetic test code"
+    run_case("non-author may correct a stale name to the entry's parameters",
+             renamed_title, True, rename=False, base_doc=stale)
+    run_case("non-author may not write other parameters into the name",
+             retitled, False, rename=False, base_doc=stale)
+
+    run_rename("non-author may move an entry onto its own [[n,k,d]] slug",
+               "60-8-9.json", "60-8-6.json", True)
+    run_rename("non-author may not rename an entry to an unrelated slug",
+               "60-8-6.json", "60-8-4.json", False)
+    run_rename("author may rename an entry to an unrelated slug",
+               "60-8-6.json", "60-8-4.json", True, author="alice")
 
     print()
     if _fail:
