@@ -1,0 +1,33 @@
+{
+  "artifact_sha256": "c5e2a21fd21bedf1dd4d023913012368861de99881bd13e54a4e61837f6a4628",
+  "environment": {
+    "extras": [
+      "research"
+    ],
+    "stim": "1.16.0"
+  },
+  "manifest_version": "1",
+  "notes": "Worked example for `qldpc reproduce`: this entry carries a circuit tier, an ler block and a committed cert, so every stage but the construction has something to re-derive.",
+  "slug": "25-1-5",
+  "stages": {
+    "certify": {
+      "status": "applicable",
+      "tlim_seconds": 600
+    },
+    "circuits": {
+      "status": "applicable"
+    },
+    "construction": {
+      "reason": "the search that produced this code was not committed; H_X and H_Z in the entry are the record",
+      "status": "not_reproducible"
+    },
+    "ler": {
+      "seed": 11,
+      "status": "applicable",
+      "tolerance": "ci95"
+    },
+    "verify": {
+      "status": "applicable"
+    }
+  }
+}

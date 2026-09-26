@@ -287,6 +287,32 @@ lesser result, it is the honest one, and `d <=` is what the board displays. If
 you have a certification approach that closes these, please open an issue; the
 two n = 180 codes above are a good regression test.
 
+## Reproducing an entry
+
+Every board entry is self-verifying: anyone can run the trusted gate against `codes/<slug>.json` and re-check its structure, `k`, witnesses, layout and distance upper bound. `qldpc reproduce` re-runs the whole evidence chain instead of that one stage, and writes down what happened.
+
+```
+./qldpc reproduce 25-1-5                          # the trusted gate only
+./qldpc reproduce 25-1-5 --circuits --certify     # add the expensive stages
+./qldpc reproduce 25-1-5 --all --out receipt.json
+```
+
+The cheap deterministic core runs by default. Everything else is opt-in behind its own flag, because an exact certification is a bounded solver run and an LER re-measurement is a hundred thousand shots.
+
+Three claim classes, and they are not interchangeable:
+
+- **reproducible**: the artifact comes back. The code object always does, because `H_X` and `H_Z` are in the entry. The circuits do, bit for bit, under the `stim` pin in `uv.lock`. The search that found the code usually does not, and an entry says so with `construction: not_reproducible` rather than leaving it to be assumed.
+- **verified**: the trusted gate accepted it. That is the trustless tier and it covers structure, `k`, and a witness-backed `d <= value`.
+- **exactly certified**: `verify/certify.py` proved no lighter logical exists, and `certs/<slug>.json` records it. Re-running the certifier can agree, disagree, or run out of its time limit, and those are three different outcomes.
+
+Each stage reports its own status: `verified`, `reconstructed`, `certified`, `benchmark_reproduced`, or one of `skipped`, `not_applicable` (the entry makes no such claim), `not_reproducible` (it does, and nothing committed can re-derive it), `budget_exceeded`, `failed`. A stage never quietly disappears from the receipt.
+
+The receipt is non-authoritative. Producing one never changes whether an entry passes, what tier it holds, or where it ranks: the gate and the certifier remain the only authorities. It is an attachment for a note, an experiment record, or a paper.
+
+Reproducing is not proving, and the receipt keeps the distinction visible. A re-derived detector error model is bit-exact under a pinned `stim`. An LER re-measurement on an independent seed agrees when it lands inside the entry's own `ci95`, which is what a Monte Carlo claim can offer and is recorded as `arithmetic_exact_remeasurement_within_ci95` rather than as a match.
+
+An optional manifest at `repro/<slug>.json` (schema: `schema/reproduction.schema.json`) declares seeds, budgets and, above all, whether a constructor recipe was committed. Without one, `reproduce` derives the applicable stages from the entry and treats the construction as not reproducible. `repro/25-1-5.json` is a worked example.
+
 ## What makes a submission interesting
 
 A code only matters if it advances a track's Pareto frontier over (n, k, d)
