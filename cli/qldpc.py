@@ -1020,6 +1020,333 @@ def cmd_recent(args):
     return 0
 
 
+
+# ---------------------------------------------------------------------------
+# reproduce: one command that re-runs an entry's evidence chain (issue #2220)
+# ---------------------------------------------------------------------------
+# Orchestration only. Every stage below calls the trusted module that already
+# owns it -- validate_candidate, circuit_verify, ler_verify, certify -- so
+# there is no second implementation of any check here, and verify/ is imported
+# read-only. The receipt this produces is NON-AUTHORITATIVE: running it never
+# changes whether an entry passes, what tier it holds, or where it ranks.
+
+REPRO_STAGES = ("verify", "circuits", "ler", "certify", "construction")
+
+# What a stage can come back as. Kept apart on purpose: "the claim re-derived
+# bit for bit" and "a Monte Carlo re-measurement landed inside the declared
+# interval" are different evidence, and collapsing them would overstate the
+# weaker one.
+ST_SKIPPED = "skipped"                      # flag not requested
+ST_NOT_APPLICABLE = "not_applicable"        # the entry makes no such claim
+ST_NOT_REPRODUCIBLE = "not_reproducible"    # the claim exists, nothing can re-derive it
+ST_BUDGET = "budget_exceeded"               # hit its declared bound
+ST_VERIFIED = "verified"                    # trusted gate passed at the declared seed
+ST_RECONSTRUCTED = "reconstructed"          # code object rebuilt and fingerprint matched
+ST_CERTIFIED = "certified"                  # certify.py re-run and agreed with certs/
+ST_BENCH = "benchmark_reproduced"           # circuits bit-exact / ler within its interval
+ST_FAILED = "failed"                        # ran, and disagreed
+
+
+def _repro_root():
+    return _ROOT
+
+
+def _sha256_file(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _repro_manifest(slug):
+    """Read the committed manifest for an entry, or None.
+
+    A manifest is optional because everything except the construction status is
+    derivable from the entry itself. It exists to declare the one thing the
+    entry cannot: whether the search that found the code was committed.
+    """
+    path = os.path.join(_repro_root(), "repro", f"{slug}.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _stage_decl(manifest, stage):
+    return ((manifest or {}).get("stages") or {}).get(stage) or {}
+
+
+def _repro_environment():
+    """Record what this reproduction is actually running under."""
+    env = {"python": sys.version.split()[0]}
+    try:
+        import stim
+        env["stim"] = stim.__version__
+    except Exception:
+        env["stim"] = None
+    lock = os.path.join(_repro_root(), "uv.lock")
+    env["uv_lock_sha256"] = _sha256_file(lock) if os.path.exists(lock) else None
+    try:
+        import validate_candidate as _vc
+        env["validator_source_sha256"] = _vc.source_sha256()
+    except Exception:
+        env["validator_source_sha256"] = None
+    env["commit"] = _git_head()
+    return env
+
+
+def _git_head():
+    try:
+        out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=_repro_root(),
+                             capture_output=True, text=True, check=False)
+        return out.stdout.strip() or None
+    except OSError:
+        return None
+
+
+def _repro_verify(doc, decl, seed):
+    """Stage 1: the trusted gate, at the declared seed."""
+    import validate_candidate as vc
+    verdict = vc.validate_candidate(doc, seed=seed, refute=False)
+    gates = verdict.get("gates", {})
+    cand = verdict.get("candidate", {})
+    ok = bool(gates.get("verify", {}).get("ok"))
+    return {
+        "status": ST_VERIFIED if ok else ST_FAILED,
+        "seed": verdict.get("validator", {}).get("seed", seed),
+        "computed": {"n": cand.get("n"), "k": cand.get("k"), "d": cand.get("d"),
+                     "fingerprint": cand.get("fingerprint"),
+                     "signature": cand.get("signature")},
+        "detail": "structural checks and both witnesses re-checked"
+        if ok else "; ".join(c["detail"] for c in
+                             gates.get("verify", {}).get("checks", [])
+                             if not c.get("ok"))[:400],
+    }
+
+
+def _repro_circuits(doc, slug, decl):
+    """Stage 2: re-derive the .dem from the committed .stim, bit for bit."""
+    if not doc.get("circuit"):
+        return {"status": ST_NOT_APPLICABLE, "detail": "no circuit block"}
+    from circuit_verify import verify_circuit
+    cdir = os.path.join(_repro_root(), "circuits", slug)
+    if not os.path.isdir(cdir):
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": f"circuits/{slug}/ is not in the tree"}
+    rep = verify_circuit(doc, cdir)
+    bad = [c["detail"] for c in rep.get("checks", []) if not c.get("ok")]
+    return {
+        "status": ST_BENCH if rep.get("ok") else ST_FAILED,
+        "determinism": "bit_exact_under_pin",
+        "stim_version": (doc.get("circuit") or {}).get("stim_version"),
+        "detail": "detector error model re-derived from the committed .stim"
+        if rep.get("ok") else "; ".join(bad)[:400],
+    }
+
+
+def _repro_ler(doc, slug, decl):
+    """Stage 3: the LER arithmetic exactly, then a seeded re-measurement.
+
+    ``verify_ler`` owns both halves. Agreement here is agreement inside the
+    entry's own ci95, which is what a Monte Carlo claim can offer and is
+    reported as such rather than as a match.
+    """
+    circ = doc.get("circuit") or {}
+    if not circ.get("ler"):
+        return {"status": ST_NOT_APPLICABLE, "detail": "no circuit.ler block"}
+    from ler_verify import verify_ler
+    cdir = os.path.join(_repro_root(), "circuits", slug)
+    if not os.path.isdir(cdir):
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": f"circuits/{slug}/ is not in the tree"}
+    rep = verify_ler(doc, cdir)
+    bad = [c["detail"] for c in rep.get("checks", []) if not c.get("ok")]
+    if any("ldpc is not installed" in b for b in bad):
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": "the decoder is missing; install the research extra"}
+    return {
+        "status": ST_BENCH if rep.get("ok") else ST_FAILED,
+        "determinism": "arithmetic_exact_remeasurement_within_ci95",
+        "detail": "ler_per_round and ci95 recomputed, and re-measured on an "
+                  "independent seed inside the declared interval"
+        if rep.get("ok") else "; ".join(bad)[:400],
+    }
+
+
+def _repro_certify(doc, slug, decl):
+    """Stage 4: re-run the bounded exact certifier and compare to certs/."""
+    cert_path = os.path.join(_repro_root(), "certs", f"{slug}.json")
+    if not os.path.exists(cert_path):
+        return {"status": ST_NOT_APPLICABLE, "detail": "no committed cert"}
+    with open(cert_path, encoding="utf-8") as f:
+        committed = json.load(f)
+    tlim = decl.get("tlim_seconds", 600)
+    try:
+        from certify import certify
+    except ImportError as e:
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": f"the certifier is unavailable: {e}"}
+    got = certify(doc, tlim=tlim)
+    if not got.get("d_exact") and committed.get("d_exact"):
+        return {"status": ST_BUDGET,
+                "detail": f"the solver did not close both sides within "
+                          f"{tlim}s; the committed cert claims exact"}
+    same = (got.get("d_exact") == committed.get("d_exact")
+            and all(got.get("sides", {}).get(s, {}).get("value")
+                    == committed.get("sides", {}).get(s, {}).get("value")
+                    for s in ("X", "Z")))
+    return {
+        "status": ST_CERTIFIED if same else ST_FAILED,
+        "tlim_seconds": tlim,
+        "solver": got.get("solver"),
+        "detail": "re-certified and agreed with certs/" + slug + ".json"
+        if same else f"disagrees with the committed cert: {got.get('sides')}",
+    }
+
+
+def _repro_construction(doc, slug, decl):
+    """Stage 5: re-derive H_X and H_Z from a committed recipe, if there is one.
+
+    The code object always reconstructs, because the matrices are in the entry.
+    What usually does not is the SEARCH that found it. An entry with no
+    committed recipe says not_reproducible and says why, which is a first-class
+    answer rather than a gap.
+    """
+    status = decl.get("status")
+    if status in (None, "not_reproducible"):
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": decl.get("reason")
+                or "no constructor recipe is declared for this entry"}
+    if status == "not_applicable":
+        return {"status": ST_NOT_APPLICABLE, "detail": decl.get("reason", "")}
+    script = decl.get("script")
+    if not script:
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": "the manifest declares the stage applicable but "
+                          "names no script"}
+    path = os.path.join(_repro_root(), script)
+    if not os.path.exists(path):
+        return {"status": ST_NOT_REPRODUCIBLE,
+                "detail": f"{script} is not in this tree"}
+    cmd = [sys.executable, path] + [str(a) for a in decl.get("args", [])]
+    budget = decl.get("budget_seconds", 900)
+    try:
+        run = subprocess.run(cmd, cwd=_repro_root(), capture_output=True,
+                             text=True, timeout=budget, check=False)
+    except subprocess.TimeoutExpired:
+        return {"status": ST_BUDGET,
+                "detail": f"{script} exceeded {budget}s"}
+    if run.returncode != 0:
+        return {"status": ST_FAILED,
+                "detail": f"{script} exited {run.returncode}: "
+                          f"{run.stderr.strip()[:300]}"}
+    # The recipe is matched by the fingerprint the verifier computes, not by
+    # the bytes of a rebuilt file: two runs may order rows differently and
+    # still be the same stabilizer code.
+    from qldpc_verify import verify as _verify
+    want = (_verify(doc) or {}).get("fingerprint")
+    got = None
+    for line in (run.stdout or "").splitlines():
+        if line.strip().startswith("fingerprint="):
+            got = line.strip().split("=", 1)[1].strip()
+    if got is None:
+        return {"status": ST_FAILED,
+                "detail": f"{script} printed no 'fingerprint=' line to compare"}
+    return {
+        "status": ST_RECONSTRUCTED if got == want else ST_FAILED,
+        "script": script,
+        "detail": "the recipe rebuilt this entry's stabilizer code"
+        if got == want else f"rebuilt a different code ({got} != {want})",
+    }
+
+
+def cmd_reproduce(args):
+    """Re-run one board entry's evidence chain and write a receipt.
+
+    The cheap deterministic core (the trusted gate) runs by default; every
+    expensive stage is opt-in behind its own flag, because an exact
+    certification or an LER re-measurement is minutes to hours and CI is not
+    where they belong.
+    """
+    slug = args.slug[:-5] if args.slug.endswith(".json") else args.slug
+    slug = os.path.basename(slug)
+    path = os.path.join(_repro_root(), "codes", f"{slug}.json")
+    if not os.path.exists(path):
+        print(f"no such board entry: codes/{slug}.json", file=sys.stderr)
+        return 2
+    with open(path, encoding="utf-8") as f:
+        doc = json.load(f)
+    manifest = _repro_manifest(slug)
+    digest = _sha256_file(path)
+
+    want = {s: getattr(args, s) for s in REPRO_STAGES}
+    if args.all:
+        want = {s: True for s in REPRO_STAGES}
+    want["verify"] = True                     # the core is never skipped
+
+    print(f"reproduce {slug}  sha256={digest[:16]}...")
+    if manifest:
+        print(f"  manifest: repro/{slug}.json (version "
+              f"{manifest.get('manifest_version')})")
+        declared = manifest.get("artifact_sha256")
+        if declared and declared != digest:
+            print("  note: the entry has changed since the manifest was "
+                  "written; both digests are in the receipt")
+    else:
+        print("  manifest: none committed; stages derived from the entry")
+
+    runners = {
+        "verify": lambda d: _repro_verify(doc, d, args.seed),
+        "circuits": lambda d: _repro_circuits(doc, slug, d),
+        "ler": lambda d: _repro_ler(doc, slug, d),
+        "certify": lambda d: _repro_certify(doc, slug, d),
+        "construction": lambda d: _repro_construction(doc, slug, d),
+    }
+    stages = {}
+    for name in REPRO_STAGES:
+        decl = _stage_decl(manifest, name)
+        if not want[name]:
+            stages[name] = {"status": ST_SKIPPED,
+                            "detail": f"--{name} not requested"}
+        elif decl.get("status") == "not_applicable":
+            stages[name] = {"status": ST_NOT_APPLICABLE,
+                            "detail": decl.get("reason", "declared not applicable")}
+        else:
+            stages[name] = runners[name](decl)
+        st = stages[name]
+        print(f"  {name:<13} {st['status']:<22} {st.get('detail', '')[:90]}")
+
+    failed = [n for n, s in stages.items() if s["status"] == ST_FAILED]
+    overall = "disagreed" if failed else "reproduced"
+    receipt = {
+        "receipt_version": "1",
+        "receipt_kind": "reproduction",
+        "artifact": {"slug": slug, "path": f"codes/{slug}.json",
+                     "sha256": digest,
+                     "manifest_sha256": (
+                         _sha256_file(os.path.join(_repro_root(), "repro",
+                                                   f"{slug}.json"))
+                         if manifest else None),
+                     "manifest_artifact_sha256": (manifest or {}).get(
+                         "artifact_sha256")},
+        "environment": _repro_environment(),
+        "stages": stages,
+        "overall": overall,
+        "authority": "non-authoritative: this receipt records a reproduction "
+                     "attempt and never changes an entry's verdict, tier, or "
+                     "ranking",
+    }
+    if args.out:
+        with open(args.out, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(receipt, f, indent=2, sort_keys=True)
+            f.write("\n")
+        print(f"  receipt -> {args.out}")
+    print(f"  overall: {overall}")
+    return 1 if failed else 0
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(
         prog="qldpc", description="qLDPC challenge submission tool")
@@ -1150,6 +1477,33 @@ def main(argv=None):
                    help="only rows mentioning this topic, matched against "
                         "fieldnote topics and titles and against code names")
     r.set_defaults(func=cmd_recent)
+
+    rp = sub.add_parser("reproduce",
+                        help="re-run one entry's evidence chain and write a "
+                             "reproduction receipt")
+    rp.add_argument("slug", help="board entry, e.g. 25-1-5")
+    rp.add_argument("--verify", action="store_true",
+                    help="the trusted gate (always runs; the flag is for "
+                         "symmetry with the others)")
+    rp.add_argument("--circuits", action="store_true",
+                    help="re-derive the detector error model from the "
+                         "committed .stim under the pinned version")
+    rp.add_argument("--ler", action="store_true",
+                    help="recheck the ler arithmetic and re-measure on an "
+                         "independent seed (needs the research extra)")
+    rp.add_argument("--certify", action="store_true",
+                    help="re-run the bounded exact certifier and compare it "
+                         "with certs/<slug>.json")
+    rp.add_argument("--construction", action="store_true",
+                    help="re-derive the code from its committed recipe, when "
+                         "the manifest declares one")
+    rp.add_argument("--all", action="store_true",
+                    help="every applicable stage; expensive")
+    rp.add_argument("--seed", type=int, default=None,
+                    help="seed for the trusted gate")
+    rp.add_argument("--out", default="",
+                    help="write the reproduction receipt to this path")
+    rp.set_defaults(func=cmd_reproduce)
 
     g = sub.add_parser("targets", help="which track cells are open: occupancy "
                                        "and frontier per cell (read before you "

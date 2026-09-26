@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unitaryfoundation.github.io/qldpc-challenge/schema/reproduction.schema.json",
+  "title": "qLDPC challenge reproduction manifest",
+  "description": "What reproducing one board entry requires and expects. Optional: `qldpc reproduce` derives every field below from the entry itself when no manifest is committed, so a manifest is only needed to say something the entry cannot -- above all whether the SEARCH that found the code was committed. The code object always reconstructs, because H_X and H_Z are in the entry; the search usually does not, and `construction.status` is where that boundary is declared rather than left to be inferred. This is not board data: nothing here changes an entry's parameters, tier, or ranking.",
+  "type": "object",
+  "required": ["manifest_version", "slug", "stages"],
+  "additionalProperties": false,
+  "properties": {
+    "manifest_version": {
+      "const": "1",
+      "description": "Bumped when a field changes meaning, never for an added optional field."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[0-9]+-[0-9]+-[0-9]+(-?[a-z0-9]+)?$",
+      "description": "The entry this manifest describes: codes/<slug>.json."
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of codes/<slug>.json when the manifest was written. `qldpc reproduce` reports a mismatch rather than failing on it: the entry may have been legitimately revised by a refutation since, and the receipt records both digests so the difference is visible."
+    },
+    "stages": {
+      "type": "object",
+      "description": "Per-stage declaration. A stage absent here is derived from the entry: `verify` always applies, `circuits` and `ler` apply when the entry carries the matching block, `certify` when certs/<slug>.json exists, and `construction` defaults to not_reproducible.",
+      "additionalProperties": false,
+      "properties": {
+        "verify": { "$ref": "#/$defs/stage" },
+        "circuits": { "$ref": "#/$defs/stage" },
+        "ler": { "$ref": "#/$defs/lerStage" },
+        "certify": { "$ref": "#/$defs/certifyStage" },
+        "construction": { "$ref": "#/$defs/constructionStage" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "What the entry was produced and last checked under. `qldpc reproduce` records what it actually ran under beside these, so a divergence is readable rather than silent.",
+      "additionalProperties": false,
+      "properties": {
+        "python": { "type": "string" },
+        "stim": { "type": "string", "description": "Must equal the uv.lock pin for a circuit re-derivation to be bit-exact." },
+        "uv_lock_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "validator_source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "extras": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "uv extras a reproduction needs, e.g. [\"research\"] for the decoder an ler re-measurement uses."
+        }
+      }
+    },
+    "notes": { "type": "string", "maxLength": 2000 }
+  },
+  "$defs": {
+    "applicability": {
+      "type": "string",
+      "enum": ["applicable", "not_applicable", "not_reproducible"],
+      "description": "applicable: the stage should run and is expected to agree. not_applicable: the entry has no such claim (no circuit block, no cert). not_reproducible: the claim exists but nothing committed can re-derive it; this is an honest status, not a failure."
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/applicability" },
+        "seed": { "type": "integer", "description": "Seed the stage is declared at; the receipt records the seed actually used." },
+        "budget_seconds": { "type": "number", "exclusiveMinimum": 0, "description": "Wall-clock bound. A stage that exceeds it reports budget_exceeded rather than a verdict." },
+        "reason": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "lerStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/applicability" },
+        "seed": { "type": "integer", "description": "Seed for the independent re-measurement, which must differ from the entry's own to be independent." },
+        "shots": { "type": "integer", "minimum": 1 },
+        "budget_seconds": { "type": "number", "exclusiveMinimum": 0 },
+        "tolerance": {
+          "type": "string",
+          "enum": ["ci95"],
+          "default": "ci95",
+          "description": "A re-measurement agrees when it lands inside the entry's declared ci95 interval. Monte Carlo agreement is agreement within an interval, never an exact match, and the receipt says which it was."
+        },
+        "reason": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "certifyStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/applicability" },
+        "tlim_seconds": { "type": "number", "exclusiveMinimum": 0, "description": "Solver time limit, passed through as certify.py --tlim. An exact certification is a bounded search: hitting the bound is budget_exceeded, not a refutation." },
+        "reason": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "constructionStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "$ref": "#/$defs/applicability" },
+        "script": { "type": "string", "description": "Repo-relative path to the committed script that rebuilds H_X and H_Z, e.g. research/cyclic_gb.py. It must exist in the tree; `qldpc reproduce --construction` runs it and compares the fingerprint the verifier computes, not the file bytes." },
+        "args": { "type": "array", "items": { "type": "string" }, "description": "Arguments the script takes to produce this entry." },
+        "seed": { "type": "integer" },
+        "budget_seconds": { "type": "number", "exclusiveMinimum": 0 },
+        "reason": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Required when status is not_reproducible: what is missing. 'the sweep was never committed' is a complete answer and a better one than an absent field."
+        }
+      }
+    }
+  }
+}
