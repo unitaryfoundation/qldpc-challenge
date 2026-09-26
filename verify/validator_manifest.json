@@ -27,7 +27,7 @@
     "verify/qldpc_verify.py": "59c59259b1716f556a6216ad77726a454bd254c1ac082e135964750500d1141d",
     "verify/refute_board.py": "d45c3d4475acd77dac0e6da7854c8d9dd142d1d077b75a166d6d3e5f729ef20d",
     "verify/transversal_gates.py": "f9228857ea673473808b30f63ace6a7fd5a71460fccf9de18103ba7ecd16cc6a",
-    "verify/validate_candidate.py": "cc840b153fcefa5465cc7ec819dceccde7a673a48502c810b16bff01f3a57ee2",
+    "verify/validate_candidate.py": "546915a67cdca08c261b7e1682595c80036f082a9499ee809248391c9c653985",
     "verify/verify_all.py": "00f83b26ffc6270dc85e44211ea498b7fb27d120eb7fc73792043b47c6898f63",
     "verify/fixtures/18-2-3.json": "d038bad67a9db16c68ae798fe87d658949d77e50ec5217e80f27a88554c9887b",
     "verify/fixtures/32-2-4.json": "ed238f3a21433358e2b9d776349731f64001241bd1e0b29d9240c60d545d9b51",

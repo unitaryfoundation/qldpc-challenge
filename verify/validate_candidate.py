@@ -257,6 +257,9 @@ def validate_candidate(doc, *, seed=None, refute=True):
                     "d_only_gain": d_only_gain,
                     "d_only_peers": d_only_peers,
                     "literature_novelty": "unverified"}
+    # the CSS board is the unqualified one, so only a non-CSS candidate
+    # names its board in the label
+    kind = "" if code_type == "CSS" else f" {code_type}"
     if exact_dup:
         verdict["labels"].append(
             "novelty not assessed: this code is already on the board "
@@ -265,20 +268,22 @@ def validate_candidate(doc, *, seed=None, refute=True):
         peers = ", ".join(d_only_peers)
         if d_only_gain:
             verdict["labels"].append(
-                f"advances the {wc} x {lc} board ONLY on d over {peers}: "
+                f"advances the {wc} x {lc}{kind} board ONLY on d "
+                f"over {peers}: "
                 "distance is the suspect axis; re-measure the peer and this "
                 "candidate at matched depth "
                 "(research/audits/leader_audit.py pair) before packaging")
         else:
             verdict["labels"].append(
-                f"advances the {wc} x {lc} board on {', '.join(advances_by)}; "
+                f"advances the {wc} x {lc}{kind} board on "
+                f"{', '.join(advances_by)}; "
                 f"its gain over {peers} is d-only: distance is the suspect "
                 "axis; re-measure the peer and this candidate at matched depth "
                 "(research/audits/leader_audit.py pair) before packaging")
     else:
         verdict["labels"].append(
-            f"advances the {wc} x {lc} {code_type} board" if board_advancing
-            else f"does not advance its {code_type} board cell")
+            f"advances the {wc} x {lc}{kind} board" if board_advancing
+            else f"does not advance its{kind} board cell")
     verdict["labels"].append("literature novelty UNVERIFIED")
 
     verdict["passed"] = bool(verify_ok and not refuted and not exact_dup)
