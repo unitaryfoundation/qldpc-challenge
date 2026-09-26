@@ -887,13 +887,54 @@ def cmd_targets(args):
     return 0
 
 
+def _plural(n, word):
+    return f"{n} {word}" + ("" if n == 1 else "s")
+
+
+def _fieldnote_meta(path):
+    """Read a fieldnote's title and topics.
+
+    Taken from its YAML frontmatter, falling back to the first heading and no
+    topics. Only the frontmatter is read.
+    """
+    title, topics = "", []
+    try:
+        with open(path, encoding="utf-8") as f:
+            if f.readline().strip() != "---":
+                f.seek(0)
+                for line in f:
+                    if line.startswith("#"):
+                        return line.lstrip("#").strip(), []
+                return "", []
+            for line in f:
+                head = line.rstrip("\n")
+                if head.strip() == "---":
+                    break
+                if head.startswith("title:"):
+                    title = head[6:].strip().strip('"')
+                elif head.startswith("topics:"):
+                    topics = [t.strip().strip('"')
+                              for t in head[7:].strip().strip("[]").split(",")
+                              if t.strip()]
+    except OSError:
+        pass
+    return title, topics
+
+
 def cmd_recent(args):
     """What moved on the board recently: codes merged, research notes, and
     fieldnotes, from git history. The 'stay current' step — read this (and
     the linked notes) before spending compute, so a new search starts from
     the community's frontier of knowledge, not just the frontier of scores.
+
+    Bounded by default: a count line plus the newest --limit rows per section,
+    because a busy fortnight is hundreds of codes and printing all of them
+    buries the reader (and fills an agent's context). --full prints every row;
+    --family / --topic narrow both sections to what a given search cares
+    about.
     """
     since = f"--since={args.days} days ago"
+    want = [t.lower() for t in (args.family, args.topic) if t]
 
     def added(path):
         r = subprocess.run(
@@ -910,26 +951,71 @@ def cmd_recent(args):
                 out.append((date, line.strip()))
         return out
 
-    codes = added("codes/")
-    notes = {os.path.basename(f)[:-3] for _, f in added("notes/")
-             if f.endswith(".md")}
-    fnotes = [f for _, f in added("fieldnotes/")
-              if f.endswith(".md") and not f.endswith("README.md")]
+    def code_row(date, f):
+        """Build one code row, reading its JSON for the family tag.
 
-    print(f"board activity, last {args.days} days:")
-    if not codes:
-        print("  no new codes")
-    for date, f in codes:
+        Called only for rows that are printed or filtered on, never for the
+        whole history.
+        """
         slug = os.path.splitext(os.path.basename(f))[0]
-        has_note = (slug in notes
-                    or os.path.exists(os.path.join(_ROOT, "notes",
-                                                   slug + ".md")))
-        tag = "note: notes/%s.md" % slug if has_note else "no research note"
-        print(f"  {date}  [[{slug.replace('-', ',')}]]  ({tag})")
-    if fnotes:
+        fam, name = "", ""
+        try:
+            with open(os.path.join(_ROOT, f), encoding="utf-8") as fh:
+                doc = json.load(fh)
+            fam, name = doc.get("family") or "", doc.get("name") or ""
+        except (OSError, ValueError):
+            pass
+        has_note = os.path.exists(os.path.join(_ROOT, "notes", slug + ".md"))
+        return {"date": date, "slug": slug, "family": fam, "name": name,
+                "note": has_note,
+                "hay": f"{slug} {fam} {name}".lower()}
+
+    codes = [code_row(d, f) for d, f in added("codes/")
+             if f.endswith(".json")]
+    fnotes = []
+    for d, f in added("fieldnotes/"):
+        if not f.endswith(".md") or f.endswith("README.md"):
+            continue
+        title, topics = _fieldnote_meta(os.path.join(_ROOT, f))
+        fnotes.append({"date": d, "path": f, "title": title, "topics": topics,
+                       "hay": f"{f} {title} {' '.join(topics)}".lower()})
+
+    n_codes, n_fnotes = len(codes), len(fnotes)
+    if want:
+        codes = [c for c in codes if any(w in c["hay"] for w in want)]
+        fnotes = [f for f in fnotes if any(w in f["hay"] for w in want)]
+    n_note = sum(1 for c in codes if c["note"])
+
+    lim = None if args.full else max(1, args.limit)
+    filt = f" matching {' + '.join(want)}" if want else ""
+    print(f"board activity, last {args.days} days{filt}: "
+          f"{_plural(len(codes), 'code')} ({n_note} with a research note), "
+          f"{_plural(len(fnotes), 'fieldnote')}")
+    if want:
+        print(f"  (of {_plural(n_codes, 'code')} and "
+              f"{_plural(n_fnotes, 'fieldnote')} in the window)")
+
+    shown = codes if lim is None else codes[:lim]
+    if shown:
+        print("codes:")
+    for c in shown:
+        tag = f"notes/{c['slug']}.md" if c["note"] else "no research note"
+        fam = f"  {c['family']}" if c["family"] else ""
+        print(f"  {c['date']}  [[{c['slug'].replace('-', ',')}]]{fam}  ({tag})")
+    if lim is not None and len(codes) > lim:
+        print(f"  ... {len(codes) - lim} more (--limit N, --full)")
+
+    shown = fnotes if lim is None else fnotes[:lim]
+    if shown:
         print("fieldnotes (negative results / calibration):")
-        for f in fnotes:
-            print(f"  {f}")
+    for f in shown:
+        print(f"  {f['date']}  {f['path']}")
+        if f["title"]:
+            topics = f"  [{', '.join(f['topics'])}]" if f["topics"] else ""
+            print(f"      {f['title']}{topics}")
+    if lim is not None and len(fnotes) > lim:
+        print(f"  ... {len(fnotes) - lim} more (--limit N, --full)")
+
     print("full log: docs research-log page, or ls notes/ fieldnotes/")
     return 0
 
@@ -1053,6 +1139,16 @@ def main(argv=None):
                                       "notes, fieldnotes (read before you "
                                       "search)")
     r.add_argument("--days", type=int, default=14)
+    r.add_argument("--limit", type=int, default=10,
+                   help="rows per section (default 10); --full for all")
+    r.add_argument("--full", action="store_true",
+                   help="print every row instead of the newest --limit")
+    r.add_argument("--family", default="",
+                   help="only rows mentioning this family tag, e.g. "
+                        "bivariate-bicycle")
+    r.add_argument("--topic", default="",
+                   help="only rows mentioning this topic, matched against "
+                        "fieldnote topics and titles and against code names")
     r.set_defaults(func=cmd_recent)
 
     g = sub.add_parser("targets", help="which track cells are open: occupancy "
