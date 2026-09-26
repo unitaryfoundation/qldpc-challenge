@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[310,14,26]] 2BGA on Z31:Z5",
  "code_type": "CSS",
  "n": 310,
@@ -3733,40 +3733,50 @@
  "distance": {
   "d": 26,
   "X": {
-   "value": 30,
+   "value": 28,
    "confidence": "upper_bound",
    "witness": [
     9,
-    16,
-    19,
-    42,
-    99,
-    123,
-    128,
-    135,
-    138,
-    151,
-    164,
-    174,
-    176,
-    180,
-    191,
-    195,
-    200,
-    222,
+    10,
+    11,
+    35,
+    38,
+    54,
+    61,
+    78,
+    82,
+    84,
+    91,
+    102,
+    140,
+    146,
+    166,
+    171,
+    182,
+    186,
+    190,
+    204,
+    206,
     235,
+    236,
+    239,
     243,
-    250,
-    252,
-    256,
-    265,
-    266,
-    279,
-    280,
-    281,
-    293,
-    308
-   ]
+    270,
+    272,
+    288
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-25",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4102
+    ]
+   }
   },
   "Z": {
    "value": 26,

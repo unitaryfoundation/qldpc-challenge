@@ -1,0 +1,145 @@
+{
+  "schema_version": "0.1",
+  "name": "[[12,4,2]] chain-coupled 422 blocks",
+  "code_type": "CSS",
+  "n": 12,
+  "k": 4,
+  "checks": {
+    "X": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6,
+        7
+      ],
+      [
+        8,
+        9,
+        10,
+        11
+      ],
+      [
+        0,
+        1,
+        4,
+        5
+      ],
+      [
+        4,
+        5,
+        8,
+        9
+      ]
+    ],
+    "Z": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6,
+        7
+      ],
+      [
+        8,
+        9,
+        10,
+        11
+      ]
+    ]
+  },
+  "distance": {
+    "d": 2,
+    "X": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        0,
+        3
+      ]
+    },
+    "Z": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        0,
+        1
+      ]
+    }
+  },
+  "provenance": {
+    "authors": [
+      "@mathysrennela"
+    ],
+    "construction": "Start with three [[4,2,2]] plaquette codes on adjacent 2x2 squares. Retain each inner block's X^4 and Z^4 stabilizers. Add two X-type stabilizers, each the product of the weight-2 logical X representative X0X1 on neighboring blocks (supports [0,1,4,5] and [4,5,8,9]); this connects all three blocks and is not a direct sum.",
+    "references": [],
+    "model": "GPT-6 Luna",
+    "date": "2026-09-23",
+    "notes": "The [[12,4,2]] parameters exist in other weight-6 entries; this is a distinct weight-4 local realization. See notes/12-4-2-c.md."
+  },
+  "family": "other",
+  "locality": {
+    "coordinates": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        0.0
+      ],
+      [
+        1.0,
+        1.0
+      ],
+      [
+        2.0,
+        0.0
+      ],
+      [
+        2.0,
+        1.0
+      ],
+      [
+        3.0,
+        0.0
+      ],
+      [
+        3.0,
+        1.0
+      ],
+      [
+        4.0,
+        0.0
+      ],
+      [
+        4.0,
+        1.0
+      ],
+      [
+        5.0,
+        0.0
+      ],
+      [
+        5.0,
+        1.0
+      ]
+    ],
+    "interaction_radius": 2.23606797749979,
+    "layers": 1
+  }
+}

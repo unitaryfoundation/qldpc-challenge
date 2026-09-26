@@ -6,6 +6,9 @@ tool. It is both the **operating manual for the research loop** and the **refere
 `research/` starter kit**: constructing a code, estimating its distance, and packaging a
 verifiable submission.
 
+A run does not need all of it. [`QUICKSTART.md`](QUICKSTART.md) is the loop and the rules on
+one page; come back here for the section the run actually reaches.
+
 The default path in `research/` is pure NumPy. An optional bit-packed C++ RIS backend can be
 built with `make fast` for larger screens and confirmation runs; Python still validates its
 witnesses.
@@ -168,6 +171,49 @@ The `trials` value is backend-specific: NumPy iterations and fast RIS samples ar
 not comparable screening budgets. All screening values remain upper bounds, and
 finalists must still pass the validation gate.
 
+### 3b. Spend the ladder wisely: the escalation gate (optional)
+
+Deep confirmation is the bottleneck
+(`../fieldnotes/2026-07-01-confirmation-is-the-bottleneck.md`), and a screen
+artifact chased too far is how it gets wasted
+(`../fieldnotes/2026-09-20-screening-traps-at-n-900.md`: 5.3M trials on a
+ladder whose first fresh deep rungs had already settled below the bar).
+`kit/escalation.py` is the rung-boundary gate against exactly that: at each
+ladder rung it weighs *promote to the next depth / hold and re-run fresh
+seeds / abandon this ladder*.
+
+The division of labor is strict, and mirrors the gate discipline above:
+
+```python
+from escalation import rung_brief, apply_verdict, append_journal
+brief = rung_brief(n, k, rungs=[(20_000, 22), (100_000, 20)],
+                   bar=106.11, family="pair-partition", spec={"P": 113},
+                   next_rung_trials=1_000_000, budget_remaining=8_000_000)
+# make the jev_decide call from brief["jev_request"] (the agent harness does
+# this; the kit itself stays offline), then enforce it:
+decision = apply_verdict(brief, verdict)
+append_journal(decision, brief, path="research/candidates/escalation.jsonl")
+```
+
+- `rung_brief` computes the facts deterministically from the ladder (best
+  bound, flat fresh-seed rungs, efficiency vs the cell bar, budget), and
+  formats the `jev_decide` request.
+- The judgment model weighs them; **`apply_verdict` owns the policy in code**.
+  The default is hold. Abandon is honored only when the ladder proves it safe:
+  best bound already below the bar, two fresh rungs flat at that bound, and no
+  frontier flag. A still-descending ladder can never be abandoned — the
+  screen-to-settled inflation is unbounded. Missing, malformed, escaped, or
+  low-confidence verdicts hold.
+- A hold destroys nothing: every rung reading is a witnessed low-weight
+  logical, and upper bounds stay valid whatever the gate says.
+- Jev verdicts are advisory model output, **not repo evidence**: they live in
+  the staging journal (gitignored), never in notes, fieldnotes, or PR bodies.
+
+Skipping the gate is always sound — it changes where trial budget goes, never
+what can be claimed. To evaluate it, run one campaign with the gate and one
+without, and compare trials-spent-to-abandon against the flat-settled point
+(the 2026-09-20 metric) on the same families.
+
 ## 4. Package a submission
 
 `submit.py` turns `(HX, HZ)` plus a little provenance into a schema-valid submission. It
@@ -190,7 +236,7 @@ doc = make_submission(
 `family` is a filterable Layer-2 tag, never ranked. You do **not** declare which tracks you
 enter: the verifier computes primary-track membership (the weight and locality classes) from `H`
 and the layout. To enter the `2d-local-*` tracks, give the code a layout — pass
-`coordinates=[[x,y], ...]` (one per qubit) and `layers=`; `submit.py` fills the `locality` block
+`coordinates=[[x,y], ...]` or `[[x,y,z], ...]` (one per qubit) and `layers=`; `submit.py` fills the `locality` block
 and computes the interaction radius, and the verifier derives the locality class from it.
 
 ## 5. Validate with the gate (do not skip)
@@ -198,6 +244,51 @@ and computes the interaction radius, and the verifier derives the locality class
 Run `validate_candidate` on the packaged doc (see **The one rule** above). Keep only
 `passed: true`. The verdict's `gates` are your evidence; its `labels` are what you show the
 human. This — not the surrogate, not your own judgment — is what decides whether you have a find.
+
+## 5b. A win only on d: audit the peer before you package
+
+A construction pins n, k and check weight, so a candidate built the same way as an existing
+board entry can only beat it on `d` — and `d` is the one axis that is a witness-backed
+*upper* bound, i.e. the one that inflates. When the gate comes back with
+
+```json
+"gates": {"novelty": {"advances_by": ["d"], "d_only_gain": true,
+                      "d_only_peers": ["[[72,6,6]] w=6 72-6-6.json"]}}
+```
+
+and the label `advances the <cell> board ONLY on d over <peer>: distance is the suspect
+axis`, assume **your** number is the soft one until a matched-depth measurement says
+otherwise. `d_only_gain` means the *whole* board advance was on `d`; `d_only_peers` is
+the list to act on, and it is non-empty even when the candidate also beat some other
+entry on `k` (the label then still names those peers, as
+`advances the <cell> board on d, k; its gain over <peer> is d-only: ...`).
+ The board has been wrong this way before (`[[882,18,30]]`→29, `[[684,12,81]]`→66,
+`[[396,10,39]]`→37 — `audits/README.md`), and chasing an inflated d is how a campaign
+ends with nothing.
+
+So measure both numbers at one budget before spending anything on packaging:
+
+```bash
+uv run --frozen python research/audits/leader_audit.py pair \
+    research/candidates/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
+    --pair-depth 64 --witness-dir /tmp/pair
+```
+
+The peers are chosen automatically — every board entry with the same n, k and max check
+weight and a lower claimed d — or name them with `--peer`. Both sides get the same trials,
+seeds and `--pair-depth`: a number read on your candidate at a deeper budget than the peer
+is an instrument artifact, not a distance difference. One of four decisions comes out:
+
+| decision | meaning | do this next |
+|---|---|---|
+| `drop: ...` | your own claim came down at its own budget | drop the candidate; the ladder was right, the packaging would have been wrong |
+| `redirect: ...` | the board peer came down | the submission is the peer's **distance revision** — a valid contribution on its own (`../CONTRIBUTING.md`) |
+| `credible: ...` | both claims held at matched depth | the gain survives; package it (step 4) |
+| `inconclusive: ...` | neither claim was reached | no information at all; go deeper or stop, and never report it as corroboration |
+
+Exit code 2 means a claim was refuted on either side, so `pair` can gate a script exactly
+like `ladder` and `screen`. Keep `--witness-dir`: the lighter logical found in a refuted
+peer *is* the revision (see **The one rule** above).
 
 ## 6. Confirm the distance exactly (optional, for a standout)
 
@@ -229,6 +320,9 @@ The constructors, surrogate, search, and packaging stay numpy-only.
   board; novelty vs the literature unverified."
 - **`upper_bound` is not `exact`.** The gate certifies an upper bound (`d<=`); an exact (`d=`)
   claim needs server certification (step 6). Only pursue it for a standout the human wants.
+- **Beating an equal (n, k, w) board entry on `d` alone is the inflation pattern** (step 5b).
+  The construction left `d` as the only free axis, so re-measure the peer and your candidate
+  at matched depth (`leader_audit.py pair`) before you treat the gain as real.
 
 ## Field notes from past campaigns
 
@@ -277,8 +371,10 @@ should not have to re-learn.
 | `kit/coset.py` | `build_coset` + `subgroup_closure`, `left_cosets`, `normalizer` |
 | `kit/surrogate.py` | `distance_rand`, `lightest_logical` (witnesses), `mixed_volume` (k upper bound) |
 | `kit/search.py` | `screen`, `pareto_frontier`, `update_leaderboard` (the funnel) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` |
+| `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal` — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
 | `kit/submit.py` | `make_submission`, `save_submission`, `validate` |
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `decoder_distance` (BP+OSD) — needs the `research` extra |
+| `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap; exact distance uses the trusted SAT certifier and needs the `research` extra |
 | `local2d/planar.py` | fast greedy open-boundary builder, exact planar distance (scipy MILP), `grid_coordinates` for the bilayer layout |
 | `local2d/boundary_engine.py` | the general open-boundary construction (`build_planar`), `reduce_weights`, `graft_r1`/`graft_r1_safe` (qubit removal) |
 | `local2d/transfer.py` | `distance_slope`: predict d(L) scaling from (f, g) before building large lattices |

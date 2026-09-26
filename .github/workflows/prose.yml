@@ -51,12 +51,15 @@ jobs:
         run: printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr_body.md"
       - name: prose check (cited paths must resolve; no scaffolding left in)
         working-directory: trusted
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           if [ -f verify/check_prose.py ]; then
             python3 verify/check_prose.py \
               --root ../submitted \
               --base origin/${{ github.base_ref }} \
-              --body-file "$RUNNER_TEMP/pr_body.md"
+              --body-file "$RUNNER_TEMP/pr_body.md" \
+              --pr-author "$PR_AUTHOR"
           else
             echo "base branch has no verify/check_prose.py yet; skipping"
           fi

@@ -1,0 +1,19 @@
+{
+ "name": "[[82,22,3]] reduction of [[87,22,3]]",
+ "d": 3,
+ "solver": "scipy/HiGHS cutoff IP",
+ "sides": {
+  "X": {
+   "value": 3,
+   "exact": true,
+   "note": "no logical < 3 exists"
+  },
+  "Z": {
+   "value": 3,
+   "exact": true,
+   "note": "no logical < 3 exists"
+  }
+ },
+ "d_exact": true,
+ "tlim_per_solve": 180.0
+}

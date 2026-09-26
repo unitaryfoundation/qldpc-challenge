@@ -61,6 +61,11 @@ def test_free_form_schema_fields_are_deliberately_covered():
         # One entry covers both use sites of the shared credit block
         # (locality.contributed_by and circuit.contributed_by).
         "$defs/contributedBy/properties/method",
+        # transversal gates (issue #1850): the display label is rendered
+        # escaped on the code page (covered by test_transversal_gates'
+        # site test with a hostile name); notes are never rendered.
+        "$defs/transversalGate/properties/name",
+        "$defs/transversalGate/properties/notes",
     }
 
 

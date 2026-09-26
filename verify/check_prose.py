@@ -20,6 +20,12 @@ Also refuses leftover tool scaffolding (an unedited `qldpc submit` draft footer,
 HTML comments, unticked checklist boxes), session URLs, and -- for a note named
 `<n>-<k>-<d>.md` -- a missing or mismatched [[n,k,d]] header.
 
+When `--pr-author` is given (CI always passes it), every fieldnote ADDED by the
+PR must credit the PR author's handle in its frontmatter `author:` line. The
+2026-09-23 escalation-gate note shipped with someone else's handle because
+nothing checked attribution; this closes that hole. Modified files are exempt
+(fixing a typo in someone else's note is fine); a missing author line fails.
+
 Only files CHANGED by the PR are checked. Notes already on the board are left
 alone; this guards what arrives from here on.
 
@@ -97,9 +103,22 @@ ARXIV_ID = re.compile(r"^(quant-ph|math|cs|cond-mat|physics)/")
 NKD = re.compile(r"\[\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]\]")
 SLUG = re.compile(r"^(\d+)-(\d+)-(\d+)$")
 
+# Frontmatter of a fieldnote: the block between the opening and closing `---`.
+FRONTMATTER = re.compile(r"\A---\s*\n(.*?)\n---\s*\n", re.S)
+# `author: "@handle"` (quotes and @ optional). GitHub logins are case-insensitive.
+AUTHOR_LINE = re.compile(
+    r"^author:\s*[\"']?@?([A-Za-z0-9][A-Za-z0-9-]*)[\"']?\s*$", re.M)
+
 # The note template is scaffolding by definition: it carries the placeholder
 # header and the instruction comment that every real note must not.
 EXEMPT = {"notes/TEMPLATE.md"}
+
+
+def strip_rel_prefix(tok):
+    """Remove a leading './' only. NOT lstrip('./'): that eats every leading
+    dot, so a legitimate dot-directory path like `.github/workflows/prose.yml`
+    became 'github/...' and could never resolve (PR #2021's body tripped it)."""
+    return tok[2:] if tok.startswith("./") else tok
 
 
 def is_repo_pathish(tok):
@@ -110,7 +129,7 @@ def is_repo_pathish(tok):
         return False
     if "<" in tok or ">" in tok or "*" in tok:      # placeholder or glob
         return False
-    bare = tok.lstrip("./")
+    bare = strip_rel_prefix(tok)
     if bare.startswith(TOPDIRS):
         return True
     return "/" in bare and bare.endswith(FILE_EXT)
@@ -119,7 +138,7 @@ def is_repo_pathish(tok):
 def resolves(tok, root):
     """A token resolves if the path, or the module file behind a
     `module.function` / `file.py::symbol` reference, exists in the tree."""
-    bare = tok.lstrip("./").rstrip("/")
+    bare = strip_rel_prefix(tok).rstrip("/")
     candidates = [bare]
     if "::" in bare:                                 # file.py::symbol
         candidates.append(bare.split("::", 1)[0])
@@ -164,7 +183,7 @@ def check_text(text, label, root, problems, is_note_slug=None):
         if not is_repo_pathish(tok) or tok in seen or tok in absolute:
             continue
         seen.add(tok)
-        bare = tok.lstrip("./")
+        bare = strip_rel_prefix(tok)
         if any(g in bare for g in GITIGNORED):
             add("gitignored working output cited as evidence", tok)
         elif not resolves(tok, root) and not external_ok:
@@ -193,6 +212,36 @@ def changed_prose(base, root):
                                       or f.startswith("fieldnotes/"))]
 
 
+def added_fieldnotes(base, root):
+    """Fieldnotes ADDED (not modified) by this PR, or None if git failed."""
+    try:
+        out = subprocess.check_output(
+            ["git", "diff", "--name-only", "--diff-filter=A", f"{base}...HEAD",
+             "--", "fieldnotes/"],
+            cwd=root, text=True)
+    except Exception as e:
+        print(f"could not diff vs {base}: {e}; failing closed")
+        return None
+    return [f for f in out.splitlines() if f.endswith(".md")]
+
+
+def check_fieldnote_author(rel, text, pr_author, problems):
+    """A newly added fieldnote must credit the PR author's own handle."""
+    fm = FRONTMATTER.match(text)
+    if not fm:
+        problems.append((rel, "fieldnote has no frontmatter",
+                         "cannot verify the author line"))
+        return
+    am = AUTHOR_LINE.search(fm.group(1))
+    if not am:
+        problems.append((rel, "fieldnote frontmatter states no author",
+                         f'expected author: "@{pr_author}"'))
+    elif am.group(1).lower() != pr_author.lower():
+        problems.append((rel, "fieldnote author does not match the PR author",
+                         f"note credits @{am.group(1)} but the PR is by "
+                         f"@{pr_author}"))
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=ROOT)
@@ -201,6 +250,10 @@ def main(argv):
                     help="file holding the PR body (never pass the body inline)")
     ap.add_argument("--files", nargs="*",
                     help="explicit files to check instead of the diff")
+    ap.add_argument("--pr-author",
+                    help="GitHub login of the PR author; every fieldnote added "
+                         "by the PR must credit this handle (CI passes it; "
+                         "local runs without it skip the attribution check)")
     args = ap.parse_args(argv)
     root = os.path.abspath(args.root)
 
@@ -228,6 +281,17 @@ def main(argv):
     if args.body_file and os.path.exists(args.body_file):
         with open(args.body_file, encoding="utf-8") as f:
             check_text(f.read(), BODY_LABEL, root, problems)
+
+    if args.pr_author:
+        added = added_fieldnotes(args.base, root)
+        if added is None:
+            return 1
+        for rel in added:
+            path = os.path.join(root, rel)
+            if not os.path.exists(path):
+                continue
+            with open(path, encoding="utf-8") as f:
+                check_fieldnote_author(rel, f.read(), args.pr_author, problems)
 
     if not problems:
         print(f"prose check ok ({len(files)} file(s) checked)")

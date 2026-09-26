@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[336,24,24]]",
  "code_type": "CSS",
  "n": 336,
@@ -3373,36 +3373,46 @@
  "distance": {
   "d": 24,
   "X": {
-   "value": 26,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": [
-    8,
-    19,
-    29,
-    39,
-    62,
-    63,
-    133,
-    138,
-    143,
-    151,
+    6,
+    9,
+    20,
+    23,
+    34,
+    37,
+    44,
+    46,
+    58,
+    60,
+    72,
+    74,
+    84,
+    85,
+    98,
+    99,
+    112,
+    113,
+    126,
+    140,
     154,
-    159,
-    177,
-    195,
-    198,
-    203,
-    210,
-    218,
-    226,
-    231,
-    239,
-    241,
-    264,
-    275,
-    297,
-    318
-   ]
+    215,
+    229,
+    243
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-25",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4101
+    ]
+   }
   },
   "Z": {
    "value": 24,

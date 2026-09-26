@@ -1,0 +1,297 @@
+{
+ "schema_version": "0.1",
+ "name": "local-sat 5x5 G=8 w8 t3 model 0",
+ "code_type": "CSS",
+ "n": 25,
+ "k": 9,
+ "checks": {
+  "X": [
+   [
+    3,
+    7,
+    8,
+    9,
+    11,
+    12,
+    14,
+    23
+   ],
+   [
+    4,
+    14,
+    18,
+    19
+   ],
+   [
+    12,
+    15,
+    16,
+    17,
+    19,
+    21,
+    22,
+    23
+   ],
+   [
+    1,
+    2,
+    6,
+    9,
+    12,
+    17
+   ],
+   [
+    1,
+    5,
+    7,
+    10,
+    13,
+    16,
+    17,
+    21
+   ],
+   [
+    6,
+    10,
+    11,
+    12,
+    15,
+    18,
+    20,
+    21
+   ],
+   [
+    8,
+    12,
+    13,
+    14,
+    17,
+    18,
+    22,
+    24
+   ],
+   [
+    0,
+    1,
+    2,
+    5,
+    8,
+    11,
+    12,
+    16
+   ]
+  ],
+  "Z": [
+   [
+    5,
+    6,
+    10,
+    13,
+    15,
+    16,
+    17,
+    21
+   ],
+   [
+    7,
+    18,
+    19,
+    21,
+    22,
+    23
+   ],
+   [
+    2,
+    3,
+    6,
+    7,
+    8,
+    13,
+    14,
+    18
+   ],
+   [
+    4,
+    8,
+    9,
+    12,
+    14,
+    18,
+    19
+   ],
+   [
+    11,
+    15,
+    16,
+    20,
+    21,
+    23
+   ],
+   [
+    12,
+    14,
+    16,
+    17,
+    18,
+    22,
+    24
+   ],
+   [
+    0,
+    1,
+    5,
+    8,
+    10,
+    12,
+    16
+   ],
+   [
+    1,
+    2,
+    5,
+    6,
+    9,
+    11
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    4,
+    7,
+    14,
+    22
+   ]
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6,
+    15,
+    16
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "SAT search on a 5x5 grid (research/local_sat.py::enumerate_local_sat_codes(n_side=5, n_generators=8, max_weight=8, t=3, radius=2.0, layers=1, solver='cadical', conf_budget=3000000, max_rounds=40, max_codes=40, seed=0, shared_t3=True)). Weight <= 8 CSS checks, interaction radius 4.0, single layer. The encoder forbids every X and Z Pauli of weight <= 3, so d >= 4; enumerate_local_sat_codes also post-checks each enumerated error vector for a nonzero syndrome before yielding, so the claim does not rest on the encoding alone. Screened against the board's Pareto frontier over (n, k, d, w), and re-verified with verify/validate_candidate.py (passed: true, board_advancing: true, no lighter logical in 3500 RIS trials).",
+  "origin": "submission",
+  "date": "2026-09-25",
+  "model": "MiMo-V2.6-Flash",
+  "notes": "Checked against the board: exact_duplicate_of null, wl_equivalent_of null, dominated_by [] in 2D-local single x weight-8, board_advancing true. Checked, not equivalent to any existing entry."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    4.0,
+    4.0
+   ]
+  ],
+  "layers": 1
+ }
+}

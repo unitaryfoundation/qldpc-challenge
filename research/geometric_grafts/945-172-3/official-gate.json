@@ -1,0 +1,51 @@
+{
+  "candidate_sha256": "ba793a36c4348b538ae757941d6906f6f0ecf3b671e860bd5b879c1df17a127d",
+  "seconds": 64.48760950006545,
+  "verdict": {
+    "passed": true,
+    "candidate": {
+      "n": 945,
+      "k": 172,
+      "d": 3,
+      "family": "topological",
+      "weight_class": "weight-4",
+      "locality_class": "local-2d-single",
+      "fingerprint": "1771dba749722f2e",
+      "signature": "84b6332025155368"
+    },
+    "gates": {
+      "verify": {
+        "ok": true,
+        "failed_checks": [],
+        "weight_class": "weight-4",
+        "locality_class": "local-2d-single"
+      },
+      "refute": {
+        "refuted": false,
+        "seed": 925139950,
+        "detail": "no lighter logical in 8000 RIS trials (seed 925139950)"
+      },
+      "dedup": {
+        "exact_duplicate_of": null,
+        "wl_equivalent_of": null
+      },
+      "novelty": {
+        "cell": [
+          "weight-4",
+          "local-2d-single"
+        ],
+        "board_advancing": true,
+        "dominated_by": [],
+        "literature_novelty": "unverified"
+      }
+    },
+    "labels": [
+      "advances the weight-4 x local-2d-single board",
+      "literature novelty UNVERIFIED"
+    ],
+    "validator": {
+      "source_sha256": "51f8d78b055c03be4b951a44f88bbca2b5d9c029c353eacfb183aa0ad32815e1",
+      "seed": 925139950
+    }
+  }
+}

@@ -1,7 +1,10 @@
 {
-  "verified_codes": 1228,
-  "certified_exact": 612,
+  "verified_codes": 1471,
+  "certified_exact": 625,
   "tracks": 12,
-  "best_kd2_over_n": 1456.704,
-  "best_geometric_efficiency": 1.5827
+  "best_kd2_over_n": 1534.381,
+  "best_geometric_efficiency": 1.6381,
+  "best_kd2_over_n_w6": 30.476,
+  "best_kd2_over_n_w8": 106.105,
+  "best_kd2_over_n_w12": 589.169
 }

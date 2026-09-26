@@ -84,10 +84,12 @@ verified, PR-ready submission:
 ```
 
 It computes n and k, finds the distance witness for you, assembles the
-schema-valid JSON, runs the full verifier locally (the same gate CI runs), and
-writes `codes/<n>-<k>-<d>.json`. If verification fails, nothing is written and
-you see exactly which check failed. [`CONTRIBUTING.md`](CONTRIBUTING.md) has
-all the flags (layouts, provenance, `--open-pr`) and the full walkthrough.
+schema-valid JSON, runs the full verifier locally (the same gate CI runs),
+generates and verifies the memory circuits of the circuit tier (`d_circ`), and
+writes `codes/<n>-<k>-<d>.json` plus `circuits/<n>-<k>-<d>/`. If verification
+fails, nothing is written and you see exactly which check failed.
+[`CONTRIBUTING.md`](CONTRIBUTING.md) has all the flags (layouts, provenance,
+`--circuits`, `--no-circuit`, `--open-pr`) and the full walkthrough.
 
 A submission is one JSON file in `codes/`, one new code per PR. CI re-runs the
 verifier; a green check means the code's cheap, trustless properties are

@@ -40,7 +40,9 @@ def _report():
 def _submit(monkeypatch, capsys, tmp_path, *extra):
     """Run a dry-run submit on the Steane code.
 
-    Returns the document it would write (the --json preview).
+    Returns the document it would write (the --json preview). The circuit
+    tier is switched off: it is not what these tests are about, and with it
+    on the document would carry a circuit block and schema 0.2.
     """
     HX, HZ = _steane()
     monkeypatch.setattr(qldpc, "load_checks", lambda _p: (HX, HZ, None, None))
@@ -53,6 +55,7 @@ def _submit(monkeypatch, capsys, tmp_path, *extra):
             "@me",
             "--dry-run",
             "--json",
+            "--no-circuit",
             "--trials",
             "50",
             "--fast-trials",

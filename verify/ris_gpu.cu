@@ -328,6 +328,10 @@ sqetch_ksub_recover_kernel(
         __syncthreads();
     }
 
+    /* control[0] still holds the last pivot-search result of the column loop;
+       a block that found no logical must clear it, or the copy-out below hands
+       the host a stabilizer row and the host commits its weight. */
+    if (tid == 0) control[0] = -1;
     if (tid == 0 && thread_best[0] <= n) {
         int wt = thread_best[0];
         atomicMin(global_best, wt);

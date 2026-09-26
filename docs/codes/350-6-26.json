@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[350,6,26]] twisted-torus BB code (arXiv:2503.03827)",
  "code_type": "CSS",
  "n": 350,
@@ -2845,38 +2845,48 @@
    ]
   },
   "Z": {
-   "value": 28,
+   "value": 26,
    "confidence": "upper_bound",
    "witness": [
-    15,
-    21,
-    56,
-    64,
-    85,
-    93,
-    94,
-    102,
-    104,
-    122,
+    14,
+    19,
+    26,
+    43,
+    52,
+    69,
+    82,
+    87,
+    100,
+    107,
+    111,
+    116,
+    120,
     125,
-    131,
-    132,
+    129,
     134,
-    141,
-    142,
-    152,
-    175,
-    185,
-    251,
-    272,
-    278,
-    280,
-    281,
-    282,
-    288,
-    291,
-    292
-   ]
+    138,
+    147,
+    201,
+    219,
+    237,
+    245,
+    273,
+    287,
+    309,
+    340
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-25",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4101
+    ]
+   }
   }
  },
  "provenance": {
@@ -2886,6 +2896,7 @@
    "Hao Song",
    "Yu-An Chen"
   ],
+  "model": "human",
   "construction": "Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+x^2y^2, g(x,y)=1+y+x^-4y on the abelian quotient group Z^2/L with twist basis a_1=[0, 35], a_2=[5, 13] (n=2|det[a_1,a_2]|=2*175). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].",
   "references": [
    "arXiv:2503.03827"

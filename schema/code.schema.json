@@ -267,12 +267,43 @@
               }
             }
           }
+        },
+        "logicals": {
+          "type": "object",
+          "description": "a symplectic logical basis for the transversal-gate claims in `gates` (issue #1850): k X-type and k Z-type logical representatives, given as sparse supports, with X_i and Z_j anticommuting exactly when i = j. The gate claims name these operators as X0..X{k-1} and Z0..Z{k-1}. Verified: each X_i lies in ker(H_Z), each Z_i in ker(H_X), and the pairing matrix is the identity over GF(2), which also makes the basis independent modulo the stabilizers.",
+          "required": [
+            "X",
+            "Z"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "X": {
+              "$ref": "#/$defs/operatorList"
+            },
+            "Z": {
+              "$ref": "#/$defs/operatorList"
+            }
+          }
+        },
+        "gates": {
+          "type": "array",
+          "description": "claimed transversal logical gates (issue #1850, stage 1). Each is a qubit permutation, optionally with one single-qubit Clifford applied uniformly to every qubit (H or S), or a block-to-block CX between two copies of the code, together with the claimed action on the logical operators of `logicals`. The verifier checks over GF(2) that the gate maps every stabilizer generator into the stabilizer group (for S also that every X-check has weight 0 mod 4, the phase condition the GF(2) image cannot see) and that the induced action on each logical generator equals the claim up to stabilizers. Witness-backed and penalty-only: a verified gate is listed on the code page and never ranks; a wrong claim fails verification.",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/transversalGate"
+          }
         }
+      },
+      "dependentRequired": {
+        "gates": [
+          "logicals"
+        ]
       }
     },
     "locality": {
       "type": "object",
-      "description": "optional; required only for the 2d-local tracks",
+      "description": "optional; required for the 2d-local tracks and for a geometric-efficiency score. Planar or 3D coordinates.",
       "required": [
         "coordinates",
         "layers"
@@ -281,7 +312,7 @@
       "properties": {
         "coordinates": {
           "type": "array",
-          "description": "one [x, y] per qubit, indexed 0..n-1",
+          "description": "one [x, y] (D = 2) or [x, y, z] (D = 3) per qubit, indexed 0..n-1; every point in a layout has the same dimension (the verifier rejects a mix). The declared dimension is the one the layout is checked and priced in: the 2D-local classes need planar coordinates, and a 3D layout is scored by the D = 3 geometric efficiency (TRACKS.md).",
           "maxItems": 5000,
           "items": {
             "type": "array",
@@ -289,13 +320,22 @@
               "type": "number"
             },
             "minItems": 2,
-            "maxItems": 2
+            "maxItems": 3
           }
         },
         "layers": {
           "type": "integer",
           "minimum": 1,
           "description": "physical layers (1 for a single layer, 2 for flip-chip bilayer); required whenever a layout is given"
+        },
+        "modules": {
+          "type": "array",
+          "description": "optional (schema 0.3): one module id per qubit, indexed 0..n-1, for a layout split across hardware modules (multi-chip assemblies, interconnected flip-chip modules, photonically linked or shuttling zones). A non-negative integer per qubit; ids need not be contiguous. Membership is independent of the coordinates, so it applies to a layout of any dimension. The verifier requires an id for every qubit and reports the checks that span more than one module, the ports (distinct neighboring modules) per module, and the qubits per module; it earns the Layer-3 flag `modular` and changes no track or score.",
+          "maxItems": 5000,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
         },
         "interaction_radius": {
           "type": "number",
@@ -543,6 +583,28 @@
       }
     },
     {
+      "$comment": "locality.modules (a 0.3 feature) requires schema_version 0.3",
+      "if": {
+        "properties": {
+          "locality": {
+            "required": [
+              "modules"
+            ]
+          }
+        },
+        "required": [
+          "locality"
+        ]
+      },
+      "then": {
+        "properties": {
+          "schema_version": {
+            "const": "0.3"
+          }
+        }
+      }
+    },
+    {
       "$comment": "provenance.search_budget (a 0.3 feature) requires schema_version 0.3",
       "if": {
         "properties": {
@@ -717,6 +779,84 @@
             }
           }
         }
+      }
+    },
+    "operatorList": {
+      "type": "array",
+      "description": "a list of Pauli operators of one type, each the sorted list of distinct qubit indices in its support (no per-operator weight cap: logical representatives can be heavier than a check)",
+      "maxItems": 1000,
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minItems": 1
+      }
+    },
+    "transversalGate": {
+      "type": "object",
+      "description": "one claimed transversal logical gate. `gate` is `permutation` (a bare qubit permutation, which must then be given), `H` or `S` (that Clifford on every qubit, composed with the optional permutation), or `CX` (a CX from qubit i of one block, the control, to qubit permutation[i] of a second block, the target; identity pairing when omitted). `logical_action` maps each logical generator label to the list of generator labels whose product it is sent to, checked up to stabilizers only (a logical factor the gate introduces belongs in this list); a generator not listed is claimed fixed. Labels are X0..X{k-1}, Z0..Z{k-1} for the (control) block and X0'..Z{k-1}' for the target block of a CX.",
+      "required": [
+        "gate",
+        "logical_action"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gate": {
+          "enum": [
+            "permutation",
+            "H",
+            "S",
+            "CX"
+          ]
+        },
+        "permutation": {
+          "type": "array",
+          "description": "image of each qubit: qubit i is sent to permutation[i]; must be a permutation of 0..n-1",
+          "maxItems": 1000,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "logical_action": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[XZ][0-9]+'?$"
+          },
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4000,
+            "items": {
+              "type": "string",
+              "pattern": "^[XZ][0-9]+'?$"
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "optional display label, e.g. 'logical Hadamard' or 'SWAP of logical qubits 0 and 1'"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 400
+        }
+      },
+      "if": {
+        "properties": {
+          "gate": {
+            "const": "permutation"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "permutation"
+        ]
       }
     }
   }

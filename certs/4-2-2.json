@@ -1,0 +1,19 @@
+{
+ "name": "[[4,2,2]] rotated toric code (2x2 torus)",
+ "d": 2,
+ "solver": "scipy/HiGHS cutoff IP",
+ "sides": {
+  "X": {
+   "value": 2,
+   "exact": true,
+   "note": "no logical < 2 exists"
+  },
+  "Z": {
+   "value": 2,
+   "exact": true,
+   "note": "no logical < 2 exists"
+  }
+ },
+ "d_exact": true,
+ "tlim_per_solve": 180.0
+}

@@ -9,11 +9,17 @@ a single command, the way ecdsa.fail does: you bring H_X and H_Z, the tool
      self-certifying distance witness,
   3. assembles a schema-valid submission,
   4. runs the full trustless verifier locally (the same gate CI runs),
-  5. fills the PR body's "what frontier does this advance?" section by
+  5. generates the circuit tier (RFC 0001): memory_x and memory_z
+     syndrome-extraction circuits on a schedule the code's structure supports
+     (research/circuit_autogen.py), searches their detector error models for
+     d_circ witnesses, and runs verify/circuit_verify.py on them; a code the
+     generator cannot schedule within the tier's caps is submitted without
+     circuits, and --circuits DIR brings your own,
+  6. fills the PR body's "what frontier does this advance?" section by
      comparing against the current board (reusing the site's Pareto logic),
      and
-  6. writes codes/<n>-<k>-<d>.json and prints the steps to open the PR
-     (or opens it for you with --open-pr).
+  7. writes codes/<n>-<k>-<d>.json plus circuits/<n>-<k>-<d>/ and prints the
+     steps to open the PR (or opens it for you with --open-pr).
 
 If verification fails, nothing is written: you see exactly which check failed
 before anything leaves your machine.
@@ -23,6 +29,7 @@ Usage:
   uv run python cli/qldpc.py submit mycode.npz --authors @me "Jane Roe" \\
       --construction "bivariate bicycle (x^3+y+y^2, ...)" --model "Opus 4.8"
   ./qldpc submit mycode.npz --authors @me        # via the launcher shim
+  ./qldpc submit mycode.npz --authors @me --no-circuit   # code tier only
 
 Input:
   .npz  with H_X and H_Z under keys hx/HX/H_X and hz/HZ/H_Z (dense 0/1 arrays
@@ -45,6 +52,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 sys.path.insert(0, os.path.join(_ROOT, "verify"))
 sys.path.insert(0, os.path.join(_ROOT, "site"))
+sys.path.insert(0, os.path.join(_ROOT, "research"))
 
 import gf2  # noqa: E402
 import heuristic_distance as hd  # noqa: E402
@@ -202,8 +210,11 @@ def build_submission(HX, HZ, args):
     if args._coords is not None:
         if len(args._coords) != n:
             raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
+        coords = [[float(v) for v in row] for row in args._coords]
+        if any(len(row) not in (2, 3) for row in coords):
+            raise SystemExit("coords rows must be [x, y] or [x, y, z]")
         doc["locality"] = {
-            "coordinates": [[float(x), float(y)] for x, y in args._coords],
+            "coordinates": coords,
             "layers": int(args.layers),
         }
     return doc
@@ -345,8 +356,17 @@ def pr_body(doc, report, args, out, note_out=None):
         f"- Parameters: [[n, k, d]] = [[{n},{k},{d}]]",
         f"- Tracks: {track} (computed by the verifier from H and the layout)",
         f"- Distance confidence: {conf_line}",
-        "",
     ]
+    circ = doc.get("circuit")
+    if circ:
+        dc = circ["d_circ"]
+        slug = os.path.splitext(os.path.basename(out))[0]
+        lines.append(
+            f"- Circuit tier: d_circ <= {min(dc['X']['value'], dc['Z']['value'])} "
+            f"(X {dc['X']['value']}, Z {dc['Z']['value']}) at rounds "
+            f"{circ['rounds']}, witness-backed, memory circuits under "
+            f"`circuits/{slug}/`")
+    lines.append("")
     if args.family:
         lines += [f"Family tag: {args.family} (a self-declared filter, never "
                   f"used for ranking).", ""]
@@ -361,6 +381,8 @@ def pr_body(doc, report, args, out, note_out=None):
                   "`schema/code.schema.json`"),
         box(True, "Distance witness(es) included for each reported side"),
         box(True, f"`python verify/qldpc_verify.py {rel_out}` passes locally"),
+        box(True, f"`python verify/circuit_verify.py {rel_out}` passes locally")
+        if circ else None,
         box(bool((args.construction or "").strip()),
             "Construction and references filled in under `provenance`")
         if (args.construction or "").strip() else None,
@@ -549,6 +571,14 @@ def dry_run_summary(doc, report, out):
         f"  distance     d <= {dist['d']} (upper_bound)",
         "               " + "  |  ".join(per_side),
     ]
+    circ = doc.get("circuit")
+    if circ:
+        dc = circ["d_circ"]
+        slug = os.path.splitext(os.path.basename(out))[0]
+        lines.append(
+            f"  circuit      d_circ <= {min(dc['X']['value'], dc['Z']['value'])} "
+            f"(X {dc['X']['value']}, Z {dc['Z']['value']}), rounds "
+            f"{circ['rounds']} -> circuits/{slug}/memory_{{x,z}}.{{stim,dem}}")
     prov = doc.get("provenance", {})
     for label, value in (
         ("authors", ", ".join(prov.get("authors", []))),
@@ -563,8 +593,87 @@ def dry_run_summary(doc, report, out):
     return "\n".join(lines)
 
 
+# ----------------------------------------------------------------------------
+# the circuit tier (RFC 0001, issue #505; default since issue #1848)
+# ----------------------------------------------------------------------------
+def schema_version_for(doc):
+    """The oldest schema version that describes the document: 0.3 with a
+    search budget, 0.2 with a circuit block, else 0.1."""
+    if (doc.get("provenance") or {}).get("search_budget"):
+        return "0.3"
+    if doc.get("circuit"):
+        return "0.2"
+    return "0.1"
+
+
+def attach_circuit_tier(doc, args):
+    """Generate the memory circuits (or take the submitter's from --circuits),
+    run the tier's fast-path verifier on them exactly as CI will, and on
+    success put the circuit block on `doc` and return {filename: text} for
+    circuits/<slug>/. Returns None, leaving `doc` alone, when no verifiable
+    tier can be produced for this code; a failing --circuits directory is a
+    hard error, since the submitter asked for those circuits specifically.
+    """
+    import circuit_autogen as ca  # noqa: E402  (stim; loaded only when used)
+    from circuit_verify import verify_circuit  # noqa: E402
+    from qldpc_verify import structure_errors  # noqa: E402
+
+    def log(msg):
+        print(f"    {msg}", flush=True)
+
+    print("  circuit tier: " + ("reading circuits from " + args.circuits
+                                if args.circuits else
+                                "generating memory circuits (--no-circuit "
+                                "skips this step)..."), flush=True)
+    try:
+        if args.circuits:
+            block, files, family = ca.from_files(
+                doc, args.circuits, rounds=args.circuit_rounds,
+                seed=args.circuit_seed, seconds=args.circuit_seconds, log=log)
+        else:
+            block, files, family = ca.generate(
+                doc, coords=args._coords, rounds=args.circuit_rounds,
+                seed=args.circuit_seed, max_candidates=args.circuit_candidates,
+                seconds=args.circuit_seconds, log=log)
+    except ca.CircuitUnavailable as e:
+        if args.circuits:
+            raise SystemExit(f"--circuits: {e}")
+        print(f"  circuit tier skipped: {e}")
+        return None
+    trial = dict(doc)
+    trial["circuit"] = block
+    trial["schema_version"] = schema_version_for(trial)
+    with tempfile.TemporaryDirectory(prefix="qldpc-circuits-") as tmp:
+        for name, text in files.items():
+            with open(os.path.join(tmp, name), "w", encoding="utf-8",
+                      newline="\n") as f:
+                f.write(text)
+        report = verify_circuit(trial, tmp)
+    problems = [f"{c['check']}: {c['detail']}" for c in report["checks"]
+                if not c["ok"]] + structure_errors(trial)
+    if problems or not report["ok"]:
+        for p in problems:
+            print(f"    FAIL  {p}")
+        if args.circuits:
+            raise SystemExit("--circuits: the supplied circuits did not pass "
+                             "verify/circuit_verify.py; nothing written.")
+        print("  circuit tier skipped: the generated circuits did not verify "
+              "(a generator bug; please report it with this output). The "
+              "code tier is unaffected.")
+        return None
+    doc["circuit"] = block
+    doc["schema_version"] = trial["schema_version"]
+    dc = block["d_circ"]
+    print(f"  OK  circuit tier verified: d_circ <= "
+          f"{min(dc['X']['value'], dc['Z']['value'])} (X {dc['X']['value']}, "
+          f"Z {dc['Z']['value']}), rounds {block['rounds']}, {family}")
+    return files
+
+
 def cmd_submit(args):
     args.authors = validate_authors(args.authors, args.anonymous)
+    if args.no_circuit and args.circuits:
+        raise SystemExit("--no-circuit and --circuits contradict each other")
     HX, HZ, coords, _draft = load_checks(args.code)
     if args.coords:                      # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
@@ -588,21 +697,39 @@ def cmd_submit(args):
 
     slug = f"{n}-{k}-{d}"
     out = os.path.join(args.out, f"{slug}.json")
+    circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
+                                "circuits", slug)
+    if not args.dry_run and not args.force:
+        for p in ([out] if args.no_circuit else [out, circuits_dir]):
+            if os.path.exists(p):
+                print(f"\n{p} already exists. Use --force to overwrite, or "
+                      f"rename.")
+                return 1
+
+    circuit_files = None if args.no_circuit else attach_circuit_tier(doc, args)
+
     if args.dry_run:
-        print(f"\n--dry-run: would write {out}")
+        print(f"\n--dry-run: would write {out}" +
+              (f" and {circuits_dir}/" if circuit_files else ""))
         if args.json:
             print(json.dumps(doc, indent=1))
         else:
             print(dry_run_summary(doc, report, out))
         return 0
-    if os.path.exists(out) and not args.force:
-        print(f"\n{out} already exists. Use --force to overwrite, or rename.")
-        return 1
     os.makedirs(args.out, exist_ok=True)
-    with open(out, "w", encoding="utf-8") as f:
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
         json.dump(doc, f, indent=1)
         f.write("\n")
     print(f"  wrote {out}")
+    if circuit_files:
+        os.makedirs(circuits_dir, exist_ok=True)
+        for name, text in circuit_files.items():
+            with open(os.path.join(circuits_dir, name), "w",
+                      encoding="utf-8", newline="\n") as f:
+                f.write(text)
+        print(f"  wrote {circuits_dir}/memory_{{x,z}}.{{stim,dem}}")
+    else:
+        circuits_dir = None
 
     # the public research note (notes/<slug>.md): how the code was found —
     # search narrative, sweep sizes, confirmation ladder, dead ends. Requested
@@ -617,7 +744,7 @@ def cmd_submit(args):
             return 1
         note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
         os.makedirs(os.path.dirname(note_out), exist_ok=True)
-        with open(note_out, "w", encoding="utf-8") as f:
+        with open(note_out, "w", encoding="utf-8", newline="\n") as f:
             f.write(note_md)
         print(f"  wrote {note_out}")
     else:
@@ -631,10 +758,12 @@ def cmd_submit(args):
 
     if args.open_pr:
         return open_pr(slug, out, note_out, title, body_file,
-                       root=_ROOT)
-    print("\nnext: open a PR with this file")
+                       root=_ROOT, circuits_dir=circuits_dir)
+    print("\nnext: open a PR with " +
+          ("these files" if note_out or circuits_dir else "this file"))
     print(f"  git checkout -b submit-{slug}")
-    print(f"  git add {out}" + (f" {note_out}" if note_out else ""))
+    print(f"  git add {out}" + (f" {note_out}" if note_out else "") +
+          (f" {circuits_dir}" if circuits_dir else ""))
     print(f"  git commit -m {title!r}")
     print(f"  git push -u origin submit-{slug}")
     print(f"  gh pr create --title {title!r} --body-file {body_file}")
@@ -646,7 +775,8 @@ def cmd_submit(args):
     return 0
 
 
-def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None):
+def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
+            circuits_dir=None):
     n_k_d = slug.replace("-", ",")
     branch = f"submit-{slug}"
     title = title or f"Add [[{n_k_d}]]"
@@ -668,7 +798,8 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None):
                       f"was opened. Fix the issues above (the drafted body is "
                       f"at {body_file}) and re-run with --open-pr.")
                 return 1
-    add = ["git", "add", out] + ([note_out] if note_out else [])
+    add = ["git", "add", out] + ([note_out] if note_out else []) + \
+        ([circuits_dir] if circuits_dir else [])
     # --title/--body-file rather than --fill: the body is the filled-in
     # pull request template, which the commit message does not carry (#404).
     create = ["gh", "pr", "create", "--title", title]
@@ -758,13 +889,54 @@ def cmd_targets(args):
     return 0
 
 
+def _plural(n, word):
+    return f"{n} {word}" + ("" if n == 1 else "s")
+
+
+def _fieldnote_meta(path):
+    """Read a fieldnote's title and topics.
+
+    Taken from its YAML frontmatter, falling back to the first heading and no
+    topics. Only the frontmatter is read.
+    """
+    title, topics = "", []
+    try:
+        with open(path, encoding="utf-8") as f:
+            if f.readline().strip() != "---":
+                f.seek(0)
+                for line in f:
+                    if line.startswith("#"):
+                        return line.lstrip("#").strip(), []
+                return "", []
+            for line in f:
+                head = line.rstrip("\n")
+                if head.strip() == "---":
+                    break
+                if head.startswith("title:"):
+                    title = head[6:].strip().strip('"')
+                elif head.startswith("topics:"):
+                    topics = [t.strip().strip('"')
+                              for t in head[7:].strip().strip("[]").split(",")
+                              if t.strip()]
+    except OSError:
+        pass
+    return title, topics
+
+
 def cmd_recent(args):
     """What moved on the board recently: codes merged, research notes, and
     fieldnotes, from git history. The 'stay current' step — read this (and
     the linked notes) before spending compute, so a new search starts from
     the community's frontier of knowledge, not just the frontier of scores.
+
+    Bounded by default: a count line plus the newest --limit rows per section,
+    because a busy fortnight is hundreds of codes and printing all of them
+    buries the reader (and fills an agent's context). --full prints every row;
+    --family / --topic narrow both sections to what a given search cares
+    about.
     """
     since = f"--since={args.days} days ago"
+    want = [t.lower() for t in (args.family, args.topic) if t]
 
     def added(path):
         r = subprocess.run(
@@ -781,26 +953,71 @@ def cmd_recent(args):
                 out.append((date, line.strip()))
         return out
 
-    codes = added("codes/")
-    notes = {os.path.basename(f)[:-3] for _, f in added("notes/")
-             if f.endswith(".md")}
-    fnotes = [f for _, f in added("fieldnotes/")
-              if f.endswith(".md") and not f.endswith("README.md")]
+    def code_row(date, f):
+        """Build one code row, reading its JSON for the family tag.
 
-    print(f"board activity, last {args.days} days:")
-    if not codes:
-        print("  no new codes")
-    for date, f in codes:
+        Called only for rows that are printed or filtered on, never for the
+        whole history.
+        """
         slug = os.path.splitext(os.path.basename(f))[0]
-        has_note = (slug in notes
-                    or os.path.exists(os.path.join(_ROOT, "notes",
-                                                   slug + ".md")))
-        tag = "note: notes/%s.md" % slug if has_note else "no research note"
-        print(f"  {date}  [[{slug.replace('-', ',')}]]  ({tag})")
-    if fnotes:
+        fam, name = "", ""
+        try:
+            with open(os.path.join(_ROOT, f), encoding="utf-8") as fh:
+                doc = json.load(fh)
+            fam, name = doc.get("family") or "", doc.get("name") or ""
+        except (OSError, ValueError):
+            pass
+        has_note = os.path.exists(os.path.join(_ROOT, "notes", slug + ".md"))
+        return {"date": date, "slug": slug, "family": fam, "name": name,
+                "note": has_note,
+                "hay": f"{slug} {fam} {name}".lower()}
+
+    codes = [code_row(d, f) for d, f in added("codes/")
+             if f.endswith(".json")]
+    fnotes = []
+    for d, f in added("fieldnotes/"):
+        if not f.endswith(".md") or f.endswith("README.md"):
+            continue
+        title, topics = _fieldnote_meta(os.path.join(_ROOT, f))
+        fnotes.append({"date": d, "path": f, "title": title, "topics": topics,
+                       "hay": f"{f} {title} {' '.join(topics)}".lower()})
+
+    n_codes, n_fnotes = len(codes), len(fnotes)
+    if want:
+        codes = [c for c in codes if any(w in c["hay"] for w in want)]
+        fnotes = [f for f in fnotes if any(w in f["hay"] for w in want)]
+    n_note = sum(1 for c in codes if c["note"])
+
+    lim = None if args.full else max(1, args.limit)
+    filt = f" matching {' + '.join(want)}" if want else ""
+    print(f"board activity, last {args.days} days{filt}: "
+          f"{_plural(len(codes), 'code')} ({n_note} with a research note), "
+          f"{_plural(len(fnotes), 'fieldnote')}")
+    if want:
+        print(f"  (of {_plural(n_codes, 'code')} and "
+              f"{_plural(n_fnotes, 'fieldnote')} in the window)")
+
+    shown = codes if lim is None else codes[:lim]
+    if shown:
+        print("codes:")
+    for c in shown:
+        tag = f"notes/{c['slug']}.md" if c["note"] else "no research note"
+        fam = f"  {c['family']}" if c["family"] else ""
+        print(f"  {c['date']}  [[{c['slug'].replace('-', ',')}]]{fam}  ({tag})")
+    if lim is not None and len(codes) > lim:
+        print(f"  ... {len(codes) - lim} more (--limit N, --full)")
+
+    shown = fnotes if lim is None else fnotes[:lim]
+    if shown:
         print("fieldnotes (negative results / calibration):")
-        for f in fnotes:
-            print(f"  {f}")
+    for f in shown:
+        print(f"  {f['date']}  {f['path']}")
+        if f["title"]:
+            topics = f"  [{', '.join(f['topics'])}]" if f["topics"] else ""
+            print(f"      {f['title']}{topics}")
+    if lim is not None and len(fnotes) > lim:
+        print(f"  ... {len(fnotes) - lim} more (--limit N, --full)")
+
     print("full log: docs research-log page, or ls notes/ fieldnotes/")
     return 0
 
@@ -848,8 +1065,9 @@ def main(argv=None):
                    help="construction family tag (a filter, not a ranking; "
                         "track membership is computed from H and the layout)")
     s.add_argument("--coords", default="",
-                   help="coordinates file (.npz key coords, or whitespace .txt); "
-                        "the verifier derives the 2d-local class from it")
+                   help="coordinates file (.npz key coords, or whitespace .txt), "
+                        "one [x, y] or [x, y, z] row per qubit; the verifier "
+                        "derives the 2d-local class from a planar layout")
     s.add_argument("--layers", type=int, default=1,
                    help="physical layers for a 2d-local layout "
                         "(1 = single layer, 2 = bilayer); default 1")
@@ -881,6 +1099,33 @@ def main(argv=None):
                    help="the search harness, e.g. 'research/kit/search.py + gf2_fast'")
     b.add_argument("--budget-notes", default="",
                    help="what the numbers cover and what they leave out")
+    c = s.add_argument_group(
+        "circuit tier",
+        "memory_x and memory_z syndrome-extraction circuits (RFC 0001) are "
+        "generated, searched for d_circ witnesses, verified, and written under "
+        "circuits/<slug>/ by default: an interleaved two-block schedule for "
+        "bicycle-type codes, a layout zigzag for surface patches, and a "
+        "generic sequential schedule otherwise. d_circ is penalty-only, so a "
+        "circuit can discount an entry but never inflate it.")
+    c.add_argument("--no-circuit", action="store_true",
+                   help="submit the code tier only, no circuits")
+    c.add_argument("--circuits", default="", metavar="DIR",
+                   help="use your own memory_x.stim and memory_z.stim from DIR "
+                        "(canonical noise recipe, see verify/circuit_tools.py) "
+                        "instead of generating them; the .dem files are "
+                        "derived with the pinned stim and the witnesses "
+                        "searched for you")
+    c.add_argument("--circuit-rounds", type=int, default=None, metavar="R",
+                   help="extraction rounds per memory circuit (default d, the "
+                        "minimum the verifier accepts)")
+    c.add_argument("--circuit-candidates", type=int, default=6, metavar="N",
+                   help="schedules screened at two rounds before the deep "
+                        "search settles on one (default 6)")
+    c.add_argument("--circuit-seconds", type=float, default=180.0,
+                   metavar="S",
+                   help="wall-clock cap per basis for the deep witness search "
+                        "(default 180; the CI gate targets 120)")
+    c.add_argument("--circuit-seed", type=int, default=0)
     s.add_argument("--trials", type=int, default=20000,
                    help="RIS trials for the distance witness search")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
@@ -903,6 +1148,16 @@ def main(argv=None):
                                       "notes, fieldnotes (read before you "
                                       "search)")
     r.add_argument("--days", type=int, default=14)
+    r.add_argument("--limit", type=int, default=10,
+                   help="rows per section (default 10); --full for all")
+    r.add_argument("--full", action="store_true",
+                   help="print every row instead of the newest --limit")
+    r.add_argument("--family", default="",
+                   help="only rows mentioning this family tag, e.g. "
+                        "bivariate-bicycle")
+    r.add_argument("--topic", default="",
+                   help="only rows mentioning this topic, matched against "
+                        "fieldnote topics and titles and against code names")
     r.set_defaults(func=cmd_recent)
 
     g = sub.add_parser("targets", help="which track cells are open: occupancy "

@@ -1,0 +1,111 @@
+{
+ "schema_version": "0.1",
+ "name": "[[8,3,2]] coupled pair of 422 blocks",
+ "code_type": "CSS",
+ "n": 8,
+ "k": 3,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6,
+    7
+   ],
+   [
+    0,
+    1,
+    4,
+    5
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    2,
+    3
+   ],
+   [
+    4,
+    5,
+    6,
+    7
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    7
+   ]
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    7
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Start with two [[4,2,2]] plaquette codes on adjacent 2x2 squares. Deform by adding one X-type stabilizer equal to the product of the same weight-2 logical X representative on each block (supports [0,1,4,5]); retain both block stabilizer pairs. The added local check couples the blocks, so this is not a direct sum.",
+  "references": [],
+  "model": "GPT-6 Luna",
+  "date": "2026-09-23",
+  "notes": "Checked against the board: no exact or Weisfeiler-Lehman equivalent entry. See notes/8-3-2.md."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    3.0,
+    1.0
+   ]
+  ],
+  "interaction_radius": 2.23606797749979,
+  "layers": 1
+ }
+}

@@ -1,0 +1,19 @@
+{
+ "name": "[[709,37,5]] multi-band dense-packed surface code",
+ "d": 5,
+ "solver": "scipy/HiGHS cutoff IP",
+ "sides": {
+  "X": {
+   "value": 5,
+   "exact": true,
+   "note": "no logical < 5 exists"
+  },
+  "Z": {
+   "value": 5,
+   "exact": true,
+   "note": "no logical < 5 exists"
+  }
+ },
+ "d_exact": true,
+ "tlim_per_solve": 180.0
+}

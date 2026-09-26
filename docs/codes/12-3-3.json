@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[12,3,3]]",
  "code_type": "CSS",
  "n": 12,
@@ -113,5 +113,66 @@
   "construction": "Check deletion from the board entry [[12,2,4]] (codes/12-2-4.json): row 1 of H_Z removed. Dropping one stabiliser generator frees one logical qubit and cannot raise the distance.",
   "notes": "Found by sweeping every single-row deletion of every small board entry and keeping those that land undominated. The parent's remaining checks are unchanged."
  },
- "family": "check-deletion"
+ "family": "check-deletion",
+ "locality": {
+  "coordinates": [
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-09-26",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

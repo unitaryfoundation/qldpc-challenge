@@ -321,3 +321,46 @@ if __name__ == "__main__":
         except pytest.skip.Exception as e:
             print(f"SKIP {fn.__name__}: {e}")
     print("ok")
+
+
+def test_gpu_recover_blocks_without_a_logical_write_nothing():
+    # Regression for the 2026-09-26 refute pass: on the large k = 1 surface
+    # codes the recover kernel committed weight-2 operators that failed CPU
+    # verification. A block that found no logical left control[0] holding
+    # the column loop's last pivot-search result, so it copied a stabilizer
+    # row into the output slot and the host committed its weight. The fix
+    # clears control[0] before the winner test. Blocks without a logical are
+    # the norm when a 64-row sketch of a several-hundred-row kernel meets a
+    # single logical direction, which is why only n >= 625 with k = 1 broke;
+    # 529-1-23 and 289-1-17 are the healthy sizes and must keep reading their
+    # claims. Every committed support must pass verify/gf2.py and the
+    # recovered weight must be exactly the claimed distance on both sides.
+    binary = os.path.join(ROOT, "build", "ris_gpu")
+    if not gpu_available(binary):
+        pytest.skip("no ris_gpu binary or no GPU")
+    for slug in ("961-1-31", "841-1-29", "729-1-27", "625-1-25",
+                 "529-1-23", "289-1-17"):
+        with open(os.path.join(ROOT, "codes", f"{slug}.json")) as f:
+            doc = json.load(f)
+        n = doc["n"]
+        HX = ris_gpu.checks_matrix(doc["checks"]["X"], n)
+        HZ = ris_gpu.checks_matrix(doc["checks"]["Z"], n)
+        for side, check, opp in (("X", HZ, HX), ("Z", HX, HZ)):
+            L_opp = gf2.logical_basis(opp, check)
+            claimed = doc["distance"][side]["value"]
+            with tempfile.NamedTemporaryFile(suffix=".risgpu", delete=False) as tmp:
+                path = tmp.name
+            try:
+                ris_gpu.write_input(path, gf2.kernel_basis(check), L_opp, n)
+                proc = subprocess.run(
+                    [binary, path, "--mode", "recover", "--trials", "1000000",
+                     "--seed", "4101"],
+                    capture_output=True, text=True, check=True)
+            finally:
+                os.unlink(path)
+            res = ris_gpu.parse_output(proc.stdout)
+            assert res.get("support"), (slug, side, res)
+            weight = ris_gpu.cpu_verify(res["support"], n, check, L_opp)
+            assert weight is not None, (slug, side, "GPU committed an operator that is not a logical")
+            assert weight == res["best_weight"], (slug, side, weight, res["best_weight"])
+            assert weight == claimed, (slug, side, weight, claimed)

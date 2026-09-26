@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[346,2,28]] GB code",
  "code_type": "CSS",
  "n": 346,
@@ -2815,39 +2815,50 @@
    ]
   },
   "Z": {
-   "value": 29,
+   "value": 28,
    "confidence": "upper_bound",
    "witness": [
-    17,
-    88,
-    89,
-    98,
-    107,
-    110,
-    119,
-    125,
-    126,
-    140,
-    145,
-    146,
-    157,
-    165,
-    215,
-    228,
-    237,
+    13,
+    14,
+    15,
+    34,
+    44,
+    45,
+    81,
+    116,
+    130,
+    131,
+    132,
+    133,
+    139,
+    158,
+    159,
+    173,
+    176,
+    185,
+    195,
+    209,
     241,
-    254,
-    259,
-    267,
-    271,
-    274,
+    263,
     276,
-    292,
-    296,
-    309,
-    317,
-    342
-   ]
+    285,
+    287,
+    290,
+    300,
+    336
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-09-25",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "seeds": [
+     4101
+    ]
+   }
   }
  },
  "provenance": {

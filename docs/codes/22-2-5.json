@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[22,2,5]] 2BGA",
  "code_type": "CSS",
  "n": 22,
@@ -222,5 +222,106 @@
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
- "family": "generalized-bicycle"
+ "family": "generalized-bicycle",
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-09-26",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

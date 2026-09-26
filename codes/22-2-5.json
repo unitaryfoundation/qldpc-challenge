@@ -1,226 +1,327 @@
 {
-  "schema_version": "0.1",
-  "name": "[[22,2,5]] 2BGA",
-  "code_type": "CSS",
-  "n": 22,
-  "k": 2,
-  "checks": {
-    "X": [
-      [
-        0,
-        10,
-        11,
-        17,
-        20,
-        21
-      ],
-      [
-        0,
-        1,
-        11,
-        12,
-        18,
-        21
-      ],
-      [
-        1,
-        2,
-        11,
-        12,
-        13,
-        19
-      ],
-      [
-        2,
-        3,
-        12,
-        13,
-        14,
-        20
-      ],
-      [
-        3,
-        4,
-        13,
-        14,
-        15,
-        21
-      ],
-      [
-        4,
-        5,
-        11,
-        14,
-        15,
-        16
-      ],
-      [
-        5,
-        6,
-        12,
-        15,
-        16,
-        17
-      ],
-      [
-        6,
-        7,
-        13,
-        16,
-        17,
-        18
-      ],
-      [
-        7,
-        8,
-        14,
-        17,
-        18,
-        19
-      ],
-      [
-        8,
-        9,
-        15,
-        18,
-        19,
-        20
-      ],
-      [
-        9,
-        10,
-        16,
-        19,
-        20,
-        21
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        1,
-        2,
-        5,
-        11,
-        12
-      ],
-      [
-        1,
-        2,
-        3,
-        6,
-        12,
-        13
-      ],
-      [
-        2,
-        3,
-        4,
-        7,
-        13,
-        14
-      ],
-      [
-        3,
-        4,
-        5,
-        8,
-        14,
-        15
-      ],
-      [
-        4,
-        5,
-        6,
-        9,
-        15,
-        16
-      ],
-      [
-        5,
-        6,
-        7,
-        10,
-        16,
-        17
-      ],
-      [
-        0,
-        6,
-        7,
-        8,
-        17,
-        18
-      ],
-      [
-        1,
-        7,
-        8,
-        9,
-        18,
-        19
-      ],
-      [
-        2,
-        8,
-        9,
-        10,
-        19,
-        20
-      ],
-      [
-        0,
-        3,
-        9,
-        10,
-        20,
-        21
-      ],
-      [
-        0,
-        1,
-        4,
-        10,
-        11,
-        21
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[22,2,5]] 2BGA",
+ "code_type": "CSS",
+ "n": 22,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    0,
+    10,
+    11,
+    17,
+    20,
+    21
+   ],
+   [
+    0,
+    1,
+    11,
+    12,
+    18,
+    21
+   ],
+   [
+    1,
+    2,
+    11,
+    12,
+    13,
+    19
+   ],
+   [
+    2,
+    3,
+    12,
+    13,
+    14,
+    20
+   ],
+   [
+    3,
+    4,
+    13,
+    14,
+    15,
+    21
+   ],
+   [
+    4,
+    5,
+    11,
+    14,
+    15,
+    16
+   ],
+   [
+    5,
+    6,
+    12,
+    15,
+    16,
+    17
+   ],
+   [
+    6,
+    7,
+    13,
+    16,
+    17,
+    18
+   ],
+   [
+    7,
+    8,
+    14,
+    17,
+    18,
+    19
+   ],
+   [
+    8,
+    9,
+    15,
+    18,
+    19,
+    20
+   ],
+   [
+    9,
+    10,
+    16,
+    19,
+    20,
+    21
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    2,
+    5,
+    11,
+    12
+   ],
+   [
+    1,
+    2,
+    3,
+    6,
+    12,
+    13
+   ],
+   [
+    2,
+    3,
+    4,
+    7,
+    13,
+    14
+   ],
+   [
+    3,
+    4,
+    5,
+    8,
+    14,
+    15
+   ],
+   [
+    4,
+    5,
+    6,
+    9,
+    15,
+    16
+   ],
+   [
+    5,
+    6,
+    7,
+    10,
+    16,
+    17
+   ],
+   [
+    0,
+    6,
+    7,
+    8,
+    17,
+    18
+   ],
+   [
+    1,
+    7,
+    8,
+    9,
+    18,
+    19
+   ],
+   [
+    2,
+    8,
+    9,
+    10,
+    19,
+    20
+   ],
+   [
+    0,
+    3,
+    9,
+    10,
+    20,
+    21
+   ],
+   [
+    0,
+    1,
+    4,
+    10,
+    11,
+    21
+   ]
+  ]
+ },
+ "distance": {
+  "d": 5,
+  "X": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    12,
+    13,
+    14,
+    16
+   ]
   },
-  "distance": {
-    "d": 5,
-    "X": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        5,
-        12,
-        13,
-        14,
-        16
-      ]
-    },
-    "Z": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        3,
-        5,
-        6,
-        7,
-        14
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@MathysRennela"
-    ],
-    "construction": "2BGA (arXiv:2306.16400) on SmallGroup(11,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt6wtL2_order11_k2.txt, line 1. nonidentity supports a=[2], b=[2, 3, 6].",
-    "references": [],
-    "date": "2026-09-19",
-    "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
-    "model": "DeepSeek V4 Flash 0731",
-    "origin": "submission"
-  },
-  "family": "generalized-bicycle"
+  "Z": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    3,
+    5,
+    6,
+    7,
+    14
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "2BGA (arXiv:2306.16400) on SmallGroup(11,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt6wtL2_order11_k2.txt, line 1. nonidentity supports a=[2], b=[2, 3, 6].",
+  "references": [],
+  "date": "2026-09-19",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "model": "DeepSeek V4 Flash 0731",
+  "origin": "submission"
+ },
+ "family": "generalized-bicycle",
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-09-26",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

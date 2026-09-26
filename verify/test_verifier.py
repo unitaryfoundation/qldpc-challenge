@@ -331,6 +331,74 @@ def main():
                       and "unrestricted" in c["detail"]
                       for c in r["checks"]))
 
+    # 7d. heuristic routing cost (issue #1847): the MST lower bound on the
+    #     nearest-neighbor SWAPs each check needs on its layout, computed for
+    #     every accepted layout and labeled heuristic; never for a code
+    #     without one. One lattice step is the layout's minimum site spacing.
+    print("\nheuristic routing cost:")
+    if GOOD.get("locality"):
+        rc = rep(GOOD)["computed"].get("routing_cost")
+        check("accepted layout reports a routing cost labeled heuristic",
+              rc is not None and rc["heuristic"] == "mst-lower-bound"
+              and isinstance(rc["total_swaps"], int)
+              and isinstance(rc["max_swaps_per_check"], int)
+              and rc["max_swaps_per_check"] <= rc["total_swaps"]
+              and rc["lattice_step"] == 1.0)
+        d = copy.deepcopy(GOOD)
+        d.pop("locality", None)
+        check("no layout, no routing cost",
+              "routing_cost" not in rep(d)["computed"])
+        # a cap-exceeding layout (every qubit on one line) is still priced
+        d = copy.deepcopy(GOOD)
+        d["locality"]["coordinates"] = [[float(i), 0.0] for i in range(d["n"])]
+        d["locality"]["layers"] = 1
+        d["locality"].pop("interaction_radius", None)
+        r = rep(d)
+        check("cap-exceeding layout still gets a routing cost",
+              r["computed"]["locality_class"] == "unrestricted"
+              and r["computed"]["routing_cost"]["total_swaps"] > 0)
+    # a small planar code: 3x3 grid of qubits, one plaquette per unit square,
+    # so every support is a nearest-neighbor cluster and costs 0 SWAPs
+    grid = [[float(x), float(y)] for y in range(3) for x in range(3)]
+    plaquettes = [[3 * y + x, 3 * y + x + 1, 3 * (y + 1) + x, 3 * (y + 1) + x + 1]
+                  for y in range(2) for x in range(2)]
+    check("planar plaquettes cost 0 SWAPs",
+          qldpc_verify.routing_cost(plaquettes, grid, 1.0) == (0, 0))
+    # the rotated surface code shipped on the board is the same statement end
+    # to end: its weight-4 checks sit on unit squares, its weight-2 boundary
+    # checks on unit edges
+    planar = json.load(open(os.path.join(ROOT, "codes", "25-1-5.json")))
+    rc = rep(planar)["computed"]["routing_cost"]
+    check("rotated surface code costs 0 SWAPs end to end",
+          (rc["total_swaps"], rc["max_swaps_per_check"]) == (0, 0))
+    # a hand-built long-range check on a unit line: qubits at 0, 1, 5, 12.
+    # MST edges 1, 4, 7 steps = 12, minus (4 - 1) = 9 SWAPs
+    line = [[float(x), 0.0] for x in range(13)]
+    check("long-range check costs MST steps minus (|support| - 1)",
+          qldpc_verify.check_routing_cost([0, 1, 5, 12], line, 1.0) == 9)
+    # the MST, not the diameter: a path 0, 1, 5, 12 plus a chord is priced by
+    # the tree, and a two-check code reports the total and the max
+    check("routing cost reports total and max over checks",
+          qldpc_verify.routing_cost([[0, 1, 5, 12], [2, 3], [7, 9]], line, 1.0)
+          == (10, 9))
+    # lattice steps follow the layout's minimum spacing: the same check on a
+    # layout with spacing 2 costs the same, since 2 units is one step there
+    check("nearest neighbor is one minimum-spacing step",
+          qldpc_verify.check_routing_cost(
+              [0, 1, 5, 12], [[2.0 * x, 0.0] for x in range(13)], 2.0) == 9)
+    # a diagonal is longer than one step (sqrt 2 rounds up to 2), and stacked
+    # flip-chip qubits count as adjacent rather than free
+    check("diagonal neighbors cost one SWAP",
+          qldpc_verify.check_routing_cost([0, 1], [[0.0, 0.0], [1.0, 1.0]], 1.0)
+          == 1)
+    check("stacked qubits are adjacent, never negative",
+          qldpc_verify.check_routing_cost([0, 1, 2],
+                                          [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+                                          1.0) == 0)
+    check("empty and singleton supports cost 0",
+          qldpc_verify.check_routing_cost([], line, 1.0) == 0
+          and qldpc_verify.check_routing_cost([4], line, 1.0) == 0)
+
     # 8. malformed: missing a required field, must not crash
     d = copy.deepcopy(GOOD)
     del d["checks"]
@@ -504,3 +572,174 @@ def test_board_reports_memoized_per_board_state(tmp_path, monkeypatch):
     rel = os.path.relpath(str(d))
     n = len(calls)
     assert Q.board_reports(rel) is r4 and len(calls) == n
+
+
+def _modular_fixture(split=lambda c: 0 if c[1] < 3 else 1):
+    """The fixture with every qubit assigned to a module by its coordinate
+    (schema 0.3, since locality.modules is a 0.3 field)."""
+    d = copy.deepcopy(GOOD)
+    d["schema_version"] = "0.3"
+    d["locality"]["modules"] = [split(c) for c in d["locality"]["coordinates"]]
+    return d
+
+
+def test_module_diagnostics():
+    """locality.modules (issue #1846): every qubit carries a module id, and the
+    verifier reports cross-module checks, ports per module, and qubits per
+    module while leaving the locality class and the rest of the verdict alone.
+    """
+    base = rep(GOOD)
+    d = _modular_fixture()
+    r = rep(d)
+    assert r["ok"]
+    assert r["computed"]["flags"]["modular"] is True
+    assert r["computed"]["locality_class"] == base["computed"]["locality_class"]
+    assert r["computed"]["locality"] == base["computed"]["locality"]
+    m = r["computed"]["modules"]
+    assert m["count"] == 2
+    mods = d["locality"]["modules"]
+    assert m["qubits_per_module"] == {"0": mods.count(0), "1": mods.count(1)}
+    # recompute the crossing set by hand and compare
+    X, Z = d["checks"]["X"], d["checks"]["Z"]
+    cross = {s: [i for i, sup in enumerate(H)
+                 if len({mods[q] for q in sup}) > 1]
+             for s, H in (("X", X), ("Z", Z))}
+    assert m["cross_module_check_indices"] == cross
+    assert m["cross_module_checks"] == len(cross["X"]) + len(cross["Z"])
+    assert 0 < m["cross_module_checks"] < len(X) + len(Z)
+    # two modules that share a check each see exactly one neighbor
+    assert m["ports_per_module"] == {"0": 1, "1": 1} and m["max_ports"] == 1
+    assert any(c["check"] == "modules_computed" and c["ok"] for c in r["checks"])
+
+    # a single module: nothing crosses, no ports
+    r1 = rep(_modular_fixture(lambda c: 7))
+    m1 = r1["computed"]["modules"]
+    assert r1["ok"] and m1["count"] == 1 and m1["cross_module_checks"] == 0
+    assert m1["ports_per_module"] == {"7": 0} and m1["max_ports"] == 0
+
+    # one module per qubit: every check crosses, ports = distinct partners
+    d2 = _modular_fixture()
+    d2["locality"]["modules"] = list(range(GOOD["n"]))
+    r2 = rep(d2)
+    m2 = r2["computed"]["modules"]
+    assert r2["ok"] and m2["count"] == GOOD["n"]
+    assert m2["cross_module_checks"] == len(X) + len(Z)
+
+    # no modules field: flag off, no block, verdict as before
+    assert base["computed"]["flags"]["modular"] is False
+    assert "modules" not in base["computed"]
+
+
+def test_module_assignment_must_cover_every_qubit():
+    """A partial assignment is a rejected layout claim, not a silent demotion;
+    a stale schema_version and an oversize list are rejected too."""
+    d = _modular_fixture()
+    d["locality"]["modules"] = d["locality"]["modules"][:-1]
+    r = rep(d)
+    assert not r["ok"] and "modules_cover_all_qubits" in failed_checks(r)
+    assert r["computed"]["flags"]["modular"] is False
+    assert "modules" not in r["computed"]
+
+    d = _modular_fixture()
+    d["schema_version"] = "0.1"
+    r = rep(d)
+    assert not r["ok"] and "schema_valid" in failed_checks(r)
+
+    d = _modular_fixture()
+    d["locality"]["modules"] = [0] * (qldpc_verify.MAX_COORDINATES + 1)
+    assert not rep(d)["ok"]
+
+    d = _modular_fixture()
+    d["locality"]["modules"][0] = -1
+    r = rep(d)
+    assert not r["ok"] and "schema_valid" in failed_checks(r)
+
+
+def _lift_to_3d(doc):
+    """The bilayer fixture unstacked into a genuine 3D layout: the two qubits
+    sharing a planar site go to z = 0 and z = 1, and layers drops to 1."""
+    d = copy.deepcopy(doc)
+    seen = {}
+    coords = []
+    for c in d["locality"]["coordinates"]:
+        z = seen.get(tuple(c), 0)
+        seen[tuple(c)] = z + 1
+        coords.append([float(c[0]), float(c[1]), float(z)])
+    d["locality"]["coordinates"] = coords
+    d["locality"]["layers"] = 1
+    d["locality"].pop("interaction_radius", None)
+    return d
+
+
+def test_3d_layout_checks():
+    """3D coordinates (issue #1849): the honesty checks and the radius carry
+    over, the report says D = 3, and no 2D-local class is earned."""
+    import math
+    base = rep(GOOD)
+    assert base["computed"]["locality"]["dimension"] == 2
+    assert "qubits_per_unit_area" in base["computed"]["locality"]
+
+    d = _lift_to_3d(GOOD)
+    r = rep(d)
+    assert r["ok"], failed_checks(r)
+    lay = r["computed"]["locality"]
+    assert lay["dimension"] == 3 and len(lay["bbox"]) == 3
+    assert lay["max_qubits_per_site"] == 1 and lay["min_site_spacing"] == 1.0
+    assert "qubits_per_unit_volume" in lay and "qubits_per_unit_area" not in lay
+    coords = d["locality"]["coordinates"]
+    radius = max(math.dist(coords[a], coords[b])
+                 for sup in d["checks"]["X"] + d["checks"]["Z"]
+                 for a in sup for b in sup)
+    assert lay["interaction_radius"] == round(radius, 4)
+    assert radius >= base["computed"]["locality"]["interaction_radius"]
+    assert r["computed"]["locality_class"] == "unrestricted"
+    assert any(c["check"] == "locality_class_computed" and "3D" in c["detail"]
+               for c in r["checks"])
+    assert any(c["check"] == "coordinates_uniform_dimension" and c["ok"]
+               for c in r["checks"])
+
+    # a claimed radius is still checked in 3D
+    d2 = copy.deepcopy(d)
+    d2["locality"]["interaction_radius"] = radius - 0.5
+    r2 = rep(d2)
+    assert not r2["ok"] and "interaction_radius_within_claim" in failed_checks(r2)
+
+    # cramming along z fails, as it does in the plane
+    d3 = copy.deepcopy(d)
+    d3["locality"]["coordinates"] = [[c[0], c[1], 0.25 * c[2]] for c in coords]
+    r3 = rep(d3)
+    assert not r3["ok"] and "site_spacing_at_least_one" in failed_checks(r3)
+
+    # stacking beyond the declared layers fails in 3D too
+    d4 = copy.deepcopy(d)
+    d4["locality"]["coordinates"] = [[c[0], c[1], 0.0] for c in coords]
+    r4 = rep(d4)
+    assert not r4["ok"] and "site_occupancy_within_layers" in failed_checks(r4)
+    # and passes when the layers are declared, but as a 3D layout it still
+    # earns no planar class
+    d4["locality"]["layers"] = 2
+    r4 = rep(d4)
+    assert r4["ok"] and r4["computed"]["locality_class"] == "unrestricted"
+    assert (r4["computed"]["locality"]["interaction_radius"]
+            == base["computed"]["locality"]["interaction_radius"])
+
+
+def test_mixed_or_higher_dimensions_rejected():
+    d = _lift_to_3d(GOOD)
+    d["locality"]["coordinates"][0] = d["locality"]["coordinates"][0][:2]
+    r = rep(d)
+    assert not r["ok"] and "coordinates_uniform_dimension" in failed_checks(r)
+    assert "locality" not in r["computed"]
+
+    d = _lift_to_3d(GOOD)
+    d["locality"]["coordinates"] = [c + [0.0] for c in d["locality"]["coordinates"]]
+    r = rep(d)
+    assert not r["ok"] and "schema_valid" in failed_checks(r)
+
+    # modules stay orthogonal to the dimension
+    d = _lift_to_3d(GOOD)
+    d["schema_version"] = "0.3"
+    d["locality"]["modules"] = [int(c[2]) for c in d["locality"]["coordinates"]]
+    r = rep(d)
+    assert r["ok"] and r["computed"]["flags"]["modular"]
+    assert r["computed"]["modules"]["count"] == 2

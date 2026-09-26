@@ -4846,46 +4846,40 @@
    }
   },
   "Z": {
-   "value": 21,
+   "value": 20,
    "confidence": "upper_bound",
    "witness": [
-    21,
-    104,
-    122,
-    137,
-    170,
-    173,
-    224,
-    238,
-    239,
-    282,
-    286,
-    298,
-    317,
-    318,
-    337,
-    351,
-    353,
-    370,
-    387,
-    503,
-    537
+    12,
+    47,
+    95,
+    98,
+    113,
+    128,
+    149,
+    161,
+    179,
+    194,
+    197,
+    200,
+    215,
+    227,
+    251,
+    263,
+    308,
+    309,
+    325,
+    342
    ],
    "witness_provenance": {
     "found_by": [
-     "@dorakingx"
+     "@vprusso"
     ],
-    "date": "2026-09-16",
-    "found_at_samples": 4000,
-    "survived_samples": 20000000,
-    "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
+    "date": "2026-09-26",
+    "found_at_samples": 300000000,
+    "survived_samples": 300000000,
+    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
     "seeds": [
-     7,
-     777001,
-     777138,
-     777275,
-     777412,
-     777549
+     4101
     ]
    }
   }

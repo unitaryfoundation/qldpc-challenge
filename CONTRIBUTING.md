@@ -25,8 +25,16 @@ arrays or scipy sparse). The tool:
 - searches for the lightest logical on each side and records it as a
   self-certifying distance witness, so you never hand-write a witness;
 - assembles the schema-valid JSON;
-- runs the full verifier locally, the same gate CI runs; and
-- writes `codes/<n>-<k>-<d>.json` and prints the steps to open the PR.
+- runs the full verifier locally, the same gate CI runs;
+- generates the circuit tier: `memory_x` and `memory_z` syndrome-extraction
+  circuits on a schedule the code's structure supports (an interleaved
+  two-block schedule for bicycle-type codes, a layout zigzag for surface
+  patches, a generic sequential schedule otherwise), searches their detector
+  error models for `d_circ` witnesses, and runs `verify/circuit_verify.py`
+  on them; a code the generator cannot schedule within the tier's caps is
+  submitted without circuits and the reason is printed; and
+- writes `codes/<n>-<k>-<d>.json` plus `circuits/<n>-<k>-<d>/` and prints
+  the steps to open the PR.
 
 If verification fails, nothing is written and you see exactly which check
 failed before anything leaves your machine.
@@ -42,6 +50,12 @@ Useful flags:
 - `--coords coords.npz --layers 2` a 2D layout; the verifier derives the locality
   class (single / bilayer / unrestricted) from it, you do not declare a track.
   `layers` is required alongside the coordinates (the CLI defaults it to 1);
+- `--circuits DIR` your own `memory_x.stim` and `memory_z.stim` (canonical
+  noise recipe, see `verify/circuit_tools.py`) in place of the generated ones;
+  the `.dem` files are derived with the pinned stim and the witnesses searched
+  for you. `--no-circuit` submits the code tier only. `d_circ` is penalty-only:
+  a circuit can discount an entry, never inflate it, and the value the CLI
+  reports is what the board will show;
 - `--open-pr` create the branch, commit, push, and open the PR for you;
 - `--anonymous` explicitly proceed without an `@handle` (the submission will
   not be bound to a GitHub account);

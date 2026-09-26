@@ -60,6 +60,7 @@ TRUSTED = (
     "verify/ler_verify.py",
     "verify/qldpc_verify.py",
     "verify/refute_board.py",
+    "verify/transversal_gates.py",
     "verify/validate_candidate.py",
     "verify/verify_all.py",
 )

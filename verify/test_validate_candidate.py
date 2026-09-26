@@ -7,7 +7,9 @@ Each case isolates one gate so a failure points at the right place:
      and is *not* a duplicate -- so the failure is unambiguously the distance gate;
   3. an exact BOARD DUPLICATE verifies but does not pass (the dedup gate);
   4. a SCHEMA-BROKEN candidate fails at verify and short-circuits;
-  5. every verdict carries the validator's source-hash provenance stamp.
+  5. every verdict carries the validator's source-hash provenance stamp;
+  6. a win whose only strict axis is d over a board peer equal in n, k and w is
+     labelled as such, with the peer named for a re-measurement.
 
 Fixtures are built from research/ (bb, submit) -- that is fine: the code UNDER TEST
 (validate_candidate) imports only verify/, never research/. An explicit seed and a small,
@@ -67,10 +69,9 @@ def main():
           vg["gates"]["novelty"]["cell"] == ["weight-6", "unrestricted"])
 
     print("1b. a code compared against ITSELF reports no novelty verdict:")
-    # Validating a doc already on the board (issue #728) makes the dedup gate
-    # fire. Reporting that as "does not advance its board cell" with an empty
-    # dominator list describes a rejection on merit that never happened, and it
-    # cost a real submission that was in fact board-advancing.
+    # Validating a doc already on the board makes the dedup gate fire. The
+    # novelty verdict is withheld rather than reported as "does not advance its
+    # board cell", which would read as a rejection on merit when none happened.
     import glob
     onboard = sorted(glob.glob(os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -124,6 +125,68 @@ def main():
     check("verdict stamps this validator's source hash",
           vg["validator"]["source_sha256"] == V.source_sha256())
     check("source hash is 64 hex chars", len(vg["validator"]["source_sha256"]) == 64)
+
+    print("6. a win whose ONLY strict axis is d is labelled as the suspect pattern:")
+    # A construction fixes n, k and w, so the only axis left to gain on is d,
+    # the axis that is an upper bound. The gate must name that case and hand
+    # back the peer to re-measure, instead of a generic "advances".
+    real_board = V._board_entries
+    w6 = max(int(HX.sum(axis=1).max()), int(HZ.sum(axis=1).max()))
+
+    def peer(k_peer, d_peer):
+        return {"name": f"peer-{k_peer}-{d_peer}.json", "n": n, "k": k_peer,
+                "d": d_peer, "fingerprint": "not-the-candidate", "sig": "neither",
+                "weight_class": "weight-6", "w": w6, "locality_class": "unrestricted"}
+
+    try:
+        V._board_entries = lambda: [peer(4, 5)]            # ties n, k, w; loses on d only
+        vd1 = V.validate_candidate(good, seed=SEED, refute=False)
+        nov = vd1["gates"]["novelty"]
+        check("flagged d_only_gain", nov["d_only_gain"] is True)
+        check("advances_by is exactly ['d']", nov["advances_by"] == ["d"])
+        check("peer named for the audit",
+              nov["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"])
+        check("label says ONLY on d and names the suspect axis",
+              any("ONLY on d" in x and "suspect axis" in x for x in vd1["labels"]))
+        check("still passes (the flag is a label, not a pass condition)",
+              vd1["passed"])
+
+        V._board_entries = lambda: [peer(3, 5)]            # wins on k as well as d
+        vd2 = V.validate_candidate(good, seed=SEED, refute=False)
+        check("a win on a structural axis too is NOT d-only",
+              vd2["gates"]["novelty"]["d_only_gain"] is False
+              and vd2["gates"]["novelty"]["advances_by"] == ["d", "k"])
+        check("generic advance label",
+              any(x == "advances the weight-6 x unrestricted board" for x in vd2["labels"]))
+
+        # Two peers at once: one beaten on d alone, one on d and k. The whole
+        # advance is no longer d-only, but the win over the first peer still
+        # rests on a suspect axis alone, so the instruction must still print.
+        V._board_entries = lambda: [peer(4, 5), peer(3, 5)]
+        vd4 = V.validate_candidate(good, seed=SEED, refute=False)
+        nov4 = vd4["gates"]["novelty"]
+        check("a structural win elsewhere does NOT clear the d-only flag",
+              nov4["d_only_gain"] is False
+              and nov4["advances_by"] == ["d", "k"])
+        check("the d-only peer is still listed",
+              nov4["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"])
+        label4 = next((x for x in vd4["labels"] if "advances the" in x), "")
+        check("label still names the advance",
+              label4.startswith("advances the weight-6 x unrestricted board on d, k"))
+        check("label still hands back the peer to re-measure",
+              "peer-4-5.json" in label4 and "suspect axis" in label4
+              and "matched depth" in label4)
+        check("still passes (the flag is a label, not a pass condition)",
+              vd4["passed"])
+
+        V._board_entries = lambda: [peer(4, 9)]            # board entry dominates
+        vd3 = V.validate_candidate(good, seed=SEED, refute=False)
+        check("dominated -> no advance, no d-only flag",
+              vd3["gates"]["novelty"]["board_advancing"] is False
+              and vd3["gates"]["novelty"]["d_only_gain"] is False
+              and any("does not advance" in x for x in vd3["labels"]))
+    finally:
+        V._board_entries = real_board
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
     return 1 if _fail else 0
