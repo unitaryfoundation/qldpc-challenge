@@ -87,7 +87,7 @@ def load_checks(path):
     """
     if path.endswith(".json"):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 doc = json.load(f)
         except json.JSONDecodeError as e:
             raise SystemExit(f"{path}: not valid JSON ({e})")
@@ -263,7 +263,7 @@ def search_budget_from_args(args):
             if raw.lstrip().startswith("{"):
                 loaded = json.loads(raw)
             else:
-                with open(raw) as f:
+                with open(raw, encoding="utf-8") as f:
                     loaded = json.load(f)
         except (OSError, json.JSONDecodeError) as e:
             raise SystemExit(f"--budget-json: cannot read {raw!r} ({e})")
@@ -419,7 +419,7 @@ def pr_body(doc, report, args, out, note_out=None):
 def write_pr_body(slug, body):
     """Stage the body where --open-pr and the manual path can both use it."""
     fd, path = tempfile.mkstemp(prefix=f"qldpc-pr-{slug}-", suffix=".md")
-    with os.fdopen(fd, "w") as f:
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
         f.write(body + "\n")
     return path
 
@@ -645,7 +645,8 @@ def attach_circuit_tier(doc, args):
     trial["schema_version"] = schema_version_for(trial)
     with tempfile.TemporaryDirectory(prefix="qldpc-circuits-") as tmp:
         for name, text in files.items():
-            with open(os.path.join(tmp, name), "w") as f:
+            with open(os.path.join(tmp, name), "w", encoding="utf-8",
+                      newline="\n") as f:
                 f.write(text)
         report = verify_circuit(trial, tmp)
     problems = [f"{c['check']}: {c['detail']}" for c in report["checks"]
@@ -716,14 +717,15 @@ def cmd_submit(args):
             print(dry_run_summary(doc, report, out))
         return 0
     os.makedirs(args.out, exist_ok=True)
-    with open(out, "w") as f:
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
         json.dump(doc, f, indent=1)
         f.write("\n")
     print(f"  wrote {out}")
     if circuit_files:
         os.makedirs(circuits_dir, exist_ok=True)
         for name, text in circuit_files.items():
-            with open(os.path.join(circuits_dir, name), "w") as f:
+            with open(os.path.join(circuits_dir, name), "w",
+                      encoding="utf-8", newline="\n") as f:
                 f.write(text)
         print(f"  wrote {circuits_dir}/memory_{{x,z}}.{{stim,dem}}")
     else:
@@ -735,14 +737,14 @@ def cmd_submit(args):
     # research log. See notes/README.md and notes/TEMPLATE.md.
     note_out = None
     if args.note_file:
-        with open(args.note_file) as f:
+        with open(args.note_file, encoding="utf-8") as f:
             note_md = f.read()
         if len(note_md.encode()) > 10 * 1024:
             print(f"\n{args.note_file} exceeds the 10 KiB note cap; trim it.")
             return 1
         note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
         os.makedirs(os.path.dirname(note_out), exist_ok=True)
-        with open(note_out, "w") as f:
+        with open(note_out, "w", encoding="utf-8", newline="\n") as f:
             f.write(note_md)
         print(f"  wrote {note_out}")
     else:
@@ -1021,6 +1023,13 @@ def cmd_recent(args):
 
 
 def main(argv=None):
+    # Windows consoles default to a legacy code page, and the summaries print
+    # "≤" (d <= 12, weight ≤ 6). Without this the run dies in the final print,
+    # after the search and the verification have already succeeded.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure") and (stream.encoding or "").lower().replace("-", "") != "utf8":
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
     p = argparse.ArgumentParser(
         prog="qldpc", description="qLDPC challenge submission tool")
     sub = p.add_subparsers(dest="cmd", required=True)
