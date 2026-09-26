@@ -503,8 +503,9 @@ border:1px solid var(--ln);border-radius:12px}
 table.board,.board tbody,.board tr,.board td{display:block;width:auto}
 table.board{min-width:0;font-size:13px;margin:12px 0}
 .board thead{display:none}
-.board tr{border:1px solid var(--ln);border-radius:12px;margin:0 0 10px;
-padding:12px 14px 10px;background:var(--soft)}
+.board tr{display:flex;flex-wrap:wrap;align-items:baseline;
+border:1px solid var(--ln);border-radius:12px;margin:0 0 8px;
+padding:9px 12px 8px;background:var(--soft)}
 .board tr.fr{border-color:var(--ac)}
 .showall{display:block;width:100%;margin:2px 0 14px;padding:11px;
 font:inherit;font-size:14px;font-weight:600;color:var(--ac);
@@ -516,7 +517,8 @@ gap:16px;padding:3px 0;border:0;white-space:normal;text-align:right}
 font-family:'Space Mono',ui-monospace,monospace;font-size:11px;
 text-transform:uppercase;letter-spacing:.04em;text-align:left}
 .board td.num{text-align:right}
-.board td.codecell{justify-content:flex-start;padding:0 0 8px;margin:0 0 6px;
+.board td.codecell{justify-content:flex-start;flex-wrap:wrap;row-gap:4px;
+width:100%;order:0;padding:0 0 6px;margin:0 0 6px;
 border-bottom:1px solid var(--ln);font-size:15px}
 .board td.codecell::before{content:none}
 .board tr.fr td.codecell::after{content:"\2605";color:var(--ac);
@@ -532,35 +534,38 @@ margin-left:8px}
 .board td.col-diag{display:none}
 /* date: small, in the card's top-right corner */
 .board tr{position:relative}
-.board td.date{position:absolute;top:12px;right:14px;width:auto;padding:0;
+.board td.date{position:absolute;top:9px;right:12px;width:auto;padding:0;
 font-size:11.5px;color:var(--mut)}
 .board td.date::before{content:none}
 .board td.codecell{padding-right:92px}
-/* kd2/n, g, w, X/Z: a horizontal stat band, big value, small label beneath
-   (column-reverse puts the ::before label under the number) */
-.board td.m3{display:inline-flex;flex-direction:column-reverse;
-align-items:center;justify-content:flex-start;gap:2px;width:24.5%;
-padding:5px 0 3px;font-size:17px;font-weight:700;
-font-variant-numeric:tabular-nums;text-align:center}
-.board td.m3::before{font-size:10.5px}
+/* kd2/n, g, w, X/Z: one line, each ::before label beside its own number
+   (row-reverse puts the label after the value). Stacking the labels under the
+   numbers cost a whole line per card, and a phone shows four or five cards. */
+.board td.m3{display:inline-flex;flex-direction:row-reverse;
+align-items:baseline;justify-content:center;gap:4px;width:24.5%;min-width:0;
+order:0;padding:2px 0;font-size:clamp(13px,3.6vw,16px);font-weight:700;
+font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+.board td.m3::before{font-size:clamp(9px,2.4vw,10.5px)}
 /* an entry with no verified layout has no g: the cell is a bare middot, so it
    is a quarter of the stat band carrying nothing. Drop it and let the three
    real stats split the width. */
 .board td.m3.m3empty{display:none}
 .board tr:has(td.m3empty) td.m3{width:32.8%}
-/* the family chip rides on the title line instead of claiming its own row */
-.board td.typecell{position:absolute;top:34px;left:14px;width:auto;
+/* the family and locality chips share the byline rather than claiming a row */
+.board td.typecell{position:static;order:1;flex:0 0 auto;width:auto;
 padding:0;margin:0}
-.board td.codecell{padding-bottom:30px}
 /* unlabeled rows: chips and byline speak for themselves */
 .board td.typecell::before,.board td.auth::before,
 .board td.model::before{content:none}
 .board td.typecell{justify-content:flex-start}
 /* bottom line: authors on the left, model on the right, one row */
-.board td.auth{display:inline-flex;width:57%;justify-content:flex-start;
-text-align:left}
-.board td.model{display:inline-flex;width:42%;justify-content:flex-end;
-text-align:right}}
+.board td.auth{display:inline-flex;order:2;flex:1 1 auto;width:auto;
+min-width:0;padding-left:8px;justify-content:flex-start;text-align:left;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* the model elides rather than wrapping the card onto another line */
+.board td.model{display:inline-flex;order:3;flex:0 1 auto;width:auto;
+min-width:0;max-width:60%;padding-left:8px;justify-content:flex-end;
+text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 /* phones: reclaim horizontal space and shrink oversized headers */
 @media(max-width:560px){.wrap{padding:0 14px}
 header.hero{padding:34px 0 30px}
