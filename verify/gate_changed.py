@@ -362,7 +362,7 @@ def board_record_slugs(code_root=ROOT):
     one, so over-claims pay extra scrutiny exactly where gaming would matter.
     Cell-aware on purpose: a 2D-local record is a record even when a nonlocal
     code beats it globally, and it deserves the deep battery too. The code
-    type is a cell dimension (issue #2131): CSS and stabilizer codes sit on
+    type is a cell dimension: CSS and stabilizer codes sit on
     separate boards, so neither can dominate the other."""
     rows = []
     for p in sorted(glob.glob(os.path.join(code_root, "codes", "*.json"))):
@@ -546,7 +546,7 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
     (refuted, d, witness, trials_completed) -- the LAST field is the count
     actually searched, which is what the receipt must record.
 
-    A stabilizer code (issue #2131) is searched through its symplectic
+    A stabilizer code is searched through its symplectic
     doubling H'_X = (A | B), H'_Z = (B | A): the accelerator's Hamming weight
     over 2n bits is an upper bound on the Pauli weight, so each proposal is
     mapped back to a Pauli operator, validated, and RE-SCORED by Pauli weight
@@ -905,7 +905,7 @@ def main(argv):
                                                       max_seconds=budget,
                                                       trials=trials)
             # the BP+OSD cross-check decodes per Pauli sector of a CSS code;
-            # a stabilizer code has no sectors and skips it (issue #2131)
+            # a stabilizer code has no sectors and skips it
             if SD is not None and not is_stabilizer(doc):
                 results["syndrome-decoder"] = SD.refute_check(doc, seed=seed + 1)
             # Frontier claims additionally face the accelerated deep search when

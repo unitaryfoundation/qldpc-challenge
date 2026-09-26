@@ -1,4 +1,4 @@
-"""General (non-CSS) stabilizer codes through the trust anchor (issue #2131).
+"""General (non-CSS) stabilizer codes through the trust anchor.
 
 The fixtures under verify/fixtures/ are the [[5,1,3]] code and the XZZX toric
 code at L = 3 and 4; the tests here build the adversarial variants in place:

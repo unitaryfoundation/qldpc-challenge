@@ -1592,12 +1592,12 @@ def load_entries():
         if not rep["ok"]:
             continue
         if doc.get("code_type") == "stabilizer":
-            # General stabilizer codes (issue #2131) rank on their own board,
+            # General stabilizer codes rank on their own board,
             # and their page (one d, generators as Pauli letters, no X/Z
             # asymmetry) is not rendered yet; skip them so the CSS board
             # neither shows nor compares against them.
             print(f"  note: {slug}: stabilizer entry, not rendered yet "
-                  f"(separate leaderboard, issue #2131)")
+                  "(separate leaderboard)")
             continue
         earned = rep["earned_distance"].get("d")
         if not earned:
@@ -3668,7 +3668,7 @@ def cells(e):
 def cell_key(e, cell):
     """Return the board key of a cell for entry e.
 
-    The code type is a cell dimension (issue #2131): a CSS entry's key is the
+    The code type is a cell dimension: a CSS entry's key is the
     (locality, weight) pair the grid renders; a stabilizer entry's key
     carries its type as a third element, so the two boards never share a
     cell, a frontier, or a record.

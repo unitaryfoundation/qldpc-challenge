@@ -37,18 +37,17 @@ strict. There can be many co-leaders. `kd^2/n` is a sortable headline figure per
 cell (see the caveat below), and never collapses the frontier into one rank.
 
 Code type, from `code_type`, is a third cell dimension: CSS codes and general
-stabilizer codes (the [[5,1,3]] code, XZZX codes, the halved pair-partition
-codes of arXiv:2609.30069) are separate leaderboards. A stabilizer code is
-compared only with stabilizer codes, so it never dominates or is dominated by
-a CSS entry, and the CSS boards are unchanged by its presence. The reason is
-that the two families decode differently: how `kd^2/n` relates to a logical
-error rate is even less settled for non-CSS codes, and one board would
-reward inflating it across the two. The check-weight class of a stabilizer
-code is computed from the number of qubits each generator acts on (a `Y`
-counts once), the locality class from the generator supports, so the
-(locality, weight) grid is the same on both boards. Codes that are CSS up to a
-Hadamard on some qubits belong on the CSS board: the verifier detects them
-and the dedup gate marks them as duplicates of the CSS entry.
+stabilizer codes are ranked on separate leaderboards. A stabilizer code is
+compared only with other stabilizer codes, so neither board's entries can
+dominate the other's. They are kept apart because `kd^2/n` does not mean the
+same thing for both: the two families decode differently, and how the figure
+tracks a logical error rate is less settled for non-CSS codes.
+
+A stabilizer code's check weight is the number of qubits each generator acts
+on (a `Y` counts once) and its locality class comes from the generator
+supports, so the (locality, weight) grid is the same on both boards. A code
+that is CSS up to a Hadamard on some qubits belongs on the CSS board; the
+verifier detects these and the dedup gate marks them as duplicates.
 
 A record whose only strict axis is `d` — the candidate ties an existing entry on
 n, k and w and raises nothing but the distance — is a different kind of claim

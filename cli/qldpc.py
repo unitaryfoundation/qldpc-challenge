@@ -34,11 +34,10 @@ Usage:
 Input:
   .npz  with H_X and H_Z under keys hx/HX/H_X and hz/HZ/H_Z (dense 0/1 arrays
         or scipy sparse). Optional 'coords' (n x 2) for the 2d-local tracks.
-        A general stabilizer code (issue #2131) instead carries its binary
-        symplectic matrix S = (A | B) under key s/S (m x 2n), or its two
-        halves under a/A and b/B (m x n each); the submission is then typed
-        code_type "stabilizer", with one Pauli-weight distance side P and no
-        circuit tier, and ranks on the separate stabilizer board.
+        A general stabilizer code instead carries its binary symplectic
+        matrix S = (A | B) under key s/S (m x 2n), or its halves under a/A
+        and b/B (m x n each). It is typed code_type "stabilizer": one
+        Pauli-weight distance side P, no circuit tier, its own board.
   .json an existing draft carrying a checks block (re-verify / re-score it).
 """
 
@@ -601,8 +600,8 @@ def frontier_summary(doc, report):
     lines = []
     for cell in cells(cand):
         L, W = cell
-        # peers share the cell AND the board: CSS and stabilizer codes are
-        # ranked separately (issue #2131)
+        # peers share the cell and the board: CSS and stabilizer codes
+        # rank separately
         idxs = [i for i, e in enumerate(entries) if cell in cells(e)
                 and e.get("code_type", "CSS") == cand["code_type"]]
         peers = [entries[i] for i in idxs]
@@ -822,7 +821,7 @@ def cmd_submit(args):
     if stabilizer:
         if args.circuits:
             raise SystemExit("--circuits: the circuit tier is not available "
-                             "for stabilizer codes (issue #2131); drop the flag")
+                             "for stabilizer codes; drop the flag")
         if not args.no_circuit:
             print("  circuit tier: not available for stabilizer codes (the "
                   "memory experiments are per basis); submitting the code "

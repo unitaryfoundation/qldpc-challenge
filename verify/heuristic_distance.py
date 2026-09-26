@@ -20,7 +20,7 @@ verify/gf2.py (no build). If the gf2_fast C++ extension is importable it is used
 for a faster, larger overall weight search; witnesses are always extracted by the
 Python path (the C++ returns weights only).
 
-General stabilizer codes (code_type "stabilizer", issue #2131): there are no
+General stabilizer codes (code_type "stabilizer"): there are no
 sides. The same RREF engine runs once on K = ker(B | A), the normalizer of
 S = (A | B) written as Pauli vectors (x | z), scoring every candidate by its
 Pauli weight |supp x union supp z| (a Y counts once) and testing nontriviality

@@ -74,9 +74,8 @@ board-relative claim, not a statement against the wider literature.
 
 ## General stabilizer codes
 
-A code whose generators mix `X` and `Z` on one qubit set (the [[5,1,3]]
-code, the XZZX toric code, the halved pair-partition codes of
-arXiv:2609.30069) has no `H_X` and `H_Z`. Submit its binary symplectic
+A code whose generators mix `X` and `Z` on one qubit (the [[5,1,3]] code,
+the XZZX toric code) has no `H_X` and `H_Z`. Submit its binary symplectic
 matrix instead: `S = (A | B)`, one row per generator, generator `i` being
 `X^{A_i} Z^{B_i}` (a qubit in both halves carries `Y`). In the `.npz` that
 is key `s` (an `m x 2n` array) or the two halves `a` and `b` (`m x n` each);
@@ -99,8 +98,7 @@ entry. What changes, and what does not:
   Pauli weight, and the accelerated pass searches the symplectic doubling
   `H'_X = (A | B)`, `H'_Z = (B | A)`, re-scoring every find by Pauli weight.
 - A code whose every generator is pure `X` or pure `Z` is a CSS code, and a
-  submission that types one `stabilizer` is rejected with the instruction to
-  type it `CSS`. The 500-plus CSS entries keep their per-side semantics.
+  submission that types one `stabilizer` is rejected.
 - A CSS board code with a Hadamard on some of its qubits is a stabilizer
   code with the same parameters. The verifier looks for such a qubit subset;
   when it finds one, the CSS code it maps to is compared with the board and a
@@ -108,12 +106,10 @@ entry. What changes, and what does not:
 - Stabilizer codes rank on a separate leaderboard. Novelty, dominance, and
   records are computed among stabilizer codes only; a stabilizer code never
   dominates or is dominated by a CSS entry.
-- Not yet available for stabilizer codes: the circuit tier (the memory
-  experiments are per basis, and a general code needs a stabilizer
-  measurement schedule the generator does not build), so `circuit` is not
-  accepted on such an entry; and exact certification (the certifier
-  minimizes Hamming weight per side), so an `exact` claim is accepted as
-  `upper_bound`, as CSS claims were before certification existed.
+- Not yet available: the circuit tier, since the memory experiments are per
+  basis, so `circuit` is not accepted on such an entry; and exact
+  certification, since the certifier minimizes Hamming weight per side, so an
+  `exact` claim is accepted as `upper_bound`.
 
 By hand, the entry is `code_type: "stabilizer"`, `schema_version: "0.4"`,
 `checks.S` as a list of `{"X": [...], "Z": [...]}` generators, and

@@ -128,7 +128,7 @@ def main(argv=None):
                 if "fingerprint" in rep:
                     fps.setdefault(rep["fingerprint"], []).append(rel)
                 # a stabilizer entry that is CSS up to local Hadamards is also
-                # filed under that CSS code's identity (issue #2131), so a
+                # filed under that CSS code's identity, so a
                 # Hadamard-relabeled copy of a CSS entry collides with it
                 ceq = rep.get("css_equivalent") or {}
                 for fp in set(ceq.get("fingerprints") or []):

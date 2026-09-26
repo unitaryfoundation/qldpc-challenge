@@ -98,7 +98,7 @@ def _identity_sets(rep):
     """Return the (fingerprints, signatures) under which a verified code is recognized.
 
     Its own, plus those of the CSS code it maps to under local Hadamards when
-    the verifier found one (report["css_equivalent"], issue #2131).
+    the verifier found one (report["css_equivalent"]).
     """
     ceq = rep.get("css_equivalent") or {}
     fps = {rep.get("fingerprint")} | set(ceq.get("fingerprints") or [])
@@ -162,7 +162,7 @@ def validate_candidate(doc, *, seed=None, refute=True):
 
     # 3. DEDUP -- compare against the board by exact fingerprint and WL signature,
     #    both already computed by the verifier above. A stabilizer candidate
-    #    that is a CSS code up to a Hadamard on some qubits (issue #2131) is
+    #    that is a CSS code up to a Hadamard on some qubits is
     #    also compared through that CSS code's fingerprint and signature, in
     #    both directions, so a relabeled copy of a board entry is marked a
     #    duplicate of it rather than admitted as a new code. The CSS and
@@ -206,7 +206,7 @@ def validate_candidate(doc, *, seed=None, refute=True):
     # so a code could be labelled "does not advance its board cell" while
     # starring on the rendered board.
     #
-    # The code type is a third cell dimension (issue #2131): a stabilizer
+    # The code type is a third cell dimension: a stabilizer
     # code is compared only with stabilizer codes and a CSS code only with
     # CSS codes, so neither board's entries can dominate the other's.
     n, k, d = doc["n"], doc["k"], claimed_d

@@ -19,7 +19,7 @@ What "verified" means per field:
               the claimed Pauli type and weight -> certifies d_side <= value
               as an UPPER BOUND. 'exact' claims are downgraded to upper_bound
               here and flagged for server certification.
-  stabilizer  (code_type "stabilizer", issue #2131) the generators are one
+  stabilizer  (code_type "stabilizer") the generators are one
               binary symplectic matrix S = (A | B), generator i being
               X^{A_i} Z^{B_i} with a qubit in both supports carrying Y. The
               checks are the general-stabilizer versions of the CSS ones:
@@ -206,7 +206,7 @@ def is_css_up_to_local_hadamard(A, B):
 
     Returns the sorted list of qubits whose Hadamard turns every generator of
     S = (A | B) into a pure-X or pure-Z operator, or None when no such subset
-    exists (issue #2131).
+    exists.
 
     A Hadamard on qubit q swaps the X and Z parts of every generator on q. A
     Y factor (a qubit in both parts) stays Y, so any Y rules the map out at
@@ -1155,7 +1155,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                "a valid P witness is required to earn a distance" if stab else
                "valid X and Z witnesses are required to earn a global distance")
 
-    # 7a. local-Hadamard equivalence (issue #2131). A CSS board code with a
+    # 7a. local-Hadamard equivalence. A CSS board code with a
     #     Hadamard on some qubits is a stabilizer code with the same
     #     [[n, k, d]] and weight, and neither rref(S) nor the labeled WL
     #     signature matches the original. When a Hadamard subset exists that
