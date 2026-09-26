@@ -74,7 +74,7 @@ EXIT_REFUTED = 2
 EXIT_INVALID = 3
 
 import surrogate  # noqa: E402
-from css import commutes, compute_k, in_rowspace, verify_css  # noqa: E402
+from css import compute_k, verify_css  # noqa: E402
 
 
 def load_entry(path):
@@ -112,69 +112,39 @@ def _dense_weight(HX, HZ):
     return w
 
 
-def _search_side(prepared, tag, trials, seed, pair_depth):
-    """One side's NumPy search, reusing the prepared GF(2) bases."""
-    hself, hopp, kernel, logicals = prepared.side(tag)
-    return surrogate._search_lightest(hself, hopp, trials, seed, pair_depth=pair_depth, bases=(kernel, logicals))
-
-
 def ris(HX, HZ, trials, seed, threads=8, pair_depth=10, prepared=None):
     """One RIS search on both sides. Returns (weight, side, support, seconds).
 
-    ``prepared`` (from ``surrogate.prepare_distance_search``) is built once by
-    the ladder and screen loops and reused: the GF(2) bases depend only on the
-    check matrices, so rebuilding them per seed is pure waste.
+    A thin shell over ``surrogate.distance_rand_witness``: the backend choice,
+    the per-side seed streams, and the Python re-check of whatever a backend
+    proposes all live in the kit, so this harness and any other caller measure
+    the same way. ``prepared`` (from ``surrogate.prepare_distance_search``) is
+    built once by the ladder and screen loops and reused, since the GF(2) bases
+    depend only on the check matrices.
+
+    A backend proposal that fails validation comes back as the no-logical
+    result, exactly like a search that found nothing: neither can move a
+    reading or reach a witness file.
     """
     t0 = time.time()
-    if surrogate._fast is not None:
-        w, side, support = surrogate._fast.distance_rand_witness(
-            np.asarray(HX, dtype=np.int8),
-            np.asarray(HZ, dtype=np.int8),
-            trials=int(trials),
-            seed=int(seed),
-            pair_depth=pair_depth,
-            threads=int(threads),
-        )
-        w = surrogate._weight_or_inf(w, HX.shape[1])
-        support = sorted(int(q) for q in support) if support else []
-        if side in ("X", "Z"):
-            return w, side, support, time.time() - t0
-        # The n+1 sentinel: no logical of either type (a k = 0 entry, or a search
-        # that found nothing). That is a result, not a reason to retry. Falling
-        # through here would re-run the whole budget on the NumPy path, which is
-        # ~1 ms/trial -- hours at an 8M rung, not a cheap second opinion.
+    found = surrogate.distance_rand_witness(
+        HX, HZ, trials, seed, backend="auto", threads=threads,
+        pair_depth=pair_depth, prepared=prepared)
+    if not found:
         return float("inf"), "", [], time.time() - t0
-    if prepared is None:
-        prepared = surrogate.prepare_distance_search(HX, HZ)
-    # Independent streams per side. With plain `seed` / `seed + 1` the Z side of
-    # ladder seed s replays the X side of seed s + 1, which is not the "fresh
-    # independent seeds each rung" the ladder advertises.
-    x_seed, z_seed = np.random.SeedSequence(int(seed)).spawn(2)
-    wx, sx = _search_side(prepared, "X", trials, x_seed, pair_depth)
-    wz, sz = _search_side(prepared, "Z", trials, z_seed, pair_depth)
-    side, (w, sup) = ("X", (wx, sx)) if wx <= wz else ("Z", (wz, sz))
-    if w > HX.shape[1]:
-        return float("inf"), "", [], time.time() - t0
-    return w, side, sorted(int(q) for q in sup), time.time() - t0
+    return found.weight, found.side, found.support, time.time() - t0
 
 
 def validate_witness(n, HX, HZ, side, weight, support):
-    """Re-check a proposed logical against the raw matrices, independently."""
-    if side not in ("X", "Z"):
-        return False, "no witness"
-    support = [int(q) for q in support]
-    if len(support) != len(set(support)) or any(q < 0 or q >= n for q in support):
-        return False, "bad support"
-    if len(support) != int(weight):
-        return False, "weight != support size"
-    v = np.zeros(n, dtype=np.int8)
-    v[support] = 1
-    Hself, Hopp = (HX, HZ) if side == "X" else (HZ, HX)
-    if not commutes(v, Hopp):
-        return False, "does not commute with the opposite checks"
-    if in_rowspace(v, Hself):
-        return False, "lies in the stabilizer row space (trivial)"
-    return True, "ok"
+    """Re-check a proposed logical against the raw matrices, independently.
+
+    The check itself is ``surrogate.validate_logical``; this keeps the harness's
+    argument order, and ``n`` is read from the matrices, so a caller that passes
+    a mismatched ``n`` is told rather than silently believed.
+    """
+    if int(n) != int(np.asarray(HX).shape[1]):
+        return False, f"n={n} does not match the matrices ({np.asarray(HX).shape[1]})"
+    return surrogate.validate_logical(HX, HZ, side, weight, support)
 
 
 def describe(n, k_claim, HX, HZ, doc, tag):

@@ -8,9 +8,13 @@ Two tools:
   bound; tight on the BB trinomial families). Use it to filter millions of
   candidate exponent sets before building any matrix.
 
-* ``distance_rand`` / ``lightest_logical`` -- a randomized GF(2) coset-leader
-  search for a low-weight nontrivial logical operator. This is the cheap stand
-  in for an exact distance solver.
+* ``distance_rand_witness`` / ``distance_rand`` / ``lightest_logical`` -- a
+  randomized GF(2) coset-leader search for a low-weight nontrivial logical
+  operator. This is the cheap stand in for an exact distance solver.
+  ``distance_rand_witness`` returns the operator itself and is the entry point
+  for a caller that has to write the witness down; ``distance_rand`` is its
+  weight. Both take ``pair_depth`` and both validate whatever a backend
+  proposes through ``validate_logical`` before returning it.
 
 HONEST SEMANTICS. ``distance_rand`` returns an **upper bound** on the true
 distance: it found *a* logical of that weight, so d <= that. It is Monte Carlo,
@@ -25,6 +29,8 @@ The default path is pure numpy. An optional ``gf2_fast`` backend accelerates the
 randomized screening search after ``make fast``; no exact-solver or decoder
 dependency is needed here.
 """
+from collections import namedtuple
+
 import numpy as np
 
 from css import kernel_basis, logical_basis, commutes, in_rowspace
@@ -35,20 +41,70 @@ except ImportError:
     _fast = None
 
 
-def _validate_fast_witness(HX, HZ, weight, side, support):
-    """Validate an accelerator proposal with the Python GF(2) stack."""
+class LogicalWitness(namedtuple("LogicalWitness",
+                                "weight side support rejected")):
+    """A logical operator found by the search, or the absence of one.
+
+    ``weight`` is its Hamming weight and an upper bound on the distance;
+    ``side`` is 'X' or 'Z'; ``support`` is the sorted qubit list, which is
+    exactly the witness a submission carries. When no logical was found, or
+    when a backend's proposal failed Python validation, ``weight`` is
+    ``float("inf")``, ``side`` is ``""`` and ``support`` is empty -- so
+    ``if witness:`` reads as "something was found".
+
+    ``rejected`` is empty except in the second case, where it carries the
+    reason validation refused the proposal. A caller that wants to know the
+    difference between "searched and found nothing" and "the backend proposed
+    something that is not a logical" reads that field; both are a
+    no-logical result for scoring.
+    """
+
+    __slots__ = ()
+
+    def __bool__(self):
+        return self.side in ("X", "Z")
+
+
+NO_LOGICAL = LogicalWitness(float("inf"), "", [], "")
+
+
+def validate_logical(HX, HZ, side, weight, support):
+    """Re-check a proposed logical against the raw matrices: ``(ok, reason)``.
+
+    The one validator in the kit. A witness is a logical of its side iff it
+    commutes with the opposite checks and is not a product of its own -- the
+    same two conditions the board's verifier applies, checked here in Python
+    whichever backend proposed it.
+    """
     if side not in ("X", "Z"):
-        return weight == HX.shape[1] + 1 and not support
+        return False, "no witness"
+    n = int(np.asarray(HX).shape[1])
     support = [int(q) for q in support]
-    n = HX.shape[1]
     if len(support) != len(set(support)) or any(q < 0 or q >= n for q in support):
-        return False
-    if int(weight) != len(support):
-        return False
+        return False, "bad support"
+    if len(support) != int(weight):
+        return False, "weight != support size"
     v = np.zeros(n, dtype=np.int8)
     v[support] = 1
     own, opposite = (HX, HZ) if side == "X" else (HZ, HX)
-    return commutes(v, opposite) and not in_rowspace(v, own)
+    if not commutes(v, opposite):
+        return False, "does not commute with the opposite checks"
+    if in_rowspace(v, own):
+        return False, "lies in the stabilizer row space (trivial)"
+    return True, "ok"
+
+
+def _validate_fast_witness(HX, HZ, weight, side, support):
+    """Report the boolean form of :func:`validate_logical`, plus no-logical.
+
+    Kept under its old name because three committed ``reproduce.py`` evidence
+    scripts import it: those files are the record of how a filed board entry
+    was rebuilt, so their imports are not ours to rename. New code should call
+    ``validate_logical`` and read the reason.
+    """
+    if side not in ("X", "Z"):
+        return int(weight) == int(np.asarray(HX).shape[1]) + 1 and not support
+    return validate_logical(HX, HZ, side, weight, support)[0]
 
 
 def _weight_or_inf(weight, n):
@@ -56,15 +112,26 @@ def _weight_or_inf(weight, n):
     return float("inf") if int(weight) > n else int(weight)
 
 
-def _distance_rand_fast(HX, HZ, trials, seed, threads):
+def _fast_witness(HX, HZ, trials, seed, threads, pair_depth):
+    """One accelerator search, validated in Python before it is returned."""
     if _fast is None:
         raise RuntimeError("gf2_fast backend is unavailable")
     weight, side, support = _fast.distance_rand_witness(
         np.asarray(HX, dtype=np.int8), np.asarray(HZ, dtype=np.int8),
-        trials=int(trials), seed=int(seed), pair_depth=10, threads=int(threads))
-    if not _validate_fast_witness(HX, HZ, weight, side, support):
-        raise RuntimeError("gf2_fast returned an invalid logical witness")
-    return _weight_or_inf(weight, HX.shape[1])
+        trials=int(trials), seed=int(seed), pair_depth=int(pair_depth),
+        threads=int(threads))
+    n = int(np.asarray(HX).shape[1])
+    if side not in ("X", "Z"):
+        # The n+1 sentinel: no logical of either type. That is a result, not a
+        # failure, and not a reason to re-run the budget on the NumPy path.
+        if _weight_or_inf(weight, n) == float("inf") and not support:
+            return NO_LOGICAL
+        return NO_LOGICAL._replace(rejected="no side reported for a witness")
+    ok, why = validate_logical(HX, HZ, side, weight, support)
+    if not ok:
+        return NO_LOGICAL._replace(rejected=why)
+    return LogicalWitness(_weight_or_inf(weight, n), side,
+                          sorted(int(q) for q in support), "")
 
 
 # =====================================================================
@@ -231,53 +298,102 @@ def _search_lightest(Hself, Hopp, trials, seed, pair_depth=10, bases=None):
     return best_w, sorted(int(j) for j in np.where(best_v)[0])
 
 
-def lightest_logical(Hself, Hopp, trials=8000, seed=0):
+def lightest_logical(Hself, Hopp, trials=8000, seed=0, pair_depth=10):
     """Lightest nontrivial logical of one type, as ``(weight, support)``.
 
     For the X side pass ``(HX, HZ)``; for the Z side pass ``(HZ, HX)``. The
     returned support is a valid distance witness for that side (the verifier
     checks: in ker(opposite), outside rowspace(own), weight == value).
     """
-    return _search_lightest(Hself, Hopp, trials, seed)
+    return _search_lightest(Hself, Hopp, trials, seed, pair_depth=pair_depth)
 
 
-def distance_rand(HX=None, HZ=None, trials=2000, seed=0, *,
-                  backend="numpy", threads=1, prepared=None):
-    """Return a randomized upper bound on ``d = min(d_X, d_Z)``.
+def distance_rand_witness(HX=None, HZ=None, trials=2000, seed=0, *,
+                          backend="numpy", threads=1, pair_depth=10,
+                          prepared=None):
+    """Search both sides for the lightest logical.
+
+    Returns a :class:`LogicalWitness`.
+
+    This is the witness-returning form of :func:`distance_rand`, and the entry
+    point to use when the operator itself is wanted and not just its weight: a
+    re-measurement that has to write the witness it found, or a submission
+    being packaged. Both backends return through here and both are validated
+    in Python first, so a proposal that is not a logical is never returned as
+    one -- it comes back as a no-logical result carrying ``rejected``.
 
     ``backend`` is ``"numpy"`` (portable), ``"fast"`` (requires ``make fast``),
-    or ``"auto"`` (fast when available, otherwise NumPy). Fast proposals are
-    validated by Python; this remains an upper-bound search, not a proof.
-    ``trials`` counts different search operations in the two backends, so the
-    same value is not a comparable screening budget across backends.
+    or ``"auto"`` (fast when available, otherwise NumPy). ``trials`` counts
+    different search operations in the two backends, so the same value is not a
+    comparable screening budget across backends.
+
+    ``pair_depth`` is how many of the lightest RREF rows the search also sums
+    in pairs, and it reaches both backends. It is the depth a claim was
+    measured at, so re-measuring a claim that used 24-80 at the default of 10
+    reads high for a reason that is the instrument, not the code.
 
     Pass ``prepared`` (from :func:`prepare_distance_search`) to skip rebuilding
-    the GF(2) bases, which is worth doing when the same code is searched at
-    more than one budget. ``HX``/``HZ`` may then be omitted. The bases do not
-    depend on ``trials`` or ``seed``, so a prepared search returns exactly what
-    the unprepared one would for the same arguments.
+    the GF(2) bases. ``HX``/``HZ`` may then be omitted. The bases do not depend
+    on ``trials`` or ``seed``, so a prepared search returns exactly what the
+    unprepared one would for the same arguments.
+
+    The two sides draw independent streams spawned from ``seed``, so neither
+    replays the other, and the Z side of one seed is not the X side of the
+    next.
     """
     if backend not in ("numpy", "fast", "auto"):
         raise ValueError("backend must be 'numpy', 'fast', or 'auto'")
     if threads < 1:
         raise ValueError("threads must be at least 1")
+    if pair_depth < 1:
+        raise ValueError("pair_depth must be at least 1")
     if prepared is not None:
         HX, HZ = prepared.HX, prepared.HZ
     elif HX is None or HZ is None:
         raise TypeError("distance_rand needs HX and HZ, or prepared=")
     if backend in ("fast", "auto") and _fast is not None:
-        return _distance_rand_fast(HX, HZ, trials, seed, threads)
+        return _fast_witness(HX, HZ, trials, seed, threads, pair_depth)
     if backend == "fast":
         raise ImportError("gf2_fast is unavailable; run `make fast` to build it")
+    x_seed, z_seed = np.random.SeedSequence(int(seed)).spawn(2)
     if prepared is None:
-        wx, _ = _search_lightest(HX, HZ, trials, seed)
-        wz, _ = _search_lightest(HZ, HX, trials, seed)
+        wx, sx = _search_lightest(HX, HZ, trials, x_seed, pair_depth=pair_depth)
+        wz, sz = _search_lightest(HZ, HX, trials, z_seed, pair_depth=pair_depth)
     else:
         hx_self, hx_opp, kx, lx = prepared.side("X")
         hz_self, hz_opp, kz, lz = prepared.side("Z")
-        wx, _ = _search_lightest(hx_self, hx_opp, trials, seed, bases=(kx, lx))
-        wz, _ = _search_lightest(hz_self, hz_opp, trials, seed, bases=(kz, lz))
-    return min(wx, wz)
+        wx, sx = _search_lightest(hx_self, hx_opp, trials, x_seed,
+                                  pair_depth=pair_depth, bases=(kx, lx))
+        wz, sz = _search_lightest(hz_self, hz_opp, trials, z_seed,
+                                  pair_depth=pair_depth, bases=(kz, lz))
+    side, weight, support = ("X", wx, sx) if wx <= wz else ("Z", wz, sz)
+    n = int(np.asarray(HX).shape[1])
+    if weight > n:
+        return NO_LOGICAL
+    ok, why = validate_logical(HX, HZ, side, weight, support)
+    if not ok:
+        return NO_LOGICAL._replace(rejected=why)
+    return LogicalWitness(int(weight), side,
+                          sorted(int(q) for q in support), "")
+
+
+def distance_rand(HX=None, HZ=None, trials=2000, seed=0, *,
+                  backend="numpy", threads=1, pair_depth=10, prepared=None):
+    """Return a randomized upper bound on ``d = min(d_X, d_Z)``.
+
+    This is the weight of :func:`distance_rand_witness`, for callers that only want the
+    number; see it for the arguments and the semantics. A backend proposal that
+    fails Python validation raises here rather than reading as no logical,
+    because a caller taking the scalar has nowhere to see the reason.
+    """
+    found = distance_rand_witness(HX, HZ, trials, seed, backend=backend,
+                                  threads=threads, pair_depth=pair_depth,
+                                  prepared=prepared)
+    if found.rejected:
+        raise RuntimeError(
+            f"{backend} backend returned an invalid logical witness: "
+            f"{found.rejected}")
+    return found.weight
 
 
 if __name__ == "__main__":
