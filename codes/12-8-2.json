@@ -1,164 +1,225 @@
 {
-  "schema_version": "0.1",
-  "name": "[[12,8,2]] 2BGA",
-  "code_type": "CSS",
-  "n": 12,
-  "k": 8,
-  "checks": {
-    "X": [
-      [
-        0,
-        1,
-        4,
-        5,
-        6,
-        7,
-        10,
-        11
-      ],
-      [
-        0,
-        1,
-        4,
-        5,
-        6,
-        7,
-        10,
-        11
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ],
-      [
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        10,
-        11
-      ],
-      [
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        10,
-        11
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        6,
-        7,
-        8,
-        9
-      ],
-      [
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        10,
-        11
-      ],
-      [
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        10,
-        11
-      ],
-      [
-        0,
-        1,
-        4,
-        5,
-        6,
-        7,
-        10,
-        11
-      ],
-      [
-        0,
-        1,
-        4,
-        5,
-        6,
-        7,
-        10,
-        11
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[12,8,2]] 2BGA",
+ "code_type": "CSS",
+ "n": 12,
+ "k": 8,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    4,
+    5,
+    6,
+    7,
+    10,
+    11
+   ],
+   [
+    0,
+    1,
+    4,
+    5,
+    6,
+    7,
+    10,
+    11
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    10,
+    11
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    10,
+    11
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7,
+    8,
+    9
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    10,
+    11
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    10,
+    11
+   ],
+   [
+    0,
+    1,
+    4,
+    5,
+    6,
+    7,
+    10,
+    11
+   ],
+   [
+    0,
+    1,
+    4,
+    5,
+    6,
+    7,
+    10,
+    11
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    10,
+    11
+   ]
   },
-  "distance": {
-    "d": 2,
-    "X": {
-      "value": 2,
-      "confidence": "upper_bound",
-      "witness": [
-        10,
-        11
-      ]
-    },
-    "Z": {
-      "value": 2,
-      "confidence": "upper_bound",
-      "witness": [
-        1,
-        6
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@MathysRennela"
-    ],
-    "construction": "2BGA (arXiv:2306.16400) on SmallGroup(6,2), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt8wtL4_order6_k8.txt, line 1. nonidentity supports a=[2, 3, 4], b=[2, 3, 4].",
-    "references": [],
-    "date": "2026-09-19",
-    "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
-    "model": "DeepSeek V4 Flash 0731",
-    "origin": "submission"
-  },
-  "family": "generalized-bicycle"
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "2BGA (arXiv:2306.16400) on SmallGroup(6,2), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt8wtL4_order6_k8.txt, line 1. nonidentity supports a=[2, 3, 4], b=[2, 3, 4].",
+  "references": [],
+  "date": "2026-09-19",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "model": "DeepSeek V4 Flash 0731",
+  "origin": "submission"
+ },
+ "family": "generalized-bicycle",
+ "locality": {
+  "coordinates": [
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.6056,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-09-26",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }
