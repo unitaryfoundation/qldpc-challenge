@@ -85,6 +85,26 @@ font-variant-numeric:tabular-nums}
 .stat-card .sub{font-size:12.5px;margin-top:5px;color:var(--mut)}
 .stat-card .sub a{font-family:'Space Mono',ui-monospace,monospace;
 color:var(--ink)}
+/* Second tier under the headline cards: the uncapped kd^2/n on the left and
+   the board census on the right. Both are outlined rather than filled, so the
+   row above stays the one the eye compares across. */
+.herosub{display:grid;grid-template-columns:2fr 3fr;gap:14px;margin:0 0 8px}
+.stat-ghost{border:1px dashed var(--ln);border-radius:14px;padding:14px 18px}
+.stat-ghost .v{font-size:25px;font-weight:700;line-height:1.05;
+font-variant-numeric:tabular-nums}
+.stat-ghost .l{font-size:12.5px;color:var(--mut);margin-top:4px}
+.stat-ghost .sub{font-size:12px;margin-top:4px;color:var(--mut)}
+.stat-ghost .sub a{font-family:'Space Mono',ui-monospace,monospace;
+color:var(--ink)}
+.census{display:grid;grid-template-columns:repeat(3,1fr);
+border:1px solid var(--ln);border-radius:14px;background:var(--soft);
+overflow:hidden}
+.census div{padding:14px 18px;border-right:1px solid var(--ln)}
+.census div:last-child{border-right:0}
+.census b{display:block;font-size:22px;line-height:1.1;font-weight:700;
+font-variant-numeric:tabular-nums;
+font-family:'Space Mono',ui-monospace,monospace}
+.census span{font-size:12px;color:var(--mut)}
 .lb{margin:18px 0 8px;border:1px solid var(--ln);border-radius:14px;
 background:#fff;overflow:hidden}
 .lbhead{display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -545,6 +565,8 @@ text-align:right}}
 @media(max-width:560px){.wrap{padding:0 14px}
 header.hero{padding:34px 0 30px}
 .statsbar{grid-template-columns:repeat(2,1fr);gap:10px}
+.herosub{grid-template-columns:1fr;gap:10px}
+.census div{padding:12px 14px}.census b{font-size:19px}
 .stat-card{padding:14px 16px}.stat-card .v{font-size:27px}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
