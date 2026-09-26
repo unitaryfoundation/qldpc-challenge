@@ -1,0 +1,337 @@
+{
+ "schema_version": "0.1",
+ "name": "local-sat bilayer 4x4x2 G=10 w6 t2 model 0",
+ "code_type": "CSS",
+ "n": 32,
+ "k": 12,
+ "checks": {
+  "X": [
+   [
+    2,
+    16,
+    18,
+    19,
+    21,
+    22
+   ],
+   [
+    1,
+    11,
+    12,
+    26,
+    29,
+    31
+   ],
+   [
+    3,
+    10,
+    13,
+    26,
+    29
+   ],
+   [
+    3,
+    14,
+    17,
+    18,
+    20,
+    22
+   ],
+   [
+    0,
+    5,
+    8,
+    10,
+    11,
+    23
+   ],
+   [
+    2,
+    5,
+    7,
+    9,
+    24,
+    26
+   ],
+   [
+    1,
+    12,
+    19,
+    24,
+    27,
+    28
+   ],
+   [
+    0,
+    6,
+    9,
+    14,
+    26,
+    30
+   ],
+   [
+    8,
+    15,
+    18,
+    21,
+    24,
+    25
+   ],
+   [
+    4,
+    6,
+    12,
+    20,
+    25,
+    27
+   ]
+  ],
+  "Z": [
+   [
+    4,
+    6,
+    14,
+    16,
+    22
+   ],
+   [
+    0,
+    7,
+    13,
+    23,
+    26,
+    31
+   ],
+   [
+    0,
+    6,
+    11,
+    27,
+    28,
+    31
+   ],
+   [
+    1,
+    7,
+    8,
+    10,
+    24,
+    29
+   ],
+   [
+    1,
+    9,
+    26,
+    28,
+    29,
+    31
+   ],
+   [
+    2,
+    3,
+    5,
+    8,
+    13,
+    18
+   ],
+   [
+    2,
+    17,
+    19,
+    21,
+    22,
+    24
+   ],
+   [
+    5,
+    8,
+    15,
+    24,
+    25,
+    27
+   ],
+   [
+    3,
+    12,
+    16,
+    19,
+    20,
+    29
+   ],
+   [
+    14,
+    16,
+    20,
+    21,
+    25,
+    30
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    9,
+    11,
+    28
+   ]
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    13,
+    29,
+    31
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@vprusso"
+  ],
+  "construction": "SAT search (research/local_sat.py build_local_cnf with the grid site list repeated 2 times, n_side=4, G=10, max_weight=6, t=2 detection, anchor radius 3.5, shared_t3 encoding, CaDiCaL 1.9.5 via python-sat) over bilayer 2D-local CSS codes: 2 qubits per site of a 4x4 grid (layers=2), each check anchored at a grid site and acting within radius 3.5 of it, so the interaction radius is at most 7.0 by construction. Model index 0 of the enumeration; distance is a witness-backed upper bound.",
+  "references": [],
+  "date": "2026-09-26",
+  "notes": "Phase 2 (bilayer) of the 2D-local SAT t=2+ campaign (issue #2024); instance b4_G10_w6_t2. Distance is an upper bound from the kit's RIS witness search at 20000 trials per side.",
+  "model": "Claude Fable 5.1 (Claude Code)"
+ },
+ "family": "local-sat-css",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ]
+  ],
+  "interaction_radius": 4.242640687119285,
+  "layers": 2
+ }
+}
