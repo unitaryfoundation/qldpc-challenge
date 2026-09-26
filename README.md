@@ -105,6 +105,23 @@ confirmed:
 Claiming a distance is exact (not just an upper bound) additionally requires
 server certification, a separate and more expensive step.
 
+### General stabilizer codes
+
+The board also accepts non-CSS stabilizer codes. Bring the binary symplectic
+matrix `S = (A | B)` instead of `H_X` and `H_Z` (key `s`, or `a` and `b`, in
+the `.npz`):
+
+```bash
+./qldpc submit mycode.npz --authors @yourhandle
+```
+
+The verifier runs the same checks in their general form, against one Pauli
+distance witness in place of the per-side ones. Stabilizer codes rank on their
+own leaderboard and are never compared with CSS entries. A code whose
+generators are all pure `X` or pure `Z` is CSS and must be submitted as one.
+Details in [`CONTRIBUTING.md`](CONTRIBUTING.md#general-stabilizer-codes) and
+[`schema/SCHEMA.md`](schema/SCHEMA.md#stabilizer-codes).
+
 Prefer to write the JSON yourself? Follow `schema/code.schema.json`
 (`schema/SCHEMA.md` documents each field — see the "By hand" section of
 [`CONTRIBUTING.md`](CONTRIBUTING.md)) and verify locally before opening a PR:

@@ -61,6 +61,9 @@ import re
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from qldpc_verify import is_stabilizer, sides
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HANDLE = re.compile(r"^@([A-Za-z0-9-]+)$")
 
@@ -224,11 +227,13 @@ def refutation_binding(author, base_doc, new_doc):
         return False, "provenance.notes may only be appended to"
 
     bd, nd = base_doc.get("distance") or {}, new_doc.get("distance") or {}
-    for side in ("X", "Z"):
+    # the sides a document carries: X and Z for a CSS code, the single Pauli
+    # side P for a stabilizer code (code_type itself is frozen above)
+    for side in sides(new_doc):
         if not (bd.get(side) and nd.get(side)):
             return False, f"distance.{side} is missing"
     tightened = 0
-    for side in ("X", "Z"):
+    for side in sides(new_doc):
         bs, ns = bd[side], nd[side]
         if bs == ns:
             continue
@@ -252,8 +257,9 @@ def refutation_binding(author, base_doc, new_doc):
                            "and its witness or confidence changed")
     if tightened == 0:
         return False, "no side's distance strictly decreased"
-    if nd.get("d") != min(nd[s].get("value", 0) for s in ("X", "Z")):
-        return False, "distance.d is not min(dX, dZ)"
+    if nd.get("d") != min(nd[s].get("value", 0) for s in sides(new_doc)):
+        return False, ("distance.d is not P.value" if is_stabilizer(new_doc)
+                       else "distance.d is not min(dX, dZ)")
     return True, ""
 
 

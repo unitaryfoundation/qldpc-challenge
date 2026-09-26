@@ -70,7 +70,7 @@ import circuit_tools as CT
 import gf2
 import heuristic_distance as H
 from circuit_verify import MAX_DEM_MECHANISMS, SIDE_FILES
-from qldpc_verify import file_size_error
+from qldpc_verify import file_size_error, generator_supports, is_stabilizer, sides
 from validate_candidate import validate_candidate
 from build_receipt import make_receipt, write_receipt
 
@@ -224,14 +224,28 @@ def layout_entered_tighter_class(base_doc: dict | None, new_doc: dict) -> bool:
     the code can become a NEW record of a 2d-local cell (its n, k, d, w are
     unchanged, so record status in cells it already occupied cannot change);
     such a claim has never faced the deep battery and must not skip it."""
-    return _locality_rank(new_doc) < _locality_rank(base_doc or {"n": new_doc.get("n"), "checks": new_doc.get("checks")})
+    return _locality_rank(new_doc) < _locality_rank(
+        base_doc or {"n": new_doc.get("n"), "checks": new_doc.get("checks"),
+                     "code_type": new_doc.get("code_type", "CSS")})
+
+
+def _witness_weight(side_block: dict) -> int:
+    """Return the weight of a stored witness.
+
+    The support size of a CSS side's list, or the Pauli weight (qubits
+    touched, a Y once) of a P side's {"X", "Z"} dict.
+    """
+    wit = side_block.get("witness") or []
+    if isinstance(wit, dict):
+        return len(set(wit.get("X") or []) | set(wit.get("Z") or []))
+    return len(wit)
 
 
 def _survival_raised(base_doc: dict | None, new_doc: dict | None) -> bool:
     """True if any side adds or raises witness_provenance.survived_samples."""
     bd = (base_doc or {}).get("distance") or {}
     nd = (new_doc or {}).get("distance") or {}
-    for side in ("X", "Z"):
+    for side in sides(new_doc or {}):
         bs = ((bd.get(side) or {}).get("witness_provenance") or {})
         ns = ((nd.get(side) or {}).get("witness_provenance") or {})
         nv = ns.get("survived_samples")
@@ -268,7 +282,9 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
             return "full", "distance and locality both changed (mixed diff)"
         bd, nd = base_doc.get("distance") or {}, new_doc.get("distance") or {}
         tightened = 0
-        for side in ("X", "Z"):
+        # a CSS code has sides X and Z; a stabilizer code the single Pauli
+        # side P (code_type is frozen above, so base and new agree)
+        for side in sides(new_doc):
             bs, ns = bd.get(side), nd.get(side)
             if bs is None or ns is None:
                 return "full", f"distance.{side} missing"
@@ -278,7 +294,7 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
             if not (isinstance(bv, int) and isinstance(nv, int) and nv < bv):
                 return "full", (f"distance.{side}.value did not strictly "
                                 "decrease")
-            if len(ns.get("witness") or []) != nv:
+            if _witness_weight(ns) != nv:
                 return "full", (f"distance.{side} witness weight does not "
                                 "equal the new value")
             if ns.get("confidence") != "upper_bound":
@@ -287,8 +303,10 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
             tightened += 1
         if tightened == 0:
             return "full", "distance changed without a side strictly decreasing"
-        if nd.get("d") != min(nd[s].get("value") for s in ("X", "Z")):
-            return "full", "distance.d is not min(dX, dZ)"
+        # d = min(dX, dZ) for a CSS code, d = P.value for a stabilizer code
+        if nd.get("d") != min(nd[s].get("value") for s in sides(new_doc)):
+            return "full", ("distance.d is not P.value" if is_stabilizer(new_doc)
+                            else "distance.d is not min(dX, dZ)")
         return "tightening", (f"{tightened} side(s) strictly decreased with "
                               "matching witnesses")
     except (KeyError, TypeError, AttributeError, ValueError) as e:
@@ -317,8 +335,7 @@ def _locality_rank(doc):
     def diam(sup):
         pts = [coords[q] for q in sup]
         return max((math.dist(a, b) for a in pts for b in pts), default=0.0)
-    radius = max((diam(s) for s in doc["checks"]["X"] + doc["checks"]["Z"]),
-                 default=0.0)
+    radius = max((diam(s) for s in generator_supports(doc)), default=0.0)
     mult = Counter(tuple(c) for c in coords)
     sites = sorted(mult)
     min_sp = min((math.dist(a, b) for i, a in enumerate(sites)
@@ -344,22 +361,25 @@ def board_record_slugs(code_root=ROOT):
     A code that claims a cell record gets deeper refutation than a dominated
     one, so over-claims pay extra scrutiny exactly where gaming would matter.
     Cell-aware on purpose: a 2D-local record is a record even when a nonlocal
-    code beats it globally, and it deserves the deep battery too."""
+    code beats it globally, and it deserves the deep battery too. The code
+    type is a cell dimension: CSS and stabilizer codes sit on
+    separate boards, so neither can dominate the other."""
     rows = []
     for p in sorted(glob.glob(os.path.join(code_root, "codes", "*.json"))):
         try:
             d = json.load(open(p))
-            ck = d.get("checks", {})
-            w = max((len(s) for s in ck.get("X", []) + ck.get("Z", [])), default=0)
+            w = max((len(s) for s in generator_supports(d)), default=0)
             rows.append((os.path.splitext(os.path.basename(p))[0],
                          d["n"], d["k"], d["distance"]["d"], w,
-                         _weight_rank(w), _locality_rank(d)))
+                         _weight_rank(w), _locality_rank(d),
+                         d.get("code_type", "CSS")))
         except Exception:
             continue
     rec = set()
     for i, a in enumerate(rows):
         dominated = any(
             j != i
+            and b[7] == a[7]                           # same board (code type)
             and b[5] <= a[5] and b[6] <= a[6]          # shares a's home cell
             and b[1] <= a[1] and b[2] >= a[2] and b[3] >= a[3] and b[4] <= a[4]
             and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])
@@ -524,10 +544,22 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
     in the same order on any machine, so a time-trimmed run is a prefix of the
     full one. Returns the refute_check tuple shape
     (refuted, d, witness, trials_completed) -- the LAST field is the count
-    actually searched, which is what the receipt must record."""
+    actually searched, which is what the receipt must record.
+
+    A stabilizer code is searched through its symplectic
+    doubling H'_X = (A | B), H'_Z = (B | A): the accelerator's Hamming weight
+    over 2n bits is an upper bound on the Pauli weight, so each proposal is
+    mapped back to a Pauli operator, validated, and RE-SCORED by Pauli weight
+    before it is compared with the claim; the witness is then the Pauli
+    {"X", "Z"} dict the verifier reads."""
     n = doc["n"]
-    HX = H._matrix(doc["checks"]["X"], n)
-    HZ = H._matrix(doc["checks"]["Z"], n)
+    stab = is_stabilizer(doc)
+    if stab:
+        A, B = H.stabilizer_matrices(doc)
+        HX, HZ = H.doubled_matrices(A, B)
+    else:
+        HX = H._matrix(doc["checks"]["X"], n)
+        HZ = H._matrix(doc["checks"]["Z"], n)
     claimed = int(doc["distance"]["d"])
     t0 = time.monotonic()
     deadline = (t0 + max_seconds) if max_seconds else None
@@ -538,7 +570,14 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
             HX, HZ, trials=t, seed=seed + i * 1_000_003, pair_depth=8,
             threads=FAST_THREADS)
         done += t
-        if side:
+        if side and stab:
+            v = np.zeros(2 * n, dtype=np.int8)
+            v[list(support)] = 1
+            v = H._pauli_from_doubled(v, side, n)
+            # Pauli weight, not the accelerator's Hamming weight over 2n bits
+            wp = int(H.pauli_weight_rows(v[None, :], n)[0])
+            proposals.append((wp, "P", tuple(int(q) for q in np.nonzero(v)[0])))
+        elif side:
             proposals.append((int(w), side, tuple(sorted(int(q) for q in support))))
         now = time.monotonic()
         if deadline and now >= deadline:
@@ -555,7 +594,12 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
               f"w={best[0] if best else None}", flush=True)
     # Lightest first; the first proposal the python stack validates wins.
     for w, side, support in sorted(set(p for p in proposals if p[0] < claimed)):
-        if _validated_logical(HX, HZ, n, w, side, support):
+        if stab:
+            v = np.zeros(2 * n, dtype=np.int8)
+            v[list(support)] = 1
+            if H.valid_pauli_logical(v, A, B):
+                return True, w, H.pauli_witness(v, n), done
+        elif _validated_logical(HX, HZ, n, w, side, support):
             return True, w, list(support), done
     # No validated refutation. Report the lightest non-improving proposal as
     # the found weight (as before); an invalid sub-claim proposal reports None.
@@ -579,7 +623,12 @@ def _structural_refute(doc, seed, trials):
     SOUND on the same terms as _fast_refute: the accelerator only proposes, and
     the find counts only after the pinned python stack confirms the support is a
     genuine nontrivial logical of that weight, lighter than the claim. Returns
-    the refute_check tuple shape: (refuted, d, witness, trials)."""
+    the refute_check tuple shape: (refuted, d, witness, trials).
+
+    CSS only: the circulant-block structure is a property of (H_X, H_Z), so a
+    stabilizer code reports nothing searched and goes to the general battery."""
+    if is_stabilizer(doc):
+        return False, None, None, 0
     n = doc["n"]
     HX = H._matrix(doc["checks"]["X"], n)
     HZ = H._matrix(doc["checks"]["Z"], n)
@@ -855,7 +904,9 @@ def main(argv):
                 results[f"RIS#{si}"] = H.refute_check(doc, seed=s,
                                                       max_seconds=budget,
                                                       trials=trials)
-            if SD is not None:
+            # the BP+OSD cross-check decodes per Pauli sector of a CSS code;
+            # a stabilizer code has no sectors and skips it
+            if SD is not None and not is_stabilizer(doc):
                 results["syndrome-decoder"] = SD.refute_check(doc, seed=seed + 1)
             # Frontier claims additionally face the accelerated deep search when
             # the extension is built (CI builds it; see Makefile `fast`): ~150x

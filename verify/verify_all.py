@@ -127,12 +127,26 @@ def main(argv=None):
                     sigs.setdefault(rep["signature"]["hash"], []).append(rel)
                 if "fingerprint" in rep:
                     fps.setdefault(rep["fingerprint"], []).append(rel)
+                # a stabilizer entry that is CSS up to local Hadamards is also
+                # filed under that CSS code's identity, so a
+                # Hadamard-relabeled copy of a CSS entry collides with it
+                ceq = rep.get("css_equivalent") or {}
+                for fp in set(ceq.get("fingerprints") or []):
+                    fps.setdefault(fp, []).append(rel + " (via local Hadamard)")
+                for h in set(ceq.get("signatures") or []):
+                    sigs.setdefault(h, []).append(rel + " (via local Hadamard)")
         else:
             failed.append(rel)
             bad = [c["check"] for c in rep["checks"] if not c["ok"]]
             print(f"FAIL  {rel}  -> {', '.join(bad)}")
 
     # identical codes (same stabilizer group, same labeling): a hard error.
+    # A stabilizer entry filed under its own CSS image is one entry twice,
+    # not a collision, so count distinct entries per fingerprint.
+    fps = {h: v for h, v in fps.items()
+           if len({x.split(" (")[0] for x in v}) > 1}
+    sigs = {h: v for h, v in sigs.items()
+            if len({x.split(" (")[0] for x in v}) > 1}
     identical = {h: v for h, v in fps.items() if len(v) > 1}
     if identical:
         print("\nIDENTICAL CODES (same stabilizer group) -- reject:")

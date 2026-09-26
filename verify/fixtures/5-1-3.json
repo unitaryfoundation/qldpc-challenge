@@ -1,0 +1,82 @@
+{
+  "schema_version": "0.4",
+  "name": "[[5,1,3]] five-qubit code",
+  "code_type": "stabilizer",
+  "n": 5,
+  "k": 1,
+  "checks": {
+    "S": [
+      {
+        "X": [
+          0,
+          3
+        ],
+        "Z": [
+          1,
+          2
+        ]
+      },
+      {
+        "X": [
+          1,
+          4
+        ],
+        "Z": [
+          2,
+          3
+        ]
+      },
+      {
+        "X": [
+          0,
+          2
+        ],
+        "Z": [
+          3,
+          4
+        ]
+      },
+      {
+        "X": [
+          1,
+          3
+        ],
+        "Z": [
+          0,
+          4
+        ]
+      }
+    ]
+  },
+  "distance": {
+    "d": 3,
+    "P": {
+      "value": 3,
+      "confidence": "upper_bound",
+      "witness": {
+        "X": [
+          0,
+          1,
+          2
+        ],
+        "Z": [
+          1
+        ]
+      }
+    }
+  },
+  "provenance": {
+    "authors": [
+      "Laflamme, Miquel, Paz, Zurek"
+    ],
+    "construction": "the perfect [[5,1,3]] code: cyclic shifts of X Z Z X I; the witness X Y X I I has Pauli weight 3 and Hamming weight 4 over the symplectic bits",
+    "origin": "baseline",
+    "references": [
+      "arXiv:quant-ph/9602019",
+      "arXiv:quant-ph/9604034"
+    ],
+    "date": "1996",
+    "notes": "Synthetic-free fixture: the code is written out by hand from its cyclic generator. Distance 3 is exact (it is the smallest code correcting one error); recorded as upper_bound because the Pauli-weight certifier is not available."
+  },
+  "family": "other"
+}

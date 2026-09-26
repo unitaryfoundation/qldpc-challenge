@@ -1,4 +1,4 @@
-"""qldpc submit: one command from parity checks to a verified submission.
+r"""qldpc submit: one command from parity checks to a verified submission.
 
 The friction in contributing used to be "read CONTRIBUTING.md, learn the JSON
 schema, hand-write a distance witness, hope CI agrees." This collapses that into
@@ -26,7 +26,7 @@ before anything leaves your machine.
 
 Usage:
   uv run python cli/qldpc.py submit mycode.npz --authors @me
-  uv run python cli/qldpc.py submit mycode.npz --authors @me "Jane Roe" \\
+  uv run python cli/qldpc.py submit mycode.npz --authors @me "Jane Roe" \
       --construction "bivariate bicycle (x^3+y+y^2, ...)" --model "Opus 4.8"
   ./qldpc submit mycode.npz --authors @me        # via the launcher shim
   ./qldpc submit mycode.npz --authors @me --no-circuit   # code tier only
@@ -34,6 +34,10 @@ Usage:
 Input:
   .npz  with H_X and H_Z under keys hx/HX/H_X and hz/HZ/H_Z (dense 0/1 arrays
         or scipy sparse). Optional 'coords' (n x 2) for the 2d-local tracks.
+        A general stabilizer code instead carries its binary symplectic
+        matrix S = (A | B) under key s/S (m x 2n), or its halves under a/A
+        and b/B (m x n each). It is typed code_type "stabilizer": one
+        Pauli-weight distance side P, no circuit tier, its own board.
   .json an existing draft carrying a checks block (re-verify / re-score it).
 """
 
@@ -82,8 +86,12 @@ def _pick(d, names):
 
 
 def load_checks(path):
-    """Return (HX, HZ, coords_or_None). Accepts .npz (matrices) or .json
-    (a draft with a checks block).
+    """Return (HX, HZ, coords_or_None, draft_or_None).
+
+    Accepts .npz (matrices) or .json (a draft with a checks block). For a
+    general stabilizer code the pair is (A, B), the two halves of the
+    symplectic matrix S = (A | B), and the returned draft (a dict with
+    code_type "stabilizer", or None) tells build_submission which it got.
     """
     if path.endswith(".json"):
         try:
@@ -92,23 +100,50 @@ def load_checks(path):
         except json.JSONDecodeError as e:
             raise SystemExit(f"{path}: not valid JSON ({e})")
         n = doc["n"]
-        HX = _matrix_from_supports(doc["checks"]["X"], n)
-        HZ = _matrix_from_supports(doc["checks"]["Z"], n)
         coords = None
         if "locality" in doc:
             coords = np.asarray(doc["locality"]["coordinates"], dtype=float)
+        if doc.get("code_type") == "stabilizer":
+            gens = doc["checks"]["S"]
+            A = _matrix_from_supports([g["X"] for g in gens], n)
+            B = _matrix_from_supports([g["Z"] for g in gens], n)
+            return A, B, coords, doc
+        HX = _matrix_from_supports(doc["checks"]["X"], n)
+        HZ = _matrix_from_supports(doc["checks"]["Z"], n)
         return HX, HZ, coords, doc
     z = np.load(path, allow_pickle=True)
+    coords = _pick(z, ("coords", "coordinates", "xy"))
+    if coords is not None:
+        coords = np.asarray(coords, dtype=float)
+    S = _pick(z, ("s", "S"))
+    A = _pick(z, ("a", "A"))
+    B = _pick(z, ("b", "B"))
+    if S is not None or A is not None or B is not None:
+        if S is not None:
+            S = _as_dense_gf2(S)
+            if S.ndim != 2 or S.shape[1] % 2:
+                raise SystemExit(f"{path}: key s must be an m x 2n matrix "
+                                 f"(A | B); got shape {S.shape}")
+            n = S.shape[1] // 2
+            A, B = S[:, :n], S[:, n:]
+        elif A is None or B is None:
+            raise SystemExit(f"{path}: a stabilizer code needs both a and b "
+                             f"(the X and Z halves of S), or s = (A | B); "
+                             f"found {list(z.keys())}")
+        else:
+            A, B = _as_dense_gf2(A), _as_dense_gf2(B)
+            if A.shape != B.shape:
+                raise SystemExit(f"{path}: a has shape {A.shape} but b has "
+                                 f"shape {B.shape}; both are m x n")
+        return A, B, coords, {"code_type": "stabilizer"}
     HX = _pick(z, ("hx", "HX", "H_X", "Hx"))
     HZ = _pick(z, ("hz", "HZ", "H_Z", "Hz"))
     if HX is None or HZ is None:
         raise SystemExit(
-            f"{path}: need H_X and H_Z arrays (keys hx/HX/H_X and hz/HZ/H_Z); "
+            f"{path}: need H_X and H_Z arrays (keys hx/HX/H_X and hz/HZ/H_Z), "
+            f"or a stabilizer code's s = (A | B) (or a and b); "
             f"found {list(z.keys())}")
     HX, HZ = _as_dense_gf2(HX), _as_dense_gf2(HZ)
-    coords = _pick(z, ("coords", "coordinates", "xy"))
-    if coords is not None:
-        coords = np.asarray(coords, dtype=float)
     return HX, HZ, coords, None
 
 
@@ -126,6 +161,101 @@ def _supports(H):
 # ----------------------------------------------------------------------------
 # building the submission
 # ----------------------------------------------------------------------------
+def build_stabilizer_submission(A, B, args):
+    """Build the submission of a general stabilizer code S = (A | B).
+
+    Isotropy in place of CSS commutation, k = n - rank S, check weight
+    |A_i union B_i|, and one Pauli-weight distance witness (RIS by Pauli
+    weight, tightened by the accelerator on the doubled matrices and
+    re-scored). Writes code_type "stabilizer" at schema 0.4. A code whose
+    every row is pure X or pure Z is refused here with the same instruction
+    the verifier gives: type it CSS.
+    """
+    n = A.shape[1]
+    if B.shape != A.shape:
+        raise SystemExit(f"A has shape {A.shape} but B has shape {B.shape}")
+    if bool(((A @ B.T + B @ A.T) % 2).any()):
+        raise SystemExit("A B^T + B A^T != 0 over GF(2): the generators do not "
+                         "commute (check your matrices / ordering)")
+    if all(not (A[i].any() and B[i].any()) for i in range(A.shape[0])):
+        raise SystemExit("every generator is pure X or pure Z: this is a CSS "
+                         "code; submit it as H_X / H_Z (keys hx, hz) so it is "
+                         "typed CSS and ranked on the CSS board")
+    S = np.concatenate([A, B], axis=1)
+    k = n - gf2.rank(S)
+    if k < 1:
+        raise SystemExit(f"computed k={k}: no logical qubits, nothing to submit")
+    wmax = int(max(((A[i] | B[i]).sum() for i in range(A.shape[0])), default=0))
+
+    print(f"  building stabilizer submission... n={n} k={k} w={wmax}", flush=True)
+    print(f"  searching for a Pauli-weight distance witness ({args.trials} RIS "
+          f"trials)...", flush=True)
+    dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials, seed=args.seed)
+    if dP is None:
+        raise SystemExit("RIS found no logical operator; cannot certify a distance")
+    if hd._fast is not None and args.fast_trials > 0:
+        # accelerator on the symplectic doubling; its Hamming weight is an
+        # upper bound on the Pauli weight, so the proposal is mapped back,
+        # validated by gf2, and re-scored before it may tighten the claim
+        print(f"  accelerator pass on the doubled matrices ({args.fast_trials} "
+              f"trials)...", flush=True)
+        HX2, HZ2 = hd.doubled_matrices(A, B)
+        wf, side, sup = hd._fast.distance_rand_witness(
+            HX2, HZ2, args.fast_trials, args.seed, 8, 8)
+        if wf is not None and side in ("X", "Z"):
+            v = np.zeros(2 * n, dtype=np.int8)
+            v[list(sup)] = 1
+            v = hd._pauli_from_doubled(v, side, n)
+            wp = int(hd.pauli_weight_rows(v[None, :], n)[0])
+            if wp < dP and hd.valid_pauli_logical(v, A, B):
+                dP, witP = wp, v
+                print(f"    accelerator tightened d to {wp}", flush=True)
+    print(f"  distance (RIS upper bound, Pauli weight) d<={dP}", flush=True)
+
+    dist = {"d": int(dP),
+            "P": {"value": int(dP), "confidence": "upper_bound",
+                  "witness": hd.pauli_witness(witP, n)}}
+    prov = {"authors": args.authors,
+            "construction": args.construction or "contributed via qldpc submit",
+            "origin": "submission",
+            "date": args.date or datetime.date.today().isoformat()}
+    if args.model:
+        prov["model"] = args.model
+    if args.notes:
+        prov["notes"] = args.notes
+    budget = search_budget_from_args(args)
+    if budget:
+        prov["search_budget"] = budget
+    gens = [{"X": _supports(A[i:i + 1])[0], "Z": _supports(B[i:i + 1])[0]}
+            for i in range(A.shape[0])]
+    doc = {
+        "schema_version": "0.4",         # code_type stabilizer is a 0.4 feature
+        "name": args.name or f"[[{n},{k},{dP}]]",
+        "code_type": "stabilizer",
+        "n": n, "k": int(k),
+        "checks": {"S": gens},
+        "distance": dist,
+        "provenance": prov,
+    }
+    if args.family:
+        doc["family"] = args.family
+    _attach_layout(doc, args, n)
+    return doc
+
+
+def _attach_layout(doc, args, n):
+    if args._coords is not None:
+        if len(args._coords) != n:
+            raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
+        coords = [[float(v) for v in row] for row in args._coords]
+        if any(len(row) not in (2, 3) for row in coords):
+            raise SystemExit("coords rows must be [x, y] or [x, y, z]")
+        doc["locality"] = {
+            "coordinates": coords,
+            "layers": int(args.layers),
+        }
+
+
 def build_submission(HX, HZ, args):
     n = HX.shape[1]
     if HZ.shape[1] != n:
@@ -207,16 +337,7 @@ def build_submission(HX, HZ, args):
     # field; provide a layout below and the locality class is derived.
     if args.family:
         doc["family"] = args.family
-    if args._coords is not None:
-        if len(args._coords) != n:
-            raise SystemExit(f"coords has {len(args._coords)} rows, need n={n}")
-        coords = [[float(v) for v in row] for row in args._coords]
-        if any(len(row) not in (2, 3) for row in coords):
-            raise SystemExit("coords rows must be [x, y] or [x, y, z]")
-        doc["locality"] = {
-            "coordinates": coords,
-            "layers": int(args.layers),
-        }
+    _attach_layout(doc, args, n)
     return doc
 
 
@@ -342,8 +463,9 @@ def pr_body(doc, report, args, out, note_out=None):
     wmax = comp.get("max_check_weight")
     track = " / ".join(x for x in (comp.get("locality_class"),
                                    comp.get("weight_class")) if x)
+    stab = doc.get("code_type") == "stabilizer"
     conf = {side: doc["distance"][side]["confidence"]
-            for side in ("X", "Z") if side in doc["distance"]}
+            for side in (("P",) if stab else ("X", "Z")) if side in doc["distance"]}
     conf_line = ", ".join(f"{s}: {c}" for s, c in conf.items())
     rel_out = _repo_path(out)
 
@@ -354,8 +476,11 @@ def pr_body(doc, report, args, out, note_out=None):
         "## Code submission",
         "",
         f"- Parameters: [[n, k, d]] = [[{n},{k},{d}]]",
-        f"- Tracks: {track} (computed by the verifier from H and the layout)",
-        f"- Distance confidence: {conf_line}",
+        f"- Tracks: {track} (computed by the verifier from H and the layout)"
+        + ("; general stabilizer code, ranked on the stabilizer board"
+           if stab else ""),
+        f"- Distance confidence: {conf_line}"
+        + (" (Pauli weight, one side)" if stab else ""),
     ]
     circ = doc.get("circuit")
     if circ:
@@ -453,6 +578,7 @@ def _entry_for(doc, report):
     return {
         "slug": f"{n}-{k}-{d}",
         "n": n, "k": k, "d": d,
+        "code_type": doc.get("code_type", "CSS"),
         "eff": round(k * d * d / n, 3),
         "w": comp.get("max_check_weight"),
         "locality_class": comp.get("locality_class", "unrestricted"),
@@ -474,7 +600,10 @@ def frontier_summary(doc, report):
     lines = []
     for cell in cells(cand):
         L, W = cell
-        idxs = [i for i, e in enumerate(entries) if cell in cells(e)]
+        # peers share the cell and the board: CSS and stabilizer codes
+        # rank separately
+        idxs = [i for i, e in enumerate(entries) if cell in cells(e)
+                and e.get("code_type", "CSS") == cand["code_type"]]
         peers = [entries[i] for i in idxs]
         # pareto() returns the set of indices on the frontier; the candidate is
         # appended last, so its index is len(peers).
@@ -554,7 +683,8 @@ def dry_run_summary(doc, report, out):
     entry = _entry_for(doc, report)
     dist = doc["distance"]
     per_side = []
-    for side in ("X", "Z"):
+    stab = doc.get("code_type") == "stabilizer"
+    for side in (("P",) if stab else ("X", "Z")):
         s = dist.get(side, {})
         witness = "witness found" if s.get("witness") else "no witness"
         per_side.append(f"{side}: <= {s.get('value')} ({s.get('confidence')}, {witness})")
@@ -563,7 +693,8 @@ def dry_run_summary(doc, report, out):
         for L, W in cells(entry)
     )
     lines = [
-        f"  code         [[{doc['n']},{doc['k']},{dist['d']}]]",
+        f"  code         [[{doc['n']},{doc['k']},{dist['d']}]]"
+        + ("  (general stabilizer code, stabilizer board)" if stab else ""),
         f"  score        kd^2/n = {entry['eff']}",
         f"  checks       max weight {entry['w']} ({comp.get('weight_class', '?')})",
         f"  locality     {comp.get('locality_class', 'unrestricted')}",
@@ -597,8 +728,13 @@ def dry_run_summary(doc, report, out):
 # the circuit tier (RFC 0001, issue #505; default since issue #1848)
 # ----------------------------------------------------------------------------
 def schema_version_for(doc):
-    """The oldest schema version that describes the document: 0.3 with a
-    search budget, 0.2 with a circuit block, else 0.1."""
+    """Return the oldest schema version that describes the document.
+
+    0.4 for a stabilizer code, 0.3 with a search budget, 0.2 with a circuit
+    block, else 0.1.
+    """
+    if doc.get("code_type") == "stabilizer":
+        return "0.4"
     if (doc.get("provenance") or {}).get("search_budget"):
         return "0.3"
     if doc.get("circuit"):
@@ -681,9 +817,22 @@ def cmd_submit(args):
         coords = np.asarray(coords, dtype=float)
     args._coords = coords
 
-    doc = build_submission(HX, HZ, args)
-
-    print("  verifying (CSS / k / weight / witnesses / locality)...", flush=True)
+    stabilizer = (_draft or {}).get("code_type") == "stabilizer"
+    if stabilizer:
+        if args.circuits:
+            raise SystemExit("--circuits: the circuit tier is not available "
+                             "for stabilizer codes; drop the flag")
+        if not args.no_circuit:
+            print("  circuit tier: not available for stabilizer codes (the "
+                  "memory experiments are per basis); submitting the code "
+                  "tier only", flush=True)
+            args.no_circuit = True
+        doc = build_stabilizer_submission(HX, HZ, args)
+        print("  verifying (isotropy / k / weight / Pauli witness / locality)...",
+              flush=True)
+    else:
+        doc = build_submission(HX, HZ, args)
+        print("  verifying (CSS / k / weight / witnesses / locality)...", flush=True)
     report = verify(doc, refute=True)
     for c in report["checks"]:
         if not c["ok"]:

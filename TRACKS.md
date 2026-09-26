@@ -36,6 +36,19 @@ beats it on all of (n lower, k higher, d higher, w lower), with at least one
 strict. There can be many co-leaders. `kd^2/n` is a sortable headline figure per
 cell (see the caveat below), and never collapses the frontier into one rank.
 
+Code type, from `code_type`, is a third cell dimension: CSS codes and general
+stabilizer codes are ranked on separate leaderboards. A stabilizer code is
+compared only with other stabilizer codes, so neither board's entries can
+dominate the other's. They are kept apart because `kd^2/n` does not mean the
+same thing for both: the two families decode differently, and how the figure
+tracks a logical error rate is less settled for non-CSS codes.
+
+A stabilizer code's check weight is the number of qubits each generator acts
+on (a `Y` counts once) and its locality class comes from the generator
+supports, so the (locality, weight) grid is the same on both boards. A code
+that is CSS up to a Hadamard on some qubits belongs on the CSS board; the
+verifier detects these and the dedup gate marks them as duplicates.
+
 A record whose only strict axis is `d` — the candidate ties an existing entry on
 n, k and w and raises nothing but the distance — is a different kind of claim
 from the rest of the frontier: both numbers are witness-backed *upper* bounds, so
@@ -67,9 +80,9 @@ color), `other`. On the board it is a filter, not a leaderboard.
 ## Layer 3: verified flags (earned badges)
 
 Only things the verifier or a certificate can prove: the distance-confidence
-tier, CSS commutation, the locality class (which doubles as Layer-1
-membership), and `modular` (the layout assigns every qubit to a hardware
-module; see below).
+tier, CSS commutation (or, for a general stabilizer code, that its generators
+commute), the locality class (which doubles as Layer-1 membership), and
+`modular` (the layout assigns every qubit to a hardware module; see below).
 
 Distance confidence is orthogonal to the tracks:
 
@@ -83,6 +96,8 @@ Distance confidence is orthogonal to the tracks:
   exists. This is NP-hard and does not scale, so large codes carry tight upper
   bounds while small and moderate codes are certified exact. The board shows an
   `exact` claim as an upper bound until a maintainer runs `verify/certify.py`.
+  For a general stabilizer code the distance is a Pauli weight and the
+  certifier does not yet minimize it, so every stabilizer entry is `d<=`.
 
 ## Diagnostics (displayed, never ranked)
 

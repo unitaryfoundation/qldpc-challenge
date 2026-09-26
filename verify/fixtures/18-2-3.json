@@ -1,0 +1,219 @@
+{
+  "schema_version": "0.4",
+  "name": "[[18,2,3]] XZZX toric code, L = 3",
+  "code_type": "stabilizer",
+  "n": 18,
+  "k": 2,
+  "checks": {
+    "S": [
+      {
+        "X": [
+          0,
+          2
+        ],
+        "Z": [
+          9,
+          15
+        ]
+      },
+      {
+        "X": [
+          9,
+          10
+        ],
+        "Z": [
+          0,
+          3
+        ]
+      },
+      {
+        "X": [
+          0,
+          1
+        ],
+        "Z": [
+          10,
+          16
+        ]
+      },
+      {
+        "X": [
+          10,
+          11
+        ],
+        "Z": [
+          1,
+          4
+        ]
+      },
+      {
+        "X": [
+          1,
+          2
+        ],
+        "Z": [
+          11,
+          17
+        ]
+      },
+      {
+        "X": [
+          9,
+          11
+        ],
+        "Z": [
+          2,
+          5
+        ]
+      },
+      {
+        "X": [
+          3,
+          5
+        ],
+        "Z": [
+          9,
+          12
+        ]
+      },
+      {
+        "X": [
+          12,
+          13
+        ],
+        "Z": [
+          3,
+          6
+        ]
+      },
+      {
+        "X": [
+          3,
+          4
+        ],
+        "Z": [
+          10,
+          13
+        ]
+      },
+      {
+        "X": [
+          13,
+          14
+        ],
+        "Z": [
+          4,
+          7
+        ]
+      },
+      {
+        "X": [
+          4,
+          5
+        ],
+        "Z": [
+          11,
+          14
+        ]
+      },
+      {
+        "X": [
+          12,
+          14
+        ],
+        "Z": [
+          5,
+          8
+        ]
+      },
+      {
+        "X": [
+          6,
+          8
+        ],
+        "Z": [
+          12,
+          15
+        ]
+      },
+      {
+        "X": [
+          15,
+          16
+        ],
+        "Z": [
+          0,
+          6
+        ]
+      },
+      {
+        "X": [
+          6,
+          7
+        ],
+        "Z": [
+          13,
+          16
+        ]
+      },
+      {
+        "X": [
+          16,
+          17
+        ],
+        "Z": [
+          1,
+          7
+        ]
+      },
+      {
+        "X": [
+          7,
+          8
+        ],
+        "Z": [
+          14,
+          17
+        ]
+      },
+      {
+        "X": [
+          15,
+          17
+        ],
+        "Z": [
+          2,
+          8
+        ]
+      }
+    ]
+  },
+  "distance": {
+    "d": 3,
+    "P": {
+      "value": 3,
+      "confidence": "upper_bound",
+      "witness": {
+        "X": [],
+        "Z": [
+          6,
+          7,
+          8
+        ]
+      }
+    }
+  },
+  "provenance": {
+    "authors": [
+      "Bonilla Ataides, Tuckett, Bartlett, Flammia, Brown"
+    ],
+    "construction": "toric code on an 3 x 3 torus (qubits on edges: horizontal edge (i,j) is index i*L+j, vertical edge (i,j) is L*L+i*L+j) with a Hadamard on every vertical edge, so every vertex and plaquette generator reads X Z Z X; all 2L^2 generators listed, two of them dependent",
+    "origin": "baseline",
+    "references": [
+      "arXiv:2009.07851"
+    ],
+    "date": "2021",
+    "notes": "Distance 3 is exact for the XZZX toric code (a local Clifford image of the toric code); recorded as upper_bound because the Pauli-weight certifier is not available."
+  },
+  "family": "topological"
+}

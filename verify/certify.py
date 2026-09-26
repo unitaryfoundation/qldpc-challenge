@@ -73,6 +73,18 @@ def _exists_lighter(H, LZ, cap, tlim):
 
 
 def certify(doc, tlim=600):
+    if doc.get("code_type") == "stabilizer":
+        # The MILP below minimizes Hamming weight in a kernel, which is the
+        # per-side CSS distance. A stabilizer code's distance is a Pauli
+        # weight (per-qubit indicator y_q >= x_q, y_q >= z_q, minimize sum
+        # y_q over ker(B | A) with one anticommutation row); that
+        # reformulation is not built yet. Until it lands an `exact`
+        # claim on a stabilizer entry is accepted as upper_bound by the
+        # verifier, exactly as CSS claims were before certification existed.
+        return {"name": doc.get("name"), "d": doc["distance"]["d"],
+                "solver": None, "sides": {}, "d_exact": False,
+                "note": "stabilizer codes: Pauli-weight certification not "
+                        "available yet; stays upper_bound"}
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
