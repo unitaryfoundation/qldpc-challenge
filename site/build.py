@@ -690,7 +690,7 @@ font-size:11px;color:var(--mut);border:1px solid var(--ln);
 border-radius:999px;padding:0 7px;line-height:16px;
 font-variant-numeric:tabular-nums}}
 .hexmark{{color:var(--ac);vertical-align:-2px}}
-/* (n, k, LER) frontier chip (issue #2125), on rows Pareto-best by measured
+/* (n, k, LER) frontier chip, on rows Pareto-best by measured
    logical error rate; the frontier list above the board reuses .latestlist */
 .lerchip{{display:inline-block;margin-left:7px;font-size:10px;line-height:1;
 padding:3px 6px;border-radius:5px;background:#ecfdf5;color:#065f46;
@@ -1154,7 +1154,7 @@ document.addEventListener('click',e=>{
  // with a verified layout (f defined), 'without' = only codes with none.
  // Clicking the active button clears it back to 'all'.
  let geoMode='';
- // asym (issue #2125): X/Z distance asymmetry, so biased-noise candidates can
+ // asym: X/Z distance asymmetry, so biased-noise candidates can
  // be pulled out by a threshold of the reader's choosing until the board
  // defines a label for them.
  const cmp=/^(n|k|d|w|eff|f|g|geo|swaps|route|ler|asym)(>=|<=|>|<|=)(-?\\d+(?:\\.\\d+)?(?:e-?\\d+)?)$/;
@@ -1166,7 +1166,7 @@ document.addEventListener('click',e=>{
    switch(m[2]){case'>=':return x>=v;case'<=':return x<=v;
     case'>':return x>v;case'<':return x<v;default:return x===v;}}
   if(t==='record'||t==='frontier')return r.dataset.record==='1';
-  // the (n, k, LER) frontier (issue #2125), separate from the record star
+  // the (n, k, LER) frontier, separate from the record star
   if(t==='ler-record')return r.dataset.lrec==='1';
   // Distance provenance. 'exact' keeps only entries whose distance is proved
   // by a committed certificate; 'upper-bound' keeps the rest, which are the
@@ -1211,7 +1211,7 @@ document.addEventListener('click',e=>{
   if(kfill){kfill.style.left=((b[0]-KMIN)/kspan*100)+'%';
    kfill.style.width=((b[1]-b[0])/kspan*100)+'%';}
   if(kval)kval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
- // Adaptive axes (issue #2125): fit each landscape scatter to the points the
+ // Adaptive axes: fit each landscape scatter to the points the
  // filter leaves visible. Mirrors scatter() in build.py (sx/sy, _axis_step,
  // the x tick step); the server-rendered axes span every code and are the
  // no-JS view.
@@ -1644,7 +1644,7 @@ def load_entries():
                            (doc.get("circuit", {}).get("d_circ") or {}).values())
                        if doc.get("circuit") else None),
             "has_ler": bool((doc.get("circuit") or {}).get("ler")),
-            # measured logical error rate (issue #2125): the worse of the two
+            # measured logical error rate: the worse of the two
             # per-round side rates, the same worst-side convention as d =
             # min(d_X, d_Z). The schema pins p and the decoder, so the number
             # is comparable across entries; ler_key carries both anyway so
@@ -1762,7 +1762,7 @@ def ler_setting(doc):
 def ler_frontier(entries):
     """Indices on the Pareto frontier over (n, k, LER) among the codes with a
     measured logical error rate: n and LER lower-is-better, k higher-is-
-    better, at least one strict (issue #2125). Decoupled from the (n, k, d, w)
+    better, at least one strict. Decoupled from the (n, k, d, w)
     frontier that awards the record star: d and w do not enter, so a code can
     be an LER record without being a distance record and vice versa.
     Computed per (p, decoder) setting."""
@@ -1795,13 +1795,7 @@ def scatter(te, front, yacc, ylabel):
     kd^2/n). Two complementary views are shown side by side, so codes that
     coincide in one (e.g. same n and d but different k) separate in the other.
     Suppressed below a handful of distinct (n, y) points (nothing to show).
-
-    The axes here span every code; the board filter then rescales them to the
-    points it leaves visible (the rescale() routine in JS mirrors sx/sy,
-    _axis_step, and the x tick step below), so a few very high kd^2/n codes
-    cannot flatten the rest of the board (issue #2125). Each point carries
-    its raw (n, y) as data-x/data-y for that, and the gridlines sit in their
-    own <g class=grid> so they can be redrawn without touching the points."""
+"""
     if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
         return ""
     W, H = 520, 274
@@ -2884,7 +2878,7 @@ def references_page(entries):
 
 
 
-# Check-weight caps of the headline kd^2/n cards (issue #2125). kd^2/n climbs
+# Check-weight caps of the headline kd^2/n cards. kd^2/n climbs
 # with check weight, so an uncapped "best on the board" card rewards whoever
 # mined the highest-weight region and invites bloating the board with heavy
 # codes; each card is the best within a cap instead, the caps that matter for
@@ -2907,7 +2901,7 @@ def progress_panel(entries, best_geo_e):
     and the best geometric efficiency g (among eligible codes -- verified
     layout, d >= GEO_MIN_D). Each card names the code achieving its number so
     the parameters behind it are visible. There is no code-count card and no
-    uncapped kd^2/n card (issue #2125: both reward volume over quality)."""
+    uncapped kd^2/n card (both reward volume over quality)."""
 
     def by_line(e, geo=False):
         """The achieving code, linked: [[n,k,d]] plus the layout facts that
@@ -2944,7 +2938,7 @@ def progress_panel(entries, best_geo_e):
     return f'<section class=statsbar>{cards}</section>'
 
 
-# Default cap of the leaderboard weight slider (issue #2125); see
+# Default cap of the leaderboard weight slider; see
 # contributors_panel.
 LB_DEFAULT_W = 8
 
@@ -2972,7 +2966,7 @@ def contributors_panel(entries):
     with check weight (it is a per-cell figure, not a global one -- TRACKS.md),
     so an uncapped headline quietly rewards whoever worked the highest-weight
     region; the slider makes the cap you are reading explicit, and it starts
-    at LB_DEFAULT_W (issue #2125), the cap that matters for early fault
+    at LB_DEFAULT_W, the cap that matters for early fault
     tolerance, rather than at the board's heaviest code. Each cap is ranked
     here and shipped precomputed, like the metric toggle."""
 
@@ -3641,7 +3635,7 @@ def compute_records(entries):
 def cell_frontier_ranked(entries, idxs):
     """Indices of a cell's Pareto frontier, ranked leader-first by kd^2/n;
     codes tied on kd^2/n rank by the lowest (n, k) pair, then the higher d
-    (issue #2125: at equal score the smallest code is the one to show). Ties
+    (at equal score the smallest code is the one to show). Ties
     on kd^2/n no longer pick an arbitrary single leader; the whole frontier is
     returned in order so co-leaders and the runner-up are visible."""
     te = [entries[i] for i in idxs]
@@ -4071,7 +4065,7 @@ def latest_codes_panel(entries, records, limit=10):
     """A 'recently added' strip (issue #308): the newest codes by submission
     date, newest first, so a visitor can see the board is live. Each row links
     to the code page and is starred if it currently holds a cell record. It is
-    the last section of the page (issue #2125)."""
+    the last section of the page."""
     rec_slugs = {entries[i]["slug"] for i in records}
     dated = [e for e in entries if e.get("date")]
     dated.sort(key=lambda e: (e["date"], e["slug"]), reverse=True)
@@ -4101,7 +4095,7 @@ def latest_codes_panel(entries, records, limit=10):
 
 
 def ler_frontier_panel(entries, lrec):
-    """The (n, k, LER) frontier as a list (issue #2125), lowest measured rate
+    """The (n, k, LER) frontier as a list, lowest measured rate
     first. Separate from the primary tracks: those rank by kd^2/n over the
     (n, k, d, w) frontier, this one ignores d and w and ranks by what a
     device-like simulation measured."""
@@ -4142,7 +4136,7 @@ def ler_frontier_panel(entries, lrec):
             f'<ol class=latestlist>{"".join(rows)}</ol></section>')
 
 
-# Default upper bound of the Codes weight slider (issue #2125); see
+# Default upper bound of the Codes weight slider; see
 # board_controls.
 BOARD_DEFAULT_W = 8
 
@@ -4181,7 +4175,7 @@ def board_controls(entries, records):
         for f in families)
     weights = [e["w"] for e in entries if e["w"] is not None]
     wmin, wmax = (min(weights), max(weights)) if weights else (0, 0)
-    # The upper handle starts at BOARD_DEFAULT_W (issue #2125): the heaviest
+    # The upper handle starts at BOARD_DEFAULT_W: the heaviest
     # codes carry kd^2/n values that dwarf the rest, and the low-weight region
     # is the one that matters for early fault tolerance. "All" and "clear
     # filters" open the range back up to the whole board.
@@ -4338,7 +4332,7 @@ def charts_block(entries, records):
 def board_table(entries, records, lrec=frozenset()):
     """The searchable, sortable table of every code, with the track type as a
     column of chips. Search and charts are rendered separately, above; this is
-    the table itself. lrec is the (n, k, LER) frontier (issue #2125), marked
+    the table itself. lrec is the (n, k, LER) frontier, marked
     with its own chip and searchable as ler-record."""
     def chips(e):
         out = [f'<span class=tchip title="construction family (a tag, not a '
@@ -4615,7 +4609,7 @@ def build():
         'as &rho;&sup2; so stacking must earn its density)</div>'
         '</section>')
     P.append(record_chart(entries))
-    # the leaderboard follows the record chart (issue #2125): the chart shows
+    # the leaderboard follows the record chart: the chart shows
     # the records climbing, the leaderboard shows who set them
     P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
@@ -4682,7 +4676,7 @@ def build():
              'Click any row for the witness, certificate, and checks. '
              '<span class=arrow>&rarr;</span></p>'
              '</a></div>')
-    # the newest submissions close the page (issue #2125): a liveness signal,
+    # the newest submissions close the page: a liveness signal,
     # lower priority than every ranking above it
     P.append(latest_codes_panel(entries, records))
     P.append('</div>')  # close the main content wrap; footer is full-width
@@ -4749,7 +4743,7 @@ def build():
     # out of sync.
     n_cells = len(cells_by_key(entries))
     # best_kd2_over_n stays for the README badge; the capped bests are the
-    # numbers the headline cards show (issue #2125).
+    # numbers the headline cards show.
     stats = {"verified_codes": len(entries), "certified_exact": n_exact,
              "tracks": n_cells, "best_kd2_over_n": best_eff,
              "best_geometric_efficiency":
