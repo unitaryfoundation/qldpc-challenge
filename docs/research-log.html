@@ -3,6 +3,31 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/32-10-4.html">[[32,10,4]] — 32-10-4</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details open><summary>note</summary><div class=notebody><h3>[[32,10,4]]: bilayer 2D-local weight-6 CSS code from a t=3 SAT search, two qubits per site of a 4x4 grid</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: weight-6 x local-2d-bilayer. At n &lt;= 32 and d &gt;= 4 the weight-6 bilayer cell was led by <code>codes/30-8-4.json</code> (k = 8, one layer) beside <code>codes/25-7-4.json</code>, <code>codes/24-6-4.json</code> (two layers), <code>codes/18-4-4.json</code>, and <code>codes/16-4-4.json</code>. For a full-rank model k = n - 2G, so G=11 forces k &gt;= 10; the column-count bound G &gt;= 2n/(w+1) = 9.1 leaves G=10 (k &gt;= 12) as the last rung that can hold a t &gt;= 2 code.</p>
+<h4>What was searched</h4>
+<p><code>research/local_sat.py</code> <code>build_local_cnf</code> with the grid site list repeated twice (each of the 16 sites of the 4x4 integer grid carries two qubits at the same coordinate, n = 32; in code, <code>local_sat._grid_sites</code> is replaced by a version that yields every site twice, the one-line <code>layers</code> extension of the single-layer encoder), G=11 checks per side anchored at a grid site and acting within anchor radius 3.5 of it (check diameter at most 7.0, the bilayer cap; on the 4x4 grid the farthest sites are 4.24 apart, so the radius constrains nothing and the instance is the weight-bounded CSS search at n = 32 with a bilayer-honest layout by construction), row weight at most 6, CSS commutation, nonzero syndrome for every Pauli error of weight at most 3. CaDiCaL 1.9.5 via python-sat, conflict cap 20,000,000 per solve, 6 h wall cap per solve, CNF streamed into the solver (395,008 variables). First solve SAT after 481.4 s and 529,455 conflicts; ten distinct models in 1133.4 s (1,477,695 conflicts), all k = 10 with d_ub = 4. Model 0 is the code here.</p>
+<h4>Evidence trail</h4>
+<p>Detection of every weight &lt;= 3 error with no weight &lt;= 3 stabilizer gives d &gt;= 4; an exhaustive enumeration after staging of every X-type and every Z-type error of weight at most 3 (5,488 supports per side, plain GF(2) column sums) found none with zero syndrome, so d &gt;= 4 holds independently of the SAT encoding. <code>research/kit/submit.make_submission</code> (20,000 RIS trials per side, the duplicated coordinates and layers = 2) embedded a weight-4 X-logical and a weight-4 Z-logical, so d = 4 exactly; the file carries confidence upper_bound as the kit labels it. <code>verify/validate_candidate.py</code>: verifier ok (weight class weight-6, locality class local-2d-bilayer, two qubits per site, measured interaction radius 4.24), no lighter logical in 3,780 RIS trials, no exact or WL-equivalent board duplicate, label &quot;advances the weight-6 x local-2d-bilayer board&quot;. Check weights: X-rows eleven of weight 6; Z-rows eleven of weight 6. kd^2/n = 5.0. It raises k at (n &lt;= 32, d = 4) in the weight-6 bilayer cell from 8 to 10; every check has weight exactly 6.</p>
+<h4>Dead ends</h4>
+<p>The rung below, G=10 (k &gt;= 12), exhausted the 20,000,000-conflict cap in 13,056 s with neither a model nor an UNSAT proof, so k = 12 at d = 4 on this grid is open, not excluded; G=9 lies below the column-count bound (9.1) and is UNSAT without solving.</p>
+<h4>Tools</h4>
+<p><code>research/local_sat.py</code>, <code>research/kit/submit.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/validate_candidate.py</code>. CaDiCaL 1.9.5 via python-sat 1.9.dev15 (Cadical195), CPython 3.12, one core.</p>
+<h4>Reproduction</h4>
+<pre>
+import local_sat
+from pysat.solvers import Cadical195
+local_sat._grid_sites = lambda side: [(float(x), float(y))
+    for y in range(side) for x in range(side) for _ in range(2)]
+s = Cadical195(bootstrap_with=[])
+cnf = local_sat.build_local_cnf(4, 11, 6, 3, 3.5, sink=s, shared_t3=True)
+s.conf_budget(20_000_000); assert s.solve_limited()
+model = {abs(m) for m in s.get_model() if m &gt; 0}
+# HX[g, q] = cnf[&quot;xr&quot;][(g, q)] in model; HZ likewise from cnf[&quot;zr&quot;];
+# coordinates = cnf[&quot;sites&quot;] (each grid point twice), layers = 2.
+</pre>
+<p>CaDiCaL is deterministic for a fixed clause order; the first model is the code in this file (fingerprint c3a81cbed39009ad).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-10-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/32-12-3.html">[[32,12,3]] — 32-12-3</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details open><summary>note</summary><div class=notebody><h3>[[32,12,3]]: bilayer 2D-local weight-6 CSS code from a t=2 SAT search, two qubits per site of a 4x4 grid</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: weight-6 x local-2d-bilayer. The board&#x27;s bilayer cell inherits every single-layer code; at n &lt;= 32 and d &gt;= 3 its weight-6 entries top out at k = 10 (<code>codes/30-10-3.json</code>), with <code>codes/25-9-3.json</code> and <code>codes/24-6-4.json</code> beside it, and no two-layer weight-6 code with d = 3 sits there. For a full-rank model k = n - 2G, so G=10 forces k &gt;= 12; the column-count bound G &gt;= 2n/(w+1) = 9.1 makes it the lowest rung that can hold a t &gt;= 2 code.</p>
@@ -53,7 +78,7 @@ model = {abs(m) for m in s.get_model() if m &gt; 0}
 # coordinates = cnf[&quot;sites&quot;] (each grid point twice), layers = 2.
 </pre>
 <p>CaDiCaL is deterministic for a fixed clause order; the first model is the code in this file (fingerprint 3d2c39fac8b37ec6).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-16-3.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/36-10-4-b.html">[[36,10,4]] — 36-10-4-b</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details open><summary>note</summary><div class=notebody><h3>[[36,10,4]]: 2D-local weight-6 CSS code with d=4 from a t=3 SAT search on a 6x6 grid</h3>
+<section class=blk><h3><a href="codes/36-10-4-b.html">[[36,10,4]] — 36-10-4-b</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[36,10,4]]: 2D-local weight-6 CSS code with d=4 from a t=3 SAT search on a 6x6 grid</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: weight-6 x local-2d-single. The d=4 points at n=36 in this cell were <code>codes/36-6-4.json</code> (G=15 checks per side) and <code>codes/36-8-4.json</code> (G=14), and the weight-8 <code>codes/36-12-4.json</code> sits in the weight-8 cell only. The board&#x27;s <code>codes/36-10-4.json</code> is a different code with the same parameters, weight 8 and no layout, so it competes only in the unrestricted cells; this file takes the -b suffix. For a full-rank model k = n - 2G, so k &gt;= 10 at weight 6 needs G &lt;= 13. The G=13 instance had been a budget wall at every budget tried: interactive budgets in the earlier campaigns, and 3 h of CaDiCaL 1.5.3 (about 7.5M conflicts) in the Phase 0 triage of issue #2024, with no model and no UNSAT proof.</p>
 <h4>What was searched</h4>
@@ -321,6 +346,31 @@ model = {abs(m) for m in s.get_model() if m &gt; 0}
 # coordinates = cnf[&quot;sites&quot;], layers = 1; then make_submission.
 </pre>
 <p>CaDiCaL is deterministic for a fixed clause order; the first model is the code in this file (fingerprint abd6357fd1cd631e).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/64-24-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/72-30-3.html">[[72,30,3]] — 72-30-3</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[72,30,3]]: bilayer 2D-local weight-6 CSS code from a t=2 SAT search, two qubits per site of a 6x6 grid</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: weight-6 x local-2d-bilayer. At n &lt;= 72 and d &gt;= 3 the cell&#x27;s best k was 22 (<code>codes/64-22-3.json</code>, one layer; 24 in the single-layer [[64,24,3]] submitted from Phase 1 of this campaign), with the two-layer entries at this size sitting lower. For a full-rank model k = n - 2G, so the ladder was run at G = 23, 22, and 21 (k floors 26, 28, 30); the column-count bound G &gt;= 2n/(w+1) = 20.6 makes G=21 the lowest rung that can hold a t &gt;= 2 code, so the ladder ends here.</p>
+<h4>What was searched</h4>
+<p><code>research/local_sat.py</code> <code>build_local_cnf</code> with the grid site list repeated twice (each of the 36 sites of the 6x6 integer grid carries two qubits at the same coordinate, n = 72; in code, <code>local_sat._grid_sites</code> is replaced by a version that yields every site twice, the one-line <code>layers</code> extension of the single-layer encoder), G=21 checks per side anchored at a grid site and acting within anchor radius 3.5 of it (check diameter at most 7.0, the bilayer cap; on the 6x6 grid the farthest sites are 7.07 apart, so the radius excludes only checks that would span opposite corners), row weight at most 6, CSS commutation, nonzero syndrome for every Pauli error of weight at most 2. CaDiCaL 1.9.5 via python-sat, conflict cap 20,000,000 per solve, 6 h wall cap per solve, CNF streamed into the solver (439,704 variables). First solve SAT after 6,253.6 s and 11,312,692 conflicts; ten distinct models in 7,685 s (14,494,472 conflicts), all k = 30 with d_ub = 3. Model 0 is the code here. The rungs above returned [[72,26,3]] and [[72,28,3]] in 1,430 s and 517 s; both are dominated by this code.</p>
+<h4>Evidence trail</h4>
+<p>Every weight &lt;= 2 error is detected by the CNF, and an exhaustive enumeration after staging of every X-type and every Z-type error of weight at most 2 (2,628 supports per side, plain GF(2) column sums) found none with zero syndrome, so d &gt;= 3 holds independently of the SAT encoding. <code>research/kit/submit.make_submission</code> (20,000 RIS trials per side, the duplicated coordinates and layers = 2) embedded a weight-3 X-logical and a weight-3 Z-logical, so d = 3 exactly; the file carries confidence upper_bound as the kit labels it. <code>verify/validate_candidate.py</code>: verifier ok (weight class weight-6, locality class local-2d-bilayer, two qubits per site, measured interaction radius 5.83), no lighter logical in 5,380 RIS trials, no exact or WL-equivalent board duplicate, label &quot;advances the weight-6 x local-2d-bilayer board&quot;. Check weights: X-rows twenty-one of weight 6; Z-rows one of weight 5 and twenty of weight 6. kd^2/n = 3.75. It raises k at (n &lt;= 72, d = 3) in the weight-6 bilayer cell from 24 to 30.</p>
+<h4>Dead ends</h4>
+<p>G=20 (k &gt;= 32) lies below the column-count bound and is UNSAT without solving. At weight 8 the same grid and G gives [[72,30,3]] as well (the weight-8 instance solved it in 79 s against 6,254 s here), so the weight-6 code supersedes it in the nested cell; the weight-8 rungs below G=21 remain open and are queued.</p>
+<h4>Tools</h4>
+<p><code>research/local_sat.py</code>, <code>research/kit/submit.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/validate_candidate.py</code>. CaDiCaL 1.9.5 via python-sat 1.9.dev15 (Cadical195), CPython 3.12, one core, 1 h 44 min to the first model.</p>
+<h4>Reproduction</h4>
+<pre>
+import local_sat
+from pysat.solvers import Cadical195
+local_sat._grid_sites = lambda side: [(float(x), float(y))
+    for y in range(side) for x in range(side) for _ in range(2)]
+s = Cadical195(bootstrap_with=[])
+cnf = local_sat.build_local_cnf(6, 21, 6, 2, 3.5, sink=s, shared_t3=True)
+s.conf_budget(20_000_000); assert s.solve_limited()
+model = {abs(m) for m in s.get_model() if m &gt; 0}
+# HX[g, q] = cnf[&quot;xr&quot;][(g, q)] in model; HZ likewise from cnf[&quot;zr&quot;];
+# coordinates = cnf[&quot;sites&quot;] (each grid point twice), layers = 2.
+</pre>
+<p>CaDiCaL is deterministic for a fixed clause order; the first model is the code in this file (fingerprint 76a6de8e0eb6e1e8).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/72-30-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/81-31-3.html">[[81,31,3]] — 81-31-3</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[81,31,3]]: 2D-local weight-6 CSS code from a t=2 SAT search on a 9x9 grid</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: weight-6 x local-2d-single. The t=2 SAT method had produced the d=3 records on the 4x4 to 8x8 grids (<code>codes/16-6-3.json</code>, <code>codes/25-9-3.json</code>, <code>codes/36-12-3.json</code>, <code>codes/49-17-3.json</code>, <code>codes/64-22-3.json</code>, and the [[64,24,3]] submitted separately from this campaign), each at the smallest number of checks per side G that is still satisfiable, one above the column-count bound G &gt;= 2n/(w+1). At n=81 and weight 6 that bound is G &gt;= 23.1, so G=25, 24, and 23 were queued; for a full-rank model k = n - 2G, so they force k &gt;= 31, 33, and 35.</p>
