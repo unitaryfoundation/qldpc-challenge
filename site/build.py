@@ -452,6 +452,26 @@ font-variant-numeric:tabular-nums}}
 .stat-card .sub{{font-size:12.5px;margin-top:5px;color:var(--mut)}}
 .stat-card .sub a{{font-family:'Space Mono',ui-monospace,monospace;
 color:var(--ink)}}
+/* Second tier under the headline cards: the uncapped kd^2/n on the left and
+   the board census on the right. Both are outlined rather than filled, so the
+   row above stays the one the eye compares across. */
+.herosub{{display:grid;grid-template-columns:2fr 3fr;gap:14px;margin:0 0 8px}}
+.stat-ghost{{border:1px dashed var(--ln);border-radius:14px;padding:14px 18px}}
+.stat-ghost .v{{font-size:25px;font-weight:700;line-height:1.05;
+font-variant-numeric:tabular-nums}}
+.stat-ghost .l{{font-size:12.5px;color:var(--mut);margin-top:4px}}
+.stat-ghost .sub{{font-size:12px;margin-top:4px;color:var(--mut)}}
+.stat-ghost .sub a{{font-family:'Space Mono',ui-monospace,monospace;
+color:var(--ink)}}
+.census{{display:grid;grid-template-columns:repeat(3,1fr);
+border:1px solid var(--ln);border-radius:14px;background:var(--soft);
+overflow:hidden}}
+.census div{{padding:14px 18px;border-right:1px solid var(--ln)}}
+.census div:last-child{{border-right:0}}
+.census b{{display:block;font-size:22px;line-height:1.1;font-weight:700;
+font-variant-numeric:tabular-nums;
+font-family:'Space Mono',ui-monospace,monospace}}
+.census span{{font-size:12px;color:var(--mut)}}
 .lb{{margin:18px 0 8px;border:1px solid var(--ln);border-radius:14px;
 background:#fff;overflow:hidden}}
 .lbhead{{display:flex;justify-content:space-between;align-items:center;gap:16px;
@@ -912,6 +932,8 @@ text-align:right}}}}
 @media(max-width:560px){{.wrap{{padding:0 14px}}
 header.hero{{padding:34px 0 30px}}
 .statsbar{{grid-template-columns:repeat(2,1fr);gap:10px}}
+.herosub{{grid-template-columns:1fr;gap:10px}}
+.census div{{padding:12px 14px}}.census b{{font-size:19px}}
 .stat-card{{padding:14px 16px}}.stat-card .v{{font-size:27px}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
@@ -2886,11 +2908,12 @@ def references_page(entries):
 HERO_CAPS = (6, 8, 12)
 
 
-def best_eff_at(entries, cap):
+def best_eff_at(entries, cap=None):
     """The entry with the best kd^2/n among codes of check weight <= cap;
-    ties go to the smallest n, then the smallest k. None when the cap holds
-    no code."""
-    pool = [e for e in entries if e["w"] is not None and e["w"] <= cap]
+    ties go to the smallest n, then the smallest k. cap None reads the whole
+    board. None when the cap holds no code."""
+    pool = [e for e in entries if e["w"] is not None
+            and (cap is None or e["w"] <= cap)]
     return max(pool, key=lambda e: (e["eff"], -e["n"], -e["k"]), default=None)
 
 
@@ -2900,8 +2923,15 @@ def progress_panel(entries, best_geo_e):
     none). Four cards: the best kd^2/n within each HERO_CAPS check-weight cap,
     and the best geometric efficiency g (among eligible codes -- verified
     layout, d >= GEO_MIN_D). Each card names the code achieving its number so
-    the parameters behind it are visible. There is no code-count card and no
-    uncapped kd^2/n card (both reward volume over quality)."""
+    the parameters behind it are visible.
+
+    A second tier beneath carries the uncapped kd^2/n and the board census.
+    Both belong on the page, and neither belongs in the row above: kd^2/n
+    climbs with check weight, so the uncapped best is a ceiling set by whoever
+    worked the heaviest region rather than a target, and a headcount is not a
+    record. They are outlined instead of filled so the top row stays the one
+    comparable series. The census splits submitted from baseline because the
+    total alone invites reading every entry as a new result."""
 
     def by_line(e, geo=False):
         """The achieving code, linked: [[n,k,d]] plus the layout facts that
@@ -2935,7 +2965,25 @@ def progress_panel(entries, best_geo_e):
                     f'<div class=v>{v}</div>'
                     f'<div class=l>{lab}</div></div>'
                     for i, (v, lab, t) in enumerate(metrics))
-    return f'<section class=statsbar>{cards}</section>'
+
+    top = best_eff_at(entries)
+    top_v = "&middot;" if top is None else f"{top['eff']:g}"
+    n_base = sum(1 for e in entries if e["origin"] == "baseline")
+    counts = (("{:,}".format(len(entries)), "codes on the board"),
+              ("{:,}".format(len(entries) - n_base), "submitted"),
+              ("{:,}".format(n_base), "literature baselines"))
+    census = "".join(f'<div><b>{v}</b><span>{lab}</span></div>'
+                     for v, lab in counts)
+    tier = (f'<div class=stat-ghost title="Best operational efficiency kd^2/n '
+            f'anywhere on the board, at any check weight. Full definition '
+            f'below.">'
+            f'<div class=v>{top_v}</div>{by_line(top)}'
+            f'<div class=l>best kd&sup2;/n at any weight</div></div>'
+            f'<div class=census title="Codes with a verified distance witness; '
+            f'submitted codes came through the challenge and are not '
+            f'necessarily novel parameter sets.">{census}</div>')
+    return (f'<section class=statsbar>{cards}</section>'
+            f'<section class=herosub>{tier}</section>')
 
 
 # Default cap of the leaderboard weight slider; see
