@@ -2640,6 +2640,7 @@
    "Hao Song",
    "Yu-An Chen"
   ],
+  "model": "human",
   "construction": "Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+x^3y^-4, g(x,y)=1+y+x^-1y^-3 on the abelian quotient group Z^2/L with twist basis a_1=[0, 159], a_2=[1, 17] (n=2|det[a_1,a_2]|=2*159). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].",
   "references": [
    "arXiv:2503.03827"
