@@ -1,0 +1,24 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "smoke-bb-72",
+    "name": "Smoke campaign: one known BB code, one experiment",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize", "target": 6 },
+    "constraints": { "max_check_weight": 6, "n": [60, 80], "min_distance": 4 },
+    "methods": {
+      "families": ["bivariate-bicycle"],
+      "generators": ["research/kit/bb.py::build_bb"],
+      "screening": { "trials_per_candidate": 200, "seeds": [0] }
+    },
+    "budget": { "candidates_screened": 4, "walltime_hours": 0.25 },
+    "stopping": [
+      { "type": "target_reached" },
+      { "type": "candidates_found", "count": 1 },
+      { "type": "budget_exhausted" }
+    ],
+    "required_outputs": ["experiment_ledger", "surviving_candidates",
+                         "negative_results", "campaign_summary"],
+    "notes": "Small enough to run in a test: it exists to prove a campaign definition drives the real loop end to end, not to find anything."
+  }
+}

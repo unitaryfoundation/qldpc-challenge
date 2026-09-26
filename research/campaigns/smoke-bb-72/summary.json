@@ -1,0 +1,59 @@
+{
+  "authority": "candidates listed here passed verify/validate_candidate.py; nothing here is a board entry until a human reviews and submits it",
+  "budget": {
+    "consumed": {
+      "candidates_screened": 1
+    },
+    "declared": {
+      "candidates_screened": 4,
+      "walltime_hours": 0.25
+    },
+    "remaining": {
+      "candidates_screened": 3,
+      "walltime_hours": 0.25
+    }
+  },
+  "campaign_id": "smoke-bb-72",
+  "campaign_name": "Smoke campaign: one known BB code, one experiment",
+  "experiments": [
+    {
+      "candidates": 0,
+      "family": "bivariate-bicycle",
+      "note": "the known Z_6 x Z_6 trinomial pair",
+      "seed": 0,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0
+      },
+      "survivors": 0
+    }
+  ],
+  "frontier_advances": 0,
+  "negative_results": [
+    {
+      "detail": "duplicate: identical to board entry 72-12-6.json; novelty not assessed: this code is already on the board as 72-12-6.json; literature novelty UNVERIFIED",
+      "what": "gate rejected"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n",
+    "target": 6
+  },
+  "report": "research/campaigns/smoke-bb-72/REPORT.md",
+  "required_outputs": [
+    "experiment_ledger",
+    "surviving_candidates",
+    "negative_results",
+    "campaign_summary"
+  ],
+  "status": "completed",
+  "stopped_by": {
+    "detail": "objective reached 6 against 6",
+    "type": "target_reached"
+  },
+  "summary_version": 1,
+  "survivors": []
+}

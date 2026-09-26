@@ -1,0 +1,39 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "w8-2dlocal-n700-1000",
+    "name": "Weight-8 2D-local codes, n=700-1000",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize" },
+    "constraints": {
+      "locality": "local-2d-bilayer",
+      "max_check_weight": 8,
+      "n": [700, 1000],
+      "min_distance": 8
+    },
+    "methods": {
+      "families": ["lifted-product", "bivariate-bicycle"],
+      "generators": ["research/kit/search.py::sample_bb"],
+      "screening": {
+        "trials_per_candidate": 250,
+        "seeds": [101, 211, 307],
+        "ladder": [[20000, 22], [100000, 20]]
+      },
+      "escalation_gate": true
+    },
+    "budget": { "cpu_hours": 500, "gpu_hours": 100, "walltime_hours": 72 },
+    "stopping": [
+      { "type": "frontier_advance" },
+      { "type": "budget_exhausted" },
+      { "type": "no_progress", "experiments": 8 }
+    ],
+    "required_outputs": [
+      "experiment_ledger",
+      "surviving_candidates",
+      "research_note",
+      "negative_results",
+      "campaign_summary"
+    ],
+    "notes": "Above n=700 the board only admits check weight <= 8 with d <= 40, which is why the weight cap and the blocklength window are what they are: outside that box a find cannot be submitted at all."
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unitaryfoundation.github.io/qldpc-challenge/schema/campaign.schema.json",
+  "title": "qLDPC challenge research campaign",
+  "description": "A bounded, reproducible search task: what to look for, where to look, how much to spend, and when to stop. A campaign is the INPUT to the autoresearch loop in research/AUTORESEARCH.md, not a replacement for it, and it is not a submission mechanism: a campaign produces candidates, a human reviews them, and only then does a PR happen. Two things it can never do, both load-bearing. Its constraints are screening filters and never claims: the locality and weight classes an entry lands in are computed by verify/ from (H_X, H_Z) and the layout, never declared here. And it cannot weaken the gate: nothing is a find until verify/validate_candidate.py returns passed: true.",
+  "type": "object",
+  "required": ["campaign"],
+  "additionalProperties": false,
+  "properties": {
+    "campaign": {
+      "type": "object",
+      "required": ["schema_version", "id", "name", "objective", "budget", "stopping"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "description": "Bumped when a field changes meaning, never for an added optional field."
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+          "description": "Stable identifier, and the directory name under research/campaigns/."
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "active", "paused", "completed", "abandoned"],
+          "default": "draft",
+          "description": "abandoned keeps its ledger and any staged finds: stopping early throws nothing away."
+        },
+        "objective": {
+          "type": "object",
+          "required": ["metric", "direction"],
+          "additionalProperties": false,
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": ["kd2_over_n", "geometric_efficiency", "distance", "logical_qubits", "frontier_entries"],
+              "description": "What the campaign is trying to move. kd2_over_n is the board's per-cell headline figure; it is compared within a cell, never globally (TRACKS.md)."
+            },
+            "direction": { "type": "string", "enum": ["maximize", "minimize"] },
+            "target": {
+              "type": "number",
+              "description": "Optional: the value that would make the campaign a success. Its absence means 'beat whatever is there'."
+            }
+          }
+        },
+        "constraints": {
+          "type": "object",
+          "description": "Where to look. Filters on the search space only. A candidate enters a track cell because the verifier computed it, never because a campaign asked for it.",
+          "additionalProperties": false,
+          "properties": {
+            "locality": {
+              "type": "string",
+              "enum": ["local-2d-single", "local-2d-bilayer", "unrestricted"],
+              "description": "The locality class to search toward. The verifier decides which class a finished code is in."
+            },
+            "max_check_weight": { "type": "integer", "minimum": 3, "maximum": 32 },
+            "n": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 1 },
+              "minItems": 2,
+              "maxItems": 2,
+              "description": "[min, max] blocklength. The admissible box is n <= 700 at any weight, or n <= 1000 at check weight <= 8 and d <= 40; a campaign may ask for less than that but not for more."
+            },
+            "k": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 1 },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "min_distance": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "methods": {
+          "type": "object",
+          "description": "How to look.",
+          "additionalProperties": false,
+          "properties": {
+            "families": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "enum": ["bivariate-bicycle", "generalized-bicycle", "2bga-coset", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+                "description": "The Layer-2 vocabulary from schema/code.schema.json. A family outside it is rejected rather than silently accepted, so a typo does not become a campaign nobody can match against the board."
+              }
+            },
+            "generators": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_./-]+\\.py(::[A-Za-z_][A-Za-z0-9_]*)?$",
+                "description": "Repo-relative path, optionally ::function, e.g. research/kit/search.py::sample_bb."
+              }
+            },
+            "screening": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "trials_per_candidate": { "type": "integer", "minimum": 1 },
+                "seeds": { "type": "array", "items": { "type": "integer" } },
+                "ladder": {
+                  "type": "array",
+                  "description": "Rungs as [trials, keep_below_weight]: screen at `trials`, carry a candidate only while its lightest logical is under `keep_below_weight`.",
+                  "items": {
+                    "type": "array",
+                    "items": { "type": "integer", "minimum": 1 },
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            },
+            "escalation_gate": {
+              "type": "boolean",
+              "default": false,
+              "description": "Use research/kit/escalation.py at rung boundaries."
+            }
+          }
+        },
+        "budget": {
+          "type": "object",
+          "description": "What may be spent. At least one field, and every one present must be positive: a campaign with a zero or absent budget is unbounded, which is the thing this object exists to prevent.",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "cpu_hours": { "type": "number", "exclusiveMinimum": 0 },
+            "gpu_hours": { "type": "number", "exclusiveMinimum": 0 },
+            "walltime_hours": { "type": "number", "exclusiveMinimum": 0 },
+            "candidates_screened": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "stopping": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Any condition firing ends the campaign. The summary records which one did.",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["budget_exhausted", "frontier_advance", "target_reached", "candidates_found", "no_progress"],
+                "description": "budget_exhausted: any budget field reached. frontier_advance: a validated candidate advanced its cell. target_reached: objective.target met. candidates_found: `count` validated survivors. no_progress: `experiments` consecutive experiments with no survivor."
+              },
+              "count": { "type": "integer", "minimum": 1 },
+              "experiments": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "required_outputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"]
+          },
+          "description": "A campaign that ends with zero board submissions still owes its ledger and its negative results: a closed family is a finding, and the next searcher pays for it twice if it is not written down."
+        },
+        "notes": { "type": "string", "maxLength": 4000 }
+      }
+    }
+  }
+}
