@@ -148,6 +148,53 @@ def base_counterpart(path, doc, changes):
     return matches[0] if len(matches) == 1 else None
 
 
+LEAD_PARAMS = re.compile(r"^\s*\[\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]\]")
+
+
+def leading_params(name):
+    """The (n, k, d) a name states up front, or None when it states none.
+
+    A name whose leading bracket is not three plain integers (a "<=" bound, a
+    bare title, no bracket) is making no claim about the parameters.
+    """
+    m = LEAD_PARAMS.match(name or "")
+    return tuple(int(x) for x in m.groups()) if m else None
+
+
+def own_params(doc):
+    return (doc.get("n"), doc.get("k"), (doc.get("distance") or {}).get("d"))
+
+
+def is_name_correction(base_doc, doc):
+    """Does doc differ from base_doc by exactly a name put right?
+
+    The leading [[n,k,d]] of a name restates what the entry already says, so a
+    name that has fallen behind a refutation is stale derived data rather than
+    a claim of its own. Correcting it to the entry's own parameters, and
+    changing nothing else, needs no binding.
+    """
+    for key in set(base_doc) | set(doc):
+        if key != "name" and base_doc.get(key) != doc.get(key):
+            return False
+    return (leading_params(doc.get("name")) == own_params(doc)
+            and leading_params(base_doc.get("name")) != own_params(doc))
+
+
+def is_slug_correction(path, base_path, doc):
+    """Is this a byte-identical move of an entry onto its own [[n,k,d]] slug?
+
+    The slug is derived data: codes/<n>-<k>-<d>.json restates what the JSON
+    already says. A move that makes the path agree with the file it holds
+    changes no claim, no witness, and no author, so it is not an edit to the
+    entry in the sense the bindings below police. A move to any other name
+    would rename the board's canonical slug, and that is not covered here.
+    """
+    if base_path is None or base_path == path:
+        return False
+    want = f"{doc.get('n')}-{doc.get('k')}-{doc.get('distance', {}).get('d')}.json"
+    return os.path.basename(path) == want
+
+
 def found_by_handles(side):
     wp = (side or {}).get("witness_provenance") or {}
     out = []
@@ -394,14 +441,34 @@ def main(argv):
                 continue
         if base_doc is not None:
             if doc == base_doc:
-                # Nothing in the JSON moved, so the diff that brought this
-                # entry here is in its other committed artifacts (its
-                # circuits/<slug>/ files). No binding describes that: every
-                # one of them is a change TO the JSON.
+                if is_slug_correction(f, base_path, doc):
+                    print(f"ok    {f}: renamed from {base_path} onto its own "
+                          "[[n,k,d]] slug, content unchanged")
+                    continue
+                if base_path != f:
+                    # A rename to anything else does change the board's
+                    # canonical slug for this entry.
+                    violations.append(
+                        (f, hs, f"renamed from {base_path} without changing "
+                         "the JSON, and the new name is not this entry's "
+                         f"[[{doc.get('n')},{doc.get('k')},"
+                         f"{doc.get('distance', {}).get('d')}]] slug; "
+                         "renaming an entry is reserved to its listed "
+                         "authors"))
+                    continue
+                # Nothing in the JSON moved and the path is the same, so the
+                # diff that brought this entry here is in its other committed
+                # artifacts (its circuits/<slug>/ files). No binding describes
+                # that: every one of them is a change TO the JSON.
                 violations.append(
                     (f, hs, "the JSON is unchanged, so the diff is in this "
                      "entry's committed circuits/ artifacts; replacing those "
                      "is reserved to its listed authors"))
+                continue
+            if is_name_correction(base_doc, doc):
+                print(f"ok    {f}: name corrected to this entry's own "
+                      f"[[{doc['n']},{doc['k']},"
+                      f"{doc['distance']['d']}]], nothing else changed")
                 continue
             attempts = []
             for label, bind, phrase in BINDINGS:
