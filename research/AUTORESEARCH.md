@@ -245,6 +245,51 @@ Run `validate_candidate` on the packaged doc (see **The one rule** above). Keep 
 `passed: true`. The verdict's `gates` are your evidence; its `labels` are what you show the
 human. This — not the surrogate, not your own judgment — is what decides whether you have a find.
 
+## 5b. A win only on d: audit the peer before you package
+
+A construction pins n, k and check weight, so a candidate built the same way as an existing
+board entry can only beat it on `d` — and `d` is the one axis that is a witness-backed
+*upper* bound, i.e. the one that inflates. When the gate comes back with
+
+```json
+"gates": {"novelty": {"advances_by": ["d"], "d_only_gain": true,
+                      "d_only_peers": ["[[72,6,6]] w=6 72-6-6.json"]}}
+```
+
+and the label `advances the <cell> board ONLY on d over <peer>: distance is the suspect
+axis`, assume **your** number is the soft one until a matched-depth measurement says
+otherwise. `d_only_gain` means the *whole* board advance was on `d`; `d_only_peers` is
+the list to act on, and it is non-empty even when the candidate also beat some other
+entry on `k` (the label then still names those peers, as
+`advances the <cell> board on d, k; its gain over <peer> is d-only: ...`).
+ The board has been wrong this way before (`[[882,18,30]]`→29, `[[684,12,81]]`→66,
+`[[396,10,39]]`→37 — `audits/README.md`), and chasing an inflated d is how a campaign
+ends with nothing.
+
+So measure both numbers at one budget before spending anything on packaging:
+
+```bash
+uv run --frozen python research/audits/leader_audit.py pair \
+    research/candidates/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
+    --pair-depth 64 --witness-dir /tmp/pair
+```
+
+The peers are chosen automatically — every board entry with the same n, k and max check
+weight and a lower claimed d — or name them with `--peer`. Both sides get the same trials,
+seeds and `--pair-depth`: a number read on your candidate at a deeper budget than the peer
+is an instrument artifact, not a distance difference. One of four decisions comes out:
+
+| decision | meaning | do this next |
+|---|---|---|
+| `drop: ...` | your own claim came down at its own budget | drop the candidate; the ladder was right, the packaging would have been wrong |
+| `redirect: ...` | the board peer came down | the submission is the peer's **distance revision** — a valid contribution on its own (`../CONTRIBUTING.md`) |
+| `credible: ...` | both claims held at matched depth | the gain survives; package it (step 4) |
+| `inconclusive: ...` | neither claim was reached | no information at all; go deeper or stop, and never report it as corroboration |
+
+Exit code 2 means a claim was refuted on either side, so `pair` can gate a script exactly
+like `ladder` and `screen`. Keep `--witness-dir`: the lighter logical found in a refuted
+peer *is* the revision (see **The one rule** above).
+
 ## 6. Confirm the distance exactly (optional, for a standout)
 
 The surrogate and the gate both certify an *upper bound*. To go further on a code the human wants
@@ -275,6 +320,9 @@ The constructors, surrogate, search, and packaging stay numpy-only.
   board; novelty vs the literature unverified."
 - **`upper_bound` is not `exact`.** The gate certifies an upper bound (`d<=`); an exact (`d=`)
   claim needs server certification (step 6). Only pursue it for a standout the human wants.
+- **Beating an equal (n, k, w) board entry on `d` alone is the inflation pattern** (step 5b).
+  The construction left `d` as the only free axis, so re-measure the peer and your candidate
+  at matched depth (`leader_audit.py pair`) before you treat the gain as real.
 
 ## Field notes from past campaigns
 

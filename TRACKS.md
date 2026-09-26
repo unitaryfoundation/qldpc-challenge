@@ -36,6 +36,25 @@ beats it on all of (n lower, k higher, d higher, w lower), with at least one
 strict. There can be many co-leaders. `kd^2/n` is a sortable headline figure per
 cell (see the caveat below), and never collapses the frontier into one rank.
 
+A record whose only strict axis is `d` — the candidate ties an existing entry on
+n, k and w and raises nothing but the distance — is a different kind of claim
+from the rest of the frontier: both numbers are witness-backed *upper* bounds, so
+the comparison says which search was deeper as much as which code is better, and
+this is where the board has historically been wrong (`[[882,18,30]]` → 29,
+`[[684,12,81]]` → 66). The submission gate reports that pattern instead of a
+generic advance: `validate_candidate` returns `advances_by: ["d"]` in
+`gates.novelty` together with `d_only_peers`, naming the entry that was beaten.
+`d_only_gain` is the stricter of the two: it is true only when nothing but `d`
+was gained anywhere on the board. The label is keyed on `d_only_peers` instead,
+so it still names those entries — and still tells you to re-measure them — when
+the candidate also beat some other entry on `k`, or `w`, or `n`.
+The matched-depth pair audit (`research/audits/leader_audit.py pair`) then
+re-measures the candidate and that entry on the same trials, seeds and pair
+depth, and its `redirect` verdict — the board's number, not the candidate's, was
+the soft one — is a distance revision, which is itself a valid submission. The
+board still ranks claims exactly as claimed; the flag says which claim to
+re-measure first.
+
 ## Layer 2: family tags (provenance, never ranked)
 
 The construction family cannot be recovered from `H`, which is exactly why it is a

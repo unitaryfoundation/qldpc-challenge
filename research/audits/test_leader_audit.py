@@ -11,7 +11,10 @@ output can become a distance revision:
   rung killed by a time limit does not cost a re-run;
 * a verdict is about the code and the instrument that was asked for -- right
   ``pair_depth``, both backends, no silently-skipped rung, no scoring of an
-  entry that is not the claimed CSS code.
+  entry that is not the claimed CSS code;
+* a candidate that would beat a board entry only on d is measured against that
+  entry at one identical budget, and the decision names which of the two claims
+  came down.
 
 The searches are stubbed throughout and the fixture is synthetic: these test the
 plumbing, not the codes, and they never read ``codes/``. Pinning a live board
@@ -317,3 +320,152 @@ def test_screen_witnesses_do_not_collide_across_directories(monkeypatch, tmp_pat
     assert len(written) == 2, f"two entries shared one witness file: {written}"
     seen = {json.loads((witness_dir / name).read_text())["entry"] for name in written}
     assert seen == set(paths)
+
+
+def _pair_args(candidate, peers, seeds=(1,), witness_dir=None):
+    return types.SimpleNamespace(
+        candidate=str(candidate),
+        peer=[str(p) for p in peers],
+        trials=2000,
+        seeds=list(seeds),
+        threads=2,
+        pair_depth=10,
+        witness_dir=None if witness_dir is None else str(witness_dir),
+    )
+
+
+def _write(tmp_path, name, d):
+    """Write a fixture-shaped entry whose claimed distance is d."""
+    doc = json.loads(json.dumps(FIXTURE))
+    doc["distance"] = {"d": d, "X": {"value": d}, "Z": {"value": d}}
+    path = tmp_path / name
+    path.write_text(json.dumps(doc))
+    return str(path)
+
+
+def test_pair_gives_the_candidate_and_its_peer_the_same_budget(monkeypatch, entry, tmp_path):
+    """Candidate and peer are measured identically: one budget, one depth, twice.
+
+    A gain measured on the candidate at a deeper budget than the board entry is
+    an instrument artifact, not a distance difference.
+    """
+    peer = _write(tmp_path, "peer.json", 1)
+    seen = []
+
+    def fake(_hx, _hz, trials, _seed, threads=8, pair_depth=10, prepared=None):
+        seen.append((trials, pair_depth))
+        return WITNESS[0], WITNESS[1], WITNESS[2], 0.0
+
+    monkeypatch.setattr(la, "ris", fake)
+    la.cmd_pair(_pair_args(entry, [peer]))
+    assert seen == [(2000, 10), (2000, 10)], "the two entries were measured differently"
+
+
+def test_pair_redirects_when_the_board_peer_is_the_soft_one(monkeypatch, entry, tmp_path, capsys):
+    """Candidate holds its claim, the peer is refuted at the same budget.
+
+    That is the finding worth acting on: the board number moved, so the
+    submission to make is the peer's distance revision, not the candidate.
+    """
+    peer = _write(tmp_path, "peer.json", 6)  # claim 6, search finds 2 -> refuted
+    monkeypatch.setattr(la, "ris", lambda *a, **k: (WITNESS[0], WITNESS[1], WITNESS[2], 0.0))
+    rc = la.cmd_pair(_pair_args(entry, [peer]))
+    out = capsys.readouterr().out
+    assert rc == la.EXIT_REFUTED
+    assert la.DECISION_REDIRECT in out
+
+
+def test_pair_drops_a_candidate_whose_own_claim_collides(monkeypatch, tmp_path, capsys):
+    """The candidate comes down first: dropping it outranks any peer finding."""
+    candidate = _write(tmp_path, "cand.json", 6)  # claim 6, search finds 2 -> refuted
+    peer = _write(tmp_path, "peer.json", 6)  # also soft, but not the point
+    monkeypatch.setattr(la, "ris", lambda *a, **k: (WITNESS[0], WITNESS[1], WITNESS[2], 0.0))
+    rc = la.cmd_pair(_pair_args(candidate, [peer]))
+    out = capsys.readouterr().out
+    assert rc == la.EXIT_REFUTED
+    assert la.DECISION_DROP in out and la.DECISION_REDIRECT not in out
+
+
+def test_pair_neither_reached_is_inconclusive_and_exits_zero(monkeypatch, entry, tmp_path, capsys):
+    """An under-read budget says nothing about either code, and must not gate."""
+    peer = _write(tmp_path, "peer.json", 1)
+    monkeypatch.setattr(la, "ris", lambda *a, **k: (float("inf"), "", [], 0.0))
+    rc = la.cmd_pair(_pair_args(entry, [peer]))
+    out = capsys.readouterr().out
+    assert rc == la.EXIT_OK
+    assert la.DECISION_INCONCLUSIVE in out
+
+
+def test_pair_without_a_d_only_peer_is_a_usage_error(monkeypatch, entry, capsys):
+    """`pair` answers one question; a candidate with no peer does not have it."""
+    monkeypatch.setattr(la, "_CODES", os.path.join(os.path.dirname(entry), "no-such-dir"))
+    assert la.cmd_pair(_pair_args(entry, [])) == la.EXIT_INVALID
+    assert "not the suspect pattern" in capsys.readouterr().err
+
+
+def test_select_peers_takes_only_equal_n_k_w_with_a_lower_d(monkeypatch, entry, tmp_path):
+    """The peer set is exactly the entries a d-only gain would be measured against."""
+    board = tmp_path / "codes"
+    board.mkdir()
+    doc = json.loads(json.dumps(FIXTURE))
+    variants = {
+        "peer.json": {"n": 4, "k": 2, "d": 1},  # the d-only peer
+        "heavier.json": {"n": 4, "k": 2, "d": 3},  # not lower d: no gain over it
+        "other-n.json": {"n": 5, "k": 2, "d": 1},  # different n: not a d-only tie
+        "other-k.json": {"n": 4, "k": 1, "d": 1},  # different k: a structural win too
+        "weight-1.json": {"n": 4, "k": 2, "d": 1},  # different check weight
+    }
+    for name, over in variants.items():
+        variant = json.loads(json.dumps(doc))
+        variant.update({k: v for k, v in over.items() if k in ("n", "k")})
+        variant["distance"] = {"d": over["d"], "X": {"value": over["d"]}, "Z": {"value": over["d"]}}
+        if name == "weight-1.json":
+            variant["checks"] = {"X": [[0], [1], [2], [3]], "Z": [[0], [1], [2], [3]]}
+        (board / name).write_text(json.dumps(variant))
+
+    monkeypatch.setattr(la, "_CODES", str(board))
+    peers = la.select_peers(entry)
+    assert peers == [str(board / "peer.json")], peers
+
+
+def test_peer_weight_comes_from_the_same_definition_as_the_candidate(monkeypatch, entry, tmp_path):
+    """A repeated check index cancels over GF(2), so both sides count it that way.
+
+    Weighing the candidate from its matrices and a peer from its raw JSON rows
+    gave two answers to one quantity, inside a function whose only job is an
+    equal-w comparison. The peer below ties the candidate on the raw distinct
+    index count (4) but its dense weight is 3, so it is not a weight peer.
+    """
+    board = tmp_path / "codes"
+    board.mkdir()
+    variant = json.loads(json.dumps(FIXTURE))
+    variant["distance"] = {"d": 1, "X": {"value": 1}, "Z": {"value": 1}}
+    variant["checks"] = {"X": [[0, 0, 1, 2, 3]], "Z": [[0, 0, 1, 2, 3]]}
+    (board / "repeat.json").write_text(json.dumps(variant))
+
+    _, _, HX, HZ, _ = la.load_entry(entry)
+    assert la._dense_weight(HX, HZ) == 4
+    assert la._doc_weight(variant) == 3  # the doc route, dense
+    assert len(set(variant["checks"]["X"][0])) == 4  # what the raw route counted
+    monkeypatch.setattr(la, "_CODES", str(board))
+    assert la.select_peers(entry) == []
+
+
+def test_decide_is_order_sensitive():
+    """A collapsing candidate is dropped even when the peer is also soft."""
+    cand = {"verdict": la.VERDICT_REFUTED}
+    peer = [{"verdict": la.VERDICT_REFUTED}]
+    assert la.decide(cand, peer) == (la.DECISION_DROP, la.EXIT_REFUTED)
+    assert la.decide({"verdict": la.VERDICT_HOLDS}, peer) == (la.DECISION_REDIRECT, la.EXIT_REFUTED)
+    assert la.decide({"verdict": la.VERDICT_HOLDS}, [{"verdict": la.VERDICT_HOLDS}]) == (
+        la.DECISION_CREDIBLE,
+        la.EXIT_OK,
+    )
+    assert la.decide({"verdict": la.VERDICT_HOLDS}, [{"verdict": la.VERDICT_INCONCLUSIVE}]) == (
+        la.DECISION_INCONCLUSIVE,
+        la.EXIT_OK,
+    )
+    assert la.decide({"verdict": la.VERDICT_INCONCLUSIVE}, [{"verdict": la.VERDICT_HOLDS}]) == (
+        la.DECISION_INCONCLUSIVE,
+        la.EXIT_OK,
+    )

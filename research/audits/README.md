@@ -20,6 +20,11 @@ uv run --frozen python research/audits/leader_audit.py ladder \
 uv run --frozen python research/audits/leader_audit.py screen \
     --trials 2000000 --seeds 51 --witness-dir /tmp/screen-witnesses \
     codes/672-20-32.json codes/922-18-31.json
+
+# a candidate against the board entry it would beat only on d, same budget
+uv run --frozen python research/audits/leader_audit.py pair \
+    research/candidates/<n>-<k>-<d>.json --trials 2000000 --seeds 51 \
+    --pair-depth 64 --witness-dir /tmp/pair
 ```
 
 It exits 2 if any claim is refuted, so it can gate a script. The other codes are
@@ -106,6 +111,37 @@ by the elimination, not the pair phase. So an `inconclusive` verdict taken at a
 shallower depth than the claim's own ladder is an artifact of the instrument and
 must not be reported as evidence about the code. The default stays 10 so
 existing invocations do not change meaning.
+
+## The pair audit: a win that is only a win on d
+
+A construction pins n, k and check weight, so a candidate built the same way as
+an existing board entry can only beat it on `d` -- and `d` is the upper bound
+that inflates. `pair` measures a candidate and the board entries it would beat
+on `d` alone at one identical budget:
+
+```
+uv run --frozen python research/audits/leader_audit.py pair \
+    research/candidates/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
+    --pair-depth 64 --witness-dir /tmp/pair
+```
+
+The peers default to every `codes/` entry with the same n, k and max check
+weight and a lower claimed d -- the pair over which the Pareto comparison has
+exactly one strict axis; `--peer` names them instead. Candidate and peers are
+measured with the same trials, seeds, pair depth and witness re-check, because a
+number read deeper on one side than the other is an artifact of the instrument,
+not a distance difference. One of four decisions comes out:
+
+| decision | meaning |
+|---|---|
+| `drop: ...` | the candidate's own claim came down at its own budget; do not package it |
+| `redirect: ...` | the board entry's claim came down; the submission is its distance revision |
+| `credible: ...` | both claims held at matched depth; the gain survives the audit |
+| `inconclusive: ...` | neither claim was reached; no information, and never corroboration |
+
+Exit 2 when either side is refuted, so it gates like `ladder` and `screen`.
+Exit 3 when there is no peer at all: that candidate is not making a d-only gain,
+so this is not the question to ask of it -- use `screen`.
 
 ## Limits
 

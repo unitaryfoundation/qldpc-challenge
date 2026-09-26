@@ -16,8 +16,10 @@ matrices before it is recorded; one that fails is discarded.
 
   ladder  one entry, an escalating budget ladder on fresh seeds each rung
   screen  several entries at one budget, to triage a whole cell's leaders
+  pair    a candidate against the board entry it would beat ONLY on d, at one
+          matched budget -- the audit a d-only gain owes before it is packaged
 
-Pass `--witness-out` (ladder) or `--witness-dir` (screen): the best support is
+Pass `--witness-out` (ladder) or `--witness-dir` (screen, pair): the best support is
 written on every new best, so a rung killed by a time limit still leaves the
 artifact a revision needs. Set `--pair-depth` to the depth the claim's own ladder
 used; the default of 10 under-reads against the 24-80 these affine ladders used,
@@ -27,12 +29,24 @@ so a soft claim cannot be refuted and lands on `inconclusive`.
       --ladder 1000000:101 5000000:201 --pair-depth 64 --witness-out /tmp/w.json
   python research/audits/leader_audit.py screen --trials 2000000 --seeds 51 52 \
       --pair-depth 64 codes/672-20-32.json codes/922-18-31.json
+  python research/audits/leader_audit.py pair research/candidates/<n>-<k>-<d>.json \
+      --trials 2000000 --seeds 51 52 --pair-depth 64 --witness-dir /tmp/pair
+
+A construction fixes n, k and w, so a candidate can only beat its board peer
+on d, and d is a bound that can be too high. `pair` decides which of the two
+numbers is wrong by measuring both at the SAME budget:
+
+  drop       the candidate's own claim came down -> it was inflated; do not package
+  redirect   the board peer came down -> the real submission is the peer's revision
+  credible   both held at matched depth -> the gain survives the audit
+  inconclusive  neither was reached -> no information; deeper or not at all
 
 `holds` never upgrades a claim to the exact (`d=`) tier; that needs
 `verify/certify.py`.
 """
 
 import argparse
+import glob
 import json
 import os
 import re
@@ -44,6 +58,7 @@ import numpy as np
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.abspath(os.path.join(_HERE, "..", ".."))
+_CODES = os.path.join(_REPO, "codes")
 for _p in (os.path.join(_REPO, "research", "kit"), os.path.join(_REPO, "verify")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
@@ -78,6 +93,23 @@ def _rows_to_dense(rows, n):
         for q in row:
             M[i, int(q)] ^= 1
     return M
+
+
+def _dense_weight(HX, HZ):
+    """Max check weight of two already-dense check matrices, 0 if both are empty.
+
+    ONE definition of "the weight" for this file: the row weight of the matrices
+    over GF(2), where a check index that appears twice cancels. Every place that
+    compares or prints a weight -- the measurement, the candidate in
+    ``select_peers`` and its peers -- goes through here, so an equal-w
+    comparison cannot end up weighing one side from the matrices and the other
+    from the JSON rows.
+    """
+    w = 0
+    for M in (HX, HZ):
+        if M.shape[0]:
+            w = max(w, int(M.sum(axis=1).max()))
+    return w
 
 
 def _search_side(prepared, tag, trials, seed, pair_depth):
@@ -148,7 +180,7 @@ def validate_witness(n, HX, HZ, side, weight, support):
 def describe(n, k_claim, HX, HZ, doc, tag):
     k = compute_k(HX, HZ)
     css_ok = verify_css(HX, HZ)
-    w = max(int(HX.sum(axis=1).max()), int(HZ.sum(axis=1).max()))
+    w = _dense_weight(HX, HZ)
     print(
         f"{tag}: n={n} k={k} (claimed {k_claim}) w={w} css_ok={css_ok}"
         f" claim d<={doc['distance']['d']}"
@@ -310,39 +342,170 @@ def cmd_ladder(args):
     return EXIT_REFUTED if verdict == VERDICT_REFUTED else EXIT_OK
 
 
+def _measure(entry, trials, seeds, threads, pair_depth, witness_dir=None):
+    """Screen one entry at one budget. Returns its row, or None if unusable.
+
+    Shared by `screen` and `pair`: a comparison between a candidate and a peer
+    only means something if both went through the same search, budget, depth and
+    witness re-check.
+    """
+    n, k_claim, HX, HZ, doc = load_entry(entry)
+    k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(entry))
+    if _reject_unusable(entry, k, k_claim, css_ok):
+        return None
+    claim = doc["distance"]["d"]
+    prepared = surrogate.prepare_distance_search(HX, HZ)
+    best = {"weight": n + 1, "side": None, "support": [], "seed": None, "trials": trials}
+    for seed in seeds:
+        weight, side, support, dt = ris(HX, HZ, trials, seed, threads, pair_depth, prepared=prepared)
+        ok, why = validate_witness(n, HX, HZ, side, weight, support)
+        print(f"  seed={seed}: d<={weight} side={side} [{dt:.0f}s] witness={why}", flush=True)
+        if not ok:
+            print(f"    DISCARDED d<={weight}: {why}", flush=True)
+            continue
+        if weight < best["weight"]:
+            best = {"weight": weight, "side": side, "support": support, "seed": seed, "trials": trials}
+            print(f"    NEW BEST d<={weight} side={side} support={support}", flush=True)
+            if witness_dir:
+                _write_witness(
+                    os.path.join(witness_dir, f"{_witness_stem(entry)}.json"),
+                    _best_payload(entry, n, k, claim, best),
+                )
+    return {
+        "entry": entry,
+        "stem": os.path.splitext(os.path.basename(entry))[0],
+        "n": n,
+        "k": k,
+        "w": w,
+        "claim": claim,
+        "weight": best["weight"],
+        "verdict": _verdict(best["weight"], claim),
+    }
+
+
 def cmd_screen(args):
     rows = []
     print(f"  pair_depth={args.pair_depth} threads={args.threads}", flush=True)
     for entry in args.entries:
-        n, k_claim, HX, HZ, doc = load_entry(entry)
-        k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(entry))
-        if _reject_unusable(entry, k, k_claim, css_ok):
+        m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
+        if m is None:
             return EXIT_INVALID
-        claim = doc["distance"]["d"]
-        prepared = surrogate.prepare_distance_search(HX, HZ)
-        best = {"weight": n + 1, "side": None, "support": [], "seed": None, "trials": args.trials}
-        for seed in args.seeds:
-            weight, side, support, dt = ris(HX, HZ, args.trials, seed, args.threads, args.pair_depth, prepared=prepared)
-            ok, why = validate_witness(n, HX, HZ, side, weight, support)
-            print(f"  seed={seed}: d<={weight} side={side} [{dt:.0f}s] witness={why}", flush=True)
-            if not ok:
-                print(f"    DISCARDED d<={weight}: {why}", flush=True)
-                continue
-            if weight < best["weight"]:
-                best = {"weight": weight, "side": side, "support": support, "seed": seed, "trials": args.trials}
-                print(f"    NEW BEST d<={weight} side={side} support={support}", flush=True)
-                if args.witness_dir:
-                    _write_witness(
-                        os.path.join(args.witness_dir, f"{_witness_stem(entry)}.json"),
-                        _best_payload(entry, n, k, claim, best),
-                    )
-        verdict = _verdict(best["weight"], claim)
-        rows.append((os.path.splitext(os.path.basename(entry))[0], n, k, w, claim, best["weight"], verdict))
+        rows.append((m["stem"], m["n"], m["k"], m["w"], m["claim"], m["weight"], m["verdict"]))
     print("=" * 72)
     print(f"{'entry':>14s} | {'n':>4s} {'k':>4s} {'w':>2s} {'claim':>5s} {'d_ub':>5s}  verdict")
     for name, n, k, w, claim, best, verdict in rows:
         print(f"{name:>14s} | {n:4d} {k:4d} {w:2d} {claim:5d} {best:5d}  {verdict}")
     return EXIT_REFUTED if any(r[-1] == VERDICT_REFUTED for r in rows) else EXIT_OK
+
+
+def _display(path):
+    """Repo-relative path when it is inside the repo, so logs stay copy-pasteable."""
+    absolute = os.path.abspath(path)
+    rel = os.path.relpath(absolute, _REPO)
+    return path if rel.startswith("..") else rel
+
+
+def _doc_weight(doc):
+    """Max check weight of a submission-shaped doc, by the route load_entry takes.
+
+    The rows are turned into the same dense matrices ``load_entry`` builds and
+    then weighed by ``_dense_weight``, so a doc and a pair of matrices cannot
+    disagree about their own weight.
+    """
+    n = int(doc["n"])
+    return _dense_weight(_rows_to_dense(doc["checks"]["X"], n), _rows_to_dense(doc["checks"]["Z"], n))
+
+
+def select_peers(candidate):
+    """Board entries the candidate would beat on d and on nothing else.
+
+    A peer has the same n, the same k and the same max check weight, and a LOWER
+    claimed d: over such a pair exactly one axis is strict, and that axis is d,
+    a witness-backed upper bound and so the one most likely to be too high.
+    Re-measuring the peer beside the candidate at one budget is what turns a
+    d-only gain from a claim into a comparison. The candidate's own file is
+    skipped when it already sits on the board.
+    """
+    n, k_claim, HX, HZ, doc = load_entry(candidate)
+    w = _dense_weight(HX, HZ)
+    d_claim = int(doc["distance"]["d"])
+    here = os.path.abspath(candidate)
+    peers = []
+    for path in sorted(glob.glob(os.path.join(_CODES, "*.json"))):
+        if os.path.abspath(path) == here:
+            continue
+        try:
+            with open(path) as fh:
+                bdoc = json.load(fh)
+            if int(bdoc["n"]) != n or int(bdoc["k"]) != k_claim:
+                continue
+            if _doc_weight(bdoc) != w or int(bdoc["distance"]["d"]) >= d_claim:
+                continue
+        except (OSError, ValueError, KeyError, TypeError, IndexError):
+            continue  # a broken board file never blocks a candidate
+        peers.append(path)
+    return peers
+
+
+DECISION_DROP = "drop: the candidate's d is inflated at this depth -- do not package it"
+DECISION_REDIRECT = (
+    "redirect: the board peer's d is inflated -- the submission worth making is the peer's distance revision"
+)
+DECISION_CREDIBLE = "credible: both claims held at matched depth -- the gain survives"
+DECISION_INCONCLUSIVE = "inconclusive: neither claim was reached at this depth -- no information"
+
+
+def decide(candidate, peers):
+    """Return the pair audit's decision, from the two measured claims.
+
+    Order is deliberate: a candidate whose own number came down is dropped even
+    when the peer is also soft, because packaging it is still the wrong move.
+    Only once the candidate holds does a collapsing peer become the finding --
+    and a board entry shown to be inflated is a valid submission in itself.
+    """
+    if candidate["verdict"] == VERDICT_REFUTED:
+        return DECISION_DROP, EXIT_REFUTED
+    if any(p["verdict"] == VERDICT_REFUTED for p in peers):
+        return DECISION_REDIRECT, EXIT_REFUTED
+    if candidate["verdict"] == VERDICT_HOLDS and all(p["verdict"] == VERDICT_HOLDS for p in peers):
+        return DECISION_CREDIBLE, EXIT_OK
+    return DECISION_INCONCLUSIVE, EXIT_OK
+
+
+def cmd_pair(args):
+    peers = list(args.peer) if args.peer else select_peers(args.candidate)
+    if not peers:
+        print(
+            "ERROR: no board entry shares this candidate's (n, k, w) with a lower d, "
+            "so there is nothing for a d-only gain to beat. This is not the suspect "
+            "pattern -- use `screen` or `ladder`.",
+            file=sys.stderr,
+            flush=True,
+        )
+        return EXIT_INVALID
+    print(
+        f"pair: trials={args.trials:,} seeds={args.seeds} pair_depth={args.pair_depth} threads={args.threads}",
+        flush=True,
+    )
+    print(f"  candidate: {_display(args.candidate)}", flush=True)
+    for p in peers:
+        print(f"  peer:      {_display(p)}", flush=True)
+    results = []
+    for entry in [args.candidate] + peers:
+        print("-" * 72, flush=True)
+        m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
+        if m is None:
+            return EXIT_INVALID
+        results.append(m)
+    print("=" * 72)
+    print(f"{'entry':>14s} | {'n':>4s} {'k':>4s} {'w':>2s} {'claim':>5s} {'d_ub':>5s}  verdict")
+    for m in results:
+        print(
+            f"{m['stem']:>14s} | {m['n']:4d} {m['k']:4d} {m['w']:2d} {m['claim']:5d} {m['weight']:5d}  {m['verdict']}"
+        )
+    decision, rc = decide(results[0], results[1:])
+    print(f"DECISION: {decision}", flush=True)
+    return rc
 
 
 class _Parser(argparse.ArgumentParser):
@@ -401,6 +564,30 @@ def main(argv=None):
         "within the repo so two same-named entries cannot overwrite each other",
     )
     scr.set_defaults(func=cmd_screen)
+
+    pr = sub.add_parser(
+        "pair",
+        help="candidate vs the board entry it would beat only on d, at one matched budget",
+    )
+    pr.add_argument("candidate", help="a submission-shaped JSON: research/candidates/... or codes/...")
+    pr.add_argument(
+        "--peer",
+        nargs="+",
+        default=None,
+        help="board entry/entries to compare against; default is every codes/ entry with the "
+        "same n, k and max check weight and a lower claimed d (the d-only peers)",
+    )
+    pr.add_argument("--trials", type=int, default=2_000_000)
+    pr.add_argument("--seeds", type=int, nargs="+", default=[51])
+    pr.add_argument("--threads", type=int, default=8)
+    pr.add_argument("--pair-depth", type=int, default=10)
+    pr.add_argument(
+        "--witness-dir",
+        default=None,
+        help="directory to drop one witness file per entry, named after the entry's path "
+        "within the repo so the candidate and its peer cannot overwrite each other",
+    )
+    pr.set_defaults(func=cmd_pair)
 
     args = ap.parse_args(argv)
     if getattr(args, "ladder", None):
