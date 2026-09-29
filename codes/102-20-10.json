@@ -1171,6 +1171,7 @@
   "authors": [
    "@gideonlsx"
   ],
+  "model": "Claude Opus 5.5",
   "construction": "Generalized bicycle code over Z_51: a = 1 + x^19 + x^27 + x^35 + x^48, b = 1 + x^7 + x^9 + x^19 mod x^51 - 1; H_X = [A|B], H_Z = [B^T|A^T]",
   "origin": "submission",
   "date": "2026-09-28"
