@@ -1,0 +1,19 @@
+{
+  "comment": "Which index sources count as published literature, and which do not. Derived provenance is only as honest as this list: the isomorphism index also carries our own deep-search output, and a match against that says the code was found here, not that it was published. A source absent from this file is treated as not-literature, so adding an index source without classifying it can never silently promote a board entry to 'literature'. A source under parameters_only is published but carries no matrices, so a hit there means the parameters are known and equivalence is undecided, never that the code is new.",
+  "literature": {
+    "lin_pryadko_2bga_abelian": "arXiv:2306.16400",
+    "lin_pryadko_2bga_nonabelian": "arXiv:2306.16400",
+    "wang_pryadko_gb": "arXiv:2203.17216",
+    "qcode_discovery_bb": "arXiv:2606.02418",
+    "bravyi2024_bb": "arXiv:2308.07915",
+    "qecdb": "https://qecdb.org"
+  },
+  "not_literature": {
+    "deep_search_2026-09": "this project's own deep search, indexed to catch internal duplicates",
+    "deep_search_unclaimed_2026-09": "this project's own deep search, unclaimed candidates",
+    "board": "another entry on this board; a duplicate, not a provenance signal"
+  },
+  "parameters_only": {
+    "codetables": "https://codetables.de -- bounds only, no construction to compare"
+  }
+}

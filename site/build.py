@@ -1621,6 +1621,34 @@ def _model_str(m):
     return m or ""
 
 
+def provenance_counts(slugs):
+    """Bucket counts from research/provenance/derived.json, or None.
+
+    Returns None unless the committed table covers exactly the slugs being
+    rendered. A table that has drifted from the board would publish a split
+    over the wrong set of codes, which is a worse failure than the site not
+    showing one.
+    """
+    path = os.path.join(ROOT, "research", "provenance", "derived.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError):
+        return None
+    table = payload.get("entries") or {}
+    if not slugs <= set(table):
+        missing = len(slugs - set(table))
+        print(f"  note: derived provenance covers {len(table)} slugs and is "
+              f"missing {missing} rendered entries; omitting the split")
+        return None
+    counts = {}
+    for slug in slugs:
+        counts[table[slug]["bucket"]] = counts.get(table[slug]["bucket"], 0) + 1
+    counts["method"] = "isomorphism against the literature index"
+    counts["caveat"] = payload.get("caveat")
+    return counts
+
+
 def load_entries():
     entries = []
     # One memoized structural pass over the board (qldpc_verify.board_reports),
@@ -5111,6 +5139,13 @@ def build():
              "tracks": n_cells, "best_kd2_over_n": best_eff,
              "best_geometric_efficiency":
                  best_geo_e["geo"] if best_geo_e else None}
+    # Where the entries came from, computed by isomorphism against the
+    # literature index rather than read off a submitter's label (#1279).
+    # Absent when the table has not been regenerated for this board, because
+    # a stale split is worse than none.
+    prov = provenance_counts({e["slug"] for e in entries})
+    if prov:
+        stats["provenance"] = prov
     for cap in HERO_CAPS:
         be = best_eff_at(entries, cap)
         stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None
