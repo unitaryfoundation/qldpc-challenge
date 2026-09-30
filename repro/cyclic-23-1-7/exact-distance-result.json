@@ -1,0 +1,15 @@
+{
+  "package": "qldpc",
+  "version": "0.3.3",
+  "input_sha256": "97f47ca9416b9302b67029b005fd50f9205a8acc11d3fd398f29801aa2a0b3ec",
+  "distance_module_sha256": "69c13629b40939e3c71b31fe3384db64bf2473e9e2ac25b42b1ebd01d2961c16",
+  "method": "QuditCode.get_distance_exact(cutoff=1), mixed Pauli weight, exhaustive logical cosets",
+  "n": 23,
+  "k": 1,
+  "stabilizer_rank": 22,
+  "nontrivial_logical_cosets": 3,
+  "operators_in_nontrivial_cosets": 12582912,
+  "exact_distance": 7,
+  "seconds": 0.047772884368896484,
+  "scope": "Independent exhaustive software result; not a formally checked proof or challenge-issued exact badge."
+}

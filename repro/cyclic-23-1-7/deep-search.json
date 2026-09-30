@@ -1,0 +1,29 @@
+{
+  "name": "[[23,1,7]] cyclic stabilizer pilot",
+  "claimed_d": 7,
+  "d_heuristic": 7,
+  "verdict": "corroborated",
+  "sides": {
+    "P": {
+      "value": 7,
+      "lightest_found": 7,
+      "witness": {
+        "X": [
+          1,
+          3,
+          7,
+          8,
+          18
+        ],
+        "Z": [
+          7,
+          14,
+          17
+        ]
+      }
+    }
+  },
+  "trials": 2000000,
+  "seed": 301100,
+  "method": "ris-pauli+gf2_fast(doubled)"
+}
