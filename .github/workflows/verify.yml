@@ -182,17 +182,23 @@ jobs:
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
         run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}
-      # A completed search, carried between runs of the same PR (issue #2633).
-      # gate_changed.py diffs against the base branch, so a PR that adds a
-      # code has a non-empty diff on every push and a push that only fixed
-      # prose re-paid the whole search: 6 of 7 PR branches with more than one
-      # run re-gated byte-identical bytes, 293 minutes in one day. The key is
-      # the candidate's bytes plus the pinned closure, computed inside the
-      # gate, so this cache is addressed by content and a stale restore cannot
-      # answer for different code or a different verifier. restore-keys is
-      # deliberately absent: a partial-key match would restore a cache built
-      # for other bytes, and the gate would then simply miss on every entry,
-      # which is correct but pointless.
+      # A completed refutation, carried between runs of the same PR (issue
+      # #2633). gate_changed.py diffs against the base branch, so a PR that
+      # adds a code has a non-empty diff on every push, and a push that only
+      # fixed prose re-paid the whole search.
+      #
+      # This cache is NOT trusted. A run executes the PR's own copy of this
+      # workflow, and the submitted tree's accelerator build runs before any
+      # gate, so a contributor can write whatever they like here. Only a
+      # refutation is ever served back, and the gate re-validates its witness
+      # against the candidate before believing it, so a planted record either
+      # proves the claimed distance wrong or is discarded. A clean result is
+      # never stored, because there would be nothing to re-check.
+      #
+      # restore-keys is a PR-scoped prefix because the primary key is per run
+      # and attempt, so the prefix is what makes a later run see an earlier
+      # one's record at all. GitHub scopes caches to the PR's own ref, so the
+      # prefix cannot reach another PR's entries.
       - name: restore completed searches
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         uses: actions/cache/restore@v4

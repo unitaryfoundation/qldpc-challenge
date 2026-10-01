@@ -526,6 +526,36 @@ def _validated_logical(HX, HZ, n, w, side, support):
             and bool(((L @ v) % 2).any()))
 
 
+def _revalidated_hits(doc, hits):
+    """Keep only the restored witnesses the pinned stack still confirms.
+
+    A cached refutation is reused, a cached clean result never is, and the
+    asymmetry rests entirely on this: a witness is a checkable fact. The
+    cache directory is writable by the submitted tree's own build step, so a
+    record arriving from it is a proposal exactly like an accelerator
+    proposal, and it is confirmed the same way before anything is believed.
+    The side is not stored, so both are tried; a refutation is a lighter
+    nontrivial logical on either side.
+    """
+    n = int(doc["n"])
+    claimed = int(doc["distance"]["d"])
+    HX = H._matrix(doc["checks"]["X"], n)
+    HZ = H._matrix(doc["checks"]["Z"], n)
+    out = {}
+    for m, (w, support) in hits.items():
+        try:
+            w = int(w)
+            support = [int(q) for q in support]
+        except (TypeError, ValueError):
+            continue
+        if w >= claimed or not support or max(support) >= n or min(support) < 0:
+            continue
+        if any(_validated_logical(HX, HZ, n, w, side, support)
+               for side in ("X", "Z")):
+            out[m] = (w, support)
+    return out
+
+
 def _fast_refute(doc, seed, trials, max_seconds=None):
     """Deep RIS via the optional C++ accelerator, kept SOUND the same way the
     python passes are: the accelerator only proposes (weight, side, support);
@@ -668,7 +698,7 @@ def main(argv):
     # (issue #2633). Absent, every run searches, which is today's behavior.
     if "--search-cache" in rest:
         i = rest.index("--search-cache")
-        search_cache = os.path.abspath(rest[i + 1]) or None
+        search_cache = os.path.abspath(rest[i + 1]) if rest[i + 1] else None
         rest = rest[:i] + rest[i + 2:]
     if "--pr-number" in rest:
         i = rest.index("--pr-number")
@@ -875,7 +905,23 @@ def main(argv):
         # not. Only the search; everything board-dependent is recomputed below.
         with open(p, "rb") as _f:
             doc_bytes = _f.read()
-        cached = RC.load(search_cache, doc_bytes, deep=deep)
+        # Load AND confirm before the stages below decide whether to run:
+        # a record that does not re-validate has to leave the search in
+        # front of us, not behind us.
+        cached = RC.load(search_cache, doc_bytes, deep=deep,
+                         accelerated=GF is not None)
+        if cached is not None:
+            _rgate, _rhits = RC.restored(cached)
+            _rhits = _revalidated_hits(doc, _rhits)
+            if _rhits:
+                cached = (_rgate, _rhits)
+                print(f"reuse    {f}: refutation from "
+                      f"{(_rgate['reused_from'].get('head_sha') or '?')[:8]} "
+                      f"(seed {_rgate.get('seed')}), witness re-checked")
+            else:
+                print(f"note     {f}: a cached record did not re-validate; "
+                      f"searching")
+                cached = None
 
         # STAGE 1 -- structure-aware pre-pass (issue #942). Cheapest mechanism
         # in the gate and, on the one family it applies to, by far the
@@ -976,15 +1022,18 @@ def main(argv):
             "diff_reason": why,
         }
         if cached is not None:
-            # The search above did not run. Take its record and its hits from
-            # the run that did, keeping that run's seed so the printed seed
+            # The search above did not run; take the confirmed record,
+            # keeping the seed of the run that searched so the printed seed
             # still reproduces the verdict it belongs to.
-            gate, hits = RC.restored(cached)
-            tag = (f"reused search from {(gate['reused_from'].get('head_sha') or '?')[:8]}"
-                   f" (seed {gate.get('seed')}); diff: {cls}")
+            gate, hits = cached
+            gate["revalidated"] = sorted(hits)
+            tag = ("reused refutation from "
+                   f"{(gate['reused_from'].get('head_sha') or '?')[:8]}"
+                   f" (seed {gate.get('seed')}, witness re-checked); "
+                   f"diff: {cls}")
         elif search_cache:
             RC.store(search_cache, doc_bytes, gate, hits, deep=deep,
-                     head_sha=head_sha)
+                     accelerated=GF is not None, head_sha=head_sha)
         if "circuit" in doc:
             gate["circuit"] = {
                 "searched": run_circuit,
@@ -1001,7 +1050,9 @@ def main(argv):
             verdict = validate_candidate(doc, seed=seed, refute=False)
             verdict["gates"]["refute"] = {
                 "refuted": bool(hits),
-                "seed": seed,
+                # the seed of the run that actually searched, so a reused
+                # record does not label itself with a seed nothing used
+                "seed": gate.get("seed", seed),
                 "detail": "distance gate recorded by gate_changed.py",
             }
             verdict["passed"] = bool(

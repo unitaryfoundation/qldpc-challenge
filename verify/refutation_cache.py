@@ -1,39 +1,43 @@
-"""Reuse of a completed distance search across runs of the same submission.
+"""Reuse of a completed refutation across runs of the same submission.
 
 `gate_changed.py` exits early when nothing under `codes/` changed, but it
 diffs against the base branch, so a PR that adds a code has a non-empty diff
-on every push for the life of the PR. A push that fixes prose therefore pays
-the full search again on byte-identical code. Measured over 100 `verify.yml`
-runs in one day: 6 of the 7 PR branches with more than one run re-gated
-identical bytes, 293.2 minutes (issue #2633).
+on every push for the life of the PR, and a push that fixes prose pays the
+full search again on byte-identical code (issue #2633).
 
-What is reused is the search and nothing else. `gates.novelty` is a claim
-about `codes/` at a point in time, so a cached verdict would serve a stale
-`board_advancing` the moment any submission merges; that is the mistake
-#2314 made and #2623 corrected. The search reads the candidate alone, so it
-is the part that survives a board that has moved on, and it is where the time
-goes.
+ONLY A REFUTATION IS EVER REUSED, and its witness is re-validated by the
+trusted verifier on load. That is not a conservatism, it is what makes the
+cache safe at all.
 
-Three properties hold the reuse down, and each is tested:
+The reason is the threat model. `verify.yml` runs on `pull_request`, so a run
+executes the PR's own copy of the workflow, and the submitted tree's
+accelerator build runs before any gate fires. A contributor can therefore
+execute arbitrary code in their own run and write whatever they like into the
+cache directory. A forged "not refuted" record would then let a later,
+diff-clean commit skip the search entirely, which is the one outcome the gate
+exists to prevent.
 
-* The key covers the pinned validation closure, not just the candidate.
-  `verify/gate_changed.py`, `verify/heuristic_distance.py`, `verify/gf2_fast.cpp`
-  and `decode/distance.py` are all in `verify/validator_manifest.json`, so any
-  change to how the search works retires every entry without anyone having to
-  remember a list.
-* A refutation is sticky. The search is one-sided: a lighter logical operator
-  found once is a witness and keeps, while a later run that misses it has
-  shown nothing. So a stored refutation is never replaced by a clean result,
-  and `store` refuses to do it.
-* A reused record carries the seed and head of the run that produced it, so
-  the printed seed still reproduces the verdict it belongs to rather than
-  being a seed the current run never used.
+A forged refutation cannot do that. The witness is re-checked here against
+the candidate before it is believed, so a planted record either validates,
+in which case the claimed distance really is overstated and failing the run
+is correct, or it does not, in which case it is discarded and the search runs.
+The asymmetry is the same one that makes refutation sound in the first place:
+a witness is a checkable fact, while "I looked and found nothing" is not.
 
-The cost is real and is not hidden: a PR that fails prose three times used to
-get three independent searches and now gets one. The gate's budget is a fixed
-`min(8000, 2500 + 40n)` under a wall-clock cap rather than "as much as we can
-afford", so those extra searches were never part of the standard a submission
-is held to.
+The consequence is that the measured 293 minutes, which were clean re-runs,
+are NOT recovered by this. Recovering them means trusting a clean result
+produced by a previous commit of an untrusted branch, and nothing inside a
+workflow the submitter controls can establish that. See the PR discussion for
+a sketch that uses GitHub's own run history as the attestation instead.
+
+Other conditions, each tested:
+
+* The key covers the pinned validation closure, so any change to how the
+  search works retires every entry without anyone maintaining a list.
+* The key covers `deep` and whether the accelerator was available, since both
+  select which battery ran.
+* A reused record carries the seed and head of the run that searched, so the
+  printed seed still reproduces the verdict it belongs to.
 """
 import hashlib
 import json
@@ -67,18 +71,26 @@ def closure_digest(manifest_path=None):
     return h.hexdigest()
 
 
-def key_for(doc_bytes, *, deep, manifest_path=None):
+def key_for(doc_bytes, *, deep, accelerated, manifest_path=None):
     """Return the cache key for these candidate bytes under this closure.
 
     ``deep`` is in the key because it selects the trial budget, so a standard
-    run's record must not answer for a deep one. The candidate's bytes rather
-    than its parsed document: the search reads the matrices, and two files
-    that differ only in whitespace produce the same search but not the same
-    submission, and the cheap, conservative choice is to re-search.
+    run's record must not answer for a deep one. ``accelerated`` is there for
+    the same reason: `_budget` gives a deep claim one Python seed plus the
+    150x fast pass when `make fast` succeeded and three Python seeds when it
+    did not, and that build is `continue-on-error`, so a flaky build would
+    otherwise leave a shallow-battery record for a healthy run to reuse in
+    place of the fast pass.
+
+    The candidate's bytes rather than its parsed document: the search reads
+    the matrices, and two files differing only in whitespace produce the same
+    search but not the same submission, and re-searching is the cheap and
+    conservative choice.
     """
     h = hashlib.sha256()
     h.update(closure_digest(manifest_path).encode("utf-8"))
     h.update(b"\0deep\0" if deep else b"\0std\0")
+    h.update(b"\0fast\0" if accelerated else b"\0python\0")
     h.update(doc_bytes)
     return h.hexdigest()
 
@@ -87,15 +99,17 @@ def _path(cache_dir, key):
     return os.path.join(cache_dir, key[:2], key[2:] + ".json")
 
 
-def load(cache_dir, doc_bytes, *, deep, manifest_path=None):
-    """Return a stored record for these bytes, or None.
+def load(cache_dir, doc_bytes, *, deep, accelerated, manifest_path=None):
+    """Return a stored refutation for these bytes, or None.
 
-    None on anything unexpected: a miss costs a search, a wrong hit costs
-    correctness.
+    None on anything unexpected, and None for a record that is not a
+    refutation: a miss costs a search, a wrong hit costs correctness, and a
+    clean record is the one a contributor's own run could have forged.
     """
     if not cache_dir:
         return None
-    key = key_for(doc_bytes, deep=deep, manifest_path=manifest_path)
+    key = key_for(doc_bytes, deep=deep, accelerated=accelerated,
+                  manifest_path=manifest_path)
     try:
         with open(_path(cache_dir, key), encoding="utf-8") as f:
             rec = json.load(f)
@@ -107,21 +121,25 @@ def load(cache_dir, doc_bytes, *, deep, manifest_path=None):
         return None
     if not isinstance(rec.get("hits"), dict):
         return None
+    # Only a refutation is reusable, and only with its witnesses. "Not
+    # refuted" carries nothing a reader can check, so it is exactly what a
+    # planted record would say.
+    if not rec["gate"].get("refuted") or not rec["hits"]:
+        return None
     return rec
 
 
-def store(cache_dir, doc_bytes, gate, hits, *, deep, head_sha=None,
-          manifest_path=None):
-    """Store a completed search; return its path, or None if refused.
+def store(cache_dir, doc_bytes, gate, hits, *, deep, accelerated,
+          head_sha=None, manifest_path=None):
+    """Store a completed refutation; return its path, or None if refused.
 
-    Refused when a stored refutation would be replaced by a clean result,
-    because the stored witness is a fact and the clean result is only the
-    absence of one.
+    A clean result is never stored. It would be unverifiable on the way back
+    in, and storing it is what would give a contributor's own run a way to
+    retire the search for a later commit.
     """
     if not cache_dir:
         return None
-    prior = load(cache_dir, doc_bytes, deep=deep, manifest_path=manifest_path)
-    if prior and prior["gate"].get("refuted") and not gate.get("refuted"):
+    if not gate.get("refuted") or not hits:
         return None
     rec = {
         "entry_version": ENTRY_VERSION,
@@ -130,7 +148,8 @@ def store(cache_dir, doc_bytes, gate, hits, *, deep, head_sha=None,
         "head_sha": head_sha,
         "stored_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    key = key_for(doc_bytes, deep=deep, manifest_path=manifest_path)
+    key = key_for(doc_bytes, deep=deep, accelerated=accelerated,
+                  manifest_path=manifest_path)
     path = _path(cache_dir, key)
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
