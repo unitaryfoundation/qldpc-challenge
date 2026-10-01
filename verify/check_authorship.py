@@ -33,6 +33,16 @@ must be byte-identical apart from an append to notes -- in particular
 rights over the code: they are still not a listed author on the next PR, and
 any later change must itself pass a binding.
 
+A fourth binding covers the one field that carries no claim: a change that
+ONLY corrects `family` binds for anyone. The schema says that tag is "used
+only as a filterable tag, never for ranking", and the verifier accepts any
+well-formed value, so a wrong one changes nothing about what an entry
+asserts. What it does is hide the entry from every query by family, including
+the queries that set campaign targets, which costs everyone who searches and
+costs its author nothing. That is the one case where reserving the fix to the
+author protects the wrong party. It is the narrowest form that can work: the
+tag and nothing else, not the name, not provenance, not a note.
+
 Replacing an existing artifact stays with the code's listed authors either
 way, which matters more for circuits than for layouts: the circuit tier is
 penalty-only (d_circ is clamped to <= d), so a donated schedule can lower an
@@ -339,10 +349,46 @@ def circuit_binding(author, base_doc, new_doc):
 # The bindings a PR author who is not a listed author may still pass, with the
 # phrase each prints on success. Declaration order is report order, except for
 # the one `evident_binding` says the change was aiming for.
+def family_binding(author, base_doc, new_doc):
+    """Does new_doc differ from base_doc by exactly a corrected family tag?
+
+    The other three bindings all describe adding or correcting a claim, and
+    every one of them is reserved narrowly because a claim is what the board
+    ranks. `family` is the one field the schema says is "used only as a
+    filterable tag, never for ranking", and the verifier accepts any
+    well-formed value, so a wrong one changes nothing about what an entry
+    asserts. What it does is hide the entry: every query by family misses it.
+
+    That asymmetry is the argument for this binding. A mis-tag costs everyone
+    who searches by family and costs its author nothing, so leaving the fix
+    to the author alone is the one case where the authorship rule protects
+    the wrong party. `904-230-22` sat mis-tagged as the unrestricted x
+    weight-8 leader while a campaign was scoped to hunt a target strictly
+    worse than the board already held, because the leader was invisible to
+    the query that set the target (#2366, #2633).
+
+    Deliberately the narrowest possible form: the tag and nothing else. Not
+    the name, not provenance, not a note explaining the change. A re-tag that
+    wants to say anything is a re-tag the author should make.
+    """
+    keys = set(base_doc) | set(new_doc)
+    for key in keys - {"family"}:
+        if base_doc.get(key) != new_doc.get(key):
+            return False, (f"field '{key}' changed (a family re-tag may change "
+                           "the family tag and nothing else)")
+    old, new = base_doc.get("family"), new_doc.get("family")
+    if old == new:
+        return False, "the family tag is unchanged"
+    if not new:
+        return False, "a family re-tag must set a tag, not remove one"
+    return True, None
+
+
 BINDINGS = (
     ("refutation", refutation_binding, "witness_provenance credit, refuting"),
     ("layout", layout_binding, "adding a first locality block to"),
     ("circuit", circuit_binding, "adding a first circuit block to"),
+    ("family", family_binding, "correcting the family tag of"),
 )
 
 
@@ -353,6 +399,9 @@ def evident_binding(base_doc, new_doc):
         return "circuit"
     if "locality" in new_doc and "locality" not in base_doc:
         return "layout"
+    if (base_doc.get("family") != new_doc.get("family")
+            and base_doc.get("distance") == new_doc.get("distance")):
+        return "family"
     return "refutation"
 
 
@@ -478,6 +527,17 @@ def main(argv):
                 continue
             attempts = []
             for label, bind, phrase in BINDINGS:
+                # Renaming an entry is reserved to its listed authors, and the
+                # other three bindings enforce that only as a side effect of
+                # refusing the claim changes a rename usually comes with. A
+                # family-only diff has no claim change to refuse, so without
+                # this a non-author could move an entry to an unrelated slug
+                # by re-tagging it in the same commit.
+                if label == "family" and base_path != f:
+                    attempts.append((f"{label} binding failed: the file was "
+                                     f"renamed from {base_path}; a family "
+                                     "re-tag may not move an entry", True))
+                    continue
                 ok, why = bind(author, base_doc, doc)
                 if ok:
                     print(f"ok    {f}: @{author} binds by {phrase} {base_path}")

@@ -649,6 +649,79 @@ def main():
     run_rename("author may rename an entry to an unrelated slug",
                "60-8-6.json", "60-8-4.json", True, author="alice")
 
+    # The family tag carries no claim, and a mis-tag costs everyone who
+    # searches by family while costing its author nothing, so correcting it
+    # alone binds for anyone (#2633). Everything else about the entry still
+    # does not.
+    def retag(family="pair-partition-cpm", **also):
+        def edit():
+            d = copy.deepcopy(BASE_DOC)
+            d["family"] = "other"
+            d.update(also)
+            return d
+        base = copy.deepcopy(BASE_DOC)
+        base["family"] = family
+        return edit, base
+
+    def tagged(base_family, new_family, **also):
+        base = copy.deepcopy(BASE_DOC)
+        if base_family is not None:
+            base["family"] = base_family
+
+        def edit():
+            d = copy.deepcopy(base)
+            if new_family is None:
+                d.pop("family", None)
+            else:
+                d["family"] = new_family
+            for k, v in also.items():
+                d[k] = v
+            return d
+        return edit, base
+
+    e, b = tagged("other", "pair-partition-cpm")
+    run_case("non-author may correct a family tag", e, True,
+             rename=False, base_doc=b)
+
+    e, b = tagged(None, "pair-partition-cpm")
+    run_case("non-author may add a missing family tag", e, True,
+             rename=False, base_doc=b)
+
+    e, b = tagged("other", None)
+    run_case("non-author may not remove a family tag", e, False,
+             rename=False, base_doc=b)
+
+    e, b = tagged("other", "pair-partition-cpm", n=61)
+    run_case("a family re-tag may not carry another field", e, False,
+             rename=False, base_doc=b)
+
+    def retag_plus_note():
+        d = copy.deepcopy(BASE_DOC)
+        d["family"] = "pair-partition-cpm"
+        d["provenance"] = dict(d["provenance"],
+                               notes="original. and a word from me")
+        return d
+    base = copy.deepcopy(BASE_DOC)
+    base["family"] = "other"
+    run_case("a family re-tag may not append to provenance.notes",
+             retag_plus_note, False, rename=False, base_doc=base)
+
+    e, b = tagged("other", "pair-partition-cpm")
+    run_case("a family re-tag plus a rename is not a family re-tag", e, False,
+             rename=True, base_doc=b)
+
+    # Not through run_case: an unchanged tag with nothing else changed is not
+    # a diff, so there is no commit to make. Asserted against the binding.
+    same = copy.deepcopy(BASE_DOC)
+    same["family"] = "other"
+    ok, why = check_authorship.family_binding("bob", same,
+                                              copy.deepcopy(same))
+    check("an unchanged family tag binds nothing", not ok and "unchanged" in why)
+
+    e, b = tagged("other", "pair-partition-cpm")
+    run_case("an author may re-tag their own entry", e, True,
+             rename=False, base_doc=b, author="alice")
+
     print()
     if _fail:
         print(f"FAILED: {_fail}")
