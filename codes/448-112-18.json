@@ -4108,5 +4108,5 @@
   ],
   "notes": "Reproduction of the Table 1 row 6 instance (P = 28) of arXiv:2609.35601v1 (Okada and Kasai), reconstructed from the published exponent arrays, F4 coefficient assignment and companion-matrix expansion. The reconstruction reproduces that paper's Table 2 invariants exactly: commuting CSS checks, rank 6P on each side (k = 4P = 112), quaternary and binary row weight 8 and 10, column weights 3 on 4P columns and 4 on 12P columns, girth 6 (quaternary) and 4 (binary). Equivalence to existing entries was checked on the base branch: no CSS entry is dominated by, or dominates, this one on (n, k, d, max check weight), and both this [[448,112,18]] and this (n,k) pair are new to codes/. Distance is re-verified here as a witness-backed upper bound (X = 18, Z = 18 from 20,000 RIS trials per side plus a 2,000,000-trial accelerator pass at seed 0); the paper claims the same value exact by exhaustive zero-syndrome search, which this repository does not certify at k = 112. P = 28 appears once in Table 1, so no sibling at the same (n,k) was traded away. Reconstructed by MiMo-V2.6-Flash; PR opened by @MathysRennela."
  },
- "family": "other"
+ "family": "pair-partition-cpm"
 }
