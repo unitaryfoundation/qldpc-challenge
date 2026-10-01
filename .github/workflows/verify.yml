@@ -182,10 +182,40 @@ jobs:
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
         run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}
+      # A completed search, carried between runs of the same PR (issue #2633).
+      # gate_changed.py diffs against the base branch, so a PR that adds a
+      # code has a non-empty diff on every push and a push that only fixed
+      # prose re-paid the whole search: 6 of 7 PR branches with more than one
+      # run re-gated byte-identical bytes, 293 minutes in one day. The key is
+      # the candidate's bytes plus the pinned closure, computed inside the
+      # gate, so this cache is addressed by content and a stale restore cannot
+      # answer for different code or a different verifier. restore-keys is
+      # deliberately absent: a partial-key match would restore a cache built
+      # for other bytes, and the gate would then simply miss on every entry,
+      # which is correct but pointless.
+      - name: restore completed searches
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: search-cache
+          key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            gate-search-${{ github.event.pull_request.number }}-
       - name: distance refutation gate (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
-        run: uv run --frozen python verify/gate_changed.py --code-root ../submitted origin/${{ github.base_ref || 'main' }} --receipt-dir ../receipts --pr-number "${{ github.event.pull_request.number }}" --pr-author "${{ github.event.pull_request.user.login }}" --base-sha "${{ github.event.pull_request.base.sha }}" --head-sha "${{ github.event.pull_request.head.sha }}"
+        run: uv run --frozen python verify/gate_changed.py --code-root ../submitted origin/${{ github.base_ref || 'main' }} --receipt-dir ../receipts --search-cache ../search-cache --pr-number "${{ github.event.pull_request.number }}" --pr-author "${{ github.event.pull_request.user.login }}" --base-sha "${{ github.event.pull_request.base.sha }}" --head-sha "${{ github.event.pull_request.head.sha }}"
+      # Saved on failure as well as success, which is the case this exists
+      # for: five of the six measured re-gatings were failure -> success, so a
+      # save that only ran on a green job would never produce a hit. Split
+      # restore/save rather than actions/cache for exactly that reason, and
+      # keyed per run and attempt because cache entries are immutable.
+      - name: save completed searches
+        if: always() && github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: search-cache
+          key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
       - name: distance refutation gate (changed submissions only)
         if: github.event_name != 'pull_request'
         working-directory: submitted

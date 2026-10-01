@@ -68,6 +68,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import circuit_tools as CT
 import gf2
 import heuristic_distance as H
+import refutation_cache as RC
 from circuit_verify import MAX_DEM_MECHANISMS, SIDE_FILES
 from qldpc_verify import file_size_error, generator_supports, is_stabilizer, sides
 from validate_candidate import validate_candidate
@@ -654,6 +655,7 @@ def main(argv):
     seed = None
     code_root = ROOT
     receipt_dir = None
+    search_cache = None
     pr_number = None
     pr_author = None
     base_sha = None
@@ -661,6 +663,12 @@ def main(argv):
     if "--receipt-dir" in rest:
         i = rest.index("--receipt-dir")
         receipt_dir = os.path.abspath(rest[i + 1])
+        rest = rest[:i] + rest[i + 2:]
+    # A completed search, reusable by a later run on byte-identical code
+    # (issue #2633). Absent, every run searches, which is today's behavior.
+    if "--search-cache" in rest:
+        i = rest.index("--search-cache")
+        search_cache = os.path.abspath(rest[i + 1]) or None
         rest = rest[:i] + rest[i + 2:]
     if "--pr-number" in rest:
         i = rest.index("--pr-number")
@@ -861,6 +869,14 @@ def main(argv):
         seeds = [seed, seed + 2, seed + 3][:nseeds]
         results = {}
 
+        # A search this run does not have to repeat (issue #2633). The key is
+        # the candidate's bytes plus the pinned closure, so a push that fixed
+        # prose reuses it and a push that touched the code or the verifier does
+        # not. Only the search; everything board-dependent is recomputed below.
+        with open(p, "rb") as _f:
+            doc_bytes = _f.read()
+        cached = RC.load(search_cache, doc_bytes, deep=deep)
+
         # STAGE 1 -- structure-aware pre-pass (issue #942). Cheapest mechanism
         # in the gate and, on the one family it applies to, by far the
         # strongest: it asks the accelerator whether H_X is [circ(a) | circ(b)]
@@ -869,7 +885,7 @@ def main(argv):
         # goes straight to stage 2, which is the ordinary path.
         struct_trials = 0
         struct_refuted = False
-        if GF is not None:
+        if GF is not None and cached is None:
             st = STRUCT_TRIALS_DEEP if deep else STRUCT_TRIALS_STD
             sres = _structural_refute(doc, seed + 11, st)
             struct_trials = sres[3]
@@ -891,7 +907,7 @@ def main(argv):
         # 52 of the board's 56 circulant GB entries have a mixed-support
         # witness, so a code that survives stage 1 still owes the full battery.
         ftrials = ftarget = 0
-        if not struct_refuted:
+        if not struct_refuted and cached is None:
             # two independent mechanisms; a hit from EITHER (any seed) refutes.
             for si, s in enumerate(seeds):
                 results[f"RIS#{si}"] = H.refute_check(doc, seed=s,
@@ -959,6 +975,16 @@ def main(argv):
             "diff_class": cls,
             "diff_reason": why,
         }
+        if cached is not None:
+            # The search above did not run. Take its record and its hits from
+            # the run that did, keeping that run's seed so the printed seed
+            # still reproduces the verdict it belongs to.
+            gate, hits = RC.restored(cached)
+            tag = (f"reused search from {(gate['reused_from'].get('head_sha') or '?')[:8]}"
+                   f" (seed {gate.get('seed')}); diff: {cls}")
+        elif search_cache:
+            RC.store(search_cache, doc_bytes, gate, hits, deep=deep,
+                     head_sha=head_sha)
         if "circuit" in doc:
             gate["circuit"] = {
                 "searched": run_circuit,
