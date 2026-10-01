@@ -19,6 +19,8 @@ same code while both look healthy. So this pins three things:
 The field lists are the contract. Adding a read to either consumer without
 adding it here is the mistake this catches.
 """
+import glob
+import json
 import os
 import re
 import shutil
@@ -76,14 +78,35 @@ def _resolve(report, path):
     return True, cur
 
 
+def _fixture_of_type(code_type):
+    """Path of any verifying fixture of this code_type.
+
+    Chosen by reading the fixtures rather than by name. Naming one couples
+    this test to a filename it has no stake in: it pinned 18-2-3.json, which
+    #2599 deletes because that fixture is the very thing its new rule
+    rejects, and the test then failed on a PR it has nothing to do with.
+    What the test needs is one CSS and one stabilizer entry, not those two.
+    """
+    for path in sorted(glob.glob(os.path.join(_HERE, "fixtures", "*.json"))):
+        try:
+            with open(path, encoding="utf-8") as f:
+                doc = json.load(f)
+        except (OSError, ValueError):
+            continue
+        if doc.get("code_type", "CSS") == code_type and Q.verify(doc)["ok"]:
+            return path
+    raise AssertionError(f"no verifying {code_type} fixture in verify/fixtures")
+
+
 @pytest.fixture
 def board(tmp_path, monkeypatch):
     """Build a two-entry board, one CSS and one stabilizer, memo off."""
     monkeypatch.setenv("QLDPC_BOARD_CACHE", "")
     d = tmp_path / "codes"
     d.mkdir()
-    shutil.copy(os.path.join(_HERE, "fixtures", "72-6-6.json"), d / "72-6-6.json")
-    shutil.copy(os.path.join(_HERE, "fixtures", "18-2-3.json"), d / "18-2-3.json")
+    for code_type in ("CSS", "stabilizer"):
+        src = _fixture_of_type(code_type)
+        shutil.copy(src, d / os.path.basename(src))
     Q._BOARD_CACHE.clear()
     return d
 
