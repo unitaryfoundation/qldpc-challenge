@@ -122,9 +122,11 @@ EXEMPT = {"notes/TEMPLATE.md"}
 
 
 def strip_rel_prefix(tok):
-    """Remove a leading './' only. NOT lstrip('./'): that eats every leading
-    dot, so a legitimate dot-directory path like `.github/workflows/prose.yml`
-    became 'github/...' and could never resolve (PR #2021's body tripped it).
+    """Remove a leading './' only.
+
+    NOT lstrip('./'): that eats every leading dot, so a legitimate
+    dot-directory path like `.github/workflows/prose.yml` became 'github/...'
+    and could never resolve.
     """
     return tok[2:] if tok.startswith("./") else tok
 
