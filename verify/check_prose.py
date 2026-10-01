@@ -124,7 +124,8 @@ EXEMPT = {"notes/TEMPLATE.md"}
 def strip_rel_prefix(tok):
     """Remove a leading './' only. NOT lstrip('./'): that eats every leading
     dot, so a legitimate dot-directory path like `.github/workflows/prose.yml`
-    became 'github/...' and could never resolve (PR #2021's body tripped it)."""
+    became 'github/...' and could never resolve (PR #2021's body tripped it).
+    """
     return tok[2:] if tok.startswith("./") else tok
 
 
@@ -142,9 +143,17 @@ def is_repo_pathish(tok):
     return "/" in bare and bare.endswith(FILE_EXT)
 
 
-def resolves(tok, root):
+def resolves(tok, root, near=None):
     """A token resolves if the path, or the module file behind a
-    `module.function` / `file.py::symbol` reference, exists in the tree."""
+    `module.function` / `file.py::symbol` reference, exists in the tree.
+
+    `near` is the directory the text itself lives in, and a token is tried
+    there as well as at the repository root. A markdown link is relative to
+    its own file, so `research/AUTORESEARCH.md` writing `campaigns/README.md`
+    is correct and opens for a reader on GitHub; resolving only from the root
+    reported those as missing. The guarantee is unchanged, since a path
+    relative to the containing file is one a reader can open.
+    """
     bare = strip_rel_prefix(tok).rstrip("/")
     candidates = [bare]
     if "::" in bare:                                 # file.py::symbol
@@ -152,19 +161,22 @@ def resolves(tok, root):
     if not bare.endswith(FILE_EXT):                  # research/kit/mod.function
         head = bare.rsplit(".", 1)[0]
         candidates += [head, head + ".py", bare + ".py"]
-    if any(os.path.exists(os.path.join(root, c)) for c in candidates):
+    bases = [root] if near is None else [root, os.path.join(root, near)]
+    if any(os.path.exists(os.path.join(b, c))
+           for b in bases for c in candidates):
         return True
     # An extensionless reference to a source file that is not .py: `verify/gf2_fast`
     # is the C++ accelerator, shipped as gf2_fast.cpp and a built .so.
-    for c in candidates:
-        d, base = os.path.split(os.path.join(root, c))
+    for b, c in ((b, c) for b in bases for c in candidates):
+        d, base = os.path.split(os.path.join(b, c))
         if base and os.path.isdir(d):
             if any(f.startswith(base + ".") for f in os.listdir(d)):
                 return True
     return False
 
 
-def check_text(text, label, root, problems, is_note_slug=None):
+def check_text(text, label, root, problems, is_note_slug=None,
+               near=None):
     external_ok = bool(EXTERNAL_MARKERS.search(text))
     # One line per distinct problem: a path repeated through a note should be
     # reported once, and never under two headings at the same time.
@@ -193,10 +205,10 @@ def check_text(text, label, root, problems, is_note_slug=None):
         bare = strip_rel_prefix(tok)
         if any(g in bare for g in GITIGNORED):
             add("gitignored working output cited as evidence", tok)
-        elif bare.endswith(LOG_SUFFIXES) and not resolves(tok, root):
+        elif bare.endswith(LOG_SUFFIXES) and not resolves(tok, root, near):
             add("raw run log cited as evidence (*.log is gitignored; promote "
                 "the lines the claim rests on into a run manifest)", tok)
-        elif not resolves(tok, root) and not external_ok:
+        elif not resolves(tok, root, near) and not external_ok:
             add("path does not exist in this tree", tok)
 
     if is_note_slug:
@@ -286,7 +298,8 @@ def main(argv):
         m = SLUG.match(os.path.basename(rel)[:-3])
         if m and rel.startswith("notes/"):
             slug = m.groups()
-        check_text(text, rel, root, problems, is_note_slug=slug)
+        check_text(text, rel, root, problems, is_note_slug=slug,
+                   near=os.path.dirname(rel))
 
     if args.body_file and os.path.exists(args.body_file):
         with open(args.body_file, encoding="utf-8") as f:

@@ -311,7 +311,7 @@ So measure both numbers at one budget before spending anything on packaging:
 ```bash
 uv run --frozen python research/audits/leader_audit.py pair \
     research/candidates/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir /tmp/pair
+    --pair-depth 64 --witness-dir <dir-for-witnesses>
 ```
 
 The peers are chosen automatically — every board entry with the same n, k and max check
