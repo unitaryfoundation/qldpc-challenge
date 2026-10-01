@@ -94,7 +94,8 @@ _REQUIRED = ["schema_version", "name", "code_type", "n", "k", "checks",
 # is unavailable and the minimal structure check runs instead.
 _FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
              "hypergraph-product", "lifted-product", "balanced-product",
-             "quantum-tanner", "tile", "topological", "other"}
+             "quantum-tanner", "tile", "pair-partition-cpm", "topological",
+             "other"}
 _NOVELTY = {"unknown", "known_parameters", "new_parameters"}
 
 # Public CI resource limits. Finite by design so malformed or hostile JSON

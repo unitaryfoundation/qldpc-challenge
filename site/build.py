@@ -3793,6 +3793,7 @@ FAMILY_LABEL = {
     "balanced-product": "balanced product",
     "quantum-tanner": "quantum Tanner",
     "tile": "tile",
+    "pair-partition-cpm": "pair-partition CPM",
     "topological": "topological",
     "other": "other",
 }
@@ -3803,7 +3804,8 @@ FAMILY_TERM = {
     "bivariate-bicycle": "bivariate", "generalized-bicycle": "generalized",
     "2bga-coset": "2bga", "hypergraph-product": "hypergraph",
     "lifted-product": "lifted", "balanced-product": "balanced",
-    "quantum-tanner": "tanner", "tile": "tile", "topological": "topological",
+    "quantum-tanner": "tanner", "tile": "tile",
+    "pair-partition-cpm": "pair-partition", "topological": "topological",
     "other": "other",
 }
 
