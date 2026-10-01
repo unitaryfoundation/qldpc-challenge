@@ -1565,6 +1565,139 @@ def _board_entry(path, data):
 # 619-entry snapshot measured ~62 MB; see issue #966).
 _BOARD_CACHE = {}
 
+# Where the per-entry disk memo lives, a sibling of the verdict cache under
+# the already-gitignored research/candidates/ (issue #2582). Overridable so a
+# caller can point it at a scratch directory; empty or CI disables it.
+BOARD_CACHE_ENV = "QLDPC_BOARD_CACHE"
+BOARD_CACHE_DIRNAME = os.path.join("research", "candidates", ".boardcache")
+_CLOSURE_DIGEST = {}
+
+
+def validator_closure_digest(manifest_path=None):
+    """Digest the pinned validation closure, as one hex string.
+
+    The per-process memo could key on the board alone because a running
+    process cannot change its own code underneath itself. A memo that
+    outlives the process loses exactly that: codes/ can be byte-identical
+    while verify/qldpc_verify.py is not, through a branch switch, a re-pin or
+    an unmerged local edit, and a board-only key would then answer with
+    reports produced by a verifier that is no longer the one being asked.
+    That would let unmerged logic inside the hash-pinned gate decide dedup
+    and novelty, which is the one thing the pin exists to prevent.
+
+    verify/validator_manifest.json is already the reviewed list of every file
+    the gate's behavior depends on: this module, gf2.py, the GF(2)
+    accelerator, schema/code.schema.json, pyproject.toml and uv.lock. Keying
+    on a digest of that mapping covers all of them at once and moves
+    automatically whenever the closure is re-pinned, so nothing has to
+    remember to extend this list.
+
+    Returns "no-manifest" when the file is missing or unreadable, which is a
+    distinct key rather than an error: a checkout without a manifest gets its
+    own cache namespace instead of sharing a pinned one.
+    """
+    path = os.path.abspath(manifest_path or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "validator_manifest.json"))
+    import hashlib
+    if path in _CLOSURE_DIGEST:
+        return _CLOSURE_DIGEST[path]
+    try:
+        with open(path, "rb") as f:
+            files = json.loads(f.read()).get("files") or {}
+    except (OSError, ValueError, AttributeError):
+        _CLOSURE_DIGEST[path] = "no-manifest"
+        return _CLOSURE_DIGEST[path]
+    h = hashlib.sha256()
+    for name in sorted(files):
+        h.update(name.encode("utf-8"))
+        h.update(b"\0" + str(files[name]).encode("utf-8") + b"\0")
+    _CLOSURE_DIGEST[path] = h.hexdigest()
+    return _CLOSURE_DIGEST[path]
+
+
+def board_cache_dir():
+    """Return the disk-memo directory, or None when it is turned off.
+
+    Off in CI, deliberately. The argument that this memo is safe is that a
+    local one's trust level equals the local checkout's, which is already
+    total: anyone who can write it can edit verify/validate_candidate.py
+    directly. That argument does not extend to a runner, and a fresh runner's
+    cache is cold anyway, so CI gains nothing and would only acquire a way to
+    be answered by something other than the board in front of it.
+    """
+    if os.environ.get("CI"):
+        return None
+    override = os.environ.get(BOARD_CACHE_ENV)
+    if override is not None:
+        return override or None
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(root, BOARD_CACHE_DIRNAME)
+
+
+def _memo_path(cache_dir, data):
+    """Where the cached report for these exact entry bytes lives.
+
+    Per entry, not per board. The whole-board digest is why the in-process
+    memo cannot amortise across a campaign: one merged submission changes one
+    byte and re-arms all 1,782 entries. Keyed per entry, that merge
+    re-verifies one.
+    """
+    import hashlib
+    h = hashlib.sha256()
+    h.update(validator_closure_digest().encode("utf-8"))
+    h.update(b"\0")
+    h.update(data)
+    key = h.hexdigest()
+    return os.path.join(cache_dir, key[:2], key[2:] + ".json")
+
+
+def _memo_read(cache_dir, path, data):
+    """Return a board entry rebuilt from the memo, or None.
+
+    None on anything unexpected, since a miss costs a re-verification and a
+    wrong hit costs correctness. doc is parsed here rather than stored: it is
+    json.loads of bytes already in hand, which is microseconds against the
+    verification the memo is actually saving.
+    """
+    try:
+        with open(_memo_path(cache_dir, data), encoding="utf-8") as f:
+            memo = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if memo.get("memo_version") != _BOARD_MEMO_VERSION:
+        return None
+    report, load_error = memo.get("report"), memo.get("load_error")
+    if report is None and load_error is None:
+        return None
+    entry = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
+             "doc": None, "report": report,
+             "size_error": None, "load_error": load_error}
+    if load_error is None:
+        try:
+            entry["doc"] = json.loads(data)
+        except ValueError:
+            return None
+    return entry
+
+
+def _memo_write(cache_dir, data, entry):
+    """Store one entry's report. A cache that cannot be written is not an error."""
+    memo = {"memo_version": _BOARD_MEMO_VERSION,
+            "closure": validator_closure_digest(),
+            "report": entry["report"], "load_error": entry["load_error"]}
+    path = _memo_path(cache_dir, data)
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        tmp = f"{path}.{os.getpid()}.tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(memo, f)
+        os.replace(tmp, path)
+    except OSError:
+        pass
+
+
+_BOARD_MEMO_VERSION = 1
+
 
 def board_reports(code_dir):
     """Verify every <code_dir>/*.json structurally, memoized on the bytes read.
@@ -1576,10 +1709,20 @@ def board_reports(code_dir):
     The pass costs what the board costs, so the figure here goes stale as the
     board grows: it was "~15-20 s locally" when written, and measured 141 s
     over 1,560 entries on 2026-10-01 (issue #2328). Treat it as minutes, not
-    seconds, when sizing anything that starts a fresh process. The memo is
-    per-process, so a new session pays it again, and the key is a digest of
-    every board byte, so an active campaign landing corrections re-pays it on
-    each merge rather than amortising it.
+    seconds, when sizing anything that starts a fresh process.
+
+    There is a second memo on disk, so a new process does not pay the pass
+    again (issue #2582). It is keyed per entry rather than per board, which
+    is what lets it amortise across a campaign: the in-process key is a
+    digest of every board byte, so one merged correction re-arms all 1,778
+    entries, while a per-entry key re-verifies the one that changed. Measured
+    over 1,778 entries: 116.9 s with the memo off, 115.9 s cold, 0.70 s warm,
+    and 0.72 s after one entry's bytes changed. Each key also covers the
+    pinned validation closure (validator_closure_digest), because codes/ can
+    be byte-identical while this file is not. It lives under the gitignored
+    research/candidates/.boardcache and is off in CI, where it would gain
+    nothing and could only answer with something other than the board in
+    front of the runner.
 
     The memo key is a digest of the file names and the exact bytes the pass
     verifies, so a changed file re-verifies the board however it was written
@@ -1609,7 +1752,20 @@ def board_reports(code_dir):
     key = h.hexdigest()
     if _BOARD_CACHE.get("dir") == code_dir and _BOARD_CACHE.get("key") == key:
         return _BOARD_CACHE["reports"]
-    reports = tuple(_board_entry(p, data) for p, data in raw)
+    cache_dir = board_cache_dir()
+    entries = []
+    for p, data in raw:
+        hit = None
+        if cache_dir and data is not None:
+            hit = _memo_read(cache_dir, p, data)
+        if hit is not None:
+            entries.append(hit)
+            continue
+        entry = _board_entry(p, data)
+        if cache_dir and data is not None and entry["size_error"] is None:
+            _memo_write(cache_dir, data, entry)
+        entries.append(entry)
+    reports = tuple(entries)
     _BOARD_CACHE.clear()
     _BOARD_CACHE.update(dir=code_dir, key=key, reports=reports)
     return reports
