@@ -1,0 +1,19 @@
+{
+  "n": 47,
+  "seed_X": [
+    1,
+    46
+  ],
+  "seed_Z": [
+    4,
+    15,
+    32,
+    43
+  ],
+  "radius": 5,
+  "represented_errors": 40911898,
+  "complete_orbit_coverage": true,
+  "different_logical_label_collisions": 0,
+  "distance_lower_bound": 11,
+  "seconds": 20.933171033859253
+}

@@ -1,0 +1,7 @@
+{
+  "upstream_commit": "ff48155b8897e6796950c64d860e9102d59c36e9",
+  "same_n_k_general_stabilizer_entries": [],
+  "CSS_equivalence": "Excluded by included trace-one local-projector obstruction certificate.",
+  "open_PR_scan": "Seven open PRs checked on 2026-10-03; none submits a code at these parameters.",
+  "literature_novelty": "UNVERIFIED; known one-block cyclic construction."
+}
