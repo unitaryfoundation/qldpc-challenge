@@ -1,0 +1,66 @@
+{
+  "n": 44,
+  "LC_permutation_CSS": false,
+  "certificate_equations": [
+    {
+      "source_stabilizer": 154761395529666255038447621,
+      "annihilator": 28064238696168453471993857,
+      "coefficient_mask": 1237940039285380274899124225,
+      "rhs": 1
+    },
+    {
+      "source_stabilizer": 154761395529666255038447621,
+      "annihilator": 56128477392336906943987714,
+      "coefficient_mask": 1237940039285661749875834880,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 154761395529666255038447621,
+      "annihilator": 112256954784673813887975428,
+      "coefficient_mask": 281474976710720,
+      "rhs": 1
+    },
+    {
+      "source_stabilizer": 77380697764841923612246018,
+      "annihilator": 28064238696168453471993857,
+      "coefficient_mask": 154742504910707718734479360,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 77380697764841923612246018,
+      "annihilator": 46203699134198535856062480,
+      "coefficient_mask": 35184372088896,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 38687987717154343074408448,
+      "annihilator": 28064238696168453471993857,
+      "coefficient_mask": 2417851639233690755661824,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 38687987717154343074408448,
+      "annihilator": 56128477392336906943987714,
+      "coefficient_mask": 10633823966281744834869687939615424512,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 38687987717154343074408448,
+      "annihilator": 46203699134198535856062480,
+      "coefficient_mask": 10633823966279326983230460914649006080,
+      "rhs": 0
+    },
+    {
+      "source_stabilizer": 28334271095549397606405,
+      "annihilator": 28064238696168453471993857,
+      "coefficient_mask": 1392682544196193615469346817,
+      "rhs": 1
+    },
+    {
+      "source_stabilizer": 28334271095549397606405,
+      "annihilator": 56128477392336906943987714,
+      "coefficient_mask": 1237940039285523280130211840,
+      "rhs": 0
+    }
+  ]
+}
