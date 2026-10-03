@@ -304,8 +304,13 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
 
 3. Screen each candidate fast: k = n - rank(H_X) - rank(H_Z), CSS commutation
    (H_X H_Z^T = 0 over GF(2)), max check weight, and an RIS distance UPPER
-   bound from research/. Keep only codes that beat the board's frontier for
-   their track on (n, k, d) and kd^2/n.
+   bound from research/. Keep only codes that are **non-dominated in their own
+   cell**: no entry in that cell beats them on all of (n lower, k higher,
+   d higher, w lower) with at least one strict. That is the whole novelty
+   rule -- `TRACKS.md` defines the cell grid, and the gate reports it as
+   `gates.novelty.board_advancing`. Do not screen on `kd^2/n`: it is a
+   sortable headline figure per cell and is not part of the frontier, so a
+   candidate can clear the frontier at a `kd^2/n` well below the cell's best.
 
 4. Before trusting a candidate, RE-VERIFY its distance with far more RIS trials
    (100k+). Low-trial surrogates return inflated upper bounds that collapse
