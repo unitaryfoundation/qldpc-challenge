@@ -504,6 +504,18 @@ def css_fingerprint(HX, HZ):
     return hashlib.sha256(fp).hexdigest()[:16]
 
 
+def css_row_space_intersection_dimension(HX, HZ):
+    """Return dim(row(HX) intersection row(HZ)) over GF(2).
+
+    This is invariant under generator-basis changes, qubit permutations, and
+    exchanging X and Z. Different values therefore rule out equivalence under
+    those transformations; equal values do not establish equivalence.
+    """
+    rx = gf2.rank(HX)
+    rz = gf2.rank(HZ)
+    return int(rx + rz - gf2.rank(np.vstack((HX, HZ))))
+
+
 def _as_int8(M):
     return (np.asarray(M, dtype=np.int8) % 2).astype(np.int8)
 
@@ -1255,6 +1267,10 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     diag = {"tanner_girth": {}, "weight_profile": {},
             "trapping_sets": {"max_size": TS_MAX_SIZE,
                               "candidate_cap": TS_MAX_CANDIDATES}}
+    if not stab:
+        diag["row_space_intersection_dimension"] = (
+            css_row_space_intersection_dimension(HX, HZ)
+        )
     diag_sides = (("S", supports),) if stab else (
         ("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"]))
     for side, rows in diag_sides:
