@@ -727,6 +727,49 @@ def main():
         print(f"FAILED: {_fail}")
         return 1
     print("ok")
+
+    # A literature match withdraws a novelty claim rather than making one, so
+    # recording it binds for anyone (#1204): novelty to known_parameters, a
+    # reference appended, nothing else.
+    def matched(novelty="known_parameters", refs=("arXiv:2306.16400",), **also):
+        def edit():
+            d = copy.deepcopy(BASE_DOC)
+            if novelty is not None:
+                d["provenance"]["novelty"] = novelty
+            d["provenance"]["references"] = list(BASE_DOC["provenance"].get("references") or []) + list(refs)
+            for k, v in also.items():
+                d[k] = v
+            return d
+        return edit
+
+    run_case("non-author may record a literature match", matched(), True,
+             rename=False)
+    run_case("non-author may add a reference alone", matched(novelty=None), True,
+             rename=False)
+    claimed = copy.deepcopy(BASE_DOC)
+    claimed["provenance"]["novelty"] = "new_parameters"
+    run_case("a literature match may withdraw a new_parameters claim",
+             matched(), True, rename=False, base_doc=claimed)
+    run_case("non-author may not assert new_parameters",
+             matched(novelty="new_parameters"), False, rename=False)
+    run_case("known_parameters without a reference does not bind",
+             matched(refs=()), False, rename=False)
+
+    def dropped_ref():
+        d = copy.deepcopy(BASE_DOC)
+        d["provenance"]["novelty"] = "known_parameters"
+        d["provenance"]["references"] = ["arXiv:2306.16400"]
+        return d
+    with_ref = copy.deepcopy(BASE_DOC)
+    with_ref["provenance"]["references"] = ["arXiv:0000.00001"]
+    run_case("a literature match may not remove a reference", dropped_ref, False,
+             rename=False, base_doc=with_ref)
+    run_case("a literature match may not carry another field",
+             matched(family="other"), False, rename=False)
+    same = copy.deepcopy(BASE_DOC)
+    ok, why = check_authorship.novelty_binding("bob", same, copy.deepcopy(BASE_DOC))
+    check("an unchanged novelty binds nothing", not ok and "nothing" in why)
+
     return 0
 
 

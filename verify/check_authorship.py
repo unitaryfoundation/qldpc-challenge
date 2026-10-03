@@ -384,11 +384,52 @@ def family_binding(author, base_doc, new_doc):
     return True, None
 
 
+def novelty_binding(author, base_doc, new_doc):
+    """Does new_doc differ from base_doc by exactly a literature match recorded?
+
+    The isomorphism index (research/provenance/) decides that an entry is a
+    published code, or that its parameter set is published, by mapping row
+    spaces under a recovered qubit permutation. Recording that result is not
+    a claim about the code; it withdraws one. `novelty: known_parameters` is
+    the schema's own word for "the [[n,k,d]] parameter set exists in the
+    literature even if this entry improves weight, layout, or construction
+    details", and the reference goes where references already live,
+    `provenance.references` (issue #1204).
+
+    The narrowest form: novelty may move to `known_parameters` and
+    `provenance.references` may grow, and nothing else may change. Not the
+    name, not notes, not the other provenance fields, and never the other
+    direction: a `new_parameters` claim is the submitter's to make.
+    """
+    keys = set(base_doc) | set(new_doc)
+    for key in keys - {"provenance"}:
+        if base_doc.get(key) != new_doc.get(key):
+            return False, (f"field '{key}' changed (a literature match may set "
+                           "novelty and add references, nothing else)")
+    bp, np_ = base_doc.get("provenance") or {}, new_doc.get("provenance") or {}
+    for key in (set(bp) | set(np_)) - {"novelty", "references"}:
+        if bp.get(key) != np_.get(key):
+            return False, f"provenance.{key} changed (a literature match may not touch it)"
+    old_refs, new_refs = list(bp.get("references") or []), list(np_.get("references") or [])
+    if new_refs[:len(old_refs)] != old_refs:
+        return False, "provenance.references may only be appended to"
+    old_nov, new_nov = bp.get("novelty"), np_.get("novelty")
+    if new_nov not in (old_nov, "known_parameters"):
+        return False, ("a literature match may set novelty to known_parameters "
+                       "only; any other novelty value is the submitter's claim")
+    if new_nov == old_nov and new_refs == old_refs:
+        return False, "nothing changed"
+    if new_nov == "known_parameters" and not new_refs:
+        return False, "known_parameters needs a reference in provenance.references"
+    return True, None
+
+
 BINDINGS = (
     ("refutation", refutation_binding, "witness_provenance credit, refuting"),
     ("layout", layout_binding, "adding a first locality block to"),
     ("circuit", circuit_binding, "adding a first circuit block to"),
     ("family", family_binding, "correcting the family tag of"),
+    ("novelty", novelty_binding, "recording a literature match on"),
 )
 
 
@@ -402,6 +443,11 @@ def evident_binding(base_doc, new_doc):
     if (base_doc.get("family") != new_doc.get("family")
             and base_doc.get("distance") == new_doc.get("distance")):
         return "family"
+    bp, np_ = base_doc.get("provenance") or {}, new_doc.get("provenance") or {}
+    if (base_doc.get("distance") == new_doc.get("distance")
+            and (bp.get("novelty") != np_.get("novelty")
+                 or bp.get("references") != np_.get("references"))):
+        return "novelty"
     return "refutation"
 
 

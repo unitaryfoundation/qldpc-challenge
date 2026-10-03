@@ -222,6 +222,24 @@ you are revising.
 `research/audits/README.md`, "Filing a distance revision", has the step list
 and worked examples.
 
+## Recording that a code is published
+
+An entry that turns out to be isomorphic to a published code, or whose
+`[[n,k,d]]` is listed in a published table, carries `novelty:
+known_parameters` and names the source in `provenance.references`. That is
+the schema's own definition of `known_parameters` ("the parameter set exists
+in the literature even if this entry improves weight, layout, or
+construction details"), so no new label is needed. `origin` is unaffected:
+a code whose matrices were reconstructed here from a parameters-only table
+stays `origin: submission` with the table in its references, because origin
+records how the entry arrived and novelty records what the literature holds.
+
+Recording a match withdraws a claim rather than making one, so anyone may
+file it: `verify/check_authorship.py` lets a non-author set `novelty` to
+`known_parameters` and append to `provenance.references`, and nothing else.
+The computed source for these matches is `research/provenance/derived.json`
+(issue #1204).
+
 ## Contribute with an LLM
 
 If you have an LLM or coding agent, it can do the whole loop: pick a target,
