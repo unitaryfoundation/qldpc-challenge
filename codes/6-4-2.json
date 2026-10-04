@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[6,4,2]]",
  "code_type": "CSS",
  "n": 6,
@@ -55,5 +55,42 @@
   "model": "Mimo-V2.6-Flash",
   "notes": "Reproduced from the Error Correction Zoo entry stab_6_4_2 (https://errorcorrectionzoo.org/c/stab_6_4_2); gate found no exact or WL-equivalent board entry."
  },
- "family": "other"
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    2.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 2.2361,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

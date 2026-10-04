@@ -1,199 +1,332 @@
 {
-  "schema_version": "0.1",
-  "name": "[[30,8,3]]",
-  "code_type": "CSS",
-  "n": 30,
-  "k": 8,
-  "checks": {
-    "X": [
-      [
-        2,
-        3,
-        5,
-        8,
-        26
-      ],
-      [
-        6,
-        7,
-        11,
-        13,
-        18
-      ],
-      [
-        4,
-        5,
-        16,
-        17,
-        20
-      ],
-      [
-        2,
-        19,
-        20,
-        22,
-        25
-      ],
-      [
-        15,
-        19,
-        21,
-        26,
-        29
-      ],
-      [
-        1,
-        6,
-        9,
-        16,
-        24
-      ],
-      [
-        4,
-        11,
-        14,
-        22,
-        24
-      ],
-      [
-        10,
-        12,
-        13,
-        27,
-        29
-      ],
-      [
-        7,
-        14,
-        21,
-        25,
-        27
-      ],
-      [
-        1,
-        10,
-        18,
-        23,
-        28
-      ],
-      [
-        0,
-        3,
-        9,
-        17,
-        23
-      ]
-    ],
-    "Z": [
-      [
-        2,
-        3,
-        9,
-        22,
-        24
-      ],
-      [
-        11,
-        13,
-        19,
-        22,
-        29
-      ],
-      [
-        1,
-        10,
-        14,
-        24,
-        27
-      ],
-      [
-        0,
-        15,
-        17,
-        19,
-        20
-      ],
-      [
-        4,
-        5,
-        14,
-        21,
-        26
-      ],
-      [
-        0,
-        6,
-        9,
-        12,
-        13
-      ],
-      [
-        6,
-        7,
-        16,
-        20,
-        25
-      ],
-      [
-        1,
-        5,
-        8,
-        16,
-        28
-      ],
-      [
-        4,
-        11,
-        17,
-        18,
-        23
-      ],
-      [
-        3,
-        10,
-        23,
-        26,
-        29
-      ],
-      [
-        7,
-        15,
-        18,
-        21,
-        28
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[30,8,3]]",
+ "code_type": "CSS",
+ "n": 30,
+ "k": 8,
+ "checks": {
+  "X": [
+   [
+    2,
+    3,
+    5,
+    8,
+    26
+   ],
+   [
+    6,
+    7,
+    11,
+    13,
+    18
+   ],
+   [
+    4,
+    5,
+    16,
+    17,
+    20
+   ],
+   [
+    2,
+    19,
+    20,
+    22,
+    25
+   ],
+   [
+    15,
+    19,
+    21,
+    26,
+    29
+   ],
+   [
+    1,
+    6,
+    9,
+    16,
+    24
+   ],
+   [
+    4,
+    11,
+    14,
+    22,
+    24
+   ],
+   [
+    10,
+    12,
+    13,
+    27,
+    29
+   ],
+   [
+    7,
+    14,
+    21,
+    25,
+    27
+   ],
+   [
+    1,
+    10,
+    18,
+    23,
+    28
+   ],
+   [
+    0,
+    3,
+    9,
+    17,
+    23
+   ]
+  ],
+  "Z": [
+   [
+    2,
+    3,
+    9,
+    22,
+    24
+   ],
+   [
+    11,
+    13,
+    19,
+    22,
+    29
+   ],
+   [
+    1,
+    10,
+    14,
+    24,
+    27
+   ],
+   [
+    0,
+    15,
+    17,
+    19,
+    20
+   ],
+   [
+    4,
+    5,
+    14,
+    21,
+    26
+   ],
+   [
+    0,
+    6,
+    9,
+    12,
+    13
+   ],
+   [
+    6,
+    7,
+    16,
+    20,
+    25
+   ],
+   [
+    1,
+    5,
+    8,
+    16,
+    28
+   ],
+   [
+    4,
+    11,
+    17,
+    18,
+    23
+   ],
+   [
+    3,
+    10,
+    23,
+    26,
+    29
+   ],
+   [
+    7,
+    15,
+    18,
+    21,
+    28
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    5,
+    14
+   ]
   },
-  "distance": {
-    "d": 3,
-    "X": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        1,
-        5,
-        14
-      ]
-    },
-    "Z": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        7,
-        13,
-        27
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@mathysrennela"
-    ],
-    "construction": "Reconstructed from qecdb.org record 67a4b0129edf81e4b7e670ad (https://qecdb.org/codes/67a4b0129edf81e4b7e670ad); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: hyperbolic_2d; database distance claim d=3 (lower 3, upper 3).",
-    "origin": "submission",
-    "date": "2026-09-27",
-    "model": "Mimo-V2.6-Free",
-    "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
-  },
-  "family": "topological"
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    7,
+    13,
+    27
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Reconstructed from qecdb.org record 67a4b0129edf81e4b7e670ad (https://qecdb.org/codes/67a4b0129edf81e4b7e670ad); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: hyperbolic_2d; database distance claim d=3 (lower 3, upper 3).",
+  "origin": "submission",
+  "date": "2026-09-27",
+  "model": "Mimo-V2.6-Free",
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
+ },
+ "family": "topological",
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    4.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    5.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    5.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    5.0,
+    4.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    4.0,
+    4.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    5.0,
+    2.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    5.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 4.0,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }
