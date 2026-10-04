@@ -1,0 +1,771 @@
+{
+  "authority": "candidates listed here passed verify/validate_candidate.py and are merged; a wall row records a rung that was not closed and claims nothing about whether a code exists there",
+  "backfilled": {
+    "by": "backfilled for issue #2726",
+    "from": [
+      "codes/*.json with family local-sat-css",
+      "fieldnotes/2026-10-03-sat-weight8-t3-at-n25-n36-is-sat.md",
+      "https://github.com/unitaryfoundation/qldpc-challenge/issues/2024"
+    ],
+    "note": "Rows for the 23 merged codes are generated from their own committed provenance, so the instance, the grid, the solver, and the screening depth are the entries' numbers. The wall rows come from the issue thread and the per-code notes: they record a rung the solver did not close, which is why they carry no screened reading. Seeds and RIS backend are not stated in any committed source and are therefore absent rather than guessed."
+  },
+  "budget": {
+    "consumed": {
+      "cpu_hours": 330
+    },
+    "declared": {},
+    "remaining": {}
+  },
+  "campaign_id": "sat-2dlocal-t2plus",
+  "campaign_name": "2D-local SAT t=2+ search: wall triage, overnight t=3, and a bilayer extension",
+  "experiments": [
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 25-7-4.json",
+      "params": {
+        "G": 9,
+        "anchor_radius": 2.0,
+        "instance": "s5_G9_w6_t3",
+        "k": 7,
+        "max_weight": 6,
+        "n": 25,
+        "n_side": 5,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 32-10-4.json",
+      "params": {
+        "G": 11,
+        "anchor_radius": 3.5,
+        "instance": "b4_G11_w6_t3",
+        "k": 10,
+        "layers": 2,
+        "max_weight": 6,
+        "n": 32,
+        "n_side": 4,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 32-12-3.json",
+      "params": {
+        "G": 10,
+        "anchor_radius": 3.5,
+        "instance": "b4_G10_w6_t2",
+        "k": 12,
+        "layers": 2,
+        "max_weight": 6,
+        "n": 32,
+        "n_side": 4,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 32-14-4.json",
+      "params": {
+        "G": 9,
+        "anchor_radius": 3.5,
+        "instance": "b4_G9_w8_t3",
+        "k": 14,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 32,
+        "n_side": 4,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 32-16-3.json",
+      "params": {
+        "G": 8,
+        "anchor_radius": 3.5,
+        "instance": "b4_G8_w8_t2",
+        "k": 16,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 32,
+        "n_side": 4,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 36-10-4-b.json",
+      "params": {
+        "G": 13,
+        "anchor_radius": 2.0,
+        "instance": "s6_G13_w6_t3",
+        "k": 10,
+        "max_weight": 6,
+        "n": 36,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 36-12-4.json",
+      "params": {
+        "G": 12,
+        "anchor_radius": 2.0,
+        "instance": "s6_G12_w8_t3",
+        "k": 12,
+        "max_weight": 8,
+        "n": 36,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 36-14-3.json",
+      "params": {
+        "G": 11,
+        "anchor_radius": 2.0,
+        "instance": "s6_G11_w6_t2",
+        "k": 14,
+        "max_weight": 6,
+        "n": 36,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 49-11-4.json",
+      "params": {
+        "G": 19,
+        "anchor_radius": 2.0,
+        "instance": "s7_G19_w6_t3",
+        "k": 11,
+        "max_weight": 6,
+        "n": 49,
+        "n_side": 7,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 49-13-4.json",
+      "params": {
+        "G": 18,
+        "anchor_radius": 2.0,
+        "instance": "s7_G18_w8_t3",
+        "k": 13,
+        "max_weight": 8,
+        "n": 49,
+        "n_side": 7,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 49-19-3.json",
+      "params": {
+        "G": 15,
+        "anchor_radius": 2.0,
+        "instance": "s7_G15_w6_t2",
+        "k": 19,
+        "max_weight": 6,
+        "n": 49,
+        "n_side": 7,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 50-16-4.json",
+      "params": {
+        "G": 17,
+        "anchor_radius": 3.5,
+        "instance": "b5_G17_w6_t3",
+        "k": 16,
+        "layers": 2,
+        "max_weight": 6,
+        "n": 50,
+        "n_side": 5,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 50-20-3-b.json",
+      "params": {
+        "G": 15,
+        "anchor_radius": 3.5,
+        "instance": "b5_G15_w6_t2",
+        "k": 20,
+        "layers": 2,
+        "max_weight": 6,
+        "n": 50,
+        "n_side": 5,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 50-22-4.json",
+      "params": {
+        "G": 14,
+        "anchor_radius": 3.5,
+        "instance": "b5_G14_w8_t3",
+        "k": 22,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 50,
+        "n_side": 5,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 50-26-3.json",
+      "params": {
+        "G": 12,
+        "anchor_radius": 3.5,
+        "instance": "b5_G12_w8_t2",
+        "k": 26,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 50,
+        "n_side": 5,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 64-10-4.json",
+      "params": {
+        "G": 27,
+        "anchor_radius": 2.0,
+        "instance": "s8_G27_w6_t3",
+        "k": 10,
+        "max_weight": 6,
+        "n": 64,
+        "n_side": 8,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 64-12-4.json",
+      "params": {
+        "G": 26,
+        "anchor_radius": 2.0,
+        "instance": "s8_G26_w6_t3",
+        "k": 12,
+        "max_weight": 6,
+        "n": 64,
+        "n_side": 8,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 64-22-3.json",
+      "params": {
+        "G": 21,
+        "anchor_radius": 2.0,
+        "instance": "s8_G21_w6_t2",
+        "k": 22,
+        "max_weight": 6,
+        "n": 64,
+        "n_side": 8,
+        "solver": "CaDiCaL 1.5.3",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 64-24-3.json",
+      "params": {
+        "G": 20,
+        "anchor_radius": 2.0,
+        "instance": "s8_G20_w6_t2",
+        "k": 24,
+        "max_weight": 6,
+        "n": 64,
+        "n_side": 8,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 72-24-4.json",
+      "params": {
+        "G": 24,
+        "anchor_radius": 3.5,
+        "instance": "b6_G24_w8_t3",
+        "k": 24,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 72,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 72-30-3.json",
+      "params": {
+        "G": 21,
+        "anchor_radius": 3.5,
+        "instance": "b6_G21_w6_t2",
+        "k": 30,
+        "layers": 2,
+        "max_weight": 6,
+        "n": 72,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 72-38-3.json",
+      "params": {
+        "G": 17,
+        "anchor_radius": 3.5,
+        "instance": "b6_G17_w8_t2",
+        "k": 38,
+        "layers": 2,
+        "max_weight": 8,
+        "n": 72,
+        "n_side": 6,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "merged as 81-31-3.json",
+      "params": {
+        "G": 25,
+        "anchor_radius": 2.0,
+        "instance": "s9_G25_w6_t2",
+        "k": 31,
+        "max_weight": 6,
+        "n": 81,
+        "n_side": 9,
+        "solver": "CaDiCaL 1.9.5",
+        "t": 2
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 20000
+      },
+      "survivors": 1,
+      "verdict": "passed"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT at 6,836 conflicts: closes k >= 8 at d >= 4 on a 4x4 grid",
+      "params": {
+        "G": 4,
+        "instance": "s4_G4_w8_t3",
+        "max_weight": 8,
+        "n_side": 4,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT at 771,877 conflicts in 47.5 s (notes/25-7-4.md)",
+      "params": {
+        "G": 5,
+        "instance": "s4_G5_w6_t3",
+        "max_weight": 6,
+        "n_side": 4,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT by the counting bound G >= 2n/(w+1); no solver run",
+      "params": {
+        "G": 13,
+        "instance": "s7_G13_w6_t2",
+        "max_weight": 6,
+        "n_side": 7,
+        "t": 2
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT by the counting bound; no solver run",
+      "params": {
+        "G": 12,
+        "instance": "s8_G12_w6_t3",
+        "max_weight": 6,
+        "n_side": 8,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT by the counting bound; no solver run",
+      "params": {
+        "G": 16,
+        "instance": "s8_G16_w6_t3",
+        "max_weight": 6,
+        "n_side": 8,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "UNSAT by the counting bound, which is 20.6 here; no solver run",
+      "params": {
+        "G": 20,
+        "instance": "s6_G20_w6_t2",
+        "max_weight": 6,
+        "n_side": 6,
+        "t": 2
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 6 h cap, not closed",
+      "params": {
+        "G": 16,
+        "instance": "s5_G16_w6_t3",
+        "max_weight": 6,
+        "n_side": 5,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 6 h cap, not closed",
+      "params": {
+        "G": 13,
+        "instance": "s5_G13_w8_t3",
+        "max_weight": 8,
+        "n_side": 5,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 6 h cap, not closed",
+      "params": {
+        "G": 25,
+        "instance": "s6_G25_w6_t3",
+        "max_weight": 6,
+        "n_side": 6,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 6 h cap, not closed",
+      "params": {
+        "G": 24,
+        "instance": "s6_G24_w6_t3",
+        "max_weight": 6,
+        "n_side": 6,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 20M-conflict cap, not closed",
+      "params": {
+        "G": 10,
+        "instance": "b4_G10_w6_t3",
+        "layers": 2,
+        "max_weight": 6,
+        "n_side": 4,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "walled at the 20M-conflict cap, not closed",
+      "params": {
+        "G": 8,
+        "instance": "b4_G8_w8_t3",
+        "layers": 2,
+        "max_weight": 8,
+        "n_side": 4,
+        "t": 3
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    }
+  ],
+  "frontier_advances": 0,
+  "negative_results": [
+    {
+      "detail": "the 2026-09-18 note recording weight-8 t=3 at n=25 and n=36 as UNSAT was wrong at the G that matters; a wall needs grid, G, weight, t, radius, solver build, and budget before it means anything",
+      "what": "a wall claim without its instance is not a result"
+    },
+    {
+      "detail": "the cell held 2 codes when the portfolio issue was written and holds 16 now, two of them from this campaign",
+      "what": "local-2d-single x weight-8 is not a wall"
+    },
+    {
+      "detail": "at 8x8 t=3, 20M conflicts is about 55 h on one core, and RAM per worker at 4.7 to 8.8 GB binds before cores do",
+      "what": "throughput falls about 8x per grid step at t=3"
+    },
+    {
+      "detail": "redundant column-count clauses cost 7 to 10 percent throughput and changed no outcome; a permuted-CNF portfolio of three replicas returned nothing",
+      "what": "three method changes bought nothing"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "frontier_entries"
+  },
+  "report": "fieldnotes/2026-10-03-sat-weight8-t3-at-n25-n36-is-sat.md",
+  "required_outputs": [
+    "experiment_ledger",
+    "surviving_candidates",
+    "negative_results",
+    "campaign_summary"
+  ],
+  "screen_quality": [],
+  "status": "completed",
+  "stopped_by": {
+    "detail": "all three phases ran to completion; 70 instances, about 330 core-hours, 23 codes filed and merged",
+    "type": "budget_exhausted"
+  },
+  "summary_version": 1,
+  "survivors": []
+}

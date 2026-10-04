@@ -182,3 +182,66 @@ nobody can connect to an assertion is weight without evidence.
 Any campaign whose numbers appear in `notes/` or `fieldnotes/` commits its
 manifest beside the note, and the note cites it. A campaign that submits
 nothing does not need one.
+
+## The screening registry
+
+`research/candidates/` is gitignored, so a family screened and discarded
+leaves nothing behind and the next session pays for it again. The committed
+record is the summary, and the registry is what the summaries add up to
+(issue #2726).
+
+Three fields on each experiment row carry the outcome rather than the tally,
+and `research/kit/campaign.py` writes them:
+
+```python
+led.start_experiment("generalized-bicycle", seed=7,
+                     mode="novel_generation",
+                     params={"ring": "Z_341", "a_support": "6+4x2"})
+led.record_screen(trials=300_000, d=78, backend="fast")
+led.record_verdict("not_run")      # screened and dropped before the gate
+led.end_experiment()
+```
+
+| Field | What it carries |
+|---|---|
+| `params` | the construction parameters that identify this family member, beside the resolved run parameters. A family name alone cannot say whether this member was tried |
+| `screened` | the lightest weight the screen found, the trial count it was read at, and which backend read it. The depth is part of the reading: NumPy iterations and fast-RIS samples are not comparable budgets. A sampled reading must carry its trial count; a structural or solver reading has none, and records what it searched instead, rather than borrowing a number from somewhere else |
+| `verdict` | `passed`, `refuted`, `held`, `duplicate`, `dominated`, or `not_run`. `not_run` is the ordinary case and the useful one: it says the member was screened and dropped before the gate |
+| `mode` | how the candidate was arrived at. The kit's samplers are rejection sampling with no memory between candidates, which is `novel_generation`; a survivor count cannot distinguish a budget spread across a family from one spent mutating a single lineage |
+
+`summary()` also computes `screen_quality`: per family, the Spearman rank
+correlation between the screened distance and the gate outcome, with the pair
+count beside it. Rank correlation and not error, because `distance_rand` at
+low trials is a ranking instrument rather than a measuring one, so an error
+bar against a depth-mismatched number would be fiction. A family whose screen
+orders candidates the way the gate does can be trusted to spend a ladder
+budget on the right rung; one whose screen does not is good for discarding
+and not for choosing. The correlation is `null`, not `0.0`, when the rows
+carry no spread: nothing was tested is a different statement from the screen
+is uninformative.
+
+Summaries are validated against
+[`../../schema/campaign_summary.schema.json`](../../schema/campaign_summary.schema.json)
+on the way out, so a reporting bug surfaces where the summary is written.
+
+### Reading it
+
+```
+qldpc screened --family generalized-bicycle --param ring=Z_341
+qldpc screened --param n_side=5 --param t=3 --json
+```
+
+Parameters match as a subset, so a query on the ring alone finds every member
+screened over it. The answer is the committed record of what was tried, at
+what depth, and how it went. It is advisory: the gate remains the only thing
+that admits a code, and a row saying `passed` records that
+`verify/validate_candidate.py` once said so, nothing more.
+
+### Backfilled summaries
+
+A summary reconstructed from prose after the fact carries a `backfilled`
+block naming the sources it was read out of. A backfilled row carries what
+its source stated and nothing more: where a seed or a screening depth was
+never written down, the field is absent rather than guessed. The September
+2026 campaigns are backfilled this way, three of them generated from their
+own committed audit JSON rather than typed from the prose around it.

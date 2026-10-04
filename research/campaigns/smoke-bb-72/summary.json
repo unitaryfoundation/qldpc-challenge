@@ -13,18 +13,33 @@
   },
   "campaign_id": "smoke-bb-72",
   "campaign_name": "Smoke campaign: one known BB code, one experiment",
+  "contract_hash": null,
   "experiments": [
     {
+      "contract_hash": null,
       "family": "bivariate-bicycle",
+      "mode": "hand_built",
       "note": "the known Z_6 x Z_6 trinomial pair",
+      "params": {
+        "a": "[(3, 0), (0, 1), (0, 2)]",
+        "b": "[(0, 3), (1, 0), (2, 0)]",
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "trials": 200
+      },
       "seed": 0,
       "spent": {
         "candidates_screened": 1,
         "cpu_hours": 0,
         "gpu_hours": 0,
-        "walltime_hours": 0
+        "walltime_hours": 0.0020998404513885463
       },
-      "survivors": 0
+      "survivors": 0,
+      "verdict": "duplicate"
     }
   ],
   "frontier_advances": 0,
@@ -39,6 +54,7 @@
     "metric": "kd2_over_n",
     "target": 6
   },
+  "params": {},
   "report": "research/campaigns/smoke-bb-72/REPORT.md",
   "required_outputs": [
     "experiment_ledger",
@@ -46,6 +62,15 @@
     "negative_results",
     "campaign_summary"
   ],
+  "run_contract": null,
+  "screen_quality": [],
+  "snapshot": {
+    "branch": "research/screening-registry",
+    "diff_sha256": null,
+    "dirty": false,
+    "head": "47b4633adcaf9d1d05921eef256c9e942e2f6e78",
+    "untracked_count": 0
+  },
   "status": "completed",
   "stopped_by": {
     "detail": "candidates_screened reached 1 of 1",

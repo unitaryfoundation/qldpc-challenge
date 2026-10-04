@@ -1,0 +1,38 @@
+{
+  "authority": "nothing was screened, so nothing here is evidence of anything except that the box is untouched",
+  "backfilled": {
+    "by": "backfilled for issue #2726",
+    "from": [
+      "research/campaigns/w8-2dlocal-n700-1000/campaign.json"
+    ],
+    "note": "No run is on record for this campaign: the definition was written and nothing was screened against it. The summary exists so that the registry distinguishes a campaign that found nothing from one that never ran, which a missing file cannot."
+  },
+  "budget": {
+    "consumed": {},
+    "declared": {
+      "cpu_hours": 500,
+      "gpu_hours": 100,
+      "walltime_hours": 72
+    },
+    "remaining": {}
+  },
+  "campaign_id": "w8-2dlocal-n700-1000",
+  "campaign_name": "Weight-8 2D-local codes, n=700-1000",
+  "experiments": [],
+  "frontier_advances": 0,
+  "negative_results": [],
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n"
+  },
+  "report": null,
+  "required_outputs": [],
+  "screen_quality": [],
+  "status": "draft",
+  "stopped_by": {
+    "detail": "never started",
+    "type": null
+  },
+  "summary_version": 1,
+  "survivors": []
+}

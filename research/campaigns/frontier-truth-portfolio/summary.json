@@ -1,0 +1,137 @@
+{
+  "authority": "a lane row records what was attempted and what came of it; the entries it points at are on the board because verify/ admitted them",
+  "backfilled": {
+    "by": "backfilled for issue #2726",
+    "from": [
+      "fieldnotes/2026-10-03-campaign-portfolio-recap-and-annihilator-sweep.md",
+      "fieldnotes/2026-09-22-frontier-truth-gpu-audit.md",
+      "https://github.com/unitaryfoundation/qldpc-challenge/issues/1851"
+    ],
+    "note": "A portfolio of nine lanes rather than one search, so a row here is a lane and not a family member: the rows carry no screened reading and no verdict, because the lanes did not produce one at this level. The two lanes that did screen per entry have their own summaries, under refute-run-1 and annihilator-sweep. Several lanes point at artifacts that predate this issue, so no budget is attributed here; the only committed figures are 14 and 23 A40-hours for the two sets of the September audit."
+  },
+  "budget": {
+    "consumed": {
+      "gpu_hours": 37
+    },
+    "declared": {},
+    "remaining": {}
+  },
+  "campaign_id": "frontier-truth-portfolio",
+  "campaign_name": "Campaign portfolio: frontier truth, family diversity, and the sparse cells",
+  "experiments": [
+    {
+      "family": "other",
+      "mode": "enumeration",
+      "note": "ran as the 300M-trial GPU audit of 22 September: twelve corrections, and the top of the board repriced from kd^2/n 1541.4 to 1456.7. Superseded by the structural sweep recorded in campaign annihilator-sweep.",
+      "params": {
+        "lane": "frontier truth"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "generalized-bicycle",
+      "mode": "enumeration",
+      "note": "ran; research/quadricycle.py, one find merged as codes/630-2-21.json. The board tags that construction multivariate-bicycle.",
+      "params": {
+        "lane": "quadricycle sweep"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "lifted-product",
+      "mode": "enumeration",
+      "note": "ran; codes/315-63-8.json merged.",
+      "params": {
+        "lane": "lifted-product weight-8 seam"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "other",
+      "mode": "enumeration",
+      "note": "ran; single-layer weight-6 gained 27 entries and bilayer weight-6 gained 35. The per-entry construction parameters are not recorded in any committed source.",
+      "params": {
+        "lane": "2D-local retrofit"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "tile",
+      "mode": "enumeration",
+      "note": "ran; distance_slope now minimizes over both row axes.",
+      "params": {
+        "lane": "tile slope"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "local-sat-css",
+      "mode": "enumeration",
+      "note": "ran, and the cell it targeted is not a wall. The instances are recorded in campaign sat-2dlocal-t2plus.",
+      "params": {
+        "lane": "SAT t=4 at weight 8"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "other",
+      "mode": "enumeration",
+      "note": "partial; what remained is not quantified in any committed source.",
+      "params": {
+        "lane": "diversity seeding"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "pair-partition-cpm",
+      "mode": "enumeration",
+      "note": "re-aimed: the d=21 target sits below codes/904-230-22.json, so the real target is d=23. No screen was run at the new target.",
+      "params": {
+        "lane": "pair-partition CPM"
+      },
+      "survivors": 0
+    },
+    {
+      "family": "check-deletion",
+      "mode": "enumeration",
+      "note": "ran; 49 check-deletion entries.",
+      "params": {
+        "lane": "deletion k-slack"
+      },
+      "survivors": 0
+    }
+  ],
+  "frontier_advances": 0,
+  "negative_results": [
+    {
+      "detail": "the cell held 2 codes when this portfolio was written and holds 16 now",
+      "what": "local-2d-single x weight-8 was called a wall and is not"
+    },
+    {
+      "detail": "the entry is codes/684-14-54.json, and at d=54 it is dominated by codes/672-14-56.json",
+      "what": "the [[684,14,72]] headline was overstated"
+    },
+    {
+      "detail": "campaigns 1, 2, and 7 need re-aiming before any further spend",
+      "what": "three lanes were aimed at numbers that have since moved"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "frontier_entries"
+  },
+  "report": "fieldnotes/2026-10-03-campaign-portfolio-recap-and-annihilator-sweep.md",
+  "required_outputs": [
+    "experiment_ledger",
+    "negative_results",
+    "campaign_summary"
+  ],
+  "screen_quality": [],
+  "status": "completed",
+  "stopped_by": {
+    "detail": "closed after the recap; the GPU lanes were re-aimed because the numbers they targeted had moved",
+    "type": "budget_exhausted"
+  },
+  "summary_version": 1,
+  "survivors": []
+}

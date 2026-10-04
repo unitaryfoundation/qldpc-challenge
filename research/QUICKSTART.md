@@ -31,6 +31,7 @@ another session is about to write too.
 
 ```bash
 ./qldpc recent --family <your family>    # what already landed, and what failed
+./qldpc screened --family <your family>  # what was screened, at what depth, how it went
 ./qldpc targets                          # which track cells are open
 ```
 

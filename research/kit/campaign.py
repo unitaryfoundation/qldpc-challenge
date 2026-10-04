@@ -46,6 +46,8 @@ except ImportError:                              # pragma: no cover
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 SCHEMA_PATH = os.path.join(_ROOT, "schema", "campaign.schema.json")
+SUMMARY_SCHEMA_PATH = os.path.join(_ROOT, "schema",
+                                   "campaign_summary.schema.json")
 SUMMARY_VERSION = 1
 JOURNAL_VERSION = 1
 CONTRACT_VERSION = 1
@@ -153,9 +155,79 @@ def read_log_excerpt(path, *, limit=MAX_LOG_EXCERPT):
             "excerpt": body}
 
 
-def _schema():
-    with open(SCHEMA_PATH, encoding="utf-8") as f:
+def _schema(path=SCHEMA_PATH):
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+# The outcomes an experiment row may record, and the ones that say anything
+# about whether the screen ranked the member correctly. A duplicate or a
+# dominated code is a fact about the board, not about the screen, so it is
+# carried on the row and left out of the correlation. held is the refutation
+# pass's outcome: the claim survived at the recorded depth.
+VERDICTS = ("passed", "refuted", "held", "duplicate", "dominated", "not_run")
+RANKING_VERDICTS = {"passed": 1, "held": 1, "refuted": 0}
+
+# How a candidate was arrived at. The kit's samplers are rejection sampling
+# with no memory between candidates, so anything driven by search.py is
+# novel_generation unless its caller says otherwise.
+MODES = ("novel_generation", "cross_pollination", "refinement", "repair",
+         "enumeration", "hand_built")
+
+
+def validate_summary(obj):
+    """Validate a campaign summary against schema/campaign_summary.schema.json.
+
+    Separate from :func:`validate_campaign` because the two documents answer
+    different questions: the campaign file is what may be spent, the summary
+    is what was. A summary that does not validate is a reporting bug and not
+    a verdict bug, so this raises rather than warns and nothing downstream
+    treats a summary as authoritative either way.
+    """
+    if jsonschema is None:                       # pragma: no cover
+        raise CampaignError("jsonschema is required to validate a summary")
+    try:
+        jsonschema.Draft202012Validator(
+            _schema(SUMMARY_SCHEMA_PATH)).validate(obj)
+    except jsonschema.ValidationError as e:
+        where = "/".join(str(p) for p in e.absolute_path) or "(root)"
+        raise CampaignError(f"{where}: {e.message}") from None
+
+
+def spearman(xs, ys):
+    """Spearman rank correlation, ties averaged; None when it is undefined.
+
+    Undefined rather than zero when either side is constant: a screen whose
+    readings are all equal, or a lane whose verdicts are all the same, has
+    produced no evidence about ordering, and reporting 0.0 there would read
+    as "the screen is uninformative" when the truth is "nothing was tested".
+    """
+    if len(xs) != len(ys) or len(xs) < 2:
+        return None
+
+    def ranks(vs):
+        order = sorted(range(len(vs)), key=lambda i: vs[i])
+        out = [0.0] * len(vs)
+        i = 0
+        while i < len(order):
+            j = i
+            while j + 1 < len(order) and vs[order[j + 1]] == vs[order[i]]:
+                j += 1
+            shared = (i + j) / 2 + 1
+            for t in range(i, j + 1):
+                out[order[t]] = shared
+            i = j + 1
+        return out
+
+    rx, ry = ranks(xs), ranks(ys)
+    n = len(rx)
+    mx, my = sum(rx) / n, sum(ry) / n
+    sxy = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    sxx = sum((a - mx) ** 2 for a in rx)
+    syy = sum((b - my) ** 2 for b in ry)
+    if sxx == 0 or syy == 0:
+        return None
+    return sxy / (sxx * syy) ** 0.5
 
 
 def validate_campaign(obj):
@@ -388,7 +460,8 @@ class Ledger:
         self._dry_streak = 0
 
     # -- experiments ------------------------------------------------------
-    def start_experiment(self, family, *, seed=None, note="", **overrides):
+    def start_experiment(self, family, *, seed=None, note="", mode=None,
+                         params=None, **overrides):
         """Begin one run: a family, a budget slice, a seed, and its depth.
 
         Any further keyword is an argv-style override of the campaign's run
@@ -402,18 +475,94 @@ class Ledger:
             raise CampaignError(
                 f"family {family!r} is not one of this campaign's families "
                 f"({', '.join(self.campaign.families)})")
-        params, deviations = self.campaign.resolved_params(**overrides)
+        if mode is not None and mode not in MODES:
+            raise CampaignError(
+                f"mode {mode!r} is not one of {', '.join(MODES)}")
+        resolved, deviations = self.campaign.resolved_params(**overrides)
+        # The construction parameters that identify this family member sit
+        # beside the resolved run parameters, because a later session matches
+        # on both: "was this member screened" and "at what depth".
+        resolved.update(params or {})
         self._current = {"family": family, "seed": seed, "note": note,
                          "spent": dict.fromkeys(BUDGET_FIELDS, 0),
                          "survivors": 0}
-        if self.campaign.run_contract or params:
-            self._current["params"] = params
+        if mode is not None:
+            self._current["mode"] = mode
+        if self.campaign.run_contract or resolved:
+            self._current["params"] = resolved
             self._current["contract_hash"] = self.campaign.contract_hash
         if deviations:
             self._current["contract_deviations"] = deviations
         self._exp_t0 = time.monotonic()
         self._mark = (len(self.survivors), len(self.negative_results))
         return self._current
+
+    def record_screen(self, *, trials, d=None, backend=None, rung=None):
+        """Record what the cheap screen read on the open experiment.
+
+        ``d`` is the lightest logical weight the screen found, which is an
+        upper bound and never a claim: the gate is the only thing that
+        decides. ``trials`` is required because the reading is meaningless
+        without the depth it was read at, and ``backend`` because NumPy
+        iterations and fast-RIS samples are not comparable budgets
+        (AUTORESEARCH.md section 3), so the count alone does not identify
+        the depth.
+        """
+        if self._current is None:
+            raise CampaignError("record_screen without start_experiment")
+        if int(trials) < 1:
+            raise CampaignError("record_screen: trials must be at least 1")
+        screened = {"trials": int(trials), "d": None if d is None else int(d)}
+        if backend is not None:
+            screened["backend"] = backend
+        if rung is not None:
+            screened["rung"] = int(rung)
+        self._current["screened"] = screened
+        return screened
+
+    def record_verdict(self, verdict):
+        """Record what the gate said about the open experiment's member.
+
+        ``not_run`` is the ordinary case and the one worth recording: it
+        says the member was screened and discarded before the gate, which is
+        what stops the next session paying for it again.
+        """
+        if self._current is None:
+            raise CampaignError("record_verdict without start_experiment")
+        if verdict not in VERDICTS:
+            raise CampaignError(
+                f"verdict {verdict!r} is not one of {', '.join(VERDICTS)}")
+        self._current["verdict"] = verdict
+        return verdict
+
+    def screen_quality(self):
+        """Per family, how well the screen's ordering matched the gate's.
+
+        Over the rows that carry both a screened distance and a gate verdict
+        that says something about ordering (passed or refuted). Reported with
+        the pair count beside it: a correlation over three rows is noise, and
+        folding the two into one number would hide that.
+        """
+        by_family = {}
+        for exp in self.experiments:
+            d = (exp.get("screened") or {}).get("d")
+            rank = RANKING_VERDICTS.get(exp.get("verdict"))
+            if d is None or rank is None:
+                continue
+            by_family.setdefault(exp["family"], ([], []))
+            xs, ys = by_family[exp["family"]]
+            xs.append(d)
+            ys.append(rank)
+        out = []
+        for family in sorted(by_family):
+            xs, ys = by_family[family]
+            row = {"family": family, "pairs": len(xs),
+                   "spearman": spearman(xs, ys)}
+            if row["spearman"] is None:
+                row["note"] = ("undefined: the rows carry no spread in the "
+                               "screen or in the verdict")
+            out.append(row)
+        return out
 
     def end_experiment(self):
         """Close the current run, fold it into the ledger, and journal it.
@@ -786,6 +935,12 @@ class Ledger:
                        "remaining": {f: round(budget[f] - spent.get(f, 0), 3)
                                      for f in budget}},
             "experiments": self.experiments,
+            # How well the cheap screen ordered this campaign's candidates
+            # against the gate, per family. Rank correlation, not error: the
+            # screen is a ranking instrument, and the only question a later
+            # session can act on is whether its ordering can be trusted to
+            # spend a ladder budget, or only to discard.
+            "screen_quality": self.screen_quality(),
             "survivors": self.survivors,
             "frontier_advances": self.frontier_advances,
             "negative_results": self.negative_results,
@@ -815,8 +970,16 @@ def write_manifest(manifest, path):
     return path
 
 
-def write_summary(summary, path):
-    """Write a campaign summary, creating its directory."""
+def write_summary(summary, path, *, validate=True):
+    """Write a campaign summary, creating its directory.
+
+    Validated on the way out by default, so a reporting bug surfaces where
+    the summary is produced rather than when a later session tries to read
+    the registry. ``validate=False`` exists for a deliberately partial
+    document under test.
+    """
+    if validate:
+        validate_summary(summary)
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(summary, f, indent=2, sort_keys=True)

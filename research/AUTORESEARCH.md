@@ -65,8 +65,11 @@ bound the search below, and its `stopping` conditions, not the budget alone,
 end the run. It cannot weaken the gate. Without one, nothing below changes.
 
 0. **Read the shared record first**: `./qldpc recent` (new codes, research
-   notes, fieldnotes), then the `fieldnotes/` entries touching your intended
-   family — blocked routes and calibration findings live there, and repeating
+   notes, fieldnotes) and `./qldpc screened --family <family>` (which members
+   were already screened, at what depth, and what the gate said: the staging
+   directory is gitignored, so this is the only committed record that a
+   family was tried and dropped), then the `fieldnotes/` entries touching
+   your intended family — blocked routes and calibration findings live there, and repeating
    them wastes the budget. Recent literature is part of that record:
    [`literature/README.md`](literature/README.md) is the arXiv watch, and its
    ledger says which new papers a human read and what they concluded

@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unitaryfoundation.github.io/qldpc-challenge/schema/campaign_summary.schema.json",
+  "title": "qLDPC challenge campaign summary",
+  "description": "What a campaign did, written beside its definition as research/campaigns/<id>/summary.json by research/kit/campaign.py. The campaign file (schema/campaign.schema.json) is the INPUT; this is the committed outcome, including the failures. It is advisory and never authoritative: a candidate is a find when verify/validate_candidate.py says so and at no other point, so nothing here admits a code, changes a tier, or moves a ranking. Its purpose is that the next session can read what was screened, at what depth, and how it went, instead of re-learning it at the same price (issue #2726).",
+  "type": "object",
+  "required": ["summary_version", "campaign_id", "status", "experiments"],
+  "properties": {
+    "summary_version": {
+      "const": 1,
+      "description": "Bumped when a field changes meaning, never for an added optional field."
+    },
+    "campaign_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+      "description": "The campaign's id, which is also its directory under research/campaigns/."
+    },
+    "campaign_name": { "type": "string", "maxLength": 200 },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "completed", "abandoned"]
+    },
+    "backfilled": {
+      "type": "object",
+      "description": "Present only on a summary reconstructed after the fact from prose rather than written by a run. A backfilled row carries whatever its source stated and nothing more: absent screening depth stays absent instead of being guessed, which is the difference between a record and a reconstruction.",
+      "required": ["from", "by"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Repo-relative paths the numbers were read out of, e.g. a fieldnote."
+        },
+        "by": { "type": "string", "minLength": 1, "description": "Who reconstructed it, and under which issue." },
+        "note": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "description": "One row per run: a family, a budget slice, and what came of it. A row that screened a family member and discarded it is as much a result as one that produced a survivor, and is the row the registry exists to carry.",
+      "items": { "$ref": "#/$defs/experiment" }
+    },
+    "screen_quality": {
+      "type": "array",
+      "description": "Per family, how well the cheap screen ordered candidates against the gate's verdicts. Rank correlation rather than error: distance_rand at low trials is a ranking instrument, not a measuring one, and AUTORESEARCH.md section 3 already warns that NumPy iterations and fast-RIS samples are not comparable screening budgets, so an error bar against a depth-mismatched number would be fiction. A family whose screen ranks the way the gate does can be trusted to spend a ladder budget on the right rung; one whose screen does not is good for discarding and not for choosing.",
+      "items": { "$ref": "#/$defs/screen_quality" }
+    },
+    "objective": { "type": "object" },
+    "snapshot": { "type": "object" },
+    "params": { "type": "object" },
+    "run_contract": { "type": ["object", "null"] },
+    "contract_hash": { "type": ["string", "null"] },
+    "stopped_by": { "type": "object" },
+    "budget": { "type": "object" },
+    "survivors": { "type": "array" },
+    "frontier_advances": { "type": "integer", "minimum": 0 },
+    "negative_results": { "type": "array" },
+    "required_outputs": { "type": "array" },
+    "report": { "type": ["string", "null"] },
+    "authority": { "type": "string" }
+  },
+  "$defs": {
+    "experiment": {
+      "type": "object",
+      "required": ["family"],
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "The family tag, written the way the board writes it, because the registry is matched against the board and not against the campaign vocabulary. That vocabulary is open in practice: codes/ carries tags such as local-sat-css, check-deletion, pair-partition-cpm, and distance-amplified that the campaign input schema's enum does not list, and a row that cannot name what was screened is worse than one naming a tag outside the enum. The campaign file still constrains what a run may declare."
+        },
+        "seed": { "type": ["integer", "null"] },
+        "note": { "type": "string", "maxLength": 2000 },
+        "spent": { "type": "object" },
+        "survivors": { "type": "integer", "minimum": 0 },
+        "params": {
+          "type": "object",
+          "description": "The construction parameters that identify this family member, and the resolved run parameters the lane invoked with. Together they are what a later session matches on before paying for a ladder: a family name alone cannot say whether this member was already tried.",
+          "additionalProperties": { "type": ["integer", "number", "string", "boolean", "array", "null"] }
+        },
+        "screened": {
+          "type": "object",
+          "description": "What the cheap screen read, and at what depth. Depth is part of the reading: two distances read at different budgets are not comparable. A sampled reading must say how many trials it took; a structural or solver reading has no trial count, and records what it searched instead, so `trials` is required for the sampling backends and absent for the others rather than filled with a number nothing measured.",
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": { "properties": { "backend": { "enum": ["numpy", "fast", "gpu", "mixed"] } }, "required": ["backend"] },
+              "then": { "required": ["trials"] }
+            },
+            {
+              "if": { "not": { "required": ["backend"] } },
+              "then": { "required": ["trials"] }
+            }
+          ],
+          "properties": {
+            "d": {
+              "type": ["integer", "null"],
+              "minimum": 0,
+              "description": "The lightest logical weight the screen found, which is an upper bound on the distance and never a claim about it. Null when the member was screened and no weight was recorded."
+            },
+            "trials": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Information-set trials per side at which `d` was read."
+            },
+            "backend": {
+              "type": "string",
+              "enum": ["numpy", "fast", "gpu", "sat", "structural", "mixed", "unknown"],
+              "description": "Which implementation produced the reading. NumPy iterations, fast-RIS samples, and GPU trials are not comparable screening budgets (AUTORESEARCH.md section 3), so the count alone does not identify the depth. sat and structural name a reading that did not come from sampling at all: a solver verdict, or a bound read off the construction."
+            },
+            "rung": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Index into the campaign's screening ladder, when it ran one."
+            }
+          }
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["passed", "refuted", "held", "duplicate", "dominated", "not_run"],
+          "description": "What the gate or the refuter said, when one was paid for. not_run is the common and useful case: it records that the member was screened and discarded before the gate, which is exactly what a later session needs in order not to pay for it again. passed means verify/validate_candidate.py returned passed: true and nothing more; it is not a board entry until a human submits it. held belongs to a refutation pass rather than a search: the claim survived a search of the recorded depth, which is evidence about the depth and never a certificate."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["novel_generation", "cross_pollination", "refinement", "repair", "enumeration", "hand_built"],
+          "description": "How the candidate was arrived at. The kit's samplers (sample_bb, sample_dihedral, sample_kasai_affine) are rejection sampling with no memory between candidates, which is novel_generation; enumeration is an exhaustive walk of a parameter box. Recorded because a survivor count cannot distinguish a budget spread across a family from one spent mutating a single lineage.",
+          "default": "novel_generation"
+        },
+        "contract_hash": { "type": ["string", "null"] },
+        "contract_deviations": { "type": "object" }
+      }
+    },
+    "screen_quality": {
+      "type": "object",
+      "required": ["family", "pairs"],
+      "additionalProperties": false,
+      "properties": {
+        "family": { "type": "string" },
+        "spearman": {
+          "type": ["number", "null"],
+          "minimum": -1,
+          "maximum": 1,
+          "description": "Spearman rank correlation between the screened distance and the gate outcome over this family's rows that carry both. Null when the rows carry no usable spread, for instance when every verdict is the same, since a correlation is undefined there rather than zero."
+        },
+        "pairs": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "How many rows carried both a screened distance and a gate verdict. A correlation over a handful of rows is noise, so this is reported beside it rather than folded into it."
+        },
+        "note": { "type": "string", "maxLength": 1000 }
+      }
+    }
+  }
+}

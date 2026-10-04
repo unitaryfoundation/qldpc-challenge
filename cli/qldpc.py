@@ -1410,6 +1410,140 @@ def campaign_rows(since):
 
 
 # ---------------------------------------------------------------------------
+# screened: the shared screening registry, read across committed summaries
+# ---------------------------------------------------------------------------
+# Issue #2726. research/candidates/ is gitignored working output, so a family
+# screened and discarded leaves nothing behind and the next session pays for
+# it again. The committed record is research/campaigns/<id>/summary.json, and
+# this is the reader over all of them: one call answers whether a family
+# member was screened, at what depth, and how it went. Advisory only -- the
+# gate remains the only thing that admits a code.
+
+def screening_rows(family="", params=None, verdicts=()):
+    """Experiment rows across committed summaries, filtered.
+
+    ``params`` matches as a subset: a row matches when every queried key is
+    present on it and compares equal, so a query on the ring alone finds
+    every member screened over that ring. Values compare as strings, since a
+    campaign that wrote l as "6" and one that wrote 6 screened the same
+    member.
+    """
+    root = os.path.join(_ROOT, "research", "campaigns")
+    want = {str(k): str(v) for k, v in (params or {}).items()}
+    rows, quality, summaries = [], [], 0
+    if not os.path.isdir(root):
+        return rows, quality, summaries
+    for cid in sorted(os.listdir(root)):
+        path = os.path.join(root, cid, "summary.json")
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as fh:
+                summ = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        summaries += 1
+        rel = os.path.relpath(path, _ROOT)
+        ident = summ.get("campaign_id") or cid
+        backfilled = bool(summ.get("backfilled"))
+        for q in summ.get("screen_quality") or []:
+            if family and q.get("family") != family:
+                continue
+            quality.append(dict(q, campaign_id=ident, path=rel))
+        for exp in summ.get("experiments") or []:
+            if family and exp.get("family") != family:
+                continue
+            if verdicts and exp.get("verdict") not in verdicts:
+                continue
+            got = {str(k): str(v) for k, v in (exp.get("params") or {}).items()}
+            if any(got.get(k) != v for k, v in want.items()):
+                continue
+            screened = exp.get("screened") or {}
+            rows.append({
+                "campaign_id": ident, "path": rel,
+                "backfilled": backfilled,
+                "family": exp.get("family") or "", "seed": exp.get("seed"),
+                "params": exp.get("params") or {},
+                "screened_d": screened.get("d"),
+                "trials": screened.get("trials"),
+                "backend": screened.get("backend") or "",
+                "rung": screened.get("rung"),
+                "verdict": exp.get("verdict") or "",
+                "mode": exp.get("mode") or "",
+                "survivors": exp.get("survivors") or 0,
+                "note": exp.get("note") or "",
+            })
+    return rows, quality, summaries
+
+
+def _kv_pairs(items):
+    """Parse repeated --param k=v into pairs, rejecting a bare token."""
+    for item in items or []:
+        if "=" not in item:
+            raise SystemExit(f"--param wants key=value, got {item!r}")
+        k, v = item.split("=", 1)
+        yield k.strip(), v.strip()
+
+
+def cmd_screened(args):
+    """Report whether this family at these parameters was already screened.
+
+    The question to ask before paying for a ladder. Reads only committed
+    campaign summaries, so a row here is a record someone left deliberately,
+    not a reading of one machine's working directory.
+    """
+    params = dict(_kv_pairs(args.param))
+    if args.params:
+        try:
+            params.update(json.loads(args.params))
+        except ValueError as e:
+            raise SystemExit(f"--params is not JSON: {e}") from None
+    rows, quality, summaries = screening_rows(
+        family=args.family, params=params,
+        verdicts=tuple(args.verdict) if args.verdict else ())
+
+    _result(args).update(query={"family": args.family, "params": params,
+                                "verdict": list(args.verdict or [])},
+                         summaries_read=summaries, matches=len(rows),
+                         rows=rows, screen_quality=quality)
+
+    what = args.family or "any family"
+    if params:
+        what += " at " + ", ".join(f"{k}={v}" for k, v in sorted(params.items()))
+    if not rows:
+        print(f"{what}: no committed campaign summary records screening it "
+              f"({summaries} read)")
+        return
+    print(f"{what}: {_plural(len(rows), 'screening record')} across "
+          f"{_plural(summaries, 'campaign summary', 'campaign summaries')}")
+    lim = None if args.full else max(1, args.limit)
+    for r in (rows if lim is None else rows[:lim]):
+        depth = (f"d<={r['screened_d']} at {r['trials']} trials"
+                 if r["screened_d"] is not None else
+                 (f"{r['trials']} trials, no weight recorded"
+                  if r["trials"] else "depth not recorded"))
+        if r["backend"]:
+            depth += f" ({r['backend']})"
+        tail = f"  {r['verdict']}" if r["verdict"] else "  verdict not recorded"
+        if r["backfilled"]:
+            tail += ", backfilled"
+        pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
+        shown = pretty or "(no construction parameters recorded)"
+        print(f"  {r['campaign_id']}  {r['family']}  {shown}")
+        print(f"    {depth}{tail}")
+    if lim is not None and len(rows) > lim:
+        print(f"  ... {len(rows) - lim} more (--limit N, --full)")
+    for q in quality:
+        if q.get("spearman") is None:
+            print(f"screen quality, {q['family']}: undefined over "
+                  f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})")
+        else:
+            print(f"screen quality, {q['family']}: Spearman "
+                  f"{q['spearman']:+.2f} over "
+                  f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})")
+
+
+# ---------------------------------------------------------------------------
 # reproduce: one command that re-runs an entry's evidence chain (issue #2220)
 # ---------------------------------------------------------------------------
 # Orchestration only. Every stage below calls the trusted module that already
@@ -1885,6 +2019,30 @@ def main(argv=None):
                         "and campaign summaries in the window, with counts) "
                         "instead of the listing")
     r.set_defaults(func=cmd_recent)
+
+    sc = sub.add_parser("screened",
+                        help="was this family at these parameters already "
+                             "screened, at what depth, and how did it go "
+                             "(committed campaign summaries only)")
+    sc.add_argument("--family", default="",
+                    help="family tag, e.g. generalized-bicycle")
+    sc.add_argument("--param", action="append", default=[], metavar="K=V",
+                    help="construction parameter to match, repeatable; "
+                         "matched as a subset, so --param ring=Z_341 finds "
+                         "every member screened over that ring")
+    sc.add_argument("--params", default="",
+                    help="the same as a JSON object")
+    sc.add_argument("--verdict", action="append", default=[],
+                    choices=["passed", "refuted", "duplicate", "dominated",
+                             "not_run"],
+                    help="only rows with this gate verdict, repeatable")
+    sc.add_argument("--limit", type=int, default=20,
+                    help="rows to print (default 20); --full for all")
+    sc.add_argument("--full", action="store_true")
+    sc.add_argument("--json", action="store_true",
+                    help="print one JSON record on stdout instead of the "
+                         "listing")
+    sc.set_defaults(func=cmd_screened)
 
     rp = sub.add_parser("reproduce",
                         help="re-run one entry's evidence chain and write a "

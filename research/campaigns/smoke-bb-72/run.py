@@ -32,19 +32,26 @@ def main(out=None, refute=False):
     led = Ledger(camp)
     print(f"campaign {camp.id}: {camp.name}")
 
-    led.start_experiment("bivariate-bicycle", seed=0,
+    a, b = [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]
+    led.start_experiment("bivariate-bicycle", seed=0, mode="hand_built",
+                         params={"l": 6, "m": 6, "a": str(a), "b": str(b)},
                          note="the known Z_6 x Z_6 trinomial pair")
-    HX, HZ = build_bb(6, 6, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)])
+    HX, HZ = build_bb(6, 6, a, b)
     n, w = HX.shape[1], int(max(HX.sum(axis=1).max(), HZ.sum(axis=1).max()))
     trials = camp.c["methods"]["screening"]["trials_per_candidate"]
     d = distance_rand(HX, HZ, trials=trials, seed=0, backend="numpy")
     led.spend(candidates_screened=1)
+    # The screen's reading and the depth it was read at, on the row, so that
+    # the next session can ask whether this member was already tried instead
+    # of screening it again (issue #2726).
+    led.record_screen(trials=trials, d=d, backend="numpy")
     print(f"  screened [[{n},?,{d}]] w={w} at {trials} trials")
 
     if not camp.in_scope(n=n, d=d, w=w):
         led.record_negative("skipped, not searched",
                             f"[[{n},.,{d}]] w={w} is outside the campaign's "
                             "search space, so nothing was measured here")
+        led.record_verdict("not_run")
         led.end_experiment()
     else:
         doc = make_submission(
@@ -55,12 +62,15 @@ def main(out=None, refute=False):
             confidence="upper_bound")
         verdict = validate_candidate(doc, seed=11, refute=refute)
         if verdict["passed"]:
+            led.record_verdict("passed")
             row = led.record_candidate(doc, verdict)
             print(f"  gate accepted [[{row['n']},{row['k']},{row['d']}]]"
                   f" -> {row['cell']}")
         else:
-            led.record_negative("gate rejected",
-                                "; ".join(verdict.get("labels") or []))
+            labels = "; ".join(verdict.get("labels") or [])
+            led.record_negative("gate rejected", labels)
+            led.record_verdict("duplicate" if "duplicate" in labels.lower()
+                               else "refuted")
             print("  gate rejected it; recorded as a negative result")
         led.end_experiment()
 

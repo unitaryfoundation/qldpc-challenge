@@ -50,7 +50,9 @@ See [`AGENTS.md`](AGENTS.md) for the precedence rule.
 Before starting a search, `./qldpc recent` summarizes what landed lately
 (codes, research notes, fieldnotes, and committed campaign summaries), so you
 begin from the community's current frontier of knowledge rather than
-rediscovering it; `--json` returns the same as one record.
+rediscovering it; `--json` returns the same as one record. `./qldpc screened`
+answers the narrower question of whether a particular family member was
+already screened, at what depth, and what the gate said about it.
 
 ## Installation
 
