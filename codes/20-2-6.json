@@ -1,223 +1,316 @@
 {
-  "schema_version": "0.1",
-  "name": "[[20,2,6]]",
-  "code_type": "CSS",
-  "n": 20,
-  "k": 2,
-  "checks": {
-    "X": [
-      [
-        7,
-        9,
-        11,
-        18
-      ],
-      [
-        0,
-        9,
-        11,
-        12,
-        14,
-        15,
-        16,
-        17
-      ],
-      [
-        1,
-        9,
-        12,
-        13,
-        16,
-        17,
-        18,
-        19
-      ],
-      [
-        2,
-        10,
-        11,
-        13,
-        14,
-        16,
-        17,
-        18
-      ],
-      [
-        3,
-        10,
-        12,
-        13,
-        14,
-        15,
-        17,
-        19
-      ],
-      [
-        4,
-        9,
-        10,
-        12,
-        16,
-        17,
-        18,
-        19
-      ],
-      [
-        5,
-        9,
-        11,
-        14,
-        15,
-        16,
-        17,
-        19
-      ],
-      [
-        6,
-        10,
-        11,
-        13,
-        15,
-        16,
-        17,
-        18
-      ],
-      [
-        8,
-        10,
-        12,
-        13,
-        14,
-        15,
-        16,
-        19
-      ]
-    ],
-    "Z": [
-      [
-        7,
-        9,
-        11,
-        18
-      ],
-      [
-        0,
-        9,
-        11,
-        12,
-        14,
-        15,
-        16,
-        17
-      ],
-      [
-        1,
-        9,
-        12,
-        13,
-        16,
-        17,
-        18,
-        19
-      ],
-      [
-        2,
-        10,
-        11,
-        13,
-        14,
-        16,
-        17,
-        18
-      ],
-      [
-        3,
-        10,
-        12,
-        13,
-        14,
-        15,
-        17,
-        19
-      ],
-      [
-        4,
-        9,
-        10,
-        12,
-        16,
-        17,
-        18,
-        19
-      ],
-      [
-        5,
-        9,
-        11,
-        14,
-        15,
-        16,
-        17,
-        19
-      ],
-      [
-        6,
-        10,
-        11,
-        13,
-        15,
-        16,
-        17,
-        18
-      ],
-      [
-        8,
-        10,
-        12,
-        13,
-        14,
-        15,
-        16,
-        19
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[20,2,6]]",
+ "code_type": "CSS",
+ "n": 20,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    7,
+    9,
+    11,
+    18
+   ],
+   [
+    0,
+    9,
+    11,
+    12,
+    14,
+    15,
+    16,
+    17
+   ],
+   [
+    1,
+    9,
+    12,
+    13,
+    16,
+    17,
+    18,
+    19
+   ],
+   [
+    2,
+    10,
+    11,
+    13,
+    14,
+    16,
+    17,
+    18
+   ],
+   [
+    3,
+    10,
+    12,
+    13,
+    14,
+    15,
+    17,
+    19
+   ],
+   [
+    4,
+    9,
+    10,
+    12,
+    16,
+    17,
+    18,
+    19
+   ],
+   [
+    5,
+    9,
+    11,
+    14,
+    15,
+    16,
+    17,
+    19
+   ],
+   [
+    6,
+    10,
+    11,
+    13,
+    15,
+    16,
+    17,
+    18
+   ],
+   [
+    8,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    19
+   ]
+  ],
+  "Z": [
+   [
+    7,
+    9,
+    11,
+    18
+   ],
+   [
+    0,
+    9,
+    11,
+    12,
+    14,
+    15,
+    16,
+    17
+   ],
+   [
+    1,
+    9,
+    12,
+    13,
+    16,
+    17,
+    18,
+    19
+   ],
+   [
+    2,
+    10,
+    11,
+    13,
+    14,
+    16,
+    17,
+    18
+   ],
+   [
+    3,
+    10,
+    12,
+    13,
+    14,
+    15,
+    17,
+    19
+   ],
+   [
+    4,
+    9,
+    10,
+    12,
+    16,
+    17,
+    18,
+    19
+   ],
+   [
+    5,
+    9,
+    11,
+    14,
+    15,
+    16,
+    17,
+    19
+   ],
+   [
+    6,
+    10,
+    11,
+    13,
+    15,
+    16,
+    17,
+    18
+   ],
+   [
+    8,
+    10,
+    12,
+    13,
+    14,
+    15,
+    16,
+    19
+   ]
+  ]
+ },
+ "distance": {
+  "d": 6,
+  "X": {
+   "value": 6,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    5,
+    9,
+    14,
+    15,
+    18
+   ]
   },
-  "distance": {
-    "d": 6,
-    "X": {
-      "value": 6,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        5,
-        9,
-        14,
-        15,
-        18
-      ]
-    },
-    "Z": {
-      "value": 6,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        5,
-        9,
-        14,
-        15,
-        18
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@mathysrennela"
-    ],
-    "construction": "Reconstructed from qecdb.org record 672e6e9c34d5954e0cb7d1b7 (https://qecdb.org/codes/672e6e9c34d5954e0cb7d1b7); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: qumba.csscode.selfdual_random; database distance claim d=6 (lower 6, upper 6).",
-    "origin": "submission",
-    "date": "2026-09-27",
-    "model": "Mimo-V2.6-Free",
-    "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
-  },
-  "family": "other"
+  "Z": {
+   "value": 6,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    5,
+    9,
+    14,
+    15,
+    18
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Reconstructed from qecdb.org record 672e6e9c34d5954e0cb7d1b7 (https://qecdb.org/codes/672e6e9c34d5954e0cb7d1b7); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: qumba.csscode.selfdual_random; database distance claim d=6 (lower 6, upper 6).",
+  "origin": "submission",
+  "date": "2026-09-27",
+  "model": "Mimo-V2.6-Free",
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.6056,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

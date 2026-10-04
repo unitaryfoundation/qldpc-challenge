@@ -1,162 +1,247 @@
 {
-  "schema_version": "0.1",
-  "name": "[[18,4,4]] [[4,2,2]]-amplified [[4,2,2]] rotated toric code (2x2 torus)",
-  "code_type": "CSS",
-  "n": 18,
-  "k": 4,
-  "checks": {
-    "X": [
-      [
-        0,
-        4,
-        8,
-        12,
-        17
-      ],
-      [
-        1,
-        5,
-        9,
-        13,
-        17
-      ],
-      [
-        2,
-        6,
-        10,
-        14,
-        17
-      ],
-      [
-        3,
-        7,
-        11,
-        15,
-        17
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        16
-      ],
-      [
-        4,
-        5,
-        6,
-        7,
-        16
-      ],
-      [
-        8,
-        9,
-        10,
-        11,
-        16
-      ],
-      [
-        12,
-        13,
-        14,
-        15,
-        16
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        4,
-        8,
-        12,
-        16
-      ],
-      [
-        1,
-        5,
-        9,
-        13,
-        16
-      ],
-      [
-        2,
-        6,
-        10,
-        14,
-        16
-      ],
-      [
-        3,
-        7,
-        11,
-        15,
-        16
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        17
-      ],
-      [
-        4,
-        5,
-        6,
-        7,
-        17
-      ],
-      [
-        8,
-        9,
-        10,
-        11,
-        17
-      ],
-      [
-        12,
-        13,
-        14,
-        15,
-        17
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[18,4,4]] [[4,2,2]]-amplified [[4,2,2]] rotated toric code (2x2 torus)",
+ "code_type": "CSS",
+ "n": 18,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    0,
+    4,
+    8,
+    12,
+    17
+   ],
+   [
+    1,
+    5,
+    9,
+    13,
+    17
+   ],
+   [
+    2,
+    6,
+    10,
+    14,
+    17
+   ],
+   [
+    3,
+    7,
+    11,
+    15,
+    17
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    16
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    16
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    16
+   ],
+   [
+    12,
+    13,
+    14,
+    15,
+    16
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    4,
+    8,
+    12,
+    16
+   ],
+   [
+    1,
+    5,
+    9,
+    13,
+    16
+   ],
+   [
+    2,
+    6,
+    10,
+    14,
+    16
+   ],
+   [
+    3,
+    7,
+    11,
+    15,
+    16
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    17
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    17
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    17
+   ],
+   [
+    12,
+    13,
+    14,
+    15,
+    17
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1,
+    12,
+    13
+   ]
   },
-  "distance": {
-    "d": 4,
-    "X": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        1,
-        12,
-        13
-      ]
-    },
-    "Z": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        1,
-        12,
-        13
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@MathysRennela"
-    ],
-    "construction": "Distance-amplified code: one [[4,2,2]] tensor-product amplification step (central three-term truncation of the chain-complex tensor product, arXiv:2609.37231 Eq. 1/Eq. 12-15) applied to the board's [[4,2,2]] rotated toric code (2x2 torus) entry, using a sparse independent-row presentation of its checks: n' = 4n + m_X + m_Z = 18, k' = 2k = 4, check weight w' = w+1 = 5. X/Z witnesses are the base witnesses tensored with the weight-2 [[4,2,2]] logical on the central register (weights 4/4); a 100000-trial fast-backend search (seed 5000) found nothing lighter (min weight 4). Base provenance: Rotated toric code on the periodic 2x2 lattice: all plaquette checks, (i+j) even -> X; distance 2 (cycle lengths).",
-    "references": [
-      "arXiv:2609.37231",
-      "arXiv:quant-ph/9707021"
-    ],
-    "date": "2026-09-30",
-    "notes": "Constructed and packaged with the Space Bunny Alpha 1.0 model. Filed under the -b slug: the board's codes/18-4-4.json is a different [[18,4,4]] (twisted-torus bivariate-bicycle, arXiv:2503.03827, by Zijian Liang, Ke Liu, Hao Song, Yu-An Chen), with a 2D-local layout, whereas this entry is the [[4,2,2]] amplification of the [[4,2,2]] toric code and carries no layout. The trusted gate reports no exact and no Weisfeiler-Leman-equivalent board entry: exact_duplicate_of null, wl_equivalent_of null.",
-    "model": "Space Bunny Alpha 1.0"
-  },
-  "family": "distance-amplified"
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1,
+    12,
+    13
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "Distance-amplified code: one [[4,2,2]] tensor-product amplification step (central three-term truncation of the chain-complex tensor product, arXiv:2609.37231 Eq. 1/Eq. 12-15) applied to the board's [[4,2,2]] rotated toric code (2x2 torus) entry, using a sparse independent-row presentation of its checks: n' = 4n + m_X + m_Z = 18, k' = 2k = 4, check weight w' = w+1 = 5. X/Z witnesses are the base witnesses tensored with the weight-2 [[4,2,2]] logical on the central register (weights 4/4); a 100000-trial fast-backend search (seed 5000) found nothing lighter (min weight 4). Base provenance: Rotated toric code on the periodic 2x2 lattice: all plaquette checks, (i+j) even -> X; distance 2 (cycle lengths).",
+  "references": [
+   "arXiv:2609.37231",
+   "arXiv:quant-ph/9707021"
+  ],
+  "date": "2026-09-30",
+  "notes": "Constructed and packaged with the Space Bunny Alpha 1.0 model. Filed under the -b slug: the board's codes/18-4-4.json is a different [[18,4,4]] (twisted-torus bivariate-bicycle, arXiv:2503.03827, by Zijian Liang, Ke Liu, Hao Song, Yu-An Chen), with a 2D-local layout, whereas this entry is the [[4,2,2]] amplification of the [[4,2,2]] toric code and carries no layout. The trusted gate reports no exact and no Weisfeiler-Leman-equivalent board entry: exact_duplicate_of null, wl_equivalent_of null.",
+  "model": "Space Bunny Alpha 1.0"
+ },
+ "family": "distance-amplified",
+ "locality": {
+  "coordinates": [
+   [
+    2.0,
+    0.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 4.0,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

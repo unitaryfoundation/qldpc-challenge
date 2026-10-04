@@ -1,211 +1,308 @@
 {
-  "schema_version": "0.1",
-  "name": "[[21,2,6]]",
-  "code_type": "CSS",
-  "n": 21,
-  "k": 2,
-  "checks": {
-    "X": [
-      [
-        0,
-        3,
-        4,
-        9,
-        11
-      ],
-      [
-        2,
-        3,
-        8,
-        10,
-        20
-      ],
-      [
-        1,
-        2,
-        7,
-        9,
-        19
-      ],
-      [
-        0,
-        1,
-        6,
-        8,
-        18
-      ],
-      [
-        0,
-        5,
-        7,
-        17,
-        20
-      ],
-      [
-        4,
-        6,
-        16,
-        19,
-        20
-      ],
-      [
-        3,
-        5,
-        15,
-        18,
-        19
-      ],
-      [
-        2,
-        4,
-        14,
-        17,
-        18
-      ],
-      [
-        1,
-        3,
-        13,
-        16,
-        17
-      ],
-      [
-        0,
-        2,
-        12,
-        15,
-        16
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        1,
-        3,
-        5,
-        9,
-        10,
-        11,
-        12
-      ],
-      [
-        0,
-        2,
-        4,
-        8,
-        9,
-        10,
-        11,
-        20
-      ],
-      [
-        1,
-        3,
-        7,
-        8,
-        9,
-        10,
-        19,
-        20
-      ],
-      [
-        0,
-        2,
-        6,
-        7,
-        8,
-        9,
-        18,
-        19
-      ],
-      [
-        1,
-        5,
-        6,
-        7,
-        8,
-        17,
-        18,
-        20
-      ],
-      [
-        0,
-        4,
-        5,
-        6,
-        7,
-        16,
-        17,
-        19
-      ],
-      [
-        3,
-        4,
-        5,
-        6,
-        15,
-        16,
-        18,
-        20
-      ],
-      [
-        2,
-        3,
-        4,
-        5,
-        14,
-        15,
-        17,
-        19
-      ],
-      [
-        1,
-        2,
-        3,
-        4,
-        13,
-        14,
-        16,
-        18
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[21,2,6]]",
+ "code_type": "CSS",
+ "n": 21,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    0,
+    3,
+    4,
+    9,
+    11
+   ],
+   [
+    2,
+    3,
+    8,
+    10,
+    20
+   ],
+   [
+    1,
+    2,
+    7,
+    9,
+    19
+   ],
+   [
+    0,
+    1,
+    6,
+    8,
+    18
+   ],
+   [
+    0,
+    5,
+    7,
+    17,
+    20
+   ],
+   [
+    4,
+    6,
+    16,
+    19,
+    20
+   ],
+   [
+    3,
+    5,
+    15,
+    18,
+    19
+   ],
+   [
+    2,
+    4,
+    14,
+    17,
+    18
+   ],
+   [
+    1,
+    3,
+    13,
+    16,
+    17
+   ],
+   [
+    0,
+    2,
+    12,
+    15,
+    16
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    3,
+    5,
+    9,
+    10,
+    11,
+    12
+   ],
+   [
+    0,
+    2,
+    4,
+    8,
+    9,
+    10,
+    11,
+    20
+   ],
+   [
+    1,
+    3,
+    7,
+    8,
+    9,
+    10,
+    19,
+    20
+   ],
+   [
+    0,
+    2,
+    6,
+    7,
+    8,
+    9,
+    18,
+    19
+   ],
+   [
+    1,
+    5,
+    6,
+    7,
+    8,
+    17,
+    18,
+    20
+   ],
+   [
+    0,
+    4,
+    5,
+    6,
+    7,
+    16,
+    17,
+    19
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    15,
+    16,
+    18,
+    20
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    14,
+    15,
+    17,
+    19
+   ],
+   [
+    1,
+    2,
+    3,
+    4,
+    13,
+    14,
+    16,
+    18
+   ]
+  ]
+ },
+ "distance": {
+  "d": 6,
+  "X": {
+   "value": 6,
+   "confidence": "upper_bound",
+   "witness": [
+    2,
+    7,
+    13,
+    14,
+    16,
+    20
+   ]
   },
-  "distance": {
-    "d": 6,
-    "X": {
-      "value": 6,
-      "confidence": "upper_bound",
-      "witness": [
-        2,
-        7,
-        13,
-        14,
-        16,
-        20
-      ]
-    },
-    "Z": {
-      "value": 6,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        1,
-        5,
-        9,
-        13,
-        15
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@mathysrennela"
-    ],
-    "construction": "Reconstructed from qecdb.org record 670522be19cca60cf657a912 (https://qecdb.org/codes/670522be19cca60cf657a912); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: none; database distance claim d=6 (lower 6, upper 6).",
-    "origin": "submission",
-    "date": "2026-09-27",
-    "model": "Mimo-V2.6-Free",
-    "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
-  },
-  "family": "other"
+  "Z": {
+   "value": 6,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1,
+    5,
+    9,
+    13,
+    15
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Reconstructed from qecdb.org record 670522be19cca60cf657a912 (https://qecdb.org/codes/670522be19cca60cf657a912); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: none; database distance claim d=6 (lower 6, upper 6).",
+  "origin": "submission",
+  "date": "2026-09-27",
+  "model": "Mimo-V2.6-Free",
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 4.0,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

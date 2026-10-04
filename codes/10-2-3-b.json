@@ -1,93 +1,146 @@
 {
-  "schema_version": "0.1",
-  "name": "[[10,2,3]]",
-  "code_type": "CSS",
-  "n": 10,
-  "k": 2,
-  "checks": {
-    "X": [
-      [
-        0,
-        1,
-        3,
-        4
-      ],
-      [
-        0,
-        2,
-        5,
-        9
-      ],
-      [
-        4,
-        5,
-        7,
-        8
-      ],
-      [
-        1,
-        2,
-        6,
-        7
-      ]
-    ],
-    "Z": [
-      [
-        1,
-        2,
-        4,
-        5
-      ],
-      [
-        3,
-        4,
-        6,
-        7
-      ],
-      [
-        0,
-        3,
-        5,
-        8
-      ],
-      [
-        2,
-        7,
-        8,
-        9
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[10,2,3]]",
+ "code_type": "CSS",
+ "n": 10,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    3,
+    4
+   ],
+   [
+    0,
+    2,
+    5,
+    9
+   ],
+   [
+    4,
+    5,
+    7,
+    8
+   ],
+   [
+    1,
+    2,
+    6,
+    7
+   ]
+  ],
+  "Z": [
+   [
+    1,
+    2,
+    4,
+    5
+   ],
+   [
+    3,
+    4,
+    6,
+    7
+   ],
+   [
+    0,
+    3,
+    5,
+    8
+   ],
+   [
+    2,
+    7,
+    8,
+    9
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    8,
+    9
+   ]
   },
-  "distance": {
-    "d": 3,
-    "X": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        8,
-        9
-      ]
-    },
-    "Z": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        5,
-        8,
-        9
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@mathysrennela"
-    ],
-    "construction": "Reconstructed from qecdb.org record 674f22cfd96c81d3c7c0bb7e (https://qecdb.org/codes/674f22cfd96c81d3c7c0bb7e); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: toric; database distance claim d=3 (lower 3, upper 3).",
-    "origin": "submission",
-    "date": "2026-09-27",
-    "model": "Mimo-V2.6-Free",
-    "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json`, a lighter-check companion to `codes/10-2-3.json` (same [[10,2,3]], max check weight 4 vs 6)."
-  },
-  "family": "topological"
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    8,
+    9
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Reconstructed from qecdb.org record 674f22cfd96c81d3c7c0bb7e (https://qecdb.org/codes/674f22cfd96c81d3c7c0bb7e); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: toric; database distance claim d=3 (lower 3, upper 3).",
+  "origin": "submission",
+  "date": "2026-09-27",
+  "model": "Mimo-V2.6-Free",
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json`, a lighter-check companion to `codes/10-2-3.json` (same [[10,2,3]], max check weight 4 vs 6)."
+ },
+ "family": "topological",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    3.0
+   ],
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    0.0,
+    4.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }

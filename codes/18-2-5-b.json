@@ -1,169 +1,254 @@
 {
-  "schema_version": "0.1",
-  "name": "[[18,2,5]]",
-  "code_type": "CSS",
-  "n": 18,
-  "k": 2,
-  "checks": {
-    "X": [
-      [
-        5,
-        6,
-        15,
-        17
-      ],
-      [
-        3,
-        4,
-        7,
-        14
-      ],
-      [
-        0,
-        9,
-        10,
-        11
-      ],
-      [
-        1,
-        2,
-        13,
-        16
-      ],
-      [
-        0,
-        4,
-        5,
-        7,
-        8,
-        9,
-        15
-      ],
-      [
-        1,
-        2,
-        4,
-        5,
-        8,
-        14,
-        17
-      ],
-      [
-        0,
-        2,
-        7,
-        8,
-        10,
-        14,
-        16
-      ],
-      [
-        0,
-        3,
-        4,
-        5,
-        11,
-        12,
-        17
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        9,
-        10,
-        11
-      ],
-      [
-        3,
-        4,
-        7,
-        14
-      ],
-      [
-        5,
-        6,
-        15,
-        17
-      ],
-      [
-        1,
-        2,
-        13,
-        16
-      ],
-      [
-        0,
-        3,
-        4,
-        5,
-        8,
-        11,
-        17
-      ],
-      [
-        2,
-        4,
-        5,
-        6,
-        7,
-        8,
-        16
-      ],
-      [
-        0,
-        2,
-        7,
-        10,
-        12,
-        14,
-        16
-      ],
-      [
-        2,
-        4,
-        8,
-        10,
-        11,
-        13,
-        14
-      ]
-    ]
+ "schema_version": "0.2",
+ "name": "[[18,2,5]]",
+ "code_type": "CSS",
+ "n": 18,
+ "k": 2,
+ "checks": {
+  "X": [
+   [
+    5,
+    6,
+    15,
+    17
+   ],
+   [
+    3,
+    4,
+    7,
+    14
+   ],
+   [
+    0,
+    9,
+    10,
+    11
+   ],
+   [
+    1,
+    2,
+    13,
+    16
+   ],
+   [
+    0,
+    4,
+    5,
+    7,
+    8,
+    9,
+    15
+   ],
+   [
+    1,
+    2,
+    4,
+    5,
+    8,
+    14,
+    17
+   ],
+   [
+    0,
+    2,
+    7,
+    8,
+    10,
+    14,
+    16
+   ],
+   [
+    0,
+    3,
+    4,
+    5,
+    11,
+    12,
+    17
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    9,
+    10,
+    11
+   ],
+   [
+    3,
+    4,
+    7,
+    14
+   ],
+   [
+    5,
+    6,
+    15,
+    17
+   ],
+   [
+    1,
+    2,
+    13,
+    16
+   ],
+   [
+    0,
+    3,
+    4,
+    5,
+    8,
+    11,
+    17
+   ],
+   [
+    2,
+    4,
+    5,
+    6,
+    7,
+    8,
+    16
+   ],
+   [
+    0,
+    2,
+    7,
+    10,
+    12,
+    14,
+    16
+   ],
+   [
+    2,
+    4,
+    8,
+    10,
+    11,
+    13,
+    14
+   ]
+  ]
+ },
+ "distance": {
+  "d": 5,
+  "X": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    8,
+    9,
+    11,
+    15
+   ]
   },
-  "distance": {
-    "d": 5,
-    "X": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        6,
-        8,
-        9,
-        11,
-        15
-      ]
-    },
-    "Z": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        1,
-        5,
-        8,
-        16,
-        17
-      ]
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@mathysrennela"
-    ],
-    "construction": "Reconstructed from qecdb.org record 6849a5e111ee4037d153b740 (https://qecdb.org/codes/6849a5e111ee4037d153b740); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: none; database distance claim d=5 (lower 5, upper 5).",
-    "origin": "submission",
-    "date": "2026-09-27",
-    "model": "Mimo-V2.6-Free",
-    "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/18-2-5-b.json`, a lighter-check companion to `codes/18-2-5.json` (same [[18,2,5]], max check weight 7 vs 8)."
-  },
-  "family": "other"
+  "Z": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    5,
+    8,
+    16,
+    17
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Reconstructed from qecdb.org record 6849a5e111ee4037d153b740 (https://qecdb.org/codes/6849a5e111ee4037d153b740); the record's H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit's random search at the trials below. Database description: none; database distance claim d=5 (lower 5, upper 5).",
+  "origin": "submission",
+  "date": "2026-09-27",
+  "model": "Mimo-V2.6-Free",
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/18-2-5-b.json`, a lighter-check companion to `codes/18-2-5.json` (same [[18,2,5]], max check weight 7 vs 8)."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    2.0
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    3.0,
+    0.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    2.0,
+    0.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@dorakingx"
+   ],
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  }
+ }
 }
