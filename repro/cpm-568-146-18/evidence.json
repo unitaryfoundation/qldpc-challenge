@@ -1,0 +1,187 @@
+{
+  "base_commit": "03109da544b960717a39cef0d38d93581f05a54f",
+  "distance_status": "upper_bound; randomized survival supplies no lower bound",
+  "matched_audit": {
+    "pair_depth": 64,
+    "threads": 4,
+    "runs": [
+      {
+        "claim": 18,
+        "entry": "codes/568-146-18.json",
+        "k": 146,
+        "n": 568,
+        "seed": 202610043,
+        "side": "X",
+        "support": [
+          50,
+          100,
+          110,
+          113,
+          173,
+          195,
+          240,
+          274,
+          275,
+          299,
+          357,
+          363,
+          410,
+          441,
+          464,
+          488,
+          504,
+          518
+        ],
+        "trials": 1000000,
+        "weight": 18
+      },
+      {
+        "claim": 14,
+        "entry": "codes/568-146-14.json",
+        "k": 146,
+        "n": 568,
+        "seed": 202610043,
+        "side": "X",
+        "support": [
+          2,
+          16,
+          49,
+          85,
+          142,
+          177,
+          208,
+          330,
+          358,
+          427,
+          455,
+          529,
+          543,
+          549
+        ],
+        "trials": 1000000,
+        "weight": 14
+      }
+    ],
+    "verdict": "both claims held at matched depth"
+  },
+  "gate": {
+    "passed": true,
+    "candidate": {
+      "n": 568,
+      "k": 146,
+      "d": 18,
+      "family": "other",
+      "weight_class": "weight-8",
+      "locality_class": "unrestricted",
+      "fingerprint": "12945cb93c0f827e",
+      "signature": "e278bb1b4fe2aa37"
+    },
+    "gates": {
+      "verify": {
+        "ok": true,
+        "failed_checks": [],
+        "weight_class": "weight-8",
+        "locality_class": "unrestricted"
+      },
+      "refute": {
+        "refuted": false,
+        "seed": 1289094777,
+        "detail": "no lighter logical in 8000 RIS trials (seed 1289094777)"
+      },
+      "dedup": {
+        "exact_duplicate_of": null,
+        "wl_equivalent_of": "568-146-14.json"
+      },
+      "novelty": {
+        "cell": [
+          "weight-8",
+          "unrestricted"
+        ],
+        "board": "CSS",
+        "board_advancing": true,
+        "dominated_by": [],
+        "advances_by": [
+          "d"
+        ],
+        "d_only_gain": true,
+        "d_only_peers": [
+          "[[568,146,14]] w=8 568-146-14.json"
+        ],
+        "literature_novelty": "unverified"
+      }
+    },
+    "labels": [
+      "possibly equivalent (same WL signature) to 568-146-14.json",
+      "advances the weight-8 x unrestricted board ONLY on d over [[568,146,14]] w=8 568-146-14.json: distance is the suspect axis; re-measure the peer and this candidate at matched depth (research/audits/leader_audit.py pair) before packaging",
+      "literature novelty UNVERIFIED"
+    ],
+    "validator": {
+      "source_sha256": "671f99a0bbe618c4331067a39651729e4a3174b6f97deb67d64e8bb7f775a8a3",
+      "seed": 1289094777
+    }
+  },
+  "novelty_check": {
+    "history_total": 9,
+    "history": [
+      {
+        "number": 146,
+        "title": "Sort the leaderboard by best kd^2/n",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/146"
+      },
+      {
+        "number": 568,
+        "title": "Share research dead ends and actionable leads",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/568"
+      },
+      {
+        "number": 2366,
+        "title": "Tag the 21 pair-partition CPM codes as pair-partition-cpm",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/2366"
+      },
+      {
+        "number": 171,
+        "title": "[[568,146,14]] pair-partition CPM CSS code",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/171"
+      },
+      {
+        "number": 2367,
+        "title": "Fail when a construction names a family its tag contradicts",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/2367"
+      },
+      {
+        "number": 428,
+        "title": "Add [[592,8,32]] non-abelian 2BGA on D148",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/pull/428"
+      },
+      {
+        "number": 1204,
+        "title": "Literature cross-check: 2 duplicate pairs, 41 submissions isomorphic to published codes, 7 frontier entries dominated by reconstructed 2BGA codes",
+        "state": "open",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/issues/1204"
+      },
+      {
+        "number": 1279,
+        "title": "A matched-baseline comparison: what is the reference code for a new-parameters entry?",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/issues/1279"
+      },
+      {
+        "number": 165,
+        "title": "Proposal: a weight-aware global figure of merit alongside per-cell kd$^2$/n",
+        "state": "closed",
+        "url": "https://github.com/unitaryfoundation/qldpc-challenge/issues/165"
+      }
+    ],
+    "author_repo_sha": "9c2a6f212025d2dc5decbf264ce2a24ba6924101",
+    "tree_truncated": false,
+    "matching_paths": [],
+    "catalogue_sha256": "625721c303b8ddd67cf3d20f28a9d8ad21f75b6acc38ca99c1888110510ada8d",
+    "catalogue_mentions_568": false
+  }
+}
