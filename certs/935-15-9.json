@@ -1,0 +1,29 @@
+{
+  "d": 9,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 15,
+  "name": "[[935,15,9]] multi-band dense-packed surface code",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 9 exists",
+      "secs": 8.3,
+      "status": "UNSAT",
+      "value": 9
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 9 exists",
+      "secs": 11.3,
+      "status": "UNSAT",
+      "value": 9
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 1800,
+  "verification": {
+    "level": "solver"
+  }
+}
