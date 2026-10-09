@@ -1,6 +1,6 @@
 {
  "schema_version": "0.4",
- "name": "[[137,1,19]]",
+ "name": "[[137,1,17]]",
  "code_type": "stabilizer",
  "n": 137,
  "k": 1,
@@ -1927,39 +1927,58 @@
   ]
  },
  "distance": {
-  "d": 19,
+  "d": 17,
   "P": {
-   "value": 19,
+   "value": 17,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     5,
-     8,
-     17,
-     34,
-     47,
-     50,
-     54,
-     56,
-     59,
-     74,
-     91,
-     98,
-     101,
-     114,
-     131
+     0,
+     18,
+     20,
+     21,
+     37,
+     38,
+     41,
+     57,
+     80,
+     96,
+     99,
+     100,
+     116,
+     117,
+     119
     ],
     "Z": [
-     3,
-     34,
-     52,
-     54,
-     74,
-     89,
-     103,
-     114,
-     131
+     18,
+     20,
+     21,
+     37,
+     38,
+     39,
+     41,
+     57,
+     80,
+     96,
+     98,
+     99,
+     100,
+     116,
+     117,
+     119
     ]
+   },
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab",
+     "@MicheldeMessieres"
+    ],
+    "date": "2026-10-09",
+    "found_at_samples": 10000,
+    "seeds": [
+     13
+    ],
+    "tool": "orbit-fold (verify/heuristic_distance.py, PR #2902)"
    }
   }
  },
@@ -1971,7 +1990,7 @@
   "origin": "submission",
   "date": "2026-10-01",
   "model": "Claude Fable 5.1",
-  "notes": "Found by a sweep of one-block palindromic cyclic codes (Camara-Ollivier-Tillich-type group-algebra code over Z_137, arXiv:quant-ph/0502086), n = 17..200, weight <= 8. Distance ladder: 300-trial Pauli-weight RIS screen, then 2 x 20,000 trials on fresh seeds (dropped 25->19). Novelty unknown: not checked against codetables.de; the dedup gate found no exact, WL-equivalent or Hadamard-image board entry. Genuinely non-CSS: a and b overlap, so every generator carries Y.",
+  "notes": "Found by a sweep of one-block palindromic cyclic codes (Camara-Ollivier-Tillich-type group-algebra code over Z_137, arXiv:quant-ph/0502086), n = 17..200, weight <= 8. Distance ladder: 300-trial Pauli-weight RIS screen, then 2 x 20,000 trials on fresh seeds (dropped 25->19). Novelty unknown: not checked against codetables.de; the dedup gate found no exact, WL-equivalent or Hadamard-image board entry. Genuinely non-CSS: a and b overlap, so every generator carries Y. Corrected to d <= 17 on 2026-10-09 by @FarLab with the orbit-fold search of PR #2902 (P: 19 -> 17; see issue #2949). The over-claim was reported by @MicheldeMessieres (issue #2899).",
   "references": [
    "arXiv:quant-ph/0502086"
   ],
