@@ -4,17 +4,10 @@ permissions:
   contents: read
   issues: write
 
-# The formal tier (issue #2511, first certificate in #2806) rests on a proof a
-# proof assistant checked, and the certificate records how to check it again:
-# repository, commit, toolchain, mathlib revision, theorem, build command.
-# verify/check_certs.py holds the certificate to its entry by hash on every
-# run, but the hash does not tell us the recipe still reaches the theorem.
-# This workflow re-runs every recorded recipe (verify/replay_formal.py) on a
-# schedule and whenever a certificate or the replayer changes, and posts one
-# line per certificate to the tracking issue (#2996) on the scheduled and
-# dispatched runs. A red run means a recipe no longer replays as recorded;
-# the certificate is not changed and nothing is re-pointed automatically
-# (issue #2955, item 1; fieldnotes/2026-10-05-formal-tier-first-replay-72-12-6.md).
+# Re-runs the build recipe recorded in every `formal` certificate
+# (verify/replay_formal.py): weekly, on dispatch, and on PRs touching certs/
+# or the replayer. Scheduled runs post one line per certificate to #2996.
+# A failure changes nothing; re-pinning is a maintainer decision (#2955).
 on:
   pull_request:
     paths:
@@ -41,9 +34,7 @@ env:
 jobs:
   replay:
     runs-on: ubuntu-latest
-    # One certificate replays in about 95 s once the mathlib cache is fetched
-    # (5 Oct fieldnote); the cache fetch and the clone dominate. The per-
-    # certificate cap is inside the script (--timeout); this is for a hang.
+    # per-certificate cap is --timeout below; this is for a hang
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4

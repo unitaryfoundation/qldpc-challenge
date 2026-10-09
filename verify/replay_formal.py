@@ -1,33 +1,16 @@
-"""Re-run the recorded recipe behind every `formal` certificate (issue #2955, item 1).
+"""Re-run the recorded recipe behind every `formal` certificate (#2955, item 1).
 
-A `formal` certificate (`certs/<slug>.json`, `verification.level == "formal"`)
-rests on a proof checked by a proof assistant, and it records exactly how to
-check it again: the repository and commit, the toolchain, the mathlib revision,
-the theorem, and the build command. `check_certs.py` holds the certificate to
-its entry by hash on every CI run, but a hash says the certificate is about the
-right code, not that the recorded recipe still reaches the theorem. Two decay
-modes are invisible to it: the pinned commit stops resolving (a fork branch is
-deleted when its upstream PR merges), or the toolchain and mathlib move and the
-file no longer builds. This script is what makes the tier a check that runs
-rather than one that was run once in a scrollback.
+A formal certificate records repo, commit, toolchain, theorem, and build
+command. check_certs.py verifies the hash binding to the entry; this script
+verifies the recipe still builds: clone, check out the commit, init LFS,
+write the recorded toolchain, run the build under a cap, report one line per
+certificate. Exit 1 if any fails. Nothing is modified.
 
-For each formal certificate: clone the recorded repo, check out the recorded
-commit, write the recorded toolchain to `lean-toolchain` if the checkout's
-differs, run the recorded `build` command verbatim under a wall-clock cap, and
-report one line per certificate. A run fails (exit 1) if any certificate's
-recipe does not replay. Nothing here changes the board or any certificate:
-a red run is information for the maintainers, who decide whether to re-pin
-the recipe (the position argued in
-fieldnotes/2026-10-05-formal-tier-first-replay-72-12-6.md) and never auto-repoint.
+    python verify/replay_formal.py --all [--timeout 1800] [--json out.json]
+    python verify/replay_formal.py 72-12-6
+    python verify/replay_formal.py --list
 
-    python verify/replay_formal.py --all                    # every formal certificate
-    python verify/replay_formal.py 72-12-6                  # named entries
-    python verify/replay_formal.py --all --timeout 1800 --json out.json
-    python verify/replay_formal.py --list                   # what would run, no cloning
-
-Requirements on the machine: git with git-lfs, and `elan` on PATH (`lake` is
-resolved through it from the recorded toolchain). Network access to the
-recorded repository and to the mathlib cache.
+Needs git with git-lfs and elan on PATH.
 """
 import argparse
 import glob
@@ -109,19 +92,13 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None):
         if rc != 0:
             result.update(status="clone_failed" if rc != "timeout" else "timeout")
         else:
-            # fetch by hash where the server allows it (GitHub does); a clone
-            # already carries every branch, so the checkout is what decides
             rc, _ = _run(f"git fetch --quiet origin {r['commit']} >/dev/null 2>&1; "
                          f"git checkout --quiet {r['commit']}", src, deadline(), log)
             if rc != 0:
                 result.update(status="checkout_failed" if rc != "timeout" else "timeout",
                               detail=f"commit {r['commit']} is not reachable from {repo}")
             else:
-                # Git LFS filters are per-machine state, not part of any recipe:
-                # without them `git lfs pull` leaves 129-byte pointer files
-                # where the stored proofs should be and the build fails on
-                # "invalid LRAT" (the decay mode of the 5 Oct fieldnote, and
-                # exactly what the first local replay of 72-12-6 hit).
+                # without LFS filters `git lfs pull` leaves pointer files
                 _run("git lfs install --local >/dev/null 2>&1 || true", src, deadline(), log)
                 tc = r.get("toolchain")
                 if tc:
