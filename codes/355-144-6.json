@@ -1,6 +1,6 @@
 {
  "schema_version": "0.4",
- "name": "[[355,144,7]] symplectic-halved CPM pair-partition fold",
+ "name": "[[355,144,6]] symplectic-halved CPM pair-partition fold",
  "code_type": "stabilizer",
  "n": 355,
  "k": 144,
@@ -3417,29 +3417,42 @@
   ]
  },
  "distance": {
-  "d": 7,
+  "d": 6,
   "P": {
-   "value": 7,
+   "value": 6,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     90,
-     129,
-     309,
-     348
+     56,
+     74,
+     181,
+     248,
+     293
     ],
     "Z": [
-     40,
-     50,
-     287,
-     348
+     56,
+     74,
+     202,
+     248,
+     293
     ]
+   },
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab"
+    ],
+    "date": "2026-10-09",
+    "found_at_samples": 10000,
+    "seeds": [
+     13
+    ],
+    "tool": "orbit-fold (verify/heuristic_distance.py, PR #2902)"
    }
   }
  },
  "provenance": {
   "construction": "Symplectic-halved CPM pair-partition code: Prop. 4 of arXiv:2609.30069. (J,L,P)=(3,10,71); the CSS parent on n_par=L*P=710 qubits has block (i,l) = C(E[i][l]) over Z_71 in H_X and D[j][l] = -E[j][sigma(l)] mod 71 in H_Z, with E = [[39, 62, 61, 1, 19, 21, 33, 15, 14, 25], [60, 27, 7, 32, 19, 15, 64, 36, 60, 25], [22, 36, 39, 43, 10, 2, 67, 30, 42, 26]] and sigma(l) = l=0->5, l=1->4, l=2->6, l=3->8, l=4->1, l=5->0, l=6->2, l=7->9, l=8->3, l=9->7 (a fixed-point-free involution of the 10 block columns). The parent is folded under pi(l,t) = (sigma(l), -t) to this general stabilizer code S = (A | B) on 355 qubits; k = n - rank S.",
-  "notes": "Fold of a halving-constrained draw; the CSS parent is the symplectic double and is submitted as its own entry. The exponent array solves the pair-partition equations E[i][u]-E[i][v] = -(E[j][sigma(u)]-E[j][sigma(v)]) in a null space of dimension 12 and was hill-climbed inside it, so the CSS condition and the halving identity cannot be broken by a move. k = 144 against the parent's 288. Equivalence to an existing entry was checked by the trusted gate (exact-duplicate and WL-equivalent both null). Literature novelty unverified. Distance is a witness-backed upper bound, not an exact certificate.",
+  "notes": "Fold of a halving-constrained draw; the CSS parent is the symplectic double and is submitted as its own entry. The exponent array solves the pair-partition equations E[i][u]-E[i][v] = -(E[j][sigma(u)]-E[j][sigma(v)]) in a null space of dimension 12 and was hill-climbed inside it, so the CSS condition and the halving identity cannot be broken by a move. k = 144 against the parent's 288. Equivalence to an existing entry was checked by the trusted gate (exact-duplicate and WL-equivalent both null). Literature novelty unverified. Distance is a witness-backed upper bound, not an exact certificate. Corrected to d <= 6 on 2026-10-09 by @FarLab with the orbit-fold search of PR #2902 (P: 7 -> 6; see issue #2949). The entry was identified in the follow-up audit on issue #2899 (2026-10-08).",
   "authors": [
    "@MathysRennela"
   ],
