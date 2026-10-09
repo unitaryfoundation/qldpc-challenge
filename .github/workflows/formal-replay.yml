@@ -1,0 +1,102 @@
+name: formal-replay
+
+permissions:
+  contents: read
+  issues: write
+
+# The formal tier (issue #2511, first certificate in #2806) rests on a proof a
+# proof assistant checked, and the certificate records how to check it again:
+# repository, commit, toolchain, mathlib revision, theorem, build command.
+# verify/check_certs.py holds the certificate to its entry by hash on every
+# run, but the hash does not tell us the recipe still reaches the theorem.
+# This workflow re-runs every recorded recipe (verify/replay_formal.py) on a
+# schedule and whenever a certificate or the replayer changes, and posts one
+# line per certificate to the tracking issue (#2996) on the scheduled and
+# dispatched runs. A red run means a recipe no longer replays as recorded;
+# the certificate is not changed and nothing is re-pointed automatically
+# (issue #2955, item 1; fieldnotes/2026-10-05-formal-tier-first-replay-72-12-6.md).
+on:
+  pull_request:
+    paths:
+      - "certs/**"
+      - "verify/replay_formal.py"
+      - ".github/workflows/formal-replay.yml"
+  schedule:
+    - cron: "0 11 * * 1"
+  workflow_dispatch:
+    inputs:
+      slugs:
+        description: "space-separated certificate slugs (default: every formal certificate)"
+        required: false
+        default: ""
+
+concurrency:
+  group: formal-replay-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TRACKING_ISSUE: "2996"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    # One certificate replays in about 95 s once the mathlib cache is fetched
+    # (5 Oct fieldnote); the cache fetch and the clone dominate. The per-
+    # certificate cap is inside the script (--timeout); this is for a hang.
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: skip when there is nothing at the formal tier
+        id: have
+        run: |
+          n=$(python3 - <<'EOF'
+          import glob, json
+          print(sum(1 for p in glob.glob("certs/*.json")
+                    if (json.load(open(p)).get("verification") or {}).get("level") == "formal"))
+          EOF
+          )
+          echo "count=$n" >> "$GITHUB_OUTPUT"
+          echo "$n formal certificate(s)"
+      - name: install elan and git-lfs
+        if: steps.have.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq git-lfs >/dev/null
+          git lfs install --skip-repo
+          curl -sSfL https://github.com/leanprover/elan/releases/latest/download/elan-x86_64-unknown-linux-gnu.tar.gz | tar xz -C /tmp
+          /tmp/elan-init -y --default-toolchain none >/dev/null
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: replay every recorded recipe
+        if: steps.have.outputs.count != '0'
+        id: replay
+        continue-on-error: true
+        run: |
+          uv run --frozen python verify/replay_formal.py --all --timeout 2400 --json formal-replay.json \
+            ${{ github.event.inputs.slugs && format('{0}', github.event.inputs.slugs) || '' }} | tee formal-replay.txt
+      - name: report to the tracking issue
+        if: steps.have.outputs.count != '0' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Replay of ${{ github.event_name == 'schedule' && 'the weekly schedule' || 'a manual dispatch' }}, run [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) at $(date -u +%Y-%m-%dT%H:%MZ), main at ${{ github.sha }}."
+            echo
+            echo '| certificate | status | seconds | repository @ commit | theorem |'
+            echo '|---|---|---|---|---|'
+            python3 - <<'EOF'
+          import json
+          for r in json.load(open("formal-replay.json")):
+              status = r["status"] + (f" ({r['detail']})" if r.get("detail") else "")
+              print(f"| `{r['slug']}` | {'ok' if r['status'] == 'ok' else '**' + status + '**'} | {r['seconds']} | {r.get('repo')} @ {str(r.get('commit'))[:12]} | {r.get('theorem')} |")
+          EOF
+            echo
+            echo "A status other than ok means the recorded recipe did not reach the theorem under the run's cap. The certificate is unchanged; re-pinning is a maintainer decision."
+          } > comment.md
+          gh issue comment "$TRACKING_ISSUE" --body-file comment.md
+      - name: fail the run if a recipe did not replay
+        if: steps.have.outputs.count != '0' && steps.replay.outcome != 'success'
+        run: |
+          echo "at least one formal certificate did not replay; see formal-replay.txt above"
+          exit 1
