@@ -1,6 +1,6 @@
 {
  "schema_version": "0.4",
- "name": "[[66,4,12]]",
+ "name": "[[66,4,11]]",
  "code_type": "stabilizer",
  "n": 66,
  "k": 4,
@@ -933,27 +933,49 @@
   ]
  },
  "distance": {
-  "d": 12,
+  "d": 11,
   "P": {
-   "value": 12,
+   "value": 11,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     4,
-     11,
-     16,
-     23,
-     28,
-     35,
-     43,
-     50,
-     55,
-     62
+     0,
+     6,
+     12,
+     18,
+     24,
+     30,
+     36,
+     42,
+     48,
+     54,
+     60
     ],
     "Z": [
-     17,
-     22
+     0,
+     6,
+     12,
+     18,
+     24,
+     30,
+     36,
+     42,
+     48,
+     54,
+     60
     ]
+   },
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab",
+     "@MicheldeMessieres"
+    ],
+    "date": "2026-10-09",
+    "found_at_samples": 10000,
+    "seeds": [
+     13
+    ],
+    "tool": "orbit-fold (verify/heuristic_distance.py, PR #2902)"
    }
   }
  },
@@ -965,7 +987,7 @@
   "origin": "submission",
   "date": "2026-09-30",
   "model": "Claude Fable 5.1",
-  "notes": "Found by a sweep of one-block palindromic cyclic codes (Camara-Ollivier-Tillich-type group-algebra code over Z_66, arXiv:quant-ph/0502086), n = 17..200, weight <= 8. Distance ladder: 300-trial Pauli-weight RIS screen, then 2 x 20,000 trials on fresh seeds (held). Novelty unknown: not checked against codetables.de; the dedup gate found no exact, WL-equivalent or Hadamard-image board entry. Genuinely non-CSS: a and b overlap, so every generator carries Y.",
+  "notes": "Found by a sweep of one-block palindromic cyclic codes (Camara-Ollivier-Tillich-type group-algebra code over Z_66, arXiv:quant-ph/0502086), n = 17..200, weight <= 8. Distance ladder: 300-trial Pauli-weight RIS screen, then 2 x 20,000 trials on fresh seeds (held). Novelty unknown: not checked against codetables.de; the dedup gate found no exact, WL-equivalent or Hadamard-image board entry. Genuinely non-CSS: a and b overlap, so every generator carries Y. Corrected to d <= 11 on 2026-10-09 by @FarLab with the orbit-fold search of PR #2902 (P: 12 -> 11; see issue #2949). The over-claim was reported by @MicheldeMessieres (issue #2899).",
   "references": [
    "arXiv:quant-ph/0502086"
   ],
