@@ -1,0 +1,23 @@
+{
+  "name": "local-sat bilayer 4x4x2 G=11 w6 t3 model 0",
+  "d": 4,
+  "sides": {
+    "X": {
+      "value": 4,
+      "exact": true,
+      "note": "no logical < 4 exists"
+    },
+    "Z": {
+      "value": 4,
+      "exact": true,
+      "note": "no logical < 4 exists"
+    }
+  },
+  "d_exact": true,
+  "solver": "scipy/HiGHS cutoff IP",
+  "tlim_per_solve": 60,
+  "verification": {
+    "level": "solver",
+    "note": "backfilled 2026-10-09 (issue #2955 item 5): a solver verdict with no proof object, as every certificate carried before #2511; proof_log upgrade via verify/proof_log_all.py"
+  }
+}

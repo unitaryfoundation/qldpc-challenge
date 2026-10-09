@@ -1,0 +1,23 @@
+{
+  "name": "local-sat 9x9 G=25 w6 t2 model 0",
+  "d": 3,
+  "sides": {
+    "X": {
+      "value": 3,
+      "exact": true,
+      "note": "no logical < 3 exists"
+    },
+    "Z": {
+      "value": 3,
+      "exact": true,
+      "note": "no logical < 3 exists"
+    }
+  },
+  "d_exact": true,
+  "solver": "scipy/HiGHS cutoff IP",
+  "tlim_per_solve": 60,
+  "verification": {
+    "level": "solver",
+    "note": "backfilled 2026-10-09 (issue #2955 item 5): a solver verdict with no proof object, as every certificate carried before #2511; proof_log upgrade via verify/proof_log_all.py"
+  }
+}

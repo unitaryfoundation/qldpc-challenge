@@ -1,0 +1,23 @@
+{
+  "name": "[[64,20,8]] depth-one universal code cons:qrm6 of Dua, Holmes, Gullans, and Albert",
+  "d": 8,
+  "sides": {
+    "X": {
+      "value": 8,
+      "exact": true,
+      "note": "no logical < 8 exists"
+    },
+    "Z": {
+      "value": 8,
+      "exact": true,
+      "note": "no logical < 8 exists"
+    }
+  },
+  "d_exact": true,
+  "solver": "scipy/HiGHS cutoff IP",
+  "tlim_per_solve": 60,
+  "verification": {
+    "level": "solver",
+    "note": "backfilled 2026-10-09 (issue #2955 item 5): a solver verdict with no proof object, as every certificate carried before #2511; proof_log upgrade via verify/proof_log_all.py"
+  }
+}

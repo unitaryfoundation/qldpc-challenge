@@ -1,0 +1,23 @@
+{
+  "name": "[[31,1,7]]",
+  "d": 7,
+  "sides": {
+    "X": {
+      "value": 7,
+      "exact": true,
+      "note": "no logical < 7 exists"
+    },
+    "Z": {
+      "value": 7,
+      "exact": true,
+      "note": "no logical < 7 exists"
+    }
+  },
+  "d_exact": true,
+  "solver": "scipy/HiGHS cutoff IP",
+  "tlim_per_solve": 60,
+  "verification": {
+    "level": "solver",
+    "note": "backfilled 2026-10-09 (issue #2955 item 5): a solver verdict with no proof object, as every certificate carried before #2511; proof_log upgrade via verify/proof_log_all.py"
+  }
+}
