@@ -43,6 +43,7 @@ Input:
 
 import argparse
 import datetime
+import glob
 import json
 import math
 import os
@@ -62,7 +63,6 @@ sys.path.insert(0, os.path.join(_ROOT, "research"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "kit"))
 
 import gf2  # noqa: E402
-import glob
 import heuristic_distance as hd  # noqa: E402
 
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body

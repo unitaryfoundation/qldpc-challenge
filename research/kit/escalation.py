@@ -357,7 +357,6 @@ def exact_first(HX, HZ, d_screened, *, tlim=EXACT_FIRST_TLIM, max_n=EXACT_FIRST_
     n = int(HX.shape[1])
     if not exact_first_applies(n, int(d_screened), max_n=max_n, max_d=max_d):
         return None
-    import os
     import sys
     vdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "verify")
     if vdir not in sys.path:
