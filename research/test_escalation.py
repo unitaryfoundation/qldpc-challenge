@@ -302,3 +302,30 @@ def test_decision_never_mutates_the_brief():
     E.apply_verdict(brief, _verdict("promote-next-rung", 0.9),
                     budget_remaining=5_000_000)
     assert brief["facts"] == before
+
+
+# -- exact before the first deep rung (issue #2955, item 5) --------------------
+
+def test_exact_first_applies_only_to_small_css_low_d():
+    from escalation import exact_first_applies
+    assert exact_first_applies(49, 4)
+    assert exact_first_applies(90, 8)
+    assert not exact_first_applies(91, 4)
+    assert not exact_first_applies(49, 9)
+    assert not exact_first_applies(49, 4, css=False)
+
+
+def test_exact_first_certifies_the_steane_code_and_passes_on_large_codes():
+    import numpy as np
+    from escalation import exact_first
+    H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+    res = exact_first(H, H, 3, tlim=30)
+    assert res is not None and res["outcome"] == "exact" and res["d_exact"]
+    assert res["sides"]["X"]["value"] == 3 and res["sides"]["X"]["exact"]
+    # a screened distance above the true one is refuted, not certified
+    res = exact_first(H, H, 4, tlim=30)
+    assert res is not None and res["outcome"] == "refuted"
+    # outside the band nothing runs
+    big = np.zeros((1, 200), dtype=np.int8)
+    big[0, :4] = 1
+    assert exact_first(big, big, 3) is None

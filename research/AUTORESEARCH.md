@@ -375,6 +375,22 @@ works from a terminal without exporting anything (`QLDPC_RUN_ID` pins it for a h
 cell name is `<weight>/<locality>`, checked against the board's own axis names — a name that is
 not a cell is refused with the valid ones rather than written as a claim nobody can find.
 
+A recipe makes the search replayable. `search.screen` takes `(spec, HX, HZ)` triples; a spec
+carrying `constructor` (`<module>.<function>` under `research/kit`) and `params` (its keyword
+arguments) is a recipe `research/kit/rebuild.py` can run, and
+`submit.write_repro_manifest(doc, slug, spec, repro_dir="repro")` turns it into the
+`repro/<slug>.json` that `qldpc reproduce --construction` re-derives the entry from
+(`repro/144-12-12.json` is the worked example). Without a recipe the manifest says
+`not_reproducible`, which is the honest default, not a failure.
+
+For a small CSS candidate (n <= 90, screened d <= 8) try `escalation.exact_first(HX, HZ, d)`
+before the first deep rung: the certifier closes those in seconds, and `d =` beats a ladder's
+`d <=`. Anything but `outcome == "exact"` leaves the ladder as it was.
+
+Before any of this, `./qldpc brief --cell <weight>/<locality> --family <tag>` prints one bounded
+snapshot: the cell's frontier and bar, what the registry says was screened for the family, what
+landed recently, and the fieldnotes that touch it (`--json` for the record).
+
 `make_submission` runs the witness search itself and records it: each side's
 `witness_provenance` carries `found_by` (the authors as `@handles`, or `found_by=` when the
 operators came from someone else), the date, `found_at_samples` and `survived_samples` equal to
@@ -570,8 +586,9 @@ should not have to re-learn.
 | `kit/coset.py` | `build_coset` + `subgroup_closure`, `left_cosets`, `normalizer` |
 | `kit/surrogate.py` | `distance_rand`, `lightest_logical` (witnesses), `mixed_volume` (k upper bound) |
 | `kit/search.py` | `screen`, `pareto_frontier`, `update_leaderboard` (the funnel) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` (all capped at check weight 8 by default), `sample_cyclic_gb` (designed k, check weight 24 to 32; section 3c) |
-| `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal` — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
-| `kit/submit.py` | `make_submission`, `save_submission`, `validate` |
+| `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
+| `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_repro_manifest` (the `repro/<slug>.json` recipe for `qldpc reproduce`) |
+| `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`) — a note to other sessions, never a lock, and never read by `verify/` |
 | `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, and the PR body from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `decoder_distance` (BP+OSD) — needs the `research` extra |

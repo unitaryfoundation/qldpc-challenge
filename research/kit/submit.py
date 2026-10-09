@@ -245,3 +245,73 @@ def save_submission(doc, path, *, on_collision="error"):
 if __name__ == "__main__":
     print("submit.py is a library; see research/test_smoke.py for end-to-end usage.",
           file=sys.stderr)
+
+
+# -- reproduction manifests for `qldpc reproduce` (#2955, item 3) --------------
+
+REPRO_MANIFEST_VERSION = "1"
+
+
+def recipe_from_spec(spec):
+    """The `{constructor, params}` recipe inside a screening spec, or None."""
+    if not isinstance(spec, dict):
+        return None
+    c, p = spec.get("constructor"), spec.get("params")
+    if not isinstance(c, str) or "." not in c or not isinstance(p, dict):
+        return None
+    return {"constructor": c, "params": p}
+
+
+def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None,
+                         budget_seconds=300, notes=""):
+    """Write <repro_dir>/<slug>.json. Construction stage runs rebuild.py with
+    the recipe from spec, or is declared not_reproducible; other stages follow
+    what the entry carries. Returns the path."""
+    import hashlib
+    recipe = recipe_from_spec(spec)
+    if recipe:
+        construction = {
+            "status": "applicable",
+            "script": "research/kit/rebuild.py",
+            "args": ["--constructor", recipe["constructor"],
+                     "--params", json.dumps(recipe["params"], separators=(",", ":"))],
+            "budget_seconds": int(budget_seconds),
+        }
+    else:
+        construction = {"status": "not_reproducible",
+                        "reason": "the spec recorded for this entry carries no "
+                                  "{constructor, params} recipe the kit can replay"}
+    circ = doc.get("circuit") or {}
+    stages = {
+        "verify": {"status": "applicable"},
+        "construction": construction,
+        "certify": {"status": "applicable", "tlim_seconds": 600} if doc.get("n", 10**9) <= 144
+        else {"status": "not_applicable", "reason": "above the certifier's demonstrated range"},
+        "circuits": {"status": "applicable"} if circ.get("d_circ")
+        else {"status": "not_applicable", "reason": "the entry has no circuit block"},
+        "ler": {"status": "applicable", "tolerance": "ci95"} if circ.get("ler")
+        else {"status": "not_applicable", "reason": "the entry has no measured rate"},
+    }
+    manifest = {
+        "manifest_version": REPRO_MANIFEST_VERSION,
+        "slug": slug,
+        "stages": stages,
+        "environment": {"extras": ["research"]},
+        "notes": notes or ("Emitted by research/kit/submit.write_repro_manifest from the "
+                           "screening spec; the construction stage replays the recipe with "
+                           "research/kit/rebuild.py and compares fingerprints."),
+    }
+    if spec is not None:
+        extra = {k: v for k, v in spec.items() if k not in ("constructor", "params")} \
+            if isinstance(spec, dict) else None
+        if extra:
+            manifest["spec_context"] = extra
+    if artifact_path and os.path.exists(artifact_path):
+        with open(artifact_path, "rb") as f:
+            manifest["artifact_sha256"] = hashlib.sha256(f.read()).hexdigest()
+    os.makedirs(repro_dir, exist_ok=True)
+    out = os.path.join(repro_dir, f"{slug}.json")
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(manifest, f, indent=2, sort_keys=True)
+        f.write("\n")
+    return out

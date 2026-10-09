@@ -44,6 +44,7 @@ See [`AGENTS.md`](AGENTS.md) for the precedence rule.
 | Have an LLM find and submit a code on your behalf | [Contribute with an LLM](CONTRIBUTING.md#contribute-with-an-llm) (a ready-to-paste prompt) |
 | Have an agent search without publishing | [`research/AUTORESEARCH.md`](research/AUTORESEARCH.md) (stage-only research workflow) |
 | See which track cells are open right now | one command: `./qldpc targets` (add `--n 200` for what a code that size needs, `--claim <cell>` to note where you are aiming) |
+| Get one snapshot of a cell before searching it | `./qldpc brief --cell weight-6/unrestricted --family <tag>`: frontier and bar, what was screened, what landed, the fieldnotes |
 | Understand the boards and the targets to beat | [`TRACKS.md`](TRACKS.md) — especially the "Reference bars" section |
 | Point a coding agent at this repo | [`AGENTS.md`](AGENTS.md) |
 

@@ -330,3 +330,49 @@ def append_journal(decision, brief, *, path):
               "facts": brief["facts"]}
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(record, sort_keys=True) + "\n")
+
+
+# -- exact before the first deep rung (#2955, item 5): the certifier takes
+# seconds for CSS codes with d <= 8 at n <= 90 (measured on #2955), so try
+# it before spending a ladder; a certificate ends the ladder, anything else
+# falls through.
+
+EXACT_FIRST_MAX_N = 90
+EXACT_FIRST_MAX_D = 8
+EXACT_FIRST_TLIM = 60.0
+
+
+def exact_first_applies(n, d, *, css=True, max_n=EXACT_FIRST_MAX_N, max_d=EXACT_FIRST_MAX_D):
+    """Whether the exact attempt is worth making before any deep rung."""
+    return bool(css) and isinstance(n, int) and isinstance(d, int) and 1 <= n <= max_n and 1 <= d <= max_d
+
+
+def exact_first(HX, HZ, d_screened, *, tlim=EXACT_FIRST_TLIM, max_n=EXACT_FIRST_MAX_N,
+                max_d=EXACT_FIRST_MAX_D):
+    """certify.certify on (HX, HZ) at d_screened when exact_first_applies,
+    else None. Adds `outcome`: exact | refuted | timeout."""
+    import numpy as np
+    HX = np.asarray(HX, dtype=np.int8)
+    HZ = np.asarray(HZ, dtype=np.int8)
+    n = int(HX.shape[1])
+    if not exact_first_applies(n, int(d_screened), max_n=max_n, max_d=max_d):
+        return None
+    import os
+    import sys
+    vdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "verify")
+    if vdir not in sys.path:
+        sys.path.insert(0, vdir)
+    from certify import certify
+    doc = {"n": n, "checks": {"X": [sorted(map(int, np.flatnonzero(r))) for r in HX],
+                               "Z": [sorted(map(int, np.flatnonzero(r))) for r in HZ]},
+           "distance": {"d": int(d_screened),
+                        "X": {"value": int(d_screened)}, "Z": {"value": int(d_screened)}}}
+    res = certify(doc, float(tlim))
+    sides = res.get("sides") or {}
+    if res.get("d_exact"):
+        res["outcome"] = "exact"
+    elif any("REFUTED" in (s.get("note") or "") for s in sides.values()):
+        res["outcome"] = "refuted"
+    else:
+        res["outcome"] = "timeout"
+    return res

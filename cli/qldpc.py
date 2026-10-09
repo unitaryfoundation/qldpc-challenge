@@ -62,6 +62,7 @@ sys.path.insert(0, os.path.join(_ROOT, "research"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "kit"))
 
 import gf2  # noqa: E402
+import glob
 import heuristic_distance as hd  # noqa: E402
 
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
@@ -1305,6 +1306,130 @@ def cmd_targets(args):
     return 0
 
 
+def _recent_code_rows(days, family):
+    """Codes added to codes/ in the last `days` days whose slug, family, or
+    name mentions `family`."""
+    r = subprocess.run(["git", "log", "--diff-filter=A", f"--since={days} days ago",
+                        "--name-only", "--pretty=format:%as", "--", "codes/"],
+                       cwd=_ROOT, capture_output=True, text=True)
+    rows, date = [], ""
+    for line in r.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if len(line) == 10 and line[4] == line[7] == "-":
+            date = line
+            continue
+        if not line.endswith(".json"):
+            continue
+        slug = os.path.splitext(os.path.basename(line))[0]
+        fam = name = ""
+        try:
+            with open(os.path.join(_ROOT, line), encoding="utf-8") as fh:
+                doc = json.load(fh)
+            fam, name = doc.get("family") or "", doc.get("name") or ""
+        except (OSError, ValueError):
+            pass
+        if family and family.lower() not in f"{slug} {fam} {name}".lower():
+            continue
+        rows.append({"date": date, "slug": slug, "family": fam, "name": name})
+    return rows
+
+
+def cmd_brief(args):
+    """One bounded snapshot before a search: the cell's frontier and bar, what
+    was screened there, what landed for the family, and the fieldnotes that
+    touch it (#2955, item 4). Composes targets, screened, recent."""
+    res = _result(args)
+    entries = _load_board_entries()
+    if not entries:
+        raise SystemExit("could not load the board; run this from a checkout")
+    by_cell = {}
+    for e in entries:
+        for cell in cells(e):
+            by_cell.setdefault(cell, []).append(e)
+    toks = [x for x in re.split(r"[/, ]+", args.cell.lower()) if x]
+
+    def matches(L, W):
+        hay = f"{L} {W} {LOCALITY_LABEL.get(L, L)} {WEIGHT_LABEL.get(W, W)}".lower()
+        return all(tok in hay for tok in toks)
+
+    def eff(e):
+        return e["k"] * e["d"] ** 2 / e["n"]
+
+    picked = [(c, v) for c, v in sorted(by_cell.items()) if matches(*c)]
+    if not picked:
+        raise SystemExit(f"no cell matched {args.cell!r}. Weight classes: "
+                         f"{sorted({c[1] for c in by_cell})}; locality classes: "
+                         f"{sorted({c[0] for c in by_cell})}")
+    fam = args.family.lower()
+    cells_out = []
+    for (L, W), peers in picked:
+        front = sorted((peers[i] for i in pareto(peers)), key=eff, reverse=True)
+        members = [e for e in peers if fam and fam in (e.get("family") or "").lower()]
+        cells_out.append({
+            "cell": f"{W}/{L}", "codes": len(peers), "nondominated": len(front),
+            "bar_kd2_over_n": round(max(eff(e) for e in peers), 3),
+            "frontier": [{"n": e["n"], "k": e["k"], "d": e["d"], "w": e["w"],
+                          "kd2_over_n": round(eff(e), 3), "slug": e.get("slug")}
+                         for e in front[:args.top]],
+            "family_codes": len(members),
+            "family_best_kd2_over_n": round(max((eff(e) for e in members), default=0.0), 3),
+        })
+    screened, quality, summaries = ([], [], 0)
+    if args.family:
+        screened, quality, summaries = screening_rows(family=args.family)
+    recent = _recent_code_rows(args.days, args.family)
+    notes = []
+    for f in sorted(glob.glob(os.path.join(_ROOT, "fieldnotes", "*.md"))):
+        if f.endswith("README.md"):
+            continue
+        title, topics = _fieldnote_meta(f)
+        hay = f"{os.path.basename(f)} {title} {' '.join(topics)}".lower()
+        if (fam and fam in hay) or any(tok in hay for tok in toks):
+            notes.append({"path": os.path.relpath(f, _ROOT), "title": title, "topics": topics})
+    claims = []
+    if hasattr(coordination, "live_claims"):
+        claims = [c for c in coordination.live_claims()
+                  if any(c.get("cell") == x["cell"] for x in cells_out)]
+    res.update(query={"cell": args.cell, "family": args.family, "days": args.days},
+               cells=cells_out, screened=screened[:args.limit], screened_total=len(screened),
+               summaries_read=summaries, screen_quality=quality,
+               recent=recent[:args.limit], recent_total=len(recent),
+               fieldnotes=notes[:args.limit], fieldnotes_total=len(notes), claims=claims)
+
+    for c in cells_out:
+        print(f"{c['cell']}: {c['codes']} codes, {c['nondominated']} nondominated, "
+              f"bar kd2/n {c['bar_kd2_over_n']}"
+              + (f"; {c['family_codes']} from {args.family}, best {c['family_best_kd2_over_n']}"
+                 if args.family else ""))
+        for e in c["frontier"]:
+            print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} kd2/n={e['kd2_over_n']}")
+        if c["nondominated"] > args.top:
+            print(f"    ... {c['nondominated'] - args.top} more nondominated")
+    for cl in claims:
+        print(f"  claimed by {cl['session_id']}"
+              + (f" ({cl['campaign']})" if cl.get("campaign") else "")
+              + f", expires {cl['expires_at']} (advisory)")
+    if args.family:
+        print(f"\nscreened, {args.family}: {len(screened)} record(s) across {summaries} "
+              f"campaign summaries" + ("" if screened else " (nothing recorded: screen before you ladder)"))
+        for r in screened[:args.limit]:
+            depth = (f"d<={r['screened_d']} at {r['trials']} trials" if r["screened_d"] is not None
+                     else "depth not recorded")
+            pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
+            print(f"    {r['campaign_id']}  {pretty or '(no params)'}  {depth}"
+                  + (f"  {r['verdict']}" if r.get("verdict") else ""))
+    print(f"\nlanded in {args.days} days" + (f" for {args.family}" if args.family else "")
+          + f": {len(recent)} code(s)")
+    for r in recent[:args.limit]:
+        print(f"    {r['date']}  {r['slug']}  {r['family']}")
+    print(f"\nfieldnotes touching this: {len(notes)}")
+    for nrow in notes[:args.limit]:
+        print(f"    {nrow['path']}  {nrow['title'][:70]}")
+    return 0
+
+
 def _claim_action(args):
     """``--claim`` / ``--release``, kept off the board path deliberately.
 
@@ -2491,6 +2616,16 @@ def main(argv=None):
                    help="print one JSON record on stdout instead of the "
                         "listing; carries the live claims as data")
     g.set_defaults(func=cmd_targets)
+
+    b = sub.add_parser("brief", help="one snapshot before a search: a cell's frontier "
+                       "and bar, what was screened there, what landed, the fieldnotes")
+    b.add_argument("--cell", required=True, help="e.g. 'weight-6/unrestricted'")
+    b.add_argument("--family", default="", help="family tag to filter screening, recent codes, and notes")
+    b.add_argument("--days", type=int, default=30, help="window for recent codes (default 30)")
+    b.add_argument("--top", type=int, default=6, help="frontier entries per cell (default 6)")
+    b.add_argument("--limit", type=int, default=8, help="rows per section (default 8)")
+    b.add_argument("--json", action="store_true", help="print one JSON record instead")
+    b.set_defaults(func=cmd_brief)
 
     args = p.parse_args(argv)
     if getattr(args, "json", False):

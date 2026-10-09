@@ -1,0 +1,39 @@
+{
+  "artifact_sha256": "3387ada7a878e6c33ffe13852f9592cec4359b6a66adfd4fb5799e80cd123f4d",
+  "environment": {
+    "extras": [
+      "research"
+    ]
+  },
+  "manifest_version": "1",
+  "notes": "Worked example of a replayable construction recipe (issue #2955, item 3): the gross code's generators as published, passed to the kit's bivariate-bicycle constructor; `qldpc reproduce 144-12-12 --construction` rebuilds the code and matches the entry's fingerprint. The other stages are declared from what the entry carries.",
+  "slug": "144-12-12",
+  "stages": {
+    "certify": {
+      "status": "applicable",
+      "tlim_seconds": 600
+    },
+    "circuits": {
+      "reason": "the entry has no circuit block",
+      "status": "not_applicable"
+    },
+    "construction": {
+      "args": [
+        "--constructor",
+        "bb.build_bb",
+        "--params",
+        "{\"l\":12,\"m\":6,\"A_terms\":[[3,0],[0,2],[0,1]],\"B_terms\":[[2,0],[1,0],[0,3]]}"
+      ],
+      "budget_seconds": 300,
+      "script": "research/kit/rebuild.py",
+      "status": "applicable"
+    },
+    "ler": {
+      "reason": "the entry has no measured rate",
+      "status": "not_applicable"
+    },
+    "verify": {
+      "status": "applicable"
+    }
+  }
+}
