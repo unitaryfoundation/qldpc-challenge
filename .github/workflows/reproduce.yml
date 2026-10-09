@@ -1,0 +1,63 @@
+name: reproduce
+
+permissions:
+  contents: read
+
+# Runs `qldpc reproduce` (verify + construction stages) for every entry
+# with a manifest in repro/: on PRs touching the kit constructors, the
+# rebuild runner, or repro/, and weekly. Receipts are non-authoritative;
+# a disagreeing stage fails the job so constructor drift shows at review.
+on:
+  pull_request:
+    paths:
+      - "research/kit/bb.py"
+      - "research/kit/group_algebra.py"
+      - "research/kit/coset.py"
+      - "research/kit/products.py"
+      - "research/kit/lp_protograph.py"
+      - "research/kit/gf2poly.py"
+      - "research/kit/rebuild.py"
+      - "research/kit/submit.py"
+      - "repro/**"
+      - ".github/workflows/reproduce.yml"
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: reproduce-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: build optional refutation accelerator
+        continue-on-error: true
+        run: make fast
+      - name: re-derive every entry that has a committed manifest
+        run: |
+          set -o pipefail
+          fails=0; n=0
+          for m in repro/*.json; do
+            [ -e "$m" ] || { echo "no manifests under repro/"; break; }
+            slug=$(basename "$m" .json)
+            [ -e "codes/$slug.json" ] || { echo "skip $slug: no such entry"; continue; }
+            n=$((n + 1))
+            echo "::group::$slug"
+            if ! uv run --frozen --extra research ./qldpc reproduce "$slug" --construction --out "receipt-$slug.json"; then
+              fails=$((fails + 1)); echo "::error::$slug: a stage disagreed; see the receipt above"
+            fi
+            echo "::endgroup::"
+          done
+          echo "$n manifest(s) run, $fails disagreed"
+          [ "$fails" -eq 0 ]
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reproduction-receipts
+          path: receipt-*.json
+          if-no-files-found: ignore
