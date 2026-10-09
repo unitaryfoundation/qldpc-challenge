@@ -117,6 +117,12 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None):
                 result.update(status="checkout_failed" if rc != "timeout" else "timeout",
                               detail=f"commit {r['commit']} is not reachable from {repo}")
             else:
+                # Git LFS filters are per-machine state, not part of any recipe:
+                # without them `git lfs pull` leaves 129-byte pointer files
+                # where the stored proofs should be and the build fails on
+                # "invalid LRAT" (the decay mode of the 5 Oct fieldnote, and
+                # exactly what the first local replay of 72-12-6 hit).
+                _run("git lfs install --local >/dev/null 2>&1 || true", src, deadline(), log)
                 tc = r.get("toolchain")
                 if tc:
                     have = ""
