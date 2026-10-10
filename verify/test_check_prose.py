@@ -1,9 +1,12 @@
 """Tests for verify/check_prose.py.
 
 Fixtures are synthetic (written to a temp tree) so the suite does not depend on
-which notes happen to be on the board; the last case pins the one behaviour that
-must hold against the real repo -- a note citing an attributed external artifact
-passes, and a note citing gitignored working output does not.
+which notes happen to be on the board. That holds for the negative cases too:
+asserting that a *real* note fails, as an earlier revision of this file did,
+makes the suite depend on a specific note staying broken, and repairing it
+turns the test red. One positive case still runs against the real repository,
+because a note citing a pinned external artifact passing is a property worth
+holding live.
 """
 import os
 import subprocess
@@ -120,7 +123,29 @@ def main():
         check("file-only problem does not blame the PR body",
               "editing the PR body" not in r.stdout)
 
-    # Against the real tree: the two behaviours the check exists to distinguish.
+        # The gitignored-output rule, end to end through the CLI. It has to run
+        # against a synthetic note: the first version asserted this on a real
+        # committed note, so repairing that note failed the suite. A check that
+        # demands a known-bad file stay bad fights the cleanup it exists to
+        # encourage.
+        dirty = os.path.join(tmp, "notes")
+        os.makedirs(dirty, exist_ok=True)
+        dirty_note = os.path.join(dirty, "9-3-3.md")
+        with open(dirty_note, "w") as f:
+            f.write("# [[9,3,3]]\n\nevidence in `research/candidates/run1/` "
+                    "see https://example.com\n")
+        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
+                            "--root", tmp, "--files", dirty_note],
+                           cwd=ROOT, capture_output=True, text=True)
+        check("a note citing gitignored output fails end to end",
+              r.returncode == 1, r.stdout.strip().splitlines()[-1:] or "")
+        check("...and names the reason",
+              "gitignored working output" in r.stdout)
+
+    # Against the real tree: a note whose citation is sound passes. The
+    # converse is not asserted against a real file -- see above; the board is
+    # expected to get cleaner over time, and the suite must not need a dirty
+    # note to stay green.
     real = os.path.join(ROOT, "notes", "300-60-14.md")
     if os.path.exists(real):
         r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
@@ -128,13 +153,6 @@ def main():
                            cwd=ROOT, capture_output=True, text=True)
         check("real note with a pinned external artifact passes",
               r.returncode == 0, r.stdout.strip().splitlines()[-1:] or "")
-
-    real = os.path.join(ROOT, "notes", "700-75-3.md")
-    if os.path.exists(real):
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--files", "notes/700-75-3.md"],
-                           cwd=ROOT, capture_output=True, text=True)
-        check("real note citing research/candidates/ fails", r.returncode == 1)
 
     print()
     if FAILURES:
