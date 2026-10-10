@@ -38,17 +38,17 @@ witness and its budget, so the evidence trail is the PR set below.
 
 | entry as filed | claimed d | found | correction | mechanism |
 |---|---:|---:|---|---|
-| [[682,182,76]], now `codes/682-182-66.json` | 76 | 66 | #1760 | exact, norm-word lift (RIS at 300M read 74) |
-| [[682,182,75]], now `codes/682-182-66-b.json` | 75 | 66 | #1771 | exact, same lift (same code up to permutation, issue #1651) |
-| [[682,172,76]] weight 32, now `codes/682-172-72.json` | 76 | 72 | #1809 | exact, single-block constituent word |
+| [[682,182,76]], now `codes/682-182-50.json` | 76 | 66 | #1760 | exact, norm-word lift (RIS at 300M read 74) |
+| [[682,182,75]], now `codes/682-182-50.json` | 75 | 66 | #1771 | exact, same lift (same code up to permutation, issue #1651) |
+| [[682,172,76]] weight 32, now `codes/682-172-50.json` | 76 | 72 | #1809 | exact, single-block constituent word |
 | [[682,140,86]], now `codes/682-140-82.json` | 86 | 82 | #1762 | sampled |
 | [[682,142,85]], now `codes/682-142-82.json` | 85 | 82 | #1763 | sampled |
-| [[640,16,88]], now `codes/640-16-52.json` | 88 | 52 | #1742 | sampled |
+| [[640,16,88]], now `codes/640-16-40.json` | 88 | 52 | #1742 | sampled |
 | [[400,12,50]], now `codes/400-12-40.json` | 50 | 40 | #1744 | sampled |
 | [[396,10,37]], now `codes/396-10-33.json` | 37 | 33 | #1743 | sampled |
-| [[600,8,96]], now `codes/600-8-92.json` | 96 | 92 | #1779 | sampled |
-| [[360,8,48]], now `codes/360-8-45.json` | 48 | 45 | #1778 | sampled |
-| [[968,18,33]], `codes/968-18-33.json` | 33 | 32 | #1852 (open) | sampled, later run at the same budget, seed 2051 |
+| [[600,8,96]], now `codes/600-8-70.json` | 96 | 92 | #1779 | sampled |
+| [[360,8,48]], now `codes/360-8-44.json` | 48 | 45 | #1778 | sampled |
+| [[968,18,33]], `codes/968-18-31.json` | 33 | 32 | #1852 (open) | sampled, later run at the same budget, seed 2051 |
 | [[390,82,32]], now `codes/390-82-31-b.json` | 32 | 31 | #1761 | exact, duplicate of [[390,82,31]] (issue #1651); RIS read 32 |
 
 The GPU also read 19 against 20 on [[562,18,20]]; PR #1731 had already
@@ -73,7 +73,7 @@ Of the four leaders the issue names for its first step: [[682,182,76]] is
 refuted to 66 exactly; [[684,14,72]] read 83, [[684,10,101]] read 108, and
 [[922,18,31]] read 33, all above the claim, so their own ladders remain the
 deepest evidence about them. [[682,172,76]] with check weight 28
-(`codes/682-172-76.json`, kd^2/n 1456.7) was in neither set; its constituent
+(`codes/682-172-52.json`, kd^2/n 1456.7) was in neither set; its constituent
 cap below is exactly 76, so the exact checks give it no slack.
 
 ## Two exact bounds
