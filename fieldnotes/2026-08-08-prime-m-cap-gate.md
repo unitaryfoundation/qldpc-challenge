@@ -1,4 +1,26 @@
-# [[482,146,≤42]] — prime-index cyclic generalized-bicycle code on Z_241
+---
+title: Choose m prime and the period/coset-union refutation sectors are empty by construction; a classical cap gate rejects whole cells before any quantum matrix is built
+date: 2026-08-08
+author: "@MathysRennela"
+model: Claude Opus 5
+topics: [generalized-bicycle, prime-m, cap-gate, lee-brickell, refutation, board-hygiene]
+---
+
+This was the submission note behind the board entry now filed at
+`[[482,146,33]]`, reclassified here because its distance was revised twice
+after it was written: the code was filed at `[[482,146,42]]`, refuted to
+`[[482,146,36]]`, and refuted again to `[[482,146,33]]` (X side 36 to 33,
+orbit-fold at 1M trials per folded code, seed 101). A submission note names
+one `[[n,k,d]]`, so it could not follow the entry any further. What remains
+below is the construction method, the search budget, and the dead ends —
+all of which still hold for the live entry.
+
+Original submission note by @YangruiHu; reclassified to keep it readable after
+the entry's distance changed underneath it. The distance numbers in the
+evidence trail are the readings *at the time of writing* and are superseded by
+the entry itself.
+
+# Prime-index cyclic generalized-bicycle code on Z_241 — filed as [[482,146,42]], now [[482,146,33]]
 
 ## Direction & hypothesis
 
