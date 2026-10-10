@@ -268,6 +268,13 @@ jobs:
       - name: certificate levels (no cert may claim evidence it lacks)
         working-directory: submitted
         run: uv run --frozen python verify/check_certs.py
+      - name: tree consistency (an artifact may not outlive its entry)
+        working-directory: submitted
+        # check_certs validates a certificate without asking whether its entry
+        # still exists, and check_prose reads only files the PR changes, so a
+        # note or cert left behind by a removal elsewhere was never seen by
+        # anything. This is the sweep that closes that gap.
+        run: uv run --frozen python verify/check_tree_consistency.py
       - name: self-tests (every verify/ and research/ test_*.py; skipped for codes-only PRs)
         if: github.event_name != 'pull_request' || steps.changes.outputs.only_codes != 'true'
         working-directory: submitted
