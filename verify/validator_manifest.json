@@ -3,7 +3,7 @@
   "files": {
     ".github/workflows/prose.yml": "29f78c591eba315576a68134bb5787debdf1d81c0c99710786953b98cf7dbfed",
     ".github/workflows/refute-weekly.yml": "885755550844b96202562607bc208d3ade890cee4d0b806332719cdf5112f22c",
-    ".github/workflows/verify.yml": "82f10609ee065a857cdbdd060c8f4c2835a04b007776086af3673ce0e0374a24",
+    ".github/workflows/verify.yml": "0acacbeeed85c9a350152b44f203441b3339d92e9ac39fbd2c7bfe0bad49c0e2",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
     "pyproject.toml": "70f8d63de7dc61577561eb8f7b92e38907110cfc4ff6fc02473eceb5ad7f921f",
     "uv.lock": "9a9e47507c05f376002b77bd4f6d43325e7df145521b6a5fcc7f12709045732d",
@@ -17,7 +17,8 @@
     "verify/check_certs.py": "5793984b2c98dc5e4b6a6e39c0ef1d67bc5d66f5811e9c28170ac50007dd38de",
     "verify/check_prose.py": "eb3adbf46a0b5113bfcb190d58e17d0ceda9a0ac1cccd3c3ad19b0671be74468",
     "verify/check_submission_scope.py": "ba5ca021ddc6d0839e940d6eaf437ef59716e72b4040db7113320e551f4bea38",
-    "verify/check_validator_integrity.py": "08376db38debf98900fa020625386a7666df36ca7d0722ee9445c170802bf783",
+    "verify/check_tree_consistency.py": "6b241bbbe7bcc842cf102c31d81133fff6a6c10128561dd125799d9de611059d",
+    "verify/check_validator_integrity.py": "7f69c3fcebe0aeb8ccb4d388a8105b589cf4b7c2522e409e41d9de49a0aac87b",
     "verify/circuit_tools.py": "eca0e30a185b1f1e44ca1240adae2604f0efc276e0c1cc08f6ea09283494769e",
     "verify/circuit_verify.py": "9190fdaa6147ea263adcf6d6d765033207ca92c891f57392896b3158f46e55eb",
     "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
