@@ -4545,6 +4545,7 @@
   ],
   "date": "2026-10-10",
   "notes": "Independent reconstruction, not a new construction. The parameters are those of the weight-8 planar tile-code family of arXiv:2504.09171 at a 16x16 lattice; the same generator call at (21,22) reproduces the board's codes/924-18-31.json check-for-check, so the family is calibrated rather than inferred. arXiv:2504.09171 reports [[512,18,19]] with d=19 stated exact, and the witness search run here did NOT reproduce that reading: it found a weight-18 Z-side logical, so this entry claims d<=18, not d<=19. That is an upper bound from an explicit witness, not an exact claim; exact certification is the maintainer-side verify/certify.py tier and is not asserted here. A sibling B-support, g={(0,1),(1,1),(2,0),(3,3)}, which the board's codes/566-18-20 records for this family, also yields n=512, k=18, w=8 on a 16x16 lattice, so two distinct codes carry these parameters; this entry's check matrices fix which one it is, and no claim is made about the other. On the Pareto frontier this entry is additive rather than displacing: nothing on the board is dominated by it, and it does not lead its cell on kd^2/n (11.39 against [[155,6,23]] at 20.48). It adds a new nondominated point at n=512, k=18, which is below every existing k=18 tile entry (n=562, n=563, n=924).",
+  "model": "Space Bunny Alpha 1.0",
   "origin": "submission",
   "search_budget": {
    "ris_trials_per_side": 1000000
