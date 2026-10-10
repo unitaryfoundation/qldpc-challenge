@@ -93,8 +93,9 @@ from surrogate import distance_rand  # noqa: E402
 # strings record THREE distinct (S_f, S_g) pairs. The A-support is NOT
 # constant across them, so a single "the family's supports" is wrong:
 #
-#   arXiv:2504.09171 B=4 tile -- S_F_TILE4 / S_G_TILE4_MAIN
+#   B=4 weight-8 tile -- S_F_TILE4 / S_G_TILE4_MAIN
 #     800-18-27 (20x20), 882-18-29 (21x21), 924-18-31 (21x22), 968-18-31 (22x22)
+#     NOT the arXiv:2504.09171 tile -- see the correction note on S_G_TILE4_MAIN.
 #   arXiv:2504.08887, square lattices -- S_F_08887 / S_G_08887
 #     288-9-6 (12x12), 450-12-6 (15x15)
 #   the "weight-8 tile" pair, non-square lattices -- S_F_W8 / S_G_W8
@@ -105,20 +106,40 @@ from surrogate import distance_rand  # noqa: E402
 # here because they are the ones a reader is most likely to sweep by mistake:
 # same function, same weight-4 or weight-8 bulk, and both reachable at a
 # lattice that yields a perfectly well-formed code that is not the entry you
-# meant. Note the papers differ -- the tile credits 2504.09171, the other two
-# 2504.08887 -- which is what makes them different pairs rather than variants
-# of this one.
+# meant. The pairs are different because their supports differ, not because
+# the papers differ.
 #
 # Each pair below reproduces every entry listed for it exactly, check matrices
 # included; see the calibration note in build_planar's docstring for the check
 # that establishes it and for why (n, k, w) cannot.
 
-#: A-support of the arXiv:2504.09171 B=4 tile, as recorded by 800-18-27,
-#: 882-18-29, 924-18-31 and 968-18-31.
+#: A-support of the B=4 weight-8 tile, as recorded by 800-18-27, 882-18-29,
+#: 924-18-31 and 968-18-31. This one IS the arXiv:2504.09171 A-support: the
+#: paper's X-tile horizontal edges are exactly {(0,0),(0,3),(2,2),(3,0)}
+#: (main.tex, \def\horizontalqubits at lines 690 and 763).
 S_F_TILE4 = ((0, 0), (0, 3), (2, 2), (3, 0))
 
 #: Its matching B-support; the same one value in all four of those entries.
+#:
+#: CORRECTION (2026-10-10). This was previously documented as "the B-support of
+#: the arXiv:2504.09171 B=4 tile". It is not. The paper's X-tile vertical edges
+#: are {(0,1),(1,0),(1,1),(3,3)} (main.tex, \def\verticalqubits at lines 691 and
+#: 764); this tuple differs from that in three of its four monomials. Measured
+#: consequence, both sides witness-validated with verify/qldpc_verify.py's own
+#: gf2 routines: S_G_TILE4_MAIN gives d <= 11 at 12x12 and d <= 18 at 16x16,
+#: where the published tile gives d <= 13 and d <= 19 -- the paper's exact
+#: [[288,18,13]] and [[512,18,19]]. So the four entries above are this repo's
+#: own constructions at the published geometry, not the published code, and a
+#: d <= 18 reading at 16x16 says nothing about the paper's d = 19.
 S_G_TILE4_MAIN = ((0, 2), (1, 3), (2, 0), (3, 3))
+
+#: The B-support the arXiv:2504.09171 B=4 weight-8 tile actually uses, paired
+#: with S_F_TILE4. Not the board's S_G_TILE4_MAIN, and not the sibling support
+#: that codes/566-18-20 and codes/578-18-20 record -- that one differs from this
+#: in the single monomial (1,0) vs (2,0), which is the "one support swap" those
+#: entries' provenance refers to. The published tile reproduces the paper's two
+#: exact distances, d <= 13 at 12x12 and d <= 19 at 16x16.
+S_G_TILE4_PUBLISHED = ((0, 1), (1, 0), (1, 1), (3, 3))
 
 #: A-support of the arXiv:2504.08887 pair (codes/288-9-6, 450-12-6). Same
 #: function and same weight-4 bulk as the tile, different paper and different
@@ -139,6 +160,8 @@ S_G_W8 = ((0, 0), (0, 1), (-1, -1), (-1, 3))
 #: Every (S_f, S_g) pair the board records for this family, as of the entries
 #: listed above. Each is verified against its own entries, not interchangeable
 #: with another: mixing two of these pairs builds a code that is on no board.
+#: S_G_TILE4_PUBLISHED is deliberately NOT here -- it is the published code, not
+#: a pair this repo has filed, so it has no board entry to be verified against.
 RECORDED_PAIRS = ((S_F_TILE4, S_G_TILE4_MAIN),
                   (S_F_08887, S_G_08887),
                   (S_F_W8, S_G_W8))
@@ -151,6 +174,13 @@ RECORDED_PAIRS = ((S_F_TILE4, S_G_TILE4_MAIN),
 # ((0,0),(1,1),(2,2),(3,3)) leaves (n, k, w) untouched and drops that to 19 of
 # 475. An assert on (n, k, w) therefore passes on the wrong code, which is the
 # exact failure this note exists to catch.
+#
+# The same trap, one level up, is what the 2026-10-10 correction above records:
+# S_G_TILE4_MAIN reproduces its four entries perfectly and is still not the
+# published tile. Distance is the only axis that told the two apart -- 18 versus
+# 19 at 16x16 -- so a generator calibrated on (n, k, w) or on check matrices
+# alone will keep calling a non-published code the published one. Calibrate
+# against a number the literature published, at a second size if you can.
 
 
 # =====================================================================
