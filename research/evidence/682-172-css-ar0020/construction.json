@@ -46,6 +46,9 @@
     "pair-audit.json": "aa1305b9927d2e9a041f1057dff71f1c47046e1f55f73f1613068523e86b72e0",
     "pair-candidate-witness.json": "7307c93f6733491928d669b714c5e1af91d70d9f06656afa551e2e4eaae97f66",
     "pair-peer-witness.json": "b2df0a511563cd6b8edc2e18614291b4f4fff6d1a66ff9e049278dd20a1b8ddc",
+    "repeat-100000-raw.json": "e1e5aedee7f0eff4c03978a30caf363aa67add421de6960d2e86cda90e42ee32",
+    "repeat-1000000-raw.json": "7876820dab598e12ad95a11e1d3729415580459c7f8a809b295034c25ac62f15",
+    "repeat-request.json": "fac90badbe93af937c5c980ddc7e4a14fd5f85efe57f9bb56545e24ff2ada052",
     "structural10000-witness.json": "982fee7589eddc9d307ae609f92d118c85f4a652c3791ee371a2d243d4d52cd4",
     "validator-verdict.json": "7cdcf291ecdc49f26781e90f2583c5657a6e3cda4657034dbd5aa0b3a1f2199b"
   },

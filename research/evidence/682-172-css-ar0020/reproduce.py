@@ -64,7 +64,8 @@ def main():
         for side, hit in raw["witnesses"].items():
             check_witness(hx, hz, side, hit["weight"], hit["support"])
             count += 1
-    for name in ("local-100000-raw.json", "local-1000000-raw.json"):
+    for name in ("local-100000-raw.json", "local-1000000-raw.json",
+                 "repeat-100000-raw.json", "repeat-1000000-raw.json"):
         raw = json.loads((HERE / name).read_text())
         check_witness(hx, hz, raw["side"], raw["weight"], raw["support"])
         count += 1
