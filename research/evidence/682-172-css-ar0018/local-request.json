@@ -1,0 +1,24 @@
+{
+  "input": "/Users/vincent.russo/Projects/genesis/wt/qldpc-publish-20261009/research/candidates/publication-20261009/degree86-asymmetric-fold-screen/ar86_0018/682-172-80-saved-operator.json",
+  "input_sha256": "2588d792eeb250149dbee828ced05cb778235ac89e55fb727e8996474b35a39c",
+  "script_sha256": "e07d7efd1c188041607f955b15db4804a5bc4dc70ae3d64468c1eaca528b23ac",
+  "runtime": {
+    "repository_commit": "c66bceb1f9b9c2dd91456c67ba6c45844932674a",
+    "native_binary_sha256": "13fb1568084b07807b30183e8782ac1a6726a0292a012b78ba0ea4f7393b8c7b",
+    "python": "3.13.15 (main, Sep  1 2026, 14:05:45) [Clang 22.1.3 ]",
+    "numpy": "2.4.6"
+  },
+  "pair_depth": 512,
+  "threads": 2,
+  "target_floor": 75,
+  "stages": [
+    {
+      "trials_requested": 100000,
+      "seed": 306190000
+    },
+    {
+      "trials_requested": 1000000,
+      "seed": 306190001
+    }
+  ]
+}

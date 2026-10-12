@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "candidate": {
+    "n": 682,
+    "k": 172,
+    "d": 76,
+    "family": "generalized-bicycle",
+    "weight_class": "weight-9plus",
+    "locality_class": "unrestricted",
+    "fingerprint": "f7930ebf3e90ed4e",
+    "signature": "092ce263c5e576a3"
+  },
+  "gates": {
+    "verify": {
+      "ok": true,
+      "failed_checks": [],
+      "weight_class": "weight-9plus",
+      "locality_class": "unrestricted"
+    },
+    "refute": {
+      "refuted": false,
+      "seed": 310618276,
+      "detail": "no lighter logical in 8000 RIS trials (seed 310618276)"
+    },
+    "dedup": {
+      "exact_duplicate_of": null,
+      "wl_equivalent_of": null
+    },
+    "novelty": {
+      "cell": [
+        "weight-9plus",
+        "unrestricted"
+      ],
+      "board": "CSS",
+      "board_advancing": true,
+      "dominated_by": [],
+      "advances_by": [
+        "d",
+        "k"
+      ],
+      "d_only_gain": false,
+      "d_only_peers": [
+        "[[682,172,50]] w=32 682-172-50.json"
+      ],
+      "literature_novelty": "unverified"
+    }
+  },
+  "labels": [
+    "advances the weight-9plus x unrestricted board on d, k; its gain over [[682,172,50]] w=32 682-172-50.json is d-only: distance is the suspect axis; re-measure the peer and this candidate at matched depth (research/audits/leader_audit.py pair) before packaging",
+    "literature novelty UNVERIFIED"
+  ],
+  "validator": {
+    "source_sha256": "671f99a0bbe618c4331067a39651729e4a3174b6f97deb67d64e8bb7f775a8a3",
+    "seed": 310618276
+  }
+}
