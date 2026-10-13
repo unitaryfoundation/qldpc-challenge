@@ -3,7 +3,7 @@
   "candidate": {
     "n": 682,
     "k": 172,
-    "d": 76,
+    "d": 75,
     "family": "generalized-bicycle",
     "weight_class": "weight-9plus",
     "locality_class": "unrestricted",
@@ -19,8 +19,8 @@
     },
     "refute": {
       "refuted": false,
-      "seed": 310618276,
-      "detail": "no lighter logical in 8000 RIS trials (seed 310618276)"
+      "seed": 310618275,
+      "detail": "no lighter logical in 8000 RIS trials (seed 310618275)"
     },
     "dedup": {
       "exact_duplicate_of": null,
@@ -51,6 +51,6 @@
   ],
   "validator": {
     "source_sha256": "671f99a0bbe618c4331067a39651729e4a3174b6f97deb67d64e8bb7f775a8a3",
-    "seed": 310618276
+    "seed": 310618275
   }
 }

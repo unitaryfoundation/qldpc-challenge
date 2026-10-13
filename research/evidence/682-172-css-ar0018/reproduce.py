@@ -33,7 +33,7 @@ def check_witness(hx, hz, side, weight, support):
 
 def main():
     recipe = json.loads((HERE / "construction.json").read_text())
-    code_path = ROOT / "codes/682-172-76.json"
+    code_path = ROOT / "codes/682-172-75.json"
     assert digest(code_path) == recipe["submitted_code_sha256"]
     for name, expected in recipe["evidence_sha256"].items():
         assert digest(HERE / name) == expected
@@ -75,6 +75,13 @@ def main():
         raw = json.loads((HERE / name).read_text())
         check_witness(hx, hz, raw["side"], raw["weight"], raw["support"])
         count += 1
+    gpu = json.loads((HERE / "gpu-quick-witness.json").read_text())
+    for side in ("X", "Z"):
+        hit = gpu[side]
+        assert hit["cpu_verified"]
+        check_witness(hx, hz, side, hit["witness_weight"],
+                      hit["operator_support"])
+        count += 1
     raw = json.loads((HERE / "pair-candidate-witness.json").read_text())
     check_witness(hx, hz, raw["side"], raw["weight"], raw["support"])
     count += 1
@@ -85,7 +92,7 @@ def main():
     count += 1
     print(json.dumps({"matrices_match_construction": True,
                       "ranks": [255, 255], "witnesses_validated": count,
-                      "distance": "d <= 76; no exact-distance certificate"}))
+                      "distance": "d <= 75; no exact-distance certificate"}))
 
 
 if __name__ == "__main__":
