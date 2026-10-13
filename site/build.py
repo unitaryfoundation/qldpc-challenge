@@ -699,6 +699,11 @@ border-radius:10px;font-size:13px;color:var(--mut)}}
 .rcwrap{{margin:26px 0 4px}}
 .rcwrap .plot{{padding:10px 12px 6px}}
 .rcsub{{font-size:13px;color:var(--mut);margin:2px 0 10px;max-width:760px}}
+/* frontier map (issue #3346): stacked under the race without JS, swapped in
+   by the Frontier mode button with it; points are SVG links */
+.rcwrap .frplot{{margin-top:8px}}
+.rcwrap .frplot a{{text-decoration:none}}
+.rcwrap .frplot circle.hit{{cursor:pointer}}
 /* phones: scroll the wide chart instead of scaling its text away */
 @media(max-width:680px){{.rcwrap .plot{{overflow-x:auto;
 -webkit-overflow-scrolling:touch}}
@@ -4064,6 +4069,16 @@ def cells_by_key(entries):
     return by_cell
 
 
+def cell_frontiers(entries):
+    """{cell key (cell_key): indices on that cell's Pareto frontier}. The one
+    per-cell frontier computation on the site: compute_records() (the star)
+    and the front page's frontier map both read it, so the map can never draw
+    a point the star does not mark (verify/board_frontier_audit.py exists
+    because hand-rolled copies of this relation drifted once)."""
+    return {key: {idxs[j] for j in pareto([entries[i] for i in idxs])}
+            for key, idxs in cells_by_key(entries).items()}
+
+
 def compute_records(entries):
     """Indices of codes on a Pareto frontier (over n, k, d, w) of any primary-track
     cell they belong to, or of the global frontier of their board. These are
@@ -4071,10 +4086,8 @@ def compute_records(entries):
     only stars where no other code in the SAME computed cell, on the same
     board (code type), beats it."""
     records = set()
-    for idxs in cells_by_key(entries).values():
-        te = [entries[i] for i in idxs]
-        for j in pareto(te):
-            records.add(idxs[j])
+    for front in cell_frontiers(entries).values():
+        records |= front
     for ct in sorted({e.get("code_type", "CSS") for e in entries}):
         idxs = [i for i, e in enumerate(entries) if e.get("code_type", "CSS") == ct]
         for j in pareto([entries[i] for i in idxs]):
@@ -4101,6 +4114,151 @@ RC_SERIES = [                       # label, weight cap, series color
     ("any w", 10**9, "#6d28d9"),    # CVD separation and contrast all pass
 ]
 
+# Frontier map (issue #3346): the records of one primary-track cell drawn at
+# (n, k), coloured by distance band. Colour is ONE hue stepped by lightness
+# (OKLCH hue 258, chroma 0.12, L 0.74 -> 0.29 in steps of 0.075), validated
+# as an ordinal ramp on the light surface: lightness monotone, every adjacent
+# step dL >= 0.06, light end 2.26:1 against the surface, hue spread 2 deg.
+# Ordering by lightness alone is what keeps the ramp readable under every
+# colour-vision deficiency -- a hue-cycled ramp would not be.
+D_BANDS = [(3, "d ≤ 3"), (5, "4–5"), (8, "6–8"), (12, "9–12"),
+           (20, "13–20"), (40, "21–40"), (10**9, "41+")]
+FR_RAMP = ["#7aacf6", "#6495dd", "#4e7ec4", "#3967ab", "#235193", "#0d3c7c",
+           "#002665"]
+# Marker radius by check weight: the cheap check is the prize, so it draws
+# the biggest dot. Weight is the cell filter and the size, never the colour
+# (cells nest, so one code sits in several weight boards at once).
+FR_RADIUS = [(4, 6.0), (6, 5.0), (8, 4.0), (10**9, 3.2)]
+FR_DEFAULT_CELL = ("unrestricted", "weight-any", "CSS")
+
+
+def d_band(d):
+    """Index of the D_BANDS band holding distance d."""
+    return next(i for i, (hi, _) in enumerate(D_BANDS) if d <= hi)
+
+
+def fr_radius(w):
+    return next(r for cap, r in FR_RADIUS if w <= cap)
+
+
+def frontier_cells(entries):
+    """The frontier map's cell list, in grid order: [(locality, weight class,
+    code type, label)] for every populated cell key, plus the index of the
+    default cell (the CSS global frontier, or the first cell when there is
+    no CSS board) and the per-entry list of cell indices on whose frontier
+    the entry sits. Membership comes from cell_frontiers(), never recomputed."""
+    fronts = cell_frontiers(entries)
+
+    def norm(key):
+        return (key[0], key[1], key[2] if len(key) == 3 else "CSS")
+
+    def order(key):
+        L, W, T = norm(key)
+        return (T != "CSS", T, LOCALITY_ORDER.index(L), WEIGHT_ORDER.index(W))
+
+    keys = sorted(fronts, key=order)
+    cells_out = []
+    for key in keys:
+        L, W, T = norm(key)
+        lab = f"{LOCALITY_LABEL[L]} · {WEIGHT_LABEL[W]}"
+        if T != "CSS":
+            lab += f" · {T}"
+        cells_out.append((L, W, T, lab))
+    # the board's global frontier: the CSS one on the main page, the one of
+    # whatever board was passed otherwise (each page charts one board)
+    default = next((i for i, c in enumerate(cells_out)
+                    if c[:3] == FR_DEFAULT_CELL), None)
+    if default is None:
+        default = next((i for i, c in enumerate(cells_out)
+                        if c[:2] == FR_DEFAULT_CELL[:2]), 0)
+    member = [[] for _ in entries]
+    for ci, key in enumerate(keys):
+        for i in fronts[key]:
+            member[i].append(ci)
+    return cells_out, default, member
+
+
+def _fr_ticks(log, lo, hi, maxv):
+    """Tick values for one frontier-map axis: 1-2-5 per decade inside the
+    log range, or a nice linear step giving at most 8 ticks."""
+    import math
+    if log:
+        return [m * 10 ** e for e in range(0, int(math.ceil(math.log10(max(maxv, 1)))) + 1)
+                for m in (1, 2, 5) if lo <= math.log10(m * 10 ** e) <= hi]
+    step = 10 ** math.floor(math.log10(max(maxv, 1) / 4))
+    for m in (1, 2, 5, 10):
+        if maxv / (step * m) <= 8:
+            step *= m
+            break
+    return list(range(0, int(maxv) + 1, int(step)))
+
+
+def frontier_map(rows, W=1040, H=400):
+    """Server render of the frontier map: the no-JS view of the default cell
+    (log-log axes, no time window). rows are the chart's per-entry data
+    dicts restricted to the cell's frontier; every point is an SVG <a> to
+    its code page, so the links work without JavaScript. The client renderer
+    (_RC_JS drawFrontier) draws every other state from the same rows."""
+    import math
+    pad_l, pad_r, pad_b, pad_t = 64, 24, 34, 14
+    nmin, nmax = min(r["n"] for r in rows), max(r["n"] for r in rows)
+    kmax = max(r["k"] for r in rows)
+    x0, x1 = math.log10(max(1, nmin)) - 0.05, math.log10(nmax) + 0.05
+    y0, y1 = -0.06, math.log10(max(2, kmax)) + 0.06
+    if x1 - x0 < 1e-9:
+        x1 = x0 + 1
+
+    def sx(n):
+        return pad_l + (math.log10(n) - x0) / (x1 - x0) * (W - pad_l - pad_r)
+
+    def sy(k):
+        return H - pad_b - (math.log10(k) - y0) / (y1 - y0) * (H - pad_t - pad_b)
+
+    grid = []
+    for t in _fr_ticks(True, x0, x1, nmax):
+        x = sx(t)
+        grid.append(f'<line x1="{x:.1f}" y1="{pad_t}" x2="{x:.1f}" y2="{H-pad_b}" '
+                    f'stroke="#eef2f7"/><text x="{x:.1f}" y="{H-pad_b+18}" '
+                    f'font-size="12" fill="#475569" text-anchor="middle">{t}</text>')
+    for t in _fr_ticks(True, y0, y1, kmax):
+        y = sy(t)
+        grid.append(f'<line x1="{pad_l}" y1="{y:.1f}" x2="{W-pad_r}" y2="{y:.1f}" '
+                    f'stroke="#eef2f7"/><text x="{pad_l-7}" y="{y:.1f}" dy="4" '
+                    f'font-size="12" fill="#475569" text-anchor="end">{t}</text>')
+    grid.append(f'<text transform="translate(14 {(pad_t+H-pad_b)/2:.0f}) rotate(-90)" '
+                'font-size="12.5" fill="#475569" text-anchor="middle">'
+                'Logical qubits (k)</text>')
+    grid.append(f'<text x="{(pad_l+W-pad_r)/2:.0f}" y="{H-2}" font-size="12.5" '
+                'fill="#475569" text-anchor="middle">Physical qubits (n)</text>')
+    pts = []
+    # big (cheap-check) dots first so the small ones stay on top
+    for r in sorted(rows, key=lambda r: (-fr_radius(r["w"]), r["d"])):
+        x, y, rad = sx(r["n"]), sy(r["k"]), fr_radius(r["w"])
+        col = FR_RAMP[d_band(r["d"])]
+        tip = (f'[[{r["n"]},{r["k"]},{r["d"]}]] · w={r["w"]} · kd²/n={r["eff"]} · '
+               f'{r["t"] or "undated"} · {"exact" if r["x"] else "upper bound"}')
+        slug = html.escape(r["slug"])
+        pts.append(f'<a href="codes/{slug}.html"><circle class=pt data-code="{slug}" '
+                   f'cx="{x:.1f}" cy="{y:.1f}" r="{rad}" fill="{col}" '
+                   'fill-opacity="0.92" stroke="#fff" stroke-width="1" '
+                   'pointer-events="none"/>'
+                   f'<circle class=hit data-code="{slug}" data-tip="{html.escape(tip)}" '
+                   f'cx="{x:.1f}" cy="{y:.1f}" r="9" fill="transparent"/></a>')
+    return (f'<svg viewBox="0 0 {W} {H}" role="img" style="width:100%;height:auto" '
+            'aria-label="Pareto-frontier records of the selected cell at (n, k), '
+            f'coloured by distance band">{"".join(grid)}{"".join(pts)}</svg>')
+
+
+def frontier_legend(count):
+    """The map's legend: the seven distance bands, the size key, the count."""
+    return ("".join(
+        f'<span class=ci data-band="{i}"><span class=cdot '
+        f'style="background:{FR_RAMP[i]}"></span>{html.escape(lab)}</span>'
+        for i, (_, lab) in enumerate(D_BANDS))
+        + '<span class=ci title="marker size: the cheaper the check, the bigger '
+          'the dot">&#9679; size = check weight (w &le; 4 largest)</span>'
+        + f'<span class=ci>{count} records</span>')
+
 
 # Client-side re-renderer for the record-progress chart: modes (record / all
 # submissions / by model), log/lin scale, and time windows. The server-rendered
@@ -4109,17 +4267,33 @@ RC_SERIES = [                       # label, weight cap, series color
 _RC_JS = """<script>(function(){
 var D=JSON.parse(document.getElementById('rcdata').textContent);
 var S=JSON.parse(document.getElementById('rcseries').textContent);
+var C=JSON.parse(document.getElementById('rccells').textContent);
 var plot=document.getElementById('rcplot');if(!plot)return;
 var init=plot.innerHTML, leg=document.getElementById('rclegend'), legInit=leg.innerHTML;
+var fplot=document.getElementById('frplot'),fleg=document.getElementById('frlegend'),fsub=document.getElementById('frsub');
 var MC=['#6d28d9','#0369a1','#b45309','#15803d','#be185d','#475569'];
-var st={m:'record',s:'log',w:'all',y:'eff'};
+// frontier map: same ramp / bands / radii as the server render (FR_RAMP, D_BANDS, FR_RADIUS)
+var RAMP=C.ramp,BANDS=C.bands,RAD=C.radius;
+function band(d){for(var i=0;i<BANDS.length;i++)if(d<=BANDS[i][0])return i;return BANDS.length-1;}
+function rad(w){for(var i=0;i<RAD.length;i++)if(w<=RAD[i][0])return RAD[i][1];return RAD[RAD.length-1][1];}
+var st={m:'record',s:'log',w:'all',y:'eff',l:C.def[0],c:C.def[1],t:C.def[2]};
+function setView(fr){
+ plot.style.display=fr?'none':'';leg.style.display=fr?'none':'';
+ fplot.style.display=fr?'':'none';fleg.style.display=fr?'':'none';if(fsub)fsub.style.display=fr?'':'none';
+ document.querySelectorAll('.rcfr').forEach(function(g){g.style.display=fr?'':'none';});
+ var yg=document.getElementById('rcygroup');if(yg)yg.style.display=fr?'none':'';
+}
 function esc(v){return String(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function mv(r){return st.y==='geo'?r.geo:r.eff;}
 function days(t){return Date.parse(t)/864e5;}
+function newest(){return Math.max.apply(null,D.filter(function(r){return r.t;}).map(function(r){return days(r.t);}));}
 function windowed(){
- if(st.w==='all')return D.slice();
- var now=Math.max.apply(null,D.map(function(r){return days(r.t);}));
- return D.filter(function(r){return now-days(r.t)<=+st.w;});
+ // the race is a time series: undated entries (none on the current board, but
+ // allowed) have no place on it; the frontier map draws them undimmed
+ var R=D.filter(function(r){return r.t;});
+ if(st.w==='all')return R;
+ var now=newest();
+ return R.filter(function(r){return now-days(r.t)<=+st.w;});
 }
 function runbest(rows){
  rows=rows.slice().sort(function(a,b){return a.t<b.t?-1:a.t>b.t?1:mv(a)-mv(b);});
@@ -4127,7 +4301,44 @@ function runbest(rows){
  rows.forEach(function(r){if(mv(r)>best){best=mv(r);out.push(r);}});
  return out;
 }
+function drawFrontier(){
+ var ci=-1;C.cells.forEach(function(c,i){if(c[0]===st.l&&c[1]===st.c&&c[2]===st.t)ci=i;});
+ var rows=D.filter(function(r){return r.fr.indexOf(ci)>=0;});
+ if(!rows.length){fplot.innerHTML='<div style="padding:40px;color:#64748b">no codes in this cell</div>';fleg.innerHTML='';return;}
+ var W=1040,H=400,pl=64,pr=24,pb=34,pt=14,lg=st.s==='log';
+ var ns=rows.map(function(r){return r.n;}),nmin=Math.min.apply(null,ns),nmax=Math.max.apply(null,ns);
+ var kmax=Math.max.apply(null,rows.map(function(r){return r.k;}));
+ var x0=lg?Math.log10(Math.max(1,nmin))-0.05:0,x1=lg?Math.log10(nmax)+0.05:nmax*1.04;
+ var y0=lg?-0.06:0,y1=lg?Math.log10(Math.max(2,kmax))+0.06:kmax*1.06;
+ if(x1-x0<1e-9)x1=x0+1;if(y1-y0<1e-9)y1=y0+1;
+ function fx(n){var v=lg?Math.log10(n):n;return pl+(v-x0)/(x1-x0)*(W-pl-pr);}
+ function fy(k){var v=lg?Math.log10(k):k;return H-pb-(v-y0)/(y1-y0)*(H-pt-pb);}
+ function ticks(lo,hi,maxv){var o=[];
+  if(lg){for(var e=0;e<=Math.ceil(Math.log10(Math.max(maxv,1)));e++)[1,2,5].forEach(function(m){var t=m*Math.pow(10,e),l=Math.log10(t);if(l>=lo&&l<=hi)o.push(t);});}
+  else{var s=Math.pow(10,Math.floor(Math.log10(Math.max(maxv,1)/4)));[1,2,5,10].some(function(m){if(maxv/(s*m)<=8){s*=m;return true;}});for(var v=0;v<=maxv;v+=s)o.push(v);}
+  return o;}
+ var g='';
+ ticks(x0,x1,nmax).forEach(function(t){var x=fx(t);g+='<line x1="'+x+'" y1="'+pt+'" x2="'+x+'" y2="'+(H-pb)+'" stroke="#eef2f7"/><text x="'+x+'" y="'+(H-pb+18)+'" font-size="12" fill="#475569" text-anchor="middle">'+t+'</text>';});
+ ticks(y0,y1,kmax).forEach(function(t){if(lg&&t<1)return;var y=fy(t);g+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#eef2f7"/><text x="'+(pl-7)+'" y="'+y+'" dy="4" font-size="12" fill="#475569" text-anchor="end">'+t+'</text>';});
+ g+='<text transform="translate(14 '+((pt+H-pb)/2)+') rotate(-90)" font-size="12.5" fill="#475569" text-anchor="middle">Logical qubits (k)</text>';
+ g+='<text x="'+((pl+W-pr)/2)+'" y="'+(H-2)+'" font-size="12.5" fill="#475569" text-anchor="middle">Physical qubits (n)</text>';
+ var now=st.w==='all'?0:newest(),body='';
+ // big (cheap-check) dots first so the small ones stay on top
+ rows.slice().sort(function(a,b){return rad(b.w)-rad(a.w)||a.d-b.d;}).forEach(function(r){
+  var x=fx(r.n),y=fy(r.k),rr=rad(r.w),col=RAMP[band(r.d)];
+  var dim=st.w!=='all'&&!(r.t&&now-days(r.t)<=+st.w);
+  var tp=esc('[['+r.n+','+r.k+','+r.d+']] · w='+r.w+' · kd²/n='+r.eff+' · '+(r.t||'undated')+' · '+(r.x?'exact':'upper bound'));
+  body+='<a href="codes/'+esc(r.slug)+'.html"><circle class=pt data-code="'+esc(r.slug)+'" cx="'+x+'" cy="'+y+'" r="'+rr+'" fill="'+col+'" fill-opacity="'+(dim?0.18:0.92)+'" stroke="#fff" stroke-width="1" pointer-events="none"/>'
+   +'<circle class=hit data-code="'+esc(r.slug)+'" data-tip="'+tp+'" cx="'+x+'" cy="'+y+'" r="9" fill="transparent"/></a>';});
+ fplot.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" role="img" aria-label="Pareto-frontier records of the selected cell at (n, k), coloured by distance band">'+g+body+'</svg>';
+ var L=BANDS.map(function(b,i){return '<span class=ci data-band="'+i+'"><span class=cdot style="background:'+RAMP[i]+'"></span>'+esc(b[1])+'</span>';}).join('');
+ L+='<span class=ci title="marker size: the cheaper the check, the bigger the dot">&#9679; size = check weight (w &le; 4 largest)</span>';
+ if(st.w!=='all')L+='<span class=ci>dimmed = added more than '+st.w+' days ago</span>';
+ fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>';
+}
 function draw(){
+ if(st.m==='frontier'){setView(true);drawFrontier();return;}
+ setView(false);
  if(st.m==='record'&&st.s==='log'&&st.w==='all'&&st.y==='eff'){plot.innerHTML=init;leg.innerHTML=legInit;return;}
  var W=1040,H=300,pl=64,pr=(st.m==='model'?182:118),pb=30,pt=14;
  var data=windowed(); if(st.m!=='record')data=data.filter(function(r){return r.sub;});
@@ -4221,10 +4432,13 @@ function draw(){
 }
 document.querySelectorAll('.rcbtn').forEach(function(b){
  b.addEventListener('click',function(){
-  var k=b.dataset.m?'m':(b.dataset.s?'s':(b.dataset.y?'y':'w'));
-  st[k]=b.dataset.m||b.dataset.s||b.dataset.y||b.dataset.w;
+  // m mode / s scale / y metric / w window / l locality / c weight class / t code type
+  var k=['m','s','y','w','l','c','t'].filter(function(q){return b.dataset[q]!==undefined;})[0];
+  if(!k)return;
+  st[k]=b.dataset[k];
   b.parentElement.querySelectorAll('.rcbtn').forEach(function(x){x.classList.remove('active');});
   b.classList.add('active');draw();});});
+setView(false);
 })();</script>"""
 
 
@@ -4347,19 +4561,52 @@ def record_chart(entries):
     # Data + client-side renderer for the alternate views (all submissions,
     # per-model) and the scale/window controls; the server-rendered SVG above
     # stays as the no-JS fallback and the initial view.
+    # Every entry rides along (undated ones too: the race skips them, the
+    # frontier map draws them). fr = the cells on whose frontier the entry
+    # sits, by index into rccells -- the star's own per-cell computation, so
+    # the client never re-derives a frontier.
+    fr_cells, fr_default, fr_member = frontier_cells(entries)
     data = [{"t": e["date"], "eff": e["eff"], "geo": e["geo"], "n": e["n"],
              "k": e["k"], "d": e["d"], "w": e["w"], "slug": e["slug"],
              "model": (e["model"] or "human"),
              "ref": geo_reference(e),
-             "sub": e["origin"] != "baseline"}
-            for e in entries if e["date"]]
+             "sub": e["origin"] != "baseline",
+             "x": e["tier"] == "exact",
+             "fr": fr_member[i]}
+            for i, e in enumerate(entries)]
     rcseries = [[lab, cap, col] for lab, cap, col in RC_SERIES]
+    rccells = {"cells": [list(c) for c in fr_cells],
+               "def": list(fr_cells[fr_default][:3]) if fr_cells else list(FR_DEFAULT_CELL),
+               "ramp": FR_RAMP, "bands": [list(b) for b in D_BANDS],
+               "radius": [list(r) for r in FR_RADIUS]}
+    fr_rows = [r for r in data if fr_default in r["fr"]] if fr_cells else []
+    fr_plot = (frontier_map(fr_rows) if fr_rows else
+               '<div style="padding:40px;color:#64748b">no codes in this cell</div>')
+    fr_legend = frontier_legend(len(fr_rows))
+    dL, dW, dT = rccells["def"]
+    types = sorted({c[2] for c in fr_cells})
+
+    def cell_btns(attr, opts, label_of, cur):
+        return "".join(
+            f'<button class="rcbtn{" active" if o == cur else ""}" {attr}={o}>'
+            f'{html.escape(label_of(o))}</button>' for o in opts)
+    cell_controls = (
+        '<span class="rcgroup rcfr" style="display:none" title="locality cell">'
+        + cell_btns("data-l", LOCALITY_ORDER, lambda o: LOCALITY_LABEL[o], dL)
+        + '</span><span class="rcgroup rcfr" style="display:none" title="check-weight cell">'
+        + cell_btns("data-c", WEIGHT_ORDER, lambda o: WEIGHT_LABEL[o], dW)
+        + '</span>'
+        + ('<span class="rcgroup rcfr" style="display:none" title="board">'
+           + cell_btns("data-t", types, lambda o: o, dT) + '</span>'
+           if len(types) > 1 else ''))
     controls = (
         '<div class=rcbar>'
         '<span class=rcgroup>'
         '<button class="rcbtn active" data-m=record>Record</button>'
         '<button class=rcbtn data-m=all>All submissions</button>'
-        '<button class=rcbtn data-m=model>By model</button></span>'
+        '<button class=rcbtn data-m=model>By model</button>'
+        '<button class=rcbtn data-m=frontier title="every record of one '
+        'primary-track cell at (n, k), coloured by distance">Frontier</button></span>'
         '<span class=rcgroup>'
         '<button class="rcbtn active" data-s=log>Log</button>'
         '<button class=rcbtn data-s=lin>Lin</button></span>'
@@ -4367,10 +4614,11 @@ def record_chart(entries):
         '<button class="rcbtn active" data-w=all>All</button>'
         '<button class=rcbtn data-w=90>90D</button>'
         '<button class=rcbtn data-w=30>30D</button></span>'
+        + cell_controls +
         # metric toggle (issue #276), pinned to the right end of the bar: f is
         # defined only for codes that ship a verified layout, so that view
         # restricts to them.
-        '<span class=rcgroup style="margin-left:auto">'
+        '<span class=rcgroup id=rcygroup style="margin-left:auto">'
         '<button class="rcbtn active" data-y=eff '
         'title="operational efficiency kd&sup2;/n">kd&sup2;/n</button>'
         '<button class=rcbtn data-y=geo title="geometric efficiency '
@@ -4389,8 +4637,21 @@ def record_chart(entries):
             '<span class=ci title="board-relative: among the seeded literature '
             'baselines and challenge entries listed here">&#9675; new record'
             '</span></div>'
+            # Frontier map (issue #3346). Rendered for the default cell so it
+            # shows, below the race, without JavaScript; the script hides it
+            # behind the Frontier mode button and redraws it per cell.
+            f'<div class="plot frplot" id=frplot>{fr_plot}</div>'
+            f'<div class=chartlegend id=frlegend>{fr_legend}</div>'
+            '<p class=rcsub id=frsub>Frontier: every record of the selected '
+            'primary-track cell at (n, k) &mdash; the same per-cell Pareto '
+            'frontier over (n, k, d, w) that awards the star, not a second '
+            'computation. Colour is the distance band and size the check '
+            'weight (cheaper checks draw bigger); the time windows dim older '
+            'entries. Switch cells to see what a locality or weight class '
+            'reaches.</p>'
             + json_data_script("rcdata", data)
             + json_data_script("rcseries", rcseries)
+            + json_data_script("rccells", rccells)
             + _RC_JS +
             '</section>')
 
