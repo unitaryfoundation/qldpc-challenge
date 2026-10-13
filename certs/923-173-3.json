@@ -1,0 +1,30 @@
+{
+  "d": 3,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 173,
+  "name": "[[923,173,3]] reduction of [[925,173,3]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 3 exists",
+      "secs": 4.3,
+      "status": "UNSAT",
+      "value": 3
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 3 exists",
+      "secs": 4.5,
+      "status": "UNSAT",
+      "value": 3
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

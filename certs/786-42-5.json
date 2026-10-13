@@ -1,0 +1,30 @@
+{
+  "d": 5,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 42,
+  "name": "[[786,42,5]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 5 exists",
+      "secs": 1.9,
+      "status": "UNSAT",
+      "value": 5
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 5 exists",
+      "secs": 2.4,
+      "status": "UNSAT",
+      "value": 5
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

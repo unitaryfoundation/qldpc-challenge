@@ -1,0 +1,30 @@
+{
+  "d": 6,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 42,
+  "name": "[[249,42,6]] [[4,2,2]]-amplified [[54,21,3]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 6 exists",
+      "secs": 1.2,
+      "status": "UNSAT",
+      "value": 6
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 6 exists",
+      "secs": 1.6,
+      "status": "UNSAT",
+      "value": 6
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

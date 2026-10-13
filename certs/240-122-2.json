@@ -1,0 +1,30 @@
+{
+  "d": 2,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 122,
+  "name": "[[240,122,2]] two-block code over C60 x C2",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 2 exists",
+      "secs": 0.5,
+      "status": "UNSAT",
+      "value": 2
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 2 exists",
+      "secs": 0.3,
+      "status": "UNSAT",
+      "value": 2
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

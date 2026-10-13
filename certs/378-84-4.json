@@ -1,0 +1,30 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 84,
+  "name": "[[378,84,4]] [[4,2,2]]-amplified [[84,42,2]] 2BGA",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 0.8,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 0.6,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

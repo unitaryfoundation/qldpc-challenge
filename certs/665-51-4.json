@@ -1,0 +1,30 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 51,
+  "name": "[[665,51,4]] reduction of [[672,51,4]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 1.3,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 1.6,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

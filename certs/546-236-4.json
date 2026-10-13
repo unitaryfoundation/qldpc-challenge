@@ -1,0 +1,30 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 236,
+  "name": "[[546,236,d]], self-dual PSL(2,13) hyperbolic surface code, {7,7} tiling",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 6.3,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 6.1,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}

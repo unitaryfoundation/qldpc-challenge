@@ -1,0 +1,30 @@
+{
+  "d": 4,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 152,
+  "name": "[[360,152,<=4]] hyperbolic surface |G|=360 3\u00d74\u00d73\u00d74",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 3.5,
+      "status": "UNSAT",
+      "value": 4
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 4 exists",
+      "secs": 1.9,
+      "status": "UNSAT",
+      "value": 4
+    }
+  },
+  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 120,
+  "verification": {
+    "level": "solver",
+    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+  }
+}
