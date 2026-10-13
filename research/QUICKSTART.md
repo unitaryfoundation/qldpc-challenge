@@ -21,7 +21,9 @@ Unattended runs stage candidates in `research/candidates/` and stop there: no
 writes to `codes/`, no commits, no PRs. A human decides what lands. Several
 sessions stage there at once, so take a run directory from
 `coordination.staging_dir()` rather than writing a flat `<n>-<k>-<d>.json`
-another session is about to write too.
+another session is about to write too, and pass the name through
+`coordination.unique_path(path, doc)`: `save_submission` refuses to write over
+a different candidate, and `unique_path` gives the second one its own name.
 
 ## The loop
 
@@ -56,7 +58,7 @@ names rather than written as a claim no reader can find.
 ```python
 import sys; sys.path[:0] = ["research/kit", "verify"]
 from bb import build_bb
-from coordination import staging_dir
+from coordination import staging_dir, unique_path
 from surrogate import distance_rand
 from submit import make_submission, save_submission
 
@@ -68,8 +70,8 @@ doc = make_submission(HX, HZ, name=f"[[72,12,{d}]] my BB code",
                       construction="Bivariate bicycle on Z_6 x Z_6.",
                       authors=["your-handle"], family="bivariate-bicycle",
                       confidence="upper_bound")
-path = f"{staging_dir()}/72-12-6.json"       # research/candidates/<run_id>/...
-save_submission(doc, path)                   # refuses to clobber another session
+path = unique_path(f"{staging_dir()}/72-12-6.json", doc)   # research/candidates/<run_id>/...
+save_submission(doc, path)                   # a second [[72,12,6]] gets its own name
 print(path)
 ```
 
