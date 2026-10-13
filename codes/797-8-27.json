@@ -7362,50 +7362,53 @@
         ],
         "date": "2026-10-13",
         "found_at_samples": 200000,
-        "tool": "Clifford image of codes/798-8-27.json logical"
+        "tool": "Clifford image of codes/798-8-27.json logical",
+        "survived_samples": 50000000
       }
     },
     "Z": {
-      "value": 28,
+      "value": 27,
       "confidence": "upper_bound",
       "witness": [
-        268,
-        271,
-        273,
-        274,
-        279,
-        293,
-        297,
-        302,
-        317,
-        322,
-        323,
-        324,
-        325,
-        666,
-        667,
-        668,
-        671,
-        688,
-        690,
-        693,
-        694,
-        698,
-        699,
-        705,
-        708,
-        717,
-        722,
-        726
+        140,
+        161,
+        162,
+        181,
+        185,
+        205,
+        206,
+        207,
+        208,
+        214,
+        216,
+        229,
+        231,
+        235,
+        236,
+        557,
+        559,
+        581,
+        582,
+        605,
+        612,
+        613,
+        629,
+        630,
+        631,
+        632,
+        635
       ],
       "witness_provenance": {
         "found_by": [
-          "@dorakingx",
           "@vprusso"
         ],
         "date": "2026-10-13",
-        "found_at_samples": 4000,
-        "tool": "Clifford image of codes/798-8-27.json logical"
+        "found_at_samples": 50000000,
+        "survived_samples": 50000000,
+        "tool": "ris_gpu",
+        "seeds": [
+          4378
+        ]
       }
     }
   },
