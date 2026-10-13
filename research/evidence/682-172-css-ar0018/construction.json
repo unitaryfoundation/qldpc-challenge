@@ -45,12 +45,13 @@
     "local-request.json": "ab0d6277ae8cc7992b168862ba2aedc4e4d17f21b1009e73cd5ecc1b4ef27b41",
     "structural10000-witness.json": "3920b7ad4a69eaf801931846c116d17437e8d45fa444dc4650d61668ae055d13",
     "validator-verdict.json": "0cecae4a0093d43e32f840b9ea396400dea73251fe4e4a773129ef1af6331a64",
-    "pair-audit.json": "5da0ad340c8cc8ae625ad6d61e3e4d244e2322a5706ba6e07ac3bf5e7ccbb07c",
+    "pair-audit.json": "18d0cb4402655d0b215730b9788c0e7938bd7aada5248963a5d74f137d879ab0",
     "pair-candidate-witness.json": "836c55f4b8f344db5bc80c9499b2e090b7331d50f475cccd71d03eab9f973a50",
     "pair-peer-witness.json": "8751c8f2b73e9bf3b3c03e49153b235c67c756a8cfc9e6d5c4d6240dbefe0196",
     "repeat-100000-raw.json": "bfa1d3356feece506b70509957e4374a0eb21e6463bb94d974082a88d0dc6f9f",
     "repeat-1000000-raw.json": "d1dec1293d21b61e1954082b7a6128e9c8b66f2adc99148e7d6a06c85ae10135",
-    "repeat-request.json": "c5f320daa9f1a2c39d48d1d63348d61082ab1ba8b7d312e962d4d1d077920a84"
+    "repeat-request.json": "c5f320daa9f1a2c39d48d1d63348d61082ab1ba8b7d312e962d4d1d077920a84",
+    "pair-audited-input.json": "cc5230631f69dced0fe717d7b1226e76f440f4bc7ff2d90d24b67e08ef40d3af"
   },
   "trusted_gate_base": "70767dc9",
   "trusted_gate_seed": 310618276,

@@ -36,5 +36,6 @@
     "cpu_verified": true
   },
   "decision": "inconclusive: neither claim was reached at this depth -- no information",
-  "interpretation": "No lighter logical found for candidate d<=77 at this budget; this does not certify distance or establish a matched-depth advantage over peer."
+  "interpretation": "No lighter logical found for candidate d<=77 at this budget; this does not certify distance or establish a matched-depth advantage over peer.",
+  "audited_input_file": "pair-audited-input.json"
 }

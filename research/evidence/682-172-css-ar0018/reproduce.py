@@ -40,7 +40,9 @@ def main():
 
     code = json.loads(code_path.read_text())
     initial = json.loads((HERE / "initial-bound.json").read_text())
+    audited = json.loads((HERE / "pair-audited-input.json").read_text())
     assert verify(code)["ok"] and verify(initial)["ok"]
+    assert verify(audited)["ok"]
     m = recipe["circulant_size"]
     a, b = recipe["a"], recipe["b"]
     rows_x = [sorted([(i + q) % m for q in a]
@@ -49,6 +51,7 @@ def main():
                      + [m + (i - q) % m for q in a]) for i in range(m)]
     assert code["checks"] == {"X": rows_x, "Z": rows_z}
     assert initial["checks"] == code["checks"]
+    assert audited["checks"] == code["checks"]
     hx, hz = matrix(code, "X"), matrix(code, "Z")
     assert [rank(hx), rank(hz)] == [255, 255]
     assert code["n"] - rank(hx) - rank(hz) == code["k"] == 172
