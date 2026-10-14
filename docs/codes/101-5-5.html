@@ -127,8 +127,8 @@
 </ul>
 <h4>Reproduction</h4>
 <pre>
-python research/build_dense_surface.py 5   # writes /tmp/dense_5.npz (hx, hz, coords)
-./qldpc submit /tmp/dense_5.npz --coords /tmp/dense_5.npz --layers 1 \
+python research/build_dense_surface.py 5 dense_5.npz   # writes hx, hz, coords
+./qldpc submit dense_5.npz --coords dense_5.npz --layers 1 \
   --authors @mathysrennela --family topological
 </pre>
 <p><code>research/build_dense_surface.py</code> in this repo reproduces the matrices exactly from <code>dense_packing_simulation_x_error.py</code> (<code>five_dense_num</code>, <code>data_num</code>, <code>auxiliary_z</code> masks and diagonal-neighbour supports). The d = 7 instance: <code>python research/build_dense_surface.py 7</code>.</p></div></section>

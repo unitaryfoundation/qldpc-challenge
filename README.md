@@ -95,7 +95,7 @@ fails, nothing is written and you see exactly which check failed.
 [`CONTRIBUTING.md`](CONTRIBUTING.md) has all the flags (layouts, provenance,
 `--circuits`, `--no-circuit`, `--open-pr`) and the full walkthrough.
 
-A submission is one JSON file in `codes/`, one new code per PR. CI re-runs the
+A submission is one JSON file in `codes/` plus its note, one new code per PR and nothing else in the diff. CI re-runs the
 verifier; a green check means the code's cheap, trustless properties are
 confirmed:
 

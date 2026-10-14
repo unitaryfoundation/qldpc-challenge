@@ -17,7 +17,7 @@ tools the repo already ships:
 
 These dependencies are optional (see the ``research`` extra in pyproject.toml).
 If one is missing, the call raises a clear ImportError telling you how to get it
-(e.g. ``uv run --with ldpc python ...``). Both take raw ``(HX, HZ)`` and build
+(``uv run --extra research python ...``). Both take raw ``(HX, HZ)`` and build
 the throwaway submission doc the certifiers consume via ``submit.make_submission``.
 """
 import importlib.util
@@ -68,9 +68,9 @@ def exact_distance(HX, HZ, tlim=600, trials=4000, seed=0, d_upper=None):
         certify = _load_module(os.path.join(_VERIFY, "certify.py"), "_qldpc_certify")
     except ImportError as e:
         raise ImportError(
-            "exact_distance needs scipy (verify/certify.py). Install it, e.g. "
-            "`uv run --with scipy python your_script.py`, or add the `research` "
-            f"extra. Underlying error: {e}")
+            "exact_distance needs scipy (verify/certify.py), part of the `research` "
+            "extra: `uv run --extra research python your_script.py`. "
+            f"Underlying error: {e}")
     doc = _throwaway_doc(HX, HZ, trials, seed)
     if d_upper:
         for side, val in d_upper.items():
@@ -102,8 +102,8 @@ def sat_exact_distance(HX, HZ, tlim=600, trials=4000, seed=0, d_upper=None):
     except ImportError as e:
         raise ImportError(
             "sat_exact_distance needs pycryptosat and python-sat "
-            "(verify/sat_certify.py). Install them, e.g. `uv run --with "
-            "pycryptosat --with python-sat python your_script.py`. "
+            "(verify/sat_certify.py), part of the `research` extra: "
+            "`uv run --extra research python your_script.py`. "
             f"Underlying error: {e}")
     doc = _throwaway_doc(HX, HZ, trials, seed)
     if d_upper:
@@ -124,15 +124,15 @@ def decoder_distance(HX, HZ, trials=200000, seed=0, max_seconds=None,
     lightest nontrivial logical the decoder's residuals reveal -- an upper bound
     from a different mechanism than the linear-algebra surrogate. ``verdict`` is
     relative to a surrogate seed claim; the useful output is ``d_heuristic`` and
-    the per-side witnesses. Requires ldpc (``uv run --with ldpc ...``).
+    the per-side witnesses. Requires ldpc (``uv run --extra research ...``).
     """
     try:
         decdist = _load_module(os.path.join(_DECODE, "distance.py"), "_qldpc_decdist")
     except ImportError as e:
         raise ImportError(
-            "decoder_distance needs ldpc (decode/distance.py). Run with "
-            "`uv run --with ldpc python your_script.py`, or add the `research` "
-            f"extra. Underlying error: {e}")
+            "decoder_distance needs ldpc (decode/distance.py), part of the `research` "
+            "extra: `uv run --extra research python your_script.py`. "
+            f"Underlying error: {e}")
     doc = _throwaway_doc(HX, HZ, witness_trials, seed)
     return decdist.estimate(doc, trials=trials, seed=seed, max_seconds=max_seconds)
 

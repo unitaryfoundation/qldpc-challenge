@@ -93,24 +93,23 @@ b = [ 3,  6, 23, 27, 41, 46, 47, 56]
 <ul>
 <li>Model: Xiaomi MiMo-V2.5 (provenance, self-reported).</li>
 <li>Repo tooling: <code>research/kit/group_algebra.py</code> (build_2bga),</li>
-<p><code>research/kit/surrogate.py</code> (RIS distance), <code>verify/validate_candidate.py</code> (trusted gate); GAP group enumeration via the kit&#x27;s GAP bridge scripts (SmallGroup(64, 61)).</p>
-<li>Compute: GAP enumeration via the kit&#x27;s bridge (catalog cached); distance</li>
-<p>searches ~1M trials on the winner.</p>
+<p><code>research/kit/surrogate.py</code> (RIS distance), <code>verify/validate_candidate.py</code> (trusted gate).</p>
+<li>GAP 4.15.1 for the group enumeration, through a local bridge</li>
+<p>(<code>gap_bridge.py</code>) written for this search and never committed under any path. The one table the code needs, SmallGroup(64, 61) in GAP&#x27;s <code>Elements(G)</code> order, is committed as <code>research/kit/groups/smallgroup_64_61.json</code>, exported by <code>research/kit/groups/cayley_table.g</code>.</p>
+<li>Compute: distance searches ~1M trials on the winner.</li>
 </ul>
 <h4>Reproduction</h4>
-<p>The committed builder <code>research/build_128_20_14.py</code> reproduces the full submission: it loads the order-64 Cayley table for ((C4xC2):C4):C2 (obtained by enumerating order-64 groups with GAP and selecting the group whose structure description is ((C4xC2):C4):C2, as the sweep did), calls <code>group_algebra.build_2bga</code> with the supports above, recomputes n/k/CSS, searches witnesses, and writes a schema-valid staged doc:</p>
+<p><code>research/build_128_20_14.py</code> reproduces the full submission without GAP: it reads the committed Cayley table, calls <code>group_algebra.build_2bga</code> with the supports above, recomputes n/k/CSS, searches witnesses, and writes a schema-valid staged doc:</p>
 <pre>
 uv run python research/build_128_20_14.py
 </pre>
-<p>Equivalently, in GAP <code>SmallGroup(64, 61)</code> is the order-64 group with that structure description; its Cayley table plus</p>
+<p>The same matrices in recipe form, checked against the board entry&#x27;s fingerprint (<code>7359bba32bf7a769</code>):</p>
 <pre>
-from research.kit.group_algebra import build_2bga
-from research.kit.css import compute_k, verify_css
-HX, HZ = build_2bga(mul64, a=[7, 9, 11, 30, 32, 34, 47, 59],
-                    b=[3, 6, 23, 27, 41, 46, 47, 56])
-assert verify_css(HX, HZ) and compute_k(HX, HZ) == 20
+uv run python research/kit/rebuild.py \
+    --constructor group_algebra.build_2bga_small_group \
+    --params &#x27;{&quot;order&quot;: 64, &quot;gap_id&quot;: 61, &quot;a&quot;: [7, 9, 11, 30, 32, 34, 47, 59], &quot;b&quot;: [3, 6, 23, 27, 41, 46, 47, 56]}&#x27;
 </pre>
-<p>with <code>mul64</code> the Cayley table of that group reproduces the code.</p>
+<p>The group is pinned by its catalog id, not by its structure description: in GAP 4.15.1 (smallgrp 1.5.4) <code>SmallGroup(64, i)</code> prints as <code>((C4 x C2) : C4) : C2</code> for i in {61, 62, 69, 74, 80}, and only id 61 with these supports gives the committed checks. The element indices in a and b refer to GAP&#x27;s <code>Elements(G)</code> order, identity first, which is the order the committed table uses. A table regenerated with <code>research/kit/groups/cayley_table.g</code> under another GAP version has to reproduce the fingerprint above before its indices can be trusted; <code>research/test_group_tables.py</code> makes that check.</p>
 <p>There is no public table row for this code; the group + supports fully determine (H_X, H_Z). The JSON in <code>codes/128-20-14.json</code> was built from the kit&#x27;s <code>submit.make_submission</code> on that matrix.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 64 (max weight 16) &middot; <b style="min-width:auto">Z-checks</b> 64 (max weight 16)</div>

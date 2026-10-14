@@ -1,9 +1,9 @@
 """Tests for cli/merge_eligible_prs.py, the maintainer-only merge helper.
 
 The behaviors worth pinning are the fail-closed ones: metadata and current-head
-check requirements, overlap blocking between PRs claiming the same code record,
-the head-SHA pin on the merge command, and that comments are only ever posted
-in --merge mode.
+check requirements, the one-code-and-its-note scope, overlap blocking between
+PRs claiming the same code record, the head-SHA pin on the merge command, and
+that comments are only ever posted in --merge mode.
 """
 
 from typing import Any
@@ -192,6 +192,144 @@ def test_changed_code_paths_includes_circuit_entries_but_not_deleted_codes():
         "codes/10-2-3.json",
         "codes/30-6-7.json",
     ]
+
+
+def test_one_code_with_its_note_is_the_unit_of_auto_merge(monkeypatch):
+    assert merge_eligible_prs.too_many_codes_reason(["codes/10-2-3.json"]) is None
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-3.json", "status": "added"},
+            {"filename": "notes/10-2-3.md", "status": "added"},
+        ],
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "_read_code_document",
+        lambda _repo, _path, _sha: _code_document(),
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_check_runs",
+        lambda _repo, _sha: _successful_checks(),
+    )
+
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+
+    assert result.eligible
+    assert result.reasons == []
+
+
+def test_pr_carrying_more_than_one_code_is_blocked(monkeypatch):
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-3.json", "status": "added"},
+            {"filename": "notes/10-2-3.md", "status": "added"},
+            {"filename": "codes/20-4-5.json", "status": "added"},
+            {"filename": "notes/20-4-5.md", "status": "added"},
+        ],
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "_read_code_document",
+        lambda _repo, _path, _sha: _code_document(),
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_check_runs",
+        lambda _repo, _sha: _successful_checks(),
+    )
+
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+
+    assert not result.eligible
+    assert result.reasons == [
+        "2 code records in one PR (codes/10-2-3.json, codes/20-4-5.json); "
+        "auto-merge covers one code and its note per PR, so a maintainer reviews this one"
+    ]
+    assert result.metadata_errors == []
+    assert result.models == ["Claude Opus 5", "Claude Opus 5"]
+
+
+def test_a_second_code_reached_only_through_circuits_also_blocks(monkeypatch):
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-3.json", "status": "modified"},
+            {"filename": "circuits/20-4-5/memory_z.stim", "status": "added"},
+        ],
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "_read_code_document",
+        lambda _repo, _path, _sha: _code_document(),
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_check_runs",
+        lambda _repo, _sha: _successful_checks(),
+    )
+
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+
+    assert not result.eligible
+    assert len(result.reasons) == 1
+    assert "codes/20-4-5.json" in result.reasons[0]
+
+
+def test_blocked_batch_pr_still_reports_its_missing_metadata(monkeypatch):
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-3.json", "status": "added"},
+            {"filename": "codes/20-4-5.json", "status": "added"},
+        ],
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "_read_code_document",
+        lambda _repo, path, _sha: _code_document(model=None) if path == "codes/20-4-5.json" else _code_document(),
+    )
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_check_runs",
+        lambda _repo, _sha: _successful_checks(),
+    )
+
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+
+    assert not result.eligible
+    assert result.metadata_errors == [("codes/20-4-5.json", "missing or empty provenance.model")]
+    assert merge_eligible_prs.metadata_comment_body(result) is not None
+
+
+def test_a_batch_pr_is_never_merged(monkeypatch):
+    result = merge_eligible_prs.Evaluation(
+        17,
+        "Add two codes",
+        "",
+        "abc123",
+        reasons=[
+            "2 code records in one PR (codes/10-2-3.json, codes/20-4-5.json); "
+            "auto-merge covers one code and its note per PR, so a maintainer reviews this one"
+        ],
+    )
+    merges = []
+    monkeypatch.setattr(merge_eligible_prs, "list_open_prs", lambda _repo, _base: [_pr()])
+    monkeypatch.setattr(merge_eligible_prs, "evaluate_pr", lambda _repo, _pr, _base: result)
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "merge_pr",
+        lambda _repo, _number, _sha: merges.append(_number),
+    )
+
+    assert merge_eligible_prs.main(["--merge"]) == 0
+    assert merges == []
 
 
 def test_checks_require_success_on_the_current_head():

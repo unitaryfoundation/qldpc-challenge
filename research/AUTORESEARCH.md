@@ -20,6 +20,7 @@ research/
   kit/         the core toolkit: constructors, surrogate, search + samplers, packaging
   local2d/     open-boundary planar (2D-local) codes: builders + distance-scaling theory
   candidates/  staging area for validated finds (gitignored working output)
+  README.md    the map: every top-level script, its status, and which of two look-alikes to use
 ```
 
 For in-process imports, put `research/kit` (and `verify/`) on `sys.path`; every kit module
@@ -445,9 +446,8 @@ otherwise. `d_only_gain` means the *whole* board advance was on `d`; `d_only_pee
 the list to act on, and it is non-empty even when the candidate also beat some other
 entry on `k` (the label then still names those peers, as
 `advances the <cell> board on d, k; its gain over <peer> is d-only: ...`).
- The board has been wrong this way before (`[[882,18,30]]`→29, `[[684,12,81]]`→66,
-`[[396,10,39]]`→37 — `audits/README.md`), and chasing an inflated d is how a campaign
-ends with nothing.
+The board has been wrong this way before (the corrections are listed in
+`audits/README.md`), and chasing an inflated d is how a campaign ends with nothing.
 
 So measure both numbers at one budget before spending anything on packaging:
 
@@ -491,16 +491,23 @@ decoder_distance(HX, HZ, trials=200000)  # BP+OSD: independent upper-bound evide
 - `decoder_distance` wraps `decode/distance.py`: a *different* mechanism, so agreement is real
   corroboration.
 
-These need extra deps (`scipy`, `ldpc`): `uv run --with scipy --with ldpc python your_script.py`.
-The constructors, surrogate, search, and packaging stay numpy-only.
-
-**The `research` extra is a separate thing from those two.** Anything that touches a JSON schema —
-`kit/campaign.py` (`load_campaign`, `write_summary`) and `kit/census_css.py` — needs
-`jsonschema`, which ships in the `research` extra and not in the default one:
+Everything in `research/` that reaches past numpy runs under the `research` extra:
 
 ```
 uv run --extra research python your_script.py
 ```
+
+It installs `scipy` (the MILP behind `exact_distance`), `ldpc` (the BP+OSD
+decoder behind `decoder_distance`), `python-sat` and `pycryptosat` (the SAT
+certifier behind `sat_exact_distance` and the exact distances in
+`kit/census_css.py`), and `pynauty` (the nauty canonicalizer in
+`kit/census_css.py` and the automorphism count in `kit/supports.py`). Installing
+only `scipy` and `ldpc` by hand looks like it works and does not: the census
+then canonicalizes only through n = 6 and reports numbers that are not
+comparable with the full run, and the automorphism count falls back to a capped
+enumeration. The constructors, surrogate, search, packaging, and the campaign
+ledger need nothing beyond the default install; the ledger validates with
+`jsonschema`, which is a base dependency.
 
 That is the same invocation CI uses for the test suite. Without it `load_campaign` fails with
 `CampaignError: jsonschema is required to validate a campaign`, which reads like a broken kit
@@ -519,16 +526,12 @@ rather than a missing flag.
   The construction left `d` as the only free axis, so re-measure the peer and your candidate
   at matched depth (`leader_audit.py pair`) before you treat the gain as real.
 
-## Field notes from past campaigns
+## Field notes
 
-Operational field experience lives in [`../fieldnotes/`](../fieldnotes/) —
-PR-able entries rendered in the site's research log. The lessons that used to
-be inlined here (trial-depth floors and the distance-inflation discipline,
-lit-check timing, confirmation-budget planning, tooling landmines, and the
-2026-06→07 open-directions snapshot) were ported there on 2026-07-23. Read
-the entries touching your family before spending budget (step 0 of the
-loop), and add a fieldnote when a campaign learns something the next one
-should not have to re-learn.
+Operational field experience lives in [`../fieldnotes/`](../fieldnotes/),
+rendered in the site's research log. Read the entries touching your family
+before spending budget (step 0 of the loop), and add one when a campaign learns
+something the next one should not have to re-learn.
 
 ## Definition of done (a candidate you may surface)
 
@@ -579,10 +582,10 @@ should not have to re-learn.
 | File | What it gives you |
 |---|---|
 | `kit/css.py` | `compute_k`, `verify_css`, and the re-exported GF(2) core (`rref`, `rank`, `kernel_basis`, `logical_basis`, ...) shared with the verifier |
-| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Needs the `research` extra (it validates against `schema/campaign.schema.json`); see [`campaigns/README.md`](campaigns/README.md) |
+| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
 | `kit/gf2poly.py` | GF(2) polynomials as ints: `factor_squarefree` (x^m - 1 over GF(2), no sympy), `designed_divisor`, `sparse_multiples`, `cyclic_gb`, `designed_k`; the designed-divisor route behind `search.sample_cyclic_gb` (section 3c) |
 | `kit/bb.py` | `build_bb`, `poly_matrix`, `KNOWN` (known BB codes to start from) |
-| `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt` |
+| `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt`; `small_group` reads a committed GAP SmallGroup table from `kit/groups/` (exported by `kit/groups/cayley_table.g`), `build_2bga_small_group` is its recipe form |
 | `kit/coset.py` | `build_coset` + `subgroup_closure`, `left_cosets`, `normalizer` |
 | `kit/surrogate.py` | `distance_rand`, `lightest_logical` (witnesses), `mixed_volume` (k upper bound) |
 | `kit/search.py` | `screen`, `pareto_frontier`, `update_leaderboard` (the funnel) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` (all capped at check weight 8 by default), `sample_cyclic_gb` (designed k, check weight 24 to 32; section 3c) |

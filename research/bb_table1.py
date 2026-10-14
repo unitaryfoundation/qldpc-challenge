@@ -17,7 +17,9 @@ is what produced the submitted document, so build_from_table("128-14-12")
 regenerates codes/128-14-12.json bit-for-bit. (The other common BB form,
 [ M(c) | M(d)^T ] with [ M(d) | M(c)^T ], gives the same n, k, weight and
 distance but a differently-labelled set of qubits, so the two are not
-interchangeable when the submission is a specific matrix.)
+interchangeable when the submission is a specific matrix.) Build BB codes with
+research/kit/bb.py; this module exists to pin that convention against the
+paper's printed table and is not a second builder.
 
 The convention is pinned against the board's own baseline entry
 codes/144-12-12.json (Bravyi et al., arXiv:2308.07915; A = x^3 + y^2 + y,

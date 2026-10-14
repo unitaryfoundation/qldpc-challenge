@@ -1,0 +1,42 @@
+name: codes-format
+
+# A one-line or re-indented codes/*.json parses and verifies, so nothing
+# objected to it (PR #3413), but each later revision then diffs as one changed
+# line. Only files the PR changed are checked. Stdlib-only, seconds long.
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+
+concurrency:
+  group: codes-format-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  codes-format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: check out submitted tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: submitted
+      # The checker runs from the base branch: a PR must not be able to weaken
+      # the check that judges it.
+      - name: check out trusted tree (base branch)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          fetch-depth: 0
+          path: trusted
+      - name: codes format (board JSON is json.dumps(doc, indent=1) plus a newline)
+        working-directory: trusted
+        run: |
+          if [ -f verify/check_codes_format.py ]; then
+            python3 verify/check_codes_format.py --root ../submitted --base origin/${{ github.base_ref }}
+          else
+            echo "base branch has no verify/check_codes_format.py yet; skipping"
+          fi

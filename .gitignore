@@ -1,17 +1,44 @@
+# A policy per path, not a list of what happened to be untracked (issue #3380).
+#
+# certs/ has no rule on purpose. Every file under it is published evidence:
+# verify/certify_all.py and verify/heuristic_certify.py write there by design,
+# verify/check_certs.py refuses a certificate that claims a level it lacks, and
+# verify/check_tree_consistency.py refuses one that outlives its entry. A
+# certificate is added deliberately, in a PR; nothing under certs/ is scratch.
+
+# Python and environments
 __pycache__/
 *.pyc
 .venv*/
-_finalize.*
-*.log
-_foldcerts.*
+
 # `_`-prefixed scratch scripts (e.g. research/_find_dominators.py, verify/_sweep_ub.py)
 _*.py
+_finalize.*
+_foldcerts.*
+*.log
+
+# Working output under research/. Stage finds under research/candidates/, put
+# run output under research/out/ or research/runs/; these are the directories
+# verify/check_prose.py refuses as evidence. Anything else under research/ is
+# meant to be committed.
 research/candidates/
+research/out/
+research/runs/
+research/board*.json
 # Advisory cell claims (qldpc targets --claim): per-second, advisory, and
 # worthless once expired, so committing them would only guarantee a merge
 # conflict on every branch that claims anything.
 research/claims/
-research/board*.json
+
+# Agent-harness scaffolding: draft PR bodies and exported session transcripts.
+# AGENTS.md requires the scaffolding deleted before review, so none of it
+# belongs in the tree.
+.prs/
+.pr-body-*.md
+session-ses_*.md
+# machine-local agent configuration (absolute paths into one home directory)
+opencode.json
+
 # LaTeX build artifacts (talks/, docs/); the .tex/.bib sources and .pdf outputs are tracked
 *.aux
 *.bbl
@@ -20,9 +47,9 @@ research/board*.json
 # compiled gf2 accelerator
 *.so
 build/
+# downloaded packages
+*.deb
 # macOS folder metadata
 .DS_Store
 # conference / paper material lives outside this repo (issue #325)
 talks/
-# exported agent session transcripts (opencode dumps); local output, never an audit trail
-session-ses_*.md
