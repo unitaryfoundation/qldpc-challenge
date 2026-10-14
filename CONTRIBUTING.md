@@ -411,9 +411,13 @@ rejects the claim), put the file in `codes/`, and verify locally before the PR:
 
 ```
 uv run python verify/qldpc_verify.py codes/my-128-6-8.json
+uv run python verify/check_codes_format.py --files codes/my-128-6-8.json
 ```
 
-Exit 0 with an `earned_distance` block means it will pass CI.
+Exit 0 with an `earned_distance` block means it will pass CI. The second
+command checks the file is written the way the board keeps every entry,
+`json.dumps(doc, indent=1)` plus a newline, so later revisions diff line by
+line; `--fix` rewrites it in place.
 
 ## Confidence tiers
 

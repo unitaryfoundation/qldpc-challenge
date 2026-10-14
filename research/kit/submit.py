@@ -237,8 +237,9 @@ def save_submission(doc, path, *, on_collision="error"):
             "coordination.unique_path(path, doc), or pass "
             "on_collision='overwrite' if replacing it is what you mean.")
     errs = validate(doc)
-    with open(path, "w") as f:
-        json.dump(doc, f, indent=2)
+    # The form the board keeps and verify/check_codes_format.py enforces.
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(doc, indent=1) + "\n")
     return errs
 
 

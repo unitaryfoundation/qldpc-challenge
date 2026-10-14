@@ -1,6 +1,7 @@
 {
   "_comment": "Pinned SHA-256 of the repo-local production validation and policy-gate execution closure. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
   "files": {
+    ".github/workflows/codes-format.yml": "afef356098e073f4262954ef8ed48da156df0aed1c480c6c304f4421da81a31c",
     ".github/workflows/prose.yml": "3ddd5fd065fa22287b7666cda5ca8439a1cbc2b935bd7c40e1fa5f232dd57dee",
     ".github/workflows/refute-weekly.yml": "c57e8094b61216d07d0402df00dad729ff4fce0ad76c162b5b82ccc91a9c86b6",
     ".github/workflows/verify.yml": "dea82a871cf6b7dd656a926a1f090ed4ec5840442f23b81c635923ef117c6bad",
@@ -15,10 +16,11 @@
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
     "verify/check_authorship.py": "71f71d42e8381060b6d6adef41746fd401b98decd1ffd113b28c2a78434c4fbb",
     "verify/check_certs.py": "5793984b2c98dc5e4b6a6e39c0ef1d67bc5d66f5811e9c28170ac50007dd38de",
+    "verify/check_codes_format.py": "50d274ad20f693233c8ae6aac28e8d538767d7b0471278e0cbfa0e5e10b34811",
     "verify/check_prose.py": "eb3adbf46a0b5113bfcb190d58e17d0ceda9a0ac1cccd3c3ad19b0671be74468",
     "verify/check_submission_scope.py": "ba5ca021ddc6d0839e940d6eaf437ef59716e72b4040db7113320e551f4bea38",
     "verify/check_tree_consistency.py": "1d477721d54adcf67d86a574137801a55d01ab0bf187031c58517d8cfcda1411",
-    "verify/check_validator_integrity.py": "7f69c3fcebe0aeb8ccb4d388a8105b589cf4b7c2522e409e41d9de49a0aac87b",
+    "verify/check_validator_integrity.py": "ad111108b28444c8fa94985aaa979bba942a0712daebe950ae5bb83d37c12407",
     "verify/circuit_tools.py": "eca0e30a185b1f1e44ca1240adae2604f0efc276e0c1cc08f6ea09283494769e",
     "verify/circuit_verify.py": "9190fdaa6147ea263adcf6d6d765033207ca92c891f57392896b3158f46e55eb",
     "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
