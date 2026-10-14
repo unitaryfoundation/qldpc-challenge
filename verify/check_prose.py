@@ -27,11 +27,15 @@ nothing checked attribution; this closes that hole. Modified files are exempt
 (fixing a typo in someone else's note is fine); a missing author line fails.
 
 Only files CHANGED by the PR are checked. Notes already on the board are left
-alone; this guards what arrives from here on.
+alone; this guards what arrives from here on. `--all` sweeps every committed
+notes/ and fieldnotes/ file instead: the weekly prose-sweep workflow runs it and
+keeps a tracking issue of what no longer resolves (#3379). `--report PATH`
+writes the problems as markdown grouped by target, for that issue.
 
 Usage:
   python verify/check_prose.py [--root PATH] [--base origin/main]
                                [--body-file PATH] [--files a.md b.md]
+                               [--all] [--report PATH]
 
 The PR body is passed as a FILE, never as a command-line string: it is untrusted
 input and must not reach a shell.
@@ -200,18 +204,33 @@ def check_text(text, label, root, problems, is_note_slug=None,
 
     seen = set()
     for m in TOKEN.finditer(text):
-        tok = (m.group(1) or m.group(2) or "").strip().rstrip(".,;:)`").lstrip("(")
-        if not is_repo_pathish(tok) or tok in seen or tok in absolute:
-            continue
-        seen.add(tok)
-        bare = strip_rel_prefix(tok)
-        if any(g in bare for g in GITIGNORED):
-            add("gitignored working output cited as evidence", tok)
-        elif bare.endswith(LOG_SUFFIXES) and not resolves(tok, root, near):
-            add("raw run log cited as evidence (*.log is gitignored; promote "
-                "the lines the claim rests on into a run manifest)", tok)
-        elif not resolves(tok, root, near) and not external_ok:
-            add("path does not exist in this tree", tok)
+        span = (m.group(1) or m.group(2) or "").strip()
+        # A backticked command names its files one word at a time:
+        # `python verify/coordination.py gate x.json` claims verify/coordination.py.
+        toks = [span]
+        if m.group(1) and " " in span:
+            toks += [w for w in span.split() if strip_rel_prefix(w).startswith(TOPDIRS)]
+        for raw in toks:
+            # `file.py::func(args)` names file.py; the call is not part of the path.
+            tok = raw.strip().rstrip(".,;:)`").lstrip("(").split("(", 1)[0]
+            if not is_repo_pathish(tok) or tok in seen or tok in absolute:
+                continue
+            seen.add(tok)
+            bare = strip_rel_prefix(tok)
+            # A file under one of this repo's top-level directories claims this
+            # repo, so an external source named elsewhere in the text does not
+            # excuse it (#3379: ten notes cited research/kit/clp.py beside an
+            # arXiv link and passed). An external artifact that happens to sit
+            # under a codes/ or research/ of its own repo keeps the excuse as
+            # long as it does not carry one of this repo's file extensions.
+            claims_this_repo = bare.startswith(TOPDIRS) and bare.endswith(FILE_EXT)
+            if any(g in bare for g in GITIGNORED):
+                add("gitignored working output cited as evidence", tok)
+            elif bare.endswith(LOG_SUFFIXES) and not resolves(tok, root, near):
+                add("raw run log cited as evidence (*.log is gitignored; promote "
+                    "the lines the claim rests on into a run manifest)", tok)
+            elif not resolves(tok, root, near) and (claims_this_repo or not external_ok):
+                add("path does not exist in this tree", tok)
 
     if is_note_slug:
         n, k, d = is_note_slug
@@ -234,6 +253,32 @@ def changed_prose(base, root):
     return [f for f in out.splitlines()
             if f.endswith(".md") and (f.startswith("notes/")
                                       or f.startswith("fieldnotes/"))]
+
+
+def all_prose(root):
+    """Every committed notes/*.md and fieldnotes/*.md, or None if git failed."""
+    try:
+        out = subprocess.check_output(
+            ["git", "ls-files", "--", "notes", "fieldnotes"], cwd=root, text=True)
+    except Exception as e:
+        print(f"could not list committed prose: {e}; failing closed")
+        return None
+    return [f for f in out.splitlines() if f.endswith(".md")]
+
+
+def write_report(problems, nfiles, path):
+    """Write the problems as markdown grouped by (kind, target), largest group first."""
+    groups = {}
+    for label, why, detail in problems:
+        groups.setdefault((why, detail), set()).add(label)
+    nbad = len({label for label, _, _ in problems})
+    lines = [f"`verify/check_prose.py --all` over {nfiles} committed notes and fieldnotes: "
+             f"{len(problems)} problem(s) in {nbad} file(s).", ""]
+    for (why, detail), labels in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0])):
+        names = ", ".join(f"`{label}`" for label in sorted(labels))
+        lines.append(f"- {why}: `{detail}` in {len(labels)} file(s): {names}")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def added_fieldnotes(base, root):
@@ -278,12 +323,15 @@ def main(argv):
                     help="GitHub login of the PR author; every fieldnote added "
                          "by the PR must credit this handle (CI passes it; "
                          "local runs without it skip the attribution check)")
+    ap.add_argument("--all", action="store_true",
+                    help="check every committed notes/ and fieldnotes/ file instead of the diff")
+    ap.add_argument("--report", help="write the problems as grouped markdown to this file")
     args = ap.parse_args(argv)
     root = os.path.abspath(args.root)
 
     files = args.files
     if files is None:
-        files = changed_prose(args.base, root)
+        files = all_prose(root) if args.all else changed_prose(args.base, root)
         if files is None:
             return 1
 
@@ -317,6 +365,9 @@ def main(argv):
                 continue
             with open(path, encoding="utf-8") as f:
                 check_fieldnote_author(rel, f.read(), args.pr_author, problems)
+
+    if args.report:
+        write_report(problems, len(files), args.report)
 
     if not problems:
         print(f"prose check ok ({len(files)} file(s) checked)")

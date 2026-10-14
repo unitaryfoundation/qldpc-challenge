@@ -1,0 +1,60 @@
+name: prose-sweep
+
+# verify/check_prose.py runs on the diff of each PR, so prose already on the
+# board is never re-read: a cited path stops resolving when its target is
+# removed, and a claim can slip through on the PR that filed it (#3379). This
+# sweeps every committed note and fieldnote weekly and keeps one tracking
+# issue current: opened when the sweep finds problems, edited in place while
+# it does, closed when it comes back clean.
+
+permissions:
+  contents: read
+  issues: write
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: prose-sweep
+  cancel-in-progress: false
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: sweep committed prose
+        id: sweep
+        run: |
+          if python3 verify/check_prose.py --all --report "$RUNNER_TEMP/body.md" | tee sweep.txt; then
+            echo "clean=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "clean=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: keep the tracking issue current
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TITLE: "Committed prose cites paths that do not resolve (weekly sweep)"
+          CLEAN: ${{ steps.sweep.outputs.clean }}
+        run: |
+          number=$(gh issue list --repo "$REPO" --state open --limit 50 \
+            --search "\"weekly sweep\" in:title" --json number,title \
+            --jq 'first(.[] | select(.title == env.TITLE)) | .number // empty')
+          if [ "$CLEAN" != "true" ] && [ -s "$RUNNER_TEMP/body.md" ]; then
+            if [ -n "$number" ]; then
+              gh issue edit "$number" --repo "$REPO" --body-file "$RUNNER_TEMP/body.md"
+              echo "updated #$number"
+            else
+              gh issue create --repo "$REPO" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
+            fi
+          elif [ "$CLEAN" = "true" ] && [ -n "$number" ]; then
+            gh issue close "$number" --repo "$REPO" \
+              --comment "Every committed note and fieldnote resolved in the sweep of $(date -u +%Y-%m-%d) (run ${{ github.run_id }}); closing until a sweep finds a problem again."
+            echo "closed #$number"
+          else
+            echo "nothing to change"
+          fi

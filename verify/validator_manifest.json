@@ -15,7 +15,7 @@
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
     "verify/check_authorship.py": "71f71d42e8381060b6d6adef41746fd401b98decd1ffd113b28c2a78434c4fbb",
     "verify/check_certs.py": "5793984b2c98dc5e4b6a6e39c0ef1d67bc5d66f5811e9c28170ac50007dd38de",
-    "verify/check_prose.py": "eb3adbf46a0b5113bfcb190d58e17d0ceda9a0ac1cccd3c3ad19b0671be74468",
+    "verify/check_prose.py": "85a9ceffdff396a29ee20521ed7070b32a52bac566cb4fb4d3bf018c2b96973e",
     "verify/check_submission_scope.py": "ba5ca021ddc6d0839e940d6eaf437ef59716e72b4040db7113320e551f4bea38",
     "verify/check_tree_consistency.py": "1d477721d54adcf67d86a574137801a55d01ab0bf187031c58517d8cfcda1411",
     "verify/check_validator_integrity.py": "7f69c3fcebe0aeb8ccb4d388a8105b589cf4b7c2522e409e41d9de49a0aac87b",

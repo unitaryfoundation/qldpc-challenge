@@ -99,6 +99,55 @@ def main():
               problems_for("# [[270,54,10]] code", tmp, slug=("270", "54", "10"))
               == [])
 
+        # #3379: a path under this repo's own top-level directories is a claim
+        # about this tree, whatever else the text cites.
+        check("repo path is caught even with an external source named",
+              problems_for("built with `research/kit/clp.py`, see "
+                           "https://arxiv.org/abs/2607.14091", tmp)
+              == ["path does not exist in this tree"])
+
+        check("external artifact under a codes/ of its own repo still passes",
+              problems_for("`codes/GB_106_w8_X.mtx` from github.com/a/b @ 1234abc", tmp)
+              == [])
+
+        check("repo path inside a backticked command is caught",
+              problems_for("gate it with `python verify/coordination.py gate x.json`", tmp)
+              == ["path does not exist in this tree"])
+
+        check("command naming an existing repo path passes",
+              problems_for("run `uv run python research/kit/group_algebra.py`", tmp) == [])
+
+        check("a call on a module resolves to the module",
+              problems_for("`research/kit/group_algebra.py::build_2bga(mul, a, b)`", tmp) == [])
+
+    # --all sweeps what is committed, and --report writes the grouped body the
+    # weekly tracking issue carries (#3379).
+    with tempfile.TemporaryDirectory() as tmp:
+        def git(*args):
+            subprocess.run(["git", *args], cwd=tmp, check=True, capture_output=True)
+        git("init", "-q")
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "notes", "1-1-1.md"), "w") as f:
+            f.write("# [[1,1,1]] built with `research/kit/missing.py`\n")
+        with open(os.path.join(tmp, "notes", "2-1-1.md"), "w") as f:
+            f.write("# [[2,1,1]] clean\n")
+        with open(os.path.join(tmp, "notes", "3-1-1.md"), "w") as f:
+            f.write("# [[3,1,1]] uncommitted, with `research/kit/missing.py`\n")
+        git("add", "notes/1-1-1.md", "notes/2-1-1.md")
+        git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
+        report = os.path.join(tmp, "report.md")
+        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
+                            "--root", tmp, "--all", "--report", report],
+                           cwd=ROOT, capture_output=True, text=True, check=False)
+        check("--all sweeps committed prose only",
+              r.returncode == 1 and "notes/1-1-1.md" in r.stdout
+              and "notes/3-1-1.md" not in r.stdout, r.stdout[-200:])
+        with open(report) as f:
+            body = f.read()
+        check("--report groups by target",
+              "over 2 committed" in body and "1 problem(s) in 1 file(s)" in body
+              and "`research/kit/missing.py` in 1 file(s): `notes/1-1-1.md`" in body, body)
+
     # A body-sourced problem must say so and point the reader at the PR
     # description; a file-only failure must not mention the body (issue #897).
     with tempfile.TemporaryDirectory() as tmp:

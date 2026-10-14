@@ -62,7 +62,9 @@ candidate that is not the one in hand, because several sessions stage at once an
 
 The board's durable value is the evidence trail, and an evidence trail that cites a file
 nobody else has is not one. `verify/check_prose.py` enforces this on every changed
-`notes/`/`fieldnotes/` file and on the PR body:
+`notes/`/`fieldnotes/` file and on the PR body, and the weekly `prose-sweep`
+workflow re-reads every committed note and keeps a tracking issue of what no
+longer resolves:
 
 **Every path you name must resolve in the PR's own tree.** Before writing a path, verify it
 against the submitted PR tree, not only the base checkout or your local workspace. A path

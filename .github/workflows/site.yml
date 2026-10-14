@@ -9,6 +9,8 @@ on:
     paths:
       - ".github/workflows/site.yml"
       - "codes/**"
+      - "notes/**"        # rendered into docs/codes/<slug>.html
+      - "fieldnotes/**"   # rendered into docs/research-log.html
       - "certs/**"
       - "receipts/**"
       - "site/**"
