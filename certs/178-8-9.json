@@ -1,0 +1,29 @@
+{
+ "name": "[[178,8,9]]",
+ "d": 9,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 24.8,
+   "note": "no logical < 9 exists"
+  },
+  "Z": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 8.6,
+   "note": "no logical < 9 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 8,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "name": "[[126,6,9]] 2BGA",
+ "d": 9,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 19.3,
+   "note": "no logical < 9 exists"
+  },
+  "Z": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 14.9,
+   "note": "no logical < 9 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 6,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

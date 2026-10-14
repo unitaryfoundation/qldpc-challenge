@@ -1,0 +1,29 @@
+{
+ "name": "[[270,18,9]] periodic bivariate-bicycle on Z_9 x Z_15",
+ "d": 9,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 39.2,
+   "note": "no logical < 9 exists"
+  },
+  "Z": {
+   "value": 9,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 42.0,
+   "note": "no logical < 9 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 18,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

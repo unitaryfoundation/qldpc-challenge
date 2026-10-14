@@ -1,0 +1,29 @@
+{
+ "name": "[[190,20,8]]",
+ "d": 8,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 8,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 1.2,
+   "note": "no logical < 8 exists"
+  },
+  "Z": {
+   "value": 8,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 1.0,
+   "note": "no logical < 8 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 20,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

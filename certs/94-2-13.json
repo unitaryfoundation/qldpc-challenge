@@ -1,0 +1,29 @@
+{
+ "name": "[[94,2,13]]",
+ "d": 13,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 13,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 100.1,
+   "note": "no logical < 13 exists"
+  },
+  "Z": {
+   "value": 13,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 135.1,
+   "note": "no logical < 13 exists"
+  }
+ },
+ "tlim_per_solve": 600,
+ "logical_classes": 2,
+ "symmetry": true,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

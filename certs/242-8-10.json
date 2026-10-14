@@ -1,0 +1,29 @@
+{
+ "name": "[[242,8,10]] open-boundary planar BB (bilayer), 11x11",
+ "d": 10,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 24.1,
+   "note": "no logical < 10 exists"
+  },
+  "Z": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 22.2,
+   "note": "no logical < 10 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 8,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

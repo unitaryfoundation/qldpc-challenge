@@ -1,0 +1,29 @@
+{
+ "name": "[[74,2,11]] 2BGA",
+ "d": 11,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 11,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 9.2,
+   "note": "no logical < 11 exists"
+  },
+  "Z": {
+   "value": 11,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 23.4,
+   "note": "no logical < 11 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 2,
+ "symmetry": true,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

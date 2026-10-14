@@ -1,0 +1,29 @@
+{
+ "name": "[[169,12,7]] reduction of [[175,12,7]]",
+ "d": 7,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 1.5,
+   "note": "no logical < 7 exists"
+  },
+  "Z": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 2.4,
+   "note": "no logical < 7 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 12,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

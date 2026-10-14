@@ -1,0 +1,29 @@
+{
+ "name": "[[126,12,10]]",
+ "d": 10,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 18.4,
+   "note": "no logical < 10 exists"
+  },
+  "Z": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 19.9,
+   "note": "no logical < 10 exists"
+  }
+ },
+ "tlim_per_solve": 120,
+ "logical_classes": 12,
+ "symmetry": true,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}
