@@ -8,6 +8,13 @@ Also enforces one NEW code per PR: the deep refutation gate spends ~10 minutes
 per frontier code, so batched submissions would blow the CI budget or force a
 shallower search per code.
 
+And the submission surface: a PR that changes code data may carry nothing
+outside codes/, circuits/, notes/, fieldnotes/, repro/, and certs/. Session
+scratch under research/ rode along on three submission PRs (issue #3414); it
+flipped the workflow's codes-only fast path into the full self-test suite and
+failed them on defects unrelated to the entry. A builder a note cites goes in
+its own PR first, so the citation resolves.
+
 Usage:
   python verify/check_submission_scope.py [--root PATH] [--base origin/main]
 """
@@ -31,6 +38,11 @@ CRITICAL_FILES = {
     "uv.lock",
     "run_tests.py",     # executes the self-tests CI relies on
 }
+# Everything a submission PR may carry: the entry, its circuit tier, its note or
+# fieldnote, its repro manifest, its certificate. docs/ is rebuilt by site.yml,
+# never by a contributor, and research/ changes are reviewed as code in their
+# own PR (issue #3414).
+SUBMISSION_SURFACE = ("codes/", "circuits/", "notes/", "fieldnotes/", "repro/", "certs/")
 
 
 def changed_files(base, root):
@@ -96,6 +108,11 @@ def is_critical(path):
     return path in CRITICAL_FILES or any(path.startswith(p) for p in CRITICAL_PREFIXES)
 
 
+def outside_surface(files):
+    """Return the changed paths a submission PR may not carry."""
+    return [f for f in files if not f.startswith(SUBMISSION_SURFACE)]
+
+
 def main(argv):
     root = ROOT
     if "--root" in argv:
@@ -125,19 +142,31 @@ def main(argv):
         for f in new_codes:
             print(f"  {f}")
         return 1
-    if not codes or not critical:
+    if not codes:
         print("submission scope ok")
         return 0
-
-    print("Submission PR changes both untrusted code data and verifier-critical files.")
-    print("Split the PR, or have a maintainer review the trusted-code changes first.")
-    print("\nCode submissions:")
-    for f in codes:
-        print(f"  {f}")
-    print("\nVerifier-critical changes:")
-    for f in critical:
-        print(f"  {f}")
-    return 1
+    if critical:
+        print("Submission PR changes both untrusted code data and verifier-critical files.")
+        print("Split the PR, or have a maintainer review the trusted-code changes first.")
+        print("\nCode submissions:")
+        for f in codes:
+            print(f"  {f}")
+        print("\nVerifier-critical changes:")
+        for f in critical:
+            print(f"  {f}")
+        return 1
+    outside = outside_surface(files)
+    if outside:
+        print("Submission PR carries paths outside the submission surface.")
+        print("A submission PR adds the entry under codes/ plus its own notes/ file, fieldnote,")
+        print("repro/ manifest, or certs/ certificate, and nothing else. A script or evidence")
+        print("file under research/ goes in its own PR first, so the note can cite it.")
+        print("\nOutside the surface:")
+        for f in outside:
+            print(f"  {f}")
+        return 1
+    print("submission scope ok")
+    return 0
 
 
 if __name__ == "__main__":

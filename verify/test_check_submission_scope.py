@@ -112,3 +112,63 @@ def test_a_deletion_does_not_consume_the_one_new_code_budget(tmp_path):
         {"codes/a-1-1.json": None, "codes/c-3-3.json": '{"n": 3}'})
     assert S.added_files(base, root) == ["codes/c-3-3.json"]
     assert S.main(["--root", root, "--base", base]) == 0
+
+
+# -- the submission surface (issue #3414) ----------------------------------
+#
+# Three submission PRs carried a working tree's untracked scratch under
+# research/: builders, sweep scripts, parked PR bodies, a malformed campaign
+# summary. Nothing was critical, so the check passed, the workflow's codes-only
+# fast path flipped to the full suite, and the only failure named the summary.
+
+def test_the_surface_is_the_entry_and_its_own_artifacts():
+    inside = ["codes/72-6-6.json", "circuits/72-6-6/memory_x.stim", "notes/72-6-6.md",
+              "fieldnotes/2026-10-14-concatenation.md", "repro/72-6-6.json", "certs/72-6-6.json"]
+    assert S.outside_surface(inside) == []
+    scratch = ["research/build_concat.py", "research/pr-bodies/72-6-6.md",
+               "research/campaigns/z4/summary.json", "docs/codes/72-6-6.html", "README.md"]
+    assert S.outside_surface(inside + scratch) == scratch
+
+
+def test_scratch_riding_on_a_submission_is_refused(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path, {"codes/10-2-3.json": '{"n": 10}'},
+        {"codes/72-6-6.json": '{"n": 72}', "notes/72-6-6.md": "# [[72,6,6]]\n",
+         "research/build_concat.py": "x = 1\n", "research/pr-bodies/72-6-6.md": "body\n"})
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "outside the submission surface" in out
+    listed = out.split("Outside the surface:")[1]
+    assert "research/build_concat.py" in listed and "research/pr-bodies/72-6-6.md" in listed
+    assert "notes/72-6-6.md" not in listed and "codes/72-6-6.json" not in listed
+
+
+def test_an_entry_with_its_own_artifacts_passes(tmp_path):
+    root, base = _repo(
+        tmp_path, {"codes/10-2-3.json": '{"n": 10}'},
+        {"codes/72-6-6.json": '{"n": 72}', "notes/72-6-6.md": "# [[72,6,6]]\n",
+         "fieldnotes/2026-10-14-concatenation.md": "---\nauthor: t\n---\n",
+         "repro/72-6-6.json": "{}", "certs/72-6-6.json": "{}",
+         "circuits/72-6-6/memory_x.stim": "H 0\n"})
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
+def test_research_changes_without_code_data_are_not_a_submission(tmp_path):
+    root, base = _repo(tmp_path, {"research/x.py": "x = 1\n"},
+                       {"research/x.py": "x = 2\n", "research/y.py": "y = 1\n"})
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
+def test_a_correction_that_removes_an_entry_is_held_to_the_surface(tmp_path):
+    root, base = _repo(
+        tmp_path, {"codes/72-6-6.json": '{"n": 72}', "research/x.py": "x = 1\n"},
+        {"codes/72-6-6.json": None, "research/x.py": "x = 2\n"})
+    assert S.main(["--root", root, "--base", base]) == 1
+
+
+def test_the_trust_boundary_message_still_wins_over_the_surface_message(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path, {"verify/qldpc_verify.py": "x = 1\n"},
+        {"codes/72-6-6.json": '{"n": 72}', "verify/qldpc_verify.py": "x = 2\n"})
+    assert S.main(["--root", root, "--base", base]) == 1
+    assert "verifier-critical" in capsys.readouterr().out
