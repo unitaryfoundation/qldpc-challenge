@@ -59,15 +59,21 @@ def _screen_one(job):
     The seed is derived from the code's own fingerprint, so a candidate gets
     the same trials wherever it runs and whatever order it arrives in.
     """
-    spec, HX, HZ, min_k, min_d, trials, seed, backend, threads = job
+    spec, HX, HZ, min_k, min_d, trials, seed, backend, threads, distance, dkw = job
     if not verify_css(HX, HZ):
         return None
     k = compute_k(HX, HZ)
     if k < min_k:
         return None
     fp = fingerprint(HX, HZ)
-    d = distance_rand(HX, HZ, trials=trials, seed=seed + int(fp, 16),
-                      backend=backend, threads=threads)
+    if distance is None:
+        d = distance_rand(HX, HZ, trials=trials, seed=seed + int(fp, 16),
+                          backend=backend, threads=threads)
+    else:
+        # An exact-distance backend has no restarts to seed, so seed/threads
+        # are forwarded rather than re-derived; the callable owns that.
+        d = distance(HX, HZ, trials=trials, seed=seed + int(fp, 16),
+                     backend=backend, threads=threads, **(dkw or {}))
     if d == float("inf") or d < min_d:
         return None
     n = int(HX.shape[1])
@@ -95,7 +101,8 @@ def _batches(it, size):
 
 def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
            metric=efficiency, keep=None, verbose=False, backend="numpy",
-           threads=1, workers=1, threads_per_candidate=None, batch=64):
+           threads=1, workers=1, threads_per_candidate=None, batch=64,
+           distance=None, distance_kwargs=None):
     """Screen an iterable of ``(spec, HX, HZ)`` candidates.
 
     ``spec`` is any JSON-serializable description of how the code was built (a
@@ -106,6 +113,17 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
     ``{spec, n, k, d, efficiency, fingerprint}`` sorted by score (best first),
     deduplicated by fingerprint, truncated to ``keep`` if given. ``backend`` and
     ``threads`` control the optional accelerated distance screen.
+
+    ``distance`` replaces the estimator with any callable of the shape
+    ``(HX, HZ, *, trials, seed, backend, threads) -> d``, returning
+    ``float("inf")`` for a code it cannot resolve (which drops the candidate).
+    ``surrogate.distance_rand`` is the default and stays the upper bound it
+    always was. ``distance.qubitserf_screen`` is an exact-distance backend that
+    drops in unchanged -- useful because the default estimator inflates, and a
+    rank computed on a loose bound ranks the wrong codes. An exact backend does
+    not make the survivor's claim exact: that is still the gate's to say.
+    ``distance_kwargs`` is forwarded verbatim to ``distance`` for the knobs it
+    owns and ``screen`` does not (``tlim=`` for ``qubitserf_screen``).
 
     ``workers`` > 1 scores candidates in parallel processes. Candidates are
     independent, so this is the axis to scale for a broad sweep;
@@ -139,7 +157,8 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
 
     seen = {}
     jobs = ((spec, HX, HZ, min_k, min_d, trials, seed, backend,
-             threads_per_candidate) for spec, HX, HZ in candidates)
+             threads_per_candidate, distance, distance_kwargs)
+            for spec, HX, HZ in candidates)
 
     if workers == 1:
         for job in jobs:

@@ -20,8 +20,10 @@ If one is missing, the call raises a clear ImportError telling you how to get it
 (``uv run --extra research python ...``). Both take raw ``(HX, HZ)`` and build
 the throwaway submission doc the certifiers consume via ``submit.make_submission``.
 """
+import functools
 import importlib.util
 import os
+import sys
 
 import numpy as np
 
@@ -135,6 +137,275 @@ def decoder_distance(HX, HZ, trials=200000, seed=0, max_seconds=None,
             f"Underlying error: {e}")
     doc = _throwaway_doc(HX, HZ, witness_trials, seed)
     return decdist.estimate(doc, trials=trials, seed=seed, max_seconds=max_seconds)
+
+
+# ---------------------------------------------------------------------------
+# Qubitserf (https://github.com/Quantinuum/Qubitserf) -- OPTIONAL, OUT-OF-BAND.
+#
+# A C++/GPU library that returns the EXACT distance, or nothing. It is not a
+# certificate and never becomes one: verify/ is the trust anchor, and a number
+# from outside this repo cannot populate ``confidence: "exact"``. Two uses it is
+# genuinely better at than the surrogates here:
+#
+#   1. Ranking candidates on true distance instead of a Monte Carlo bound.
+#      distance_rand inflates -- AUTORESEARCH.md notes "a high d at low trials
+#      usually means the search hasn't found the light logical yet". This has
+#      no such failure mode: it either proves d or returns nothing.
+#   2. Triaging where sat_exact_distance() is worth its budget.
+#
+# Measured on this board (8-core CPU box, 2026-10): cc agrees with the board's
+# own certifiers on 211/211 sampled certified entries spanning d=2..14, and is
+# 600-4000x faster than them on the same entries. Its REACH is not better --
+# every d>=16 code tried stalled past 280s, including k=2 ones. Cost tracks
+# the search depth d, not n, k, or check weight.
+# ---------------------------------------------------------------------------
+
+
+def _qsf_import():
+    # An in-tree build keeps the native lib at Qubitserf/python/qubitserf/_lib,
+    # so the checkout's python/ directory has to be importable. Honour an
+    # explicit path rather than making everyone pip-install the wheel.
+    _p = os.environ.get("QUBITSERF_PYTHON")
+    if _p and _p not in sys.path:
+        sys.path.insert(0, _p)
+    try:
+        from qubitserf import distfind as _df
+    except ImportError as e:
+        raise ImportError(
+            "Qubitserf is not importable. It is an out-of-band C++ build, not a "
+            "pip dependency of this repo: `git clone "
+            "https://github.com/Quantinuum/Qubitserf && cd Qubitserf && "
+            "python -m pip install .` (needs CMake >= 3.20 and a C++17 "
+            "compiler; CUDA/Metal optional and NOT recommended for qLDPC -- on "
+            "sparse codes CPU connected-cluster beats GPU Brouwer-Zimmerman by "
+            "orders of magnitude). For an in-tree build, set "
+            "QUBITSERF_PYTHON=/path/to/Qubitserf/python. "
+            f"Underlying error: {e}")
+    return _df
+
+
+_QSF_SUBPROCESS_SRC = r"""
+import os, sys
+import numpy as np
+sys.path.insert(0, os.environ.get("QUBITSERF_PYTHON", ""))
+from qubitserf import distfind as df
+HX = np.load(sys.argv[1])["HX"]
+HZ = np.load(sys.argv[2])["HZ"]
+print("RESULT", df.css_distance(HX, HZ, method=sys.argv[3], which=sys.argv[4],
+                                threads=int(sys.argv[5])))
+"""
+
+
+def _qsf_subprocess(HX, HZ, method, which, threads, tlim):
+    """Timeout by real process kill for callers that cannot fork.
+
+    A ``multiprocessing.Pool`` worker is daemonic and may not have children, so
+    the fork path in :func:`qubitserf_distance` is unavailable under
+    ``screen(workers=N)``. ``subprocess`` sidesteps the daemon flag and still
+    gives a genuine kill rather than an abandoned thread.
+    """
+    import subprocess
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as td:
+        fx = os.path.join(td, "HX.npz")
+        fz = os.path.join(td, "HZ.npz")
+        np.savez_compressed(fx, HX=np.asarray(HX, dtype=np.uint8))
+        np.savez_compressed(fz, HZ=np.asarray(HZ, dtype=np.uint8))
+        env = dict(os.environ)
+        env.setdefault("OMP_NUM_THREADS", str(max(1, int(threads))))
+        try:
+            r = subprocess.run(
+                [sys.executable, "-c", _QSF_SUBPROCESS_SRC, fx, fz,
+                 method, which, str(threads)],
+                capture_output=True, text=True, timeout=tlim, env=env,
+                check=False)  # rc surfaces via the no-RESULT RuntimeError below
+        except subprocess.TimeoutExpired:
+            return None
+        for line in r.stdout.splitlines():
+            if line.startswith("RESULT "):
+                out = int(line.split()[1])
+                return None if out == -1 else out
+        raise RuntimeError(
+            f"qubitserf subprocess produced no result "
+            f"(rc={r.returncode}): {r.stderr.strip()[-300:]}")
+
+
+def qubitserf_distance(HX, HZ, method="cc", which="min", threads=0, tlim=600):
+    """Exact CSS distance via Qubitserf, or ``None`` if it did not finish.
+
+    ``method="cc"`` (connected cluster) is the one for sparse qLDPC codes and
+    the only one to try first; ``"mitm"`` is an independent cross-check on
+    small codes. ``"bz"`` targets dense codes, is the only GPU-capable one, and
+    was NOT reproducible here -- it stalled past 90s on the [[144,12,12]] gross
+    code where its own docs claim 3.87s.
+
+    ``tlim`` is a wall-clock budget enforced by a real process kill, because a C
+    extension never yields to SIGALRM. A killed run returns ``None``, kept
+    deliberately distinct from any answer: only a returned integer counts.
+    """
+    _df = _qsf_import()
+    import multiprocessing as mp
+
+    ctx = mp.get_context("fork")
+
+    def _run(q):
+        try:
+            q.put(_df.css_distance(HX, HZ, method=method, which=which,
+                                   threads=threads))
+        except Exception as e:  # noqa: BLE001 -- surfaced to the parent
+            q.put(f"error:{type(e).__name__}: {e}")
+
+    q = ctx.Queue()
+    p = ctx.Process(target=_run, args=(q,))
+    try:
+        p.start()
+    except AssertionError:
+        # Daemonic caller (a Pool worker): it cannot fork a child of its own.
+        p.close()
+        return _qsf_subprocess(HX, HZ, method, which, threads, tlim)
+    p.join(tlim)
+    if p.is_alive():
+        p.terminate()
+        p.join(5)
+        if p.is_alive():
+            p.kill()
+            p.join()
+        return None
+    try:
+        out = q.get_nowait()
+    except Exception:
+        return None
+    if isinstance(out, str):
+        raise RuntimeError(f"qubitserf: {out}")
+    return None if out == -1 else int(out)
+
+
+def qubitserf_screen(HX, HZ, trials=None, seed=0, backend=None, threads=1,
+                     method="cc", tlim=120, **_):
+    """Screen a code with Qubitserf's connected-cluster exact distance.
+
+    Signature-compatible with ``surrogate.distance_rand`` so it drops into
+    ``screen(..., distance=qubitserf_screen)`` unchanged. ``trials`` and
+    ``backend`` are accepted and ignored -- there are no random restarts to run,
+    and ``backend`` means the bit-packed RIS backend to ``distance_rand``, not
+    Qubitserf's cpu/gpu selector.
+
+    Returns ``float("inf")`` when a code does not finish in ``tlim``, which is
+    exactly what ``distance_rand`` returns when it finds no logical, so screen
+    drops the candidate. A returned value is exact *as far as Qubitserf is
+    concerned*, which is not a claim about your code: label anything you submit
+    ``upper_bound`` and let the gate speak.
+    """
+    d = qubitserf_distance(HX, HZ, method=method, threads=threads, tlim=tlim)
+    return float("inf") if d is None else d
+
+
+SCREENS = ("rand", "qubitserf")
+
+
+def resolve_screen(name="qubitserf", *, fallback=True, **overrides):
+    """Resolve a ``search.screen`` distance backend by name: ``"rand"`` or ``"qubitserf"``.
+
+    ``"qubitserf"`` resolves to :func:`qubitserf_screen` with ``tlim``
+    defaulting to 30 -- the measured knee of 2026-10: over 279 board codes a
+    30 s cap returned the large majority of the answers for a small fraction
+    of the compute -- and any keyword given here overrides that default.
+    ``"rand"`` resolves to ``surrogate.distance_rand``, the Monte Carlo upper
+    bound that is and stays the kit's default estimator.
+
+    With ``fallback=True`` (the default), a machine without the Qubitserf
+    build degrades to ``distance_rand`` instead of raising, so a sweep runs
+    anywhere -- but a degraded run is a BOUND, not exact, and its records
+    carry whatever the surrogate returns, inflated upward. Pass
+    ``fallback=False`` to require the exact backend.
+
+    Either backend returns ``float("inf")`` for a code it cannot resolve in
+    budget, and ``screen`` drops that candidate. Dropped means *unknown, not
+    refuted*: a family swept away by a small ``tlim`` has not been shown
+    empty, so never treat a screen drop as the last word on a family.
+    """
+    if name == "rand":
+        from surrogate import distance_rand
+        return distance_rand
+    if name == "qubitserf":
+        try:
+            _qsf_import()
+        except ImportError:
+            if not fallback:
+                raise
+            from surrogate import distance_rand
+            return distance_rand
+        overrides.setdefault("tlim", 30)
+        return functools.partial(qubitserf_screen, **overrides)
+    raise ValueError(f"unknown screen backend {name!r}; expected one of {SCREENS}")
+
+
+def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
+                   seed=0, which="both"):
+    """Two-stage verification: connected cluster proposes, the repo decides.
+
+    This is the same division of labor ``escalation.exact_first`` already makes
+    -- try a cheap exact check *before* spending a deep RIS ladder, and let
+    anything that fails fall through -- with the caps raised. That function is
+    bounded to ``n <= 90, d <= 8`` because it calls ``verify/certify.py``
+    (MILP) directly, and MILP is what stops there. ``cc`` reaches n=937,
+    d=14 at a ~0.03s median, so it can decide whether the expensive stage is
+    worth starting at all.
+
+    Stage 1 -- ``qubitserf_distance`` per side. Exact or nothing.
+    Stage 2 -- ``verify/sat_certify.py``, unchanged. **It is the authority**;
+    cc only decides whether stage 2 starts and where each side aims. Measured
+    2026-10-14: the tight bound does NOT make the SAT solve cheaper -- within
+    2% of a loose screening bound on entries spanning k=1..68 -- so this
+    wrapper exists for experimentation, not for speed.
+
+    Returns::
+
+        {"outcome": "exact" | "refuted" | "timeout" | "unverified",
+         "cc_d": int or None, "cc_X": .., "cc_Z": ..,
+         "sat": verify/sat_certify.py's dict, or None if stage 2 was skipped}
+
+    * ``exact``   -- stage 2 confirmed ``d_exact``. A real certificate; the
+      maintainer re-runs the same certifier.
+    * ``refuted`` -- stage 2 found a logical lighter than the claim. cc caught
+      the over-claim in the sense that it existed to catch it; do not trust it.
+    * ``timeout`` -- cc produced nothing and stage 2 did not close either.
+      **Never a result.** No amount of care turns it into one.
+    * ``unverified`` -- cc returned nothing, so no tight bound was available
+      and stage 2 was not run.
+
+    cc is deliberately not consulted in the verdict: its answer only decides
+    whether stage 2 starts and where it aims.
+    """
+    cc_x = cc_z = None
+    cc_d = None
+    if which in ("both", "x"):
+        cc_x = qubitserf_distance(HX, HZ, which="x", tlim=tlim_qsf)
+    if which in ("both", "z"):
+        cc_z = qubitserf_distance(HX, HZ, which="z", tlim=tlim_qsf)
+    sides = [v for v in (cc_x, cc_z) if v is not None]
+    if sides:
+        cc_d = min(sides)
+        # The bound stage 2 tests: per-side, so each solve aims at the value
+        # that side actually achieved rather than the weaker minimum.
+        d_up = {"X": cc_x if cc_x is not None else cc_d,
+                "Z": cc_z if cc_z is not None else cc_d}
+        sat = sat_exact_distance(HX, HZ, tlim=tlim_sat, trials=trials,
+                                 seed=seed, d_upper=d_up)
+        if sat.get("d_exact"):
+            outcome = "exact"
+        elif any("REFUTED" in ((v or {}).get("note") or "")
+                 for v in (sat.get("sides") or {}).values()):
+            outcome = "refuted"
+        else:
+            outcome = "timeout"
+        return {"outcome": outcome, "cc_d": cc_d, "cc_X": cc_x, "cc_Z": cc_z,
+                "sat": sat}
+    # No tight bound from stage 1: fall through to the ladder rather than
+    # guessing. Reporting None keeps that decision the caller's.
+    return {"outcome": "unverified", "cc_d": None, "cc_X": None,
+            "cc_Z": None, "sat": None}
 
 
 if __name__ == "__main__":
