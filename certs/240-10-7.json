@@ -1,0 +1,29 @@
+{
+ "name": "[[240,10,7]] two-block code over C3 x (C5 : C8)",
+ "d": 7,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 11.7,
+   "note": "no logical < 7 exists"
+  },
+  "Z": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 11.0,
+   "note": "no logical < 7 exists"
+  }
+ },
+ "tlim_per_solve": 300,
+ "logical_classes": 10,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

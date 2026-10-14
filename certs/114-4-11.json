@@ -1,0 +1,29 @@
+{
+ "name": "[[114,4,11]] two-block code over C57 (Lee, arXiv:2610.13880)",
+ "d": 11,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 11,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 127.4,
+   "note": "no logical < 11 exists"
+  },
+  "Z": {
+   "value": 11,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 120.9,
+   "note": "no logical < 11 exists"
+  }
+ },
+ "tlim_per_solve": 300,
+ "logical_classes": 4,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

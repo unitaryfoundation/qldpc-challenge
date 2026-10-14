@@ -1,0 +1,29 @@
+{
+ "name": "[[294,12,7]] two-block code over C7 x (C7 : C3)",
+ "d": 7,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 18.8,
+   "note": "no logical < 7 exists"
+  },
+  "Z": {
+   "value": 7,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 14.7,
+   "note": "no logical < 7 exists"
+  }
+ },
+ "tlim_per_solve": 300,
+ "logical_classes": 12,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

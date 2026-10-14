@@ -1,0 +1,29 @@
+{
+ "name": "[[140,6,10]] weight-5 mixed-monomial BB code (LLM-guided evolutionary search)",
+ "d": 10,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 52.9,
+   "note": "no logical < 10 exists"
+  },
+  "Z": {
+   "value": 10,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 59.7,
+   "note": "no logical < 10 exists"
+  }
+ },
+ "tlim_per_solve": 300,
+ "logical_classes": 6,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}

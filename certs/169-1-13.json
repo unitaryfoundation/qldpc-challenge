@@ -1,0 +1,29 @@
+{
+ "name": "[[169,1,13]] rotated surface code (13x13)",
+ "d": 13,
+ "solver": "CryptoMiniSat 5.14 SAT",
+ "encoding": "selector",
+ "sides": {
+  "X": {
+   "value": 13,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 13.5,
+   "note": "no logical < 13 exists"
+  },
+  "Z": {
+   "value": 13,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.6,
+   "note": "no logical < 13 exists"
+  }
+ },
+ "tlim_per_solve": 300,
+ "logical_classes": 1,
+ "symmetry": false,
+ "d_exact": true,
+ "verification": {
+  "level": "solver"
+ }
+}
