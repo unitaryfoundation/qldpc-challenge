@@ -1,5 +1,8 @@
 """Generic 2D layout search: fold a periodic code into the plane.
 
+Not research/foldbound.py, which folds a code onto an orbit-constant subspace to
+bound its distance; the two share a verb and nothing else.
+
 Given a CSS code's check supports, assign every qubit an integer grid site
 (at most `layers` qubits per site; distinct integer sites are >= 1 apart by
 construction) so as to minimise the interaction radius = max check diameter.

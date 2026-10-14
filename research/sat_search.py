@@ -1,6 +1,10 @@
 """SAT-based CSS code discovery (DalFavero et al., arXiv:2608.23460, Sec. VI),
 with the group-membership slack handled the CSS way.
 
+This is the unconstrained base. A find carries no layout, so it cannot enter the
+2d-local tracks; for those use research/local_sat.py, which extends this file
+with a locality constraint on every check.
+
 Formulates "find an [[n, k]] CSS code whose checks all have weight <= w and
 which detects every Pauli error of weight <= t" as CNF:
 

@@ -1,5 +1,8 @@
 """Upper-bound a CSS code's distance by folding it onto a symmetric subspace.
 
+A refuter, not a layout tool: research/local2d/fold_layout.py also "folds", but
+it folds a periodic code into the plane to minimize its interaction radius.
+
 For any partition of the n qubits into equal-size orbits, the vectors constant
 on orbits are u = O v, and H_Z u = 0 collapses to (H_Z O) v = 0 on n/r columns.
 Such a u is a logical exactly when it also escapes the rowspace of H_X, and its

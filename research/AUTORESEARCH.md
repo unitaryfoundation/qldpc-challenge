@@ -20,6 +20,7 @@ research/
   kit/         the core toolkit: constructors, surrogate, search + samplers, packaging
   local2d/     open-boundary planar (2D-local) codes: builders + distance-scaling theory
   candidates/  staging area for validated finds (gitignored working output)
+  README.md    the map: every top-level script, its status, and which of two look-alikes to use
 ```
 
 For in-process imports, put `research/kit` (and `verify/`) on `sys.path`; every kit module
