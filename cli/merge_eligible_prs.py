@@ -5,6 +5,11 @@ and with --merge it both posts comments to and squash-merges other people's
 pull requests, so it needs `gh` auth with merge rights on the repository and
 should only be run by a maintainer. Report-only by default. Every merge is
 pinned to the head SHA that was rechecked immediately beforehand.
+
+Scope is one entry per PR: the unit the board files under a slug is
+`codes/<slug>.json` plus `notes/<slug>.md`, so a PR carrying several code
+records is a batch to read rather than one to merge, and it is reported and
+skipped.
 """
 
 import argparse
@@ -19,6 +24,10 @@ DEFAULT_REPO = "unitaryfoundation/qldpc-challenge"
 DEFAULT_BASE = "main"
 PAGE_SIZE = 100
 REQUIRED_CHECKS = ("verify", "prose")
+# One entry per PR. Everything the board files for an entry hangs off its slug
+# (`notes/<slug>.md`, `circuits/<slug>/`, `certs/<slug>.json`), so a PR touching
+# two records is a batch whose provenance has to be read one entry at a time.
+MAX_CODES_PER_PR = 1
 
 
 class GitHubCLIError(RuntimeError):
@@ -121,6 +130,16 @@ def changed_code_paths(files: list[dict[str, Any]]) -> list[str]:
     return sorted(paths)
 
 
+def too_many_codes_reason(code_paths: list[str]) -> str | None:
+    """Return why a PR is out of scope for auto-merge, naming every record."""
+    if len(code_paths) <= MAX_CODES_PER_PR:
+        return None
+    return (
+        f"{len(code_paths)} code records in one PR ({', '.join(code_paths)}); "
+        "auto-merge covers one code and its note per PR, so a maintainer reviews this one"
+    )
+
+
 def metadata_error(document: Any) -> str | None:
     """Validate that a code declares a model and at least one author."""
     if not isinstance(document, dict):
@@ -217,6 +236,11 @@ def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
         if not code_paths:
             result.reasons.append("no changed code JSON or associated circuit artifacts")
         else:
+            # Blocked on scope, but still read every record: a batch PR's author
+            # needs the same provenance feedback a single-entry PR gets.
+            too_many = too_many_codes_reason(code_paths)
+            if too_many:
+                result.reasons.append(too_many)
             for path in code_paths:
                 document = _read_code_document(repo, path, head_sha)
                 error = metadata_error(document)
