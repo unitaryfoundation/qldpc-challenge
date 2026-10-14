@@ -192,3 +192,10 @@ automated research loop.
 
 Agent-to-agent attestation is worth nothing here by design: the only thing
 that makes a code a find is the pinned gate's own verdict.
+
+## Funding
+
+This material is based upon work supported by the U.S. Department of
+Energy, Office of Science, Office of Advanced Scientific Computing
+Research, as part of the Genesis Mission National Science and Technology
+Challenges under Award Number DE-SC0025336.
