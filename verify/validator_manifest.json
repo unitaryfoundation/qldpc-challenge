@@ -4,7 +4,7 @@
     ".github/workflows/codes-format.yml": "afef356098e073f4262954ef8ed48da156df0aed1c480c6c304f4421da81a31c",
     ".github/workflows/prose.yml": "3ddd5fd065fa22287b7666cda5ca8439a1cbc2b935bd7c40e1fa5f232dd57dee",
     ".github/workflows/refute-weekly.yml": "c57e8094b61216d07d0402df00dad729ff4fce0ad76c162b5b82ccc91a9c86b6",
-    ".github/workflows/verify.yml": "dea82a871cf6b7dd656a926a1f090ed4ec5840442f23b81c635923ef117c6bad",
+    ".github/workflows/verify.yml": "f34515704721f6493adf1537aea28134ea3aa152fab29e64d0bf8923a5783cdb",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
     "pyproject.toml": "70f8d63de7dc61577561eb8f7b92e38907110cfc4ff6fc02473eceb5ad7f921f",
     "uv.lock": "9a9e47507c05f376002b77bd4f6d43325e7df145521b6a5fcc7f12709045732d",

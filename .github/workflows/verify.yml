@@ -226,7 +226,11 @@ jobs:
           # claim. The integrity manifest is a hash listing and cannot change a
           # measurement, so re-pinning it does not count. A diff that cannot be
           # computed exits non-zero and so counts as changed (fail closed).
-          if git diff --quiet "$base"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json'; then
+          # Tests, the policy checkers (check_*.py, the pre-push gate), and the
+          # test fixtures never measure a claim, so they are left out: with them
+          # in, a prose-checker edit scheduled the full re-measure, which ran
+          # past this job's 130-minute timeout on PR #3418.
+          if git diff --quiet "$base"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures'; then
             ler_stack_changed=false
           else
             ler_stack_changed=true
@@ -252,7 +256,7 @@ jobs:
           before="${{ github.event.before }}"
           if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
             ler_stack_changed=true
-          elif git diff --quiet "$before"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json'; then
+          elif git diff --quiet "$before"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures'; then
             ler_stack_changed=false
           else
             ler_stack_changed=true
