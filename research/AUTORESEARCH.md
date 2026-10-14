@@ -491,16 +491,23 @@ decoder_distance(HX, HZ, trials=200000)  # BP+OSD: independent upper-bound evide
 - `decoder_distance` wraps `decode/distance.py`: a *different* mechanism, so agreement is real
   corroboration.
 
-These need extra deps (`scipy`, `ldpc`): `uv run --with scipy --with ldpc python your_script.py`.
-The constructors, surrogate, search, and packaging stay numpy-only.
-
-**The `research` extra is a separate thing from those two.** Anything that touches a JSON schema —
-`kit/campaign.py` (`load_campaign`, `write_summary`) and `kit/census_css.py` — needs
-`jsonschema`, which ships in the `research` extra and not in the default one:
+Everything in `research/` that reaches past numpy runs under the `research` extra:
 
 ```
 uv run --extra research python your_script.py
 ```
+
+It installs `scipy` (the MILP behind `exact_distance`), `ldpc` (the BP+OSD
+decoder behind `decoder_distance`), `python-sat` and `pycryptosat` (the SAT
+certifier behind `sat_exact_distance` and the exact distances in
+`kit/census_css.py`), and `pynauty` (the nauty canonicalizer in
+`kit/census_css.py` and the automorphism count in `kit/supports.py`). Installing
+only `scipy` and `ldpc` by hand looks like it works and does not: the census
+then canonicalizes only through n = 6 and reports numbers that are not
+comparable with the full run, and the automorphism count falls back to a capped
+enumeration. The constructors, surrogate, search, packaging, and the campaign
+ledger need nothing beyond the default install; the ledger validates with
+`jsonschema`, which is a base dependency.
 
 That is the same invocation CI uses for the test suite. Without it `load_campaign` fails with
 `CampaignError: jsonschema is required to validate a campaign`, which reads like a broken kit
@@ -579,7 +586,7 @@ should not have to re-learn.
 | File | What it gives you |
 |---|---|
 | `kit/css.py` | `compute_k`, `verify_css`, and the re-exported GF(2) core (`rref`, `rank`, `kernel_basis`, `logical_basis`, ...) shared with the verifier |
-| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Needs the `research` extra (it validates against `schema/campaign.schema.json`); see [`campaigns/README.md`](campaigns/README.md) |
+| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
 | `kit/gf2poly.py` | GF(2) polynomials as ints: `factor_squarefree` (x^m - 1 over GF(2), no sympy), `designed_divisor`, `sparse_multiples`, `cyclic_gb`, `designed_k`; the designed-divisor route behind `search.sample_cyclic_gb` (section 3c) |
 | `kit/bb.py` | `build_bb`, `poly_matrix`, `KNOWN` (known BB codes to start from) |
 | `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt` |

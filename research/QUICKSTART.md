@@ -125,10 +125,8 @@ read at, and a screening depth read at one budget is not comparable to the same
 depth read at another. `not_run` is the ordinary and useful verdict — it says
 the member was screened and discarded before the gate.
 
-Three prerequisites, all real. The ledger validates against a JSON schema, so
-it needs the `research` extra — run it as
-`uv run --extra research python your_script.py`, not a bare `uv run python`.
-It needs a `campaign.json`; `campaign.scaffold_campaign` builds one, or copy
+Two prerequisites, both real. It needs a `campaign.json`;
+`campaign.scaffold_campaign` builds one, or copy
 the smallest complete example —
 `research/campaigns/smoke-bb-72/run.py` — or
 [`campaigns/README.md`](campaigns/README.md), which documents the whole
