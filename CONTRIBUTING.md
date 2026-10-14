@@ -186,10 +186,12 @@ community's current frontier of knowledge, and `./qldpc screened --family
 <family>` says which members of a family were already screened and how they
 went.
 
-Then open a pull request adding only your file under `codes/` (plus its
-`notes/` file) — **one new code
-per PR** (CI enforces this): each frontier submission gets a deep, ~10-minute
-refutation search, and that budget is per code. CI re-runs the
+Then open a pull request adding only your file under `codes/`, plus its
+`notes/` file and, if you have them, a fieldnote, its `repro/` manifest, or its
+`certs/` certificate. Nothing else rides along: a script under `research/` that
+the note cites goes in its own PR first, so the citation resolves. CI enforces
+that surface and **one new code per PR**: each frontier submission gets a deep,
+~10-minute refutation search, and that budget is per code. CI re-runs the
 verifier; a green check is required to merge. Open the PR from your own account:
 CI checks that the PR author is one of the code's `@handle` authors, so list
 yourself (literature baselines with no `@handle` are exempt).
@@ -411,9 +413,13 @@ rejects the claim), put the file in `codes/`, and verify locally before the PR:
 
 ```
 uv run python verify/qldpc_verify.py codes/my-128-6-8.json
+uv run python verify/check_codes_format.py --files codes/my-128-6-8.json
 ```
 
-Exit 0 with an `earned_distance` block means it will pass CI.
+Exit 0 with an `earned_distance` block means it will pass CI. The second
+command checks the file is written the way the board keeps every entry,
+`json.dumps(doc, indent=1)` plus a newline, so later revisions diff line by
+line; `--fix` rewrites it in place.
 
 ## Confidence tiers
 

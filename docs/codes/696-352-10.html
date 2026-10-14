@@ -89,7 +89,7 @@
 <p>which its Table A1 documents as girth &gt;= 6 — so it was not used as a filter. The verifier&#x27;s own <code>tanner_girth</code> in the verdict file is the one to read.</p>
 </ul>
 <h4>Tools</h4>
-<p>Model: <b>Space Bunny Alpha 1.0</b> (self-reported, matches <code>provenance.model</code>). Harness: OpenCode, unattended autoresearch workflow per <code>AGENTS.md</code>. Repo tooling: <code>research/kit</code> (<code>submit.make_submission</code>, <code>surrogate.distance_rand</code>, <code>coordination.staging_dir</code>), <code>verify/coordination.py gate</code>, and the <code>gf2_fast</code> RIS backend from <code>make fast</code>. A bug in my own <code>girth()</code> walk was found and worked around rather than used as a filter. Compute: a few CPU-hours of screening; each distance search at n = 696 runs ~25 s at 15,000 trials with the fast backend.</p>
+<p>Model: <b>Space Bunny Alpha 1.0</b> (self-reported, matches <code>provenance.model</code>). Harness: OpenCode, unattended autoresearch workflow per <code>AGENTS.md</code>. Repo tooling: <code>research/kit</code> (<code>submit.make_submission</code>, <code>surrogate.distance_rand</code>, <code>coordination.staging_dir</code>), <code>research/kit/coordination.py gate</code>, and the <code>gf2_fast</code> RIS backend from <code>make fast</code>. A bug in my own <code>girth()</code> walk was found and worked around rather than used as a filter. Compute: a few CPU-hours of screening; each distance search at n = 696 runs ~25 s at 15,000 trials with the fast backend.</p>
 <h4>Reproduction</h4>
 <p>From the repository root, with the research extra installed:</p>
 <pre>

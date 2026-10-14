@@ -1,7 +1,8 @@
 """A/B campaign: baseline fixed-ladder vs the escalation gate (AUTORESEARCH.md 3b).
 
-Working output. Gitignored by the ``_*.py`` rule; state lives under
-``research/candidates/ab_gate/``. Both arms screen the same BB pool with the
+This script is tracked; its state is working output under
+``research/candidates/ab_gate/``, which is gitignored and never evidence.
+Both arms screen the same BB pool with the
 same seed, take the same survivors, and run the same ladder depth schedule
 under the same per-candidate trial cap, each with an independent ladder:
 

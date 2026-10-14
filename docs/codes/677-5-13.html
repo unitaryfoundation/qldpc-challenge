@@ -90,8 +90,8 @@
 <p><code>research/build_dense_surface.py</code> (this repo) with argument 13; numpy GF(2) rref; <code>./qldpc submit</code> (RIS witness search, schema, verifier, locality).</p>
 <h4>Reproduction</h4>
 <pre>
-python research/build_dense_surface.py 13   # writes /tmp/dense_13.npz (hx, hz, coords)
-./qldpc submit /tmp/dense_13.npz --coords /tmp/dense_13.npz --layers 1 \
+python research/build_dense_surface.py 13 dense_13.npz   # writes hx, hz, coords
+./qldpc submit dense_13.npz --coords dense_13.npz --layers 1 \
   --authors @mathysrennela --family topological
 </pre></div></section>
 <section class=blk><h3>Parity checks</h3>

@@ -27,6 +27,9 @@ labels are arbitrary elements of F_2[G], and any bivariate polynomial pair
 (A, B) in them. ``PAPER_INSTANCES`` rebuilds that paper's five examples; the
 A4 x C6 [[144,16,12]] one reproduces the paper's SHA-256 matrix digests.
 """
+import json
+import os
+
 import numpy as np
 
 
@@ -175,6 +178,32 @@ def build_2bga(mul, a, b):
     HX = np.concatenate([La, Rb], axis=1).astype(np.int8)
     HZ = np.concatenate([Rb.T, La.T], axis=1).astype(np.int8)
     return HX, HZ
+
+
+_GROUPS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groups")
+
+
+def small_group(order, gap_id):
+    """Cayley table of GAP's SmallGroup(order, gap_id), read from research/kit/groups/.
+
+    The tables there were exported by ``groups/cayley_table.g``: elements in
+    GAP's ``Elements(G)`` order with the identity at index 0, entry [r, c] the
+    index of g_r g_c. The catalog id pins the group; GAP's structure
+    description does not (five groups of order 64 print as ((C4 x C2) : C4) : C2).
+    """
+    path = os.path.join(_GROUPS_DIR, f"smallgroup_{order}_{gap_id}.json")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"no committed table for SmallGroup({order}, {gap_id}); "
+                                "export one with research/kit/groups/cayley_table.g")
+    with open(path, encoding="utf-8") as f:
+        mul = np.asarray(json.load(f)["table"], dtype=np.int64)
+    assert mul.shape == (order, order) and (mul[0] == np.arange(order)).all()
+    return mul
+
+
+def build_2bga_small_group(order, gap_id, a, b):
+    """``build_2bga`` on a committed SmallGroup table; the recipe form for ``rebuild.py``."""
+    return build_2bga(small_group(order, gap_id), a, b)
 
 
 # ----------------------------------------------------------------------

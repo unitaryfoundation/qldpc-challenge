@@ -7,20 +7,23 @@ stops before dedup, so the suite establishes that the kit agrees with the
 verifier's *schema* and never that the kit agrees with the *board*. A kit that
 drifts onto published codes passes CI silently.
 
-This closes that gap for the page. It runs the documented snippet once, then
-checks that what the page says about it is still true:
+This closes that gap for the page. It runs the documented snippet as written,
+staging call included, then checks that what the page says about it is still
+true:
 
   - the snippet still runs, and what it builds is still schema-valid;
   - the `[[n,k,d]]` the page names is the one the snippet builds;
-  - the gate still returns the verdict the page's prose claims.
+  - the gate still returns the verdict the page's prose claims;
+  - the staging call writes the candidate, and a second candidate with the
+    same parameters lands beside it instead of colliding (issue #3377).
 
 So if the page and the board ever disagree -- an entry removed, a construction
 edited, a claim left behind after a change -- this fails instead of misleading
 the next reader.
 
-Costs about as much as `research/test_smoke.py`: one Monte Carlo witness search
-(~14 s, the documented snippet's own `trials`, run once for the module) plus a
-board load and a `refute=False` gate pass.
+Costs about twice `research/test_smoke.py`: two Monte Carlo witness searches
+(~14 s each, `make_submission`'s own `trials`, one per run of the snippet) plus
+a board load and a `refute=False` gate pass.
 """
 import io
 import os
@@ -91,29 +94,38 @@ def board():
 
 
 @pytest.fixture(scope="module")
-def doc():
-    """The submission the documented snippet builds.
+def staging(tmp_path_factory):
+    """A throwaway staging root, so the documented call writes for real without
+    touching the repository's `research/candidates/`."""
+    return str(tmp_path_factory.mktemp("staging"))
 
-    Module-scoped because it is the expensive half: the snippet runs a Monte
-    Carlo witness search at its own documented `trials`, and every test below
-    reads the same document.
 
-    `staging_dir` and `save_submission` are stubbed so a test run writes nothing
-    to the staging tree. Everything else executes as written, so a changed
-    signature in `make_submission` is caught here rather than by a reader.
+def _run_documented_snippet(staging_root, *, build=None):
+    """Execute the documented snippet as written, staged under ``staging_root``.
+
+    Only the staging root and the run id move, through the knobs `coordination`
+    already exposes (`CANDIDATES` and `$QLDPC_RUN_ID`), so `staging_dir` and
+    `save_submission` run as written and the documented call is the one under
+    test, collision policy included. An earlier fixture stubbed both, and a
+    documented call that raised `CandidateCollision` passed (issue #3377).
+
+    ``build`` optionally replaces `bb.build_bb` for this run; the regression
+    test below uses it to get a second, different candidate out of the same
+    snippet. Saved and restored by hand rather than monkeypatched: the module
+    fixture outlives pytest's function-scoped monkeypatch.
     """
     for p in ("research/kit", "verify"):
         if p not in sys.path:
             sys.path.insert(0, os.path.join(ROOT, p))
+    import bb
     import coordination
-    import submit
 
-    # Save and restore rather than monkeypatch: the fixture is module-scoped and
-    # pytest's monkeypatch is function-scoped, and leaving these replaced would
-    # hand every later test in the process a stubbed staging tree.
-    real_staging_dir, real_save = coordination.staging_dir, submit.save_submission
-    coordination.staging_dir = lambda *a, **k: os.path.join(ROOT, "research", "candidates")
-    submit.save_submission = lambda doc_, path, **k: path
+    real_root, real_build = coordination.CANDIDATES, bb.build_bb
+    real_rid = os.environ.get(coordination.RUN_ID_ENV)
+    coordination.CANDIDATES = staging_root
+    os.environ[coordination.RUN_ID_ENV] = "documented-example"
+    if build is not None:
+        bb.build_bb = build
 
     cwd = os.getcwd()
     os.chdir(ROOT)                      # the snippet uses relative sys.path entries
@@ -123,10 +135,34 @@ def doc():
             exec(compile(_documented_snippet(), QUICKSTART, "exec"), ns)  # noqa: S102
     finally:
         os.chdir(cwd)
-        coordination.staging_dir = real_staging_dir
-        submit.save_submission = real_save
+        coordination.CANDIDATES, bb.build_bb = real_root, real_build
+        if real_rid is None:
+            os.environ.pop(coordination.RUN_ID_ENV, None)
+        else:
+            os.environ[coordination.RUN_ID_ENV] = real_rid
     assert "doc" in ns, "the documented snippet no longer builds a submission doc"
-    return ns["doc"]
+    assert "path" in ns and os.path.isfile(ns["path"]), (
+        "the documented snippet no longer stages the submission it builds")
+    assert os.path.commonpath([ns["path"], staging_root]) == staging_root, (
+        f"the documented snippet staged outside its run directory: {ns['path']}")
+    return ns
+
+
+@pytest.fixture(scope="module")
+def documented(staging):
+    """The documented snippet's namespace, run once for the module.
+
+    Module-scoped because it is the expensive half: `make_submission` runs a
+    Monte Carlo witness search at its own `trials`, and every test below reads
+    the same document.
+    """
+    return _run_documented_snippet(staging)
+
+
+@pytest.fixture(scope="module")
+def doc(documented):
+    """The submission the documented snippet builds."""
+    return documented["doc"]
 
 
 def test_documented_snippet_builds_a_schema_valid_submission(doc):
@@ -180,3 +216,41 @@ def test_page_claim_agrees_with_the_gate(doc, board):
             f"QUICKSTART.md's example is marked `# gate: "
             f"{_claimed_gate_outcome()}` but the gate returns passed="
             f"{verdict.get('passed')}. Update the marker or the example.")
+
+
+def test_documented_staging_keeps_both_candidates(documented, staging):
+    """Two candidates with the same parameters must both survive staging.
+
+    Issue #3377: `AGENTS.md` and this page prescribed the flat `<n>-<k>-<d>.json`
+    name, and `save_submission` refuses to write over a different candidate at
+    that name, so the second session's witness was never written. Run the
+    documented snippet again with a different code of the same `[[n,k]]`, a
+    column permutation of the example, into the same staging directory. With
+    `unique_path` both files exist; with the flat name the second run raises
+    `CandidateCollision`, which is the failure this test is for.
+    """
+    import bb
+    import numpy as np
+
+    real_build = bb.build_bb
+    rng = np.random.default_rng(3377)
+
+    def permuted(*args, **kwargs):
+        HX, HZ = real_build(*args, **kwargs)
+        perm = rng.permutation(HX.shape[1])
+        return HX[:, perm], HZ[:, perm]
+
+    second = _run_documented_snippet(staging, build=permuted)
+    first_doc, second_doc = documented["doc"], second["doc"]
+    assert (first_doc["n"], first_doc["k"]) == (second_doc["n"], second_doc["k"])
+    assert first_doc["checks"] != second_doc["checks"], \
+        "the second run rebuilt the first candidate, so nothing was tested"
+
+    first_path, second_path = documented["path"], second["path"]
+    assert os.path.dirname(first_path) == os.path.dirname(second_path), \
+        "the two runs did not share a staging directory"
+    assert first_path != second_path, "the second candidate took the first one's path"
+    assert os.path.isfile(first_path) and os.path.isfile(second_path)
+    stem = os.path.splitext(os.path.basename(first_path))[0]
+    assert os.path.basename(second_path).startswith(stem), (
+        f"the second candidate was staged under an unrelated name: {second_path}")

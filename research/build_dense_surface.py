@@ -86,6 +86,7 @@ def build(distance):
 if __name__ == "__main__":
     import sys
     d = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    out = sys.argv[2] if len(sys.argv) > 2 else f"dense_{d}.npz"
     HX, HZ, coords, data, allcoords = build(d)
     n = len(data)
     rX = np.linalg.matrix_rank(HX.astype(np.int64)) if n else 0
@@ -116,5 +117,5 @@ if __name__ == "__main__":
     print(f"coords range (normalized) x:[{coords[:,0].min()},{coords[:,0].max()}] y:[{coords[:,1].min()},{coords[:,1].max()}]")
     print(f"claim interaction_radius {r:.6f}; min site spacing {coords.min(axis=0) if False else 'unit by construction'}")
 
-    np.savez(f"/tmp/dense_{d}.npz", hx=HX, hz=HZ, coords=coords)
-    print(f"wrote /tmp/dense_{d}.npz  (hx hz coords)")
+    np.savez(out, hx=HX, hz=HZ, coords=coords)
+    print(f"wrote {out}  (hx hz coords)")

@@ -89,7 +89,7 @@
 <h4>Reproduction</h4>
 <p>No new search is needed -- rebuild from the paper&#x27;s printed data:</p>
 <p>1. <code>G := SmallGroup(252,21)</code> in GAP 4.15.1, with PCG generators <code>f_1..f_r</code>. 2. <code>H = &lt;f2*f5, f4&gt;</code>; <code>N := Normalizer(G,H)</code>; <code>m := Index(G,H)</code>, so <code>n = 4m</code>. 3. Take <code>A</code> (over <code>F_2[G]</code>) and <code>B</code> (over <code>F_2[N]</code>) from the paper&#x27;s Appendix A entry for this code, written as <code>+</code>-separated PCG words. 4. Build <code>L(A)</code> and <code>R(B)</code> as <code>m x m</code> block matrices from the left and right coset actions, assemble <code>H_X</code> and <code>H_Z</code> blockwise as in Definition III.1, and concatenate.</p>
-<p>Expected: <code>n = 168</code>, <code>k = 10</code>, max row weight 6, and <code>H_X H_Z^T = 0</code>, with no search required for any of those four facts. The construction is implemented in <code>research/kit/clp.py</code>.</p>
+<p>Expected: <code>n = 168</code>, <code>k = 10</code>, max row weight 6, and <code>H_X H_Z^T = 0</code>, with no search required for any of those four facts. The construction was implemented in a local <code>clp.py</code> that was never committed under any path; the four steps above are the reproduction.</p>
 <p>The group data itself is reconstructible with: <code>G := SmallGroup(252,21)</code>, then read each element&#x27;s word from <code>List(Elements(G), String)</code>.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 84 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 84 (max weight 6)</div>

@@ -32,6 +32,7 @@ _ROOT = os.path.dirname(_HERE)
 # verdict dependencies. validator_manifest.json cannot hash itself without recursion.
 TRUSTED = (
     # CI orchestration: selects the trusted checkout, commands, and arguments.
+    ".github/workflows/codes-format.yml",
     ".github/workflows/prose.yml",
     ".github/workflows/refute-weekly.yml",
     ".github/workflows/verify.yml",
@@ -49,6 +50,7 @@ TRUSTED = (
     "verify/build_receipt.py",
     "verify/check_authorship.py",
     "verify/check_certs.py",
+    "verify/check_codes_format.py",
     "verify/check_prose.py",
     "verify/check_submission_scope.py",
     "verify/check_tree_consistency.py",

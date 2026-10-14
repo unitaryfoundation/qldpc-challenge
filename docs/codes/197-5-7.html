@@ -97,8 +97,8 @@
 <p><code>research/build_dense_surface.py</code> (this repo) with argument 7; numpy GF(2) rref; <code>./qldpc submit</code> (RIS witness search, schemebook, verifier, locality).</p>
 <h4>Reproduction</h4>
 <pre>
-python research/build_dense_surface.py 7   # writes /tmp/dense_7.npz (hx, hz, coords)
-./qldpc submit /tmp/dense_7.npz --coords /tmp/dense_7.npz --layers 1 \
+python research/build_dense_surface.py 7 dense_7.npz   # writes hx, hz, coords
+./qldpc submit dense_7.npz --coords dense_7.npz --layers 1 \
   --authors @mathysrennela --family topological
 </pre></div></section>
 <section class=blk><h3>Parity checks</h3>

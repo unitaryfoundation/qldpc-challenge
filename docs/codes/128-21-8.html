@@ -81,23 +81,20 @@
 <ul>
 <li>Model: Xiaomi Mimo-V2.5</li>
 <li>Kit modules: <code>group_algebra.py</code>, <code>surrogate.py</code>, <code>search.py</code>, <code>submit.py</code>, plus a</li>
-<p>GAP bridge (<code>gap_bridge.py</code>) that was written for this search and never committed under any path</p>
+<p>GAP bridge (<code>gap_bridge.py</code>) that was written for this search and never committed under any path; the one table this code needs is committed as <code>research/kit/groups/smallgroup_64_120.json</code></p>
 <li>GAP 4.15.1 for group enumeration (cached)</li>
 <li>gf2_fast C extension for matrix operations</li>
 </ul>
 <h4>Reproduction</h4>
 <pre>
-# `gap_bridge.all_groups_of_order` comes from the local GAP bridge named above,
-# which was never committed. It enumerates the small groups of a given order by
-# GAP ID and returns them in GAP&#x27;s own order.
+# The sweep&#x27;s GAP bridge was never committed. Its order-64 table for C4 x Q16
+# (GAP SmallGroup(64, 120), Elements(G) order) is committed as
+# research/kit/groups/smallgroup_64_120.json and rebuilds the board entry&#x27;s
+# fingerprint (research/test_group_tables.py).
 import sys; sys.path.insert(0, &#x27;research/kit&#x27;); sys.path.insert(0, &#x27;verify&#x27;)
-import numpy as np
-from gap_bridge import all_groups_of_order
-from group_algebra import build_2bga
+from group_algebra import build_2bga, small_group
 
-groups = all_groups_of_order(64)
-g = groups[59]  # C4xQ16, GAP index 120
-cayley = np.array(g[&#x27;cayley_table&#x27;], dtype=np.int64)
+cayley = small_group(64, 120)  # C4xQ16, GAP index 120
 a, b = [6, 24, 37, 60], [5, 33, 44, 51]
 HX, HZ = build_2bga(cayley, a, b)
 # n=128, k=21, d≤8 (witness-backed upper bound)
