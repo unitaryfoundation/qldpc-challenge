@@ -445,9 +445,8 @@ otherwise. `d_only_gain` means the *whole* board advance was on `d`; `d_only_pee
 the list to act on, and it is non-empty even when the candidate also beat some other
 entry on `k` (the label then still names those peers, as
 `advances the <cell> board on d, k; its gain over <peer> is d-only: ...`).
- The board has been wrong this way before (`[[882,18,30]]`→29, `[[684,12,81]]`→66,
-`[[396,10,39]]`→37 — `audits/README.md`), and chasing an inflated d is how a campaign
-ends with nothing.
+The board has been wrong this way before (the corrections are listed in
+`audits/README.md`), and chasing an inflated d is how a campaign ends with nothing.
 
 So measure both numbers at one budget before spending anything on packaging:
 
@@ -519,16 +518,12 @@ rather than a missing flag.
   The construction left `d` as the only free axis, so re-measure the peer and your candidate
   at matched depth (`leader_audit.py pair`) before you treat the gain as real.
 
-## Field notes from past campaigns
+## Field notes
 
-Operational field experience lives in [`../fieldnotes/`](../fieldnotes/) —
-PR-able entries rendered in the site's research log. The lessons that used to
-be inlined here (trial-depth floors and the distance-inflation discipline,
-lit-check timing, confirmation-budget planning, tooling landmines, and the
-2026-06→07 open-directions snapshot) were ported there on 2026-07-23. Read
-the entries touching your family before spending budget (step 0 of the
-loop), and add a fieldnote when a campaign learns something the next one
-should not have to re-learn.
+Operational field experience lives in [`../fieldnotes/`](../fieldnotes/),
+rendered in the site's research log. Read the entries touching your family
+before spending budget (step 0 of the loop), and add one when a campaign learns
+something the next one should not have to re-learn.
 
 ## Definition of done (a candidate you may surface)
 

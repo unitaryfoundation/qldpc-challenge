@@ -66,8 +66,8 @@ A record whose only strict axis is `d` — the candidate ties an existing entry 
 n, k and w and raises nothing but the distance — is a different kind of claim
 from the rest of the frontier: both numbers are witness-backed *upper* bounds, so
 the comparison says which search was deeper as much as which code is better, and
-this is where the board has historically been wrong (`[[882,18,30]]` → 29,
-`[[684,12,81]]` → 66). The submission gate reports that pattern instead of a
+this is where the board has historically been wrong (the corrections are
+recorded in `research/audits/README.md`). The submission gate reports that pattern instead of a
 generic advance: `validate_candidate` returns `advances_by: ["d"]` in
 `gates.novelty` together with `d_only_peers`, naming the entry that was beaten.
 `d_only_gain` is the stricter of the two: it is true only when nothing but `d`

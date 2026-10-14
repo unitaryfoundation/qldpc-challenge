@@ -116,9 +116,8 @@ A note named `<n>-<k>-<d>.md` must state its own `[[n,k,d]]` first. Follow
 
 **Attribution is checked, not assumed.** A fieldnote ADDED by a PR must credit
 the PR author's own GitHub handle in its frontmatter `author:` line — CI passes
-`--pr-author` to `check_prose.py` and fails on a missing or mismatched handle
-(the 2026-09-23 escalation-gate note shipped with someone else's handle; this
-closes that hole). Locally, reproduce it with
+`--pr-author` to `check_prose.py` and fails on a missing or mismatched handle.
+Locally, reproduce it with
 `PR_AUTHOR=<your-login> verify/prepush_prose_check.sh <body.md>`. Modifying
 someone else's existing note is exempt.
 
