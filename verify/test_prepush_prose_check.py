@@ -7,6 +7,7 @@ build a small upstream, a fork of it with a stale main, and a branch on the
 fork, and check which base the script resolves and what it says.
 """
 import os
+import re
 import subprocess
 import sys
 
@@ -114,3 +115,19 @@ def test_uncommitted_notes_are_refused_and_other_dirt_is_not(fork):
     r = _run(repo)
     assert r.returncode == 2
     assert "notes/draft.md" in r.stderr
+
+
+def test_the_contributor_prompt_checks_the_note_and_names_the_gate():
+    """The paste-ready prompt in CONTRIBUTING.md is what a contributor's agent executes.
+
+    It once ran the prose check on the code JSON, which the scanner passes
+    trivially, and never named this gate (#3382).
+    """
+    with open(os.path.join(_ROOT, "CONTRIBUTING.md"), encoding="utf-8") as f:
+        text = f.read()
+    start = text.index("You are contributing to the QEC Challenge")
+    block = text[start:start + text[start:].index("```")]
+    files = re.findall(r"--files\s+(\S+)", block)
+    assert files and all(f.endswith(".md") for f in files), files
+    assert "verify/prepush_prose_check.sh <body.md>" in block
+    assert os.access(SCRIPT, os.X_OK)

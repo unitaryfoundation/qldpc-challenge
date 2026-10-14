@@ -391,7 +391,18 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
        or a deliberate "checked, not equivalent";
      - if no research note was staged, add notes/<n>-<k>-<d>.md.
    Then re-run: uv run python verify/check_prose.py --body-file <body.md>
-   --files codes/<n>-<k>-<d>.json — it must exit 0 before review.
+   --files notes/<n>-<k>-<d>.md (the changed .md files, never the JSON: the
+   scanner reads whatever it is handed, and a JSON passes trivially). It must
+   exit 0 before review.
+
+6. Before every git push of the branch, run
+   verify/prepush_prose_check.sh <body.md>. The local check reads your
+   working tree, where uncommitted files exist; CI reads only committed
+   files, and the script re-runs the check in a clean worktree of HEAD, so it
+   fails exactly when CI would. In a fork, add the canonical repository as
+   `upstream` first (git remote add upstream
+   https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
+   upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
 
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.
