@@ -637,8 +637,8 @@ def pr_body(doc, report, args, out, note_out=None):
     if front:
         lines += front
     else:
-        lines += ["(Name the track and the existing entry this beats or "
-                  "extends, and on which axis.)"]
+        lines += ["(Name the track and the cell it lands in, any entry it "
+                  "dominates, and on which axis.)"]
     lines += [
         f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight {wmax}, "
         f"locality class {comp.get('locality_class', 'unknown')}.",

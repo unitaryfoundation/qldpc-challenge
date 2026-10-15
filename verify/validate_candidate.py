@@ -224,7 +224,7 @@ def validate_candidate(doc, *, seed=None, refute=True):
     # code competes in, and the raw max check weight is a ranking axis inside
     # it. Comparing on class alone treated a w = 32 code as dominating a w = 7
     # one whenever n, k and d allowed, which the site's own frontier does not,
-    # so a code could be labelled "does not advance its board cell" while
+    # so a code could be labelled "not board-advancing" while
     # starring on the rendered board.
     #
     # The code type is a third cell dimension: a stabilizer
