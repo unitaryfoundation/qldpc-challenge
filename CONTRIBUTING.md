@@ -348,10 +348,10 @@ You are contributing to the QEC Challenge, a leaderboard of quantum LDPC
 codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
 
 1. Clone https://github.com/unitaryfoundation/qldpc-challenge. Read TRACKS.md
-   (the tracks and the "Reference bars" section, which lists the live bars to
-   beat) and research/AUTORESEARCH.md, the manual for the research/ starter
+   (the tracks and the "Reference bars" section, which lists reference codes
+   and efficiencies near the frontier) and research/AUTORESEARCH.md, the manual for the research/ starter
    kit (code constructors, the RIS distance surrogate, submission packaging).
-   Pick one target from the reference bars.
+   Pick one track cell or reference bar to aim at.
 
 2. Search a construction family. Represent each candidate as a small Python
    program that generates (H_X, H_Z), and mutate that generator (its
@@ -411,8 +411,11 @@ deep re-verification.
 ```
 
 Two rules keep a submission honest and worth merging: every distance carries a
-checkable witness (the CLI produces it), and a code only counts if it advances
-a track's frontier rather than just filling the board.
+checkable witness (the CLI produces it), and a code is worth submitting if it is
+board-advancing, meaning no entry in its track cell dominates it. Beating a
+particular entry is not required. A code whose only strict gain over an entry is
+distance needs re-measurement at matched depth first (see "What makes a
+submission interesting").
 
 ## By hand
 
@@ -504,9 +507,16 @@ An optional manifest at `repro/<slug>.json` (schema: `schema/reproduction.schema
 
 ## What makes a submission interesting
 
-A code only matters if it advances a track's Pareto frontier over (n, k, d)
-under that track's constraints (check weight, locality). Dominated codes are
-accepted and recorded but will not sit on the frontier. See `TRACKS.md`.
+A code is worth submitting if it is board-advancing: under the track's constraints
+(check weight, locality), no entry dominates it over (n, k, d, w). Such a code
+extends the frontier even when it beats no existing entry, and it need not beat the
+cell's kd^2/n leader. Dominated codes pass the gate and are recorded as non-frontier
+results, but they do not sit on the frontier. See `TRACKS.md`.
+
+A board-advancing code whose only strict gain over an entry is d (same n, k and w)
+calls for caution, not rejection: both distances are upper bounds, so re-measure the
+peer and the candidate at matched depth (`research/audits/leader_audit.py pair`)
+before submitting.
 
 ## Tips
 

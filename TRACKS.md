@@ -80,7 +80,9 @@ depth, and its `redirect` verdict — the board's number, not the candidate's, w
 the soft one — is a distance revision, which is a correction to that entry
 rather than a new submission (`research/audits/README.md`). The
 board still ranks claims exactly as claimed; the flag says which claim to
-re-measure first.
+re-measure first. It is a caution, not a rejection: a board-advancing code whose
+only gain is on d is still worth submitting once the peer and the candidate have been
+re-measured at matched depth.
 
 ## Layer 2: family tags (provenance, never ranked)
 

@@ -524,7 +524,11 @@ rather than a missing flag.
   claim needs server certification (step 6). Only pursue it for a standout the human wants.
 - **Beating an equal (n, k, w) board entry on `d` alone is the inflation pattern** (step 5b).
   The construction left `d` as the only free axis, so re-measure the peer and your candidate
-  at matched depth (`leader_audit.py pair`) before you treat the gain as real.
+  at matched depth (`leader_audit.py pair`) before you treat the gain as real. This is
+  caution, not disqualification: a board-advancing code that gains only on `d` stays
+  worth submitting once re-measured.
+- **Not beating a leader is not a failure.** A board-advancing code that beats no entry
+  extends the frontier and is worth submitting. Report it as board-advancing, not as a loss.
 
 ## Field notes
 

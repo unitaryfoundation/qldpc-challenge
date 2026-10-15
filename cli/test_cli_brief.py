@@ -50,7 +50,7 @@ def test_brief_reports_the_cell_frontier_and_bar(small_board):
     assert cell["codes"] == 2 and cell["nondominated"] == 2
     assert cell["bar_kd2_over_n"] == 12.0
     assert cell["frontier"][0]["slug"] == "144-12-12"
-    assert "bar kd2/n 12.0" in buf.getvalue()
+    assert "best kd2/n 12.0" in buf.getvalue()
 
 
 def test_brief_with_a_family_composes_screening_recent_and_notes(small_board):

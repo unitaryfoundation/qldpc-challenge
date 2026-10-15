@@ -70,8 +70,8 @@ def main():
 
     print("1b. a code compared against ITSELF reports no novelty verdict:")
     # Validating a doc already on the board makes the dedup gate fire. The
-    # novelty verdict is withheld rather than reported as "does not advance its
-    # board cell", which would read as a rejection on merit when none happened.
+    # novelty verdict is withheld rather than reported as "not board-advancing",
+    # which would read as a rejection on merit when none happened.
     import glob
     onboard = sorted(glob.glob(os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -85,7 +85,7 @@ def main():
               vd["gates"]["novelty"]["board_advancing"] is None)
         check("label names the duplicate, not a cell failure",
               any("already on the board" in x for x in vd["labels"])
-              and not any("does not advance" in x for x in vd["labels"]))
+              and not any("not board-advancing" in x for x in vd["labels"]))
         check("still fails the gate", not vd["passed"])
 
     print("2. an OVER-CLAIM (same checks, inflated witnesses) is rejected:")
@@ -184,7 +184,8 @@ def main():
         check("dominated -> no advance, no d-only flag",
               vd3["gates"]["novelty"]["board_advancing"] is False
               and vd3["gates"]["novelty"]["d_only_gain"] is False
-              and any("does not advance" in x for x in vd3["labels"]))
+              and any(x.startswith("not board-advancing") and "dominated by" in x
+                      and "non-frontier" in x for x in vd3["labels"]))
     finally:
         V._board_entries = real_board
 

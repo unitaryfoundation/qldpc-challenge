@@ -758,7 +758,7 @@ def frontier_summary(doc, report):
                           or e["d"] < cand["d"] or e["w"] > cand["w"])]
         dominated.sort(key=lambda e: (-e["eff"], e["n"]))
         head = (f"- **{LOCALITY_LABEL[L]} / {WEIGHT_LABEL[W]}**: "
-                f"{'on the Pareto frontier' if on_front else 'not on the frontier'}")
+                f"{'on the Pareto frontier' if on_front else 'not on the frontier (dominated by a cell entry)'}")
         if dominated:
             names = ", ".join(f"[[{e['n']},{e['k']},{e['d']}]]"
                               for e in dominated)
@@ -1278,8 +1278,7 @@ def cmd_targets(args):
                 print(f"  nothing at n <= {args.n}: any verified code here "
                       f"lands on the frontier")
             else:
-                print(f"  at n <= {args.n}, {len(near)} entries to get past; "
-                      f"the ones to beat:")
+                print(f"  at n <= {args.n}, {len(near)} frontier entries:")
                 for e in sorted(near, key=eff, reverse=True)[:args.top]:
                     print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} "
                           f"kd2/n={eff(e):.2f}")
@@ -1294,7 +1293,9 @@ def cmd_targets(args):
           f"A code counts in every cell it qualifies for (the classes nest), "
           f"so these counts overlap by design.")
     print("Nondominated means no other code in the cell beats it on all of "
-          "n, k, d and check weight at once, which is what earns a record star.")
+          "n, k, d and check weight at once. That is the whole bar for a "
+          "submission: a nondominated code extends the frontier whether or not "
+          "it beats any particular entry, so there is no single rank to top.")
     if claims:
         print(f"\n{_plural(len(claims), 'live claim')}, advisory and expiring "
               f"(nothing enforces them; see `qldpc targets --help`):")
@@ -1337,7 +1338,8 @@ def _recent_code_rows(days, family):
 
 
 def cmd_brief(args):
-    """One bounded snapshot before a search: the cell's frontier and bar, what
+    """One bounded snapshot before a search: the cell's frontier and best
+    efficiency, what
     was screened there, what landed for the family, and the fieldnotes that
     touch it (#2955, item 4). Composes targets, screened, recent."""
     res = _result(args)
@@ -1400,7 +1402,7 @@ def cmd_brief(args):
 
     for c in cells_out:
         print(f"{c['cell']}: {c['codes']} codes, {c['nondominated']} nondominated, "
-              f"bar kd2/n {c['bar_kd2_over_n']}"
+              f"best kd2/n {c['bar_kd2_over_n']}"
               + (f"; {c['family_codes']} from {args.family}, best {c['family_best_kd2_over_n']}"
                  if args.family else ""))
         for e in c["frontier"]:
@@ -2539,8 +2541,9 @@ def main(argv=None):
     cv.add_argument("campaign", help="campaign id, the directory under "
                                      "research/campaigns/")
     cv.add_argument("--bar", type=float, default=None,
-                    help="the reference kd^2/n to beat; defaults to the "
-                         "campaign's objective.target when it has one")
+                    help="the reference kd^2/n the curve is compared against; "
+                         "defaults to the campaign's objective.target when it "
+                         "has one")
     cv.add_argument("--cell", default="",
                     help="take the bar from the board's best in this cell, "
                          "e.g. 'unrestricted/weight-6'")
@@ -2618,7 +2621,7 @@ def main(argv=None):
     g.set_defaults(func=cmd_targets)
 
     b = sub.add_parser("brief", help="one snapshot before a search: a cell's frontier "
-                       "and bar, what was screened there, what landed, the fieldnotes")
+                       "and best efficiency, what was screened there, what landed, the fieldnotes")
     b.add_argument("--cell", required=True, help="e.g. 'weight-6/unrestricted'")
     b.add_argument("--family", default="", help="family tag to filter screening, recent codes, and notes")
     b.add_argument("--days", type=int, default=30, help="window for recent codes (default 30)")

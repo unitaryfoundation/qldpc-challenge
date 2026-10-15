@@ -4,6 +4,21 @@ This repo is a public, automatically verified leaderboard for quantum LDPC (qLDP
 The `verify/` stack machine-checks submissions; `research/` is a starter kit for constructing
 and searching for new codes.
 
+## The motto
+
+Any board-advancing code is worth submitting: a code that passes the gate and is
+not dominated by any entry in its track cell. A code that beats no existing entry
+is still a frontier extension, so "does not beat the cell leader" is never a reason
+to discard it. The board ranks by Pareto frontier, not by the kd^2/n leader.
+
+A board-advancing code whose only strict gain over an entry is distance (d, with n,
+k and w no better) needs caution, not rejection. Both distances are upper bounds, so
+such a gain is where inflated bounds show up. Re-measure the peer and the candidate
+at matched depth (`research/audits/leader_audit.py pair`) before submitting it.
+
+Dominated codes pass the gate but are not board-advancing. Record them as non-frontier
+results; do not submit them as frontier codes.
+
 ## Choose the workflow before acting
 
 There are two supported workflows. The user's publication authorization determines which one

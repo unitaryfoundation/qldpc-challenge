@@ -293,18 +293,24 @@ def validate_candidate(doc, *, seed=None, refute=True):
                 f"over {peers}: "
                 "distance is the suspect axis; re-measure the peer and this "
                 "candidate at matched depth "
-                "(research/audits/leader_audit.py pair) before packaging")
+                "(research/audits/leader_audit.py pair) before submitting; "
+                "a caution, not a rejection")
         else:
             verdict["labels"].append(
                 f"advances the {wc} x {lc}{kind} board on "
                 f"{', '.join(advances_by)}; "
                 f"its gain over {peers} is d-only: distance is the suspect "
                 "axis; re-measure the peer and this candidate at matched depth "
-                "(research/audits/leader_audit.py pair) before packaging")
+                "(research/audits/leader_audit.py pair) before submitting; "
+                "a caution, not a rejection")
+    elif board_advancing:
+        verdict["labels"].append(f"advances the {wc} x {lc}{kind} board")
     else:
+        more = len(dominators) - 1
+        tail = f" and {more} more" if more else ""
         verdict["labels"].append(
-            f"advances the {wc} x {lc}{kind} board" if board_advancing
-            else f"does not advance its{kind} board cell")
+            f"not board-advancing{kind}: dominated by {dominators[0]}{tail}; "
+            "recorded as a non-frontier result")
     verdict["labels"].append("literature novelty UNVERIFIED")
 
     verdict["passed"] = bool(verify_ok and not refuted and not exact_dup)
