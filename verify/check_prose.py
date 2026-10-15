@@ -26,6 +26,19 @@ PR must credit the PR author's handle in its frontmatter `author:` line. The
 nothing checked attribution; this closes that hole. Modified files are exempt
 (fixing a typo in someone else's note is fine); a missing author line fails.
 
+A distance revision moves `notes/<n>-<k>-<old d>.md` to the new slug, and the
+convention that keeps the record intact is to paste the previous note under a
+`## Original note, with the file paths updated` heading beneath the revision
+record. 42 of the first 186 revisions deleted the old note and wrote a fresh one
+instead, and four of those lost most of the search narrative (#3388). So when
+the PR changes a `codes/` or `notes/` slug's d, the old note's body lines must
+still be found, slug-normalized, in the new note or in a fieldnote the PR
+touches: at least 70% of them, or the check fails and names the two ways out
+(fold the old note forward, or reclassify its narrative into `fieldnotes/`).
+Whether git saw a rename is reported but not judged: a fold-in that more than
+doubles the note can fall under git's similarity threshold and still keep
+every line.
+
 Only files CHANGED by the PR are checked. Notes already on the board are left
 alone; this guards what arrives from here on. `--all` sweeps every committed
 notes/ and fieldnotes/ file instead: the weekly prose-sweep workflow runs it and
@@ -123,6 +136,20 @@ AUTHOR_LINE = re.compile(
 # The note template is scaffolding by definition: it carries the placeholder
 # header and the instruction comment that every real note must not.
 EXEMPT = {"notes/TEMPLATE.md"}
+
+# The heading under which a distance revision carries the note it replaces.
+# The check measures what survives rather than looking for the heading, so a
+# narrative moved to fieldnotes/ (as #3053 did) passes too.
+FOLD_IN_HEADING = "## Original note, with the file paths updated"
+RETENTION_MIN = 0.70
+
+# n, k, d, and the optional disambiguating suffix (`-b`, `-s`) of a slug.
+CODE_PATH = re.compile(r"^codes/(\d+)-(\d+)-(\d+)((?:-[a-z0-9]+)?)\.json$")
+NOTE_PATH = re.compile(r"^notes/(\d+)-(\d+)-(\d+)((?:-[a-z0-9]+)?)\.md$")
+# A slug anywhere in prose: n and k are kept, d is dropped, so updating the
+# file paths inside a folded-in note does not count against it.
+SLUG_IN_TEXT = re.compile(r"\b(\d+)-(\d+)-\d+\b")
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 
 
 def strip_rel_prefix(tok):
@@ -311,6 +338,131 @@ def check_fieldnote_author(rel, text, pr_author, problems):
                          f"@{pr_author}"))
 
 
+def body_lines(text):
+    """Return the prose lines of a note, normalized for comparison across a revision.
+
+    Headings, table rows, fenced blocks, HTML comments, and blank lines are
+    dropped. A slug or [[n,k,d]] keeps n and k and loses d, and runs of
+    whitespace collapse, so a fold-in that only updated paths matches line
+    for line.
+    """
+    lines = set()
+    fenced = False
+    for raw in HTML_COMMENT.sub("", text).splitlines():
+        line = raw.strip()
+        if line.startswith(("```", "~~~")):
+            fenced = not fenced
+            continue
+        if fenced or not line or line.startswith(("#", "|")):
+            continue
+        line = NKD.sub(lambda m: f"[[{m.group(1)},{m.group(2)},d]]", line)
+        line = SLUG_IN_TEXT.sub(r"\1-\2-d", line)
+        lines.add(re.sub(r"\s+", " ", line))
+    return lines
+
+
+def retention(old_text, new_text):
+    """Return the fraction of the old note's body lines present in the new text.
+
+    1.0 when the old note had no body to lose.
+    """
+    old = body_lines(old_text)
+    if not old:
+        return 1.0
+    return len(old & body_lines(new_text)) / len(old)
+
+
+def slug_into(path, table):
+    """Record a codes/ or notes/ slug as (n, k, suffix) -> {d}; other paths are ignored."""
+    m = CODE_PATH.match(path) or NOTE_PATH.match(path)
+    if m:
+        table.setdefault(m.group(1, 2, 4), set()).add(m.group(3))
+
+
+def slug_changes(base, root):
+    """Return the distance revisions in the diff vs `base`.
+
+    A dict old-slug -> new-slug for every codes/ or notes/ file whose n and k
+    stayed and whose d changed, whether git saw a rename or a delete beside
+    an add; the set of old-note paths git did report as renames; and the
+    fieldnotes the PR adds or modifies. None if git failed.
+    """
+    try:
+        out = subprocess.check_output(
+            ["git", "diff", "--name-status", "-M", f"{base}...HEAD",
+             "--", "codes/", "notes/", "fieldnotes/"],
+            cwd=root, text=True)
+    except Exception as e:
+        print(f"could not diff vs {base}: {e}")
+        return None
+    gone, came, renamed_notes, fieldnotes = {}, {}, set(), []
+    for row in out.splitlines():
+        parts = row.split("\t")
+        status, paths = parts[0][0], parts[1:]
+        if paths[-1].startswith("fieldnotes/"):
+            if status in "AMR":
+                fieldnotes.append(paths[-1])
+            continue
+        if status in "DR":
+            slug_into(paths[0], gone)
+        if status in "AR":
+            slug_into(paths[-1], came)
+        if status == "R" and NOTE_PATH.match(paths[0]):
+            renamed_notes.add(paths[0])
+    events = {}
+    for (n, k, suffix), old_ds in gone.items():
+        for old_d in old_ds:
+            for new_d in came.get((n, k, suffix), ()):
+                if new_d != old_d:
+                    events[f"{n}-{k}-{old_d}{suffix}"] = f"{n}-{k}-{new_d}{suffix}"
+    return events, renamed_notes, fieldnotes
+
+
+def check_revisions(base, root, problems):
+    """Fail a distance revision that drops the previous note's body (#3388).
+
+    For every slug whose d the PR changed, the old note as it stood at `base`
+    is compared with the new note plus every fieldnote the PR touches. Returns
+    False only if git could not produce the diff.
+    """
+    found = slug_changes(base, root)
+    if found is None:
+        return False
+    events, renamed_notes, fieldnotes = found
+    carried = ""
+    for rel in fieldnotes:
+        path = os.path.join(root, rel)
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                carried += f.read() + "\n"
+    for old_slug, new_slug in sorted(events.items()):
+        old_note, new_note = f"notes/{old_slug}.md", f"notes/{new_slug}.md"
+        if os.path.exists(os.path.join(root, old_note)):
+            continue                                    # note not touched
+        try:
+            old_text = subprocess.check_output(
+                ["git", "show", f"{base}:{old_note}"], cwd=root, text=True,
+                stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            continue                                    # no note to lose
+        new_text = ""
+        if os.path.exists(os.path.join(root, new_note)):
+            with open(os.path.join(root, new_note), encoding="utf-8") as f:
+                new_text = f.read()
+        kept = retention(old_text, new_text + "\n" + carried)
+        if kept >= RETENTION_MIN:
+            continue
+        how = ("git saw a rename" if old_note in renamed_notes
+               else "git saw a delete beside an add, not a rename")
+        where = new_note if new_text else "no note under the new slug"
+        problems.append((
+            new_note if new_text else old_note,
+            "distance revision drops the previous note's body",
+            f"{old_note} -> {where}: {kept:.0%} of its body lines survive "
+            f"(minimum {RETENTION_MIN:.0%}); {how}"))
+    return True
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=ROOT)
@@ -366,6 +518,16 @@ def main(argv):
             with open(path, encoding="utf-8") as f:
                 check_fieldnote_author(rel, f.read(), args.pr_author, problems)
 
+    # Not under --all: a sweep has no diff to read revisions from. Under
+    # --files the diff is still the source of truth for this check, but the
+    # root may be a bare directory with no git history (the self-tests), so
+    # only the CI shape, where the diff also chose the files, fails closed.
+    if not args.all and not check_revisions(args.base, root, problems):
+        if files is not args.files:
+            print("failing closed")
+            return 1
+        print("skipping the revision check")
+
     if args.report:
         write_report(problems, len(files), args.report)
 
@@ -380,6 +542,14 @@ def main(argv):
         print(f"\nAnything labelled '{BODY_LABEL}' above is in the PR description, "
               "not in a\ncommitted file: fix it by editing the PR body. Nothing in "
               "the tree has to\nchange for it.")
+
+    if any(why.startswith("distance revision") for _, why, _ in problems):
+        print("\nA distance revision keeps the note it replaces: `git mv` it to the new")
+        print("slug, put the revision record on top, and carry the previous text under")
+        print(f"'{FOLD_IN_HEADING}', with its paths pointed at the new")
+        print("slug. If the narrative belongs elsewhere, move it to a dated fieldnotes/")
+        print("entry in the same PR instead (PR #3053 did this for [[502,102,50]]). See")
+        print("research/audits/README.md, 'Filing a distance revision'.")
 
     print("\nFix by pointing at something that exists in this PR, or by naming the")
     print("external source and pinning it (e.g. 'github.com/org/repo @ abc1234,")

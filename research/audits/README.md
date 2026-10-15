@@ -214,7 +214,13 @@ name the entry you are revising.
 File it the way every merged correction has been filed:
 
 1. `git mv codes/<n>-<k>-<old-d>.json codes/<n>-<k>-<new-d>.json`, and the
-   note beside it.
+   note beside it. Keep the note's text: the revision record goes on top and
+   the previous note follows under `## Original note, with the file paths
+   updated`, with its paths pointed at the new slug. If the search narrative
+   belongs elsewhere, move it to a dated `fieldnotes/` entry in the same PR
+   instead, as PR #3053 did for `[[502,102,50]]`. `verify/check_prose.py`
+   fails a revision whose new note and fieldnotes keep less than 70% of the
+   old note's body lines (issue #3388).
 2. Lower the side that came down and store the witness that lowered it, with
    `witness_provenance` recording who found it, at what budget, and with
    which tool. `d` is the minimum over the sides. The `found_by` handle has

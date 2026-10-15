@@ -4,7 +4,11 @@
 exist in this PR's tree, or name and pin its external source (e.g.
 "github.com/org/repo @ abc1234, `path/there.py`"). research/candidates/ is
 gitignored working output and cannot be cited as evidence: commit the script or
-describe the method. Checked by verify/check_prose.py. Delete this comment. -->
+describe the method. For a distance revision, `git mv` the old note to the new
+slug, put the revision record on top, and keep the previous text under
+`## Original note, with the file paths updated`: the check fails a revision
+that keeps less than 70% of the old note's body lines (issue #3388). Checked by
+verify/check_prose.py. Delete this comment. -->
 
 
 ## Direction & hypothesis

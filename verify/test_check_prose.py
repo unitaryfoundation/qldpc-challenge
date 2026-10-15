@@ -203,6 +203,99 @@ def main():
         check("real note with a pinned external artifact passes",
               r.returncode == 0, r.stdout.strip().splitlines()[-1:] or "")
 
+    # A distance revision must carry the previous note's body forward (#3388).
+    check("slug update inside a fold-in is not a loss",
+          check_prose.retention("built as `codes/10-2-6.json`, see [[10,2,6]]\n",
+                                "built as `codes/10-2-5.json`, see [[10,2,5]]\n") == 1.0)
+    check("headings, tables, fences, and comments are not body",
+          check_prose.retention("# [[10,2,6]]\n| a | b |\n```\nx = 1\n```\n<!-- c -->\n",
+                                "") == 1.0)
+    table = {}
+    check_prose.slug_into("codes/12-4-2-b.json", table)
+    check_prose.slug_into("notes/12-4-3-b.md", table)
+    check_prose.slug_into("codes/12-4-2.json", table)
+    check("a suffixed slug pairs only with its own suffix",
+          table == {("12", "4", "-b"): {"2", "3"}, ("12", "4", ""): {"2"}}, table)
+    check("a stub keeps nothing",
+          check_prose.retention("# t\n\nline one\nline two\n", "# t\n\nother\n") == 0.0)
+
+    OLD_NOTE = ("# [[10,2,6]] a construction\n\n## What was searched\n\n"
+                "Rebuild from `codes/10-2-6.json`.\n"
+                + "".join(f"Sweep {i} at {1000 * (i + 1)} trials found nothing lighter "
+                          "than weight 6.\n" for i in range(12)))
+    OLD_NOTE_UPDATED = OLD_NOTE.replace("10-2-6", "10-2-5").replace("[[10,2,6]]", "[[10,2,5]]")
+    STUB = ("# [[10,2,5]] distance revision\n\nOnly the distance block differs; "
+            "a weight-5 logical was found.\n")
+
+    def revision_repo(tmp, new_note, fieldnote=None, mv=True):
+        """Commit the old entry on main, then a revision of it on a branch."""
+        def git(*args):
+            subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
+                           cwd=tmp, check=True, capture_output=True)
+        git("init", "-q")
+        git("symbolic-ref", "HEAD", "refs/heads/main")
+        os.makedirs(os.path.join(tmp, "codes"))
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "codes", "10-2-6.json"), "w") as f:
+            f.write('{"name": "[[10,2,6]]", "distance": 6}\n')
+        with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+            f.write(OLD_NOTE)
+        git("add", "-A")
+        git("commit", "-q", "-m", "base")
+        git("checkout", "-q", "-b", "revision")
+        if mv:
+            git("mv", "codes/10-2-6.json", "codes/10-2-5.json")
+            git("mv", "notes/10-2-6.md", "notes/10-2-5.md")
+        else:
+            git("rm", "-q", "codes/10-2-6.json", "notes/10-2-6.md")
+            os.makedirs(os.path.join(tmp, "codes"), exist_ok=True)
+            os.makedirs(os.path.join(tmp, "notes"), exist_ok=True)
+        with open(os.path.join(tmp, "codes", "10-2-5.json"), "w") as f:
+            f.write('{"name": "[[10,2,5]]", "distance": 5}\n')
+        if new_note is not None:
+            with open(os.path.join(tmp, "notes", "10-2-5.md"), "w") as f:
+                f.write(new_note)
+        if fieldnote is not None:
+            os.makedirs(os.path.join(tmp, "fieldnotes"))
+            with open(os.path.join(tmp, "fieldnotes", "2026-10-15-ten-two.md"), "w") as f:
+                f.write(fieldnote)
+        git("add", "-A")
+        git("commit", "-q", "-m", "Tighten [[10,2,6]] to 5")
+        return subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
+                               "--root", tmp, "--base", "main"],
+                              cwd=ROOT, capture_output=True, text=True, check=False)
+
+    folded = STUB + "\n## Original note, with the file paths updated\n\n" + OLD_NOTE_UPDATED
+    with tempfile.TemporaryDirectory() as tmp:
+        r = revision_repo(tmp, folded)
+        check("fold-in under the heading passes", r.returncode == 0,
+              r.stdout[-200:] + r.stderr[-300:])
+    with tempfile.TemporaryDirectory() as tmp:
+        r = revision_repo(tmp, STUB, mv=False)
+        check("stub replacing the note fails", r.returncode == 1
+              and "distance revision drops the previous note's body" in r.stdout
+              and "notes/10-2-6.md -> notes/10-2-5.md: 0% of its body lines" in r.stdout
+              and "delete beside an add" in r.stdout, r.stdout[-300:])
+        check("...and names the way out", "Filing a distance revision" in r.stdout)
+    # Nine of thirteen body lines kept: similar enough for git to call it a
+    # rename, and still a third of the record gone.
+    partial = (STUB + "\n## Original note, with the file paths updated\n\n"
+               + "\n".join(OLD_NOTE_UPDATED.splitlines()[:-4]) + "\n")
+    with tempfile.TemporaryDirectory() as tmp:
+        r = revision_repo(tmp, partial, mv=True)
+        check("a rename that drops a third of the body still fails", r.returncode == 1
+              and "69% of its body lines" in r.stdout
+              and "git saw a rename" in r.stdout, r.stdout[-300:])
+    with tempfile.TemporaryDirectory() as tmp:
+        fieldnote = ("---\ntitle: ten-two search\nauthor: \"@t\"\n---\n\n"
+                     "# The search behind [[10,2,5]]\n\n" + OLD_NOTE_UPDATED.split("\n", 2)[2])
+        r = revision_repo(tmp, STUB, fieldnote=fieldnote, mv=False)
+        check("narrative moved to a fieldnote passes", r.returncode == 0, r.stdout[-200:])
+    with tempfile.TemporaryDirectory() as tmp:
+        r = revision_repo(tmp, None, mv=False)
+        check("entry revised with its note dropped fails",
+              r.returncode == 1 and "no note under the new slug" in r.stdout, r.stdout[-300:])
+
     print()
     if FAILURES:
         print(f"{len(FAILURES)} failure(s): {', '.join(FAILURES)}")
