@@ -1,0 +1,45 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 20000,
+      "cpu_hours": 4
+    },
+    "constraints": {
+      "max_check_weight": 12,
+      "min_distance": 4,
+      "n": [
+        200,
+        684
+      ]
+    },
+    "id": "affine-2bga-n684",
+    "methods": {
+      "families": [
+        "generalized-bicycle"
+      ],
+      "generators": [
+        "research/kasai_affine_sweep.py"
+      ],
+      "screening": {
+        "seeds": [
+          7
+        ],
+        "trials_per_candidate": 400
+      }
+    },
+    "name": "Affine 2BGA (Kasai) sweeps at n <= 684, check weights 8 and 12",
+    "notes": "sample_kasai_affine is the only kit sampler whose n reaches the band the board's most efficient entries sit in (630..682); see the reach table in research/AUTORESEARCH.md. weight=6 -> check weight 12, weight=4 -> check weight 8, since check weight is 2*weight. Both sweeps rank candidates on a refined reading, because the coarse distance reading inflates d and efficiency goes as d^2. The gate decides every find.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "completed",
+    "stopping": [
+      {
+        "experiments": 2,
+        "type": "no_progress"
+      }
+    ]
+  }
+}

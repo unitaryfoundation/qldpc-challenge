@@ -1,0 +1,145 @@
+{
+  "aborted_experiments": 0,
+  "authority": "candidates listed here passed verify/validate_candidate.py; nothing here is a board entry until a human reviews and submits it",
+  "budget": {
+    "consumed": {
+      "candidates_screened": 6030,
+      "cpu_hours": 2.4
+    },
+    "declared": {
+      "candidates_screened": 20000,
+      "cpu_hours": 4
+    },
+    "remaining": {
+      "candidates_screened": 13970,
+      "cpu_hours": 1.6
+    }
+  },
+  "campaign_id": "affine-2bga-n684",
+  "campaign_name": "Affine 2BGA (Kasai) sweeps at n <= 684, check weights 8 and 12",
+  "contract_hash": null,
+  "errors": [],
+  "experiments": [
+    {
+      "contract_hash": null,
+      "family": "generalized-bicycle",
+      "mode": "novel_generation",
+      "note": "w=12; coarse 50-trial screen, top 6 refined at 2000 trials",
+      "params": {
+        "check_weight": 12,
+        "num": 30,
+        "refine_trials": 2000,
+        "sampler": "sample_kasai_affine",
+        "screen_trials": 50,
+        "weight": 6
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 125,
+        "kd2_over_n": 91.37426900584795,
+        "trials": 2000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 30,
+        "cpu_hours": 0.9,
+        "gpu_hours": 0,
+        "walltime_hours": 4.324030790788432e-07
+      },
+      "survivors": 1,
+      "verdict": "passed",
+      "verified_kd2_over_n": 89.91812865497076
+    },
+    {
+      "contract_hash": null,
+      "family": "generalized-bicycle",
+      "mode": "novel_generation",
+      "note": "w=8; 6000 candidates, top 25 refined at 20000 trials",
+      "params": {
+        "check_weight": 8,
+        "num": 6000,
+        "refine_trials": 20000,
+        "sampler": "sample_kasai_affine",
+        "screen_trials": 400,
+        "weight": 4
+      },
+      "screened": {
+        "backend": "fast",
+        "d": 96,
+        "kd2_over_n": 188.6315789473684,
+        "trials": 20000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6000,
+        "cpu_hours": 1.5,
+        "gpu_hours": 0,
+        "walltime_hours": 8.552414106412066e-07
+      },
+      "survivors": 0,
+      "verdict": "refuted"
+    }
+  ],
+  "frontier_advances": 1,
+  "negative_results": [
+    {
+      "detail": "the gate passed it at seed 1889774572, but 14 independent re-runs gave 13 passes and one weight-123 logical, and a deeper probe read 118, then 117 twice, at 20k, 50k and 150k trials. qldpc submit's own witness search found a weight-111 logical, so the entry was filed as codes/684-4-111.json at the lighter reading rather than at this record's 124.",
+      "what": "the 124 claim was superseded before submission"
+    },
+    {
+      "detail": "50 trials read 131 and 2000 read 125; two of the six refined finalists collapsed from 101 to 16, so the refine stage is load-bearing",
+      "what": "coarse reading inflated"
+    },
+    {
+      "detail": "claimed 96 after a 20000-trial refine; the refutation found a weight-40 logical, and dedup reported WL equivalence to the existing board entry 684-14-54.json. does_it_advance.py had called it a 13-entry advance on n, k and d -- every axis of that was an inflated bound over a code already on the board. The gate's d_only_peers named 684-14-54.json first, which is the entry the WL signature then matched, so the caution was aimed at exactly the right code. Recorded as a non-frontier result, not submitted.",
+      "what": "gate refuted [[684,14,96]]: over-claimed distance and a WL match"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n"
+  },
+  "params": {},
+  "report": null,
+  "required_outputs": [],
+  "run_contract": null,
+  "screen_quality": [
+    {
+      "family": "generalized-bicycle",
+      "pairs": 2,
+      "spearman": 1.0
+    }
+  ],
+  "snapshot": {
+    "branch": "motto-board-advancing",
+    "diff_sha256": "a056351289bf60585b82ec49244d2140c0b5d97405e4ef3cf5879da65c88d525",
+    "dirty": true,
+    "head": "5ba9aa4b8dd6553644fc63dedb5507e809d1b8e0",
+    "untracked_count": 213
+  },
+  "status": "paused",
+  "stopped_by": {
+    "detail": "still running",
+    "type": null
+  },
+  "summary_version": 1,
+  "survivors": [
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-9plus",
+        "unrestricted"
+      ],
+      "d": 124,
+      "fingerprint": "2ecee93c299fd227",
+      "k": 4,
+      "labels": [
+        "advances the weight-9plus x unrestricted board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 684,
+      "weight_class": "weight-9plus"
+    }
+  ]
+}
