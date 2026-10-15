@@ -34,6 +34,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `build_halved_pp.py` | canonical | symplectic-halved CPM pair-partition codes (arXiv:2609.30069) |
 | `multiband_surface.py` | canonical | the general multi-band dense-packed surface family; `build_dense_surface.py` is one fixed point of it |
 | `apm_kasai.py` | canonical | Kasai affine-permutation CSS family (arXiv:2504.17790) at board-admissible blocklengths |
+| `kasai_affine_sweep.py` | canonical | sweep of `sample_kasai_affine` over the n = 630-682 band only that sampler reaches, staged with the refine pass a coarse reading needs |
 | `quadcycle4d.py` | canonical | quadcycle codes, the 4D multi-cyclic family of arXiv:2610.10731 |
 | `quadricycle.py` | canonical | quadricycle codes, rank-4 periodic generalized bicycles |
 | `spc_product.py` | canonical | single-parity-check D-fold product codes, including the [[512,174,8]] instance |
@@ -49,6 +50,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `foldbound.py` | audit | distance upper bound by folding a code onto a symmetric subspace; a refuter, not a layout tool |
 | `annihilator_sweep.py` | audit | the annihilator attack over the board's uncertified block-shaped entries (issue #2706) |
 | `board_bar.py` | audit | the smallest undominated d for a candidate (n, k, w), read off the board before any distance search |
+| `does_it_advance.py` | audit | mirror of the gate's novelty block: would this candidate beat the board, and on which axes, before paying for the gate |
 | `derive_provenance.py` | audit | literature-versus-discovered provenance for every entry from the isomorphism check (issue #1279) |
 | `arxiv_watch.py` | audit | arXiv triage for papers that may carry a board-relevant code; claims, never distances |
 | `circuit_autogen.py` | canonical | memory-circuit generation behind `qldpc submit` (issue #1848) |
