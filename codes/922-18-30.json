@@ -1,6 +1,6 @@
 {
  "schema_version": "0.2",
- "name": "[[922,18,31]] reduction of [[924,18,31]]",
+ "name": "[[922,18,30]] reduction of [[924,18,31]]",
  "code_type": "CSS",
  "n": 922,
  "k": 18,
@@ -8350,7 +8350,7 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
    "value": 31,
    "confidence": "upper_bound",
@@ -8405,51 +8405,49 @@
    }
   },
   "Z": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    109,
-    172,
-    192,
-    212,
-    218,
-    232,
-    235,
-    252,
-    258,
-    264,
-    275,
-    281,
-    287,
-    312,
-    315,
-    318,
-    321,
-    324,
-    327,
-    330,
-    332,
-    353,
-    661,
-    686,
-    711,
-    729,
-    750,
-    752,
-    773,
-    794,
-    815
+    131,
+    194,
+    214,
+    234,
+    240,
+    254,
+    257,
+    274,
+    280,
+    297,
+    303,
+    334,
+    337,
+    340,
+    343,
+    346,
+    349,
+    354,
+    683,
+    708,
+    732,
+    747,
+    751,
+    772,
+    774,
+    795,
+    816,
+    837,
+    856,
+    879
    ],
    "witness_provenance": {
     "found_by": [
      "@vprusso"
     ],
-    "date": "2026-09-25",
+    "date": "2026-10-10",
     "found_at_samples": 300000000,
-    "survived_samples": 300000000,
-    "tool": "verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)",
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     4102
+     2
     ]
    }
   }
@@ -8463,7 +8461,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-09-17",
-  "notes": "Derived from codes/924-18-31.json, not an independent construction; the source's authors are @e-eight and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[924,18,31]] on (n, k, d, w), which therefore leaves the frontier of every cell the two share. The measured interaction radius is unchanged at 4.24264, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "notes": "Derived from codes/924-18-31.json, not an independent construction; the source's authors are @e-eight and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[924,18,31]] on (n, k, d, w), which therefore leaves the frontier of every cell the two share. The measured interaction radius is unchanged at 4.24264, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified. Distance revision 2026-10-15 from the weekly Perlmutter re-verification sweep of 2026-10-10 (witnesses by @vprusso): Z side 31 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "Claude Opus 5 (Claude Code)",
   "origin": "submission",
   "novelty": "unknown"
