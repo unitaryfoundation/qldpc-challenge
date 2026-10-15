@@ -2956,7 +2956,7 @@
   "construction": "Regular {6,6} hyperbolic surface code on a closed orientable surface. Quotient Q = Delta_6/Gamma_PBC with Q = PSL(2,13); the face-vertex swap is a projective involution J in PGL(2,13) imposing y = J x J^-1, with ord(x) = ord(y) = 6 and ord(xy) = 2. Data qubits on edges = left cosets of the order-2 subgroup <xy>; Z checks on face boundaries = left cosets of <x>; X checks on vertex stars = left cosets of <y>; checks commute because each face boundary meets each vertex an even number of times. n = |Q|/2 = 546 and k/n = (6-4)/6 + 2/n by Euler, giving k = 184. Regenerated from the algebra of arXiv:2610.10948 Sec. II by research/hyperbolic_psl.py (class 0 of the check-support-signature enumeration, 546 classes at (p,q)=(6,13)); the matrices are recomputed, not copied, since that paper publishes its matrices on request only.",
   "origin": "submission",
   "date": "2026-10-15",
-  "model": "human",
+  "model": "MiMo-V2.6-Flash",
   "notes": "Distance is a homological systole: a shortest cycle in the primal graph outside the GF(2) span of the face boundaries is a genuine logical. Both sides carry explicit weight-6 witnesses, so d<=6 is witness-backed, not certified exact; eight generator classes measured the same, the other 538 were not measured.",
   "search_budget": {
    "candidates_screened": 8,
