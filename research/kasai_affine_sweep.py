@@ -66,7 +66,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--num", type=int, default=6000, help="candidates to draw")
     ap.add_argument("--weight", type=int, default=6, help="monomials per side; check weight = 2*weight")
+    ap.add_argument("--q-min", type=int, default=7, help="q>=q_min gives n>=2q(q-1)")
     ap.add_argument("--q-max", type=int, default=19, help="q<=19 gives n<=684")
+    ap.add_argument(
+        "--only-k",
+        default=None,
+        help="comma-separated k values to keep (e.g. 2,4,6). Efficiency ranks "
+        "high k first, but the distance needed to advance a cell is roughly "
+        "independent of k -- so a refine budget ranked on k*d^2/n spends itself "
+        "on the k that cannot reach it.",
+    )
     ap.add_argument("--trials", type=int, default=400, help="RIS trials per candidate")
     ap.add_argument("--min-k", type=int, default=4)
     ap.add_argument("--min-d", type=int, default=4)
@@ -75,8 +84,9 @@ def main():
     ap.add_argument("--stage", type=int, default=6, help="how many finalists to stage")
     ap.add_argument("--refine", type=int, default=0, help="re-screen this many finalists at --refine-trials")
     ap.add_argument("--refine-trials", type=int, default=20_000)
-    ap.add_argument("--witness-trials", type=int, default=3000,
-                    help="budget make_submission spends finding the witness it writes")
+    ap.add_argument(
+        "--witness-trials", type=int, default=3000, help="budget make_submission spends finding the witness it writes"
+    )
     ap.add_argument("--dry-run", action="store_true", help="screen only, stage nothing")
     args = ap.parse_args()
 
@@ -88,7 +98,7 @@ def main():
         )
 
     t0 = time.time()
-    cands = sample_kasai_affine(args.num, q_range=(7, args.q_max), weight=args.weight, seed=args.seed)
+    cands = sample_kasai_affine(args.num, q_range=(args.q_min, args.q_max), weight=args.weight, seed=args.seed)
     print(
         f"screening {args.num} x 2bga-affine weight={args.weight} "
         f"(check weight {2 * args.weight}) at {args.trials} trials, "
@@ -107,6 +117,15 @@ def main():
     )
     elapsed = time.time() - t0
     print(f"  -> {len(recs)} distinct codes survived k>={args.min_k}, d>={args.min_d} in {elapsed:.0f}s", flush=True)
+
+    if args.only_k and recs:
+        keep = {int(x) for x in str(args.only_k).split(",")}
+        before = len(recs)
+        recs = [r for r in recs if int(r["k"]) in keep]
+        # screen returns them ordered by efficiency; keep that ordering honest
+        # after the filter rather than assuming it survived the slice
+        recs.sort(key=lambda r: (-r["efficiency"], r["fingerprint"]))
+        print(f"  -> --only-k {sorted(keep)}: {before} -> {len(recs)}", flush=True)
 
     if not recs:
         print("nothing survived; nothing staged")
@@ -130,7 +149,7 @@ def main():
     # so the inflation is squared. A candidate at 50 trials and eff 187 means
     # nothing until it has been re-run deep on its own. Re-rank the finalists on
     # the deep reading, and never on the coarse one.
-    if args.refine and len(recs):
+    if args.refine and recs:
         k_take = min(args.refine, len(recs))
         print(f"\nrefining top {k_take} at {args.refine_trials} trials...", flush=True)
         refined = []
@@ -165,6 +184,27 @@ def main():
                 f"(coarse d was {r.get('coarse_d', r['d'])})",
                 flush=True,
             )
+
+    # Never lose the specs. --dry-run used to print [[n,k,d]] and discard every
+    # monomial list the refine stage identified, and the draw is only
+    # reproducible from the same seed: a dry run that names a winner without
+    # its (a, b) makes the find unrecoverable if the console scrolls away.
+    dump = os.path.join(_HERE, "kasai_sweep_refined.json")
+    slim = [
+        {
+            "n": r["n"],
+            "k": r["k"],
+            "d": r["d"],
+            "efficiency": r["efficiency"],
+            "fingerprint": r.get("fingerprint"),
+            "coarse_d": r.get("coarse_d", r["d"]),
+            "spec": r["spec"],
+        }
+        for r in recs
+    ]
+    with open(dump, "w") as fh:
+        json.dump(slim, fh, indent=1)
+    print(f"\n{len(slim)} refined records (spec included) -> {dump}", flush=True)
 
     if args.dry_run:
         print("\n--dry-run: staging nothing")

@@ -1,0 +1,482 @@
+[
+ {
+  "n": 684,
+  "k": 6,
+  "d": 102,
+  "efficiency": 91.2632,
+  "fingerprint": "1c6bdbd56c54b86f",
+  "coarse_d": 121,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    90,
+    252,
+    75,
+    64
+   ],
+   "b": [
+    199,
+    200,
+    7,
+    184
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 101,
+  "efficiency": 89.4825,
+  "fingerprint": "4714f9a6cc8a7588",
+  "coarse_d": 121,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    339,
+    180,
+    138,
+    239
+   ],
+   "b": [
+    151,
+    86,
+    328,
+    239
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 100,
+  "efficiency": 87.7193,
+  "fingerprint": "09e267a57a2c70a5",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    295,
+    283,
+    195,
+    307
+   ],
+   "b": [
+    135,
+    105,
+    194,
+    143
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 100,
+  "efficiency": 87.7193,
+  "fingerprint": "5811e8f51a3c2ac0",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    6,
+    259,
+    206,
+    292
+   ],
+   "b": [
+    103,
+    237,
+    65,
+    230
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 99,
+  "efficiency": 85.9737,
+  "fingerprint": "cad1228579f279d1",
+  "coarse_d": 121,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    194,
+    297,
+    105,
+    159
+   ],
+   "b": [
+    98,
+    278,
+    67,
+    69
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 98,
+  "efficiency": 84.2456,
+  "fingerprint": "6bfb068017479eae",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    229,
+    254,
+    211,
+    167
+   ],
+   "b": [
+    247,
+    284,
+    226,
+    193
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 97,
+  "efficiency": 82.5351,
+  "fingerprint": "8cbbdb524faf56ea",
+  "coarse_d": 121,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    130,
+    256,
+    253,
+    241
+   ],
+   "b": [
+    116,
+    226,
+    275,
+    184
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 96,
+  "efficiency": 80.8421,
+  "fingerprint": "42f5d93fa307b00c",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    267,
+    194,
+    234,
+    11
+   ],
+   "b": [
+    275,
+    170,
+    44,
+    186
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 94,
+  "efficiency": 77.5088,
+  "fingerprint": "0dd51fa3a79fa490",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    195,
+    216,
+    81,
+    260
+   ],
+   "b": [
+    308,
+    280,
+    183,
+    41
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "0e47e7ababe2f0b7",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    282,
+    258,
+    341,
+    238
+   ],
+   "b": [
+    104,
+    204,
+    40,
+    164
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "14ca146780a61dd3",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    333,
+    322,
+    281,
+    219
+   ],
+   "b": [
+    292,
+    281,
+    7,
+    61
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "1ba4d47f188e6bbc",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    63,
+    102,
+    198,
+    47
+   ],
+   "b": [
+    310,
+    157,
+    74,
+    84
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "381d58e0966c5bd2",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    44,
+    85,
+    169,
+    275
+   ],
+   "b": [
+    67,
+    318,
+    8,
+    306
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "3a596b288dd675a1",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    2,
+    216,
+    248,
+    223
+   ],
+   "b": [
+    73,
+    118,
+    170,
+    114
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "48dfddf9c98a2989",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    333,
+    204,
+    141,
+    245
+   ],
+   "b": [
+    81,
+    233,
+    302,
+    297
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "552b5de8a4107480",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    158,
+    269,
+    327,
+    305
+   ],
+   "b": [
+    147,
+    61,
+    215,
+    298
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "6548fe9a1a91e942",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    254,
+    168,
+    324,
+    289
+   ],
+   "b": [
+    96,
+    331,
+    92,
+    84
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "74039f140cf0a5db",
+  "coarse_d": 120,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    218,
+    211,
+    331,
+    266
+   ],
+   "b": [
+    74,
+    307,
+    128,
+    150
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "e5bbf41cf73be383",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    180,
+    263,
+    34,
+    240
+   ],
+   "b": [
+    309,
+    81,
+    265,
+    186
+   ]
+  }
+ },
+ {
+  "n": 684,
+  "k": 6,
+  "d": 18,
+  "efficiency": 2.8421,
+  "fingerprint": "f748b3e4c7811567",
+  "coarse_d": 122,
+  "spec": {
+   "family": "2bga-affine",
+   "q": 19,
+   "a": [
+    202,
+    37,
+    286,
+    50
+   ],
+   "b": [
+    83,
+    154,
+    26,
+    92
+   ]
+  }
+ }
+]
