@@ -172,6 +172,44 @@ def gate_next():
     print(f"\n{n_briefs} brief(s) await jev_decide in {bdir}")
 
 
+def harness_override(action, facts, *, level, n_levels):
+    """Apply the harness's own authority over a rung boundary.
+
+    Not the verdict: this is what the harness does with a brief whose ladder
+    arithmetic settles the question by itself, whatever the model said and
+    whether a model said anything. It returns ``(action, reason_or_None)`` and
+    never widens a fence -- the only abandon it can emit is one
+    ``_abandon_is_proven_safe`` already licenses.
+
+    Both branches turn on the same fact, a bound that ``MIN_FLAT_RUNGS``
+    fresh-seed rungs agree on, because that is the one number
+    ``escalation.MIN_FLAT_RUNGS`` already means: the depth at which a bound
+    counts as settled. The two branches used to disagree, with abandon
+    licensed at 2 and the depth advance demanded at 3, so the one boundary
+    where a rung transition could be authorized was a boundary at which it
+    was not. A two-rung ladder -- 20k then 200k, the shape every recorded
+    run took -- can never reach 3, so the gate could only ever say hold.
+    They are now read from the same constant and cannot drift apart again.
+    """
+    flat = facts["flat_fresh_rungs_at_best"]
+    if flat < E.MIN_FLAT_RUNGS:
+        return action, None
+    if action != "abandon-ladder" and E._abandon_is_proven_safe(facts):
+        # The bound can only fall and it already scores below the bar, so
+        # deeper trials cannot rescue this ladder: abandoning destroys
+        # nothing, and continuing to spend on it does.
+        return "abandon-ladder", ("harness: ladder proven below bar (bound "
+                                  "can only fall), abandoning on its own "
+                                  "authority")
+    if action == "hold-deepen" and level < n_levels - 1:
+        # Replaying a depth the bound has already settled buys nothing, so
+        # the harness advances the depth rather than the trial count.
+        return "promote-next-rung", (
+            f"harness: bound settled over {E.MIN_FLAT_RUNGS} fresh rungs, "
+            "advancing depth on its own authority")
+    return action, None
+
+
 def gate_apply():
     state = _load()
     assert state, "run init first"
@@ -190,33 +228,14 @@ def gate_apply():
         assert brief["id"] == c["brief_id"], "state drifted from brief"
         d = E.apply_verdict(brief, verdict,
                             budget_remaining=state["cap"] - c["spent"])
-        # Harness policy (not the verdict): a candidate that has produced 3
-        # identical fresh-seed readings has a settled bound; replaying the
-        # same depth again buys nothing, so the harness itself advances the
-        # depth. And when the ladder ARITHMETICALLY proves the bar is
-        # unreachable (bound can only fall, best already below d_needed,
-        # stable across fresh seeds, nothing frontier-flagged), the harness
-        # abandons on its own authority even over a Jev hold -- that fence
-        # is exactly the condition under which abandoning destroys nothing.
-        if (d["action"] != "abandon-ladder"
-                and E._abandon_is_proven_safe(brief["facts"])
-                and brief["facts"]["flat_fresh_rungs_at_best"] >= 3):
-            d = dict(d, action="abandon-ladder",
-                     reason=d["reason"] + "; harness: ladder proven below "
-                     "bar (bound can only fall), abandoning on its own "
-                     "authority")
+        action, why = harness_override(d["action"], brief["facts"],
+                                       level=c["level"],
+                                       n_levels=len(state["ladder"]))
+        if why:
+            d = dict(d, action=action, reason=d["reason"] + "; " + why)
+        if action == "abandon-ladder":
             c["disposition"] = "abandoned"
-        elif (d["action"] == "hold-deepen"
-                and brief["facts"]["flat_fresh_rungs_at_best"] >= 3
-                and c["level"] < len(state["ladder"]) - 1):
-            d = dict(d, action="promote-next-rung",
-                     reason=d["reason"] + "; harness: bound settled over "
-                     "3 fresh rungs, advancing depth on its own authority")
-            c["level"] = min(c["level"] + 1, len(state["ladder"]) - 1)
-            c["repeats"] = 0
-        elif d["action"] == "abandon-ladder":
-            c["disposition"] = "abandoned"
-        elif d["action"] == "promote-next-rung":
+        elif action == "promote-next-rung":
             c["level"] = min(c["level"] + 1, len(state["ladder"]) - 1)
             c["repeats"] = 0
         else:
