@@ -14,7 +14,7 @@
     "schema/cert.schema.json": "98cb7df8e0d25b4ecf51de45785c1a357225e3d246db3a57dc9d2700dff505db",
     "schema/code.schema.json": "47b309cc45f52f2be21c261973cf6780b088c2fe366127e83bf3c5755f6e02ea",
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
-    "verify/check_authorship.py": "71f71d42e8381060b6d6adef41746fd401b98decd1ffd113b28c2a78434c4fbb",
+    "verify/check_authorship.py": "05777cc48a685634aba2b122ac852e7a229247bc5085cdcbea7c297891b60076",
     "verify/check_certs.py": "5793984b2c98dc5e4b6a6e39c0ef1d67bc5d66f5811e9c28170ac50007dd38de",
     "verify/check_codes_format.py": "50d274ad20f693233c8ae6aac28e8d538767d7b0471278e0cbfa0e5e10b34811",
     "verify/check_prose.py": "57419651740d418c6755257630f143b45d832da89d1315c9d4f5323298a18e29",

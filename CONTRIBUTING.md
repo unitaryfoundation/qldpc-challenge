@@ -279,6 +279,22 @@ you are revising.
 `research/audits/README.md`, "Filing a distance revision", has the step list
 and worked examples.
 
+## Raising a circuit fault distance already on the board
+
+An entry whose circuit tier reads `d_circ < d` is a target in the same way,
+and a better schedule for the same code is a contribution to the entry, not
+a new submission. Replace `circuits/<slug>/` and the `circuit` block, leave
+the code data alone, and credit yourself in the new block's
+`contributed_by`. `verify/check_authorship.py` lets a non-author make
+exactly that replacement when the claimed `d_circ` is no lower on either
+side and higher on at least one, at no fewer rounds, with every field the
+old block carried still present. It refuses the replacement when the old
+block carries measured-rate points (`circuit.ler`), since those measure the
+schedule being replaced, and it refuses a schedule that reads the same or
+lower anywhere; both stay with the listed authors. The gate re-derives the
+committed detector error models and re-runs the circuit search on the new
+claim, as it does for a first donated tier.
+
 ## One code, one entry
 
 Two files whose check matrices generate the same stabilizer group up to a

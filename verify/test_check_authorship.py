@@ -722,12 +722,6 @@ def main():
     run_case("an author may re-tag their own entry", e, True,
              rename=False, base_doc=b, author="alice")
 
-    print()
-    if _fail:
-        print(f"FAILED: {_fail}")
-        return 1
-    print("ok")
-
     # A literature match withdraws a novelty claim rather than making one, so
     # recording it binds for anyone (#1204): novelty to known_parameters, a
     # reference appended, nothing else.
@@ -771,6 +765,13 @@ def main():
     check("an unchanged novelty binds nothing", not ok and "nothing" in why)
 
     _rate_cases()
+    _circuit_improvement_cases()
+
+    print()
+    if _fail:
+        print(f"FAILED: {_fail}")
+        return 1
+    print("ok")
     return 0
 
 
@@ -838,6 +839,155 @@ def _rate_cases():
 
     run_case("the listed author may add rate points too",
              migrated(), True, author="alice", rename=False, base_doc=base)
+
+
+def _circuit_improvement_cases():
+    """A better schedule (PRs #3621, #3623): replacing an existing circuit
+    tier binds for anyone when the claimed d_circ is no lower on either side
+    and higher on at least one, at no fewer rounds, credited in the new
+    block's contributed_by. A reading that is lower anywhere, fewer rounds, a
+    dropped field, a schedule with measured-rate points, or any change
+    outside the circuit block stays with the listed authors."""
+    print("\ncircuit improvement binding (a better schedule):")
+    base = copy.deepcopy(BASE_DOC)
+    base["schema_version"] = "0.2"
+    base["circuit"] = {
+        "d_circ": {"X": {"value": 4, "confidence": "upper_bound",
+                         "witness": [0, 1, 2, 3]},
+                   "Z": {"value": 5, "confidence": "upper_bound",
+                         "witness": [1, 2, 3, 4, 5]}},
+        "rounds": 6, "stim_version": "1.16.0",
+        "notes": "edge-coloring schedule.",
+    }
+    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"),
+            ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
+    better = [("circuits/60-8-6/memory_x.stim", "# rescheduled\n"),
+              ("circuits/60-8-6/memory_z.stim", "# rescheduled\n")]
+
+    def improved(x=6, z=5, rounds=6, credit="@bob", **also):
+        def edit():
+            d = copy.deepcopy(base)
+            d["circuit"]["d_circ"]["X"] = {
+                "value": x, "confidence": "upper_bound",
+                "witness": list(range(x))}
+            d["circuit"]["d_circ"]["Z"] = {
+                "value": z, "confidence": "upper_bound",
+                "witness": list(range(1, z + 1))}
+            d["circuit"]["rounds"] = rounds
+            d["circuit"]["notes"] = "PPO-chosen schedule."
+            d["circuit"]["contributed_by"] = {
+                "by": [credit], "date": "2026-10-16",
+                "method": "schedule synthesis"}
+            d["provenance"]["notes"] += " Schedule improved."
+            for k, v in also.items():
+                d[k] = v
+            return d
+        return edit
+
+    def case(name, edit, ok, base_doc=base, **kw):
+        run_case(name, edit, ok, rename=False, base_doc=base_doc,
+                 base_files=stim, files=better, **kw)
+
+    case("non-author may replace the circuit tier when d_circ rises on one "
+         "side", improved(), True)
+    case("a rise on both sides binds", improved(x=6, z=6), True)
+    case("a rise at more rounds binds", improved(rounds=7), True)
+    case("the same d_circ on both sides is a replacement, not a rise",
+         improved(x=4, z=5), False)
+    case("a lower reading on one side is rejected even when the other rises",
+         improved(x=6, z=4), False)
+    case("a rise read at fewer rounds is rejected", improved(rounds=5), False)
+
+    def uncredited():
+        d = improved()()
+        del d["circuit"]["contributed_by"]
+        return d
+    case("a rise without contributed_by credit is rejected", uncredited,
+         False)
+    case("a rise crediting someone else is rejected",
+         improved(credit="@carol"), False)
+
+    def drops_notes():
+        d = improved()()
+        del d["circuit"]["notes"]
+        return d
+    case("a rise that drops a field the block carried is rejected",
+         drops_notes, False)
+
+    def appends_author():
+        d = improved()()
+        d["provenance"]["authors"].append("@bob")
+        return d
+    case("a rise that also appends to authors is rejected", appends_author,
+         False)
+
+    def rewrites_notes():
+        d = improved()()
+        d["provenance"]["notes"] = "rewritten."
+        return d
+    case("a rise that rewrites provenance.notes is rejected", rewrites_notes,
+         False)
+    case("a rise may not carry another field", improved(n=61), False)
+
+    def touches_distance():
+        d = improved()()
+        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
+                              "witness": [0, 1, 2, 3, 4]}
+        d["distance"]["d"] = 5
+        return d
+    case("a rise that also edits the distance is rejected", touches_distance,
+         False)
+
+    measured = copy.deepcopy(base)
+    measured["circuit"]["ler"] = {
+        "X": [{"p": 0.001, "shots": 1000, "failures": 5}],
+        "Z": [{"p": 0.001, "shots": 1000, "failures": 7}]}
+
+    def improved_measured():
+        d = improved()()
+        d["circuit"]["ler"] = copy.deepcopy(measured["circuit"]["ler"])
+        return d
+    case("replacing a schedule that carries measured-rate points is "
+         "reserved to the listed authors", improved_measured, False,
+         base_doc=measured)
+    case("the listed author may replace a measured schedule",
+         improved_measured, True, base_doc=measured, author="alice")
+    case("the listed author may still replace the tier without a rise",
+         improved(x=4, z=5), True, author="alice")
+
+    check("the evident binding for a d_circ change is the improvement",
+          check_authorship.evident_binding(base, improved()())
+          == "circuit_improvement")
+    ok, why = check_authorship.circuit_improvement_binding(
+        "bob", base, improved(x=4, z=5)())
+    check("a no-rise replacement names the reason",
+          not ok and "no side" in why)
+    ok, why = check_authorship.circuit_improvement_binding(
+        "bob", base, improved(x=6, z=4)())
+    check("a fall on one side names the side",
+          not ok and "d_circ.Z fell" in why)
+
+    def bob_rewrites_after_improvement():
+        d = improved()()
+        d["checks"]["Z"] = [[3, 4, 6]]
+        d["provenance"]["construction"] = "bob's construction"
+        return d
+    with tempfile.TemporaryDirectory() as td:
+        make_repo(td, base_doc=base, extra=stim)
+        git(td, "checkout", "-q", "main")
+        write_code(td, "60-8-6.json", improved()())
+        for rel, content in better:
+            write_file(td, rel, content)
+        git(td, "add", "-A")
+        git(td, "commit", "-q", "-m", "improvement merged")
+        git(td, "checkout", "-q", "-b", "followup")
+        write_code(td, "60-8-6.json", bob_rewrites_after_improvement())
+        git(td, "add", "-A")
+        git(td, "commit", "-q", "-m", "followup")
+        rc = check_authorship.main(
+            ["--author", "bob", "--root", td, "--base", "main"])
+        check("after a merged improvement, @bob still cannot edit the code",
+              rc != 0)
 
 
 def test_main():

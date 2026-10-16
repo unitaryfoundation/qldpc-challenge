@@ -52,12 +52,27 @@ the rest, so a planted point is caught the way a planted distance is;
 removing or altering an existing point, or touching anything else in the
 entry, stays with the listed authors. This is what lets a maintainer carry
 the board's entries through a schema change in the tier without owning them.
-Replacing an existing artifact stays with the code's listed authors either
-way, which matters more for circuits than for layouts: the circuit tier is
-penalty-only (d_circ is clamped to <= d), so a donated schedule can lower an
-entry's score where a donated layout can only improve its class. Reserving
-replacement means a mediocre donated schedule is always the authors' to beat
-with a better one.
+Replacing an existing artifact stays with the code's listed authors, which
+matters more for circuits than for layouts: the circuit tier is penalty-only
+(d_circ is clamped to <= d), so a donated schedule can lower an entry's score
+where a donated layout can only improve its class. Reserving replacement
+means a mediocre donated schedule is always the authors' to beat with a
+better one.
+
+A binding for a better schedule (PRs #3621 and #3623): a change that
+replaces an existing `circuit` block with one whose claimed d_circ is no
+lower on either side and higher on at least one, at no fewer rounds, with
+the PR author credited in the new block's `contributed_by.by`, binds for
+anyone. That is the one replacement the penalty-only argument does not
+reach: it cannot lower the entry's standing, and the claim it makes is
+checked the way a first donated tier's is (gate_changed.py re-derives the
+committed DEMs and re-runs the circuit search whenever the claim surface
+changes), so a schedule that does not support its d_circ is refuted there.
+The new block may not drop a key the old one carried, and an old block
+carrying measured-rate points (`circuit.ler`) stays with the listed
+authors: those points measure the schedule being replaced, and discarding
+them is their call. A reading that is the same or lower anywhere remains a
+replacement, reserved as above.
 
 The artifacts under `circuits/<slug>/` are part of that entry's claim surface,
 so a diff there counts as a change to `codes/<slug>.json` -- the same mapping
@@ -347,12 +362,87 @@ def circuit_binding(author, base_doc, new_doc):
     discount a score -- so unlike a layout, a donated schedule can lower the
     entry's standing. It is still a true fact about the code (the same
     principle that lets a non-author refute a distance), and reserving
-    REPLACEMENT to the listed authors leaves a mediocre donated schedule
-    theirs to beat. The committed circuits/<slug>/ artifacts are checked by
+    REPLACEMENT to the listed authors, except the strict rise of
+    circuit_improvement_binding, leaves a mediocre donated schedule theirs
+    to beat. The committed circuits/<slug>/ artifacts are checked by
     verify/circuit_verify.py and re-gated by gate_changed.py, so a donated
     tier cannot under-claim d_circ without a valid witness at that weight."""
     return addition_binding(author, base_doc, new_doc, "circuit",
                             "a circuit tier")
+
+
+def circuit_improvement_binding(author, base_doc, new_doc):
+    """Does new_doc differ from base_doc by exactly a replacement of its
+    circuit tier that raises the claimed fault distance, credited to author?
+    Returns (ok, reason-if-not).
+
+    Replacement is otherwise reserved to the listed authors because the tier
+    is penalty-only: a donated schedule that reads lower than the committed
+    one lowers the entry's standing. One that reads no lower on either side
+    and higher on at least one cannot, and it is a fact about the code in
+    the sense a refutation is: gate_changed.py re-derives the committed DEMs
+    and re-runs the circuit search on any changed claim surface, so a d_circ
+    the new circuits do not support is refuted there, as for a first
+    addition. Rounds may not drop (d_circ is non-increasing in rounds, so a
+    reading at fewer rounds is a weaker claim, not a higher one), no key the
+    old block carried may disappear, and an old block with measured-rate
+    points stays with the listed authors, since the points measure the
+    schedule being replaced. Outside the circuit block: append to
+    provenance.notes, change `name` and `schema_version`, nothing else.
+    Credit lives in the new block's contributed_by, as for a first addition,
+    so the binding never widens the contributor's rights over the code."""
+    bc, nc = base_doc.get("circuit"), new_doc.get("circuit")
+    if not isinstance(bc, dict):
+        return False, "the entry has no circuit tier to improve"
+    if not isinstance(nc, dict):
+        return False, "the circuit tier was removed, not improved"
+    for key in (set(base_doc) | set(new_doc)) - {"circuit", "name",
+                                                 "schema_version",
+                                                 "provenance"}:
+        if base_doc.get(key) != new_doc.get(key):
+            return False, (f"field '{key}' changed (a better schedule may "
+                           "replace the circuit block and nothing else)")
+
+    bp, np_ = base_doc.get("provenance") or {}, new_doc.get("provenance") or {}
+    for key in (set(bp) | set(np_)) - {"notes"}:
+        if bp.get(key) != np_.get(key):
+            return False, (f"provenance.{key} changed (credit for a schedule "
+                           "lives in circuit.contributed_by, not in "
+                           "provenance)")
+    old_notes, new_notes = bp.get("notes", ""), np_.get("notes", "")
+    if not new_notes.startswith(old_notes):
+        return False, "provenance.notes may only be appended to"
+
+    if "ler" in bc:
+        return False, ("the committed circuit carries measured-rate points; "
+                       "replacing a measured schedule is reserved to its "
+                       "listed authors")
+    missing = sorted(set(bc) - set(nc))
+    if missing:
+        return False, (f"circuit.{missing[0]} was dropped (a better schedule "
+                       "keeps every field the entry carried)")
+    if (nc.get("rounds") or 0) < (bc.get("rounds") or 0):
+        return False, ("circuit.rounds decreased (a fault distance read at "
+                       "fewer rounds is a weaker claim, not a higher one)")
+
+    bd, nd = bc.get("d_circ") or {}, nc.get("d_circ") or {}
+    raised = 0
+    for side in ("X", "Z"):
+        bv = (bd.get(side) or {}).get("value")
+        nv = (nd.get(side) or {}).get("value")
+        if not isinstance(bv, int) or not isinstance(nv, int):
+            return False, f"circuit.d_circ.{side}.value is missing"
+        if nv < bv:
+            return False, (f"circuit.d_circ.{side} fell from {bv} to {nv} "
+                           "(a lower reading is a replacement, reserved to "
+                           "the listed authors)")
+        raised += nv > bv
+    if raised == 0:
+        return False, "no side's circuit fault distance rose"
+    if author not in contributed_by_handles(nc):
+        return False, ("circuit.contributed_by.by does not list the PR "
+                       f"author @{author}")
+    return True, ""
 
 
 # The bindings a PR author who is not a listed author may still pass, with the
@@ -494,6 +584,8 @@ BINDINGS = (
     ("refutation", refutation_binding, "witness_provenance credit, refuting"),
     ("layout", layout_binding, "adding a first locality block to"),
     ("circuit", circuit_binding, "adding a first circuit block to"),
+    ("circuit_improvement", circuit_improvement_binding,
+     "raising the circuit fault distance of"),
     ("family", family_binding, "correcting the family tag of"),
     ("novelty", novelty_binding, "recording a literature match on"),
     ("rate", rate_binding, "adding measured-rate points to"),
@@ -505,6 +597,11 @@ def evident_binding(base_doc, new_doc):
     leads with one relevant rejection instead of three."""
     if "circuit" in new_doc and "circuit" not in base_doc:
         return "circuit"
+    if (isinstance(base_doc.get("circuit"), dict)
+            and isinstance(new_doc.get("circuit"), dict)
+            and base_doc["circuit"].get("d_circ") != new_doc["circuit"].get("d_circ")
+            and base_doc.get("distance") == new_doc.get("distance")):
+        return "circuit_improvement"
     if (isinstance(base_doc.get("circuit"), dict)
             and isinstance(new_doc.get("circuit"), dict)
             and base_doc["circuit"].get("ler") != new_doc["circuit"].get("ler")
@@ -675,7 +772,8 @@ def main(argv):
               "credited to them in witness_provenance.found_by (issue #611), "
               "or exactly a first-layout addition credited to them in "
               "locality.contributed_by.by, or exactly a first-circuit-tier "
-              "addition credited to them in circuit.contributed_by.by.")
+              "addition or a d_circ-raising circuit-tier replacement credited "
+              "to them in circuit.contributed_by.by.")
         for f, hs, extra in violations:
             print(f"  {f}: authors {['@' + h for h in hs]} do not include "
                   f"@{author}" + (f"; {extra}" if extra else ""))
