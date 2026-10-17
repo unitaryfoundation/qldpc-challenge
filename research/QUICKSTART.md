@@ -16,6 +16,10 @@ the human.
 lose it.** Persist every candidate through `submit.make_submission` and
 `submit.save_submission`, which embed the witness. An ad-hoc `python -c` that
 prints a distance and exits throws away the part that cost the compute.
+`save_submission` refuses a document the gate's verify step would refuse (a
+direct sum, a check over the weight cap, a malformed or mistyped document) and
+keeps it under `rejected/` beside the path with the failed checks, so fix the
+document, or drop the code (issue #3616).
 
 Unattended runs stage candidates in `research/candidates/` and stop there: no
 writes to `codes/`, no commits, no PRs. A human decides what lands. Several
@@ -91,7 +95,9 @@ and flags a Weisfeiler-Leman signature match as `board_wl`,
 (issue #3620).
 
 That command runs `verify/validate_candidate.py` unchanged and writes the
-verdict it returned to `<the path>.verdict.json`, beside the candidate.
+verdict it returned to `<the path>.verdict.json`, beside the candidate. A
+candidate the verifier's structural half refuses is not gated at all: the
+command writes the failed checks to `<the path>.preflight.json` and exits 1.
 Running the gate script directly prints the same verdict and writes nothing,
 so the evidence for a find lives in a scrollback and is gone with the
 session; the witness in the candidate file is only half of what a reviewer

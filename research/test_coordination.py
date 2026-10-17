@@ -24,25 +24,33 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, "kit"))
 
 from coordination import (  # noqa: E402
+    PREFLIGHT_SUFFIX,
+    REJECTED_DIRNAME,
     RUN_ID_ENV,
     SESSION_ENV,
     CandidateCollision,
+    PreflightFailure,
     VerdictCache,
     _parse,
     cell_slug,
     claim,
     content_digest,
+    gate_and_record,
     holds_same_candidate,
     live_claims,
+    preflight_path,
     prune_claims,
     read_claim,
+    rejected_path,
     release,
     run_id,
+    seed_cache_from_record,
     session_id,
     staging_dir,
     unique_path,
     validate_cached,
     validator_sha256,
+    verdict_path,
 )
 from submit import save_submission  # noqa: E402
 
@@ -66,6 +74,29 @@ def candidate(**over):
     }
     doc.update(over)
     return doc
+
+
+def variant(witness):
+    """``candidate()`` with another X witness: a different candidate the gate accepts.
+
+    Any weight-2 operator commutes with the one Z check and is outside the
+    one X row, so the document stays valid and only its digest changes.
+    """
+    doc = candidate()
+    doc["distance"]["X"]["witness"] = list(witness)
+    return doc
+
+
+def direct_sum_candidate():
+    """Two [[4,2,2]] blocks on disjoint qubits: valid witnesses, not one code.
+
+    The shape of 15 of the 41 refusals in issue #3616. The gate's verify step
+    fails it on ``tanner_connected`` and ``stabilizer_group_connected`` and
+    then still spends the random search on it, because the witnesses on the
+    first block verify and earn a distance to refute.
+    """
+    return candidate(n=8, k=4, checks={"X": [[0, 1, 2, 3], [4, 5, 6, 7]],
+                                       "Z": [[0, 1, 2, 3], [4, 5, 6, 7]]})
 
 
 REFUTE_OK = {"refuted": False, "seed": 7, "detail": "no lighter operator"}
@@ -194,11 +225,11 @@ def test_re_saving_the_same_candidate_needs_no_new_name(tmp_path):
 def test_a_second_candidate_gets_its_own_name(tmp_path):
     p = str(tmp_path / "4-2-2.json")
     save_submission(candidate(), p)
-    other = candidate(k=1)
+    other = variant([2, 3])
     second = unique_path(p, other)
     assert second != p and second.endswith(".json")
     save_submission(other, second)
-    third = unique_path(p, candidate(k=3))
+    third = unique_path(p, variant([1, 2]))
     assert third not in (p, second)
 
 
@@ -208,7 +239,7 @@ def test_saving_over_another_session_s_candidate_is_refused(tmp_path):
     save_submission(candidate(), p)
     before = open(p).read()
     with pytest.raises(CandidateCollision, match="already holds a different"):
-        save_submission(candidate(k=1), p)
+        save_submission(variant([2, 3]), p)
     assert open(p).read() == before
 
 
@@ -221,8 +252,8 @@ def test_saving_the_same_candidate_again_is_not_a_collision(tmp_path):
 def test_a_caller_that_means_to_replace_still_can(tmp_path):
     p = str(tmp_path / "4-2-2.json")
     save_submission(candidate(), p)
-    save_submission(candidate(k=1), p, on_collision="overwrite")
-    assert json.load(open(p))["k"] == 1
+    save_submission(variant([2, 3]), p, on_collision="overwrite")
+    assert json.load(open(p))["distance"]["X"]["witness"] == [2, 3]
     with pytest.raises(ValueError, match="unknown mode"):
         save_submission(candidate(), p, on_collision="clobber")
 
@@ -499,6 +530,153 @@ def test_the_gate_cli_mode_exits_with_the_verdict(tmp_path, monkeypatch, capsys)
     assert "verdict written to" in out.err
     assert os.path.exists(coordination.verdict_path(path))
     assert coordination._main(["gate"]) == 2
+
+
+# -- the preflight (issue #3616) ------------------------------------------
+#
+# The gate's verify step refuses a document on checks that read the document
+# alone and then, when its witnesses verify, still spends the random search
+# on it. The preflight makes that refusal first, with the verifier's own
+# function. What is pinned here: nothing is lost (the document and the
+# report are kept), nothing is gated (the gate is not called and no verdict
+# is written), and a refutation recorded beside a candidate is not searched
+# for twice.
+
+def test_saving_what_the_gate_would_refuse_keeps_it_out_of_the_way(tmp_path):
+    doc = direct_sum_candidate()
+    path = str(tmp_path / "8-4-2.json")
+    with pytest.raises(PreflightFailure) as info:
+        save_submission(doc, path)
+    assert not os.path.exists(path)                      # nothing to gate under the name
+    kept = rejected_path(path)
+    assert os.path.exists(kept) and holds_same_candidate(kept, doc)   # the witness survived
+    report = preflight_path(kept)
+    with open(report, encoding="utf-8") as f:
+        rep = json.load(f)
+    assert [x["check"] for x in rep["failed"]] == ["tanner_connected",
+                                                   "stabilizer_group_connected"]
+    assert rep["recorded"]["content_digest"] == content_digest(doc)
+    err = info.value
+    assert err.kept == (kept, report) and err.path == path
+    assert err.result["code_at_fault"] and err.result["kinds"] == ["construction"]
+    assert "Tanner graph has 2 connected component(s)" in str(err)
+    assert "no edit to the document fixes it" in str(err)
+
+
+def test_two_refused_documents_of_one_name_both_survive(tmp_path):
+    path = str(tmp_path / "8-4-2.json")
+    a = direct_sum_candidate()
+    b = direct_sum_candidate()
+    b["distance"]["X"]["witness"] = [2, 3]               # another witness, another candidate
+    for doc in (a, b):
+        with pytest.raises(PreflightFailure):
+            save_submission(doc, path)
+    kept = sorted(os.listdir(os.path.join(str(tmp_path), REJECTED_DIRNAME)))
+    assert len([k for k in kept if k.endswith(PREFLIGHT_SUFFIX)]) == 2
+    assert len([k for k in kept if not k.endswith(PREFLIGHT_SUFFIX)]) == 2
+    assert "8-4-2.json" in kept                           # the first keeps the plain name
+
+
+def test_a_caller_that_means_to_stage_it_anyway_still_can(tmp_path):
+    path = str(tmp_path / "8-4-2.json")
+    assert save_submission(direct_sum_candidate(), path, preflight=False) == []
+    assert os.path.exists(path) and not os.path.exists(rejected_path(path))
+
+
+def test_a_document_that_passes_the_preflight_is_staged_as_before(tmp_path):
+    path = str(tmp_path / "4-2-2.json")
+    assert save_submission(candidate(), path) == []
+    assert os.path.exists(path) and not os.path.exists(preflight_path(path))
+    assert not os.path.isdir(os.path.join(str(tmp_path), REJECTED_DIRNAME))
+
+
+def test_gate_and_record_refuses_before_the_gate_and_keeps_the_report(tmp_path):
+    doc = direct_sum_candidate()
+    path = str(tmp_path / "8-4-2.json")
+    save_submission(doc, path, preflight=False)
+    calls = []
+
+    def gate(d, *, seed=None, refute=True):
+        calls.append(refute)
+        return stamped(passed=False)
+
+    with pytest.raises(PreflightFailure) as info:
+        gate_and_record(path, cache=cache_at(tmp_path), validator=gate)
+    assert calls == []                                   # the search was never spent
+    assert not os.path.exists(verdict_path(path))        # no verdict: the gate did not run
+    report = preflight_path(path)
+    assert info.value.kept == (report,) and os.path.exists(report)
+    with open(report, encoding="utf-8") as f:
+        assert json.load(f)["recorded"]["content_digest"] == content_digest(doc)
+    assert "not gated" in str(info.value)
+
+
+def test_gate_and_record_can_be_told_to_gate_regardless(tmp_path):
+    path = str(tmp_path / "8-4-2.json")
+    save_submission(direct_sum_candidate(), path, preflight=False)
+    verdict, out = gate_and_record(
+        path, cache=cache_at(tmp_path), preflight=False,
+        validator=lambda d, *, seed=None, refute=True: stamped(passed=False))
+    assert verdict["passed"] is False and os.path.exists(out)
+
+
+def test_the_gate_cli_prints_the_report_and_not_a_verdict(tmp_path, capsys):
+    import coordination
+    path = str(tmp_path / "8-4-2.json")
+    save_submission(direct_sum_candidate(), path, preflight=False)
+    assert coordination._main(["gate", path]) == 1
+    out = capsys.readouterr()
+    report = json.loads(out.out)
+    assert report["ok"] is False and "passed" not in report and "gates" not in report
+    assert "stabilizer_group_connected" in out.err and "not gated" in out.err
+    assert not os.path.exists(coordination.verdict_path(path))
+    assert os.path.exists(coordination.preflight_path(path))
+
+
+def test_a_refutation_recorded_beside_the_candidate_is_not_searched_again(tmp_path):
+    """The record outlives the cache; a lighter logical found once is a witness."""
+    doc = candidate()
+    path = str(tmp_path / "4-2-2.json")
+    save_submission(doc, path)
+    record = stamped(passed=False, refute=REFUTED)
+    record["recorded"] = {"candidate": "4-2-2.json",
+                          "content_digest": content_digest(doc)}
+    with open(verdict_path(path), "w", encoding="utf-8") as f:
+        json.dump(record, f)
+    cache = cache_at(tmp_path)
+    assert cache.get(doc) is None                         # the cache was emptied
+
+    def gate_without_search(d, *, seed=None, refute=True):
+        assert refute is False, "the recorded refutation must be reused"
+        return stamped(passed=True)
+
+    verdict, out = gate_and_record(path, cache=cache, validator=gate_without_search)
+    assert verdict["passed"] is False and verdict["gates"]["refute"] == REFUTED
+    assert cache.get(doc) == REFUTED                      # and the cache has it back
+    with open(out, encoding="utf-8") as f:
+        assert json.load(f)["recorded"]["refutation_reused"] is True
+
+
+def test_only_this_documents_own_refutation_seeds_the_cache(tmp_path):
+    doc = candidate()
+    path = str(tmp_path / "4-2-2.json")
+    save_submission(doc, path)
+    mine = {"content_digest": content_digest(doc)}
+    cases = {
+        "another document": dict(stamped(passed=False, refute=REFUTED),
+                                 recorded={"content_digest": "not-this-one"}),
+        "a clean search": dict(stamped(passed=True), recorded=mine),
+        "another validator": dict(stamped(passed=False, refute=REFUTED,
+                                          validator={"source_sha256": "stale", "seed": 9}),
+                                  recorded=mine),
+    }
+    for why, record in cases.items():
+        cache = VerdictCache(root=str(tmp_path / why.replace(" ", "-")))
+        with open(verdict_path(path), "w", encoding="utf-8") as f:
+            json.dump(record, f)
+        assert seed_cache_from_record(cache, doc, verdict_path(path)) is False, why
+        assert cache.get(doc) is None, why
+    assert seed_cache_from_record(cache_at(tmp_path), doc, str(tmp_path / "missing.json")) is False
 
 
 # -- advisory cell claims (issue #2314, item 6) ---------------------------

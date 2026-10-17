@@ -43,7 +43,17 @@ This module is outside the trust spine and cannot reach into it:
 
 * The verdict is kept beside the candidate. :func:`gate_and_record` writes
   what the gate returned to ``<path>.verdict.json`` (issue #2781); the cache
-  above is a cache and that file is the record.
+  above is a cache and that file is the record. A refutation in that record
+  is fed back into the cache when the cache has lost it, so a lighter
+  logical found on one run of a document is never searched for again on
+  the same document (issue #3616).
+* A preflight refusal subtracts too. :func:`gate_and_record` and
+  ``submit.save_submission`` first run ``prescreen.preflight``, which is
+  ``qldpc_verify.verify(doc, refute=False)``, the function the gate calls
+  with the search turned off, and refuse the document only on a check the
+  gate's verify step would fail it on. A document that passes goes to the
+  gate unchanged; one that fails is kept, with the verifier's report, and
+  gets no verdict, because the gate was never run on it (issue #3616).
 """
 import errno
 import hashlib
@@ -77,6 +87,32 @@ UNKEYED_PROVENANCE = ("authors", "construction", "references", "date", "notes")
 
 class CandidateCollision(RuntimeError):
     """A staging write that would have destroyed another session's candidate."""
+
+
+class PreflightFailure(RuntimeError):
+    """A document the gate's verify step would refuse, caught before the gate ran.
+
+    ``result`` is ``prescreen.preflight``'s report; ``kept`` the files that
+    were written instead (the document under ``rejected/`` and the report,
+    or the report alone beside a staged candidate); ``path`` what the caller
+    asked for.
+    """
+
+    def __init__(self, result, kept=(), *, path=None, what="not staged"):
+        self.result = result
+        self.kept = tuple(kept)
+        self.path = path
+        lines = [f"{path or 'candidate'}: {what}; the gate's verify step "
+                 "would refuse this document"]
+        for f in result.get("failed") or ():
+            lines.append(f"  {f['check']} ({f['kind']}): {f['detail']}")
+        lines.append("the code is inadmissible; no edit to the document fixes it"
+                     if result.get("code_at_fault") else
+                     "the document is wrong and the code may be fine; fix the "
+                     "document and save it again")
+        if self.kept:
+            lines.append("kept: " + ", ".join(self.kept))
+        super().__init__("\n".join(lines))
 
 
 # -- identity and staging -------------------------------------------------
@@ -434,6 +470,80 @@ def holds_same_candidate(path, doc):
         return False
 
 
+# -- the verifier's structural half, before anything is spent -------------
+#
+# ``prescreen.preflight`` is ``qldpc_verify.verify(doc, refute=False)`` read
+# for its failed checks, so what it refuses is exactly what the gate's
+# verify step refuses (issue #3616). Imported lazily, like the gate, so
+# importing this module stays cheap.
+
+PREFLIGHT_SUFFIX = ".preflight.json"
+REJECTED_DIRNAME = "rejected"
+
+
+def _preflight(doc):
+    if _HERE not in sys.path:
+        sys.path.insert(0, _HERE)
+    import prescreen
+    return prescreen.preflight(doc)
+
+
+def preflight_path(path):
+    """Where the preflight report for the candidate at ``path`` is kept.
+
+    ``<stem>.preflight.json`` beside it, the convention of :func:`verdict_path`,
+    and for the same reason: two extensions deep, no ``checks`` field, so a
+    ``*.json`` glob for candidates cannot mistake it for one.
+    """
+    base = path[:-len(".json")] if path.endswith(".json") else path
+    return base + PREFLIGHT_SUFFIX
+
+
+def rejected_path(path):
+    """Where a document refused by the preflight is kept: ``<dir>/rejected/<name>``.
+
+    A subdirectory rather than a suffix because a refused document still has
+    ``checks`` and would pass for a candidate under a ``*.json`` glob of the
+    staging directory; the listing of a run directory shows only what may
+    be gated.
+    """
+    head, name = os.path.split(os.fspath(path))
+    return os.path.join(head, REJECTED_DIRNAME, name)
+
+
+def record_preflight(path, result, doc=None):
+    """Write the preflight report for the candidate at ``path`` beside it.
+
+    Returns the report's path. The report is the verifier's own failed
+    checks with their detail strings, which the gate's verdict does not
+    carry (it keeps check names only), plus the run and time it was taken.
+    """
+    report = dict(result)
+    report["recorded"] = {
+        "candidate": os.path.basename(path),
+        "content_digest": content_digest(doc) if doc is not None else None,
+        "run_id": run_id(),
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+    }
+    out = preflight_path(path)
+    _write_atomic(out, report)
+    return out
+
+
+def quarantine(path, doc, result):
+    """Keep a refused document and its report under ``rejected/`` beside ``path``.
+
+    Returns ``(document_path, report_path)``. The document goes through
+    :func:`unique_path`, so two different refused documents of one name
+    both survive, and re-saving the same one reuses its file. Nothing is
+    lost: a witness in a document that only needs a field fixed is still
+    the most expensive thing in the loop.
+    """
+    kept = unique_path(rejected_path(path), doc)
+    _write_atomic(kept, doc)
+    return kept, record_preflight(kept, result, doc)
+
+
 # -- what a cached verdict is allowed to outlive --------------------------
 
 def validator_sha256(path=None):
@@ -683,8 +793,33 @@ def verdict_path(path):
     return base + VERDICT_SUFFIX
 
 
+def seed_cache_from_record(cache, doc, record_path):
+    """Feed a refutation recorded beside a candidate back into the cache.
+
+    Returns True when the cache took it. Only a refutation is fed back: a
+    lighter logical found for this document is a witness and stays true,
+    while a clean search in the record may have been a shallow run, which
+    the record does not say. The record must be for this document (its
+    ``recorded.content_digest`` matches) and ``VerdictCache.put`` still
+    refuses it when the validator has changed since.
+    """
+    if cache.get(doc) is not None:
+        return False
+    try:
+        with open(record_path, encoding="utf-8") as f:
+            rec = json.load(f)
+    except (OSError, ValueError):
+        return False
+    ref = _refutation(rec)
+    if not ref or not ref.get("refuted"):
+        return False
+    if (rec.get("recorded") or {}).get("content_digest") != content_digest(doc):
+        return False
+    return cache.put(doc, rec) is not None
+
+
 def gate_and_record(path, *, seed=None, refute=True, cache=None,
-                    validator=None):
+                    validator=None, preflight=True):
     """Run the gate on the candidate at ``path`` and keep the verdict beside it.
 
     Returns ``(verdict, out_path)``. The verdict is the gate's own, obtained
@@ -700,9 +835,28 @@ def gate_and_record(path, *, seed=None, refute=True, cache=None,
 
     ``verify/`` is untouched. This is a caller that persists what the gate
     returned, not a change to what it returns.
+
+    Two things happen before the gate (issue #3616). With ``preflight``
+    (the default) the document is run through ``prescreen.preflight``, the
+    verifier's structural half, and a document it fails is not gated:
+    the report is written to :func:`preflight_path`, no verdict is written
+    because none was produced, and :class:`PreflightFailure` is raised with
+    the failed checks in the verifier's words. The gate would have refused
+    the document on the same checks, after spending the random search on
+    it whenever its witnesses verify. Then a refutation already recorded in
+    the verdict file beside the candidate is fed back into the cache when
+    the cache has lost it, so the search is not run again for a lighter
+    logical that an earlier run already found.
     """
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
+    if preflight:
+        result = _preflight(doc)
+        if not result["ok"]:
+            report = record_preflight(path, result, doc)
+            raise PreflightFailure(result, (report,), path=path, what="not gated")
+    cache = VerdictCache() if cache is None else cache
+    seed_cache_from_record(cache, doc, verdict_path(path))
     verdict, reused = validate_cached(doc, cache=cache, validator=validator,
                                       seed=seed, refute=refute)
     out = verdict_path(path)
@@ -722,13 +876,21 @@ def _main(argv):
     """Run the module as a command.
 
     With no arguments it prints this run's identity. ``gate <path>`` gates a
-    staged candidate and writes the verdict beside it, exit 0 iff passed.
+    staged candidate and writes the verdict beside it, exit 0 iff passed. A
+    candidate the gate's verify step would refuse is not gated: the
+    verifier's report is printed and written to ``<path>.preflight.json``
+    instead of a verdict, exit 1.
     """
     if argv and argv[0] == "gate":
         if len(argv) != 2:
             print("usage: python research/kit/coordination.py gate <candidate.json>")
             return 2
-        verdict, out = gate_and_record(argv[1])
+        try:
+            verdict, out = gate_and_record(argv[1])
+        except PreflightFailure as e:
+            print(json.dumps(e.result, indent=2))
+            print(e, file=sys.stderr)
+            return 1
         print(json.dumps(verdict, indent=2))
         print(f"verdict written to {out}", file=sys.stderr)
         return 0 if verdict.get("passed") else 1

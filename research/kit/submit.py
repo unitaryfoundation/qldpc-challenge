@@ -14,6 +14,11 @@ Given the two parity-check matrices and a little provenance, this:
     as the max check diameter) when you pass per-qubit coordinates;
   * validates the whole document against ``schema/code.schema.json``.
 
+``save_submission`` then runs the verifier's structural half on the document
+(``prescreen.preflight``, issue #3616) and refuses to stage one the gate's
+verify step would refuse; the document and the failed checks are kept under
+``rejected/`` beside the path instead.
+
 The result is a dict you can write to ``codes/your-code.json`` and submit.
 
     from submit import make_submission, save_submission
@@ -30,13 +35,14 @@ import re
 import sys
 
 import numpy as np
-from coordination import CandidateCollision, holds_same_candidate
+from coordination import CandidateCollision, PreflightFailure, holds_same_candidate, quarantine
 from css import commutes, compute_k, in_rowspace, verify_css
 from prescreen import block_structure, describe_structure
+from prescreen import preflight as run_preflight
 from surrogate import lightest_logical
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_SCHEMA_PATH = os.path.join(_HERE, "..", "schema", "code.schema.json")
+_SCHEMA_PATH = os.path.join(_HERE, "..", "..", "schema", "code.schema.json")
 
 
 def _supports(H):
@@ -61,17 +67,21 @@ def _interaction_radius(checks, coordinates):
 
 
 def validate(doc):
-    """Return a list of schema violations ([] means valid).
+    """Return the list of schema violations in ``doc``; ``[]`` means valid.
 
-    Uses jsonschema if available, else returns [] (the verifier will do the
-    authoritative check).
+    Raises ``RuntimeError`` when ``jsonschema`` cannot be imported, rather
+    than returning ``[]``: the return value cannot tell "valid" from "not
+    checked", and ``campaign.validate_summary`` already raises in the same
+    case, so that is the kit's one convention (issue #3616). ``jsonschema``
+    is a core dependency, so under ``uv run`` this does not fire.
     """
     try:
         import jsonschema
-        with open(_SCHEMA_PATH) as f:
-            schema = json.load(f)
-    except Exception:
-        return []
+    except ImportError as e:
+        raise RuntimeError("jsonschema is required to validate a submission "
+                           "and is a core dependency; run under `uv run`") from e
+    with open(_SCHEMA_PATH, encoding="utf-8") as f:
+        schema = json.load(f)
     v = jsonschema.Draft202012Validator(schema)
     return [f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
             for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))]
@@ -219,10 +229,24 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     return doc
 
 
-def save_submission(doc, path, *, on_collision="error"):
-    """Write ``doc`` to ``path`` as pretty JSON, after a schema check.
+def save_submission(doc, path, *, on_collision="error", preflight=True):
+    """Write ``doc`` to ``path`` as pretty JSON, after the verifier's structural half.
 
     Returns the list of schema violations (empty on success).
+
+    With ``preflight`` (the default) the document is first run through
+    ``prescreen.preflight``, which is ``qldpc_verify.verify(doc,
+    refute=False)``: the checks the gate makes before its random distance
+    search, decided by the same function. A document that fails any of them
+    is not written to ``path``. It is kept, with the report, under
+    ``rejected/`` beside ``path`` (``coordination.quarantine``), and
+    :class:`coordination.PreflightFailure` is raised naming the failed
+    checks in the verifier's words and which kind of fix there is: a
+    ``construction`` or ``weight`` failure is the code's and no edit fixes
+    it, the rest are the document's and the code may be fine. Of 355 gate
+    runs staged in the ten days before issue #3616, 41 were refused on these
+    checks, most after the search had been spent. ``preflight=False``
+    writes the document regardless.
 
     A found low-weight logical is the most expensive data this kit produces, so
     this refuses by default to write over a *different* candidate already at
@@ -249,6 +273,10 @@ def save_submission(doc, path, *, on_collision="error"):
             "coordination.staging_dir(), or pass "
             "coordination.unique_path(path, doc), or pass "
             "on_collision='overwrite' if replacing it is what you mean.")
+    if preflight:
+        result = run_preflight(doc)
+        if not result["ok"]:
+            raise PreflightFailure(result, quarantine(path, doc, result), path=path)
     errs = validate(doc)
     # The form the board keeps and verify/check_codes_format.py enforces.
     with open(path, "w", encoding="utf-8", newline="\n") as f:

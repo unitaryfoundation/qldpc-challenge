@@ -382,6 +382,17 @@ of them the same filename, so the second write used to delete the first one's wi
 the same candidate is not a collision, and `unique_path` gives a second candidate with the same
 parameters its own name.
 
+`save_submission` also refuses, with `PreflightFailure`, a document the gate's verify step would
+refuse: before writing it runs `prescreen.preflight`, the verifier's structural half
+(`qldpc_verify.verify(doc, refute=False)`), so what it refuses is exactly what the gate refuses
+on the checks before its distance search. The document and the report go to `rejected/` beside
+the path, so the witness is kept, and the message says which kind of fix there is: a
+`construction` or `weight` failure is the code's and no edit fixes it, `packaging`, `typing`,
+`witness`, or `layout` is the document's and the code may be fine. Of 355 gate runs staged in
+the ten days before issue #3616, 41 were refused on these checks, and the gate had spent the
+random search on most of them first, since a structural failure does not stop the verifier from
+earning and then refuting a distance. `preflight=False` writes the document anyway.
+
 Two sessions aiming at the same board cell is a cost, not a correctness problem, but it is a
 wasted ladder, so say where you are going before you start one:
 
@@ -438,9 +449,14 @@ Run `validate_candidate` on the packaged doc (see **The one rule** above). Keep 
 human. This — not the surrogate, not your own judgment — is what decides whether you have a find.
 
 Before you pay for the gate on a staged file, `uv run python research/kit/prescreen.py <path>`
-repeats the two cheap refusals (one connected code, not already on the board) and exits 1 when
-the gate would refuse the candidate for either. `make_submission` already refuses to package a
-direct sum, so a staged file normally fails this only when the board moved under it.
+runs the verifier's structural half on the document (`prescreen.preflight`), repeats the two
+cheap refusals (one connected code, not already on the board), and exits 1 when the gate would
+refuse the candidate for any of them. `coordination.py gate` and `gate_and_record` make the
+preflight refusal themselves: a candidate that fails it is not gated, the verifier's failed
+checks are written to `<path>.preflight.json` instead of a verdict, and `PreflightFailure` is
+raised (exit 1 from the command). `make_submission` refuses to package a direct sum and
+`save_submission` refuses to stage anything the preflight fails, so a staged file normally fails
+this only when the board moved under it or it was staged with `preflight=False`.
 
 The random distance search inside the gate is the expensive part, so do not pay twice for the
 same answer:
@@ -459,7 +475,9 @@ entry is served only while the validator source is unchanged, a refutation once 
 downgraded by a later run that missed it, and the reuse is subtractive: it can turn a pass into a
 failure and never the other way around. The cache lives in the gitignored
 the staging directory's `.verdicts/` folder. Nothing in it is evidence, and deleting it costs compute rather
-than correctness.
+than correctness. `gate_and_record` feeds a refutation recorded in the candidate's own
+`.verdict.json` back into the cache when the cache has lost it, so a lighter logical found on an
+earlier run of the same document is not searched for again (issue #3616).
 
 ## 5b. A win only on d: audit the peer before you package
 
@@ -632,11 +650,11 @@ something the next one should not have to re-learn.
 | `kit/coset.py` | `build_coset` + `subgroup_closure`, `left_cosets`, `normalizer` |
 | `kit/surrogate.py` | `distance_rand`, `lightest_logical` (witnesses), `mixed_volume` (k upper bound) |
 | `kit/search.py` | `screen`, `screen_adaptive`, `pareto_frontier`, `update_leaderboard` (the funnel; `audit=` counts what the pre-pass dropped, `board=` sets how a board match is handled) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` (all capped at check weight 8 by default), `sample_cyclic_gb` (designed k, check weight 24 to 32; section 3c) |
-| `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). Run on a staged file: `python research/kit/prescreen.py <path>` |
+| `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). `preflight`, `describe_preflight`: the verifier's structural half on a packaged document, the checks the gate's verify step would fail it on, in the verifier's words and sorted into a fault in the code or in the document (issue #3616). Run on a staged file: `python research/kit/prescreen.py <path>` |
 | `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
 | `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_repro_manifest` (the `repro/<slug>.json` recipe for `qldpc reproduce`) |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
-| `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`) — a note to other sessions, never a lock, and never read by `verify/` |
+| `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
 | `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, and the PR body from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `decoder_distance` (BP+OSD), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
 | `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap, through n = 8 with the nauty canonicalizer (pynauty, in the `research` extra; n <= 6 without it); exact distance uses the trusted SAT certifier |

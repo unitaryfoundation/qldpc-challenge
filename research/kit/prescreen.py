@@ -32,12 +32,25 @@ clears every check here can still be refuted there.
 
 ``search.screen`` and ``search.screen_adaptive`` run these checks on every
 candidate before spending the distance screen, and ``submit.make_submission``
-refuses to package a direct sum. For a candidate already staged as a file:
+refuses to package a direct sum.
+
+``preflight`` (issue #3616) is the same idea one stage later, on the packaged
+document: it runs ``qldpc_verify.verify(doc, refute=False)``, the verifier's
+structural half, and reports the checks the gate's verify step would fail
+the document on, with the verifier's own detail strings. Of the 355 gate
+runs staged in the ten days before #3616, 41 were refused on such checks
+(disconnected constructions, check weight over the cap, CSS codes typed
+``stabilizer``, malformed documents), and the gate had spent the random
+distance search on most of them first: the verifier records a structural
+failure and carries on, and a valid witness earns a distance to refute.
+``submit.save_submission`` refuses to stage a document that fails it and
+``coordination.gate_and_record`` refuses to gate one. For a candidate
+already staged as a file:
 
     uv run python research/kit/prescreen.py research/candidates/<run>/<n>-<k>-<d>.json
 
-prints the structure and the board match and exits 1 when the gate would
-refuse the candidate structurally or as an exact duplicate.
+prints the preflight, the structure, and the board match and exits 1 when
+the gate would refuse the candidate on any of them.
 """
 import argparse
 import json
@@ -213,6 +226,95 @@ def prescreen(HX, HZ, *, index=None, board=True):
             "labels": labels}
 
 
+# -- the verifier's structural half on a packaged document (issue #3616) ----
+
+# Which failed checks say the code is inadmissible, as opposed to the
+# document being wrong. ``construction`` and ``weight`` are properties of
+# (HX, HZ) that no edit to the document changes; everything else is a
+# document the code may still be fine under: a malformed field, a wrong
+# ``code_type``, a witness that does not verify, a layout that does not
+# cover the qubits.
+KINDS = {
+    "construction": ("tanner_connected", "stabilizer_group_connected",
+                     "css_commutation", "stabilizer_commutation",
+                     "k_at_least_1"),
+    "weight": ("check_weight_is_ldpc",),
+    "typing": ("stabilizer_code_is_not_css",
+               "stabilizer_code_is_not_locally_css"),
+    "layout": ("coordinates_cover_all_qubits", "coordinates_uniform_dimension",
+               "interaction_radius_within_claim", "site_occupancy_within_layers",
+               "site_spacing_at_least_one", "modules_cover_all_qubits"),
+    "other": ("verifier_ran",),
+}
+CODE_KINDS = frozenset({"construction", "weight"})
+
+
+def kind_of(check, detail=""):
+    """Classify a failed verifier check: what kind of thing is wrong.
+
+    ``schema_valid`` needs its detail: the schema caps a check row at 32
+    qubits, so a check over the weight cap is refused there, before the
+    verifier's own ``check_weight_is_ldpc`` is reached, as a ``checks/...``
+    row that "is too long". That is the code's weight, not the document's
+    shape, and 7 of the 41 refusals in #3616 were this.
+    """
+    for kind, names in KINDS.items():
+        if check in names:
+            return kind
+    if check == "schema_valid" and any(
+            part.startswith("checks/") and "is too long" in part
+            for part in detail.split("; ")):
+        return "weight"
+    if check.startswith(("distance_", "d_matches_")):
+        return "witness"
+    return "packaging"
+
+
+def preflight(doc):
+    """Run the verifier's structural half on a packaged document.
+
+    ``qldpc_verify.verify(doc, refute=False)``, read for its failed checks.
+    Returns ``{"ok", "failed", "kinds", "code_at_fault", "computed"}``:
+    ``failed`` is one ``{"check", "detail", "kind"}`` per failed check, in
+    the verifier's order and in the verifier's words; ``kinds`` the distinct
+    kinds among them (``kind_of``); ``code_at_fault`` True when any failure
+    is about the code rather than the document; ``computed`` what the
+    verifier derived (``code_type``, ``n``, ``k``, ``max_check_weight``,
+    ``weight_class``), as far as it got.
+
+    The failed checks are exactly ``gates.verify.failed_checks`` of the
+    gate's verdict for this document: ``validate_candidate`` calls the same
+    function and excludes the same one check, ``distance_not_refuted``,
+    which ``refute=False`` never records. A document that fails here fails
+    the gate's verify step, and one that passes here can still be refuted
+    there, so this decides nothing the gate would not.
+    """
+    rep = qldpc_verify.verify(doc, refute=False)
+    failed = [{"check": c["check"], "detail": c.get("detail", ""),
+               "kind": kind_of(c["check"], c.get("detail", ""))}
+              for c in rep["checks"]
+              if not c["ok"] and c["check"] != "distance_not_refuted"]
+    kinds = sorted({f["kind"] for f in failed})
+    comp = rep.get("computed") or {}
+    keep = ("code_type", "n", "k", "max_check_weight", "weight_class")
+    return {"ok": not failed, "failed": failed, "kinds": kinds,
+            "code_at_fault": any(k in CODE_KINDS for k in kinds),
+            "computed": {k: comp[k] for k in keep if k in comp}}
+
+
+def describe_preflight(result):
+    """One line per failed check, then what kind of fix there is."""
+    if result["ok"]:
+        return "the verifier's structural checks all pass"
+    lines = [f"{f['check']} ({f['kind']}): {f['detail']}"
+             for f in result["failed"]]
+    lines.append("the code is inadmissible; no edit to the document fixes it"
+                 if result["code_at_fault"] else
+                 "the document is wrong and the code may be fine; fix the "
+                 "document and save it again")
+    return "\n".join(lines)
+
+
 def load_matrices(path):
     """Load (HX, HZ) from a staged candidate file.
 
@@ -242,7 +344,9 @@ def load_matrices(path):
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description="Decide, before the gate, whether a candidate is one "
-                    "connected code and whether the board already holds it.")
+                    "connected code, whether the board already holds it, "
+                    "and (for a .json document) whether the gate's verify "
+                    "step would refuse it.")
     ap.add_argument("path", nargs="?",
                     help="candidate .json or .npz; with none, run the demo")
     ap.add_argument("--no-board", action="store_true",
@@ -252,13 +356,35 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if args.path is None:
         return _demo()
+    pre = None
+    if args.path.endswith(".json"):
+        with open(args.path, encoding="utf-8") as f:
+            doc = json.load(f)
+        pre = preflight(doc)
+        if qldpc_verify.is_stabilizer(doc):
+            # the structure and board checks here read CSS matrices; the
+            # gate's own dedup covers a stabilizer candidate
+            if args.json:
+                print(json.dumps({"preflight": pre,
+                                  "gate_would_refuse": not pre["ok"]}, indent=1))
+            else:
+                print(f"{args.path}: a stabilizer candidate; preflight only")
+                for line in describe_preflight(pre).split("\n"):
+                    print(f"  {'REFUSE  ' if not pre['ok'] else ''}{line}")
+            return 0 if pre["ok"] else 1
     HX, HZ = load_matrices(args.path)
     verdict = prescreen(HX, HZ, board=not args.no_board)
+    if pre is not None:
+        verdict["preflight"] = pre
+        verdict["gate_would_refuse"] = verdict["gate_would_refuse"] or not pre["ok"]
     if args.json:
         print(json.dumps(verdict, indent=1))
     else:
         n = int(np.asarray(HX).shape[1])
         print(f"{args.path}: n={n}, {describe_structure(verdict['structure'])}")
+        if pre is not None and not pre["ok"]:
+            for line in describe_preflight(pre).split("\n"):
+                print(f"  REFUSE  {line}")
         match = verdict["board"]
         if not args.no_board:
             if match["exact"]:

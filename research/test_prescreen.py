@@ -195,3 +195,148 @@ def test_cli_passes_a_connected_code_without_the_board(tmp_path):
     assert proc.returncode == 0, proc.stderr
     verdict = json.loads(proc.stdout)
     assert verdict["structure"]["connected"] and not verdict["reasons"]
+
+
+# -- the verifier's structural half on a packaged document (issue #3616) ----
+#
+# The property is the same as above: the preflight refuses exactly what the
+# gate's verify step refuses, in the verifier's own words, and sorts a fault
+# in the code (nothing to fix) from a fault in the document (fix and save).
+
+import validate_candidate  # noqa: E402  (prescreen put verify/ on the path)
+
+
+def _packaged(HX, HZ):
+    return make_submission(HX, HZ, name="preflight test", construction="t",
+                           authors=["@tester"], trials=200, seed=1)
+
+
+def _direct_sum_doc():
+    """Two Steanes on disjoint qubits, with a valid witness on the first block.
+
+    `make_submission` refuses to package this, so it is assembled by hand: the
+    document the issue's n = 36 batch staged twelve of. Its witnesses verify,
+    so the gate's verify step fails it and then still spends the random
+    search on the distance they earn.
+    """
+    sup = [[int(q) for q in np.nonzero(r)[0]] for r in TWO_STEANES]
+    doc = _packaged(STEANE, STEANE)
+    doc.update(n=14, k=2, checks={"X": sup, "Z": sup})
+    for side in ("X", "Z"):
+        doc["distance"][side].update(value=3, witness=[0, 1, 2])
+    doc["distance"]["d"] = 3
+    return doc
+
+
+def _typed_stabilizer():
+    """Steane filed as a stabilizer code: the issue's typing failure."""
+    rows = [[int(q) for q in np.nonzero(r)[0]] for r in STEANE]
+    return {"schema_version": "0.4", "name": "Steane typed stabilizer",
+            "code_type": "stabilizer", "n": 7, "k": 1,
+            "checks": {"S": [{"X": r, "Z": []} for r in rows]
+                       + [{"X": [], "Z": r} for r in rows]},
+            "distance": {"d": 3, "P": {"value": 3, "confidence": "upper_bound",
+                                       "witness": {"X": [0, 1, 2], "Z": []}}},
+            "provenance": {"authors": ["@tester"], "construction": "t",
+                           "date": "2026-10-17", "references": [], "notes": ""}}
+
+
+def test_preflight_passes_a_packaged_code():
+    r = P.preflight(_packaged(STEANE, STEANE))
+    assert r["ok"] and not r["failed"] and not r["kinds"] and not r["code_at_fault"]
+    assert r["computed"] == {"code_type": "CSS", "n": 7, "k": 1,
+                             "max_check_weight": 4, "weight_class": "weight-4"}
+    assert P.describe_preflight(r) == "the verifier's structural checks all pass"
+
+
+def test_preflight_refuses_a_direct_sum_in_the_verifiers_words():
+    r = P.preflight(_direct_sum_doc())
+    assert [f["check"] for f in r["failed"]] == ["tanner_connected",
+                                                 "stabilizer_group_connected"]
+    assert r["failed"][0]["detail"] == "Tanner graph has 2 connected component(s)"
+    assert "2 independent block(s)" in r["failed"][1]["detail"]
+    assert r["kinds"] == ["construction"] and r["code_at_fault"]
+    assert P.describe_preflight(r).endswith("no edit to the document fixes it")
+
+
+def test_preflight_fails_exactly_the_checks_the_gate_fails():
+    """`gates.verify.failed_checks` of the real gate, search off, is the preflight's list."""
+    doc = _direct_sum_doc()
+    verdict = validate_candidate.validate_candidate(doc, refute=False)
+    assert not verdict["passed"]
+    assert verdict["gates"]["verify"]["failed_checks"] == [
+        f["check"] for f in P.preflight(doc)["failed"]]
+
+
+def test_preflight_names_the_weight_cap():
+    n = qldpc_verify.MAX_CHECK_WEIGHT + 1
+    row = list(range(n))
+    doc = _packaged(STEANE, STEANE)
+    doc.update(n=n, k=n - 2, checks={"X": [row], "Z": [row]})
+    doc["distance"] = {"d": 2,
+                       "X": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
+                       "Z": {"value": 2, "confidence": "upper_bound", "witness": [0, 2]}}
+    r = P.preflight(doc)
+    # The schema caps a row at 32 qubits, so the refusal comes from
+    # `schema_valid`, before the verifier's own weight check is reached;
+    # the kind still says the code's weight is the fault.
+    assert [(f["check"], f["kind"]) for f in r["failed"]] == [("schema_valid", "weight")]
+    assert "checks/X/0" in r["failed"][0]["detail"] and "is too long" in r["failed"][0]["detail"]
+    assert r["code_at_fault"]
+    assert P.kind_of("check_weight_is_ldpc") == "weight"
+
+
+def test_preflight_sorts_a_document_fault_from_a_code_fault():
+    """The issue's commonest packaging failure, eight times in one batch."""
+    doc = _packaged(STEANE, STEANE)
+    del doc["distance"]["X"]["witness_provenance"]["date"]
+    r = P.preflight(doc)
+    assert [(f["check"], f["kind"]) for f in r["failed"]] == [("schema_valid", "packaging")]
+    assert "'date' is a required property" in r["failed"][0]["detail"]
+    assert not r["code_at_fault"]
+    assert P.describe_preflight(r).endswith("fix the document and save it again")
+
+
+def test_preflight_catches_a_css_code_typed_stabilizer():
+    r = P.preflight(_typed_stabilizer())
+    assert [(f["check"], f["kind"]) for f in r["failed"]] == [
+        ("stabilizer_code_is_not_css", "typing")]
+    assert 'set code_type to "CSS"' in r["failed"][0]["detail"]
+    assert not r["code_at_fault"]
+
+
+def test_every_kind_in_the_table_is_a_check_the_verifier_records():
+    """The classification names real checks, so a renamed check cannot go unclassified."""
+    with open(os.path.join(_HERE, "..", "verify", "qldpc_verify.py"), encoding="utf-8") as f:
+        source = f.read()
+    for kind, names in P.KINDS.items():
+        for name in names:
+            assert f'record("{name}"' in source, (kind, name)
+    assert P.kind_of("distance_X_witness") == "witness"
+    assert P.kind_of("d_matches_min_side") == "witness"
+    assert P.kind_of("k_matches_claim") == "packaging"
+    assert P.kind_of("schema_valid", "distance/X/witness_provenance: 'date' is a required property") == "packaging"
+    assert P.kind_of("schema_valid", "checks/X/0: [] is too short") == "packaging"
+
+
+def test_cli_preflights_a_staged_document(tmp_path):
+    path = tmp_path / "14-2-3.json"
+    path.write_text(json.dumps(_direct_sum_doc()))
+    proc = subprocess.run(
+        [sys.executable, os.path.join(_HERE, "kit", "prescreen.py"), str(path),
+         "--no-board", "--json"], capture_output=True, text=True, check=False)
+    assert proc.returncode == 1, proc.stderr
+    out = json.loads(proc.stdout)
+    assert [f["check"] for f in out["preflight"]["failed"]] == [
+        "tanner_connected", "stabilizer_group_connected"]
+    assert out["gate_would_refuse"]
+
+
+def test_cli_preflights_a_stabilizer_document(tmp_path):
+    path = tmp_path / "7-1-3.json"
+    path.write_text(json.dumps(_typed_stabilizer()))
+    proc = subprocess.run(
+        [sys.executable, os.path.join(_HERE, "kit", "prescreen.py"), str(path),
+         "--no-board"], capture_output=True, text=True, check=False)
+    assert proc.returncode == 1, proc.stderr
+    assert "REFUSE" in proc.stdout and "stabilizer_code_is_not_css" in proc.stdout
