@@ -466,7 +466,10 @@ def _rebuild_symmetric_checks(mats, n):
         rows = [r.copy() for r in M]
         seen = {tuple(r.tolist()) for r in rows}
         frontier = list(rows)
-        while frontier:
+        # Bound the closure: a row space has dimension <= n, so more than a
+        # small multiple of the original rows (or of n) is blowup, not signal.
+        cap = max(M.shape[0] * 4, 2 * n)
+        while frontier and len(rows) < cap:
             r = frontier.pop()
             for g in gens:
                 invp = np.argsort(g)
@@ -476,7 +479,9 @@ def _rebuild_symmetric_checks(mats, n):
                     seen.add(t)
                     rows.append(r2)
                     frontier.append(r2)
-        if len(rows) > M.shape[0]:
+                    if len(rows) >= cap:
+                        break
+        if M.shape[0] < len(rows) <= cap:
             out.append(np.asarray(rows, dtype=M.dtype))
         else:
             out.append(M.copy())
@@ -815,7 +820,7 @@ def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
         return None
     from pycryptosat import Solver
     from pysat.card import CardEnc, EncType
-    m, c = F.shape
+    _, c = F.shape
     W = int(claimed) - 1
     if W < 1:
         return None
@@ -856,8 +861,6 @@ def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
 def _sat_fold_partition(P, sizes, HX, HZ, claimed, time_budget):
     """Try both sides on one orbit partition.  Returns (side, weight, full_vector)
     or None."""
-    n = HX.shape[1]
-    c = P.shape[1]
     # X side: v in ker HZ, outside rowspace HX.
     Fx = (HZ @ P) % 2
     Lx = gf2.logical_basis(HX, HZ)
@@ -873,23 +876,13 @@ def _sat_fold_partition(P, sizes, HX, HZ, claimed, time_budget):
             continue
         w, x = res
         v = (P @ x).astype(np.int8)
-        # validate on full matrices
-        H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
-        if int(v.sum()) != w:
-            # weighted; check kernel/rowspace instead
-            pass
-        if not ((H_ker @ v) % 2).any() and ((gf2.logical_basis(H_row, H_ker) @ v) % 2).any():
-            # nontriviality via logical basis of opposite type
-            pass
-        # Use _valid_logical for CSS? heuristic has _valid_logical?
-        ok = (not ((H_ker @ v) % 2).any())
         H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
         if _valid_logical(v, H_ker, H_row):
-            return side, w, v
+            return side, int(v.sum()), v
     return None
 
 
-def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0):
+def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0, gens=None):
     """SAT-fold refutation stage (optional; needs pycryptosat + python-sat).
     Returns (refuted, d_found, witness, partitions) like orbit_fold_refute."""
     if not _sat_available():
@@ -900,13 +893,17 @@ def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0):
         return False, None, None, 0
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
-    gens = structural_automorphisms([HX, HZ], n) + nauty_automorphisms([HX, HZ], n)
+    if gens is None:
+        gens = structural_automorphisms([HX, HZ], n) + nauty_automorphisms([HX, HZ], n)
     if not gens:
         return False, None, None, 0
     rng = np.random.default_rng(seed)
     parts = orbit_partitions(gens, n, rng)
     if not parts:
         return False, None, None, 0
+    # Per-partition time share so a slow solver does not consume the whole budget
+    # on the first partition.
+    per_part = max(1.0, max_seconds / max(1, len(parts)))
     t0 = time.monotonic()
     searched = 0
     for part in parts:
@@ -917,24 +914,16 @@ def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0):
         P = np.zeros((n, c), dtype=np.int8)
         for q in range(n):
             P[q, int(labels[q])] = 1
-        remaining = max_seconds - (time.monotonic() - t0)
+        remaining = min(per_part, max_seconds - (time.monotonic() - t0))
         if remaining <= 0:
             break
         res = _sat_fold_partition(P, sizes, HX, HZ, claimed, remaining)
         searched += 1
         if res is not None:
             side, w, v = res
-            if w < claimed:
-                # nontriviality already checked loosely; validate properly
-                H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
-                L = gf2.logical_basis(H_row, H_ker) if False else None
-                # Use _valid_logical if exists
-                try:
-                    valid = _valid_logical(v, H_ker, H_row)
-                except NameError:
-                    valid = (not ((H_ker @ v) % 2).any())
-                if valid:
-                    return True, w, sorted(int(q) for q in np.nonzero(v)[0]), searched
+            H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
+            if _valid_logical(v, H_ker, H_row) and w < claimed:
+                return True, int(v.sum()), sorted(int(q) for q in np.nonzero(v)[0]), searched
     return False, None, None, searched
 
 
@@ -956,7 +945,9 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
         return (w < claimed), w, (pauli_witness(v, n) if w < claimed else None), searched
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
-    res = orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=max_seconds)
+    gens = structural_automorphisms([HX, HZ], n) + nauty_automorphisms([HX, HZ], n)
+    res = orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=max_seconds,
+                                 gens=gens)
     found = [res[s] for s in ("X", "Z") if res[s] is not None]
     if found:
         w, v = min(found, key=lambda t: t[0])
@@ -964,9 +955,10 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
             wit = sorted(int(j) for j in np.nonzero(v)[0])
             return True, w, wit, res["partitions"]
     # SAT fold fallback for large folded kernels (optional; needs python-sat).
-    if _sat_available():
+    if _sat_available() and gens:
         sref, sw, swit, sp = orbit_fold_sat_refute(doc, seed=seed + 97,
-                                                  max_seconds=max(5.0, 0.5 * max_seconds))
+                                                  max_seconds=max(5.0, 0.5 * max_seconds),
+                                                  gens=gens)
         if sref:
             return True, sw, swit, res["partitions"] + sp
     if found:

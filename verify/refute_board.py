@@ -295,8 +295,15 @@ def main(argv):
           + (f"; shard {args.shard}: {len(paths)} entries" if args.shard else "") + ", largest n first\n")
     if args.deep:
         def refute(doc, seed=0, capture=None):
+            # Deep completion pass: bounded + SAT fold first (sound refutation),
+            # then a long RIS pass.  The fold runs at the deep budget with nauty
+            # and the SAT fold enabled; RIS covers what the fold cannot see.
+            sref, sd, swit, _sp = H.orbit_fold_refute(
+                doc, seed=seed + 97, trials=50000, max_seconds=300.0)
+            if sref:
+                return True, sd, swit, 50000
             return H.refute_check(doc, seed=seed, trials=50000,
-                                 max_seconds=300.0, fold_trials=50000,
+                                 max_seconds=300.0, fold_trials=0,
                                  capture=capture)
     else:
         refute = H.refute_check
