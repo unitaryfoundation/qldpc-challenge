@@ -300,3 +300,32 @@ keep finding new operators past 5,000 distinct ids, or that hit the sweep's
 per-side cap of 1,000, is censored: its count is a floor and no estimate is
 made. Nothing here is a gate input or a board column; `verify/` reads neither
 the records, the table, nor the report.
+
+## Deciding what the WL signature only flags: `permutation_audit.py`
+
+The gate has two dedup outcomes, an identical fingerprint and a shared
+Weisfeiler-Leman signature, and `verify/two_block_equivalence.py` decides the
+cyclic two-block family outright; every other flagged pair waits for a human
+(issue #3427). `permutation_audit.py run` walks every pair of board entries
+that share a WL signature with different fingerprints, and every literature
+match in `research/provenance/derived.json`, and gives each one of four
+verdicts: `equivalent` with the permutation (nauty on the typed Tanner graph,
+or on the basis-independent hypergraph of all low-weight row-space vectors
+when the rank allows), re-verified on the row spaces with the negative
+control; `inequivalent` when a basis-independent invariant differs in both
+orientations (ranks, the dimension of the intersection of the X and Z row
+spaces, the exact low-weight enumerator); `gb_family_no` when the two-block
+decider finds no unit map, which is the family verdict and not a proof
+against other permutations; `undecided` otherwise. Equivalent pairs with two
+different distance claims are flagged, since the lighter witness transports.
+
+```
+uv run --extra research python research/audits/permutation_audit.py run --out research/audits/permutation_audit-<date>.json
+uv run --extra research python research/audits/permutation_audit.py recheck research/audits/permutation_audit-<date>.json
+```
+
+The 2BGA literature matches are rebuilt from their archive rows on the GAP
+tables under `research/kit/groups/`; the QECDB matches are fetched from the
+database's API and the fetched rows are kept in the record. Nothing here is a
+gate input; `recheck` re-verifies every recorded permutation from the blob
+hashes it cites, as `permutation_equivalence.py` does for its ledger.

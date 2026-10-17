@@ -4,8 +4,9 @@ The gate is fast and the search is the interesting part, but the stretch between
 ``validate_candidate.py`` returning ``passed: true`` and an open PR is neither:
 it is a fixed list of mechanical steps (copy the validated document into
 ``codes/``, retype the ladder into ``notes/<slug>.md``, fill the PR body's
-checklist and frontier section, run the prose check) that has been rewritten as
-throwaway shell once per campaign. Issue #2328 measures what that costs and
+checklist and frontier section, write the ``repro/<slug>.json`` manifest from
+the recipe the candidate was staged with, run the prose check) that has been
+rewritten as throwaway shell once per campaign. Issue #2328 measures what that costs and
 where it fails: glue that scrapes the CLI's human-oriented output, fails to
 parse it, and fails silently.
 
@@ -74,6 +75,7 @@ import escalation  # noqa: E402
 import qldpc as cli  # noqa: E402
 import qldpc_verify  # noqa: E402
 import validate_candidate as gate  # noqa: E402
+from submit import read_recipe, recipe_from_spec, write_repro_manifest  # noqa: E402
 
 REPORT_SCHEMA = "qldpc-promote/1"
 
@@ -109,7 +111,13 @@ class PromoteError(ValueError):
 # inputs
 # ----------------------------------------------------------------------------
 def load_plan(path):
-    """Read a plan file and return its list of ``(candidate_doc, evidence)``."""
+    """Read a plan file and return its list of ``(candidate_doc, evidence, recipe)``.
+
+    ``recipe`` is the plan's own ``recipe`` key when it has one, else the spec
+    ``submit.save_submission`` kept beside a candidate given by path
+    (``<stem>.recipe.json``), else None; it becomes ``repro/<slug>.json`` in
+    the bundle (issue #2955, item 3).
+    """
     with open(path, encoding="utf-8") as f:
         raw = json.load(f)
     plans = raw if isinstance(raw, list) else [raw]
@@ -118,6 +126,7 @@ def load_plan(path):
         if not isinstance(plan, dict) or "candidate" not in plan:
             raise PromoteError(f"{path}[{i}]: a plan needs a 'candidate' key")
         cand = plan["candidate"]
+        recipe = plan.get("recipe")
         if isinstance(cand, str):
             cand_path = cand if os.path.isabs(cand) else os.path.join(
                 os.path.dirname(os.path.abspath(path)), cand)
@@ -125,7 +134,9 @@ def load_plan(path):
                 cand_path = os.path.join(_ROOT, cand)
             with open(cand_path, encoding="utf-8") as f:
                 cand = json.load(f)
-        out.append((cand, plan.get("evidence") or {}))
+            if recipe is None:
+                recipe = read_recipe(cand_path)
+        out.append((cand, plan.get("evidence") or {}, recipe))
     return out
 
 
@@ -437,7 +448,8 @@ def equivalence_finding(verdict, doc):
                   "this code's fingerprint or Weisfeiler-Leman signature")
 
 
-def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel):
+def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
+            repro_rel=None, reproducible=False):
     """Render the PR body from the verified document and the gate's own verdict.
 
     Same sections as ``.github/pull_request_template.md`` and the same frontier
@@ -497,22 +509,31 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel):
     if construction:
         lines += [f"Construction: {construction}", ""]
     lines += [f"Research note: `{note_rel}`", ""]
+    if repro_rel:
+        lines += [f"Reproduction manifest: `{repro_rel}`" + (
+            f"; `./qldpc reproduce {n}-{k}-{d} --construction` rebuilds the code "
+            "from its recipe with `research/kit/rebuild.py` and compares "
+            "fingerprints." if reproducible else
+            "; its construction stage is declared not reproducible, since the "
+            "recorded spec carries no constructor and params for "
+            "`research/kit/rebuild.py` to run."), ""]
     return "\n".join(lines)
 
 
 # ----------------------------------------------------------------------------
 # the bundle
 # ----------------------------------------------------------------------------
-def _git_commands(slug, title, code_rel, note_rel, body_file, base="main"):
+def _git_commands(slug, title, code_rel, note_rel, body_file, base="main", extra=()):
     """Return the branch/commit/push/PR sequence for one bundle.
 
     Quoted with ``shlex`` because the title carries the construction string,
-    which is free text and reaches a shell here.
+    which is free text and reaches a shell here. ``extra`` lists further
+    files the bundle wrote (the ``repro/`` manifest).
     """
     q = shlex.quote
     return [
         f"git checkout -b submit-{slug} {base}",
-        f"git add {q(code_rel)} {q(note_rel)}",
+        "git add " + " ".join(q(f) for f in (code_rel, note_rel, *extra)),
         f"git commit -m {q(title)}",
         f"verify/prepush_prose_check.sh {q(body_file)}",
         f"git push -u origin submit-{slug}",
@@ -547,13 +568,21 @@ def _run_check_prose(root, body_file, files, pr_author=None):
 
 def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             min_deep_trials=DEFAULT_MIN_DEEP_TRIALS, pr_author=None,
-            body_dir=None, write=True, force=False, seed=None, base="main"):
+            body_dir=None, write=True, force=False, seed=None, base="main",
+            recipe=None):
     """Build one submission bundle and return its report.
 
     The order is fixed and is the point: evidence, then the trusted gate on the
     final document, then the files, then ``verify/check_prose.py`` on what was
     written. A blocker stops the bundle and is reported; nothing is skipped to
     get past one.
+
+    ``recipe`` is the screening spec the candidate was staged with
+    (``load_plan`` reads it from ``<stem>.recipe.json`` beside the candidate).
+    With one, the bundle also carries ``repro/<slug>.json``, written from the
+    final document so its ``artifact_sha256`` is the committed file's; a spec
+    without a ``{constructor, params}`` recipe gives a manifest whose
+    construction stage says ``not_reproducible`` (issue #2955, item 3).
     """
     report = {"schema": REPORT_SCHEMA, "ok": False, "slug": None, "title": None,
               "branch": None, "files": {}, "body_file": None, "gates": {},
@@ -620,8 +649,12 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     code_rel = os.path.join("codes", f"{slug}.json")
     note_rel = os.path.join("notes", f"{slug}.md")
     code_path, note_path = os.path.join(root, code_rel), os.path.join(root, note_rel)
+    repro_rel = os.path.join("repro", f"{slug}.json") if recipe is not None else None
+    written = [(code_path, code_rel), (note_path, note_rel)]
+    if repro_rel:
+        written.append((os.path.join(root, repro_rel), repro_rel))
     if not force:
-        for p, rel in ((code_path, code_rel), (note_path, note_rel)):
+        for p, rel in written:
             if os.path.exists(p):
                 blocked.append(f"{rel} already exists; pass force=True to "
                                f"overwrite or pick another candidate")
@@ -636,9 +669,12 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
                        f"{NOTE_CAP_BYTES}-byte note cap; trim the evidence record")
         return report
     body = pr_body(doc, report_verify, verdict, evidence, facts,
-                   code_rel=code_rel, note_rel=note_rel)
+                   code_rel=code_rel, note_rel=note_rel, repro_rel=repro_rel,
+                   reproducible=recipe_from_spec(recipe) is not None)
     report["title"] = bundle_title(doc, evidence)
     report["files"] = {"code": code_rel, "note": note_rel}
+    if repro_rel:
+        report["files"]["repro"] = repro_rel
 
     body_dir = body_dir or os.path.join(root, "research", "candidates")
     body_file = os.path.join(body_dir, f"pr-body-{slug}.md")
@@ -651,11 +687,16 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             f.write("\n")
         with open(note_path, "w", encoding="utf-8", newline="\n") as f:
             f.write(note_md)
+        if repro_rel:
+            write_repro_manifest(doc, slug, recipe,
+                                 repro_dir=os.path.join(root, "repro"),
+                                 artifact_path=code_path)
         with open(body_file, "w", encoding="utf-8", newline="\n") as f:
             f.write(body)
         report["body_file"] = body_file
         # 3. the prose gate, on what is actually on disk.
-        prose = _run_check_prose(root, body_file, [code_rel, note_rel],
+        prose = _run_check_prose(root, body_file,
+                                 [rel for _, rel in written],
                                  pr_author=pr_author)
         report["gates"]["check_prose"] = prose
         if not prose["ok"]:
@@ -669,7 +710,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
 
     report["needs_human"] = needs_human(doc, verdict, body_file if write else None)
     report["commands"] = _git_commands(slug, report["title"], code_rel, note_rel,
-                                       body_file, base=base)
+                                       body_file, base=base,
+                                       extra=[repro_rel] if repro_rel else ())
     report["ok"] = not blocked
     return report
 
@@ -709,8 +751,12 @@ def needs_human(doc, verdict, body_file):
 
 
 def promote_all(plans, **kwargs):
-    """Promote each ``(candidate, evidence)`` plan and return the reports."""
-    return [promote(cand, ev, **kwargs) for cand, ev in plans]
+    """Promote each ``(candidate, evidence[, recipe])`` plan and return the reports."""
+    out = []
+    for plan in plans:
+        cand, ev, *rest = plan
+        out.append(promote(cand, ev, recipe=rest[0] if rest else None, **kwargs))
+    return out
 
 
 def script_for(reports, *, shell="#!/bin/sh\nset -eu\n"):

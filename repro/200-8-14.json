@@ -1,0 +1,43 @@
+{
+  "artifact_sha256": "c64c2f86f912f7a4480edd94bdbfebea19a96417dedf538813533368ccca750a",
+  "environment": {
+    "extras": [
+      "research"
+    ]
+  },
+  "manifest_version": "1",
+  "notes": "Emitted for the 2BGA baseline seed of issue #3658. The construction stage rebuilds the code from the archive row's supports on the committed GAP table research/kit/groups/smallgroup_100_6.json and compares fingerprints.",
+  "slug": "200-8-14",
+  "spec_context": {
+    "family": "2bga-nonabelian",
+    "source": "arXiv:2306.16400 nonabelian row 100 6 8 14 [ 1, 6, 21 ] [ 1, 14, 70 ]"
+  },
+  "stages": {
+    "certify": {
+      "reason": "above the certifier's demonstrated range",
+      "status": "not_applicable"
+    },
+    "circuits": {
+      "reason": "the entry has no circuit block",
+      "status": "not_applicable"
+    },
+    "construction": {
+      "args": [
+        "--constructor",
+        "group_algebra.build_2bga_small_group",
+        "--params",
+        "{\"order\":100,\"gap_id\":6,\"a\":[0,5,20],\"b\":[0,13,69]}"
+      ],
+      "budget_seconds": 300,
+      "script": "research/kit/rebuild.py",
+      "status": "applicable"
+    },
+    "ler": {
+      "reason": "the entry has no measured rate",
+      "status": "not_applicable"
+    },
+    "verify": {
+      "status": "applicable"
+    }
+  }
+}

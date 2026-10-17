@@ -462,3 +462,127 @@ def test_plan_file_drives_a_batch(tmp_path, empty_board):
     script = P.script_for(reports)
     assert "gh pr create" in script
     assert "git checkout -b submit-72-12-6" in script
+
+
+# --------------------------------------------- the reproduction manifest (#2955)
+#
+# A candidate staged with `save_submission(doc, path, spec=...)` carries its
+# recipe beside it, and the bundle turns that into `repro/<slug>.json` for the
+# committed entry. Pinned here: the manifest binds the committed file, its
+# construction stage runs the recipe, the git commands and the PR body carry
+# it, a spec without a recipe gives an honest manifest, and a candidate
+# without a spec gets no manifest at all. No PR author is passed: with one,
+# check_prose diffs fieldnotes/ against origin/main, and the farm is not a
+# git repository.
+
+RECIPE_72 = {"constructor": "bb.build_bb",
+             "params": {"l": 6, "m": 6, "A_terms": [[3, 0], [0, 1], [0, 2]],
+                        "B_terms": [[0, 3], [1, 0], [2, 0]]},
+             "family": "bivariate-bicycle"}
+
+
+def _passing_verdict(doc, seed=None, **kw):
+    """Return a gate verdict shaped like the real one, for a code the board already holds."""
+    return {"passed": True,
+            "labels": ["advances the weight-6 x unrestricted board",
+                       "literature novelty UNVERIFIED"],
+            "gates": {"verify": {"ok": True, "failed_checks": []},
+                      "refute": {"refuted": False, "seed": 1, "detail": "none"},
+                      "dedup": {"exact_duplicate_of": None, "wl_equivalent_of": None},
+                      "novelty": {"board_advancing": True, "advances_by": ["n"],
+                                  "d_only_gain": False, "d_only_peers": [],
+                                  "dominated_by": []}},
+            "validator": {"source_sha256": "test", "seed": 1}}
+
+
+def test_a_recipe_becomes_a_manifest_bound_to_the_committed_file(tmp_path, monkeypatch):
+    import hashlib
+
+    import rebuild
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    root = _farm(tmp_path)
+    rep = P.promote(_doc(), _evidence(), recipe=RECIPE_72, root=root,
+                    body_dir=str(tmp_path / "bodies"))
+    assert rep["ok"], rep["blocked_by"]
+    repro_rel = rep["files"]["repro"]
+    assert repro_rel == os.path.join("repro", "72-12-6.json")
+    with open(os.path.join(root, repro_rel), encoding="utf-8") as f:
+        m = json.load(f)
+    c = m["stages"]["construction"]
+    assert c["status"] == "applicable" and c["args"][:2] == ["--constructor", "bb.build_bb"]
+    assert m["spec_context"] == {"family": "bivariate-bicycle"}
+    with open(os.path.join(root, rep["files"]["code"]), "rb") as f:
+        assert m["artifact_sha256"] == hashlib.sha256(f.read()).hexdigest()
+    # the recipe rebuilds the committed code, so `qldpc reproduce --construction` will match
+    HX, HZ = rebuild.rebuild(RECIPE_72["constructor"], RECIPE_72["params"])
+    with open(os.path.join(root, rep["files"]["code"]), encoding="utf-8") as f:
+        assert rebuild.fingerprint_of(HX, HZ) == P.qldpc_verify.verify(json.load(f))["fingerprint"]
+    add = next(cmd for cmd in rep["commands"] if cmd.startswith("git add "))
+    assert add == f"git add codes/72-12-6.json notes/72-12-6.md {repro_rel}"
+    with open(rep["body_file"], encoding="utf-8") as f:
+        body = f.read()
+    assert f"Reproduction manifest: `{repro_rel}`" in body
+    assert "./qldpc reproduce 72-12-6 --construction" in body
+    assert rep["gates"]["check_prose"]["ok"], rep["gates"]["check_prose"]
+
+
+def test_a_spec_without_a_recipe_gives_an_honest_manifest(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    root = _farm(tmp_path)
+    rep = P.promote(_doc(), _evidence(), recipe={"note": "hand-built"}, root=root,
+                    body_dir=str(tmp_path / "bodies"))
+    assert rep["ok"], rep["blocked_by"]
+    with open(os.path.join(root, rep["files"]["repro"]), encoding="utf-8") as f:
+        assert json.load(f)["stages"]["construction"]["status"] == "not_reproducible"
+    with open(rep["body_file"], encoding="utf-8") as f:
+        assert "declared not reproducible" in f.read()
+
+
+def test_without_a_recipe_no_manifest_is_written(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    root = _farm(tmp_path)
+    rep = P.promote(_doc(), _evidence(), root=root,
+                    body_dir=str(tmp_path / "bodies"))
+    assert rep["ok"], rep["blocked_by"]
+    assert "repro" not in rep["files"] and not os.path.exists(os.path.join(root, "repro"))
+    assert "git add codes/72-12-6.json notes/72-12-6.md" in rep["commands"]
+    with open(rep["body_file"], encoding="utf-8") as f:
+        assert "Reproduction manifest" not in f.read()
+
+
+def test_an_existing_manifest_blocks_without_force(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    root = _farm(tmp_path)
+    os.makedirs(os.path.join(root, "repro"))
+    with open(os.path.join(root, "repro", "72-12-6.json"), "w", encoding="utf-8") as f:
+        f.write("{}\n")
+    rep = P.promote(_doc(), _evidence(), recipe=RECIPE_72, root=root, write=False)
+    assert not rep["ok"] and any("repro/72-12-6.json already exists" in b for b in rep["blocked_by"])
+
+
+def test_load_plan_reads_the_recipe_kept_beside_the_candidate(tmp_path):
+    from submit import save_submission
+    cand = _doc()
+    save_submission(cand, str(tmp_path / "72-12-6.json"), spec=RECIPE_72)
+    plan = tmp_path / "plan.json"
+    with open(plan, "w", encoding="utf-8") as f:
+        json.dump([{"candidate": "72-12-6.json", "evidence": _evidence()},
+                   {"candidate": "72-12-6.json", "evidence": _evidence(),
+                    "recipe": {"note": "the plan's own recipe wins"}},
+                   {"candidate": cand, "evidence": _evidence()}], f)
+    plans = P.load_plan(str(plan))
+    assert [p[2] for p in plans] == [RECIPE_72, {"note": "the plan's own recipe wins"}, None]
+    assert plans[0][0] == cand
+
+
+def test_promote_all_takes_plans_with_or_without_a_recipe():
+    seen = []
+
+    def fake(cand, ev, *, recipe=None, **kw):
+        seen.append(recipe)
+        return {"ok": True}
+
+    from unittest import mock
+    with mock.patch.object(P, "promote", fake):
+        P.promote_all([({}, {}), ({}, {}, RECIPE_72)])
+    assert seen == [None, RECIPE_72]
