@@ -1,0 +1,57 @@
+{
+  "upstream_commit": "d9ef620f71939868090938e954bd15573e2f2233",
+  "candidate_file": "codes/124-20-13.json",
+  "candidate_sha256": "47434871dbd6e023e893f1062440f428109d7ae8344ece3124b2be9b99183781",
+  "seed": 20261017732,
+  "verdict": {
+    "passed": true,
+    "candidate": {
+      "n": 124,
+      "k": 20,
+      "d": 13,
+      "family": "generalized-bicycle",
+      "weight_class": "weight-9plus",
+      "locality_class": "unrestricted",
+      "fingerprint": "7741e48b11f3cc91",
+      "signature": "0e1ac753a77ac75a"
+    },
+    "gates": {
+      "verify": {
+        "ok": true,
+        "failed_checks": [],
+        "weight_class": "weight-9plus",
+        "locality_class": "unrestricted"
+      },
+      "refute": {
+        "refuted": false,
+        "seed": 20261017732,
+        "detail": "no lighter logical in 7460 RIS trials (seed 20261017732)"
+      },
+      "dedup": {
+        "exact_duplicate_of": null,
+        "wl_equivalent_of": null
+      },
+      "novelty": {
+        "cell": [
+          "weight-9plus",
+          "unrestricted"
+        ],
+        "board": "CSS",
+        "board_advancing": true,
+        "dominated_by": [],
+        "advances_by": [],
+        "d_only_gain": false,
+        "d_only_peers": [],
+        "literature_novelty": "unverified"
+      }
+    },
+    "labels": [
+      "advances the weight-9plus x unrestricted board",
+      "literature novelty UNVERIFIED"
+    ],
+    "validator": {
+      "source_sha256": "94fb17ca619427f783ba77ede31f9c59ffa1662a7008e68c9799367a37cdff19",
+      "seed": 20261017732
+    }
+  }
+}

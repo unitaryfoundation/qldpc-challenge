@@ -1,0 +1,114 @@
+{
+  "candidate_file": "124-20-13.json",
+  "candidate_sha256": "47434871dbd6e023e893f1062440f428109d7ae8344ece3124b2be9b99183781",
+  "original_optimized_reference_sha256": "748df148634412298876764cf231e70619c751148ac9225fe5872f135f0413ee",
+  "n": 124,
+  "k": 20,
+  "recipe": {
+    "field_modulus": "omega^2+omega+1",
+    "m": 31,
+    "f_nonzero": {
+      "0": 3,
+      "1": 2,
+      "3": 1,
+      "8": 2,
+      "11": 3
+    },
+    "g_nonzero": {
+      "0": 3,
+      "1": 1,
+      "4": 1,
+      "12": 2,
+      "13": 3
+    },
+    "physical_coordinate": "block*62 + 2*j + bit; block=0,1; j=0..30; bit=0,1"
+  },
+  "same_group": {
+    "X": {
+      "actual_raw_stacked_ranks": [
+        52,
+        52,
+        52
+      ]
+    },
+    "Z": {
+      "actual_raw_stacked_ranks": [
+        52,
+        52,
+        52
+      ]
+    }
+  },
+  "witnesses": {
+    "X": {
+      "support": [
+        4,
+        9,
+        12,
+        13,
+        34,
+        41,
+        70,
+        76,
+        78,
+        111,
+        118,
+        122,
+        123
+      ],
+      "weight": 13,
+      "zero_syndrome": true,
+      "augmented_rank": 53
+    },
+    "Z": {
+      "support": [
+        7,
+        11,
+        23,
+        42,
+        43,
+        48,
+        52,
+        53,
+        64,
+        77,
+        86,
+        103,
+        113
+      ],
+      "weight": 13,
+      "zero_syndrome": true,
+      "augmented_rank": 53
+    }
+  },
+  "column_files": {
+    "X": {
+      "file": "X-columns.txt",
+      "sha256": "6c8a38e4e59e6d5edaddd9d8122f7f21306529af833096e9ff4e933065bbfa21",
+      "j_plus_1_syndrome_action": "left rotate by2 among62 bits"
+    },
+    "Z": {
+      "file": "Z-columns.txt",
+      "sha256": "c1a3e9e558b6fcb24803c903b6c5987d5b11304c4c4550b154c8bbf75b7b7359",
+      "j_plus_1_syndrome_action": "left rotate by2 among62 bits"
+    }
+  },
+  "candidate_distance_metadata_unchanged": true,
+  "full_exhaustive_run": false,
+  "duality_entrywise": true,
+  "resources": {
+    "w": 13,
+    "degree": 12,
+    "M": 104,
+    "I": 1352
+  },
+  "expected_nonempty_orbits_per_weight": [
+    4,
+    246,
+    10004,
+    302621,
+    7262904,
+    144047596
+  ],
+  "expected_nonempty_orbits": 151623375
+}

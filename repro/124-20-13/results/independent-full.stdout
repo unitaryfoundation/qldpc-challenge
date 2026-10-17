@@ -1,0 +1,7 @@
+{"weight":1,"actual":4,"expected":4}
+{"weight":2,"actual":246,"expected":246}
+{"weight":3,"actual":10004,"expected":10004}
+{"weight":4,"actual":302621,"expected":302621}
+{"weight":5,"actual":7262904,"expected":7262904}
+{"weight":6,"actual":144047596,"expected":144047596}
+{"completed":true,"entries":151623375,"distinct_orbit_syndrome_collisions":0,"fixed_syndromes":0,"seconds":13.6995}

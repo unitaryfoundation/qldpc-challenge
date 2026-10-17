@@ -1,0 +1,7 @@
+independent_orbit_check.cpp: In function ‘int main(int, char**)’:
+independent_orbit_check.cpp:36:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   36 |  if(K.size()!=total)return 5;std::sort(K.begin(),K.end());V duplicates=0;for(size_t i=1;i<K.size();++i)duplicates+=(K[i]==K[i-1]);
+      |  ^~
+independent_orbit_check.cpp:36:30: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   36 |  if(K.size()!=total)return 5;std::sort(K.begin(),K.end());V duplicates=0;for(size_t i=1;i<K.size();++i)duplicates+=(K[i]==K[i-1]);
+      |                              ^~~

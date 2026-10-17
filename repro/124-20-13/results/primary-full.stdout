@@ -1,0 +1,8 @@
+{"stage":"enumerate","weight":1,"representatives":4,"expected":4,"anchored_leaves":4,"seconds":1.319e-06}
+{"stage":"enumerate","weight":2,"representatives":246,"expected":246,"anchored_leaves":306,"seconds":0.000121449}
+{"stage":"enumerate","weight":3,"representatives":10004,"expected":10004,"anchored_leaves":13954,"seconds":0.00154419}
+{"stage":"enumerate","weight":4,"representatives":302621,"expected":302621,"anchored_leaves":468251,"seconds":0.0110718}
+{"stage":"enumerate","weight":5,"representatives":7262904,"expected":7262904,"anchored_leaves":12422045,"seconds":0.182799}
+{"stage":"enumerate","weight":6,"representatives":144047596,"expected":144047596,"anchored_leaves":271340175,"seconds":3.52067}
+{"stage":"sort_start","keys":151623375,"bytes":1212987000}
+{"stage":"complete","keys":151623375,"duplicate_groups":0,"duplicate_pairs":0,"max_multiplicity":0,"exceptional_fixed_syndromes":0,"fnv1a64":11959195323682888719,"seconds":13.459}

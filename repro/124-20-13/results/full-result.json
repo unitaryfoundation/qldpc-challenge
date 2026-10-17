@@ -1,0 +1,55 @@
+{
+  "complete": true,
+  "candidate_sha256": "748df148634412298876764cf231e70619c751148ac9225fe5872f135f0413ee",
+  "source_sha256": {
+    "orbit_mitm.cpp": "7ba8f53164929a8e96ad79ecfaa21de7f5535b4b266f92b975a14e8e00923493",
+    "independent_orbit_check.cpp": "83f32feb92818fe06fc5f0c30f24243f097c44d1d9abb1dce445f8836b161941",
+    "check_sorted_keys.cpp": "9e1719c1ef962e127036a40e14112203952a6c8836fae7e8c09308a0ca4cca97"
+  },
+  "nonempty_half_support_orbits": 151623375,
+  "primary_terminal": {
+    "stage": "complete",
+    "keys": 151623375,
+    "duplicate_groups": 0,
+    "duplicate_pairs": 0,
+    "max_multiplicity": 0,
+    "exceptional_fixed_syndromes": 0,
+    "fnv1a64": 11959195323682888719,
+    "seconds": 13.459
+  },
+  "independent_terminal": {
+    "completed": true,
+    "entries": 151623375,
+    "distinct_orbit_syndrome_collisions": 0,
+    "fixed_syndromes": 0,
+    "seconds": 13.6995
+  },
+  "sorted_key_stream_check": {
+    "keys": 151623375,
+    "duplicates": 0,
+    "descending": 0,
+    "fixed_syndromes": 0,
+    "invalid_high_bits": 0,
+    "minimum": 25235,
+    "maximum": 1057588070732611535
+  },
+  "sorted_key_sha256": "87c3d881051f044ba8c5c15287aca06b58dbfdf58d20a0a0e524d8795b357510",
+  "sorted_key_bytes": 1212987000,
+  "large_key_file_retained": false,
+  "primary_timing": {
+    "returncode": 0,
+    "wall_seconds": 13.495405120076612,
+    "child_cpu_seconds": 13.493605
+  },
+  "independent_timing": {
+    "returncode": 0,
+    "wall_seconds": 13.736973330029286,
+    "child_cpu_seconds": 13.735692000000002
+  },
+  "local_mathematical_distance": {
+    "dX": 13,
+    "dZ": 13,
+    "d": 13
+  },
+  "scope": "This bound physical stabilizer group and equivalent generator presentations. Local exhaustive result, not an official server exact badge or a novelty claim. Candidate JSON metadata is unchanged."
+}
