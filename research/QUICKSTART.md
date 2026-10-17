@@ -19,7 +19,11 @@ prints a distance and exits throws away the part that cost the compute.
 `save_submission` refuses a document the gate's verify step would refuse (a
 direct sum, a check over the weight cap, a malformed or mistyped document) and
 keeps it under `rejected/` beside the path with the failed checks, so fix the
-document, or drop the code (issue #3616).
+document, or drop the code (issue #3616). Pass it `spec=` when the code came
+from a recipe (a `constructor` under `research/kit` and its `params`): the
+spec is kept beside the candidate, and promotion turns it into the
+`repro/<slug>.json` that `qldpc reproduce` rebuilds the entry from (issue
+#2955).
 
 Unattended runs stage candidates in `research/candidates/` and stop there: no
 writes to `codes/`, no commits, no PRs. A human decides what lands. Several
@@ -68,15 +72,18 @@ from submit import make_submission, save_submission
 
 # gate: duplicate -- the board already holds this code. Keep in step with the
 # paragraph below; research/test_documented_examples.py fails if the two disagree.
-HX, HZ = build_bb(6, 6, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)])
+spec = {"constructor": "bb.build_bb",        # the recipe research/kit/rebuild.py replays
+        "params": {"l": 6, "m": 6, "A_terms": [[3, 0], [0, 1], [0, 2]],
+                   "B_terms": [[0, 3], [1, 0], [2, 0]]}}
+HX, HZ = build_bb(**spec["params"])
 d = distance_rand(HX, HZ, trials=600)        # an upper bound, never a proof
 doc = make_submission(HX, HZ, name=f"[[72,12,{d}]] my BB code",
                       construction="Bivariate bicycle on Z_6 x Z_6.",
                       authors=["your-handle"], family="bivariate-bicycle",
                       confidence="upper_bound")
 path = unique_path(f"{staging_dir()}/72-12-6.json", doc)   # research/candidates/<run_id>/...
-save_submission(doc, path)                   # a second [[72,12,6]] gets its own name
-print(path)
+save_submission(doc, path, spec=spec)        # a second [[72,12,6]] gets its own name;
+print(path)                                  # the recipe is kept beside the candidate
 ```
 
 ```bash
