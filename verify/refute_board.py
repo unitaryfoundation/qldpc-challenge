@@ -242,6 +242,8 @@ def main(argv):
                     "the rest are reported unreached and the run fails")
     ap.add_argument("--report", help="write the JSON report here")
     ap.add_argument("--root", default=ROOT, help=argparse.SUPPRESS)
+    ap.add_argument("--deep", action="store_true",
+                    help="completion pass: longer per-entry budgets (50k trials, 300s, 50k fold trials) with nauty/SAT fold when available")
     ap.add_argument("--summarize", nargs="+", metavar="REPORT", help="combine shard reports instead of searching")
     ap.add_argument("--expect", type=int, help="with --summarize: the number of shard reports there must be")
     args = ap.parse_args(argv)
@@ -257,9 +259,15 @@ def main(argv):
     paths = shard_paths(scoped, args.shard)
     print(f"scope {args.scope}: {len(scoped)} of {len(board)} entries"
           + (f"; shard {args.shard}: {len(paths)} entries" if args.shard else "") + ", largest n first\n")
+    if args.deep:
+        def refute(doc, seed=0):
+            return H.refute_check(doc, seed=seed, trials=50000,
+                                 max_seconds=300.0, fold_trials=50000)
+    else:
+        refute = H.refute_check
     _install_stop_handlers()
     rep = refute_paths(paths, seed, max_seconds=None if args.max_minutes is None else 60 * args.max_minutes,
-                       root=args.root)
+                       root=args.root, refute=refute)
     rep["shard"] = args.shard
     rep["scope"] = args.scope
     if args.report:
