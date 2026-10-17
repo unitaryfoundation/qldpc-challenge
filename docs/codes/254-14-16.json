@@ -2098,8 +2098,10 @@
   "date": "2026-08-15",
   "references": [
    "arXiv:2111.03654",
-   "arXiv:2306.16400"
-  ]
+   "arXiv:2306.16400",
+   "arXiv:2503.03827 (Table VII: permutation-equivalent generalized bicycle row)"
+  ],
+  "novelty": "known_parameters"
  },
  "family": "generalized-bicycle"
 }

@@ -1,0 +1,11 @@
+{"order": 6, "gap_id": 2, "structure_description": "C6", "gap_version": "4.16.1", "smallgrp_version": "1.7.0",
+ "ordering": "GAP Elements(G), identity first", "convention": "table[r][c] is the index of g_r * g_c",
+ "elements": ["<identity> of ...", "f1", "f2", "f1*f2", "f2^2", "f1*f2^2"],
+ "table": [
+  [0,1,2,3,4,5],
+  [1,0,3,2,5,4],
+  [2,3,4,5,0,1],
+  [3,2,5,4,1,0],
+  [4,5,0,1,2,3],
+  [5,4,1,0,3,2]
+ ]}

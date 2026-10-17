@@ -623,7 +623,11 @@
   "construction": "Two-block group-algebra (2BGA) code on the non-abelian group Dic9; n=72, k=8, max check weight 6.",
   "origin": "submission",
   "date": "2026-08-04",
-  "model": "Claude Opus 4.8"
+  "model": "Claude Opus 4.8",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(36,1):a[4]:b[2,11,28]; research/provenance/derived.json)"
+  ]
  },
  "locality": {
   "coordinates": [

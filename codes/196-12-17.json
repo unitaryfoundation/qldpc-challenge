@@ -1832,8 +1832,10 @@
   "date": "2026-08-17",
   "notes": "Published Lin\u2013Pryadko baseline reconstructed from the authors public database at commit 403d194c3f98f0cadc236aecbc4a8b6139ccf23c. Paper reports exact d=17; repository records a witness-backed upper bound. Literature novelty is not claimed.",
   "references": [
-   "arXiv:2306.16400"
-  ]
+   "arXiv:2306.16400",
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(98,3):a[3,14]:b[9,10,59]; research/provenance/derived.json)"
+  ],
+  "novelty": "known_parameters"
  },
  "family": "generalized-bicycle"
 }

@@ -1,0 +1,30 @@
+{
+  "d": 14,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 4,
+  "name": "[[114,4,14]] twisted-torus BB code (arXiv:2503.03827)",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 14 exists",
+      "secs": 1360.4,
+      "status": "UNSAT",
+      "value": 14
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 14 exists",
+      "secs": 1129.0,
+      "status": "UNSAT",
+      "value": 14
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: drat-trim did not finish in 2400s"
+  }
+}

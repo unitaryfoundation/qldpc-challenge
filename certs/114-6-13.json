@@ -1,0 +1,30 @@
+{
+  "d": 13,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 6,
+  "name": "[[114,6,13]] 2BGA",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 13 exists",
+      "secs": 1944.6,
+      "status": "UNSAT",
+      "value": 13
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 13 exists",
+      "secs": 1801.5,
+      "status": "UNSAT",
+      "value": 13
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: kissat did not finish in 2400s"
+  }
+}

@@ -1984,7 +1984,11 @@
   "construction": "Weight-8 BB code on Z_24 x Z_4, h=6 cover of [[32,8,4]] from Table 12 of arXiv:2511.13560. Polynomials: A = x^9 y^3 + x^4 + x^6 + x^19 y^2, B = x^22 y + x^8 y + x^7 + x^5 y.",
   "origin": "submission",
   "date": "2026-09-15",
-  "model": "Mimo V2.5"
+  "model": "Mimo V2.5",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2511.13560 (Table 12)"
+  ]
  },
  "family": "bivariate-bicycle",
  "locality": {

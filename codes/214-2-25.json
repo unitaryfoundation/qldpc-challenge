@@ -2221,10 +2221,13 @@
   ],
   "construction": "Generalized bicycle on the circulant ring Z_107: H_X = [B^T | A^T], H_Z = [A | B] with A = circ(a), B = circ(b), a = [0, 9, 13, 21, 27, 59], b = [0, 1]. Found by search over GB polynomial supports; distance proven exact by exhaustive DFS refutation (EMPTY at W = 24, 316,311,844,431 nodes).",
   "origin": "submission",
-  "novelty": "unknown",
+  "novelty": "known_parameters",
   "model": "exhaustive verification (exhaustive-qec verifier 0.1.0)",
   "date": "2026-08-14",
-  "notes": "Distance certified exhaustively, not estimated. Full method, evidence and a re-runnable notebook: https://github.com/qernelkit/verifiable-qec-experiments/blob/main/experiments/qldpc_challenge/qldpc_challenge.ipynb"
+  "notes": "Distance certified exhaustively, not estimated. Full method, evidence and a re-runnable notebook: https://github.com/qernelkit/verifiable-qec-experiments/blob/main/experiments/qldpc_challenge/qldpc_challenge.ipynb",
+  "references": [
+   "arXiv:2203.17216 (isomorphic to wangpryadko2022:GB_214_w8; research/provenance/derived.json)"
+  ]
  },
  "family": "generalized-bicycle"
 }

@@ -1294,7 +1294,11 @@
   "construction": "Univariate bicycle code over R_62 = F2[x]/(x^62-1); a(x) = 1 + x + x^4 + x^7; b(x) = a(x^(2^3)) mod (x^62-1) (Frobenius coupling); H_X=[A,B], H_Z=[B^T,A^T]. Reconstruction of arXiv:2605.14173v1 Table I row 1.",
   "origin": "submission",
   "date": "2026-08-23",
-  "model": "Ox Alpha 1.0"
+  "model": "Ox Alpha 1.0",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2605.14173 (Table I, row 1)"
+  ]
  },
  "family": "generalized-bicycle",
  "locality": {

@@ -1248,7 +1248,11 @@
   "construction": "BB on Z_5xZ_15, A={x^0*y^0, x^0*y^6, x^0*y^8}, B={x^0*y^5, x^1*y^0, x^4*y^0}",
   "origin": "submission",
   "date": "2026-09-15",
-  "model": "MiMo V2.5"
+  "model": "MiMo V2.5",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2408.10001 (Wang and Mueller, Table 1: the same coprime bivariate bicycle polynomials)"
+  ]
  },
  "family": "bivariate-bicycle",
  "locality": {

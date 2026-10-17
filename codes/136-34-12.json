@@ -1484,7 +1484,11 @@
   "construction": "GALA code of arXiv:2608.07431 Table S5: L=8, J=3, abelian bottom C_17, F=(x^2, x+1, x^3+x^16, x^13+x^12), G=(x^15, x^4+x^5, x^14+x, x^16); two-block quasi-cyclic over F2[Z_4 x C_17] with active-orthogonality pattern (r2 reflection sector involution). Reconstructed from the paper's explicit generators; paper certifies d=12 exactly.",
   "origin": "submission",
   "date": "2026-08-24",
-  "model": "Ox Alpha 1.0"
+  "model": "Ox Alpha 1.0",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2608.07431 (Table S5)"
+  ]
  },
  "family": "other"
 }

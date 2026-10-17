@@ -766,6 +766,18 @@ def validate_cached(doc, *, cache=None, validator=None, seed=None, refute=True):
     cache = VerdictCache() if cache is None else cache
     gate = validator or _gate()
     ref = cache.get(doc) if refute else None
+    if ref is not None and ref.get("refuted"):
+        # Refused at the door: a cached refutation stays refuted, so there is
+        # nothing to re-run (issue #3619). The gate is not invoked.
+        verdict = {
+            "passed": False,
+            "candidate": None,
+            "gates": {"refute": ref},
+            "labels": [f"refuted (over-claimed distance): "
+                       f"{ref.get('detail')}"],
+            "validator": {"source_sha256": cache.validator()},
+        }
+        return verdict, True
     if ref is not None:
         return _with_refutation(gate(doc, seed=seed, refute=False), ref), True
     verdict = gate(doc, seed=seed, refute=refute)

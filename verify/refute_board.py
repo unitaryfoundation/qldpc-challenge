@@ -30,10 +30,19 @@ every K-th entry of that order starting at I, which puts an equal share of
 the large entries in each shard; the workflow runs K shards in parallel and a
 summary job over their reports.
 
+With ``--recapture PATH`` every checked entry also appends one JSON line to
+PATH as it completes (``recapture.py``, issue #2897): the run and file seed,
+trials, wall time, battery, and every logical the search found at weight <=
+the claimed distance, as an operator id and a class id with its weight. That
+is the search coverage the docstring above promises, written down, and a
+cancelled run keeps the lines it wrote. Nothing reads it back here; the
+estimator over the accumulated records is ``research/audits/recapture.py``.
+
 Exit 0 only if nothing was refuted, nothing errored, and every entry was reached.
 
 Usage:
-  python verify/refute_board.py [--seed N] [--scope records|all] [--shard I/K] [--max-minutes M] [--report PATH]
+  python verify/refute_board.py [--seed N] [--scope records|all] [--shard I/K] [--max-minutes M]
+                                [--report PATH] [--recapture PATH]
   python verify/refute_board.py --summarize REPORT... [--expect K]
 """
 import argparse
@@ -48,6 +57,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import heuristic_distance as H
+import recapture as RC
 from qldpc_verify import file_size_error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -111,16 +121,24 @@ def file_seed(seed, rel):
     return (seed + rel_hash) % (2**31)
 
 
-def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check, clock=time.time, out=print):
+def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check, clock=time.time, out=print,
+                 recapture=None):
     """Run the refuter over ``paths`` and return the report.
 
     No new entry is opened once ``max_seconds`` of wall clock have passed; the
     rest are listed under ``unreached``. A SIGTERM or SIGINT raised as ``_Stopped``
     mid-entry also ends the loop with that entry and its successors unreached.
+
+    With ``recapture`` (a path), each checked entry's search runs with a
+    ``recapture.Capture`` at the claimed distance and its record is appended
+    to that file before the next entry is opened; ``rep["recorded"]`` counts
+    the lines written. The refuter is then called with ``capture=``, so a
+    stand-in refuter must accept it.
     """
     t0 = clock()
     rep = {"seed": seed, "total": len(paths), "checked": 0, "skipped": [], "refuted": [], "errored": [],
-           "unreached": [], "stopped_by": None, "complete": False, "seconds": 0.0}
+           "unreached": [], "stopped_by": None, "complete": False, "seconds": 0.0,
+           "recapture": recapture, "recorded": 0}
     idx = 0
     try:
         for idx, p in enumerate(paths):
@@ -137,8 +155,14 @@ def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check
             if "distance" not in doc or "d" not in doc.get("distance", {}):
                 rep["skipped"].append(rel)
                 continue
+            fs = file_seed(seed, rel)
+            cap = RC.Capture(threshold=int(doc["distance"]["d"])) if recapture else None
+            t_entry = time.monotonic()
             try:
-                is_refuted, d_found, wit, trials = refute(doc, seed=file_seed(seed, rel))
+                if cap is None:
+                    is_refuted, d_found, wit, trials = refute(doc, seed=fs)
+                else:
+                    is_refuted, d_found, wit, trials = refute(doc, seed=fs, capture=cap)
             except _Stopped:
                 raise
             except Exception as e:                 # FAIL CLOSED
@@ -146,6 +170,13 @@ def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check
                 out(f"ERROR    {rel}: refuter failed ({type(e).__name__}: {e}) -- fails closed, manual review")
                 continue
             rep["checked"] += 1
+            if cap is not None:
+                slug = os.path.splitext(os.path.basename(p))[0]
+                RC.append_record(recapture, RC.entry_record(
+                    doc, slug, run_seed=seed, file_seed=fs, capture=cap,
+                    seconds=time.monotonic() - t_entry, refuted=is_refuted, d_found=d_found,
+                    trials=trials, battery=RC.battery_of(cap)))
+                rep["recorded"] += 1
             if is_refuted:
                 rep["refuted"].append([rel, d_found, doc["distance"]["d"], wit])
                 out(f"REFUTED  {rel}: found weight-{d_found} logical < claimed {doc['distance']['d']}\n"
@@ -241,6 +272,9 @@ def main(argv):
     ap.add_argument("--max-minutes", type=float, help="open no new entry after this much wall clock; "
                     "the rest are reported unreached and the run fails")
     ap.add_argument("--report", help="write the JSON report here")
+    ap.add_argument("--recapture", metavar="PATH",
+                    help="append one JSON line per checked entry here as the run goes: seeds, trials, "
+                         "and every logical found at weight <= the claimed distance (issue #2897)")
     ap.add_argument("--root", default=ROOT, help=argparse.SUPPRESS)
     ap.add_argument("--summarize", nargs="+", metavar="REPORT", help="combine shard reports instead of searching")
     ap.add_argument("--expect", type=int, help="with --summarize: the number of shard reports there must be")
@@ -259,7 +293,7 @@ def main(argv):
           + (f"; shard {args.shard}: {len(paths)} entries" if args.shard else "") + ", largest n first\n")
     _install_stop_handlers()
     rep = refute_paths(paths, seed, max_seconds=None if args.max_minutes is None else 60 * args.max_minutes,
-                       root=args.root)
+                       root=args.root, recapture=args.recapture)
     rep["shard"] = args.shard
     rep["scope"] = args.scope
     if args.report:
@@ -267,6 +301,8 @@ def main(argv):
             json.dump(rep, f, indent=1)
     code, line = verdict(rep)
     print(f"\n{summary_line(rep)}")
+    if args.recapture:
+        print(f"recapture: {rep['recorded']} entry record(s) appended to {args.recapture}")
     if rep["unreached"]:
         print("unreached: " + ", ".join(rep["unreached"][:20]) + (" ..." if len(rep["unreached"]) > 20 else ""))
     print(line)
