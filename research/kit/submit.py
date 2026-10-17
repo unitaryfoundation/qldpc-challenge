@@ -17,7 +17,12 @@ Given the two parity-check matrices and a little provenance, this:
 ``save_submission`` then runs the verifier's structural half on the document
 (``prescreen.preflight``, issue #3616) and refuses to stage one the gate's
 verify step would refuse; the document and the failed checks are kept under
-``rejected/`` beside the path instead.
+``rejected/`` beside the path instead. Pass it ``spec=`` when the code came
+out of a recipe (a screening spec with ``constructor`` and ``params``): the
+spec is kept as ``<stem>.recipe.json`` beside the candidate, and
+``promote.py`` turns it into the ``repro/<slug>.json`` that ``qldpc
+reproduce --construction`` re-derives the entry from (issue #2955).
+
 
 The result is a dict you can write to ``codes/your-code.json`` and submit.
 
@@ -104,7 +109,7 @@ def _handles(names):
 def make_submission(HX, HZ, *, name, construction, authors, family=None,
                     references=None, notes=None, date=None, tracks=(),
                     confidence="upper_bound", coordinates=None, layers=None,
-                    trials=8000, seed=0, found_by=None):
+                    trials=8000, seed=0, found_by=None, witnesses=None):
     """Build a submission dict for the CSS code (HX, HZ).
 
     Parameters
@@ -146,6 +151,16 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
         operator (issue #611), and ``verify/check_authorship.py`` reads it
         there. Handles that do not fit the schema's ``@name`` pattern are
         dropped; with none left the block is omitted rather than invented.
+    witnesses : optional (wx, xwit, wz, zwit)
+        Precomputed witnesses, to skip the NumPy search. The ``gf2_fast``
+        backend finds lighter logicals than ``lightest_logical`` does at a
+        comparable budget once ``n`` is a few hundred, so a caller screening
+        with the accelerator already holds the data this would spend a long
+        time rediscovering -- and the witness is the expensive artifact. They
+        are re-checked here against the same two conditions the search
+        validated them with (commutes with the opposite checks, outside the
+        row space of its own), so a caller cannot hand in an operator the
+        verifier will reject.
 
     Returns
     -------
@@ -166,8 +181,14 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     n = HX.shape[1]
     k = compute_k(HX, HZ)
 
-    wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
-    wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
+    if witnesses is not None:
+        wx, xwit, wz, zwit = witnesses
+        wx, wz = int(wx), int(wz)
+        xwit = [int(q) for q in xwit]
+        zwit = [int(q) for q in zwit]
+    else:
+        wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
+        wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
     if not xwit or not zwit:
         raise ValueError("no nontrivial logical found on some side "
                          f"(k={k}); is this a valid encoding code?")
@@ -229,10 +250,20 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     return doc
 
 
-def save_submission(doc, path, *, on_collision="error", preflight=True):
+def save_submission(doc, path, *, on_collision="error", preflight=True, spec=None):
+
     """Write ``doc`` to ``path`` as pretty JSON, after the verifier's structural half.
 
     Returns the list of schema violations (empty on success).
+
+    ``spec`` is the screening spec the code was built from, when there is
+    one. It is kept beside the candidate as ``<stem>.recipe.json``
+    (:func:`write_recipe`) so that ``promote.py`` can emit the reproduction
+    manifest for the committed entry; the issue #2955 record is that an
+    agent-found entry otherwise lands ``not_reproducible`` by omission. The
+    document is written first, since the witness in it is the expensive
+    part, and a spec that is not a JSON object raises ``TypeError`` after
+    that write.
 
     With ``preflight`` (the default) the document is first run through
     ``prescreen.preflight``, which is ``qldpc_verify.verify(doc,
@@ -281,6 +312,8 @@ def save_submission(doc, path, *, on_collision="error", preflight=True):
     # The form the board keeps and verify/check_codes_format.py enforces.
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(doc, indent=1) + "\n")
+    if spec is not None:
+        write_recipe(doc, path, spec)
     return errs
 
 
@@ -292,6 +325,60 @@ if __name__ == "__main__":
 # -- reproduction manifests for `qldpc reproduce` (#2955, item 3) --------------
 
 REPRO_MANIFEST_VERSION = "1"
+RECIPE_SUFFIX = ".recipe.json"
+RECIPE_VERSION = "1"
+
+
+def recipe_path(path):
+    """``<stem>.recipe.json`` beside the candidate at ``path``: where its spec is kept.
+
+    Two extensions deep and without a ``checks`` field, like ``.verdict.json``
+    and ``.preflight.json``, so a ``*.json`` glob for candidates skips it.
+    """
+    base = path[:-len(".json")] if path.endswith(".json") else path
+    return base + RECIPE_SUFFIX
+
+
+def write_recipe(doc, path, spec):
+    """Keep ``spec`` beside the candidate at ``path``; return the sidecar's path.
+
+    The spec rather than a manifest: a manifest binds the committed
+    document's hash, and the document ``promote.py`` commits is not the
+    staged one (it rewrites authors, date, and notes), so the manifest is
+    emitted there, from this spec and the final document. ``reproducible``
+    records whether the spec carries a ``{constructor, params}`` recipe that
+    ``rebuild.py`` can run; a spec without one is kept all the same, and the
+    manifest will then say ``not_reproducible``.
+    """
+    if not isinstance(spec, dict):
+        raise TypeError("spec must be a JSON object (the screening spec the "
+                        f"code was built from), not {type(spec).__name__}")
+    rec = {"recipe_version": RECIPE_VERSION,
+           "slug": f"{doc.get('n')}-{doc.get('k')}-{(doc.get('distance') or {}).get('d')}",
+           "candidate": os.path.basename(path),
+           "reproducible": recipe_from_spec(spec) is not None,
+           "spec": spec}
+    out = recipe_path(path)
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, indent=1, sort_keys=True) + "\n")
+    return out
+
+
+def read_recipe(path):
+    """Return the spec kept beside the candidate at ``path``, or None.
+
+    None for a missing, unreadable, or malformed sidecar, so a caller that
+    finds no recipe does not mistake that for one that says
+    ``not_reproducible``.
+    """
+    try:
+        with open(recipe_path(path), encoding="utf-8") as f:
+            rec = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(rec, dict) or not isinstance(rec.get("spec"), dict):
+        return None
+    return rec["spec"]
 
 
 def recipe_from_spec(spec):

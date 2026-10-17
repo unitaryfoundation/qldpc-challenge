@@ -416,11 +416,15 @@ not a cell is refused with the valid ones rather than written as a claim nobody 
 
 A recipe makes the search replayable. `search.screen` takes `(spec, HX, HZ)` triples; a spec
 carrying `constructor` (`<module>.<function>` under `research/kit`) and `params` (its keyword
-arguments) is a recipe `research/kit/rebuild.py` can run, and
-`submit.write_repro_manifest(doc, slug, spec, repro_dir="repro")` turns it into the
-`repro/<slug>.json` that `qldpc reproduce --construction` re-derives the entry from
-(`repro/144-12-12.json` is the worked example). Without a recipe the manifest says
-`not_reproducible`, which is the honest default, not a failure.
+arguments) is a recipe `research/kit/rebuild.py` can run. Pass it to
+`save_submission(doc, path, spec=spec)` and it is kept as `<stem>.recipe.json` beside the staged
+candidate. `kit/promote.py` reads it from there (or from a `recipe` key in the plan) and writes
+`repro/<slug>.json` from the final document, with the committed file's hash, into the bundle it
+assembles; that manifest is what `qldpc reproduce --construction` re-derives the entry from
+(`repro/144-12-12.json` is the worked example, and `submit.write_repro_manifest` is the writer).
+Without a recipe the manifest says `not_reproducible`, which is the honest default, not a
+failure; without a spec no manifest is written and `reproduce` derives its stages from the entry
+alone.
 
 For a small CSS candidate (n <= 90, screened d <= 8) try `escalation.exact_first(HX, HZ, d)`
 before the first deep rung: the certifier closes those in seconds, and `d =` beats a ladder's
@@ -652,10 +656,11 @@ something the next one should not have to re-learn.
 | `kit/search.py` | `screen`, `screen_adaptive`, `pareto_frontier`, `update_leaderboard` (the funnel; `audit=` counts what the pre-pass dropped, `board=` sets how a board match is handled) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` (all capped at check weight 8 by default), `sample_cyclic_gb` (designed k, check weight 24 to 32; section 3c) |
 | `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). `preflight`, `describe_preflight`: the verifier's structural half on a packaged document, the checks the gate's verify step would fail it on, in the verifier's words and sorted into a fault in the code or in the document (issue #3616). Run on a staged file: `python research/kit/prescreen.py <path>` |
 | `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
-| `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_repro_manifest` (the `repro/<slug>.json` recipe for `qldpc reproduce`) |
+| `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_recipe`, `read_recipe` (the spec kept beside a staged candidate), `write_repro_manifest` (the `repro/<slug>.json` manifest for `qldpc reproduce`) |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
-| `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, and the PR body from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
+| `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
+
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `decoder_distance` (BP+OSD), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
 | `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap, through n = 8 with the nauty canonicalizer (pynauty, in the `research` extra; n <= 6 without it); exact distance uses the trusted SAT certifier |
 | `kit/products.py` | classical combining products: `hypergraph_product`, `lifted_product`, `balanced_product` + a sampler each; the lifted/balanced ones cover the multi-block protographs `kit/lp_protograph.py` specializes |

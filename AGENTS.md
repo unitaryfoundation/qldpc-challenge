@@ -31,9 +31,10 @@ commit, push, or open a PR on their behalf. Follow `CONTRIBUTING.md`. After the 
 the trusted validation gate, the agent may write the verified submission to `codes/` and use
 `./qldpc submit ... --open-pr` to create the branch, commit, push, and PR.
 `research/kit/promote.py` is the alternative when the candidate already carries
-the witnesses the gate accepted: it assembles `codes/`, the note, and the PR body
-without re-running the distance search, runs the gate and the prose check in
-order, and returns what is still outstanding as JSON. It writes files and never
+the witnesses the gate accepted: it assembles `codes/`, the note, the PR body, and
+the `repro/` manifest when the candidate was staged with a recipe, without
+re-running the distance search, runs the gate and the prose check in order, and
+returns what is still outstanding as JSON. It writes files and never
 runs git or gh, so the branch, push, and PR stay explicit.
 
 ### Unattended autoresearch
@@ -73,7 +74,9 @@ discards it. If a search finds a valid logical but the save fails, that is a har
 report it. `save_submission` refuses to write over a candidate that is not the one in hand,
 because several sessions stage at once and the flat `<n>-<k>-<d>.json` name hands two of them the
 same file; `unique_path` gives the second one its own name, and re-saving the same candidate
-keeps its name.
+keeps its name. Pass `spec=` to `save_submission` when the code came from a recipe (a
+`constructor` under `research/kit` and its `params`), so the reproduction manifest can be
+emitted when the candidate is promoted (issue #2955).
 
 `save_submission` also runs the verifier's structural half on the document first
 (`research/kit/prescreen.preflight`, which is `qldpc_verify.verify(doc, refute=False)`) and raises
