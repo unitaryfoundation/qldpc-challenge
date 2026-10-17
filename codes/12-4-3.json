@@ -1,0 +1,146 @@
+{
+ "schema_version": "0.3",
+ "name": "[[12,4,3]]",
+ "code_type": "CSS",
+ "n": 12,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    4,
+    5,
+    6,
+    10
+   ],
+   [
+    1,
+    2,
+    3,
+    4,
+    7,
+    11
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    6,
+    8
+   ],
+   [
+    0,
+    3,
+    4,
+    5,
+    7,
+    9
+   ],
+   [
+    2,
+    3,
+    4,
+    5,
+    8,
+    10
+   ],
+   [
+    0,
+    1,
+    2,
+    5,
+    9,
+    11
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    2,
+    6,
+    8,
+    9,
+    11
+   ],
+   [
+    1,
+    3,
+    6,
+    7,
+    8,
+    11
+   ],
+   [
+    2,
+    4,
+    7,
+    8,
+    10,
+    11
+   ],
+   [
+    3,
+    5,
+    7,
+    8,
+    9,
+    10
+   ],
+   [
+    0,
+    4,
+    6,
+    7,
+    9,
+    10
+   ],
+   [
+    1,
+    5,
+    6,
+    9,
+    10,
+    11
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    8,
+    10
+   ]
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    6,
+    8,
+    10
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@FarLab"
+  ],
+  "construction": "2BGA coset code (kit coset.build_coset) on group mc(3,18,2) (|G|=54) with non-normal subgroup H = [0, 6, 12, 22, 28, 34, 38, 44, 50], a = [0, 24, 43, 45] (subset of G), b = [0, 30] (subset of N_G(H)); element indices of the Cayley table (identity = 0; convention in the note)",
+  "origin": "submission",
+  "date": "2026-10-17",
+  "model": "Claude Fable 5.1",
+  "search_budget": {
+   "candidates_screened": 1120600,
+   "ris_trials_per_side": 60000000,
+   "cpu_hours": 3,
+   "tool": "research/kit 2BGA sweep + gf2_fast on Brev n2d-highcpu-64"
+  }
+ },
+ "family": "2bga-coset"
+}
