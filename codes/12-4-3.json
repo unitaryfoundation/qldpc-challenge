@@ -1,0 +1,170 @@
+{
+ "schema_version": "0.2",
+ "name": "[[12,4,3]] two-block group algebra CSS (arXiv:2306.16400)",
+ "code_type": "CSS",
+ "n": 12,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    0,
+    4,
+    6,
+    7,
+    9,
+    10
+   ],
+   [
+    1,
+    5,
+    6,
+    7,
+    8,
+    11
+   ],
+   [
+    0,
+    2,
+    6,
+    8,
+    9,
+    11
+   ],
+   [
+    1,
+    3,
+    7,
+    8,
+    9,
+    10
+   ],
+   [
+    2,
+    4,
+    7,
+    8,
+    10,
+    11
+   ],
+   [
+    3,
+    5,
+    6,
+    9,
+    10,
+    11
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    2,
+    5,
+    6,
+    8
+   ],
+   [
+    0,
+    1,
+    3,
+    4,
+    7,
+    9
+   ],
+   [
+    1,
+    2,
+    3,
+    4,
+    8,
+    10
+   ],
+   [
+    0,
+    2,
+    3,
+    5,
+    9,
+    11
+   ],
+   [
+    0,
+    3,
+    4,
+    5,
+    6,
+    10
+   ],
+   [
+    1,
+    2,
+    4,
+    5,
+    7,
+    11
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    2,
+    8,
+    11
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 40000,
+    "survived_samples": 40000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     20261017
+    ]
+   }
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6,
+    9
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 40000,
+    "survived_samples": 40000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     20261018
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "Lin, Hsiang-Ku",
+   "Pryadko, Leonid P."
+  ],
+  "construction": "Two-block group-algebra (2BGA) code over SmallGroup(6,2) = C6, archive row \"6 2 4 3 [ 3 ] [ 2, 3, 6 ]\" of the abelian enumeration (Lin and Pryadko, arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98). a = {g_i : i in [3]} and b = {g_i : i in [2, 3, 6]} with elements indexed as GAP's Elements(SmallGroup(6,2)) numbers them, 1-based (the identity is implicit in the archive's lists); H_X = [L(a) | R(b)], H_Z = [R(b)^T | L(a)^T] over the left and right regular representations. Rebuilt here as research/kit/group_algebra.build_2bga_small_group(6, 2, [0, 2], [0, 1, 2, 5]) on the committed Cayley table research/kit/groups/smallgroup_6_2.json (GAP 4.16.1, smallgrp 1.7.0), 0-based indices with the identity at 0.",
+  "references": [
+   "arXiv:2306.16400",
+   "https://github.com/QEC-pages/2BGA-codes"
+  ],
+  "date": "2023",
+  "notes": "Literature baseline (arXiv:2306.16400, Lin and Pryadko, 28 Jun 2023), seeded for issue #3658 as the 2BGA archive row that dominates 12-4-2 at equal n, k, and check weight. Reconstructed here from the archive row with the group table exported by research/kit/groups/cayley_table.g; n, k, and the check weight match the row, and the reconstruction convention was checked by rebuilding five archive rows already on the board and finding each permutation-equivalent to its entry. The archive's d = 3 is a QDistRnd upper bound; this entry claims d <= 3 from its own witnesses (40,000 RIS trials per side on the NumPy backend, seed 20261017, X 3, Z 3), and 2 x 2,000,000 gf2_fast trials found nothing lighter than 3.",
+  "origin": "baseline",
+  "novelty": "known_parameters"
+ },
+ "family": "generalized-bicycle"
+}
