@@ -59,7 +59,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - name: refute this shard of the board's records (random seed, stops cleanly at 300 min)
         run: >
-          uv run --frozen python verify/refute_board.py
+          uv run --frozen --extra research python verify/refute_board.py
           --scope ${{ github.event.inputs.scope || 'records' }}
           --shard ${{ matrix.shard }}/${{ env.SHARDS }} --max-minutes 300
           --report refute-shard-${{ matrix.shard }}.json
@@ -123,7 +123,7 @@ jobs:
           echo "failed to push the table after 5 attempts"; exit 1
       - name: coverage across shards (fails unless every shard completed clean)
         run: >
-          uv run --frozen python verify/refute_board.py
+          uv run --frozen --extra research python verify/refute_board.py
           --summarize "reports/refute-shard-*.json" --expect ${{ env.SHARDS }}
       - name: frontier consistency audit (the three record implementations)
         run: uv run --frozen python verify/board_frontier_audit.py

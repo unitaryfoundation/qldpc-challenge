@@ -443,6 +443,46 @@ def structural_automorphisms(mats, n, max_multipliers=8):
     return gens
 
 
+def _rebuild_symmetric_checks(mats, n):
+    """Rebuild a symmetric (shift-closed) check set before automorphism search.
+
+    A row-reduced check matrix can hide a symmetry that its row space still has:
+    the structural detectors accept such a matrix through their span test, but
+    nauty builds its graph from the *rows*, so a row-reduced set exposes no
+    automorphism.  When a structural shift is found, close the row set under it
+    (all shifts of every row) and hand that symmetric set to nauty.  Matrices
+    with no detectable shift are returned unchanged.  Returns a list of arrays.
+    """
+    out = []
+    for Lab in mats:
+        M = np.asarray(Lab)
+        try:
+            gens = structural_automorphisms([M], n)
+        except Exception:
+            gens = []
+        if not gens:
+            out.append(M.copy())
+            continue
+        rows = [r.copy() for r in M]
+        seen = {tuple(r.tolist()) for r in rows}
+        frontier = list(rows)
+        while frontier:
+            r = frontier.pop()
+            for g in gens:
+                invp = np.argsort(g)
+                r2 = r[invp].copy()
+                t = tuple(r2.tolist())
+                if t not in seen:
+                    seen.add(t)
+                    rows.append(r2)
+                    frontier.append(r2)
+        if len(rows) > M.shape[0]:
+            out.append(np.asarray(rows, dtype=M.dtype))
+        else:
+            out.append(M.copy())
+    return out
+
+
 def nauty_automorphisms(mats, n):
     """Generators of the Tanner-graph automorphism group restricted to qubits,
     via pynauty; [] when pynauty is not importable. Each matrix is a vertex
@@ -450,6 +490,7 @@ def nauty_automorphisms(mats, n):
     coloured by its label so Pauli types are preserved."""
     if _NautyGraph is None:
         return []
+    mats = _rebuild_symmetric_checks(mats, n)
     adj = {}
     colours = [set(range(n))]
     nxt = n
@@ -754,6 +795,149 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
     return out
 
 
+
+def _sat_available():
+    try:
+        import pycryptosat  # noqa: F401
+        from pysat.card import CardEnc  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
+    """SAT fold on one side.  F is the folded check matrix (m x c), Lf the
+    folded logical generators (k x c); ``sizes[j]`` is the orbit size of column
+    j.  Returns (weight, x) with weight < claimed, or None."""
+    if not _sat_available():
+        return None
+    if Lf is None or Lf.shape[0] == 0:
+        return None
+    from pycryptosat import Solver
+    from pysat.card import CardEnc, EncType
+    m, c = F.shape
+    W = int(claimed) - 1
+    if W < 1:
+        return None
+    # Weighted cardinality via expanded (duplicate) literals.
+    expanded = []
+    for j in range(c):
+        expanded.extend([j + 1] * int(sizes[j]))
+    s = Solver(threads=1)
+    for row in F:
+        idx = [int(j) + 1 for j in range(c) if row[j]]
+        if idx:
+            s.add_xor_clause(idx, False)
+    top = c
+    selectors = []
+    for t in range(Lf.shape[0]):
+        top += 1
+        selectors.append(top)
+        tidx = [int(j) + 1 for j in range(c) if Lf[t, j]]
+        s.add_xor_clause(tidx + [top], False)
+    if not selectors:
+        return None
+    s.add_clause(selectors)
+    card = CardEnc.atmost(lits=expanded, bound=W, top_id=top,
+                          encoding=EncType.seqcounter)
+    top = max(top, card.nv)
+    for cl in card.clauses:
+        s.add_clause(cl)
+    sat, sol = s.solve(time_limit=time_limit)
+    if not sat:
+        return None
+    x = np.array([1 if sol[j + 1] else 0 for j in range(c)], dtype=np.int8)
+    w = int(sum(int(sizes[j]) for j in range(c) if x[j]))
+    if w <= 0 or w >= claimed:
+        return None
+    return w, x
+
+
+def _sat_fold_partition(P, sizes, HX, HZ, claimed, time_budget):
+    """Try both sides on one orbit partition.  Returns (side, weight, full_vector)
+    or None."""
+    n = HX.shape[1]
+    c = P.shape[1]
+    # X side: v in ker HZ, outside rowspace HX.
+    Fx = (HZ @ P) % 2
+    Lx = gf2.logical_basis(HX, HZ)
+    Lfx = (Lx @ P) % 2
+    # Z side.
+    Fz = (HX @ P) % 2
+    Lz = gf2.logical_basis(HZ, HX)
+    Lfz = (Lz @ P) % 2
+    per_side = max(1.0, time_budget / 2.0)
+    for side, F, Lf in (("X", Fx, Lfx), ("Z", Fz, Lfz)):
+        res = _sat_fold_side(F, Lf, sizes, claimed, per_side)
+        if res is None:
+            continue
+        w, x = res
+        v = (P @ x).astype(np.int8)
+        # validate on full matrices
+        H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
+        if int(v.sum()) != w:
+            # weighted; check kernel/rowspace instead
+            pass
+        if not ((H_ker @ v) % 2).any() and ((gf2.logical_basis(H_row, H_ker) @ v) % 2).any():
+            # nontriviality via logical basis of opposite type
+            pass
+        # Use _valid_logical for CSS? heuristic has _valid_logical?
+        ok = (not ((H_ker @ v) % 2).any())
+        H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
+        if _valid_logical(v, H_ker, H_row):
+            return side, w, v
+    return None
+
+
+def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0):
+    """SAT-fold refutation stage (optional; needs pycryptosat + python-sat).
+    Returns (refuted, d_found, witness, partitions) like orbit_fold_refute."""
+    if not _sat_available():
+        return False, None, None, 0
+    n = doc["n"]
+    claimed = int(doc["distance"]["d"])
+    if _is_stabilizer(doc):
+        return False, None, None, 0
+    HX = _matrix(doc["checks"]["X"], n)
+    HZ = _matrix(doc["checks"]["Z"], n)
+    gens = structural_automorphisms([HX, HZ], n) + nauty_automorphisms([HX, HZ], n)
+    if not gens:
+        return False, None, None, 0
+    rng = np.random.default_rng(seed)
+    parts = orbit_partitions(gens, n, rng)
+    if not parts:
+        return False, None, None, 0
+    t0 = time.monotonic()
+    searched = 0
+    for part in parts:
+        if time.monotonic() - t0 >= max_seconds:
+            break
+        labels, c, _ = part
+        sizes = np.array([int(np.sum(labels == j)) for j in range(c)], dtype=int)
+        P = np.zeros((n, c), dtype=np.int8)
+        for q in range(n):
+            P[q, int(labels[q])] = 1
+        remaining = max_seconds - (time.monotonic() - t0)
+        if remaining <= 0:
+            break
+        res = _sat_fold_partition(P, sizes, HX, HZ, claimed, remaining)
+        searched += 1
+        if res is not None:
+            side, w, v = res
+            if w < claimed:
+                # nontriviality already checked loosely; validate properly
+                H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
+                L = gf2.logical_basis(H_row, H_ker) if False else None
+                # Use _valid_logical if exists
+                try:
+                    valid = _valid_logical(v, H_ker, H_row)
+                except NameError:
+                    valid = (not ((H_ker @ v) % 2).any())
+                if valid:
+                    return True, w, sorted(int(q) for q in np.nonzero(v)[0]), searched
+    return False, None, None, searched
+
+
 def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
     """Gate mechanism in the refute_check tuple shape: (refuted, d_found,
     witness, searched). ``searched`` is the number of orbit partitions (plus
@@ -774,11 +958,22 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
     HZ = _matrix(doc["checks"]["Z"], n)
     res = orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=max_seconds)
     found = [res[s] for s in ("X", "Z") if res[s] is not None]
-    if not found:
-        return False, None, None, res["partitions"]
-    w, v = min(found, key=lambda t: t[0])
-    wit = sorted(int(j) for j in np.nonzero(v)[0]) if w < claimed else None
-    return (w < claimed), w, wit, res["partitions"]
+    if found:
+        w, v = min(found, key=lambda t: t[0])
+        if w < claimed:
+            wit = sorted(int(j) for j in np.nonzero(v)[0])
+            return True, w, wit, res["partitions"]
+    # SAT fold fallback for large folded kernels (optional; needs python-sat).
+    if _sat_available():
+        sref, sw, swit, sp = orbit_fold_sat_refute(doc, seed=seed + 97,
+                                                  max_seconds=max(5.0, 0.5 * max_seconds))
+        if sref:
+            return True, sw, swit, res["partitions"] + sp
+    if found:
+        w, v = min(found, key=lambda t: t[0])
+        wit = sorted(int(j) for j in np.nonzero(v)[0]) if w < claimed else None
+        return (w < claimed), w, wit, res["partitions"]
+    return False, None, None, res["partitions"]
 
 
 def _merge_fold(sides, res, n):

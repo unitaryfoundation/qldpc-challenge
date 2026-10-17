@@ -374,7 +374,7 @@ jobs:
       - name: distance refutation gate (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: trusted
-        run: uv run --frozen python verify/gate_changed.py --code-root ../submitted origin/${{ github.base_ref || 'main' }} --receipt-dir ../receipts --search-cache ../search-cache --pr-number "${{ github.event.pull_request.number }}" --pr-author "${{ github.event.pull_request.user.login }}" --base-sha "${{ github.event.pull_request.base.sha }}" --head-sha "${{ github.event.pull_request.head.sha }}"
+        run: uv run --frozen --extra research python verify/gate_changed.py --code-root ../submitted origin/${{ github.base_ref || 'main' }} --receipt-dir ../receipts --search-cache ../search-cache --pr-number "${{ github.event.pull_request.number }}" --pr-author "${{ github.event.pull_request.user.login }}" --base-sha "${{ github.event.pull_request.base.sha }}" --head-sha "${{ github.event.pull_request.head.sha }}"
       # Saved on failure as well as success, which is the case this exists
       # for: five of the six measured re-gatings were failure -> success, so a
       # save that only ran on a green job would never produce a hit. Split
@@ -389,7 +389,7 @@ jobs:
       - name: distance refutation gate (changed submissions only)
         if: github.event_name != 'pull_request'
         working-directory: submitted
-        run: uv run --frozen python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
+        run: uv run --frozen --extra research python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
       - name: upload verification receipts
         if: always() && github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         uses: actions/upload-artifact@v4
