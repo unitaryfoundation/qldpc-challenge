@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "portable_default_layout_from_unrelated_cwd": true,
+  "isolated_python_standard_library_only": true,
+  "receipt_finite_certificate_matches": true,
+  "negative_controls": [
+    {
+      "case": "inconsistent_side_value",
+      "rejected": true,
+      "error": "ValueError: X: JSON side value is not6"
+    },
+    {
+      "case": "wrong_group",
+      "rejected": true,
+      "error": "ValueError: X: supplied group differs from polynomial reconstruction"
+    },
+    {
+      "case": "weight6_noncommuting_witness",
+      "rejected": true,
+      "error": "ValueError: X: nonzero witness syndrome"
+    }
+  ],
+  "successful_checker_cpu_seconds": 0.042770495000000006,
+  "portable_checker_cpu_seconds": 0.038448332,
+  "validation_parent_cpu_seconds": 0.005742285,
+  "alternate_valid_witnesses_and_reordered_same_group_accepted": true
+}

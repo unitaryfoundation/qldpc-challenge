@@ -1,0 +1,62 @@
+{
+  "upstream_commit": "d9ef620f71939868090938e954bd15573e2f2233",
+  "candidate_file": "codes/117-13-6.json",
+  "candidate_sha256": "cc26b3740165a541fa7923d099468ba6df4ee41999db25dd6186a2e955bfd69d",
+  "seed": 20261017731,
+  "verdict": {
+    "passed": true,
+    "candidate": {
+      "n": 117,
+      "k": 13,
+      "d": 6,
+      "family": "lifted-product",
+      "weight_class": "weight-6",
+      "locality_class": "unrestricted",
+      "fingerprint": "c608460781e66d33",
+      "signature": "044357710652f42c"
+    },
+    "gates": {
+      "verify": {
+        "ok": true,
+        "failed_checks": [],
+        "weight_class": "weight-6",
+        "locality_class": "unrestricted"
+      },
+      "refute": {
+        "refuted": false,
+        "seed": 20261017731,
+        "detail": "no lighter logical in 7180 RIS trials (seed 20261017731)"
+      },
+      "dedup": {
+        "exact_duplicate_of": null,
+        "wl_equivalent_of": null
+      },
+      "novelty": {
+        "cell": [
+          "weight-6",
+          "unrestricted"
+        ],
+        "board": "CSS",
+        "board_advancing": true,
+        "dominated_by": [],
+        "advances_by": [
+          "d",
+          "k",
+          "n",
+          "w"
+        ],
+        "d_only_gain": false,
+        "d_only_peers": [],
+        "literature_novelty": "unverified"
+      }
+    },
+    "labels": [
+      "advances the weight-6 x unrestricted board",
+      "literature novelty UNVERIFIED"
+    ],
+    "validator": {
+      "source_sha256": "94fb17ca619427f783ba77ede31f9c59ffa1662a7008e68c9799367a37cdff19",
+      "seed": 20261017731
+    }
+  }
+}

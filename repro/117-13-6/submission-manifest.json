@@ -1,0 +1,24 @@
+{
+  "upstream_commit": "d9ef620f71939868090938e954bd15573e2f2233",
+  "candidate_sha256": "cc26b3740165a541fa7923d099468ba6df4ee41999db25dd6186a2e955bfd69d",
+  "checks_sha256": "da7ebb974d6d2b842f7f05f5c76e76ab35d263d51f358e9f59e4c36cacee5b93",
+  "distance_schema": "upper_bound",
+  "local_mathematical_distance": 6,
+  "files": {
+    "codes/117-13-6.json": "cc26b3740165a541fa7923d099468ba6df4ee41999db25dd6186a2e955bfd69d",
+    "notes/117-13-6.md": "c35c0f9fe5206b20693ee82be44795c5f27586fcafe37245f1d9f4c5ba2cb41a",
+    "repro/117-13-6/README.md": "6bda797098f4374a94e5b435c84dc0e1123d93b6f43c3d21a94267c9d433356e",
+    "repro/117-13-6/RIS.md": "a4b2155842ffa174e19145729ecebdeca4e23d00de23552c20ae87bf96256989",
+    "repro/117-13-6/SHA256SUMS": "3a660b1ff9d84065ad53ee45d9c06a2ee5c49c2d086ce823ea627bde578c3c45",
+    "repro/117-13-6/check.py": "7935895d30a9038084ab17a9bd645e5191520278fc7911d7aace1598d2ab49dc",
+    "repro/117-13-6/final-candidate-proof.json": "531728ac6da2e22e516d9f2c9fdfe584b874146e970e7bca18d42abdf40a7a34",
+    "repro/117-13-6/gate-verdict.json": "d8138663a90e3940c66094652db9a409bbe64f29f58197638feda0bd735001dd",
+    "repro/117-13-6/manifest.json": "91e3527e1dc821e5fa8de17f1c4fba24577c627a13a7f8524dd167e64b8142a6",
+    "repro/117-13-6/publication-gate-verdict.json": "5fd94eb05f03cb6990329bdd0d807072865a9f0ef1f39c8f079d4d7b6e669e2b",
+    "repro/117-13-6/receipt.json": "8d63ab43736f81cc0ece98e334f456ef96c14227d57e7fc91ce9b69c6ee1ce12",
+    "repro/117-13-6/replay_ris.py": "e53446683e52d899dee41e594ad66cf7e5f9b0a3a4ff5ff1d717f0084f2edf83",
+    "repro/117-13-6/ris-ladder.json": "bf4a5debf68aa033561f2f12d72aad3f6e5ec04555783c7b1114912b8fba2ffa",
+    "repro/117-13-6/validation.json": "a1db39f3f4c491f097d82db4b4cfbb137ca7cc4c750fb65ca58706f43d9c202d"
+  },
+  "publication_upstream_commit": "c4f4873bbe9ab4203e795d7cc832dab2cb4e0ae2"
+}

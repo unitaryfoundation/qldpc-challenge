@@ -1,0 +1,64 @@
+{
+  "upstream_commit": "d9ef620f71939868090938e954bd15573e2f2233",
+  "source_sha256": "c7409cbfbd15bf5d3287ed660a6e0bd4ecb0620f6f868a6e29f5975dcc3703fc",
+  "checks_sha256": "da7ebb974d6d2b842f7f05f5c76e76ab35d263d51f358e9f59e4c36cacee5b93",
+  "api": "surrogate.distance_rand_witness(backend=fast,threads=1,pair_depth=16)",
+  "semantics": "trials per CSS side; both sequential loops completed; raw_reading is the smaller side result returned by the API",
+  "native_pauli_trials": 0,
+  "doubled_trials": 0,
+  "fold_trials": 0,
+  "rungs": [
+    {
+      "rung": 0,
+      "seed": 20261017721,
+      "fresh": true,
+      "trials_per_css_side": 1000000,
+      "total_css_trials": 2000000,
+      "backend": "gf2_fast",
+      "threads": 1,
+      "pair_depth": 16,
+      "raw_reading": 6,
+      "side": "X",
+      "support": [
+        29,
+        38,
+        64,
+        73,
+        92,
+        110
+      ],
+      "rejected": "",
+      "retained_d": 6,
+      "cpu_seconds": 17.532422649999997,
+      "wall_seconds": 17.53395431197714,
+      "candidate_sha256": "ac6feb1c6271d48c059c3b5d9089c87eac94db045755a7f382babc27d955e57c",
+      "checks_sha256": "da7ebb974d6d2b842f7f05f5c76e76ab35d263d51f358e9f59e4c36cacee5b93"
+    },
+    {
+      "rung": 1,
+      "seed": 20261017722,
+      "fresh": true,
+      "trials_per_css_side": 1000000,
+      "total_css_trials": 2000000,
+      "backend": "gf2_fast",
+      "threads": 1,
+      "pair_depth": 16,
+      "raw_reading": 6,
+      "side": "X",
+      "support": [
+        29,
+        38,
+        64,
+        73,
+        92,
+        110
+      ],
+      "rejected": "",
+      "retained_d": 6,
+      "cpu_seconds": 17.502407889,
+      "wall_seconds": 17.503175509977154,
+      "candidate_sha256": "28f8bbf3043dbcd2c4a8e6a88ec0139224d7311e45fd36285fda6bcabec4897a",
+      "checks_sha256": "da7ebb974d6d2b842f7f05f5c76e76ab35d263d51f358e9f59e4c36cacee5b93"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "package": "CSS117 independent finite reproduction",
+  "version": 1,
+  "runtime_dependencies": [
+    "Python3 standard library"
+  ],
+  "default_installation": "repro/117-13-6/check.py",
+  "default_input": "codes/117-13-6.json",
+  "input_binding": "Exact reconstructed binary rowspaces and actual supplied witnesses; source byte SHA recorded for provenance only, not imposed by checker",
+  "original_candidate_sha256": "c7409cbfbd15bf5d3287ed660a6e0bd4ecb0620f6f868a6e29f5975dcc3703fc",
+  "prior_independent_audit_sha256": "620490f142376c566d3143becf80a6c2b5b19e18028fc80f34e01690f3ed618b",
+  "prior_independent_audit_script_sha256": "449e12cc5620d6edce5b5d313e7eea0a41c78609973d8f8f87d765acbd33e071",
+  "claim_scope": "The fixed reconstructed CSS instance has local finite proof dX=dZ=d6; JSON remains upper_bound; official gate separate",
+  "files": {
+    "README.md": "6bda797098f4374a94e5b435c84dc0e1123d93b6f43c3d21a94267c9d433356e",
+    "check.py": "7935895d30a9038084ab17a9bd645e5191520278fc7911d7aace1598d2ab49dc",
+    "receipt.json": "8d63ab43736f81cc0ece98e334f456ef96c14227d57e7fc91ce9b69c6ee1ce12",
+    "validation.json": "a1db39f3f4c491f097d82db4b4cfbb137ca7cc4c750fb65ca58706f43d9c202d"
+  }
+}
