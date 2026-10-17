@@ -259,3 +259,44 @@ uv run python research/audits/permutation_equivalence.py FIRST.json SECOND.json 
 ```
 
 A hit means the pair falls under "One code, one entry" in `CONTRIBUTING.md`.
+
+## The recapture census: how much of L is known
+
+The weekly sweep (`verify/refute_board.py`, run by `refute-weekly.yml` with a
+fresh seed each Monday) now writes down every logical it finds at weight at
+most the claimed distance, not only the one that beat the claim
+(`verify/recapture.py`, issue #2897). Each entry's record carries the run and
+file seed, the trials, the battery, and every logical as an operator id (the
+vector) and a class id (its coset modulo the side's own checks), with its
+weight. The raw records are a workflow artifact; what the repository keeps is
+`recapture/incidence.json`, the per-logical count of runs it was found in, per
+entry, side, battery, and weight, which the summary job folds each sweep's
+records into and commits.
+
+`recapture.py` estimates the census from that table:
+
+```
+uv run python research/audits/recapture.py report                       # every entry with captures
+uv run python research/audits/recapture.py report --slug 72-12-6 --unit cls
+uv run python research/audits/recapture.py report shard-0.jsonl shard-1.jsonl   # from raw records
+uv run python research/audits/recapture.py fold --table recapture/incidence.json shard-*.jsonl
+```
+
+Per weight class with captures it reports the distinct logicals seen, how many
+were seen in exactly one run and in exactly two, a bias-corrected Chao estimate
+(the incidence form; runs are the sampling units) with a 95% interval, the
+coverage (seen over estimated), and the mean number of runs each observed
+logical was found in. After a refutation at weight w, the row at w says
+whether w is the floor or the tip. Without one, the row at the claimed
+distance says how complete the census of the minimum-weight class is.
+
+Read it with the calibration in mind (`test_recapture_census.py`). On the
+5 x 5 toric code, whose ten weight-5 X operators are enumerated, the interval
+covers the truth 20 of 20 times once each observed operator has been
+recaptured about five times on average, and fails in both directions below
+that; a class under that mean is marked sparse, and a width-zero interval is
+a statement about the sample, not a proof of completeness. A class whose runs
+keep finding new operators past 5,000 distinct ids, or that hit the sweep's
+per-side cap of 1,000, is censored: its count is a floor and no estimate is
+made. Nothing here is a gate input or a board column; `verify/` reads neither
+the records, the table, nor the report.

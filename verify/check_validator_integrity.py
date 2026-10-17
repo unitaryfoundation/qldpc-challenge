@@ -64,6 +64,7 @@ TRUSTED = (
     "verify/ler_tools.py",
     "verify/ler_verify.py",
     "verify/qldpc_verify.py",
+    "verify/recapture.py",
     "verify/refutation_cache.py",
     "verify/refute_board.py",
     "verify/transversal_gates.py",
