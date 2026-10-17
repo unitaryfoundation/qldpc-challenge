@@ -77,17 +77,6 @@ same file; `unique_path` gives the second one its own name, and re-saving the sa
 keeps its name. Pass `spec=` to `save_submission` when the code came from a recipe (a
 `constructor` under `research/kit` and its `params`), so the reproduction manifest can be
 emitted when the candidate is promoted (issue #2955).
-
-`save_submission` also runs the verifier's structural half on the document first
-(`research/kit/prescreen.preflight`, which is `qldpc_verify.verify(doc, refute=False)`) and raises
-`PreflightFailure` instead of staging one the gate's verify step would refuse. Nothing is lost:
-the document and the failed checks go to `rejected/` beside the path. Read the report before
-deciding what to do. A `construction` or `weight` failure (a direct sum, a check over the
-32-qubit cap) is the code's, and no edit to the document fixes it; `packaging`, `typing`,
-`witness`, or `layout` is the document's, and the code may be fine. `coordination.py gate` makes
-the same refusal before spending the gate and writes `<path>.preflight.json` instead of a verdict
-(issue #3616).
-
 `save_submission` also runs the verifier's structural half on the document first
 (`research/kit/prescreen.preflight`, which is `qldpc_verify.verify(doc, refute=False)`) and raises
 `PreflightFailure` instead of staging one the gate's verify step would refuse. Nothing is lost:

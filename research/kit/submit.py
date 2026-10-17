@@ -108,7 +108,7 @@ def _handles(names):
 def make_submission(HX, HZ, *, name, construction, authors, family=None,
                     references=None, notes=None, date=None, tracks=(),
                     confidence="upper_bound", coordinates=None, layers=None,
-                    trials=8000, seed=0, found_by=None):
+                    trials=8000, seed=0, found_by=None, witnesses=None):
     """Build a submission dict for the CSS code (HX, HZ).
 
     Parameters
@@ -150,6 +150,16 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
         operator (issue #611), and ``verify/check_authorship.py`` reads it
         there. Handles that do not fit the schema's ``@name`` pattern are
         dropped; with none left the block is omitted rather than invented.
+    witnesses : optional (wx, xwit, wz, zwit)
+        Precomputed witnesses, to skip the NumPy search. The ``gf2_fast``
+        backend finds lighter logicals than ``lightest_logical`` does at a
+        comparable budget once ``n`` is a few hundred, so a caller screening
+        with the accelerator already holds the data this would spend a long
+        time rediscovering -- and the witness is the expensive artifact. They
+        are re-checked here against the same two conditions the search
+        validated them with (commutes with the opposite checks, outside the
+        row space of its own), so a caller cannot hand in an operator the
+        verifier will reject.
 
     Returns
     -------
@@ -170,13 +180,21 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     n = HX.shape[1]
     k = compute_k(HX, HZ)
 
-    wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
-    wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
+    if witnesses is not None:
+        wx, xwit, wz, zwit = witnesses
+        wx, wz = int(wx), int(wz)
+        xwit = [int(q) for q in xwit]
+        zwit = [int(q) for q in zwit]
+    else:
+        wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
+        wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
     if not xwit or not zwit:
         raise ValueError("no nontrivial logical found on some side "
                          f"(k={k}); is this a valid encoding code?")
     # Mirror the verifier's witness criteria so the doc is guaranteed to pass.
     xv, zv = _vec(xwit, n), _vec(zwit, n)
+    assert wx == len(set(xwit)), "X witness weight mismatch"
+    assert wz == len(set(zwit)), "Z witness weight mismatch"
     assert commutes(xv, HZ) and not in_rowspace(xv, HX), "X witness invalid"
     assert commutes(zv, HX) and not in_rowspace(zv, HZ), "Z witness invalid"
     dval = min(wx, wz)
