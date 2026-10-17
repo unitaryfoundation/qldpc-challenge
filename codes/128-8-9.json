@@ -1096,6 +1096,7 @@
    "Lin, Hsiang-Ku",
    "Pryadko, Leonid P."
   ],
+  "model": "Claude Fable 5.1 (Claude Code)",
   "construction": "Two-block group-algebra (2BGA) code over SmallGroup(64,47) = C16 : C4, archive row \"64 47 8 9 [ 3 ] [ 2, 15, 26 ]\" of the nonabelian enumeration (Lin and Pryadko, arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98). a = {g_i : i in [3]} and b = {g_i : i in [2, 15, 26]} with elements indexed as GAP's Elements(SmallGroup(64,47)) numbers them, 1-based (the identity is implicit in the archive's lists); H_X = [L(a) | R(b)], H_Z = [R(b)^T | L(a)^T] over the left and right regular representations. Rebuilt here as research/kit/group_algebra.build_2bga_small_group(64, 47, [0, 2], [0, 1, 14, 25]) on the committed Cayley table research/kit/groups/smallgroup_64_47.json (GAP 4.16.1, smallgrp 1.7.0), 0-based indices with the identity at 0.",
   "references": [
    "arXiv:2306.16400",
