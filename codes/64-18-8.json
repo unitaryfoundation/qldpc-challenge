@@ -688,7 +688,11 @@
   "construction": "2BGA from Lin-Pryadko database: GAP SmallGroup(32,21), a=1+g2+g3+g17, b=1+g7+g22+g31",
   "origin": "submission",
   "date": "2026-08-20",
-  "model": "Solar Pro 4 (Upstage AI)"
+  "model": "Solar Pro 4 (Upstage AI)",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(32,21):a[2,3,17]:b[7,22,31]; research/provenance/derived.json)"
+  ]
  },
  "family": "generalized-bicycle",
  "locality": {

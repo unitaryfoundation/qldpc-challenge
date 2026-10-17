@@ -625,7 +625,11 @@
   "origin": "submission",
   "date": "2026-09-18",
   "model": "DeepSeek V4 Flash 0731",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry."
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(36,8):a[3,14]:b[4,28]; research/provenance/derived.json)"
+  ]
  },
  "family": "generalized-bicycle",
  "locality": {

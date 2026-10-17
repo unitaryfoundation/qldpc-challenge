@@ -1495,9 +1495,11 @@
   "origin": "submission",
   "date": "2026-07-17",
   "references": [
-   "arXiv:0903.0566"
+   "arXiv:0903.0566",
+   "arXiv:2402.05228 (Table VI: hypergraph product of the [15,11,3] Hamming code with itself)"
   ],
-  "model": "Tencent Hy3"
+  "model": "Tencent Hy3",
+  "novelty": "known_parameters"
  },
  "family": "hypergraph-product"
 }

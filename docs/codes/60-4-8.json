@@ -469,7 +469,11 @@
   "origin": "submission",
   "date": "2026-09-02",
   "model": "Claude Fable 5.1",
-  "notes": "Distance is a witnessed UPPER BOUND (RIS witness search, 20000 Python trials plus a 2,000,000-trial accelerator pass at packaging; earlier confirmation ladders in notes/60-4-8.md); novelty vs the literature unverified. Equivalence check: verify/validate_candidate.py dedup found no identical or WL-equivalent entry on the board. Layout: simulated annealing over integer grid sites with at most 2 qubits per site (research/local2d/fold_layout.py::anneal), 2 layers, measured interaction radius 3.6056; the verifier derives the locality class. Search driven by Claude Fable 5.1 as one lane of a multi-agent campaign."
+  "notes": "Distance is a witnessed UPPER BOUND (RIS witness search, 20000 Python trials plus a 2,000,000-trial accelerator pass at packaging; earlier confirmation ladders in notes/60-4-8.md); novelty vs the literature unverified. Equivalence check: verify/validate_candidate.py dedup found no identical or WL-equivalent entry on the board. Layout: simulated annealing over integer grid sites with at most 2 qubits per site (research/local2d/fold_layout.py::anneal), 2 layers, measured interaction radius 3.6056; the verifier derives the locality class. Search driven by Claude Fable 5.1 as one lane of a multi-agent campaign.",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(30,4):a[6]:b[3,13], 2bga:SmallGroup(30,1):a[5]:b[4,15]; research/provenance/derived.json)"
+  ]
  },
  "family": "generalized-bicycle",
  "locality": {

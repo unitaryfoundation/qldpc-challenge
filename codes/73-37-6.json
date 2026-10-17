@@ -1124,7 +1124,11 @@
   "construction": "Reconstructed from qecdb.org record (see provenance.references); H-field X/Z row split, k recomputed, witnesses from the kit's random search.",
   "origin": "submission",
   "date": "2026-08-15",
-  "model": "DeepSeek V4 Flash 0731"
+  "model": "DeepSeek V4 Flash 0731",
+  "novelty": "known_parameters",
+  "references": [
+   "https://qecdb.org/codes/672e147545661c824c3fba8b (isomorphic record; research/provenance/derived.json)"
+  ]
  },
  "locality": {
   "coordinates": [

@@ -553,10 +553,12 @@
   ],
   "construction": "Two-term multivariate bicycle on Z_7 x Z_6; A=[[0, 0], [4, 4]], B=[[0, 0], [5, 5]]; identity-normalized x/y/xy supports; screen seed=20260816, sample=4.",
   "references": [
-   "arXiv:2406.19151"
+   "arXiv:2406.19151",
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(42,6):a[8]:b[28]; research/provenance/derived.json)"
   ],
   "date": "2026-08-16",
-  "notes": "Screened at 160 trials; package witness search used 1600 trials. Distance is an upper bound. LAYOUT added 2026-08-20: a 1-layer planar layout with measured interaction radius 6.4031 (integer-grid sites, min site spacing 1.0, at most 1 qubits per site), placing the code in the local-2d-bilayer class with geometric efficiency g = 0.0046. Layout credit and method are recorded in locality.contributed_by; the code, its distance claims, and its authorship are unchanged. Part of the layout-filling effort (issue #654 discussion)."
+  "notes": "Screened at 160 trials; package witness search used 1600 trials. Distance is an upper bound. LAYOUT added 2026-08-20: a 1-layer planar layout with measured interaction radius 6.4031 (integer-grid sites, min site spacing 1.0, at most 1 qubits per site), placing the code in the local-2d-bilayer class with geometric efficiency g = 0.0046. Layout credit and method are recorded in locality.contributed_by; the code, its distance claims, and its authorship are unchanged. Part of the layout-filling effort (issue #654 discussion).",
+  "novelty": "known_parameters"
  },
  "family": "bivariate-bicycle",
  "locality": {

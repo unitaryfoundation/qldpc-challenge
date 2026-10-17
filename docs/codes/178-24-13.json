@@ -1838,7 +1838,11 @@
   "construction": "Univariate bicycle code over R_89 = F2[x]/(x^89-1); a(x) = 1 + x^9 + x^10 + x^12; b(x) = a(x^(2^5)) mod (x^89-1) (Frobenius coupling, gcd(89,32)=1 so wt(b)=wt(a)); H_X=[A,B], H_Z=[B^T,A^T]. Reconstruction of arXiv:2605.14173v1 Table I row 3.",
   "origin": "submission",
   "date": "2026-08-23",
-  "model": "Ox Alpha 1.0"
+  "model": "Ox Alpha 1.0",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2605.14173 (Table I, row 3)"
+  ]
  },
  "family": "generalized-bicycle"
 }

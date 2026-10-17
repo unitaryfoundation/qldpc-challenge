@@ -1,0 +1,195 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[88,36,4]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"other","code_origin":"submission","code_tier":"ub","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-8"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../stabilizer.html">&larr; back to the stabilizer board</a>
+<div class=codehead><span class="mono big">[[88,36,4]]</span> <span class="b ub" title="verified upper bound: an explicit logical of this weight, and independent refutation searches found nothing lighter">d &le;</span><span class="tchip stab" title="general (non-CSS) stabilizer code: one Pauli-weight distance, ranked on the stabilizer board">stabilizer</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>88</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>36</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>4</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>6.545</div></div>
+<div class=cell title="max check weight |supp X_i ∪ supp Z_i| (a Y factor counts one qubit)"><div class=l>w</div><div class=v>8</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/88-36-4.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B88%2C36%2C4%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/88-36-4.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B88%2C36%2C4%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/88-36-4.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/88-36-4.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv style="color:var(--mut)">a general stabilizer code has no X and Z sides: d is the minimum Pauli weight of a nontrivial logical operator (a Y factor counts one qubit), and the witness is one Pauli operator that commutes with every generator and is not a product of them</div>
+<div class=kv><b>d</b> 4 &middot; witness Pauli weight 4 (claimed upper_bound)</div>
+<details><summary>witness operator (Pauli string, 4 qubits)</summary><div class=wit>IIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIII
+X: []
+Z: [22, 33, 54, 65]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;); the Pauli-weight certifier is not built yet, so stabilizer entries cannot earn d= for now</span></div>
+</section>
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the generator/qubit graph a decoder runs on (one graph, over the generator supports). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from S, never a ranking axis."><b>girth</b> S 4 <span class=claimed>(shortest cycle of the generator Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> S 8</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> S 5</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets S</b> (1,5)×88 (2,4)×132 (3,5)×616 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for S</summary><div class=wit>(1,5): 88
+(2,4): 132
+(2,6): 330
+(2,8): 484
+(3,5): 616
+(3,7): 3256
+(3,9): 5500
+(3,11): 4048</div></details>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/hirobumii">@hirobumii</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> {&quot;column_labels&quot;: [[0, 0, 0], [0, 0, 1], [0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 0, 1], [1, 1, 0], [1, 1, 1]], &quot;construction&quot;: &quot;degree-five monochromatic XYZ binary-cube template&quot;, &quot;ell&quot;: 11, &quot;row_labels&quot;: [[0, 0, 0], [1, 1, 1], [1, 0, 0], [0, 1, 1], [0, 1, 0]], &quot;row_types&quot;: [&quot;X&quot;, &quot;X&quot;, &quot;Z&quot;, &quot;Z&quot;, &quot;Y&quot;], &quot;shifts&quot;: [1, 2, 3]}</div>
+<div class=kv><b>model</b> <span class=modelmark></span>GPT-6 Astra <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>builds on</b> Baldelli, Orsucci, Lazaro and Battaglioni, Quantum XYZ Stabilizer Codes, arXiv:2607.14988v1, Sections III-V. https://arxiv.org/abs/2607.14988v1, Lee, Okada, Maskara, Kasai and Zhou, Design Principles for Ultra-High-Rate Quantum Codes, arXiv:2609.30069v1, Sections III-IV. https://arxiv.org/abs/2609.30069v1, Finite proof sources, input binding, non-LC-CSS argument and deep-search receipts: https://github.com/hirobumii/qldpc-cyclic-xyz-evidence/tree/3c673081df60df2b708781ff561da857da898cf7</div>
+<div class=kv><b>date</b> 2026-10-17</div>
+<div class=kv><b>notes</b> Known XYZ check-space framework; fixed cyclic instance, max check weight 8 and qubit degree 5. Current gate found no exact/WL duplicate and advances the weight-8 unrestricted stabilizer frontier at upstream 0433d4ff5ff371976c0c03b02b103770f9fe0ee9. Global novelty and general code equivalence remain unestablished; not constructed by applying a Clifford to a board entry. Two new seeds 2026101781/2026101782 each ran 20000 Python Pauli RIS trials plus a 2000000-trial gf2_fast doubling request and 50000-trial orbit-fold budget; lightest found 4 throughout. Exact finite binary-symplectic parameter proof is supplementary; the challenge field remains upper_bound, with no circuit claim. AI tools: GPT-6 Astra with OpenAI Codex, used for exploration, review, validation and drafting. See notes/88-36-4.md.</div>
+<div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/88-36-4.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[88,36,4]] — cyclic XYZ binary cube, L=11</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the weight-8, unrestricted stabilizer frontier. Start within the known XYZ framework of <a href="https://arxiv.org/html/2607.14988v1">Baldelli et al.</a>, Sections III–V: three pairwise-orthogonal binary check spaces carrying pure X, Z and Y checks. Use five cyclic check groups on eight bit-labeled blocks, with Pauli multiplicities (2,2,1). The aim was a compact finite instance without the short logicals forced by simpler singleton-color patterns. Pair-partition cancellation and symplectic halving have close prior in <a href="https://arxiv.org/html/2609.30069v1">Lee et al.</a>, Sections III–IV. Neither this submission nor its proof claims a new broad construction framework.</p>
+<h4>What was searched</h4>
+<p>Fixed construction: L=11, shifts (1,2,3), eight cyclic blocks and five check groups. The validation scope is the two finite instances. Total historical candidate count and search compute were not recorded reliably.</p>
+<p>Let q=(q1,q2,q3) range over binary triples in lexicographic order and s range modulo L. Qubit (q,s) has flat index L*(4*q1+2*q2+q3)+s. For each i modulo L, take one site from every q block at these offsets:</p>
+<p>| Check type | Site coordinate s | | --- | --- | | X | i | | X | i+q1+2*q2+3*q3 | | Z | i+q1 | | Z | i+2*q2+3*q3 | | Y | i+2*q2 |</p>
+<p>Order the check groups as in the table, then i=0,...,L-1. All sites are reduced modulo L. This reconstructs the ordered checks in codes/88-36-4.json. Each row has Pauli weight eight, each data qubit has degree five, and the 55-check binary symplectic matrix has rank 52, so k=36.</p>
+<h4>Evidence trail</h4>
+<p>At upstream commit 0433d4ff5ff371976c0c03b02b103770f9fe0ee9 the unchanged official candidate gate passed, found no exact or WL-equivalent board entry, and returned board_advancing=true for the weight-8 / unrestricted stabilizer cell. Its quick refutation pass used 6,020 trials, seed 1737797753. This quick gate is distinct from the deep searches below.</p>
+<p>Fresh official deep searches during preparation:</p>
+<p>| Seed | Python Pauli RIS | Accelerated doubled-code request | Orbit-fold budget | Lightest Pauli | | --- | ---: | ---: | ---: | ---: | | 2026101781 | 20,000 | 2,000,000 | 50,000 | 4 | | 2026101782 | 20,000 | 2,000,000 | 50,000 | 4 |</p>
+<p>The accelerator used eight threads and pair depth eight. Its proposals are mapped back and rescored by the official Python stack. The orbit-fold budget is per folded code under its own official time cap; the runs searched 19 and 18 partitions/frames respectively. The main Python and accelerator calls were not time-truncated. These are distinct methods and budgets, not two million Python Pauli trials. The packaging did not use promote.py.</p>
+<p>The JSON reports distance.P.confidence=upper_bound. Its explicit pure-Z witness is [22,33,54,65], namely (010,0),(011,0),(100,-1),(101,-1). It commutes with every check and lies outside the full stabilizer rowspace. The official stabilizer path has no native exact-certification or circuit tier.</p>
+<p>Exact finite binary symplectic parameters are additional evidence. The <a href="https://github.com/hirobumii/qldpc-cyclic-xyz-evidence/tree/3c673081df60df2b708781ff561da857da898cf7">public source and audit package</a> contains the Lean 4.19.0 theorem QLDPC.xyz88_parameters, the delivered independent clean-source rebuild, and the actual deep-search outputs with witnesses. Preparation reran manifest verification, source scans, literal binding, independent candidate computation and byte-identical certificate regeneration. The supplied kernel build was not repeated during preparation. JSON parsing and hashing remain external; signed Pauli/Hilbert-space correspondence, infinite families, LC-CSSness, novelty and experimental fault tolerance are outside the Lean proof. The independent computation checked no nonzero normalizer of weight 1–3 and the weight-four logical.</p>
+<p>There is also a full-rowspace finite non-LC-CSS certificate, independent of the official supplied-generator test. For each generator support Q, rank(S)-rank(S restricted outside Q)=1, retaining both symplectic halves. In a CSS image a mixed generator would split into two independent stabilizers inside Q, contradicting that dimension. Every qubit sees all three Pauli axes among these minimal-support generators; local Cliffords cannot send those three axes into only X and Z. This includes arbitrary generator rebasing and qubit permutations. The public package provides a direct replay script.</p>
+<p>Literature status remains unknown. The current board and targeted primary-source and exact-parameter searches did not establish an identical published point; absence from this limited search does not prove worldwide novelty or general inequivalence to published codes. No priority or superiority to all CSS codes is claimed. Distance is fixed at four here; no growing-distance claim is made.</p>
+<h4>Dead ends</h4>
+<p>The motivating restricted singleton-color incidence pattern permits repeated same-axis syndromes and weight-two normalizers. Simply adding a second group of only one color leaves the analogous obstruction for the other singleton colors. The (2,2,1) choice avoids that specific mechanism. This is a scoped design lesson, not a no-go theorem for arbitrary degree-four stabilizer codes. No other exploratory code or negative-result dataset is submitted in this PR.</p>
+<h4>Tools</h4>
+<p>Model: GPT-6 Astra. Agent environment: OpenAI Codex. AI assistance covered construction exploration, review, literature checking, official validation and preparation of the submission. Python 3.12.3, the upstream uv.lock, NumPy 2.4.6, Stim 1.16.0, the research extra and the official gf2_fast accelerator were used. Runtime for each deep run was tens of seconds on the preparation host; full historical compute and token usage are unknown. No decoder performance or hardware cost was measured.</p>
+<h4>Reproduction</h4>
+<p>Reconstruct the five groups from the table, or use the exact ordered matrix already in codes/88-36-4.json. At the upstream commit above:</p>
+<pre>
+uv sync --frozen --python 3.12 --extra research --extra certify
+make fast
+uv run python verify/qldpc_verify.py codes/88-36-4.json
+uv run python verify/validate_candidate.py codes/88-36-4.json
+uv run python verify/heuristic_distance.py codes/88-36-4.json --trials 20000 --fast-trials 2000000 --fold-trials 50000 --seed 2026101781
+</pre>
+<p>Repeat the last command with seed 2026101782. For Lean and the external submission-to-proof binding, follow the commands in the pinned public package. Its original input hash is 353865b626ea7205b62e5fcf0826b4aa453f506d28330c6291fcf1d8344ffefe; only submission metadata and formatting change, not checks or witness.</p></div></section>
+<section class=blk><h3>Stabilizer generators</h3>
+<div class=kv><b>generators</b> 55 (max weight 8; 11 mixed X/Z) <span class=claimed>(one binary symplectic matrix S = (A | B); generator i is X on A_i and Z on B_i, Y where both)</span></div>
+<details><summary>generators (55, Pauli strings on 88 qubits)</summary><div class=wit>XIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIII
+IXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIII
+IIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIII
+IIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIII
+IIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIII
+IIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIII
+IIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIII
+IIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIII
+IIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXII
+IIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXI
+IIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIXIIIIIIIIIIX
+XIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIII
+IXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIII
+IIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXII
+IIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXI
+IIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIX
+IIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIXIIIIIIIIII
+IIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIXIIIIIIIIIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIXIIIIIIIII
+IIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIXIIIIIIIIIIIIIIIIIXIIXIIIIIIIIIIIIIIIIIIIIXIIXIIIIIIII
+IIIIIIIIXIIXIIIIIIIIIIIIIIIIIIIIXIIXIIIIIIIIIIIIIIIIIXIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIII
+IIIIIIIIIXIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIXIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIII
+IIIIIIIIIIXIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIIIIXIIIIIIIIIIIIIXIIIIIIIIIXIIIIIIIIIIIIIXIIIII
+ZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIII
+IZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIII
+IIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIII
+IIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIII
+IIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIII
+IIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIII
+IIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIII
+IIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZII
+IIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZI
+IIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZ
+IIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIIIZIIIIIIIIII
+ZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIII
+IZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIII
+IIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIII
+IIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZII
+IIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZI
+IIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIIIIIIIIIIIIZ
+IIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIZIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIZIIIIIIIIII
+IIIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIZIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIZIIIIIIIIIZIIZIIIIIIIII
+IIIIIIIIZIIZIIIIIIIIIIIIIIIIIIIIZIIZIIIIIIIIIIIIIIIIZIIZIIIIIIIIIIIIIIIIIIIIZIIZIIIIIIII
+IIIIIIIIIZIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIIIIIIIIIIIIZIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIII
+IIIIIIIIIIZIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIIIIIIIIIIIIIZIIZIIIIIIIIIZIIIIIIIIIIIIIZIIIIII
+YIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIII
+IYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIII
+IIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIII
+IIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIII
+IIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIII
+IIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIII
+IIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYII
+IIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYI
+IIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIYIIIIIIIIYIIIIIIIIIIYIIIIIIIIIIIIYIIIIIIIIIIY
+IIIIIIIIIYIIIIIIIIIIYIYIIIIIIIIIIYIIIIIIIIIIIIIIIIIIIYIIIIIIIIIIYIYIIIIIIIIIIYIIIIIIIIII
+IIIIIIIIIIYIIIIIIIIIIYIYIIIIIIIIIIYIIIIIIIIIIIIIIIIIIIYIIIIIIIIIIYIYIIIIIIIIIIYIIIIIIIII</div></details>
+<details><summary>symplectic rows (A | B) (55, sparse supports)</summary><div class=wit>X: [0, 11, 22, 33, 44, 55, 66, 77]  Z: []
+X: [1, 12, 23, 34, 45, 56, 67, 78]  Z: []
+X: [2, 13, 24, 35, 46, 57, 68, 79]  Z: []
+X: [3, 14, 25, 36, 47, 58, 69, 80]  Z: []
+X: [4, 15, 26, 37, 48, 59, 70, 81]  Z: []
+X: [5, 16, 27, 38, 49, 60, 71, 82]  Z: []
+X: [6, 17, 28, 39, 50, 61, 72, 83]  Z: []
+X: [7, 18, 29, 40, 51, 62, 73, 84]  Z: []
+X: [8, 19, 30, 41, 52, 63, 74, 85]  Z: []
+X: [9, 20, 31, 42, 53, 64, 75, 86]  Z: []
+X: [10, 21, 32, 43, 54, 65, 76, 87]  Z: []
+X: [0, 14, 24, 38, 45, 59, 69, 83]  Z: []
+X: [1, 15, 25, 39, 46, 60, 70, 84]  Z: []
+X: [2, 16, 26, 40, 47, 61, 71, 85]  Z: []
+X: [3, 17, 27, 41, 48, 62, 72, 86]  Z: []
+X: [4, 18, 28, 42, 49, 63, 73, 87]  Z: []
+X: [5, 19, 29, 43, 50, 64, 74, 77]  Z: []
+X: [6, 20, 30, 33, 51, 65, 75, 78]  Z: []
+X: [7, 21, 31, 34, 52, 55, 76, 79]  Z: []
+X: [8, 11, 32, 35, 53, 56, 66, 80]  Z: []
+X: [9, 12, 22, 36, 54, 57, 67, 81]  Z: []
+X: [10, 13, 23, 37, 44, 58, 68, 82]  Z: []
+X: []  Z: [0, 11, 22, 33, 45, 56, 67, 78]
+X: []  Z: [1, 12, 23, 34, 46, 57, 68, 79]
+X: []  Z: [2, 13, 24, 35, 47, 58, 69, 80]
+X: []  Z: [3, 14, 25, 36, 48, 59, 70, 81]
+X: []  Z: [4, 15, 26, 37, 49, 60, 71, 82]
+X: []  Z: [5, 16, 27, 38, 50, 61, 72, 83]
+X: []  Z: [6, 17, 28, 39, 51, 62, 73, 84]
+X: []  Z: [7, 18, 29, 40, 52, 63, 74, 85]
+X: []  Z: [8, 19, 30, 41, 53, 64, 75, 86]
+X: []  Z: [9, 20, 31, 42, 54, 65, 76, 87]
+X: []  Z: [10, 21, 32, 43, 44, 55, 66, 77]
+X: []  Z: [0, 14, 24, 38, 44, 58, 68, 82]
+X: []  Z: [1, 15, 25, 39, 45, 59, 69, 83]
+X: []  Z: [2, 16, 26, 40, 46, 60, 70, 84]
+X: []  Z: [3, 17, 27, 41, 47, 61, 71, 85]
+X: []  Z: [4, 18, 28, 42, 48, 62, 72, 86]
+X: []  Z: [5, 19, 29, 43, 49, 63, 73, 87]
+X: []  Z: [6, 20, 30, 33, 50, 64, 74, 77]
+X: []  Z: [7, 21, 31, 34, 51, 65, 75, 78]
+X: []  Z: [8, 11, 32, 35, 52, 55, 76, 79]
+X: []  Z: [9, 12, 22, 36, 53, 56, 66, 80]
+X: []  Z: [10, 13, 23, 37, 54, 57, 67, 81]
+X: [0, 11, 24, 35, 44, 55, 68, 79]  Z: [0, 11, 24, 35, 44, 55, 68, 79]
+X: [1, 12, 25, 36, 45, 56, 69, 80]  Z: [1, 12, 25, 36, 45, 56, 69, 80]
+X: [2, 13, 26, 37, 46, 57, 70, 81]  Z: [2, 13, 26, 37, 46, 57, 70, 81]
+X: [3, 14, 27, 38, 47, 58, 71, 82]  Z: [3, 14, 27, 38, 47, 58, 71, 82]
+X: [4, 15, 28, 39, 48, 59, 72, 83]  Z: [4, 15, 28, 39, 48, 59, 72, 83]
+X: [5, 16, 29, 40, 49, 60, 73, 84]  Z: [5, 16, 29, 40, 49, 60, 73, 84]
+X: [6, 17, 30, 41, 50, 61, 74, 85]  Z: [6, 17, 30, 41, 50, 61, 74, 85]
+X: [7, 18, 31, 42, 51, 62, 75, 86]  Z: [7, 18, 31, 42, 51, 62, 75, 86]
+X: [8, 19, 32, 43, 52, 63, 76, 87]  Z: [8, 19, 32, 43, 52, 63, 76, 87]
+X: [9, 20, 22, 33, 53, 64, 66, 77]  Z: [9, 20, 22, 33, 53, 64, 66, 77]
+X: [10, 21, 23, 34, 54, 65, 67, 78]  Z: [10, 21, 23, 34, 54, 65, 67, 78]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>88-36-4</code> &middot; <a href="88-36-4.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/88-36-4.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>

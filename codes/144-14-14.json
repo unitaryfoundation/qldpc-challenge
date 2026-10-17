@@ -1500,7 +1500,11 @@
   "construction": "Weight-8 BB code on Z_12 x Z_6, h=2 cover of [[72,14,8]] base code from Table 7 of arXiv:2511.13560. Polynomials: A = x^6 y^4 + x^5 y^4 + x^3 + x^11 y^3, B = y^5 + x^8 y + x^5 y^5 + x^9 y^4.",
   "origin": "submission",
   "date": "2026-09-15",
-  "model": "Mimo V2.5"
+  "model": "Mimo V2.5",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2511.13560 (Table 7)"
+  ]
  },
  "family": "bivariate-bicycle"
 }

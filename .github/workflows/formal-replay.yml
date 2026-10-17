@@ -10,7 +10,11 @@ permissions:
 # with the dates of the recorded toolchain and mathlib and an advisory
 # second replay at the repository's current default branch, which is where a
 # Lean or mathlib bump that breaks the proof shows up first (#2955, m13v).
-# Only the pinned replay fails the run; re-pinning is a maintainer decision.
+# Both replays inherit a pinned toolchain (the certificate's, or upstream's
+# own), so a build can stay green on an old Lean forever; each toolchain cell
+# therefore also says how many Lean releases it is behind the current one,
+# and two or more is marked stale. Only the pinned replay fails the run;
+# re-pinning is a maintainer decision.
 on:
   pull_request:
     paths:
@@ -86,28 +90,54 @@ jobs:
             echo '| certificate | pinned replay | seconds | repository @ commit | theorem | toolchain (released) | mathlib (committed) | head replay (advisory) |'
             echo '|---|---|---|---|---|---|---|---|'
             python3 - <<'EOF'
-          import json, os
+          import json, os, re
+          STALE_RELEASES = 2   # this many Lean releases behind the current one is stale
           def status(r):
               s = r["status"] + (f" ({r['detail']})" if r.get("detail") else "")
               return "ok" if r["status"] == "ok" else "**" + s + "**"
           def dated(name, date, age):
               return "?" if not name else name + (f" ({date}, {age} d old)" if date else "")
+          def release(tag):
+              # leanprover/lean4:v4.30.0-rc2 -> (4, 30); a release candidate counts as the release it precedes
+              m = re.search(r"v(\d+)\.(\d+)", tag or "")
+              return (int(m.group(1)), int(m.group(2))) if m else None
+          def currency(toolchain, latest):
+              have, cur = release(toolchain), release(latest)
+              if not have or not cur or have[0] != cur[0]:
+                  return "currency unknown", False
+              behind = cur[1] - have[1]
+              if behind <= 0:
+                  return "current", False
+              word = f"{behind} release{'s' if behind != 1 else ''} behind {latest}"
+              return (word + ", stale", True) if behind >= STALE_RELEASES else (word, False)
           head = {}
           if os.path.exists("formal-replay-head.json"):
               head = {r["slug"]: r for r in json.load(open("formal-replay-head.json"))}
-          for r in json.load(open("formal-replay.json")):
+          rows = json.load(open("formal-replay.json"))
+          stale_pinned = stale_head = 0
+          for r in rows:
+              latest = r.get("latest_toolchain")
+              cur, stale = currency(r.get("toolchain"), latest)
+              stale_pinned += stale
+              tc = dated(r.get('toolchain'), r.get('toolchain_date'), r.get('toolchain_age_days')) + f"; {cur}"
               h = head.get(r["slug"])
-              hcol = "not run" if h is None else (
-                  f"{status(h)} at {str(h.get('commit'))[:12]} in {h['seconds']} s, toolchain "
-                  f"{dated(h.get('toolchain'), h.get('toolchain_date'), h.get('toolchain_age_days'))}, "
-                  f"mathlib {dated(h.get('mathlib'), h.get('mathlib_date'), h.get('mathlib_age_days'))}")
-              tc = dated(r.get('toolchain'), r.get('toolchain_date'), r.get('toolchain_age_days'))
-              if r.get("latest_toolchain"):
-                  tc += f"; current release {r['latest_toolchain']}"
+              if h is None:
+                  hcol = "not run"
+              else:
+                  hcur, hstale = currency(h.get("toolchain"), h.get("latest_toolchain") or latest)
+                  stale_head += hstale
+                  hcol = (f"{status(h)} at {str(h.get('commit'))[:12]} in {h['seconds']} s, toolchain "
+                          f"{dated(h.get('toolchain'), h.get('toolchain_date'), h.get('toolchain_age_days'))}; {hcur}, "
+                          f"mathlib {dated(h.get('mathlib'), h.get('mathlib_date'), h.get('mathlib_age_days'))}")
               print(f"| `{r['slug']}` | {status(r)} | {r['seconds']} | {r.get('repo')} @ {str(r.get('commit'))[:12]} | {r.get('theorem')} | {tc} | {dated(r.get('mathlib'), r.get('mathlib_date'), r.get('mathlib_age_days'))} | {hcol} |")
+          print()
+          if stale_pinned or stale_head:
+              print(f"Stale toolchains: {stale_pinned} of {len(rows)} recorded recipe(s) and {stale_head} of {len(head)} head build(s) are {STALE_RELEASES} or more Lean releases behind the current release. Green there means the proof builds on a frozen snapshot, not on current Lean; moving the toolchain is upstream's upkeep, and this line is where the lag shows.")
+          else:
+              print(f"No stale toolchains: every recorded recipe and head build is within {STALE_RELEASES - 1} release(s) of the current Lean release.")
           EOF
             echo
-            echo "A status other than ok in the pinned column means the recorded recipe did not reach the theorem under the run's cap. The certificate is unchanged; re-pinning is a maintainer decision. The head column is advisory: it rebuilds the theorem at the repository's current default branch with that branch's own toolchain and mathlib, so a bump that breaks the proof shows there first. Nothing gates on it."
+            echo "A status other than ok in the pinned column means the recorded recipe did not reach the theorem under the run's cap. The certificate is unchanged; re-pinning is a maintainer decision. The head column is advisory: it rebuilds the theorem at the repository's current default branch with that branch's own toolchain and mathlib, so a bump that breaks the proof shows there first. Nothing gates on it. Each toolchain cell says how many Lean releases that toolchain is behind the current release, since both replays build on a pinned toolchain and would stay green on an old one; two or more is marked stale."
           } > comment.md
           gh issue comment "$TRACKING_ISSUE" --body-file comment.md
       - name: fail the run if a recipe did not replay

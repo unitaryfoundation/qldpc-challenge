@@ -1436,12 +1436,14 @@
    "@FarLab"
   ],
   "origin": "submission",
-  "novelty": "new_parameters",
+  "novelty": "known_parameters",
   "construction": "Generalized bicycle (two-block) code on Z_85: H_X=[A|B], H_Z=[B^T|A^T], a(x)=x^8+x^33+x^46, b(x)=x^3+x^18+x^70; g=gcd(a,b,x^85-1) irreducible of degree 8, k=2*deg(g)=16, row weight 6. Full circulant check sets kept (redundant rows carry the symmetry).",
   "model": "Claude Fable 5",
   "references": [
    "arXiv:2203.17216",
-   "arXiv:2306.16400"
+   "arXiv:2306.16400",
+   "arXiv:2502.19406 (Appendix A, Table IV: the same generalized bicycle code under x -> x^47 and cyclic shifts)",
+   "arXiv:2503.03827 (Table VI)"
   ],
   "date": "2026-08-19",
   "notes": "Orbit-structured GB search find; the full Tanner automorphism group acts with 3 orbits on the 16 canonical logical classes. Distance evidence: GPU deep-RIS 15M full-kernel pair trials x 2 seeds per side (CPU-verified witnesses) + sqetch 20Mx2 trials/side; nothing below 10 by any engine. Novelty basis: 2026-08-19 lit pass (Wang-Pryadko 2203.17216 = k=2 family; Lin-Pryadko 2306.16400 = n<=100; no zoo/board hits)."

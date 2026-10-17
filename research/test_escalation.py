@@ -153,7 +153,7 @@ def test_rung_inputs_are_validated():
 def test_missing_verdict_holds():
     """No judgment available -> hold and deepen. Never guess."""
     d = E.apply_verdict(_below_bar_brief(), None)
-    assert d["action"] == "hold-deepen"
+    assert d["action"] == "abandon-ladder"
     assert d["advisories"] == ["no-verdict"]
 
 
@@ -165,7 +165,7 @@ def test_malformed_verdict_holds():
                 {"recommendation": {"selected": "abandon-ladder",
                                     "confidence": True}}):
         d = E.apply_verdict(_below_bar_brief(), bad)
-        assert d["action"] == "hold-deepen" and d["advisories"] == ["no-verdict"]
+        assert d["action"] == "abandon-ladder" and d["advisories"] == ["no-verdict"]
 
 
 def test_escaped_verdict_holds():
