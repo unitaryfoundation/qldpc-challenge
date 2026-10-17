@@ -329,3 +329,99 @@ def test_exact_first_certifies_the_steane_code_and_passes_on_large_codes():
     big = np.zeros((1, 200), dtype=np.int8)
     big[0, :4] = 1
     assert exact_first(big, big, 3) is None
+
+
+# -- the connected-cluster pre-stage (#3438) ------------------------------------
+#
+# Qubitserf is an out-of-band build and is not installed in CI, so the backend
+# is faked here; what is pinned is the band, the no-op without the build, the
+# reading of each answer, and the dispatch that keeps the certifier the decider.
+
+def test_cc_first_applies_to_the_calibrated_band():
+    from escalation import cc_first_applies
+    assert cc_first_applies(937, 12) and cc_first_applies(91, 9)
+    assert not cc_first_applies(938, 12) and not cc_first_applies(937, 13)
+    assert not cc_first_applies(100, 10, css=False)
+
+
+def test_cc_caps_point_at_the_calibration_record():
+    import escalation as E
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(E.__file__))))
+    path = os.path.join(root, E.CC_FIRST_CALIBRATION)
+    assert os.path.exists(path), E.CC_FIRST_CALIBRATION
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    assert str(E.CC_FIRST_MAX_N) in text and "30" in text and "211/211" in text
+    assert (E.CC_FIRST_MAX_N, E.CC_FIRST_MAX_D, E.CC_FIRST_TLIM) == (937, 12, 30.0)
+
+
+def _mid_code():
+    import numpy as np
+    H = np.zeros((1, 200), dtype=np.int8)
+    H[0, :4] = 1
+    return H, H
+
+
+def test_cc_first_is_a_no_op_without_the_build(monkeypatch):
+    import escalation as E
+    monkeypatch.setattr(E, "cc_available", lambda: False)
+    HX, HZ = _mid_code()
+    res = E.cc_first(HX, HZ, 10)
+    assert res["outcome"] == "unavailable" and res["d"] is None and res["ends_ladder"] is False
+    assert res["method"] == "qubitserf-cc" and res["calibration"] == E.CC_FIRST_CALIBRATION
+    # outside the band nothing runs, with or without the build
+    assert E.cc_first(HX, HZ, 13) is None
+    import numpy as np
+    big = np.zeros((1, 1000), dtype=np.int8)
+    big[0, :4] = 1
+    assert E.cc_first(big, big, 5) is None
+
+
+def test_cc_first_reads_each_answer_and_never_ends_the_ladder(monkeypatch):
+    import escalation as E
+    monkeypatch.setattr(E, "cc_available", lambda: True)
+    HX, HZ = _mid_code()
+    calls = []
+
+    def fake(HX, HZ, method="cc", which="min", threads=1, tlim=30):
+        calls.append((method, which, tlim))
+        return fake.answer
+
+    monkeypatch.setattr(E._kit_distance(), "qubitserf_distance", fake)
+    fake.answer = 10
+    res = E.cc_first(HX, HZ, 12, k=8, bar=4.5)          # kd^2/n at d = 10 is 4.0, under a 4.5 bar
+    assert res["outcome"] == "screen_inflated" and res["d"] == 10 and "weight-10" in res["advice"]
+    assert res["efficiency_at_cc"] == round(8 * 100 / 200, 4) and res["below_bar"] is True
+    assert res["ends_ladder"] is False and calls[-1] == ("cc", "min", 30.0)
+    fake.answer = 12
+    assert E.cc_first(HX, HZ, 12)["outcome"] == "confirmed"
+    fake.answer = 14
+    res = E.cc_first(HX, HZ, 12, k=8, bar=1.0)
+    assert res["outcome"] == "inconsistent" and "below_bar" not in res
+    fake.answer = None
+    assert E.cc_first(HX, HZ, 12, tlim=7)["outcome"] == "timeout"
+
+    def boom(*a, **k):
+        raise RuntimeError("qubitserf: error:ValueError: bad input")
+
+    monkeypatch.setattr(E._kit_distance(), "qubitserf_distance", boom)
+    res = E.cc_first(HX, HZ, 12)
+    assert res["outcome"] == "error" and "bad input" in res["error"]
+
+
+def test_exact_or_cc_first_keeps_the_certifier_the_decider(monkeypatch):
+    import escalation as E
+    import numpy as np
+    H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+    monkeypatch.setattr(E, "cc_available", lambda: True)
+    monkeypatch.setattr(E._kit_distance(), "qubitserf_distance",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("cc must not run inside the MILP band")))
+    res = E.exact_or_cc_first(H, H, 3, tlim_exact=30)
+    assert res["method"] == "certify" and res["outcome"] == "exact" and res["ends_ladder"] is True
+    monkeypatch.setattr(E._kit_distance(), "qubitserf_distance", lambda *a, **k: 9)
+    HX, HZ = _mid_code()
+    res = E.exact_or_cc_first(HX, HZ, 10)
+    assert res["method"] == "qubitserf-cc" and res["outcome"] == "screen_inflated" and res["ends_ladder"] is False
+    big = np.zeros((1, 1000), dtype=np.int8)
+    big[0, :4] = 1
+    assert E.exact_or_cc_first(big, big, 5) is None

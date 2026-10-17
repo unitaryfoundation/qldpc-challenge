@@ -408,3 +408,139 @@ def exact_first(HX, HZ, d_screened, *, tlim=EXACT_FIRST_TLIM, max_n=EXACT_FIRST_
     else:
         res["outcome"] = "timeout"
     return res
+
+
+# -- connected-cluster pre-stage (#3438): Qubitserf's connected-cluster exact
+# distance reaches where the MILP certifier above does not. Calibrated on this
+# board in CC_FIRST_CALIBRATION: agreement with the board's certifiers on 211 of
+# 211 certified entries (d = 2 to 14), median 0.08 s over 279 codes, n up to
+# 937 and d <= 12 in practice, with the knee of the time-to-answer curve at a
+# 30 s cap. The caps below are that record's numbers and nothing else; a
+# re-measurement changes them here and nowhere else.
+#
+# A screen, never a certifier. Its answer decides whether the ladder is worth
+# starting and where to aim it; it never ends a ladder, never populates
+# ``confidence: "exact"``, and the gate remains the only authority. A wrong
+# answer costs recall (a dropped candidate), never correctness. Qubitserf is an
+# out-of-band C++ build, not a dependency of this repo, so without it the
+# pre-stage is a no-op that says so.
+
+CC_FIRST_MAX_N = 937
+CC_FIRST_MAX_D = 12
+CC_FIRST_TLIM = 30.0
+CC_FIRST_CALIBRATION = "fieldnotes/2026-10-14-qubitserf-what-it-is-for.md"
+CC_FIRST_METHOD = "qubitserf-cc"
+
+
+def cc_first_applies(n, d, *, css=True, max_n=CC_FIRST_MAX_N, max_d=CC_FIRST_MAX_D):
+    """Whether the connected-cluster attempt is inside the calibrated band."""
+    return bool(css) and isinstance(n, int) and isinstance(d, int) and 1 <= n <= max_n and 1 <= d <= max_d
+
+
+def _kit_distance():
+    import sys
+    here = os.path.dirname(os.path.abspath(__file__))
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import distance
+    return distance
+
+
+def cc_available():
+    """Whether the out-of-band Qubitserf build is importable (``QUBITSERF_PYTHON`` honored)."""
+    try:
+        _kit_distance()._qsf_import()
+    except ImportError:
+        return False
+    return True
+
+
+def cc_first(HX, HZ, d_screened, *, tlim=CC_FIRST_TLIM, max_n=CC_FIRST_MAX_N,
+             max_d=CC_FIRST_MAX_D, threads=1, k=None, bar=None):
+    """Qubitserf's connected-cluster distance of (HX, HZ) when ``cc_first_applies``, else None.
+
+    Returns a record with ``method`` (``qubitserf-cc``), ``d`` (the answer, or
+    None), ``d_screened``, ``seconds``, ``tlim``, ``calibration`` (the fieldnote
+    the caps rest on), ``ends_ladder`` (always False), ``advice``, and
+    ``outcome``:
+
+    * ``screen_inflated``: ``d < d_screened``; the screened reading is too
+      high, so the ladder is not worth starting at that bar and the witness
+      search should aim at weight ``d``;
+    * ``confirmed``: ``d == d_screened``; a deeper ladder cannot lower it, so
+      spend on witnesses and certification instead;
+    * ``inconsistent``: ``d > d_screened``, above a witnessed upper bound;
+      trust the witness and ignore the reading;
+    * ``timeout``: no answer within ``tlim``; the ladder proceeds as it was;
+    * ``error``: the build raised; the ladder proceeds as it was;
+    * ``unavailable``: no Qubitserf build; the ladder proceeds as it was.
+
+    With ``k`` and ``bar`` the record also carries ``efficiency_at_cc`` and
+    ``below_bar`` for a consistent answer, the same arithmetic ``rung_brief``
+    uses, so a caller can drop a candidate the answer already puts under its
+    cell bar.
+    """
+    import numpy as np
+    HX = np.asarray(HX, dtype=np.int8)
+    HZ = np.asarray(HZ, dtype=np.int8)
+    n = int(HX.shape[1])
+    d_screened = int(d_screened)
+    if not cc_first_applies(n, d_screened, max_n=max_n, max_d=max_d):
+        return None
+    res = {"method": CC_FIRST_METHOD, "d": None, "d_screened": d_screened, "n": n,
+           "tlim": float(tlim), "calibration": CC_FIRST_CALIBRATION, "ends_ladder": False,
+           "seconds": 0.0}
+    if not cc_available():
+        res.update(outcome="unavailable",
+                   advice="no Qubitserf build; the ladder proceeds as it was")
+        return res
+    import time
+    t0 = time.monotonic()
+    try:
+        d_cc = _kit_distance().qubitserf_distance(HX, HZ, method="cc", which="min",
+                                                  threads=threads, tlim=tlim)
+    except RuntimeError as e:
+        res.update(outcome="error", error=str(e)[:300], seconds=round(time.monotonic() - t0, 2),
+                   advice="the build raised; the ladder proceeds as it was")
+        return res
+    res["seconds"] = round(time.monotonic() - t0, 2)
+    if d_cc is None:
+        res.update(outcome="timeout",
+                   advice=f"no answer in {tlim:g} s; the ladder proceeds as it was")
+        return res
+    d_cc = int(d_cc)
+    res["d"] = d_cc
+    if d_cc < d_screened:
+        res.update(outcome="screen_inflated",
+                   advice=f"the screened reading {d_screened} is too high; search for a weight-{d_cc} "
+                          f"witness and package it as upper_bound, and do not start the ladder at {d_screened}")
+    elif d_cc == d_screened:
+        res.update(outcome="confirmed",
+                   advice=f"connected cluster agrees with the screened {d_screened}; a deeper ladder "
+                          "cannot lower it, so spend on witnesses and certification instead")
+    else:
+        res.update(outcome="inconsistent",
+                   advice=f"connected cluster reports {d_cc}, above the witnessed bound {d_screened}; "
+                          "trust the witness, ignore this reading, and report the build")
+    if k is not None and bar is not None and d_cc <= d_screened:
+        eff = _efficiency(n, int(k), d_cc)
+        res["efficiency_at_cc"] = round(eff, 4)
+        res["below_bar"] = eff < bar
+    return res
+
+
+def exact_or_cc_first(HX, HZ, d_screened, *, tlim_exact=EXACT_FIRST_TLIM,
+                      tlim_cc=CC_FIRST_TLIM, **cc_kwargs):
+    """``exact_first`` where the certifier reaches, ``cc_first`` beyond it, None past both.
+
+    The certifier stays the decider: inside its band its verdict is returned
+    unchanged and the connected-cluster stage never runs. Only the result's
+    ``method`` and ``outcome`` tell the two apart, and only an ``exact_first``
+    result can end a ladder.
+    """
+    res = exact_first(HX, HZ, d_screened, tlim=tlim_exact)
+    if res is not None:
+        res.setdefault("method", "certify")
+        res.setdefault("ends_ladder", res.get("outcome") == "exact")
+        return res
+    return cc_first(HX, HZ, d_screened, tlim=tlim_cc, **cc_kwargs)

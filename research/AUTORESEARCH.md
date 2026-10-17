@@ -430,6 +430,18 @@ For a small CSS candidate (n <= 90, screened d <= 8) try `escalation.exact_first
 before the first deep rung: the certifier closes those in seconds, and `d =` beats a ladder's
 `d <=`. Anything but `outcome == "exact"` leaves the ladder as it was.
 
+Above that band, `escalation.cc_first(HX, HZ, d)` asks Qubitserf's connected-cluster exact
+distance where the calibration in `../fieldnotes/2026-10-14-qubitserf-what-it-is-for.md` says it
+reaches (n <= 937, screened d <= 12, a 30 s cap: 211 of 211 certified entries agreed with the
+board's certifiers, median 0.08 s over 279 codes), and `escalation.exact_or_cc_first` dispatches
+between the two with the certifier staying the decider inside its band. The connected-cluster
+answer is a screen, never a certifier: `screen_inflated` says the screened reading is too high
+and names the weight to search a witness at, `confirmed` says a deeper ladder cannot lower it,
+`timeout` leaves the ladder as it was, and none of them ends a ladder or sets
+`confidence: exact`. Without the out-of-band Qubitserf build the stage returns
+`outcome: unavailable` and nothing else changes. The caps are module constants that name the
+calibration record, so a re-measurement changes them in one place (issue #3438).
+
 Before any of this, `./qldpc brief --cell <weight>/<locality> --family <tag>` prints one bounded
 snapshot: the cell's frontier and bar, what the registry says was screened for the family, what
 landed recently, and the fieldnotes that touch it (`--json` for the record).
@@ -655,7 +667,7 @@ something the next one should not have to re-learn.
 | `kit/surrogate.py` | `distance_rand`, `lightest_logical` (witnesses), `mixed_volume` (k upper bound) |
 | `kit/search.py` | `screen`, `screen_adaptive`, `pareto_frontier`, `update_leaderboard` (the funnel; `audit=` counts what the pre-pass dropped, `board=` sets how a board match is handled) + samplers: `sample_bb`, `sample_dihedral`, `sample_metacyclic`, `sample_kasai_affine` (all capped at check weight 8 by default), `sample_cyclic_gb` (designed k, check weight 24 to 32; section 3c) |
 | `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). `preflight`, `describe_preflight`: the verifier's structural half on a packaged document, the checks the gate's verify step would fail it on, in the verifier's words and sorted into a fault in the code or in the document (issue #3616). Run on a staged file: `python research/kit/prescreen.py <path>` |
-| `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
+| `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung), `cc_first` and `exact_or_cc_first` (the connected-cluster pre-stage beyond the certifier's band, a screen that aims the ladder and never ends it; a no-op without the Qubitserf build) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
 | `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_recipe`, `read_recipe` (the spec kept beside a staged candidate), `write_repro_manifest` (the `repro/<slug>.json` manifest for `qldpc reproduce`) |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
