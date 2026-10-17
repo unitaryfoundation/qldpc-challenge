@@ -1,0 +1,30 @@
+{
+  "d": 12,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 12,
+  "name": "[[112,12,12]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 12 exists",
+      "secs": 1849.1,
+      "status": "UNSAT",
+      "value": 12
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 12 exists",
+      "secs": 1888.0,
+      "status": "UNSAT",
+      "value": 12
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: drat-trim did not finish in 2400s"
+  }
+}

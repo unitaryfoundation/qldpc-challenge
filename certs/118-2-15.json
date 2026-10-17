@@ -1,0 +1,30 @@
+{
+  "d": 15,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 2,
+  "name": "[[118,2,15]] GB code",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 15 exists",
+      "secs": 369.2,
+      "status": "UNSAT",
+      "value": 15
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 15 exists",
+      "secs": 430.5,
+      "status": "UNSAT",
+      "value": 15
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": true,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: kissat did not finish in 2400s"
+  }
+}
