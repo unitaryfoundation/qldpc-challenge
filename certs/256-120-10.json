@@ -1,0 +1,30 @@
+{
+  "d": 10,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 120,
+  "name": "[[256,120,<=10]] affine-Frobenius quasi-dyadic CSS",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 10 exists",
+      "secs": 947.0,
+      "status": "UNSAT",
+      "value": 10
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 10 exists",
+      "secs": 352.0,
+      "status": "UNSAT",
+      "value": 10
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: kissat did not finish in 2400s"
+  }
+}

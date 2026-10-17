@@ -1,0 +1,30 @@
+{
+  "d": 8,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 150,
+  "name": "[[256,150,8]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 75.6,
+      "status": "UNSAT",
+      "value": 8
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 78.3,
+      "status": "UNSAT",
+      "value": 8
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: kissat did not finish in 2400s"
+  }
+}
