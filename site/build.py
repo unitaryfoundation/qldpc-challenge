@@ -509,6 +509,20 @@ max-width:38ch}}
 /* the title wrapper is the grid item; min-width:0 lets the 1fr column
    shrink below the subtitle's min-content and wrap it */
 .lbhead>div{{grid-area:title;min-width:0}}
+/* Phones (issue #3762): the two-row layout above still leaves the title
+   about 70px. The hero card's auto column takes its 260px cap out of a
+   ~350px row, so the 1fr title column gets the rest, one word per line; and
+   the slider, a grid item in that same 1fr column with no min-width:0, keeps
+   its own width and paints over the toggle. One column instead: title, the
+   card under it, the slider across the whole row (a wider track for a
+   finger), then the toggle. */
+@media(max-width:680px){{
+.lbhead{{grid-template-columns:minmax(0,1fr);
+grid-template-areas:"title" "hero" "slider" "toggle"}}
+.lbsub{{max-width:none}}
+.lbheroes>.lbscore{{justify-self:start;text-align:left;max-width:none}}
+.lbhead>.lbwf{{justify-self:stretch}}
+.lbhead>.lbwf .wfslider{{flex:1 1 auto;width:auto}}}}
 .lbcta{{flex:0 0 auto;font-size:13px;font-weight:700;color:#fff;
 font-family:'Space Mono',ui-monospace,monospace;
 background:var(--ac);border:none;border-radius:8px;padding:8px 14px;
@@ -634,19 +648,19 @@ font-size:13.5px}}
 .cmrow:hover .cmname{{text-decoration:underline}}
 .cmrow .cmname{{color:var(--ac);font-family:var(--mono,monospace)}}
 .cmrow .cmeff{{font-variant-numeric:tabular-nums;color:var(--mut)}}
-/* phones: show every metric column (codes/frontier/exact/kd2n) instead of
-   hiding the right-hand ones. The list scrolls horizontally as one unit; rows
-   share a min-width so the columns stay aligned row-to-row while scrolling. */
-@media(max-width:680px){{.lbm{{width:64px}}
-.lblist{{overflow-x:auto}}
-/* A handle wider than its column painted over the codes count beside it: the
-   name had a min-width but nothing that made a long one yield, and the metric
-   columns are flex:0 0 auto, so they never gave way (issue #2233). The name
-   gets a real column inside the row's scroll width, and any handle breaks
-   rather than overflowing. */
-.lbrow{{min-width:560px}}
-.lbnamewrap{{min-width:150px;overflow-wrap:anywhere}}
-.lbname{{min-width:0}}}}
+/* Phones: every metric column stays (codes/frontier/exact/kd2n, issue #172),
+   on a second line of the row. The earlier form, a 560px row scrolling
+   sideways inside the card, showed up as clipped columns on a phone (issue
+   #3762). The name takes exactly what is left of the first line after the
+   rank and the avatar (20 + 34 and two 14px gaps), so the metrics always
+   wrap, and they divide the second line equally, which is wide enough for
+   the "on frontier" label at 375px. A long handle breaks inside its line
+   instead of painting over a neighbor (issue #2233). */
+@media(max-width:680px){{
+.lbrow{{flex-wrap:wrap;row-gap:6px;padding:10px 16px}}
+.lbnamewrap{{flex:0 0 calc(100% - 82px);overflow-wrap:anywhere}}
+.lbm{{flex:1 1 0;width:auto}}
+.lblist{{max-height:290px}}}}
 .how{{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:40px 0}}
 .how .card{{border:1px solid var(--ln);border-radius:12px;padding:20px;
 background:var(--soft);display:block;color:inherit;text-decoration:none}}
