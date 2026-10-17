@@ -91,3 +91,61 @@ def test_write_repro_manifest_without_a_recipe_is_honest(tmp_path):
     assert m["stages"]["construction"]["status"] == "not_reproducible"
     assert "recipe" in m["stages"]["construction"]["reason"]
     assert m["stages"]["circuits"]["status"] == "not_applicable"
+
+
+# -- the recipe kept beside a staged candidate (issue #2955, item 3) ---------
+#
+# `save_submission(doc, path, spec=...)` keeps the spec as `<stem>.recipe.json`
+# beside the candidate, and `promote.py` turns it into `repro/<slug>.json` for
+# the committed entry. What is pinned here: the sidecar round-trips, says
+# whether the spec is a recipe, and is absent rather than empty when no spec
+# was given.
+
+import pytest  # noqa: E402
+from submit import RECIPE_SUFFIX, read_recipe, recipe_path, save_submission  # noqa: E402
+
+
+def _board_doc():
+    return json.load(open(os.path.join(ROOT, "codes", "144-12-12.json")))
+
+
+def test_save_submission_keeps_the_spec_beside_the_candidate(tmp_path):
+    path = str(tmp_path / "144-12-12.json")
+    spec = {**GROSS, "family": "bivariate-bicycle"}
+    assert save_submission(_board_doc(), path, spec=spec) == []
+    side = recipe_path(path)
+    assert side == str(tmp_path / f"144-12-12{RECIPE_SUFFIX}") and os.path.exists(side)
+    rec = json.load(open(side))
+    assert rec["slug"] == "144-12-12" and rec["candidate"] == "144-12-12.json"
+    assert rec["reproducible"] is True and rec["spec"] == spec
+    assert read_recipe(path) == spec
+
+
+def test_a_spec_without_a_recipe_is_kept_and_says_so(tmp_path):
+    path = str(tmp_path / "144-12-12.json")
+    save_submission(_board_doc(), path, spec={"note": "hand-built"})
+    assert json.load(open(recipe_path(path)))["reproducible"] is False
+    assert read_recipe(path) == {"note": "hand-built"}
+
+
+def test_without_a_spec_nothing_is_kept(tmp_path):
+    path = str(tmp_path / "144-12-12.json")
+    save_submission(_board_doc(), path)
+    assert not os.path.exists(recipe_path(path)) and read_recipe(path) is None
+
+
+def test_a_spec_must_be_a_json_object_and_the_document_is_written_first(tmp_path):
+    path = str(tmp_path / "144-12-12.json")
+    with pytest.raises(TypeError, match="JSON object"):
+        save_submission(_board_doc(), path, spec="bb(12, 6)")
+    assert os.path.exists(path) and not os.path.exists(recipe_path(path))
+
+
+def test_a_malformed_sidecar_reads_as_absent(tmp_path):
+    path = str(tmp_path / "144-12-12.json")
+    with open(recipe_path(path), "w") as f:
+        f.write("{not json")
+    assert read_recipe(path) is None
+    with open(recipe_path(path), "w") as f:
+        json.dump({"recipe_version": "1", "spec": "a string"}, f)
+    assert read_recipe(path) is None
