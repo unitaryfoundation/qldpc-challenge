@@ -4084,6 +4084,7 @@
   ],
   "date": "2026-08-05",
   "notes": "",
-  "model": "Deepseek V4 Flash 0731"
+  "model": "Deepseek V4 Flash 0731",
+  "novelty": "known_parameters"
  }
 }

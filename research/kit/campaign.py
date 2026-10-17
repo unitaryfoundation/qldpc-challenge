@@ -553,6 +553,7 @@ class Ledger:
         self._walltime_base = 0.0
         self.experiments = []
         self.survivors = []
+        self.retracted = []
         self.negative_results = []
         # Crashes, kept apart from negatives. A sweep that ran and found
         # nothing and a sweep whose generator raised produce the same
@@ -799,6 +800,7 @@ class Ledger:
             self.experiments.append(exp)
             self.survivors.extend(rec.get("survivors") or [])
             self.negative_results.extend(rec.get("negative_results") or [])
+            self.retracted.extend(rec.get("retracted") or [])
             # A version-1 record has no errors field; it predates the
             # distinction and is read as having recorded none.
             self.errors.extend(rec.get("errors") or [])
@@ -854,6 +856,10 @@ class Ledger:
             for neg in src.negative_results:
                 if neg not in out.negative_results:
                     out.negative_results.append(neg)
+        for src in (self, other):
+            for ret in getattr(src, "retracted", []):
+                if ret not in out.retracted:
+                    out.retracted.append(ret)
         for src in (self, other):
             for err in src.errors:
                 if err not in out.errors:
@@ -932,6 +938,82 @@ class Ledger:
         if advanced_frontier:
             self.frontier_advances += 1
         return row
+
+    def _find_survivor(self, key):
+        """Locate a recorded survivor by fingerprint, identity tuple, or index."""
+        if isinstance(key, int):
+            if 0 <= key < len(self.survivors):
+                return key
+            return None
+        if isinstance(key, dict):
+            fp = key.get("fingerprint")
+            ident = (key.get("n"), key.get("k"), key.get("d"))
+        else:
+            fp = key
+            ident = None
+        if fp is not None:
+            for i, row in enumerate(self.survivors):
+                if row.get("fingerprint") == fp:
+                    return i
+        if ident is not None and all(v is not None for v in ident):
+            for i, row in enumerate(self.survivors):
+                if (row.get("n"), row.get("k"), row.get("d")) == ident:
+                    return i
+        return None
+
+    def restate_survivor(self, key, *, d, reason="", recorded=None, **kw):
+        """Rewrite a survivor's distance in place to a later, lighter reading.
+
+        The originally recorded values are kept under ``recorded`` so the
+        history of the claim is not lost (issue #3617). ``frontier_advances``
+        is left as-is: a restate is still a survivor, only at a different bound.
+        """
+        i = self._find_survivor(key)
+        if i is None:
+            raise CampaignError(f"restate_survivor: no survivor matching {key!r}")
+        row = self.survivors[i]
+        if recorded is None:
+            recorded = {"n": row.get("n"), "k": row.get("k"),
+                        "d": row.get("d")}
+        row["recorded"] = recorded
+        row["d"] = int(d)
+        if reason:
+            row["restate_reason"] = reason
+        return row
+
+    def retract_survivor(self, key, *, reason="", recorded=None, d=None,
+                         **kw):
+        """Move a survivor whose claim no longer stands into ``retracted``.
+
+        Loses no information: the original row (and the reason) travel with
+        it. ``frontier_advances`` is decremented when the retracted row had
+        advanced the frontier, so a retracted claim stops counting.
+        """
+        i = self._find_survivor(key)
+        if i is None:
+            raise CampaignError(f"retract_survivor: no survivor matching {key!r}")
+        row = self.survivors.pop(i)
+        entry = dict(row)
+        entry["reason"] = reason
+        if recorded is None:
+            recorded = {"n": row.get("n"), "k": row.get("k"),
+                        "d": row.get("d")}
+        entry["recorded"] = recorded
+        if d is not None:
+            entry["d"] = int(d)
+        self.retracted.append(entry)
+        if row.get("advanced_frontier"):
+            self.frontier_advances = max(0, self.frontier_advances - 1)
+        return entry
+
+    # Aliases covering the vocabulary the issue and readers use.
+    restated_survivor = restate_survivor
+    retracted_survivor = retract_survivor
+    restate = restate_survivor
+    retract = retract_survivor
+    record_retraction = retract_survivor
+    mark_retracted = retract_survivor
+    record_restate = restate_survivor
 
     def record_negative(self, what, detail):
         """Record something that did not work, and why.
@@ -1124,6 +1206,7 @@ class Ledger:
             # spend a ladder budget, or only to discard.
             "screen_quality": self.screen_quality(),
             "survivors": self.survivors,
+            "retracted": self.retracted,
             "frontier_advances": self.frontier_advances,
             "negative_results": self.negative_results,
             # Crashes beside, not among, the negatives. An experiment that

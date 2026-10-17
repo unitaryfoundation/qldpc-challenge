@@ -497,7 +497,11 @@
   "origin": "submission",
   "date": "2026-08-04",
   "model": "Claude Opus 4.8",
-  "notes": "Layout certification: a verifier-accepted honest bilayer layout (stacked 4x7 grid, 2 qubits per site, layers=2, measured interaction radius ~6.708) was found by @mathysrennela (Aug 2026). It earns the code the local-2d-bilayer class and makes the site's geometric efficiency g = 4kd^2/(n rho^2 r^4) computable. Co-authored by @mathysrennela for this layout contribution; code authorship shared with @vprusso."
+  "notes": "Layout certification: a verifier-accepted honest bilayer layout (stacked 4x7 grid, 2 qubits per site, layers=2, measured interaction radius ~6.708) was found by @mathysrennela (Aug 2026). It earns the code the local-2d-bilayer class and makes the site's geometric efficiency g = 4kd^2/(n rho^2 r^4) computable. Co-authored by @mathysrennela for this layout contribution; code authorship shared with @vprusso.",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to 2bga:SmallGroup(28,1):a[4]:b[2,7,17]; research/provenance/derived.json)"
+  ]
  },
  "locality": {
   "coordinates": [

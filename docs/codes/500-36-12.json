@@ -4380,7 +4380,8 @@
   "date": "2026-09-14",
   "notes": "Construction family and protograph published in arXiv:2606.24808 (R3EliteP02 at t=30, reported [[1500,76,<=20]]); this entry is the same protograph at a new, smaller lift (t=10), a parameter point the paper does not tabulate; literature novelty of the parameter set unverified. Board dedup gate-checked: not an exact or WL-equivalent duplicate of any existing entry.",
   "model": "GLM 5.3 Flash",
-  "origin": "submission"
+  "origin": "submission",
+  "novelty": "known_parameters"
  },
  "family": "lifted-product"
 }

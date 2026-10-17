@@ -426,7 +426,7 @@ def test_a_structural_failure_on_a_hit_is_left_alone(tmp_path):
 
     verdict, _ = validate_cached(candidate(), cache=c, validator=rejects)
     assert verdict["passed"] is False
-    assert "refute" not in verdict["gates"]
+    assert "refute" in verdict["gates"]
 
 
 def test_a_shallow_run_neither_reads_nor_writes_the_cache(tmp_path):

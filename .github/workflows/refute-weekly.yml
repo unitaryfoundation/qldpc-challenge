@@ -19,6 +19,14 @@ name: refute-weekly
 # summary job fails unless every shard completed clean. When a shard report
 # shows "stopped by budget", add a shard here (the matrix list and SHARDS must
 # agree). A manual run can pass scope=all for the full back catalogue.
+#
+# Each shard also writes a recapture record per entry (refute_board.py
+# --recapture, issue #2897): every logical the search found at weight <= the
+# claimed distance, with the seeds and budget. The raw lines are a workflow
+# artifact (about 13 MB per sweep, too much to commit weekly); the summary job
+# folds them into research/audits/recapture/incidence.json, the per-logical
+# count of runs it was found in, and commits that. Nothing under verify/ reads
+# it; research/audits/recapture.py estimates the census from it.
 
 permissions:
   contents: read
@@ -55,19 +63,24 @@ jobs:
           --scope ${{ github.event.inputs.scope || 'records' }}
           --shard ${{ matrix.shard }}/${{ env.SHARDS }} --max-minutes 300
           --report refute-shard-${{ matrix.shard }}.json
-      - name: upload the shard report
+          --recapture refute-shard-${{ matrix.shard }}.jsonl
+      - name: upload the shard report and its recapture records
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: refute-shard-${{ matrix.shard }}
-          path: refute-shard-${{ matrix.shard }}.json
+          path: |
+            refute-shard-${{ matrix.shard }}.json
+            refute-shard-${{ matrix.shard }}.jsonl
           if-no-files-found: warn
 
   summary:
     needs: refute-board
     if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    permissions:
+      contents: write     # the incidence table under research/audits/recapture/ (#2897)
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -76,6 +89,38 @@ jobs:
           pattern: refute-shard-*
           merge-multiple: true
           path: reports
+      - name: fold the recapture records into the incidence table and commit it (race-safe)
+        # Runs whatever the shards' verdicts were: a shard that stopped at its
+        # budget still wrote a record for every entry it checked, and that is
+        # the coverage this table exists to keep. The census is advisory and
+        # goes to the step summary; the table is the only thing committed.
+        run: |
+          shopt -s nullglob
+          files=(reports/refute-shard-*.jsonl)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "no recapture records in the shard artifacts"; exit 0
+          fi
+          uv run --frozen python research/audits/recapture.py fold "${files[@]}"
+          {
+            echo "## recapture census (advisory, issue #2897)"
+            echo
+            uv run --frozen python research/audits/recapture.py report
+          } >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/audits/recapture/incidence.json
+          if git diff --cached --quiet; then
+            echo "the table did not change"; exit 0
+          fi
+          git commit -m "Weekly recapture incidence table [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"; exit 0
+            fi
+            echo "push raced; rebasing and retrying ($attempt)"
+            git fetch origin main && git rebase origin/main || exit 1
+          done
+          echo "failed to push the table after 5 attempts"; exit 1
       - name: coverage across shards (fails unless every shard completed clean)
         run: >
           uv run --frozen python verify/refute_board.py

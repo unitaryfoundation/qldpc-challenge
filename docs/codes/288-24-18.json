@@ -2949,7 +2949,11 @@
   "origin": "submission",
   "date": "2026-08-28",
   "model": "human",
-  "notes": "Reconstructed from the paper Supplementary Information; 20,000 pure-Python RIS trials per side at seed 20260828 found no lighter logical."
+  "notes": "Reconstructed from the paper Supplementary Information; 20,000 pure-Python RIS trials per side at seed 20260828 found no lighter logical.",
+  "novelty": "known_parameters",
+  "references": [
+   "arXiv:2608.08996 (Supplementary Information: the published supports)"
+  ]
  },
  "family": "lifted-product"
 }

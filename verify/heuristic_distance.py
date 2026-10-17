@@ -116,12 +116,18 @@ def _rref_perm(K, perm):
     return out
 
 
-def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None):
+def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None,
+                    capture=None):
     """RIS upper-bound search for the lightest nontrivial X-type logical: a vector
     in ker(H_Z) that anticommutes with some Z-logical. Returns (weight, witness),
     or (None, None) if the code has no logicals of this type. Stops after `trials`
     permutations or `max_seconds` wall-clock, whichever comes first (the time cap
-    keeps the CI gate bounded regardless of n)."""
+    keeps the CI gate bounded regardless of n).
+
+    ``capture`` (a ``recapture.SideSink``, issue #2897) receives every
+    nontrivial row ``consider`` sees at weight <= ``capture.threshold``. It
+    reads what the search computed anyway and never touches ``best``, so the
+    result for a given seed is the same with or without it."""
     n = HX.shape[1]
     K = gf2.kernel_basis(HZ)
     LZ = gf2.logical_basis(HX, HZ)
@@ -135,6 +141,10 @@ def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None):
         nonlocal best, wit
         w = rows.sum(1)
         nontrivial = ((rows @ LZ.T) % 2).any(1)
+        if capture is not None:
+            hits = np.where(nontrivial & (w > 0) & (w <= capture.threshold))[0]
+            if hits.size:
+                capture.add(rows[hits], w[hits])
         for i in np.where(nontrivial & (w > 0) & (w < best))[0]:
             best, wit = int(w[i]), rows[i].copy()
 
@@ -152,7 +162,8 @@ def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None):
     return best, wit
 
 
-def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None):
+def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None,
+                          capture=None):
     """Search for the lightest nontrivial logical Pauli operator, by Pauli weight.
 
     RIS upper-bound search on the stabilizer code S = (A | B). Returns
@@ -161,6 +172,7 @@ def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None):
     ris_min_logical: K = ker(B | A) is the normalizer written as Pauli
     vectors, L a logical basis of N(S) modulo S, and a candidate is nontrivial
     iff it anticommutes with some row of L, i.e. (x | z) . (L_z | L_x) = 1.
+    ``capture`` is as in ris_min_logical, by Pauli weight.
     """
     n = A.shape[1]
     S, SL = doubled_matrices(A, B)              # S = (A | B), S Lambda = (B | A)
@@ -177,6 +189,10 @@ def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None):
         nonlocal best, wit
         w = pauli_weight_rows(rows, n)
         nontrivial = ((rows @ LS.T) % 2).any(1)
+        if capture is not None:
+            hits = np.where(nontrivial & (w > 0) & (w <= capture.threshold))[0]
+            if hits.size:
+                capture.add(rows[hits], w[hits])
         for i in np.where(nontrivial & (w > 0) & (w < best))[0]:
             best, wit = int(w[i]), rows[i].copy()
 
@@ -782,7 +798,7 @@ def _merge_fold(sides, res, n):
 
 
 def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
-                         fold_trials=0):
+                         fold_trials=0, capture=None):
     """Run estimate() for a stabilizer code: one Pauli-weight side, P. The
     orbit-fold + random-frame pass (orbit_fold_min_pauli_logical) runs first
     when ``fold_trials`` > 0, under its own cap, as in the CSS path."""
@@ -795,7 +811,10 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
         fold = orbit_fold_min_pauli_logical(A, B, fold_trials, seed + 5,
                                             max_seconds=_fold_seconds(max_seconds))
         _merge_fold(sides, fold, n)
-    wP, witP = ris_min_pauli_logical(A, B, trials, seed, max_seconds=max_seconds)
+        if capture is not None and fold.get("P") is not None:
+            capture.add_vector("P", fold["P"][1], fold["P"][0])
+    wP, witP = ris_min_pauli_logical(A, B, trials, seed, max_seconds=max_seconds,
+                                     capture=capture.side("P") if capture is not None else None)
     cur = sides.get("P", {}).get("lightest_found")
     if wP is not None and (cur is None or wP < cur):
         sides["P"] = {"lightest_found": wP, "witness": pauli_witness(witP, n)}
@@ -842,14 +861,17 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
         verdict = "corroborated"
     else:
         verdict = "inconclusive"
-    return {"name": doc.get("name", ""), "claimed_d": claimed,
-            "d_heuristic": d_heur, "verdict": verdict,
-            "sides": sides, "trials": trials, "seed": seed, "method": method,
-            "fold_partitions": (fold["partitions"] + fold["frames"]) if fold else 0}
+    res = {"name": doc.get("name", ""), "claimed_d": claimed,
+           "d_heuristic": d_heur, "verdict": verdict,
+           "sides": sides, "trials": trials, "seed": seed, "method": method,
+           "fold_partitions": (fold["partitions"] + fold["frames"]) if fold else 0}
+    if capture is not None:
+        capture.result = res
+    return res
 
 
 def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
-             fold_trials=FOLD_TRIALS_DEFAULT):
+             fold_trials=FOLD_TRIALS_DEFAULT, capture=None):
     """Heuristic distance verdict for a submission `doc`.
 
     ``trials`` is the pure-Python RIS budget per side; ``fast_trials`` is the
@@ -867,10 +889,15 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
     larger budget as its own stage).
 
     A stabilizer code (code_type "stabilizer") takes _estimate_stabilizer:
-    one Pauli-weight side P, the whole budget on it."""
+    one Pauli-weight side P, the whole budget on it.
+
+    ``capture`` (a ``recapture.Capture``, issue #2897) collects every logical
+    the RIS passes see at weight <= its threshold, plus the fold pass's
+    validated find per side, and receives this function's report as
+    ``capture.result``. It changes nothing about the verdict."""
     if _is_stabilizer(doc):
         return _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
-                                    fold_trials=fold_trials)
+                                    fold_trials=fold_trials, capture=capture)
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
@@ -882,9 +909,15 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
         fold = orbit_fold_min_logical(HX, HZ, fold_trials, seed + 5,
                                       max_seconds=_fold_seconds(max_seconds))
         _merge_fold(sides, fold, n)
+        if capture is not None:
+            for side in ("X", "Z"):
+                if fold.get(side) is not None:
+                    capture.add_vector(side, fold[side][1], fold[side][0])
     half = (max_seconds / 2) if max_seconds else None       # split budget per side
-    wX, witX = ris_min_logical(HX, HZ, trials, seed, max_seconds=half)        # X (ker HZ)
-    wZ, witZ = ris_min_logical(HZ, HX, trials, seed + 1, max_seconds=half)    # Z (ker HX)
+    sink_x = capture.side("X") if capture is not None else None
+    sink_z = capture.side("Z") if capture is not None else None
+    wX, witX = ris_min_logical(HX, HZ, trials, seed, max_seconds=half, capture=sink_x)      # X (ker HZ)
+    wZ, witZ = ris_min_logical(HZ, HX, trials, seed + 1, max_seconds=half, capture=sink_z)  # Z (ker HX)
     for side, w, wit in (("X", wX, witX), ("Z", wZ, witZ)):
         cur = sides.get(side, {}).get("lightest_found")
         if w is not None and (cur is None or w < cur):
@@ -938,25 +971,31 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
     else:
         verdict = "inconclusive"     # budget too small to even reach the claimed weight
 
-    return {"name": doc.get("name", ""), "claimed_d": claimed,
-            "d_heuristic": d_heur, "verdict": verdict,
-            "sides": sides, "trials": trials, "seed": seed, "method": method,
-            "fold_partitions": fold["partitions"] if fold else 0}
+    res = {"name": doc.get("name", ""), "claimed_d": claimed,
+           "d_heuristic": d_heur, "verdict": verdict,
+           "sides": sides, "trials": trials, "seed": seed, "method": method,
+           "fold_partitions": fold["partitions"] if fold else 0}
+    if capture is not None:
+        capture.result = res
+    return res
 
 
 def refute_check(doc, seed=0, max_seconds=10.0, trials=None,
-                 fold_trials=FOLD_TRIALS_DEFAULT):
+                 fold_trials=FOLD_TRIALS_DEFAULT, capture=None):
     """CI gate. Run a bounded, time-capped RIS search and report whether it found a
     logical LIGHTER than the claimed distance. Returns (refuted, d_found, witness,
     trials). Sound (the witness is a checkable lighter logical) but not complete (a
     null result is not a proof); pure Python with a fixed seed, so deterministic and
     non-flaky. Budget is n-scaled trials under a wall-clock cap; pass ``trials`` to
-    override the default target (the CI gate scales both with code size)."""
+    override the default target (the CI gate scales both with code size).
+    ``capture`` is handed to estimate() unchanged (the weekly sweep's recapture
+    record, issue #2897); the gate never passes one."""
     n = doc["n"]
     if trials is None:
         trials = min(8000, 2500 + 40 * n)
     res = estimate(doc, trials=trials, seed=seed, fast_trials=0,
-                   max_seconds=max_seconds, fold_trials=fold_trials)
+                   max_seconds=max_seconds, fold_trials=fold_trials,
+                   capture=capture)
     claimed = int(doc["distance"]["d"])
     dh = res["d_heuristic"]
     refuted = dh is not None and dh < claimed

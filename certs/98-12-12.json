@@ -1,0 +1,30 @@
+{
+  "d": 12,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 12,
+  "name": "[[98,12,12]] two-block code over C7 x C7 (Lee, arXiv:2610.13880)",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 12 exists",
+      "secs": 1324.5,
+      "status": "UNSAT",
+      "value": 12
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 12 exists",
+      "secs": 1496.1,
+      "status": "UNSAT",
+      "value": 12
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 2400,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: kissat did not finish in 2400s"
+  }
+}

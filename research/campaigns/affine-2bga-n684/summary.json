@@ -131,7 +131,7 @@
         "weight-9plus",
         "unrestricted"
       ],
-      "d": 124,
+      "d": 111,
       "fingerprint": "2ecee93c299fd227",
       "k": 4,
       "labels": [
@@ -139,7 +139,12 @@
         "literature novelty UNVERIFIED"
       ],
       "n": 684,
-      "weight_class": "weight-9plus"
+      "weight_class": "weight-9plus",
+      "recorded": {
+        "n": 684,
+        "k": 4,
+        "d": 124
+      }
     }
   ]
 }

@@ -255,7 +255,28 @@ def _abandon_is_proven_safe(facts):
             and not facts["frontier_flagged"])
 
 
-def apply_verdict(brief, verdict=None, *, budget_remaining=None):
+def harness_override(action, facts, *, level=0, n_levels=2):
+    """The deterministic no-verdict policy promoted from ab_escalation_gate.
+
+    Returns ``(action, reason_or_None)``. It never widens a fence: the only
+    abandon it emits is one ``_abandon_is_proven_safe`` already licenses.
+    """
+    flat = facts["flat_fresh_rungs_at_best"]
+    if flat < MIN_FLAT_RUNGS:
+        return action, None
+    if action != "abandon-ladder" and _abandon_is_proven_safe(facts):
+        return "abandon-ladder", ("harness: ladder proven below bar (bound "
+                                  "can only fall), abandoning on its own "
+                                  "authority")
+    if action == "hold-deepen" and level < n_levels - 1:
+        return "promote-next-rung", (
+            f"harness: bound settled over {MIN_FLAT_RUNGS} fresh rungs, "
+            "advancing depth on its own authority")
+    return action, None
+
+
+def apply_verdict(brief, verdict=None, *, budget_remaining=None, level=None,
+                  n_levels=None):
     """Enforce the policy: turn a brief + verdict into an audited decision.
 
     The fences, in order of authority:
@@ -281,10 +302,22 @@ def apply_verdict(brief, verdict=None, *, budget_remaining=None):
     advisories = []
 
     if parsed is None:
-        return {"action": "hold-deepen",
-                "reason": "no parsable verdict; default holds and deepens",
-                "confidence": None, "escaped": False, "brief_id": brief["id"],
-                "advisories": ["no-verdict"]}
+        action = "hold-deepen"
+        advisories = ["no-verdict"]
+        if level is None:
+            level = 0
+        if n_levels is None:
+            n_levels = 2
+        new_action, why = harness_override(action, facts, level=level,
+                                          n_levels=n_levels)
+        reason = "no parsable verdict; default holds and deepens"
+        if why:
+            action = new_action
+            reason = reason + "; " + why
+        # Confidence is unknown without a verdict; keep the no-verdict advisory.
+        return {"action": action, "reason": reason, "confidence": None,
+                "escaped": False, "brief_id": brief["id"],
+                "advisories": advisories}
     action, conf, escaped = parsed
 
     if escaped:
