@@ -1095,14 +1095,13 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 5,
+    "value": 4,
     "confidence": "upper_bound",
     "witness": [
-     478,
-     487,
-     2665,
-     2675,
-     4935
+     11120,
+     11122,
+     14809,
+     14811
     ]
    },
    "X": {
