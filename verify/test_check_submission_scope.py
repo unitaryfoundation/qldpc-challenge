@@ -174,3 +174,81 @@ def test_the_trust_boundary_message_still_wins_over_the_surface_message(tmp_path
         {"codes/x-1-1.json": '{"n": 1}', "verify/qldpc_verify.py": "x = 2\n"})
     assert S.main(["--root", root, "--base", base]) == 1
     assert "verifier-critical" in capsys.readouterr().out
+
+
+# -- the shape of repro/ (issue #3810) --------------------------------------
+#
+# Two submission PRs (#3706, #3707) each put a working tree under
+# repro/<slug>/: a README, scripts, three C++ checkers, and a results/
+# directory of compile receipts, captured stdout and stderr, and exported
+# columns, 40-odd files for one entry. repro/ was admitted as a whole, so the
+# surface rule passed them. Under repro/ a submission carries only the
+# manifest of its own entry, repro/<slug>.json, the one file qldpc reproduce
+# and the reproduce workflow read.
+
+BUNDLE = {
+    "repro/x-1-1/README.md": "# evidence\n",
+    "repro/x-1-1/reproduce.py": "print(1)\n",
+    "repro/x-1-1/results/compile-checker.receipt.json": "{}",
+    "repro/x-1-1/results/run-ris.stdout": "",
+    "repro/x-1-1/results/run-ris.stderr": "",
+    "repro/x-1-1/fresh-candidate-binding/X-columns.txt": "0 1 2\n",
+}
+
+
+def test_under_repro_only_the_entrys_own_manifest_passes():
+    slugs = {"x-1-1"}
+    assert S.misplaced_repro(
+        ["codes/x-1-1.json", "notes/x-1-1.md", "repro/x-1-1.json"], slugs) == []
+    assert S.misplaced_repro(sorted(BUNDLE), slugs) == sorted(BUNDLE)
+    # a manifest, but for an entry this PR does not touch
+    assert S.misplaced_repro(["repro/y-2-2.json"], slugs) == ["repro/y-2-2.json"]
+    # not a manifest: the wrong extension, or the right name one level down
+    assert S.misplaced_repro(["repro/x-1-1.md", "repro/x-1-1/x-1-1.json"], slugs) \
+        == ["repro/x-1-1.md", "repro/x-1-1/x-1-1.json"]
+    # a removal is never refused
+    gone = "repro/x-1-1/results/run-ris.stdout"
+    assert S.misplaced_repro([gone], slugs, deleted={gone}) == []
+
+
+def test_an_evidence_directory_riding_on_a_submission_is_refused(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
+        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n", **BUNDLE})
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "not its entry's manifest" in out
+    listed = out.split("Not a manifest of this PR's entry:")[1]
+    for p in BUNDLE:
+        assert p in listed
+    assert "codes/x-1-1.json" not in listed and "notes/x-1-1.md" not in listed
+
+
+def test_a_manifest_for_another_entry_is_refused(tmp_path):
+    root, base = _repo(
+        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
+        {"codes/x-1-1.json": '{"n": 1}', "repro/y-2-2.json": "{}"})
+    assert S.main(["--root", root, "--base", base]) == 1
+
+
+def test_a_circuit_tier_may_carry_its_entrys_manifest(tmp_path):
+    # circuits/<slug>/ is code data for <slug>, so the manifest binds to it too
+    root, base = _repo(
+        tmp_path, {"codes/x-1-1.json": '{"n": 1}'},
+        {"circuits/x-1-1/memory_x.stim": "H 0\n", "repro/x-1-1.json": "{}"})
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
+def test_an_entry_may_leave_with_its_evidence_directory(tmp_path):
+    had = {"codes/x-1-1.json": '{"n": 1}', "repro/x-1-1.json": "{}",
+           "repro/x-1-1/deep-search.json": "{}"}
+    root, base = _repo(tmp_path, had, {p: None for p in had})
+    assert set(S.deleted_files(base, root)) == set(had)
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
+def test_evidence_under_repro_without_code_data_is_not_a_submission(tmp_path):
+    # the same bundle in a PR with no code data is reviewed as code, like a
+    # research/ change; the surface rules apply to submissions only
+    root, base = _repo(tmp_path, {"codes/x-1-1.json": '{"n": 1}'}, BUNDLE)
+    assert S.main(["--root", root, "--base", base]) == 0

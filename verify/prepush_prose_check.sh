@@ -1,9 +1,12 @@
 #!/bin/sh
-# Pre-push prose gate: reproduce CI's view of a submission branch before pushing.
+# Pre-push gate: reproduce CI's view of a submission branch before pushing.
 #
 # CI checks the PR body and changed notes against a tree containing ONLY
 # committed files. This script runs the check inside a clean worktree of
-# HEAD, so it fails exactly when CI would.
+# HEAD, so it fails exactly when CI would. It first runs the submission
+# scope check (one new code, nothing outside the submission surface, and
+# under repro/ only the entry's own manifest), which diffs committed content
+# against the base and so already sees what CI will.
 #
 # Usage: [BASE=<remote>/main] [PR_AUTHOR=<login>] verify/prepush_prose_check.sh <pr-body-file>
 #   The PR body must be given as a file; pass /dev/null if you have none yet.
@@ -98,6 +101,10 @@ if [ -n "$PR_AUTHOR" ]; then
 fi
 
 echo "base: $BASE ($(git rev-parse --short "$BASE"))"
+
+# Scope first: it is cheap, and a stray file under research/ or a directory
+# under repro/ is a different fix from a broken citation (issue #3810).
+"$PY" "$ROOT/verify/check_submission_scope.py" --base "$BASE"
 
 # No exec here: exec would skip the EXIT trap and leak the worktree.
 if [ -z "$CHANGED" ]; then

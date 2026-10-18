@@ -187,10 +187,12 @@ community's current frontier of knowledge, and `./qldpc screened --family
 went.
 
 Then open a pull request adding only your file under `codes/`, plus its
-`notes/` file and, if you have them, a fieldnote, its `repro/` manifest, or its
-`certs/` certificate. Nothing else rides along: a script under `research/` that
-the note cites goes in its own PR first, so the citation resolves. CI enforces
-that surface and **one new code per PR**: each frontier submission gets a deep,
+`notes/` file and, if you have them, a fieldnote, its `repro/<slug>.json`
+manifest, or its `certs/` certificate. Nothing else rides along: a script under
+`research/` that the note cites goes in its own PR first, so the citation
+resolves, and run output (receipts, captured stdout, exported matrices) does
+not go in the tree at all; under `repro/` the manifest is the only file. CI
+enforces that surface and **one new code per PR**: each frontier submission gets a deep,
 ~10-minute refutation search, and that budget is per code. CI re-runs the
 verifier; a green check is required to merge. Open the PR from your own account:
 CI checks that the PR author is one of the code's `@handle` authors, so list
@@ -417,7 +419,8 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    verify/prepush_prose_check.sh <body.md>. The local check reads your
    working tree, where uncommitted files exist; CI reads only committed
    files, and the script re-runs the check in a clean worktree of HEAD, so it
-   fails exactly when CI would. In a fork, add the canonical repository as
+   fails exactly when CI would. It also runs the submission scope check
+   against the same base. In a fork, add the canonical repository as
    `upstream` first (git remote add upstream
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.

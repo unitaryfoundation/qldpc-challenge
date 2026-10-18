@@ -143,7 +143,10 @@ verify/prepush_prose_check.sh <pr-body.md>
 ```
 
 It re-runs the check inside a clean worktree of HEAD (committed content only), which fails
-exactly when CI would. It must exit 0 before the push. Treat this as part of pushing, not
+exactly when CI would, and it runs the submission scope check first: a submission PR
+carries the entry, its note, and at most its `repro/<slug>.json` manifest, so a stray file
+under `research/` or a directory of run output under `repro/` is reported here rather than
+by CI (issue #3810). It must exit 0 before the push. Treat this as part of pushing, not
 as an optional review step — the working-tree check proves nothing about what CI sees.
 
 In a fork, `origin` is the fork, and its `origin/main` is whatever the fork last synced,

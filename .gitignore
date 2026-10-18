@@ -30,6 +30,13 @@ research/board*.json
 # conflict on every branch that claims anything.
 research/claims/
 
+# Under repro/ the tree holds one manifest per entry, repro/<slug>.json. A
+# working directory beside it (run output, receipts, exported matrices) is
+# what two submission PRs committed with `git add -A` (issue #3810); the
+# scope check refuses it on a submission PR, and this keeps it out of the
+# index in the first place. Directories already tracked stay tracked.
+repro/*/
+
 # Agent-harness scaffolding: draft PR bodies and exported session transcripts.
 # AGENTS.md requires the scaffolding deleted before review, so none of it
 # belongs in the tree.
