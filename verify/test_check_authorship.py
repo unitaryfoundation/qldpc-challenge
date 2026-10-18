@@ -86,7 +86,7 @@ def refuted(with_wp=True, found_by="@bob"):
 
 def run_rename(name, base_fname, new_fname, expect_ok, author="bob"):
     """Move codes/<base_fname> to <new_fname>, content byte-identical."""
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         git(td, "init", "-q", "-b", "main")
         write_code(td, base_fname, BASE_DOC)
         git(td, "add", "-A")
@@ -106,7 +106,7 @@ def run_case(name, edit, expect_ok, author="bob", rename=True,
     is the interesting shape for circuits/, where the claim surface moves
     outside the JSON. base_files/files are (relpath, content) written on the
     base commit and on the change."""
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=base_doc, extra=base_files)
         doc = edit() if edit is not None else None
         if doc is None:
@@ -485,7 +485,7 @@ def main():
              base_files=[("circuits/70-4-8/memory_x.stim", "# orphan\n")],
              files=[("circuits/70-4-8/memory_x.stim", "# changed\n")],
              base_doc=HAS_CIRCUIT)
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=HAS_CIRCUIT, extra=STIM)
         git(td, "rm", "-q", "codes/60-8-6.json",
             *[path for path, _ in STIM])
@@ -512,7 +512,7 @@ def main():
           "rights on the next PR):")
 
     def merged_state_case(name, followup_edit, expect_ok, merged_doc=None):
-        with tempfile.TemporaryDirectory() as td:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
             make_repo(td)                       # base on main, branch 'change'
             git(td, "checkout", "-q", "main")   # merge the binding into main
             write_code(td, "60-8-6.json", merged_doc or adds_layout())
@@ -571,7 +571,7 @@ def main():
     print("\nplain submissions (original binding):")
     def new_code():
         return copy.deepcopy(BASE_DOC)
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         write_code(td, "61-9-6.json", new_code())
         git(td, "add", "codes")
@@ -584,7 +584,7 @@ def main():
         check("new code by its author still accepted", rc == 0)
 
     print("fail closed on git failure:")
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         # a base ref that cannot resolve makes the diff fail; the check must
         # exit nonzero rather than silently passing
@@ -606,15 +606,15 @@ def main():
         return check_authorship.main(
             ["--author", "bob", "--root", td, "--base", "main"])
 
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         check("new submission with no @handle rejected",
               submit_new(td, ["Jane Roe"]) == 1)
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         check("new baseline submission with no @handle exempt",
               submit_new(td, ["Jane Roe"], origin="baseline") == 0)
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         check("new submission with only a malformed handle rejected",
               submit_new(td, ["@bad!handle"]) == 1)
@@ -972,7 +972,7 @@ def _circuit_improvement_cases():
         d["checks"]["Z"] = [[3, 4, 6]]
         d["provenance"]["construction"] = "bob's construction"
         return d
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=base, extra=stim)
         git(td, "checkout", "-q", "main")
         write_code(td, "60-8-6.json", improved()())

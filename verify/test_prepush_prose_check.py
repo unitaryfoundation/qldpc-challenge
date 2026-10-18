@@ -41,7 +41,8 @@ def fork(tmp_path):
     # The script's own tree is what check_prose.py runs from, so give the
     # repositories the verifier they will be asked to run.
     os.makedirs(up / "verify")
-    for name in ("check_prose.py", "prepush_prose_check.sh"):
+    for name in ("check_prose.py", "check_submission_scope.py",
+                 "prepush_prose_check.sh"):
         with open(os.path.join(_HERE, name), encoding="utf-8") as f:
             (up / "verify" / name).write_text(f.read(), encoding="utf-8")
     _git(up, "add", "verify")
