@@ -98,11 +98,6 @@ jobs:
           fetch-depth: 0
           path: trusted
       - uses: astral-sh/setup-uv@v5
-      # Build the optional RIS accelerator in each tree that runs searches. Best
-      # effort (continue-on-error): the python passes are the gate's baseline and
-      # run unchanged without it, so a failed build only costs the extra depth.
-      # For code PRs the gate runs from the trusted tree, so the extension is
-      # compiled from BASE-BRANCH source -- a PR cannot alter the C++ it is gated by.
       # The early exit (issue #2615). The gate and verify_all read the
       # submitted tree's codes/, circuits/, schema/ and decode/ and the trusted
       # tree's verifier stack; a digest over exactly those tree objects names
@@ -116,6 +111,9 @@ jobs:
       # digest covers the trusted tree too, so a base-branch verifier change
       # invalidates it. And the cache is scoped to this PR's own ref by
       # GitHub, so no other PR's verdict can be served here.
+      - name: trusted validation stack integrity (the autoresearch gate can't be silently weakened)
+        working-directory: submitted
+        run: uv run --frozen python verify/check_validator_integrity.py
       - name: digest of what the gate reads
         if: github.event_name == 'pull_request'
         id: digest
@@ -141,15 +139,6 @@ jobs:
           echo "nothing the gate reads changed since a run that passed on these bytes; skipping verify_all and the gate (issue #2615)" | tee -a "$GITHUB_STEP_SUMMARY"
           cat passed-verdict/marker.json | tee -a "$GITHUB_STEP_SUMMARY"
           mkdir -p receipts && cp -r passed-verdict/receipts/. receipts/ 2>/dev/null || true
-      - name: build optional refutation accelerator (trusted tree)
-        if: github.event_name == 'pull_request'
-        working-directory: trusted
-        continue-on-error: true
-        run: make fast
-      - name: build optional refutation accelerator (submitted tree)
-        working-directory: submitted
-        continue-on-error: true
-        run: make fast
       - name: detect changed code submissions
         if: github.event_name == 'pull_request'
         id: changes
@@ -266,9 +255,6 @@ jobs:
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
         run: uv run --frozen python verify/check_submission_scope.py --root ../submitted --base origin/${{ github.base_ref }}
-      - name: trusted validation stack integrity (the autoresearch gate can't be silently weakened)
-        working-directory: submitted
-        run: uv run --frozen python verify/check_validator_integrity.py
       - name: certificate levels (no cert may claim evidence it lacks)
         working-directory: submitted
         run: uv run --frozen python verify/check_certs.py
@@ -294,6 +280,27 @@ jobs:
           else
             echo "base branch has no verify/check_tree_consistency.py yet; skipping"
           fi
+      # Cheap metadata checks run BEFORE the (up to ~95-minute) refutation gate: a PR that
+      # fails one of them should not first burn a full gate run (PR #278 spent the
+      # whole gate on 18 valid layouts and then died on one authorship mismatch).
+      - name: authorship check (PR author must be a listed @handle author)
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: trusted
+        run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}
+      # Build the optional RIS accelerator in each tree that runs searches. Best
+      # effort (continue-on-error): the python passes are the gate's baseline and
+      # run unchanged without it, so a failed build only costs the extra depth.
+      # For code PRs the gate runs from the trusted tree, so the extension is
+      # compiled from BASE-BRANCH source -- a PR cannot alter the C++ it is gated by.
+      - name: build optional refutation accelerator (trusted tree)
+        if: github.event_name == 'pull_request' && steps.verdict.outputs.cache-hit != 'true'
+        working-directory: trusted
+        continue-on-error: true
+        run: make fast
+      - name: build optional refutation accelerator (submitted tree)
+        working-directory: submitted
+        continue-on-error: true
+        run: make fast
       - name: self-tests (every verify/ and research/ test_*.py; skipped for codes-only PRs)
         if: github.event_name != 'pull_request' || steps.changes.outputs.only_codes != 'true'
         working-directory: submitted
@@ -339,13 +346,6 @@ jobs:
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true') || (github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed == 'true' && steps.verdict.outputs.cache-hit != 'true')
         working-directory: submitted
         run: uv run --frozen --extra research python verify/verify_all.py
-      # Cheap metadata checks run BEFORE the (up to ~95-minute) refutation gate: a PR that
-      # fails one of them should not first burn a full gate run (PR #278 spent the
-      # whole gate on 18 valid layouts and then died on one authorship mismatch).
-      - name: authorship check (PR author must be a listed @handle author)
-        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
-        working-directory: trusted
-        run: uv run --frozen python verify/check_authorship.py --root ../submitted --author "${{ github.event.pull_request.user.login }}" --base origin/${{ github.base_ref }}
       # A completed refutation, carried between runs of the same PR (issue
       # #2633). gate_changed.py diffs against the base branch, so a PR that
       # adds a code has a non-empty diff on every push, and a push that only
