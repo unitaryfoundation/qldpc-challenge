@@ -1,0 +1,101 @@
+{
+ "schema_version": "0.1",
+ "name": "[[11,3,3]]",
+ "code_type": "CSS",
+ "n": 11,
+ "k": 3,
+ "checks": {
+  "X": [
+   [
+    2,
+    5,
+    6,
+    10
+   ],
+   [
+    1,
+    3,
+    4,
+    5,
+    7,
+    10
+   ],
+   [
+    0,
+    1,
+    2,
+    3,
+    9,
+    10
+   ],
+   [
+    3,
+    4,
+    8,
+    9
+   ]
+  ],
+  "Z": [
+   [
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    7,
+    8
+   ],
+   [
+    0,
+    3,
+    5,
+    6,
+    8
+   ],
+   [
+    0,
+    1,
+    2,
+    5,
+    8,
+    9
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    9,
+    10
+   ]
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    4,
+    7,
+    8
+   ]
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "E-GRAFT",
+  "origin": "submission",
+  "date": "2026-10-19",
+  "model": "Beam 1.0"
+ }
+}
