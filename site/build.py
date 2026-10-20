@@ -367,6 +367,10 @@ LI_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" 
            '1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C'
            '23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>')
 
+# Rows of the (n, k, LER) frontier a phone shows before its Show-all button
+# (issue #3931); the desktop list is short enough to show whole.
+LER_PHONE_ROWS = 5
+
 CSS = f"""
 :root{{--ink:#0f172a;--mut:#64748b;--ln:#d9dfe9;--ac:{ACCENT};--ex:{EXACT};
 --exb:{GREEN_BRIGHT};--dark:{DARK};--bg:#fbfbfd;--soft:#f8fafc}}
@@ -916,8 +920,9 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}}
    narrow screens (where the table sets its own min-width). */
 .boardscroll{{max-height:64vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}}
-/* "Show all" reveal for the collapsed mobile card list (issue #336);
-   desktop keeps the bounded scroll box and never needs it. */
+/* "Show all" reveal for the collapsed mobile card list (issue #336) and the
+   LER frontier list (issue #3931); desktop keeps the bounded scroll box and
+   the whole list, and never needs it. */
 .showall{{display:none}}
 /* On screens tall enough to fit plots + legend + a useful slice of the table,
    size the explorer to exactly one viewport: plots and legend keep their
@@ -949,6 +954,12 @@ padding:9px 12px 8px;background:var(--soft)}}
 font:inherit;font-size:14px;font-weight:600;color:var(--ac);
 background:var(--soft);border:1px solid var(--ln);border-radius:12px;
 cursor:pointer}}
+/* the (n, k, LER) frontier: two dozen rows of three lines each on a phone,
+   a screenful or more between the primary tracks and the board (issue
+   #3931). The first few rows, then the same Show-all reveal as the cards;
+   the list is static, so a CSS cap is safe here where the cards' was not. */
+.lerfront:not(.open) .latestlist li:nth-child(n+{LER_PHONE_ROWS + 1}){{display:none}}
+.lerfront.open .showall{{display:none}}
 .board td{{display:flex;justify-content:space-between;align-items:baseline;
 gap:16px;padding:3px 0;border:0;white-space:normal;text-align:right}}
 .board td::before{{content:attr(data-label);color:var(--mut);flex:0 0 auto;
@@ -1252,6 +1263,14 @@ document.addEventListener('click',e=>{
  // with a verified layout (f defined), 'without' = only codes with none.
  // Clicking the active button clears it back to 'all'.
  let geoMode='';
+ // The filters as the page loaded them: defaultValue is the markup's value
+ // attribute, so a browser restoring form state on reload does not move the
+ // baseline. Used by the card cap in apply().
+ function atdefault(){
+  const same=el=>!el||el.value===el.defaultValue;
+  return !q.value.trim()&&same(wlo)&&same(whi)&&same(dlo)&&same(dhi)
+   &&same(nlo)&&same(nhi)&&same(klo)&&same(khi)
+   &&!(lit&&lit.classList.contains('active'))&&geoMode==='';}
  // asym: X/Z distance asymmetry, so biased-noise candidates can
  // be pulled out by a threshold of the reader's choosing until the board
  // defines a label for them.
@@ -1352,13 +1371,20 @@ document.addEventListener('click',e=>{
   board.classList.toggle('showroute',
    (rtog&&rtog.classList.contains('active'))||(!!cellTok&&anyRoute));
   // Collapse only the unfiltered mobile card list; any narrowing shows every
-  // match (some may sit past the cap). Walk current DOM order, not the static
-  // rows array, so a sorted board collapses to its first cards, not its
-  // original ones. Chart dots key off vis, so capped cards stay plotted.
-  const capped=showall&&cardsmq.matches&&!allcards&&shown===rows.length;
+  // match (some may sit past the cap). Unfiltered is every row shown, or the
+  // filters as the page loaded them: the weight slider starts at
+  // BOARD_DEFAULT_W (#2132), so the loaded view already hides rows and the
+  // every-row test alone never held at load, which put every card within
+  // the default weight on a phone (issue #3931). Walk current DOM order,
+  // not the static rows array, so a sorted board collapses to its first
+  // cards, not its original ones. Chart dots key off vis, so capped cards
+  // stay plotted.
+  const capped=showall&&cardsmq.matches&&!allcards
+   &&(shown===rows.length||atdefault());
   if(capped){let ci=0;board.querySelectorAll('tbody tr').forEach(r=>{
    if(r.style.display===''&&++ci>CARDCAP)r.style.display='none';});}
-  if(showall)showall.style.display=capped?'':'none';
+  if(showall){showall.style.display=capped?'':'none';
+   if(capped)showall.textContent='Show all '+shown+' codes';}
   if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
   var chip=document.getElementById('qchip');
   if(chip){var f=q.value.trim();
@@ -4826,7 +4852,9 @@ def ler_frontier_panel(entries, lrec):
     """The (n, k, LER) frontier as a list, lowest measured rate
     first. Separate from the primary tracks: those rank by kd^2/n over the
     (n, k, d, w) frontier, this one ignores d and w and ranks by what a
-    device-like simulation measured."""
+    device-like simulation measured. On a phone the list shows its first
+    LER_PHONE_ROWS rows behind a Show-all button (issue #3931); the CSS
+    does the capping, the button only opens the section."""
     if not lrec:
         return ""
     measured = [e for e in entries if e["ler"] is not None]
@@ -4855,6 +4883,13 @@ def ler_frontier_panel(entries, lrec):
     where = "; ".join(f'p = {p:g}' for p, _ in settings)
     decs = sorted({dec for _, dec in settings if dec})
     where += " with decoder " + ", ".join(html.escape(d) for d in decs) if decs else ""
+    more = ""
+    if len(rows) > LER_PHONE_ROWS:
+        more = ('<button type=button class="showall lershow">'
+                f'Show all {len(rows)} codes</button>'
+                '<script>(function(){var s=document.getElementById("lerfront"),'
+                'b=s&&s.querySelector(".lershow");if(b)b.addEventListener('
+                '"click",function(){s.classList.add("open");});})();</script>')
     return ('<section class="latest lerfront" id=lerfront>'
             '<h2 class=track>Logical error rate frontier '
             f'<span class=tcount>&middot; {len(rows)} of {len(measured)} '
@@ -4872,7 +4907,7 @@ def ler_frontier_panel(entries, lrec):
             'independent of the (n, k, d, w) frontier that awards the '
             'record star, and the rows below carry the <span class=lerchip>'
             'LER record</span> chip in the table.</p>'
-            f'<ol class=latestlist>{"".join(rows)}</ol></section>')
+            f'<ol class=latestlist>{"".join(rows)}</ol>{more}</section>')
 
 
 # Default upper bound of the Codes weight slider; see
@@ -5560,8 +5595,10 @@ def build():
     # the records climbing, the leaderboard shows who set them
     P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
-    P.append(ler_frontier_panel(entries, lrec))
-    # the other board, in plain sight above the table it is kept apart from
+    # the other board, right after the primary tracks it is the counterpart
+    # of and above the two CSS-only rankings it is kept apart from. It used
+    # to follow the LER frontier, which on a phone is a screenful or more
+    # (issue #3931).
     ns = len(stab_entries)
     P.append('<div class=xboard>'
              f'<span><b>General (non-CSS) stabilizer codes</b> rank on their own '
@@ -5570,6 +5607,8 @@ def build():
              'entries below.</span>'
              '<a class=lbcta href="stabilizer.html">Stabilizer board &rarr;</a>'
              '</div>')
+    # the LER frontier directly above the table whose rows carry its chip
+    P.append(ler_frontier_panel(entries, lrec))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
     P.append(charts_block(entries, records))
