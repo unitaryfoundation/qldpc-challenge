@@ -235,13 +235,21 @@ def build_stabilizer_submission(A, B, args):
             "P": {"value": int(dP), "confidence": "upper_bound",
                   "witness": hd.pauli_witness(witP, n)}}
     prov = {"authors": args.authors,
-            "construction": args.construction or "contributed via qldpc submit",
+            "construction": (args.construction
+                             or (getattr(args, "_draft", None) or {}).get(
+                                 "provenance", {}).get("construction")
+                             or "contributed via qldpc submit"),
             "origin": "submission",
             "date": args.date or datetime.date.today().isoformat()}
     if args.model:
         prov["model"] = args.model
     if args.notes:
         prov["notes"] = args.notes
+    elif (getattr(args, "_draft", None) or {}).get("provenance", {}).get("notes"):
+        prov["notes"] = (args._draft["provenance"]["notes"])
+    _draft_refs = (getattr(args, "_draft", None) or {}).get("provenance", {}).get("references")
+    if _draft_refs and "references" not in prov:
+        prov["references"] = list(_draft_refs)
     budget = search_budget_from_args(args)
     if budget:
         prov["search_budget"] = budget
@@ -289,34 +297,51 @@ def build_submission(HX, HZ, args):
 
     # lightest logical on each side -> self-certifying distance upper bound.
     print(f"  building submission... n={n} k={k} w={wmax}", flush=True)
-    print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
-          flush=True)
-    dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
-    dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
-    if dX is None or dZ is None:
-        raise SystemExit("RIS found no logical operator on one side; "
-                         "cannot certify a distance")
-    # Let the C++ accelerator tighten the claim when it can. The Python search
-    # slows sharply with n, so on a large code it stops far above the lightest
-    # logical and the entry would claim a distance the submitter can already
-    # disprove. Anything the accelerator returns is checked by gf2 before it is
-    # used, and it is only adopted when it is strictly lighter.
-    if hd._fast is not None and args.fast_trials > 0:
-        print(f"  accelerator pass ({args.fast_trials} trials)...", flush=True)
-        wf, side, sup = hd._fast.distance_rand_witness(
-            HX, HZ, args.fast_trials, args.seed, 8, 8)
-        if wf is not None and side in ("X", "Z"):
-            v = np.zeros(n, dtype=np.int8)
-            v[list(sup)] = 1
-            H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
-            cur = dX if side == "X" else dZ
-            if int(v.sum()) < cur and hd._valid_logical(v, H_ker, H_row):
-                if side == "X":
-                    dX, witX = int(v.sum()), v
-                else:
-                    dZ, witZ = int(v.sum()), v
-                print(f"    accelerator tightened d_{side} to {int(v.sum())}",
+    reuse = getattr(args, "reuse_witnesses", False)
+    draft = getattr(args, "_draft", None)
+    reused = False
+    if reuse and isinstance(draft, dict):
+        dx = (draft.get("distance") or {}).get("X", {}).get("value")
+        dz = (draft.get("distance") or {}).get("Z", {}).get("value")
+        wx = (draft.get("distance") or {}).get("X", {}).get("witness")
+        wz = (draft.get("distance") or {}).get("Z", {}).get("witness")
+        if dx is not None and dz is not None and wx and wz:
+            witX = np.zeros(n, dtype=np.int8)
+            witX[list(wx)] = 1
+            witZ = np.zeros(n, dtype=np.int8)
+            witZ[list(wz)] = 1
+            # re-check validity against the rebuilt matrices
+            if (hd._valid_logical(witX, HZ, HX) and hd._valid_logical(witZ, HX, HZ)
+                    and int(witX.sum()) == int(dx) and int(witZ.sum()) == int(dz)):
+                dX, dZ = int(dx), int(dz)
+                reused = True
+                print(f"  reusing staged witnesses: d_X<={dX}, d_Z<={dZ}",
                       flush=True)
+    if not reused:
+        print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
+              flush=True)
+        dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
+        dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
+        if dX is None or dZ is None:
+            raise SystemExit("RIS found no logical operator on one side; "
+                             "cannot certify a distance")
+        # Let the C++ accelerator tighten the claim when it can.
+        if hd._fast is not None and args.fast_trials > 0:
+            print(f"  accelerator pass ({args.fast_trials} trials)...", flush=True)
+            wf, side, sup = hd._fast.distance_rand_witness(
+                HX, HZ, args.fast_trials, args.seed, 8, 8)
+            if wf is not None and side in ("X", "Z"):
+                v = np.zeros(n, dtype=np.int8)
+                v[list(sup)] = 1
+                H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
+                cur = dX if side == "X" else dZ
+                if int(v.sum()) < cur and hd._valid_logical(v, H_ker, H_row):
+                    if side == "X":
+                        dX, witX = int(v.sum()), v
+                    else:
+                        dZ, witZ = int(v.sum()), v
+                    print(f"    accelerator tightened d_{side} to {int(v.sum())}",
+                          flush=True)
     d = min(dX, dZ)
     print(f"  distance (RIS upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
           flush=True)
@@ -329,13 +354,21 @@ def build_submission(HX, HZ, args):
               "witness": sorted(int(q) for q in np.where(witZ)[0])},
     }
     prov = {"authors": args.authors,
-            "construction": args.construction or "contributed via qldpc submit",
+            "construction": (args.construction
+                             or (getattr(args, "_draft", None) or {}).get(
+                                 "provenance", {}).get("construction")
+                             or "contributed via qldpc submit"),
             "origin": "submission",
             "date": args.date or datetime.date.today().isoformat()}
     if args.model:
         prov["model"] = args.model
     if args.notes:
         prov["notes"] = args.notes
+    elif (getattr(args, "_draft", None) or {}).get("provenance", {}).get("notes"):
+        prov["notes"] = (args._draft["provenance"]["notes"])
+    _draft_refs = (getattr(args, "_draft", None) or {}).get("provenance", {}).get("references")
+    if _draft_refs and "references" not in prov:
+        prov["references"] = list(_draft_refs)
     budget = search_budget_from_args(args)
     if budget:
         prov["search_budget"] = budget
@@ -968,6 +1001,7 @@ def cmd_submit(args):
                   if cz is not None else np.loadtxt(args.coords))
         coords = np.asarray(coords, dtype=float)
     args._coords = coords
+    args._draft = _draft
 
     stabilizer = (_draft or {}).get("code_type") == "stabilizer"
     if stabilizer:
@@ -2466,6 +2500,9 @@ def main(argv=None):
     c.add_argument("--circuit-seed", type=int, default=0)
     s.add_argument("--trials", type=int, default=20000,
                    help="RIS trials for the distance witness search")
+    s.add_argument("--reuse-witnesses", action="store_true",
+                   help="reuse the distance witnesses already present in a "
+                   "JSON draft instead of re-running the RIS search")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")
