@@ -165,6 +165,295 @@ def _supports(H):
 
 
 # ----------------------------------------------------------------------------
+# reusing a draft's distance witnesses (--reuse-witnesses)
+# ----------------------------------------------------------------------------
+# An imported code arrives with its distance witnesses already found and
+# checked. Re-running the RIS search can replace a lighter imported witness
+# with a heavier one, so a run starts from the draft's witness and lets the
+# search replace it only with a strictly lighter one. The lighter witness is
+# the better claim, so this is the rule on every JSON re-submit.
+#
+# `--reuse-witnesses` is the strict form of the same rule: it starts from
+# the draft's witness, refuses the run when that witness cannot be used
+# (rather than searching for another one behind the user's back), and skips
+# the Python RIS search, which is the slow part on a large code. The
+# accelerator pass still runs, so the claim has the same depth behind it as
+# any other submit. The flag means "start from these", not "trust these".
+#
+# Three rules keep the reuse honest:
+#
+#   * The witness is the evidence and its weight is derived from it, so the
+#     weight comes from the witness and never from the draft's `value` field.
+#     A draft whose `value` disagrees with its witness is reported, not
+#     obeyed.
+#   * A draft whose witness cannot be used is refused (with the flag) or
+#     reported and ignored (without it), naming the side and the check that
+#     failed. There is no silent fallback: the user asked to keep the stored
+#     witness, and a fallback would hand them a different claim with nothing
+#     saying so.
+#   * The accelerator pass is not optional in reuse mode. It is the depth
+#     behind the claim -- research/kit/promote.py refuses to reuse a witness
+#     unless the ladder already spent the same budget -- so a run without it
+#     is refused rather than left with an unbacked claim.
+#
+# The reuse path preserves the witness and its weight. It does not preserve
+# the draft's `confidence` label: the document always records a
+# witness-backed `upper_bound`, which is what the draft's witness supports.
+
+# cli/qldpc.py's --fast-trials default is 2,000,000 accelerator trials shared
+# across the two sides, on top of 20,000 RIS trials per side; half of the
+# shared budget is the matching per-side depth. The same constant guards the
+# reuse path here (research/kit/promote.py: DEFAULT_MIN_DEEP_TRIALS).
+REUSE_MIN_FAST_TRIALS = 1_000_000
+
+# The keys the schema's witnessProvenance accepts, and the ones it requires.
+_WP_KEYS = ("found_by", "date", "found_at_samples", "survived_samples", "tool",
+             "seeds")
+_WP_REQUIRED = ("found_by", "date", "found_at_samples")
+
+
+class _WitnessError(ValueError):
+    """A draft's distance witness cannot be used."""
+
+
+def _reuse_index_list(side, lst, n):
+    """Return `lst` as qubit indices in [0, n), or refuse it.
+
+    An index outside the range is a message, not an IndexError: the usual
+    cause is a source that numbered its qubits from 1, and a traceback says
+    nothing about which witness was wrong.
+    """
+    if not isinstance(lst, (list, tuple)):
+        raise _WitnessError(
+            f"the {side} witness must be a list of qubit indices, got "
+            f"{type(lst).__name__}")
+    out = []
+    for idx in lst:
+        if (not isinstance(idx, (int, np.integer)) or isinstance(idx, bool)
+                or int(idx) < 0 or int(idx) >= n):
+            raise _WitnessError(
+                f"the {side} witness has index {idx!r} outside [0, {n}); this "
+                f"code's qubits are numbered from 0")
+        out.append(int(idx))
+    return out
+
+
+def _draft_claimed(draft, side):
+    """Return the draft's claimed distance value for `side`, or None."""
+    if not isinstance(draft, dict):
+        return None
+    return ((draft.get("distance") or {}).get(side) or {}).get("value")
+
+
+def _reuse_value_note(side, claimed, weight):
+    """Report a draft whose `value` disagrees with its own witness."""
+    if claimed is None or int(claimed) == int(weight):
+        return
+    print(f"  the draft's {side} value {claimed} does not match its witness "
+          f"weight {weight}; using the witness", flush=True)
+
+
+def _css_witnesses_from_draft(draft, HX, HZ, n):
+    """Return ((dX, witX, dZ, witZ), reason) from the draft's witnesses.
+
+    The witness tuple is None when the draft carries no usable witness, and
+    the reason says why, so the caller can either report it (the default
+    path, which searches anyway) or refuse the run (--reuse-witnesses,
+    where the user asked for this witness).
+    """
+    dist = draft.get("distance") or {}
+    xdoc = dist.get("X") or {}
+    zdoc = dist.get("Z") or {}
+    wx = xdoc.get("witness")
+    wz = zdoc.get("witness")
+    if wx is None and wz is None:
+        return None, ("the draft carries no distance witness "
+                      "(distance.X.witness / distance.Z.witness)")
+    if wx is None or wz is None:
+        missing = "Z" if wx is None else "X"
+        return None, (f"the draft carries a witness on one side only: "
+                      f"distance.{missing}.witness is missing")
+    try:
+        witX = np.zeros(n, dtype=np.int8)
+        for i in _reuse_index_list("X", wx, n):
+            witX[i] = 1
+        witZ = np.zeros(n, dtype=np.int8)
+        for i in _reuse_index_list("Z", wz, n):
+            witZ[i] = 1
+    except _WitnessError as e:
+        return None, str(e)
+    if not hd._valid_logical(witX, HZ, HX):
+        return None, ("the X witness is not a nontrivial logical of the "
+                      "rebuilt matrices (it does not commute with H_X, or it "
+                      "lies in the row space of H_Z)")
+    if not hd._valid_logical(witZ, HX, HZ):
+        return None, ("the Z witness is not a nontrivial logical of the "
+                      "rebuilt matrices (it does not commute with H_Z, or it "
+                      "lies in the row space of H_X)")
+    return (int(witX.sum()), witX, int(witZ.sum()), witZ), None
+
+
+def _pauli_witness_from_draft(draft, A, B, n):
+    """Return ((dP, witP), reason) from the draft's distance.P witness."""
+    pd = (draft.get("distance") or {}).get("P") or {}
+    pw = pd.get("witness")
+    if not isinstance(pw, dict):
+        return None, ("the draft carries no Pauli witness "
+                      "(distance.P.witness)")
+    try:
+        xlist = _reuse_index_list("P.X", pw.get("X") or [], n)
+        zlist = _reuse_index_list("P.Z", pw.get("Z") or [], n)
+    except _WitnessError as e:
+        return None, str(e)
+    if not xlist and not zlist:
+        return None, "the P witness is empty"
+    v = np.zeros(2 * n, dtype=np.int8)
+    for i in xlist:
+        v[i] = 1
+    for i in zlist:
+        v[n + i] = 1
+    if not hd.valid_pauli_logical(v, A, B):
+        return None, ("the P witness is not a nontrivial logical of the "
+                      "rebuilt matrices")
+    return (int(hd.pauli_weight_rows(v[None, :], n)[0]), v), None
+
+
+def _reuse_accelerator_requirement(args):
+    """Refuse a reuse run that would leave the claim without any depth.
+
+    The reused witness was found elsewhere; the depth behind the claim is
+    the accelerator pass this run makes. Skipping it (no accelerator built,
+    or `--fast-trials 0`) would file a bound with nothing behind it, which is
+    what research/kit/promote.py refuses to do.
+    """
+    if getattr(args, "reuse_witnesses", False):
+        if hd._fast is None:
+            raise SystemExit(
+                "--reuse-witnesses: the C++ accelerator is not built, so the "
+                "reused witness would be the only evidence behind the "
+                "claim; build it (make fast) or drop the flag")
+        if int(getattr(args, "fast_trials", 0)) <= 0:
+            raise SystemExit(
+                "--reuse-witnesses: --fast-trials 0 leaves the reused witness "
+                "without a deep pass behind it; give it the accelerator's "
+                "budget or drop the flag")
+        trials = int(args.fast_trials)
+        if trials < REUSE_MIN_FAST_TRIALS:
+            print(f"  --reuse-witnesses: {trials:,} accelerator trials is "
+                  f"below the {REUSE_MIN_FAST_TRIALS:,} per side that "
+                  f"research/kit/promote.py requires before it reuses a "
+                  f"witness; the claim will be thinner than a normal "
+                  f"submit's", flush=True)
+
+
+def _provenance(args, draft=None):
+    """Return the document's provenance block.
+
+    A run that reuses a draft's witnesses also keeps the draft's source
+    attribution: its construction text, its notes, its references and its
+    novelty are the description of the imported code, and a submitter who
+    re-imports it should not have to retype them. The draft is consulted
+    only in reuse mode, so an ordinary re-submit never copies someone else's
+    construction text under a new name.
+    """
+    reuse = getattr(args, "reuse_witnesses", False)
+    prov = {"authors": args.authors,
+            "construction": (args.construction
+                             or "contributed via qldpc submit"),
+            "origin": "submission",
+            "date": args.date or datetime.date.today().isoformat()}
+    if args.model:
+        prov["model"] = args.model
+    if args.notes:
+        prov["notes"] = args.notes
+    budget = search_budget_from_args(args)
+    if budget:
+        prov["search_budget"] = budget
+    if not reuse or not isinstance(draft, dict):
+        return prov
+    dprov = draft.get("provenance") or {}
+    if not args.construction and dprov.get("construction"):
+        prov["construction"] = dprov["construction"]
+    if not args.notes and dprov.get("notes"):
+        prov["notes"] = dprov["notes"]
+    refs = dprov.get("references")
+    if refs:
+        prov["references"] = list(refs)
+    novelty = dprov.get("novelty")
+    if novelty:
+        prov["novelty"] = novelty
+    elif dprov.get("origin") == "baseline" or dprov.get("references"):
+        # the draft already attributes the code to a published source, so
+        # the parameter set is in the literature by its own account. Say so
+        # rather than leaving the entry to imply a novelty claim it cannot
+        # support.
+        prov["novelty"] = "known_parameters"
+        print("  --reuse-witnesses: recording novelty: known_parameters "
+              "(the draft attributes the code to a published source)",
+              flush=True)
+    else:
+        print("  --reuse-witnesses: the draft declares no novelty; an "
+              "imported published code should carry novelty: "
+              "known_parameters", flush=True)
+    return prov
+
+
+def _reuse_witness_provenance(draft, side):
+    """Return the draft's witness_provenance for `side`, if it has one.
+
+    A block that does not fit the schema is dropped rather than written: the
+    document has to stay valid, and the block is a record of who found the
+    witness, not a claim the verifier checks.
+    """
+    if not isinstance(draft, dict):
+        return None
+    sd = (draft.get("distance") or {}).get(side) or {}
+    wp = sd.get("witness_provenance")
+    if not isinstance(wp, dict):
+        return None
+    if any(k not in _WP_KEYS for k in wp) or any(k not in wp
+                                                 for k in _WP_REQUIRED):
+        print(f"  dropping the draft's {side} witness_provenance: it does "
+              f"not fit the schema", flush=True)
+        return None
+    handles = wp.get("found_by")
+    if not (isinstance(handles, list) and handles
+            and all(isinstance(a, str) and HANDLE.fullmatch(a)
+                    for a in handles)):
+        print(f"  dropping the draft's {side} witness_provenance: "
+              f"found_by is not a list of @handles", flush=True)
+        return None
+    if not (isinstance(wp.get("date"), str)
+            and re.fullmatch(r"\d{4}-\d{2}-\d{2}", wp["date"])):
+        print(f"  dropping the draft's {side} witness_provenance: the date "
+              f"is not YYYY-MM-DD", flush=True)
+        return None
+    samples = wp.get("found_at_samples")
+    if not (isinstance(samples, int) and not isinstance(samples, bool)
+            and samples >= 1):
+        print(f"  dropping the draft's {side} witness_provenance: "
+              f"found_at_samples is not a positive integer", flush=True)
+        return None
+    return dict(wp)
+
+
+def _accelerator_witness_provenance(args):
+    """Return a witness_provenance for a witness the accelerator just found.
+
+    The draft's block describes the draft's witness, not this one, so it
+    cannot travel with it. This records the pass that produced the witness
+    that is actually in the document.
+    """
+    handles = [a for a in getattr(args, "authors", []) if HANDLE.fullmatch(a)]
+    if not handles:
+        return None
+    return {"found_by": handles,
+            "date": datetime.date.today().isoformat(),
+            "found_at_samples": int(getattr(args, "fast_trials", 0)),
+            "tool": "gf2_fast"}
+
+
+# ----------------------------------------------------------------------------
 # building the submission
 # ----------------------------------------------------------------------------
 def build_stabilizer_submission(A, B, args):
@@ -209,50 +498,41 @@ def build_stabilizer_submission(A, B, args):
     print(f"  building stabilizer submission... n={n} k={k} w={wmax}", flush=True)
     reuse = getattr(args, "reuse_witnesses", False)
     draft = getattr(args, "_draft", None)
-    reused = False
-    if reuse and isinstance(draft, dict):
-        pd = (draft.get("distance") or {}).get("P") or {}
-        pw = pd.get("witness")
-        if isinstance(pw, dict):
-            xlist = pw.get("X") or []
-            zlist = pw.get("Z") or []
-            if not (isinstance(xlist, (list, tuple))
-                    and isinstance(zlist, (list, tuple))):
-                raise SystemExit("--reuse-witnesses: P witness must be an object "
-                                 "with X/Z index lists")
-            for side, lst in (("X", xlist), ("Z", zlist)):
-                for idx in lst:
-                    if (not isinstance(idx, (int, np.integer))
-                            or isinstance(idx, bool)
-                            or int(idx) < 0 or int(idx) >= n):
-                        raise SystemExit(
-                            f"--reuse-witnesses: P witness {side} index "
-                            f"{idx!r} outside [0, {n})")
-            v = np.zeros(2 * n, dtype=np.int8)
-            for idx in xlist:
-                v[int(idx)] = 1
-            for idx in zlist:
-                v[n + int(idx)] = 1
-            if not hd.valid_pauli_logical(v, A, B):
-                raise SystemExit("--reuse-witnesses: P witness failed "
-                                 "valid_pauli_logical (not a nontrivial logical)")
-            wp = int(hd.pauli_weight_rows(v[None, :], n)[0])
-            pv = pd.get("value")
-            if pv is not None and int(pv) != wp:
-                print(f"  --reuse-witnesses: P draft value {pv} != witness "
-                      f"weight {wp}; using {wp}", flush=True)
-            dP, witP = wp, v
-            reused = True
-            print(f"  reusing staged witness: d_P<={dP}", flush=True)
-    if not reused:
+    wp_reused = None
+    dw = None
+    if isinstance(draft, dict):
+        dw, reason = _pauli_witness_from_draft(draft, A, B, n)
+        if dw is None:
+            if reuse:
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
+                                 f"to search for the witness instead")
+            print(f"  the draft's witness is not usable ({reason}); searching "
+                  f"for a witness instead", flush=True)
+    if reuse:
+        if dw is None:
+            raise SystemExit("--reuse-witnesses: the input carries no draft "
+                             "to take the witness from")
+        dP, witP = dw
+        _reuse_value_note("P", _draft_claimed(draft, "P"), dP)
+        wp_reused = _reuse_witness_provenance(draft, "P")
+        print(f"  reusing the draft's witness: d_P<={dP}", flush=True)
+    else:
         print(f"  searching for a Pauli-weight distance witness "
               f"({args.trials} RIS trials)...", flush=True)
         dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials,
                                             seed=args.seed)
+        if dw is not None and (dP is None or dw[0] < dP):
+            # the draft's witness can only be replaced by a strictly lighter
+            # one, so the document keeps the better of the two
+            _reuse_value_note("P", _draft_claimed(draft, "P"), dw[0])
+            dP, witP = dw
+            wp_reused = _reuse_witness_provenance(draft, "P")
         if dP is None:
             raise SystemExit("RIS found no logical operator; "
                              "cannot certify a distance")
     # accelerator on the symplectic doubling; runs on reused witnesses too.
+    # A reused witness that the accelerator lightens is a different witness,
+    # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
         print(f"  accelerator pass on the doubled matrices "
               f"({args.fast_trials} trials)...", flush=True)
@@ -266,36 +546,17 @@ def build_stabilizer_submission(A, B, args):
             wp = int(hd.pauli_weight_rows(v[None, :], n)[0])
             if wp < dP and hd.valid_pauli_logical(v, A, B):
                 dP, witP = wp, v
+                wp_reused = _accelerator_witness_provenance(args)
                 print(f"    accelerator tightened d to {wp}", flush=True)
-    print(f"  distance (RIS upper bound, Pauli weight) d<={dP}", flush=True)
+    print(f"  distance (witnessed upper bound, Pauli weight) d<={dP}",
+          flush=True)
 
-    dist = {"d": int(dP),
-            "P": {"value": int(dP), "confidence": "upper_bound",
-                  "witness": hd.pauli_witness(witP, n)}}
-    _draft = getattr(args, "_draft", None)
-    _draft_prov = (_draft.get("provenance") if isinstance(_draft, dict) else None) or {}
-    reuse = getattr(args, "reuse_witnesses", False)
-    _construction = args.construction
-    if not _construction and reuse:
-        _construction = _draft_prov.get("construction")
-    prov = {"authors": args.authors,
-            "construction": (_construction
-                             or "contributed via qldpc submit"),
-            "origin": "submission",
-            "date": args.date or datetime.date.today().isoformat()}
-    if args.model:
-        prov["model"] = args.model
-    if args.notes:
-        prov["notes"] = args.notes
-    elif reuse and _draft_prov.get("notes"):
-        prov["notes"] = _draft_prov["notes"]
-    if reuse:
-        _draft_refs = _draft_prov.get("references")
-        if _draft_refs:
-            prov["references"] = list(_draft_refs)
-    budget = search_budget_from_args(args)
-    if budget:
-        prov["search_budget"] = budget
+    pside = {"value": int(dP), "confidence": "upper_bound",
+             "witness": hd.pauli_witness(witP, n)}
+    if wp_reused:
+        pside["witness_provenance"] = wp_reused
+    dist = {"d": int(dP), "P": pside}
+    prov = _provenance(args, draft)
     gens = [{"X": _supports(A[i:i + 1])[0], "Z": _supports(B[i:i + 1])[0]}
             for i in range(A.shape[0])]
     doc = {
@@ -342,70 +603,49 @@ def build_submission(HX, HZ, args):
     print(f"  building submission... n={n} k={k} w={wmax}", flush=True)
     reuse = getattr(args, "reuse_witnesses", False)
     draft = getattr(args, "_draft", None)
-    reused = False
-    if reuse and isinstance(draft, dict):
-        dist = draft.get("distance") or {}
-        xdoc = dist.get("X") or {}
-        zdoc = dist.get("Z") or {}
-        wx = xdoc.get("witness")
-        wz = zdoc.get("witness")
-        if wx is not None or wz is not None:
-            if not (isinstance(wx, (list, tuple))
-                    and isinstance(wz, (list, tuple))):
-                raise SystemExit("--reuse-witnesses: X/Z witness must be a list "
-                                 "of qubit indices")
-            for side, lst in (("X", wx), ("Z", wz)):
-                for idx in lst:
-                    if (not isinstance(idx, (int, np.integer))
-                            or isinstance(idx, bool)
-                            or int(idx) < 0 or int(idx) >= n):
-                        raise SystemExit(
-                            f"--reuse-witnesses: {side} witness index "
-                            f"{idx!r} outside [0, {n})")
-            witX = np.zeros(n, dtype=np.int8)
-            for idx in wx:
-                witX[int(idx)] = 1
-            witZ = np.zeros(n, dtype=np.int8)
-            for idx in wz:
-                witZ[int(idx)] = 1
-            if not hd._valid_logical(witX, HZ, HX):
-                raise SystemExit("--reuse-witnesses: X witness failed "
-                                 "_valid_logical (not a nontrivial logical)")
-            if not hd._valid_logical(witZ, HX, HZ):
-                raise SystemExit("--reuse-witnesses: Z witness failed "
-                                 "_valid_logical (not a nontrivial logical)")
-            dx_raw = xdoc.get("value")
-            dz_raw = zdoc.get("value")
-            vx = int(witX.sum())
-            vz = int(witZ.sum())
-            if dx_raw is not None and int(dx_raw) != vx:
-                print(f"  --reuse-witnesses: X draft value {dx_raw} != "
-                      f"witness weight {vx}; using {vx}", flush=True)
-            if dz_raw is not None and int(dz_raw) != vz:
-                print(f"  --reuse-witnesses: Z draft value {dz_raw} != "
-                      f"witness weight {vz}; using {vz}", flush=True)
-            dX, dZ = vx, vz
-            reused = True
-            print(f"  reusing staged witnesses: d_X<={dX}, d_Z<={dZ}",
-                  flush=True)
-    if not reused:
-        if reuse and isinstance(draft, dict):
-            dist = draft.get("distance") or {}
-            xw = (dist.get("X") or {}).get("witness")
-            zw = (dist.get("Z") or {}).get("witness")
-            if xw is not None or zw is not None:
-                # one side present but not both: reject rather than silently drop
-                if not (xw is not None and zw is not None):
-                    raise SystemExit("--reuse-witnesses: need witnesses on both "
-                                     "X and Z sides")
+    wp_x = wp_z = None
+    dw = None
+    if isinstance(draft, dict):
+        dw, reason = _css_witnesses_from_draft(draft, HX, HZ, n)
+        if dw is None:
+            if reuse:
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
+                                 f"to search for the witnesses instead")
+            print(f"  the draft's witnesses are not usable ({reason}); "
+                  f"searching for them instead", flush=True)
+    if reuse:
+        if dw is None:
+            raise SystemExit("--reuse-witnesses: the input carries no draft "
+                             "to take the witnesses from")
+        dX, witX, dZ, witZ = dw
+        _reuse_value_note("X", _draft_claimed(draft, "X"), dX)
+        _reuse_value_note("Z", _draft_claimed(draft, "Z"), dZ)
+        wp_x = _reuse_witness_provenance(draft, "X")
+        wp_z = _reuse_witness_provenance(draft, "Z")
+        print(f"  reusing the draft's witnesses: d_X<={dX}, d_Z<={dZ}",
+              flush=True)
+    else:
         print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
               flush=True)
         dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
         dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
+        if dw is not None:
+            # the draft's witnesses can only be replaced by strictly lighter
+            # ones, so the document keeps the better of the two
+            if dX is None or dw[0] < dX:
+                _reuse_value_note("X", _draft_claimed(draft, "X"), dw[0])
+                dX, witX = dw[0], dw[1]
+                wp_x = _reuse_witness_provenance(draft, "X")
+            if dZ is None or dw[2] < dZ:
+                _reuse_value_note("Z", _draft_claimed(draft, "Z"), dw[2])
+                dZ, witZ = dw[2], dw[3]
+                wp_z = _reuse_witness_provenance(draft, "Z")
         if dX is None or dZ is None:
             raise SystemExit("RIS found no logical operator on one side; "
                              "cannot certify a distance")
     # Let the C++ accelerator tighten the claim (runs on reused witnesses too).
+    # A reused witness that the accelerator lightens is a different witness,
+    # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
         print(f"  accelerator pass ({args.fast_trials} trials)...", flush=True)
         wf, side, sup = hd._fast.distance_rand_witness(
@@ -418,50 +658,31 @@ def build_submission(HX, HZ, args):
             if int(v.sum()) < cur and hd._valid_logical(v, H_ker, H_row):
                 if side == "X":
                     dX, witX = int(v.sum()), v
+                    wp_x = _accelerator_witness_provenance(args)
                 else:
                     dZ, witZ = int(v.sum()), v
+                    wp_z = _accelerator_witness_provenance(args)
                 print(f"    accelerator tightened d_{side} to {int(v.sum())}",
                       flush=True)
     d = min(dX, dZ)
-    print(f"  distance (RIS upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
+    print(f"  distance (witnessed upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
           flush=True)
 
-    dist = {
-        "d": int(d),
-        "X": {"value": int(dX), "confidence": "upper_bound",
-              "witness": sorted(int(q) for q in np.where(witX)[0])},
-        "Z": {"value": int(dZ), "confidence": "upper_bound",
-              "witness": sorted(int(q) for q in np.where(witZ)[0])},
-    }
-    _draft = getattr(args, "_draft", None)
-    _draft_prov = (_draft.get("provenance") if isinstance(_draft, dict) else None) or {}
-    reuse = getattr(args, "reuse_witnesses", False)
-    _construction = args.construction
-    if not _construction and reuse:
-        _construction = _draft_prov.get("construction")
-    prov = {"authors": args.authors,
-            "construction": (_construction
-                             or "contributed via qldpc submit"),
-            "origin": "submission",
-            "date": args.date or datetime.date.today().isoformat()}
-    if args.model:
-        prov["model"] = args.model
-    if args.notes:
-        prov["notes"] = args.notes
-    elif reuse and _draft_prov.get("notes"):
-        prov["notes"] = _draft_prov["notes"]
-    if reuse:
-        _draft_refs = _draft_prov.get("references")
-        if _draft_refs:
-            prov["references"] = list(_draft_refs)
-    budget = search_budget_from_args(args)
-    if budget:
-        prov["search_budget"] = budget
+    xside = {"value": int(dX), "confidence": "upper_bound",
+             "witness": sorted(int(q) for q in np.where(witX)[0])}
+    zside = {"value": int(dZ), "confidence": "upper_bound",
+             "witness": sorted(int(q) for q in np.where(witZ)[0])}
+    if wp_x:
+        xside["witness_provenance"] = wp_x
+    if wp_z:
+        zside["witness_provenance"] = wp_z
+    dist = {"d": int(d), "X": xside, "Z": zside}
+    prov = _provenance(args, draft)
 
     doc = {
         # search_budget is a 0.3 feature; without it the document stays at
         # the oldest version that describes it, so older readers accept it.
-        "schema_version": "0.3" if budget else "0.1",
+        "schema_version": "0.3" if prov.get("search_budget") else "0.1",
         "name": args.name or f"[[{n},{k},{d}]]",
         "code_type": "CSS",
         "n": n, "k": int(k),
@@ -1082,9 +1303,10 @@ def cmd_submit(args):
     HX, HZ, coords, _draft = load_checks(args.code)
     if (getattr(args, "reuse_witnesses", False)
             and not (isinstance(_draft, dict) and "checks" in _draft)):
-        raise SystemExit("--reuse-witnesses: input has no JSON draft to take "
-                         "witnesses from (only .json drafts carry distance "
-                         "witnesses); drop the flag")
+        raise SystemExit("--reuse-witnesses: the input carries no JSON draft "
+                         "to take witnesses from (only a .json draft carries "
+                         "distance witnesses); drop the flag")
+    _reuse_accelerator_requirement(args)
     if args.coords:                      # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
         coords = (_pick(cz, ("coords", "coordinates", "xy"))
@@ -2591,13 +2813,18 @@ def main(argv=None):
     s.add_argument("--trials", type=int, default=20000,
                    help="RIS trials for the distance witness search")
     s.add_argument("--reuse-witnesses", action="store_true",
-                   help="reuse the distance witnesses already present in a "
-                   "JSON draft as the starting point: skip the Python RIS "
-                   "search, validate them against the rebuilt matrices, and let "
-                   "the accelerator tighten the claim. CSS drafts reuse "
-                   "distance.X/Z; stabilizer drafts reuse distance.P. Requires "
-                   "a JSON draft (rejected for .npz input). Preserves the "
-                   "witness and its weight, not an `exact` confidence label.")
+                   help="start from the distance witnesses already present in "
+                   "a JSON draft instead of searching for them again: the "
+                   "witnesses are validated against the rebuilt matrices, "
+                   "their weight is taken from the witness (a draft whose "
+                   "value disagrees is reported), and the accelerator pass "
+                   "still runs and may tighten the claim. CSS drafts reuse "
+                   "distance.X/Z, stabilizer drafts reuse distance.P. A draft "
+                   "whose witness cannot be used is refused, never replaced "
+                   "by a search. Requires a JSON draft (rejected for .npz "
+                   "input) and the accelerator pass (rejected with "
+                   "--fast-trials 0). Preserves the witness and its weight, "
+                   "not an `exact` confidence label.")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")
