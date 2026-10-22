@@ -3,6 +3,53 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/1000-407-4.html">[[1000,407,4]] — 1000-407-4</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details open><summary>note</summary><div class=notebody><h3>[[1000,407,4]] — one Z-check deletion from 1000-406-6.json (C-DELETE-CHECK b20)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 1000 &lt;= n reachable by deleting one check from 1000-406-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 4, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>1000-406-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 6]</b> with</li>
+<p>w_del = 16, w_exp = 20 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 4 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>1000-406-6.json</code> from <code>codes/</code>, remove the Z-check whose support is [14, 19, 103, 119, 200, 219, 912, 919], and set k = 407. The result is <code>codes/1000-407-4.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/1000-407-4.json
+python verify/check_codes_format.py --files codes/1000-407-4.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/1000-407-4.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/1000-407-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/110-28-10.html">[[110,28,10]] — 110-28-10</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[110,28,10]] — halved pair-partition code converted to CSS</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aim at the unrestricted / weight-9plus cell with a high-rate stabilizer code. The paper (arXiv:2610.28737) proves that among the 191 symplectically halved pair-partition entries of Lee et al. (arXiv:2609.30069) only one is LC-equivalent to CSS: the [[110,28,10]] plain-fold instance. Converting it to CSS should place a (110,28,10) code on the CSS board, where no CSS entry dominates it on (n,k,d,w).</p>
@@ -25,7 +72,406 @@
 <p>Beam 1.0 (model), OpenCode agent harness. Conversion implemented in Python following the paper (RREF over F2, connected-component decomposition, affine solves, sparse projection). Repository tooling: <code>research/kit/submit.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Parameters: J=4, L=10, P=22, voltage seed 14. Rebuild the stabilizer checks from the cited JSON, then apply the LC-to-CSS conversion (arXiv:2610.28737 Algorithm 1) to obtain H_X, H_Z. The converted supports are the submitted checks.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/110-28-10.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/854-158-2.html">[[854,158,2]] — 854-158-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details open><summary>note</summary><div class=notebody><h3>[[854,158,2]] — one Z-check deletion from 854-157-3.json (C-DELETE-CHECK b237)</h3>
+<section class=blk><h3><a href="codes/493-153-6.html">[[493,153,6]] — 493-153-6</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[493,153,6]] — cyclic lifted product over F₂[ℤ₁₇] (LiftDiff family)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: <code>weight-9plus × unrestricted</code>, CSS board. The paper arXiv:2610.25213 (LiftDiff) reports a <code>[[493,153,6]]</code> lifted-product code over ℤ₁₇ with base matrix 2×5 and target column weight 2. Its parameter point has no dominator in the current board, so reproducing it is board-advancing.</p>
+<h4>What was searched</h4>
+<p>Reimplemented the construction family: cyclic lifted product <code>LP(M,M)</code> over <code>F₂[ℤ₁₇]</code> with base matrix <code>M</code> of size 2×5, every cell nonzero (column weight 2), entries of polynomial weight 1 or 2. Random supports sampled uniformly over group elements; for each candidate built <code>H_X, H_Z</code> via <code>research/kit/nonabelian_lp.lifted_product_base</code>, computed <code>k</code> via <code>compute_k</code>, and screened the distance with <code>research/kit/surrogate.distance_rand</code>. A candidate with <code>k=153</code>, max check weight 9 and surrogate distance at least 6 was found after ~35 k-hits among 500+ trials. The selected candidate has one entry of polynomial weight 2 and the rest weight 1.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li><code>n=493</code>, <code>k=153</code>, max check weight 9.</li>
+<li>RIS upper bound: <code>d_X ≤ 6</code>, <code>d_Z ≤ 6</code> at 20000 trials per side, then</li>
+<p>2,000,000-trial accelerator pass; no lighter logical found.</p>
+<li>Claim is a witness-backed upper bound (<code>d≤</code>), not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>All-weight-1 (monomial) supports give <code>k=161</code> but distance 2.</li>
+<li>Random mixed weights (1/2) without structural bias usually land at w=10–13;</li>
+<p>the w=9 profile requires exactly one weight-2 entry.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/nonabelian_lp.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/qldpc_verify.py</code>, <code>verify/check_prose.py</code>. Compute: single CPU core, ~30 minutes.</p>
+<h4>Reproduction</h4>
+<p>Group: <code>Z_17</code> (<code>cyclic_product(17)</code>). Base matrix <code>M</code> is 2×5; all cells nonzero. One cell (row 1, column 4, 0-indexed) has polynomial support <code>[4, 12]</code>; all other cells are single group elements: row 0: <code>[3, 7, 11, 15, 2]</code>; row 1: <code>[5, 9, 13, [4,12], 1]</code> (the bracketed cell is the weight-2 entry). Build with <code>lifted_product_base(mul, M, M)</code>. The full <code>H_X, H_Z</code> are stored in the submitted <code>.npz</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/493-153-6.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/720-145-1.html">[[720,145,1]] — 720-145-1</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[720,145,1]] — one X-check deletion from 720-144-3.json (C-DELETE-CHECK a1)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 720 &lt;= n reachable by deleting one check from 720-144-3.json, filed at d=1 deliberately.</p>
+<p>Deleting the X-check with support [0, 24, 288, 576] removes the last X-check touching 1 qubit, so a single-qubit logical survives: the entry is a bare-qubit code by construction, not by accident. It is submitted because it still advances on k in a cell where nothing else reaches that k at this blocklength, and because those bare qubits are the obvious target for a follow-up d=1 -&gt; d=2 move (adding a X-check covering one of them kills the logical; that addition is not part of this entry).</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>720-144-3.json</code> claims d = 3; the child was re-measured, not inherited.</li>
+<li>Seed-0 estimate over the child: 1 per side, 8000 trials/side.</li>
+<li>Filed claim: <b>d = 1</b>, witness-backed upper bound. A weight-1 logical cannot be beaten by</li>
+<p>any search, so the refutation gate passes trivially here and yields no distance evidence.</p>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k.</li>
+<li>Priced transport agrees: <code>C-DELETE-CHECK</code> price terms w_del = 1, w_exp = 3</li>
+<p>(RIS upper bounds, 20,000 trials, seed 0) give d&#x27; = min(d, w_del, w_exp) = 1, matching the measured child exactly. The exposed term collapses to 1 for precisely these bare-qubit deletions -- that is the closed form of the mechanism, not a coincidence.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>720-144-3.json</code> from <code>codes/</code>, remove the X-check whose support is [0, 24, 288, 576], and set k = 145. The result is <code>codes/720-145-1.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/720-145-1.json
+python verify/check_codes_format.py --files codes/720-145-1.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/720-145-1.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/720-145-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/750-153-5.html">[[750,153,5]] — 750-153-5</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[750,153,5]] — one X-check deletion from 750-152-7.json (C-DELETE-CHECK a264)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 750 &lt;= n reachable by deleting one check from 750-152-7.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 5, against a parent claim of 7.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>750-152-7.json</code> claims d = 7.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 7]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 7]</b> with</li>
+<p>w_del = 19, w_exp = 7 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 5 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>750-152-7.json</code> from <code>codes/</code>, remove the X-check whose support is [287, 405, 598, 648, 738], and set k = 153. The result is <code>codes/750-153-5.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/750-153-5.json
+python verify/check_codes_format.py --files codes/750-153-5.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/750-153-5.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/750-153-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/768-193-7.html">[[768,193,7]] — 768-193-7</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[768,193,7]] — one X-check deletion from 768-192-13.json (C-DELETE-CHECK a86)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 768 &lt;= n reachable by deleting one check from 768-192-13.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 7, against a parent claim of 13.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>768-192-13.json</code> claims d = 13.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 13]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 13]</b> with</li>
+<p>w_del = 13, w_exp = 156 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 13 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on d, k, n.</li>
+<li>Advancement: d, k, n.</li>
+</ul>
+<p>The seed-0 estimate reported 13; a separate refutation run at seed 1 found a weight-7 logical, so the entry is filed at the tighter 7. Distance here is seed-dependent in the way a bounded randomized search always is: every figure is an upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>768-192-13.json</code> from <code>codes/</code>, remove the X-check whose support is [74, 184, 244, 347, 439, 649, 703], and set k = 193. The result is <code>codes/768-193-7.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/768-193-7.json
+python verify/check_codes_format.py --files codes/768-193-7.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/768-193-7.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/768-193-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/769-170-1.html">[[769,170,1]] — 769-170-1</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[769,170,1]] — one X-check deletion from 769-169-2.json (C-DELETE-CHECK a1)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 769 &lt;= n reachable by deleting one check from 769-169-2.json, filed at d=1 deliberately.</p>
+<p>Deleting the X-check with support [0, 25, 325, 625] removes the last X-check touching 2 qubits, so a single-qubit logical survives: the entry is a bare-qubit code by construction, not by accident. It is submitted because it still advances on k in a cell where nothing else reaches that k at this blocklength, and because those bare qubits are the obvious target for a follow-up d=1 -&gt; d=2 move (adding a X-check covering one of them kills the logical; that addition is not part of this entry).</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>769-169-2.json</code> claims d = 2; the child was re-measured, not inherited.</li>
+<li>Seed-0 estimate over the child: 1 per side, 8000 trials/side.</li>
+<li>Filed claim: <b>d = 1</b>, witness-backed upper bound. A weight-1 logical cannot be beaten by</li>
+<p>any search, so the refutation gate passes trivially here and yields no distance evidence.</p>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k.</li>
+<li>Priced transport agrees: <code>C-DELETE-CHECK</code> price terms w_del = 1, w_exp = 13</li>
+<p>(RIS upper bounds, 20,000 trials, seed 0) give d&#x27; = min(d, w_del, w_exp) = 1, matching the measured child exactly. The exposed term collapses to 1 for precisely these bare-qubit deletions -- that is the closed form of the mechanism, not a coincidence.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>769-169-2.json</code> from <code>codes/</code>, remove the X-check whose support is [0, 25, 325, 625], and set k = 170. The result is <code>codes/769-170-1.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/769-170-1.json
+python verify/check_codes_format.py --files codes/769-170-1.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/769-170-1.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/769-170-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/780-319-3.html">[[780,319,3]] — 780-319-3</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[780,319,3]] — one X-check deletion from 780-318-6.json (C-DELETE-CHECK a155)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 780 &lt;= n reachable by deleting one check from 780-318-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 3, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>780-318-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 6]</b> with</li>
+<p>w_del = 25, w_exp = 18 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 3 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k, n.</li>
+<li>Advancement: k, n.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>780-318-6.json</code> from <code>codes/</code>, remove the X-check whose support is [156, 162, 390, 416, 624, 657, 702, 747], and set k = 319. The result is <code>codes/780-319-3.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/780-319-3.json
+python verify/check_codes_format.py --files codes/780-319-3.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/780-319-3.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/780-319-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/800-327-3.html">[[800,327,3]] — 800-327-3</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[800,327,3]] — one X-check deletion from 800-326-6.json (C-DELETE-CHECK a3)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 800 &lt;= n reachable by deleting one check from 800-326-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 3, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>800-326-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 3]</b> with</li>
+<p>w_del = 3, w_exp = 16 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 3 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k, n.</li>
+<li>Advancement: k, n.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>800-326-6.json</code> from <code>codes/</code>, remove the X-check whose support is [2, 9, 242, 245, 482, 507, 722, 727], and set k = 327. The result is <code>codes/800-327-3.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/800-327-3.json
+python verify/check_codes_format.py --files codes/800-327-3.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/800-327-3.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/800-327-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/838-165-1.html">[[838,165,1]] — 838-165-1</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[838,165,1]] — one X-check deletion from 838-164-3.json (C-DELETE-CHECK a1)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 838 &lt;= n reachable by deleting one check from 838-164-3.json, filed at d=1 deliberately.</p>
+<p>Deleting the X-check with support [0, 19] removes the last X-check touching 1 qubit, so a single-qubit logical survives: the entry is a bare-qubit code by construction, not by accident. It is submitted because it still advances on k in a cell where nothing else reaches that k at this blocklength, and because those bare qubits are the obvious target for a follow-up d=1 -&gt; d=2 move (adding a X-check covering one of them kills the logical; that addition is not part of this entry).</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>838-164-3.json</code> claims d = 3; the child was re-measured, not inherited.</li>
+<li>Seed-0 estimate over the child: 1 per side, 8000 trials/side.</li>
+<li>Filed claim: <b>d = 1</b>, witness-backed upper bound. A weight-1 logical cannot be beaten by</li>
+<p>any search, so the refutation gate passes trivially here and yields no distance evidence.</p>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k.</li>
+<li>Priced transport agrees: <code>C-DELETE-CHECK</code> price terms w_del = 1, w_exp = 3</li>
+<p>(RIS upper bounds, 20,000 trials, seed 0) give d&#x27; = min(d, w_del, w_exp) = 1, matching the measured child exactly. The exposed term collapses to 1 for precisely these bare-qubit deletions -- that is the closed form of the mechanism, not a coincidence.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>838-164-3.json</code> from <code>codes/</code>, remove the X-check whose support is [0, 19], and set k = 165. The result is <code>codes/838-165-1.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/838-165-1.json
+python verify/check_codes_format.py --files codes/838-165-1.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/838-165-1.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/838-165-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/840-343-3.html">[[840,343,3]] — 840-343-3</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[840,343,3]] — one Z-check deletion from 840-342-6.json (C-DELETE-CHECK b105)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 840 &lt;= n reachable by deleting one check from 840-342-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 3, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>840-342-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 6]</b> with</li>
+<p>w_del = 9, w_exp = 22 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 3 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k, n.</li>
+<li>Advancement: k, n.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>840-342-6.json</code> from <code>codes/</code>, remove the Z-check whose support is [273, 326, 352, 357, 441, 450, 777, 798], and set k = 343. The result is <code>codes/840-343-3.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/840-343-3.json
+python verify/check_codes_format.py --files codes/840-343-3.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/840-343-3.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/840-343-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/854-158-2.html">[[854,158,2]] — 854-158-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[854,158,2]] — one Z-check deletion from 854-157-3.json (C-DELETE-CHECK b237)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>A high-k board region at 854 &lt;= n reachable by deleting one check from 854-157-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
 <h4>What was searched</h4>
@@ -72,7 +518,383 @@ python verify/qldpc_verify.py codes/854-158-2.json
 python verify/check_codes_format.py --files codes/854-158-2.json
 </pre>
 <p>Both exit 0. The distance witnesses in <code>codes/854-158-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/854-158-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/108-58-4.html">[[108,58,4]] — 108-58-4</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[108,58,4]] — Cornucopia q=3 with searched column shifts</h3>
+<section class=blk><h3><a href="codes/869-170-2.html">[[869,170,2]] — 869-170-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[869,170,2]] — one X-check deletion from 869-169-3.json (C-DELETE-CHECK a339)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 869 &lt;= n reachable by deleting one check from 869-169-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>869-169-3.json</code> claims d = 3.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 3]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 2]</b> with</li>
+<p>w_del = 2, w_exp = 3 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 2 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>869-169-3.json</code> from <code>codes/</code>, remove the X-check whose support is [127, 156, 181, 182], and set k = 170. The result is <code>codes/869-170-2.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/869-170-2.json
+python verify/check_codes_format.py --files codes/869-170-2.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/869-170-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/869-170-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/888-171-2.html">[[888,171,2]] — 888-171-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[888,171,2]] — one Z-check deletion from 888-170-3.json (C-DELETE-CHECK b357)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 888 &lt;= n reachable by deleting one check from 888-170-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>888-170-3.json</code> claims d = 3.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 3]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 2]</b> with</li>
+<p>w_del = 2, w_exp = 3 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 2 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>888-170-3.json</code> from <code>codes/</code>, remove the Z-check whose support is [6, 26], and set k = 171. The result is <code>codes/888-171-2.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/888-171-2.json
+python verify/check_codes_format.py --files codes/888-171-2.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/888-171-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/888-171-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/897-174-2.html">[[897,174,2]] — 897-174-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[897,174,2]] — one X-check deletion from 897-173-3.json (C-DELETE-CHECK a348)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 897 &lt;= n reachable by deleting one check from 897-173-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>897-173-3.json</code> claims d = 3.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 3]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 3]</b> with</li>
+<p>w_del = 6, w_exp = 3 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 2 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>897-173-3.json</code> from <code>codes/</code>, remove the X-check whose support is [835, 836, 862, 883], and set k = 174. The result is <code>codes/897-174-2.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/897-174-2.json
+python verify/check_codes_format.py --files codes/897-174-2.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/897-174-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/897-174-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/898-197-1.html">[[898,197,1]] — 898-197-1</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[898,197,1]] — one X-check deletion from 898-196-2.json (C-DELETE-CHECK a1)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 898 &lt;= n reachable by deleting one check from 898-196-2.json, filed at d=1 deliberately.</p>
+<p>Deleting the X-check with support [0, 27, 378, 729] removes the last X-check touching 2 qubits, so a single-qubit logical survives: the entry is a bare-qubit code by construction, not by accident. It is submitted because it still advances on k in a cell where nothing else reaches that k at this blocklength, and because those bare qubits are the obvious target for a follow-up d=1 -&gt; d=2 move (adding a X-check covering one of them kills the logical; that addition is not part of this entry).</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>898-196-2.json</code> claims d = 2; the child was re-measured, not inherited.</li>
+<li>Seed-0 estimate over the child: 1 per side, 8000 trials/side.</li>
+<li>Filed claim: <b>d = 1</b>, witness-backed upper bound. A weight-1 logical cannot be beaten by</li>
+<p>any search, so the refutation gate passes trivially here and yields no distance evidence.</p>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on k.</li>
+<li>Priced transport agrees: <code>C-DELETE-CHECK</code> price terms w_del = 1, w_exp = 14</li>
+<p>(RIS upper bounds, 20,000 trials, seed 0) give d&#x27; = min(d, w_del, w_exp) = 1, matching the measured child exactly. The exposed term collapses to 1 for precisely these bare-qubit deletions -- that is the closed form of the mechanism, not a coincidence.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>898-196-2.json</code> from <code>codes/</code>, remove the X-check whose support is [0, 27, 378, 729], and set k = 197. The result is <code>codes/898-197-1.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/898-197-1.json
+python verify/check_codes_format.py --files codes/898-197-1.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/898-197-1.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/898-197-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/900-367-3.html">[[900,367,3]] — 900-367-3</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[900,367,3]] — one X-check deletion from 900-366-6.json (C-DELETE-CHECK a245)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 900 &lt;= n reachable by deleting one check from 900-366-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 3, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>900-366-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 3]</b> with</li>
+<p>w_del = 3, w_exp = 46 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 3 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>900-366-6.json</code> from <code>codes/</code>, remove the X-check whose support is [246, 255, 516, 538, 725, 786, 827, 876], and set k = 367. The result is <code>codes/900-367-3.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/900-367-3.json
+python verify/check_codes_format.py --files codes/900-367-3.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/900-367-3.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/900-367-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/923-174-2.html">[[923,174,2]] — 923-174-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[923,174,2]] — one Z-check deletion from 923-173-3.json (C-DELETE-CHECK b344)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 923 &lt;= n reachable by deleting one check from 923-173-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>923-173-3.json</code> claims d = 3.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 3]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 3]</b> with</li>
+<p>w_del = 4, w_exp = 5 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 2 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>923-173-3.json</code> from <code>codes/</code>, remove the Z-check whose support is [851, 852, 883, 884], and set k = 174. The result is <code>codes/923-174-2.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/923-174-2.json
+python verify/check_codes_format.py --files codes/923-174-2.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/923-174-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/923-174-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/960-391-3.html">[[960,391,3]] — 960-391-3</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[960,391,3]] — one Z-check deletion from 960-390-6.json (C-DELETE-CHECK b269)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 960 &lt;= n reachable by deleting one check from 960-390-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 3, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>960-390-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 6]</b> with</li>
+<p>w_del = 17, w_exp = 13 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 3 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>960-390-6.json</code> from <code>codes/</code>, remove the Z-check whose support is [646, 654, 717, 750, 830, 846, 880, 942], and set k = 391. The result is <code>codes/960-391-3.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/960-391-3.json
+python verify/check_codes_format.py --files codes/960-391-3.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/960-391-3.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/960-391-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/980-399-4.html">[[980,399,4]] — 980-399-4</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[980,399,4]] — one Z-check deletion from 980-398-6.json (C-DELETE-CHECK b202)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 980 &lt;= n reachable by deleting one check from 980-398-6.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 4, against a parent claim of 6.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>980-398-6.json</code> claims d = 6.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 6]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 6]</b> with</li>
+<p>w_del = 42, w_exp = 24 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 4 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>980-398-6.json</code> from <code>codes/</code>, remove the Z-check whose support is [595, 675, 693, 777, 791, 853, 889, 965], and set k = 399. The result is <code>codes/980-399-4.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/980-399-4.json
+python verify/check_codes_format.py --files codes/980-399-4.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/980-399-4.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/980-399-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/108-58-4.html">[[108,58,4]] — 108-58-4</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[108,58,4]] — Cornucopia q=3 with searched column shifts</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis was that at a small, admissible <code>q</code> (n = 36q ≤ 700) an unexplored shift tuple would land on the frontier where no Cornucopia instance of these parameters existed yet.</p>
 <h4>What was searched</h4>
