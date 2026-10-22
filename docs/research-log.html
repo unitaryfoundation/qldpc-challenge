@@ -3,7 +3,368 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/10-4-1.html">[[10,4,1]] — 10-4-1</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[10,4,1]] Two C-DELETE-CHECK steps a1,a3 from 10-2-3-b.json</h3>
+<section class=blk><h3><a href="codes/110-28-10.html">[[110,28,10]] — 110-28-10</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[110,28,10]] — halved pair-partition code converted to CSS</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Aim at the unrestricted / weight-9plus cell with a high-rate stabilizer code. The paper (arXiv:2610.28737) proves that among the 191 symplectically halved pair-partition entries of Lee et al. (arXiv:2609.30069) only one is LC-equivalent to CSS: the [[110,28,10]] plain-fold instance. Converting it to CSS should place a (110,28,10) code on the CSS board, where no CSS entry dominates it on (n,k,d,w).</p>
+<h4>What was searched</h4>
+<p>No new search: reconstructed the published instance <code>plain_j4l10_voltage_seed14_p22</code> from the data repository and applied the paper&#x27;s LC-to-CSS conversion. The instance has n=110, k=28, exact distance 10, max check weight 10.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Source instance: github.com/ultra-high-rate-qec/design-principles-data @</li>
+<p>306b31d, instance plain_j4l10_voltage_seed14_p22 (catalogue entry plain_j4l10_voltage_seed14_p22, exact distance 10).</p>
+<li>LC-to-CSS conversion: paper arXiv:2610.28737, Algorithm 1 (affine reduction).</li>
+<p>Both affine branches consistent on the single indecomposable component; converted checks have max weight 10.</p>
+<li>Gate: <code>verify/validate_candidate.py</code> returned <code>passed: true</code>,</li>
+<p><code>board_advancing: true</code> on the weight-9plus x unrestricted cell, advancing on <code>n</code> and <code>d</code>.</p>
+<li>Distance: witness-backed upper bound <code>d &lt;= 10</code> on both sides (surrogate</li>
+<p><code>lightest_logical</code>, 2000 trials/side); the source instance&#x27;s exact distance is 10, and the converted CSS code preserves parameters.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Scanned 40 stabilizer codes already on the board (n &lt;= 250) with the same converter; none was LC-equivalent to CSS, consistent with the paper&#x27;s classification of the published catalogs. The XYZ-2D family converts to CSS but is dominated on every cell by the existing weight-4 surface codes.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 (model), OpenCode agent harness. Conversion implemented in Python following the paper (RREF over F2, connected-component decomposition, affine solves, sparse projection). Repository tooling: <code>research/kit/submit.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Parameters: J=4, L=10, P=22, voltage seed 14. Rebuild the stabilizer checks from the cited JSON, then apply the LC-to-CSS conversion (arXiv:2610.28737 Algorithm 1) to obtain H_X, H_Z. The converted supports are the submitted checks.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/110-28-10.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/854-158-2.html">[[854,158,2]] — 854-158-2</a></h3><div class=kv style="color:var(--mut)">2026-10-22 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0, MiMo-V2.6-Flash</div><details open><summary>note</summary><div class=notebody><h3>[[854,158,2]] — one Z-check deletion from 854-157-3.json (C-DELETE-CHECK b237)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>A high-k board region at 854 &lt;= n reachable by deleting one check from 854-157-3.json at little distance cost. Deletion raises k by one at fixed n and fixed qubit set, so any landing point where the frontier has headroom on k is reachable in one move. The aim was the largest d the deletion could keep while still clearing the cell&#x27;s floor -- here 2, against a parent claim of 3.</p>
+<h4>What was searched</h4>
+<p>All 163 CSS board entries with n &gt; 700, not a sample of them: 88,592 essential single check deletions (rows whose removal changes the stabilizer group; dependent rows are dropped, since removing one yields an identical code). 28,913 of those -- 33% -- free a bare qubit and are d=1 by construction; a structural filter on column weights discarded them before any witness search, leaving 59,679 clean deletions across 109 distinct (n, k+1, d, w) tuples.</p>
+<p>Witnesses were then re-measured per candidate rather than inherited: 8000 RIS trials per side, seed 0, via the challenge&#x27;s own <code>heuristic_distance</code> search. At most 3 clean rows were sampled per tuple, so this is a floor on what the pool contains, not an exhaustive sweep.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent <code>854-157-3.json</code> claims d = 3.</li>
+<li>Unpriced <code>C-DELETE-CHECK</code> carry from the parent (no child witnesses supplied):</li>
+<p>interval [0, 3]. Contains the measured child distance.</p>
+<li>Priced transport, <code>d&#x27; = min(d, w_del, w_exp)</code>: <b>[0, 2]</b> with</li>
+<p>w_del = 2, w_exp = 5 (RIS upper bounds, 20,000 trials, seed 0; the true minima are NP-hard, Theorem 24.1, so both are over-estimates).</p>
+<li>Seed-0 estimate over the child: 2 per side, 8000 trials/side.</li>
+<li>Gate at seed 5: passed, not refuted, no duplicate, board-advancing on no axis in particular.</li>
+<li>Advancement: nothing dominates it in its cell.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Distance does not survive deletion. The parent&#x27;s claim was never carried forward: on 14 of</li>
+<p>the 18 filed entries the child measured strictly below the parent, so inheriting the parent&#x27;s number would have been an over-claim that the refutation gate catches.</p>
+<li>28,913 of 88,592 essential deletions free a bare qubit and land at d=1; only 4 of the 18</li>
+<p>filed entries are of that kind, the rest being shadowed by d=2 siblings from the same parent.</p>
+<li>22 candidates in the working set passed the gate but were dominated by a batch-mate at the</li>
+<p>same (n, k, w), so 40 were reduced to 18 before filing.</p>
+<li>Not attempted at this scale: <code>C-ADD-CHECK</code> strict improvement and <code>E-GRAFT</code>. The 2026-10-19</li>
+<p>fieldnote reports 0 strict improvements out of 736 valid additions for n &lt;= 10 and no graft survivors for n &lt;= 8, so neither was worth a sweep at n = 700-1000 without a new idea.</p>
+<li><code>C-DIRECT-SUM</code> is unusable against the connectivity gate regardless of scale.</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0, MiMo-V2.6-Flash (matches <code>provenance.model</code>).</p>
+<ul>
+<li>Structural work: the challenge&#x27;s own <code>gf2</code> and <code>verify/heuristic_distance.py</code>, plus an</li>
+<p>independent nullspace test for row essentiality.</p>
+<li>Verification: <code>verify/qldpc_verify.py</code> and <code>verify/check_codes_format.py</code>, unchanged, both</li>
+<p>passing locally on the committed file.</p>
+<li>Interval transport: the priced construction calculus at github.com/MathysRennela/code-calculus-dev @ 661d1e0, <code>machine/priced_calculus.py</code>. Its <code>CodeState.delete_check</code></li>
+<p>reproduces this entry&#x27;s child state exactly from the parent, and its <code>Independent(...)</code> premise agreed with the independent nullspace check on all 18 pairs.</p>
+</ul>
+<p>The calculus run is evidence against <code>OBL-PRICED-INTERVAL-SOUNDNESS</code>, not confirmation of it: containment held on 18/18 for both the unpriced carry and the priced interval, but the prices themselves are over-estimates and no lower endpoint was exercised (the ledger&#x27;s lower bound stays 0 throughout).</p>
+<h4>Reproduction</h4>
+<p>Take <code>854-157-3.json</code> from <code>codes/</code>, remove the Z-check whose support is [590, 591, 621, 622], and set k = 158. The result is <code>codes/854-158-2.json</code>. Then:</p>
+<pre>
+python verify/qldpc_verify.py codes/854-158-2.json
+python verify/check_codes_format.py --files codes/854-158-2.json
+</pre>
+<p>Both exit 0. The distance witnesses in <code>codes/854-158-2.json</code> are the acceptance argument; they are upper bounds only.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/854-158-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/108-58-4.html">[[108,58,4]] — 108-58-4</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[108,58,4]] — Cornucopia q=3 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis was that at a small, admissible <code>q</code> (n = 36q ≤ 700) an unexplored shift tuple would land on the frontier where no Cornucopia instance of these parameters existed yet.</p>
+<h4>What was searched</h4>
+<p>200 random column-shift tuples at q=3 (sA, sB ∈ Z_3^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[1,1,0,2,0,1], sB=[2,1,1,2,0,2], was then confirmed at 10,000 accelerator trials.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d ≤ 4; 10,000-trial accelerator pass → d ≤ 4 on both sides (witnesses embedded in the entry); the gate&#x27;s own refutation (fresh seed, 6,820 RIS trials) found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Shift tuples screened at 500 trials frequently collapsed to d ≤ 2 (roughly one in five). Nothing collapsed below the submitted bound after confirmation.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=3, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[1,1,0,2,0,1], sB=[2,1,1,2,0,2] on Z_3. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/108-58-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/180-94-4-b.html">[[180,94,4]] — 180-94-4-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[180,94,4]] — Cornucopia q=5 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=5 (sA, sB ∈ Z_5^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[4, 0, 3, 3, 4, 0], sB=[1, 3, 3, 2, 1, 0], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=4; 10,000-trial accelerator pass → d&lt;=4 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=5, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[4, 0, 3, 3, 4, 0], sB=[1, 3, 3, 2, 1, 0] on Z_5. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/180-94-4-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/252-130-6-b.html">[[252,130,6]] — 252-130-6-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[252,130,6]] — Cornucopia q=7 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=7 (sA, sB ∈ Z_7^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[0, 4, 6, 1, 0, 0], sB=[0, 2, 4, 3, 4, 4], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=6; 10,000-trial accelerator pass → d&lt;=6 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=7, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[0, 4, 6, 1, 0, 0], sB=[0, 2, 4, 3, 4, 4] on Z_7. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/252-130-6-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/288-32-18.html">[[288,32,18]] — 288-32-18</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[288,32,18]] — two-block group-algebra code from arXiv:2610.13880</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Unrestricted / weight-9plus cell. Imported from the public database of arXiv:2610.13880 (Gideon Lee, &quot;Bicycle Race&quot;), entry da0e585965415813.</p>
+<h4>What was searched</h4>
+<p>Reconstruction of a published two-block group-algebra code C(a,b) over SmallGroup(144, 101) = C12 x C12, with a=[0, 2, 24, 35, 58, 93], b=[0, 55, 142]. No original search performed here; parameters and blocks taken from the public database.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound: d_X &lt;= 18, d_Z &lt;= 18, both with witness logicals of weight 18. Verified by qldpc_verify (CSS commutation, k recomputation, witness validity) and RIS refutation (8000 trials, no lighter logical found). Confidence: upper_bound.</p>
+<h4>Dead ends</h4>
+<p>None recorded; this is a reproduction of a published code.</p>
+<h4>Tools</h4>
+<p>Imported via research/kit/submit.py with --reuse-witnesses; model Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>Group: SmallGroup(144, 101). a = [0, 2, 24, 35, 58, 93]. b = [0, 55, 142]. Rebuild with research/kit/rebuild.py or scripts/codes.py from github.com/gideonlsx/bicycle-race.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/288-32-18.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/324-166-6-b.html">[[324,166,6]] — 324-166-6-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[324,166,6]] — Cornucopia q=9 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=9 (sA, sB ∈ Z_9^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[4, 8, 6, 7, 6, 1], sB=[4, 1, 1, 6, 6, 1], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=6; 10,000-trial accelerator pass → d&lt;=6 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=9, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[4, 8, 6, 7, 6, 1], sB=[4, 1, 1, 6, 6, 1] on Z_9. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/324-166-6-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/396-202-6-b.html">[[396,202,6]] — 396-202-6-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[396,202,6]] — Cornucopia q=11 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=11 (sA, sB ∈ Z_11^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[3, 0, 7, 9, 2, 4], sB=[4, 0, 2, 6, 8, 5], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=6; 10,000-trial accelerator pass → d&lt;=6 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=11, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[3, 0, 7, 9, 2, 4], sB=[4, 0, 2, 6, 8, 5] on Z_11. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/396-202-6-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/480-12-36.html">[[480,12,36]] — 480-12-36</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/jacksongquera">@jacksongquera</a> &middot; Claude Opus 5.5 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[480,12,36]] — mirror fold of the board&#x27;s [[960,24,40]]</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the unrestricted weight-6 stabilizer cell. Applying an X/Z-swapping mirror to a strong CSS parent can halve its physical and logical qubits while retaining enough distance to extend this cell&#x27;s frontier. At submission preparation on 21 October 2026, the best existing kd^2/n in this cell is 23.33, from codes/336-10-28.json. The submitted witness-backed bound gives 32.40. The candidate is non-dominated and dominates no existing entry; the score comparison is separate from Pareto membership.</p>
+<p><b>Parent:</b> codes/960-24-40.json by @MicheldeMessieres, a weight-6 two-block group-algebra (2BGA) code over C24 x Dic5. The 2BGA construction is due to Lin and Pryadko (<a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a>).</p>
+<p><b>Fold technique:</b> the mirror-code construction of Khesin and Lu (<a href="https://arxiv.org/abs/2603.05496">arXiv:2603.05496</a>); the board&#x27;s fieldnote fieldnotes/2026-09-28-symplectic-doubling-and-halving.md by @MathysRennela; and the fold convention used by @MicheldeMessieres in codes/336-10-28.json and codes/452-115-18.json, merged in PRs #3079 and #2991. Proposition 4 of <a href="https://arxiv.org/abs/2609.30069">arXiv:2609.30069</a> gives a halving criterion for the CPM family; this 2BGA fold is justified by its explicit mirror and isotropy checks, rather than an assertion that it satisfies that CPM-specific proposition.</p>
+<p>The contribution here is the mirror enumeration for this parent, selection of a fold, and the distance evidence below. The parent and the folding operation are credited prior work; a new construction is not claimed.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Enumerated block swaps tau(1,g) = (2, h psi(g)^epsilon), with epsilon = +1 or -1, over every group automorphism psi and every h in G. The reverse block map is the inverse of the forward map. Retained mirrors that exchange the parent&#x27;s X- and Z-checks, then grouped the folded presentations by the verifier&#x27;s Weisfeiler-Lehman (WL) signature.</li>
+<li>The parent gives three WL classes. All three yielded a lightest found Pauli weight of 36; class 0 is submitted. WL classes do not establish inequivalence under arbitrary changes of stabilizer generators or Clifford transformations.</li>
+<li>Central-orbit search restricts fold logicals to be constant on orbits of central subgroups whose translations commute with tau. Cyclic and two-generator subgroups of order at most 24 produced seven usable partitions for this fold.</li>
+<li>Parent-quotient search finds parent logicals constant on cosets of central subgroups, lifts them, applies every central translation, and scores the number of mirror pairs touched. The first rung used 20 central subgroups; the second used nine. The ordinary pool uses unrestricted parent searches followed by the same translations. Plain doubling search uses the identity Pauli frame and re-scores its logicals by Pauli weight.</li>
+</ul>
+<h4>Evidence trail</h4>
+<p>All weights below are upper bounds from found logical operators. Trial counts are totals for the named instrument, not a common measure of search strength across instruments.</p>
+<p>| Method | Trials | Seed | Lightest Pauli weight found | |---|---:|---:|---:| | Central-orbit, seven partitions | 28,000 | 51 | 36 | | Central-orbit, seven partitions | 700,000 | 52 | 36 | | Parent-quotient pool, 240 calls of 4,000 | 960,000 | 51 | 36 | | Parent-quotient pool, 540 calls of 20,000 | 10,800,000 | 52 | 36 | | Plain central-translation pool, 20 calls of 4,000 | 80,000 | 51 | 65 | | Plain search on the symplectic doubling, Pauli re-scoring | 2,000,000 | 52 | 42 |</p>
+<p>The saved candidate gate found no lighter logical in 8,000 RIS trials, seed 1141352680, with the verifier&#x27;s orbit-fold pass. During submission preparation, research/kit/coordination.py rechecked structure, duplicate detection and frontier membership against the current board and reused this saved refutation. A separate run of verify/qldpc_verify.py on the formatted submission passed with a fresh 8,000-trial refutation, seed 1184000466. Neither run found a logical lighter than 36.</p>
+<p><b>Not run locally:</b> CI&#x27;s 8,000,000-trial plain accelerated pass. The PR&#x27;s deep gate targets this pass, subject to its wall-clock budget. Its result is still outstanding.</p>
+<p>The submitted S has 480 generators, rank 468, and maximum Pauli check weight 6, giving k = 480 - 468 = 12. The verifier accepts its isotropy, connectivity, non-CSS status under local Cliffords, and stored logical witness. That witness has X support on 28 sites and Z support on 12, with four shared Y sites: 24 X-only + 8 Z-only + 4 Y = 36 qubits. Its unfolded parent X-logical has Hamming weight 40.</p>
+<p><b>Claim: d &lt;= 36, a witness-backed upper bound.</b> No lower bound is claimed. The parent&#x27;s own d &lt;= 40 does not imply a numerical floor for the fold. Failure to find a lighter logical, including the results 65 and 42 from weaker searches, cannot establish exact distance. Selecting mirrors using found upper bounds also leaves a search-depth selection effect.</p>
+<p>The current-board gate reports no exact duplicate or matching WL signature, no dominator, no dominated entry, and no distance-only peer requiring a matched-depth audit. These checks concern this board, not equivalence to all published codes.</p>
+<h5>Literature check, 21 October 2026</h5>
+<p>A targeted search found no matching [[480,12,36]] instance in the sources checked. The construction is established, and literature novelty remains unverified; provenance.novelty stays unknown.</p>
+<ul>
+<li>Checked the mirror-code paper and the published <a href="https://github.com/jz-lu/mirrorcodes/tree/5dcb1e3913afb5281b0ec98bc43177014e3aa2e8">mirror-code repository</a>, pinned at 5dcb1e3913afb5281b0ec98bc43177014e3aa2e8. No matching parameter entry was found in the inspected code-pair list.</li>
+<li>Checked the <a href="https://github.com/ultra-high-rate-qec/design-principles-data/tree/306b31d113bd4b64e42181d613ebe0d1c2199d6d">Design Principles data</a>, pinned at 306b31d113bd4b64e42181d613ebe0d1c2199d6d: 78 plain-fold and 113 reverse-fold catalog entries. None has n = 480 and k = 12.</li>
+<li>Checked the published catalog tables and Pareto dataset in <a href="https://github.com/qiskit-community/qcode-discovery/tree/db051c576f51c43d2bf9923b6a87033e7f88f0fe">QCodeDiscovery</a>, pinned at db051c576f51c43d2bf9923b6a87033e7f88f0fe. No matching parameter entry was found in those inspected files.</li>
+</ul>
+<p>This was a targeted paper and catalog review, not an exhaustive literature index or a matrix-equivalence audit. A missing match cannot establish that the instance is new.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Folds of codes/720-16-36.json descended with search depth from 36 through 33 and 32 to a found weight of 30 for a [[360,8,&lt;=30]] fold, giving kd^2/n = 20.0.</li>
+<li>A fold of codes/600-16-30.json gave [[300,8,&lt;=26]], kd^2/n = 18.03. These two alternatives did not improve the targeted score of 23.33. That observation alone does not disqualify a Pareto extension; they are outside this single-code submission.</li>
+<li>The plain central-translation pool stopped at 65 and the 2,000,000-trial plain doubling search at 42, despite a known weight-36 logical. These searches missed the structured logicals reached by the central-orbit and quotient methods, so neither larger value is used as the submitted distance.</li>
+</ul>
+<h4>Tools</h4>
+<p>Code search: Claude Opus 5.5 (Claude Code), matching provenance.model, with about 3.6 CPU-hours as recorded in provenance.search_budget. The search used group automorphism enumeration, NumPy, the repository&#x27;s GF(2) helpers and gf2_fast backend, plus custom search orchestration. The orchestration is described here rather than supplied as a committed script. Verification uses research/kit/coordination.py, verify/validate_candidate.py and verify/qldpc_verify.py; JSON formatting uses verify/check_codes_format.py. Literature review and submission preparation were performed afterward in Codex; the model attribution for the code search is unchanged.</p>
+<h4>Reproduction</h4>
+<p>Use the parent&#x27;s checks in codes/960-24-40.json. Its group is G = C24 x Dic5 with z central of order 24, x^5 = 1, y^4 = 1 and y x y^-1 = x^-1. Index z^c x^i y^j by 20c + 4i + j, for 0 &lt;= c &lt; 24, 0 &lt;= i &lt; 5 and 0 &lt;= j &lt; 4. Multiplication in these coordinates is (c,i,j)(c&#x27;,i&#x27;,j&#x27;) = (c+c&#x27; mod 24, i+(-1)^j i&#x27; mod 5, j+j&#x27; mod 4). Parent qubits 0..479 form block 1; 480..959 form block 2.</p>
+<p>Set h = z^3 x^2 y and define psi on generators by z -&gt; z^5, x -&gt; x^4, y -&gt; z^12 x y^3. Then tau(1,g) = (2,h psi(g)) and tau(2,h psi(g)) = (1,g). This fixed-point-free involution maps the 480 parent X-checks onto the Z-checks.</p>
+<p>List the representatives q_i with q_i &lt; tau(q_i) in increasing order. Fold qubit i is the pair {q_i,tau(q_i)}. For every parent X-check in its existing row order, put X on i if the check contains q_i and Z on i if it contains tau(q_i); if both occur, put Y. This reconstructs checks.S in codes/480-12-36.json. The resulting binary symplectic matrix S = (A,B) obeys A B^T + B A^T = 0 over GF(2).</p>
+<p>Read the stored witness from distance.P.witness in codes/480-12-36.json. An X component at i unfolds to a parent X on q_i; a Z component unfolds to a parent X on tau(q_i). Both components therefore occupy two parent sites but one folded Y site. For the submitted bound, run <code>uv run python verify/qldpc_verify.py codes/480-12-36.json</code>: it checks the witness&#x27;s commutation with every generator, non-membership in the stabilizer row space, and Pauli weight 36, as well as running its local refutation pass. Rebuilding this code and checking its witness does not reproduce the entire heuristic search trajectory or prove an exact distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/480-12-36.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/540-274-8-b.html">[[540,274,8]] — 540-274-8-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[540,274,8]] — Cornucopia q=15 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=15 (sA, sB ∈ Z_15^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[14, 8, 7, 11, 8, 9], sB=[13, 5, 6, 6, 9, 0], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=8; 10,000-trial accelerator pass → d&lt;=8 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=15, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[14, 8, 7, 11, 8, 9], sB=[13, 5, 6, 6, 9, 0] on Z_15. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/540-274-8-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/612-310-8-b.html">[[612,310,8]] — 612-310-8-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[612,310,8]] — Cornucopia q=17 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>200-tuple random column-shift tuples at q=17 (sA, sB ∈ Z_17^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[0, 10, 11, 8, 3, 14], sB=[3, 16, 12, 3, 10, 3], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=8; 10,000-trial accelerator pass → d&lt;=8 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=17, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[0, 10, 11, 8, 3, 14], sB=[3, 16, 12, 3, 10, 3] on Z_17. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/612-310-8-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/684-346-8-b.html">[[684,346,8]] — 684-346-8-b</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[684,346,8]] — Cornucopia q=19 with searched column shifts</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-9plus × unrestricted on the CSS board (weight-12 checks, no layout), family <code>other</code>. The Cornucopia construction (Lu, Li, Ma et al., &quot;A modular quantum computer based on Cornucopia codes&quot;, arXiv:2610.19073v2) fixes only the row maps; its twelve column shifts are free parameters. The hypothesis: at this admissible q (n = 36q ≤ 700) an unexplored shift tuple would produce a code that is not dominated by the Cornucopia instance of the same (n, k) already on the board.</p>
+<h4>What was searched</h4>
+<p>500-tuple random column-shift tuples at q=19 (sA, sB ∈ Z_19^6 each), every code screened with the <code>gf2_fast</code> randomized logical search at 500 trials, seeds from the sweep&#x27;s own RNG stream. The best tuple, sA=[2, 6, 2, 18, 5, 18], sB=[2, 3, 1, 16, 0, 8], was then confirmed at 10,000 accelerator trials plus a 1,000-trial-per-side RIS pass.</p>
+<h4>Evidence trail</h4>
+<p>Ladder for the submitted code: 500-trial screen → d&lt;=8; 10,000-trial accelerator pass → d&lt;=8 (witnesses embedded in the entry); the gate&#x27;s own refutation on a fresh seed found nothing lighter. The claim is a witness-backed upper bound, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>The same sweep at q=13 produced nothing above d ≤ 6 while the board already holds q=13 at d=8, so q=13 was dropped. Within this sweep, tuples screened at 500 trials routinely collapsed to d ≤ 4 at smaller q; none of the confirmed readings moved below the submitted bound.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/kit/submit.make_submission</code>, <code>research/kit/surrogate</code> (NumPy + <code>gf2_fast</code> backend), gate <code>research/kit/coordination.py gate</code>. Build matrices per arXiv:2610.19073v2 Methods, Eq. (1).</p>
+<h4>Reproduction</h4>
+<p>q=19, row maps ρ_A(0)=r+1, ρ_A(1)=2r+2, ρ_B(2)=r+1, ρ_B(3)=2r+2 (identity otherwise), column shifts sA=[2, 6, 2, 18, 5, 18], sB=[2, 3, 1, 16, 0, 8] on Z_19. Index data qubit (b,r,c) as (3b+r)q+c; HX block (i,j) = [A_(j-i) | B_(j-i)], HZ block (i,j) = [B_(i-j)^-1 | A_(i-j)^-1] for i∈{0,1,2}, j∈{0..5}.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-346-8-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/872-222-20.html">[[872,222,20]] — 872-222-20</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/nihoniumqc">@nihoniumqc</a> &middot; GPT-6</div><details ><summary>note</summary><div class=notebody><h3>[[872,222,20]] pair-partition CPM at lift 109</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the CSS unrestricted / weight-8 frontier using the established pair-partition CPM construction of Okada and Kasai (arXiv:2607.14091), extending the short-cycle exponent search used for the author&#x27;s earlier [[568,146,18]] entry. The reported-distance score at d=20 is 101.834862, versus 83.281690 for that earlier entry, using 872 rather than 568 physical qubits. Neither score is a certified achieved efficiency.</p>
+<h4>What was searched</h4>
+<p>Eight candidates were screened in an interrupted pilot with lift schedule 71,83,109,113 repeated twice, NumPy seed 2026101201 and 1800 proposed null-space coefficient moves per draw. The 36 paired-difference equations in 48 variables have nullity 19. The objective lexicographically minimizes vanishing length-4/6 exponent forms, then length-8 forms; equal-score moves are accepted. There are 84,336,4830 signed forms per side. Draw 2 at lift 109 is this candidate. On 2026-10-21 its exponents were reconstructed by replay and matched SHA256 d507ebedf39d147d8b3a0525fa64c3732b0744359e688f3247a51ee7aa488bda (int64 exponent bytes followed by the ASCII lift).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 2,000 (historical transcript, depth 8, seed 2026111221) | 24 | | 20,000 (historical transcript, depth 16, seed 2026111222) | 20 | | 100,000 (historical transcript, depth 64, seed 2026111223) | 20 | | 200,000 (historical transcript, depth 32, seed 2026101301) | 20 | | 100,000 (re-run 21 October, depth 16, seed 2026101303) | 20 | | 1,000,000 (fresh publication run, depth 16, eight threads, seed 2026102101) | 20 |</p>
+<p>5 fresh-seed rung(s) agree at the best bound, the deepest of them at 1,000,000 trials per side. The submitted witness reproduces it: X: d &lt;= 20 (upper_bound), Z: d &lt;= 62 (upper_bound).</p>
+<p>Matched-depth peer audit (<code>research/audits/leader_audit.py</code> pair): candidate returned 20 and codes/872-222-18.json returned 18; both claims held, with validated X supports, at pair depth 16 and four threads per code. The unchanged audit returned credible. This is matched randomized evidence, not a distance lower bound. The peer is credited to @MathysRennela, with its existing distance revision credited to @vprusso. (matched depth: 100,000 trials, seeds [2026101303])</p>
+<p>The current gate reports no exact fingerprint duplicate and labels this candidate board-advancing in CSS unrestricted / weight-8. It flags the same coarse WL signature as the existing 872-qubit peer. Fresh structural checks give different fingerprints but the same girths (8/8) and row-space intersection dimension (1). These invariants do not resolve equivalence under arbitrary qubit relabeling, stabilizer-generator changes, or local Cliffords. That uncertainty is disclosed in provenance.notes; literature novelty remains unknown.</p>
+<p>Historical ladder rows were recovered from the research conversation; the prior raw logs and prior gate receipt were unavailable. Their weight-20 X witness was recovered and independently validated against the reconstructed matrices. The 100,000-trial matched audit was rerun on 21 October using the unchanged upstream harness at commit e5c2ed1ed86a7028a7ac3f94d4c789170eabae49. Its candidate and peer supports were validated. The stored Z witness initially has weight 62 from a four-trial recovery search; no d_Z=20 claim is inferred from an overall minimum of 20. Exact certification was attempted at cap 19 on one logical generator per sector using the unchanged upstream MILP routine with a 60-second limit per call. Both returned unresolved (103.75 and 97.13 seconds elapsed including overhead); the remaining 221 generators per side were not tested. No exact certificate is claimed. A fresh publication confirmation at repository commit 5d704d73f7022b745841274ed21ad2d8182898f6 completed 1,000,000 accelerated trials per side, seed 2026102101, depth 16 and eight threads, returning a validated X logical of weight 20 in 416 seconds. This witness is stored in the submission. The original and recovered witnesses were retained locally; no raw run outputs are added to the submission tree.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Historical pilot outcomes at lifts 71 and 83 were 14 or 16; the second</li>
+<p>lift-109 candidate dropped from 24 to 18, and the second lift-113 candidate dropped from 42 to 22 to 20. These are transcript-derived screening results, not fresh remeasurements.</p>
+<li>The bounded MILP probes did not prove exact distance. Increasing randomized</li>
+<p>RIS budgets does not substitute for an infeasibility proof.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GPT-6 (Codex for the original search; GPT-6.1 for recovery publication preparation). Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/surrogate.py</code>, <code>research/audits/leader_audit.py</code>, <code>verify/gf2_fast.cpp</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>. Compute: CPU only. The unchanged C++ accelerator was built with GCC for the publication confirmation. No exact-distance certificate and no circuit-level claim.</p>
+<h4>Reproduction</h4>
+<p>Rebuild the matrices in the exact submitted ordering with this recipe:</p>
+<pre>
+import numpy as np
+P = 109
+EX = [[13,82,43,52,73,10,49,97],
+      [48,26,5,31,30,71,42,68],
+      [25,95,9,6,93,0,23,74]]
+EZ = [[106,2,90,58,57,16,96,17],
+      [101,108,22,105,83,36,59,41],
+      [101,97,58,39,60,33,72,76]]
+def lift(E):
+    H = np.zeros((3*P,8*P), dtype=np.int8)
+    r = np.arange(P)
+    for i in range(3):
+        for j in range(8):
+            H[i*P+r,j*P+(r-E[i][j])%P] = 1
+    return H
+HX, HZ = lift(EX), lift(EZ)
+assert not np.any((HX @ HZ.T) % 2)
+</pre>
+<p>Cube matchings: M0=(0,4)(1,7)(2,6)(3,5), M1=(0,7)(1,2)(3,4)(5,6), M2=(0,2)(1,5)(3,7)(4,6). For block-row pair (i,j), each (a,b) in M[(i-j) mod 3] satisfies EX[i,a]-EX[i,b]-EZ[j,a]+EZ[j,b]=0 modulo 109. These paired differences establish CSS commutation. The matrices have ranks 325 and 325, hence k=872-650=222; every check has weight 8 and every column has weight 3. The inline recipe reproduces the matrix object without requiring the original search workspace.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/872-222-20.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/912-234-22.html">[[912,234,22]] — 912-234-22</a></h3><div class=kv style="color:var(--mut)">2026-10-21 &middot; submission note &middot; <a href="https://github.com/jacksongquera">@jacksongquera</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h3>[[912,234,22]] — pair-partition CPM (3,8) code at P = 114</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the unrestricted weight-8 CSS cell. At submission preparation on 21 October 2026, codes/928-238-22.json by @MicheldeMessieres has the highest reported kd^2/n in this cell, 124.12931. This candidate gives 124.18421 using its submitted upper bound. It extends the Pareto frontier and dominates no existing entry: relative to that comparator it uses fewer physical qubits but encodes fewer logical qubits, at the same reported distance and weight. The score comparison is separate from Pareto dominance and could change if a lighter logical is found.</p>
+<p>The comparator&#x27;s note reports two P = 114, k = 234 draws reading 22 in a Stern screen without further investigation. The hypothesis here was that a longer anneal of the 8-cycle count could produce a P = 114 draw that retained that reading under deeper searches. This is evidence about a selected instance, not a demonstrated causal advantage of annealing.</p>
+<p><b>Inspired by:</b> codes/928-238-22.json and codes/976-250-22.json by @MicheldeMessieres for the even-lift k = 2P + 6 mechanism, anneal length and fold filter; codes/904-230-22.json by @vprusso for the matchings and 8-cycle polishing; codes/808-206-20.json by @pandey-tushar for the girth-8 filter; and fieldnotes/2026-09-20-screening-traps-at-n-900.md by @e-eight for the score and lift-cap discussion.</p>
+<p><b>Technique:</b> the pair-partition construction and paired-difference design system are due to Okada and Kasai (<a href="https://arxiv.org/abs/2607.14091v4">arXiv:2607.14091v4</a>). Quasi-cyclic quantum LDPC constructions using circulant permutation matrices precede this work, including Hagiwara and Imai (<a href="https://arxiv.org/abs/quant-ph/0701020v4">arXiv:quant-ph/0701020v4</a>). The contribution is this draw, the annealing schedule with fold checkpoints, and the distance evidence below. Literature novelty remains unverified.</p>
+<h4>What was searched</h4>
+<p>At P = 114, draw solutions of the 36 paired-difference equations in the Reproduction section using a 19-dimensional integer solution basis reduced modulo 114. Require girth 8 in both Tanner graphs and compute k over GF(2). The ordinary arms retain starting draws with k &gt;= 234; the residue-class arm selects a mod-3 class supporting k &gt;= 236.</p>
+<p>For subgroup orders m = 2, 3, 6, search the quotient lift over Z_(114/m) at 1,000 RIS trials per side. Lift a quotient word to the full code and check its commutation and non-membership in the same-type stabilizer row space. Discard a draw if a valid lifted logical has weight below 22. A quotient word alone is insufficient: its lift might be a stabilizer.</p>
+<p>For the long anneals, try 15,000 single-coefficient changes in the design basis. Reject girth violations; accept an increase delta in the summed 8-cycle count with probability exp(-delta/T), with T decreasing geometrically from 64 toward 4. Recheck the starting k after every accepted move and connectivity and the fold filter every 200 accepted moves, reverting to a validated checkpoint on failure. Return the validated state with the lowest 8-cycle count. For the submitted draw, k remains 234.</p>
+<p>The long-anneal arms screen at 2,000 RIS trials per side, then escalate readings of at least 22 through 10,000, 30,000 and 300,000 trials on fresh seeds. The greedy control instead uses 2,000 and 30,000 trials, with deep follow-up recorded separately. Counts below are completed task records, excluding metadata, reconciled on 21 October 2026. A screened draw has a recorded full-code RIS reading after its fold filter and climb.</p>
+<p>| Arm at P = 114 | Completed tasks | Fold-capped | Screened | Final recorded readings | |---|---:|---:|---:|---| | Greedy, 400 moves | 1,641 | 1,078 | 563 | 12: 77; 14: 20; 16: 188; 18: 128; 20: 148; 22: 2 | | Anneal, 15,000 moves, run 1 | 1,867 | 1,247 | 620 | 12: 9; 14: 20; 16: 219; 18: 130; 20: 240; 22: 2 | | Anneal, 15,000 moves, run 2 | 2,002 | 1,338 | 664 | 12: 7; 14: 22; 16: 267; 18: 96; 20: 272 | | Designed mod-3 class, 2,000 moves | 1,522 | 1,152 | 370 | 12: 23; 14: 15; 16: 186; 18: 47; 20: 99 |</p>
+<p>Annealed readings of 22 reached 300,000 trials; greedy readings reached 30,000. These are not matched-depth success rates. Follow-up appears below. The anneal runs screened 1,284 draws.</p>
+<h4>Evidence trail</h4>
+<p>Submitted draw seed: 72114432, anneal run 1. Each row below is a fresh-seed gf2_fast random-information-set search; the reading is the lightest logical found across the X and Z sides, not two separate side-specific readings. Finds were checked for zero syndrome and exclusion from the same-type stabilizer row space. Trial budgets are per side, distributed across threads.</p>
+<p>| Trials per side | Seed | Pair depth | Lightest found | |---:|---:|---:|---:| | 2,000 | 505801027 | 8 | 32 | | 10,000 | 506801030 | 8 | 22 | | 30,000 | 507801033 | 8 | 22 | | 300,000 | 508801036 | 8 | 22 | | 200,000 | 51 | 8 | 22 | | 2,000,000 | 52 | 8 | 22 | | 8,000,000 | 53 | 8 | 22 | | 500,000 | 909 | 48 | 22 |</p>
+<p>The ladder budgets sum to 11,042,000 trials per side, excluding fold and packaging searches and the gate. The first reading was 32; seven later rungs found 22. Separately, the stored X and Z witnesses have weight 22 and record 300,000-trial searches with seeds 777 and 778, respectively; the latter used the sides swapped. Both witness supports and their provenance are preserved.</p>
+<p>The campaign&#x27;s subgroup quotient filter found a valid lifted logical of weight 24 for this draw. A separate recorded research/foldbound.py run returned 152 as its lightest found lifted logical. These instruments use different partitions and neither supplies a lower bound; 152 does not exclude logicals below 152 and adds no tighter bound than the stored 22.</p>
+<p><b>Claim: d_X &lt;= 22 and d_Z &lt;= 22, with confidence upper_bound.</b> No lower bound is claimed. The incumbent&#x27;s notes/928-238-22.md reports a completed cpm_distance enumeration through weight 20 and a parity argument; that enumeration was not run here. Repeated heuristic failures to find a lighter logical do not provide the same evidence. Selecting the draw by its found upper bound also introduces a search-depth selection effect.</p>
+<p>The final-document gate through research/kit/promote.py passed against the current board: no lighter logical in 8,000 RIS trials, seed 1437419671; no dominator, dominated entry, distance-only peer or duplicate match. Board checks and frontier membership concern this board only; absence of fingerprint or WL matches is not a general proof of code inequivalence. CI&#x27;s fresh deep refutation remains outstanding, and its trial target is subject to a wall-clock budget.</p>
+<p>A second draw, seed 72115344, has different exponent arrays and the same reported parameters. Its in-worker readings were 38, 26, 22, 22 at 2,000, 10,000, 30,000, 300,000 trials. It then found 22 at 200,000 (seed 51), 2,000,000 (seed 52), and 8,000,000 (seed 53), all at pair depth 8. Its 8M rung completed in about 5,601 seconds. It is not submitted because the same parameter point adds no frontier extension. No depth-48 result is claimed for that second draw.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Greedy control seed 60114136 fell from 22 at 30,000 trials to 20 at</li>
+<p>300,000, seed 401. A second control, seed 61114449, read 22 at 30,000; no deeper follow-up is present in the reviewed records. It cannot be counted as either a deep success or a deep failure.</p>
+<li>The P = 114 mod-3 arm had 1,152 of 1,522 completed tasks fold-capped;</li>
+<p>all 370 screened results were at most 20. This is about 76% fold-capped, rather than the 92% reported in an earlier draft.</p>
+<li>At P = 115, the designed mod-5 arm completed 149 tasks: six fold-capped</li>
+<p>and 143 screened, reading 12 in 123 cases, 16 in 19, and 18 in one. This arm produced no reading of 22.</p>
+<li>Anneal run 2 produced no reading above 20 among 664 screened draws.</li>
+<p>These outcomes describe the tested draws, not an impossibility result for a lift or a residue class.</p>
+</ul>
+<h4>Tools</h4>
+<p>Code search: Claude Fable 5.1 in Claude Code, matching provenance.model, for @jacksongquera. Python and NumPy implement the design system, anneal and quotient filter; research/kit/surrogate.py wraps the verify/gf2_fast backend; research/kit/submit.py packages witnesses. Supplementary folding uses research/foldbound.py. The campaign estimated about 45 CPU-hours for four P = 114 search arms and 12 for follow-up ladders, approximately 57 total; these are campaign estimates, not a precise cost for this selected code. The custom search orchestration is described here and is not a committed script. Evidence reconciliation and submission preparation were performed afterward in Codex; the code-search model attribution is unchanged.</p>
+<h4>Reproduction</h4>
+<p>Set P = 114 and use these exponent arrays:</p>
+<pre>
+E_x = [[7, 36, 9, 74, 72, 80, 62, 78],
+       [87, 104, 31, 0, 102, 78, 34, 74],
+       [102, 26, 88, 102, 97, 50, 71, 12]]
+E_z = [[113, 58, 99, 76, 64, 82, 38, 100],
+       [65, 5, 67, 85, 80, 49, 70, 89],
+       [101, 72, 45, 98, 96, 46, 28, 58]]
+</pre>
+<p>Start with zero 342 by 912 binary matrices. For i = 0..2, j = 0..7, r = 0..113, set H_X[i*P+r, j*P+((r-E_x[i][j]) mod P)] = 1; use E_z for H_Z. Qubit j*P+c is column block j, offset c. Enumerate rows in increasing i*P+r order and sort each support to reconstruct checks.X and checks.Z in codes/912-234-22.json.</p>
+<p>The matchings are M0 = (0,4)(1,7)(2,6)(3,5), M1 = (0,7)(1,2)(3,4)(5,6), M2 = (0,2)(1,5)(3,7)(4,6). For each pair (a,b) in M[(i-j) mod 3], the arrays obey E_x[i][a]-E_x[i][b]-E_z[j][a]+E_z[j][b] = 0 modulo 114. The two ranks are 339, so k = 912-339-339 = 234. Check weight is 8.</p>
+<p>Run <code>uv run python verify/qldpc_verify.py codes/912-234-22.json</code> to check structure, commutation, rank, connectivity and the stored nontrivial weight-22 witnesses, with its local refutation pass. The exponent arrays reconstruct the submitted matrices; they do not replay the heuristic search trajectory. This two-file submission includes no automated constructor or reproduction manifest. The arrays, lift rule, seeds and budgets are recorded here. No circuit tier is included: n = 912 exceeds the tier&#x27;s n &lt;= 200 cap.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/912-234-22.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/100-53-2.html">[[100,53,2]] — 100-53-2</a></h3><div class=kv style="color:var(--mut)">2026-10-20 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[100,53,2]] — C-DELETE-CHECK reduction</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Deletion of a check from a board entry.</p>
+<h4>Evidence trail</h4>
+<p>Gate passes, board_advancing.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/100-53-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/31-21-3.html">[[31,21,3]] — 31-21-3</a></h3><div class=kv style="color:var(--mut)">2026-10-20 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[31,21,3]] — CSS code from the Hamming [31,26,3] code and its Simplex dual</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>The <code>unrestricted</code> / weight-9plus cell. CSS codes with high <code>k</code> for small <code>n</code> are sparse: the largest CSS <code>k</code> on the board for <code>n &lt;= 31</code> was 20. A CSS code with <code>n = 31</code> and <code>k &gt;= 21</code> would therefore extend the frontier regardless of its distance, provided it was valid and connected.</p>
+<h4>What was searched</h4>
+<p>Construction by hand rather than random search. The classical Hamming code <code>[31,26,3]</code> over GF(2) contains its dual, the Simplex code <code>[31,5,16]</code>, so the standard CSS construction applies with <code>C_1 = C_2 = Hamming</code>. The parity-check matrix is the <code>5 x 31</code> matrix whose columns are all nonzero 5-bit vectors; the same matrix serves as both <code>H_X</code> and <code>H_Z</code> because its rows are self-orthogonal (the all-ones? no: <code>H H^T = 0</code> mod 2, since each coordinate is 1 in 16 of the 31 columns). This gives <code>n = 31</code>, <code>rank(H_X) = rank(H_Z) = 5</code>, hence <code>k = 31 - 5 - 5 = 21</code>, and <code>d = 3</code>.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>CSS commutation <code>H_X H_Z^T = 0</code> holds by construction.</li>
+<li><code>k = 21</code> computed as <code>n - rank(H_X) - rank(H_Z)</code>.</li>
+<li>Distance witness: lightest X-logical and Z-logical of weight 3 found at 500 RIS trials per side (<code>d &lt;= 3</code>, upper bound). The gate re-ran its own refutation search and did not find a lighter logical.</li>
+<li>Gate result: <code>passed: true</code>, <code>board_advancing: true</code>, cell <code>weight-9plus x unrestricted</code>.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>Random CSS search at <code>n = 9</code> and random bivariate-bicycle sweeps in this session produced only dominated or duplicate candidates; the Hamming construction was chosen to target the high-<code>k</code> gap directly.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Used <code>research/kit/css.py</code>, <code>research/kit/surrogate.py</code>, and <code>research/kit/submit.py</code>; verification via <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Build <code>H</code> as the <code>5 x 31</code> matrix whose columns are the integers <code>1..31</code> written in 5 bits (column <code>j</code> = binary representation of <code>j</code>). Set <code>H_X = H_Z = H</code>. Equivalently, <code>H[i, j] = (j &gt;&gt; i) &amp; 1</code> for <code>i in 0..4</code>, <code>j in 1..31</code> (0-indexed columns for <code>j-1</code>).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/31-21-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/44-25-2.html">[[44,25,2]] — 44-25-2</a></h3><div class=kv style="color:var(--mut)">2026-10-20 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[44,25,2]] — C-DELETE-CHECK reduction</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the frontier by deleting a check from a board entry, raising <code>k</code> while preserving <code>d</code> (inherited witnesses).</p>
+<h4>What was searched</h4>
+<p>Single C-DELETE-CHECK on parents in <code>n=41–50</code>, all rows, inherited-witness validation, full gate.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: a board entry with <code>n=44</code>.</li>
+<li>Delete one check → <code>n=44, k=25, d=2</code>.</li>
+<li>Distance is a witness-backed upper bound (both sides), gate passes.</li>
+<li><code>board_advancing: true</code>.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>Many deletions collapsed <code>d</code> via new lower-weight logicals; only a few survived the gate.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Calculus: the priced construction calculus, operation <code>C-DELETE-CHECK</code>.</p>
+<h4>Reproduction</h4>
+<p>Apply <code>C-DELETE-CHECK</code> with the row id in the candidate&#x27;s provenance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/44-25-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/10-4-1.html">[[10,4,1]] — 10-4-1</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[10,4,1]] Two C-DELETE-CHECK steps a1,a3 from 10-2-3-b.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Board-advancing code found by the priced construction calculus. Operation: two C-DELETE-CHECK steps on a board entry, raising k while keeping a witness-backed distance. Rule used: C-DELETE-CHECK (twice).</p>
 <h4>What was searched</h4>
@@ -16,7 +377,7 @@
 <p>Model: Beam 1.0. The local verdict is <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Reconstruct the parent board code, delete the two named checks in order, and recompute n, k, and the witness-backed distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/10-4-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/11-3-3-b.html">[[11,3,3]] — 11-3-3-b</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[11,3,3]] — graft reduction to an [[11,3,3]] CSS code</h3>
+<section class=blk><h3><a href="codes/11-3-3-b.html">[[11,3,3]] — 11-3-3-b</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[11,3,3]] — graft reduction to an [[11,3,3]] CSS code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the weight-6 x unrestricted cell with a smaller-n representative: the existing [[11,3,3]] entry and several larger-n siblings share parameters, so a graft that removes a qubit while preserving k, d, and weight class is a frontier extension on the n axis.</p>
 <h4>What was searched</h4>
@@ -31,7 +392,7 @@
 <p>Model: Beam 1.0. Harness: unreleased code calculus tool (E-GRAFT). Repo tooling: verify/validate_candidate.py, verify/qldpc_verify.py. Compute: local CPU.</p>
 <h4>Reproduction</h4>
 <p>The construction is not reproducible from a committed script: the generating tool is unreleased. The check matrices are given in codes/11-3-3-b.json; anyone can re-run the trusted gate with <code>uv run python verify/validate_candidate.py codes/11-3-3-b.json</code>. Construction stage is declared not reproducible.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-3-3-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/11-3-3-c.html">[[11,3,3]] — 11-3-3-c</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[11,3,3]] — E-GRAFT reduction of [[12,3,3]]</h3>
+<section class=blk><h3><a href="codes/11-3-3-c.html">[[11,3,3]] — 11-3-3-c</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[11,3,3]] — E-GRAFT reduction of [[12,3,3]]</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-6 × local-2d-single</code> cell: remove one qubit from the board&#x27;s <code>[[12,3,3]]</code> entry via the <code>E-GRAFT</code> rule of the priced construction calculus, preserving <code>k</code> and <code>d</code> while lowering <code>n</code> (and hence raising <code>kd²/n</code>).</p>
 <h4>What was searched</h4>
@@ -376,6 +737,13 @@
 <p>Model: Beam 1.0. The local verdict is <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Reconstruct the parent board code, delete the named check, and recompute n, k, and the witness-backed distance. The resulting checks are the submitted ones.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/40-23-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/52-29-2.html">[[52,29,2]] — 52-29-2</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[52,29,2]] — C-DELETE-CHECK reduction</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Deletion of a check from a board entry.</p>
+<h4>Evidence trail</h4>
+<p>Gate passes, board_advancing.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-29-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/6-5-1.html">[[6,5,1]] — 6-5-1</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[6,5,1]] C-DELETE-CHECK b1 from 6-4-2.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Board-advancing code found by the priced construction calculus. Operation: C-DELETE-CHECK applied to a board entry, raising k / lowering check weight while keeping a witness-backed distance. Rule used: C-DELETE-CHECK.</p>
