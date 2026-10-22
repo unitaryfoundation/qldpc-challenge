@@ -47,7 +47,7 @@ def _logicals(H_ker, H_row, n=6):
 
 
 def _vector(support, n=6):
-    """The 0/1 vector of a support."""
+    """Return the 0/1 vector of a support."""
     v = np.zeros(n, dtype=np.int8)
     for i in support:
         v[i] = 1
