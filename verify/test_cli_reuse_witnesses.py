@@ -553,3 +553,58 @@ def test_reuse_refuses_a_pauli_witness_index_outside_the_code(monkeypatch):
     with pytest.raises(SystemExit, match=r"outside \[0, 4\)"):
         _submit(monkeypatch, draft, extra=["--reuse-witnesses"],
                 matrices=(SA, SB))
+
+
+
+# ----------------------------------------------------------------------------
+# schema_version stays valid when the accelerator tightens (regression)
+# ----------------------------------------------------------------------------
+def test_reuse_tightened_doc_passes_real_verify(monkeypatch):
+    import qldpc_verify
+
+    _no_search(monkeypatch)
+    fast = _FakeFast(side="X", support=LIGHT_X)
+    monkeypatch.setattr(hd, "_fast", fast)
+    draft = _draft(HEAVY_X, LIGHT_Z)
+
+    doc = _submit(monkeypatch, draft, extra=["--reuse-witnesses"])
+
+    report = qldpc_verify.verify(doc, refute=False)
+    assert report["ok"], report["checks"]
+
+
+def test_npz_path_tightened_doc_passes_real_verify(monkeypatch):
+    import qldpc_verify
+
+    calls = {"n": 0}
+
+    def ris(HX, HZ, trials, seed):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return (len(HEAVY_X), _vector(HEAVY_X))
+        return (len(LIGHT_Z), _vector(LIGHT_Z))
+
+    monkeypatch.setattr(hd, "ris_min_logical", ris)
+    fast = _FakeFast(side="X", support=LIGHT_X)
+    monkeypatch.setattr(hd, "_fast", fast)
+
+    built = []
+
+    def load_checks(_p):
+        return (HX, HZ, None, None)
+
+    monkeypatch.setattr(qldpc, "load_checks", load_checks)
+    monkeypatch.setattr(qldpc, "attach_circuit_tier", lambda _d, _a: None)
+
+    def fake_verify(doc, refute):
+        built.append(doc)
+        return {"ok": True, "checks": [], "computed": {}, "earned_distance": {}}
+
+    monkeypatch.setattr(qldpc, "verify", fake_verify)
+    rc = qldpc.main(["submit", "x.npz", "--authors", "@me", "--dry-run",
+                     "--no-circuit", "--fast-trials", "300000", "--seed", "1"])
+    assert rc == 0
+    doc = built[0]
+
+    report = qldpc_verify.verify(doc, refute=False)
+    assert report["ok"], report["checks"]

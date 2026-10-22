@@ -200,10 +200,10 @@ def _supports(H):
 # the draft's `confidence` label: the document always records a
 # witness-backed `upper_bound`, which is what the draft's witness supports.
 
-# cli/qldpc.py's --fast-trials default is 2,000,000 accelerator trials shared
-# across the two sides, on top of 20,000 RIS trials per side; half of the
-# shared budget is the matching per-side depth. The same constant guards the
-# reuse path here (research/kit/promote.py: DEFAULT_MIN_DEEP_TRIALS).
+# cli/qldpc.py's --fast-trials default is 2,000,000 accelerator trials per
+# side (run_side is invoked once per side with the full budget), on top of
+# 20,000 RIS trials per side. The same constant guards the reuse path here
+# (research/kit/promote.py: DEFAULT_MIN_DEEP_TRIALS).
 REUSE_MIN_FAST_TRIALS = 1_000_000
 
 # The keys the schema's witnessProvenance accepts, and the ones it requires.
@@ -679,10 +679,18 @@ def build_submission(HX, HZ, args):
     dist = {"d": int(d), "X": xside, "Z": zside}
     prov = _provenance(args, draft)
 
+    # witness_provenance (a 0.2 feature) requires 0.2 or later; a code
+    # tier that carries it must not be filed as 0.1.
+    if prov.get("search_budget"):
+        _sv = "0.3"
+    elif wp_x or wp_z:
+        _sv = "0.2"
+    else:
+        _sv = "0.1"
     doc = {
         # search_budget is a 0.3 feature; without it the document stays at
         # the oldest version that describes it, so older readers accept it.
-        "schema_version": "0.3" if prov.get("search_budget") else "0.1",
+        "schema_version": _sv,
         "name": args.name or f"[[{n},{k},{d}]]",
         "code_type": "CSS",
         "n": n, "k": int(k),
@@ -1212,13 +1220,19 @@ def schema_version_for(doc):
     """Return the oldest schema version that describes the document.
 
     0.4 for a stabilizer code, 0.3 with a search budget, 0.2 with a circuit
-    block, else 0.1.
+    block or a witness_provenance, else 0.1.
     """
     if doc.get("code_type") == "stabilizer":
         return "0.4"
     if (doc.get("provenance") or {}).get("search_budget"):
         return "0.3"
-    if doc.get("circuit"):
+    dist = doc.get("distance") or {}
+    has_wp = False
+    for side in ("X", "Z", "P"):
+        if isinstance(dist.get(side), dict) and dist[side].get(
+                "witness_provenance"):
+            has_wp = True
+    if has_wp or doc.get("circuit"):
         return "0.2"
     return "0.1"
 
