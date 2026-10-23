@@ -2,9 +2,9 @@
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
   "literature": 449,
-  "no_match": 868,
-  "not_derived": 14,
-  "parameters_only": 255
+  "no_match": 791,
+  "not_derived": 1234,
+  "parameters_only": 254
  },
  "derivation_version": 1,
  "entries": {
@@ -33,6 +33,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "10-4-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "100-2-10": {
    "bucket": "no_match",
    "matches": []
@@ -48,6 +52,10 @@
     }
    ]
   },
+  "100-2-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "100-20-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -57,6 +65,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "100-23-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "100-24-5": {
    "bucket": "literature",
@@ -80,6 +92,10 @@
     }
    ]
   },
+  "100-30-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "100-4-14": {
    "bucket": "literature",
    "matches": [
@@ -102,6 +118,18 @@
     }
    ]
   },
+  "100-52-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "100-53-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "100-8-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "100-8-5": {
    "bucket": "literature",
    "matches": [
@@ -113,6 +141,14 @@
     }
    ]
   },
+  "1000-406-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "1000-407-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "101-5-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -122,6 +158,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "102-16-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "102-18-9": {
    "bucket": "no_match",
@@ -145,6 +185,18 @@
     }
    ]
   },
+  "102-6-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "102-8-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "103-30-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "104-30-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -165,6 +217,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "104-4-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "104-52-2": {
    "bucket": "literature",
@@ -211,6 +267,10 @@
     }
    ]
   },
+  "104-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "104-8-12": {
    "bucket": "literature",
    "matches": [
@@ -221,6 +281,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "105-21-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "105-25-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "106-2-15": {
    "bucket": "literature",
@@ -243,6 +311,14 @@
     }
    ]
   },
+  "108-10-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-12-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "108-12-7": {
    "bucket": "literature",
    "matches": [
@@ -253,6 +329,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "108-16-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "108-16-2": {
    "bucket": "literature",
@@ -296,6 +376,10 @@
     }
    ]
   },
+  "108-32-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "108-36-2": {
    "bucket": "literature",
    "matches": [
@@ -315,6 +399,18 @@
   },
   "108-36-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "108-4-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-4-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-4-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "108-40-2": {
@@ -352,6 +448,10 @@
     }
    ]
   },
+  "108-40-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "108-54-2": {
    "bucket": "literature",
    "matches": [
@@ -362,6 +462,18 @@
      "xz_swapped": false
     }
    ]
+  },
+  "108-56-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-58-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-6-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "108-6-6": {
    "bucket": "literature",
@@ -395,6 +507,18 @@
     }
    ]
   },
+  "108-8-12-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-8-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "108-8-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "108-8-6": {
    "bucket": "parameters_only",
    "matches": [
@@ -420,12 +544,32 @@
     }
    ]
   },
+  "11-3-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-3-3-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-3-3-c": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "11-5-3": {
    "bucket": "no_match",
    "matches": []
   },
   "110-2-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "110-25-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "110-28-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "110-8-11": {
@@ -438,6 +582,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "111-3-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "112-12-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "112-12-12": {
    "bucket": "literature",
@@ -464,6 +616,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "112-18-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "112-2-10": {
    "bucket": "parameters_only",
@@ -500,6 +656,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "112-40-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "112-42-2": {
    "bucket": "literature",
@@ -540,6 +700,10 @@
     }
    ]
   },
+  "112-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "112-6-7": {
    "bucket": "parameters_only",
    "matches": [
@@ -549,6 +713,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "112-6-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "112-8-13": {
    "bucket": "literature",
@@ -560,6 +728,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "113-1-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "114-4-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "114-4-14": {
    "bucket": "parameters_only",
@@ -592,6 +768,10 @@
     }
    ]
   },
+  "116-18-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "116-2-15": {
    "bucket": "literature",
    "matches": [
@@ -618,6 +798,18 @@
     }
    ]
   },
+  "117-13-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "117-19-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "117-38-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "117-44-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -627,6 +819,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "118-14-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "118-2-15": {
    "bucket": "literature",
@@ -654,6 +850,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "119-17-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "119-23-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "119-34-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -668,12 +872,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "119-35-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "119-36-3": {
    "bucket": "no_match",
    "matches": []
   },
   "119-37-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "119-37-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "119-38-3": {
@@ -713,6 +925,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "12-3-3-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-4-2": {
    "bucket": "parameters_only",
    "matches": [
@@ -744,8 +960,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "12-4-2-d": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-4-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-4-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "12-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-5-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-6-1": {
+   "bucket": "not_derived",
    "matches": []
   },
   "12-6-2": {
@@ -759,6 +995,14 @@
     }
    ]
   },
+  "12-6-2-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-7-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-8-2": {
    "bucket": "literature",
    "matches": [
@@ -769,6 +1013,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "12-8-2-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-9-1": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "120-12-10": {
    "bucket": "literature",
@@ -781,6 +1033,18 @@
     }
    ]
   },
+  "120-12-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "120-16-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "120-16-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "120-16-8": {
    "bucket": "literature",
    "matches": [
@@ -791,6 +1055,18 @@
      "xz_swapped": false
     }
    ]
+  },
+  "120-18-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "120-2-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "120-20-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "120-22-4": {
    "bucket": "parameters_only",
@@ -812,6 +1088,10 @@
     }
    ]
   },
+  "120-24-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "120-24-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -821,6 +1101,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "120-27-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "120-32-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "120-34-5": {
    "bucket": "parameters_only",
@@ -906,6 +1194,10 @@
     }
    ]
   },
+  "120-43-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "120-44-2": {
    "bucket": "literature",
    "matches": [
@@ -946,6 +1238,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "120-44-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "120-6-15": {
    "bucket": "literature",
@@ -1027,6 +1323,10 @@
     }
    ]
   },
+  "121-11-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "121-17-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -1048,6 +1348,10 @@
     }
    ]
   },
+  "123-3-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "123-3-7": {
    "bucket": "parameters_only",
    "matches": [
@@ -1058,8 +1362,20 @@
     }
    ]
   },
+  "123-8-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "124-10-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "124-10-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "124-10-15": {
+   "bucket": "not_derived",
    "matches": []
   },
   "124-14-11": {
@@ -1072,6 +1388,18 @@
     }
    ]
   },
+  "124-14-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "124-20-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "124-22-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "124-4-16": {
    "bucket": "literature",
    "matches": [
@@ -1082,6 +1410,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "125-25-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "125-25-4": {
    "bucket": "parameters_only",
@@ -1097,6 +1429,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "126-12-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "126-14-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "126-14-9": {
    "bucket": "literature",
    "matches": [
@@ -1108,6 +1448,14 @@
     }
    ]
   },
+  "126-16-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "126-18-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "126-18-14": {
    "bucket": "parameters_only",
    "matches": [
@@ -1117,6 +1465,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "126-18-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "126-18-7": {
    "bucket": "literature",
@@ -1139,6 +1491,18 @@
      "xz_swapped": false
     }
    ]
+  },
+  "126-20-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "126-20-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "126-24-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "126-26-9": {
    "bucket": "no_match",
@@ -1209,6 +1573,14 @@
     }
    ]
   },
+  "126-54-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "126-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "126-6-16": {
    "bucket": "parameters_only",
    "matches": [
@@ -1244,6 +1616,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "127-1-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "128-12-16": {
    "bucket": "parameters_only",
    "matches": [
@@ -1263,6 +1639,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "128-14-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "128-16-6": {
    "bucket": "literature",
@@ -1326,6 +1706,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "128-42-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "128-48-2": {
    "bucket": "literature",
@@ -1430,8 +1814,20 @@
     }
    ]
   },
+  "128-8-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "13-1-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "130-14-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "130-29-13": {
+   "bucket": "not_derived",
    "matches": []
   },
   "130-8-7": {
@@ -1458,6 +1854,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "132-32-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "132-4-12": {
    "bucket": "literature",
@@ -1498,6 +1898,10 @@
     }
    ]
   },
+  "132-47-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "132-48-2": {
    "bucket": "literature",
    "matches": [
@@ -1530,6 +1934,22 @@
      "source": "codetables"
     }
    ]
+  },
+  "132-8-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "133-19-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "133-25-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "134-2-17": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "134-2-18": {
    "bucket": "literature",
@@ -1674,6 +2094,10 @@
     }
    ]
   },
+  "137-1-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "139-7-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -1720,6 +2144,14 @@
     }
    ]
   },
+  "14-7-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "14-7-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "14-8-2": {
    "bucket": "literature",
    "matches": [
@@ -1731,6 +2163,10 @@
     }
    ]
   },
+  "14-9-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "140-10-10": {
    "bucket": "parameters_only",
    "matches": [
@@ -1740,6 +2176,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "140-10-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "140-12-15": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "140-20-6": {
    "bucket": "literature",
@@ -1751,6 +2195,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "140-31-14": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "140-42-2": {
    "bucket": "literature",
@@ -1836,6 +2284,22 @@
     }
    ]
   },
+  "142-2-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "143-13-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "143-15-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "143-23-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "144-10-16": {
    "bucket": "parameters_only",
    "matches": [
@@ -1845,6 +2309,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "144-10-16-b": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "144-12-12": {
    "bucket": "literature",
@@ -1892,6 +2360,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "144-12-12-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "144-12-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "144-14-14": {
    "bucket": "parameters_only",
@@ -1954,6 +2430,14 @@
     }
    ]
   },
+  "144-2-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "144-24-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "144-36-4": {
    "bucket": "literature",
    "matches": [
@@ -1982,6 +2466,10 @@
     }
    ]
   },
+  "144-4-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "144-42-2": {
    "bucket": "literature",
    "matches": [
@@ -1992,6 +2480,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "144-44-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "144-48-2": {
    "bucket": "literature",
@@ -2052,6 +2544,10 @@
     }
    ]
   },
+  "144-76-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "144-8-12": {
    "bucket": "no_match",
    "matches": []
@@ -2097,8 +2593,20 @@
     }
    ]
   },
+  "144-8-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "145-32-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "146-18-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "146-18-15": {
+   "bucket": "not_derived",
    "matches": []
   },
   "146-18-4": {
@@ -2111,6 +2619,18 @@
     }
    ]
   },
+  "146-18-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "146-20-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "147-21-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "148-2-19": {
    "bucket": "literature",
    "matches": [
@@ -2121,6 +2641,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "148-39-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "148-4-18": {
    "bucket": "literature",
@@ -2178,6 +2702,10 @@
     }
    ]
   },
+  "150-24-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "150-30-10": {
    "bucket": "parameters_only",
    "matches": [
@@ -2190,6 +2718,34 @@
   },
   "150-32-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "150-33-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "150-33-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "150-4-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "150-53-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "150-62-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "150-8-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "151-1-21": {
+   "bucket": "not_derived",
    "matches": []
   },
   "151-6-8": {
@@ -2298,6 +2854,22 @@
     }
    ]
   },
+  "154-8-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "155-5-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "155-6-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "155-6-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "156-2-17": {
    "bucket": "literature",
    "matches": [
@@ -2365,6 +2937,10 @@
     }
    ]
   },
+  "156-8-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "156-80-2": {
    "bucket": "literature",
    "matches": [
@@ -2424,6 +3000,10 @@
     }
    ]
   },
+  "16-2-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "16-4-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -2433,6 +3013,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "16-4-4-s": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "16-6-3": {
    "bucket": "parameters_only",
@@ -2487,6 +3071,14 @@
     }
    ]
   },
+  "160-14-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "160-16-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "160-18-6": {
    "bucket": "no_match",
    "matches": []
@@ -2513,6 +3105,10 @@
     }
    ]
   },
+  "160-24-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "160-32-10": {
    "bucket": "parameters_only",
    "matches": [
@@ -2522,6 +3118,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "160-35-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "160-36-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "160-4-19": {
    "bucket": "literature",
@@ -2550,6 +3154,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "160-42-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "160-48-2": {
    "bucket": "literature",
@@ -2655,8 +3263,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "161-23-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "161-8-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "162-12-17": {
+   "bucket": "not_derived",
    "matches": []
   },
   "162-16-9": {
@@ -2669,6 +3285,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "162-18-7": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "162-4-13": {
    "bucket": "literature",
@@ -2733,6 +3353,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "162-84-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "163-12-10": {
    "bucket": "parameters_only",
@@ -2808,12 +3432,28 @@
     }
    ]
   },
+  "168-10-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "168-10-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "168-10-8": {
    "bucket": "no_match",
    "matches": []
   },
   "168-12-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "168-12-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "168-12-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "168-12-4": {
@@ -2844,6 +3484,10 @@
     }
    ]
   },
+  "168-14-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "168-16-10": {
    "bucket": "literature",
    "matches": [
@@ -2865,6 +3509,10 @@
     }
    ]
   },
+  "168-16-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "168-18-10": {
    "bucket": "literature",
    "matches": [
@@ -2875,6 +3523,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "168-20-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "168-20-14": {
    "bucket": "parameters_only",
@@ -2907,6 +3559,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "168-24-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "168-28-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "168-4-14": {
    "bucket": "no_match",
@@ -2955,6 +3615,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "168-59-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "168-6-16": {
    "bucket": "no_match",
@@ -3033,21 +3697,19 @@
     }
    ]
   },
+  "169-13-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "169-13-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "169-8-9": {
    "bucket": "parameters_only",
    "matches": [
     {
      "id": "codetables:[[169,8]]",
-     "ref": "https://codetables.de -- bounds only, no construction to compare",
-     "source": "codetables"
-    }
-   ]
-  },
-  "17-1-5": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "codetables:[[17,1]]",
      "ref": "https://codetables.de -- bounds only, no construction to compare",
      "source": "codetables"
     }
@@ -3061,6 +3723,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "17-1-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "170-16-10": {
    "bucket": "parameters_only",
    "matches": [
@@ -3070,6 +3736,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "170-16-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "170-16-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "170-18-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "170-2-13": {
    "bucket": "no_match",
@@ -3089,6 +3767,10 @@
     }
    ]
   },
+  "170-37-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "170-52-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -3099,6 +3781,10 @@
     }
    ]
   },
+  "170-70-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "170-8-20": {
    "bucket": "parameters_only",
    "matches": [
@@ -3108,6 +3794,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "171-25-7": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "172-2-21": {
    "bucket": "literature",
@@ -3130,6 +3820,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "172-48-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "173-1-23": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "174-4-18": {
    "bucket": "parameters_only",
@@ -3200,6 +3898,10 @@
     }
    ]
   },
+  "176-48-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "176-6-19": {
    "bucket": "literature",
    "matches": [
@@ -3221,6 +3923,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "176-8-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "176-88-2": {
    "bucket": "literature",
@@ -3249,6 +3955,10 @@
     }
    ]
   },
+  "177-3-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "177-9-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -3269,6 +3979,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "178-2-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "178-22-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "178-24-13": {
    "bucket": "parameters_only",
@@ -3294,6 +4012,10 @@
     }
    ]
   },
+  "18-1-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "18-10-2": {
    "bucket": "literature",
    "matches": [
@@ -3304,6 +4026,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "18-12-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "18-2-5": {
    "bucket": "literature",
@@ -3318,6 +4044,14 @@
   },
   "18-2-5-b": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "18-2-5-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "18-3-5": {
+   "bucket": "not_derived",
    "matches": []
   },
   "18-4-3": {
@@ -3341,6 +4075,10 @@
     }
    ]
   },
+  "18-4-4-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "18-8-2": {
    "bucket": "literature",
    "matches": [
@@ -3352,6 +4090,34 @@
     }
    ]
   },
+  "18-8-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-10-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-12-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-12-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-14-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-16-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-16-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "180-18-14": {
    "bucket": "parameters_only",
    "matches": [
@@ -3361,6 +4127,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "180-2-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "180-2-15": {
    "bucket": "literature",
@@ -3373,6 +4143,10 @@
     }
    ]
   },
+  "180-20-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "180-20-14": {
    "bucket": "parameters_only",
    "matches": [
@@ -3382,6 +4156,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "180-20-15": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "180-20-7": {
    "bucket": "literature",
@@ -3394,6 +4172,14 @@
     }
    ]
   },
+  "180-22-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-24-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "180-36-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -3404,6 +4190,10 @@
     }
    ]
   },
+  "180-39-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "180-4-14": {
    "bucket": "parameters_only",
    "matches": [
@@ -3413,6 +4203,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "180-4-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-4-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-48-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "180-54-2": {
    "bucket": "literature",
@@ -3460,6 +4262,22 @@
      "xz_swapped": false
     }
    ]
+  },
+  "180-8-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-94-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "180-94-4-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "182-32-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "182-6-12": {
    "bucket": "parameters_only",
@@ -3534,6 +4352,10 @@
     }
    ]
   },
+  "185-40-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "186-10-14": {
    "bucket": "parameters_only",
    "matches": [
@@ -3555,6 +4377,58 @@
     }
    ]
   },
+  "186-10-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-10-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-12-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-14-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-14-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-16-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-20-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-20-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-20-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-30-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-64-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "186-65-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "187-27-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "188-4-21": {
    "bucket": "literature",
    "matches": [
@@ -3566,6 +4440,22 @@
     }
    ]
   },
+  "188-49-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "188-95-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "188-95-3-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "189-27-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "19-1-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -3575,6 +4465,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "190-20-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "190-38-8": {
    "bucket": "parameters_only",
@@ -3595,6 +4489,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "190-78-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "191-27-3": {
    "bucket": "parameters_only",
@@ -3650,6 +4548,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "192-14-18": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "192-14-4": {
    "bucket": "literature",
@@ -4148,6 +5050,14 @@
     }
    ]
   },
+  "196-12-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "196-12-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "196-15-11": {
    "bucket": "parameters_only",
    "matches": [
@@ -4157,6 +5067,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "196-16-17": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "196-2-14": {
    "bucket": "no_match",
@@ -4195,6 +5109,10 @@
     }
    ]
   },
+  "196-56-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "196-6-20": {
    "bucket": "literature",
    "matches": [
@@ -4205,6 +5123,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "197-26-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "197-5-7": {
    "bucket": "parameters_only",
@@ -4225,6 +5147,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "198-22-7": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "198-24-18": {
    "bucket": "no_match",
@@ -4277,6 +5203,18 @@
    "bucket": "no_match",
    "matches": []
   },
+  "20-2-6-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "20-3-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "20-4-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "20-8-2": {
    "bucket": "literature",
    "matches": [
@@ -4320,6 +5258,14 @@
     }
    ]
   },
+  "200-16-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "200-16-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "200-2-20": {
    "bucket": "literature",
    "matches": [
@@ -4330,6 +5276,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "200-24-16": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "200-40-12": {
    "bucket": "parameters_only",
@@ -4351,6 +5301,10 @@
     }
    ]
   },
+  "200-43-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "200-60-2": {
    "bucket": "literature",
    "matches": [
@@ -4361,6 +5315,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "200-8-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "200-8-14": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "200-8-18": {
    "bucket": "literature",
@@ -4449,6 +5411,22 @@
    "bucket": "no_match",
    "matches": []
   },
+  "204-18-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "204-22-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "204-24-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "204-28-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "204-4-20": {
    "bucket": "parameters_only",
    "matches": [
@@ -4458,6 +5436,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "204-72-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "205-12-12": {
    "bucket": "parameters_only",
@@ -4483,6 +5465,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "205-8-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "207-8-10": {
    "bucket": "no_match",
    "matches": []
@@ -4495,12 +5481,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "21-1-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "21-2-6": {
    "bucket": "no_match",
    "matches": []
   },
+  "21-3-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "210-10-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "210-10-21": {
+   "bucket": "not_derived",
    "matches": []
   },
   "210-12-10": {
@@ -4512,6 +5510,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "210-12-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "210-14-20": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "210-24-20": {
    "bucket": "parameters_only",
@@ -4537,6 +5543,10 @@
     }
    ]
   },
+  "210-28-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "210-42-12": {
    "bucket": "parameters_only",
    "matches": [
@@ -4547,6 +5557,18 @@
     }
    ]
   },
+  "210-56-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "210-6-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "210-60-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "210-8-16": {
    "bucket": "parameters_only",
    "matches": [
@@ -4556,6 +5578,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "210-86-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "210-90-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "211-12-12": {
    "bucket": "parameters_only",
@@ -4588,6 +5618,14 @@
     }
    ]
   },
+  "216-10-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "216-112-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "216-12-18": {
    "bucket": "parameters_only",
    "matches": [
@@ -4598,6 +5636,18 @@
     }
    ]
   },
+  "216-24-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "216-4-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "216-4-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "216-6-23": {
    "bucket": "parameters_only",
    "matches": [
@@ -4607,6 +5657,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "216-76-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "216-76-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "216-8-14": {
    "bucket": "no_match",
@@ -4625,6 +5683,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "216-8-20": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "216-8-21": {
    "bucket": "parameters_only",
@@ -4690,8 +5752,48 @@
     }
    ]
   },
+  "220-47-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "220-52-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "222-4-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "222-52-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "222-76-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "224-112-2": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "224-12-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-12-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-18-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-18-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-18-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "224-22-16": {
@@ -4704,6 +5806,18 @@
     }
    ]
   },
+  "224-24-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "224-52-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "224-6-20": {
    "bucket": "parameters_only",
    "matches": [
@@ -4713,6 +5827,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "224-6-21": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "225-1-15": {
    "bucket": "no_match",
@@ -4730,6 +5848,14 @@
   },
   "226-2-15": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "228-34-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "228-4-17": {
+   "bucket": "not_derived",
    "matches": []
   },
   "228-82-12": {
@@ -4776,6 +5902,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "23-1-7-cyclic": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "23-11-3": {
    "bucket": "no_match",
    "matches": []
@@ -4800,6 +5930,10 @@
     }
    ]
   },
+  "230-40-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "230-46-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -4809,6 +5943,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "230-94-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "232-104-3": {
    "bucket": "parameters_only",
@@ -4840,6 +5978,18 @@
     }
    ]
   },
+  "234-12-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "234-156-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "234-24-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "234-26-7": {
    "bucket": "no_match",
    "matches": []
@@ -4853,6 +6003,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "234-52-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "234-72-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "234-78-3": {
    "bucket": "no_match",
@@ -4868,6 +6026,18 @@
     }
    ]
   },
+  "234-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "234-82-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "235-96-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "236-16-12": {
    "bucket": "parameters_only",
    "matches": [
@@ -4877,6 +6047,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "238-6-14": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "238-6-18": {
    "bucket": "no_match",
@@ -4966,6 +6140,14 @@
     }
    ]
   },
+  "24-15-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "24-16-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "24-2-6": {
    "bucket": "literature",
    "matches": [
@@ -4987,6 +6169,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "24-4-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "24-6-4": {
    "bucket": "literature",
@@ -5018,6 +6204,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "240-10-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "240-12-12": {
    "bucket": "parameters_only",
    "matches": [
@@ -5027,6 +6217,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "240-122-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "240-13-15": {
    "bucket": "parameters_only",
@@ -5048,6 +6242,18 @@
     }
    ]
   },
+  "240-16-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-16-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-16-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "240-16-20": {
    "bucket": "parameters_only",
    "matches": [
@@ -5062,8 +6268,44 @@
    "bucket": "no_match",
    "matches": []
   },
+  "240-18-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-20-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-20-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-22-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-24-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-24-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-28-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "240-30-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "240-32-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-4-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "240-48-12": {
@@ -5075,6 +6317,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "240-51-18": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "240-6-11": {
    "bucket": "parameters_only",
@@ -5095,6 +6341,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "240-8-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "240-8-14": {
    "bucket": "parameters_only",
@@ -5119,6 +6369,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "240-8-20-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-82-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "240-90-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "241-121-3": {
    "bucket": "parameters_only",
@@ -5154,6 +6416,10 @@
     }
    ]
   },
+  "245-49-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "246-4-22": {
    "bucket": "parameters_only",
    "matches": [
@@ -5163,6 +6429,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "246-84-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "247-35-3": {
    "bucket": "parameters_only",
@@ -5194,8 +6464,36 @@
     }
    ]
   },
+  "248-10-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "248-126-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "248-16-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "248-20-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "248-24-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "248-62-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "248-66-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "249-42-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "249-8-11": {
@@ -5213,6 +6511,14 @@
     }
    ]
   },
+  "25-1-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "25-5-3-cyclic": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "25-5-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -5222,6 +6528,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "25-5-5-cyclic": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "25-7-4": {
    "bucket": "no_match",
@@ -5233,6 +6543,10 @@
   },
   "25-9-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "250-40-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "250-50-16": {
@@ -5249,6 +6563,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "252-108-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "252-12-14": {
    "bucket": "no_match",
    "matches": []
@@ -5263,6 +6581,14 @@
     }
    ]
   },
+  "252-12-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-128-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "252-130-6": {
    "bucket": "parameters_only",
    "matches": [
@@ -5272,6 +6598,62 @@
      "source": "codetables"
     }
    ]
+  },
+  "252-130-6-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-16-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-168-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-18-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-20-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-20-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-20-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-22-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-22-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-22-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-26-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-30-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-32-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "252-84-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "253-13-5": {
    "bucket": "parameters_only",
@@ -5283,6 +6665,10 @@
     }
    ]
   },
+  "254-126-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "254-14-16": {
    "bucket": "parameters_only",
    "matches": [
@@ -5292,6 +6678,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "254-14-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "254-14-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "254-28-22": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "254-42-14": {
    "bucket": "no_match",
@@ -5339,12 +6737,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "254-84-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "254-86-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "254-98-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "256-110-16": {
    "bucket": "no_match",
    "matches": []
   },
   "256-120-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "256-120-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "256-130-8": {
@@ -5359,6 +6773,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "256-16-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "256-194-4": {
    "bucket": "no_match",
    "matches": []
@@ -5371,12 +6789,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "256-68-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "258-32-22": {
    "bucket": "no_match",
    "matches": []
   },
   "258-6-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "258-88-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "259-12-14": {
@@ -5399,6 +6825,22 @@
      "xz_swapped": false
     }
    ]
+  },
+  "26-2-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "26-8-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "260-58-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "260-80-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "261-37-3": {
    "bucket": "no_match",
@@ -5426,8 +6868,20 @@
     }
    ]
   },
+  "264-4-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "264-6-12": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "264-70-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "264-8-11": {
+   "bucket": "not_derived",
    "matches": []
   },
   "264-8-18": {
@@ -5436,6 +6890,10 @@
   },
   "264-8-22": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "264-88-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "265-8-12": {
@@ -5450,8 +6908,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "268-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "268-8-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "27-11-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "27-2-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "27-3-5-cyclic": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "27-3-7": {
+   "bucket": "not_derived",
    "matches": []
   },
   "270-10-24": {
@@ -5462,12 +6940,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "270-24-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "270-24-30": {
    "bucket": "no_match",
    "matches": []
   },
   "270-30-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "270-34-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "270-36-13": {
+   "bucket": "not_derived",
    "matches": []
   },
   "270-5-13": {
@@ -5478,6 +6968,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "270-72-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "270-8-20": {
    "bucket": "no_match",
    "matches": []
@@ -5486,8 +6980,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "270-94-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "271-7-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "272-144-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "272-152-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "275-39-3": {
@@ -5524,6 +7030,10 @@
   },
   "276-8-12": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "276-96-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "276-98-14": {
@@ -5567,6 +7077,10 @@
     }
    ]
   },
+  "278-44-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "28-10-3": {
    "bucket": "literature",
    "matches": [
@@ -5577,6 +7091,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "28-12-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "28-14-2": {
    "bucket": "literature",
@@ -5600,6 +7118,10 @@
     }
    ]
   },
+  "28-17-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "28-2-6": {
    "bucket": "literature",
    "matches": [
@@ -5611,6 +7133,10 @@
     }
    ]
   },
+  "28-3-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "28-4-5": {
    "bucket": "literature",
    "matches": [
@@ -5621,6 +7147,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "28-4-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "28-4-6-b": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "28-6-2": {
    "bucket": "literature",
@@ -5638,6 +7172,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "28-6-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "28-7-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "28-8-4": {
    "bucket": "literature",
@@ -5658,8 +7200,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "280-12-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "280-120-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "280-20-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "280-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "280-6-15": {
+   "bucket": "not_derived",
    "matches": []
   },
   "280-6-22": {
@@ -5670,12 +7228,32 @@
    "bucket": "no_match",
    "matches": []
   },
+  "280-74-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "280-8-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "281-121-4": {
    "bucket": "no_match",
    "matches": []
   },
+  "282-143-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "282-96-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "284-58-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "286-88-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "288-100-3": {
@@ -5703,8 +7281,16 @@
     }
    ]
   },
+  "288-12-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-12-24": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "288-148-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "288-16-16": {
@@ -5719,12 +7305,36 @@
    "bucket": "no_match",
    "matches": []
   },
+  "288-16-24-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-18-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "288-18-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-24-18": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "288-28-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "288-32-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "288-36-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "288-4-20": {
+   "bucket": "not_derived",
    "matches": []
   },
   "288-46-8": {
@@ -5772,12 +7382,32 @@
     }
    ]
   },
+  "288-6-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "288-6-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "288-64-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-74-4": {
    "bucket": "no_match",
    "matches": []
   },
+  "288-76-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-8-12": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "288-8-15": {
+   "bucket": "not_derived",
    "matches": []
   },
   "288-8-20": {
@@ -5791,12 +7421,20 @@
     }
    ]
   },
+  "288-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "288-8-24": {
    "bucket": "no_match",
    "matches": []
   },
   "288-8-35": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "288-9-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "289-1-17": {
@@ -5807,6 +7445,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "29-1-9-cyclic": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "290-64-6": {
    "bucket": "no_match",
    "matches": []
@@ -5815,24 +7457,96 @@
    "bucket": "no_match",
    "matches": []
   },
+  "292-148-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "292-18-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "292-18-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "292-18-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "292-22-23": {
+   "bucket": "not_derived",
    "matches": []
   },
   "294-10-14": {
    "bucket": "no_match",
    "matches": []
   },
+  "294-10-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "294-12-14": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "294-12-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-12-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-126-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-16-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-16-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-18-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-24-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-24-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-28-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "294-36-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "294-6-22": {
    "bucket": "no_match",
    "matches": []
   },
+  "294-6-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "294-8-19": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "296-78-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "298-2-17": {
@@ -5857,6 +7571,10 @@
     }
    ]
   },
+  "30-10-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-12-2": {
    "bucket": "literature",
    "matches": [
@@ -5867,6 +7585,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "30-12-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "30-14-3": {
    "bucket": "literature",
@@ -5890,6 +7612,10 @@
     }
    ]
   },
+  "30-17-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-2-7": {
    "bucket": "literature",
    "matches": [
@@ -5900,6 +7626,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "30-20-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "30-4-3": {
    "bucket": "parameters_only",
@@ -5958,6 +7688,10 @@
     }
    ]
   },
+  "30-7-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-8-3": {
    "bucket": "no_match",
    "matches": []
@@ -5973,20 +7707,60 @@
     }
    ]
   },
+  "30-8-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-8-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-9-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "300-104-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "300-12-25": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "300-152-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "300-16-10": {
    "bucket": "no_match",
    "matches": []
   },
+  "300-18-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "300-2-30": {
    "bucket": "no_match",
    "matches": []
   },
+  "300-20-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "300-20-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "300-28-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "300-32-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "300-36-13": {
+   "bucket": "not_derived",
    "matches": []
   },
   "300-4-27": {
@@ -6005,12 +7779,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "300-8-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "300-8-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "302-120-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "302-2-28": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "302-32-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "302-36-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "303-3-11": {
@@ -6019,6 +7809,22 @@
   },
   "303-43-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "306-106-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "306-204-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "306-26-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "306-68-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "308-10-26": {
@@ -6035,6 +7841,14 @@
   },
   "31-1-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "31-1-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "31-21-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "310-10-22": {
@@ -6061,6 +7875,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "310-20-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "310-6-26": {
    "bucket": "no_match",
    "matches": []
@@ -6069,12 +7887,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "312-104-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "312-2-39": {
    "bucket": "no_match",
    "matches": []
   },
+  "312-208-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "312-8-22": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "312-96-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "315-254-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "315-63-8": {
@@ -6111,6 +7945,10 @@
   },
   "316-2-37": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "316-8-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "317-41-3": {
@@ -6228,6 +8066,14 @@
     }
    ]
   },
+  "32-18-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "32-19-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "32-2-7": {
    "bucket": "literature",
    "matches": [
@@ -6238,6 +8084,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "32-4-7": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "32-6-6": {
    "bucket": "literature",
@@ -6261,6 +8111,14 @@
     }
    ]
   },
+  "320-16-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "320-36-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "320-6-28": {
    "bucket": "no_match",
    "matches": []
@@ -6271,6 +8129,10 @@
   },
   "320-64-14": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "320-64-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "320-64-9": {
@@ -6285,12 +8147,24 @@
    "bucket": "not_derived",
    "matches": []
   },
-  "322-2-41": {
-   "bucket": "no_match",
+  "322-2-39": {
+   "bucket": "not_derived",
    "matches": []
   },
   "323-43-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "324-108-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "324-166-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "324-166-6-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "324-2-18": {
@@ -6299,6 +8173,10 @@
   },
   "324-4-30": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "324-72-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "325-5-9": {
@@ -6332,8 +8210,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "329-190-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "33-2-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "33-3-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "330-10-27": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "330-112-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "330-14-33": {
@@ -6360,8 +8254,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "330-50-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "330-6-32": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "330-60-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "330-66-10": {
@@ -6378,6 +8280,10 @@
   },
   "330-67-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "330-68-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "330-68-7": {
@@ -6408,8 +8314,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "336-10-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "336-12-24": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "336-16-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "336-20-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "336-20-20": {
@@ -6418,6 +8336,10 @@
   },
   "336-20-21": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "336-24-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "336-24-18": {
@@ -6448,6 +8370,22 @@
    "bucket": "no_match",
    "matches": []
   },
+  "336-88-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "338-104-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "338-8-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "34-16-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "34-2-7": {
    "bucket": "literature",
    "matches": [
@@ -6458,6 +8396,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "34-2-7-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "34-2-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "34-4-3": {
    "bucket": "parameters_only",
@@ -6477,6 +8423,34 @@
    "bucket": "no_match",
    "matches": []
   },
+  "340-16-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "340-18-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "340-188-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "342-118-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "342-40-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "342-40-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "342-42-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "342-46-3": {
    "bucket": "no_match",
    "matches": []
@@ -6485,12 +8459,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "342-76-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "344-6-40": {
    "bucket": "no_match",
    "matches": []
   },
   "344-8-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "345-278-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "345-8-14": {
+   "bucket": "not_derived",
    "matches": []
   },
   "345-9-7": {
@@ -6519,8 +8505,12 @@
     }
    ]
   },
-  "348-2-44": {
-   "bucket": "no_match",
+  "348-2-41": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "348-24-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "348-4-34": {
@@ -6531,12 +8521,36 @@
    "bucket": "no_match",
    "matches": []
   },
+  "35-17-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-18-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-19-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-5-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-5-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "350-20-30": {
    "bucket": "no_match",
    "matches": []
   },
-  "350-20-44": {
-   "bucket": "no_match",
+  "350-20-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "350-6-17": {
+   "bucket": "not_derived",
    "matches": []
   },
   "350-6-26": {
@@ -6615,8 +8629,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "355-144-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "356-13-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "356-4-31": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "357-210-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "358-2-29": {
@@ -6705,6 +8731,10 @@
     }
    ]
   },
+  "36-16-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "36-18-2": {
    "bucket": "literature",
    "matches": [
@@ -6715,6 +8745,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "36-19-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "36-2-6": {
    "bucket": "literature",
@@ -6749,6 +8783,18 @@
     }
    ]
   },
+  "36-20-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-21-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-24-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "36-4-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -6776,6 +8822,14 @@
     }
    ]
   },
+  "36-4-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-4-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "36-6-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -6790,6 +8844,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "36-6-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-6-6-m": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-7-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "36-8-4": {
    "bucket": "parameters_only",
@@ -6834,6 +8900,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "360-12-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "360-12-24": {
    "bucket": "literature",
    "matches": [
@@ -6855,8 +8925,56 @@
    "bucket": "no_match",
    "matches": []
   },
+  "360-122-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-152-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-16-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-16-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-18-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-18-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-184-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-20-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-20-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-24-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "360-38-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "360-4-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-4-24": {
+   "bucket": "not_derived",
    "matches": []
   },
   "360-48-3": {
@@ -6887,12 +9005,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "360-8-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "360-8-27": {
    "bucket": "no_match",
    "matches": []
   },
-  "360-8-45": {
-   "bucket": "no_match",
+  "360-8-44": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "360-80-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "361-1-19": {
@@ -6913,6 +9039,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "364-112-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "364-13-11": {
    "bucket": "not_derived",
@@ -6943,6 +9073,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "37-21-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "37-22-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "37-5-3": {
    "bucket": "parameters_only",
@@ -6988,6 +9126,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "372-34-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "372-44-18": {
    "bucket": "no_match",
    "matches": []
@@ -7000,16 +9142,36 @@
    "bucket": "no_match",
    "matches": []
   },
+  "376-190-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "376-6-32": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "376-98-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "378-10-48": {
    "bucket": "no_match",
    "matches": []
   },
+  "378-10-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "378-12-27": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "378-128-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-16-25": {
+   "bucket": "not_derived",
    "matches": []
   },
   "378-16-36": {
@@ -7020,8 +9182,40 @@
    "bucket": "no_match",
    "matches": []
   },
-  "378-4-48": {
-   "bucket": "no_match",
+  "378-18-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-18-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-26-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-26-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-32-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-4-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-42-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "378-44-26": {
+   "bucket": "not_derived",
    "matches": []
   },
   "378-50-3": {
@@ -7032,6 +9226,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "378-84-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "379-51-3": {
    "bucket": "no_match",
    "matches": []
@@ -7040,12 +9238,44 @@
    "bucket": "no_match",
    "matches": []
   },
+  "38-2-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "38-2-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "382-36-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "384-12-17": {
    "bucket": "no_match",
    "matches": []
   },
   "384-16-23": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "384-16-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "384-18-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "384-18-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "384-196-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "384-36-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "384-52-3": {
@@ -7060,6 +9290,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "39-2-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "39-3-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "390-10-32": {
    "bucket": "no_match",
    "matches": []
@@ -7072,8 +9310,24 @@
    "bucket": "no_match",
    "matches": []
   },
-  "390-6-50": {
-   "bucket": "no_match",
+  "390-28-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "390-32-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "390-50-42": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "390-54-41": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "390-6-48": {
+   "bucket": "not_derived",
    "matches": []
   },
   "390-68-26": {
@@ -7128,12 +9382,32 @@
    "bucket": "no_match",
    "matches": []
   },
+  "391-13-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "392-102-14": {
    "bucket": "no_match",
    "matches": []
   },
+  "392-18-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "392-18-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "392-2-52": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "392-22-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "392-28-22": {
+   "bucket": "not_derived",
    "matches": []
   },
   "392-8-15": {
@@ -7171,8 +9445,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "396-202-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "396-202-6-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "396-88-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "398-54-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "399-234-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "4-2-2": {
@@ -7189,6 +9479,10 @@
      "source": "qecdb"
     }
    ]
+  },
+  "4-3-1": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "40-10-4": {
    "bucket": "literature",
@@ -7212,6 +9506,10 @@
     }
    ]
   },
+  "40-12-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "40-14-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -7232,6 +9530,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "40-16-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-18-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "40-2-8": {
    "bucket": "literature",
@@ -7261,6 +9567,14 @@
     }
    ]
   },
+  "40-20-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-21-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "40-22-2": {
    "bucket": "literature",
    "matches": [
@@ -7289,6 +9603,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "40-23-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-24-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "40-4-8": {
    "bucket": "literature",
@@ -7357,6 +9679,10 @@
     }
    ]
   },
+  "40-9-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "400-12-40": {
    "bucket": "no_match",
    "matches": []
@@ -7373,12 +9699,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "401-13-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "402-6-50": {
    "bucket": "no_match",
    "matches": []
   },
   "404-4-34": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "404-8-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "405-21-5": {
@@ -7389,12 +9723,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "405-81-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "406-6-28": {
    "bucket": "no_match",
    "matches": []
   },
-  "406-8-36": {
-   "bucket": "no_match",
+  "406-8-35": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "408-18-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "408-216-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "408-216-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "41-16-4": {
@@ -7427,16 +9777,28 @@
    "bucket": "no_match",
    "matches": []
   },
-  "410-2-57": {
-   "bucket": "no_match",
+  "410-2-55": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "410-48-30": {
+   "bucket": "not_derived",
    "matches": []
   },
   "410-8-16": {
    "bucket": "no_match",
    "matches": []
   },
+  "414-136-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "414-6-9": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "414-92-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "416-104-17": {
@@ -7445,6 +9807,10 @@
   },
   "416-36-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "416-39-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "416-4-50": {
@@ -7500,6 +9866,18 @@
     }
    ]
   },
+  "42-12-4-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "42-12-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "42-12-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "42-13-4": {
    "bucket": "no_match",
    "matches": []
@@ -7514,6 +9892,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "42-14-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "42-14-6": {
    "bucket": "parameters_only",
@@ -7574,6 +9956,10 @@
     }
    ]
   },
+  "42-28-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "42-4-7": {
    "bucket": "literature",
    "matches": [
@@ -7617,6 +10003,10 @@
     }
    ]
   },
+  "42-6-7-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "42-8-3": {
    "bucket": "literature",
    "matches": [
@@ -7639,6 +10029,10 @@
     }
    ]
   },
+  "420-10-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "420-10-30": {
    "bucket": "no_match",
    "matches": []
@@ -7647,8 +10041,44 @@
    "bucket": "no_match",
    "matches": []
   },
+  "420-14-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "420-18-26": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "420-24-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-249-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-28-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-32-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-4-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-6-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-8-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "420-8-14": {
+   "bucket": "not_derived",
    "matches": []
   },
   "420-8-26": {
@@ -7701,8 +10131,40 @@
    "bucket": "no_match",
    "matches": []
   },
+  "430-56-42": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "430-56-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "430-58-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "432-112-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "432-20-22": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "432-220-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "432-4-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "432-8-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "432-96-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "434-10-28": {
@@ -7713,8 +10175,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "434-16-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "434-2-39": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "434-30-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "434-40-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "434-52-48": {
+   "bucket": "not_derived",
    "matches": []
   },
   "434-58-3": {
@@ -7737,6 +10215,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "438-22-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "44-2-10": {
    "bucket": "literature",
    "matches": [
@@ -7747,6 +10229,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "44-2-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "44-22-2": {
    "bucket": "literature",
@@ -7769,6 +10255,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "44-25-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "44-4-7": {
    "bucket": "literature",
@@ -7795,8 +10285,20 @@
    "bucket": "no_match",
    "matches": []
   },
-  "442-2-65": {
-   "bucket": "no_match",
+  "441-252-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "442-2-60": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "442-234-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "442-234-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "442-60-3": {
@@ -7807,12 +10309,32 @@
    "bucket": "no_match",
    "matches": []
   },
+  "443-74-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "444-154-18": {
    "bucket": "no_match",
    "matches": []
   },
   "444-2-39": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "446-13-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "446-68-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "446-74-50": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "446-76-48": {
+   "bucket": "not_derived",
    "matches": []
   },
   "447-7-9": {
@@ -7838,6 +10360,10 @@
     }
    ]
   },
+  "45-5-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "45-9-3": {
    "bucket": "literature",
    "matches": [
@@ -7849,8 +10375,16 @@
     }
    ]
   },
+  "450-100-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "450-12-26": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "450-12-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "450-24-50": {
@@ -7869,8 +10403,12 @@
    "bucket": "no_match",
    "matches": []
   },
-  "452-2-40": {
-   "bucket": "no_match",
+  "452-115-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "452-2-38": {
+   "bucket": "not_derived",
    "matches": []
   },
   "452-228-2": {
@@ -7907,6 +10445,18 @@
    "bucket": "no_match",
    "matches": []
   },
+  "46-19-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "46-2-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "46-2-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "46-2-9": {
    "bucket": "literature",
    "matches": [
@@ -7917,6 +10467,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "46-20-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "462-10-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "462-10-60": {
    "bucket": "no_match",
@@ -7938,12 +10496,44 @@
    "bucket": "no_match",
    "matches": []
   },
+  "464-32-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "464-4-36": {
    "bucket": "no_match",
    "matches": []
   },
+  "466-118-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "466-2-65": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "466-58-50": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "466-58-52": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "466-58-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "466-60-53": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "466-60-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "466-60-57": {
+   "bucket": "not_derived",
    "matches": []
   },
   "467-63-3": {
@@ -7954,8 +10544,24 @@
    "bucket": "no_match",
    "matches": []
   },
-  "470-2-64": {
-   "bucket": "no_match",
+  "468-238-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "468-36-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "47-1-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "470-192-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "470-2-62": {
+   "bucket": "not_derived",
    "matches": []
   },
   "472-122-14": {
@@ -7964,6 +10570,10 @@
   },
   "472-122-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "474-18-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "476-34-8": {
@@ -7997,6 +10607,18 @@
     }
    ]
   },
+  "48-10-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-11-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-11-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "48-12-4": {
    "bucket": "literature",
    "matches": [
@@ -8019,6 +10641,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "48-14-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "48-15-4": {
    "bucket": "literature",
@@ -8060,6 +10686,10 @@
     }
    ]
   },
+  "48-16-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "48-16-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -8069,6 +10699,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "48-16-5-b": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "48-17-4": {
    "bucket": "no_match",
@@ -8087,6 +10721,10 @@
   },
   "48-18-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "48-18-4-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "48-19-3": {
@@ -8139,6 +10777,10 @@
     }
    ]
   },
+  "48-20-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "48-24-2": {
    "bucket": "literature",
    "matches": [
@@ -8155,6 +10797,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "48-24-3": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "48-25-2": {
    "bucket": "literature",
@@ -8202,6 +10848,22 @@
     }
    ]
   },
+  "48-29-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-30-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-32-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-4-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "48-4-7": {
    "bucket": "literature",
    "matches": [
@@ -8244,6 +10906,14 @@
     }
    ]
   },
+  "48-6-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-7-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "48-8-6": {
    "bucket": "literature",
    "matches": [
@@ -8254,6 +10924,26 @@
      "xz_swapped": false
     }
    ]
+  },
+  "48-8-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "48-8-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "480-12-36": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "480-24-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "480-24-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "480-32-9": {
    "bucket": "no_match",
@@ -8271,8 +10961,28 @@
    "bucket": "no_match",
    "matches": []
   },
-  "482-146-36": {
-   "bucket": "no_match",
+  "482-146-33": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "482-48-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "482-50-60": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "482-96-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "482-98-51": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "483-282-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "484-2-22": {
@@ -8293,6 +11003,10 @@
   },
   "488-126-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "488-44-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "49-1-7": {
@@ -8322,32 +11036,64 @@
    "bucket": "no_match",
    "matches": []
   },
-  "490-20-60": {
-   "bucket": "no_match",
+  "49-7-6": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "490-20-70": {
-   "bucket": "no_match",
+  "490-13-15": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "490-20-70-b": {
-   "bucket": "no_match",
+  "490-20-56": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "490-20-70-c": {
-   "bucket": "no_match",
+  "490-20-56-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "490-20-56-c": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "490-20-56-d": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "490-20-56-e": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "490-40-20": {
+   "bucket": "not_derived",
    "matches": []
   },
   "492-170-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "492-18-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "492-8-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "493-13-7": {
    "bucket": "no_match",
    "matches": []
   },
+  "493-153-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "494-2-65": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "494-304-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "495-67-3": {
@@ -8379,6 +11125,10 @@
   },
   "50-16-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "50-16-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "50-18-4": {
@@ -8447,6 +11197,10 @@
     }
    ]
   },
+  "50-6-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "50-8-5": {
    "bucket": "literature",
    "matches": [
@@ -8460,6 +11214,10 @@
   },
   "500-100-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "500-100-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "500-36-12": {
@@ -8482,8 +11240,36 @@
    "bucket": "no_match",
    "matches": []
   },
-  "502-2-75": {
-   "bucket": "no_match",
+  "502-2-71": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-10-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-16-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-16-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-18-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-24-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-256-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "504-26-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "504-36-8": {
@@ -8496,6 +11282,18 @@
   },
   "506-26-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "508-14-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "508-14-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "508-30-32": {
+   "bucket": "not_derived",
    "matches": []
   },
   "51-12-3": {
@@ -8519,6 +11317,10 @@
     }
    ]
   },
+  "51-3-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "51-7-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -8529,12 +11331,12 @@
     }
    ]
   },
-  "510-12-72": {
-   "bucket": "no_match",
+  "510-12-60": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "510-14-51": {
-   "bucket": "no_match",
+  "510-14-38": {
+   "bucket": "not_derived",
    "matches": []
   },
   "510-16-24": {
@@ -8549,12 +11351,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "510-20-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "510-278-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "510-32-10": {
    "bucket": "no_match",
    "matches": []
   },
   "510-34-9": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "510-38-25": {
+   "bucket": "not_derived",
    "matches": []
   },
   "510-4-30": {
@@ -8565,24 +11379,132 @@
    "bucket": "no_match",
    "matches": []
   },
-  "510-6-69": {
-   "bucket": "no_match",
+  "510-40-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "510-6-66": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "511-18-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "511-69-3": {
    "bucket": "no_match",
    "matches": []
   },
+  "511-8-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "512-12-30": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "512-128-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-132-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-174-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-18-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-18-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-54-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "512-8-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-128-52": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-130-38": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-130-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-130-51": {
+   "bucket": "not_derived",
    "matches": []
   },
   "514-162-29": {
    "bucket": "no_match",
    "matches": []
   },
+  "514-32-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-32-62": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-32-68": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-32-70": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-34-59": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-64-64": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-64-64-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-66-59": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-66-63": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-96-58": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-98-54": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "514-98-55": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "515-27-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "515-8-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "516-178-20": {
@@ -8599,6 +11521,10 @@
   },
   "519-27-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "52-15-7": {
+   "bucket": "not_derived",
    "matches": []
   },
   "52-2-10": {
@@ -8638,6 +11564,10 @@
     }
    ]
   },
+  "52-29-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "52-4-9": {
    "bucket": "literature",
    "matches": [
@@ -8648,6 +11578,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "520-330-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "520-44-8": {
    "bucket": "no_match",
@@ -8669,8 +11603,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "526-2-79": {
-   "bucket": "no_match",
+  "526-2-77": {
+   "bucket": "not_derived",
    "matches": []
   },
   "528-4-34": {
@@ -8689,8 +11623,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "53-1-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "53-20-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "53-21-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "530-216-12": {
@@ -8786,6 +11728,18 @@
     }
    ]
   },
+  "54-24-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "54-36-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "54-4-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "54-4-9": {
    "bucket": "literature",
    "matches": [
@@ -8830,6 +11784,10 @@
     }
    ]
   },
+  "54-8-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "54-9-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -8856,6 +11814,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "540-274-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "540-274-8-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "540-36-9": {
    "bucket": "no_match",
    "matches": []
@@ -8868,12 +11834,16 @@
    "bucket": "no_match",
    "matches": []
   },
-  "542-2-51": {
-   "bucket": "no_match",
+  "542-2-47": {
+   "bucket": "not_derived",
    "matches": []
   },
   "545-73-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "546-10-13": {
+   "bucket": "not_derived",
    "matches": []
   },
   "546-10-66": {
@@ -8884,8 +11854,32 @@
    "bucket": "no_match",
    "matches": []
   },
+  "546-184-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "546-236-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "546-236-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "546-28-38": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "546-32-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "546-34-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "546-34-30": {
+   "bucket": "not_derived",
    "matches": []
   },
   "546-46-8": {
@@ -8900,8 +11894,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "547-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "548-13-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "548-24-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "549-75-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "55-15-5": {
+   "bucket": "not_derived",
    "matches": []
   },
   "550-110-18": {
@@ -8920,8 +11930,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "556-2-83": {
-   "bucket": "no_match",
+  "556-2-70": {
+   "bucket": "not_derived",
    "matches": []
   },
   "557-29-5": {
@@ -8932,8 +11942,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "558-12-42": {
-   "bucket": "no_match",
+  "558-12-40": {
+   "bucket": "not_derived",
    "matches": []
   },
   "558-12-63": {
@@ -8944,12 +11954,16 @@
    "bucket": "no_match",
    "matches": []
   },
-  "558-4-81": {
-   "bucket": "no_match",
+  "558-4-69": {
+   "bucket": "not_derived",
    "matches": []
   },
   "558-76-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "56-12-7": {
+   "bucket": "not_derived",
    "matches": []
   },
   "56-12-8": {
@@ -8973,6 +11987,10 @@
     }
    ]
   },
+  "56-14-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "56-16-5": {
    "bucket": "literature",
    "matches": [
@@ -8983,6 +12001,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "56-16-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "56-18-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "56-2-10": {
    "bucket": "literature",
@@ -9008,6 +12034,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "56-24-4": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "56-28-2": {
    "bucket": "literature",
@@ -9055,6 +12085,10 @@
     }
    ]
   },
+  "56-36-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "56-4-10": {
    "bucket": "literature",
    "matches": [
@@ -9088,6 +12122,10 @@
     }
    ]
   },
+  "56-8-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "56-8-8": {
    "bucket": "parameters_only",
    "matches": [
@@ -9098,16 +12136,48 @@
     }
    ]
   },
-  "560-10-70": {
-   "bucket": "no_match",
+  "560-10-64": {
+   "bucket": "not_derived",
    "matches": []
   },
   "560-2-22": {
    "bucket": "no_match",
    "matches": []
   },
+  "560-20-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-20-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-26-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-28-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-286-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-32-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "560-34-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "560-40-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "561-68-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "562-18-19": {
@@ -9124,6 +12194,10 @@
   },
   "564-194-18": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "564-286-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "564-4-36": {
@@ -9150,8 +12224,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "568-146-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "569-9-9": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "57-14-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "57-18-4": {
@@ -9165,16 +12247,20 @@
     }
    ]
   },
-  "570-12-88": {
-   "bucket": "no_match",
+  "57-3-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "570-12-70": {
+   "bucket": "not_derived",
    "matches": []
   },
   "570-2-40": {
    "bucket": "no_match",
    "matches": []
   },
-  "570-2-56": {
-   "bucket": "no_match",
+  "570-2-51": {
+   "bucket": "not_derived",
    "matches": []
   },
   "570-38-9": {
@@ -9185,8 +12271,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "570-8-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "572-18-20": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "572-352-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "572-8-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "573-8-19": {
+   "bucket": "not_derived",
    "matches": []
   },
   "574-252-18": {
@@ -9201,8 +12303,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "574-56-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "576-12-30": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "576-148-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "576-16-32": {
@@ -9211,6 +12321,10 @@
   },
   "576-2-24": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "576-242-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "576-28-24": {
@@ -9237,6 +12351,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "576-32-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "576-42-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "576-8-32": {
    "bucket": "no_match",
    "matches": []
@@ -9249,6 +12371,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "578-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "579-13-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "58-16-3": {
    "bucket": "literature",
    "matches": [
@@ -9259,6 +12389,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "58-2-11": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "58-2-7": {
    "bucket": "literature",
@@ -9281,8 +12415,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "580-4-50": {
-   "bucket": "no_match",
+  "580-4-46": {
+   "bucket": "not_derived",
    "matches": []
   },
   "582-30-5": {
@@ -9299,6 +12433,14 @@
   },
   "584-18-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "585-355-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "588-10-14": {
+   "bucket": "not_derived",
    "matches": []
   },
   "588-6-14": {
@@ -9333,16 +12475,24 @@
    "bucket": "no_match",
    "matches": []
   },
-  "598-2-97": {
-   "bucket": "no_match",
+  "598-2-91": {
+   "bucket": "not_derived",
    "matches": []
   },
   "598-25-4": {
    "bucket": "no_match",
    "matches": []
   },
+  "599-13-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "6-4-2": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "6-5-1": {
+   "bucket": "not_derived",
    "matches": []
   },
   "60-12-6": {
@@ -9364,6 +12514,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "60-16-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "60-2-11": {
    "bucket": "literature",
@@ -9463,8 +12617,20 @@
     }
    ]
   },
+  "60-40-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "60-6-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "60-6-9": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "60-8-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "60-8-6": {
@@ -9495,6 +12661,14 @@
     }
    ]
   },
+  "60-8-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "600-16-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "600-40-12": {
    "bucket": "no_match",
    "matches": []
@@ -9507,12 +12681,12 @@
    "bucket": "no_match",
    "matches": []
   },
-  "600-8-88": {
-   "bucket": "no_match",
+  "600-8-70": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "602-2-63": {
-   "bucket": "no_match",
+  "602-2-51": {
+   "bucket": "not_derived",
    "matches": []
   },
   "602-264-20": {
@@ -9523,16 +12697,16 @@
    "bucket": "no_match",
    "matches": []
   },
-  "602-8-34": {
-   "bucket": "no_match",
+  "602-8-32": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "604-4-86": {
-   "bucket": "no_match",
+  "604-4-74": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "606-2-57": {
-   "bucket": "no_match",
+  "606-2-49": {
+   "bucket": "not_derived",
    "matches": []
   },
   "606-6-78": {
@@ -9551,7 +12725,39 @@
    "bucket": "no_match",
    "matches": []
   },
+  "609-354-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "610-122-69": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "610-20-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "610-40-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "612-13-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "612-18-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "612-310-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "612-310-8-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "612-36-28": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -9567,12 +12773,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "616-6-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "616-84-3": {
    "bucket": "no_match",
    "matches": []
   },
+  "618-24-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "618-4-38": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "618-44-20": {
+   "bucket": "not_derived",
    "matches": []
   },
   "62-10-6": {
@@ -9597,6 +12815,14 @@
     }
    ]
   },
+  "62-10-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "62-12-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "62-12-7": {
    "bucket": "parameters_only",
    "matches": [
@@ -9618,8 +12844,16 @@
     }
    ]
   },
+  "62-2-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "62-20-10": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "620-13-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "620-14-43": {
@@ -9630,12 +12864,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "620-20-70": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "620-4-80": {
    "bucket": "no_match",
    "matches": []
   },
+  "620-52-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "621-85-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "624-384-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "624-52-9": {
@@ -9662,6 +12908,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "628-24-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "63-13-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "63-2-7": {
    "bucket": "no_match",
    "matches": []
@@ -9675,6 +12929,18 @@
      "source": "codetables"
     }
    ]
+  },
+  "63-9-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "63-9-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-10-15": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "630-10-72": {
    "bucket": "no_match",
@@ -9708,36 +12974,68 @@
    "bucket": "no_match",
    "matches": []
   },
-  "630-20-70": {
-   "bucket": "no_match",
+  "630-20-66": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-20-90-w20": {
-   "bucket": "no_match",
+  "630-20-66-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-20-66-c": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-20-72": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-24-60": {
    "bucket": "no_match",
    "matches": []
   },
+  "630-26-35": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-28-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-28-42": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "630-28-60": {
    "bucket": "no_match",
    "matches": []
   },
-  "630-28-84": {
-   "bucket": "no_match",
+  "630-32-54": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-32-60": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-32-66-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-32-70": {
    "bucket": "no_match",
    "matches": []
   },
-  "630-32-70-b": {
-   "bucket": "no_match",
+  "630-34-32": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-32-90": {
-   "bucket": "no_match",
+  "630-36-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-36-54-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-36-56": {
@@ -9748,32 +13046,36 @@
    "bucket": "no_match",
    "matches": []
   },
-  "630-36-72": {
-   "bucket": "no_match",
+  "630-36-60-b": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-36-90": {
-   "bucket": "no_match",
+  "630-36-60-c": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-36-90-b": {
-   "bucket": "no_match",
+  "630-40-22": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-40-42": {
    "bucket": "no_match",
    "matches": []
   },
-  "630-40-70": {
-   "bucket": "no_match",
+  "630-40-42-b": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-40-84": {
-   "bucket": "no_match",
+  "630-40-60": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-44-30": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "630-44-50": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-44-56": {
@@ -9784,20 +13086,32 @@
    "bucket": "no_match",
    "matches": []
   },
-  "630-44-70": {
-   "bucket": "no_match",
+  "630-44-60-b": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-44-90": {
-   "bucket": "no_match",
+  "630-48-22": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "630-48-90": {
-   "bucket": "no_match",
+  "630-48-54": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-50-63": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "630-6-11": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-6-36": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "630-8-18": {
+   "bucket": "not_derived",
    "matches": []
   },
   "630-8-36": {
@@ -9842,6 +13156,10 @@
   },
   "64-12-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "64-14-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "64-16-6": {
@@ -9917,6 +13235,10 @@
     }
    ]
   },
+  "64-20-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "64-22-3": {
    "bucket": "no_match",
    "matches": []
@@ -9931,6 +13253,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "64-22-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "64-24-2": {
    "bucket": "literature",
@@ -9951,6 +13277,10 @@
   },
   "64-24-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "64-24-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "64-32-2": {
@@ -10019,6 +13349,14 @@
     }
    ]
   },
+  "64-42-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "64-48-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "64-6-8": {
    "bucket": "literature",
    "matches": [
@@ -10040,8 +13378,12 @@
     }
    ]
   },
-  "640-16-52": {
-   "bucket": "no_match",
+  "640-132-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "640-16-40": {
+   "bucket": "not_derived",
    "matches": []
   },
   "640-20-32": {
@@ -10068,8 +13410,24 @@
    "bucket": "not_derived",
    "matches": []
   },
-  "646-2-101": {
-   "bucket": "no_match",
+  "646-2-100": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "646-350-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "648-18-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "648-328-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "648-8-23": {
+   "bucket": "not_derived",
    "matches": []
   },
   "648-88-3": {
@@ -10086,6 +13444,18 @@
     }
    ]
   },
+  "65-17-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "65-5-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "65-5-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "65-9-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -10096,8 +13466,16 @@
     }
    ]
   },
+  "650-144-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "650-2-85": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "651-114-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "651-51-4": {
@@ -10108,8 +13486,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "654-6-47": {
-   "bucket": "no_match",
+  "654-6-45": {
+   "bucket": "not_derived",
    "matches": []
   },
   "655-114-3": {
@@ -10126,6 +13504,14 @@
   },
   "658-34-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "658-380-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "658-8-20": {
+   "bucket": "not_derived",
    "matches": []
   },
   "659-35-5": {
@@ -10190,6 +13576,18 @@
     }
    ]
   },
+  "66-4-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "66-4-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "66-44-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "66-6-10": {
    "bucket": "literature",
    "matches": [
@@ -10200,6 +13598,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "66-6-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "660-18-30": {
    "bucket": "no_match",
@@ -10217,16 +13619,52 @@
    "bucket": "no_match",
    "matches": []
   },
+  "660-8-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "660-8-30": {
    "bucket": "no_match",
    "matches": []
   },
-  "662-180-60": {
-   "bucket": "no_match",
+  "662-122-80": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "662-2-106": {
-   "bucket": "no_match",
+  "662-122-84": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-122-95": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-180-50": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-2-103": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-60-94": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-60-96": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-62-89": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "662-62-93": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "663-351-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "663-91-3": {
@@ -10257,8 +13695,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "666-6-74": {
-   "bucket": "no_match",
+  "666-6-69": {
+   "bucket": "not_derived",
    "matches": []
   },
   "667-7-11": {
@@ -10269,8 +13707,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "670-8-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "671-35-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "672-10-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "672-14-56": {
@@ -10295,6 +13741,10 @@
   },
   "672-228-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "672-28-30": {
+   "bucket": "not_derived",
    "matches": []
   },
   "672-336-12": {
@@ -10333,11 +13783,23 @@
    "bucket": "no_match",
    "matches": []
   },
-  "674-168-74": {
-   "bucket": "no_match",
+  "674-128-81": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "674-168-76": {
+  "674-168-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-168-48-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-170-51": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-170-51-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -10353,20 +13815,24 @@
    "bucket": "no_match",
    "matches": []
   },
-  "674-42-97": {
-   "bucket": "no_match",
+  "674-42-94": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "674-44-95": {
-   "bucket": "no_match",
+  "674-44-89": {
+   "bucket": "not_derived",
    "matches": []
   },
   "674-84-44": {
    "bucket": "no_match",
    "matches": []
   },
-  "674-86-87": {
-   "bucket": "no_match",
+  "674-84-92": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-86-56": {
+   "bucket": "not_derived",
    "matches": []
   },
   "674-86-89": {
@@ -10377,12 +13843,28 @@
    "bucket": "no_match",
    "matches": []
   },
+  "674-86-91": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-86-92": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "674-86-93": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "675-139-8": {
    "bucket": "no_match",
    "matches": []
   },
   "676-110-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "676-13-16": {
+   "bucket": "not_derived",
    "matches": []
   },
   "676-2-26": {
@@ -10465,92 +13947,172 @@
    "bucket": "no_match",
    "matches": []
   },
+  "680-360-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "681-13-16": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-102-77": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-102-90": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-122-44": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-122-52": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-130-56": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-132-64": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "682-140-66": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "682-140-76-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "682-140-82": {
    "bucket": "no_match",
    "matches": []
   },
-  "682-140-82-b": {
-   "bucket": "no_match",
+  "682-142-50": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-142-79": {
-   "bucket": "no_match",
+  "682-142-54": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-142-82": {
-   "bucket": "no_match",
+  "682-142-81": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-172-72": {
-   "bucket": "no_match",
+  "682-172-50": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-172-76": {
-   "bucket": "no_match",
+  "682-172-52": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-172-78": {
-   "bucket": "no_match",
+  "682-172-52-b": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-182-64": {
-   "bucket": "no_match",
+  "682-182-42": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-182-66": {
-   "bucket": "no_match",
+  "682-182-50": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "682-182-66-b": {
-   "bucket": "no_match",
-   "matches": []
-  },
-  "682-2-110": {
-   "bucket": "no_match",
+  "682-2-107": {
+   "bucket": "not_derived",
    "matches": []
   },
   "682-20-22": {
    "bucket": "no_match",
    "matches": []
   },
+  "682-20-38": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-32-42": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-40-66": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-62-100": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-82-35": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-92-64": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "682-92-68": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "684-10-90": {
    "bucket": "not_derived",
    "matches": []
   },
-  "684-12-66": {
-   "bucket": "no_match",
+  "684-12-45": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "684-12-70": {
-   "bucket": "no_match",
+  "684-12-51": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "684-12-71": {
-   "bucket": "no_match",
+  "684-12-54": {
+   "bucket": "not_derived",
    "matches": []
   },
   "684-14-54": {
    "bucket": "not_derived",
    "matches": []
   },
-  "684-20-40": {
-   "bucket": "no_match",
+  "684-20-36": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "684-8-63": {
-   "bucket": "no_match",
+  "684-346-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "684-346-8-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "684-4-104": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "684-6-77": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "684-8-54": {
+   "bucket": "not_derived",
    "matches": []
   },
   "688-172-4": {
    "bucket": "no_match",
    "matches": []
   },
-  "690-12-110": {
-   "bucket": "no_match",
+  "69-3-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "690-12-84": {
+   "bucket": "not_derived",
    "matches": []
   },
   "690-234-3": {
@@ -10581,8 +14143,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "696-352-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "696-76-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "697-25-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "698-2-79": {
@@ -10606,6 +14176,10 @@
     }
    ]
   },
+  "70-10-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "70-2-11": {
    "bucket": "literature",
    "matches": [
@@ -10627,6 +14201,18 @@
      "xz_swapped": false
     }
    ]
+  },
+  "70-22-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "70-6-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "70-6-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "70-6-8": {
    "bucket": "literature",
@@ -10669,6 +14255,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "700-20-60": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "700-206-28": {
    "bucket": "no_match",
    "matches": []
@@ -10685,12 +14275,16 @@
    "bucket": "no_match",
    "matches": []
   },
-  "700-26-100": {
-   "bucket": "no_match",
+  "700-26-50": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "700-26-98": {
-   "bucket": "no_match",
+  "700-26-50-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "700-26-50-c": {
+   "bucket": "not_derived",
    "matches": []
   },
   "700-44-16": {
@@ -10721,20 +14315,52 @@
    "bucket": "no_match",
    "matches": []
   },
+  "708-24-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "709-37-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "709-8-25": {
+   "bucket": "not_derived",
    "matches": []
   },
   "71-1-11": {
    "bucket": "no_match",
    "matches": []
   },
+  "710-8-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "711-8-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "712-182-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "712-8-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "715-19-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "717-8-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "718-64-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "72-10-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "72-10-9": {
@@ -10777,8 +14403,16 @@
     }
    ]
   },
+  "72-12-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "72-14-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "72-20-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "72-22-4": {
@@ -10947,6 +14581,18 @@
     }
    ]
   },
+  "72-4-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "72-4-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "72-48-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "72-6-6": {
    "bucket": "parameters_only",
    "matches": [
@@ -11001,12 +14647,52 @@
     }
    ]
   },
+  "72-8-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "720-122-8": {
    "bucket": "no_match",
    "matches": []
   },
+  "720-144-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "720-145-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "720-16-36": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "720-184-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "720-24-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "720-302-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "721-18-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "722-18-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "722-8-20": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "722-8-25": {
+   "bucket": "not_derived",
    "matches": []
   },
   "726-38-5": {
@@ -11040,6 +14726,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "73-44-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "73-46-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "730-28-38": {
    "bucket": "no_match",
    "matches": []
@@ -11050,6 +14744,10 @@
   },
   "738-4-31": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "74-12-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "74-2-11": {
@@ -11068,6 +14766,26 @@
      "xz_swapped": false
     }
    ]
+  },
+  "74-2-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "75-10-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "75-7-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "750-152-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "750-153-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "756-24-34": {
    "bucket": "no_match",
@@ -11105,6 +14823,74 @@
      "xz_swapped": false
     }
    ]
+  },
+  "76-40-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "760-18-25": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "760-40-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "761-1-39": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "762-28-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "764-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "767-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "768-192-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "768-193-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "768-258-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "769-169-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "769-170-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "769-41-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "77-11-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "77-11-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "773-25-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "774-8-21": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "776-198-20": {
    "bucket": "no_match",
@@ -11152,6 +14938,10 @@
     }
    ]
   },
+  "78-4-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "78-4-9": {
    "bucket": "literature",
    "matches": [
@@ -11163,16 +14953,64 @@
     }
    ]
   },
+  "78-52-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "78-6-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "780-318-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "780-319-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "780-4-20": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "780-64-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "780-64-10-a5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "782-36-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "784-2-28": {
    "bucket": "no_match",
    "matches": []
   },
+  "784-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "785-41-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "785-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "786-42-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "786-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "787-8-21": {
+   "bucket": "not_derived",
    "matches": []
   },
   "79-11-3": {
@@ -11185,16 +15023,68 @@
     }
    ]
   },
+  "792-18-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "792-202-20": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "792-8-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "793-18-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "794-18-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "794-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "795-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "796-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "797-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "798-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "799-8-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-2-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "8-3-2": {
    "bucket": "no_match",
    "matches": []
   },
+  "8-3-2-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "8-3-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "8-4-1": {
+   "bucket": "not_derived",
    "matches": []
   },
   "8-4-2": {
@@ -11214,6 +15104,10 @@
     }
    ]
   },
+  "8-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "8-6-2": {
    "bucket": "literature",
    "matches": [
@@ -11230,6 +15124,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "8-7-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-12-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "80-16-4": {
    "bucket": "parameters_only",
@@ -11300,6 +15202,18 @@
     }
    ]
   },
+  "80-24-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-24-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-26-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-30-2": {
    "bucket": "literature",
    "matches": [
@@ -11310,6 +15224,22 @@
      "xz_swapped": false
     }
    ]
+  },
+  "80-32-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-33-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-34-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-36-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "80-4-12": {
    "bucket": "literature",
@@ -11350,6 +15280,10 @@
     }
    ]
   },
+  "80-41-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-42-2": {
    "bucket": "literature",
    "matches": [
@@ -11379,6 +15313,18 @@
     }
    ]
   },
+  "80-42-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-44-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "80-45-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-6-10": {
    "bucket": "literature",
    "matches": [
@@ -11390,6 +15336,10 @@
     }
    ]
   },
+  "80-6-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-8-10": {
    "bucket": "parameters_only",
    "matches": [
@@ -11399,6 +15349,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "80-8-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "80-8-8": {
    "bucket": "parameters_only",
@@ -11418,8 +15372,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "800-326-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "800-327-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "800-8-21": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "800-8-27": {
+   "bucket": "not_derived",
    "matches": []
   },
   "808-206-20": {
@@ -11440,12 +15406,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "81-9-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "810-166-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "810-42-5": {
    "bucket": "no_match",
    "matches": []
   },
   "819-43-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "82-2-14": {
+   "bucket": "not_derived",
    "matches": []
   },
   "82-2-9": {
@@ -11469,12 +15447,56 @@
     }
    ]
   },
+  "820-44-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "824-210-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "824-32-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "826-28-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "830-146-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "832-68-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "832-68-10-group64": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "834-32-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "837-45-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "838-164-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "838-165-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-10-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-10-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "84-10-9": {
@@ -11509,6 +15531,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "84-14-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-16-9": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "84-2-9": {
    "bucket": "literature",
@@ -11561,6 +15591,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "84-22-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "84-24-2": {
    "bucket": "literature",
@@ -11641,6 +15675,14 @@
     }
    ]
   },
+  "84-36-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-38-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "84-4-11": {
    "bucket": "literature",
    "matches": [
@@ -11651,6 +15693,18 @@
      "xz_swapped": false
     }
    ]
+  },
+  "84-4-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-4-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-40-6": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "84-42-2": {
    "bucket": "literature",
@@ -11673,6 +15727,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "84-56-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "84-6-10": {
    "bucket": "literature",
@@ -11700,12 +15758,40 @@
    "bucket": "no_match",
    "matches": []
   },
+  "84-8-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "84-8-12-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "840-214-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "840-342-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "840-343-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "841-1-29": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "845-169-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "849-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "849-9-11": {
+   "bucket": "not_derived",
    "matches": []
   },
   "85-22-4": {
@@ -11747,12 +15833,56 @@
    "bucket": "no_match",
    "matches": []
   },
+  "85-8-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "853-25-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "854-157-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "854-158-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "855-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "856-218-20": {
    "bucket": "no_match",
    "matches": []
   },
+  "861-157-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "861-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "862-46-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "864-146-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "865-157-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "869-169-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "869-170-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "87-22-3": {
@@ -11765,12 +15895,32 @@
     }
    ]
   },
+  "87-3-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "872-222-18": {
    "bucket": "no_match",
    "matches": []
   },
+  "872-222-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "874-157-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "874-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "875-8-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "88-2-14": {
+   "bucket": "not_derived",
    "matches": []
   },
   "88-24-4": {
@@ -11784,6 +15934,14 @@
     }
    ]
   },
+  "88-24-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "88-36-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "88-4-12": {
    "bucket": "literature",
    "matches": [
@@ -11794,6 +15952,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "88-4-13": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "88-44-2": {
    "bucket": "literature",
@@ -11851,16 +16013,56 @@
    "bucket": "no_match",
    "matches": []
   },
+  "888-170-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "888-171-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "888-226-18": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "89-1-15": {
+   "bucket": "not_derived",
    "matches": []
   },
   "896-194-6": {
    "bucket": "no_match",
    "matches": []
   },
+  "897-173-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "897-174-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "898-196-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "898-197-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "899-173-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "899-18-31": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "899-47-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "90-10-11": {
+   "bucket": "not_derived",
    "matches": []
   },
   "90-10-7": {
@@ -11874,6 +16076,14 @@
     }
    ]
   },
+  "90-12-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-12-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "90-12-9": {
    "bucket": "literature",
    "matches": [
@@ -11884,6 +16094,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "90-14-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-16-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "90-16-7": {
    "bucket": "literature",
@@ -11896,6 +16114,14 @@
     }
    ]
   },
+  "90-18-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-20-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "90-20-7": {
    "bucket": "parameters_only",
    "matches": [
@@ -11905,6 +16131,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "90-20-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-21-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "90-24-2": {
    "bucket": "literature",
@@ -11916,6 +16150,14 @@
      "xz_swapped": false
     }
    ]
+  },
+  "90-24-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-26-5": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "90-28-2": {
    "bucket": "literature",
@@ -11939,6 +16181,10 @@
     }
    ]
   },
+  "90-35-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "90-4-12": {
    "bucket": "literature",
    "matches": [
@@ -11950,6 +16196,14 @@
     }
    ]
   },
+  "90-4-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "90-4-14-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "90-4-9": {
    "bucket": "parameters_only",
    "matches": [
@@ -11959,6 +16213,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "90-60-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "90-8-10": {
    "bucket": "literature",
@@ -11996,16 +16254,60 @@
    "bucket": "no_match",
    "matches": []
   },
+  "900-366-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "900-367-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "902-42-38": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "904-12-36": {
+   "bucket": "not_derived",
    "matches": []
   },
   "904-230-22": {
    "bucket": "no_match",
    "matches": []
   },
+  "91-13-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "91-13-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "91-19-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "91-7-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "910-12-36": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "912-234-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "912-48-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "913-49-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "914-18-31": {
+   "bucket": "not_derived",
    "matches": []
   },
   "92-2-13": {
@@ -12021,6 +16323,10 @@
   },
   "92-2-14": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "92-25-8": {
+   "bucket": "not_derived",
    "matches": []
   },
   "92-4-13": {
@@ -12045,12 +16351,40 @@
     }
    ]
   },
-  "922-18-31": {
-   "bucket": "no_match",
+  "92-48-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "920-18-31": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "921-18-31": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "922-18-30": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "923-173-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "923-174-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "924-18-31": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "925-173-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "928-238-22": {
+   "bucket": "not_derived",
    "matches": []
   },
   "93-13-3": {
@@ -12063,6 +16397,30 @@
     }
    ]
   },
+  "93-29-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "93-3-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "93-32-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "93-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "930-18-36": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "930-50-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "931-169-3": {
    "bucket": "no_match",
    "matches": []
@@ -12071,8 +16429,32 @@
    "bucket": "no_match",
    "matches": []
   },
+  "935-15-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "936-48-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "936-76-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "936-76-10-group72": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "937-25-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "937-25-7": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "937-49-5": {
+   "bucket": "not_derived",
    "matches": []
   },
   "94-2-13": {
@@ -12092,12 +16474,60 @@
     }
    ]
   },
+  "94-2-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "94-36-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "943-8-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "944-105-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "944-32-24": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "945-172-3": {
    "bucket": "no_match",
    "matches": []
   },
+  "946-50-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "948-24-28": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "95-22-11": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "95-5-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "955-51-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "957-105-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-10-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-10-12-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "96-12-9": {
@@ -12110,6 +16540,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "96-16-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "96-16-6": {
    "bucket": "literature",
@@ -12157,6 +16591,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "96-18-10": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "96-18-4": {
    "bucket": "literature",
@@ -12231,6 +16669,10 @@
     }
    ]
   },
+  "96-20-9": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "96-21-6": {
    "bucket": "literature",
    "matches": [
@@ -12252,6 +16694,26 @@
      "xz_swapped": false
     }
    ]
+  },
+  "96-22-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-23-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-24-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-24-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-30-8": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "96-34-4": {
    "bucket": "literature",
@@ -12325,6 +16787,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "96-36-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "96-37-3": {
    "bucket": "no_match",
    "matches": []
@@ -12367,6 +16833,14 @@
     }
    ]
   },
+  "96-4-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-40-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "96-48-2": {
    "bucket": "literature",
    "matches": [
@@ -12401,6 +16875,14 @@
     }
    ]
   },
+  "96-6-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "96-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "96-6-6": {
    "bucket": "literature",
    "matches": [
@@ -12423,8 +16905,32 @@
     }
    ]
   },
+  "96-8-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "960-198-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "960-24-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "960-258-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "960-390-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "960-391-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "960-8-23": {
+   "bucket": "not_derived",
    "matches": []
   },
   "961-1-31": {
@@ -12445,6 +16951,18 @@
   },
   "968-8-23": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "97-25-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "976-250-22": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "98-12-12": {
+   "bucket": "not_derived",
    "matches": []
   },
   "98-12-9": {
@@ -12469,6 +16987,14 @@
     }
    ]
   },
+  "98-18-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "98-26-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "98-6-12": {
    "bucket": "literature",
    "matches": [
@@ -12480,6 +17006,14 @@
     }
    ]
   },
+  "98-6-14": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "98-6-14-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "98-6-7": {
    "bucket": "literature",
    "matches": [
@@ -12490,6 +17024,34 @@
      "xz_swapped": false
     }
    ]
+  },
+  "98-8-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "980-196-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "980-398-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "980-399-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "989-53-5": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "99-17-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "990-198-17": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "998-54-5": {
    "bucket": "no_match",
