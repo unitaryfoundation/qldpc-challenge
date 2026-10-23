@@ -1,0 +1,94 @@
+name: provenance-top-up
+
+# research/provenance/derived.json buckets every board entry by what the
+# literature index found (research/provenance/README.md). Regenerating it
+# needs the index, which is not shipped, so a code merge cannot update it,
+# and the table fell 1,200 entries behind the board with nothing saying so
+# (issue #4023). derive_provenance.py --top-up needs neither the index nor
+# pynauty: it adds a not_derived row for every entry the table has not seen
+# and drops the rows of entries that left. This runs that weekly on main,
+# commits the result, and keeps one tracking issue listing the entries the
+# index has not been run against, the backlog only an index run
+# (--from-matches) can clear. Nothing here gates a submission.
+
+permissions:
+  contents: write
+  issues: write
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"      # every Monday 07:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: provenance-top-up
+  cancel-in-progress: false
+
+jobs:
+  top-up:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: top up the table and commit it (race-safe)
+        # --check before and after goes to the step summary; the run fails
+        # only if the table is BROKEN (an unknown bucket, literature with no
+        # evidence, counts that disagree), which the top-up cannot cause and
+        # a human has to look at.
+        run: |
+          python3 research/derive_provenance.py --check | tee before.txt || true
+          python3 research/derive_provenance.py --top-up | tee topup.txt
+          python3 research/derive_provenance.py --check | tee after.txt
+          grep -q '^ok:' after.txt
+          {
+            echo "## provenance top-up"
+            echo
+            echo '```'
+            cat before.txt topup.txt after.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/provenance/derived.json
+          if git diff --cached --quiet; then
+            echo "the table already covers the board"; exit 0
+          fi
+          git commit -m "Weekly provenance top-up: $(sed -n 's/^topped up: \(.*\), [0-9]* entries$/\1/p' topup.txt) [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"; exit 0
+            fi
+            echo "push raced; rebasing and retrying ($attempt)"
+            git fetch origin main && git rebase origin/main || exit 1
+          done
+          echo "failed to push the table after 5 attempts"; exit 1
+      - name: keep the tracking issue of unchecked entries current
+        # The issue is found by its exact title among open issues, so renaming
+        # it starts a new one. Opened when the not_derived list is non-empty,
+        # edited in place while it stays so, closed when it empties.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TITLE: "Board entries the literature index has not been run against (weekly provenance top-up)"
+        run: |
+          summary=$(python3 research/derive_provenance.py --residual tracking-body.md \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          echo "$summary"
+          n=${summary#not_derived=}; n=${n%% *}
+          number=$(gh issue list --repo "$REPO" --state open --limit 50 \
+            --search "\"weekly provenance top-up\" in:title" --json number,title \
+            --jq 'first(.[] | select(.title == env.TITLE)) | .number // empty')
+          if [ "$n" != "0" ]; then
+            if [ -n "$number" ]; then
+              gh issue edit "$number" --repo "$REPO" --body-file tracking-body.md
+              echo "updated #$number"
+            else
+              gh issue create --repo "$REPO" --title "$TITLE" --body-file tracking-body.md
+            fi
+          elif [ -n "$number" ]; then
+            gh issue close "$number" --repo "$REPO" \
+              --comment "The index has been run against every board entry as of $(date -u +%Y-%m-%d) (run ${{ github.run_id }}); closing until the top-up records an unchecked entry again."
+            echo "closed #$number"
+          else
+            echo "no unchecked entries and no open tracking issue"
+          fi

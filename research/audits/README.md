@@ -194,6 +194,29 @@ The replay is only quotable if it ends where the repository is, and
 parsed. The committed SVGs are the charts as of the date in their titles;
 regenerate them with the commands above.
 
+## Family concentration of the frontier: `family_concentration.py`
+
+`site/build.py` (`family_concentration`) measures, for every CSS primary-track
+cell and for the global CSS frontier, the share of the frontier's records held
+by the top declared family and by the top two, the Herfindahl-Hirschman index
+over families, and whether the cell's leader (largest kd^2/n) belongs to a
+family other than that of the cell's earliest-dated member, which is where the
+search moved a cell (issue #4025). It reads the same `cell_frontiers` and
+`pareto` that award the star, and the site publishes it in `docs/stats.json`
+and beside the frontier map's legend. This script records a dated measurement,
+`family_concentration-<date>.json`, and prints the tables a fieldnote quotes,
+so the shape of the frontier is a time series rather than a snapshot.
+
+`family` is the board's one self-declared label (`research/AUTORESEARCH.md`:
+filterable, never ranked), so every number here measures the declared tag, not
+a property recovered from H; the derived provenance buckets under
+`research/provenance/` are the computed axis wherever they cover an entry.
+Nothing here ranks anything.
+
+```
+uv run python research/audits/family_concentration.py --markdown
+```
+
 ## Limits
 
 These are upper-bound searches. `holds` never upgrades a claim to the exact

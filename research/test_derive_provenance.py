@@ -241,3 +241,24 @@ def test_not_derived_is_distinct_from_no_match(tmp_path):
     buckets = {s: v["bucket"] for s, v in table.items()}
     assert all(buckets[s] == "no_match" for s in covered)
     assert any(v == "not_derived" for v in buckets.values())
+
+
+def test_the_residual_body_lists_every_unchecked_entry(tmp_path, capsys):
+    """The tracking issue is the published remainder (issue #4023).
+
+    Every not_derived entry must appear, nothing the index has seen may, and
+    the count the workflow reads has to match the list it publishes.
+    """
+    out = tmp_path / "body.md"
+    assert dp.residual(str(out), "https://example.invalid/runs/1") == 0
+    body = out.read_text(encoding="utf-8")
+    with open(dp.DERIVED, encoding="utf-8") as f:
+        table = json.load(f)["entries"]
+    pending = {s for s, v in table.items() if v["bucket"] == "not_derived"}
+    seen = {s for s, v in table.items() if v["bucket"] != "not_derived"}
+    listed = set(body.split("<details>", 1)[1].split("</details>", 1)[0].split())
+    assert pending <= listed and not (seen & listed)
+    assert f"{len(pending):,} of the board's {len(table):,} entries" in body
+    assert "https://example.invalid/runs/1" in body
+    assert capsys.readouterr().out.strip() == \
+        f"not_derived={len(pending)} entries={len(table)}"

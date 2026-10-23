@@ -251,6 +251,20 @@ jobs:
             ler_stack_changed=true
           fi
           echo "ler_stack_changed=$ler_stack_changed" >> "$GITHUB_OUTPUT"
+      - name: provenance table staleness (advisory, issue #4023)
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: submitted
+        # research/provenance/derived.json cannot be regenerated here (the
+        # literature index is not shipped), so a code PR is never asked to
+        # update it; the weekly provenance-top-up workflow does. This only
+        # puts the backlog on the PR that grows it. Never fails.
+        run: |
+          out=$(python3 research/derive_provenance.py --check || true)
+          printf '%s\n' "$out"
+          stale=$(printf '%s\n' "$out" | sed -n 's/^derived provenance is STALE: //p')
+          if [ -n "$stale" ]; then
+            echo "::warning title=research/provenance/derived.json is behind the board::${stale} The weekly provenance-top-up workflow records them as not_derived; nothing to do in this PR."
+          fi
       - name: submission scope check (code data cannot change its own verifier)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
