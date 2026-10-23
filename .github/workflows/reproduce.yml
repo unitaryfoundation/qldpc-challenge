@@ -18,6 +18,8 @@ on:
       - "research/kit/gf2poly.py"
       - "research/kit/rebuild.py"
       - "research/kit/submit.py"
+      - "research/kit/multisize.py"
+      - "research/repro/multisize.json"
       - "repro/**"
       - ".github/workflows/reproduce.yml"
   schedule:
@@ -55,6 +57,12 @@ jobs:
           done
           echo "$n manifest(s) run, $fails disagreed"
           [ "$fails" -eq 0 ]
+      - name: recipes at other sizes (display-only table; drift fails here, issue #4031)
+        # research/repro/multisize.json is what the code page shows under
+        # "Recipe at other sizes". It is derived from the manifests and the kit
+        # constructors, so a new manifest or a changed constructor has to come
+        # with a regenerated table: `python research/kit/multisize.py run`.
+        run: uv run --frozen --extra research python research/kit/multisize.py check
       - uses: actions/upload-artifact@v4
         if: always()
         with:

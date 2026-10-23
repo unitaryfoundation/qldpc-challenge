@@ -131,6 +131,14 @@ from above and are not claimed minimal. The site shows these on code pages and
 as sortable columns in the tables; they enter neither the Pareto frontier nor
 any score.
 
+An entry whose reproduction manifest carries a construction recipe also shows
+the recipe rebuilt at neighboring sizes (`research/kit/multisize.py`,
+`research/repro/multisize.json`): per size, whether the checks commute, the
+code encodes, its Tanner graph is connected, and it stays within the caps. No
+distance is searched at any size. A recipe that holds up at other sizes is
+evidence of a construction rather than a tuned artifact; the result is shown
+and never ranked.
+
 ## A note on kd^2/n
 
 `kd^2/n` is the Bravyi-Poulin-Terhal saturation ratio. It is bounded and

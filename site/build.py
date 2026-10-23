@@ -1726,6 +1726,55 @@ def provenance_counts(slugs):
     return counts
 
 
+def multisize_table():
+    """The multi-size recipe table (research/repro/multisize.json), or {} when absent."""
+    path = os.path.join(ROOT, "research", "repro", "multisize.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def multisize_block(rec):
+    """The code page's "Recipe at other sizes" section for one lifted recipe (issue #4031).
+
+    Display-only: per size, the verifier's cheap structural checks on the
+    recipe rebuilt there (commutation, k >= 1, a connected Tanner graph, the
+    caps), with the numbers behind them and no distance. An empty string for
+    a recipe that was not lifted.
+    """
+    if not rec or rec.get("status") != "lifted" or not rec.get("sizes"):
+        return ""
+    own = rec.get("own") or {}
+    rows = []
+    for s in rec["sizes"]:
+        if "n" not in s:
+            rows.append(f'<li><b>{html.escape(s["label"])}</b>: does not build '
+                        f'({html.escape(str(s.get("error", "")))[:120]})</li>')
+            continue
+        failed = [c for c, ok in s["checks"].items() if not ok]
+        verdict = ("passes: commutes, encodes, connected, within the caps" if s["pass"] else
+                   "fails: " + ", ".join({"commutes": "checks do not commute", "encodes": "k = 0",
+                                           "connected": f"{s['components']} Tanner components",
+                                           "within_caps": "outside the caps"}[c] for c in failed))
+        rows.append(f'<li><b>{html.escape(s["label"])}</b>: [[{s["n"]},{s["k"]}]] w={s["w"]}, '
+                    f'{html.escape(verdict)}</li>')
+    repro = ("rebuilds this entry" if rec.get("reproduces_entry") else
+             "does not rebuild this entry's fingerprint" if rec.get("reproduces_entry") is False else
+             "entry not compared")
+    return ('<section class=blk><h3>Recipe at other sizes</h3>'
+            '<div class=kv style="color:var(--mut)">the stored construction recipe '
+            f'(<code>{html.escape(rec["constructor"])}</code>, {repro} at its own parameters) rebuilt at '
+            f'neighboring sizes ({html.escape(rec["rule"])}) and put through the verifier\'s cheap '
+            'structural checks only: no distance at any size, no ranking, no tier. A recipe that holds '
+            'up at other sizes is evidence of a construction rather than a tuned artifact; one that '
+            'does not is a fact about the recipe, not about this entry.</div>'
+            f'<div class=kv><b>passes at</b> {rec["passed"]} of {rec["tried"]} sizes'
+            + (f' &middot; own size [[{own["n"]},{own["k"]}]] w={own["w"]}' if "n" in own else "")
+            + '</div><ul class=kv>' + "".join(rows) + '</ul></section>')
+
+
 def load_entries():
     entries = []
     # One memoized structural pass over the board (qldpc_verify.board_reports),
@@ -2852,6 +2901,11 @@ def detail_page(e):
                  '<span class=cert-no>none yet &middot; distance stands as a '
                  'self-certified upper bound (d &le;)</span></div>')
     P.append('</section>')
+
+    # the recipe at other sizes (issue #4031): display-only, like the
+    # diagnostics below; present when the entry's repro manifest carries a
+    # recipe the kit can lift.
+    P.append(multisize_block((multisize_table().get("entries") or {}).get(e["slug"])))
 
     # diagnostics (issue #1844): decoder-friendliness read off H and the
     # spread of the stored witnesses read off the layout, as the verifier
