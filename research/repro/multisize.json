@@ -1,11 +1,11 @@
 {
  "caveat": "display-only: a pass is a structural fact about the recipe at that size, not a distance claim and not a novelty claim; nothing here ranks or tiers",
  "counts": {
-  "constructor_missing": 1,
+  "constructor_missing": 0,
   "lifted": 1,
   "manifests": 5,
   "no_lift_rule": 2,
-  "no_recipe": 1,
+  "no_recipe": 2,
   "sizes_passed": 4,
   "sizes_tried": 8
  },
@@ -598,52 +598,11 @@
    "status": "no_recipe"
   },
   "256-120-12": {
-   "constructor": "paper_2609_24201.build_qd",
-   "params": {
-    "a": [
-     12,
-     11,
-     10,
-     3,
-     7,
-     1,
-     6
-    ],
-    "b": [
-     4,
-     9,
-     6,
-     7,
-     12,
-     1,
-     8
-    ],
-    "c": [
-     9,
-     10,
-     3,
-     5,
-     13,
-     15,
-     7
-    ],
-    "d": [
-     10,
-     11,
-     14,
-     11,
-     11,
-     2,
-     1
-    ],
-    "ell": 4,
-    "w": 7
-   },
-   "reason": "research/kit/paper_2609_24201.py is not in the kit, so the recipe cannot be replayed here",
-   "status": "constructor_missing"
+   "reason": "the recipe names research/kit/paper_2609_24201.py (build_qd), which was not committed with the entry (#3911), so research/kit/rebuild.py cannot replay it; the constructor and params are kept here for when the module lands",
+   "status": "no_recipe"
   }
  },
- "head": "d7985096a3db4d12698b4f77c7a99b27c3e95f3b",
+ "head": "72ab8f1d7676bbfca37a052672e5624352d31bb1",
  "issue": 4031,
  "lifts": {
   "bb.build_bb": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",

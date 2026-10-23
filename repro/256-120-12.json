@@ -25,8 +25,9 @@
         "{\"a\":[12,11,10,3,7,1,6],\"b\":[4,9,6,7,12,1,8],\"c\":[9,10,3,5,13,15,7],\"d\":[10,11,14,11,11,2,1],\"ell\":4,\"w\":7}"
       ],
       "budget_seconds": 300,
+      "reason": "the recipe names research/kit/paper_2609_24201.py (build_qd), which was not committed with the entry (#3911), so research/kit/rebuild.py cannot replay it; the constructor and params are kept here for when the module lands",
       "script": "research/kit/rebuild.py",
-      "status": "applicable"
+      "status": "not_reproducible"
     },
     "ler": {
       "reason": "the entry has no measured rate",
