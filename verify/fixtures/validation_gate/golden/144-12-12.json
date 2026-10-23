@@ -1,0 +1,277 @@
+{
+ "doc_sha256": "3387ada7a878e6c33ffe13852f9592cec4359b6a66adfd4fb5799e80cd123f4d",
+ "report": {
+  "checks": [
+   {
+    "check": "schema_valid",
+    "detail": "",
+    "ok": true
+   },
+   {
+    "check": "qubit_indices_in_range",
+    "detail": "max index 143, n=144",
+    "ok": true
+   },
+   {
+    "check": "no_repeated_qubits_in_a_check",
+    "detail": "rows with repeats: []",
+    "ok": true
+   },
+   {
+    "check": "tanner_connected",
+    "detail": "Tanner graph has 1 connected component(s)",
+    "ok": true
+   },
+   {
+    "check": "stabilizer_group_connected",
+    "detail": "stabilizer group splits into 1 independent block(s) on disjoint qubit sets (sizes 144)",
+    "ok": true
+   },
+   {
+    "check": "css_commutation",
+    "detail": "H_X H_Z^T = 0 over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "k_matches_claim",
+    "detail": "computed k=12, claimed 12",
+    "ok": true
+   },
+   {
+    "check": "k_at_least_1",
+    "detail": "computed k=12; a submission must encode >= 1 logical qubit",
+    "ok": true
+   },
+   {
+    "check": "check_weight_is_ldpc",
+    "detail": "max check weight 6",
+    "ok": true
+   },
+   {
+    "check": "family_in_vocabulary",
+    "detail": "bivariate-bicycle",
+    "ok": true
+   },
+   {
+    "check": "distance_X_witness",
+    "detail": "weight=12 (claim 12), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_witness",
+    "detail": "weight=12 (claim 12), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "d_matches_min_side",
+    "detail": "min earned side = 12, claimed d = 12",
+    "ok": true
+   },
+   {
+    "check": "local_hadamard_css_images",
+    "detail": "1 local-Hadamard image(s) of this CSS code filed with it, so a Hadamard-relabelled copy collides with it whichever code_type it is submitted under",
+    "ok": true
+   },
+   {
+    "check": "coordinates_cover_all_qubits",
+    "detail": "144 coords, n=144",
+    "ok": true
+   },
+   {
+    "check": "coordinates_uniform_dimension",
+    "detail": "D = 2",
+    "ok": true
+   },
+   {
+    "check": "interaction_radius_within_claim",
+    "detail": "measured 6.0000 <= claim 6.0",
+    "ok": true
+   },
+   {
+    "check": "site_occupancy_within_layers",
+    "detail": "max 2 qubit(s) per site, layers=2",
+    "ok": true
+   },
+   {
+    "check": "site_spacing_at_least_one",
+    "detail": "min spacing between distinct sites 1.0000 (>= 1.0 required)",
+    "ok": true
+   },
+   {
+    "check": "locality_class_computed",
+    "detail": "local-2d-bilayer",
+    "ok": true
+   }
+  ],
+  "computed": {
+   "code_type": "CSS",
+   "diagnostics": {
+    "logical_diameter": {
+     "X": 7.2801,
+     "Z": 6.3246
+    },
+    "row_space_intersection_dimension": 20,
+    "tanner_girth": {
+     "X": 6,
+     "Z": 6
+    },
+    "trapping_sets": {
+     "X": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        144
+       ],
+       [
+        2,
+        4,
+        1080
+       ],
+       [
+        3,
+        3,
+        144
+       ],
+       [
+        3,
+        5,
+        10368
+       ],
+       [
+        3,
+        7,
+        1440
+       ]
+      ]
+     },
+     "Z": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        144
+       ],
+       [
+        2,
+        4,
+        1080
+       ],
+       [
+        3,
+        3,
+        144
+       ],
+       [
+        3,
+        5,
+        10368
+       ],
+       [
+        3,
+        7,
+        1440
+       ]
+      ]
+     },
+     "candidate_cap": 2000000,
+     "max_size": 3
+    },
+    "weight_profile": {
+     "X": {
+      "column": {
+       "max": 3,
+       "mean": 3.0,
+       "min": 3
+      },
+      "row": {
+       "max": 6,
+       "mean": 6.0,
+       "min": 6
+      }
+     },
+     "Z": {
+      "column": {
+       "max": 3,
+       "mean": 3.0,
+       "min": 3
+      },
+      "row": {
+       "max": 6,
+       "mean": 6.0,
+       "min": 6
+      }
+     }
+    }
+   },
+   "flags": {
+    "css": true,
+    "locality_class": "local-2d-bilayer",
+    "modular": false,
+    "stabilizer": false
+   },
+   "k": 12,
+   "locality": {
+    "bbox": [
+     7.0,
+     8.0
+    ],
+    "dimension": 2,
+    "interaction_radius": 6.0,
+    "layers": 2,
+    "max_qubits_per_site": 2,
+    "min_site_spacing": 1.0,
+    "qubits_per_unit_area": 2.5714
+   },
+   "locality_class": "local-2d-bilayer",
+   "max_check_weight": 6,
+   "n": 144,
+   "rank_HX": 66,
+   "rank_HZ": 66,
+   "routing_cost": {
+    "heuristic": "mst-lower-bound",
+    "lattice_step": 1.0,
+    "max_swaps_per_check": 12,
+    "total_swaps": 762
+   },
+   "weight_class": "weight-6"
+  },
+  "css_equivalent": {
+   "enumeration_capped": false,
+   "fingerprints": [
+    "4cb9c1592c491d1d"
+   ],
+   "images": 1,
+   "of": "css",
+   "signatures": [
+    "913841434af471fe"
+   ]
+  },
+  "earned_distance": {
+   "X": {
+    "tier": "upper_bound",
+    "value": 12
+   },
+   "Z": {
+    "tier": "upper_bound",
+    "value": 12
+   },
+   "d": {
+    "tier": "upper_bound",
+    "value": 12
+   }
+  },
+  "fingerprint": "37b3cbe42450eeba",
+  "name": "[[144,12,12]] bivariate bicycle code",
+  "ok": true,
+  "signature": {
+   "d": 12,
+   "hash": "913841434af471fe",
+   "k": 12,
+   "n": 144
+  }
+ },
+ "slug": "144-12-12"
+}

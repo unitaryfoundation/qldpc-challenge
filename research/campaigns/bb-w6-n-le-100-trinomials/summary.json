@@ -1,0 +1,3449 @@
+{
+  "aborted_experiments": 0,
+  "authority": "candidates listed here passed verify/validate_candidate.py; nothing here is a board entry until a human reviews and submits it",
+  "budget": {
+    "consumed": {
+      "candidates_screened": 120,
+      "walltime_hours": 0.022
+    },
+    "declared": {
+      "candidates_screened": 120,
+      "walltime_hours": 0.5
+    },
+    "remaining": {
+      "candidates_screened": 0,
+      "walltime_hours": 0.478
+    }
+  },
+  "campaign_id": "bb-w6-n-le-100-trinomials",
+  "campaign_name": "Weight-6 bivariate bicycle codes at n <= 100: can random trinomial pairs beat the cell's seeded bar?",
+  "contract_hash": null,
+  "direction": {
+    "abandon_criterion": {
+      "flat_fresh_rungs": 2,
+      "note": "a candidate whose 400-trial screen reads at or below 8.889 is not deepened at all; one that reads above it goes to the gate, and its ladder is dropped once two fresh-seed rungs agree at a bound below the bar or at 20,000 trials",
+      "trials_cap": 20000
+    },
+    "bar": {
+      "axes": [
+        "kd2_over_n"
+      ],
+      "note": "the best kd^2/n among weight-6 entries with n <= 100 (8.889); 98-6-12 at 8.816 is next, both seeded baselines",
+      "slug": "90-8-10"
+    },
+    "budget": {
+      "candidates_screened": 120,
+      "trials_per_candidate": 400,
+      "walltime_hours": 0.5
+    },
+    "cell": "unrestricted~weight-6",
+    "expected_value": "A weight-6 code at n <= 100 above 8.889 would be the first submitted entry to lead the unrestricted weight-6 cell at that size; the cell's two best entries there are seeded literature baselines.",
+    "family": "bivariate-bicycle",
+    "feasibility": "n <= 100 is far under BASE_MAX_N (700); bb.py builds a trinomial pair in milliseconds, the 400-trial numpy screen reads a candidate in under a second, and the gate runs in seconds at this size, so the whole campaign fits in minutes on a laptop with no accelerator.",
+    "hypothesis": "Random trinomial pairs on small tori Z_l x Z_m (n = 2lm <= 100) contain a weight-6 CSS code with kd^2/n above 8.889, the unrestricted weight-6 cell's best at n <= 100.",
+    "novelty": {
+      "against": "the bivariate-bicycle family of arXiv:2308.07915 and the board's seeded baselines at n <= 100 (90-8-10, 98-6-12, 84-6-10)",
+      "claim": "a trinomial bivariate-bicycle code at n <= 100 with kd^2/n above the cell's best there"
+    },
+    "what_a_negative_would_teach": "That 120 random trinomial pairs at n <= 100 under a 400-trial screen hold nothing above the seeded bar, so the small-torus trinomial space is, at this depth, already covered by the literature's own picks; the next session should spend its budget on larger tori or on four-term polynomials rather than re-sampling here."
+  },
+  "errors": [],
+  "experiments": [
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 4), (0, 3), (2, 6)]",
+        "B": "[(2, 4), (0, 1), (1, 3)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.1851851851851851,
+        "trials": 400
+      },
+      "seed": 9,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011694667834995522
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (3, 1), (4, 2)]",
+        "B": "[(3, 3), (5, 3), (4, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 33,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010874140056936691
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 3), (4, 7), (4, 5)]",
+        "B": "[(1, 4), (0, 0), (0, 2)]",
+        "k": 4,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 61,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002269229627886994
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 0), (1, 2), (0, 0)]",
+        "B": "[(2, 0), (5, 4), (2, 2)]",
+        "k": 8,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.7777777777777777,
+        "trials": 400
+      },
+      "seed": 62,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001688042361315133
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 6), (0, 9), (2, 1)]",
+        "B": "[(2, 3), (0, 0), (1, 7)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.0666666666666667,
+        "trials": 400
+      },
+      "seed": 78,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001335270021809265
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 7), (3, 6), (1, 5)]",
+        "B": "[(3, 6), (3, 2), (0, 1)]",
+        "k": 4,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 80,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025805076390194394
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 5), (3, 2), (4, 5)]",
+        "B": "[(5, 3), (6, 5), (3, 0)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.204081632653061,
+        "trials": 400
+      },
+      "seed": 95,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002791167825408694
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 1), (1, 0), (0, 5)]",
+        "B": "[(3, 3), (2, 2), (4, 0)]",
+        "k": 6,
+        "l": 5,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 5.485714285714286,
+        "trials": 400
+      },
+      "seed": 97,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001762292824504483
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 0), (0, 2), (2, 1)]",
+        "B": "[(6, 2), (2, 0), (4, 1)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.5238095238095237,
+        "trials": 400
+      },
+      "seed": 104,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.508597220294177e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 4), (3, 6), (2, 0)]",
+        "B": "[(1, 4), (2, 3), (4, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.9183673469387754,
+        "trials": 400
+      },
+      "seed": 118,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002446967361417289
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 3), (3, 2), (5, 4)]",
+        "B": "[(4, 4), (2, 1), (0, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.8888888888888888,
+        "trials": 400
+      },
+      "seed": 137,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014260391200271745
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 5), (2, 0), (0, 3)]",
+        "B": "[(0, 3), (0, 4), (0, 2)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 150,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012839637722613083
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 3), (3, 2), (7, 3)]",
+        "B": "[(3, 1), (8, 1), (1, 0)]",
+        "k": 4,
+        "l": 9,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.0,
+        "trials": 400
+      },
+      "seed": 154,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00018397686330394613
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 2), (3, 2), (0, 1)]",
+        "B": "[(5, 0), (5, 2), (2, 4)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.8888888888888888,
+        "trials": 400
+      },
+      "seed": 164,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00017744168975493974
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 4), (0, 7), (1, 1)]",
+        "B": "[(0, 0), (4, 7), (5, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 8
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.166666666666667,
+        "trials": 400
+      },
+      "seed": 166,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00028224478023023244
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 1), (0, 0), (2, 1)]",
+        "B": "[(3, 0), (2, 2), (4, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.0,
+        "trials": 400
+      },
+      "seed": 173,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010974703692934579
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(8, 1), (7, 2), (2, 0)]",
+        "B": "[(6, 0), (3, 2), (6, 1)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 181,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012001395833471583
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 3), (0, 5), (2, 5)]",
+        "B": "[(5, 0), (4, 0), (4, 4)]",
+        "k": 8,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.7777777777777777,
+        "trials": 400
+      },
+      "seed": 190,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00016952256943720084
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(7, 2), (7, 0), (0, 1)]",
+        "B": "[(1, 1), (1, 0), (2, 2)]",
+        "k": 4,
+        "l": 8,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "kd2_over_n": 0.3333333333333333,
+        "trials": 400
+      },
+      "seed": 200,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.109304415889912e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 1), (4, 1), (0, 5)]",
+        "B": "[(6, 0), (1, 4), (5, 3)]",
+        "k": 6,
+        "l": 7,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.1428571428571428,
+        "trials": 400
+      },
+      "seed": 220,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00022329052082366413
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 3), (4, 0), (5, 0)]",
+        "B": "[(4, 1), (3, 5), (6, 0)]",
+        "k": 6,
+        "l": 7,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.5714285714285716,
+        "trials": 400
+      },
+      "seed": 233,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00023711612273473294
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 2), (0, 7), (2, 4)]",
+        "B": "[(2, 8), (0, 2), (1, 0)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 245,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001478439583701806
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 0), (1, 3), (4, 1)]",
+        "B": "[(5, 1), (0, 2), (0, 4)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.8888888888888888,
+        "trials": 400
+      },
+      "seed": 247,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00017345376163979784
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 4), (3, 3), (1, 3)]",
+        "B": "[(2, 1), (4, 2), (1, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 5.485714285714286,
+        "trials": 400
+      },
+      "seed": 250,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00018262762750964612
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 1), (5, 0), (6, 2)]",
+        "B": "[(6, 2), (6, 1), (4, 0)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 265,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.626875004161978e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 5), (1, 4), (0, 3)]",
+        "B": "[(5, 4), (0, 0), (3, 5)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.8888888888888888,
+        "trials": 400
+      },
+      "seed": 289,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00016480260418676255
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 2), (2, 3), (1, 4)]",
+        "B": "[(2, 2), (2, 3), (2, 1)]",
+        "k": 4,
+        "l": 4,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.0,
+        "trials": 400
+      },
+      "seed": 298,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00017849743055800598
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 1), (0, 6), (1, 8)]",
+        "B": "[(1, 3), (1, 2), (1, 4)]",
+        "k": 4,
+        "l": 4,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.0,
+        "trials": 400
+      },
+      "seed": 313,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00017927888890780094
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 5), (5, 6), (0, 4)]",
+        "B": "[(5, 3), (4, 4), (0, 1)]",
+        "k": 4,
+        "l": 6,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.761904761904762,
+        "trials": 400
+      },
+      "seed": 330,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00022335887724895859
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 1), (2, 4), (7, 3)]",
+        "B": "[(8, 1), (7, 1), (0, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 344,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002396874075445036
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 2), (3, 4), (1, 1)]",
+        "B": "[(4, 0), (0, 4), (2, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.0666666666666667,
+        "trials": 400
+      },
+      "seed": 360,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00013172647003860524
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 5), (0, 3), (2, 1)]",
+        "B": "[(0, 0), (3, 1), (2, 2)]",
+        "k": 8,
+        "l": 4,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 362,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010751584499505245
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 2), (8, 3), (7, 0)]",
+        "B": "[(0, 1), (1, 4), (2, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 371,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00023307585642517854
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 0), (2, 2), (5, 2)]",
+        "B": "[(0, 1), (9, 1), (7, 0)]",
+        "k": 8,
+        "l": 10,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 4.8,
+        "trials": 400
+      },
+      "seed": 401,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001497270602784637
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 2), (0, 0), (1, 3)]",
+        "B": "[(6, 1), (5, 5), (0, 1)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 6.122448979591836,
+        "trials": 400
+      },
+      "seed": 430,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002916277083568275
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 3), (2, 4), (0, 4)]",
+        "B": "[(1, 5), (0, 2), (2, 3)]",
+        "k": 4,
+        "l": 3,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 443,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.497643526022633e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (5, 1), (7, 2)]",
+        "B": "[(5, 1), (1, 0), (8, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 452,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001300617244689622
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(8, 1), (4, 2), (5, 2)]",
+        "B": "[(7, 0), (5, 2), (4, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.7407407407407405,
+        "trials": 400
+      },
+      "seed": 461,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00013388717611734238
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 4), (1, 2), (6, 3)]",
+        "B": "[(0, 2), (3, 1), (1, 3)]",
+        "k": 4,
+        "l": 7,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.761904761904762,
+        "trials": 400
+      },
+      "seed": 462,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00022651312497651413
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 2), (8, 0), (8, 2)]",
+        "B": "[(3, 1), (2, 1), (4, 1)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 536,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012172001142365237
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 2), (4, 6), (2, 1)]",
+        "B": "[(4, 4), (5, 6), (2, 0)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.9795918367346939,
+        "trials": 400
+      },
+      "seed": 554,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002660166319563157
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 3), (0, 0), (4, 0)]",
+        "B": "[(0, 4), (2, 3), (4, 5)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.204081632653061,
+        "trials": 400
+      },
+      "seed": 556,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00028212516193485093
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (6, 2), (4, 1)]",
+        "B": "[(4, 0), (0, 2), (5, 1)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 563,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.913699087014214e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 2), (2, 3), (4, 7)]",
+        "B": "[(2, 5), (1, 7), (4, 0)]",
+        "k": 4,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 612,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025780339110901374
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 5), (0, 4), (2, 0)]",
+        "B": "[(2, 5), (2, 4), (0, 0)]",
+        "k": 6,
+        "l": 3,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 5.142857142857143,
+        "trials": 400
+      },
+      "seed": 613,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010390663189658274
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 0), (4, 4), (5, 0)]",
+        "B": "[(5, 0), (3, 2), (0, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.5555555555555554,
+        "trials": 400
+      },
+      "seed": 631,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00019260472223524833
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(8, 1), (1, 1), (6, 1)]",
+        "B": "[(8, 1), (7, 2), (0, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 656,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010491459501079387
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 5), (2, 2), (1, 0)]",
+        "B": "[(2, 5), (0, 4), (1, 9)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 669,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001199295255355537
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 5), (1, 5), (1, 1)]",
+        "B": "[(2, 8), (2, 7), (0, 8)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 707,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001056577661074698
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 7), (2, 7), (1, 0)]",
+        "B": "[(2, 1), (1, 4), (0, 0)]",
+        "k": 4,
+        "l": 3,
+        "m": 8
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 740,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 8.504645834263e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 5), (1, 7), (1, 5)]",
+        "B": "[(1, 0), (1, 2), (2, 0)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "kd2_over_n": 0.2962962962962963,
+        "trials": 400
+      },
+      "seed": 772,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.306069446106752e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 2), (0, 4), (5, 0)]",
+        "B": "[(2, 1), (4, 3), (3, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.4,
+        "trials": 400
+      },
+      "seed": 784,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014111946776716245
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 2), (7, 0), (7, 1)]",
+        "B": "[(3, 1), (2, 2), (8, 0)]",
+        "k": 4,
+        "l": 10,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 795,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014495156246185716
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(8, 1), (1, 2), (0, 1)]",
+        "B": "[(0, 2), (5, 4), (4, 1)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 838,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00024989759251992734
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 3), (1, 1), (5, 4)]",
+        "B": "[(2, 4), (6, 0), (0, 1)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.9795918367346939,
+        "trials": 400
+      },
+      "seed": 839,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002592322222578029
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 0), (0, 1), (2, 8)]",
+        "B": "[(2, 0), (0, 8), (1, 9)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 846,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014246430558462937
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 4), (1, 6), (2, 0)]",
+        "B": "[(3, 1), (3, 4), (0, 3)]",
+        "k": 6,
+        "l": 4,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.7142857142857142,
+        "trials": 400
+      },
+      "seed": 890,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00013437304387076035
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 4), (2, 6), (2, 5)]",
+        "B": "[(2, 6), (2, 1), (2, 2)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 895,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012593884273276974
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 0), (5, 5), (6, 5)]",
+        "B": "[(2, 1), (1, 1), (1, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 6.122448979591836,
+        "trials": 400
+      },
+      "seed": 898,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00029529086805673107
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 3), (8, 3), (1, 0)]",
+        "B": "[(7, 1), (5, 1), (3, 3)]",
+        "k": 4,
+        "l": 9,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.5555555555555554,
+        "trials": 400
+      },
+      "seed": 913,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00019216557861202293
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 0), (3, 4), (2, 1)]",
+        "B": "[(4, 3), (8, 3), (0, 1)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 954,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00026747494192224823
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 1), (5, 2), (5, 0)]",
+        "B": "[(6, 1), (3, 2), (4, 0)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 974,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010180945579324745
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 1), (1, 2), (6, 0)]",
+        "B": "[(1, 2), (8, 1), (5, 0)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.7407407407407405,
+        "trials": 400
+      },
+      "seed": 982,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014678328692550874
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 2), (1, 3), (4, 5)]",
+        "B": "[(2, 0), (1, 5), (5, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.9183673469387754,
+        "trials": 400
+      },
+      "seed": 1058,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00031351591415134153
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 1), (0, 4), (5, 1)]",
+        "B": "[(2, 2), (5, 0), (1, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 6.122448979591836,
+        "trials": 400
+      },
+      "seed": 1063,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0003105537847538168
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 2), (2, 6), (0, 1)]",
+        "B": "[(3, 3), (1, 0), (2, 2)]",
+        "k": 6,
+        "l": 4,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.7142857142857142,
+        "trials": 400
+      },
+      "seed": 1073,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012896407389133754
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 5), (0, 2), (3, 3)]",
+        "B": "[(0, 0), (2, 1), (0, 3)]",
+        "k": 6,
+        "l": 4,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.857142857142857,
+        "trials": 400
+      },
+      "seed": 1084,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00014878769670354408
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 2), (0, 4), (2, 0)]",
+        "B": "[(4, 2), (0, 3), (1, 4)]",
+        "k": 8,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 4.0,
+        "trials": 400
+      },
+      "seed": 1113,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00019998564831136416
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 0), (2, 1), (2, 8)]",
+        "B": "[(0, 6), (0, 7), (1, 5)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1114,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012113839109790408
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 0), (2, 3), (2, 5)]",
+        "B": "[(5, 4), (0, 0), (6, 3)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.204081632653061,
+        "trials": 400
+      },
+      "seed": 1115,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002866437266735981
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 2), (5, 2), (3, 1)]",
+        "B": "[(5, 2), (1, 3), (3, 1)]",
+        "k": 4,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 1120,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001048177083592034
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 1), (0, 4), (4, 2)]",
+        "B": "[(4, 0), (5, 2), (0, 3)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 1121,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025913718751528194
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 4), (1, 2), (0, 5)]",
+        "B": "[(2, 9), (0, 1), (2, 3)]",
+        "k": 8,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 2.1333333333333333,
+        "trials": 400
+      },
+      "seed": 1130,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00015543259272817522
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 5), (1, 3), (4, 5)]",
+        "B": "[(2, 5), (2, 2), (4, 1)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.204081632653061,
+        "trials": 400
+      },
+      "seed": 1154,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00028143896999406734
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 2), (3, 4), (1, 0)]",
+        "B": "[(2, 5), (4, 2), (2, 1)]",
+        "k": 8,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "kd2_over_n": 0.4444444444444444,
+        "trials": 400
+      },
+      "seed": 1172,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001600607985811722
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 2), (5, 3), (0, 2)]",
+        "B": "[(6, 3), (5, 6), (0, 5)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 6.122448979591836,
+        "trials": 400
+      },
+      "seed": 1173,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.000303541551111266
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 3), (3, 0), (1, 0)]",
+        "B": "[(4, 2), (2, 1), (3, 3)]",
+        "k": 4,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 1176,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011278012722161494
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (3, 0), (2, 2)]",
+        "B": "[(1, 1), (5, 2), (6, 1)]",
+        "k": 6,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 5.142857142857143,
+        "trials": 400
+      },
+      "seed": 1184,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.909793999718709e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (3, 2), (6, 3)]",
+        "B": "[(2, 0), (1, 2), (6, 0)]",
+        "k": 6,
+        "l": 7,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.7142857142857142,
+        "trials": 400
+      },
+      "seed": 1191,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001297921761094282
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 2), (0, 6), (5, 1)]",
+        "B": "[(4, 2), (3, 6), (5, 6)]",
+        "k": 4,
+        "l": 6,
+        "m": 8
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 0.6666666666666666,
+        "trials": 400
+      },
+      "seed": 1193,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025861076389749847
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 4), (6, 2), (0, 1)]",
+        "B": "[(3, 0), (0, 6), (1, 2)]",
+        "k": 12,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.9591836734693877,
+        "trials": 400
+      },
+      "seed": 1198,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0003109315161256947
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 0), (7, 2), (6, 1)]",
+        "B": "[(3, 1), (0, 0), (6, 2)]",
+        "k": 4,
+        "l": 8,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.0,
+        "trials": 400
+      },
+      "seed": 1228,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011419221053883019
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 0), (3, 3), (1, 0)]",
+        "B": "[(4, 3), (3, 3), (2, 0)]",
+        "k": 4,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 1237,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010860494195690586
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 3), (2, 5), (3, 2)]",
+        "B": "[(5, 1), (1, 5), (3, 2)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.5555555555555554,
+        "trials": 400
+      },
+      "seed": 1238,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00019816239584340817
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 8), (2, 6), (1, 3)]",
+        "B": "[(1, 2), (0, 3), (2, 6)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1245,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.000107404108857736
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 3), (3, 5), (3, 4)]",
+        "B": "[(1, 1), (3, 0), (6, 5)]",
+        "k": 4,
+        "l": 7,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.761904761904762,
+        "trials": 400
+      },
+      "seed": 1248,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00019685439804258446
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 0), (1, 4), (2, 2)]",
+        "B": "[(2, 3), (6, 1), (1, 3)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 1258,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00024394876168419918
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 2), (5, 3), (3, 3)]",
+        "B": "[(6, 0), (7, 0), (5, 4)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 1270,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025501062498531406
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 5), (0, 4), (1, 3)]",
+        "B": "[(1, 5), (1, 0), (2, 1)]",
+        "k": 4,
+        "l": 4,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.0,
+        "trials": 400
+      },
+      "seed": 1285,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011068471080054425
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 7), (2, 6), (1, 2)]",
+        "B": "[(1, 4), (1, 6), (3, 2)]",
+        "k": 4,
+        "l": 4,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.5555555555555554,
+        "trials": 400
+      },
+      "seed": 1297,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001804576619502364
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(6, 0), (3, 2), (3, 3)]",
+        "B": "[(3, 6), (0, 0), (1, 1)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 6.122448979591836,
+        "trials": 400
+      },
+      "seed": 1306,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00029394951390309467
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 2), (1, 1), (5, 2)]",
+        "B": "[(4, 5), (3, 3), (5, 5)]",
+        "k": 4,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.5555555555555554,
+        "trials": 400
+      },
+      "seed": 1314,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00018105094916083747
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 0), (0, 2), (0, 6)]",
+        "B": "[(1, 0), (2, 3), (0, 1)]",
+        "k": 6,
+        "l": 5,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "kd2_over_n": 1.3714285714285714,
+        "trials": 400
+      },
+      "seed": 1329,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00016269309025826969
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 1), (2, 7), (0, 1)]",
+        "B": "[(0, 0), (2, 7), (2, 6)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1334,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012210648138231286
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 1), (3, 6), (1, 0)]",
+        "B": "[(3, 5), (5, 4), (4, 2)]",
+        "k": 4,
+        "l": 6,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.0476190476190474,
+        "trials": 400
+      },
+      "seed": 1335,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00022482010419480502
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 1), (0, 3), (0, 2)]",
+        "B": "[(3, 3), (2, 4), (3, 2)]",
+        "k": 4,
+        "l": 4,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.0,
+        "trials": 400
+      },
+      "seed": 1348,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011097796280713131
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 5), (1, 7), (1, 0)]",
+        "B": "[(1, 3), (2, 4), (1, 5)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1354,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001281779049895704
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 8), (2, 1), (1, 3)]",
+        "B": "[(0, 3), (1, 7), (2, 1)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.4,
+        "trials": 400
+      },
+      "seed": 1379,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00013901461808321375
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 5), (2, 0), (1, 8)]",
+        "B": "[(1, 6), (3, 7), (4, 7)]",
+        "k": 8,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 5.688888888888889,
+        "trials": 400
+      },
+      "seed": 1426,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002743606480847423
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 1), (2, 0), (0, 2)]",
+        "B": "[(3, 0), (0, 1), (1, 2)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1473,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012355166662018747
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 0), (0, 1), (3, 2)]",
+        "B": "[(0, 2), (4, 0), (4, 1)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 1509,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.643648136665838e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 3), (1, 4), (3, 1)]",
+        "B": "[(5, 4), (0, 4), (1, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 5.485714285714286,
+        "trials": 400
+      },
+      "seed": 1526,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00018713391191946962
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 7), (2, 6), (1, 7)]",
+        "B": "[(1, 5), (1, 0), (0, 6)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1532,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00013029001135792998
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 1), (5, 1), (3, 1)]",
+        "B": "[(3, 2), (5, 0), (1, 2)]",
+        "k": 16,
+        "l": 6,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "kd2_over_n": 1.3333333333333333,
+        "trials": 400
+      },
+      "seed": 1537,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001265194330416206
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 6), (4, 5), (2, 7)]",
+        "B": "[(3, 6), (4, 5), (4, 1)]",
+        "k": 4,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 1548,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025902053250724245
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 2), (5, 3), (4, 2)]",
+        "B": "[(2, 2), (2, 3), (5, 4)]",
+        "k": 8,
+        "l": 6,
+        "m": 6
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 4.0,
+        "trials": 400
+      },
+      "seed": 1578,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002020648610778153
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 1), (2, 0), (0, 2)]",
+        "B": "[(0, 0), (4, 1), (0, 2)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 1604,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00010159557859878987
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(2, 7), (1, 5), (1, 1)]",
+        "B": "[(0, 1), (0, 3), (2, 1)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.7407407407407405,
+        "trials": 400
+      },
+      "seed": 1606,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012890636552280435
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 4), (0, 6), (2, 9)]",
+        "B": "[(1, 7), (2, 9), (0, 1)]",
+        "k": 4,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 1616,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00015333137720719808
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 1), (1, 0), (5, 3)]",
+        "B": "[(8, 3), (6, 4), (1, 0)]",
+        "k": 4,
+        "l": 9,
+        "m": 5
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 4.444444444444445,
+        "trials": 400
+      },
+      "seed": 1620,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002564748958037752
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 1), (2, 0), (1, 1)]",
+        "B": "[(7, 2), (5, 1), (0, 0)]",
+        "k": 4,
+        "l": 9,
+        "m": 4
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 10,
+        "kd2_over_n": 5.555555555555555,
+        "trials": 400
+      },
+      "seed": 1639,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00018491530085965578
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 0), (2, 2), (0, 1)]",
+        "B": "[(0, 2), (5, 0), (4, 1)]",
+        "k": 4,
+        "l": 9,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 2.6666666666666665,
+        "trials": 400
+      },
+      "seed": 1644,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00012749622698821541
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 4), (2, 6), (0, 2)]",
+        "B": "[(4, 0), (1, 1), (4, 8)]",
+        "k": 4,
+        "l": 5,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 1.6,
+        "trials": 400
+      },
+      "seed": 1671,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00025909746524929587
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(4, 2), (4, 0), (6, 1)]",
+        "B": "[(6, 1), (2, 2), (0, 0)]",
+        "k": 4,
+        "l": 7,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.4285714285714284,
+        "trials": 400
+      },
+      "seed": 1682,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.663353027361962e-05
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 5), (3, 5), (2, 2)]",
+        "B": "[(3, 2), (4, 5), (2, 2)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.9183673469387754,
+        "trials": 400
+      },
+      "seed": 1734,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002962451274894799
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(0, 0), (8, 2), (9, 1)]",
+        "B": "[(1, 1), (1, 2), (3, 0)]",
+        "k": 4,
+        "l": 10,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 4.266666666666667,
+        "trials": 400
+      },
+      "seed": 1740,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0001401871180213574
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 4), (1, 5), (2, 7)]",
+        "B": "[(1, 1), (2, 0), (2, 7)]",
+        "k": 8,
+        "l": 3,
+        "m": 10
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 4.8,
+        "trials": 400
+      },
+      "seed": 1768,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00015131697918857552
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(1, 1), (2, 4), (0, 7)]",
+        "B": "[(0, 1), (0, 5), (2, 5)]",
+        "k": 4,
+        "l": 3,
+        "m": 9
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "kd2_over_n": 0.2962962962962963,
+        "trials": 400
+      },
+      "seed": 1775,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011159709499528011
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(5, 1), (3, 2), (2, 0)]",
+        "B": "[(1, 2), (2, 1), (5, 0)]",
+        "k": 4,
+        "l": 8,
+        "m": 3
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "kd2_over_n": 3.0,
+        "trials": 400
+      },
+      "seed": 1781,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00011056114583172732
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "bivariate-bicycle",
+      "mode": "novel_generation",
+      "note": "",
+      "params": {
+        "A": "[(3, 5), (6, 3), (0, 4)]",
+        "B": "[(6, 4), (6, 2), (2, 5)]",
+        "k": 6,
+        "l": 7,
+        "m": 7
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 8,
+        "kd2_over_n": 3.9183673469387754,
+        "trials": 400
+      },
+      "seed": 1792,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0002909433216296343
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    }
+  ],
+  "frontier_advances": 0,
+  "negative_results": [
+    {
+      "detail": "120 trinomial pairs with k >= 1 at n in [40, 100], 400 numpy RIS trials each (1673 further draws had k = 0 and were not charged): the best screened kd^2/n was 6.122 at [[98,6,10]] (l=7, m=7) against the bar 8.889 (90-8-10); That 120 random trinomial pairs at n <= 100 under a 400-trial screen hold nothing above the seeded bar, so the small-torus trinomial space is, at this depth, already covered by the literature's own picks; the next session should spend its budget on larger tori or on four-term polynomials rather than re-sampling here.",
+      "what": "bar not reached"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n",
+    "target": 8.889
+  },
+  "params": {},
+  "report": "research/campaigns/bb-w6-n-le-100-trinomials/REPORT.md",
+  "required_outputs": [
+    "experiment_ledger",
+    "negative_results",
+    "campaign_summary"
+  ],
+  "retracted": [],
+  "run_contract": null,
+  "screen_quality": [],
+  "snapshot": {
+    "branch": "kit/direction-card",
+    "diff_sha256": "d687a63e6cf69d26bf4912347914e76cd2a106f2d1d7033fbdd07e6b0f434447",
+    "dirty": true,
+    "head": "630185d73544236e74908805837b8a0cb599db6b",
+    "untracked_count": 4
+  },
+  "status": "completed",
+  "stopped_by": {
+    "detail": "candidates_screened reached 120 of 120",
+    "type": "budget_exhausted"
+  },
+  "summary_version": 1,
+  "survivors": []
+}

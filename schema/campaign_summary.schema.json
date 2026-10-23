@@ -4,7 +4,12 @@
   "title": "qLDPC challenge campaign summary",
   "description": "What a campaign did, written beside its definition as research/campaigns/<id>/summary.json by research/kit/campaign.py. The campaign file (schema/campaign.schema.json) is the INPUT; this is the committed outcome, including the failures. It is advisory and never authoritative: a candidate is a find when verify/validate_candidate.py says so and at no other point, so nothing here admits a code, changes a tier, or moves a ranking. Its purpose is that the next session can read what was screened, at what depth, and how it went, instead of re-learning it at the same price (issue #2726).",
   "type": "object",
-  "required": ["summary_version", "campaign_id", "status", "experiments"],
+  "required": [
+    "summary_version",
+    "campaign_id",
+    "status",
+    "experiments"
+  ],
   "properties": {
     "summary_version": {
       "const": 1,
@@ -15,58 +20,123 @@
       "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
       "description": "The campaign's id, which is also its directory under research/campaigns/."
     },
-    "campaign_name": { "type": "string", "maxLength": 200 },
+    "campaign_name": {
+      "type": "string",
+      "maxLength": 200
+    },
     "status": {
       "type": "string",
-      "enum": ["draft", "active", "paused", "completed", "abandoned"]
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "completed",
+        "abandoned"
+      ]
     },
     "backfilled": {
       "type": "object",
       "description": "Present only on a summary reconstructed after the fact from prose rather than written by a run. A backfilled row carries whatever its source stated and nothing more: absent screening depth stays absent instead of being guessed, which is the difference between a record and a reconstruction.",
-      "required": ["from", "by"],
+      "required": [
+        "from",
+        "by"
+      ],
       "additionalProperties": false,
       "properties": {
         "from": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "description": "Repo-relative paths the numbers were read out of, e.g. a fieldnote."
         },
-        "by": { "type": "string", "minLength": 1, "description": "Who reconstructed it, and under which issue." },
-        "note": { "type": "string", "maxLength": 2000 }
+        "by": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Who reconstructed it, and under which issue."
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 2000
+        }
       }
     },
     "experiments": {
       "type": "array",
       "description": "One row per run: a family, a budget slice, and what came of it. A row that screened a family member and discarded it is as much a result as one that produced a survivor, and is the row the registry exists to carry.",
-      "items": { "$ref": "#/$defs/experiment" }
+      "items": {
+        "$ref": "#/$defs/experiment"
+      }
     },
     "screen_quality": {
       "type": "array",
       "description": "Per family, how well the cheap screen ordered candidates against the gate's verdicts. Rank correlation rather than error: distance_rand at low trials is a ranking instrument, not a measuring one, and AUTORESEARCH.md section 3 already warns that NumPy iterations and fast-RIS samples are not comparable screening budgets, so an error bar against a depth-mismatched number would be fiction. A family whose screen ranks the way the gate does can be trusted to spend a ladder budget on the right rung; one whose screen does not is good for discarding and not for choosing.",
-      "items": { "$ref": "#/$defs/screen_quality" }
+      "items": {
+        "$ref": "#/$defs/screen_quality"
+      }
     },
-    "objective": { "type": "object" },
-    "snapshot": { "type": "object" },
-    "params": { "type": "object" },
-    "run_contract": { "type": ["object", "null"] },
-    "contract_hash": { "type": ["string", "null"] },
-    "stopped_by": { "type": "object" },
-    "budget": { "type": "object" },
-    "survivors": { "type": "array" },
-    "frontier_advances": { "type": "integer", "minimum": 0 },
-    "negative_results": { "type": "array" },
+    "objective": {
+      "type": "object"
+    },
+    "snapshot": {
+      "type": "object"
+    },
+    "params": {
+      "type": "object"
+    },
+    "run_contract": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "contract_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "stopped_by": {
+      "type": "object"
+    },
+    "budget": {
+      "type": "object"
+    },
+    "survivors": {
+      "type": "array"
+    },
+    "frontier_advances": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "negative_results": {
+      "type": "array"
+    },
     "errors": {
       "type": "array",
       "description": "Crashes, kept apart from negative_results on purpose. A negative is a measurement and an error is the absence of one; a summary that files both under one heading reads a broken generator as a closed family. Each item names the experiment it aborted.",
       "items": {
         "type": "object",
-        "required": ["what", "detail"],
+        "required": [
+          "what",
+          "detail"
+        ],
         "additionalProperties": false,
         "properties": {
-          "what": { "type": "string", "minLength": 1 },
-          "detail": { "type": "string" },
-          "experiment": { "type": "integer", "minimum": 0, "description": "index into experiments of the row this aborted" }
+          "what": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string"
+          },
+          "experiment": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "index into experiments of the row this aborted"
+          }
         }
       }
     },
@@ -75,14 +145,206 @@
       "minimum": 0,
       "description": "How many experiment rows carry aborted: true. Reported beside the experiment count so the two are never read as one number."
     },
-    "required_outputs": { "type": "array" },
-    "report": { "type": ["string", "null"] },
-    "authority": { "type": "string" }
+    "required_outputs": {
+      "type": "array"
+    },
+    "report": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authority": {
+      "type": "string"
+    },
+    "direction": {
+      "description": "The campaign's direction card, copied from the definition when the summary is written (issue #4028): null for a campaign defined before the card existed, absent on a summary written before this field.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "hypothesis",
+            "cell",
+            "family",
+            "bar",
+            "budget",
+            "feasibility",
+            "novelty",
+            "expected_value",
+            "abandon_criterion",
+            "what_a_negative_would_teach"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "hypothesis": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400,
+              "description": "One sentence: the construction claim being tested."
+            },
+            "cell": {
+              "type": "string",
+              "pattern": "^(local-2d-single|local-2d-bilayer|unrestricted)~(weight-4|weight-6|weight-8|weight-any)$",
+              "description": "The primary-track cell aimed at, locality~weight in the board's vocabulary. The verifier decides which cell a finished code lands in; this is where the campaign is pointed."
+            },
+            "family": {
+              "type": "string",
+              "enum": [
+                "bivariate-bicycle",
+                "generalized-bicycle",
+                "2bga-coset",
+                "hypergraph-product",
+                "lifted-product",
+                "balanced-product",
+                "quantum-tanner",
+                "tile",
+                "topological",
+                "other"
+              ],
+              "description": "The family tag the campaign searches, from the same list as methods.families."
+            },
+            "bar": {
+              "type": "object",
+              "required": [
+                "slug",
+                "axes"
+              ],
+              "additionalProperties": false,
+              "description": "The entry to beat, by slug, and the axes it must be beaten on.",
+              "properties": {
+                "slug": {
+                  "type": "string",
+                  "pattern": "^[0-9]+-[0-9]+-[0-9]+(-[a-z0-9]+)?$"
+                },
+                "axes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "n",
+                      "k",
+                      "d",
+                      "w",
+                      "kd2_over_n",
+                      "geometric_efficiency"
+                    ]
+                  }
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 400
+                }
+              }
+            },
+            "budget": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": false,
+              "description": "Screening trials and wall clock in the units the campaign spends: the campaign budget's fields, plus the screen depth per candidate.",
+              "properties": {
+                "cpu_hours": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "gpu_hours": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "walltime_hours": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "candidates_screened": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "trials_per_candidate": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "feasibility": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600,
+              "description": "Why this is cheap to test here: which cap, which cell, which toolkit."
+            },
+            "novelty": {
+              "type": "object",
+              "required": [
+                "claim",
+                "against"
+              ],
+              "additionalProperties": false,
+              "description": "What is claimed to be new, and against which published family or entry.",
+              "properties": {
+                "claim": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 400
+                },
+                "against": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300,
+                  "description": "The published family or entries the claim is measured against; 'none known' is an answer."
+                }
+              }
+            },
+            "expected_value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600,
+              "description": "What a positive result is worth, as a statement and never a number: a number would be a score, and TRACKS.md's own reasoning about kd^2/n is that one number must not stand in for a frontier."
+            },
+            "abandon_criterion": {
+              "type": "object",
+              "required": [
+                "flat_fresh_rungs",
+                "trials_cap"
+              ],
+              "additionalProperties": false,
+              "description": "When the ladder is dropped, in the terms research/kit/escalation.py enforces.",
+              "properties": {
+                "flat_fresh_rungs": {
+                  "type": "integer",
+                  "minimum": 2,
+                  "description": "Fresh-seed rungs that must agree at a bound already below the bar before the ladder is abandoned; escalation.py's MIN_FLAT_RUNGS is the floor."
+                },
+                "trials_cap": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "RIS trials per candidate after which the ladder is dropped whatever it reads."
+                },
+                "note": {
+                  "type": "string",
+                  "maxLength": 400
+                }
+              }
+            },
+            "what_a_negative_would_teach": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 600,
+              "description": "The falsifiable content of a failure: what the next session may stop trying."
+            }
+          }
+        }
+      ]
+    }
   },
   "$defs": {
     "experiment": {
       "type": "object",
-      "required": ["family"],
+      "required": [
+        "family"
+      ],
       "additionalProperties": false,
       "properties": {
         "family": {
@@ -91,14 +353,36 @@
           "maxLength": 64,
           "description": "The family tag, written the way the board writes it, because the registry is matched against the board and not against the campaign vocabulary. That vocabulary is open in practice: codes/ carries tags such as local-sat-css, check-deletion, pair-partition-cpm, and distance-amplified that the campaign input schema's enum does not list, and a row that cannot name what was screened is worse than one naming a tag outside the enum. The campaign file still constrains what a run may declare."
         },
-        "seed": { "type": ["integer", "null"] },
-        "note": { "type": "string", "maxLength": 2000 },
-        "spent": { "type": "object" },
-        "survivors": { "type": "integer", "minimum": 0 },
+        "seed": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "spent": {
+          "type": "object"
+        },
+        "survivors": {
+          "type": "integer",
+          "minimum": 0
+        },
         "params": {
           "type": "object",
           "description": "The construction parameters that identify this family member, and the resolved run parameters the lane invoked with. Together they are what a later session matches on before paying for a ladder: a family name alone cannot say whether this member was already tried.",
-          "additionalProperties": { "type": ["integer", "number", "string", "boolean", "array", "null"] }
+          "additionalProperties": {
+            "type": [
+              "integer",
+              "number",
+              "string",
+              "boolean",
+              "array",
+              "null"
+            ]
+          }
         },
         "screened": {
           "type": "object",
@@ -106,17 +390,48 @@
           "additionalProperties": false,
           "allOf": [
             {
-              "if": { "properties": { "backend": { "enum": ["numpy", "fast", "gpu", "mixed"] } }, "required": ["backend"] },
-              "then": { "required": ["trials"] }
+              "if": {
+                "properties": {
+                  "backend": {
+                    "enum": [
+                      "numpy",
+                      "fast",
+                      "gpu",
+                      "mixed"
+                    ]
+                  }
+                },
+                "required": [
+                  "backend"
+                ]
+              },
+              "then": {
+                "required": [
+                  "trials"
+                ]
+              }
             },
             {
-              "if": { "not": { "required": ["backend"] } },
-              "then": { "required": ["trials"] }
+              "if": {
+                "not": {
+                  "required": [
+                    "backend"
+                  ]
+                }
+              },
+              "then": {
+                "required": [
+                  "trials"
+                ]
+              }
             }
           ],
           "properties": {
             "d": {
-              "type": ["integer", "null"],
+              "type": [
+                "integer",
+                "null"
+              ],
               "minimum": 0,
               "description": "The lightest logical weight the screen found, which is an upper bound on the distance and never a claim about it. Null when the member was screened and no weight was recorded."
             },
@@ -127,11 +442,22 @@
             },
             "backend": {
               "type": "string",
-              "enum": ["numpy", "fast", "gpu", "sat", "structural", "mixed", "unknown"],
+              "enum": [
+                "numpy",
+                "fast",
+                "gpu",
+                "sat",
+                "structural",
+                "mixed",
+                "unknown"
+              ],
               "description": "Which implementation produced the reading. NumPy iterations, fast-RIS samples, and GPU trials are not comparable screening budgets (AUTORESEARCH.md section 3), so the count alone does not identify the depth. sat and structural name a reading that did not come from sampling at all: a solver verdict, or a bound read off the construction."
             },
             "kd2_over_n": {
-              "type": ["number", "null"],
+              "type": [
+                "number",
+                "null"
+              ],
               "minimum": 0,
               "description": "The efficiency this reading implies, k d^2 / n, when the member's n and k are known. Carried rather than recomputed because the reading is what it is: a later session plotting the campaign should not have to guess which n the screen was reading against."
             },
@@ -144,12 +470,26 @@
         },
         "verdict": {
           "type": "string",
-          "enum": ["passed", "refuted", "held", "duplicate", "dominated", "not_run"],
+          "enum": [
+            "passed",
+            "refuted",
+            "held",
+            "duplicate",
+            "dominated",
+            "not_run"
+          ],
           "description": "What the gate or the refuter said, when one was paid for. not_run is the common and useful case: it records that the member was screened and discarded before the gate, which is exactly what a later session needs in order not to pay for it again. passed means verify/validate_candidate.py returned passed: true and nothing more; it is not a board entry until a human submits it. held belongs to a refutation pass rather than a search: the claim survived a search of the recorded depth, which is evidence about the depth and never a certificate."
         },
         "mode": {
           "type": "string",
-          "enum": ["novel_generation", "cross_pollination", "refinement", "repair", "enumeration", "hand_built"],
+          "enum": [
+            "novel_generation",
+            "cross_pollination",
+            "refinement",
+            "repair",
+            "enumeration",
+            "hand_built"
+          ],
           "description": "How the candidate was arrived at. The kit's samplers (sample_bb, sample_dihedral, sample_kasai_affine) are rejection sampling with no memory between candidates, which is novel_generation; enumeration is an exhaustive walk of a parameter box. Recorded because a survivor count cannot distinguish a budget spread across a family from one spent mutating a single lineage.",
           "default": "novel_generation"
         },
@@ -158,22 +498,40 @@
           "description": "True when the experiment crashed rather than completed. A crashed sweep and a sweep that ran and lost produce the same survivor count, so without this flag a summary reading N experiments, 0 survivors cannot say whether anything was measured. Set by Ledger.record_error, never by hand."
         },
         "verified_kd2_over_n": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": 0,
           "description": "The best k d^2 / n among this row's gate-passed survivors. Separate from the screened reading because the two disagree exactly when it matters: a screen that inflates at low depth reads above the bar while the gate never admits anything near it."
         },
-        "contract_hash": { "type": ["string", "null"] },
-        "contract_deviations": { "type": "object" }
+        "contract_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contract_deviations": {
+          "type": "object"
+        }
       }
     },
     "screen_quality": {
       "type": "object",
-      "required": ["family", "pairs"],
+      "required": [
+        "family",
+        "pairs"
+      ],
       "additionalProperties": false,
       "properties": {
-        "family": { "type": "string" },
+        "family": {
+          "type": "string"
+        },
         "spearman": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "minimum": -1,
           "maximum": 1,
           "description": "Spearman rank correlation between the screened distance and the gate outcome over this family's rows that carry both. Null when the rows carry no usable spread, for instance when every verdict is the same, since a correlation is undefined there rather than zero."
@@ -183,7 +541,10 @@
           "minimum": 0,
           "description": "How many rows carried both a screened distance and a gate verdict. A correlation over a handful of rows is noise, so this is reported beside it rather than folded into it."
         },
-        "note": { "type": "string", "maxLength": 1000 }
+        "note": {
+          "type": "string",
+          "maxLength": 1000
+        }
       }
     }
   }

@@ -4,6 +4,7 @@
     "id": "w8-2dlocal-n700-1000",
     "name": "Weight-8 2D-local codes, n=700-1000",
     "status": "draft",
+    "direction": null,
     "objective": { "metric": "kd2_over_n", "direction": "maximize" },
     "constraints": {
       "locality": "local-2d-bilayer",

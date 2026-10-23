@@ -4,12 +4,22 @@
   "title": "qLDPC challenge research campaign",
   "description": "A bounded, reproducible search task: what to look for, where to look, how much to spend, and when to stop. A campaign is the INPUT to the autoresearch loop in research/AUTORESEARCH.md, not a replacement for it, and it is not a submission mechanism: a campaign produces candidates, a human reviews them, and only then does a PR happen. Two things it can never do, both load-bearing. Its constraints are screening filters and never claims: the locality and weight classes an entry lands in are computed by verify/ from (H_X, H_Z) and the layout, never declared here. And it cannot weaken the gate: nothing is a find until verify/validate_candidate.py returns passed: true.",
   "type": "object",
-  "required": ["campaign"],
+  "required": [
+    "campaign"
+  ],
   "additionalProperties": false,
   "properties": {
     "campaign": {
       "type": "object",
-      "required": ["schema_version", "id", "name", "objective", "budget", "stopping"],
+      "required": [
+        "schema_version",
+        "id",
+        "name",
+        "objective",
+        "budget",
+        "stopping",
+        "direction"
+      ],
       "additionalProperties": false,
       "properties": {
         "schema_version": {
@@ -21,24 +31,49 @@
           "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
           "description": "Stable identifier, and the directory name under research/campaigns/."
         },
-        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
         "status": {
           "type": "string",
-          "enum": ["draft", "active", "paused", "completed", "abandoned"],
+          "enum": [
+            "draft",
+            "active",
+            "paused",
+            "completed",
+            "abandoned"
+          ],
           "default": "draft",
           "description": "abandoned keeps its ledger and any staged finds: stopping early throws nothing away."
         },
         "objective": {
           "type": "object",
-          "required": ["metric", "direction"],
+          "required": [
+            "metric",
+            "direction"
+          ],
           "additionalProperties": false,
           "properties": {
             "metric": {
               "type": "string",
-              "enum": ["kd2_over_n", "geometric_efficiency", "distance", "logical_qubits", "frontier_entries"],
+              "enum": [
+                "kd2_over_n",
+                "geometric_efficiency",
+                "distance",
+                "logical_qubits",
+                "frontier_entries"
+              ],
               "description": "What the campaign is trying to move. kd2_over_n is the board's per-cell headline figure; it is compared within a cell, never globally (TRACKS.md)."
             },
-            "direction": { "type": "string", "enum": ["maximize", "minimize"] },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "maximize",
+                "minimize"
+              ]
+            },
             "target": {
               "type": "number",
               "description": "Optional: the value, among validated survivors, that would make the campaign a success. Its absence means 'beat whatever is there'."
@@ -52,24 +87,41 @@
           "properties": {
             "locality": {
               "type": "string",
-              "enum": ["local-2d-single", "local-2d-bilayer", "unrestricted"],
+              "enum": [
+                "local-2d-single",
+                "local-2d-bilayer",
+                "unrestricted"
+              ],
               "description": "The locality class to search toward. The verifier decides which class a finished code is in."
             },
-            "max_check_weight": { "type": "integer", "minimum": 3, "maximum": 32 },
+            "max_check_weight": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 32
+            },
             "n": {
               "type": "array",
-              "items": { "type": "integer", "minimum": 1 },
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
               "minItems": 2,
               "maxItems": 2,
               "description": "[min, max] blocklength. The admissible box is n <= 700 at any weight, or n <= 1000 at check weight <= 8 and d <= 40; a campaign may ask for less than that but not for more."
             },
             "k": {
               "type": "array",
-              "items": { "type": "integer", "minimum": 1 },
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
               "minItems": 2,
               "maxItems": 2
             },
-            "min_distance": { "type": "integer", "minimum": 1 }
+            "min_distance": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         },
         "methods": {
@@ -82,7 +134,18 @@
               "minItems": 1,
               "items": {
                 "type": "string",
-                "enum": ["bivariate-bicycle", "generalized-bicycle", "2bga-coset", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+                "enum": [
+                  "bivariate-bicycle",
+                  "generalized-bicycle",
+                  "2bga-coset",
+                  "hypergraph-product",
+                  "lifted-product",
+                  "balanced-product",
+                  "quantum-tanner",
+                  "tile",
+                  "topological",
+                  "other"
+                ],
                 "description": "The Layer-2 vocabulary from schema/code.schema.json. A family outside it is rejected rather than silently accepted, so a typo does not become a campaign nobody can match against the board."
               }
             },
@@ -98,14 +161,26 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "trials_per_candidate": { "type": "integer", "minimum": 1, "description": "A flat screening depth. When `ladder` is present the rungs govern instead and this field should be absent, so that two executors screen to the same depth." },
-                "seeds": { "type": "array", "items": { "type": "integer" } },
+                "trials_per_candidate": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "A flat screening depth. When `ladder` is present the rungs govern instead and this field should be absent, so that two executors screen to the same depth."
+                },
+                "seeds": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
                 "ladder": {
                   "type": "array",
                   "description": "Rungs as [trials, keep_below_weight]: screen at `trials`, carry a candidate only while its lightest logical is under `keep_below_weight`.",
                   "items": {
                     "type": "array",
-                    "items": { "type": "integer", "minimum": 1 },
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
                     "minItems": 2,
                     "maxItems": 2
                   }
@@ -122,7 +197,10 @@
         "run_contract": {
           "type": "object",
           "description": "The invocation this campaign is run at, so that 'matched depth' is readable off the committed summary instead of re-derived by an audit afterwards. Depth, trials and seeds passed as free-form argv leave no record of what each lane actually ran at, and two distances read at different budgets are not comparable; AUTORESEARCH.md 5b repairs that after the fact, and this is the same fact recorded up front. It constrains nothing a campaign may claim: a candidate is a find when verify/validate_candidate.py says so and at no other point. When present, the sweep entry points take their parameters from here rather than from argv, and an explicit argv override is recorded on the experiment row as a deviation rather than silently applied.",
-          "required": ["template", "parameters"],
+          "required": [
+            "template",
+            "parameters"
+          ],
           "additionalProperties": false,
           "properties": {
             "template": {
@@ -136,7 +214,13 @@
               "description": "The resolved values the template is filled with. Every placeholder in the template must appear here, and every key here must appear in the template, so neither can drift from the other unnoticed.",
               "minProperties": 1,
               "additionalProperties": {
-                "type": ["integer", "number", "string", "boolean", "array"],
+                "type": [
+                  "integer",
+                  "number",
+                  "string",
+                  "boolean",
+                  "array"
+                ],
                 "description": "A scalar, or an array for a swept parameter such as seeds or ladder rungs."
               }
             }
@@ -148,10 +232,23 @@
           "minProperties": 1,
           "additionalProperties": false,
           "properties": {
-            "cpu_hours": { "type": "number", "exclusiveMinimum": 0 },
-            "gpu_hours": { "type": "number", "exclusiveMinimum": 0 },
-            "walltime_hours": { "type": "number", "exclusiveMinimum": 0, "description": "Measured by the ledger from its own clock, not self-reported." },
-            "candidates_screened": { "type": "integer", "minimum": 1 }
+            "cpu_hours": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "gpu_hours": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "walltime_hours": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Measured by the ledger from its own clock, not self-reported."
+            },
+            "candidates_screened": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         },
         "stopping": {
@@ -160,16 +257,30 @@
           "description": "Any condition firing ends the campaign. The summary names the first condition in this list that is satisfied when it is written, so order this list with the reason you most want reported first.",
           "items": {
             "type": "object",
-            "required": ["type"],
+            "required": [
+              "type"
+            ],
             "additionalProperties": false,
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["budget_exhausted", "frontier_advance", "target_reached", "candidates_found", "no_progress"],
+                "enum": [
+                  "budget_exhausted",
+                  "frontier_advance",
+                  "target_reached",
+                  "candidates_found",
+                  "no_progress"
+                ],
                 "description": "budget_exhausted: any budget field reached. frontier_advance: a validated candidate advanced its cell, which ends the campaign at the FIRST advance; that suits a probe and not a sweep. target_reached: objective.target met, read off the validated survivors, so a metric the ledger cannot compute from (n, k, d) is rejected with this condition. candidates_found: `count` validated survivors. no_progress: `experiments` consecutive experiments with no survivor."
               },
-              "count": { "type": "integer", "minimum": 1 },
-              "experiments": { "type": "integer", "minimum": 1 }
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "experiments": {
+                "type": "integer",
+                "minimum": 1
+              }
             }
           }
         },
@@ -178,11 +289,201 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "enum": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"]
+            "enum": [
+              "experiment_ledger",
+              "surviving_candidates",
+              "research_note",
+              "negative_results",
+              "campaign_summary"
+            ]
           },
           "description": "A campaign that ends with zero board submissions still owes its ledger and its negative results: a closed family is a finding, and the next searcher pays for it twice if it is not written down."
         },
-        "notes": { "type": "string", "maxLength": 4000 }
+        "notes": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "direction": {
+          "description": "The direction card (issue #4028): why this campaign, where it is aimed, what it must beat, what it may spend, when it is dropped, and what a negative result teaches. Required for every campaign defined after 2026-10-23; the campaigns defined before carry null, the honest value for a record that never stated its stakes. Not objective.direction, which is maximize or minimize.",
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "hypothesis",
+                "cell",
+                "family",
+                "bar",
+                "budget",
+                "feasibility",
+                "novelty",
+                "expected_value",
+                "abandon_criterion",
+                "what_a_negative_would_teach"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "hypothesis": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 400,
+                  "description": "One sentence: the construction claim being tested."
+                },
+                "cell": {
+                  "type": "string",
+                  "pattern": "^(local-2d-single|local-2d-bilayer|unrestricted)~(weight-4|weight-6|weight-8|weight-any)$",
+                  "description": "The primary-track cell aimed at, locality~weight in the board's vocabulary. The verifier decides which cell a finished code lands in; this is where the campaign is pointed."
+                },
+                "family": {
+                  "type": "string",
+                  "enum": [
+                    "bivariate-bicycle",
+                    "generalized-bicycle",
+                    "2bga-coset",
+                    "hypergraph-product",
+                    "lifted-product",
+                    "balanced-product",
+                    "quantum-tanner",
+                    "tile",
+                    "topological",
+                    "other"
+                  ],
+                  "description": "The family tag the campaign searches, from the same list as methods.families."
+                },
+                "bar": {
+                  "type": "object",
+                  "required": [
+                    "slug",
+                    "axes"
+                  ],
+                  "additionalProperties": false,
+                  "description": "The entry to beat, by slug, and the axes it must be beaten on.",
+                  "properties": {
+                    "slug": {
+                      "type": "string",
+                      "pattern": "^[0-9]+-[0-9]+-[0-9]+(-[a-z0-9]+)?$"
+                    },
+                    "axes": {
+                      "type": "array",
+                      "minItems": 1,
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "n",
+                          "k",
+                          "d",
+                          "w",
+                          "kd2_over_n",
+                          "geometric_efficiency"
+                        ]
+                      }
+                    },
+                    "note": {
+                      "type": "string",
+                      "maxLength": 400
+                    }
+                  }
+                },
+                "budget": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": false,
+                  "description": "Screening trials and wall clock in the units the campaign spends: the campaign budget's fields, plus the screen depth per candidate.",
+                  "properties": {
+                    "cpu_hours": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "gpu_hours": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "walltime_hours": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "candidates_screened": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "trials_per_candidate": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  }
+                },
+                "feasibility": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "Why this is cheap to test here: which cap, which cell, which toolkit."
+                },
+                "novelty": {
+                  "type": "object",
+                  "required": [
+                    "claim",
+                    "against"
+                  ],
+                  "additionalProperties": false,
+                  "description": "What is claimed to be new, and against which published family or entry.",
+                  "properties": {
+                    "claim": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 400
+                    },
+                    "against": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 300,
+                      "description": "The published family or entries the claim is measured against; 'none known' is an answer."
+                    }
+                  }
+                },
+                "expected_value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "What a positive result is worth, as a statement and never a number: a number would be a score, and TRACKS.md's own reasoning about kd^2/n is that one number must not stand in for a frontier."
+                },
+                "abandon_criterion": {
+                  "type": "object",
+                  "required": [
+                    "flat_fresh_rungs",
+                    "trials_cap"
+                  ],
+                  "additionalProperties": false,
+                  "description": "When the ladder is dropped, in the terms research/kit/escalation.py enforces.",
+                  "properties": {
+                    "flat_fresh_rungs": {
+                      "type": "integer",
+                      "minimum": 2,
+                      "description": "Fresh-seed rungs that must agree at a bound already below the bar before the ladder is abandoned; escalation.py's MIN_FLAT_RUNGS is the floor."
+                    },
+                    "trials_cap": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "description": "RIS trials per candidate after which the ladder is dropped whatever it reads."
+                    },
+                    "note": {
+                      "type": "string",
+                      "maxLength": 400
+                    }
+                  }
+                },
+                "what_a_negative_would_teach": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "The falsifiable content of a failure: what the next session may stop trying."
+                }
+              }
+            }
+          ]
+        }
       }
     }
   }

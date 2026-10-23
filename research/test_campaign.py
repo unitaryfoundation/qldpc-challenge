@@ -8,6 +8,7 @@ the schema doing its job, which is worth pinning because a campaign that
 validates loosely is a task two executors can read differently.
 """
 import copy
+import glob
 import json
 import os
 import sys
@@ -39,12 +40,28 @@ GOOD = {
         "id": "test-campaign",
         "name": "A campaign for the tests",
         "objective": {"metric": "kd2_over_n", "direction": "maximize"},
+        "direction": None,
         "constraints": {"max_check_weight": 8, "n": [100, 400],
                         "locality": "local-2d-bilayer"},
         "methods": {"families": ["bivariate-bicycle"]},
         "budget": {"cpu_hours": 10},
         "stopping": [{"type": "budget_exhausted"}],
     }
+}
+
+
+CARD = {
+    "hypothesis": "GB codes over Z_341 reach kd^2/n above the cell's bar at weight 6.",
+    "cell": "unrestricted~weight-6",
+    "family": "generalized-bicycle",
+    "bar": {"slug": "682-20-22", "axes": ["kd2_over_n"]},
+    "budget": {"cpu_hours": 2, "trials_per_candidate": 400},
+    "feasibility": "n = 682 is under BASE_MAX_N and group_algebra.py builds the family.",
+    "novelty": {"claim": "a weight-6 GB code above the cell's bar at n = 682",
+                "against": "the cyclic GB tables of arXiv:2306.16400"},
+    "expected_value": "A weight-6 code above the bar at n = 682 would lead the cell at that size.",
+    "abandon_criterion": {"flat_fresh_rungs": 2, "trials_cap": 20000},
+    "what_a_negative_would_teach": "That weight-6 GB over Z_341 is exhausted at this depth.",
 }
 
 
@@ -811,7 +828,7 @@ def test_dead_ends_survive_a_write_and_reload(tmp_path):
 
 def test_a_scaffold_is_a_valid_campaign_with_the_defaults_filled():
     from campaign import scaffold_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     c = spec["campaign"]
     assert c["schema_version"] == 1 and c["id"] == "gb-probe"
     assert c["objective"] == {"metric": "kd2_over_n", "direction": "maximize"}
@@ -826,13 +843,12 @@ def test_a_scaffold_has_no_default_budget():
     with pytest.raises(TypeError):
         scaffold_campaign("gb-probe", "GB probe")
     with pytest.raises(CampaignError, match="budget"):
-        scaffold_campaign("gb-probe", "GB probe", budget={})
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={})
 
 
 def test_scaffold_fields_pass_through_and_are_validated():
     from campaign import scaffold_campaign
-    spec = scaffold_campaign(
-        "gb-probe", "GB probe", budget={"candidates_screened": 50},
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"candidates_screened": 50},
         families=["generalized-bicycle"],
         objective={"target": 20},
         stopping=[{"type": "target_reached"}, {"type": "budget_exhausted"}],
@@ -841,10 +857,10 @@ def test_scaffold_fields_pass_through_and_are_validated():
     assert c["methods"] == {"families": ["generalized-bicycle"]}
     assert c["objective"]["target"] == 20 and c["constraints"] == {"n": [600, 700]}
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 1},
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
                           families=["not-a-family"])
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 1},
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
                           stopping=[{"type": "target_reached"}])   # no target
 
 
@@ -855,7 +871,7 @@ def test_a_bare_campaign_dict_is_told_about_the_wrapper():
 
 def test_write_campaign_round_trips_through_load_campaign(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2},
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2},
                              families=["generalized-bicycle"])
     path = tmp_path / "campaigns" / "gb-probe" / "campaign.json"
     assert write_campaign(spec, str(path)) == str(path)
@@ -869,7 +885,7 @@ def test_write_campaign_round_trips_through_load_campaign(tmp_path):
 
 def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     path = str(tmp_path / "campaign.json")
     write_campaign(spec, path)
     with pytest.raises(CampaignError, match="overwrite=True"):
@@ -881,7 +897,7 @@ def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
 
 def test_write_campaign_holds_the_directory_to_the_id(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     wrong = tmp_path / "campaigns" / "other-name" / "campaign.json"
     with pytest.raises(CampaignError, match="directory name"):
         write_campaign(spec, str(wrong))
@@ -891,7 +907,7 @@ def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     """The documented route for a run that does not want a directory yet."""
     from campaign import scaffold_campaign
     led = Ledger(Campaign(scaffold_campaign(
-        "adhoc", "ad hoc", budget={"candidates_screened": 10},
+        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
         families=["bivariate-bicycle"])))
     led.start_experiment("bivariate-bicycle", seed=1, params={"l": 6})
     led.record_screen(trials=1000, d=6, backend="numpy")
@@ -903,3 +919,65 @@ def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     assert summ["campaign_id"] == "adhoc"
     assert summ["experiments"][0]["screened"] == {"trials": 1000, "d": 6,
                                                   "backend": "numpy"}
+
+
+# -- the direction card (issue #4028) -----------------------------------------
+
+def test_a_new_campaign_must_state_its_direction_card():
+    from campaign import scaffold_campaign
+    with pytest.raises(CampaignError, match="direction card"):
+        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
+    assert spec["campaign"]["direction"] == CARD
+    assert Campaign(spec).direction == CARD
+
+
+@pytest.mark.parametrize("damage", [
+    lambda c: c.pop("expected_value"),
+    lambda c: c.update(cell="weight-6"),
+    lambda c: c.update(family="not-a-family"),
+    lambda c: c["bar"].pop("axes"),
+    lambda c: c["abandon_criterion"].update(flat_fresh_rungs=1),
+    lambda c: c.update(expected_value=7),
+])
+def test_a_malformed_card_is_rejected(damage):
+    from campaign import scaffold_campaign
+    card = copy.deepcopy(CARD)
+    damage(card)
+    with pytest.raises(CampaignError):
+        scaffold_campaign("gb-probe", "GB probe", card=card, budget={"cpu_hours": 2})
+
+
+def test_a_definition_before_the_card_carries_null_and_still_loads():
+    obj = copy.deepcopy(GOOD)
+    obj["campaign"]["direction"] = None
+    assert Campaign(validate_campaign(obj)).direction is None
+    obj["campaign"].pop("direction")
+    with pytest.raises(CampaignError):
+        validate_campaign(obj)                    # the key is required, null or not
+
+
+def test_the_summary_carries_the_card(tmp_path):
+    from campaign import scaffold_campaign
+    led = Ledger(Campaign(scaffold_campaign(
+        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
+        families=["generalized-bicycle"])))
+    led.start_experiment("generalized-bicycle", seed=1, params={"m": 341})
+    led.record_screen(trials=400, d=6, backend="numpy")
+    led.record_verdict("not_run")
+    led.end_experiment()
+    s = led.summary()
+    assert s["direction"] == CARD
+    write_summary(s, str(tmp_path / "summary.json"))
+    assert json.load(open(tmp_path / "summary.json"))["direction"]["bar"]["slug"] == "682-20-22"
+
+
+def test_the_committed_campaigns_either_state_a_card_or_say_null():
+    for f in sorted(glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))):
+        c = load_campaign(f)
+        assert "direction" in c.c, f
+        if c.direction is not None:
+            assert c.direction["bar"]["slug"] and c.direction["what_a_negative_would_teach"]
+    cards = [load_campaign(f).direction for f in
+             glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))]
+    assert any(cards), "one committed campaign ships with the card filled in"

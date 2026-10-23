@@ -65,3 +65,29 @@ def test_summaries_handle_missing_data():
     e = {"diag": {"tanner_girth": {"X": 6, "Z": "acyclic"}}, "ldiam": None}
     assert "H_Z girth acyclic" in build.girth_cell_title(e)
     assert "no verified layout" in build.ldiam_cell_title(e)
+
+
+def test_the_recipe_at_other_sizes_block_is_display_only(tmp_path):
+    """Render one lifted recipe's per-size verdicts with the caveat, and nothing otherwise.
+
+    Issue #4031: the block is display-only and absent for a recipe that was
+    not lifted.
+    """
+    import importlib.util
+    import os
+    spec = importlib.util.spec_from_file_location(
+        "site_build_multisize", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                             "site", "build.py"))
+    build = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(build)
+    rec = {"status": "lifted", "constructor": "bb.build_bb", "rule": "l +- 1", "passed": 1, "tried": 2,
+           "reproduces_entry": True, "own": {"n": 144, "k": 12, "w": 6},
+           "sizes": [{"label": "l=6, m=6", "n": 72, "k": 12, "w": 6, "components": 1, "pass": True,
+                      "checks": {"commutes": True, "encodes": True, "connected": True, "within_caps": True}},
+                     {"label": "l=13, m=6", "n": 156, "k": 0, "w": 6, "components": 1, "pass": False,
+                      "checks": {"commutes": True, "encodes": False, "connected": True, "within_caps": True}}]}
+    html_out = build.multisize_block(rec)
+    assert "Recipe at other sizes" in html_out and "passes at</b> 1 of 2 sizes" in html_out
+    assert "[[72,12]] w=6, passes" in html_out and "[[156,0]] w=6, fails: k = 0" in html_out
+    assert "no distance at any size" in html_out and "rebuilds this entry" in html_out
+    assert build.multisize_block({"status": "no_lift_rule"}) == "" and build.multisize_block(None) == ""

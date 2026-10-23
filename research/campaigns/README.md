@@ -47,6 +47,7 @@ defaults worth having, and `write_campaign` validates and writes it:
 from campaign import scaffold_campaign, write_campaign
 
 spec = scaffold_campaign("gb-z341-probe", "GB over Z_341, one night",
+                         card={...},                      # the direction card, below
                          budget={"cpu_hours": 8},
                          families=["generalized-bicycle"],
                          constraints={"n": [600, 700]})
@@ -77,6 +78,36 @@ write_summary(led.summary(), "research/campaigns/<id>/summary.json")
 The definition is wrapped, `{"campaign": {...}}`; `validate_campaign` says
 so when handed the bare fields. Both the ledger and the writer need the
 `research` extra for `jsonschema`: `uv run --extra research python ...`.
+
+## The direction card
+
+The definition says what to look for and how much to spend. It did not say
+why, so a later session reading `summary.json` could not tell a direction
+abandoned for a reason from one nobody came back to (issue #4028). The
+`direction` block is that record, written in the definition and copied into
+the summary by `write_summary`. `scaffold_campaign` refuses a new campaign
+without one (`card=`); the five campaigns defined before it carry
+`direction: null`, which is the honest value for a record that never stated
+its stakes, and nothing invents values for them. (`objective.direction` is a
+different field: maximize or minimize.)
+
+| field | what it holds |
+|---|---|
+| `hypothesis` | one sentence: the construction claim being tested |
+| `cell` | where it is aimed, as `locality~weight` in the board's vocabulary (`unrestricted~weight-6`); the verifier still decides where a finished code lands |
+| `family` | the family tag searched, from the same list as `methods.families` |
+| `bar` | the entry to beat, by `slug`, and the `axes` it must beat it on (`n`, `k`, `d`, `w`, `kd2_over_n`, `geometric_efficiency`), with an optional `note` |
+| `budget` | screening trials and wall clock in the units the campaign spends: the budget fields plus `trials_per_candidate` |
+| `feasibility` | why this is cheap to test here: which cap, which cell, which toolkit |
+| `novelty` | `claim`, what is said to be new, and `against`, the published family or entries it is measured against; "none known" is an answer |
+| `expected_value` | what a positive result is worth, as a statement: "a weight-6 2D-local code at k >= 8 would be the first in this cell". Never a number: a number would be a score, and TRACKS.md's own reasoning about kd^2/n is that one number must not stand in for a frontier |
+| `abandon_criterion` | when the ladder is dropped, in the terms `research/kit/escalation.py` enforces: `flat_fresh_rungs` (at least 2, its `MIN_FLAT_RUNGS`) agreeing at a bound below the bar, and a `trials_cap` per candidate, with an optional `note` |
+| `what_a_negative_would_teach` | the falsifiable content of a failure: what the next session may stop trying |
+
+`research/campaigns/bb-w6-n-le-100-trinomials/` is the first campaign filed
+with the card; its `summary.json` shows the block beside the ledger. Section
+1 of `research/AUTORESEARCH.md` asks for the card as part of picking a
+direction.
 
 ## The run contract
 

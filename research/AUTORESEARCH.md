@@ -108,6 +108,15 @@ A **direction** is a concrete target: a track cell (locality class × weight cla
 vague, translate it: look at the board (`codes/*.json`, the site, `TRACKS.md`) for a **sparse
 cell** or a **record to beat**, and aim there.
 
+Write the direction down before building. A campaign's `direction` block (the direction
+card, `research/campaigns/README.md`) holds the hypothesis, the cell and family, the entry to
+beat and on which axes, the budget in the units the run spends, why it is feasible here, what
+is claimed to be new and against what, what a positive result is worth as a statement, the
+abandon criterion `research/kit/escalation.py` can enforce, and what a negative result would
+teach. `scaffold_campaign(..., card={...})` writes it and `summary.json` carries it, so the next
+session can tell a direction abandoned for a reason from one nobody came back to.
+`research/campaigns/bb-w6-n-le-100-trinomials/campaign.json` is a filled-in example.
+
 Track membership is **computed by the verifier**, not declared: the check-weight class
 (`weight-4`/`weight-6`/`weight-8`) is derived from the max row weight of `H_X`, `H_Z`, and the
 locality class from the layout (none → `unrestricted`). The `family` tag below is the only
@@ -579,6 +588,40 @@ That is the same invocation CI uses for the test suite. Without it `load_campaig
 `CampaignError: jsonschema is required to validate a campaign`, which reads like a broken kit
 rather than a missing flag.
 
+## 7. Circuit tier: search the schedule (optional, for an entry that has one)
+
+The code-search loop above finds codes. The circuit tier (`../TRACKS.md`) is the same
+shape one level down, and nobody has searched it: the 160-odd entries with
+`circuits/<slug>/` carry the standard schedules #1026 backfilled, and
+arXiv:2610.23832 and arXiv:2610.31352 found that standard schedules are far from what a
+search against a frozen evaluator reaches. `kit/circuit_search.py` is that search for one
+entry: `H`, the layout, the noise recipe, and the round count stay fixed; the schedule
+(interleaved two-block slot assignments, layout zigzag pattern pairs, edge-coloring orders
+of the generic sequential extraction) is the search space; the evaluator is
+`verify/circuit_verify.py`, called and never edited.
+
+```
+uv run --extra research python research/kit/circuit_search.py 72-12-6 --attempts 12 --seconds 60
+uv run --extra research python research/kit/circuit_search.py 64-18-8 --attempts 6 --seconds 120 --ler
+```
+
+Each attempt is staged under `research/candidates/<run>/circuit-search/<slug>/attempt-NN/`
+with the four circuit files, the circuit block, the entry with the block in place, the
+verifier's verdict, and a `notes.md` saying what the schedule was and what the screen and
+the deep search read; `ledger.jsonl` has one line per attempt, improving or not, and
+`summary.json` the baseline, the ranking, and the survivors. Score is `d_circ` per basis,
+the lower basis first, read off the same RIS search the generator and the gate use at
+twice the gate's trial budget; `--ler` adds the per-round logical error rate at one grid
+rate for the baseline and every evaluated schedule, which is what separates two schedules
+at the same `d_circ`. Three things the loop cannot do, by construction: raise `d_circ`
+above `d` (the tier is penalty-only), promote anything (a survivor is staged for a human;
+promotion replaces the entry's `circuit` block and `circuits/<slug>/` in one PR with
+`circuit.contributed_by.by` naming the schedule's author, the binding
+`verify/check_authorship.py` checks), or settle a value (every `d_circ` is a witness-backed
+upper bound, and the gate's own refutation search is what a promoted schedule survives).
+Build on the staged lineage of earlier runs rather than starting fresh; the papers' records
+came from agents reading each other's attempts.
+
 ## Pitfalls (these are why the gate exists)
 
 - **The surrogate distance is an UPPER BOUND** (step 2). Trust the gate's refutation, not your
@@ -669,6 +712,7 @@ something the next one should not have to re-learn.
 | `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). `preflight`, `describe_preflight`: the verifier's structural half on a packaged document, the checks the gate's verify step would fail it on, in the verifier's words and sorted into a fault in the code or in the document (issue #3616). Run on a staged file: `python research/kit/prescreen.py <path>` |
 | `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung), `cc_first` and `exact_or_cc_first` (the connected-cluster pre-stage beyond the certifier's band, a screen that aims the ladder and never ends it; a no-op without the Qubitserf build) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
 | `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_recipe`, `read_recipe` (the spec kept beside a staged candidate), `write_repro_manifest` (the `repro/<slug>.json` manifest for `qldpc reproduce`) |
+| `kit/circuit_search.py` | `search(slug, ...)`: the circuit-tier schedule search of section 7, over every applicable family of `research/circuit_autogen.py`, staging every attempt with its verdict and notes under `research/candidates/`, scoring by `d_circ` per basis (and LER with `--ler`); `verify/circuit_verify.py` is called, never edited |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
 | `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
@@ -680,6 +724,9 @@ something the next one should not have to re-learn.
 | `kit/doubling.py` | free Z2 double-cover ("doubling") for bivariate bicycle codes: the `s=2` complement to `spectral.cover_k`, which handles odd covers only |
 | `kit/spectral.py` | spectral (Frobenius-orbit) screening for semisimple BB codes, from arXiv:2608.27565, restricted to the binary semisimple case: `cover_k` and the odd-cover machinery |
 | `kit/phantom.py` | the phantom-code construction of arXiv:2609.16542 — `build_phantom_outer` and the rest of the three consolidated pieces |
+| `kit/gauss_law.py` | the quantum Gauss's law codes of arXiv:2608.00165 — `classical_gauss_law_1d`, `optimal_1d_multiplicities` (Theorem III.5's optimal duplication counts) and `quantum_gauss_law_1d`, the CSS code `[[N d(d+1)/2, N, d]]`; the family's `kd^2/n = 2d/(d+1)` is below 2 by construction, so it is a construction, not a board lead |
+| `kit/tensor_network.py` | the tensor-network codes of arXiv:2009.10329 — `glue` (Theorem 1's index contraction, done at the group level), the SWO08 `[[6,1,3]]` block and the `[[11,1,3]]` code it produces; the block is non-CSS and the paper's 7-qubit state is not abelian, so the family is not submittable |
+| `kit/coset_gap.py` | the coset two-block codes `Q_G^H(ahat, bhat)` of arXiv:2606.17268 — `build(ell, m, s, ahat, bhat)` assembles the check matrices inside GAP (`SmallGroup`, `Core`, `Normalizer`, `LeftCosets`, `Representative`), so no coset-representative convention is re-derived in Python; `PAPER_INSTANCES` transcribes all 29 published instances, and every one reproduces its stated (n, k) |
 | `local2d/planar.py` | fast greedy open-boundary builder, exact planar distance (scipy MILP), `grid_coordinates` for the bilayer layout |
 | `local2d/boundary_engine.py` | the general open-boundary construction (`build_planar`), `reduce_weights`, `graft_r1`/`graft_r1_safe` (qubit removal) |
 | `local2d/transfer.py` | `distance_slope`: predict d(L) scaling from (f, g) before building large lattices |

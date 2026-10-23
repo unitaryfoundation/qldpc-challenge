@@ -1,0 +1,54 @@
+name: certification-queue
+
+# research/certs/todo.json lists every board entry whose distance is still a
+# witnessed upper bound, with what certifying it would take and in the order
+# the work should go (research/certs/certification_queue.py, issue #4027).
+# It is derived from codes/ and certs/, so it goes stale with every merge:
+# this regenerates it weekly on main and commits it, the way
+# provenance-top-up keeps the derived provenance table. The queue certifies
+# nothing and gates nothing; every distance in it stays an upper bound.
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 8 * * 1"      # every Monday 08:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: certification-queue
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: regenerate the queue and commit it (race-safe)
+        run: |
+          uv run --frozen python research/certs/certification_queue.py | tee queue.txt
+          {
+            echo "## certification queue"
+            echo
+            echo '```'
+            cat queue.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/certs/todo.json
+          if git diff --cached --quiet; then
+            echo "the queue did not change"; exit 0
+          fi
+          git commit -m "Weekly certification queue: $(sed -n '1s/ of .*//p' queue.txt) [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"; exit 0
+            fi
+            echo "push raced; rebasing and retrying ($attempt)"
+            git fetch origin main && git rebase origin/main || exit 1
+          done
+          echo "failed to push the queue after 5 attempts"; exit 1

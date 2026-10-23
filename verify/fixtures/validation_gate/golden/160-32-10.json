@@ -1,0 +1,380 @@
+{
+ "doc_sha256": "ac362f1adf9646fb4dc0209b387e2f8e488d76cd09bab2e4ef97bebd6ff51edb",
+ "report": {
+  "checks": [
+   {
+    "check": "schema_valid",
+    "detail": "",
+    "ok": true
+   },
+   {
+    "check": "qubit_indices_in_range",
+    "detail": "max index 159, n=160",
+    "ok": true
+   },
+   {
+    "check": "no_repeated_qubits_in_a_check",
+    "detail": "rows with repeats: []",
+    "ok": true
+   },
+   {
+    "check": "tanner_connected",
+    "detail": "Tanner graph has 1 connected component(s)",
+    "ok": true
+   },
+   {
+    "check": "stabilizer_group_connected",
+    "detail": "stabilizer group splits into 1 independent block(s) on disjoint qubit sets (sizes 160)",
+    "ok": true
+   },
+   {
+    "check": "css_commutation",
+    "detail": "H_X H_Z^T = 0 over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "k_matches_claim",
+    "detail": "computed k=32, claimed 32",
+    "ok": true
+   },
+   {
+    "check": "k_at_least_1",
+    "detail": "computed k=32; a submission must encode >= 1 logical qubit",
+    "ok": true
+   },
+   {
+    "check": "check_weight_is_ldpc",
+    "detail": "max check weight 9",
+    "ok": true
+   },
+   {
+    "check": "model_version_specified",
+    "detail": "GPT 5.6 Sol",
+    "ok": true
+   },
+   {
+    "check": "family_in_vocabulary",
+    "detail": "balanced-product",
+    "ok": true
+   },
+   {
+    "check": "novelty_in_vocabulary",
+    "detail": "known_parameters",
+    "ok": true
+   },
+   {
+    "check": "distance_X_witness",
+    "detail": "weight=10 (claim 10), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_X_exact_flagged",
+    "detail": "exact claim accepted as upper_bound pending server certification",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_witness",
+    "detail": "weight=10 (claim 10), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_exact_flagged",
+    "detail": "exact claim accepted as upper_bound pending server certification",
+    "ok": true
+   },
+   {
+    "check": "d_matches_min_side",
+    "detail": "min earned side = 10, claimed d = 10",
+    "ok": true
+   },
+   {
+    "check": "local_hadamard_css_images",
+    "detail": "1 local-Hadamard image(s) of this CSS code filed with it, so a Hadamard-relabelled copy collides with it whichever code_type it is submitted under",
+    "ok": true
+   }
+  ],
+  "computed": {
+   "code_type": "CSS",
+   "diagnostics": {
+    "row_space_intersection_dimension": 18,
+    "tanner_girth": {
+     "X": 4,
+     "Z": 4
+    },
+    "trapping_sets": {
+     "X": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        128
+       ],
+       [
+        1,
+        6,
+        32
+       ],
+       [
+        2,
+        4,
+        960
+       ],
+       [
+        2,
+        5,
+        32
+       ],
+       [
+        2,
+        7,
+        1088
+       ],
+       [
+        2,
+        10,
+        192
+       ],
+       [
+        3,
+        3,
+        448
+       ],
+       [
+        3,
+        4,
+        24
+       ],
+       [
+        3,
+        5,
+        8256
+       ],
+       [
+        3,
+        6,
+        1600
+       ],
+       [
+        3,
+        7,
+        1296
+       ],
+       [
+        3,
+        8,
+        24400
+       ],
+       [
+        3,
+        9,
+        1152
+       ],
+       [
+        3,
+        10,
+        2560
+       ],
+       [
+        3,
+        11,
+        11600
+       ],
+       [
+        3,
+        12,
+        224
+       ],
+       [
+        3,
+        13,
+        1024
+       ],
+       [
+        3,
+        14,
+        1248
+       ],
+       [
+        3,
+        16,
+        64
+       ]
+      ]
+     },
+     "Z": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        128
+       ],
+       [
+        1,
+        6,
+        32
+       ],
+       [
+        2,
+        4,
+        960
+       ],
+       [
+        2,
+        5,
+        32
+       ],
+       [
+        2,
+        7,
+        1088
+       ],
+       [
+        2,
+        10,
+        192
+       ],
+       [
+        3,
+        3,
+        448
+       ],
+       [
+        3,
+        5,
+        8256
+       ],
+       [
+        3,
+        6,
+        1680
+       ],
+       [
+        3,
+        7,
+        1296
+       ],
+       [
+        3,
+        8,
+        24320
+       ],
+       [
+        3,
+        9,
+        1152
+       ],
+       [
+        3,
+        10,
+        2568
+       ],
+       [
+        3,
+        11,
+        11600
+       ],
+       [
+        3,
+        12,
+        224
+       ],
+       [
+        3,
+        13,
+        1024
+       ],
+       [
+        3,
+        14,
+        1248
+       ],
+       [
+        3,
+        16,
+        64
+       ]
+      ]
+     },
+     "candidate_cap": 2000000,
+     "max_size": 3
+    },
+    "weight_profile": {
+     "X": {
+      "column": {
+       "max": 6,
+       "mean": 3.6,
+       "min": 3
+      },
+      "row": {
+       "max": 9,
+       "mean": 9.0,
+       "min": 9
+      }
+     },
+     "Z": {
+      "column": {
+       "max": 6,
+       "mean": 3.6,
+       "min": 3
+      },
+      "row": {
+       "max": 9,
+       "mean": 9.0,
+       "min": 9
+      }
+     }
+    }
+   },
+   "flags": {
+    "css": true,
+    "locality_class": "unrestricted",
+    "modular": false,
+    "stabilizer": false
+   },
+   "k": 32,
+   "locality_class": "unrestricted",
+   "max_check_weight": 9,
+   "n": 160,
+   "rank_HX": 64,
+   "rank_HZ": 64,
+   "weight_class": "weight-9plus"
+  },
+  "css_equivalent": {
+   "enumeration_capped": false,
+   "fingerprints": [
+    "8874e5ec491e5b86"
+   ],
+   "images": 1,
+   "of": "css",
+   "signatures": [
+    "a07adcaaa68333ce"
+   ]
+  },
+  "earned_distance": {
+   "X": {
+    "tier": "upper_bound",
+    "value": 10
+   },
+   "Z": {
+    "tier": "upper_bound",
+    "value": 10
+   },
+   "d": {
+    "tier": "upper_bound",
+    "value": 10
+   }
+  },
+  "fingerprint": "1b35c9096206dba2",
+  "name": "[[160,32,10]] ZSZ-LP code",
+  "ok": true,
+  "signature": {
+   "d": 10,
+   "hash": "a07adcaaa68333ce",
+   "k": 32,
+   "n": 160
+  }
+ },
+ "slug": "160-32-10"
+}

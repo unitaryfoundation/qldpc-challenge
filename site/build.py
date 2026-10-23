@@ -469,7 +469,7 @@ font-variant-numeric:tabular-nums}}
 .stat-ghost .sub{{font-size:12px;margin-top:4px;color:var(--mut)}}
 .stat-ghost .sub a{{font-family:'Space Mono',ui-monospace,monospace;
 color:var(--ink)}}
-.census{{display:grid;grid-template-columns:repeat(3,1fr);
+.census{{display:grid;grid-template-columns:repeat(5,1fr);
 border:1px solid var(--ln);border-radius:14px;background:var(--soft);
 overflow:hidden}}
 .census div{{padding:14px 18px;border-right:1px solid var(--ln)}}
@@ -1018,7 +1018,10 @@ text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}}}
 header.hero{{padding:34px 0 30px}}
 .statsbar{{grid-template-columns:repeat(2,1fr);gap:10px}}
 .herosub{{grid-template-columns:1fr;gap:10px}}
-.census div{{padding:12px 14px}}.census b{{font-size:19px}}
+.census{{grid-template-columns:repeat(3,1fr)}}
+.census div{{padding:12px 10px;border-bottom:1px solid var(--ln)}}
+.census div:nth-child(3n){{border-right:0}}
+.census div:nth-last-child(-n+2){{border-bottom:0}}.census b{{font-size:19px}}
 .stat-card{{padding:14px 16px}}.stat-card .v{{font-size:27px}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
@@ -1722,6 +1725,81 @@ def provenance_counts(slugs):
         bucket = (table.get(slug) or {}).get("bucket", "not_derived")
         counts[bucket] = counts.get(bucket, 0) + 1
     counts["method"] = "isomorphism against the literature index"
+    counts["caveat"] = payload.get("caveat")
+    return counts
+
+
+def multisize_table():
+    """The multi-size recipe table (research/repro/multisize.json), or {} when absent."""
+    path = os.path.join(ROOT, "research", "repro", "multisize.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def multisize_block(rec):
+    """The code page's "Recipe at other sizes" section for one lifted recipe (issue #4031).
+
+    Display-only: per size, the verifier's cheap structural checks on the
+    recipe rebuilt there (commutation, k >= 1, a connected Tanner graph, the
+    caps), with the numbers behind them and no distance. An empty string for
+    a recipe that was not lifted.
+    """
+    if not rec or rec.get("status") != "lifted" or not rec.get("sizes"):
+        return ""
+    own = rec.get("own") or {}
+    rows = []
+    for s in rec["sizes"]:
+        if "n" not in s:
+            rows.append(f'<li><b>{html.escape(s["label"])}</b>: does not build '
+                        f'({html.escape(str(s.get("error", "")))[:120]})</li>')
+            continue
+        failed = [c for c, ok in s["checks"].items() if not ok]
+        verdict = ("passes: commutes, encodes, connected, within the caps" if s["pass"] else
+                   "fails: " + ", ".join({"commutes": "checks do not commute", "encodes": "k = 0",
+                                           "connected": f"{s['components']} Tanner components",
+                                           "within_caps": "outside the caps"}[c] for c in failed))
+        rows.append(f'<li><b>{html.escape(s["label"])}</b>: [[{s["n"]},{s["k"]}]] w={s["w"]}, '
+                    f'{html.escape(verdict)}</li>')
+    repro = ("rebuilds this entry" if rec.get("reproduces_entry") else
+             "does not rebuild this entry's fingerprint" if rec.get("reproduces_entry") is False else
+             "entry not compared")
+    return ('<section class=blk><h3>Recipe at other sizes</h3>'
+            '<div class=kv style="color:var(--mut)">the stored construction recipe '
+            f'(<code>{html.escape(rec["constructor"])}</code>, {repro} at its own parameters) rebuilt at '
+            f'neighboring sizes ({html.escape(rec["rule"])}) and put through the verifier\'s cheap '
+            'structural checks only: no distance at any size, no ranking, no tier. A recipe that holds '
+            'up at other sizes is evidence of a construction rather than a tuned artifact; one that '
+            'does not is a fact about the recipe, not about this entry.</div>'
+            f'<div class=kv><b>passes at</b> {rec["passed"]} of {rec["tried"]} sizes'
+            + (f' &middot; own size [[{own["n"]},{own["k"]}]] w={own["w"]}' if "n" in own else "")
+            + '</div><ul class=kv>' + "".join(rows) + '</ul></section>')
+
+
+def board_screen_counts(slugs):
+    """Verdict counts from research/provenance/board_screen.json, or None.
+
+    The screen compares each CSS entry with the board's own seeded and
+    literature entries by exact fingerprint and Weisfeiler-Leman signature
+    (issue #4024). A rendered entry the screen has not seen counts as
+    not_screened, for the same reason provenance_counts keeps not_derived.
+    """
+    path = os.path.join(ROOT, "research", "provenance", "board_screen.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError):
+        return None
+    table = payload.get("entries") or {}
+    counts = {}
+    for slug in slugs:
+        verdict = (table.get(slug) or {}).get("verdict", "not_screened")
+        counts[verdict] = counts.get(verdict, 0) + 1
+    counts["reference_entries"] = (payload.get("reference") or {}).get("total")
+    counts["method"] = ("fingerprint and Weisfeiler-Leman signature against the "
+                        "board's seeded and literature entries")
     counts["caveat"] = payload.get("caveat")
     return counts
 
@@ -2853,6 +2931,11 @@ def detail_page(e):
                  'self-certified upper bound (d &le;)</span></div>')
     P.append('</section>')
 
+    # the recipe at other sizes (issue #4031): display-only, like the
+    # diagnostics below; present when the entry's repro manifest carries a
+    # recipe the kit can lift.
+    P.append(multisize_block((multisize_table().get("entries") or {}).get(e["slug"])))
+
     # diagnostics (issue #1844): decoder-friendliness read off H and the
     # spread of the stored witnesses read off the layout, as the verifier
     # computed them. Evidence shown beside the code, never a ranking input.
@@ -3390,9 +3473,17 @@ def progress_panel(entries, best_geo_e):
     top = best_eff_at(entries)
     top_v = "&middot;" if top is None else f"{top['eff']:g}"
     n_base = sum(1 for e in entries if e["origin"] == "baseline")
+    # The two evidence counts the board can state about itself (issue #4024):
+    # distances with a certificate, and entries whose novelty anyone has
+    # looked at. provenance.novelty is the only field that says whether a
+    # code is new, and a metric that is never counted is never closed.
+    n_exact = sum(1 for e in entries if e["tier"] == "exact")
+    n_audited = sum(1 for e in entries if (e.get("novelty") or "unknown") != "unknown")
     counts = (("{:,}".format(len(entries)), "codes on the board"),
               ("{:,}".format(len(entries) - n_base), "submitted"),
-              ("{:,}".format(n_base), "literature baselines"))
+              ("{:,}".format(n_base), "literature baselines"),
+              ("{:,}".format(n_exact), "certified exact"),
+              ("{:,}".format(n_audited), "novelty audited"))
     census = "".join(f'<div><b>{v}</b><span>{lab}</span></div>'
                      for v, lab in counts)
     tier = (f'<div class=stat-ghost title="Best operational efficiency kd^2/n '
@@ -3402,7 +3493,11 @@ def progress_panel(entries, best_geo_e):
             f'<div class=l>best kd&sup2;/n at any weight</div></div>'
             f'<div class=census title="Codes with a verified distance witness; '
             f'submitted codes came through the challenge and are not '
-            f'necessarily novel parameter sets.">{census}</div>')
+            f'necessarily novel parameter sets. Certified exact: entries whose '
+            f'distance carries a certificate. Novelty audited: entries whose '
+            f'provenance.novelty is known_parameters or new_parameters rather '
+            f'than unaudited; new_parameters is a submitter or reviewer claim, '
+            f'not a verifier-proved fact.">{census}</div>')
     return (f'<section class=statsbar>{cards}</section>'
             f'<section class=herosub>{tier}</section>')
 
@@ -4063,6 +4158,9 @@ NOVELTY_LABEL = {
 }
 
 
+NOVELTY_BUCKETS = ("unknown", "known_parameters", "new_parameters")
+
+
 def novelty_label(v):
     return NOVELTY_LABEL.get(v, NOVELTY_LABEL["unknown"])
 
@@ -4115,6 +4213,92 @@ def cell_frontiers(entries):
     because hand-rolled copies of this relation drifted once)."""
     return {key: {idxs[j] for j in pareto([entries[i] for i in idxs])}
             for key, idxs in cells_by_key(entries).items()}
+
+
+FAMILY_CAVEAT = ("family is the one self-declared label on an entry, filterable and "
+                 "never ranked, so these shares measure the declared tag, not a "
+                 "property recovered from H; the derived provenance buckets are the "
+                 "computed axis wherever they cover an entry")
+
+
+def _family_shares(entries, idxs):
+    """Return the declared-family shares of one frontier: top family, top two, and HHI.
+
+    "other" is what an entry without a family tag renders as, not a family,
+    so it is reported as untagged: in the denominator of every share, out of
+    the top list and the HHI.
+    """
+    c = collections.Counter(entries[i]["family"] for i in idxs)
+    total = sum(c.values())
+    untagged = c.pop("other", 0)
+
+    def share(n):
+        return round(n / total, 3) if total else 0.0
+    top = c.most_common(2)
+    return {"records": total, "families": len(c),
+            "untagged": untagged, "untagged_share": share(untagged),
+            "top": [{"family": f, "records": n, "share": share(n)} for f, n in top],
+            "top1_share": share(top[0][1]) if top else 0.0,
+            "top2_share": share(sum(n for _, n in top)) if top else 0.0,
+            "hhi": round(sum((n / total) ** 2 for n in c.values()), 3) if total else 0.0}
+
+
+def family_concentration(entries):
+    """Measure how much of each CSS frontier one declared family holds (issue #4025).
+
+    For every CSS primary-track cell and for the global CSS frontier, the
+    share of the frontier's records held by the top family and the top two,
+    and the Herfindahl-Hirschman index over families, read off the same
+    cell_frontiers and pareto that award the star. Each cell also says
+    whether the search moved it: the leader (largest kd^2/n; ties to the
+    earliest date, then the slug) belongs to a family other than the
+    incumbent's, where the incumbent is the same leader taken over the cell's
+    literature baselines alone (provenance.origin baseline), the best the
+    seeded literature had there. Cells nest, so a code counts in every cell
+    it qualifies for.
+
+    family is the board's one self-declared label (FAMILY_CAVEAT), so this is
+    a diagnostic of the declared tag, displayed and never ranked.
+    """
+    by_cell = cells_by_key(entries)
+    fronts = cell_frontiers(entries)
+    css = [i for i, e in enumerate(entries) if e.get("code_type", "CSS") == "CSS"]
+    global_front = [css[j] for j in pareto([entries[i] for i in css])]
+    out, moved = {}, 0
+    for key in sorted(k for k in by_cell if len(k) == 2):
+        members = by_cell[key]
+
+        def rank(i):
+            return (-entries[i]["eff"], entries[i].get("date") or "~", entries[i]["slug"])
+        leader = min(members, key=rank)
+        baselines = [i for i in members if entries[i].get("origin") == "baseline"]
+        incumbent = min(baselines, key=rank) if baselines else None
+        rec = _family_shares(entries, sorted(fronts[key]))
+        rec["members"] = len(members)
+        rec["leader"] = {"slug": entries[leader]["slug"], "family": entries[leader]["family"],
+                         "eff": entries[leader]["eff"]}
+        rec["incumbent"] = ({"slug": entries[incumbent]["slug"],
+                             "family": entries[incumbent]["family"],
+                             "eff": entries[incumbent]["eff"]} if incumbent is not None else None)
+        rec["moved"] = (rec["incumbent"] is not None
+                        and rec["leader"]["family"] != rec["incumbent"]["family"])
+        moved += rec["moved"]
+        out[f"{key[0]}~{key[1]}"] = rec
+    return {"global": _family_shares(entries, global_front), "cells": out,
+            "cells_moved": moved, "cells_total": len(out),
+            "definitions": {
+                "frontier": "the per-cell and global CSS Pareto frontiers over (n, k, d, w), "
+                            "the same cell_frontiers and pareto that award the star; cells "
+                            "nest, so a code counts in every cell it qualifies for",
+                "leader": "the cell member with the largest kd^2/n (ties: earliest date, then slug)",
+                "incumbent": "the same leader over the cell's literature baselines alone "
+                             "(provenance.origin baseline); null when the cell has none",
+                "moved": "the leader's declared family differs from the incumbent's",
+                "untagged": "records rendered as family other, the default for an entry "
+                            "without a family tag; in every denominator, never a family",
+                "hhi": "sum of squared shares of the named families over the frontier's "
+                       "records, from 1/families (even split) to 1 (one family)"},
+            "caveat": FAMILY_CAVEAT}
 
 
 def compute_records(entries):
@@ -4287,15 +4471,33 @@ def frontier_map(rows, W=1040, H=400):
             f'coloured by distance band">{"".join(grid)}{"".join(pts)}</svg>')
 
 
-def frontier_legend(count):
-    """The map's legend: the seven distance bands, the size key, the count."""
+def family_legend_item(conc):
+    """Render a frontier's declared-family concentration as one legend item.
+
+    The declared-versus-computed caveat is its title (issue #4025).
+    """
+    if not conc or not conc.get("top"):
+        return ""
+    top = conc["top"][0]
+    return (f'<span class=ci title="{html.escape(FAMILY_CAVEAT)}">declared family: '
+            f'{html.escape(top["family"])} {round(100 * conc["top1_share"])}% of records, '
+            f'top two {round(100 * conc["top2_share"])}%, HHI {conc["hhi"]:.2f}</span>')
+
+
+def frontier_legend(count, conc=None):
+    """Render the map's legend.
+
+    The seven distance bands, the size key, the count, and the cell's
+    declared-family concentration when known.
+    """
     return ("".join(
         f'<span class=ci data-band="{i}"><span class=cdot '
         f'style="background:{FR_RAMP[i]}"></span>{html.escape(lab)}</span>'
         for i, (_, lab) in enumerate(D_BANDS))
         + '<span class=ci title="marker size: the cheaper the check, the bigger '
           'the dot">&#9679; size = check weight (w &le; 4 largest)</span>'
-        + f'<span class=ci>{count} records</span>')
+        + f'<span class=ci>{count} records</span>'
+        + family_legend_item(conc))
 
 
 # Client-side re-renderer for the record-progress chart: modes (record / all
@@ -4372,7 +4574,9 @@ function drawFrontier(){
  var L=BANDS.map(function(b,i){return '<span class=ci data-band="'+i+'"><span class=cdot style="background:'+RAMP[i]+'"></span>'+esc(b[1])+'</span>';}).join('');
  L+='<span class=ci title="marker size: the cheaper the check, the bigger the dot">&#9679; size = check weight (w &le; 4 largest)</span>';
  if(st.w!=='all')L+='<span class=ci>dimmed = added more than '+st.w+' days ago</span>';
- fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>';
+ var cc=C.conc&&C.conc[ci];
+ if(cc)L+='<span class=ci title="'+esc(C.caveat)+'">declared family: '+esc(cc.top)+' '+Math.round(cc.top1*100)+'% of records, top two '+Math.round(cc.top2*100)+'%, HHI '+cc.hhi.toFixed(2)+'</span>';
+ fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>'+(cc?'':'');
 }
 function draw(){
  if(st.m==='frontier'){setView(true);drawFrontier();return;}
@@ -4613,15 +4817,32 @@ def record_chart(entries):
              "fr": fr_member[i]}
             for i, e in enumerate(entries)]
     rcseries = [[lab, cap, col] for lab, cap, col in RC_SERIES]
+    # Declared-family concentration per cell (issue #4025): the script appends
+    # it to the legend when the cell changes, so it is computed once here, by
+    # the same per-cell frontier, and never re-derived client-side.
+    fc = family_concentration(entries)
+    conc = [({"top": c["top"][0]["family"], "top1": c["top1_share"],
+              "top2": c["top2_share"], "hhi": c["hhi"]} if c and c.get("top") else None)
+            for c in (fc["cells"].get(f"{cell[0]}~{cell[1]}") if cell[2] == "CSS" else None
+                      for cell in fr_cells)]
     rccells = {"cells": [list(c) for c in fr_cells],
                "def": list(fr_cells[fr_default][:3]) if fr_cells else list(FR_DEFAULT_CELL),
                "ramp": FR_RAMP, "bands": [list(b) for b in D_BANDS],
-               "radius": [list(r) for r in FR_RADIUS]}
+               "radius": [list(r) for r in FR_RADIUS],
+               "conc": conc, "caveat": FAMILY_CAVEAT}
     fr_rows = [r for r in data if fr_default in r["fr"]] if fr_cells else []
     fr_plot = (frontier_map(fr_rows) if fr_rows else
                '<div style="padding:40px;color:#64748b">no codes in this cell</div>')
-    fr_legend = frontier_legend(len(fr_rows))
     dL, dW, dT = rccells["def"]
+    fr_legend = frontier_legend(len(fr_rows), fc["cells"].get(f"{dL}~{dW}") if dT == "CSS" else None)
+    g = fc["global"]
+    fr_shape = (f' Across the whole CSS frontier ({g["records"]:,} records) the top declared '
+                f'family, {html.escape(g["top"][0]["family"])}, holds {round(100 * g["top1_share"])}% '
+                f'and the top two {round(100 * g["top2_share"])}% (HHI {g["hhi"]:.2f}); the search '
+                f'has moved {fc["cells_moved"]} of {fc["cells_total"]} cells to a family other than '
+                f'the family of the best literature baseline there. family is the one self-declared label on an '
+                f'entry, so these read the declared tag, not anything recovered from H.'
+                if g.get("top") else "")
     types = sorted({c[2] for c in fr_cells})
 
     def cell_btns(attr, opts, label_of, cur):
@@ -4686,7 +4907,7 @@ def record_chart(entries):
             'computation. Colour is the distance band and size the check '
             'weight (cheaper checks draw bigger); the time windows dim older '
             'entries. Switch cells to see what a locality or weight class '
-            'reaches.</p>'
+            f'reaches.{fr_shape}</p>'
             + json_data_script("rcdata", data)
             + json_data_script("rcseries", rcseries)
             + json_data_script("rccells", rccells)
@@ -5684,6 +5905,19 @@ def build():
     prov = provenance_counts({e["slug"] for e in entries})
     if prov:
         stats["provenance"] = prov
+    # How much of the board anyone has cleared against the literature (issue
+    # #4024). Audited means known_parameters or new_parameters; the latter is
+    # a submitter or reviewer claim, not a verifier-proved fact. Over both
+    # boards, like verified_codes.
+    nov = collections.Counter((e.get("novelty") or "unknown") for e in all_entries)
+    stats["novelty"] = {b: nov.get(b, 0) for b in NOVELTY_BUCKETS}
+    stats["novelty_audited"] = len(all_entries) - stats["novelty"]["unknown"]
+    screen = board_screen_counts({e["slug"] for e in entries})
+    if screen:
+        stats["board_screen"] = screen
+    # The frontier's shape by declared family (issue #4025): per cell and
+    # global shares and HHI, with the declared-versus-computed caveat inside.
+    stats["family_concentration"] = family_concentration(all_entries)
     for cap in HERO_CAPS:
         be = best_eff_at(entries, cap)
         stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None

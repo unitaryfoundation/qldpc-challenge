@@ -1,0 +1,359 @@
+{
+ "doc_sha256": "cac83bb31fb11773dc10da19d66a2a30c54390c7692fff532b65fdd270104056",
+ "report": {
+  "checks": [
+   {
+    "check": "schema_valid",
+    "detail": "",
+    "ok": true
+   },
+   {
+    "check": "qubit_indices_in_range",
+    "detail": "max index 6, n=7",
+    "ok": true
+   },
+   {
+    "check": "no_repeated_qubits_in_a_check",
+    "detail": "rows with repeats: []",
+    "ok": true
+   },
+   {
+    "check": "tanner_connected",
+    "detail": "Tanner graph has 1 connected component(s)",
+    "ok": true
+   },
+   {
+    "check": "stabilizer_group_connected",
+    "detail": "stabilizer group splits into 1 independent block(s) on disjoint qubit sets (sizes 7)",
+    "ok": true
+   },
+   {
+    "check": "css_commutation",
+    "detail": "H_X H_Z^T = 0 over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "k_matches_claim",
+    "detail": "computed k=1, claimed 1",
+    "ok": true
+   },
+   {
+    "check": "k_at_least_1",
+    "detail": "computed k=1; a submission must encode >= 1 logical qubit",
+    "ok": true
+   },
+   {
+    "check": "check_weight_is_ldpc",
+    "detail": "max check weight 4",
+    "ok": true
+   },
+   {
+    "check": "family_in_vocabulary",
+    "detail": "topological",
+    "ok": true
+   },
+   {
+    "check": "distance_X_witness",
+    "detail": "weight=3 (claim 3), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_X_exact_flagged",
+    "detail": "exact claim accepted as upper_bound pending server certification",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_witness",
+    "detail": "weight=3 (claim 3), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_exact_flagged",
+    "detail": "exact claim accepted as upper_bound pending server certification",
+    "ok": true
+   },
+   {
+    "check": "d_matches_min_side",
+    "detail": "min earned side = 3, claimed d = 3",
+    "ok": true
+   },
+   {
+    "check": "local_hadamard_css_images",
+    "detail": "1 local-Hadamard image(s) of this CSS code filed with it, so a Hadamard-relabelled copy collides with it whichever code_type it is submitted under",
+    "ok": true
+   },
+   {
+    "check": "coordinates_cover_all_qubits",
+    "detail": "7 coords, n=7",
+    "ok": true
+   },
+   {
+    "check": "coordinates_uniform_dimension",
+    "detail": "D = 2",
+    "ok": true
+   },
+   {
+    "check": "interaction_radius_within_claim",
+    "detail": "measured 2.0000 <= claim 2.0",
+    "ok": true
+   },
+   {
+    "check": "site_occupancy_within_layers",
+    "detail": "max 1 qubit(s) per site, layers=1",
+    "ok": true
+   },
+   {
+    "check": "site_spacing_at_least_one",
+    "detail": "min spacing between distinct sites 1.0000 (>= 1.0 required)",
+    "ok": true
+   },
+   {
+    "check": "locality_class_computed",
+    "detail": "local-2d-single",
+    "ok": true
+   },
+   {
+    "check": "transversal_logicals_valid",
+    "detail": "k=1 X and Z logical representatives with identity pairing over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "gate_0_preserves_stabilizers",
+    "detail": "H: every stabilizer generator maps into the stabilizer group",
+    "ok": true
+   },
+   {
+    "check": "gate_0_logical_action",
+    "detail": "induced action on the logical generators matches the claim modulo stabilizers: X0 -> Z0, Z0 -> X0",
+    "ok": true
+   }
+  ],
+  "computed": {
+   "code_type": "CSS",
+   "diagnostics": {
+    "logical_diameter": {
+     "X": 1.7321,
+     "Z": 2.0
+    },
+    "row_space_intersection_dimension": 3,
+    "tanner_girth": {
+     "X": 4,
+     "Z": 4
+    },
+    "trapping_sets": {
+     "X": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        1,
+        3
+       ],
+       [
+        1,
+        2,
+        3
+       ],
+       [
+        1,
+        3,
+        1
+       ],
+       [
+        2,
+        1,
+        9
+       ],
+       [
+        2,
+        2,
+        6
+       ],
+       [
+        3,
+        0,
+        7
+       ],
+       [
+        3,
+        1,
+        12
+       ],
+       [
+        3,
+        2,
+        6
+       ],
+       [
+        3,
+        3,
+        3
+       ]
+      ]
+     },
+     "Z": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        1,
+        3
+       ],
+       [
+        1,
+        2,
+        3
+       ],
+       [
+        1,
+        3,
+        1
+       ],
+       [
+        2,
+        1,
+        9
+       ],
+       [
+        2,
+        2,
+        6
+       ],
+       [
+        3,
+        0,
+        7
+       ],
+       [
+        3,
+        1,
+        12
+       ],
+       [
+        3,
+        2,
+        6
+       ],
+       [
+        3,
+        3,
+        3
+       ]
+      ]
+     },
+     "candidate_cap": 2000000,
+     "max_size": 3
+    },
+    "weight_profile": {
+     "X": {
+      "column": {
+       "max": 3,
+       "mean": 1.714,
+       "min": 1
+      },
+      "row": {
+       "max": 4,
+       "mean": 4.0,
+       "min": 4
+      }
+     },
+     "Z": {
+      "column": {
+       "max": 3,
+       "mean": 1.714,
+       "min": 1
+      },
+      "row": {
+       "max": 4,
+       "mean": 4.0,
+       "min": 4
+      }
+     }
+    }
+   },
+   "flags": {
+    "css": true,
+    "locality_class": "local-2d-single",
+    "modular": false,
+    "stabilizer": false
+   },
+   "k": 1,
+   "locality": {
+    "bbox": [
+     2.5,
+     1.7321
+    ],
+    "dimension": 2,
+    "interaction_radius": 2.0,
+    "layers": 1,
+    "max_qubits_per_site": 1,
+    "min_site_spacing": 1.0,
+    "qubits_per_unit_area": 1.6165
+   },
+   "locality_class": "local-2d-single",
+   "max_check_weight": 4,
+   "n": 7,
+   "rank_HX": 3,
+   "rank_HZ": 3,
+   "routing_cost": {
+    "heuristic": "mst-lower-bound",
+    "lattice_step": 1.0,
+    "max_swaps_per_check": 0,
+    "total_swaps": 0
+   },
+   "transversal_gates": [
+    {
+     "action": {
+      "X0": [
+       "Z0"
+      ],
+      "Z0": [
+       "X0"
+      ]
+     },
+     "blocks": 1,
+     "gate": "H",
+     "name": "logical Hadamard",
+     "permutation_trivial": true,
+     "verified": true
+    }
+   ],
+   "weight_class": "weight-4"
+  },
+  "css_equivalent": {
+   "enumeration_capped": false,
+   "fingerprints": [
+    "bba04b8d060bf796"
+   ],
+   "images": 1,
+   "of": "css",
+   "signatures": [
+    "ddd192d631883de9"
+   ]
+  },
+  "earned_distance": {
+   "X": {
+    "tier": "upper_bound",
+    "value": 3
+   },
+   "Z": {
+    "tier": "upper_bound",
+    "value": 3
+   },
+   "d": {
+    "tier": "upper_bound",
+    "value": 3
+   }
+  },
+  "fingerprint": "bba04b8d060bf796",
+  "name": "[[7,1,3]] color code",
+  "ok": true,
+  "signature": {
+   "d": 3,
+   "hash": "ddd192d631883de9",
+   "k": 1,
+   "n": 7
+  }
+ },
+ "slug": "7-1-3"
+}

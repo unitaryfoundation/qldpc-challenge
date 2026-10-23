@@ -69,6 +69,7 @@ TRUSTED = (
     "verify/refute_board.py",
     "verify/transversal_gates.py",
     "verify/validate_candidate.py",
+    "verify/validation_gate.py",
     "verify/verify_all.py",
 )
 
@@ -76,15 +77,27 @@ TRUSTED = (
 # current fixture is explicit above so deleting it fails closed; discovery here also
 # makes a newly added fixture require a manifest update automatically.
 TRUSTED_FIXTURES = "verify/fixtures/*.json"
+# The validation gate's golden verdicts (issue #4030): the expected outputs a
+# changed verifier must reproduce. Pinned so that re-recording them is a
+# deliberate, reviewable change like any other change to the closure.
+TRUSTED_GOLDEN = "verify/fixtures/validation_gate/golden/*.json"
 
 
 def trusted_files(root=_ROOT):
     files = list(TRUSTED)
-    for path in sorted(glob.glob(os.path.join(root, TRUSTED_FIXTURES))):
-        relative = os.path.relpath(path, root).replace(os.sep, "/")
-        if relative not in files:
-            files.append(relative)
+    for pattern in (TRUSTED_FIXTURES, TRUSTED_GOLDEN):
+        for path in sorted(glob.glob(os.path.join(root, pattern))):
+            relative = os.path.relpath(path, root).replace(os.sep, "/")
+            if relative not in files:
+                files.append(relative)
     return tuple(files)
+
+
+def run_validation_gate():
+    """Run verify/validation_gate.py on this tree; 0 iff every part passes."""
+    sys.path.insert(0, _HERE)
+    import validation_gate
+    return validation_gate.main(["--quiet"])
 
 
 def _manifest_path(root):
@@ -101,7 +114,17 @@ def current_hashes(root=_ROOT):
             if os.path.isfile(os.path.join(root, fn))}
 
 
-def update(root=_ROOT):
+def update(root=_ROOT, gate=run_validation_gate):
+    # A re-pin says the changed verifier is the one to trust from now on, so
+    # the validation gate (solved cases, broken artifacts with their expected
+    # diagnoses, published reproductions; issue #4030) has to pass first. It
+    # runs against this checkout, so it is skipped for another --root.
+    if root == _ROOT and gate is not None:
+        if gate() != 0:
+            print("FAIL: the validation gate did not pass; not re-pinning. Fix the verifier, or, "
+                  "if a verdict changed by design, re-record it with "
+                  "`python verify/validation_gate.py --update-golden` and review that diff.")
+            return 1
     expected = trusted_files(root)
     hashes = current_hashes(root)
     missing = [fn for fn in expected if fn not in hashes]

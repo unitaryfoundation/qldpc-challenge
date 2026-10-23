@@ -194,6 +194,48 @@ The replay is only quotable if it ends where the repository is, and
 parsed. The committed SVGs are the charts as of the date in their titles;
 regenerate them with the commands above.
 
+## Family concentration of the frontier: `family_concentration.py`
+
+`site/build.py` (`family_concentration`) measures, for every CSS primary-track
+cell and for the global CSS frontier, the share of the frontier's records held
+by the top declared family and by the top two, the Herfindahl-Hirschman index
+over families, and whether the cell's leader (largest kd^2/n) belongs to a
+family other than that of the cell's earliest-dated member, which is where the
+search moved a cell (issue #4025). It reads the same `cell_frontiers` and
+`pareto` that award the star, and the site publishes it in `docs/stats.json`
+and beside the frontier map's legend. This script records a dated measurement,
+`family_concentration-<date>.json`, and prints the tables a fieldnote quotes,
+so the shape of the frontier is a time series rather than a snapshot.
+
+`family` is the board's one self-declared label (`research/AUTORESEARCH.md`:
+filterable, never ranked), so every number here measures the declared tag, not
+a property recovered from H; the derived provenance buckets under
+`research/provenance/` are the computed axis wherever they cover an entry.
+Nothing here ranks anything.
+
+```
+uv run python research/audits/family_concentration.py --markdown
+```
+
+## Who opened each cell and family: `cell_openings.py`
+
+Issue #4029 asked whether the board should flag the entry that first
+populates a cell, a family, or a geometry. The decision was no flag, and this
+script is the record that stands in its place: for every populated cell key
+(locality class, weight class, code type), the first entry by
+`provenance.date` (ties by slug), the first entry per declared family tag, and
+the first modular and 3D-layout entries, as `cell_openings-<date>.json` with
+a table. On the board of 2026-10-23 three entries open all 24 cells, because
+cells nest and the smallest, lowest-weight, most local code is in every cell
+it qualifies for (the Steane code opened every CSS cell in 1996), and the
+family half rests on the one self-declared label. First arrival is a fact
+about the board's history, not a property of a code, so it is recorded here
+and never shown as a badge, ranked, or scored.
+
+```
+uv run python research/audits/cell_openings.py --markdown
+```
+
 ## Limits
 
 These are upper-bound searches. `holds` never upgrades a claim to the exact
