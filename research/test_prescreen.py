@@ -340,3 +340,22 @@ def test_cli_preflights_a_stabilizer_document(tmp_path):
          "--no-board"], capture_output=True, text=True, check=False)
     assert proc.returncode == 1, proc.stderr
     assert "REFUSE" in proc.stdout and "stabilizer_code_is_not_css" in proc.stdout
+
+
+def test_the_validation_gate_mirrors_the_preflight_taxonomy():
+    """Keep verify/validation_gate.py's copy of the taxonomy identical to this kit's.
+
+    The gate cannot import the kit (verify/ imports nothing from research/),
+    so it carries a mirror of KINDS, CODE_KINDS, and kind_of (issue #4030).
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "validation_gate_mirror",
+        os.path.join(os.path.dirname(_HERE), "verify", "validation_gate.py"))
+    gate = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gate)
+    assert gate.KINDS == P.KINDS and gate.CODE_KINDS == P.CODE_KINDS
+    for check, detail in (("css_commutation", ""), ("schema_valid", "checks/X/3 is too long"),
+                          ("schema_valid", "'n' is a required property"), ("distance_Z_witness", ""),
+                          ("coordinates_cover_all_qubits", ""), ("something_new", "")):
+        assert gate.kind_of(check, detail) == P.kind_of(check, detail)

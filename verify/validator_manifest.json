@@ -20,7 +20,7 @@
     "verify/check_prose.py": "57419651740d418c6755257630f143b45d832da89d1315c9d4f5323298a18e29",
     "verify/check_submission_scope.py": "3e0eb0dd67eaf9d93fe0d99fdb16e5c52d7f0bd02966db4e0e0ca30fe22dc4bd",
     "verify/check_tree_consistency.py": "1d477721d54adcf67d86a574137801a55d01ab0bf187031c58517d8cfcda1411",
-    "verify/check_validator_integrity.py": "c4f9b26f9aa13a4c9d1a50d84dc37f8218cc2f38ea35e31717e3241d3dbda02b",
+    "verify/check_validator_integrity.py": "02d7f7a0fb43ead2fb6409cc61d109f78eae0b19984622065ace3b4875b8d29b",
     "verify/circuit_tools.py": "eca0e30a185b1f1e44ca1240adae2604f0efc276e0c1cc08f6ea09283494769e",
     "verify/circuit_verify.py": "9190fdaa6147ea263adcf6d6d765033207ca92c891f57392896b3158f46e55eb",
     "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
@@ -35,8 +35,20 @@
     "verify/refute_board.py": "593baa851b890fcd0e5daaa3aec6823df012e7770940da19e1432143d04c6c7d",
     "verify/transversal_gates.py": "28d1cb573186be934182a58a72b8739331008530f8ee35060fc5fcb8d24def66",
     "verify/validate_candidate.py": "94fb17ca619427f783ba77ede31f9c59ffa1662a7008e68c9799367a37cdff19",
+    "verify/validation_gate.py": "3e905b69ba196035dcdcea222d24634f4a2b1c0ec366c4d1fca75b1138627a5e",
     "verify/verify_all.py": "04b56336ed54e7ad3acf12c586fe691a9be1a79a7878b318c2cb1431f61d126c",
     "verify/fixtures/17-1-7.json": "a514e65313456aa563e6708e097523bdb057d038de79a400cf816e269ddb5bab",
-    "verify/fixtures/5-1-3.json": "a710f6da99a3a696c549d6a2cba00172f7c184149bda44acdb718e42554624d2"
+    "verify/fixtures/5-1-3.json": "a710f6da99a3a696c549d6a2cba00172f7c184149bda44acdb718e42554624d2",
+    "verify/fixtures/validation_gate/golden/100-20-8.json": "c9e4d73c6ecee8e38a5e545f5cb5ac7a7b142dbf768ef3348af8a22f7a4bf12b",
+    "verify/fixtures/validation_gate/golden/120-24-8.json": "800761b22ff1c121866dc4ac926515661e330beb7906b15ea57b237d6e8fcffd",
+    "verify/fixtures/validation_gate/golden/144-12-12.json": "b65144637bbfb40ea4399737172c7a6ce24ce7555d9578e688b8dab423a2091a",
+    "verify/fixtures/validation_gate/golden/150-30-10.json": "f255bb31bb5bf63aa39fd19897973de4e09868161f009cf3c811a4c2f4e3e828",
+    "verify/fixtures/validation_gate/golden/160-32-10.json": "5351fefe3f94268567f9fcb53bfaab58a64a7862d4344a70ab481b42ba2cf8e6",
+    "verify/fixtures/validation_gate/golden/160-36-6.json": "106739f2770f22f3c768217604d34c0db128c921d977829e2dc3566ce7cbd7c4",
+    "verify/fixtures/validation_gate/golden/170-34-8.json": "729e0e1dc9b4d4bfdd28183ed36de987088457aece51692bc84252c0d4e2981e",
+    "verify/fixtures/validation_gate/golden/180-36-8.json": "719dcab0b1db1a9fd0846398d7b74c291ce966eb292953a8dd6bcd04cefcc854",
+    "verify/fixtures/validation_gate/golden/190-38-8.json": "75c3dab000277287856e6adb067cbe31bbd6fbe455fe3b20680a595c73a4a7f6",
+    "verify/fixtures/validation_gate/golden/7-1-3.json": "a94e0a31b9f14d6841a0d473f56753ab9831be0447b08b660140192b68e68a56",
+    "verify/fixtures/validation_gate/golden/72-12-6.json": "771c22b52e0d02022f792dee54426fc2c66ca274795d59d32b3ae88467648f31"
   }
 }

@@ -1,0 +1,270 @@
+{
+ "doc_sha256": "69d7e2655e631543165cea02a9567ef38a756d21fa65a5bedefa2ca4f3594cb7",
+ "report": {
+  "checks": [
+   {
+    "check": "schema_valid",
+    "detail": "",
+    "ok": true
+   },
+   {
+    "check": "qubit_indices_in_range",
+    "detail": "max index 159, n=160",
+    "ok": true
+   },
+   {
+    "check": "no_repeated_qubits_in_a_check",
+    "detail": "rows with repeats: []",
+    "ok": true
+   },
+   {
+    "check": "tanner_connected",
+    "detail": "Tanner graph has 1 connected component(s)",
+    "ok": true
+   },
+   {
+    "check": "stabilizer_group_connected",
+    "detail": "stabilizer group splits into 1 independent block(s) on disjoint qubit sets (sizes 160)",
+    "ok": true
+   },
+   {
+    "check": "css_commutation",
+    "detail": "H_X H_Z^T = 0 over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "k_matches_claim",
+    "detail": "computed k=36, claimed 36",
+    "ok": true
+   },
+   {
+    "check": "k_at_least_1",
+    "detail": "computed k=36; a submission must encode >= 1 logical qubit",
+    "ok": true
+   },
+   {
+    "check": "check_weight_is_ldpc",
+    "detail": "max check weight 6",
+    "ok": true
+   },
+   {
+    "check": "model_version_specified",
+    "detail": "Claude Fable 5.1",
+    "ok": true
+   },
+   {
+    "check": "family_in_vocabulary",
+    "detail": "lifted-product",
+    "ok": true
+   },
+   {
+    "check": "distance_X_witness",
+    "detail": "weight=6 (claim 6), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_witness",
+    "detail": "weight=6 (claim 6), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "d_matches_min_side",
+    "detail": "min earned side = 6, claimed d = 6",
+    "ok": true
+   },
+   {
+    "check": "local_hadamard_css_images",
+    "detail": "1 local-Hadamard image(s) of this CSS code filed with it, so a Hadamard-relabelled copy collides with it whichever code_type it is submitted under",
+    "ok": true
+   }
+  ],
+  "computed": {
+   "code_type": "CSS",
+   "diagnostics": {
+    "row_space_intersection_dimension": 22,
+    "tanner_girth": {
+     "X": 8,
+     "Z": 8
+    },
+    "trapping_sets": {
+     "X": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        2,
+        128
+       ],
+       [
+        1,
+        4,
+        32
+       ],
+       [
+        2,
+        2,
+        384
+       ],
+       [
+        2,
+        4,
+        512
+       ],
+       [
+        2,
+        6,
+        64
+       ],
+       [
+        3,
+        2,
+        1152
+       ],
+       [
+        3,
+        4,
+        4864
+       ],
+       [
+        3,
+        6,
+        2816
+       ],
+       [
+        3,
+        8,
+        448
+       ]
+      ]
+     },
+     "Z": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        2,
+        128
+       ],
+       [
+        1,
+        4,
+        32
+       ],
+       [
+        2,
+        2,
+        384
+       ],
+       [
+        2,
+        4,
+        512
+       ],
+       [
+        2,
+        6,
+        64
+       ],
+       [
+        3,
+        2,
+        1152
+       ],
+       [
+        3,
+        4,
+        4864
+       ],
+       [
+        3,
+        6,
+        2816
+       ],
+       [
+        3,
+        8,
+        448
+       ]
+      ]
+     },
+     "candidate_cap": 2000000,
+     "max_size": 3
+    },
+    "weight_profile": {
+     "X": {
+      "column": {
+       "max": 4,
+       "mean": 2.4,
+       "min": 2
+      },
+      "row": {
+       "max": 6,
+       "mean": 6.0,
+       "min": 6
+      }
+     },
+     "Z": {
+      "column": {
+       "max": 4,
+       "mean": 2.4,
+       "min": 2
+      },
+      "row": {
+       "max": 6,
+       "mean": 6.0,
+       "min": 6
+      }
+     }
+    }
+   },
+   "flags": {
+    "css": true,
+    "locality_class": "unrestricted",
+    "modular": false,
+    "stabilizer": false
+   },
+   "k": 36,
+   "locality_class": "unrestricted",
+   "max_check_weight": 6,
+   "n": 160,
+   "rank_HX": 62,
+   "rank_HZ": 62,
+   "weight_class": "weight-6"
+  },
+  "css_equivalent": {
+   "enumeration_capped": false,
+   "fingerprints": [
+    "68ad7f027c0c4a27"
+   ],
+   "images": 1,
+   "of": "css",
+   "signatures": [
+    "2e2d8ce2e8e41aec"
+   ]
+  },
+  "earned_distance": {
+   "X": {
+    "tier": "upper_bound",
+    "value": 6
+   },
+   "Z": {
+    "tier": "upper_bound",
+    "value": 6
+   },
+   "d": {
+    "tier": "upper_bound",
+    "value": 6
+   }
+  },
+  "fingerprint": "4ce36b584009fa4a",
+  "name": "[[160,36,6]]",
+  "ok": true,
+  "signature": {
+   "d": 6,
+   "hash": "2e2d8ce2e8e41aec",
+   "k": 36,
+   "n": 160
+  }
+ },
+ "slug": "160-36-6"
+}
