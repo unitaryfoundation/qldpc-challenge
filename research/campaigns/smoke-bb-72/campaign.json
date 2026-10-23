@@ -4,6 +4,7 @@
     "id": "smoke-bb-72",
     "name": "Smoke campaign: one known BB code, one experiment",
     "status": "draft",
+    "direction": null,
     "objective": { "metric": "kd2_over_n", "direction": "maximize", "target": 6 },
     "constraints": { "max_check_weight": 6, "n": [60, 80], "min_distance": 4 },
     "methods": {

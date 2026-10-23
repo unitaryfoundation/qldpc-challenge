@@ -108,6 +108,15 @@ A **direction** is a concrete target: a track cell (locality class × weight cla
 vague, translate it: look at the board (`codes/*.json`, the site, `TRACKS.md`) for a **sparse
 cell** or a **record to beat**, and aim there.
 
+Write the direction down before building. A campaign's `direction` block (the direction
+card, `research/campaigns/README.md`) holds the hypothesis, the cell and family, the entry to
+beat and on which axes, the budget in the units the run spends, why it is feasible here, what
+is claimed to be new and against what, what a positive result is worth as a statement, the
+abandon criterion `research/kit/escalation.py` can enforce, and what a negative result would
+teach. `scaffold_campaign(..., card={...})` writes it and `summary.json` carries it, so the next
+session can tell a direction abandoned for a reason from one nobody came back to.
+`research/campaigns/bb-w6-n-le-100-trinomials/campaign.json` is a filled-in example.
+
 Track membership is **computed by the verifier**, not declared: the check-weight class
 (`weight-4`/`weight-6`/`weight-8`) is derived from the max row weight of `H_X`, `H_Z`, and the
 locality class from the layout (none → `unrestricted`). The `family` tag below is the only

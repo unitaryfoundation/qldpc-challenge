@@ -35,6 +35,7 @@
     },
     "schema_version": 1,
     "status": "completed",
+    "direction": null,
     "stopping": [
       {
         "experiments": 2,

@@ -4,6 +4,7 @@
     "id": "openalex-harvest-2863",
     "name": "OpenAlex literature harvest (issue #2863): reconstruct the board-absent instances of the Tier 1 papers and screen them against the board",
     "status": "completed",
+    "direction": null,
     "objective": { "metric": "kd2_over_n", "direction": "maximize" },
     "constraints": { "n": [1, 1000] },
     "methods": {
