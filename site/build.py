@@ -4117,6 +4117,92 @@ def cell_frontiers(entries):
             for key, idxs in cells_by_key(entries).items()}
 
 
+FAMILY_CAVEAT = ("family is the one self-declared label on an entry, filterable and "
+                 "never ranked, so these shares measure the declared tag, not a "
+                 "property recovered from H; the derived provenance buckets are the "
+                 "computed axis wherever they cover an entry")
+
+
+def _family_shares(entries, idxs):
+    """Return the declared-family shares of one frontier: top family, top two, and HHI.
+
+    "other" is what an entry without a family tag renders as, not a family,
+    so it is reported as untagged: in the denominator of every share, out of
+    the top list and the HHI.
+    """
+    c = collections.Counter(entries[i]["family"] for i in idxs)
+    total = sum(c.values())
+    untagged = c.pop("other", 0)
+
+    def share(n):
+        return round(n / total, 3) if total else 0.0
+    top = c.most_common(2)
+    return {"records": total, "families": len(c),
+            "untagged": untagged, "untagged_share": share(untagged),
+            "top": [{"family": f, "records": n, "share": share(n)} for f, n in top],
+            "top1_share": share(top[0][1]) if top else 0.0,
+            "top2_share": share(sum(n for _, n in top)) if top else 0.0,
+            "hhi": round(sum((n / total) ** 2 for n in c.values()), 3) if total else 0.0}
+
+
+def family_concentration(entries):
+    """Measure how much of each CSS frontier one declared family holds (issue #4025).
+
+    For every CSS primary-track cell and for the global CSS frontier, the
+    share of the frontier's records held by the top family and the top two,
+    and the Herfindahl-Hirschman index over families, read off the same
+    cell_frontiers and pareto that award the star. Each cell also says
+    whether the search moved it: the leader (largest kd^2/n; ties to the
+    earliest date, then the slug) belongs to a family other than the
+    incumbent's, where the incumbent is the same leader taken over the cell's
+    literature baselines alone (provenance.origin baseline), the best the
+    seeded literature had there. Cells nest, so a code counts in every cell
+    it qualifies for.
+
+    family is the board's one self-declared label (FAMILY_CAVEAT), so this is
+    a diagnostic of the declared tag, displayed and never ranked.
+    """
+    by_cell = cells_by_key(entries)
+    fronts = cell_frontiers(entries)
+    css = [i for i, e in enumerate(entries) if e.get("code_type", "CSS") == "CSS"]
+    global_front = [css[j] for j in pareto([entries[i] for i in css])]
+    out, moved = {}, 0
+    for key in sorted(k for k in by_cell if len(k) == 2):
+        members = by_cell[key]
+
+        def rank(i):
+            return (-entries[i]["eff"], entries[i].get("date") or "~", entries[i]["slug"])
+        leader = min(members, key=rank)
+        baselines = [i for i in members if entries[i].get("origin") == "baseline"]
+        incumbent = min(baselines, key=rank) if baselines else None
+        rec = _family_shares(entries, sorted(fronts[key]))
+        rec["members"] = len(members)
+        rec["leader"] = {"slug": entries[leader]["slug"], "family": entries[leader]["family"],
+                         "eff": entries[leader]["eff"]}
+        rec["incumbent"] = ({"slug": entries[incumbent]["slug"],
+                             "family": entries[incumbent]["family"],
+                             "eff": entries[incumbent]["eff"]} if incumbent is not None else None)
+        rec["moved"] = (rec["incumbent"] is not None
+                        and rec["leader"]["family"] != rec["incumbent"]["family"])
+        moved += rec["moved"]
+        out[f"{key[0]}~{key[1]}"] = rec
+    return {"global": _family_shares(entries, global_front), "cells": out,
+            "cells_moved": moved, "cells_total": len(out),
+            "definitions": {
+                "frontier": "the per-cell and global CSS Pareto frontiers over (n, k, d, w), "
+                            "the same cell_frontiers and pareto that award the star; cells "
+                            "nest, so a code counts in every cell it qualifies for",
+                "leader": "the cell member with the largest kd^2/n (ties: earliest date, then slug)",
+                "incumbent": "the same leader over the cell's literature baselines alone "
+                             "(provenance.origin baseline); null when the cell has none",
+                "moved": "the leader's declared family differs from the incumbent's",
+                "untagged": "records rendered as family other, the default for an entry "
+                            "without a family tag; in every denominator, never a family",
+                "hhi": "sum of squared shares of the named families over the frontier's "
+                       "records, from 1/families (even split) to 1 (one family)"},
+            "caveat": FAMILY_CAVEAT}
+
+
 def compute_records(entries):
     """Indices of codes on a Pareto frontier (over n, k, d, w) of any primary-track
     cell they belong to, or of the global frontier of their board. These are
@@ -4287,15 +4373,33 @@ def frontier_map(rows, W=1040, H=400):
             f'coloured by distance band">{"".join(grid)}{"".join(pts)}</svg>')
 
 
-def frontier_legend(count):
-    """The map's legend: the seven distance bands, the size key, the count."""
+def family_legend_item(conc):
+    """Render a frontier's declared-family concentration as one legend item.
+
+    The declared-versus-computed caveat is its title (issue #4025).
+    """
+    if not conc or not conc.get("top"):
+        return ""
+    top = conc["top"][0]
+    return (f'<span class=ci title="{html.escape(FAMILY_CAVEAT)}">declared family: '
+            f'{html.escape(top["family"])} {round(100 * conc["top1_share"])}% of records, '
+            f'top two {round(100 * conc["top2_share"])}%, HHI {conc["hhi"]:.2f}</span>')
+
+
+def frontier_legend(count, conc=None):
+    """Render the map's legend.
+
+    The seven distance bands, the size key, the count, and the cell's
+    declared-family concentration when known.
+    """
     return ("".join(
         f'<span class=ci data-band="{i}"><span class=cdot '
         f'style="background:{FR_RAMP[i]}"></span>{html.escape(lab)}</span>'
         for i, (_, lab) in enumerate(D_BANDS))
         + '<span class=ci title="marker size: the cheaper the check, the bigger '
           'the dot">&#9679; size = check weight (w &le; 4 largest)</span>'
-        + f'<span class=ci>{count} records</span>')
+        + f'<span class=ci>{count} records</span>'
+        + family_legend_item(conc))
 
 
 # Client-side re-renderer for the record-progress chart: modes (record / all
@@ -4372,7 +4476,9 @@ function drawFrontier(){
  var L=BANDS.map(function(b,i){return '<span class=ci data-band="'+i+'"><span class=cdot style="background:'+RAMP[i]+'"></span>'+esc(b[1])+'</span>';}).join('');
  L+='<span class=ci title="marker size: the cheaper the check, the bigger the dot">&#9679; size = check weight (w &le; 4 largest)</span>';
  if(st.w!=='all')L+='<span class=ci>dimmed = added more than '+st.w+' days ago</span>';
- fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>';
+ var cc=C.conc&&C.conc[ci];
+ if(cc)L+='<span class=ci title="'+esc(C.caveat)+'">declared family: '+esc(cc.top)+' '+Math.round(cc.top1*100)+'% of records, top two '+Math.round(cc.top2*100)+'%, HHI '+cc.hhi.toFixed(2)+'</span>';
+ fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>'+(cc?'':'');
 }
 function draw(){
  if(st.m==='frontier'){setView(true);drawFrontier();return;}
@@ -4613,15 +4719,32 @@ def record_chart(entries):
              "fr": fr_member[i]}
             for i, e in enumerate(entries)]
     rcseries = [[lab, cap, col] for lab, cap, col in RC_SERIES]
+    # Declared-family concentration per cell (issue #4025): the script appends
+    # it to the legend when the cell changes, so it is computed once here, by
+    # the same per-cell frontier, and never re-derived client-side.
+    fc = family_concentration(entries)
+    conc = [({"top": c["top"][0]["family"], "top1": c["top1_share"],
+              "top2": c["top2_share"], "hhi": c["hhi"]} if c and c.get("top") else None)
+            for c in (fc["cells"].get(f"{cell[0]}~{cell[1]}") if cell[2] == "CSS" else None
+                      for cell in fr_cells)]
     rccells = {"cells": [list(c) for c in fr_cells],
                "def": list(fr_cells[fr_default][:3]) if fr_cells else list(FR_DEFAULT_CELL),
                "ramp": FR_RAMP, "bands": [list(b) for b in D_BANDS],
-               "radius": [list(r) for r in FR_RADIUS]}
+               "radius": [list(r) for r in FR_RADIUS],
+               "conc": conc, "caveat": FAMILY_CAVEAT}
     fr_rows = [r for r in data if fr_default in r["fr"]] if fr_cells else []
     fr_plot = (frontier_map(fr_rows) if fr_rows else
                '<div style="padding:40px;color:#64748b">no codes in this cell</div>')
-    fr_legend = frontier_legend(len(fr_rows))
     dL, dW, dT = rccells["def"]
+    fr_legend = frontier_legend(len(fr_rows), fc["cells"].get(f"{dL}~{dW}") if dT == "CSS" else None)
+    g = fc["global"]
+    fr_shape = (f' Across the whole CSS frontier ({g["records"]:,} records) the top declared '
+                f'family, {html.escape(g["top"][0]["family"])}, holds {round(100 * g["top1_share"])}% '
+                f'and the top two {round(100 * g["top2_share"])}% (HHI {g["hhi"]:.2f}); the search '
+                f'has moved {fc["cells_moved"]} of {fc["cells_total"]} cells to a family other than '
+                f'the family of the best literature baseline there. family is the one self-declared label on an '
+                f'entry, so these read the declared tag, not anything recovered from H.'
+                if g.get("top") else "")
     types = sorted({c[2] for c in fr_cells})
 
     def cell_btns(attr, opts, label_of, cur):
@@ -4686,7 +4809,7 @@ def record_chart(entries):
             'computation. Colour is the distance band and size the check '
             'weight (cheaper checks draw bigger); the time windows dim older '
             'entries. Switch cells to see what a locality or weight class '
-            'reaches.</p>'
+            f'reaches.{fr_shape}</p>'
             + json_data_script("rcdata", data)
             + json_data_script("rcseries", rcseries)
             + json_data_script("rccells", rccells)
@@ -5684,6 +5807,9 @@ def build():
     prov = provenance_counts({e["slug"] for e in entries})
     if prov:
         stats["provenance"] = prov
+    # The frontier's shape by declared family (issue #4025): per cell and
+    # global shares and HHI, with the declared-versus-computed caveat inside.
+    stats["family_concentration"] = family_concentration(all_entries)
     for cap in HERO_CAPS:
         be = best_eff_at(entries, cap)
         stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None
