@@ -469,7 +469,7 @@ font-variant-numeric:tabular-nums}}
 .stat-ghost .sub{{font-size:12px;margin-top:4px;color:var(--mut)}}
 .stat-ghost .sub a{{font-family:'Space Mono',ui-monospace,monospace;
 color:var(--ink)}}
-.census{{display:grid;grid-template-columns:repeat(3,1fr);
+.census{{display:grid;grid-template-columns:repeat(5,1fr);
 border:1px solid var(--ln);border-radius:14px;background:var(--soft);
 overflow:hidden}}
 .census div{{padding:14px 18px;border-right:1px solid var(--ln)}}
@@ -1018,7 +1018,10 @@ text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}}}
 header.hero{{padding:34px 0 30px}}
 .statsbar{{grid-template-columns:repeat(2,1fr);gap:10px}}
 .herosub{{grid-template-columns:1fr;gap:10px}}
-.census div{{padding:12px 14px}}.census b{{font-size:19px}}
+.census{{grid-template-columns:repeat(3,1fr)}}
+.census div{{padding:12px 10px;border-bottom:1px solid var(--ln)}}
+.census div:nth-child(3n){{border-right:0}}
+.census div:nth-last-child(-n+2){{border-bottom:0}}.census b{{font-size:19px}}
 .stat-card{{padding:14px 16px}}.stat-card .v{{font-size:27px}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
@@ -1722,6 +1725,32 @@ def provenance_counts(slugs):
         bucket = (table.get(slug) or {}).get("bucket", "not_derived")
         counts[bucket] = counts.get(bucket, 0) + 1
     counts["method"] = "isomorphism against the literature index"
+    counts["caveat"] = payload.get("caveat")
+    return counts
+
+
+def board_screen_counts(slugs):
+    """Verdict counts from research/provenance/board_screen.json, or None.
+
+    The screen compares each CSS entry with the board's own seeded and
+    literature entries by exact fingerprint and Weisfeiler-Leman signature
+    (issue #4024). A rendered entry the screen has not seen counts as
+    not_screened, for the same reason provenance_counts keeps not_derived.
+    """
+    path = os.path.join(ROOT, "research", "provenance", "board_screen.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError):
+        return None
+    table = payload.get("entries") or {}
+    counts = {}
+    for slug in slugs:
+        verdict = (table.get(slug) or {}).get("verdict", "not_screened")
+        counts[verdict] = counts.get(verdict, 0) + 1
+    counts["reference_entries"] = (payload.get("reference") or {}).get("total")
+    counts["method"] = ("fingerprint and Weisfeiler-Leman signature against the "
+                        "board's seeded and literature entries")
     counts["caveat"] = payload.get("caveat")
     return counts
 
@@ -3390,9 +3419,17 @@ def progress_panel(entries, best_geo_e):
     top = best_eff_at(entries)
     top_v = "&middot;" if top is None else f"{top['eff']:g}"
     n_base = sum(1 for e in entries if e["origin"] == "baseline")
+    # The two evidence counts the board can state about itself (issue #4024):
+    # distances with a certificate, and entries whose novelty anyone has
+    # looked at. provenance.novelty is the only field that says whether a
+    # code is new, and a metric that is never counted is never closed.
+    n_exact = sum(1 for e in entries if e["tier"] == "exact")
+    n_audited = sum(1 for e in entries if (e.get("novelty") or "unknown") != "unknown")
     counts = (("{:,}".format(len(entries)), "codes on the board"),
               ("{:,}".format(len(entries) - n_base), "submitted"),
-              ("{:,}".format(n_base), "literature baselines"))
+              ("{:,}".format(n_base), "literature baselines"),
+              ("{:,}".format(n_exact), "certified exact"),
+              ("{:,}".format(n_audited), "novelty audited"))
     census = "".join(f'<div><b>{v}</b><span>{lab}</span></div>'
                      for v, lab in counts)
     tier = (f'<div class=stat-ghost title="Best operational efficiency kd^2/n '
@@ -3402,7 +3439,11 @@ def progress_panel(entries, best_geo_e):
             f'<div class=l>best kd&sup2;/n at any weight</div></div>'
             f'<div class=census title="Codes with a verified distance witness; '
             f'submitted codes came through the challenge and are not '
-            f'necessarily novel parameter sets.">{census}</div>')
+            f'necessarily novel parameter sets. Certified exact: entries whose '
+            f'distance carries a certificate. Novelty audited: entries whose '
+            f'provenance.novelty is known_parameters or new_parameters rather '
+            f'than unaudited; new_parameters is a submitter or reviewer claim, '
+            f'not a verifier-proved fact.">{census}</div>')
     return (f'<section class=statsbar>{cards}</section>'
             f'<section class=herosub>{tier}</section>')
 
@@ -4061,6 +4102,9 @@ NOVELTY_LABEL = {
     "new_parameters": "new parameter set claimed by submitter",
     "unknown": "novelty not audited",
 }
+
+
+NOVELTY_BUCKETS = ("unknown", "known_parameters", "new_parameters")
 
 
 def novelty_label(v):
@@ -5684,6 +5728,16 @@ def build():
     prov = provenance_counts({e["slug"] for e in entries})
     if prov:
         stats["provenance"] = prov
+    # How much of the board anyone has cleared against the literature (issue
+    # #4024). Audited means known_parameters or new_parameters; the latter is
+    # a submitter or reviewer claim, not a verifier-proved fact. Over both
+    # boards, like verified_codes.
+    nov = collections.Counter((e.get("novelty") or "unknown") for e in all_entries)
+    stats["novelty"] = {b: nov.get(b, 0) for b in NOVELTY_BUCKETS}
+    stats["novelty_audited"] = len(all_entries) - stats["novelty"]["unknown"]
+    screen = board_screen_counts({e["slug"] for e in entries})
+    if screen:
+        stats["board_screen"] = screen
     for cap in HERO_CAPS:
         be = best_eff_at(entries, cap)
         stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None
