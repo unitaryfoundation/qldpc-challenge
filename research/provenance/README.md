@@ -30,8 +30,14 @@ people least able to fix it (issue #2391).
 
 So a board entry the index has not seen gets its own bucket, `not_derived`,
 distinct from `no_match`. `--top-up` adds those rows and drops rows for
-entries that have left the board; it needs neither the index nor pynauty, so
-it is a normal part of merging. A later `--from-matches` promotes them.
+entries that have left the board; it needs neither the index nor pynauty.
+Nobody runs it by hand: the `provenance-top-up` workflow runs it on `main`
+every Monday and commits the result, and a code PR gets a warning annotation
+from `verify.yml` with the number of entries the table has not seen
+(advisory; nothing to do in the PR). `--residual` writes the list of
+`not_derived` entries, which the same workflow keeps in a tracking issue,
+because only an index run (`--from-matches` with `--covered`) clears it
+(issue #4023).
 
 `--check` hard-fails only on what is wrong: an unknown bucket, `literature`
 with no evidence, or counts that disagree with the entries. Staleness is
@@ -73,6 +79,9 @@ python research/derive_provenance.py --check
 
 # reconcile coverage after codes/ changes (needs neither)
 python research/derive_provenance.py --top-up
+
+# list the entries only an index run can settle (the tracking-issue body)
+python research/derive_provenance.py --residual body.md
 ```
 
 `iso_check.py` and `iso_common.py` are vendored from this project'"'"'s `novelty`
