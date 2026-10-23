@@ -16,19 +16,19 @@
   },
   "solver": "scipy/HiGHS MILP",
   "verification": {
-    "checker": "Lean 4 v4.30.0-rc2 with mathlib 5450b53e5ddc; bv_decide re-solves the two distance lemmas and checks the LRAT with Lean's verified checker, bv_check replays stored LRAT for the rank lemmas",
+    "checker": "Lean 4 v4.35.0 with mathlib 56a005855ea1; bv_decide re-solves the two distance lemmas and the four rank lemmas and checks each fresh LRAT with Lean's verified checker (no stored certificates at this commit)",
     "checks_sha256": "9deb83c9d05295a286035d0460156d36c768617dfcfdb9e1578b65d9aa5868c0",
     "cnf_sha256": "X=91a98dcec67dca06872e9ce6fca421cd02d765727d2a3a42c96ff7402936430d;Z=4546191f0bedbe91badb72564e170e9158cd1d21ce7e870803be5eee39e55adb",
     "level": "formal",
-    "note": "BB72_dist_6 proves 6 <= distance of BB72_css, whose BB72_X and BB72_Z literals decode (row-major, bit i*72+j) to this entry's rows on the same qubit labels; the weight-6 witnesses give d <= 6. Pinned to upstream 2e35d200, the 2026-10-10 merge of Lean-QEC#33 (the two distance lemmas use bv_decide; the stored LRAT files at e0b90148 do not verify). Replayed 2026-10-05 at the PR head e0587cc, 95 s, and 2026-10-11 at 2e35d200, 796 s, same toolchain and mathlib.",
+    "note": "BB72_dist_6 proves 6 <= distance of BB72_css, whose BB72_X and BB72_Z literals decode (row-major, bit i*72+j) to this entry's rows on the same qubit labels; the weight-6 witnesses give d <= 6. Pinned to vprusso/Lean-QEC ae8bdd15, the Lean v4.35.0 port offered upstream as Lean-QEC#37 (every SAT lemma re-solves with bv_decide; the stored LRAT files do not verify on 4.35). Replayed 2026-10-11 at upstream 2e35d200 on v4.30.0-rc2, 796 s, and 2026-10-23 at ae8bdd15, 741 s from a fresh clone.",
     "reference": "arXiv:2605.16523",
     "replay": {
       "build": "git lfs pull && lake exe cache get && lake build LeanQEC.Stabilizer.Examples.BB.BB72",
-      "commit": "2e35d200850dbe92add29fc1ed0f617e3b18c414",
-      "mathlib": "5450b53e5ddc",
-      "repo": "github.com/VerifiedQC/Lean-QEC",
+      "commit": "ae8bdd1525f7f9f04022159a1f8c5381eb0f3960",
+      "mathlib": "56a005855ea1",
+      "repo": "github.com/vprusso/Lean-QEC",
       "theorem": "BB72_dist_6",
-      "toolchain": "leanprover/lean4:v4.30.0-rc2"
+      "toolchain": "leanprover/lean4:v4.35.0"
     }
   }
 }
