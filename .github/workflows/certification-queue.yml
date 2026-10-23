@@ -43,7 +43,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "the queue did not change"; exit 0
           fi
-          git commit -m "Weekly certification queue: $(sed -n '1s/ of .*//p' queue.txt) [skip ci]"
+          # queue.txt's second line reads "N upper-bound entries (M records) of T; ..."
+          git commit -m "Weekly certification queue: $(sed -n '2p' queue.txt | sed 's/ of .*//') [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:main; then
               echo "pushed on attempt $attempt"; exit 0
