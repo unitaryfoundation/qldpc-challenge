@@ -115,6 +115,19 @@ Distance confidence is orthogonal to the tracks:
   For a general stabilizer code the distance is a Pauli weight and the
   certifier does not yet minimize it, so every stabilizer entry is `d<=`.
 
+Not a flag: first arrival. Issue #4029 asked whether the entry that first
+populates a cell, a family, or a geometry should carry an `opens` badge. The
+answer recorded there is no. Cells nest, so the smallest, lowest-weight, most
+local code is the first entry of every cell it qualifies for (three entries
+open all 24 cells on the board of 2026-10-23), the family half would rest on
+the one self-declared label and give it something to be gamed for, and
+"first" is a fact about the board's history rather than something the verifier
+can prove about a code, which is what this layer is for. The history is kept
+instead, as a dated record under `research/audits/` (`cell_openings.py`): the
+first entry per cell, per declared family within a cell, and the first modular
+and 3D-layout entries, with their dates. It is displayed nowhere on the board
+and enters no ranking.
+
 ## Diagnostics (displayed, never ranked)
 
 The verifier also reports, per code, a few properties that are computed from

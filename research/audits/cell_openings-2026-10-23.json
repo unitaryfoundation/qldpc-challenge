@@ -1,0 +1,1897 @@
+{
+ "audit_version": 1,
+ "caveat": "first arrival is a fact about the board's history, not a property of a code; nothing here is a flag, a rank, or a score (decision on issue #4029)",
+ "cells": {
+  "local-2d-bilayer~weight-4": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "bivariate-bicycle": {
+     "d": 9,
+     "date": "2026-08-16",
+     "family": "bivariate-bicycle",
+     "k": 2,
+     "n": 84,
+     "origin": "submission",
+     "slug": "84-2-9"
+    },
+    "generalized-bicycle": {
+     "d": 11,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 122,
+     "origin": "submission",
+     "slug": "122-2-11"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 256
+  },
+  "local-2d-bilayer~weight-4~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 5
+  },
+  "local-2d-bilayer~weight-6": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 10,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 4,
+     "n": 96,
+     "origin": "baseline",
+     "slug": "96-4-10"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 35,
+     "n": 119,
+     "origin": "submission",
+     "slug": "119-35-3"
+    },
+    "distance-amplified": {
+     "d": 4,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 4,
+     "n": 18,
+     "origin": "submission",
+     "slug": "18-4-4-b"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2022-03-31",
+     "family": "generalized-bicycle",
+     "k": 8,
+     "n": 42,
+     "origin": "baseline",
+     "slug": "42-8-3"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 9,
+     "n": 45,
+     "origin": "submission",
+     "slug": "45-9-3"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 661
+  },
+  "local-2d-bilayer~weight-6~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 60
+  },
+  "local-2d-bilayer~weight-8": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 4,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 8,
+     "n": 32,
+     "origin": "baseline",
+     "slug": "32-8-4"
+    },
+    "2bga-nonabelian": {
+     "d": 15,
+     "date": "2026-10-12",
+     "family": "2bga-nonabelian",
+     "k": 2,
+     "n": 100,
+     "origin": "baseline",
+     "slug": "100-2-15"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 35,
+     "n": 119,
+     "origin": "submission",
+     "slug": "119-35-3"
+    },
+    "distance-amplified": {
+     "d": 6,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 22,
+     "n": 124,
+     "origin": "submission",
+     "slug": "124-22-6"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2022-03-31",
+     "family": "generalized-bicycle",
+     "k": 8,
+     "n": 42,
+     "origin": "baseline",
+     "slug": "42-8-3"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 9,
+     "n": 45,
+     "origin": "submission",
+     "slug": "45-9-3"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-07-25",
+     "family": "other",
+     "k": 7,
+     "n": 15,
+     "origin": "submission",
+     "slug": "15-7-3"
+    },
+    "pair-partition-cpm": {
+     "d": 8,
+     "date": "2026",
+     "family": "pair-partition-cpm",
+     "k": 30,
+     "n": 104,
+     "origin": "baseline",
+     "slug": "104-30-8"
+    },
+    "tile": {
+     "d": 14,
+     "date": "2026-06-25",
+     "family": "tile",
+     "k": 12,
+     "n": 294,
+     "origin": "submission",
+     "slug": "294-12-14"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 1043
+  },
+  "local-2d-bilayer~weight-8~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "pair-partition-cpm": {
+     "d": 3,
+     "date": "2026-10-01",
+     "family": "pair-partition-cpm",
+     "k": 95,
+     "n": 188,
+     "origin": "submission",
+     "slug": "188-95-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 122
+  },
+  "local-2d-bilayer~weight-any": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 4,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 8,
+     "n": 32,
+     "origin": "baseline",
+     "slug": "32-8-4"
+    },
+    "2bga-nonabelian": {
+     "d": 15,
+     "date": "2026-10-12",
+     "family": "2bga-nonabelian",
+     "k": 2,
+     "n": 100,
+     "origin": "baseline",
+     "slug": "100-2-15"
+    },
+    "balanced-product": {
+     "d": 10,
+     "date": "2026-08-02",
+     "family": "balanced-product",
+     "k": 30,
+     "n": 150,
+     "origin": "submission",
+     "slug": "150-30-10"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 35,
+     "n": 119,
+     "origin": "submission",
+     "slug": "119-35-3"
+    },
+    "distance-amplified": {
+     "d": 6,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 22,
+     "n": 124,
+     "origin": "submission",
+     "slug": "124-22-6"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2022-03-31",
+     "family": "generalized-bicycle",
+     "k": 8,
+     "n": 42,
+     "origin": "baseline",
+     "slug": "42-8-3"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 33,
+     "n": 102,
+     "origin": "submission",
+     "slug": "102-33-3"
+    },
+    "lifted-product": {
+     "d": 8,
+     "date": "2026-08-04",
+     "family": "lifted-product",
+     "k": 24,
+     "n": 120,
+     "origin": "submission",
+     "slug": "120-24-8"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-07-25",
+     "family": "other",
+     "k": 7,
+     "n": 15,
+     "origin": "submission",
+     "slug": "15-7-3"
+    },
+    "pair-partition-cpm": {
+     "d": 8,
+     "date": "2026",
+     "family": "pair-partition-cpm",
+     "k": 30,
+     "n": 104,
+     "origin": "baseline",
+     "slug": "104-30-8"
+    },
+    "tile": {
+     "d": 14,
+     "date": "2026-06-25",
+     "family": "tile",
+     "k": 12,
+     "n": 294,
+     "origin": "submission",
+     "slug": "294-12-14"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 1130
+  },
+  "local-2d-bilayer~weight-any~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "pair-partition-cpm": {
+     "d": 6,
+     "date": "2026-09-28",
+     "family": "pair-partition-cpm",
+     "k": 32,
+     "n": 145,
+     "origin": "submission",
+     "slug": "145-32-6"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 125
+  },
+  "local-2d-single~weight-4": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "generalized-bicycle": {
+     "d": 7,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 58,
+     "origin": "submission",
+     "slug": "58-2-7"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 243
+  },
+  "local-2d-single~weight-4~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 5
+  },
+  "local-2d-single~weight-6": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "bivariate-bicycle": {
+     "d": 2,
+     "date": "2025",
+     "family": "bivariate-bicycle",
+     "k": 4,
+     "n": 12,
+     "origin": "baseline",
+     "slug": "12-4-2"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 3,
+     "n": 12,
+     "origin": "submission",
+     "slug": "12-3-3"
+    },
+    "distance-amplified": {
+     "d": 4,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 4,
+     "n": 18,
+     "origin": "submission",
+     "slug": "18-4-4-b"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 10,
+     "origin": "submission",
+     "slug": "10-2-3"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 353
+  },
+  "local-2d-single~weight-6~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 11
+  },
+  "local-2d-single~weight-8": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "bivariate-bicycle": {
+     "d": 2,
+     "date": "2025",
+     "family": "bivariate-bicycle",
+     "k": 4,
+     "n": 12,
+     "origin": "baseline",
+     "slug": "12-4-2"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 3,
+     "n": 12,
+     "origin": "submission",
+     "slug": "12-3-3"
+    },
+    "distance-amplified": {
+     "d": 4,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 4,
+     "n": 18,
+     "origin": "submission",
+     "slug": "18-4-4-b"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 10,
+     "origin": "submission",
+     "slug": "10-2-3"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-07-25",
+     "family": "other",
+     "k": 7,
+     "n": 15,
+     "origin": "submission",
+     "slug": "15-7-3"
+    },
+    "tile": {
+     "d": 15,
+     "date": "2026-10-01",
+     "family": "tile",
+     "k": 8,
+     "n": 288,
+     "origin": "submission",
+     "slug": "288-8-15"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 418
+  },
+  "local-2d-single~weight-8~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 13
+  },
+  "local-2d-single~weight-any": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "bivariate-bicycle": {
+     "d": 2,
+     "date": "2025",
+     "family": "bivariate-bicycle",
+     "k": 4,
+     "n": 12,
+     "origin": "baseline",
+     "slug": "12-4-2"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 3,
+     "n": 12,
+     "origin": "submission",
+     "slug": "12-3-3"
+    },
+    "distance-amplified": {
+     "d": 4,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 4,
+     "n": 18,
+     "origin": "submission",
+     "slug": "18-4-4-b"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 10,
+     "origin": "submission",
+     "slug": "10-2-3"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-07-25",
+     "family": "other",
+     "k": 7,
+     "n": 15,
+     "origin": "submission",
+     "slug": "15-7-3"
+    },
+    "tile": {
+     "d": 15,
+     "date": "2026-10-01",
+     "family": "tile",
+     "k": 8,
+     "n": 288,
+     "origin": "submission",
+     "slug": "288-8-15"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 419
+  },
+  "local-2d-single~weight-any~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 13
+  },
+  "unrestricted~weight-4": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "bivariate-bicycle": {
+     "d": 9,
+     "date": "2026-08-16",
+     "family": "bivariate-bicycle",
+     "k": 2,
+     "n": 84,
+     "origin": "submission",
+     "slug": "84-2-9"
+    },
+    "generalized-bicycle": {
+     "d": 11,
+     "date": "2026-09-19",
+     "family": "generalized-bicycle",
+     "k": 2,
+     "n": 122,
+     "origin": "submission",
+     "slug": "122-2-11"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 271
+  },
+  "unrestricted~weight-4~stabilizer": {
+   "first": {
+    "d": 5,
+    "date": "2026-09-27",
+    "family": "topological",
+    "k": 1,
+    "n": 13,
+    "origin": "submission",
+    "slug": "13-1-5"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 5,
+     "date": "2026-09-27",
+     "family": "topological",
+     "k": 1,
+     "n": 13,
+     "origin": "submission",
+     "slug": "13-1-5"
+    }
+   },
+   "first_modular": null,
+   "members": 7
+  },
+  "unrestricted~weight-6": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 10,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 4,
+     "n": 96,
+     "origin": "baseline",
+     "slug": "96-4-10"
+    },
+    "2bga-nonabelian": {
+     "d": 9,
+     "date": "2023",
+     "family": "2bga-nonabelian",
+     "k": 8,
+     "n": 128,
+     "origin": "baseline",
+     "slug": "128-8-9"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 35,
+     "n": 119,
+     "origin": "submission",
+     "slug": "119-35-3"
+    },
+    "distance-amplified": {
+     "d": 4,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 4,
+     "n": 18,
+     "origin": "submission",
+     "slug": "18-4-4-b"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2022-03-31",
+     "family": "generalized-bicycle",
+     "k": 8,
+     "n": 42,
+     "origin": "baseline",
+     "slug": "42-8-3"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 9,
+     "n": 45,
+     "origin": "submission",
+     "slug": "45-9-3"
+    },
+    "lifted-product": {
+     "d": 4,
+     "date": "2026-08-12",
+     "family": "lifted-product",
+     "k": 71,
+     "n": 676,
+     "origin": "submission",
+     "slug": "676-71-4"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 5,
+     "date": "2026-08-20",
+     "family": "other",
+     "k": 6,
+     "n": 126,
+     "origin": "submission",
+     "slug": "126-6-5"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 932
+  },
+  "unrestricted~weight-6~stabilizer": {
+   "first": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_3d_layout": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 28,
+     "date": "2026-10-11",
+     "family": "2bga-coset",
+     "k": 10,
+     "n": 336,
+     "origin": "submission",
+     "slug": "336-10-28"
+    },
+    "bivariate-bicycle": {
+     "d": 8,
+     "date": "2026-10-07",
+     "family": "bivariate-bicycle",
+     "k": 4,
+     "n": 144,
+     "origin": "submission",
+     "slug": "144-4-8"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "topological": {
+     "d": 6,
+     "date": "2005",
+     "family": "topological",
+     "k": 12,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-12-6"
+    }
+   },
+   "first_modular": null,
+   "members": 76
+  },
+  "unrestricted~weight-8": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 4,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 8,
+     "n": 32,
+     "origin": "baseline",
+     "slug": "32-8-4"
+    },
+    "2bga-nonabelian": {
+     "d": 9,
+     "date": "2023",
+     "family": "2bga-nonabelian",
+     "k": 8,
+     "n": 128,
+     "origin": "baseline",
+     "slug": "128-8-9"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 3,
+     "date": "2026-09-21",
+     "family": "check-deletion",
+     "k": 35,
+     "n": 119,
+     "origin": "submission",
+     "slug": "119-35-3"
+    },
+    "distance-amplified": {
+     "d": 6,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 22,
+     "n": 124,
+     "origin": "submission",
+     "slug": "124-22-6"
+    },
+    "generalized-bicycle": {
+     "d": 3,
+     "date": "2022-03-31",
+     "family": "generalized-bicycle",
+     "k": 8,
+     "n": 42,
+     "origin": "baseline",
+     "slug": "42-8-3"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 9,
+     "n": 45,
+     "origin": "submission",
+     "slug": "45-9-3"
+    },
+    "lifted-product": {
+     "d": 18,
+     "date": "2026",
+     "family": "lifted-product",
+     "k": 16,
+     "n": 288,
+     "origin": "baseline",
+     "slug": "288-16-18"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 54,
+     "date": "2026-07-18",
+     "family": "other",
+     "k": 8,
+     "n": 684,
+     "origin": "submission",
+     "slug": "684-8-54"
+    },
+    "pair-partition-cpm": {
+     "d": 8,
+     "date": "2026",
+     "family": "pair-partition-cpm",
+     "k": 30,
+     "n": 104,
+     "origin": "baseline",
+     "slug": "104-30-8"
+    },
+    "quantum-tanner": {
+     "d": 8,
+     "date": "2026-08-10",
+     "family": "quantum-tanner",
+     "k": 8,
+     "n": 80,
+     "origin": "submission",
+     "slug": "80-8-8"
+    },
+    "tile": {
+     "d": 14,
+     "date": "2026-06-25",
+     "family": "tile",
+     "k": 12,
+     "n": 294,
+     "origin": "submission",
+     "slug": "294-12-14"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 1829
+  },
+  "unrestricted~weight-8~stabilizer": {
+   "first": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_3d_layout": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 28,
+     "date": "2026-10-11",
+     "family": "2bga-coset",
+     "k": 10,
+     "n": 336,
+     "origin": "submission",
+     "slug": "336-10-28"
+    },
+    "bivariate-bicycle": {
+     "d": 12,
+     "date": "2026-10-07",
+     "family": "bivariate-bicycle",
+     "k": 12,
+     "n": 144,
+     "origin": "submission",
+     "slug": "144-12-12-b"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "pair-partition-cpm": {
+     "d": 6,
+     "date": "2026-10-01",
+     "family": "pair-partition-cpm",
+     "k": 49,
+     "n": 188,
+     "origin": "submission",
+     "slug": "188-49-6"
+    },
+    "topological": {
+     "d": 6,
+     "date": "2005",
+     "family": "topological",
+     "k": 12,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-12-6"
+    }
+   },
+   "first_modular": null,
+   "members": 152
+  },
+  "unrestricted~weight-any": {
+   "first": {
+    "d": 3,
+    "date": "1996-01-29",
+    "family": "topological",
+    "k": 1,
+    "n": 7,
+    "origin": "baseline",
+    "slug": "7-1-3"
+   },
+   "first_3d_layout": null,
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 4,
+     "date": "2023",
+     "family": "2bga-coset",
+     "k": 8,
+     "n": 32,
+     "origin": "baseline",
+     "slug": "32-8-4"
+    },
+    "2bga-nonabelian": {
+     "d": 9,
+     "date": "2023",
+     "family": "2bga-nonabelian",
+     "k": 8,
+     "n": 128,
+     "origin": "baseline",
+     "slug": "128-8-9"
+    },
+    "balanced-product": {
+     "d": 10,
+     "date": "2026-07-31",
+     "family": "balanced-product",
+     "k": 54,
+     "n": 270,
+     "origin": "submission",
+     "slug": "270-54-10"
+    },
+    "bivariate-bicycle": {
+     "d": 10,
+     "date": "2023-08-15",
+     "family": "bivariate-bicycle",
+     "k": 8,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-8-10"
+    },
+    "check-deletion": {
+     "d": 28,
+     "date": "2026-09-08",
+     "family": "check-deletion",
+     "k": 212,
+     "n": 700,
+     "origin": "submission",
+     "slug": "700-212-28"
+    },
+    "distance-amplified": {
+     "d": 6,
+     "date": "2026-09-30",
+     "family": "distance-amplified",
+     "k": 22,
+     "n": 124,
+     "origin": "submission",
+     "slug": "124-22-6"
+    },
+    "generalized-bicycle": {
+     "d": 8,
+     "date": "2019-04-04",
+     "family": "generalized-bicycle",
+     "k": 28,
+     "n": 126,
+     "origin": "baseline",
+     "slug": "126-28-8"
+    },
+    "hypergraph-product": {
+     "d": 3,
+     "date": "2026-07-17",
+     "family": "hypergraph-product",
+     "k": 33,
+     "n": 102,
+     "origin": "submission",
+     "slug": "102-33-3"
+    },
+    "lifted-product": {
+     "d": 12,
+     "date": "2026",
+     "family": "lifted-product",
+     "k": 40,
+     "n": 200,
+     "origin": "baseline",
+     "slug": "200-40-12"
+    },
+    "local-2d-single": {
+     "d": 3,
+     "date": "2026-08-31",
+     "family": "local-2d-single",
+     "k": 15,
+     "n": 107,
+     "origin": "submission",
+     "slug": "107-15-3"
+    },
+    "local-sat-css": {
+     "d": 4,
+     "date": "2026-09-24",
+     "family": "local-sat-css",
+     "k": 7,
+     "n": 25,
+     "origin": "submission",
+     "slug": "25-7-4"
+    },
+    "multivariate-bicycle": {
+     "d": 10,
+     "date": "2026-08-15",
+     "family": "multivariate-bicycle",
+     "k": 2,
+     "n": 112,
+     "origin": "submission",
+     "slug": "112-2-10"
+    },
+    "other": {
+     "d": 54,
+     "date": "2026-07-18",
+     "family": "other",
+     "k": 8,
+     "n": 684,
+     "origin": "submission",
+     "slug": "684-8-54"
+    },
+    "pair-partition-cpm": {
+     "d": 8,
+     "date": "2026",
+     "family": "pair-partition-cpm",
+     "k": 30,
+     "n": 104,
+     "origin": "baseline",
+     "slug": "104-30-8"
+    },
+    "quantum-tanner": {
+     "d": 8,
+     "date": "2026-08-10",
+     "family": "quantum-tanner",
+     "k": 8,
+     "n": 80,
+     "origin": "submission",
+     "slug": "80-8-8"
+    },
+    "tile": {
+     "d": 14,
+     "date": "2026-06-25",
+     "family": "tile",
+     "k": 12,
+     "n": 294,
+     "origin": "submission",
+     "slug": "294-12-14"
+    },
+    "topological": {
+     "d": 3,
+     "date": "1996-01-29",
+     "family": "topological",
+     "k": 1,
+     "n": 7,
+     "origin": "baseline",
+     "slug": "7-1-3"
+    }
+   },
+   "first_modular": null,
+   "members": 2533
+  },
+  "unrestricted~weight-any~stabilizer": {
+   "first": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_3d_layout": {
+    "d": 6,
+    "date": "2005",
+    "family": "topological",
+    "k": 12,
+    "n": 108,
+    "origin": "baseline",
+    "slug": "108-12-6"
+   },
+   "first_by_declared_family": {
+    "2bga-coset": {
+     "d": 28,
+     "date": "2026-10-11",
+     "family": "2bga-coset",
+     "k": 10,
+     "n": 336,
+     "origin": "submission",
+     "slug": "336-10-28"
+    },
+    "bivariate-bicycle": {
+     "d": 12,
+     "date": "2026-10-07",
+     "family": "bivariate-bicycle",
+     "k": 12,
+     "n": 144,
+     "origin": "submission",
+     "slug": "144-12-12-b"
+    },
+    "other": {
+     "d": 3,
+     "date": "2026-09-27",
+     "family": "other",
+     "k": 1,
+     "n": 5,
+     "origin": "submission",
+     "slug": "5-1-3"
+    },
+    "pair-partition-cpm": {
+     "d": 6,
+     "date": "2026-09-28",
+     "family": "pair-partition-cpm",
+     "k": 32,
+     "n": 145,
+     "origin": "submission",
+     "slug": "145-32-6"
+    },
+    "topological": {
+     "d": 6,
+     "date": "2005",
+     "family": "topological",
+     "k": 12,
+     "n": 108,
+     "origin": "baseline",
+     "slug": "108-12-6"
+    }
+   },
+   "first_modular": null,
+   "members": 196
+  }
+ },
+ "counts": {
+  "cells": 24,
+  "distinct_cell_openers": 3,
+  "distinct_family_in_cell_openers": 45,
+  "entries": 2729
+ },
+ "date": "2026-10-23",
+ "definitions": {
+  "3d_layout": "the verifier's layout dimension",
+  "cell": "a populated primary-track cell key: locality class, weight class, and code type for a stabilizer entry (site/build.py cells_by_key); cells nest, so an entry is in every cell it qualifies for",
+  "family": "the entry's declared family tag, the board's one self-declared label",
+  "first": "the member with the earliest provenance.date, ties broken by slug; a seeded baseline carries its publication date, a submission its submission date",
+  "modular": "the verifier's modular-layout flag"
+ },
+ "head": "4cf198a586d6c1bc63c0c420acf21bcbd50c24df",
+ "issue": 4029
+}

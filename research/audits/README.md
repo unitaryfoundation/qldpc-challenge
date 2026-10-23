@@ -217,6 +217,25 @@ Nothing here ranks anything.
 uv run python research/audits/family_concentration.py --markdown
 ```
 
+## Who opened each cell and family: `cell_openings.py`
+
+Issue #4029 asked whether the board should flag the entry that first
+populates a cell, a family, or a geometry. The decision was no flag, and this
+script is the record that stands in its place: for every populated cell key
+(locality class, weight class, code type), the first entry by
+`provenance.date` (ties by slug), the first entry per declared family tag, and
+the first modular and 3D-layout entries, as `cell_openings-<date>.json` with
+a table. On the board of 2026-10-23 three entries open all 24 cells, because
+cells nest and the smallest, lowest-weight, most local code is in every cell
+it qualifies for (the Steane code opened every CSS cell in 1996), and the
+family half rests on the one self-declared label. First arrival is a fact
+about the board's history, not a property of a code, so it is recorded here
+and never shown as a badge, ranked, or scored.
+
+```
+uv run python research/audits/cell_openings.py --markdown
+```
+
 ## Limits
 
 These are upper-bound searches. `holds` never upgrades a claim to the exact
