@@ -702,8 +702,9 @@ gap:16px;margin:14px 0 4px;position:relative}}
 /* The plots were position:sticky here (#273) so the point<->row hover
    highlight stayed visible while the table scrolled. But the opaque pinned
    plots covered the table and leaderboard whenever plots + legend + table
-   outgrew the viewport (issue #302). The both-on-screen effect now comes from
-   fitting the explorer to one viewport instead; see .explorer by .boardscroll. */
+   outgrew the viewport (issue #302). The explorer was then fitted to one
+   viewport, which overflowed the same way once the legends grew; the board
+   now has a tall scroll box of its own instead (see .boardscroll). */
 .plot{{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}}
 .chartlegend{{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
@@ -914,28 +915,25 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}}
    cleanly. */
 /* The table is a bounded, internally scrolling box so the board stays compact
    instead of running the full length of the page. Its header pins to the top of
-   this box (thead is position:sticky) while the rows scroll under it, and the
-   plots sit just above it, both on screen at once, so the row-hover -> point
-   highlight stays usable. overflow:auto also carries the horizontal scroll on
-   narrow screens (where the table sets its own min-width). */
-.boardscroll{{max-height:64vh;overflow:auto;-webkit-overflow-scrolling:touch;
+   this box (thead is position:sticky) while the rows scroll under it. The box
+   takes most of a viewport, so the leaderboard is the first thing on screen
+   once the page is scrolled to it; the plots above it stay a short scroll away
+   for the row-hover -> point highlight. overflow:auto also carries the
+   horizontal scroll on narrow screens (where the table sets its own min-width). */
+.boardscroll{{max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}}
 /* "Show all" reveal for the collapsed mobile card list (issue #336) and the
    LER frontier list (issue #3931); desktop keeps the bounded scroll box and
    the whole list, and never needs it. */
 .showall{{display:none}}
-/* On screens tall enough to fit plots + legend + a useful slice of the table,
-   size the explorer to exactly one viewport: plots and legend keep their
-   natural height and the board's scroll box absorbs the remainder, so plots
-   and table are on screen together (the row-hover -> point highlight from
-   #273) without anything sliding underneath anything (issue #302). Shorter
-   screens keep normal flow -- the plots scroll away and the 64vh box above
-   applies -- so the flex column is never over-constrained into overlapping
-   the leaderboard below. Width gate matches the card-layout breakpoint. */
-@media(min-width:821px) and (min-height:800px){{
-.explorer{{display:flex;flex-direction:column;max-height:100vh}}
-.explorer>*{{flex:0 0 auto}}
-.explorer .boardscroll{{flex:1 1 auto;min-height:240px;max-height:none}}}}
+/* The explorer (plots, legends, table) is plain flow. It used to be a flex
+   column capped at one viewport so plots and table shared the screen (#302),
+   with the board's box taking whatever was left above a 240px floor. Once the
+   plots and the two legends alone outgrew the viewport minus that floor, the
+   floor won over the cap: the box overflowed the capped column, and the
+   "how to" cards that follow it were laid out over the board's rows. No cap
+   on the column means nothing can overflow it; the board box above carries
+   its own height. */
 @media(max-width:1000px){{table.board{{table-layout:auto;min-width:820px}}}}
 /* Narrow screens: rather than drop columns (and hide g, a headline metric)
    into a horizontal scroll, each row becomes a card so every field stays
@@ -5614,7 +5612,7 @@ def build():
     P.append(charts_block(entries, records))
     P.append(board_legend(asym=True))
     P.append(board_table(entries, records, lrec))
-    P.append('</div>')  # close explorer (the viewport-fitted plots+table column)
+    P.append('</div>')  # close explorer (the plots+legend+table column)
     # the three steps follow the board: 'climb the board' should be read after
     # the board has been seen, not before
     P.append('<div class=how>'
