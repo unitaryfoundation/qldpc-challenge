@@ -43,6 +43,35 @@ because only an index run (`--from-matches` with `--covered`) clears it
 with no evidence, or counts that disagree with the entries. Staleness is
 reported loudly and exits 0.
 
+## The board screen: what the repository can settle without the index
+
+`board_screen.py` compares every CSS entry with the board's own reference
+set, the 355 entries seeded from the literature (`provenance.origin:
+baseline`) plus the entries the index already matched (bucket `literature`
+above), using the two primitives the gate uses for dedup: the exact
+fingerprint (`css_fingerprint` in `verify/qldpc_verify.py`, the reduced row
+echelon forms of H_X and H_Z) and the Weisfeiler-Leman signature of the typed
+Tanner graph (`signature`, invariant under qubit permutations). `board_screen.json`
+is the record, one verdict per entry (issue #4024):
+
+| verdict | meaning | what to do with it |
+|---|---|---|
+| `exact_match` | the fingerprint equals a reference entry's: the same stabilizer group on the same labels | the entry is that code |
+| `review` | the WL signature equals a reference entry's and the fingerprint does not | a review item, not a verdict; each pair is listed, with the permutation audit's decision (`research/audits/permutation_audit-<date>.json`: `equivalent`, `inequivalent`, `gb_family_no`, `undecided`) where it has one |
+| `distinct` | the WL signature matches no reference entry | not permutation-equivalent to any seeded or literature entry on this board; says nothing about codes the board does not carry |
+
+Reference entries are screened against the rest of the reference set.
+Stabilizer (non-CSS) entries are outside the screen, as they are outside the
+derived table. `distinct` is a statement about the board, not a novelty claim,
+and nothing here changes an entry's `novelty` value or any ranking; the
+index-only backlog stays in `derived.json` as `not_derived`.
+
+```
+# rescreen the board (needs numpy, not the index) and validate the record
+python research/provenance/board_screen.py run
+python research/provenance/board_screen.py check
+```
+
 ## What `no_match` does not mean
 
 It does not mean the code is new. Two different sparse generating sets of the
