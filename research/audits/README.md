@@ -352,14 +352,29 @@ cyclic two-block family outright; every other flagged pair waits for a human
 that share a WL signature with different fingerprints, and every literature
 match in `research/provenance/derived.json`, and gives each one of four
 verdicts: `equivalent` with the permutation (nauty on the typed Tanner graph,
-or on the basis-independent hypergraph of all low-weight row-space vectors
-when the rank allows), re-verified on the row spaces with the negative
-control; `inequivalent` when a basis-independent invariant differs in both
-orientations (ranks, the dimension of the intersection of the X and Z row
-spaces, the exact low-weight enumerator); `gb_family_no` when the two-block
+or on the basis-independent hypergraph of all row-space vectors up to the
+check weight), re-verified on the row spaces with the negative control;
+`inequivalent` when a basis-independent invariant differs in both
+orientations (ranks, the dimension and weight enumerator of the intersection
+of the X and Z row spaces, the dimensions and weight enumerators of the two
+hulls, the per-weight counts of row-space vectors up to the check weight) or
+when those hypergraphs are not isomorphic; `gb_family_no` when the two-block
 decider finds no unit map, which is the family verdict and not a proof
 against other permutations; `undecided` otherwise. Equivalent pairs with two
 different distance claims are flagged, since the lighter witness transports.
+
+The vectors up to the check weight come from a Brouwer-Zimmermann enumeration
+(issue #4057): disjoint information sets are cut from the row space, every
+sum of at most t_i systematic rows of set i is formed (times every kernel
+combination for a partial last set), and a vector missed by all sets has
+weight at least the sum of the t_i + 1, so the list is complete once that sum
+exceeds the check weight, at any rank. The lists contain every check row, so
+they span, and an isomorphism of the hypergraphs they define is a permutation
+equivalence in both directions (Leon's argument); when the lists are exactly
+the check rows, the verdict is the Tanner comparison made decisive. The plan
+(sets, subset sizes, row sums, column-order seed) is kept in the record;
+`run --enum-budget` caps the row sums per row space, and a pair over the
+budget stays `undecided`.
 
 ```
 uv run --extra research python research/audits/permutation_audit.py run --out research/audits/permutation_audit-<date>.json

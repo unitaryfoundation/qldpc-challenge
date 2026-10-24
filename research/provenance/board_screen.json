@@ -1,20 +1,18 @@
 {
- "audit": "research/audits/permutation_audit-2026-10-17.json",
+ "audit": "research/audits/permutation_audit-2026-10-24.json",
  "caveat": "distinct means not permutation-equivalent to any seeded or literature entry on this board, not that the code is unpublished; review is a flag, not a verdict; nothing here is a novelty claim",
  "counts": {
-  "distinct": 2494,
+  "distinct": 2498,
   "exact_match": 0,
   "review": 38,
-  "screened": 2532,
+  "screened": 2536,
   "wl_matches": 38,
   "wl_matches_by_audit": {
    "equivalent": 1,
-   "inequivalent": 25,
-   "not_audited": 1,
-   "undecided": 11
+   "inequivalent": 37
   }
  },
- "date": "2026-10-23",
+ "date": "2026-10-24",
  "entries": {
   "10-2-3": {
    "in_reference": true,
@@ -93,6 +91,11 @@
   },
   "100-8-5": {
    "in_reference": true,
+   "matches": [],
+   "verdict": "distinct"
+  },
+  "1000-200-29": {
+   "in_reference": false,
    "matches": [],
    "verdict": "distinct"
   },
@@ -362,6 +365,11 @@
    "verdict": "distinct"
   },
   "112-12-8": {
+   "in_reference": false,
+   "matches": [],
+   "verdict": "distinct"
+  },
+  "112-16-10": {
    "in_reference": false,
    "matches": [],
    "verdict": "distinct"
@@ -822,7 +830,7 @@
    "in_reference": false,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "124-14-13"
     }
@@ -2489,7 +2497,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "186-10-17"
     }
@@ -2500,7 +2508,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "186-10-16"
     }
@@ -3223,6 +3231,7 @@
    "in_reference": false,
    "matches": [
     {
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "224-18-15"
     }
@@ -5456,7 +5465,7 @@
    "in_reference": false,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "330-8-24"
     }
@@ -7503,7 +7512,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "472-122-16"
     }
@@ -7514,7 +7523,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "472-122-14"
     }
@@ -7696,6 +7705,11 @@
    "matches": [],
    "verdict": "distinct"
   },
+  "48-8-6-b": {
+   "in_reference": false,
+   "matches": [],
+   "verdict": "distinct"
+  },
   "48-8-7": {
    "in_reference": true,
    "matches": [],
@@ -7785,7 +7799,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "488-126-16"
     }
@@ -7796,7 +7810,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "488-126-14"
     }
@@ -8782,7 +8796,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "56-2-8"
     }
@@ -8798,7 +8812,7 @@
    "in_reference": true,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "56-2-10"
     }
@@ -11004,7 +11018,7 @@
    "in_reference": false,
    "matches": [
     {
-     "audit": "undecided",
+     "audit": "inequivalent",
      "by": "wl",
      "slug": "72-10-9"
     }
@@ -12898,13 +12912,18 @@
    "matches": [],
    "verdict": "distinct"
   },
+  "996-166-32": {
+   "in_reference": false,
+   "matches": [],
+   "verdict": "distinct"
+  },
   "998-54-5": {
    "in_reference": false,
    "matches": [],
    "verdict": "distinct"
   }
  },
- "head": "d5a2a7406f92841ae1129c7db228c4d6eac35892",
+ "head": "80b42665b99f81c5f5b4e4eebfee0b54c41cde41",
  "issue": 4024,
  "method": "each CSS entry against the reference set by exact fingerprint (verify/qldpc_verify.py css_fingerprint: rref of H_X and H_Z) and Weisfeiler-Leman signature of the typed Tanner graph (signature); WL pairs the permutation audit decided carry its verdict",
  "not_screened": {

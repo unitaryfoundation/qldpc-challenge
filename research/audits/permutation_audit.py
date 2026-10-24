@@ -10,22 +10,27 @@ different fingerprints, and over the literature matches recorded in
 * `equivalent`: a qubit permutation carries the first entry's X and Z row
   spaces onto the second's (optionally after an X/Z swap). The permutation is
   the evidence, found by nauty's canonical form of the typed Tanner graph
-  (`research/provenance/iso_common.py`) or, for small codes, of the
-  basis-independent hypergraph of all low-weight row-space vectors, and
+  (`research/provenance/iso_common.py`) or of the basis-independent
+  hypergraph of all row-space vectors up to the check weight, and
   re-verified here by row-space mapping (`permutation_equivalence.check_pair`)
   with the ledger's negative control (one extra transposition must fail).
-* `inequivalent`: a basis-independent invariant differs in both orientations:
-  the ranks, the dimension of the intersection of the X and Z row spaces, or
-  the exact count of row-space vectors of weight at most the check weight,
-  which is enumerable when the rank is small. Sound; no permutation exists.
+* `inequivalent`: a basis-independent invariant differs in both orientations
+  (the ranks, the dimension and weight enumerator of the intersection of the X
+  and Z row spaces, the dimensions and weight enumerators of the two hulls, or
+  the per-weight counts of row-space vectors up to the check weight), or the
+  hypergraphs of all row-space vectors up to the check weight are not
+  isomorphic. The light vectors come from a Brouwer-Zimmermann enumeration
+  over disjoint information sets, complete to that weight at any rank (issue
+  #4057, after Leon's method); when they are exactly the check rows, this is
+  the Tanner comparison made decisive. Sound; no permutation exists.
 * `gb_family_no`: both entries are genuine cyclic two-block (generalized
   bicycle) codes and `verify/two_block_equivalence.py` finds no unit map,
   shift, or block swap carrying one onto the other. This is the family
   decider's verdict, the one the board already acts on; it is not a proof
   against permutations outside that group of maps.
 * `undecided`: the invariants agree, the Tanner graphs are not isomorphic, and
-  the row space is too large to enumerate. Nothing here says the pair is one
-  code or two.
+  the light-vector enumeration is over its budget (`run --enum-budget`).
+  Nothing here says the pair is one code or two.
 
 Equivalent pairs with different claimed distances are flagged under
 `distance_conflict`: the lighter entry's witness transports onto the heavier
@@ -64,14 +69,13 @@ for rel in ("verify", os.path.join("research", "provenance"), os.path.join("rese
     if p not in sys.path:
         sys.path.insert(0, p)
 
-import gf2  # noqa: E402
 import iso_common as I  # noqa: E402
 import numpy as np  # noqa: E402
 import permutation_equivalence as PE  # noqa: E402
 import qldpc_verify as V  # noqa: E402
 import two_block_equivalence as TB  # noqa: E402
 
-AUDIT_VERSION = 1
+AUDIT_VERSION = 2
 # The 41 submissions issue #1204 found isomorphic to a published code, the
 # literature half of #3427's audit. `run --all-literature` widens this to every
 # `literature` row of derived.json.
@@ -83,6 +87,15 @@ ISSUE_1204_MATCHES = (
 # 2**rank row-space vectors are enumerated exactly below this; above it the
 # low-weight enumerator and the hypergraph encoding are skipped.
 ENUM_LIMIT = 2 ** 20
+# A partial information set is used when its kernel has at most this many rows
+# (every kernel combination is enumerated with it).
+KERNEL_BITS = 8
+# Row sums the light-vector enumeration may plan per row space before the pair
+# is left undecided (`run --enum-budget`); 10**9 is about a minute of numpy.
+DEFAULT_BUDGET = 10 ** 9
+# Column orders tried for the information sets (the natural order and seeded
+# shuffles); the cheapest complete plan is enumerated.
+ORDER_TRIES = 6
 QECDB_API = "https://qecdb.org/api/codes/{}"
 
 
@@ -106,29 +119,105 @@ def blob_sha(path):
     return subprocess.check_output(["git", "hash-object", path], cwd=ROOT, text=True).strip()
 
 
+# -- GF(2) on bit-packed ints -----------------------------------------------------
+
+def echelon_basis(vecs):
+    """Return an independent spanning set of ``vecs`` (one vector per pivot bit)."""
+    piv = {}
+    for v0 in vecs:
+        v = v0
+        while v:
+            h = v.bit_length() - 1
+            if h in piv:
+                v ^= piv[h]
+            else:
+                piv[h] = v
+                break
+    return [piv[h] for h in sorted(piv, reverse=True)]
+
+
+def dependencies(vecs):
+    """Return a basis of the masks m over ``vecs`` whose XOR is zero (the left kernel)."""
+    piv, out = {}, []
+    for i, v0 in enumerate(vecs):
+        v, tag = v0, 1 << i
+        while v:
+            h = v.bit_length() - 1
+            if h in piv:
+                pv, pt = piv[h]
+                v ^= pv
+                tag ^= pt
+            else:
+                piv[h] = (v, tag)
+                break
+        if not v:
+            out.append(tag)
+    return out
+
+
+def combine(vecs, mask):
+    out, i = 0, 0
+    while mask:
+        if mask & 1:
+            out ^= vecs[i]
+        mask >>= 1
+        i += 1
+    return out
+
+
+def hull_basis(basis):
+    """Basis of C ∩ C^⊥ for the code C with the independent rows ``basis``."""
+    gram = [sum(((b & c).bit_count() & 1) << j for j, c in enumerate(basis)) for b in basis]
+    return [combine(basis, m) for m in dependencies(gram)]
+
+
+def intersection_basis(bx, bz):
+    """Basis of span(bx) ∩ span(bz) for independent ``bx`` and ``bz``."""
+    low = (1 << len(bx)) - 1
+    return [combine(bx, m & low) for m in dependencies(list(bx) + list(bz))]
+
+
+def weight_enumerator(basis, limit=ENUM_LIMIT):
+    """[[weight, count], ...] over the nonzero vectors of the span, or None past ``limit``."""
+    if 2 ** len(basis) > limit:
+        return None
+    counts, cur = {}, 0
+    for g in range(1, 2 ** len(basis)):
+        cur ^= basis[(g & -g).bit_length() - 1]
+        c = cur.bit_count()
+        counts[c] = counts.get(c, 0) + 1
+    return [[w, counts[w]] for w in sorted(counts)]
+
+
 # -- invariants ----------------------------------------------------------------
 
 def invariants(code):
     """Return the basis-independent invariants of ``code``, oriented (X, Z).
 
-    The ranks, the dimension of the intersection of the row spaces, and the
-    exact low-weight enumerators when the rank allows.
+    The ranks, the dimension of the intersection of the X and Z row spaces,
+    the dimensions of the two hulls (each row space meeting its own dual), the
+    weight enumerators of those three subspaces when they have at most 2**20
+    vectors, and the exact low-weight enumerators when the rank allows.
     """
-    HX, HZ = dense(code)
-    rx, rz = gf2.rank(HX), gf2.rank(HZ)
-    inter = V.css_row_space_intersection_dimension(HX, HZ, rx, rz)
     X, Z = code.normalized()
+    bx, bz = echelon_basis(X), echelon_basis(Z)
+    rx, rz = len(bx), len(bz)
+    inter = intersection_basis(bx, bz)
+    hx, hz = hull_basis(bx), hull_basis(bz)
     wmax = code.max_weight()
     lowx = I.low_weight_enumerator(X, wmax, limit=ENUM_LIMIT)
     lowz = I.low_weight_enumerator(Z, wmax, limit=ENUM_LIMIT)
-    return {"n": code.n, "rank_X": rx, "rank_Z": rz, "intersection": inter,
+    return {"n": code.n, "rank_X": rx, "rank_Z": rz, "intersection": len(inter),
+            "hull_X": len(hx), "hull_Z": len(hz),
+            "intersection_weights": weight_enumerator(inter),
+            "hull_X_weights": weight_enumerator(hx), "hull_Z_weights": weight_enumerator(hz),
             "wmax": wmax, "low_X": lowx, "low_Z": lowz}
 
 
 def _oriented(inv, swap):
-    if not swap:
-        return (inv["rank_X"], inv["rank_Z"], inv["low_X"], inv["low_Z"])
-    return (inv["rank_Z"], inv["rank_X"], inv["low_Z"], inv["low_X"])
+    a, b = ("Z", "X") if swap else ("X", "Z")
+    return (inv["rank_" + a], inv["rank_" + b], inv["low_" + a], inv["low_" + b],
+            inv["hull_" + a], inv["hull_" + b], inv["hull_" + a + "_weights"], inv["hull_" + b + "_weights"])
 
 
 def invariants_separate(ia, ib):
@@ -137,11 +226,18 @@ def invariants_separate(ia, ib):
         return "n"
     if ia["intersection"] != ib["intersection"]:
         return "intersection dimension"
+    wa, wb = ia.get("intersection_weights"), ib.get("intersection_weights")
+    if wa is not None and wb is not None and wa != wb:
+        return "weight enumerator of the intersection of the X and Z row spaces"
     reasons = []
+    a = _oriented(ia, False)
     for swap in (False, True):
-        a, b = _oriented(ia, swap), _oriented(ib, swap)
+        b = _oriented(ib, swap)
         if (a[0], a[1]) != (b[0], b[1]):
             reasons.append("ranks")
+            continue
+        if (a[4], a[5]) != (b[4], b[5]):
+            reasons.append("hull dimensions")
             continue
         wmax = min(ia["wmax"], ib["wmax"])
         la, lb = a[2], b[2]
@@ -152,68 +248,287 @@ def invariants_separate(ia, ib):
         if lza is not None and lzb is not None and lza[:wmax + 1] != lzb[:wmax + 1]:
             reasons.append("low-weight enumerator of the Z row space")
             continue
+        if a[6] is not None and b[6] is not None and a[6] != b[6]:
+            reasons.append("weight enumerator of the hull of the X row space")
+            continue
+        if a[7] is not None and b[7] is not None and a[7] != b[7]:
+            reasons.append("weight enumerator of the hull of the Z row space")
+            continue
         return None                                   # this orientation is not refuted
-    return " / ".join(reasons)
+    return reasons[0] if reasons[0] == reasons[1] else " / ".join(reasons)
+
+
+# -- the light vectors of a row space (Brouwer-Zimmermann) ---------------------
+
+def _permute_bits(v, perm):
+    out, i = 0, 0
+    while v:
+        if v & 1:
+            out |= 1 << perm[i]
+        v >>= 1
+        i += 1
+    return out
+
+
+def information_sets(basis, n, kernel_bits=KERNEL_BITS, order=None):
+    """Disjoint information sets of span(basis), greedily, as (systematic rows, kernel rows).
+
+    Gauss-Jordan elimination restricted to the columns no earlier set used
+    picks pivot columns, the first available column in ``order`` (a column
+    permutation; None is the natural order); the systematic rows carry an
+    identity block on them and the kernel rows vanish on them. A set whose
+    columns do not carry the full rank is kept only when its kernel has at
+    most ``kernel_bits`` rows, since every kernel combination is enumerated
+    with it; it is the last set.
+    """
+    if order is not None:
+        inverse = [0] * n
+        for i, p in enumerate(order):
+            inverse[p] = i
+        sets = information_sets([_permute_bits(v, order) for v in basis], n, kernel_bits)
+        return [([_permute_bits(v, inverse) for v in s], [_permute_bits(v, inverse) for v in kk]) for s, kk in sets]
+    k = len(basis)
+    used, sets = 0, []
+    while True:
+        avail = ((1 << n) - 1) & ~used
+        rows = list(basis)
+        pivots = {}                                   # pivot column -> row index
+        taken = 0
+        while True:
+            cand = None
+            for i, r in enumerate(rows):
+                if i in pivots.values():
+                    continue
+                c = r & avail & ~taken
+                if c:
+                    cand = (i, (c & -c).bit_length() - 1)
+                    break
+            if cand is None:
+                break
+            i, p = cand
+            pivots[p] = i
+            taken |= 1 << p
+            pr = rows[i]
+            for j in range(k):
+                if j != i and (rows[j] >> p) & 1:
+                    rows[j] ^= pr
+        r = len(pivots)
+        if r == 0:
+            break
+        sys_idx = set(pivots.values())
+        systematic = [rows[i] for i in sorted(sys_idx)]
+        kernel = [rows[i] for i in range(k) if i not in sys_idx]
+        if kernel and len(kernel) > kernel_bits:
+            break
+        sets.append((systematic, kernel))
+        used |= taken
+        if kernel:
+            break
+    return sets
+
+
+def _thresholds(sets, wmax):
+    """Per-set subset sizes t_i with sum(t_i + 1) > wmax, chosen cheapest first; and the cost in row sums."""
+    from math import comb
+
+    def marginal(i, t):
+        r, kap = len(sets[i][0]), len(sets[i][1])
+        return comb(r, t) << kap
+    ts = [0] * len(sets)
+    cost = sum(marginal(i, 0) for i in range(len(sets)))
+    while sum(t + 1 for t in ts) <= wmax:
+        open_sets = [i for i in range(len(sets)) if ts[i] < len(sets[i][0])]
+        if not open_sets:
+            break                                     # every set enumerates its whole row space
+        i = min(open_sets, key=lambda i: marginal(i, ts[i] + 1))
+        ts[i] += 1
+        cost += marginal(i, ts[i])
+    return ts, cost
+
+
+def _pack(vecs, n):
+    W = (n + 63) // 64
+    arr = np.zeros((len(vecs), W), dtype=np.uint64)
+    mask = (1 << 64) - 1
+    for i, v in enumerate(vecs):
+        for w in range(W):
+            arr[i, w] = (v >> (64 * w)) & mask
+    return arr
+
+
+def _unpack(rows):
+    return [int.from_bytes(r.astype("<u8").tobytes(), "little") for r in rows]
+
+
+def _enumerate_set(systematic, kernel, t, n, wmax, found):
+    """Add to ``found`` every sum of at most ``t`` systematic rows and a kernel combination with weight <= wmax."""
+    from itertools import combinations
+    R = _pack(systematic, n)
+    span = [0]
+    for v in kernel:
+        span += [s ^ v for s in span]
+    K = _pack(span, n)
+    r = R.shape[0]
+
+    def keep(cand):
+        for e in K:
+            block = cand ^ e
+            wt = np.bitwise_count(block).sum(axis=1, dtype=np.int64)
+            hit = np.flatnonzero(wt <= wmax)
+            if hit.size:
+                found.update(v for v in _unpack(block[hit]) if v)
+    keep(np.zeros((1, R.shape[1]), dtype=np.uint64))            # s = 0
+    if t >= 1 and r:
+        keep(R)                                                    # s = 1
+    if t >= 2 and r >= 2:
+        pairs = [(i, j) for i in range(r) for j in range(i + 1, r)]
+        P = np.array([R[i] ^ R[j] for i, j in pairs], dtype=np.uint64)
+        start = [0] * (r + 1)                                      # first pair with i >= q
+        pos = 0
+        for q in range(r + 1):
+            while pos < len(pairs) and pairs[pos][0] < q:
+                pos += 1
+            start[q] = pos
+        for s in range(2, t + 1):
+            for prefix in combinations(range(r), s - 2):
+                last = prefix[-1] if prefix else -1
+                lo = start[last + 1]
+                if lo >= len(pairs):
+                    continue
+                if prefix:
+                    base = np.bitwise_xor.reduce(R[list(prefix)], axis=0)
+                else:
+                    base = np.zeros(R.shape[1], dtype=np.uint64)
+                keep(base[None, :] ^ P[lo:])
+
+
+def light_vectors(vecs, n, wmax, budget=DEFAULT_BUDGET, tries=ORDER_TRIES):
+    """Every row-space vector of weight <= wmax, complete, or None when the plan exceeds ``budget``.
+
+    Brouwer-Zimmermann: with disjoint information sets I_1..I_m and subset
+    sizes t_i, enumerating every sum of at most t_i systematic rows of set i
+    (times every kernel combination, for a partial last set) finds each
+    vector whose restriction to some I_i has at most t_i ones; a vector missed
+    by all sets has weight at least sum(t_i + 1), so the list is complete up
+    to wmax once that sum exceeds wmax. The sets depend on the column order,
+    so ``tries`` orders are planned and the cheapest is enumerated. Returns
+    (vectors, plan) where the plan records the sets, the subset sizes, the
+    number of row sums, and the order's seed.
+    """
+    import random
+    basis = echelon_basis(vecs)
+    if not basis:
+        return [], {"sets": [], "row_sums": 0}
+    best = None
+    for seed in range(tries):                          # the natural column order, then seeded shuffles
+        order = None
+        if seed:
+            order = list(range(n))
+            random.Random(seed).shuffle(order)
+        sets = information_sets(basis, n, order=order)
+        ts, cost = _thresholds(sets, wmax)
+        if best is None or cost < best[2]:
+            best = (sets, ts, cost, seed)
+    sets, ts, cost, seed = best
+    plan = {"sets": [{"rank": len(s), "kernel": len(kk), "t": t} for (s, kk), t in zip(sets, ts)],
+            "row_sums": cost, "column_order_seed": seed}
+    if cost > budget:
+        return None, plan
+    found = set()
+    for (systematic, kernel), t in zip(sets, ts):
+        _enumerate_set(systematic, kernel, t, n, wmax, found)
+    return sorted(found), plan
+
+
+def weight_counts(vecs, wmax):
+    counts = [0] * (wmax + 1)
+    for v in vecs:
+        counts[v.bit_count()] += 1
+    return counts
+
+
+def light_vector_stage(a, b, budget=DEFAULT_BUDGET):
+    """Decide the pair on the complete lists of light row-space vectors, or report why not.
+
+    Both codes' X and Z row spaces are enumerated up to the larger of the two
+    check weights. The per-weight counts are basis-independent invariants; when
+    they agree in some orientation, nauty compares the hypergraphs whose
+    hyperedges are those vectors, which decides equivalence in both directions
+    because the lists are complete and contain every check row, so they span.
+    """
+    t0 = time.monotonic()
+    wmax = max(a.max_weight(), b.max_weight())
+    out = {"wmax": wmax, "method": "Brouwer-Zimmermann enumeration, complete to weight wmax"}
+    lists = {}
+    for code, key in ((a, "first"), (b, "second")):
+        X, Z = code.normalized()
+        lx, px = light_vectors(X, code.n, wmax, budget)
+        lz, pz = light_vectors(Z, code.n, wmax, budget)
+        out[key] = {"plan": {"X": px, "Z": pz}}
+        if lx is None or lz is None:
+            out["outcome"] = f"over budget: {key} needs {max(px['row_sums'] or 0, pz['row_sums'] or 0):,} row sums"
+            out["seconds"] = round(time.monotonic() - t0, 2)
+            return None, out
+        assert I.rank_ints(lx) == len(echelon_basis(X)) and I.rank_ints(lz) == len(echelon_basis(Z))
+        out[key]["counts"] = {"X": weight_counts(lx, wmax), "Z": weight_counts(lz, wmax)}
+        out[key]["checks_only"] = {"X": lx == X, "Z": lz == Z}
+        lists[key] = (lx, lz)
+    ca, cb = out["first"]["counts"], out["second"]["counts"]
+    agree = [swap for swap in (False, True)
+             if (ca["X"], ca["Z"]) == ((cb["Z"], cb["X"]) if swap else (cb["X"], cb["Z"]))]
+    if not agree:
+        w = next(w for w in range(wmax + 1)
+                 if ca["X"][w] != cb["X"][w] or ca["Z"][w] != cb["Z"][w])
+        out["outcome"] = "counts differ"
+        out["seconds"] = round(time.monotonic() - t0, 2)
+        return ("inequivalent", f"count of row-space vectors of weight {w} differs in both orientations "
+                                f"(enumeration complete to weight {wmax})"), out
+    ha = I.Code(a.id + "@light", a.n, I.ints_to_rows(lists["first"][0]), I.ints_to_rows(lists["first"][1]))
+    hb = I.Code(b.id + "@light", b.n, I.ints_to_rows(lists["second"][0]), I.ints_to_rows(lists["second"][1]))
+    for swap in agree:
+        perm = I.nauty_permutation(ha, hb, swap=swap)
+        if perm is not None:
+            out["outcome"] = "hypergraphs isomorphic"
+            out["seconds"] = round(time.monotonic() - t0, 2)
+            return ("equivalent", [perm[i] for i in range(a.n)], swap), out
+    tanner = all(out[k]["checks_only"][s] for k in ("first", "second") for s in ("X", "Z"))
+    out["outcome"] = "hypergraphs not isomorphic"
+    out["seconds"] = round(time.monotonic() - t0, 2)
+    tail = "; they are exactly the check rows, so this is the Tanner comparison made decisive)" if tanner else ")"
+    return ("inequivalent",
+            f"the hypergraphs of all row-space vectors of weight at most {wmax} are not isomorphic in any "
+            "orientation (the lists are complete and span the row spaces, so no permutation exists" + tail), out
 
 
 # -- the decision --------------------------------------------------------------
 
-def rowspace_vectors(vecs, wmax):
-    """Every row-space vector of weight <= wmax, or None past ENUM_LIMIT."""
-    basis, piv = [], {}
-    for v in vecs:
-        w = v
-        while w:
-            h = w.bit_length() - 1
-            if h in piv:
-                w ^= piv[h]
-            else:
-                piv[h] = w
-                basis.append(w)
-                break
-    if 2 ** len(basis) > ENUM_LIMIT:
-        return None
-    out, cur = [], 0
-    for g in range(1, 2 ** len(basis)):
-        cur ^= basis[(g & -g).bit_length() - 1]
-        if cur.bit_count() <= wmax:
-            out.append(cur)
-    return out
-
-
-def hypergraph_code(code, wmax):
-    """Return the basis-independent encoding of ``code``, or None.
-
-    All row-space vectors of weight <= wmax as the generating set, when they
-    are enumerable and span the row space.
-    """
-    X, Z = code.normalized()
-    lx, lz = rowspace_vectors(X, wmax), rowspace_vectors(Z, wmax)
-    if lx is None or lz is None:
-        return None
-    if I.rank_ints(lx) != I.rank_ints(X) or I.rank_ints(lz) != I.rank_ints(Z):
-        return None
-    return I.Code(code.id + "@hyper", code.n, I.ints_to_rows(lx), I.ints_to_rows(lz))
-
-
 def find_permutation(a, b):
-    """(perm, swap, how) from the Tanner graph, else from the hypergraph, else None."""
+    """(perm, swap) from nauty on the typed Tanner graphs, else (None, None)."""
     for swap in (False, True):
         perm = I.nauty_permutation(a, b, swap=swap)
         if perm is not None:
-            return [perm[i] for i in range(a.n)], swap, "tanner"
-    wmax = max(a.max_weight(), b.max_weight())
-    ha, hb = hypergraph_code(a, wmax), hypergraph_code(b, wmax)
-    if ha is not None and hb is not None:
-        for swap in (False, True):
-            perm = I.nauty_permutation(ha, hb, swap=swap)
-            if perm is not None:
-                return [perm[i] for i in range(a.n)], swap, "hypergraph"
-        return None, None, "hypergraph-no"
-    return None, None, None
+            return [perm[i] for i in range(a.n)], swap
+    return None, None
 
 
-def decide(a, b, doc_a, doc_b):
+def _equivalent(out, a, b, doc_a, doc_b, perm, swap, how):
+    ok, detail = PE.check_pair(doc_a, doc_b, perm, swap=swap)
+    if not ok:
+        out.update(verdict="undecided", reason=f"{how} isomorphism did not verify on the row spaces", detail=detail)
+        return
+    ctrl = PE.negative_control(doc_a, doc_b, perm) if not swap else None
+    out.update(verdict="equivalent", permutation=perm, swap=swap, found_by=how, row_spaces=detail,
+               negative_control={True: "a perturbed permutation fails",
+                                 False: "skipped: the perturbation is an automorphism",
+                                 None: "not run for a swapped pair"}[ctrl])
+    da, db = a.meta.get("d"), b.meta.get("d")
+    if da is not None and db is not None and da != db:
+        out["distance_conflict"] = {"first_d": da, "second_d": db,
+                                    "note": f"one code under two claims; the weight-{min(da, db)} witness "
+                                            f"transports, so the claim of {max(da, db)} is over-stated"}
+
+
+def decide(a, b, doc_a, doc_b, budget=DEFAULT_BUDGET):
     """One pair's verdict with its evidence."""
     t0 = time.monotonic()
     out = {"first": a.id, "second": b.id, "n": a.n}
@@ -224,29 +539,18 @@ def decide(a, b, doc_a, doc_b):
         out.update(verdict="inequivalent", reason=f"{sep} differs in both orientations")
         out["seconds"] = round(time.monotonic() - t0, 2)
         return out
-    perm, swap, how = find_permutation(a, b)
+    perm, swap = find_permutation(a, b)
     if perm is not None:
-        ok, detail = PE.check_pair(doc_a, doc_b, perm, swap=swap)
-        if not ok:
-            out.update(verdict="undecided", reason=f"{how} isomorphism did not verify on the row spaces", detail=detail)
-        else:
-            ctrl = PE.negative_control(doc_a, doc_b, perm) if not swap else None
-            out.update(verdict="equivalent", permutation=perm, swap=swap, found_by=how,
-                       row_spaces=detail,
-                       negative_control={True: "a perturbed permutation fails",
-                                         False: "skipped: the perturbation is an automorphism",
-                                         None: "not run for a swapped pair"}[ctrl])
-            da, db = a.meta.get("d"), b.meta.get("d")
-            if da is not None and db is not None and da != db:
-                out["distance_conflict"] = {"first_d": da, "second_d": db,
-                                            "note": f"one code under two claims; the weight-{min(da, db)} witness "
-                                                    f"transports, so the claim of {max(da, db)} is over-stated"}
+        _equivalent(out, a, b, doc_a, doc_b, perm, swap, "tanner")
         out["seconds"] = round(time.monotonic() - t0, 2)
         return out
-    if how == "hypergraph-no":
-        out.update(verdict="inequivalent",
-                   reason="the hypergraphs of all low-weight row-space vectors are not isomorphic "
-                          "(basis-independent, so no permutation exists)")
+    verdict, light = light_vector_stage(a, b, budget)
+    out["light_vectors"] = light
+    if verdict is not None:
+        if verdict[0] == "equivalent":
+            _equivalent(out, a, b, doc_a, doc_b, verdict[1], verdict[2], "hypergraph")
+        else:
+            out.update(verdict="inequivalent", reason=verdict[1])
         out["seconds"] = round(time.monotonic() - t0, 2)
         return out
     gb = None
@@ -263,7 +567,8 @@ def decide(a, b, doc_a, doc_b):
         out["seconds"] = round(time.monotonic() - t0, 2)
         return out
     out.update(verdict="undecided",
-               reason="invariants agree, Tanner graphs are not isomorphic, row space too large to enumerate")
+               reason=f"invariants agree, Tanner graphs are not isomorphic, and the light-vector enumeration is "
+                      f"{light['outcome']}")
     out["seconds"] = round(time.monotonic() - t0, 2)
     return out
 
@@ -286,14 +591,14 @@ def wl_clusters():
     return sorted(clusters, key=lambda c: (c[0][2]["n"], c[0][0]))
 
 
-def audit_board():
+def audit_board(budget=DEFAULT_BUDGET):
     pairs = []
     for members in wl_clusters():
         for i in range(len(members)):
             for j in range(i + 1, len(members)):
                 sa, _, da = members[i]
                 sb, _, db = members[j]
-                rec = decide(code_from_doc(sa, da), code_from_doc(sb, db), da, db)
+                rec = decide(code_from_doc(sa, da), code_from_doc(sb, db), da, db, budget=budget)
                 rec["first_blob"] = blob_sha(os.path.join(ROOT, "codes", sa + ".json"))
                 rec["second_blob"] = blob_sha(os.path.join(ROOT, "codes", sb + ".json"))
                 rec["k"] = da.get("k")
@@ -345,7 +650,7 @@ def qecdb_matrices(rows):
     return np.array(HX, dtype=np.int8).reshape(-1, n), np.array(HZ, dtype=np.int8).reshape(-1, n)
 
 
-def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES):
+def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES, budget=DEFAULT_BUDGET):
     """Re-derive the index's literature matches for ``slugs`` (None: every literature row)."""
     with open(os.path.join(ROOT, "research", "provenance", "derived.json"), encoding="utf-8") as f:
         entries = json.load(f)["entries"]
@@ -384,12 +689,23 @@ def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES):
                 print(f"{rec['verdict']:13s} {slug} <- {m['id']}  {rec['reason']}", flush=True)
                 continue
             lit_doc = {"n": lit.n, "checks": {"X": lit.X, "Z": lit.Z}}
-            perm, swap, how = find_permutation(lit, board)
+            perm, swap = find_permutation(lit, board)
+            how = "tanner"
             if perm is None:
                 sep = invariants_separate(invariants(lit), invariants(board))
-                rec.update(verdict="inequivalent" if sep else "undecided",
-                           reason=f"{sep} differs" if sep else "no Tanner isomorphism and the invariants agree")
-            else:
+                if sep:
+                    rec.update(verdict="inequivalent", reason=f"{sep} differs in both orientations")
+                else:
+                    verdict, light = light_vector_stage(lit, board, budget)
+                    rec["light_vectors"] = light
+                    if verdict is None:
+                        rec.update(verdict="undecided", reason="no Tanner isomorphism, the invariants agree, and "
+                                   f"the light-vector enumeration is {light['outcome']}")
+                    elif verdict[0] == "inequivalent":
+                        rec.update(verdict="inequivalent", reason=verdict[1])
+                    else:
+                        perm, swap, how = verdict[1], verdict[2], "hypergraph"
+            if perm is not None:
                 ok, detail = PE.check_pair(lit_doc, doc, perm, swap=swap)
                 rec.update(verdict="equivalent" if ok else "undecided", permutation=perm, swap=swap,
                            found_by=how, row_spaces=detail,
@@ -401,10 +717,10 @@ def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES):
 
 # -- the record and its re-check --------------------------------------------------
 
-def run(out_path, fetch=None, all_literature=False):
+def run(out_path, fetch=None, all_literature=False, budget=DEFAULT_BUDGET):
     t0 = time.monotonic()
-    board = audit_board()
-    lit = audit_literature(fetch, slugs=None if all_literature else ISSUE_1204_MATCHES)
+    board = audit_board(budget)
+    lit = audit_literature(fetch, slugs=None if all_literature else ISSUE_1204_MATCHES, budget=budget)
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     record = {
         "audit_version": AUDIT_VERSION,
@@ -416,6 +732,7 @@ def run(out_path, fetch=None, all_literature=False):
         "semantics": "permutation[i] = j means qubit i of the first code is qubit j of the second; equivalence "
                      "means the permuted X and Z row spaces of the first equal those of the second, after an "
                      "X/Z swap when swap is true",
+        "enum_budget": budget,
         "counts": {
             "board_pairs": len(board),
             "board": {v: sum(1 for p in board if p["verdict"] == v)
@@ -473,11 +790,13 @@ def main(argv=None):
     r.add_argument("--out", default=os.path.join(HERE, f"permutation_audit-{datetime.date.today().isoformat()}.json"))
     r.add_argument("--all-literature", action="store_true",
                    help="re-derive every literature row of derived.json, not only the 41 of issue #1204")
+    r.add_argument("--enum-budget", type=float, default=DEFAULT_BUDGET,
+                   help="row sums the light-vector enumeration may plan per row space (default %(default)s)")
     c = sub.add_parser("recheck", help="re-verify the permutations a record carries")
     c.add_argument("record")
     args = ap.parse_args(argv)
     if args.cmd == "run":
-        run(args.out, all_literature=args.all_literature)
+        run(args.out, all_literature=args.all_literature, budget=int(args.enum_budget))
         return 0
     return 1 if recheck(args.record) else 0
 
