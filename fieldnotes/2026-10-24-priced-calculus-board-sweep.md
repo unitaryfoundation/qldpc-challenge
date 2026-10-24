@@ -33,12 +33,11 @@ were validated with the unchanged challenge verifier (`passed: true`).
 
 ## d = 1 codes
 
-349 board-advancing candidates with d = 1 were found, spread over 44 distinct
-(n, k, cell) groups. They are dominated in distance but advance (n, k) or
-weight/locality axes. Whether they can be turned into d = 2 codes is open:
-single moves from d = 2/d = 3 parents mostly collapse to d = 1, and the
-27 d >= 2 candidates found in the same sweep were all dominated. Chained moves
-and patch growth (E-EXTEND with new qubits) are the next levers.
+349 board-advancing candidates with d = 1 were found, spread over 27 distinct
+(n, k) pairs, 44 distinct (n, k, cell) groups, and 41 distinct (n, k, w)
+triples. They advance (n, k) or weight/locality axes but not distance. A
+sampled C-ADD-CHECK morphing attempt did not turn any d = 1 code into d = 2;
+d = 2 codes came from d = 3/d = 4 parents via puncture/peel/deletion.
 
 ## Suggested next steps
 
