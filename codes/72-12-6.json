@@ -1,5 +1,5 @@
 {
- "schema_version": "0.5",
+ "schema_version": "0.2",
  "name": "[[72,12,6]] bivariate bicycle code",
  "code_type": "CSS",
  "n": 72,
@@ -955,36 +955,6 @@
   "rounds": 6,
   "stim_version": "1.16.0",
   "notes": "Interleaved two-block schedule on the depth-7 monomial shape of arXiv:2308.07915 Table 5 (A=x3,y1,y2, B=y3,x1,x2), CX-layer slots X [2, 4, 6, 1, 3, 5], Z [4, 2, 0, 5, 3, 1]",
-  "ler": {
-   "X": [
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 231,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.003926276,
-     "ci95": [
-      0.003447849,
-      0.004470848
-     ]
-    }
-   ],
-   "Z": [
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 222,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.003770368,
-     "ci95": [
-      0.003302474,
-      0.004304317
-     ]
-    }
-   ]
-  },
   "contributed_by": {
    "by": [
     "@haithamb"
