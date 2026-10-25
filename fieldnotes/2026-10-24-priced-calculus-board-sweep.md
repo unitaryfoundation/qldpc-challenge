@@ -1,3 +1,4 @@
+---
 title: Priced construction calculus: board sweep over deletion, peel, puncture, graft
 date: 2026-10-24
 author: "@MathysRennela"
