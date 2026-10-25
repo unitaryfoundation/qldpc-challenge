@@ -46,8 +46,7 @@ Campaign A:
 | --- | --- | --- | --- |
 | E-PUNCTURE | `codes/12-2-4-b.json` | `[[11,3,3]]` (x3) | #4059-#4061 |
 | E-PEEL | `codes/12-3-3.json` | `[[11,3,3]]` (x2) | #4062-#4063 |
-| C-DELETE-CHECK | `codes/12-4-2.json` | `[[12,5,2]]` (x6) | #4064-#4069 |
-
+| C-DELETE-CHECK | `codes/12-4-2.json` | `[[12,5,2]]` (x6 submitted, 2 distinct) | #4064-#4069 |
 Campaign B (best per distinct (n, k, d)):
 
 | (n,k,d) | cell | radius | PR |
@@ -101,6 +100,18 @@ were owed.
 
 Total code submissions: 87. Total PRs opened in this campaign (including
 fieldnote): 88.
+
+## Deduplication (post-submission)
+
+A later permutation audit (`research/audits/permutation_audit.py`) found that several of the submitted variants are the same code up to a qubit permutation and were removed as duplicates:
+
+- `[[12,5,2]]` C-DELETE-CHECK: the six variants collapse to two distinct codes (`b` and `c`); `d` and `e` are equivalent to `b`, `f` is equivalent to `c`, and `g` is identical to `b` (issue #4103). Removed: `d`, `e`, `f`, `g` (PRs #4106, #4143).
+- `[[11,3,3]]`: `d` and `f` are equivalent. Removed: `f` (PR #4143).
+- `[[8,4,1]]`: the `-b` variant is equivalent to the base entry. Removed: `8-4-1-b` (PR #4143).
+- `[[42,12,4]]`: the `-b` variant is equivalent. Removed: `42-12-4-b` (PR #4143).
+- `[[390,82,31]]`: the `-b` variant is equivalent. Removed: `390-82-31-b` (PR #4143).
+
+So Campaign A's 11 d >= 2 PRs represent 6 distinct (n, k, d) codes; the removed entries pass the gate but are not board-advancing on their own.
 
 ## Suggested next steps
 
