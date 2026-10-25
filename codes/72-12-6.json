@@ -628,7 +628,8 @@
   "references": [
    "arXiv:2308.07915"
   ],
-  "notes": "Distance d=6 established in arXiv:2308.07915 (Table 3); witness here is a decoder-found logical operator of that weight (upper bound). 2D-local layout added 2026-07-27: simulated annealing over qubit-to-site assignments on a unit-spaced triangular grid (2 layers, capacity 1 per site per layer); measured interaction radius 4.582576 (bilayer); same code, same check matrices."
+  "notes": "Distance d=6 established in arXiv:2308.07915 (Table 3); witness here is a decoder-found logical operator of that weight (upper bound). 2D-local layout added 2026-07-27: simulated annealing over qubit-to-site assignments on a unit-spaced triangular grid (2 layers, capacity 1 per site per layer); measured interaction radius 4.582576 (bilayer); same code, same check matrices.",
+  "model": "human"
  },
  "family": "bivariate-bicycle",
  "locality": {
