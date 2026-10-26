@@ -254,11 +254,18 @@ def test_the_residual_body_lists_every_unchecked_entry(tmp_path, capsys):
     body = out.read_text(encoding="utf-8")
     with open(dp.DERIVED, encoding="utf-8") as f:
         table = json.load(f)["entries"]
-    pending = {s for s, v in table.items() if v["bucket"] == "not_derived"}
+    stab = dp.stabilizer_slugs()
+    pending = {s for s, v in table.items() if v["bucket"] == "not_derived" and s not in stab}
+    outside = {s for s, v in table.items() if v["bucket"] == "not_derived" and s in stab}
     seen = {s for s, v in table.items() if v["bucket"] != "not_derived"}
-    listed = set(body.split("<details>", 1)[1].split("</details>", 1)[0].split())
-    assert pending <= listed and not (seen & listed)
+    blocks = body.split("<details>")[1:]
+    listed = set(blocks[0].split("</details>", 1)[0].split())
+    assert pending <= listed and not ((seen | outside) & listed)
+    if outside:
+        # the entries no index run can settle are listed apart and left out of the count
+        apart = set(blocks[1].split("</details>", 1)[0].split())
+        assert outside <= apart and not (pending & apart) and "does not wait on them" in body
     assert f"{len(pending):,} of the board's {len(table):,} entries" in body
     assert "https://example.invalid/runs/1" in body
     assert capsys.readouterr().out.strip() == \
-        f"not_derived={len(pending)} entries={len(table)}"
+        f"not_derived={len(pending)} stabilizer_outside_method={len(outside)} entries={len(table)}"

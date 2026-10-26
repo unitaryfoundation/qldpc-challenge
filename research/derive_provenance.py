@@ -87,6 +87,29 @@ def board_slugs():
                   if f.endswith(".json"))
 
 
+def stabilizer_slugs():
+    """Board entries the index checker has no method for: general stabilizer codes.
+
+    ``iso_check.py`` decides equivalence on the typed Tanner graph of a CSS pair
+    and skips every other entry, so no index run can move these out of
+    ``not_derived``. The residual list reports them apart and does not wait
+    on them.
+    """
+    d = os.path.join(ROOT, "codes")
+    out = set()
+    for f in os.listdir(d):
+        if not f.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(d, f), encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        if doc.get("code_type", "CSS") != "CSS":
+            out.add(f[:-5])
+    return out
+
+
 def derive(matches_csv, param_csv=None, covered=None):
     """Bucket every board slug from the isomorphism and parameter tables.
 
@@ -216,14 +239,18 @@ def residual(path, run_url=None):
     """Write the tracking-issue body listing the entries the index has not seen.
 
     The list is what a later index run must cover; the weekly top-up only keeps
-    it honest as the board changes. Prints ``not_derived=N entries=M`` for the
-    workflow that decides whether the issue stays open.
+    it honest as the board changes. General stabilizer entries, which the
+    checker cannot test, are listed apart and left out of the count. Prints
+    ``not_derived=N stabilizer_outside_method=S entries=M`` for the workflow
+    that decides whether the issue stays open.
     """
     with open(DERIVED, encoding="utf-8") as f:
         payload = json.load(f)
     table = payload["entries"]
     c = counts(table)
-    pending = sorted(s for s, v in table.items() if v["bucket"] == "not_derived")
+    stab = stabilizer_slugs()
+    pending = sorted(s for s, v in table.items() if v["bucket"] == "not_derived" and s not in stab)
+    outside = sorted(s for s, v in table.items() if v["bucket"] == "not_derived" and s in stab)
     today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     lines = [
         f"As of {today}, the literature index has not been run against "
@@ -251,6 +278,22 @@ def residual(path, run_url=None):
         "",
         "</details>",
         "",
+    ]
+    if outside:
+        lines += [
+            f"A further {len(outside):,} entries are general stabilizer codes, which the "
+            "checker's typed-Tanner-graph test does not cover (it decides CSS pairs only). "
+            "They stay not_derived until there is a method for them, and this issue does "
+            "not wait on them.",
+            "",
+            f"<details><summary>{len(outside):,} stabilizer entries outside the checker's method</summary>",
+            "",
+            " ".join(outside),
+            "",
+            "</details>",
+            "",
+        ]
+    lines += [
         "Kept current by the provenance-top-up workflow"
         + (f" ([this run]({run_url}))" if run_url else "")
         + ": opened when the list is non-empty, edited in place while it stays "
@@ -258,7 +301,7 @@ def residual(path, run_url=None):
     ]
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"not_derived={len(pending)} entries={len(table)}")
+    print(f"not_derived={len(pending)} stabilizer_outside_method={len(outside)} entries={len(table)}")
     return 0
 
 

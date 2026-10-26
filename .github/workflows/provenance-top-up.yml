@@ -87,7 +87,7 @@ jobs:
             fi
           elif [ -n "$number" ]; then
             gh issue close "$number" --repo "$REPO" \
-              --comment "The index has been run against every board entry as of $(date -u +%Y-%m-%d) (run ${{ github.run_id }}); closing until the top-up records an unchecked entry again."
+              --comment "The index has been run against every CSS board entry as of $(date -u +%Y-%m-%d) (run ${{ github.run_id }}); general stabilizer entries are outside its method. Closing until the top-up records an unchecked entry again."
             echo "closed #$number"
           else
             echo "no unchecked entries and no open tracking issue"

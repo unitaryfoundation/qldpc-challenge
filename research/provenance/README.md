@@ -19,7 +19,7 @@ qubit permutation. `derived.json` is that output, bucketed:
 | `literature` | isomorphic to a published code, with source, reference, and the matched id |
 | `parameters_only` | a published code shares its parameters but ships no matrices, so equivalence is undecided |
 | `no_match` | nothing in the index matches |
-| `not_derived` | the index has not been run against this entry at all |
+| `not_derived` | the index has not been run against this entry at all; general stabilizer entries stay here, since the checker decides CSS pairs only, and the tracking issue lists them apart |
 
 ## Coverage is a state, not an error
 
