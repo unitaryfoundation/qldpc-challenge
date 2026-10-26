@@ -68,7 +68,10 @@ first, and tries the tools above cheapest first: the torus-grid screen, then
 `fold_layout.anneal` (one layer against the 4.0 cap, two against 7.0),
 `hinge_anneal.run_job` from the fold embedding, and `tri_hinge_anneal`'s long
 chain, inside `--entry-seconds` of wall clock per entry and `--job-seconds`
-per run. A layout is accepted only when `verify/qldpc_verify.py`, run on the
+per run, stopping early once `--max-layouts` of them are accepted. The cap
+is what keeps one PR inside the verify job's 130-minute window: a first
+layout makes the entry a locality record, so `verify/gate_changed.py` runs
+its deep battery on every entry in the PR. A layout is accepted only when `verify/qldpc_verify.py`, run on the
 entry with it attached, returns ok with a 2D-local class. The accepted layout
 is attached as exactly the change `verify/check_authorship.py`'s layout
 binding admits (a first `locality` block credited in `contributed_by`, an
@@ -84,7 +87,7 @@ layers, the class, and the seconds, so a miss at a per-entry budget is not
 retried at that budget or a shorter one (`--retry` or `--slugs` reopens it).
 
 ```
-uv run python research/local2d/layout_sweep.py run --credit @vprusso --job-seconds 14400 --entry-seconds 600
+uv run python research/local2d/layout_sweep.py run --credit @vprusso --job-seconds 14400 --entry-seconds 600 --max-layouts 40
 uv run python research/local2d/layout_sweep.py stage --out-dir research/out/layout_sweep    # attach to codes/
 uv run python research/local2d/layout_sweep.py pr-body --out-dir research/out/layout_sweep --out body.md
 ```

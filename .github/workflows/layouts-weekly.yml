@@ -43,6 +43,10 @@ on:
         description: "wall clock per entry across the search stages"
         required: false
         default: "600"
+      max_layouts:
+        description: "stop once this many layouts are accepted, so one PR fits the verify job"
+        required: false
+        default: "40"
       credit:
         description: "@handle credited in locality.contributed_by (default: the SWEEP_CREDIT variable, else @vprusso)"
         required: false
@@ -80,6 +84,7 @@ jobs:
         env:
           JOB_MINUTES: ${{ github.event.inputs.job_minutes || '240' }}
           ENTRY_SECONDS: ${{ github.event.inputs.entry_seconds || '600' }}
+          MAX_LAYOUTS: ${{ github.event.inputs.max_layouts || '40' }}
           SLUGS: ${{ github.event.inputs.slugs }}
           STAGES: ${{ github.event.inputs.stages || 'all' }}
         run: |
@@ -88,7 +93,7 @@ jobs:
           [ "$STAGES" = "screen" ] && stages="--stages screen"
           uv run --frozen python research/local2d/layout_sweep.py run \
             --out-dir "$OUT_DIR" --credit "$CREDIT" --job-seconds $(( JOB_MINUTES * 60 )) \
-            --entry-seconds "$ENTRY_SECONDS" $stages ${SLUGS:+--slugs $SLUGS}
+            --entry-seconds "$ENTRY_SECONDS" --max-layouts "$MAX_LAYOUTS" $stages ${SLUGS:+--slugs $SLUGS}
           cat "$OUT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"
           staged=$(ls "$OUT_DIR"/layouts/*.json 2>/dev/null | grep -c . || true)
           echo "staged=$staged" >> "$GITHUB_OUTPUT"

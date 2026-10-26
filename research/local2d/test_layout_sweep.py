@@ -125,6 +125,22 @@ def test_a_run_stages_the_screen_hit_logs_the_attempt_and_stage_attaches_it(bare
     assert "| 72-6-6 |" in LS.summary_markdown(m)
 
 
+def test_the_layout_cap_stops_a_run_and_the_next_run_continues(bare, tmp_path):
+    codes, attempts = tmp_path / "codes", tmp_path / "attempts.jsonl"
+    codes.mkdir()
+    for name in ("72-6-6", "72-6-6-b"):
+        with open(codes / f"{name}.json", "w", encoding="utf-8", newline="\n") as f:
+            f.write(LS.canonical(bare))
+    m = LS.run_sweep(out_dir=str(tmp_path / "out"), attempts_path=str(attempts), credit="@vprusso",
+                     job_seconds=600, entry_seconds=60, stages=("screen",), codes_dir=str(codes), max_layouts=1)
+    assert m["staged"] == ["72-6-6"] and m["opened"] == 1
+    assert m["stopped_by_cap"] and not m["stopped_by_budget"] and m["left"] == 1
+    assert "stopped at the layout cap with 1 left" in LS.summary_markdown(m)
+    m2 = LS.run_sweep(out_dir=str(tmp_path / "out2"), attempts_path=str(attempts), credit="@vprusso",
+                      job_seconds=600, entry_seconds=60, stages=("screen",), codes_dir=str(codes), max_layouts=1)
+    assert m2["staged"] == ["72-6-6-b"] and m2["skipped"] == {"awaiting_pr": 1} and not m2["stopped_by_cap"]
+
+
 def test_the_annealers_run_inside_the_budget_on_a_small_code(bare, tmp_path):
     """The search stages at tiny iteration counts: a miss or a hit, within the deadline, never a crash."""
     codes = tmp_path / "codes"

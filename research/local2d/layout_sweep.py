@@ -17,8 +17,9 @@ through the layout tools in this directory in order of cost:
    that produced the layout of codes/510-16-26.json.
 
 Each entry gets --entry-seconds of wall clock, checked between stages and
-jobs, and the run stops opening entries at --job-seconds. A layout is
-accepted only when verify/qldpc_verify.py, run on the entry with the layout
+jobs, and the run stops opening entries at --job-seconds, or once
+--max-layouts of them are accepted (the workflow sets it so one PR fits the
+verify job). A layout is accepted only when verify/qldpc_verify.py, run on the entry with the layout
 attached, returns ok with a 2D-local class: the verifier, not the search, is
 the authority on occupancy, spacing, and radius. The accepted layout is kept
 under <out-dir>/layouts/<slug>.json, and the entry with it attached under
@@ -315,9 +316,14 @@ def attempt(slug, doc, path, *, stages, entry_seconds, fold_iters, hinge_iters, 
 
 
 def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, stages=STAGES, codes_dir=CODES,
-              slugs=None, retry=False, max_entries=0, fold_iters=100_000, hinge_iters=150_000, hinge_seeds=4,
-              tri_iters=2_000_000):
-    """Open layoutless entries smallest first until the budget is spent; keep what the verifier accepts."""
+              slugs=None, retry=False, max_entries=0, max_layouts=0, fold_iters=100_000, hinge_iters=150_000,
+              hinge_seeds=4, tri_iters=2_000_000):
+    """Open layoutless entries smallest first until the budget is spent; keep what the verifier accepts.
+
+    ``max_layouts`` stops the run once that many layouts are accepted, so the PR
+    the workflow opens stays inside the verify job's window: the gate runs its
+    deep battery on every entry whose first layout makes it a locality record.
+    """
     date, head, url = utc_today(), git_head(), run_url()
     last = {r["slug"]: r for r in load_jsonl(attempts_path)}
     chosen, skipped = select(layoutless(codes_dir), last=last, entry_seconds=entry_seconds, slugs=slugs,
@@ -326,13 +332,17 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
         chosen = chosen[:max_entries]
     manifest = {"date": date, "head": head, "run": url, "credit": credit, "job_seconds": job_seconds,
                 "entry_seconds": entry_seconds, "stages": list(stages), "selected": len(chosen),
-                "skipped": dict(skipped), "results": [], "staged": [], "stopped_by_budget": False, "left": 0}
+                "skipped": dict(skipped), "results": [], "staged": [], "stopped_by_budget": False,
+                "stopped_by_cap": False, "left": 0}
     os.makedirs(os.path.join(out_dir, "layouts"), exist_ok=True)
     os.makedirs(os.path.join(out_dir, "codes"), exist_ok=True)
     t_start = time.time()
     for i, (slug, doc) in enumerate(chosen):
         if time.time() - t_start > job_seconds:
             manifest["stopped_by_budget"], manifest["left"] = True, len(chosen) - i
+            break
+        if max_layouts and len(manifest["staged"]) >= max_layouts:
+            manifest["stopped_by_cap"], manifest["left"] = True, len(chosen) - i
             break
         path = os.path.join(codes_dir, slug + ".json")
         got = attempt(slug, doc, path, stages=stages, entry_seconds=entry_seconds, fold_iters=fold_iters,
@@ -393,7 +403,8 @@ def summary_markdown(m):
              f"{m['job_seconds']} s, stages {', '.join(m['stages'])}. Opened {m.get('opened', 0)} of "
              f"{m['selected']} selected entries in {m.get('seconds', 0)} s"
              + (f"; stopped by the budget with {m['left']} left for the next run." if m.get("stopped_by_budget")
-                else "."), "",
+                else f"; stopped at the layout cap with {m['left']} left for the next run."
+                if m.get("stopped_by_cap") else "."), "",
              f"accepted {o.get('accepted', 0)} (" + (_counts(m.get("by_stage", {})) or "none")
              + f"), miss {o.get('miss', 0)}; skipped " + (_counts(m["skipped"]) or "none"), ""]
     acc = [r for r in m["results"] if r["outcome"] == "accepted"]
@@ -505,7 +516,9 @@ def main(argv=None):
     r.add_argument("--stages", nargs="+", default=list(STAGES), choices=STAGES)
     r.add_argument("--slugs", nargs="*", default=None)
     r.add_argument("--retry", action="store_true", help="reopen entries missed at this budget")
-    r.add_argument("--max-entries", type=int, default=0)
+    r.add_argument("--max-entries", type=int, default=0, help="open at most this many entries")
+    r.add_argument("--max-layouts", type=int, default=0,
+                   help="stop once this many layouts are accepted (one PR's worth for the verify job)")
     r.add_argument("--fold-iters", type=int, default=100_000)
     r.add_argument("--hinge-iters", type=int, default=150_000)
     r.add_argument("--hinge-seeds", type=int, default=4)
@@ -523,8 +536,8 @@ def main(argv=None):
             ap.error("--credit is an @handle")
         m = run_sweep(out_dir=a.out_dir, attempts_path=a.attempts, credit=a.credit, job_seconds=a.job_seconds,
                       entry_seconds=a.entry_seconds, stages=tuple(a.stages), slugs=a.slugs, retry=a.retry,
-                      max_entries=a.max_entries, fold_iters=a.fold_iters, hinge_iters=a.hinge_iters,
-                      hinge_seeds=a.hinge_seeds, tri_iters=a.tri_iters)
+                      max_entries=a.max_entries, max_layouts=a.max_layouts, fold_iters=a.fold_iters,
+                      hinge_iters=a.hinge_iters, hinge_seeds=a.hinge_seeds, tri_iters=a.tri_iters)
         o = m["outcomes"]
         print(f"opened {m['opened']} of {m['selected']}: accepted {o.get('accepted', 0)} (staged under "
               f"{os.path.relpath(a.out_dir, ROOT)}), miss {o.get('miss', 0)}, left {m['left']}")
