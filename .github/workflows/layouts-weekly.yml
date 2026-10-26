@@ -16,15 +16,20 @@ name: layouts-weekly
 # credited handle, and check_submission_scope have run on the branch.
 #
 # Credit. The layout binding ties a first layout to the PR author, so the
-# @handle in locality.contributed_by has to be the account that owns the PR.
-# The credited handle is the SWEEP_CREDIT repository variable, or the
-# `credit` input on a manual run, and defaults to @vprusso. A pull request
-# opened with the Actions token gets no pull_request runs and would fail the
-# authorship step under the bot's name; a fine-grained token in the
-# SWEEP_PR_TOKEN secret (contents and pull requests, read and write) makes
-# its owner the PR author, so set SWEEP_CREDIT to that owner's handle and the
-# PR's checks start and pass on their own. Without the token, the PR is a
-# staged branch for the credited maintainer to reopen under their own account.
+# @handle in locality.contributed_by has to be the account that owns the PR,
+# and a PR the Actions token opens would fail the authorship step under the
+# bot's name. The job therefore needs two settings, and the scheduled run
+# does nothing until a maintainer provides them: SWEEP_CREDIT, a repository
+# variable holding the credited @handle (the `credit` input overrides it on
+# a manual run), and SWEEP_PR_TOKEN, a fine-grained token of that account
+# with contents and pull requests read and write on this repository, which
+# opens the PR as that account so its checks start and pass on their own.
+# A run without them fails at its first step and says so.
+#
+# An accepted layout holds its entry back for 14 days while its PR lands,
+# then the entry is placed again, so a PR that never opened or never merged
+# cannot lock it out; the run's output directory is uploaded as a 30-day
+# artifact whatever happens after the sweep.
 
 permissions:
   contents: write
@@ -48,7 +53,7 @@ on:
         required: false
         default: "40"
       credit:
-        description: "@handle credited in locality.contributed_by (default: the SWEEP_CREDIT variable, else @vprusso)"
+        description: "@handle credited in locality.contributed_by (default: the SWEEP_CREDIT variable)"
         required: false
         default: ""
       slugs:
@@ -67,14 +72,31 @@ concurrency:
 
 env:
   PYTHONUNBUFFERED: "1"
-  CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT || '@vprusso' }}
+  CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT }}
   OUT_DIR: ${{ runner.temp }}/layout-sweep
 
 jobs:
   sweep:
+    # The schedule waits for the credit setting; a manual run may pass it as an input.
+    if: github.event_name == 'workflow_dispatch' || vars.SWEEP_CREDIT != ''
     runs-on: ubuntu-latest
     timeout-minutes: 330
     steps:
+      - name: require the credited account and its token
+        env:
+          SWEEP_PR_TOKEN: ${{ secrets.SWEEP_PR_TOKEN }}
+        run: |
+          ok=1
+          case "$CREDIT" in
+            @?*) ;;
+            "") echo "::error::no credited handle: set the SWEEP_CREDIT repository variable, or the credit input on a manual run"; ok=0 ;;
+            *) echo "::error::the credit is an @handle, got '$CREDIT'"; ok=0 ;;
+          esac
+          if [ -z "$SWEEP_PR_TOKEN" ]; then
+            echo "::error::no SWEEP_PR_TOKEN secret: a fine-grained token of the credited account (contents and pull requests, read and write) opens the PR as that account, which the layout binding requires"
+            ok=0
+          fi
+          [ "$ok" = 1 ]
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -97,6 +119,14 @@ jobs:
           cat "$OUT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"
           staged=$(ls "$OUT_DIR"/layouts/*.json 2>/dev/null | grep -c . || true)
           echo "staged=$staged" >> "$GITHUB_OUTPUT"
+      - name: keep the run's output whatever happens next
+        if: always() && steps.sweep.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: layout-sweep-${{ github.run_number }}
+          path: ${{ env.OUT_DIR }}
+          retention-days: 30
+          if-no-files-found: warn
       - name: commit the attempt log (race-safe)
         if: always() && steps.sweep.outcome != 'skipped'
         run: |
@@ -106,7 +136,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "no attempt to record"; exit 0
           fi
-          counts=$(cat "$OUT_DIR/counts.txt")
+          counts=$(cat "$OUT_DIR/counts.txt" 2>/dev/null || echo "run ended before its tally")
           git commit -m "Weekly layout sweep: $counts [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:main; then
@@ -119,7 +149,7 @@ jobs:
       - name: stage the layouts on a branch and open the PR
         if: steps.sweep.outputs.staged != '0'
         env:
-          GH_TOKEN: ${{ secrets.SWEEP_PR_TOKEN || github.token }}
+          GH_TOKEN: ${{ secrets.SWEEP_PR_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail

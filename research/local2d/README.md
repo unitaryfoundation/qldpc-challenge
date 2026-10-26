@@ -79,15 +79,20 @@ appended provenance note, the schema bump to 0.2), written in the board's one
 format, and the `layouts-weekly` workflow opens the PR with the layouts of
 one run. The credited handle is the account that will own that PR, since the
 binding ties a first layout to the PR author; the workflow reads it from the
-`SWEEP_CREDIT` repository variable.
+`SWEEP_CREDIT` repository variable and opens the PR with the `SWEEP_PR_TOKEN`
+secret, a fine-grained token of that account, and its scheduled run does
+nothing until both are set. The run's output directory is uploaded as a
+30-day artifact whatever happens after the sweep.
 
 `sweep_attempts.jsonl` records every entry opened: the stage that placed it
 (`screen`, `fold`, `hinge`, `tri`) or `miss`, the best radius seen, the
-layers, the class, and the seconds, so a miss at a per-entry budget is not
-retried at that budget or a shorter one (`--retry` or `--slugs` reopens it).
+layers, the class, the stages it ran, and the seconds, so a miss at a
+per-entry budget is not retried at that budget or a shorter one with the
+same stages or fewer (`--retry` or `--slugs` reopens it), and an accepted
+layout is left alone for 14 days while its PR lands, then placed again.
 
 ```
-uv run python research/local2d/layout_sweep.py run --credit @vprusso --job-seconds 14400 --entry-seconds 600 --max-layouts 40
+uv run python research/local2d/layout_sweep.py run --credit @handle --job-seconds 14400 --entry-seconds 600 --max-layouts 40
 uv run python research/local2d/layout_sweep.py stage --out-dir research/out/layout_sweep    # attach to codes/
 uv run python research/local2d/layout_sweep.py pr-body --out-dir research/out/layout_sweep --out body.md
 ```

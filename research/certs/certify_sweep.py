@@ -74,6 +74,21 @@ def utc_today():
     return datetime.datetime.now(datetime.timezone.utc).date().isoformat()
 
 
+# How long an exact attempt holds its entry back while its PR lands. After
+# that the PR was never opened, or was closed without merging, and the entry
+# is solved again rather than locked out by a certificate nobody filed.
+AWAITING_DAYS = 14
+
+
+def _days_since(date_str, today=None):
+    try:
+        then = datetime.date.fromisoformat(date_str or "")
+    except ValueError:
+        return None
+    now = datetime.date.fromisoformat(today) if today else datetime.datetime.now(datetime.timezone.utc).date()
+    return (now - then).days
+
+
 def git_head():
     try:
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
@@ -127,14 +142,16 @@ def _row_from_doc(slug, doc):
             "d": dist["d"], "sides": sides, "band": None, "position": None, "record": None}
 
 
-def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False):
+def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None):
     """Return the entries the sweep opens, in queue order, and why it passes over the rest.
 
     Skipped: stabilizer entries (no certifier), entries that have a
     certificate file already, entries whose side values differ from d (a
     certificate at d would not be honored), entries not on the board, an
     entry a previous attempt refuted, an entry a previous attempt certified
-    whose PR has not landed, and, unless ``retry``, an entry that timed out or
+    whose PR has not landed (for ``AWAITING_DAYS`` days; after that the
+    certificate was lost or its PR closed, and the entry is solved again),
+    and, unless ``retry``, an entry that timed out or
     errored at this time limit or a longer one. Naming ``slugs`` lifts the
     attempt-based skips for those slugs and admits slugs outside the queue.
     The first four skips hold either way: a certificate at d would change
@@ -182,8 +199,10 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
             skip(slug, "refuted", f"refuted on {prev.get('date')}; the entry's claim has to change first")
             continue
         if prev and prev.get("outcome") == "exact":
-            skip(slug, "awaiting_pr", f"certified on {prev.get('date')}; its certificate has not landed")
-            continue
+            age = _days_since(prev.get("date"), today)
+            if age is None or age <= AWAITING_DAYS:
+                skip(slug, "awaiting_pr", f"certified on {prev.get('date')}; its certificate has not landed")
+                continue
         if (prev and not retry and prev.get("outcome") in ("timeout", "error")
                 and (prev.get("tlim") or 0) >= tlim):
             skip(slug, "attempted", f"{prev.get('outcome')} at {prev.get('tlim')} s per solve on {prev.get('date')}")
@@ -318,7 +337,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     wall = wall_clock(tlim)
     date, head, url = utc_today(), git_head(), run_url()
     last = last_attempts(load_jsonl(attempts_path))
-    chosen, skipped, reasons = select(queue, last=last, tlim=tlim, certs_dir=certs_dir,
+    chosen, skipped, reasons = select(queue, last=last, tlim=tlim, today=date, certs_dir=certs_dir,
                                       codes_dir=codes_dir, slugs=slugs, retry=retry)
     if max_entries:
         chosen = chosen[:max_entries]
@@ -443,7 +462,19 @@ def stage(out_dir, *, certs_dir=CERTS):
         for row in load_jsonl(batch):
             if row["slug"] in staged:
                 append_jsonl(os.path.join(certs_dir, BATCH_LOG), row)
+    with open(os.path.join(out_dir, "staged.json"), "w", encoding="utf-8") as f:
+        json.dump({"staged": staged, "skipped": skipped}, f, indent=1)
     return staged, skipped
+
+
+def staged_slugs(out_dir, sub="certs"):
+    """Return what ``stage`` copied once it has run, else what the run left under out_dir."""
+    rec = os.path.join(out_dir, "staged.json")
+    if os.path.exists(rec):
+        with open(rec, encoding="utf-8") as f:
+            return sorted(json.load(f)["staged"])
+    d = os.path.join(out_dir, sub)
+    return sorted(n[:-5] for n in os.listdir(d) if n.endswith(".json")) if os.path.isdir(d) else []
 
 
 def pr_text(m, staged=None):
@@ -553,9 +584,7 @@ def main(argv=None):
     with open(os.path.join(a.out_dir, "run.json"), encoding="utf-8") as f:
         m = json.load(f)
     if a.cmd == "pr-body":
-        staged = sorted(os.path.splitext(n)[0] for n in os.listdir(os.path.join(a.out_dir, "certs"))
-                        if n.endswith(".json"))
-        title, body = pr_text(m, staged=staged)
+        title, body = pr_text(m, staged=staged_slugs(a.out_dir))
     else:
         got = refutation_text(m)
         if got is None:

@@ -71,8 +71,9 @@ opened is one line of `attempts.jsonl`, committed to `main` by the workflow:
 The log is what keeps the sweep from reopening the same entries: an entry that
 timed out or errored at a limit is not reopened at that limit or a shorter one
 (`--retry` or naming it in `--slugs` does), a refuted entry is never reopened
-until its claim changes, and a certified entry is left alone until its
-certificate lands. What closes is written in the #3666 shape, the certifier's
+until its claim changes, and a certified entry is left alone for 14 days
+while its certificate lands (after that its PR was never opened or never
+merged, and the entry is solved again). What closes is written in the #3666 shape, the certifier's
 record without its per-side proof blocks plus a `proof_log_batch.jsonl` row
 for a proof_log certificate, and the workflow stages it on a
 `certs/weekly-<date>` branch, runs `verify/check_certs.py` and a replay of the
@@ -82,7 +83,11 @@ side opens an issue with the witness weights instead and fails the run.
 A pull request the Actions token opens gets no `pull_request` runs, so close
 and reopen it, or push an empty commit, to start the PR's own checks. A
 fine-grained token in the `SWEEP_PR_TOKEN` secret makes its owner the PR
-author and the checks start on their own.
+author and the checks start on their own. The run's output directory (the
+staged certificates, `run.json`, the summary) is uploaded as a workflow
+artifact for 30 days whatever happens after the sweep, so a failed stage
+step or a closed PR loses no solving, and `stage` records what it copied in
+`staged.json`, which is what the PR body lists.
 
 ```
 uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400

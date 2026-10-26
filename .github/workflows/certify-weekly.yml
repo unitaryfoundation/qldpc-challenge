@@ -8,6 +8,10 @@ name: certify-weekly
 # solve, until the job budget is spent. Every attempt, closed or not, is one
 # line of research/certs/attempts.jsonl, committed to main here so an entry
 # that timed out at this budget is not reopened at the same budget next week.
+# An entry it certified is left alone for 14 days while its PR lands, then
+# solved again, so a PR that never opened or never merged cannot lock it
+# out; and the run's output directory is uploaded as a 30-day artifact
+# whatever happens after the sweep, so a failed step loses no solving.
 # The certificates that close are staged on a branch in the #3666 shape (the
 # certifier's record without its proof blocks, plus a proof_log_batch.jsonl
 # row) and opened as a certs-only PR, after verify/check_certs.py and a
@@ -110,6 +114,14 @@ jobs:
           echo "rc=$rc" >> "$GITHUB_OUTPUT"
           # 3 is a refutation, reported by the last step; anything else nonzero is a crash.
           [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ]
+      - name: keep the run's output whatever happens next
+        if: always() && steps.sweep.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: certify-sweep-${{ github.run_number }}
+          path: ${{ env.OUT_DIR }}
+          retention-days: 30
+          if-no-files-found: warn
       - name: commit the attempt log (race-safe)
         if: always() && steps.sweep.outcome != 'skipped'
         run: |
@@ -119,7 +131,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "no attempt to record"; exit 0
           fi
-          counts=$(cat "$OUT_DIR/counts.txt")
+          counts=$(cat "$OUT_DIR/counts.txt" 2>/dev/null || echo "run ended before its tally")
           git commit -m "Weekly certification sweep: $counts [skip ci]"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:main; then

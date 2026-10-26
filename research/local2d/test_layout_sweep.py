@@ -66,22 +66,29 @@ def test_selection_is_smallest_first_and_skips_what_an_earlier_run_settled(tmp_p
     for slug, n, extra in (("big", 100, {}), ("small", 20, {}), ("laid", 10, {"locality": {"coordinates": [[0, 0]],
                                                                                       "layers": 1}}),
                            ("stab", 8, {"code_type": "stabilizer"}), ("done", 30, {}), ("missed", 40, {}),
-                           ("cheap", 50, {})):
+                           ("cheap", 50, {}), ("stale", 35, {}), ("screened", 45, {})):
         doc = {"code_type": "CSS", "n": n, "k": 1, "checks": {"X": [[0]], "Z": [[1]]}, "distance": {"d": 1}}
         doc.update(extra)
         with open(codes / f"{slug}.json", "w", encoding="utf-8") as f:
             json.dump(doc, f)
     entries = LS.layoutless(str(codes))
-    assert [s for s, _ in entries] == ["small", "done", "missed", "cheap", "big"]
-    last = {"done": {"outcome": "accepted", "entry_seconds": 600},
-            "missed": {"outcome": "miss", "entry_seconds": 600},
-            "cheap": {"outcome": "miss", "entry_seconds": 60}}
-    chosen, skipped = LS.select(entries, last=last, entry_seconds=600)
-    assert [s for s, _ in chosen] == ["small", "cheap", "big"], "a miss at a shorter budget is reopened"
+    assert [s for s, _ in entries] == ["small", "done", "stale", "missed", "screened", "cheap", "big"]
+    last = {"done": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-10-20"},
+            "stale": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-09-01"},
+            "missed": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20"},
+            "screened": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20", "stages": ["screen"]},
+            "cheap": {"outcome": "miss", "entry_seconds": 60, "date": "2026-10-20"}}
+    today = "2026-10-26"
+    chosen, skipped = LS.select(entries, last=last, entry_seconds=600, today=today)
+    assert [s for s, _ in chosen] == ["small", "stale", "screened", "cheap", "big"], \
+        "a shorter budget, fewer stages, or an accepted row older than AWAITING_DAYS: reopened"
     assert skipped == {"awaiting_pr": 1, "missed_at_budget": 1}
-    chosen, _ = LS.select(entries, last=last, entry_seconds=600, retry=True)
-    assert [s for s, _ in chosen] == ["small", "missed", "cheap", "big"], "retry reopens misses, not accepted ones"
-    chosen, _ = LS.select(entries, last=last, entry_seconds=600, slugs=["missed", "done", "big"])
+    chosen, skipped = LS.select(entries, last=last, entry_seconds=600, stages=("screen",), today=today)
+    assert [s for s, _ in chosen] == ["small", "stale", "cheap", "big"] and skipped["missed_at_budget"] == 2
+    chosen, _ = LS.select(entries, last=last, entry_seconds=600, retry=True, today=today)
+    assert [s for s, _ in chosen] == ["small", "stale", "missed", "screened", "cheap", "big"], \
+        "retry reopens misses, not accepted ones"
+    chosen, _ = LS.select(entries, last=last, entry_seconds=600, slugs=["missed", "done", "big"], today=today)
     assert [s for s, _ in chosen] == ["done", "missed", "big"], "named slugs lift both skips"
 
 
@@ -113,6 +120,7 @@ def test_a_run_stages_the_screen_hit_logs_the_attempt_and_stage_attaches_it(bare
     # stage writes the current codes/ file with the layout, canonically, and refuses a second time
     staged, skipped = LS.stage(str(out), codes_dir=str(codes))
     assert staged == ["72-6-6"] and skipped == []
+    assert LS.staged_slugs(str(out)) == ["72-6-6"] and rows[0]["stages"] == ["screen"]
     with open(codes / "72-6-6.json", encoding="utf-8") as f:
         text = f.read()
     assert check_codes_format.check_text(text) is None

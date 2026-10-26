@@ -39,34 +39,49 @@ def _write(path, obj):
 def test_selection_skips_what_the_sweep_cannot_use(tmp_path):
     S = _script()
     codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
-    for slug in ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stab", "short"):
+    for slug in ("plain", "filed", "mismatch", "timed", "errored", "refuted", "landed", "stale", "stab", "short"):
         _write(os.path.join(codes, slug + ".json"), {"n": 12})
     _write(os.path.join(certs, "filed.json"), {"d_exact": True})
     queue = {"entries": [_row("stab", code_type="stabilizer"), _row("filed"), _row("mismatch", x=3),
-                         _row("timed"), _row("errored"), _row("refuted"), _row("landed"), _row("gone"),
+                         _row("timed"), _row("errored"), _row("refuted"), _row("landed"), _row("stale"), _row("gone"),
                          _row("short"), _row("plain")]}
     last = {"timed": {"outcome": "timeout", "tlim": 600, "date": "2026-10-20"},
             "errored": {"outcome": "error", "tlim": 900, "date": "2026-10-20"},
             "refuted": {"outcome": "refuted", "tlim": 600, "date": "2026-10-20"},
             "landed": {"outcome": "exact", "tlim": 600, "date": "2026-10-20"},
+            "stale": {"outcome": "exact", "tlim": 600, "date": "2026-09-01"},
             "short": {"outcome": "timeout", "tlim": 60, "date": "2026-10-20"}}
-    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes)
-    assert [r["slug"] for r in chosen] == ["short", "plain"], "an older, shorter attempt does not block a longer one"
+    today = "2026-10-26"
+    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, today=today)
+    assert [r["slug"] for r in chosen] == ["stale", "short", "plain"], \
+        "a shorter attempt does not block a longer one, and an exact row older than AWAITING_DAYS lets go"
     assert skipped == {"stabilizer": 1, "certified": 1, "side_mismatch": 1, "attempted": 2, "refuted": 1,
                        "awaiting_pr": 1, "not_on_board": 1}
     assert "differ from d" in reasons["mismatch"] and "timeout at 600" in reasons["timed"]
     # --retry reopens what timed out or errored, never what was refuted or already certified
-    chosen, skipped, _ = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, retry=True)
-    assert [r["slug"] for r in chosen] == ["timed", "errored", "short", "plain"]
+    chosen, skipped, _ = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, retry=True,
+                                  today=today)
+    assert [r["slug"] for r in chosen] == ["timed", "errored", "stale", "short", "plain"]
     # a longer budget reopens a shorter attempt on its own
-    chosen, _, _ = S.select(queue, last=last, tlim=1200, certs_dir=certs, codes_dir=codes)
+    chosen, _, _ = S.select(queue, last=last, tlim=1200, certs_dir=certs, codes_dir=codes, today=today)
     assert "timed" in [r["slug"] for r in chosen] and "errored" in [r["slug"] for r in chosen]
     # named slugs: queue order is replaced by the named order, and a slug outside the queue is read from codes/
     _write(os.path.join(codes, "extra.json"), {"n": 20, "k": 2, "code_type": "CSS",
                                                  "distance": {"d": 4, "X": {"value": 4}, "Z": {"value": 4}}})
-    chosen, _, _ = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+    chosen, _, _ = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, today=today,
                             slugs=["extra", "timed", "refuted", "filed"])
     assert [r["slug"] for r in chosen] == ["extra", "timed", "refuted"] and chosen[0]["d"] == 4
+
+
+def test_the_pr_body_names_what_stage_copied_not_what_the_run_left(tmp_path):
+    S = _script()
+    out, certs = tmp_path / "out", tmp_path / "certs"
+    for slug in ("a", "b"):
+        _write(str(out / "certs" / f"{slug}.json"), {"d_exact": True})
+    _write(str(certs / "b.json"), {"d_exact": True})      # landed through another PR meanwhile
+    assert S.staged_slugs(str(out)) == ["a", "b"], "before stage: the run's output"
+    assert S.stage(str(out), certs_dir=str(certs)) == (["a"], ["b"])
+    assert S.staged_slugs(str(out)) == ["a"], "after stage: what the diff carries"
 
 
 def _proof(sha, clauses, proved=True):

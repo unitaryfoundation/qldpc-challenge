@@ -31,9 +31,10 @@ and the schema_version bump that contributed_by needs. The layouts-weekly
 workflow opens the PR.
 
 Every entry opened is one line of sweep_attempts.jsonl, accepted or not, so a
-miss at this budget is not retried at the same budget next week.
+miss at this budget and these stages is not retried at the same budget next
+week, and an accepted layout is left alone for 14 days while its PR lands.
 
-    uv run python research/local2d/layout_sweep.py run --job-seconds 14400 --credit @vprusso
+    uv run python research/local2d/layout_sweep.py run --job-seconds 14400 --credit @handle
     uv run python research/local2d/layout_sweep.py stage --out-dir research/out/layout_sweep
     uv run python research/local2d/layout_sweep.py pr-body --out-dir research/out/layout_sweep --out body.md
 """
@@ -126,13 +127,29 @@ def layoutless(codes_dir=CODES):
     return out
 
 
-def select(entries, *, last, entry_seconds, slugs=None, retry=False):
+# How long an accepted layout holds its entry back while its PR lands. After
+# that the PR was never opened, or was closed without merging, and the entry
+# is placed again rather than locked out by a layout nobody filed.
+AWAITING_DAYS = 14
+
+
+def _days_since(date_str, today=None):
+    try:
+        then = datetime.date.fromisoformat(date_str or "")
+    except ValueError:
+        return None
+    now = datetime.date.fromisoformat(today) if today else datetime.datetime.now(datetime.timezone.utc).date()
+    return (now - then).days
+
+
+def select(entries, *, last, entry_seconds, stages=STAGES, slugs=None, retry=False, today=None):
     """Return the entries to open and a count of the ones passed over.
 
-    An entry a previous run accepted is left alone until its layout lands;
-    an entry a previous run missed at this per-entry budget or a longer one
-    is reopened only with ``retry``. Naming ``slugs`` restricts the sweep to
-    them and lifts both skips.
+    An entry a previous run accepted is left alone for ``AWAITING_DAYS`` while
+    its layout lands (after that its PR was lost or closed, and it is placed
+    again); an entry a previous run missed at this per-entry budget or a
+    longer one, with these stages or more, is reopened only with ``retry``.
+    Naming ``slugs`` restricts the sweep to them and lifts both skips.
     """
     if slugs:
         want = set(slugs)
@@ -141,10 +158,13 @@ def select(entries, *, last, entry_seconds, slugs=None, retry=False):
     for slug, doc in entries:
         prev = last.get(slug) if not slugs else None
         if prev and prev.get("outcome") == "accepted":
-            skipped["awaiting_pr"] += 1
-            continue
+            age = _days_since(prev.get("date"), today)
+            if age is None or age <= AWAITING_DAYS:
+                skipped["awaiting_pr"] += 1
+                continue
         if (prev and not retry and prev.get("outcome") == "miss"
-                and (prev.get("entry_seconds") or 0) >= entry_seconds):
+                and (prev.get("entry_seconds") or 0) >= entry_seconds
+                and set(prev.get("stages") or STAGES) >= set(stages)):
             skipped["missed_at_budget"] += 1
             continue
         chosen.append((slug, doc))
@@ -326,8 +346,8 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
     """
     date, head, url = utc_today(), git_head(), run_url()
     last = {r["slug"]: r for r in load_jsonl(attempts_path)}
-    chosen, skipped = select(layoutless(codes_dir), last=last, entry_seconds=entry_seconds, slugs=slugs,
-                             retry=retry)
+    chosen, skipped = select(layoutless(codes_dir), last=last, entry_seconds=entry_seconds, stages=stages,
+                             slugs=slugs, retry=retry, today=date)
     if max_entries:
         chosen = chosen[:max_entries]
     manifest = {"date": date, "head": head, "run": url, "credit": credit, "job_seconds": job_seconds,
@@ -349,6 +369,7 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
                       hinge_iters=hinge_iters, hinge_seeds=hinge_seeds, tri_iters=tri_iters)
         row = {"date": date, "head": head, "run": url, "slug": slug, "n": doc["n"], "k": doc["k"],
                "d": doc["distance"]["d"], "family": doc.get("family"), "entry_seconds": entry_seconds,
+               "stages": list(stages),
                "secs": got["secs"], "best_radius": got["best_radius"], "outcome": "miss", "stage": None,
                "layers": None, "class": None}
         layout = got["layout"]
@@ -452,7 +473,19 @@ def stage(out_dir, *, codes_dir=CODES, credit=None):
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             f.write(canonical(new))
         staged.append(slug)
+    with open(os.path.join(out_dir, "staged.json"), "w", encoding="utf-8") as f:
+        json.dump({"staged": staged, "skipped": skipped}, f, indent=1)
     return staged, skipped
+
+
+def staged_slugs(out_dir, sub="layouts"):
+    """Return what ``stage`` attached once it has run, else what the run left under out_dir."""
+    rec = os.path.join(out_dir, "staged.json")
+    if os.path.exists(rec):
+        with open(rec, encoding="utf-8") as f:
+            return sorted(json.load(f)["staged"])
+    d = os.path.join(out_dir, sub)
+    return sorted(n[:-5] for n in os.listdir(d) if n.endswith(".json")) if os.path.isdir(d) else []
 
 
 def pr_text(m, staged=None):
@@ -550,9 +583,7 @@ def main(argv=None):
         return 0
     with open(os.path.join(a.out_dir, "run.json"), encoding="utf-8") as f:
         m = json.load(f)
-    staged = sorted(os.path.splitext(n)[0] for n in os.listdir(os.path.join(a.out_dir, "layouts"))
-                    if n.endswith(".json"))
-    title, body = pr_text(m, staged=staged)
+    title, body = pr_text(m, staged=staged_slugs(a.out_dir))
     with open(a.out, "w", encoding="utf-8") as f:
         f.write(body)
     print(title)
