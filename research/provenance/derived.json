@@ -2,8 +2,8 @@
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
   "literature": 449,
-  "no_match": 791,
-  "not_derived": 1235,
+  "no_match": 790,
+  "not_derived": 1313,
   "parameters_only": 254
  },
  "derivation_version": 1,
@@ -34,6 +34,22 @@
    "matches": []
   },
   "10-4-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "10-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "10-6-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "10-6-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "10-7-1": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -140,6 +156,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "1000-200-29": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "1000-406-6": {
    "bucket": "not_derived",
@@ -556,8 +576,56 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "11-3-3-d": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-3-3-e": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-3-3-g": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-3-3-h": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-4-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "11-5-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "11-6-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-7-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-8-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-8-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-9-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "11-9-1-b": {
+   "bucket": "not_derived",
    "matches": []
   },
   "110-2-10": {
@@ -604,6 +672,10 @@
   },
   "112-12-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "112-16-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "112-16-6": {
@@ -892,6 +964,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "12-10-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-2-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -976,11 +1052,27 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "12-5-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-5-2": {
    "bucket": "not_derived",
    "matches": []
   },
+  "12-5-2-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-5-2-c": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-6-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-6-1-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -1003,6 +1095,14 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "12-7-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-8-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "12-8-2": {
    "bucket": "literature",
    "matches": [
@@ -1019,6 +1119,10 @@
    "matches": []
   },
   "12-9-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "12-9-1-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -2148,6 +2252,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "14-7-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "14-7-2": {
    "bucket": "not_derived",
    "matches": []
@@ -2679,6 +2787,10 @@
   },
   "15-5-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "15-6-1": {
+   "bucket": "not_derived",
    "matches": []
   },
   "15-7-3": {
@@ -5039,6 +5151,10 @@
     }
    ]
   },
+  "196-100-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "196-12-17": {
    "bucket": "literature",
    "matches": [
@@ -6920,6 +7036,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "27-12-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "27-12-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "27-2-6": {
    "bucket": "not_derived",
    "matches": []
@@ -7560,6 +7684,18 @@
     }
    ]
   },
+  "3-2-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-10-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-10-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-10-3": {
    "bucket": "literature",
    "matches": [
@@ -7570,6 +7706,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "30-10-3-b": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "30-10-5": {
    "bucket": "not_derived",
@@ -7663,6 +7803,14 @@
     }
    ]
   },
+  "30-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-5-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-6-5": {
    "bucket": "parameters_only",
    "matches": [
@@ -7715,7 +7863,19 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "30-9-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-9-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "30-9-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "30-9-3-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -7848,6 +8008,10 @@
    "matches": []
   },
   "31-21-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "31-22-1": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -8070,7 +8234,15 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "32-19-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "32-19-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "32-19-2-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -8164,6 +8336,10 @@
    "matches": []
   },
   "324-166-6-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "324-196-4": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -8386,6 +8562,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "34-17-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "34-2-7": {
    "bucket": "literature",
    "matches": [
@@ -8414,6 +8594,14 @@
      "source": "codetables"
     }
    ]
+  },
+  "34-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "34-5-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "340-16-18": {
    "bucket": "no_match",
@@ -8529,7 +8717,19 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "35-19-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-19-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "35-19-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "35-19-3-b": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -8830,6 +9030,14 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "36-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "36-5-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "36-6-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -9078,6 +9286,14 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "37-22-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "37-22-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "37-22-3": {
    "bucket": "not_derived",
    "matches": []
@@ -9091,6 +9307,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "37-6-1": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "37-7-3": {
    "bucket": "parameters_only",
@@ -9238,6 +9458,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "38-11-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "38-11-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "38-2-10": {
    "bucket": "not_derived",
    "matches": []
@@ -9374,10 +9602,6 @@
    "bucket": "no_match",
    "matches": []
   },
-  "390-82-31-b": {
-   "bucket": "no_match",
-   "matches": []
-  },
   "390-82-38": {
    "bucket": "no_match",
    "matches": []
@@ -9495,6 +9719,14 @@
     }
    ]
   },
+  "40-11-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-11-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "40-12-4": {
    "bucket": "literature",
    "matches": [
@@ -9532,6 +9764,10 @@
    ]
   },
   "40-16-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-17-3": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -9575,6 +9811,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "40-21-3-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "40-22-2": {
    "bucket": "literature",
    "matches": [
@@ -9604,11 +9844,23 @@
     }
    ]
   },
+  "40-22-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "40-23-2": {
    "bucket": "not_derived",
    "matches": []
   },
   "40-24-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-25-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "40-25-2": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -9689,6 +9941,10 @@
   },
   "400-2-20": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "400-256-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "400-35-8": {
@@ -9865,10 +10121,6 @@
      "xz_swapped": false
     }
    ]
-  },
-  "42-12-4-b": {
-   "bucket": "not_derived",
-   "matches": []
   },
   "42-12-5": {
    "bucket": "not_derived",
@@ -11114,6 +11366,10 @@
   },
   "5-1-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "5-4-1": {
+   "bucket": "not_derived",
    "matches": []
   },
   "50-10-4": {
@@ -14180,6 +14436,22 @@
     }
    ]
   },
+  "7-3-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "7-4-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "7-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "7-6-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "70-10-6": {
    "bucket": "not_derived",
    "matches": []
@@ -15109,6 +15381,14 @@
    ]
   },
   "8-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-5-1-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-6-1": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -16065,6 +16345,18 @@
    "bucket": "no_match",
    "matches": []
   },
+  "9-4-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "9-5-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "9-6-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "90-10-11": {
    "bucket": "not_derived",
    "matches": []
@@ -16961,6 +17253,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "972-166-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "976-250-22": {
    "bucket": "not_derived",
    "matches": []
@@ -17054,6 +17350,18 @@
    "matches": []
   },
   "990-198-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "996-166-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "996-166-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "996-166-36": {
    "bucket": "not_derived",
    "matches": []
   },

@@ -6,6 +6,11 @@ set of matrices changed whenever someone tightened a distance, and two
 permutation-equivalent codes submitted at different claimed distances never
 collided. That is how the board came to hold equivalent entries its own
 duplicate check could not see.
+
+The twin the issue reports, 390-82-31-b, left the board when #4143 removed
+the permutation-equivalent duplicates, which is the outcome this file
+protects, so the tests that need both documents read the removed one from
+verify/fixtures/equivalence/, as the board held it.
 """
 import copy
 import glob
@@ -25,6 +30,14 @@ from two_block_equivalence import equivalent, scan  # noqa: E402
 
 def load(slug):
     with open(os.path.join(_ROOT, "codes", f"{slug}.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
+FIXTURES = os.path.join(_HERE, "fixtures", "equivalence")
+
+
+def fixture(slug):
+    with open(os.path.join(FIXTURES, f"{slug}.json"), encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -50,8 +63,8 @@ def test_a_wrong_k_claim_does_not_change_the_signature(code):
 
 
 def test_two_permutation_equivalent_entries_collide(code):
-    """The pair the issue reports, as it sits on the board today."""
-    assert signature(code)["hash"] == signature(load("390-82-31-b"))["hash"]
+    """The pair the issue reports, the twin as the board held it until #4143."""
+    assert signature(code)["hash"] == signature(fixture("390-82-31-b"))["hash"]
 
 
 def test_the_signature_still_separates_different_codes(code):
@@ -68,7 +81,7 @@ def test_the_signature_still_separates_different_codes(code):
 
 def test_the_equivalence_test_decides_rather_than_flags():
     """A WL collision is necessary, not sufficient; this closes the question."""
-    a, b = load("390-82-31"), load("390-82-31-b")
+    a, b = load("390-82-31"), fixture("390-82-31-b")
     found = equivalent(a, b)
     assert found is not None, "a known equivalent pair was not decided"
     unit, _swapped = found
@@ -77,12 +90,17 @@ def test_the_equivalence_test_decides_rather_than_flags():
 
 
 def test_the_board_scan_names_the_pairs_it_finds():
-    """Run over the real board, so a new duplicate cannot land unnoticed."""
-    hits = scan(sorted(glob.glob(os.path.join(_ROOT, "codes", "*.json"))))
-    slugs = {tuple(sorted((a, b))) for a, b, _ in hits}
-    assert ("390-82-31", "390-82-31-b") in slugs
+    """The scan names the known pair, and the real board holds none since #4143."""
+    pair = [os.path.join(_ROOT, "codes", "390-82-31.json"), os.path.join(FIXTURES, "390-82-31-b.json")]
+    hits = scan(pair)
+    assert {tuple(sorted((a, b))) for a, b, _ in hits} == {("390-82-31", "390-82-31-b")}
     for a, b, (unit, _sw) in hits:
         assert unit >= 1 and a != b
+    # Over the real board, so a new permutation-equivalent duplicate fails here
+    # instead of landing unnoticed.
+    board = scan(sorted(glob.glob(os.path.join(_ROOT, "codes", "*.json"))))
+    assert board == [], f"permutation-equivalent entries on the board: {board}"
+
 
 def test_two_block_shape_without_the_circulant_structure_is_refused():
     """Refuse a code that has the two-block shape without the structure.
@@ -95,7 +113,7 @@ def test_two_block_shape_without_the_circulant_structure_is_refused():
 
     from two_block_equivalence import equivalent, is_generalised_bicycle
 
-    a, b = load("390-82-31"), load("390-82-31-b")
+    a, b = load("390-82-31"), fixture("390-82-31-b")
     assert is_generalised_bicycle(a) and is_generalised_bicycle(b)
     assert equivalent(a, b) is not None            # the genuine pair still decides
 
