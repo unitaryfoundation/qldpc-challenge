@@ -1,0 +1,144 @@
+name: layouts-weekly
+
+# A board entry with no layout computes as unrestricted and never improves on
+# its own (issue #4148). research/local2d/layout_sweep.py opens the CSS
+# entries that have none, smallest n first, and tries the layout tools in
+# research/local2d/ in order of cost: the exact torus-grid screen (free),
+# then fold_layout, hinge_anneal, and tri_hinge_anneal inside a per-entry
+# budget. A layout is accepted only when verify/qldpc_verify.py, run on the
+# entry with it attached, returns ok with a 2D-local class. Every entry
+# opened is one line of research/local2d/sweep_attempts.jsonl, committed to
+# main here so a miss at this budget is not retried at the same budget next
+# week. The accepted layouts go into codes/ on a branch, as exactly the
+# change check_authorship.py's layout binding admits (a first locality block
+# credited in contributed_by, an appended note, the schema bump), and are
+# opened as one PR after check_codes_format, check_authorship for the
+# credited handle, and check_submission_scope have run on the branch.
+#
+# Credit. The layout binding ties a first layout to the PR author, so the
+# @handle in locality.contributed_by has to be the account that owns the PR.
+# The credited handle is the SWEEP_CREDIT repository variable, or the
+# `credit` input on a manual run, and defaults to @vprusso. A pull request
+# opened with the Actions token gets no pull_request runs and would fail the
+# authorship step under the bot's name; a fine-grained token in the
+# SWEEP_PR_TOKEN secret (contents and pull requests, read and write) makes
+# its owner the PR author, so set SWEEP_CREDIT to that owner's handle and the
+# PR's checks start and pass on their own. Without the token, the PR is a
+# staged branch for the credited maintainer to reopen under their own account.
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  schedule:
+    - cron: "0 6 * * 2"      # every Tuesday 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      job_minutes:
+        description: "stop opening entries after this many minutes"
+        required: false
+        default: "240"
+      entry_seconds:
+        description: "wall clock per entry across the search stages"
+        required: false
+        default: "600"
+      credit:
+        description: "@handle credited in locality.contributed_by (default: the SWEEP_CREDIT variable, else @vprusso)"
+        required: false
+        default: ""
+      slugs:
+        description: "space-separated slugs to try instead of the layoutless entries smallest first"
+        required: false
+        default: ""
+      stages:
+        description: "screen only (free), or all four stages"
+        type: choice
+        default: "all"
+        options: [all, screen]
+
+concurrency:
+  group: layouts-weekly
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+  CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT || '@vprusso' }}
+  OUT_DIR: ${{ runner.temp }}/layout-sweep
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+      - name: sweep the layoutless entries, smallest first
+        id: sweep
+        env:
+          JOB_MINUTES: ${{ github.event.inputs.job_minutes || '240' }}
+          ENTRY_SECONDS: ${{ github.event.inputs.entry_seconds || '600' }}
+          SLUGS: ${{ github.event.inputs.slugs }}
+          STAGES: ${{ github.event.inputs.stages || 'all' }}
+        run: |
+          set -euo pipefail
+          stages=""
+          [ "$STAGES" = "screen" ] && stages="--stages screen"
+          uv run --frozen python research/local2d/layout_sweep.py run \
+            --out-dir "$OUT_DIR" --credit "$CREDIT" --job-seconds $(( JOB_MINUTES * 60 )) \
+            --entry-seconds "$ENTRY_SECONDS" $stages ${SLUGS:+--slugs $SLUGS}
+          cat "$OUT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          staged=$(ls "$OUT_DIR"/layouts/*.json 2>/dev/null | grep -c . || true)
+          echo "staged=$staged" >> "$GITHUB_OUTPUT"
+      - name: commit the attempt log (race-safe)
+        if: always() && steps.sweep.outcome != 'skipped'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/local2d/sweep_attempts.jsonl
+          if git diff --cached --quiet; then
+            echo "no attempt to record"; exit 0
+          fi
+          counts=$(cat "$OUT_DIR/counts.txt")
+          git commit -m "Weekly layout sweep: $counts [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"; exit 0
+            fi
+            echo "push raced; rebasing and retrying ($attempt)"
+            git fetch origin main && git rebase origin/main || exit 1
+          done
+          echo "failed to push the attempt log after 5 attempts"; exit 1
+      - name: stage the layouts on a branch and open the PR
+        if: steps.sweep.outputs.staged != '0'
+        env:
+          GH_TOKEN: ${{ secrets.SWEEP_PR_TOKEN || github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          branch="layouts/weekly-$(date -u +%Y-%m-%d)"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            branch="$branch-${{ github.run_number }}"
+          fi
+          git checkout -q -B "$branch" origin/main
+          uv run --frozen python research/local2d/layout_sweep.py stage --out-dir "$OUT_DIR" | tee stage.txt
+          slugs=$(sed -n 's/^staged: //p' stage.txt)
+          if [ -z "$slugs" ] || [ "$slugs" = "nothing" ]; then
+            echo "every staged layout landed or was refused meanwhile"; exit 0
+          fi
+          files=$(for s in $slugs; do echo "codes/$s.json"; done)
+          title=$(uv run --frozen python research/local2d/layout_sweep.py pr-body --out-dir "$OUT_DIR" --out body.md)
+          git add codes
+          git commit -q -m "$title"
+          {
+            echo; echo "## checks on the branch"; echo; echo '```'
+            uv run --frozen python verify/check_codes_format.py --files $files
+            uv run --frozen python verify/check_authorship.py --author "${CREDIT#@}" --base origin/main
+            uv run --frozen python verify/check_submission_scope.py --base origin/main
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          git push origin "$branch"
+          gh pr create --repo "$REPO" --base main --head "$branch" --title "$title" --body-file body.md

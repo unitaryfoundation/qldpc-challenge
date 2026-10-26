@@ -45,3 +45,47 @@ a PR touching only `certs/`.
 uv run python research/certs/certification_queue.py            # writes todo.json
 uv run python research/certs/certification_queue.py --check    # exit 1 if the committed queue is stale
 ```
+
+## The weekly sweep
+
+`certify_sweep.py` works the head of the queue, and the `certify-weekly`
+workflow runs it every Monday at 12:00 UTC, after the queue has regenerated
+(issue #4148). In queue order it skips what a certificate at `d` cannot help
+(stabilizer entries, entries whose side values differ from `d`, entries that
+already have a `certs/` file) and runs `verify/sat_certify.py` with the proof
+path on the rest, one time limit per solve (600 s by default), until the job
+budget is spent (four hours by default). Each entry runs in a subprocess
+under a hard wall clock of six solves plus five minutes, because the solver's
+own limit is advisory: CryptoMiniSat checks it between search rounds, and a
+442-qubit instance ran nine minutes past a 60 s limit in testing. Each entry
+opened is one line of `attempts.jsonl`, committed to `main` by the workflow:
+
+| field | meaning |
+|---|---|
+| `slug`, `n`, `k`, `d`, `band`, `position` | the entry and where the queue had it |
+| `date`, `head`, `run`, `tlim` | when, from which commit, in which Actions run, at what limit per solve |
+| `outcome` | `exact` (both sides UNSAT at `d - 1`), `timeout` (a side did not finish, or the wall clock killed the entry), `refuted` (a side found a lighter logical; the witness is in `witness`), `error` (the certifier refused: a pairing set that does not span `k`, or the two encodings disagree) |
+| `level` | `proof_log` when drat-trim verified both sides' refutations, `solver` when CryptoMiniSat closed both sides and the proof path did not finish on one |
+| `sides` | per side the status, the seconds, and whether the proof was verified |
+
+The log is what keeps the sweep from reopening the same entries: an entry that
+timed out or errored at a limit is not reopened at that limit or a shorter one
+(`--retry` or naming it in `--slugs` does), a refuted entry is never reopened
+until its claim changes, and a certified entry is left alone until its
+certificate lands. What closes is written in the #3666 shape, the certifier's
+record without its per-side proof blocks plus a `proof_log_batch.jsonl` row
+for a proof_log certificate, and the workflow stages it on a
+`certs/weekly-<date>` branch, runs `verify/check_certs.py` and a replay of the
+quick proof_log certificates there, and opens the certs-only PR. A refuted
+side opens an issue with the witness weights instead and fails the run.
+
+A pull request the Actions token opens gets no `pull_request` runs, so close
+and reopen it, or push an empty commit, to start the PR's own checks. A
+fine-grained token in the `SWEEP_PR_TOKEN` secret makes its owner the PR
+author and the checks start on their own.
+
+```
+uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
+uv run python research/certs/certify_sweep.py stage --out-dir research/out/certify_sweep   # copy into certs/
+uv run python research/certs/certify_sweep.py pr-body --out-dir research/out/certify_sweep --out body.md
+```
