@@ -339,6 +339,89 @@ surface code to 1, but they answer different questions.
     range continuously inside the class; a trivial sqrt(n)-range layout is
     not banned by g, just priced into irrelevance (g ~ n^-2).
 
+## Scalable families at surface-code parity
+
+An entry with an honest layout, `d >= 3`, and `g >= 1` matches or beats the
+rotated surface code under the pricing above. "A scalable family with g > 1"
+has been used for five different claims (issue #4160), and a reviewer can hold
+a submission only to the bar it names, so the five are listed here, strictest
+first. None of them ranks anything: the board ranks by the Pareto frontier
+over `(n, k, d, w)` within a track cell, and `g >= 1` is a property an entry
+has or lacks. A PR claiming one of these bars names it in the "Surface-code
+parity bar" line of the PR body (the template carries the line) and in the
+note's "Direction & hypothesis" section.
+
+Every rung, under every bar, is an ordinary submission. It passes the trusted
+gate (`verify/validate_candidate.py`), ships a distance witness (an upper
+bound is accepted, and g then inherits that tier), carries the layout its g is
+computed from, declares a construction family from the Layer-2 vocabulary (a
+locality class is a track, not a family), and comes with a note following
+`notes/TEMPLATE.md`. g is `site/build.py::geo_score` as defined above. At the
+surface-code point `r = sqrt 2`, `rho = 1` of `local-2d-single x weight-4` it
+reduces to `k d^2 / n`, so `g >= 1` there is `k / n >= 1 / d^2`.
+
+1. **Asymptotic family**: `n` and `d` both grow and g tends to a constant
+   `c > 4/3`. A closed form or parametric recipe gives `(n, k, d)` as
+   functions of one or two growing parameters and produces
+   `local-2d-single x weight-4` codes with honest layouts at infinitely many
+   sizes, with `d` unbounded and `liminf g >= c` for a stated `c > 4/3`. The
+   4/3 is the reported large-`d` constant of the dense-packed ladder and of
+   its multi-band variant
+   (`fieldnotes/2026-08-29-triplet-reverse-engineering-and-manifold-subtraction.md`,
+   `fieldnotes/2026-08-31-multiband-sweep-and-exact-d4-sat.md`); a
+   construction whose constant exceeds it is new. Acceptance: at least three
+   gate-passed rungs at distinct, growing `d` (for example 5, 7, and 9) whose
+   g moves toward `c` as the closed form predicts, and a note stating the
+   closed form and the asymptotic. One-off codes and `d = 2` tilings are out
+   of scope.
+
+2. **Size scaling at fixed distance**: `d` fixed, `n` growing, `g >= 1`
+   throughout. The distance need not grow. Acceptance: at least three
+   gate-passed rungs at one `d` with `n` strictly increasing within the cap
+   (`n <= 700`, or `n <= 1000` at `w <= 8` and `d <= 40`), each at `g >= 1`,
+   mutually non-dominated on `(n, k)` or dominating an existing entry. No
+   closed form is required. A recipe in the reproduction manifest
+   (`repro/<slug>.json`, construction stage) is preferred because it lets the
+   family be rebuilt at other sizes. Prefer `d >= 5`: a `d = 3` slice is the
+   one most exposed to a change in the headline threshold.
+
+3. **Reproducible recipe**: one `g >= 1` rung plus multi-size evidence.
+   Acceptance: a gate-passed rung with `g >= 1` and `d >= 3` whose
+   reproduction manifest carries a construction recipe, and the recipe
+   rebuilt at three or more sizes passing the structural checks recorded in
+   `research/repro/multisize.json` (checks commute, the code encodes, the
+   Tanner graph is connected, the caps hold; `research/kit/multisize.py`). No
+   distance is claimed at the other sizes and no asymptotic constant is
+   claimed. This is the least evidence of a construction the board records,
+   and the floor at which a family claim rests on more than one point.
+
+4. **Pointwise parity**: a single code. Acceptance: a gate-passed code with
+   `d >= 3`, an honest layout, and `g >= 1`. No family, recipe, or asymptotic
+   is claimed, and the note need not claim one. Such a code is
+   board-advancing whenever it is undominated in its cell, so it is worth
+   submitting. It carries the tier of its distance, and if the headline
+   threshold `GEO_MIN_D` is raised a `d = 3` entry loses its headline
+   eligibility without losing its place on the board.
+
+5. **New mechanism**: `g > 1` at `w <= 4` in `local-2d-single` by a route
+   other than those on the board (perimeter logicals of the dense-packed
+   ladder, the multi-band boundary refund, chamfered and hole-lattice surface
+   codes; `fieldnotes/2026-08-29-g-parity-agenda.md` records them).
+   Acceptance: a gate-passed rung with `g > 1` and `d >= 3`, a note
+   describing the mechanism and the free parameter that grows `n` or `d`,
+   and a sketched family (closed form or recipe). A recipe that rebuilds at
+   three or more sizes also meets bar 3. Reproducibility is required; an
+   asymptotic proof is not.
+
+Bars 1 to 3 are judged on a statement about the family, so a later change to
+the headline threshold does not retire them; the entries such a change would
+affect are bar-4 codes at small `d`. For orientation, on 2026-10-30 the board
+held 186 eligible entries at `g >= 1`, all at `w = 4` in `local-2d-single`
+and all at upper-bound distances, with `d` from 3 to 31. The largest g was
+1.76 at `d = 4` ([[957,105,4]]), then 1.68 at `d = 3`, 1.35 at `d = 5`, and
+1.27 at `d = 13`, and every member at `d >= 15` is a [[d^2,1,d]] surface code
+at exactly 1.
+
 ## Reference bars
 
 - 2D-local efficiency: the published weight-8 exact bar is kd^2/n ~ 12.7, the
