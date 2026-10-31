@@ -40,7 +40,7 @@ env:
 
 jobs:
   replay:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # per-certificate cap is --timeout below; this is for a hang
     timeout-minutes: 240
     steps:

@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # The full set is about 2.1 core-hours of solving and checking, 40 min
     # of it on one entry (certs/proof_log_batch.jsonl records the per-entry
     # times); the per-PR subset is seconds. The cap is for a hang.

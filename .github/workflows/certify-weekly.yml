@@ -62,7 +62,7 @@ concurrency:
 
 jobs:
   sweep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # job_minutes is when the sweep stops opening entries; the entry it is on
     # may run to six solves of tlim (two XOR solves, two kissat runs, two
     # drat-trim checks) past that, plus the build and the replay.
