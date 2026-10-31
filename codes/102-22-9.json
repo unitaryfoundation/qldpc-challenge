@@ -851,7 +851,11 @@
   "origin": "submission",
   "date": "2026-09-27",
   "model": "Mimo-V2.6-Free",
-  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry."
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry.",
+  "references": [
+   "arXiv:2604.19481 (Tripier et al., the Walking Cat architecture, code Q102: this entry is that code up to a relabeling of the qubits, verified by Tanner-graph isomorphism with the row spaces mapped; the qecdb.org record this entry was reconstructed from attributes the construction to arXiv:2306.16400, whose database has no group of order 51)"
+  ],
+  "novelty": "known_parameters"
  },
  "family": "generalized-bicycle",
  "locality": {
