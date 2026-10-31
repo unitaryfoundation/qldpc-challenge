@@ -60,13 +60,6 @@ concurrency:
   group: certify-weekly
   cancel-in-progress: false
 
-env:
-  PYTHONUNBUFFERED: "1"
-  # The same pins as proof-replay.yml, so the certificates this stages are
-  # produced by the solver and checker that replay them.
-  KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
-  DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
-
 jobs:
   sweep:
     runs-on: ubuntu-latest
@@ -75,7 +68,10 @@ jobs:
     # drat-trim checks) past that, plus the build and the replay.
     timeout-minutes: 350
     env:
-      OUT_DIR: ${{ runner.temp }}/certify-sweep
+      PYTHONUNBUFFERED: "1"
+      KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+      DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+      OUT_DIR: /tmp/certify-sweep
     steps:
       - uses: actions/checkout@v4
         with:
