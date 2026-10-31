@@ -60,9 +60,14 @@ jobs:
       - name: recipes at other sizes (display-only table; drift fails here, issue #4031)
         # research/repro/multisize.json is what the code page shows under
         # "Recipe at other sizes". It is derived from the manifests and the kit
-        # constructors, so a new manifest or a changed constructor has to come
-        # with a regenerated table: `python research/kit/multisize.py run`.
-        run: uv run --frozen --extra research python research/kit/multisize.py check
+        # constructors. A committed verdict a fresh run no longer reproduces
+        # fails here: that is a constructor or a lift rule changing what a
+        # recipe does, and it belongs in the PR that changed it. A manifest the
+        # table has not caught up with passes as pending: a submission PR
+        # carries repro/<slug>.json and nothing under research/ (issue #3810),
+        # and site.yml regenerates the table on main after the merge. The
+        # scheduled run is strict, so a table that stayed behind fails there.
+        run: uv run --frozen --extra research python research/kit/multisize.py check ${{ github.event_name != 'pull_request' && '--strict' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:

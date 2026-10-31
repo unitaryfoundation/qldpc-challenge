@@ -44,8 +44,14 @@ jobs:
           for attempt in 1 2 3 4 5; do
             git fetch origin main
             git reset --hard origin/main
+            # research/repro/multisize.json is derived from repro/ and the kit
+            # constructors and read by the code pages. A submission PR cannot
+            # carry it (issue #3810), so it is regenerated here, after the
+            # merge, and committed with the pages; `run` leaves the file alone
+            # when no row changed.
+            uv run --frozen --extra research python research/kit/multisize.py run
             make build
-            git add docs/*.html docs/codes docs/stats.json docs/style.css docs/favicon.svg
+            git add docs/*.html docs/codes docs/stats.json docs/style.css docs/favicon.svg research/repro/multisize.json
             if git diff --cached --quiet; then
               echo "site already up to date"; exit 0
             fi
