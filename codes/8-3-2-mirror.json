@@ -123,6 +123,7 @@
    "@mathysrennela"
   ],
   "construction": "Mirror code on Z_8, A=[3, 7], B=[5, 4, 2, 7]",
-  "date": "2026-10-30"
+  "date": "2026-10-30",
+  "model": "Beam 1.0"
  }
 }
