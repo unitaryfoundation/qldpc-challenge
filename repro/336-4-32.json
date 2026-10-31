@@ -1,0 +1,39 @@
+{
+  "artifact_sha256": "25a43fd12320294432ef1a55ed8594293441925f4e58198239f0d1662ea313cd",
+  "environment": {
+    "extras": [
+      "research"
+    ]
+  },
+  "manifest_version": "1",
+  "notes": "Emitted by research/kit/submit.write_repro_manifest from the screening spec; the construction stage replays the recipe with research/kit/rebuild.py and compares fingerprints.",
+  "slug": "336-4-32",
+  "stages": {
+    "certify": {
+      "reason": "above the certifier's demonstrated range",
+      "status": "not_applicable"
+    },
+    "circuits": {
+      "reason": "the entry has no circuit block",
+      "status": "not_applicable"
+    },
+    "construction": {
+      "args": [
+        "--constructor",
+        "bb.build_bb",
+        "--params",
+        "{\"l\":14,\"m\":12,\"A_terms\":[[5,11],[9,1],[10,11],[13,6]],\"B_terms\":[[7,9],[9,1],[0,5],[13,4]]}"
+      ],
+      "budget_seconds": 300,
+      "script": "research/kit/rebuild.py",
+      "status": "applicable"
+    },
+    "ler": {
+      "reason": "the entry has no measured rate",
+      "status": "not_applicable"
+    },
+    "verify": {
+      "status": "applicable"
+    }
+  }
+}
