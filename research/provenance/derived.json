@@ -1,10 +1,10 @@
 {
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
-  "literature": 485,
-  "no_match": 1746,
-  "not_derived": 367,
-  "parameters_only": 408
+  "literature": 491,
+  "no_match": 1973,
+  "not_derived": 143,
+  "parameters_only": 399
  },
  "derivation_version": 1,
  "entries": {
@@ -41,7 +41,7 @@
    ]
   },
   "10-2-4": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "10-4-1": {
@@ -65,11 +65,11 @@
    "matches": []
   },
   "10-7-1-b": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "10-7-1-c": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "10-8-1": {
@@ -106,7 +106,7 @@
    ]
   },
   "100-23-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "100-24-5": {
@@ -236,17 +236,13 @@
    "matches": []
   },
   "102-22-9": {
-   "bucket": "parameters_only",
+   "bucket": "literature",
    "matches": [
     {
-     "id": "qecdb:6a422a11d15d481af09df8a3",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:6a422a11d15d481af09df8a3",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
+     "id": "walkingcat:[[102,22,9]]:GB8:l51m1:A=x^22 + x^26 + x^37 + x^50:B=x^19 + x^28 + x^29 + x^35:40 independent translates per side",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -358,11 +354,11 @@
    ]
   },
   "105-21-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "105-25-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "106-2-15": {
@@ -391,7 +387,7 @@
    "matches": []
   },
   "108-12-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "108-12-7": {
@@ -658,7 +654,7 @@
    "matches": []
   },
   "11-3-3-f": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "11-3-3-g": {
@@ -678,7 +674,7 @@
    "matches": []
   },
   "11-5-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "11-6-1": {
@@ -698,7 +694,7 @@
    "matches": []
   },
   "11-8-1-c": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "11-9-1": {
@@ -714,7 +710,7 @@
    "matches": []
   },
   "110-25-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "110-28-10": {
@@ -733,7 +729,7 @@
    ]
   },
   "111-3-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "112-12-10": {
@@ -917,7 +913,7 @@
    ]
   },
   "113-1-17": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "114-4-11": {
@@ -1007,7 +1003,7 @@
    "matches": []
   },
   "117-19-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "117-38-3": {
@@ -1055,11 +1051,11 @@
    "matches": []
   },
   "119-17-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "119-23-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "119-34-5": {
@@ -1145,7 +1141,7 @@
    "matches": []
   },
   "12-3-3-s": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "12-4-2": {
@@ -1386,11 +1382,11 @@
    ]
   },
   "120-27-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "120-32-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "120-34-5": {
@@ -1478,7 +1474,7 @@
    ]
   },
   "120-43-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "120-44-2": {
@@ -1614,7 +1610,7 @@
    ]
   },
   "121-11-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "121-17-3": {
@@ -1813,8 +1809,21 @@
    ]
   },
   "126-20-11": {
-   "bucket": "no_match",
-   "matches": []
+   "bucket": "literature",
+   "matches": [
+    {
+     "id": "walkingcat:[[126,20,11]]:GB8:l63m1:A=1 + x^1 + x^3 + x^41:B=x^19 + x^29 + x^52 + x^58",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[126,20,11]]:BB8:l9m7:A=1 + x^1 y^1 + x^2 y^4 + x^5 y^6:B=x^1 + x^2 y^1 + x^4 y^6 + x^7 y^4",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    }
+   ]
   },
   "126-20-7": {
    "bucket": "no_match",
@@ -1971,7 +1980,7 @@
    ]
   },
   "127-1-19": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "128-12-16": {
@@ -2212,11 +2221,11 @@
    ]
   },
   "13-1-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "13-7-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "130-14-6": {
@@ -2224,7 +2233,7 @@
    "matches": []
   },
   "130-29-13": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "130-8-7": {
@@ -2300,7 +2309,7 @@
    ]
   },
   "132-47-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "132-48-2": {
@@ -2341,15 +2350,15 @@
    "matches": []
   },
   "133-19-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "133-25-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "134-2-17": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "134-2-18": {
@@ -2496,7 +2505,7 @@
    ]
   },
   "137-1-17": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "139-7-5": {
@@ -2520,7 +2529,7 @@
    ]
   },
   "14-3-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "14-6-2": {
@@ -2608,7 +2617,7 @@
    ]
   },
   "140-31-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "140-42-2": {
@@ -2696,11 +2705,11 @@
    ]
   },
   "142-2-18": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "143-13-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "143-15-6": {
@@ -2708,7 +2717,7 @@
    "matches": []
   },
   "143-23-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "144-10-16": {
@@ -2775,6 +2784,18 @@
      "ref": "arXiv:2606.02418",
      "source": "qcode_discovery_bb",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[144,12,12]]:BB6:l12m6:A=x^3 + y^1 + y^2:B=y^3 + x^1 + x^2",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[144,12,12]]:BB6:l12m6:A=1 + y^1 + x^3 y^2:B=x^1 + x^2 + x^3 y^3",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -2809,12 +2830,13 @@
    ]
   },
   "144-14-14": {
-   "bucket": "parameters_only",
+   "bucket": "literature",
    "matches": [
     {
-     "id": "codetables:[[144,14]]",
-     "ref": "https://codetables.de -- bounds only, no construction to compare",
-     "source": "codetables"
+     "id": "walkingcat:[[144,14,14]]:BB8:l12m6:A=1 + y^1 + x^1 + x^5 y^4:B=1 + x^2 y^3 + x^6 y^2 + x^7 y^5",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -2913,7 +2935,7 @@
    ]
   },
   "144-4-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "144-42-2": {
@@ -3060,7 +3082,7 @@
    ]
   },
   "145-32-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "146-18-14": {
@@ -3108,7 +3130,7 @@
    "matches": []
   },
   "147-21-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "148-2-19": {
@@ -3123,7 +3145,7 @@
    ]
   },
   "148-39-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "148-4-18": {
@@ -3220,7 +3242,7 @@
    "matches": []
   },
   "150-33-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "150-33-6": {
@@ -3232,11 +3254,11 @@
    "matches": []
   },
   "150-53-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "150-62-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "150-8-18": {
@@ -3244,7 +3266,7 @@
    "matches": []
   },
   "151-1-21": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "151-6-8": {
@@ -3370,15 +3392,15 @@
    ]
   },
   "155-5-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "155-6-20": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "155-6-21-b": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "156-2-17": {
@@ -3495,7 +3517,7 @@
    ]
   },
   "16-10-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "16-2-4": {
@@ -3647,7 +3669,7 @@
    ]
   },
   "160-35-16": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "160-36-6": {
@@ -3687,7 +3709,7 @@
    ]
   },
   "160-42-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "160-48-2": {
@@ -3795,7 +3817,7 @@
    "matches": []
   },
   "161-23-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "161-8-8": {
@@ -4160,7 +4182,7 @@
    ]
   },
   "168-59-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "168-6-16": {
@@ -4241,11 +4263,11 @@
    ]
   },
   "169-13-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "169-13-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "169-8-9": {
@@ -4347,7 +4369,7 @@
    ]
   },
   "170-37-16": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "170-52-3": {
@@ -4361,7 +4383,7 @@
    ]
   },
   "170-70-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "170-8-20": {
@@ -4375,7 +4397,7 @@
    ]
   },
   "171-25-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "172-2-21": {
@@ -4405,7 +4427,7 @@
    "matches": []
   },
   "173-1-23": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "174-4-18": {
@@ -4539,7 +4561,7 @@
    ]
   },
   "177-3-16": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "177-9-5": {
@@ -4564,7 +4586,7 @@
    ]
   },
   "178-2-20": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "178-22-16": {
@@ -4596,7 +4618,7 @@
    ]
   },
   "18-1-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "18-10-2": {
@@ -4637,11 +4659,11 @@
    ]
   },
   "18-2-5-s": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "18-3-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "18-4-3": {
@@ -4725,7 +4747,7 @@
    ]
   },
   "180-2-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "180-2-15": {
@@ -4799,7 +4821,7 @@
    ]
   },
   "180-39-16": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "180-4-14": {
@@ -4974,7 +4996,7 @@
    ]
   },
   "185-40-17": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "186-10-14": {
@@ -5055,11 +5077,11 @@
    "matches": []
   },
   "186-65-13": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "187-27-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "188-4-21": {
@@ -5074,19 +5096,19 @@
    ]
   },
   "188-49-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "188-95-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "188-95-3-b": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "189-27-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "19-1-5": {
@@ -5880,15 +5902,15 @@
    ]
   },
   "20-2-6-s": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "20-3-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "20-4-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "20-8-2": {
@@ -5978,7 +6000,7 @@
    ]
   },
   "200-43-19": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "200-60-2": {
@@ -6176,7 +6198,7 @@
    "matches": []
   },
   "21-1-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "21-2-6": {
@@ -6195,7 +6217,7 @@
    ]
   },
   "21-3-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "210-10-16": {
@@ -6297,7 +6319,7 @@
    ]
   },
   "210-86-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "210-90-3": {
@@ -6358,7 +6380,7 @@
    "matches": []
   },
   "216-4-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "216-4-18": {
@@ -6488,7 +6510,7 @@
    ]
   },
   "220-47-18": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "220-52-5": {
@@ -6651,7 +6673,7 @@
    ]
   },
   "23-1-7-cyclic": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "23-11-3": {
@@ -6704,7 +6726,7 @@
    ]
   },
   "230-94-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "232-104-3": {
@@ -6804,7 +6826,7 @@
    "matches": []
   },
   "235-96-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "236-16-12": {
@@ -7144,7 +7166,7 @@
    ]
   },
   "240-51-18": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "240-6-11": {
@@ -7679,7 +7701,7 @@
    "matches": []
   },
   "256-16-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "256-194-4": {
@@ -7732,7 +7754,7 @@
    ]
   },
   "26-2-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "26-8-4": {
@@ -7853,15 +7875,15 @@
    "matches": []
   },
   "27-2-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "27-3-5-cyclic": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "27-3-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "270-10-24": {
@@ -7953,7 +7975,7 @@
    "matches": []
   },
   "276-2-27": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "276-4-24": {
@@ -8081,7 +8103,7 @@
    ]
   },
   "28-3-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "28-4-5": {
@@ -8238,7 +8260,7 @@
    "matches": []
   },
   "282-143-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "282-96-6": {
@@ -8454,7 +8476,7 @@
    "matches": []
   },
   "29-1-9-cyclic": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "29-5-4": {
@@ -8577,54 +8599,12 @@
    "matches": []
   },
   "30-10-1": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:67a394df9d65c7b4098268fe",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a3961f9d65c7b409826907",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a39c149d65c7b40982690c",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a4b4b84bcb3522b2d465a7",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "30-10-2": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:67a394df9d65c7b4098268fe",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a3961f9d65c7b409826907",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a39c149d65c7b40982690c",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a4b4b84bcb3522b2d465a7",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "30-10-3": {
    "bucket": "literature",
@@ -8638,29 +8618,8 @@
    ]
   },
   "30-10-3-b": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:67a394df9d65c7b4098268fe",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a394df9d65c7b4098268fe",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a3961f9d65c7b409826907",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67a3961f9d65c7b409826907",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "30-10-5": {
    "bucket": "no_match",
@@ -8744,6 +8703,18 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[30,4,5]]:GB5:l15m1:A=1 + x^1 + x^5:B=x^1 + x^4",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "yedelfosse2025:[[30,4,5]]:GB5:l15m1:A=1 + x^1 + x^5:B=x^1 + x^4",
+     "ref": "arXiv:2503.22071",
+     "source": "ye_delfosse2025_bb5",
+     "xz_swapped": false
     }
    ]
   },
@@ -8759,54 +8730,12 @@
    ]
   },
   "30-5-1": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:67081a473ce7883b56a9a65f",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67081b7a3ce7883b56a9a676",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67081ce33ce7883b56a9a68c",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:670822033ce7883b56a9a6b8",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "30-5-2": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:67081a473ce7883b56a9a65f",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67081b7a3ce7883b56a9a676",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67081ce33ce7883b56a9a68c",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:670822033ce7883b56a9a6b8",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "30-6-5": {
    "bucket": "parameters_only",
@@ -8834,7 +8763,7 @@
    ]
   },
   "30-7-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "30-8-3": {
@@ -8869,6 +8798,18 @@
      "id": "2bga:SmallGroup(15,1):a[3,11]:b[5,14]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[30,8,4]]:BB6:l5m3:A=1 + x^1 + x^3 y^1:B=y^1 + x^1 y^2 + x^4 y^2",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[30,8,4]]:GB6:l15m1:A=1 + x^1 + x^4:B=x^2 + x^9 + x^11",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
      "xz_swapped": false
     }
    ]
@@ -9051,7 +8992,7 @@
    ]
   },
   "31-1-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "31-15-3": {
@@ -9372,11 +9313,11 @@
    ]
   },
   "32-25-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "32-4-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "32-6-6": {
@@ -9410,7 +9351,7 @@
    "matches": []
   },
   "320-2-32": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "320-36-16": {
@@ -9513,15 +9454,15 @@
    "matches": []
   },
   "329-190-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "33-2-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "33-3-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "330-10-27": {
@@ -9617,7 +9558,7 @@
    "matches": []
   },
   "336-10-28": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "336-12-24": {
@@ -9917,7 +9858,7 @@
    ]
   },
   "35-5-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "35-8-5": {
@@ -10017,7 +9958,7 @@
    "matches": []
   },
   "355-144-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "356-13-11": {
@@ -10238,6 +10179,12 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_nonabelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[36,4,6]]:BB5:l6m3:A=1 + y^1 + x^2:B=y^2 + x^1 y^1",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -10326,7 +10273,7 @@
    ]
   },
   "36-7-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "36-8-4": {
@@ -10394,7 +10341,7 @@
    "matches": []
   },
   "360-12-20": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "360-12-24": {
@@ -10463,11 +10410,11 @@
    "matches": []
   },
   "360-4-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "360-4-24": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "360-48-3": {
@@ -10759,19 +10706,19 @@
    "matches": []
   },
   "38-12-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "38-12-2": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "38-2-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "38-2-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "38-25-2": {
@@ -10827,11 +10774,11 @@
    "matches": []
   },
   "39-13-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-13-2": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-17-3": {
@@ -10843,11 +10790,11 @@
    "matches": []
   },
   "39-2-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-23-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-24-3": {
@@ -10855,7 +10802,7 @@
    "matches": []
   },
   "39-25-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-25-3": {
@@ -10863,11 +10810,11 @@
    "matches": []
   },
   "39-26-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "39-3-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "390-10-32": {
@@ -11310,7 +11257,7 @@
    ]
   },
   "40-9-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "400-12-40": {
@@ -11498,6 +11445,12 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[42,10,5]]:GB7:l21m1:A=1 + x^1 + x^3 + x^13:B=x^3 + x^19 + x^20",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -11659,12 +11612,19 @@
    ]
   },
   "42-6-6b": {
-   "bucket": "parameters_only",
+   "bucket": "literature",
    "matches": [
     {
-     "id": "codetables:[[42,6]]",
-     "ref": "https://codetables.de -- bounds only, no construction to compare",
-     "source": "codetables"
+     "id": "walkingcat:[[42,6,6]]:BB6:l7m3:A=1 + x^1 + x^3 y^1:B=x^1 + x^5 y^2 + x^6 y^1",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[42,6,6]]:GB6:l21m1:A=1 + x^1 + x^3:B=x^1 + x^12 + x^20",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -11675,6 +11635,12 @@
      "id": "2bga:SmallGroup(21,2):a[3,11]:b[5,16,20]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[42,6,7]]:GB7:l21m1:A=1 + x^1 + x^2 + x^5:B=1 + x^1 + x^10",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
      "xz_swapped": false
     }
    ]
@@ -11802,7 +11768,7 @@
    "matches": []
   },
   "424-106-20": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "426-6-42": {
@@ -12063,7 +12029,7 @@
    ]
   },
   "45-5-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "45-9-3": {
@@ -12106,7 +12072,7 @@
    "matches": []
   },
   "452-115-18": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "452-2-38": {
@@ -12152,11 +12118,11 @@
    "matches": []
   },
   "46-2-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "46-2-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "46-2-9": {
@@ -12312,7 +12278,7 @@
    "matches": []
   },
   "472-119-20": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "472-122-14": {
@@ -12388,7 +12354,7 @@
    ]
   },
   "48-11-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "48-12-4": {
@@ -12657,7 +12623,7 @@
    ]
   },
   "48-29-4": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "48-30-4": {
@@ -12685,6 +12651,24 @@
      "id": "2bga:SmallGroup(24,2):a[2]:b[3,20]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[48,4,7]]:BB5:l8m3:A=1 + y^1 + x^1 y^2:B=x^3 y^2 + x^6 y^2",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[48,4,7]]:GB5:l24m1:A=1 + x^1 + x^8:B=x^2 + x^23",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "yedelfosse2025:[[48,4,7]]:BB5:l8m3:A=1 + y^1 + x^1 y^2:B=x^3 y^2 + x^6 y^2",
+     "ref": "arXiv:2503.22071",
+     "source": "ye_delfosse2025_bb5",
      "xz_swapped": false
     }
    ]
@@ -12731,7 +12715,7 @@
    ]
   },
   "48-7-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "48-8-6": {
@@ -12746,29 +12730,8 @@
    ]
   },
   "48-8-6-b": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "qecdb:670a5f246ad97a47efbc0a03",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:670a5f246ad97a47efbc0a03",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67bc8c88e8112da5fce0be41",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    },
-    {
-     "id": "qecdb:67bc8c88e8112da5fce0be41",
-     "ref": "https://qecdb.org",
-     "source": "qecdb"
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "48-8-7": {
    "bucket": "no_match",
@@ -12792,7 +12755,7 @@
    ]
   },
   "480-12-34": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "480-24-18": {
@@ -12856,11 +12819,11 @@
    "matches": []
   },
   "485-97-25": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "488-123-22": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "488-126-14": {
@@ -12903,7 +12866,7 @@
    "matches": []
   },
   "49-7-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "490-13-15": {
@@ -12975,11 +12938,11 @@
    "matches": []
   },
   "498-83-30": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "5-1-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "5-4-1": {
@@ -13106,7 +13069,7 @@
    ]
   },
   "500-100-15": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "500-100-16": {
@@ -13215,7 +13178,7 @@
    ]
   },
   "51-3-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "51-7-3": {
@@ -13321,7 +13284,7 @@
    "matches": []
   },
   "512-54-24": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "512-8-20": {
@@ -13421,7 +13384,7 @@
    "matches": []
   },
   "52-15-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "52-2-10": {
@@ -13542,7 +13505,7 @@
    "matches": []
   },
   "53-1-13": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "53-20-3": {
@@ -14187,7 +14150,7 @@
    ]
   },
   "56-8-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "56-8-7": {
@@ -14211,7 +14174,7 @@
    ]
   },
   "56-9-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "560-10-64": {
@@ -14299,7 +14262,7 @@
    "matches": []
   },
   "568-143-22": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "568-146-14": {
@@ -14330,7 +14293,7 @@
    ]
   },
   "57-3-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "570-12-70": {
@@ -14438,7 +14401,7 @@
    "matches": []
   },
   "576-42-24": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "576-8-32": {
@@ -14473,7 +14436,7 @@
    ]
   },
   "58-2-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "58-2-7": {
@@ -14494,7 +14457,7 @@
    ]
   },
   "58-32-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "580-2-75": {
@@ -14594,11 +14557,11 @@
    "matches": []
   },
   "60-11-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-12-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-12-6": {
@@ -14622,23 +14585,23 @@
    ]
   },
   "60-13-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-13-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-14-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-15-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-16-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-16-6": {
@@ -14646,11 +14609,11 @@
    "matches": []
   },
   "60-18-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-19-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-2-11": {
@@ -14665,7 +14628,7 @@
    ]
   },
   "60-20-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-20-5": {
@@ -14783,6 +14746,18 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_nonabelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[60,4,8]]:BB5:l15m2:A=1 + x^1 + x^5:B=x^4 + x^10 y^1",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[60,4,8]]:GB5:l30m1:A=1 + x^2 + x^10:B=x^17 + x^20",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -14827,7 +14802,7 @@
    ]
   },
   "60-8-13": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "60-8-6": {
@@ -15012,6 +14987,12 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[62,10,6]]:GB6:l31m1:A=1 + x^1 + x^12:B=1 + x^3 + x^8",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -15057,11 +15038,11 @@
    ]
   },
   "62-16-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-17-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-18-6": {
@@ -15080,11 +15061,11 @@
    ]
   },
   "62-2-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-20-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-20-6": {
@@ -15124,11 +15105,11 @@
    "matches": []
   },
   "62-6-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-7-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "620-13-16": {
@@ -15192,7 +15173,7 @@
    "matches": []
   },
   "63-13-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "63-18-7": {
@@ -15246,7 +15227,7 @@
    "matches": []
   },
   "63-7-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "63-9-6": {
@@ -15723,7 +15704,7 @@
    ]
   },
   "64-24-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "64-32-2": {
@@ -15902,11 +15883,11 @@
    "matches": []
   },
   "65-5-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "65-5-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "65-9-3": {
@@ -15972,7 +15953,7 @@
    "matches": []
   },
   "66-12-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "66-2-11": {
@@ -16030,7 +16011,7 @@
    ]
   },
   "66-4-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "66-4-12": {
@@ -16053,7 +16034,7 @@
    ]
   },
   "66-6-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "660-18-30": {
@@ -16081,7 +16062,7 @@
    "matches": []
   },
   "662-122-77": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "662-122-84": {
@@ -16089,7 +16070,7 @@
    "matches": []
   },
   "662-122-86": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "662-180-50": {
@@ -16197,7 +16178,7 @@
    "matches": []
   },
   "672-28-30": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "672-336-12": {
@@ -16493,11 +16474,11 @@
    "matches": []
   },
   "682-20-37": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "682-32-38": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "682-40-66": {
@@ -16557,7 +16538,7 @@
    "matches": []
   },
   "684-4-81": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "684-6-77": {
@@ -16573,7 +16554,7 @@
    "matches": []
   },
   "69-3-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "69-6-5": {
@@ -16601,7 +16582,7 @@
    "matches": []
   },
   "693-6-64": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "696-174-4": {
@@ -16939,7 +16920,7 @@
    "matches": []
   },
   "711-187-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "711-8-25": {
@@ -16955,7 +16936,7 @@
    "matches": []
   },
   "714-22-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "715-19-7": {
@@ -16971,7 +16952,7 @@
    "matches": []
   },
   "719-305-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "72-10-10": {
@@ -17020,6 +17001,18 @@
      "id": "2bga:SmallGroup(36,11):a[1,2,15]:b[1,7,32]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_nonabelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[72,12,6]]:BB6:l6m6:A=x^3 + y^1 + y^2:B=y^3 + x^1 + x^2",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[72,12,6]]:BB6:l6m6:A=1 + y^1 + x^3 y^2:B=1 + x^1 + x^2 y^3",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
      "xz_swapped": false
     }
    ]
@@ -17325,6 +17318,12 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[72,8,8]]:BB6:l12m3:A=1 + y^1 + x^3 y^2:B=y^2 + x^1 + x^8 y^1",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -17392,7 +17391,7 @@
    "matches": []
   },
   "73-10-15": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "73-37-6": {
@@ -17419,11 +17418,11 @@
    "matches": []
   },
   "73-44-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "73-46-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "730-28-38": {
@@ -17460,23 +17459,23 @@
    ]
   },
   "74-2-13": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "749-155-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "749-156-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "75-10-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "75-7-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "750-152-7": {
@@ -17537,7 +17536,7 @@
    "matches": []
   },
   "761-1-39": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "762-28-32": {
@@ -17577,11 +17576,11 @@
    "matches": []
   },
   "77-11-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "77-11-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "773-25-10": {
@@ -17802,7 +17801,7 @@
    "matches": []
   },
   "8-2-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "8-3-2": {
@@ -17818,7 +17817,7 @@
    "matches": []
   },
   "8-3-3": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "8-4-1": {
@@ -17976,7 +17975,7 @@
    "matches": []
   },
   "80-33-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "80-34-5": {
@@ -18136,11 +18135,11 @@
    "matches": []
   },
   "800-29-24": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "800-32-22": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "800-326-6": {
@@ -18178,7 +18177,7 @@
    "matches": []
   },
   "81-9-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "810-166-8": {
@@ -18194,7 +18193,7 @@
    "matches": []
   },
   "82-2-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "82-2-9": {
@@ -18289,6 +18288,12 @@
      "id": "2bga:SmallGroup(42,6):a[8,28]:b[6,22,37]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[84,10,9]]:GB7:l42m1:A=1 + x^1 + x^4 + x^9:B=x^4 + x^17 + x^36",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
      "xz_swapped": false
     }
    ]
@@ -18648,7 +18653,7 @@
    "matches": []
   },
   "85-8-9": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "853-25-10": {
@@ -18710,7 +18715,7 @@
    ]
   },
   "87-3-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "872-222-18": {
@@ -18756,11 +18761,11 @@
    ]
   },
   "88-24-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "88-36-4": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "88-4-12": {
@@ -18916,7 +18921,7 @@
    "matches": []
   },
   "9-7-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "90-10-11": {
@@ -19007,7 +19012,7 @@
    ]
   },
   "90-21-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "90-24-2": {
@@ -19114,6 +19119,18 @@
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
      "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[90,8,10]]:BB6:l15m3:A=x^9 + y^1 + y^2:B=1 + x^2 + x^7",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[90,8,10]]:BB6:l15m3:A=1 + y^1 + x^3 y^2:B=1 + x^4 + x^14",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
     }
    ]
   },
@@ -19124,6 +19141,12 @@
      "id": "2bga:SmallGroup(45,1):a[6,17]:b[2,24,31]",
      "ref": "arXiv:2306.16400",
      "source": "lin_pryadko_2bga_abelian",
+     "xz_swapped": false
+    },
+    {
+     "id": "walkingcat:[[90,8,11]]:GB7:l45m1:A=1 + x^1 + x^4 + x^40:B=x^8 + x^22 + x^34",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
      "xz_swapped": false
     }
    ]
@@ -19157,19 +19180,19 @@
    "matches": []
   },
   "91-13-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "91-13-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "91-19-6": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "91-7-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "910-12-36": {
@@ -19219,7 +19242,7 @@
    ]
   },
   "92-25-8": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "92-4-13": {
@@ -19295,15 +19318,15 @@
    "matches": []
   },
   "93-3-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "93-32-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "93-6-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "930-18-36": {
@@ -19368,7 +19391,7 @@
    ]
   },
   "94-2-14": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "94-36-3": {
@@ -19400,11 +19423,11 @@
    "matches": []
   },
   "95-22-11": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "95-5-10": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "955-51-5": {
@@ -19416,7 +19439,7 @@
    "matches": []
   },
   "96-10-12": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "96-10-12-b": {
@@ -19601,8 +19624,15 @@
    ]
   },
   "96-22-8": {
-   "bucket": "no_match",
-   "matches": []
+   "bucket": "literature",
+   "matches": [
+    {
+     "id": "walkingcat:[[96,22,8]]:BB8:l12m4:A=1 + y^1 + x^1 + x^7 y^1:B=x^1 y^1 + x^3 y^2 + x^3 y^3 + x^7",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    }
+   ]
   },
   "96-23-6": {
    "bucket": "no_match",
@@ -19826,7 +19856,7 @@
    "matches": []
   },
   "960-24-38": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "960-258-6": {
@@ -19954,8 +19984,15 @@
    ]
   },
   "98-8-13": {
-   "bucket": "no_match",
-   "matches": []
+   "bucket": "literature",
+   "matches": [
+    {
+     "id": "walkingcat:[[98,8,13]]:GB8:l49m1:A=1 + x^1 + x^3 + x^41:B=x^5 + x^22 + x^32 + x^48",
+     "ref": "arXiv:2604.19481",
+     "source": "tripier2026_walking_cat",
+     "xz_swapped": false
+    }
+   ]
   },
   "980-196-3": {
    "bucket": "no_match",
@@ -19974,7 +20011,7 @@
    "matches": []
   },
   "99-17-7": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "990-198-17": {
@@ -19982,7 +20019,7 @@
    "matches": []
   },
   "994-142-40": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "996-166-32": {
@@ -20002,11 +20039,11 @@
    "matches": []
   },
   "999-417-2": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "999-418-2": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   }
  },
