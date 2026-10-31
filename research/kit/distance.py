@@ -426,3 +426,137 @@ if __name__ == "__main__":
         print("  decoder (BP+OSD):", res.get("d_heuristic"), res.get("verdict"))
     except ImportError as e:
         print("  decoder: skipped --", str(e).splitlines()[0])
+
+
+# ---------------------------------------------------------------------------
+# SAT-based lower bounds for screening (issue: "use SAT estimators as lower
+# bounds instead of exact bounds")
+# ---------------------------------------------------------------------------
+
+def _gf2():
+    """Lazy import of verify/gf2.py (GF(2) rank)."""
+    import os, sys
+    _v = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "verify")
+    if _v not in sys.path:
+        sys.path.insert(0, _v)
+    import gf2 as _g
+    return _g
+
+
+def weight_one_logical_exists(HX, HZ):
+    """Cheap, exact linear-algebra check for a distance-1 code.
+
+    A weight-1 logical on the X side exists iff some qubit ``q`` has a zero
+    column in ``HZ`` (so ``e_q`` commutes with every Z check) and ``e_q`` is
+    not a product of X checks (not in rowspace(HX)). The Z side is symmetric.
+
+    This is the whole content of "can we show d >= 2": a SAT instance at
+    ``W = 1`` asks exactly this question, and the linear-algebra answer is
+    both cheaper and exact. Returns ``True`` when at least one side has a
+    weight-1 logical, i.e. when the code's distance is 1.
+    """
+    HX = np.asarray(HX, dtype=np.int8) % 2
+    HZ = np.asarray(HZ, dtype=np.int8) % 2
+    n = int(HX.shape[1])
+    gf2 = _gf2()
+    for side_self, side_opp in ((HX, HZ), (HZ, HX)):
+        for q in range(n):
+            if int(side_opp[:, q].sum()) != 0:
+                continue
+            v = np.zeros(n, dtype=np.int8)
+            v[q] = 1
+            # in rowspace iff rank does not grow
+            if gf2.rank(np.vstack([side_self, v.reshape(1, -1)])) \
+                    == gf2.rank(side_self):
+                continue  # stabilizer, trivial
+            return True
+    return False
+
+
+def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
+    """Use the SAT certifier as a *lower*-bound screen.
+
+    Claims ``d = min_d`` (so ``W = min_d - 1``) and runs
+    ``verify/sat_certify.py`` unchanged. The outcome is about whether a
+    nontrivial logical of weight ``< min_d`` exists:
+
+      * ``"proved"``    -- UNSAT on both sides: no logical lighter than
+        ``min_d``, so the true distance is ``>= min_d``. Safe to keep.
+      * ``"refuted"``   -- SAT on at least one side: a logical of weight
+        ``<= min_d - 1`` exists; carries it as ``witness``. Drop the code
+        (its distance is below ``min_d``).
+      * ``"timeout"``   -- the solver ran out of budget on (at least) one
+        side. **Inconclusive, not a refutation**: the code may still have
+        ``d >= min_d``. Do not drop on a timeout; treat it as "unresolved".
+      * ``"error"``     -- the certifier raised (bad pairing set, missing
+        dep, ...); details in ``detail``.
+
+    This is the screening analogue of ``sat_exact_distance`` with a shallow
+    claim: cheap (seconds for ``min_d`` up to ~6 on board-sized codes) and
+    it only ever says "definitely too light" or "definitely not too light",
+    never an exact distance. A code that is "proved" here still needs the
+    full gate / exact certification before anything is claimed.
+
+    Returns a dict with ``min_d``, ``outcome``, ``d_exact``, ``sides``,
+    ``witness`` (when refuted), ``secs`` and, on timeout, which side timed
+    out.
+    """
+    import time
+    t0 = time.monotonic()
+    try:
+        res = sat_exact_distance(HX, HZ, tlim=tlim, trials=trials, seed=seed,
+                                 d_upper={"X": int(min_d), "Z": int(min_d)})
+    except Exception as e:  # noqa: BLE001 -- reported, not raised
+        return {"min_d": int(min_d), "outcome": "error",
+                "detail": f"{type(e).__name__}: {e}",
+                "secs": round(time.monotonic() - t0, 2)}
+    sides = res.get("sides") or {}
+    secs = round(time.monotonic() - t0, 2)
+    witness = None
+    timed_out = [s for s, b in sides.items()
+                 if (b or {}).get("status") == "TIMEOUT"]
+    refuted = [s for s, b in sides.items()
+               if (b or {}).get("status") == "SAT"]
+    for s in refuted:
+        w = (sides[s] or {}).get("witness")
+        if w is not None:
+            witness = {"side": s, "support": list(w)}
+            break
+    if refuted:
+        outcome = "refuted"
+    elif timed_out:
+        outcome = "timeout"
+    elif res.get("d_exact"):
+        outcome = "proved"
+    else:
+        outcome = "timeout"
+    out = {"min_d": int(min_d), "outcome": outcome,
+           "d_exact": bool(res.get("d_exact")),
+           "sides": sides, "secs": secs}
+    if witness is not None:
+        out["witness"] = witness
+    if timed_out:
+        out["timed_out_sides"] = timed_out
+    return out
+
+
+def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, trials=200, seed=0):
+    """Screen predicate built on :func:`sat_lower_bound`.
+
+    Returns ``True`` when the code is *shown* to have distance ``< min_d``
+    (drop it), ``False`` when it is shown to have distance ``>= min_d``
+    (keep it), and ``None`` when the solver timed out (inconclusive -- the
+    caller decides, but the safe default is to keep and let the surrogate /
+    gate speak). This is the shape a ``search.screen`` filter can consume.
+
+    Note the asymmetry with ``surrogate.distance_rand``: the surrogate is an
+    upper bound that drops on a *found* logical; this is a lower bound that
+    drops on a *proved* low logical. Timeouts never drop.
+    """
+    r = sat_lower_bound(HX, HZ, min_d=min_d, tlim=tlim, trials=trials,
+                        seed=seed)
+    if r["outcome"] == "refuted":
+        return True
+    if r["outcome"] == "proved":
+        return False
+    return None
