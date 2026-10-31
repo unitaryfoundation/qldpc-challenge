@@ -73,7 +73,6 @@ concurrency:
 env:
   PYTHONUNBUFFERED: "1"
   CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT }}
-  OUT_DIR: ${{ runner.temp }}/layout-sweep
 
 jobs:
   sweep:
@@ -81,6 +80,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || vars.SWEEP_CREDIT != ''
     runs-on: ubuntu-latest
     timeout-minutes: 330
+    env:
+      OUT_DIR: ${{ runner.temp }}/layout-sweep
     steps:
       - name: require the credited account and its token
         env:
