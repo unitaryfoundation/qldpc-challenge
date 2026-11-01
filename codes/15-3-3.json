@@ -1,0 +1,140 @@
+{
+ "schema_version": "0.2",
+ "name": "priced-calculus-15-3-3",
+ "code_type": "CSS",
+ "n": 15,
+ "k": 3,
+ "checks": {
+  "X": [
+   [
+    0,
+    3,
+    11,
+    14
+   ],
+   [
+    1,
+    2,
+    12,
+    13
+   ],
+   [
+    0,
+    1,
+    4,
+    5
+   ],
+   [
+    2,
+    3,
+    6,
+    7
+   ],
+   [
+    4,
+    7,
+    8,
+    10
+   ],
+   [
+    8,
+    9,
+    11,
+    12
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    11,
+    12
+   ],
+   [
+    2,
+    3,
+    13,
+    14
+   ],
+   [
+    0,
+    3,
+    4,
+    7
+   ],
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    4,
+    5,
+    8,
+    9
+   ],
+   [
+    8,
+    10,
+    11,
+    14
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    2,
+    6,
+    13
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-10-31",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     0
+    ]
+   }
+  },
+  "Z": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    3,
+    6,
+    14
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-10-31",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "priced calculus E-PUNCTURE transform of codes/16-2-4.json",
+  "references": [],
+  "date": "2026-10-31",
+  "notes": "",
+  "model": "Beam 1.0"
+ }
+}
