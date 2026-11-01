@@ -47,10 +47,29 @@ def _load_module(path, name):
 def _throwaway_doc(HX, HZ, trials, seed):
     """A minimal, schema-shaped doc (with witnesses and per-side distance values)
     for a code under construction -- enough for the certifiers, no provenance."""
-    return make_submission(
-        HX, HZ, name="(in-progress)", construction="(in-progress)",
-        authors=["?"], tracks=[], trials=trials, seed=seed,
-    )
+    HX = np.asarray(HX, dtype=np.int8) % 2
+    HZ = np.asarray(HZ, dtype=np.int8) % 2
+    if trials and int(trials) > 0:
+        return make_submission(
+            HX, HZ, name="(in-progress)", construction="(in-progress)",
+            authors=["?"], tracks=[], trials=int(trials), seed=seed,
+        )
+    n = int(HX.shape[1])
+    gf2 = _load_module(os.path.join(_VERIFY, "gf2.py"), "_qldpc_gf2_min")
+    k = int(n - gf2.rank(HX) - gf2.rank(HZ))
+    return {
+        "name": "(in-progress)",
+        "code_type": "CSS",
+        "n": n,
+        "k": k,
+        "checks": {"X": [sorted(int(j) for j in np.nonzero(row % 2)[0])
+                         for row in HX],
+                   "Z": [sorted(int(j) for j in np.nonzero(row % 2)[0])
+                         for row in HZ]},
+        "distance": {"d": 1,
+                     "X": {"value": 1, "confidence": "upper_bound"},
+                     "Z": {"value": 1, "confidence": "upper_bound"}},
+    }
 
 
 def exact_distance(HX, HZ, tlim=600, trials=4000, seed=0, d_upper=None):
@@ -408,6 +427,184 @@ def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
             "cc_Z": None, "sat": None}
 
 
+# ---------------------------------------------------------------------------
+# SAT-based lower bounds for screening (PR #4311)
+# ---------------------------------------------------------------------------
+# Complement to the Monte Carlo *upper* bound in surrogate.distance_rand: the
+# SAT certifier (verify/sat_certify.py) is usually run to certify an exact
+# distance by proving UNSAT at W = d - 1. Run at a shallow bound W = min_d - 1
+# it proves only d >= min_d, cheaply enough to use as a screen. This is a
+# lower bound, not an exact distance and not a certificate: anything promoted
+# still goes through verify/ and the gate.
+
+def _gf2_mod():
+    return _load_module(os.path.join(_VERIFY, "gf2.py"), "_qldpc_gf2")
+
+
+def weight_one_logical_exists(HX, HZ):
+    """Cheap, exact linear-algebra check for a distance-1 code.
+
+    A weight-1 logical on the X side exists iff some qubit ``q`` has a zero
+    column in ``HZ`` (so ``e_q`` commutes with every Z check) and ``e_q`` is
+    not a product of X checks (not in rowspace(HX)). The Z side is symmetric.
+
+    This is the whole content of "can we show d >= 2": a SAT instance at
+    ``W = 1`` asks exactly this question, and the linear-algebra answer is
+    both cheaper and exact. Returns ``True`` when at least one side has a
+    weight-1 logical, i.e. when the code's distance is 1.
+    """
+    HX = np.asarray(HX, dtype=np.int8) % 2
+    HZ = np.asarray(HZ, dtype=np.int8) % 2
+    n = int(HX.shape[1])
+    gf2 = _gf2_mod()
+    for side_self, side_opp in ((HX, HZ), (HZ, HX)):
+        R, piv = gf2.rref(side_self)
+        for q in range(n):
+            if int(side_opp[:, q].sum()) != 0:
+                continue
+            vv = np.zeros(n, dtype=np.int8)
+            vv[q] = 1
+            for i, c in enumerate(piv):
+                if vv[c]:
+                    vv = (vv ^ R[i]).astype(np.int8)
+            if vv.any():
+                return True
+    return False
+
+
+def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
+    """Use the SAT certifier as a *lower*-bound screen.
+
+    Claims ``d = min_d`` (so ``W = min_d - 1``) and runs
+    ``verify/sat_certify.py`` unchanged. The outcome is about whether a
+    nontrivial logical of weight ``< min_d`` exists:
+
+      * ``"proved"``    -- UNSAT on both sides: no logical lighter than
+        ``min_d``, so the true distance is ``>= min_d``. Safe to keep.
+      * ``"refuted"``   -- SAT on at least one side: a logical of weight
+        ``<= min_d - 1`` exists; carries it as ``witness``. Drop the code
+        (its distance is below ``min_d``).
+      * ``"timeout"``   -- the solver ran out of budget on (at least) one
+        side. **Inconclusive, not a refutation**: the code may still have
+        ``d >= min_d``. Do not drop on a timeout; treat it as "unresolved".
+      * ``"unknown"``   -- a side reported a status other than SAT/UNSAT/
+        TIMEOUT (e.g. NO_SOLVER, UNKNOWN, NO_PAIRING). Inconclusive.
+      * ``"error"``     -- the certifier raised (bad pairing set, missing
+        dep, ...); details in ``detail``.
+
+    For ``min_d <= 2`` the check is done by linear algebra (no solver).
+
+    Returns a dict with ``min_d``, ``outcome``, ``both_sides_unsat``,
+    ``sides``, ``secs`` and, when refuted, ``witness``.
+    """
+    import time
+    t0 = time.monotonic()
+    HXa = np.asarray(HX, dtype=np.int8) % 2
+    HZa = np.asarray(HZ, dtype=np.int8) % 2
+    n = int(HXa.shape[1])
+    min_d = int(min_d)
+
+    # Linear-algebra fast path for min_d <= 2.
+    if min_d <= 2:
+        gf2 = _gf2_mod()
+        found = None
+        for side_self, side_opp, side_name in ((HXa, HZa, "X"),
+                                                (HZa, HXa, "Z")):
+            R, piv = gf2.rref(side_self)
+            for q in range(n):
+                if int(side_opp[:, q].sum()) != 0:
+                    continue
+                vv = np.zeros(n, dtype=np.int8)
+                vv[q] = 1
+                for i, c in enumerate(piv):
+                    if vv[c]:
+                        vv = (vv ^ R[i]).astype(np.int8)
+                if vv.any():
+                    found = (side_name, int(q))
+                    break
+            if found is not None:
+                break
+        secs = round(time.monotonic() - t0, 2)
+        if found is not None:
+            side, q = found
+            return {"min_d": min_d, "outcome": "refuted",
+                    "both_sides_unsat": False, "d_exact": False,
+                    "sides": {}, "secs": secs,
+                    "witness": {"side": side, "support": [q]}}
+        return {"min_d": min_d, "outcome": "proved",
+                "both_sides_unsat": True, "d_exact": True,
+                "sides": {}, "secs": secs}
+
+    try:
+        res = sat_exact_distance(HX, HZ, tlim=tlim, trials=0, seed=seed,
+                                 d_upper={"X": min_d, "Z": min_d})
+    except Exception as e:  # noqa: BLE001 -- reported, not raised
+        return {"min_d": min_d, "outcome": "error",
+                "detail": f"{type(e).__name__}: {e}",
+                "secs": round(time.monotonic() - t0, 2)}
+    sides = res.get("sides") or {}
+    secs = round(time.monotonic() - t0, 2)
+    witness = None
+    timed_out = [s for s, b in sides.items()
+                 if (b or {}).get("status") == "TIMEOUT"]
+    refuted = [s for s, b in sides.items()
+               if (b or {}).get("status") == "SAT"]
+    unknown = [s for s, b in sides.items()
+               if (b or {}).get("status") not in ("SAT", "UNSAT", "TIMEOUT")]
+    for s in refuted:
+        w = (sides[s] or {}).get("witness")
+        if w is not None:
+            witness = {"side": s, "support": list(w)}
+            break
+    if refuted:
+        outcome = "refuted"
+    elif timed_out:
+        outcome = "timeout"
+    elif unknown:
+        outcome = "unknown"
+    elif res.get("d_exact"):
+        outcome = "proved"
+    else:
+        outcome = "timeout"
+    both = (outcome == "proved")
+    out = {"min_d": min_d, "outcome": outcome,
+           "both_sides_unsat": both, "d_exact": both,
+           "sides": sides, "secs": secs}
+    if witness is not None:
+        out["witness"] = witness
+    if timed_out:
+        out["timed_out_sides"] = timed_out
+    if unknown:
+        out["unknown_sides"] = unknown
+    return out
+
+
+def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, trials=200, seed=0,
+               backend=None, threads=1, **_):
+    """Standalone pre-filter built on :func:`sat_lower_bound`.
+
+    Returns ``True`` when the code is *shown* to have distance ``< min_d``
+    (drop it), ``False`` when it is shown to have distance ``>= min_d``
+    (keep it), and ``None`` when the solver timed out or was otherwise
+    inconclusive (the caller decides, but the safe default is to keep and let
+    the surrogate / gate speak).
+
+    This is a standalone pre-filter, not a ``search.screen`` ``distance=``
+    backend: it returns a verdict rather than a distance, and timeouts are
+    never treated as refutations. ``backend``/``threads`` are accepted for
+    call-site compatibility and ignored.
+    """
+    r = sat_lower_bound(HX, HZ, min_d=min_d, tlim=tlim, trials=trials,
+                        seed=seed)
+    if r["outcome"] == "error":
+        raise RuntimeError(r.get("detail", "sat screen error"))
+    if r["outcome"] == "refuted":
+        return True
+    if r["outcome"] == "proved":
+        return False
+    return None
+
+
 if __name__ == "__main__":
     # Confirm a small known code both ways (each is a no-op if its dep is absent).
     from bb import build_bb, KNOWN
@@ -426,3 +623,4 @@ if __name__ == "__main__":
         print("  decoder (BP+OSD):", res.get("d_heuristic"), res.get("verdict"))
     except ImportError as e:
         print("  decoder: skipped --", str(e).splitlines()[0])
+
