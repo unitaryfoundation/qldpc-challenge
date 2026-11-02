@@ -79,6 +79,13 @@ A fifth campaign targeted Pareto frontier gaps in the (weight_class, locality)
 cells. Found 11 new board-advancing codes (mostly d=2, plus `[[47,8,7]]`
 d=7 and `[[60,9,5]]` d=5). All passed the gate. Promoted as PRs #4485-#4495.
 
+## Expanded search space (n=100-200, follow-up)
+
+A seventh campaign ran gap-targeted search over n=100-200 CSS parents (depth-1 only).
+Found 45 board-advancing codes including high-distance finds: `[[181,6,17]]` (d=17),
+`[[173,4,17]]` (d=17), `[[167,10,13]]` (d=13), `[[153,6,15]]` (d=15),
+`[[123,10,9]]` (d=9), `[[125,12,9]]` (d=9). All 45 promoted as PRs.
+
 ## Gap-targeted depth-1 search (follow-up)
 
 A sixth campaign ran gap-targeted search over n<=100 CSS parents (depth-1 only).
