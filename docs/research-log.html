@@ -3,6 +3,17 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/11-4-2.html">[[11,4,2]] — 11-4-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[11,4,2]] — priced calculus E-PEEL transform of bbga code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-5 unrestricted CSS cell. Transform a generated bbga code code with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Construction family code generated from research/kit (bbga sampler), then single-step peel (E-PEEL) enumerated with machine.planner.plan from github.com/MathysRennela/code-calculus-dev. Rule used: E-PEEL. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent: generated bbga code.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Generate a bbga code, apply the E-PEEL move of the priced calculus, re-run witness search.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-4-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/18-9-2.html">[[18,9,2]] — 18-9-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[18,9,2]] — priced calculus C-DELETE-CHECK transform of bb code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 unrestricted CSS cell. Transform a generated bb code code with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
@@ -27,7 +38,7 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer. Approx compute: CPU only.</p>
 <h4>Reproduction</h4>
 <p>Rebuild H_X/H_Z from codes/23-1-7.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/21-3-5.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/30-18-3.html">[[30,18,3]] — 30-18-3</a></h3><div class=kv style="color:var(--mut)">2026-11-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[30,18,3]] — priced calculus E-PEEL transform of 32-18-4.json</h3>
+<section class=blk><h3><a href="codes/30-18-3.html">[[30,18,3]] — 30-18-3</a></h3><div class=kv style="color:var(--mut)">2026-11-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[30,18,3]] — priced calculus E-PEEL transform of 32-18-4.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-15 unrestricted CSS cell. Transform a connected CSS parent (32-18-4.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
