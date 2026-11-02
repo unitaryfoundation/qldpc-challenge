@@ -20,11 +20,18 @@ existing board entry and was dropped).
 survivors. After excluding the 16 already submitted and one exact duplicate,
 108 new distinct tuples were submitted as PRs #4339-#4446.
 
-In total, **160+ PRs** were submitted from this campaign family (124 from the
+In total, **201 PRs** were submitted from this campaign family (124 from the
 calculus transform campaigns + 3 from the construction family pipeline:
 `[[18,9,2]]` (BB, C-DELETE-CHECK), `[[11,4,2]]` (BBGA, E-PEEL), and
 `[[41,10,5]]` (BB, E-PEEL) + 2 from the imaginative search:
-`[[9,5,2]]` (E-PUNCTURE) and `[[10,4,2]]` (E-PEEL)).
+`[[9,5,2]]` (E-PUNCTURE) and `[[10,4,2]]` (E-PEEL) + 11 from the
+gap-targeted search (PRs #4485-#4495) + 16 from the gap-targeted depth-1
+search (PRs #4496-#4514) + 45 from the expanded search space campaign
+(PRs #4515-#4562)).
+
+Across all sessions, **364 code PRs** and **3 fieldnote PRs** mention the
+priced calculus or a calculus rule, for **367 total calculus-related PRs**
+out of 1,903 total PRs by @MathysRennela.
 
 Rule breakdown across all 125 distinct board-advancing tuples:
 
