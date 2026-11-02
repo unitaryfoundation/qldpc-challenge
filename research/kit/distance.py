@@ -478,7 +478,8 @@ def weight_one_logical_exists(HX, HZ):
     return _first_weight_one_logical(HX, HZ) is not None
 
 
-def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0):
+def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
+                    trials=None, **_):
     """Use the SAT certifier as a *lower*-bound screen.
 
     Claims ``d = min_d`` (so ``W = min_d - 1``) and runs
@@ -499,6 +500,9 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0):
         dep, ...); details in ``detail``.
 
     For ``min_d <= 2`` the check is done by linear algebra (no solver).
+
+    ``trials``/``backend``/``threads`` are accepted for call-site compatibility
+    and ignored: this helper builds its own minimal document.
 
     Returns a dict with ``min_d``, ``outcome``, ``both_sides_unsat``,
     ``sides``, ``secs`` and, when refuted, ``witness``.
