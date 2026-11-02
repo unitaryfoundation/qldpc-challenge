@@ -44,8 +44,32 @@ def test_recipes_without_a_rule_or_a_module_are_labeled():
     assert ms.analyze("x", {"stages": {"construction": {"status": "not_reproducible"}}})["status"] == "no_recipe"
 
 
-def test_the_committed_table_matches_a_fresh_run():
+def test_compare_separates_drift_from_rows_the_table_has_not_caught_up_with():
+    was = {"a": ("lifted", [True, False], True), "b": ("no_lift_rule", [], True), "d": ("no_recipe", [], None)}
+    new = {"a": ("lifted", [False, False], True), "c": ("lifted", [True], True), "d": ("no_recipe", [], None)}
+    assert ms.compare(new, was) == ({"a"}, {"c"}, {"b"})
+    assert ms.compare(was, was) == (set(), set(), set())
+
+
+def test_unchanged_ignores_the_date_and_head_of_a_run():
+    with open(ms.TABLE, encoding="utf-8") as f:
+        old = json.load(f)
+    fresh = dict(old, date="1970-01-01", head="0" * 40)
+    assert ms.unchanged(fresh, old)
+    assert not ms.unchanged(dict(fresh, entries={}), old)
+    assert not ms.unchanged(dict(fresh, lifts={}), old)
+
+
+def test_the_committed_table_has_no_drift_from_a_fresh_run():
+    """A verdict the table records must still come out of the kit.
+
+    A manifest the table has not caught up with is not drift: a submission PR
+    adds its own repro/<slug>.json and may not touch research/ (issue #3810),
+    and site.yml regenerates the table on main after the merge. The scheduled
+    reproduce run checks with --strict, where nothing should be pending.
+    """
     with open(ms.TABLE, encoding="utf-8") as f:
         old = json.load(f)
     assert old["issue"] == 4031 and "no distance" in old["method"]
-    assert ms.verdicts(ms.build_table()) == ms.verdicts(old)
+    drifted, _added, _removed = ms.compare(ms.verdicts(ms.build_table()), ms.verdicts(old))
+    assert drifted == set(), drifted

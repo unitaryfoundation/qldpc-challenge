@@ -1,426 +1,462 @@
 {
-  "schema_version": "0.2",
-  "name": "[[24,4,5]] two-block code over D12",
-  "code_type": "CSS",
-  "n": 24,
-  "k": 4,
-  "checks": {
-    "X": [
-      [
-        0,
-        1,
-        2,
-        3,
-        7,
-        8,
-        12,
-        22
-      ],
-      [
-        0,
-        1,
-        4,
-        5,
-        9,
-        10,
-        13,
-        23
-      ],
-      [
-        0,
-        2,
-        4,
-        5,
-        6,
-        10,
-        14,
-        19
-      ],
-      [
-        0,
-        3,
-        5,
-        6,
-        7,
-        11,
-        14,
-        15
-      ],
-      [
-        1,
-        2,
-        4,
-        7,
-        8,
-        11,
-        16,
-        21
-      ],
-      [
-        1,
-        2,
-        3,
-        5,
-        8,
-        9,
-        16,
-        17
-      ],
-      [
-        2,
-        3,
-        6,
-        8,
-        9,
-        10,
-        12,
-        18
-      ],
-      [
-        0,
-        3,
-        4,
-        7,
-        9,
-        10,
-        18,
-        19
-      ],
-      [
-        0,
-        4,
-        5,
-        6,
-        8,
-        11,
-        13,
-        20
-      ],
-      [
-        1,
-        5,
-        6,
-        7,
-        9,
-        11,
-        20,
-        21
-      ],
-      [
-        1,
-        2,
-        6,
-        7,
-        10,
-        11,
-        15,
-        22
-      ],
-      [
-        3,
-        4,
-        8,
-        9,
-        10,
-        11,
-        17,
-        23
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        6,
-        12,
-        13,
-        14,
-        15,
-        19,
-        20
-      ],
-      [
-        1,
-        8,
-        12,
-        13,
-        16,
-        17,
-        21,
-        22
-      ],
-      [
-        2,
-        3,
-        12,
-        14,
-        16,
-        17,
-        18,
-        22
-      ],
-      [
-        3,
-        10,
-        12,
-        15,
-        17,
-        18,
-        19,
-        23
-      ],
-      [
-        4,
-        5,
-        13,
-        14,
-        16,
-        19,
-        20,
-        23
-      ],
-      [
-        5,
-        11,
-        13,
-        14,
-        15,
-        17,
-        20,
-        21
-      ],
-      [
-        6,
-        7,
-        14,
-        15,
-        18,
-        20,
-        21,
-        22
-      ],
-      [
-        2,
-        7,
-        12,
-        15,
-        16,
-        19,
-        21,
-        22
-      ],
-      [
-        8,
-        9,
-        12,
-        16,
-        17,
-        18,
-        20,
-        23
-      ],
-      [
-        4,
-        9,
-        13,
-        17,
-        18,
-        19,
-        21,
-        23
-      ],
-      [
-        0,
-        10,
-        13,
-        14,
-        18,
-        19,
-        22,
-        23
-      ],
-      [
-        1,
-        11,
-        15,
-        16,
-        20,
-        21,
-        22,
-        23
-      ]
-    ]
-  },
-  "distance": {
-    "d": 5,
-    "X": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        0,
-        1,
-        4,
-        11,
-        13
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1039
-        ]
-      }
-    },
-    "Z": {
-      "value": 5,
-      "confidence": "upper_bound",
-      "witness": [
-        3,
-        5,
-        10,
-        20,
-        22
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1040
-        ]
-      }
-    }
-  },
-  "provenance": {
-    "authors": [
-      "Lee, Gideon"
-    ],
-    "construction": "Two-block group-algebra code C(a,b) over D12 = SmallGroup(12, 4) (order 12), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 24; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 1, 2, 3, 7, 8}, b = {0, 6} as element indices. Check weight 8. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
-    "references": [
-      "arXiv:2610.13880"
+ "schema_version": "0.2",
+ "name": "[[24,4,5]] two-block code over D12",
+ "code_type": "CSS",
+ "n": 24,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    2,
+    3,
+    7,
+    8,
+    12,
+    22
+   ],
+   [
+    0,
+    1,
+    4,
+    5,
+    9,
+    10,
+    13,
+    23
+   ],
+   [
+    0,
+    2,
+    4,
+    5,
+    6,
+    10,
+    14,
+    19
+   ],
+   [
+    0,
+    3,
+    5,
+    6,
+    7,
+    11,
+    14,
+    15
+   ],
+   [
+    1,
+    2,
+    4,
+    7,
+    8,
+    11,
+    16,
+    21
+   ],
+   [
+    1,
+    2,
+    3,
+    5,
+    8,
+    9,
+    16,
+    17
+   ],
+   [
+    2,
+    3,
+    6,
+    8,
+    9,
+    10,
+    12,
+    18
+   ],
+   [
+    0,
+    3,
+    4,
+    7,
+    9,
+    10,
+    18,
+    19
+   ],
+   [
+    0,
+    4,
+    5,
+    6,
+    8,
+    11,
+    13,
+    20
+   ],
+   [
+    1,
+    5,
+    6,
+    7,
+    9,
+    11,
+    20,
+    21
+   ],
+   [
+    1,
+    2,
+    6,
+    7,
+    10,
+    11,
+    15,
+    22
+   ],
+   [
+    3,
+    4,
+    8,
+    9,
+    10,
+    11,
+    17,
+    23
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    6,
+    12,
+    13,
+    14,
+    15,
+    19,
+    20
+   ],
+   [
+    1,
+    8,
+    12,
+    13,
+    16,
+    17,
+    21,
+    22
+   ],
+   [
+    2,
+    3,
+    12,
+    14,
+    16,
+    17,
+    18,
+    22
+   ],
+   [
+    3,
+    10,
+    12,
+    15,
+    17,
+    18,
+    19,
+    23
+   ],
+   [
+    4,
+    5,
+    13,
+    14,
+    16,
+    19,
+    20,
+    23
+   ],
+   [
+    5,
+    11,
+    13,
+    14,
+    15,
+    17,
+    20,
+    21
+   ],
+   [
+    6,
+    7,
+    14,
+    15,
+    18,
+    20,
+    21,
+    22
+   ],
+   [
+    2,
+    7,
+    12,
+    15,
+    16,
+    19,
+    21,
+    22
+   ],
+   [
+    8,
+    9,
+    12,
+    16,
+    17,
+    18,
+    20,
+    23
+   ],
+   [
+    4,
+    9,
+    13,
+    17,
+    18,
+    19,
+    21,
+    23
+   ],
+   [
+    0,
+    10,
+    13,
+    14,
+    18,
+    19,
+    22,
+    23
+   ],
+   [
+    1,
+    11,
+    15,
+    16,
+    20,
+    21,
+    22,
+    23
+   ]
+  ]
+ },
+ "distance": {
+  "d": 5,
+  "X": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1,
+    4,
+    11,
+    13
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
     ],
     "date": "2026-10-12",
-    "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
-    "origin": "baseline",
-    "novelty": "known_parameters",
-    "model": "Mimo-V2.6-Flash"
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1039
+    ]
+   }
   },
-  "family": "2bga-nonabelian",
-  "locality": {
-    "coordinates": [
-      [
-        1.0,
-        3.0
-      ],
-      [
-        3.0,
-        1.0
-      ],
-      [
-        1.0,
-        2.0
-      ],
-      [
-        0.0,
-        1.0
-      ],
-      [
-        1.0,
-        1.0
-      ],
-      [
-        2.0,
-        3.0
-      ],
-      [
-        3.0,
-        2.0
-      ],
-      [
-        1.0,
-        0.0
-      ],
-      [
-        1.0,
-        2.0
-      ],
-      [
-        2.0,
-        2.0
-      ],
-      [
-        2.0,
-        3.0
-      ],
-      [
-        3.0,
-        1.0
-      ],
-      [
-        1.0,
-        1.0
-      ],
-      [
-        1.0,
-        3.0
-      ],
-      [
-        0.0,
-        2.0
-      ],
-      [
-        2.0,
-        0.0
-      ],
-      [
-        0.0,
-        1.0
-      ],
-      [
-        0.0,
-        2.0
-      ],
-      [
-        2.0,
-        2.0
-      ],
-      [
-        1.0,
-        0.0
-      ],
-      [
-        2.0,
-        1.0
-      ],
-      [
-        2.0,
-        1.0
-      ],
-      [
-        3.0,
-        2.0
-      ],
-      [
-        2.0,
-        0.0
-      ]
+  "Z": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    3,
+    5,
+    10,
+    20,
+    22
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
     ],
-    "layers": 2,
-    "interaction_radius": 3.1623,
-    "contributed_by": {
-      "by": [
-        "@MathysRennela"
-      ],
-      "date": "2026-10-13",
-      "method": "Simulated annealing over integer-grid site assignments with the repo's own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier's own rule."
-    }
+    "date": "2026-10-12",
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1040
+    ]
+   }
   }
+ },
+ "provenance": {
+  "authors": [
+   "Lee, Gideon"
+  ],
+  "construction": "Two-block group-algebra code C(a,b) over D12 = SmallGroup(12, 4) (order 12), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 24; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 1, 2, 3, 7, 8}, b = {0, 6} as element indices. Check weight 8. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
+  "references": [
+   "arXiv:2610.13880"
+  ],
+  "date": "2026-10-12",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "origin": "baseline",
+  "novelty": "known_parameters",
+  "model": "Mimo-V2.6-Flash"
+ },
+ "family": "2bga-nonabelian",
+ "locality": {
+  "coordinates": [
+   [
+    1.0,
+    3.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    2.0,
+    0.0
+   ]
+  ],
+  "layers": 2,
+  "interaction_radius": 3.1623,
+  "contributed_by": {
+   "by": [
+    "@MathysRennela"
+   ],
+   "date": "2026-10-13",
+   "method": "Simulated annealing over integer-grid site assignments with the repo's own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier's own rule."
+  }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 5,
+    "confidence": "upper_bound",
+    "witness": [
+     34,
+     317,
+     412,
+     723,
+     1343
+    ]
+   },
+   "Z": {
+    "value": 5,
+    "confidence": "upper_bound",
+    "witness": [
+     3616,
+     3633,
+     3650,
+     3683,
+     3688
+    ]
+   }
+  },
+  "rounds": 5,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [5, 2, 3, 8, 4, 6, 1, 7], Z-check term slots [5, 6, 4, 0, 2, 3, 7, 1] over terms A_0..A_5, B_0..B_1); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-10-31",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [5, 2, 3, 8, 4, 6, 1, 7], Z-check term slots [5, 6, 4, 0, 2, 3, 7, 1] over terms A_0..A_5, B_0..B_1)"
+  }
+ }
 }
