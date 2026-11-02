@@ -6967,10 +6967,15 @@
    ],
    "witness_provenance": {
     "found_by": [
-     "qldpc-challenge CI gate, PR #4477, seed 1516409015 (orbit-fold)"
+     "@rajendrarajpurohit"
     ],
     "date": "2026-11-03",
-    "tool": "verify/gate_changed.py"
+    "found_at_samples": 1,
+    "survived_samples": 1,
+    "tool": "verify/gate_changed.py (CI gate of PR #4477, orbit-fold search, seed 1516409015)",
+    "seeds": [
+     1516409015
+    ]
    }
   },
   "Z": {
@@ -7034,7 +7039,8 @@
    "arXiv:2610.12782"
   ],
   "novelty": "new_parameters",
-  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The CI gate of PR #4477 found a weight 36 logical (orbit-fold search); the claim was lowered from 40 to 36 and that witness is the one carried on that side."
+  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The CI gate of PR #4477 found a weight 36 logical (orbit-fold search); the claim was lowered from 40 to 36 and that witness is the one carried on that side.",
+  "model": "human"
  },
  "family": "2bga-coset"
 }
