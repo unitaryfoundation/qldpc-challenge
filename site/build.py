@@ -2749,6 +2749,26 @@ def ldiam_cell_title(e):
     return parts + ". " + LDIAM_TIP
 
 
+def cert_side_notes(cert):
+    """One line per certified side, for the certificate row of a code page.
+
+    The solver certifiers write a ``note`` per side ("no logical < d exists").
+    A formal certificate (schema tier ``formal``) carries only ``value`` and
+    ``exact`` per side, since its statement lives in the replayed theorem, so
+    the same sentence is built from those; certs/1000-406-6.json was the first
+    one and it stopped the site build with a KeyError.
+    """
+    out = []
+    for side, v in (cert.get("sides") or {}).items():
+        v = v or {}
+        note = v.get("note")
+        if not note and v.get("exact"):
+            note = f"no logical < {v.get('value', cert.get('d'))} exists"
+        if note:
+            out.append(f"{side}: {note}")
+    return "; ".join(out)
+
+
 def detail_page(e):
     doc, cert = e["doc"], e["cert"]
     n, k, d = e["n"], e["k"], e["d"]
@@ -2913,8 +2933,7 @@ def detail_page(e):
             P.append(f'<details><summary>{wit_sum}</summary>'
                      f'<div class=wit>{wit_body}</div></details>')
     if cert and cert.get("d_exact"):
-        notes = "; ".join(f'{s}: {v["note"]}' for s, v in
-                          cert.get("sides", {}).items())
+        notes = cert_side_notes(cert)
         P.append(f'<div class=kv><b>certificate</b> '
                  f'<span class=cert-ok>exact, d = {d}</span> &middot; '
                  f'{html.escape(cert.get("solver",""))}</div>'

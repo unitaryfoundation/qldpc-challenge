@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[40,6,5]] weight-6 generalized bicycle (2BGA) code",
  "code_type": "CSS",
  "n": 40,
@@ -534,5 +534,41 @@
    ]
   ],
   "layers": 2
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 5,
+    "confidence": "upper_bound",
+    "witness": [
+     8643,
+     8650,
+     8684,
+     8757,
+     8788
+    ]
+   },
+   "Z": {
+    "value": 5,
+    "confidence": "upper_bound",
+    "witness": [
+     1451,
+     1454,
+     4037,
+     4038,
+     4046
+    ]
+   }
+  },
+  "rounds": 5,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-10-31",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3)"
+  }
  }
 }

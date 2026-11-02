@@ -58,8 +58,12 @@ jobs:
   # Compile-only coverage for the optional CUDA accelerator.  This deliberately
   # does not require a GPU and is advisory until the hosted toolkit install is
   # proven stable.
+  # Pinned to ubuntu-24.04 in every workflow (not ubuntu-latest): the label moved
+  # to ubuntu-26.04 on 2026-10-31, whose NVIDIA apt repo has no cuda-nvcc-12-6
+  # and whose default Python 3.14 has no pycryptosat wheel, so every run on
+  # main and on PRs failed before any entry was checked.
   ris-compile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
     steps:
@@ -72,7 +76,7 @@ jobs:
         run: nvcc -O3 -arch=sm_75 -c verify/ris_gpu.cu -o /dev/null
 
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # 90 min fast-pass cap (gate_changed.FAST_SECONDS) + ~30 min of fixed steps
     # + margin. Hitting this means a hang or a bug, not a large code.
     timeout-minutes: 130

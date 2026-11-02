@@ -1,6 +1,6 @@
 {
  "schema_version": "0.2",
- "name": "n1000-41-10-5",
+ "name": "priced-calculus-41-10-5",
  "code_type": "CSS",
  "n": 41,
  "k": 10,
@@ -335,7 +335,7 @@
     "found_by": [
      "@mathys"
     ],
-    "date": "2026-11-02",
+    "date": "2026-11-01",
     "found_at_samples": 1000,
     "survived_samples": 1000,
     "tool": "research/kit/surrogate.lightest_logical",
@@ -358,7 +358,7 @@
     "found_by": [
      "@mathys"
     ],
-    "date": "2026-11-02",
+    "date": "2026-11-01",
     "found_at_samples": 1000,
     "survived_samples": 1000,
     "tool": "research/kit/surrogate.lightest_logical",
@@ -374,7 +374,7 @@
   ],
   "construction": "priced calculus E-PEEL transform of codes/42-10-6.json",
   "references": [],
-  "date": "2026-11-02",
+  "date": "2026-11-01",
   "notes": "",
   "model": "Beam 1.0"
  }

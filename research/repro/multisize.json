@@ -2,14 +2,14 @@
  "caveat": "display-only: a pass is a structural fact about the recipe at that size, not a distance claim and not a novelty claim; nothing here ranks or tiers",
  "counts": {
   "constructor_missing": 0,
-  "lifted": 1,
-  "manifests": 5,
+  "lifted": 20,
+  "manifests": 24,
   "no_lift_rule": 2,
   "no_recipe": 2,
-  "sizes_passed": 4,
-  "sizes_tried": 8
+  "sizes_passed": 142,
+  "sizes_tried": 146
  },
- "date": "2026-10-23",
+ "date": "2026-11-01",
  "entries": {
   "128-8-9": {
    "constructor": "group_algebra.build_2bga_small_group",
@@ -60,6 +60,511 @@
    "reason": "parameters are element indices into one GAP table; no size lift",
    "reproduces_entry": true,
    "status": "no_lift_rule"
+  },
+  "132-4-17": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "c909118df207c25b",
+    "k": 4,
+    "n": 132,
+    "params": {
+     "A_terms": [
+      [
+       0,
+       5
+      ],
+      [
+       1,
+       6
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       4,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       2,
+       3
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       10
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "l": 6,
+     "m": 11
+    },
+    "pass": true,
+    "rank_X": 64,
+    "rank_Z": 64,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      0,
+      5
+     ],
+     [
+      1,
+      6
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      4,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      2,
+      3
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      10
+     ],
+     [
+      1,
+      0
+     ]
+    ],
+    "l": 6,
+    "m": 11
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7dca54c12f139d8b",
+     "k": 2,
+     "label": "l=5, m=11",
+     "n": 110,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 5,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 54,
+     "rank_Z": 54,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "cfeedf9a1f013e86",
+     "k": 2,
+     "label": "l=7, m=11",
+     "n": 154,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 7,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 76,
+     "rank_Z": 76,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "88e80eef0a19524e",
+     "k": 4,
+     "label": "l=6, m=10",
+     "n": 120,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 6,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 58,
+     "rank_Z": 58,
+     "w": 6
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a6aebe7542c0eb77",
+     "k": 4,
+     "label": "l=6, m=12",
+     "n": 144,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 6,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 70,
+     "rank_Z": 70,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "dbd9eb13820f7642",
+     "k": 4,
+     "label": "l=12, m=11",
+     "n": 264,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 12,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 130,
+     "rank_Z": 130,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "2be36abe21ce5d8b",
+     "k": 4,
+     "label": "l=6, m=22",
+     "n": 264,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 6,
+      "m": 22
+     },
+     "pass": true,
+     "rank_X": 130,
+     "rank_Z": 130,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "9f976d9436d2c857",
+     "k": 2,
+     "label": "l=3, m=11",
+     "n": 66,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        5
+       ],
+       [
+        1,
+        6
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        4,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        2,
+        3
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        1,
+        10
+       ],
+       [
+        1,
+        0
+       ]
+      ],
+      "l": 3,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 32,
+     "rank_Z": 32,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
   },
   "144-12-12": {
    "constructor": "bb.build_bb",
@@ -543,6 +1048,2140 @@
    "status": "lifted",
    "tried": 8
   },
+  "144-6-17": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "3ae02ed505084f40",
+    "k": 6,
+    "n": 144,
+    "params": {
+     "A_terms": [
+      [
+       6,
+       2
+      ],
+      [
+       6,
+       7
+      ],
+      [
+       7,
+       0
+      ],
+      [
+       3,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       4,
+       4
+      ],
+      [
+       6,
+       4
+      ],
+      [
+       7,
+       5
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "l": 9,
+     "m": 8
+    },
+    "pass": true,
+    "rank_X": 69,
+    "rank_Z": 69,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      6,
+      2
+     ],
+     [
+      6,
+      7
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      4,
+      4
+     ],
+     [
+      6,
+      4
+     ],
+     [
+      7,
+      5
+     ],
+     [
+      3,
+      1
+     ]
+    ],
+    "l": 9,
+    "m": 8
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "cecfce4d5e9f711e",
+     "k": 14,
+     "label": "l=8, m=8",
+     "n": 128,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 8,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 57,
+     "rank_Z": 57,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "0e5bbbc464276ed7",
+     "k": 10,
+     "label": "l=10, m=8",
+     "n": 160,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 10,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 75,
+     "rank_Z": 75,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "b1cf67a860c81bfe",
+     "k": 2,
+     "label": "l=9, m=7",
+     "n": 126,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 9,
+      "m": 7
+     },
+     "pass": true,
+     "rank_X": 62,
+     "rank_Z": 62,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "08c5ce4a9c5d79fd",
+     "k": 2,
+     "label": "l=9, m=9",
+     "n": 162,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 9,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 80,
+     "rank_Z": 80,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "0d443929cd8620bc",
+     "k": 10,
+     "label": "l=18, m=8",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 18,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 139,
+     "rank_Z": 139,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7ba135113061f915",
+     "k": 6,
+     "label": "l=9, m=16",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 9,
+      "m": 16
+     },
+     "pass": true,
+     "rank_X": 141,
+     "rank_Z": 141,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "09adad482bc0f585",
+     "k": 6,
+     "label": "l=9, m=4",
+     "n": 72,
+     "params": {
+      "A_terms": [
+       [
+        6,
+        2
+       ],
+       [
+        6,
+        7
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        4
+       ],
+       [
+        6,
+        4
+       ],
+       [
+        7,
+        5
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "l": 9,
+      "m": 4
+     },
+     "pass": true,
+     "rank_X": 33,
+     "rank_Z": 33,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "160-4-20": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "2270d3ef87227956",
+    "k": 4,
+    "n": 160,
+    "params": {
+     "A_terms": [
+      [
+       7,
+       7
+      ],
+      [
+       4,
+       3
+      ],
+      [
+       4,
+       5
+      ],
+      [
+       2,
+       8
+      ]
+     ],
+     "B_terms": [
+      [
+       0,
+       2
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       5,
+       9
+      ],
+      [
+       1,
+       8
+      ]
+     ],
+     "l": 8,
+     "m": 10
+    },
+    "pass": true,
+    "rank_X": 78,
+    "rank_Z": 78,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      7,
+      7
+     ],
+     [
+      4,
+      3
+     ],
+     [
+      4,
+      5
+     ],
+     [
+      2,
+      8
+     ]
+    ],
+    "B_terms": [
+     [
+      0,
+      2
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      1,
+      8
+     ]
+    ],
+    "l": 8,
+    "m": 10
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d5f3186f2d0107e2",
+     "k": 2,
+     "label": "l=7, m=10",
+     "n": 140,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 7,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 69,
+     "rank_Z": 69,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "6a09170514e2825b",
+     "k": 2,
+     "label": "l=9, m=10",
+     "n": 180,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 9,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 89,
+     "rank_Z": 89,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "8727446e15e73361",
+     "k": 2,
+     "label": "l=8, m=9",
+     "n": 144,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 8,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 71,
+     "rank_Z": 71,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f98700f2b4167e19",
+     "k": 2,
+     "label": "l=8, m=11",
+     "n": 176,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 8,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 87,
+     "rank_Z": 87,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7859e8fb7c902481",
+     "k": 4,
+     "label": "l=16, m=10",
+     "n": 320,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 16,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 158,
+     "rank_Z": 158,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d9b78ea2b0722fc1",
+     "k": 8,
+     "label": "l=8, m=20",
+     "n": 320,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 8,
+      "m": 20
+     },
+     "pass": true,
+     "rank_X": 156,
+     "rank_Z": 156,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "2ff8b8dad525f3e1",
+     "k": 4,
+     "label": "l=4, m=10",
+     "n": 80,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 4,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 38,
+     "rank_Z": 38,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a7d23b2cc79bc0d3",
+     "k": 2,
+     "label": "l=8, m=5",
+     "n": 80,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        7
+       ],
+       [
+        4,
+        3
+       ],
+       [
+        4,
+        5
+       ],
+       [
+        2,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        5,
+        9
+       ],
+       [
+        1,
+        8
+       ]
+      ],
+      "l": 8,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 39,
+     "rank_Z": 39,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
+  "176-4-21": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "ec690afe3162bc2c",
+    "k": 4,
+    "n": 176,
+    "params": {
+     "A_terms": [
+      [
+       10,
+       0
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       4,
+       7
+      ],
+      [
+       3,
+       1
+      ]
+     ],
+     "B_terms": [
+      [
+       5,
+       7
+      ],
+      [
+       9,
+       2
+      ],
+      [
+       5,
+       2
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "l": 11,
+     "m": 8
+    },
+    "pass": true,
+    "rank_X": 86,
+    "rank_Z": 86,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      10,
+      0
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      4,
+      7
+     ],
+     [
+      3,
+      1
+     ]
+    ],
+    "B_terms": [
+     [
+      5,
+      7
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      5,
+      2
+     ],
+     [
+      2,
+      1
+     ]
+    ],
+    "l": 11,
+    "m": 8
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "08384a1cdf91b5f0",
+     "k": 8,
+     "label": "l=10, m=8",
+     "n": 160,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 10,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 76,
+     "rank_Z": 76,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a45fccaa64bb29e4",
+     "k": 10,
+     "label": "l=12, m=8",
+     "n": 192,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 12,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 91,
+     "rank_Z": 91,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "9bc3b8dbf85b5c5f",
+     "k": 2,
+     "label": "l=11, m=7",
+     "n": 154,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 11,
+      "m": 7
+     },
+     "pass": true,
+     "rank_X": 76,
+     "rank_Z": 76,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "46ed35602205f21e",
+     "k": 2,
+     "label": "l=11, m=9",
+     "n": 198,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 11,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 98,
+     "rank_Z": 98,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "bff90c59da4333a5",
+     "k": 8,
+     "label": "l=22, m=8",
+     "n": 352,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 22,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 172,
+     "rank_Z": 172,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a751bfd361171b2d",
+     "k": 4,
+     "label": "l=11, m=16",
+     "n": 352,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 11,
+      "m": 16
+     },
+     "pass": true,
+     "rank_X": 174,
+     "rank_Z": 174,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "92a4b1ad078d8109",
+     "k": 4,
+     "label": "l=11, m=4",
+     "n": 88,
+     "params": {
+      "A_terms": [
+       [
+        10,
+        0
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        4,
+        7
+       ],
+       [
+        3,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        7
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        5,
+        2
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 11,
+      "m": 4
+     },
+     "pass": true,
+     "rank_X": 42,
+     "rank_Z": 42,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "192-4-22": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "d4304395a8848ed1",
+    "k": 4,
+    "n": 192,
+    "params": {
+     "A_terms": [
+      [
+       7,
+       1
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       9,
+       2
+      ],
+      [
+       10,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       1,
+       5
+      ],
+      [
+       4,
+       0
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ]
+     ],
+     "l": 16,
+     "m": 6
+    },
+    "pass": true,
+    "rank_X": 94,
+    "rank_Z": 94,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      7,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      10,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      1,
+      5
+     ],
+     [
+      4,
+      0
+     ],
+     [
+      2,
+      0
+     ],
+     [
+      2,
+      1
+     ]
+    ],
+    "l": 16,
+    "m": 6
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c842d251eaf77892",
+     "k": 8,
+     "label": "l=15, m=6",
+     "n": 180,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 15,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 86,
+     "rank_Z": 86,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a51c2aed0d26afb7",
+     "k": 4,
+     "label": "l=17, m=6",
+     "n": 204,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 17,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 100,
+     "rank_Z": 100,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "4f2fb952a09cbb8e",
+     "k": 2,
+     "label": "l=16, m=5",
+     "n": 160,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 16,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 79,
+     "rank_Z": 79,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "e66c3f860503a2c3",
+     "k": 2,
+     "label": "l=16, m=7",
+     "n": 224,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 16,
+      "m": 7
+     },
+     "pass": true,
+     "rank_X": 111,
+     "rank_Z": 111,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "9b8a99d3efabdb10",
+     "k": 4,
+     "label": "l=32, m=6",
+     "n": 384,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 32,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 190,
+     "rank_Z": 190,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ffd8c903ec128632",
+     "k": 8,
+     "label": "l=16, m=12",
+     "n": 384,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 16,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 188,
+     "rank_Z": 188,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "4976389d7aa44634",
+     "k": 4,
+     "label": "l=8, m=6",
+     "n": 96,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 8,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 46,
+     "rank_Z": 46,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7f2595805bd45a4b",
+     "k": 2,
+     "label": "l=16, m=3",
+     "n": 96,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        1
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        4,
+        0
+       ],
+       [
+        2,
+        0
+       ],
+       [
+        2,
+        1
+       ]
+      ],
+      "l": 16,
+      "m": 3
+     },
+     "pass": true,
+     "rank_X": 47,
+     "rank_Z": 47,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
   "200-8-14": {
    "constructor": "group_algebra.build_2bga_small_group",
    "own": {
@@ -593,16 +3232,7257 @@
    "reproduces_entry": true,
    "status": "no_lift_rule"
   },
+  "208-6-22": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "c78ef51fcd4866c9",
+    "k": 6,
+    "n": 208,
+    "params": {
+     "A_terms": [
+      [
+       2,
+       5
+      ],
+      [
+       0,
+       4
+      ],
+      [
+       4,
+       2
+      ],
+      [
+       4,
+       3
+      ]
+     ],
+     "B_terms": [
+      [
+       5,
+       0
+      ],
+      [
+       0,
+       7
+      ],
+      [
+       6,
+       2
+      ],
+      [
+       3,
+       5
+      ]
+     ],
+     "l": 13,
+     "m": 8
+    },
+    "pass": true,
+    "rank_X": 101,
+    "rank_Z": 101,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      2,
+      5
+     ],
+     [
+      0,
+      4
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      4,
+      3
+     ]
+    ],
+    "B_terms": [
+     [
+      5,
+      0
+     ],
+     [
+      0,
+      7
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      3,
+      5
+     ]
+    ],
+    "l": 13,
+    "m": 8
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ddd285eb7b6024ec",
+     "k": 10,
+     "label": "l=12, m=8",
+     "n": 192,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 12,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 91,
+     "rank_Z": 91,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "3f179586da0a16a7",
+     "k": 8,
+     "label": "l=14, m=8",
+     "n": 224,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 14,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 108,
+     "rank_Z": 108,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "947b9f30d9f3eca6",
+     "k": 2,
+     "label": "l=13, m=7",
+     "n": 182,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 13,
+      "m": 7
+     },
+     "pass": true,
+     "rank_X": 90,
+     "rank_Z": 90,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a52d33f4baf9ced5",
+     "k": 2,
+     "label": "l=13, m=9",
+     "n": 234,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 13,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 116,
+     "rank_Z": 116,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "97ebd7c29b93a9df",
+     "k": 8,
+     "label": "l=26, m=8",
+     "n": 416,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 26,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 204,
+     "rank_Z": 204,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "608cbc99bd5176ef",
+     "k": 6,
+     "label": "l=13, m=16",
+     "n": 416,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 13,
+      "m": 16
+     },
+     "pass": true,
+     "rank_X": 205,
+     "rank_Z": 205,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "44d3c58a89eed3ee",
+     "k": 6,
+     "label": "l=13, m=4",
+     "n": 104,
+     "params": {
+      "A_terms": [
+       [
+        2,
+        5
+       ],
+       [
+        0,
+        4
+       ],
+       [
+        4,
+        2
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        0
+       ],
+       [
+        0,
+        7
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        3,
+        5
+       ]
+      ],
+      "l": 13,
+      "m": 4
+     },
+     "pass": true,
+     "rank_X": 49,
+     "rank_Z": 49,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "234-6-24": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "d6766d037ecff679",
+    "k": 6,
+    "n": 234,
+    "params": {
+     "A_terms": [
+      [
+       3,
+       6
+      ],
+      [
+       9,
+       4
+      ],
+      [
+       6,
+       3
+      ],
+      [
+       5,
+       1
+      ]
+     ],
+     "B_terms": [
+      [
+       3,
+       0
+      ],
+      [
+       8,
+       2
+      ],
+      [
+       12,
+       8
+      ],
+      [
+       0,
+       0
+      ]
+     ],
+     "l": 13,
+     "m": 9
+    },
+    "pass": true,
+    "rank_X": 114,
+    "rank_Z": 114,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      3,
+      6
+     ],
+     [
+      9,
+      4
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      5,
+      1
+     ]
+    ],
+    "B_terms": [
+     [
+      3,
+      0
+     ],
+     [
+      8,
+      2
+     ],
+     [
+      12,
+      8
+     ],
+     [
+      0,
+      0
+     ]
+    ],
+    "l": 13,
+    "m": 9
+   },
+   "passed": 6,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d90046b83d2076d3",
+     "k": 6,
+     "label": "l=12, m=9",
+     "n": 216,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 12,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 105,
+     "rank_Z": 105,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "79e4219e31075ec7",
+     "k": 6,
+     "label": "l=14, m=9",
+     "n": 252,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 14,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 123,
+     "rank_Z": 123,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "8eaefb6b39f80a93",
+     "k": 4,
+     "label": "l=13, m=8",
+     "n": 208,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 102,
+     "rank_Z": 102,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f3f197b9f668cca9",
+     "k": 4,
+     "label": "l=13, m=10",
+     "n": 260,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 128,
+     "rank_Z": 128,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "8df0e4202b408f16",
+     "k": 6,
+     "label": "l=26, m=9",
+     "n": 468,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 26,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 231,
+     "rank_Z": 231,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a6fef0c513e9eef0",
+     "k": 8,
+     "label": "l=13, m=18",
+     "n": 468,
+     "params": {
+      "A_terms": [
+       [
+        3,
+        6
+       ],
+       [
+        9,
+        4
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        5,
+        1
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        0
+       ],
+       [
+        8,
+        2
+       ],
+       [
+        12,
+        8
+       ],
+       [
+        0,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 18
+     },
+     "pass": true,
+     "rank_X": 230,
+     "rank_Z": 230,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 6
+  },
   "25-1-5": {
    "reason": "the search that produced this code was not committed; H_X and H_Z in the entry are the record",
    "status": "no_recipe"
   },
+  "252-8-23": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "34b8d7c3e9a4e725",
+    "k": 8,
+    "n": 252,
+    "params": {
+     "A_terms": [
+      [
+       0,
+       4
+      ],
+      [
+       12,
+       1
+      ],
+      [
+       3,
+       7
+      ],
+      [
+       4,
+       3
+      ]
+     ],
+     "B_terms": [
+      [
+       10,
+       5
+      ],
+      [
+       5,
+       7
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       1,
+       3
+      ]
+     ],
+     "l": 14,
+     "m": 9
+    },
+    "pass": true,
+    "rank_X": 122,
+    "rank_Z": 122,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      0,
+      4
+     ],
+     [
+      12,
+      1
+     ],
+     [
+      3,
+      7
+     ],
+     [
+      4,
+      3
+     ]
+    ],
+    "B_terms": [
+     [
+      10,
+      5
+     ],
+     [
+      5,
+      7
+     ],
+     [
+      2,
+      2
+     ],
+     [
+      1,
+      3
+     ]
+    ],
+    "l": 14,
+    "m": 9
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "6b92e6970bfa05b1",
+     "k": 2,
+     "label": "l=13, m=9",
+     "n": 234,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 13,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 116,
+     "rank_Z": 116,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "455dee65648a370e",
+     "k": 6,
+     "label": "l=15, m=9",
+     "n": 270,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 15,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 132,
+     "rank_Z": 132,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f57b3ad368337183",
+     "k": 8,
+     "label": "l=14, m=8",
+     "n": 224,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 14,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 108,
+     "rank_Z": 108,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7d31be6ab830b1df",
+     "k": 8,
+     "label": "l=14, m=10",
+     "n": 280,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 14,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 136,
+     "rank_Z": 136,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "17d6c0ac616ad640",
+     "k": 8,
+     "label": "l=28, m=9",
+     "n": 504,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 28,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 248,
+     "rank_Z": 248,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "683019626367da50",
+     "k": 8,
+     "label": "l=14, m=18",
+     "n": 504,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 14,
+      "m": 18
+     },
+     "pass": true,
+     "rank_X": 248,
+     "rank_Z": 248,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "26de569fb5da9e1a",
+     "k": 8,
+     "label": "l=7, m=9",
+     "n": 126,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        4
+       ],
+       [
+        12,
+        1
+       ],
+       [
+        3,
+        7
+       ],
+       [
+        4,
+        3
+       ]
+      ],
+      "B_terms": [
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        2,
+        2
+       ],
+       [
+        1,
+        3
+       ]
+      ],
+      "l": 7,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 59,
+     "rank_Z": 59,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "256-10-24": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "3891a4104d9972a9",
+    "k": 10,
+    "n": 256,
+    "params": {
+     "A_terms": [
+      [
+       7,
+       4
+      ],
+      [
+       5,
+       7
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       2,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       5,
+       3
+      ],
+      [
+       6,
+       3
+      ],
+      [
+       12,
+       2
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "l": 16,
+     "m": 8
+    },
+    "pass": true,
+    "rank_X": 123,
+    "rank_Z": 123,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      7,
+      4
+     ],
+     [
+      5,
+      7
+     ],
+     [
+      0,
+      1
+     ],
+     [
+      2,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      5,
+      3
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      12,
+      2
+     ],
+     [
+      3,
+      3
+     ]
+    ],
+    "l": 16,
+    "m": 8
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ef2cf8afc3c5c077",
+     "k": 2,
+     "label": "l=15, m=8",
+     "n": 240,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 15,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 119,
+     "rank_Z": 119,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "601cd1aae1654f03",
+     "k": 2,
+     "label": "l=17, m=8",
+     "n": 272,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 17,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 135,
+     "rank_Z": 135,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d90184c1deea20a5",
+     "k": 6,
+     "label": "l=16, m=7",
+     "n": 224,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 7
+     },
+     "pass": true,
+     "rank_X": 109,
+     "rank_Z": 109,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "4527c411ea1a5a40",
+     "k": 6,
+     "label": "l=16, m=9",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 141,
+     "rank_Z": 141,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "39df3fe3e8906ae0",
+     "k": 10,
+     "label": "l=32, m=8",
+     "n": 512,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 32,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 251,
+     "rank_Z": 251,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "82995ea136c0bc9c",
+     "k": 10,
+     "label": "l=16, m=16",
+     "n": 512,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 16
+     },
+     "pass": true,
+     "rank_X": 251,
+     "rank_Z": 251,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "6c84884d68371670",
+     "k": 10,
+     "label": "l=8, m=8",
+     "n": 128,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 8,
+      "m": 8
+     },
+     "pass": true,
+     "rank_X": 59,
+     "rank_Z": 59,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c8f2fe30856bc04d",
+     "k": 10,
+     "label": "l=16, m=4",
+     "n": 128,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        5,
+        7
+       ],
+       [
+        0,
+        1
+       ],
+       [
+        2,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        6,
+        3
+       ],
+       [
+        12,
+        2
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 4
+     },
+     "pass": true,
+     "rank_X": 59,
+     "rank_Z": 59,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
   "256-120-12": {
    "reason": "the recipe names research/kit/paper_2609_24201.py (build_qd), which was not committed with the entry (#3911), so research/kit/rebuild.py cannot replay it; the constructor and params are kept here for when the module lands",
    "status": "no_recipe"
+  },
+  "264-4-26": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "d800189ed8208d2f",
+    "k": 4,
+    "n": 264,
+    "params": {
+     "A_terms": [
+      [
+       1,
+       4
+      ],
+      [
+       6,
+       6
+      ],
+      [
+       10,
+       5
+      ],
+      [
+       5,
+       7
+      ]
+     ],
+     "B_terms": [
+      [
+       5,
+       5
+      ],
+      [
+       8,
+       9
+      ],
+      [
+       9,
+       1
+      ],
+      [
+       6,
+       10
+      ]
+     ],
+     "l": 12,
+     "m": 11
+    },
+    "pass": true,
+    "rank_X": 130,
+    "rank_Z": 130,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      1,
+      4
+     ],
+     [
+      6,
+      6
+     ],
+     [
+      10,
+      5
+     ],
+     [
+      5,
+      7
+     ]
+    ],
+    "B_terms": [
+     [
+      5,
+      5
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      9,
+      1
+     ],
+     [
+      6,
+      10
+     ]
+    ],
+    "l": 12,
+    "m": 11
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "14963d8a7f19a30f",
+     "k": 2,
+     "label": "l=11, m=11",
+     "n": 242,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 11,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 120,
+     "rank_Z": 120,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "2cf117f3deab0c01",
+     "k": 2,
+     "label": "l=13, m=11",
+     "n": 286,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 13,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 142,
+     "rank_Z": 142,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "921e11aee2780b46",
+     "k": 6,
+     "label": "l=12, m=10",
+     "n": 240,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 12,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 117,
+     "rank_Z": 117,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "088a280d0f0f1882",
+     "k": 6,
+     "label": "l=12, m=12",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 12,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 141,
+     "rank_Z": 141,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d8bc9bbf092e171a",
+     "k": 4,
+     "label": "l=24, m=11",
+     "n": 528,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 24,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 262,
+     "rank_Z": 262,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "b7310658dcf853a9",
+     "k": 6,
+     "label": "l=12, m=22",
+     "n": 528,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 12,
+      "m": 22
+     },
+     "pass": true,
+     "rank_X": 261,
+     "rank_Z": 261,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "36c1a670db51556f",
+     "k": 4,
+     "label": "l=6, m=11",
+     "n": 132,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        4
+       ],
+       [
+        6,
+        6
+       ],
+       [
+        10,
+        5
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        6,
+        10
+       ]
+      ],
+      "l": 6,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 64,
+     "rank_Z": 64,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "264-6-25": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "c551008055125c1a",
+    "k": 6,
+    "n": 264,
+    "params": {
+     "A_terms": [
+      [
+       1,
+       5
+      ],
+      [
+       6,
+       8
+      ],
+      [
+       7,
+       0
+      ],
+      [
+       10,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       3,
+       4
+      ],
+      [
+       1,
+       5
+      ],
+      [
+       9,
+       2
+      ],
+      [
+       10,
+       11
+      ]
+     ],
+     "l": 11,
+     "m": 12
+    },
+    "pass": true,
+    "rank_X": 129,
+    "rank_Z": 129,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      1,
+      5
+     ],
+     [
+      6,
+      8
+     ],
+     [
+      7,
+      0
+     ],
+     [
+      10,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      3,
+      4
+     ],
+     [
+      1,
+      5
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      10,
+      11
+     ]
+    ],
+    "l": 11,
+    "m": 12
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "872d31ea72136c3a",
+     "k": 8,
+     "label": "l=10, m=12",
+     "n": 240,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 10,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 116,
+     "rank_Z": 116,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "4a32bdd2ab6ce0a9",
+     "k": 8,
+     "label": "l=12, m=12",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 12,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 140,
+     "rank_Z": 140,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f14ff837c197aac4",
+     "k": 2,
+     "label": "l=11, m=11",
+     "n": 242,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 11,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 120,
+     "rank_Z": 120,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "5f1a2f975476588b",
+     "k": 2,
+     "label": "l=11, m=13",
+     "n": 286,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 11,
+      "m": 13
+     },
+     "pass": true,
+     "rank_X": 142,
+     "rank_Z": 142,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "1a00b0005465b36d",
+     "k": 8,
+     "label": "l=22, m=12",
+     "n": 528,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 22,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 260,
+     "rank_Z": 260,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "9d8c4b824cbde2c4",
+     "k": 6,
+     "label": "l=11, m=24",
+     "n": 528,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 11,
+      "m": 24
+     },
+     "pass": true,
+     "rank_X": 261,
+     "rank_Z": 261,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a30ddf1b9397d97d",
+     "k": 4,
+     "label": "l=11, m=6",
+     "n": 132,
+     "params": {
+      "A_terms": [
+       [
+        1,
+        5
+       ],
+       [
+        6,
+        8
+       ],
+       [
+        7,
+        0
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        4
+       ],
+       [
+        1,
+        5
+       ],
+       [
+        9,
+        2
+       ],
+       [
+        10,
+        11
+       ]
+      ],
+      "l": 11,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 64,
+     "rank_Z": 64,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "280-4-28": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "25edc7d10c544072",
+    "k": 4,
+    "n": 280,
+    "params": {
+     "A_terms": [
+      [
+       7,
+       4
+      ],
+      [
+       10,
+       6
+      ],
+      [
+       11,
+       8
+      ],
+      [
+       11,
+       7
+      ]
+     ],
+     "B_terms": [
+      [
+       0,
+       1
+      ],
+      [
+       7,
+       3
+      ],
+      [
+       3,
+       6
+      ],
+      [
+       5,
+       7
+      ]
+     ],
+     "l": 14,
+     "m": 10
+    },
+    "pass": true,
+    "rank_X": 138,
+    "rank_Z": 138,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      7,
+      4
+     ],
+     [
+      10,
+      6
+     ],
+     [
+      11,
+      8
+     ],
+     [
+      11,
+      7
+     ]
+    ],
+    "B_terms": [
+     [
+      0,
+      1
+     ],
+     [
+      7,
+      3
+     ],
+     [
+      3,
+      6
+     ],
+     [
+      5,
+      7
+     ]
+    ],
+    "l": 14,
+    "m": 10
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f4635635e83f0e5f",
+     "k": 2,
+     "label": "l=13, m=10",
+     "n": 260,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 13,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 129,
+     "rank_Z": 129,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "2a4a124f530293d2",
+     "k": 2,
+     "label": "l=15, m=10",
+     "n": 300,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 15,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 149,
+     "rank_Z": 149,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "1c5c693239744655",
+     "k": 2,
+     "label": "l=14, m=9",
+     "n": 252,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 14,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 125,
+     "rank_Z": 125,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ce9c795e4afb8a14",
+     "k": 2,
+     "label": "l=14, m=11",
+     "n": 308,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 14,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 153,
+     "rank_Z": 153,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "47e47e006b44f189",
+     "k": 4,
+     "label": "l=28, m=10",
+     "n": 560,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 28,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 278,
+     "rank_Z": 278,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "201a2186d2830e56",
+     "k": 4,
+     "label": "l=14, m=20",
+     "n": 560,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 14,
+      "m": 20
+     },
+     "pass": true,
+     "rank_X": 278,
+     "rank_Z": 278,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "40176332c600c531",
+     "k": 2,
+     "label": "l=7, m=10",
+     "n": 140,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 7,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 69,
+     "rank_Z": 69,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "95c9e3b5a0a45e4a",
+     "k": 2,
+     "label": "l=14, m=5",
+     "n": 140,
+     "params": {
+      "A_terms": [
+       [
+        7,
+        4
+       ],
+       [
+        10,
+        6
+       ],
+       [
+        11,
+        8
+       ],
+       [
+        11,
+        7
+       ]
+      ],
+      "B_terms": [
+       [
+        0,
+        1
+       ],
+       [
+        7,
+        3
+       ],
+       [
+        3,
+        6
+       ],
+       [
+        5,
+        7
+       ]
+      ],
+      "l": 14,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 69,
+     "rank_Z": 69,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
+  "280-8-26": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "c018d4c098c665f8",
+    "k": 8,
+    "n": 280,
+    "params": {
+     "A_terms": [
+      [
+       5,
+       3
+      ],
+      [
+       9,
+       8
+      ],
+      [
+       0,
+       8
+      ],
+      [
+       8,
+       0
+      ]
+     ],
+     "B_terms": [
+      [
+       8,
+       9
+      ],
+      [
+       5,
+       3
+      ],
+      [
+       10,
+       0
+      ],
+      [
+       4,
+       6
+      ]
+     ],
+     "l": 14,
+     "m": 10
+    },
+    "pass": true,
+    "rank_X": 136,
+    "rank_Z": 136,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      5,
+      3
+     ],
+     [
+      9,
+      8
+     ],
+     [
+      0,
+      8
+     ],
+     [
+      8,
+      0
+     ]
+    ],
+    "B_terms": [
+     [
+      8,
+      9
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      10,
+      0
+     ],
+     [
+      4,
+      6
+     ]
+    ],
+    "l": 14,
+    "m": 10
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "66e18de3f626f467",
+     "k": 2,
+     "label": "l=13, m=10",
+     "n": 260,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 13,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 129,
+     "rank_Z": 129,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a95ec10078ab0195",
+     "k": 6,
+     "label": "l=15, m=10",
+     "n": 300,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 15,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 147,
+     "rank_Z": 147,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7f7dd64a16661e49",
+     "k": 12,
+     "label": "l=14, m=9",
+     "n": 252,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 14,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 120,
+     "rank_Z": 120,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "01c3b568a715dce5",
+     "k": 8,
+     "label": "l=14, m=11",
+     "n": 308,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 14,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 150,
+     "rank_Z": 150,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "7ad6005a9ad35f92",
+     "k": 8,
+     "label": "l=28, m=10",
+     "n": 560,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 28,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 276,
+     "rank_Z": 276,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "5384ed9d2cb5e4c4",
+     "k": 8,
+     "label": "l=14, m=20",
+     "n": 560,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 14,
+      "m": 20
+     },
+     "pass": true,
+     "rank_X": 276,
+     "rank_Z": 276,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c8af1dbb862b4f22",
+     "k": 8,
+     "label": "l=7, m=10",
+     "n": 140,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 7,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 66,
+     "rank_Z": 66,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "69de4ab72c377ec4",
+     "k": 8,
+     "label": "l=14, m=5",
+     "n": 140,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        3
+       ],
+       [
+        9,
+        8
+       ],
+       [
+        0,
+        8
+       ],
+       [
+        8,
+        0
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        9
+       ],
+       [
+        5,
+        3
+       ],
+       [
+        10,
+        0
+       ],
+       [
+        4,
+        6
+       ]
+      ],
+      "l": 14,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 66,
+     "rank_Z": 66,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
+  "286-2-29": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "0dfa9b8d3f351f2e",
+    "k": 2,
+    "n": 286,
+    "params": {
+     "A_terms": [
+      [
+       5,
+       5
+      ],
+      [
+       8,
+       9
+      ],
+      [
+       1,
+       9
+      ],
+      [
+       8,
+       2
+      ]
+     ],
+     "B_terms": [
+      [
+       4,
+       8
+      ],
+      [
+       0,
+       10
+      ],
+      [
+       3,
+       1
+      ],
+      [
+       7,
+       0
+      ]
+     ],
+     "l": 13,
+     "m": 11
+    },
+    "pass": true,
+    "rank_X": 142,
+    "rank_Z": 142,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      5,
+      5
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      1,
+      9
+     ],
+     [
+      8,
+      2
+     ]
+    ],
+    "B_terms": [
+     [
+      4,
+      8
+     ],
+     [
+      0,
+      10
+     ],
+     [
+      3,
+      1
+     ],
+     [
+      7,
+      0
+     ]
+    ],
+    "l": 13,
+    "m": 11
+   },
+   "passed": 6,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c34d00114ab71cd8",
+     "k": 8,
+     "label": "l=12, m=11",
+     "n": 264,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 12,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 128,
+     "rank_Z": 128,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d1e45a9f5e949853",
+     "k": 4,
+     "label": "l=14, m=11",
+     "n": 308,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 14,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 152,
+     "rank_Z": 152,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "bde226f7b5994d62",
+     "k": 2,
+     "label": "l=13, m=10",
+     "n": 260,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 129,
+     "rank_Z": 129,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "12d31282283e6309",
+     "k": 2,
+     "label": "l=13, m=12",
+     "n": 312,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 155,
+     "rank_Z": 155,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "187fab96aa30d63c",
+     "k": 4,
+     "label": "l=26, m=11",
+     "n": 572,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 26,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 284,
+     "rank_Z": 284,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "e00fe58c626de342",
+     "k": 2,
+     "label": "l=13, m=22",
+     "n": 572,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        5
+       ],
+       [
+        8,
+        9
+       ],
+       [
+        1,
+        9
+       ],
+       [
+        8,
+        2
+       ]
+      ],
+      "B_terms": [
+       [
+        4,
+        8
+       ],
+       [
+        0,
+        10
+       ],
+       [
+        3,
+        1
+       ],
+       [
+        7,
+        0
+       ]
+      ],
+      "l": 13,
+      "m": 22
+     },
+     "pass": true,
+     "rank_X": 285,
+     "rank_Z": 285,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 6
+  },
+  "300-10-26": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "4069f26eee63e7a9",
+    "k": 10,
+    "n": 300,
+    "params": {
+     "A_terms": [
+      [
+       11,
+       7
+      ],
+      [
+       8,
+       8
+      ],
+      [
+       1,
+       7
+      ],
+      [
+       9,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       3,
+       9
+      ],
+      [
+       7,
+       9
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       9,
+       4
+      ]
+     ],
+     "l": 15,
+     "m": 10
+    },
+    "pass": true,
+    "rank_X": 145,
+    "rank_Z": 145,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      11,
+      7
+     ],
+     [
+      8,
+      8
+     ],
+     [
+      1,
+      7
+     ],
+     [
+      9,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      3,
+      9
+     ],
+     [
+      7,
+      9
+     ],
+     [
+      7,
+      7
+     ],
+     [
+      9,
+      4
+     ]
+    ],
+    "l": 15,
+    "m": 10
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "a476eca46bfe0a17",
+     "k": 2,
+     "label": "l=14, m=10",
+     "n": 280,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 14,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 139,
+     "rank_Z": 139,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "924a846cc8952ab8",
+     "k": 2,
+     "label": "l=16, m=10",
+     "n": 320,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 16,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 159,
+     "rank_Z": 159,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "0498d85d051e4a3b",
+     "k": 6,
+     "label": "l=15, m=9",
+     "n": 270,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 15,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 132,
+     "rank_Z": 132,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "e3f1f99b4b3a120e",
+     "k": 2,
+     "label": "l=15, m=11",
+     "n": 330,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 15,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 164,
+     "rank_Z": 164,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ed4b98032dd3abd9",
+     "k": 10,
+     "label": "l=30, m=10",
+     "n": 600,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 30,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 295,
+     "rank_Z": 295,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "b036dd5188b23eab",
+     "k": 10,
+     "label": "l=15, m=20",
+     "n": 600,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 15,
+      "m": 20
+     },
+     "pass": true,
+     "rank_X": 295,
+     "rank_Z": 295,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "6c2320eb94b7b421",
+     "k": 10,
+     "label": "l=15, m=5",
+     "n": 150,
+     "params": {
+      "A_terms": [
+       [
+        11,
+        7
+       ],
+       [
+        8,
+        8
+       ],
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        3,
+        9
+       ],
+       [
+        7,
+        9
+       ],
+       [
+        7,
+        7
+       ],
+       [
+        9,
+        4
+       ]
+      ],
+      "l": 15,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 70,
+     "rank_Z": 70,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "308-4-30": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "dc1ff35d0669106e",
+    "k": 4,
+    "n": 308,
+    "params": {
+     "A_terms": [
+      [
+       9,
+       9
+      ],
+      [
+       8,
+       10
+      ],
+      [
+       10,
+       10
+      ],
+      [
+       9,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       1,
+       7
+      ],
+      [
+       9,
+       6
+      ],
+      [
+       12,
+       3
+      ],
+      [
+       4,
+       1
+      ]
+     ],
+     "l": 14,
+     "m": 11
+    },
+    "pass": true,
+    "rank_X": 152,
+    "rank_Z": 152,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      9,
+      9
+     ],
+     [
+      8,
+      10
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      9,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      1,
+      7
+     ],
+     [
+      9,
+      6
+     ],
+     [
+      12,
+      3
+     ],
+     [
+      4,
+      1
+     ]
+    ],
+    "l": 14,
+    "m": 11
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c9aa465f9c341639",
+     "k": 2,
+     "label": "l=13, m=11",
+     "n": 286,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 13,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 142,
+     "rank_Z": 142,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "85513a2a90ebb59d",
+     "k": 2,
+     "label": "l=15, m=11",
+     "n": 330,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 15,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 164,
+     "rank_Z": 164,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "de2ce3c85299ddb7",
+     "k": 4,
+     "label": "l=14, m=10",
+     "n": 280,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 14,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 138,
+     "rank_Z": 138,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "05dc411136f2c61a",
+     "k": 4,
+     "label": "l=14, m=12",
+     "n": 336,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 14,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 166,
+     "rank_Z": 166,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "b7174776d0c96eee",
+     "k": 4,
+     "label": "l=28, m=11",
+     "n": 616,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 28,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 306,
+     "rank_Z": 306,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f459ebddb64c3105",
+     "k": 4,
+     "label": "l=14, m=22",
+     "n": 616,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 14,
+      "m": 22
+     },
+     "pass": true,
+     "rank_X": 306,
+     "rank_Z": 306,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "107011e3de731062",
+     "k": 2,
+     "label": "l=7, m=11",
+     "n": 154,
+     "params": {
+      "A_terms": [
+       [
+        9,
+        9
+       ],
+       [
+        8,
+        10
+       ],
+       [
+        10,
+        10
+       ],
+       [
+        9,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        1,
+        7
+       ],
+       [
+        9,
+        6
+       ],
+       [
+        12,
+        3
+       ],
+       [
+        4,
+        1
+       ]
+      ],
+      "l": 7,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 76,
+     "rank_Z": 76,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
+  },
+  "320-12-27": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "e8e80b8730452065",
+    "k": 12,
+    "n": 320,
+    "params": {
+     "A_terms": [
+      [
+       14,
+       2
+      ],
+      [
+       3,
+       9
+      ],
+      [
+       3,
+       2
+      ],
+      [
+       10,
+       5
+      ]
+     ],
+     "B_terms": [
+      [
+       8,
+       2
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       3,
+       3
+      ]
+     ],
+     "l": 16,
+     "m": 10
+    },
+    "pass": true,
+    "rank_X": 154,
+    "rank_Z": 154,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      14,
+      2
+     ],
+     [
+      3,
+      9
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      10,
+      5
+     ]
+    ],
+    "B_terms": [
+     [
+      8,
+      2
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      1,
+      1
+     ],
+     [
+      3,
+      3
+     ]
+    ],
+    "l": 16,
+    "m": 10
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "243629a62fe59c12",
+     "k": 2,
+     "label": "l=15, m=10",
+     "n": 300,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 15,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 149,
+     "rank_Z": 149,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "3449fb8bdc40b647",
+     "k": 2,
+     "label": "l=17, m=10",
+     "n": 340,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 17,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 169,
+     "rank_Z": 169,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "23fc437f28eb57d6",
+     "k": 6,
+     "label": "l=16, m=9",
+     "n": 288,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 9
+     },
+     "pass": true,
+     "rank_X": 141,
+     "rank_Z": 141,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "d66f98671c35343f",
+     "k": 6,
+     "label": "l=16, m=11",
+     "n": 352,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 173,
+     "rank_Z": 173,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "786a86be61e8831a",
+     "k": 12,
+     "label": "l=32, m=10",
+     "n": 640,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 32,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 314,
+     "rank_Z": 314,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "48ee1e078477363d",
+     "k": 16,
+     "label": "l=16, m=20",
+     "n": 640,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 20
+     },
+     "pass": true,
+     "rank_X": 312,
+     "rank_Z": 312,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "e93a952985c68f14",
+     "k": 12,
+     "label": "l=8, m=10",
+     "n": 160,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 8,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 74,
+     "rank_Z": 74,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "f45caa113930eeeb",
+     "k": 6,
+     "label": "l=16, m=5",
+     "n": 160,
+     "params": {
+      "A_terms": [
+       [
+        14,
+        2
+       ],
+       [
+        3,
+        9
+       ],
+       [
+        3,
+        2
+       ],
+       [
+        10,
+        5
+       ]
+      ],
+      "B_terms": [
+       [
+        8,
+        2
+       ],
+       [
+        2,
+        1
+       ],
+       [
+        1,
+        1
+       ],
+       [
+        3,
+        3
+       ]
+      ],
+      "l": 16,
+      "m": 5
+     },
+     "pass": true,
+     "rank_X": 77,
+     "rank_Z": 77,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
+  "336-4-32": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "0d06c1664dbe255e",
+    "k": 4,
+    "n": 336,
+    "params": {
+     "A_terms": [
+      [
+       5,
+       11
+      ],
+      [
+       9,
+       1
+      ],
+      [
+       10,
+       11
+      ],
+      [
+       13,
+       6
+      ]
+     ],
+     "B_terms": [
+      [
+       7,
+       9
+      ],
+      [
+       9,
+       1
+      ],
+      [
+       0,
+       5
+      ],
+      [
+       13,
+       4
+      ]
+     ],
+     "l": 14,
+     "m": 12
+    },
+    "pass": true,
+    "rank_X": 166,
+    "rank_Z": 166,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      5,
+      11
+     ],
+     [
+      9,
+      1
+     ],
+     [
+      10,
+      11
+     ],
+     [
+      13,
+      6
+     ]
+    ],
+    "B_terms": [
+     [
+      7,
+      9
+     ],
+     [
+      9,
+      1
+     ],
+     [
+      0,
+      5
+     ],
+     [
+      13,
+      4
+     ]
+    ],
+    "l": 14,
+    "m": 12
+   },
+   "passed": 8,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "11cd3370f7893c26",
+     "k": 2,
+     "label": "l=13, m=12",
+     "n": 312,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 13,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 155,
+     "rank_Z": 155,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "fc8d5413f081ed48",
+     "k": 2,
+     "label": "l=15, m=12",
+     "n": 360,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 15,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 179,
+     "rank_Z": 179,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "95682420d25787b1",
+     "k": 2,
+     "label": "l=14, m=11",
+     "n": 308,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 14,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 153,
+     "rank_Z": 153,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "b3da86d2ef1104a8",
+     "k": 2,
+     "label": "l=14, m=13",
+     "n": 364,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 14,
+      "m": 13
+     },
+     "pass": true,
+     "rank_X": 181,
+     "rank_Z": 181,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "1c88eacb73586a5e",
+     "k": 4,
+     "label": "l=28, m=12",
+     "n": 672,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 28,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 334,
+     "rank_Z": 334,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "ff31310e2bbb3c3e",
+     "k": 4,
+     "label": "l=14, m=24",
+     "n": 672,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 14,
+      "m": 24
+     },
+     "pass": true,
+     "rank_X": 334,
+     "rank_Z": 334,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "c896fe10089a9521",
+     "k": 2,
+     "label": "l=7, m=12",
+     "n": 168,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 7,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 83,
+     "rank_Z": 83,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "47ec735e0ab75d25",
+     "k": 4,
+     "label": "l=14, m=6",
+     "n": 168,
+     "params": {
+      "A_terms": [
+       [
+        5,
+        11
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        10,
+        11
+       ],
+       [
+        13,
+        6
+       ]
+      ],
+      "B_terms": [
+       [
+        7,
+        9
+       ],
+       [
+        9,
+        1
+       ],
+       [
+        0,
+        5
+       ],
+       [
+        13,
+        4
+       ]
+      ],
+      "l": 14,
+      "m": 6
+     },
+     "pass": true,
+     "rank_X": 82,
+     "rank_Z": 82,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 8
+  },
+  "352-6-32": {
+   "constructor": "bb.build_bb",
+   "own": {
+    "checks": {
+     "commutes": true,
+     "connected": true,
+     "encodes": true,
+     "within_caps": true
+    },
+    "components": 1,
+    "fingerprint": "ead51d2bcb0cc369",
+    "k": 6,
+    "n": 352,
+    "params": {
+     "A_terms": [
+      [
+       0,
+       7
+      ],
+      [
+       2,
+       8
+      ],
+      [
+       11,
+       6
+      ],
+      [
+       9,
+       8
+      ]
+     ],
+     "B_terms": [
+      [
+       5,
+       8
+      ],
+      [
+       7,
+       8
+      ],
+      [
+       6,
+       2
+      ],
+      [
+       8,
+       10
+      ]
+     ],
+     "l": 16,
+     "m": 11
+    },
+    "pass": true,
+    "rank_X": 173,
+    "rank_Z": 173,
+    "w": 8
+   },
+   "params": {
+    "A_terms": [
+     [
+      0,
+      7
+     ],
+     [
+      2,
+      8
+     ],
+     [
+      11,
+      6
+     ],
+     [
+      9,
+      8
+     ]
+    ],
+    "B_terms": [
+     [
+      5,
+      8
+     ],
+     [
+      7,
+      8
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      8,
+      10
+     ]
+    ],
+    "l": 16,
+    "m": 11
+   },
+   "passed": 7,
+   "reproduces_entry": true,
+   "rule": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
+   "sizes": [
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "e84d66bd9b61e30d",
+     "k": 2,
+     "label": "l=15, m=11",
+     "n": 330,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 15,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 164,
+     "rank_Z": 164,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "412f2855dfec0549",
+     "k": 2,
+     "label": "l=17, m=11",
+     "n": 374,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 17,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 186,
+     "rank_Z": 186,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "05da984543665342",
+     "k": 6,
+     "label": "l=16, m=10",
+     "n": 320,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 16,
+      "m": 10
+     },
+     "pass": true,
+     "rank_X": 157,
+     "rank_Z": 157,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "53ec848c52604280",
+     "k": 6,
+     "label": "l=16, m=12",
+     "n": 384,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 16,
+      "m": 12
+     },
+     "pass": true,
+     "rank_X": 189,
+     "rank_Z": 189,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "da1673c2d1e346e2",
+     "k": 6,
+     "label": "l=32, m=11",
+     "n": 704,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 32,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 349,
+     "rank_Z": 349,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "03fe48fcd3b84cf3",
+     "k": 6,
+     "label": "l=16, m=22",
+     "n": 704,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 16,
+      "m": 22
+     },
+     "pass": true,
+     "rank_X": 349,
+     "rank_Z": 349,
+     "w": 8
+    },
+    {
+     "checks": {
+      "commutes": true,
+      "connected": true,
+      "encodes": true,
+      "within_caps": true
+     },
+     "components": 1,
+     "fingerprint": "4bb9d0435ac28853",
+     "k": 6,
+     "label": "l=8, m=11",
+     "n": 176,
+     "params": {
+      "A_terms": [
+       [
+        0,
+        7
+       ],
+       [
+        2,
+        8
+       ],
+       [
+        11,
+        6
+       ],
+       [
+        9,
+        8
+       ]
+      ],
+      "B_terms": [
+       [
+        5,
+        8
+       ],
+       [
+        7,
+        8
+       ],
+       [
+        6,
+        2
+       ],
+       [
+        8,
+        10
+       ]
+      ],
+      "l": 8,
+      "m": 11
+     },
+     "pass": true,
+     "rank_X": 85,
+     "rank_Z": 85,
+     "w": 8
+    }
+   ],
+   "status": "lifted",
+   "tried": 7
   }
  },
- "head": "72ab8f1d7676bbfca37a052672e5624352d31bb1",
+ "head": "be84c17ad3380c3ba6cb4b74d3c7cdba85ee720d",
  "issue": 4031,
  "lifts": {
   "bb.build_bb": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",

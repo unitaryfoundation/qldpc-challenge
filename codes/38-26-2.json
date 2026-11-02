@@ -1,0 +1,246 @@
+{
+ "schema_version": "0.2",
+ "name": "priced-calculus-38-26-2",
+ "code_type": "CSS",
+ "n": 38,
+ "k": 26,
+ "checks": {
+  "X": [
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+   ],
+   [
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    10,
+    12,
+    14,
+    16,
+    20,
+    22,
+    24,
+    26,
+    30,
+    32,
+    34,
+    36
+   ],
+   [
+    1,
+    2,
+    5,
+    6,
+    11,
+    12,
+    15,
+    16,
+    21,
+    22,
+    25,
+    26,
+    31,
+    32,
+    35,
+    36
+   ],
+   [
+    2,
+    3,
+    4,
+    7,
+    12,
+    13,
+    14,
+    17,
+    22,
+    23,
+    24,
+    27,
+    32,
+    33,
+    34,
+    37
+   ]
+  ],
+  "Z": [
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27
+   ],
+   [
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37
+   ],
+   [
+    0,
+    2,
+    4,
+    6,
+    10,
+    12,
+    14,
+    16,
+    20,
+    22,
+    24,
+    26,
+    30,
+    32,
+    34,
+    36
+   ],
+   [
+    1,
+    2,
+    5,
+    6,
+    11,
+    12,
+    15,
+    16,
+    21,
+    22,
+    25,
+    26,
+    31,
+    32,
+    35,
+    36
+   ],
+   [
+    2,
+    3,
+    4,
+    7,
+    12,
+    13,
+    14,
+    17,
+    22,
+    23,
+    24,
+    27,
+    32,
+    33,
+    34,
+    37
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    21,
+    25
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-11-01",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     0
+    ]
+   }
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    8,
+    9
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-11-01",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "priced calculus E-PUNCTURE transform of codes/40-24-4.json",
+  "references": [],
+  "date": "2026-11-01",
+  "notes": "",
+  "model": "Beam 1.0"
+ }
+}

@@ -74,7 +74,7 @@ jobs:
   sweep:
     # The schedule waits for the credit setting; a manual run may pass it as an input.
     if: github.event_name == 'workflow_dispatch' || vars.SWEEP_CREDIT != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 330
     env:
       PYTHONUNBUFFERED: "1"
