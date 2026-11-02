@@ -4707,7 +4707,8 @@
    "arXiv:2610.12782"
   ],
   "novelty": "new_parameters",
-  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani."
+  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "model": "human"
  },
  "family": "2bga-coset"
 }
