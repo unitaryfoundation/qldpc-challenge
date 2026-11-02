@@ -117,7 +117,7 @@ def load_checks(path):
         HX = _matrix_from_supports(doc["checks"]["X"], n)
         HZ = _matrix_from_supports(doc["checks"]["Z"], n)
         return HX, HZ, coords, doc
-    z = np.load(path, allow_pickle=True)
+    z = np.load(path, allow_pickle=False)
     coords = _pick(z, ("coords", "coordinates", "xy"))
     if coords is not None:
         coords = np.asarray(coords, dtype=float)
