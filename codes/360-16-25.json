@@ -3327,7 +3327,8 @@
    "arXiv:2610.12782"
   ],
   "novelty": "known_parameters",
-  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 25 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani."
+  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 25 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "model": "human"
  },
  "family": "2bga-coset"
 }
