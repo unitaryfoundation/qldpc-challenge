@@ -428,7 +428,7 @@ def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
 
 
 # ---------------------------------------------------------------------------
-# SAT-based lower bounds for screening (PR #4311)
+# SAT-based lower bounds for screening (issue #4230)
 # ---------------------------------------------------------------------------
 # Complement to the Monte Carlo *upper* bound in surrogate.distance_rand: the
 # SAT certifier (verify/sat_certify.py) is usually run to certify an exact
@@ -441,23 +441,18 @@ def _gf2_mod():
     return _load_module(os.path.join(_VERIFY, "gf2.py"), "_qldpc_gf2")
 
 
-def weight_one_logical_exists(HX, HZ):
-    """Cheap, exact linear-algebra check for a distance-1 code.
+def _first_weight_one_logical(HX, HZ):
+    """Return the first ``(side, qubit)`` weight-1 logical, or ``None``.
 
     A weight-1 logical on the X side exists iff some qubit ``q`` has a zero
     column in ``HZ`` (so ``e_q`` commutes with every Z check) and ``e_q`` is
     not a product of X checks (not in rowspace(HX)). The Z side is symmetric.
-
-    This is the whole content of "can we show d >= 2": a SAT instance at
-    ``W = 1`` asks exactly this question, and the linear-algebra answer is
-    both cheaper and exact. Returns ``True`` when at least one side has a
-    weight-1 logical, i.e. when the code's distance is 1.
     """
     HX = np.asarray(HX, dtype=np.int8) % 2
     HZ = np.asarray(HZ, dtype=np.int8) % 2
     n = int(HX.shape[1])
     gf2 = _gf2_mod()
-    for side_self, side_opp in ((HX, HZ), (HZ, HX)):
+    for side_self, side_opp, side_name in ((HX, HZ, "X"), (HZ, HX, "Z")):
         R, piv = gf2.rref(side_self)
         for q in range(n):
             if int(side_opp[:, q].sum()) != 0:
@@ -468,11 +463,22 @@ def weight_one_logical_exists(HX, HZ):
                 if vv[c]:
                     vv = (vv ^ R[i]).astype(np.int8)
             if vv.any():
-                return True
-    return False
+                return (side_name, int(q))
+    return None
 
 
-def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
+def weight_one_logical_exists(HX, HZ):
+    """Cheap, exact linear-algebra check for a distance-1 code.
+
+    This is the whole content of "can we show d >= 2": a SAT instance at
+    ``W = 1`` asks exactly this question, and the linear-algebra answer is
+    both cheaper and exact. Returns ``True`` when at least one side has a
+    weight-1 logical, i.e. when the code's distance is 1.
+    """
+    return _first_weight_one_logical(HX, HZ) is not None
+
+
+def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0):
     """Use the SAT certifier as a *lower*-bound screen.
 
     Claims ``d = min_d`` (so ``W = min_d - 1``) and runs
@@ -506,33 +512,16 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
 
     # Linear-algebra fast path for min_d <= 2.
     if min_d <= 2:
-        gf2 = _gf2_mod()
-        found = None
-        for side_self, side_opp, side_name in ((HXa, HZa, "X"),
-                                                (HZa, HXa, "Z")):
-            R, piv = gf2.rref(side_self)
-            for q in range(n):
-                if int(side_opp[:, q].sum()) != 0:
-                    continue
-                vv = np.zeros(n, dtype=np.int8)
-                vv[q] = 1
-                for i, c in enumerate(piv):
-                    if vv[c]:
-                        vv = (vv ^ R[i]).astype(np.int8)
-                if vv.any():
-                    found = (side_name, int(q))
-                    break
-            if found is not None:
-                break
+        found = _first_weight_one_logical(HXa, HZa)
         secs = round(time.monotonic() - t0, 2)
         if found is not None:
             side, q = found
             return {"min_d": min_d, "outcome": "refuted",
-                    "both_sides_unsat": False, "d_exact": False,
+                    "both_sides_unsat": False,
                     "sides": {}, "secs": secs,
                     "witness": {"side": side, "support": [q]}}
         return {"min_d": min_d, "outcome": "proved",
-                "both_sides_unsat": True, "d_exact": True,
+                "both_sides_unsat": True,
                 "sides": {}, "secs": secs}
 
     try:
@@ -565,10 +554,10 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
     elif res.get("d_exact"):
         outcome = "proved"
     else:
-        outcome = "timeout"
+        outcome = "unknown"
     both = (outcome == "proved")
     out = {"min_d": min_d, "outcome": outcome,
-           "both_sides_unsat": both, "d_exact": both,
+           "both_sides_unsat": both,
            "sides": sides, "secs": secs}
     if witness is not None:
         out["witness"] = witness
@@ -579,7 +568,7 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, trials=200, seed=0):
     return out
 
 
-def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, trials=200, seed=0,
+def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, seed=0,
                backend=None, threads=1, **_):
     """Standalone pre-filter built on :func:`sat_lower_bound`.
 
@@ -594,8 +583,7 @@ def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, trials=200, seed=0,
     never treated as refutations. ``backend``/``threads`` are accepted for
     call-site compatibility and ignored.
     """
-    r = sat_lower_bound(HX, HZ, min_d=min_d, tlim=tlim, trials=trials,
-                        seed=seed)
+    r = sat_lower_bound(HX, HZ, min_d=min_d, tlim=tlim, seed=seed)
     if r["outcome"] == "error":
         raise RuntimeError(r.get("detail", "sat screen error"))
     if r["outcome"] == "refuted":
