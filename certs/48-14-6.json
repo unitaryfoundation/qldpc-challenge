@@ -1,0 +1,37 @@
+{
+  "d": 6,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 14,
+  "name": "[[48,14,6]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 6 exists",
+      "secs": 0.3,
+      "status": "UNSAT",
+      "value": 6
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 6 exists",
+      "secs": 0.3,
+      "status": "UNSAT",
+      "value": 6
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 600,
+  "verification": {
+    "checker": "drat-trim sha256:92f0aa9575ed519d",
+    "cnf_sha256": "X=1d1dda9d5707b6659831cbe9eaec519393f7312a8d1b52b19033c09bb6e23d73;Z=b10474ae693a692823d9c8ae9c4a9402cec1013947b8a26e0c0f5a8293d13288",
+    "level": "proof_log",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
+    "replay": {
+      "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+      "emit": "python verify/replay_proofs.py 48-14-6",
+      "emitter": "verify/sat_certify.py side_cnf, XOR chunk arity 5, no symmetry prefix"
+    }
+  }
+}
