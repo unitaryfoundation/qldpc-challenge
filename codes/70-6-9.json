@@ -679,11 +679,11 @@
   ],
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(35,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt7wtL3_order35_k6.txt, line 1. nonidentity supports a=[3, 14], b=[3, 13, 20].",
   "references": [
-   "arXiv:2306.16400 (Lin and Pryadko; this entry reproduces line 1 of diswtabelian_wt7wtL3_order35_k6.txt in the authors' public database github.com/QEC-pages/2BGA-codes, abelian.zip, July 2023)",
-   "arXiv:2604.19481 (Tripier et al., the Walking Cat architecture, code Q70: a [[70,6,9]] weight-7 bivariate bicycle code with the same parameters that is not permutation-equivalent to this entry, including under an X/Z swap; both codes have exactly 35 minimum-weight stabilizers per side)"
+   "arXiv:2306.16400",
+   "arXiv:2604.19481"
   ],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Reproduces line 1 of diswtabelian_wt7wtL3_order35_k6.txt in Lin and Pryadko's public database (github.com/QEC-pages/2BGA-codes, abelian.zip, July 2023; element indices are 1-based GAP positions). Table XXX of arXiv:2604.19481 lists two weight-7 [[70,6,9]] bivariate bicycle codes with l = 7, m = 5, x = S_l (x) I_m, y = I_l (x) S_m: Q70, A = y^2 + x^2 + x^3 + x^4, B = y + x + x^3, and a second row, A = y^3 + x y + x^2 y^2 + x^5, B = x y^3 + x^5 + x^6 y^2. Neither is permutation-equivalent to this entry, with or without an X/Z swap: each of the three codes has exactly 35 weight-7 stabilizers per side (SAT: no other row-space vector of weight at most 7), so the 35-row generating sets are canonical, and nauty's canonical forms of their typed Tanner graphs differ. The verifier's WL signature does not separate them, so the board's dedup would flag either Walking Cat code as a review pair against this entry.",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission",
   "novelty": "known_parameters"
