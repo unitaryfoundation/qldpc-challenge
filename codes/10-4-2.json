@@ -63,7 +63,7 @@
    ],
    "witness_provenance": {
     "found_by": [
-     "@mathys"
+     "@MathysRennela"
     ],
     "date": "2026-11-02",
     "found_at_samples": 1000,
@@ -83,7 +83,7 @@
    ],
    "witness_provenance": {
     "found_by": [
-     "@mathys"
+     "@MathysRennela"
     ],
     "date": "2026-11-02",
     "found_at_samples": 1000,
@@ -99,8 +99,10 @@
   "authors": [
    "@mathysrennela"
   ],
-  "construction": "priced calculus E-PEEL transform of a board entry",
-  "references": [],
+  "construction": "E-PEEL q=4 Z then E-PEEL q=8 X from 12-4-3.json",
+  "references": [
+   "arXiv:2306.16400 (isomorphic to the archive row 6 2 4 3 [ 3 ] [ 2, 3, 6 ] of the abelian enumeration, github.com/QEC-pages/2BGA-codes @ 403d194c3f98, rebuilt on research/kit/groups/smallgroup_6_2.json; issue #3658)"
+  ],
   "date": "2026-11-02",
   "notes": "",
   "model": "Beam 1.0"
