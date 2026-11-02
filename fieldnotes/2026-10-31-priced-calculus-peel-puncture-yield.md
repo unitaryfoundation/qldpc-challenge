@@ -20,7 +20,7 @@ existing board entry and was dropped).
 survivors. After excluding the 16 already submitted and one exact duplicate,
 108 new distinct tuples were submitted as PRs #4339-#4446.
 
-In total, **129 PRs** were submitted from this campaign family (124 from the
+In total, **160+ PRs** were submitted from this campaign family (124 from the
 calculus transform campaigns + 3 from the construction family pipeline:
 `[[18,9,2]]` (BB, C-DELETE-CHECK), `[[11,4,2]]` (BBGA, E-PEEL), and
 `[[41,10,5]]` (BB, E-PEEL) + 2 from the imaginative search:
@@ -72,6 +72,19 @@ A fourth campaign applied all priced calculus moves (peel, puncture, deletion,
 rebase) to both board codes and previously staged candidates as parents. Found
 2 new board-advancing codes: `[[9,5,2]]` (E-PUNCTURE) and `[[10,4,2]]`
 (E-PEEL), both d=2. Submitted as PRs #4475 and #4476.
+
+## Gap-targeted search (follow-up)
+
+A fifth campaign targeted Pareto frontier gaps in the (weight_class, locality)
+cells. Found 11 new board-advancing codes (mostly d=2, plus `[[47,8,7]]`
+d=7 and `[[60,9,5]]` d=5). All passed the gate. Promoted as PRs #4485-#4495.
+
+## Gap-targeted depth-1 search (follow-up)
+
+A sixth campaign ran gap-targeted search over n<=100 CSS parents (depth-1 only).
+Found 23 board-advancing codes including high-distance finds: `[[83,14,9]]`
+(d=9), `[[97,6,11]]` (d=11), `[[95,20,7]]` (d=7), `[[77,26,5]]` (d=5).
+16 new distinct tuples promoted as PRs #4496-#4514.
 
 ## Gap-targeted search (follow-up)
 
