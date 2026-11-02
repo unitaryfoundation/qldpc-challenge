@@ -1,0 +1,109 @@
+{
+ "schema_version": "0.2",
+ "name": "construct-11-4-2",
+ "code_type": "CSS",
+ "n": 11,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    3,
+    4,
+    7,
+    8
+   ],
+   [
+    0,
+    5,
+    6,
+    9,
+    10
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    3,
+    4,
+    9
+   ],
+   [
+    0,
+    3,
+    4,
+    10
+   ],
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    3,
+    4,
+    7,
+    8
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    6
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-11-02",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     0
+    ]
+   }
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    3,
+    7
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathys"
+    ],
+    "date": "2026-11-02",
+    "found_at_samples": 1000,
+    "survived_samples": 1000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "priced calculus E-PEEL transform of bbga code",
+  "references": [],
+  "date": "2026-11-02",
+  "notes": "",
+  "model": "Beam 1.0"
+ }
+}
