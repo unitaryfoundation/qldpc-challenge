@@ -1,515 +1,549 @@
 {
-  "schema_version": "0.2",
-  "name": "[[40,16,4]] two-block code over C10 x C2",
-  "code_type": "CSS",
-  "n": 40,
-  "k": 16,
-  "checks": {
-    "X": [
-      [
-        0,
-        6,
-        9,
-        11,
-        15,
-        20,
-        21,
-        35,
-        38
-      ],
-      [
-        1,
-        7,
-        8,
-        13,
-        17,
-        20,
-        21,
-        37,
-        39
-      ],
-      [
-        2,
-        3,
-        12,
-        14,
-        18,
-        22,
-        24,
-        35,
-        38
-      ],
-      [
-        0,
-        3,
-        10,
-        13,
-        15,
-        20,
-        22,
-        23,
-        25
-      ],
-      [
-        4,
-        5,
-        10,
-        16,
-        19,
-        22,
-        24,
-        37,
-        39
-      ],
-      [
-        1,
-        5,
-        11,
-        12,
-        17,
-        21,
-        23,
-        24,
-        25
-      ],
-      [
-        2,
-        6,
-        7,
-        16,
-        18,
-        20,
-        22,
-        26,
-        28
-      ],
-      [
-        0,
-        3,
-        7,
-        14,
-        17,
-        23,
-        26,
-        27,
-        29
-      ],
-      [
-        4,
-        8,
-        9,
-        14,
-        19,
-        21,
-        24,
-        26,
-        28
-      ],
-      [
-        1,
-        5,
-        9,
-        15,
-        16,
-        25,
-        27,
-        28,
-        29
-      ],
-      [
-        2,
-        6,
-        10,
-        11,
-        19,
-        23,
-        26,
-        30,
-        32
-      ],
-      [
-        1,
-        3,
-        7,
-        11,
-        18,
-        27,
-        30,
-        31,
-        33
-      ],
-      [
-        4,
-        8,
-        12,
-        13,
-        18,
-        25,
-        28,
-        30,
-        32
-      ],
-      [
-        0,
-        5,
-        9,
-        13,
-        19,
-        29,
-        31,
-        32,
-        33
-      ],
-      [
-        4,
-        6,
-        10,
-        14,
-        15,
-        27,
-        30,
-        34,
-        36
-      ],
-      [
-        2,
-        5,
-        7,
-        11,
-        15,
-        31,
-        34,
-        35,
-        37
-      ],
-      [
-        2,
-        8,
-        12,
-        16,
-        17,
-        29,
-        32,
-        34,
-        36
-      ],
-      [
-        3,
-        4,
-        9,
-        13,
-        17,
-        33,
-        35,
-        36,
-        37
-      ],
-      [
-        0,
-        8,
-        10,
-        14,
-        18,
-        31,
-        34,
-        38,
-        39
-      ],
-      [
-        1,
-        6,
-        12,
-        16,
-        19,
-        33,
-        36,
-        38,
-        39
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        1,
-        3,
-        6,
-        20,
-        23,
-        27,
-        33,
-        38
-      ],
-      [
-        0,
-        1,
-        5,
-        8,
-        21,
-        25,
-        29,
-        31,
-        39
-      ],
-      [
-        2,
-        3,
-        4,
-        6,
-        22,
-        26,
-        30,
-        35,
-        36
-      ],
-      [
-        3,
-        5,
-        7,
-        10,
-        22,
-        23,
-        27,
-        31,
-        37
-      ],
-      [
-        2,
-        4,
-        5,
-        8,
-        24,
-        28,
-        32,
-        34,
-        37
-      ],
-      [
-        3,
-        5,
-        9,
-        12,
-        24,
-        25,
-        29,
-        33,
-        35
-      ],
-      [
-        6,
-        7,
-        8,
-        10,
-        20,
-        26,
-        30,
-        34,
-        39
-      ],
-      [
-        7,
-        9,
-        11,
-        14,
-        21,
-        26,
-        27,
-        31,
-        35
-      ],
-      [
-        6,
-        8,
-        9,
-        12,
-        21,
-        28,
-        32,
-        36,
-        38
-      ],
-      [
-        7,
-        9,
-        13,
-        16,
-        20,
-        28,
-        29,
-        33,
-        37
-      ],
-      [
-        10,
-        11,
-        12,
-        14,
-        23,
-        24,
-        30,
-        34,
-        38
-      ],
-      [
-        11,
-        13,
-        15,
-        18,
-        20,
-        25,
-        30,
-        31,
-        35
-      ],
-      [
-        10,
-        12,
-        13,
-        16,
-        22,
-        25,
-        32,
-        36,
-        39
-      ],
-      [
-        11,
-        13,
-        17,
-        19,
-        21,
-        23,
-        32,
-        33,
-        37
-      ],
-      [
-        14,
-        15,
-        16,
-        18,
-        22,
-        27,
-        28,
-        34,
-        38
-      ],
-      [
-        0,
-        2,
-        15,
-        17,
-        20,
-        23,
-        29,
-        34,
-        35
-      ],
-      [
-        14,
-        16,
-        17,
-        19,
-        24,
-        26,
-        29,
-        36,
-        39
-      ],
-      [
-        1,
-        4,
-        15,
-        17,
-        21,
-        25,
-        27,
-        36,
-        37
-      ],
-      [
-        0,
-        2,
-        18,
-        19,
-        22,
-        26,
-        31,
-        32,
-        38
-      ],
-      [
-        1,
-        4,
-        18,
-        19,
-        24,
-        28,
-        30,
-        33,
-        39
-      ]
-    ]
-  },
-  "distance": {
-    "d": 4,
-    "X": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        2,
-        18,
-        30,
-        34
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1036
-        ]
-      }
-    },
-    "Z": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        5,
-        17,
-        29,
-        37
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1037
-        ]
-      }
-    }
-  },
-  "provenance": {
-    "authors": [
-      "Lee, Gideon"
-    ],
-    "construction": "Two-block group-algebra code C(a,b) over C10 x C2 = SmallGroup(20, 5) (order 20), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 40; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 3, 7, 13, 18}, b = {0, 1, 3, 6} as element indices. Check weight 9. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
-    "references": [
-      "arXiv:2610.13880"
+ "schema_version": "0.2",
+ "name": "[[40,16,4]] two-block code over C10 x C2",
+ "code_type": "CSS",
+ "n": 40,
+ "k": 16,
+ "checks": {
+  "X": [
+   [
+    0,
+    6,
+    9,
+    11,
+    15,
+    20,
+    21,
+    35,
+    38
+   ],
+   [
+    1,
+    7,
+    8,
+    13,
+    17,
+    20,
+    21,
+    37,
+    39
+   ],
+   [
+    2,
+    3,
+    12,
+    14,
+    18,
+    22,
+    24,
+    35,
+    38
+   ],
+   [
+    0,
+    3,
+    10,
+    13,
+    15,
+    20,
+    22,
+    23,
+    25
+   ],
+   [
+    4,
+    5,
+    10,
+    16,
+    19,
+    22,
+    24,
+    37,
+    39
+   ],
+   [
+    1,
+    5,
+    11,
+    12,
+    17,
+    21,
+    23,
+    24,
+    25
+   ],
+   [
+    2,
+    6,
+    7,
+    16,
+    18,
+    20,
+    22,
+    26,
+    28
+   ],
+   [
+    0,
+    3,
+    7,
+    14,
+    17,
+    23,
+    26,
+    27,
+    29
+   ],
+   [
+    4,
+    8,
+    9,
+    14,
+    19,
+    21,
+    24,
+    26,
+    28
+   ],
+   [
+    1,
+    5,
+    9,
+    15,
+    16,
+    25,
+    27,
+    28,
+    29
+   ],
+   [
+    2,
+    6,
+    10,
+    11,
+    19,
+    23,
+    26,
+    30,
+    32
+   ],
+   [
+    1,
+    3,
+    7,
+    11,
+    18,
+    27,
+    30,
+    31,
+    33
+   ],
+   [
+    4,
+    8,
+    12,
+    13,
+    18,
+    25,
+    28,
+    30,
+    32
+   ],
+   [
+    0,
+    5,
+    9,
+    13,
+    19,
+    29,
+    31,
+    32,
+    33
+   ],
+   [
+    4,
+    6,
+    10,
+    14,
+    15,
+    27,
+    30,
+    34,
+    36
+   ],
+   [
+    2,
+    5,
+    7,
+    11,
+    15,
+    31,
+    34,
+    35,
+    37
+   ],
+   [
+    2,
+    8,
+    12,
+    16,
+    17,
+    29,
+    32,
+    34,
+    36
+   ],
+   [
+    3,
+    4,
+    9,
+    13,
+    17,
+    33,
+    35,
+    36,
+    37
+   ],
+   [
+    0,
+    8,
+    10,
+    14,
+    18,
+    31,
+    34,
+    38,
+    39
+   ],
+   [
+    1,
+    6,
+    12,
+    16,
+    19,
+    33,
+    36,
+    38,
+    39
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    3,
+    6,
+    20,
+    23,
+    27,
+    33,
+    38
+   ],
+   [
+    0,
+    1,
+    5,
+    8,
+    21,
+    25,
+    29,
+    31,
+    39
+   ],
+   [
+    2,
+    3,
+    4,
+    6,
+    22,
+    26,
+    30,
+    35,
+    36
+   ],
+   [
+    3,
+    5,
+    7,
+    10,
+    22,
+    23,
+    27,
+    31,
+    37
+   ],
+   [
+    2,
+    4,
+    5,
+    8,
+    24,
+    28,
+    32,
+    34,
+    37
+   ],
+   [
+    3,
+    5,
+    9,
+    12,
+    24,
+    25,
+    29,
+    33,
+    35
+   ],
+   [
+    6,
+    7,
+    8,
+    10,
+    20,
+    26,
+    30,
+    34,
+    39
+   ],
+   [
+    7,
+    9,
+    11,
+    14,
+    21,
+    26,
+    27,
+    31,
+    35
+   ],
+   [
+    6,
+    8,
+    9,
+    12,
+    21,
+    28,
+    32,
+    36,
+    38
+   ],
+   [
+    7,
+    9,
+    13,
+    16,
+    20,
+    28,
+    29,
+    33,
+    37
+   ],
+   [
+    10,
+    11,
+    12,
+    14,
+    23,
+    24,
+    30,
+    34,
+    38
+   ],
+   [
+    11,
+    13,
+    15,
+    18,
+    20,
+    25,
+    30,
+    31,
+    35
+   ],
+   [
+    10,
+    12,
+    13,
+    16,
+    22,
+    25,
+    32,
+    36,
+    39
+   ],
+   [
+    11,
+    13,
+    17,
+    19,
+    21,
+    23,
+    32,
+    33,
+    37
+   ],
+   [
+    14,
+    15,
+    16,
+    18,
+    22,
+    27,
+    28,
+    34,
+    38
+   ],
+   [
+    0,
+    2,
+    15,
+    17,
+    20,
+    23,
+    29,
+    34,
+    35
+   ],
+   [
+    14,
+    16,
+    17,
+    19,
+    24,
+    26,
+    29,
+    36,
+    39
+   ],
+   [
+    1,
+    4,
+    15,
+    17,
+    21,
+    25,
+    27,
+    36,
+    37
+   ],
+   [
+    0,
+    2,
+    18,
+    19,
+    22,
+    26,
+    31,
+    32,
+    38
+   ],
+   [
+    1,
+    4,
+    18,
+    19,
+    24,
+    28,
+    30,
+    33,
+    39
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    2,
+    18,
+    30,
+    34
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
     ],
     "date": "2026-10-12",
-    "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
-    "origin": "baseline",
-    "novelty": "known_parameters",
-    "model": "Mimo-V2.6-Flash"
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1036
+    ]
+   }
   },
-  "family": "generalized-bicycle"
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    17,
+    29,
+    37
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-10-12",
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1037
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "Lee, Gideon"
+  ],
+  "construction": "Two-block group-algebra code C(a,b) over C10 x C2 = SmallGroup(20, 5) (order 20), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 40; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 3, 7, 13, 18}, b = {0, 1, 3, 6} as element indices. Check weight 9. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
+  "references": [
+   "arXiv:2610.13880"
+  ],
+  "date": "2026-10-12",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "origin": "baseline",
+  "novelty": "known_parameters",
+  "model": "Mimo-V2.6-Flash"
+ },
+ "family": "generalized-bicycle",
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     7796,
+     7803,
+     9777,
+     10099
+    ]
+   },
+   "Z": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     6117,
+     6118,
+     9738,
+     9742
+    ]
+   }
+  },
+  "rounds": 4,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [8, 9, 2, 1, 7, 3, 4, 5, 6], Z-check term slots [1, 2, 8, 7, 0, 3, 6, 5, 4] over terms A_0..A_4, B_0..B_3); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-02",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [8, 9, 2, 1, 7, 3, 4, 5, 6], Z-check term slots [1, 2, 8, 7, 0, 3, 6, 5, 4] over terms A_0..A_4, B_0..B_3)"
+  }
+ }
 }
