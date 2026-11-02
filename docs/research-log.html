@@ -3,6 +3,30 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/10-4-2.html">[[10,4,2]] — 10-4-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[10,4,2]] — priced calculus E-PEEL chain from 12-4-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Depth-2 E-PEEL chain on the board entry codes/12-4-3.json, yielding a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Priced construction calculus (E-PEEL) enumerated every one- and two-move chain (planner.candidate_moves with structural screening) from the CSS entries with 9 &lt;= n &lt;= 13. The survivor is reached at depth 2: codes/12-4-3.json -&gt; E-PEEL qubit 4 in sector Z against {2,4,7,8,10,11} -&gt; E-PEEL qubit 8 in sector X against {0,1,2,3,6,8}. No intermediate matches a board entry. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/12-4-3.json.</p>
+<h4>Dead ends</h4>
+<p>Depth-1 E-PEEL on the same parents mostly yielded d=1 or dominated points.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Parent: codes/12-4-3.json. Apply E-PEEL qubit 4 in sector Z then E-PEEL qubit 8 in sector X; re-run the witness search at 1000 RIS trials per side. Full matrices in codes/10-4-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/10-4-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/107-61-2.html">[[107,61,2]] — 107-61-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[107,61,2]] — priced calculus E-PUNCTURE transform of codes/108-58-4.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-12 unrestricted CSS cell. Transform a connected CSS parent (codes/108-58-4.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/108-58-4.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/108-58-4.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/108-58-4.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/107-61-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/11-4-2.html">[[11,4,2]] — 11-4-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[11,4,2]] — priced calculus E-PEEL transform of bbga code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-5 unrestricted CSS cell. Transform a generated bbga code code with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
@@ -14,7 +38,18 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Generate a bbga code, apply the E-PEEL move of the priced calculus, re-run witness search.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-4-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/18-9-2.html">[[18,9,2]] — 18-9-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[18,9,2]] — priced calculus C-DELETE-CHECK transform of bb code</h3>
+<section class=blk><h3><a href="codes/111-12-11.html">[[111,12,11]] — 111-12-11</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[111,12,11]] — priced calculus E-PEEL transform of codes/112-12-12.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (codes/112-12-12.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/112-12-12.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/112-12-12.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/112-12-12.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/111-12-11.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/18-9-2.html">[[18,9,2]] — 18-9-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[18,9,2]] — priced calculus C-DELETE-CHECK transform of bb code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 unrestricted CSS cell. Transform a generated bb code code with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
@@ -25,7 +60,262 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Generate a bb code, apply the C-DELETE-CHECK move of the priced calculus, re-run witness search.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/18-9-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/21-3-5.html">[[21,3,5]] — 21-3-5</a></h3><div class=kv style="color:var(--mut)">2026-11-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[21,3,5]] — priced calculus E-PUNCTURE transform of 23-1-7.json</h3>
+<section class=blk><h3><a href="codes/26-11-2.html">[[26,11,2]] — 26-11-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[26,11,2]] — priced calculus E-PEEL transform of codes/27-11-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Transform a connected CSS parent (codes/27-11-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/27-11-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/27-11-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/27-11-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/26-11-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/26-12-2.html">[[26,12,2]] — 26-12-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[26,12,2]] — priced calculus E-PUNCTURE transform of codes/27-11-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Transform a connected CSS parent (codes/27-11-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/27-11-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/27-11-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/27-11-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/26-12-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/29-18-2.html">[[29,18,2]] — 29-18-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[29,18,2]] — priced calculus E-PEEL transform of codes/30-18-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-15 unrestricted CSS cell. Transform a connected CSS parent (codes/30-18-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/30-18-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/30-18-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/30-18-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/29-18-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/29-19-2.html">[[29,19,2]] — 29-19-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[29,19,2]] — priced calculus E-PUNCTURE transform of codes/30-18-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-15 unrestricted CSS cell. Transform a connected CSS parent (codes/30-18-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/30-18-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/30-18-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/30-18-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/29-19-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/43-6-2.html">[[43,6,2]] — 43-6-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[43,6,2]] — priced calculus E-PEEL transform of codes/44-6-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/44-6-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/44-6-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/44-6-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/44-6-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/43-6-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/43-7-2.html">[[43,7,2]] — 43-7-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[43,7,2]] — priced calculus E-PUNCTURE transform of codes/44-6-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/44-6-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/44-6-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/44-6-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/44-6-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/43-7-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/45-30-2.html">[[45,30,2]] — 45-30-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[45,30,2]] — priced calculus E-PEEL transform of codes/46-30-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-23 unrestricted CSS cell. Transform a connected CSS parent (codes/46-30-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/46-30-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/46-30-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/46-30-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/45-30-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/45-31-2.html">[[45,31,2]] — 45-31-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[45,31,2]] — priced calculus E-PUNCTURE transform of codes/46-30-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-23 unrestricted CSS cell. Transform a connected CSS parent (codes/46-30-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/46-30-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/46-30-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/46-30-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/45-31-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/47-7-2.html">[[47,7,2]] — 47-7-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[47,7,2]] — priced calculus E-PUNCTURE transform of codes/48-6-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/48-6-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/48-6-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/48-6-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/48-6-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/47-7-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/49-7-2.html">[[49,7,2]] — 49-7-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[49,7,2]] — priced calculus E-PUNCTURE transform of codes/50-6-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/50-6-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/50-6-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/50-6-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/50-6-3.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/49-7-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/53-13-5.html">[[53,13,5]] — 53-13-5</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[53,13,5]] — priced calculus E-PUNCTURE transform of codes/54-12-6-b.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (codes/54-12-6-b.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/54-12-6-b.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/54-12-6-b.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/54-12-6-b.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/53-13-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/53-36-2.html">[[53,36,2]] — 53-36-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[53,36,2]] — priced calculus E-PEEL transform of codes/54-36-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-27 unrestricted CSS cell. Transform a connected CSS parent (codes/54-36-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/54-36-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/54-36-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/54-36-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/53-36-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/63-8-2.html">[[63,8,2]] — 63-8-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[63,8,2]] — priced calculus E-PEEL transform of codes/64-8-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/64-8-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/64-8-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/64-8-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/64-8-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/63-8-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/77-10-2.html">[[77,10,2]] — 77-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[77,10,2]] — priced calculus E-PEEL transform of codes/78-10-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/78-10-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/78-10-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/78-10-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/78-10-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/77-10-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/77-26-5.html">[[77,26,5]] — 77-26-5</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[77,26,5]] — priced calculus E-PEEL transform of codes/78-26-5.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-10 unrestricted CSS cell. Transform a connected CSS parent (codes/78-26-5.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/78-26-5.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/78-26-5.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/78-26-5.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/77-26-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/77-27-5.html">[[77,27,5]] — 77-27-5</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[77,27,5]] — priced calculus E-PEEL transform of codes/78-27-5.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-10 unrestricted CSS cell. Transform a connected CSS parent (codes/78-27-5.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/78-27-5.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/78-27-5.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/78-27-5.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/77-27-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/83-14-9.html">[[83,14,9]] — 83-14-9</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[83,14,9]] — priced calculus E-PEEL transform of codes/84-14-10.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (codes/84-14-10.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/84-14-10.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/84-14-10.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/84-14-10.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/83-14-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/89-49-3.html">[[89,49,3]] — 89-49-3</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[89,49,3]] — priced calculus E-PUNCTURE transform of codes/90-20-7.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-31 unrestricted CSS cell. Transform a connected CSS parent (codes/90-20-7.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PUNCTURE. Parent: codes/90-20-7.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/90-20-7.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/90-20-7.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/89-49-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/9-5-2.html">[[9,5,2]] — 9-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,5,2]] — priced calculus E-PUNCTURE chain from 11-3-3-d.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Depth-2 E-PUNCTURE chain on the staged intermediate codes/11-3-3-d.json (itself a single E-PUNCTURE of the board entry codes/12-2-4-b.json), yielding a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Priced construction calculus (E-PUNCTURE) enumerated every one- and two-move chain (planner.candidate_moves with structural screening) from the CSS entries with 9 &lt;= n &lt;= 13. The survivor is reached only at depth 2: codes/11-3-3-d.json -&gt; E-PUNCTURE qubit 3 -&gt; E-PUNCTURE qubit 7 (qubit indices of the parent document). The intermediate [[10,4,2]] of weight 6 matches no board entry. The direct parent is the staged intermediate codes/11-3-3-d.json, not a board entry; the non-calculus root is codes/12-2-4-b.json (three E-PUNCTURE moves total). Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/11-3-3-d.json (staged intermediate); root codes/12-2-4-b.json.</p>
+<h4>Dead ends</h4>
+<p>Depth-1 E-PUNCTURE from board entries did not reach this point; the survivor appears only at depth 2.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Parent: codes/11-3-3-d.json. Apply E-PUNCTURE qubit 3 then E-PUNCTURE qubit 7 (qubit indices of the parent document); re-run the witness search at 1000 RIS trials per side. Full matrices in codes/9-5-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-5-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/92-13-2.html">[[92,13,2]] — 92-13-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[92,13,2]] — priced calculus E-PEEL transform of codes/93-13-3.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/93-13-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/93-13-3.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/93-13-3.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/93-13-3.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/92-13-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/95-20-7.html">[[95,20,7]] — 95-20-7</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[95,20,7]] — priced calculus E-PEEL transform of codes/96-20-8.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (codes/96-20-8.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/96-20-8.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/96-20-8.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/96-20-8.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/95-20-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/95-21-6.html">[[95,21,6]] — 95-21-6</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[95,21,6]] — priced calculus E-PEEL transform of codes/96-21-6.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (codes/96-21-6.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/96-21-6.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/96-21-6.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/96-21-6.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/95-21-6.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/97-6-11.html">[[97,6,11]] — 97-6-11</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[97,6,11]] — priced calculus E-PEEL transform of codes/98-6-12.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Transform a connected CSS parent (codes/98-6-12.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Gap-targeted search: all priced calculus moves (peel, puncture, deletion, rebase) applied to board codes. Targets Pareto frontier gaps. Rule used: E-PEEL. Parent: codes/98-6-12.json. Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/98-6-12.json.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Rebuild H_X/H_Z from codes/98-6-12.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/97-6-11.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/21-3-5.html">[[21,3,5]] — 21-3-5</a></h3><div class=kv style="color:var(--mut)">2026-11-01 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[21,3,5]] — priced calculus E-PUNCTURE transform of 23-1-7.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-8 unrestricted CSS cell. Transform a connected CSS parent (23-1-7.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
@@ -1403,6 +1693,44 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer. Approx compute: CPU only.</p>
 <h4>Reproduction</h4>
 <p>Rebuild H_X/H_Z from <code>codes/85-37-5.json</code> by applying the E-PUNCTURE move of the priced calculus as recorded above; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/83-55-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Priced construction calculus: peel and puncture carry the board-advancing yield</h3><div class=kv style="color:var(--mut)">2026-11-01 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Finding</h4>
+<p>Two campaigns of the priced construction calculus over connected CSS parents.</p>
+<p><b>Campaign 1</b> (depth-1, <code>n &lt;= 40</code>, <code>d &gt;= 4</code>): 57 board-advancing survivors across 17 distinct <code>(n, k, d, w)</code> tuples. 16 submitted as PRs #4312-#4327 (the <code>[[11,3,3]]</code> candidate is an exact duplicate of an existing board entry and was dropped).</p>
+<p><b>Campaign 2</b> (depth-1 + depth-2, <code>n &lt;= 100</code>, <code>d &gt;= 4</code>): 4,961 distinct <code>(n, k, d, w)</code> tuples enumerated, of which 125 had board-advancing survivors. After excluding the 16 already submitted and one exact duplicate, 108 new distinct tuples were submitted as PRs #4339-#4446.</p>
+<p>In total, <b>160+ PRs</b> were submitted from this campaign family (124 from the calculus transform campaigns + 3 from the construction family pipeline: <code>[[18,9,2]]</code> (BB, C-DELETE-CHECK), <code>[[11,4,2]]</code> (BBGA, E-PEEL), and <code>[[41,10,5]]</code> (BB, E-PEEL) + 2 from the imaginative search: <code>[[9,5,2]]</code> (E-PUNCTURE) and <code>[[10,4,2]]</code> (E-PEEL)).</p>
+<p>Rule breakdown across all 125 distinct board-advancing tuples:</p>
+<p>| Move | Distinct tuples | | --- | --- | | E-PEEL | 71 | | E-PUNCTURE | 45 | | C-DELETE-CHECK | 9 |</p>
+<p>Distance distribution: d=2 (32), d=3 (39), d=4 (12), d=5 (25), d=6 (8), d=7 (9). The d=7 finds (<code>[[71,8,7]]</code>, <code>[[63,18,7]]</code>, <code>[[63,20,7]]</code>, etc.) are the deepest-distance survivors.</p>
+<p>For the first time in this campaign family, peel and puncture are the dominant productive moves rather than deletion. Peel produced the most distinct tuples (71), followed by puncture (45). Deletion found only 9.</p>
+<h4>Assessment of the calculus</h4>
+<ul>
+<li><b>Puncture is the workhorse for high-k advancement.</b> It reliably creates</li>
+<p>new high-<code>k</code> points from d &gt;= 4 parents (e.g. <code>[[39,25,3]]</code>, <code>[[35,8,5]]</code>, <code>[[71,49,2]]</code>). Every puncture tuple has d &gt;= 2.</p>
+<li><b>Peel is the most prolific move</b> overall (71 distinct tuples), producing</li>
+<p>survivors across all distance levels including d=7. It is cheaper and more often applicable than puncture.</p>
+<li><b>Deletion is marginal in this regime</b> (9 tuples). Most deletions either</li>
+<p>free a bare qubit, disconnect the Tanner graph, or collapse to an existing entry.</p>
+<li><b>Depth-2 chains</b> (peel-&gt;puncture, puncture-&gt;peel) are productive but</li>
+<p>generate enormous candidate counts for large parents (n &gt;= 70, up to 20,000+ sequences per parent), requiring per-parent timeouts (120s). Parents with &gt;100 depth-1 candidates were skipped to keep the search tractable.</p>
+<li><b>The calculus is efficient at producing board-advancing CSS codes</b> when</li>
+<p>restricted to peel/puncture on connected d &gt;= 4 parents: 125 board-advancing survivors, all validated with <code>passed: true</code>.</p>
+<li><b>Limits:</b> all distances are witness-backed upper bounds (1000 RIS trials</li>
+<p>per side); several finds are possibly WL-equivalent to existing entries and need matched-depth follow-up. No graft/Hadamard/rebase/extend gains were sought in this run.</p>
+</ul>
+<h4>Imaginative search (follow-up)</h4>
+<p>A fourth campaign applied all priced calculus moves (peel, puncture, deletion, rebase) to both board codes and previously staged candidates as parents. Found 2 new board-advancing codes: <code>[[9,5,2]]</code> (E-PUNCTURE) and <code>[[10,4,2]]</code> (E-PEEL), both d=2. Submitted as PRs #4475 and #4476.</p>
+<h4>Gap-targeted search (follow-up)</h4>
+<p>A fifth campaign targeted Pareto frontier gaps in the (weight_class, locality) cells. Found 11 new board-advancing codes (mostly d=2, plus <code>[[47,8,7]]</code> d=7 and <code>[[60,9,5]]</code> d=5). All passed the gate. Promoted as PRs #4485-#4495.</p>
+<h4>Expanded search space (n=100-200, follow-up)</h4>
+<p>A seventh campaign ran gap-targeted search over n=100-200 CSS parents (depth-1 only). Found 45 board-advancing codes including high-distance finds: <code>[[181,6,17]]</code> (d=17), <code>[[173,4,17]]</code> (d=17), <code>[[167,10,13]]</code> (d=13), <code>[[153,6,15]]</code> (d=15), <code>[[123,10,9]]</code> (d=9), <code>[[125,12,9]]</code> (d=9). All 45 promoted as PRs.</p>
+<h4>Gap-targeted depth-1 search (follow-up)</h4>
+<p>A sixth campaign ran gap-targeted search over n&lt;=100 CSS parents (depth-1 only). Found 23 board-advancing codes including high-distance finds: <code>[[83,14,9]]</code> (d=9), <code>[[97,6,11]]</code> (d=11), <code>[[95,20,7]]</code> (d=7), <code>[[77,26,5]]</code> (d=5). 16 new distinct tuples promoted as PRs #4496-#4514.</p>
+<h4>Gap-targeted search (follow-up)</h4>
+<p>A fifth campaign targeted Pareto frontier gaps in the (weight_class, locality) cells. Found 11 new board-advancing codes (mostly d=2, plus <code>[[47,8,7]]</code> d=7 and <code>[[60,9,5]]</code> d=5). All passed the gate.</p>
+<h4>Construction family pipeline (follow-up)</h4>
+<p>A third campaign applied peel/puncture to codes generated from construction families (BB, BBGA, dihedral, metacyclic, Kasai affine, hypergraph product, lifted product, balanced product, doubling, coset, layer codes, phantom, affine, gauss law, nonabelian LP, LP protograph). Most generated codes have k=0 or n&gt;40; only the BB and BBGA families produced board-advancing survivors (3 codes, listed above). The priced calculus transforms are most productive on existing board codes (already on the Pareto frontier), not on random construction family codes.</p>
+<h4>Suggested next steps</h4>
+<p>1. Matched-depth <code>leader_audit.py pair</code> audits for the possibly-equivalent tuples before merging. 2. Deeper witness search on the d = 2 survivors to settle whether any reach d = 3. 3. Explore n &lt;= 100, d &gt;= 5 parents with depth-2 chains, skipping parents that generate excessive candidate counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-10-31-priced-calculus-peel-puncture-yield.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/15-3-3.html">[[15,3,3]] — 15-3-3</a></h3><div class=kv style="color:var(--mut)">2026-10-31 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[15,3,3]] — priced-calculus transform of 16-2-4.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (16-2-4.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
