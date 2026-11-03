@@ -3,7 +3,52 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/10-4-2.html">[[10,4,2]] — 10-4-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[10,4,2]] — priced calculus E-PEEL chain from 12-4-3.json</h3>
+<section class=blk><h3><a href="codes/224-12-21.html">[[224,12,21]] — 224-12-21</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><h3>[[224,12,21]] CLP code, check weight 9</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani, Table II. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
+<h4>Direction and hypothesis</h4>
+<p>Part of the paper&#x27;s search over 14,843 pairs (G,H), 30 &lt;= m &lt;= 100, at check weights 7 to 10, for codes with kd^2/n above the published bar at each weight. This code is one of the paper&#x27;s Table II candidates, whose distances are upper bounds only; the paper&#x27;s integer program certification does not reach d &gt; 20.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(224,169), H = &lt;f2, f6&gt; = C4, m = 56, n = 4m, check weight 9. Protographs a and B in the entry&#x27;s construction field.</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 2 x 10^5 QDistRnd per side | d &lt;= 21 | | rescreen | 10^6 QDistRnd per side, both sides | d &lt;= 21 | | this tool | 20,000 RIS trials per side | X &lt;= 21, Z &lt;= 21 |</p>
+<p>Not certified exact. The witnesses in the entry are the ones this tool found, checked by the verifier.</p>
+<h4>Dead ends</h4>
+<p>In the paper&#x27;s screen, six of seven candidates with bounds at or above 25 lost weight between 2 x 10^5 and 10^6 rounds; this one held. Non square layouts and 3x3 shapes with single element entries were closed as negative results in the paper.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/224-12-21.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/360-16-25.html">[[360,16,25]] — 360-16-25</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><h3>[[360,16,25]] CLP code, check weight 7</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani, Table II. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
+<h4>Direction and hypothesis</h4>
+<p>Part of the paper&#x27;s search over 14,843 pairs (G,H), 30 &lt;= m &lt;= 100, at check weights 7 to 10, for codes with kd^2/n above the published bar at each weight. This code is one of the paper&#x27;s Table II candidates, whose distances are upper bounds only; the paper&#x27;s integer program certification does not reach d &gt; 20.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(810,106), H = &lt;f2, f3*f5&gt; = C3 x C3, m = 90, n = 4m, check weight 7. Protographs a and B in the entry&#x27;s construction field.</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 2 x 10^5 QDistRnd per side | d &lt;= 25 | | rescreen | 10^6 QDistRnd per side, both sides | d &lt;= 25 | | this tool | 20,000 RIS trials per side | X &lt;= 25, Z &lt;= 26 |</p>
+<p>Not certified exact. The witnesses in the entry are the ones this tool found, checked by the verifier.</p>
+<h4>Dead ends</h4>
+<p>In the paper&#x27;s screen, six of seven candidates with bounds at or above 25 lost weight between 2 x 10^5 and 10^6 rounds; this one held. Non square layouts and 3x3 shapes with single element entries were closed as negative results in the paper.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/360-16-25.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/360-20-27.html">[[360,20,27]] — 360-20-27</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><h3>[[360,20,27]] CLP code, check weight 10</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani, Table II. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
+<h4>Direction and hypothesis</h4>
+<p>Part of the paper&#x27;s search over 14,843 pairs (G,H), 30 &lt;= m &lt;= 100, at check weights 7 to 10, for codes with kd^2/n above the published bar at each weight. This code is one of the paper&#x27;s Table II candidates, whose distances are upper bounds only; the paper&#x27;s integer program certification does not reach d &gt; 20.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(270,25), H = &lt;f2*f3*f4&gt; = C3, m = 90, n = 4m, check weight 10. Protographs a and B in the entry&#x27;s construction field.</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 2 x 10^5 QDistRnd per side | d &lt;= 27 | | rescreen | 10^6 QDistRnd per side, both sides | d &lt;= 27 | | this tool | 20,000 RIS trials per side | X &lt;= 27, Z &lt;= 28 |</p>
+<p>Not certified exact. The witnesses in the entry are the ones this tool found, checked by the verifier.</p>
+<h4>Dead ends</h4>
+<p>In the paper&#x27;s screen, six of seven candidates with bounds at or above 25 lost weight between 2 x 10^5 and 10^6 rounds; this one held. Non square layouts and 3x3 shapes with single element entries were closed as negative results in the paper.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/360-20-27.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/10-4-2.html">[[10,4,2]] — 10-4-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[10,4,2]] — priced calculus E-PEEL chain from 12-4-3.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 unrestricted CSS cell. Depth-2 E-PEEL chain on the board entry codes/12-4-3.json, yielding a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
@@ -16,7 +61,7 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Parent: codes/12-4-3.json. Apply E-PEEL qubit 4 in sector Z then E-PEEL qubit 8 in sector X; re-run the witness search at 1000 RIS trials per side. Full matrices in codes/10-4-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/10-4-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/100-5-4.html">[[100,5,4]] — 100-5-4</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[100,5,4]] — priced calculus E-PEEL transform of codes/101-5-5.json</h3>
+<section class=blk><h3><a href="codes/100-5-4.html">[[100,5,4]] — 100-5-4</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[100,5,4]] — priced calculus E-PEEL transform of codes/101-5-5.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/101-5-5.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
@@ -27,7 +72,7 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Rebuild H_X/H_Z from codes/101-5-5.json by applying the E-PEEL move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/100-5-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/106-15-2.html">[[106,15,2]] — 106-15-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[106,15,2]] — priced calculus E-PEEL transform of codes/107-15-3.json</h3>
+<section class=blk><h3><a href="codes/106-15-2.html">[[106,15,2]] — 106-15-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[106,15,2]] — priced calculus E-PEEL transform of codes/107-15-3.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/107-15-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
 <h4>What was searched</h4>
@@ -2541,6 +2586,23 @@
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer. Approx compute: CPU only.</p>
 <h4>Reproduction</h4>
 <p>Rebuild H_X/H_Z from <code>codes/40-16-4.json</code> by applying the C-DELETE-CHECK move of the priced calculus as recorded above; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/40-17-3-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/576-20-24.html">[[576,20,24]] — 576-20-24</a></h3><div class=kv style="color:var(--mut)">2026-10-31 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[576,20,24]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/576_20_24).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(288,1021), H = &lt;f2*f4&gt; = C2, m = 144. a = 1 + f2*f3*f4*f5*f6^2*f7 + f1*f2*f4*f5;  B = [[1 + f3*f4*f5, 1], [1, f5^2*f7 + f3*f4*f5*f6]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 24 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 24 | | this tool | 500,000 RIS trials per side | X &lt;= 24, Z &lt;= 24 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/576-20-24.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/72-39-1.html">[[72,39,1]] — 72-39-1</a></h3><div class=kv style="color:var(--mut)">2026-10-31 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[72,39,1]] check-deletion from 72-38-3</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Issue #4162 asks for high-rate codes (k/n &gt;= 0.15) inside the w &lt;= 8 box. The local-SAT CSS parent 72-38-3 (rate 38/72 ~ 0.53, weight 8) sits in a thin high-k cell, and deleting one independent X check raises k by one while keeping n and w, producing a (72, 39, &lt;=1) point that no existing entry dominates.</p>
@@ -2609,6 +2671,91 @@
 <h4>Reproduction</h4>
 <p>Parent: <code>codes/12-2-4.json</code> (<code>[[12,2,4]]</code>), edited by the priced construction calculus (research/kit) — <code>C-DELETE-CHECK+</code> (remove one X check) composed with <code>E-GRAFT</code> (reconnect the Tanner graph). The resulting <code>[[11,3,3]]</code> document with its 3D <code>locality.coordinates</code> (compact grid, spacing 1, <code>layers=1</code>) is committed in this PR as <code>codes/11-3-3-f.json</code>.</p>
 <p>Distance was produced by reusing the draft&#x27;s witnesses (<code>distance.X/Z</code>, support <code>[0,1,7]</code>) validated against the rebuilt matrices, then a 2,000,000-trial accelerator pass (<code>./qldpc submit --reuse-witnesses</code>), followed by the gate refutation (<code>research/kit/coordination.py gate</code>) at 2,940 RIS trials on a fresh seed. The verification command run locally was <code>python verify/qldpc_verify.py codes/11-3-3-f.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-3-3-f.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/576-16-30.html">[[576,16,30]] — 576-16-30</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[576,16,30]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/576_16_30).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(432,692), H = &lt;f5*f6*f7&gt; = C3, m = 144. a = 1 + f2*f4*f5^2*f6 + f1*f4*f5*f6^2*f7;  B = [[1, 1 + f3*f4*f6*f7^2], [1 + f3*f7^2, f6^2*f7^2]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 30 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 30 | | this tool | 500,000 RIS trials per side | X &lt;= 30, Z &lt;= 30 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/576-16-30.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/588-18-28.html">[[588,18,28]] — 588-18-28</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[588,18,28]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/588_18_28).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(1029,15), H = &lt;f3*f4^6&gt; = C7, m = 147. a = 1 + f2^2*f3^2*f4^5 + f1*f2^2*f4;  B = [[1 + f4^4, 1], [1, f2^3*f4^2 + f2^4*f4^6]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 30 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 30 | | this tool | 500,000 RIS trials per side | X &lt;= 30, Z &lt;= 28 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/588-18-28.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/640-16-32.html">[[640,16,32]] — 640-16-32</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[640,16,32]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/640_16_32).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(800,639), H = &lt;f6*f7^2&gt; = C5, m = 160. a = 1 + f2*f4*f5*f6^4*f7 + f1*f2*f3*f4*f6^3*f7;  B = [[1, 1 + f1*f2*f4*f7^2], [1 + f1*f2*f7^4, f4*f7^4]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 32 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 32 | | this tool | 500,000 RIS trials per side | X &lt;= 32, Z &lt;= 34 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/640-16-32.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/640-24-24.html">[[640,24,24]] — 640-24-24</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[640,24,24]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/640_24_24).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(800,453), H = &lt;f6&gt; = C5, m = 160. a = 1 + f3*f5*f6^2*f7^2 + f2*f3*f6;  B = [[1 + f4*f7, 1], [1, f1*f4*f6*f7 + f1*f5*f6^3*f7^3]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 24 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 24 | | this tool | 500,000 RIS trials per side | X &lt;= 24, Z &lt;= 24 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/640-24-24.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/672-24-26.html">[[672,24,26]] — 672-24-26</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[672,24,26]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. This parameter set is not in the current version of the paper; it comes from the same search extended to longer codes and will appear in the updated version, with the data in https://github.com/rajendrarajpurohit/CLP_QLDPC (folder large_m/672_24_26).</p>
+<h4>Direction and hypothesis</h4>
+<p>The paper&#x27;s search covered 120 &lt;= n &lt;= 400 (m = [G:H] from 30 to 100). The question was whether the same construction scales: does the 1x1 over 2x2 layout at check weight 6 keep its distance growing when m goes to 120 to 250, that is n from 480 to 1000, and where do such codes sit on this board&#x27;s weight-6 frontier.</p>
+<h4>What was searched</h4>
+<p>25,240 pairs (G,H), H cyclic of order 2 to 9, core free, [G:N_G(H)] in {2,3,4}, [N_G(H):H] &gt;= 4, from SmallGroups of order 240 to 2000 (orders with more than 2000 groups skipped). 1,500 random draws per pair of a with |a| = 3 and B with entry weights 2 1 / 1 2 or 1 2 / 2 1, then 20,000 draws per pair on the 6,836 pairs with 560 &lt;= n &lt;= 700 whose best k was at least 16, logging any draw whose (n, k, d) was not Pareto dominated by the weight-6 cell of this board on 24 Oct 2026. Screening ladder: 50 and 500 QDistRnd rounds with an early abort at the required distance, then 20,000, then 200,000 on both sides.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(1176,269), H = &lt;f5*f6^3&gt; = C7, m = 168. a = 1 + f3*f4^2*f6 + f2*f4*f5^4*f6^3;  B = [[1 + f1*f6^4, 1], [1, f2*f3*f6^2 + f1*f3*f6^6]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 200,000 QDistRnd per side | d &lt;= 26 | | rescreen | 1,000,000 QDistRnd per side | d &lt;= 26 | | this tool | 500,000 RIS trials per side | X &lt;= 26, Z &lt;= 26 |</p>
+<p>The witnesses in the entry are the ones this tool found; each was checked by the verifier. Not certified exact; the paper&#x27;s integer program certification does not reach these distances.</p>
+<h4>Dead ends</h4>
+<p>Shapes with |a| = 2 or |a| = 4 (B entry weights up to 2 2 / 2 2) raise k to 24 and far beyond at these lengths but over 9,560 pairs never paired that k with a distance above the frontier for its k. Bounds from the 200,000 round stage overestimate by 2 to 16 at n near 1000; only the 10^6 figures are reported.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above (large_m/search), no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit with --trials 500000.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ; verify.py there checks the structure and this board&#x27;s verifier checks the witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/672-24-26.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/684-4-81.html">[[684,4,81]] — 684-4-81</a></h3><div class=kv style="color:var(--mut)">2026-10-30 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[684,4,81]] — weight-8 generalized bicycle on the affine group Aff(F_19)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Issue #4162 asks for codes in the box <code>n &lt;= 1000, w &lt;= 8</code>, and the weight-8 × unrestricted cell was thin at large <code>n</code>. The families that populate the efficiency frontier sit at check weight 12 to 32, so <code>w = 8</code> near <code>n ~ 700</code> had little in it. The structural bet: generalized bicycle over a non-abelian group rather than a cyclic one. <code>Aff(F_q)</code> (the structure behind Kasai&#x27;s affine-coset construction) has order <code>q(q-1)</code>, so a 2BGA block lands at <code>n = 2q(q-1)</code> — <code>q = 19</code> gives <code>n = 684</code> exactly — and two weight-4 supports give check weight 8 with no tuning.</p>
