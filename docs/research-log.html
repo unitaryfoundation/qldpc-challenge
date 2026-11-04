@@ -3,6 +3,19 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/84-61-2.html">[[84,61,2]] — 84-61-2</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[84,61,2]] — graft reduction of a CSS code to 84 qubits</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the weight-9plus x unrestricted cell: reduce the qubit count of an existing CSS entry while preserving k and d, extending the Pareto frontier on the n axis.</p>
+<h4>What was searched</h4>
+<p>One candidate produced by grafting degree-1 qubits (qubits contained in exactly one X or Z check, removed together with that check) from a 107-qubit CSS board entry. The graft preserved k = 61 and the distance bound d &lt;= 2 while reducing n from 107 to 84. Check weight remains 12.</p>
+<h4>Evidence trail</h4>
+<p>Distance confirmation: the graft checks preserved the bound d &lt;= 2 at every removal (surrogate, 200 trials per side). The submitted witnesses reproduce the bound: X: d &lt;= 2 (upper_bound), Z: d &lt;= 2 (upper_bound).</p>
+<h4>Dead ends</h4>
+<p>None recorded beyond standard screening rejections.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: local code calculus graft (degree-1 qubit removal). Repo tooling: verify/validate_candidate.py, verify/qldpc_verify.py. Compute: local CPU.</p>
+<h4>Reproduction</h4>
+<p>The construction is not reproducible from a committed script. The check matrices are given in codes/84-61-2.json; re-run the trusted gate with <code>uv run python verify/validate_candidate.py codes/84-61-2.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/84-61-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/224-12-21.html">[[224,12,21]] — 224-12-21</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><h3>[[224,12,21]] CLP code, check weight 9</h3>
 <p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani, Table II. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
 <h4>Direction and hypothesis</h4>
@@ -33,7 +46,7 @@
 <p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s qldpc submit.</p>
 <h4>Reproduction</h4>
 <p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/360-16-25.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/360-20-27.html">[[360,20,27]] — 360-20-27</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><h3>[[360,20,27]] CLP code, check weight 10</h3>
+<section class=blk><h3><a href="codes/360-20-27.html">[[360,20,27]] — 360-20-27</a></h3><div class=kv style="color:var(--mut)">2026-11-03 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><h3>[[360,20,27]] CLP code, check weight 10</h3>
 <p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani, Table II. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
 <h4>Direction and hypothesis</h4>
 <p>Part of the paper&#x27;s search over 14,843 pairs (G,H), 30 &lt;= m &lt;= 100, at check weights 7 to 10, for codes with kd^2/n above the published bar at each weight. This code is one of the paper&#x27;s Table II candidates, whose distances are upper bounds only; the paper&#x27;s integer program certification does not reach d &gt; 20.</p>
