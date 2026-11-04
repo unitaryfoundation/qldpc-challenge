@@ -1,6 +1,6 @@
 {
  "schema_version": "0.3",
- "name": "[[372,10,31]] CLP code, weight 9, SmallGroup(186,3)",
+ "name": "[[372,10,30]] CLP code, weight 9, SmallGroup(186,3)",
  "code_type": "CSS",
  "n": 372,
  "k": 10,
@@ -4103,43 +4103,54 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    4,
-    14,
-    21,
-    28,
-    31,
-    45,
-    68,
-    73,
-    108,
-    138,
-    160,
-    163,
-    166,
-    175,
-    189,
-    193,
-    199,
-    211,
-    214,
-    216,
-    231,
-    260,
-    262,
-    264,
-    268,
-    269,
-    294,
-    312,
-    334,
-    348,
-    362
-   ]
+    2,
+    23,
+    46,
+    59,
+    62,
+    65,
+    71,
+    74,
+    83,
+    91,
+    95,
+    104,
+    113,
+    116,
+    131,
+    140,
+    155,
+    164,
+    176,
+    181,
+    206,
+    272,
+    284,
+    308,
+    325,
+    326,
+    337,
+    339,
+    353,
+    357
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@rajendrarajpurohit"
+    ],
+    "date": "2026-11-04",
+    "found_at_samples": 1,
+    "survived_samples": 1,
+    "tool": "verify/gate_changed.py, maintainer run, seed 20261104 (RIS-fast)",
+    "seeds": [
+     20261104
+    ]
+   }
   },
   "Z": {
    "value": 32,
@@ -4194,7 +4205,7 @@
    "arXiv:2610.12782"
   ],
   "novelty": "known_parameters",
-  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 32 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 32 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The trusted gate (CI seed 752741155 and an independent run with seed 20261104) found weight 30 X-type logicals; the claim is lowered to 30 and the paper's Table II will adopt 30.",
   "model": "human"
  },
  "family": "2bga-coset"
