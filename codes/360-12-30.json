@@ -1,6 +1,6 @@
 {
  "schema_version": "0.3",
- "name": "[[360,12,31]] CLP code, weight 9, SmallGroup(270,25)",
+ "name": "[[360,12,30]] CLP code, weight 9, SmallGroup(270,25)",
  "code_type": "CSS",
  "n": 360,
  "k": 12,
@@ -3971,43 +3971,54 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    15,
-    16,
-    23,
-    24,
+    0,
+    3,
+    4,
+    11,
+    12,
+    13,
+    25,
+    26,
     27,
-    37,
-    69,
-    79,
-    84,
-    109,
-    113,
-    114,
-    174,
-    195,
-    272,
-    276,
-    292,
-    301,
-    307,
-    308,
-    310,
-    311,
-    316,
-    326,
-    332,
-    339,
-    345,
-    346,
-    351,
-    356,
-    359
-   ]
+    42,
+    43,
+    44,
+    60,
+    61,
+    75,
+    90,
+    93,
+    94,
+    101,
+    102,
+    103,
+    115,
+    116,
+    117,
+    132,
+    133,
+    134,
+    150,
+    151,
+    165
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@rajendrarajpurohit"
+    ],
+    "date": "2026-11-04",
+    "found_at_samples": 1,
+    "survived_samples": 1,
+    "tool": "verify/gate_changed.py (CI gate, orbit-fold)",
+    "seeds": [
+     0
+    ]
+   }
   },
   "Z": {
    "value": 32,
@@ -4062,7 +4073,7 @@
    "arXiv:2610.12782"
   ],
   "novelty": "known_parameters",
-  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 31 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 31 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The CI gate's orbit-fold search found a weight 30 logical; the claim was lowered from 31 to 30 and the paper's Table II will be corrected.",
   "model": "human"
  },
  "family": "2bga-coset"
