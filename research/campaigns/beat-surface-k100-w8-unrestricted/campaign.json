@@ -1,0 +1,35 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "beat-surface-k100-w8-unrestricted",
+    "name": "Beat the surface code at k=100, weight-8, unrestricted",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize" },
+    "constraints": {
+      "locality": "unrestricted",
+      "max_check_weight": 8,
+      "n": [500, 1000],
+      "k": [95, 105],
+      "min_distance": 4
+    },
+    "methods": {
+      "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
+    },
+    "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
+    "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
+    "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
+    "direction": {
+      "hypothesis": "An unrestricted weight-8 code at k~100 can beat 100 independent surface patches on kd^2/n.",
+      "cell": "unrestricted~weight-8",
+      "family": "generalized-bicycle",
+      "bar": { "slug": "957-105-4", "axes": ["kd2_over_n", "n"], "note": "Holey rotated surface code k=105 as nearest multi-logical baseline." },
+      "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
+      "feasibility": "Unrestricted weight-8 cell supports n up to 1000 at w<=8, d<=40.",
+      "novelty": { "claim": "First systematic k~100 frontier probe in this cell", "against": "Existing unrestricted weight-8 entries." },
+      "expected_value": "An unrestricted weight-8 code at k>=95 on the cell frontier would be a milestone result.",
+      "abandon_criterion": { "flat_fresh_rungs": 2, "trials_cap": 2000000 },
+      "what_a_negative_would_teach": "Whether unrestricted weight-8 constructions can reach k~100, or whether the cell saturates earlier."
+    }
+  }
+}

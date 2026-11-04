@@ -1,0 +1,35 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "beat-surface-k10-w4-2d",
+    "name": "Beat the surface code at k=10, weight-4, 2D single-layer",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize" },
+    "constraints": {
+      "locality": "local-2d-single",
+      "max_check_weight": 4,
+      "n": [80, 400],
+      "k": [8, 12],
+      "min_distance": 4
+    },
+    "methods": {
+      "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
+    },
+    "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
+    "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
+    "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
+    "direction": {
+      "hypothesis": "A weight-4 2D-local code at k~10 can beat the surface-code baseline (10 independent d=5 patches, n~250) on kd^2/n while keeping locality honest.",
+      "cell": "local-2d-single~weight-4",
+      "family": "bivariate-bicycle",
+      "bar": { "slug": "101-5-5", "axes": ["kd2_over_n", "n"], "note": "Dense-packed surface [[101,5,5]] as structural reference; 10 logicals ~ 2 patches." },
+      "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
+      "feasibility": "Weight-4 2D-local cell already populated; board_bar.py can price candidates before distance search.",
+      "novelty": { "claim": "First systematic k~10 frontier probe in this cell", "against": "Existing local-2d-single weight-4 entries and surface-code patches." },
+      "expected_value": "A weight-4 2D-local code at k>=8 on the cell frontier would be the first multi-logical result in this cell.",
+      "abandon_criterion": { "flat_fresh_rungs": 2, "trials_cap": 2000000, "note": "Drop the ladder if two consecutive rungs agree below the bar." },
+      "what_a_negative_would_teach": "Whether weight-4 2D-local constructions can reach k~10 at all, or whether the cell is structurally capped below that."
+    }
+  }
+}
