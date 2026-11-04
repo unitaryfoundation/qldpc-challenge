@@ -386,3 +386,30 @@ tables under `research/kit/groups/`; the QECDB matches are fetched from the
 database's API and the fetched rows are kept in the record. Nothing here is a
 gate input; `recheck` re-verifies every recorded permutation from the blob
 hashes it cites, as `permutation_equivalence.py` does for its ledger.
+
+## The finite-size map against the surface code: `surface_code_map.py`
+
+Issue #4601 (Beat the Surface Code) asks first for a structural map: for k
+logical qubits, which verified codes use fewer data qubits than the surface
+code at the same distance, in which cell, and with what verification status.
+`surface_code_map.py` reads the board through `site/build.py`'s loader and,
+for each k target (1, 10, 25, 50, 100), each track (2D single-layer, 2D
+bilayer, unrestricted) and each check-weight cap (4, 6, 8, any), finds at
+every d the smallest-n entry with at least k logical qubits and a distance
+bound of at least d, against k independent rotated surface-code patches,
+n = k d^2. It also records the price of 2D locality (n of the best 2D entry
+over n of the best unrestricted entry at the same k and d) and, for every k
+from 1 to 100, the best factor over d in each track. The record is
+`surface_code_map-<date>.json`; `--markdown` prints the tables a fieldnote
+quotes.
+
+```
+uv run python research/audits/surface_code_map.py --markdown
+uv run python research/audits/surface_code_map.py --out research/audits/surface_code_map-<date>.json
+```
+
+Read the tiers before quoting a factor: the baseline distance is exact,
+while a board entry at tier `ub` is a witness-backed upper bound and beats
+the surface code only if its bound is tight. The comparison counts data
+qubits only; the operational comparison in #4601 (total qubits at matched
+logical error rate) is Level 2 and is not computed here.
