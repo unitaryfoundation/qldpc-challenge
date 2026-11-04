@@ -69,6 +69,13 @@ def test_free_form_schema_fields_are_deliberately_covered():
         # site test with a hostile name); notes are never rendered.
         "$defs/transversalGate/properties/name",
         "$defs/transversalGate/properties/notes",
+        # benchmark (schema 0.6, issue #4603): Tier B comparison metadata the
+        # verifier checks and the site never renders.
+        "properties/benchmark/properties/decoder/properties/implementation",
+        "properties/benchmark/properties/decoder/properties/name",
+        "properties/benchmark/properties/decoder/properties/parameters",
+        "properties/benchmark/properties/method",
+        "properties/benchmark/properties/noise_model/properties/description",
     }
 
 

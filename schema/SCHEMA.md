@@ -1,4 +1,4 @@
-# Submission format (v0.1 to v0.5)
+# Submission format (v0.1 to v0.6)
 
 A submission is one JSON file describing one qLDPC code, placed under
 `codes/`: a CSS code given by its X and Z checks, or (since 0.4) a general
@@ -26,10 +26,10 @@ Two principles drive the format:
 
 ## Fields
 
-- `schema_version`: `"0.1"`, `"0.2"`, `"0.3"`, `"0.4"`, or `"0.5"` (0.2 added the
-  optional `witness_provenance` block, 0.3 the optional
-  `provenance.search_budget` and `locality.modules` blocks, 0.4 the
-  `stabilizer` code type, 0.5 the list-of-points form of `circuit.ler`;
+- `schema_version`: `"0.1"` through `"0.6"` (0.2 added the optional
+  `witness_provenance` block, 0.3 the optional `provenance.search_budget`
+  and `locality.modules` blocks, 0.4 the `stabilizer` code type, 0.5 the
+  list-of-points form of `circuit.ler`, 0.6 the optional `benchmark` block;
   older files remain valid unchanged).
 - `name`: human-readable, e.g. `"[[72,6,6]] generalized weight-6 planar BB code"`.
 - `code_type`: `"CSS"` or `"stabilizer"` (0.4). The fields below describe a
@@ -246,6 +246,52 @@ Two principles drive the format:
     an existing entry never changes its author list, and it is what binds a
     first-layout contribution by someone who is not a listed author (see
     `circuit.contributed_by` for the same rule on circuits).
+- `benchmark` (optional; requires `schema_version: "0.6"`; issues #4601 and
+  #4603): one documented comparison of the entry against a surface-code
+  baseline at matched logical count, for the Beat the Surface Code
+  campaign's Tier B. Non-scoring: no track or ranking reads it, the board
+  does not display it yet, and a wrong block fails the document, never the
+  code.
+  - `hardware_track`: one of `2d-nearest-neighbor`, `bounded-degree`,
+    `long-range`, `biased-noise`, `bosonic-hybrid` (the tracks of issue
+    #4601, each with its own surface-code baseline).
+  - `noise_model`: `kind` (`circuit-level-depolarizing` is the campaign's
+    common benchmark; `phenomenological`, `code-capacity`,
+    `biased-circuit-level`, and `other` are recorded as such and do not
+    support an operational claim), `p` in (0, 0.5], optional `bias` (eta,
+    at least 1) and a one-line `description` of the recipe.
+  - `surface_baseline`: exactly one of `slug` (a committed entry,
+    `codes/<slug>.json`; the verifier checks that it exists and that its `k`
+    is at least this entry's: `benchmark_baseline_on_board`,
+    `benchmark_baseline_k`) or `patches: {"d": ...}` (k independent rotated
+    patches of distance d, k d^2 data qubits in all, the baseline for a k
+    with no single-code entry).
+  - `decoder`: `name`, optional `implementation` (package and version, or
+    repository @ commit) and `parameters`.
+  - `resources.candidate`, `resources.baseline`: `data_qubits`,
+    `ancilla_qubits`, optional `total_qubits`, `rounds`,
+    `spacetime_volume`, `decoder_latency_us`. The verifier requires
+    `candidate.data_qubits = n` (`benchmark_candidate_data_qubits`),
+    `baseline.data_qubits` equal to the baseline entry's `n` or to k d^2
+    (`benchmark_baseline_data_qubits`), and every `total_qubits` equal to
+    its data plus ancilla counts (`benchmark_qubit_totals`).
+  - `logical_error_rate`: `target` (the pL both experiments are sized to
+    reach), `candidate`, optional `baseline`, all in (0, 0.5], `per`
+    (`round` or `shot`), optional `shots`.
+  - `status`: `documented`, the only value for now: the numbers are the
+    submitter's, produced as `method` states. A `verified` status,
+    reproduced by the repository's own tooling, waits for that tooling
+    (issue #4601, Level 2).
+  - `method` (up to 1000 characters): simulator, schedule source, where the
+    baseline's numbers come from, and where the write-up lives.
+  - `date` (optional) and `contributed_by` (optional; required when the
+    contributor is not a listed author: `verify/check_authorship.py` binds a
+    PR that adds a first `benchmark` block through it, as for a layout or a
+    circuit tier).
+  The verifier records the reading in `computed.benchmark`: the baseline's
+  `n` and `k`, both qubit totals, their ratio, and whether the candidate
+  meets the target with fewer physical qubits (`beats_baseline`). Recorded,
+  not ranked.
 - `provenance`: `authors`, `construction` (how it was built), optional
   `references`, `date`, `notes`, `model`.
   - `origin`: `"baseline"` for a literature seed or `"submission"` for a code

@@ -343,6 +343,23 @@ file it: `verify/check_authorship.py` lets a non-author set `novelty` to
 The computed source for these matches is `research/provenance/derived.json`
 (issue #1204).
 
+## Recording a comparison against the surface code
+
+The Beat the Surface Code campaign (issue #4601) asks whether a code beats
+the surface code on physical qubits at matched logical count and logical
+error rate, with syndrome ancillas counted. An entry may carry one such
+comparison in an optional `benchmark` block (`schema_version: "0.6"`): the
+hardware track, the noise model and physical rate, the baseline (a committed
+surface-code entry or k rotated patches of a stated distance), the decoder,
+the resource counts of both memory experiments, the target and measured
+logical error rates, and the method. The verifier checks the block against
+the entry and the board, records what it says in `computed.benchmark`, and
+ranks nothing by it; `status` is `documented` until the repository can
+reproduce such a measurement itself. The fields are listed in
+`schema/SCHEMA.md`; the research note carries the write-up. A non-author
+may add a first `benchmark` block to an entry, credited in
+`benchmark.contributed_by`, the way a layout or a circuit tier is donated.
+
 ## Contribute with an LLM
 
 If you have an LLM or coding agent, it can do the whole loop: pick a target,
