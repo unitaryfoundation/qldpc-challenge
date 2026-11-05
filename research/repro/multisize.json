@@ -3,13 +3,13 @@
  "counts": {
   "constructor_missing": 0,
   "lifted": 20,
-  "manifests": 24,
+  "manifests": 25,
   "no_lift_rule": 2,
-  "no_recipe": 2,
+  "no_recipe": 3,
   "sizes_passed": 142,
   "sizes_tried": 146
  },
- "date": "2026-11-01",
+ "date": "2026-11-05",
  "entries": {
   "128-8-9": {
    "constructor": "group_algebra.build_2bga_small_group",
@@ -10480,9 +10480,13 @@
    ],
    "status": "lifted",
    "tried": 7
+  },
+  "684-12-108": {
+   "reason": "the spec recorded for this entry carries no {constructor, params} recipe the kit can replay",
+   "status": "no_recipe"
   }
  },
- "head": "be84c17ad3380c3ba6cb4b74d3c7cdba85ee720d",
+ "head": "394c0760aba1bc7f8f3825c99dbf5869c18e15f3",
  "issue": 4031,
  "lifts": {
   "bb.build_bb": "l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)",
