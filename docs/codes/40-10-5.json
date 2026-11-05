@@ -1,0 +1,371 @@
+{
+ "schema_version": "0.3",
+ "name": "[[40,10,5]] E-PEEL of 41-10-5",
+ "code_type": "CSS",
+ "n": 40,
+ "k": 10,
+ "checks": {
+  "X": [
+   [
+    3,
+    10,
+    17,
+    23,
+    29,
+    30,
+    32,
+    37
+   ],
+   [
+    5,
+    14,
+    18,
+    24,
+    28,
+    37,
+    38,
+    39
+   ],
+   [
+    4,
+    13,
+    17,
+    23,
+    34,
+    36,
+    37,
+    38
+   ],
+   [
+    6,
+    8,
+    19,
+    25,
+    29,
+    31,
+    38,
+    39
+   ],
+   [
+    0,
+    2,
+    10,
+    20,
+    31,
+    32,
+    35
+   ],
+   [
+    1,
+    12,
+    15,
+    20,
+    21,
+    27,
+    35,
+    36
+   ],
+   [
+    3,
+    7,
+    16,
+    22,
+    33,
+    35,
+    36,
+    37
+   ],
+   [
+    0,
+    5,
+    8,
+    23,
+    24,
+    25,
+    28,
+    35
+   ],
+   [
+    2,
+    12,
+    17,
+    21,
+    26,
+    32,
+    38
+   ],
+   [
+    1,
+    7,
+    18,
+    21,
+    22,
+    27,
+    39
+   ],
+   [
+    3,
+    13,
+    19,
+    21,
+    22,
+    23,
+    31,
+    33
+   ],
+   [
+    1,
+    9,
+    16,
+    22,
+    28,
+    29,
+    30,
+    36
+   ],
+   [
+    4,
+    11,
+    14,
+    20,
+    22,
+    23,
+    24,
+    34
+   ],
+   [
+    6,
+    9,
+    15,
+    24,
+    25,
+    26,
+    29,
+    36
+   ],
+   [
+    4,
+    12,
+    18,
+    24,
+    27,
+    30,
+    32,
+    38
+   ]
+  ],
+  "Z": [
+   [
+    4,
+    5,
+    6,
+    12,
+    18,
+    24,
+    27,
+    38
+   ],
+   [
+    6,
+    8,
+    9,
+    10,
+    19,
+    25,
+    29,
+    31
+   ],
+   [
+    5,
+    8,
+    9,
+    14,
+    18,
+    24,
+    28,
+    39
+   ],
+   [
+    9,
+    10,
+    11,
+    12,
+    20,
+    26,
+    30
+   ],
+   [
+    1,
+    7,
+    12,
+    13,
+    15,
+    21,
+    27,
+    36
+   ],
+   [
+    3,
+    7,
+    13,
+    14,
+    16,
+    22,
+    33,
+    37
+   ],
+   [
+    4,
+    8,
+    13,
+    14,
+    17,
+    23,
+    34,
+    38
+   ],
+   [
+    6,
+    9,
+    15,
+    16,
+    17,
+    26,
+    29,
+    36
+   ],
+   [
+    1,
+    7,
+    11,
+    18,
+    19,
+    22,
+    27,
+    39
+   ],
+   [
+    0,
+    3,
+    11,
+    13,
+    19,
+    23,
+    31,
+    33
+   ],
+   [
+    0,
+    4,
+    11,
+    14,
+    15,
+    20,
+    24,
+    34
+   ],
+   [
+    3,
+    4,
+    5,
+    10,
+    17,
+    23,
+    32,
+    37
+   ],
+   [
+    0,
+    5,
+    8,
+    15,
+    16,
+    25,
+    28,
+    35
+   ],
+   [
+    2,
+    12,
+    17,
+    18,
+    19,
+    21,
+    32,
+    38
+   ],
+   [
+    5,
+    6,
+    7,
+    19,
+    25,
+    33,
+    39
+   ]
+  ]
+ },
+ "distance": {
+  "d": 5,
+  "X": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    4,
+    14,
+    18,
+    22,
+    32
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-03",
+    "found_at_samples": 3000,
+    "survived_samples": 3000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  },
+  "Z": {
+   "value": 5,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    8,
+    9,
+    10,
+    29
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-03",
+    "found_at_samples": 3000,
+    "survived_samples": 3000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     2
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@vprusso"
+  ],
+  "construction": "Priced construction calculus E-PEEL of codes/41-10-5.json ([[41,10,5]], max check weight 8; itself Mathys Rennela's priced-calculus E-PEEL of codes/42-10-6.json, a generalized bicycle code reconstructed from qecdb record 67ac182d9d65c7b409826af2): delete qubit 22 (0-based index in the parent file) together with its unique Z check b5, and relabel the surviving qubits in increasing order of their parent indices. Consumer: github.com/unitaryfoundation/code-calculus @ 1b9a942, machine/priced_calculus.py.",
+  "references": [],
+  "date": "2026-11-04",
+  "notes": "Single-step priced-calculus E-PEEL child of board entry 41-10-5. verify/validate_candidate.py found no board entry sharing this code's fingerprint or Weisfeiler-Leman signature, local-Hadamard images included.",
+  "model": "Claude Fable 5.1",
+  "origin": "submission",
+  "search_budget": {
+   "ris_trials_per_side": 10000000
+  }
+ }
+}
