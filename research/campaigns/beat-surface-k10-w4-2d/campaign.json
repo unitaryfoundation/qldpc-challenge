@@ -1,0 +1,36 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "beat-surface-k10-w4-2d",
+    "name": "Beat the surface code at k=10, weight-4, 2D single-layer",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize" },
+    "constraints": {
+      "locality": "local-2d-single",
+      "max_check_weight": 4,
+      "n": [80, 400],
+      "k": [8, 12],
+      "min_distance": 4
+    },
+    "methods": {
+      "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "generators": [],
+      "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
+    },
+    "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
+    "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
+    "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
+    "direction": {
+      "hypothesis": "A weight-4 2D-local code can beat the cell frontier entry 368-8-8 (k=8, d=8, n=368, kd^2/n=1.39) on kd^2/n; target kd^2/n > 1.39 (e.g. k>=8, d>=8, n<368), in a cell whose entries sit at 1.2-1.4 where Bravyi-Poulin-Terhal gives only a constant factor.",
+      "cell": "local-2d-single~weight-4",
+      "family": "other",
+      "bar": { "slug": "368-8-8", "axes": ["kd2_over_n", "n"], "note": "Cell frontier entry (exact); 2D single-layer weight-4 entries currently reach 1.2-1.4." },
+      "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
+      "feasibility": "Weight-4 2D-local cell already populated; board_bar.py can price candidates before distance search; upside is a constant factor only.",
+      "novelty": { "claim": "Push the weight-4 2D-local frontier beyond (k=8,d=8,n=368); not the first multi-logical result in this cell (15 entries already exist).", "against": "Existing local-2d-single weight-4 entries, including 368-8-8." },
+      "expected_value": "A weight-4 2D-local code on the cell frontier at kd^2/n > 1.4 would be a constant-factor improvement in a cell currently at 1.2-1.4; a 2D single-layer code has kd^2 = O(n) (Bravyi, Poulin, Terhal).",
+      "abandon_criterion": { "flat_fresh_rungs": 2, "trials_cap": 2000000, "note": "Drop the ladder if two consecutive rungs agree below the bar." },
+      "what_a_negative_would_teach": "Whether weight-4 2D-local constructions can reach k~10 at all, or whether the cell is structurally capped below that."
+    }
+  }
+}
