@@ -1958,7 +1958,7 @@ def load_entries():
         entries.append({
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "code_type": doc.get("code_type", "CSS"),
-            "eff": round(k * d * d / n, 3), "tier": tier,
+            "eff": float(f"{k * d * d / n:.6g}"), "tier": tier,
             "d_X": d_x, "d_Z": d_z,
             "tier_X": tiers.get("X"), "tier_Z": tiers.get("Z"),
             "tier_P": tiers.get("P"),
