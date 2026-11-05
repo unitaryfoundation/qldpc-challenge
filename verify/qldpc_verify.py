@@ -100,6 +100,15 @@ _FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
              "other"}
 _NOVELTY = {"unknown", "known_parameters", "new_parameters"}
 
+# Tier B benchmark metadata (issues #4601, #4603): optional and non-scoring.
+# The schema holds the vocabulary and ranges; benchmark_checks() below holds
+# the cross-field half. The required set is mirrored here so the minimal
+# structure check still enforces the shape when jsonschema is unavailable.
+_BENCHMARK_REQUIRED = ("hardware_track", "noise_model", "surface_baseline",
+                       "decoder", "resources", "logical_error_rate", "status",
+                       "method")
+_BENCHMARK_SCHEMA_VERSIONS = ("0.6",)
+
 # Public CI resource limits. Finite by design so malformed or hostile JSON
 # cannot force unbounded work. The blocklength cap is a verification-budget
 # rule: above it the distance gate cannot stand behind a claim. It has two
@@ -591,6 +600,73 @@ def _board_code(slug):
         return None
 
 
+def _resource_total(block):
+    """Physical qubits of one memory experiment: the stated total, else data plus ancillas."""
+    return block.get("total_qubits", block["data_qubits"] + block["ancilla_qubits"])
+
+
+def benchmark_checks(doc, record):
+    """Check the optional ``benchmark`` block against the entry and the board.
+
+    Issues #4601 and #4603. Records the cross-field checks through ``record``
+    and returns the summary kept under ``report["computed"]["benchmark"]``.
+    The block is non-scoring, so nothing
+    here moves a verdict on the code; a block that contradicts the entry (the
+    candidate's data qubits are not ``n``, a total that is not its data plus
+    ancillas, a baseline that is not on the board or encodes fewer logical
+    qubits than this entry, a baseline count that is not the baseline's) fails
+    the document, the way a layout that does not cover the qubits does. The
+    schema holds the types and ranges; this is the cross-field half.
+    """
+    b = doc["benchmark"]
+    n, k = doc["n"], doc["k"]
+    cand, base = b["resources"]["candidate"], b["resources"]["baseline"]
+    record("benchmark_candidate_data_qubits", cand["data_qubits"] == n,
+           f"benchmark.resources.candidate.data_qubits={cand['data_qubits']}, n={n}")
+    bad_totals = [side for side, blk in (("candidate", cand), ("baseline", base))
+                  if "total_qubits" in blk
+                  and blk["total_qubits"] != blk["data_qubits"] + blk["ancilla_qubits"]]
+    record("benchmark_qubit_totals", not bad_totals,
+           "total_qubits = data_qubits + ancilla_qubits"
+           + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""))
+    sb = b["surface_baseline"]
+    bn = None
+    if "slug" in sb:
+        bdoc = _board_code(sb["slug"])
+        on_board = (isinstance(bdoc, dict)
+                    and all(isinstance(bdoc.get(f), int) for f in ("n", "k")))
+        record("benchmark_baseline_on_board", on_board,
+               f"codes/{sb['slug']}.json" + ("" if on_board else " is not a board entry"))
+        baseline = {"slug": sb["slug"]}
+        if on_board:
+            bn, bk = bdoc["n"], bdoc["k"]
+            record("benchmark_baseline_k", bk >= k,
+                   f"baseline k={bk}, entry k={k}: the baseline must encode "
+                   "at least as many logical qubits")
+            baseline.update(n=bn, k=bk)
+    else:
+        d = sb["patches"]["d"]
+        bn = k * d * d
+        baseline = {"patches": {"count": k, "d": d}, "n": bn, "k": k}
+    if bn is not None:
+        record("benchmark_baseline_data_qubits", base["data_qubits"] == bn,
+               f"benchmark.resources.baseline.data_qubits={base['data_qubits']}, "
+               f"baseline data qubits={bn}")
+    ler = b["logical_error_rate"]
+    ct, bt = _resource_total(cand), _resource_total(base)
+    meets = ler["candidate"] <= ler["target"]
+    return {"status": b["status"],
+            "hardware_track": b["hardware_track"],
+            "noise": {"kind": b["noise_model"]["kind"], "p": b["noise_model"]["p"]},
+            "baseline": baseline,
+            "candidate_total_qubits": ct,
+            "baseline_total_qubits": bt,
+            "qubit_ratio": round(bt / ct, 4) if ct else None,
+            "meets_target": bool(meets),
+            "fewer_qubits": bool(ct < bt),
+            "beats_baseline": bool(meets and ct < bt)}
+
+
 def structure_errors(doc):
     """Return a list of human-readable structural problems, or [] if the doc
     conforms. Uses jsonschema when installed, else a minimal key/type check."""
@@ -622,6 +698,14 @@ def structure_errors(doc):
                                       and "coordinates" in doc["locality"]
                                       and "layers" in doc["locality"]):
             errs.append("locality must have coordinates and layers")
+        if "benchmark" in doc:
+            if not isinstance(doc["benchmark"], dict):
+                errs.append("benchmark must be an object")
+            else:
+                errs += [f"benchmark missing field: {k}" for k in _BENCHMARK_REQUIRED
+                         if k not in doc["benchmark"]]
+                if doc.get("schema_version") not in _BENCHMARK_SCHEMA_VERSIONS:
+                    errs.append("benchmark requires schema_version 0.6")
     if errs:
         return errs
     return resource_errors(doc)
@@ -1761,6 +1845,13 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             record(label, ok, detail)
         if gcomputed is not None:
             report["computed"]["transversal_gates"] = gcomputed
+    # 12. Tier B benchmark metadata (issues #4601, #4603). Optional and
+    #     non-scoring: the schema holds the vocabulary and ranges, this checks
+    #     the block against the entry and the board and records what the
+    #     comparison says. Entries without the field are untouched, so no
+    #     committed verdict moves.
+    if "benchmark" in doc:
+        report["computed"]["benchmark"] = benchmark_checks(doc, record)
     # Layer-1 locality class (computed) + Layer-3 flags (verifier-proven only;
     # the exact-d flag is added at site-build time from certs/, since exactness
     # is certified separately, not by this trustless check). `css` is the
