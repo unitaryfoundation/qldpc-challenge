@@ -68,6 +68,7 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
 from campaign import curve_from_summary, write_curve  # noqa: E402
 from check_authorship import HANDLE  # noqa: E402
@@ -986,6 +987,12 @@ def pr_body(doc, report, args, out, note_out=None):
     else:
         lines += ["(Name the track and the cell it lands in, any entry it "
                   "dominates, and on which axis.)"]
+    peers = getattr(args, "_d_only_peers", None) or []
+    audit = getattr(args, "_peer_audit", None)
+    if peers and audit:
+        lines.append(f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
+                     f"peer audit (`research/audits/leader_audit.py pair`): "
+                     f"{peer_audit.summary(audit)}")
     lines += [
         f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight {wmax}, "
         f"locality class {comp.get('locality_class', 'unknown')}.",
@@ -1308,6 +1315,89 @@ def _result(args):
     return args._result
 
 
+def _claim_depth(args):
+    """Return (trials, pair_depth) the submitted distance claim rests on.
+
+    The RIS pass runs ``--trials`` per side; when the accelerator is built and
+    ``--fast-trials`` is positive its pass is the deeper one, at pair depth 8
+    (``build_submission``). A peer audit read shallower than this is an
+    instrument artifact, not a distance difference (AUTORESEARCH.md 5b).
+    """
+    trials = int(getattr(args, "trials", 0) or 0)
+    fast = int(getattr(args, "fast_trials", 0) or 0)
+    if hd._fast is not None and fast > 0:
+        return max(trials, fast), 8
+    return trials, None
+
+
+def _peer_audit_check(doc, report, args, res, slug):
+    """Refuse a d-only gain that carries no matched-depth peer audit (issue #4236).
+
+    The rule and the record are ``research/kit/peer_audit.py``'s, shared with
+    ``research/kit/promote.py`` so the two packaging paths cannot drift. The
+    peers are the board entries the gate would name as ``d_only_peers``: same
+    board, a cell no looser than the candidate's, the same n, k, and max check
+    weight, and a lower claimed d. Returns an exit code; 0 means proceed. A dry
+    run reports what the real run would refuse and proceeds, since the dry
+    run is how the document to audit is obtained.
+    """
+    peers = peer_audit.d_only_peers(_entry_for(doc, report), _load_board_entries())
+    audit = None
+    path = getattr(args, "peer_audit", "") or ""
+    if path:
+        try:
+            audit = peer_audit.load_audit(path)
+        except peer_audit.PeerAuditError as e:
+            print(f"\n{e}")
+            res["error"] = {"stage": "peer-audit", "message": str(e)}
+            return 1
+    args._d_only_peers, args._peer_audit = peers, audit
+    res["d_only_peers"] = list(peers)
+    res["peer_audit"] = None if audit is None else {
+        "path": path, "decision": audit.get("decision"),
+        "trials": audit.get("trials"), "seeds": audit.get("seeds"),
+        "pair_depth": audit.get("pair_depth"), "peers": audit.get("peers")}
+    if not peers:
+        if audit is not None:
+            print("  note: --peer-audit given, but no board entry is beaten on d "
+                  "alone; the audit is recorded in the result and not required")
+        return 0
+    trials, pair_depth = _claim_depth(args)
+    staged = None
+    if audit is None and not args.dry_run:
+        # the pair command needs a submission-shaped file; stage the verified
+        # document where the kit stages candidates (gitignored), so the
+        # refusal names a path that exists
+        staged = coordination.unique_path(
+            os.path.join(coordination.staging_dir(), f"{slug}.json"), doc)
+        with open(staged, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(doc, f, indent=1)
+            f.write("\n")
+    problems = peer_audit.blockers(
+        peers, audit, required_trials=trials, required_pair_depth=pair_depth,
+        candidate_path=staged or "<the verified document; --dry-run --json prints "
+                                 "it under doc>",
+        attach="re-run submit with --peer-audit <that file>")
+    if not problems:
+        print(f"  OK  gain over {', '.join(peers)} is on d alone and the "
+              f"matched-depth peer audit covers it: {peer_audit.summary(audit)}")
+        return 0
+    if args.dry_run:
+        res["would_refuse"] = problems
+        print("\n--dry-run: the real run would be refused on the peer audit:")
+        for p in problems:
+            print(f"  {p}")
+        return 0
+    print("\nsubmission refused; nothing written to the board:")
+    for p in problems:
+        print(f"  {p}")
+    if staged:
+        print(f"  the verified document was staged at {staged} for the audit")
+        res["staged"] = staged
+    res["error"] = {"stage": "peer-audit", "message": "; ".join(problems)}
+    return 1
+
+
 def cmd_submit(args):
     res = _result(args)
     res["stage"] = "build"
@@ -1364,6 +1454,9 @@ def cmd_submit(args):
     res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
                score=round(k * d * d / n, 3),
                earned_distance=report.get("earned_distance"))
+    rc = _peer_audit_check(doc, report, args, res, slug)
+    if rc:
+        return rc
     out = os.path.join(args.out, f"{slug}.json")
     circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
                                 "circuits", slug)
@@ -2839,6 +2932,12 @@ def main(argv=None):
                    "input) and the accelerator pass (rejected with "
                    "--fast-trials 0). Preserves the witness and its weight, "
                    "not an `exact` confidence label.")
+    s.add_argument("--peer-audit", default="", metavar="FILE",
+                   help="the record research/audits/leader_audit.py pair --json-out "
+                        "wrote for this candidate; required when the gain over a "
+                        "board entry is on d alone (same n, k, and check weight), "
+                        "and it must be credible, at least as deep as this run's "
+                        "search, and cover every such entry (issue #4236)")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")

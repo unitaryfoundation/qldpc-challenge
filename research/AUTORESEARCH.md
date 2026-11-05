@@ -564,7 +564,7 @@ So measure both numbers at one budget before spending anything on packaging:
 ```bash
 uv run --frozen python research/audits/leader_audit.py pair \
     "$STAGING"/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers are chosen automatically — every board entry with the same n, k and max check
@@ -582,6 +582,16 @@ is an instrument artifact, not a distance difference. One of four decisions come
 Exit code 2 means a claim was refuted on either side, so `pair` can gate a script exactly
 like `ladder` and `screen`. Keep `--witness-dir`: the lighter logical found in a refuted
 peer *is* the revision (see **The one rule** above).
+
+Both packaging paths enforce this (issue #4236). `./qldpc submit --peer-audit <file>` and
+`evidence.peer_audit` in `kit/promote.py` take the record `--json-out` writes, and refuse a
+d-only gain when no record is given, when its decision is not `credible`, when it was read
+at fewer trials than the claim's own search, or when it does not cover every peer the gate
+named. `submit` stages the verified document under the run's staging directory and prints
+the exact `pair` command when it refuses, and a dry run reports what the real run would
+refuse. The rule is one module, `kit/peer_audit.py`, shared by both paths so they cannot
+drift. Prose in `evidence.peer_audit`, from notes written before the record existed, is
+still accepted and reported as unchecked.
 
 ## 6. Confirm the distance exactly (optional, for a standout)
 
@@ -751,6 +761,7 @@ something the next one should not have to re-learn.
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
 | `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
+| `kit/peer_audit.py` | `d_only_peers`, `blockers`, `load_audit`, `record`: the matched-depth peer audit a d-only gain owes (section 5b), as one rule for `kit/promote.py` and `./qldpc submit --peer-audit`; reads the record `research/audits/leader_audit.py pair --json-out` writes (issue #4236) |
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `sat_exact_distance` (SAT, `d=`), `decoder_distance` (BP+OSD), `weight_one_logical_exists`, `sat_lower_bound`, `sat_screen` (SAT-based lower-bound screening helpers), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
 | `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap, through n = 8 with the nauty canonicalizer (pynauty, in the `research` extra; n <= 6 without it); exact distance uses the trusted SAT certifier |
 | `kit/products.py` | classical combining products: `hypergraph_product`, `lifted_product`, `balanced_product` + a sampler each; the lifted/balanced ones cover the multi-block protographs `kit/lp_protograph.py` specializes |
