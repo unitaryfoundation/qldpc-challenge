@@ -51,6 +51,7 @@ TRUSTED = (
     "verify/check_authorship.py",
     "verify/check_certs.py",
     "verify/check_codes_format.py",
+    "verify/check_pr_duplicates.py",
     "verify/check_prose.py",
     "verify/check_submission_scope.py",
     "verify/check_tree_consistency.py",

@@ -2,6 +2,7 @@ name: verify
 
 permissions:
   contents: read
+  pull-requests: read   # check_pr_duplicates.py lists the open PRs (issue #4107)
 
 on:
   pull_request:
@@ -273,6 +274,20 @@ jobs:
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
         run: uv run --frozen python verify/check_submission_scope.py --root ../submitted --base origin/${{ github.base_ref }}
+      - name: "duplicate check against the other open PRs (issue #4107)"
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: trusted
+        # verify_all sees one tree. Two PRs that each added a presentation of
+        # the same code (#4064 and #4069, an X/Z swap apart) passed alone and
+        # merged minutes apart, and every run on main then failed on the pair
+        # until a removal landed (issue #4103). This compares the PR's entries
+        # with those of every other open PR under the identities verify_all
+        # files an entry under and refuses the later filing. The trusted copy
+        # runs, as for the scope check, and it runs on a verdict-cache hit too,
+        # because the other PRs are not in the digest.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --frozen python verify/check_pr_duplicates.py --root ../submitted --base origin/${{ github.base_ref }} --repo "${{ github.repository }}" --pr-number "${{ github.event.pull_request.number }}"
       - name: certificate levels (no cert may claim evidence it lacks)
         working-directory: submitted
         run: uv run --frozen python verify/check_certs.py
