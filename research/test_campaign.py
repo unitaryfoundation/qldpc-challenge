@@ -939,6 +939,10 @@ def test_a_new_campaign_must_state_its_direction_card():
     lambda c: c["bar"].pop("axes"),
     lambda c: c["abandon_criterion"].update(flat_fresh_rungs=1),
     lambda c: c.update(expected_value=7),
+    lambda c: c.update(non_monotonic={"why_worth_starting": "a wall"}),
+    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, regresses_on=["score"])),
+    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, stop="never")),
+    lambda c: c.update(non_monotonic="entered worse on purpose"),
 ])
 def test_a_malformed_card_is_rejected(damage):
     from campaign import scaffold_campaign
@@ -955,6 +959,49 @@ def test_a_definition_before_the_card_carries_null_and_still_loads():
     obj["campaign"].pop("direction")
     with pytest.raises(CampaignError):
         validate_campaign(obj)                    # the key is required, null or not
+
+
+NON_MONOTONIC = {
+    "why_worth_starting": "every weight-6 neighbor of 682-20-22 settles at d = 22 by 20,000 trials",
+    "regresses_on": ["d", "kd2_over_n"],
+    "precondition": "supports sharing a divisor of x^341 - 1 of degree at least 4",
+    "base": "682-20-22",
+}
+
+
+def test_a_route_entered_worse_on_purpose_says_so_on_the_card(tmp_path):
+    """The optional field (issue #4237) validates in the definition and in the summary."""
+    from campaign import scaffold_campaign
+    card = dict(CARD, non_monotonic=NON_MONOTONIC)
+    spec = scaffold_campaign("gb-probe", "GB probe", card=card, budget={"cpu_hours": 2},
+                             families=["generalized-bicycle"])
+    assert spec["campaign"]["direction"]["non_monotonic"] == NON_MONOTONIC
+    assert spec["campaign"]["direction"]["abandon_criterion"] == CARD["abandon_criterion"]
+    minimal = dict(NON_MONOTONIC)
+    minimal.pop("base")                            # base is the one optional part
+    scaffold_campaign("gb-probe", "GB probe", card=dict(CARD, non_monotonic=minimal),
+                      budget={"cpu_hours": 2})
+    led = Ledger(Campaign(spec))
+    led.start_experiment("generalized-bicycle", seed=1, params={"m": 341},
+                         note="first rung expected below the bar; the lattice is a wall")
+    led.record_screen(trials=400, d=20, backend="numpy")
+    led.record_verdict("dominated")
+    led.end_experiment()
+    out = write_summary(led.summary(), str(tmp_path / "summary.json"))
+    assert json.load(open(out))["direction"]["non_monotonic"] == NON_MONOTONIC
+
+
+def test_the_summary_schema_carries_the_same_card_as_the_definition():
+    """The card is duplicated in the two schemas; a field added to one must reach the other."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, "schema", "campaign.schema.json"), encoding="utf-8") as f:
+        definition = json.load(f)["properties"]["campaign"]["properties"]["direction"]
+    with open(os.path.join(root, "schema", "campaign_summary.schema.json"), encoding="utf-8") as f:
+        summary = json.load(f)["properties"]["direction"]
+    assert definition["oneOf"] == summary["oneOf"]
+    card = definition["oneOf"][1]
+    assert "non_monotonic" in card["properties"]
+    assert "non_monotonic" not in card["required"]
 
 
 def test_the_summary_carries_the_card(tmp_path):

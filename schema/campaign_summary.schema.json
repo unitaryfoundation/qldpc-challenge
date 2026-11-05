@@ -333,6 +333,39 @@
               "minLength": 1,
               "maxLength": 600,
               "description": "The falsifiable content of a failure: what the next session may stop trying."
+            },
+            "non_monotonic": {
+              "type": "object",
+              "required": ["why_worth_starting", "regresses_on", "precondition"],
+              "additionalProperties": false,
+              "description": "Present only when the route is entered knowing its first candidates are worse than the bar on some axis (issue #4237): the statement of what made it worth starting. The stop is abandon_criterion, applied as for any ladder; a non-monotonic route gets no second stopping rule.",
+              "properties": {
+                "why_worth_starting": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "The signal, in a sentence: a lattice of small improvements that all fail the same way, a family whose parameter space is untouched, or a construction that would win only if a specific property held."
+                },
+                "regresses_on": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {"type": "string", "enum": ["n", "k", "d", "w", "kd2_over_n", "geometric_efficiency"]},
+                  "description": "The axes the route's first candidates are expected to be worse on than the bar."
+                },
+                "precondition": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "What must hold for the route to pay off, as checkable properties, and the transform searched for to establish them."
+                },
+                "base": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Where the route starts: a board slug, or the [[n,k,d]] of a staged off-frontier intermediate and the campaign whose summary records it under survivors."
+                }
+              }
             }
           }
         }
