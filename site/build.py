@@ -892,6 +892,9 @@ border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer;
 box-shadow:0 1px 2px rgba(17,17,17,.25)}}
 .wfval{{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
 color:var(--ink);min-width:2.4em;text-align:right}}
+.asofinput{{border:0;font:inherit;font-size:12px;padding:2px 4px;
+background:transparent;color:var(--ink);cursor:pointer}}
+.asofinput:focus{{outline:none}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -1234,6 +1237,15 @@ document.addEventListener('click',e=>{
  if(!board||!q)return;
  const count=document.getElementById('boardcount');
  const rows=[...board.querySelectorAll('tbody tr')];
+ const asof=document.getElementById('asof');
+ const clearasof=document.getElementById('clearasof');
+ rows.forEach(r=>{const s=r.querySelector('td.star');
+  r._origRecord=r.dataset.record;
+  r._origClass=r.className;
+  r._origStar=s?s.innerHTML:'';
+  r._origStarTitle=s?s.title:'';});
+ (function(){const p=new URLSearchParams(location.search).get('asof');
+  if(p&&asof)asof.value=p;})();
  // Phones render the rows as cards in normal page flow (no bounded scroll
  // box), so the full list buried the leaderboard below it (issue #336): show
  // the first few and a "Show all" button. The cap lives inside apply(), not
@@ -1361,11 +1373,13 @@ document.addEventListener('click',e=>{
   const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
   const litOn=lit&&lit.classList.contains('active');
   const vis=new Set();let shown=0;
+  const ao=asof?asof.value:'';
   rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d,nn=+r.dataset.n,kk=+r.dataset.k;
    const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])
     &&(nn>=nb[0]&&nn<=nb[1])&&(kk>=kb[0]&&kk<=kb[1])
     &&(geoMode===''||(geoMode==='with')===(+r.dataset.geo>=0))
-    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t));
+    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t))
+    &&(!ao||!!r.dataset.date&&r.dataset.date<=ao);
    r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
   const cellTok=toks.find(t=>t.slice(0,18)==='cell:unrestricted~');
   const anyRoute=rows.some(r=>r.style.display===''&&+r.dataset.route>=0);
@@ -1386,7 +1400,8 @@ document.addEventListener('click',e=>{
    if(r.style.display===''&&++ci>CARDCAP)r.style.display='none';});}
   if(showall){showall.style.display=capped?'':'none';
    if(capped)showall.textContent='Show all '+shown+' codes';}
-  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
+  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes'
+   +(ao?' (as of '+ao+')':'');
   var chip=document.getElementById('qchip');
   if(chip){var f=q.value.trim();
    chip.style.display=f?'':'none';
@@ -1401,7 +1416,10 @@ document.addEventListener('click',e=>{
  }
  function clearall(){q.value='';
   document.querySelectorAll('.ttab').forEach(t=>
-   t.classList.toggle('active',t.dataset.q==='')); resetsliders();apply();}
+   t.classList.toggle('active',t.dataset.q==='')); resetsliders();
+  if(asof)asof.value='';
+  updateStarsForDate('');
+  apply();}
  var chipEl=document.getElementById('qchip');
  if(chipEl)chipEl.addEventListener('click',clearall);
  var clrEl=document.getElementById('clearfilters');
@@ -1427,6 +1445,59 @@ document.addEventListener('click',e=>{
   if(lit)lit.classList.remove('active');
   geoMode='';document.querySelectorAll('.geotab').forEach(x=>
    x.classList.remove('active'));}
+ // Historical portal: recompute frontier (record) stars for the board as of a
+ // given date. Only codes dated on or before `ao` participate; the Pareto rule
+ // mirrors site/build.py's compute_records() (per cell + per code type).
+ function dominates(a,b){
+  return a.n<=b.n && a.k>=b.k && a.d>=b.d && a.w<=b.w &&
+   (a.n<b.n || a.k>b.k || a.d>b.d || a.w<b.w);}
+ function histPareto(list){
+  const front=new Set();
+  for(let i=0;i<list.length;i++){
+   let dom=false;
+   for(let j=0;j<list.length;j++){
+    if(i===j)continue;
+    if(dominates(list[j],list[i])){dom=true;break;}
+   }
+   if(!dom)front.add(list[i].row);
+  }
+  return front;
+ }
+ function updateStarsForDate(ao){
+  if(!ao){
+   rows.forEach(r=>{const s=r.querySelector('td.star');
+    r.dataset.record=r._origRecord;
+    r.className=r._origClass;
+    if(s){s.innerHTML=r._origStar;s.title=r._origStarTitle;}});
+   return;
+  }
+  const visible=rows.filter(r=>r.dataset.date && r.dataset.date<=ao);
+  const recordSet=new Set();
+  const cells=new Set();
+  visible.forEach(r=>(r.dataset.cells||'').split(/\\s+/).filter(Boolean)
+   .forEach(c=>cells.add(c)));
+  cells.forEach(cell=>{
+   const list=visible.filter(r=>(' '+(r.dataset.cells||'')+' ')
+     .indexOf(' '+cell+' ')>=0)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  const types=new Set(visible.map(r=>r.dataset.ct||'CSS'));
+  types.forEach(ct=>{
+   const list=visible.filter(r=>(r.dataset.ct||'CSS')===ct)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  rows.forEach(r=>{
+   const s=r.querySelector('td.star');
+   const isRec=recordSet.has(r) && !!r.dataset.date && r.dataset.date<=ao;
+   r.dataset.record=isRec?'1':'0';
+   r.classList.toggle('fr',isRec);
+   if(s){
+    s.innerHTML=isRec?'&#9733;':'';
+    s.title=isRec?'record: Pareto-best in a computed cell among listed codes (board-relative, not a literature record) (as of '+ao+')':'';}
+  });
+ }
  // Primary-tracks grid: a cell's code-count chip filters the table to that
  // (locality x weight) cell and scrolls it into view.
  document.querySelectorAll('[data-cell]').forEach(b=>{
@@ -1436,6 +1507,20 @@ document.addEventListener('click',e=>{
    const bd=document.getElementById('board');
    if(bd)bd.scrollIntoView({behavior:'smooth'});});});
  if(lit)lit.addEventListener('click',()=>{lit.classList.toggle('active');apply();});
+ if(asof){asof.addEventListener('change',()=>{
+   updateStarsForDate(asof.value);
+   try{const u=new URL(location.href);
+    if(asof.value)u.searchParams.set('asof',asof.value);
+    else u.searchParams.delete('asof');
+    history.replaceState(null,'',u);}catch(e){}
+   apply();});
+  if(asof.value)updateStarsForDate(asof.value);}
+ if(clearasof){clearasof.addEventListener('click',()=>{
+   if(asof)asof.value='';
+   updateStarsForDate('');
+   try{const u=new URL(location.href);u.searchParams.delete('asof');
+    history.replaceState(null,'',u);}catch(e){}
+   apply();});}
  if(rtog)rtog.addEventListener('click',()=>{rtog.classList.toggle('active');apply();});
  document.querySelectorAll('.geotab').forEach(g=>{
   g.addEventListener('click',()=>{
@@ -5270,6 +5355,14 @@ def board_controls(entries, records):
             'shown by itself in unrestricted cells that have layouts. A '
             'diagnostic, not a rank">swaps</button></nav>'
             f'<div class=filterrow>{wslider}{dslider}{nslider}{kslider}'
+            '<label class=wfilter title="roll the board back to a past date: '
+            'only codes dated on or before this day count, and frontier stars '
+            'are recomputed for that snapshot (upper bounds, not certified)">'
+            '<span class=wflabel>as of</span>'
+            '<input type=date id=asof class=asofinput></label>'
+            '<button type=button id=clearasof class=otog '
+            'title="clear the historical date and return to the current board">'
+            'current</button>'
             '<button type=button id=clearfilters class=otog '
             'title="reset search, sliders, and every active filter">'
             'clear filters</button></div>'
@@ -5479,6 +5572,7 @@ def board_table(entries, records, lrec=frozenset()):
             f'data-ldiam="{e["ldiam"] if e["ldiam"] is not None else -1}" '
             f'data-tracks="{html.escape(search_terms)}" '
             f'data-cells="{html.escape(cell_keys)}" '
+            f'data-ct="{html.escape(e.get("code_type", "CSS"))}" '
             f'data-record="{1 if fr else 0}" '
             f'data-ler="{e["ler"] if e["ler"] is not None else -1}" '
             f'data-lrec="{1 if i in lrec else 0}" '
