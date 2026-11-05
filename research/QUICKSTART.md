@@ -42,6 +42,7 @@ a different candidate, and `unique_path` gives the second one its own name.
 ```bash
 ./qldpc recent --family <your family>    # what already landed, and what failed
 ./qldpc screened --family <your family>  # what was screened, at what depth, how it went
+./qldpc negatives --family <your family> # why routes were closed, and what would reopen them
 ./qldpc targets                          # which track cells are open
 ```
 

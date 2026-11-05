@@ -181,6 +181,34 @@ survivors, frontier advances, negative results, families), and
 `./qldpc recent --json` hands the same fields to the next session as data,
 so a closed family is learned from the summary rather than from the report.
 
+A negative is reusable only with its preconditions (issue #4233).
+`record_negative(what, detail)` takes two more keywords: `assumptions`, a
+list of what the negative depends on (the family and check weight, the `n`
+range, the backend and trial depth, how the gate behaved), and `revisit_if`,
+the one concrete change that would make the route worth retrying, in prose,
+in the direction card's register. A negative recorded inside an experiment
+also carries that experiment's `family` and `params`.
+`schema/campaign_summary.schema.json` types the item; all four fields are
+optional, so a bare `{what, detail}` still validates, it just cannot say
+whether its reason still applies.
+
+```python
+led.record_negative(
+    "weight-6 trinomials at n <= 100 do not reach the bar",
+    "120 pairs, 400 numpy trials each: best kd^2/n 6.1 against 8.9",
+    assumptions=["weight-6 BB, trinomial a and b", "n in [40, 100]",
+                 "400 numpy RIS trials per candidate"],
+    revisit_if="a screen that reaches 1e5 trials per candidate, or weight-8 pairs")
+```
+
+`./qldpc negatives` reads them back across every committed summary.
+`--family` finds the negatives about a family (a bare one stands for every
+family its campaign ran), `--param k=v` matches a negative's own `params` as
+a subset, `--match` searches the text, and `--json` hands the rows over as
+data. Run it beside `./qldpc screened` before picking a direction:
+`screened` says a member was tried, `negatives` says why a route was closed
+and what would reopen it.
+
 `abandoned` keeps everything a run produced. Stopping early throws nothing
 away.
 
@@ -332,6 +360,8 @@ on the way out, so a reporting bug surfaces where the summary is written.
 ```
 qldpc screened --family generalized-bicycle --param ring=Z_341
 qldpc screened --param n_side=5 --param t=3 --json
+qldpc negatives --family generalized-bicycle
+qldpc negatives --match weight-8 --json
 ```
 
 Parameters match as a subset, so a query on the ring alone finds every member

@@ -1036,14 +1036,47 @@ class Ledger:
     mark_retracted = retract_survivor
     record_restate = restate_survivor
 
-    def record_negative(self, what, detail):
+    def record_negative(self, what, detail, *, assumptions=None, revisit_if=None,
+                        family=None, params=None):
         """Record something that did not work, and why.
 
         A closed family, a wall, a ladder that collapsed. This is the half of a
         campaign that survives a zero-submission run, and the next searcher
         pays for it twice if it is not written down.
+
+        ``assumptions`` and ``revisit_if`` (issue #4233) are what let a later
+        session reuse the negative rather than only find it: the
+        preconditions it depends on (the family and check weight, the n
+        range, the backend and trial depth, how the gate behaved), and the
+        one concrete change that would make the route worth retrying. Both
+        are optional; a negative with neither is still a record, only one
+        that cannot say whether its reason still applies. ``family`` and
+        ``params`` default to the open experiment's, so ``./qldpc negatives``
+        can answer by family and parameter.
         """
-        self.negative_results.append({"what": what, "detail": detail})
+        item = {"what": what, "detail": detail}
+        if assumptions is not None:
+            if (isinstance(assumptions, str) or not isinstance(assumptions, (list, tuple))
+                    or not assumptions
+                    or not all(isinstance(a, str) and a.strip() for a in assumptions)):
+                raise CampaignError(
+                    "record_negative: assumptions is a non-empty list of strings, "
+                    "one precondition each")
+            item["assumptions"] = list(assumptions)
+        if revisit_if is not None:
+            if not isinstance(revisit_if, str) or not revisit_if.strip():
+                raise CampaignError(
+                    "record_negative: revisit_if is a sentence naming the change "
+                    "that would make this worth retrying")
+            item["revisit_if"] = revisit_if
+        current = self._current or {}
+        family = current.get("family") if family is None else family
+        params = current.get("params") if params is None else params
+        if family:
+            item["family"] = family
+        if params:
+            item["params"] = dict(params)
+        self.negative_results.append(item)
 
     def record_error(self, what, detail):
         """Record that the open experiment crashed, as distinct from losing.
