@@ -8,8 +8,8 @@ Writes hx, hz (and coords if a layout exists) so the baseline can be fed to
 This does not generate new codes; it packages an existing verified entry as a
 reproducible baseline artifact (issue #4601).
 """
+
 import json
-import os
 import sys
 
 import numpy as np
@@ -19,7 +19,6 @@ def extract(path):
     with open(path) as f:
         d = json.load(f)
     checks = d["checks"]
-    hx = np.array(checks.get("X", []), dtype=object)
     # store as list of supports in a simple way: write dense arrays
     n = d["n"]
     HX = np.zeros((len(checks.get("X", [])), n), dtype=np.uint8)

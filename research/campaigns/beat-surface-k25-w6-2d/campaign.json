@@ -14,20 +14,21 @@
     },
     "methods": {
       "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "generators": ["research/local2d/boundary_engine.py::build_planar", "research/local2d/planar.py::grid_coordinates"],
       "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
     },
     "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
     "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
     "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
     "direction": {
-      "hypothesis": "A weight-6 bilayer code at k~25 can beat the holey surface baseline [[598,25,4]] on kd^2/n.",
+      "hypothesis": "A bilayer weight-6 code can beat the cell frontier entry 190-20-8 (k=20, d=8, n=190, kd^2/n=6.7) on kd^2/n; target kd^2/n > 6.7 (e.g. k>=20, d>=8, n<=700).",
       "cell": "local-2d-bilayer~weight-6",
       "family": "generalized-bicycle",
-      "bar": { "slug": "598-25-4", "axes": ["kd2_over_n", "n"], "note": "Holey rotated surface code baseline." },
+      "bar": { "slug": "190-20-8", "axes": ["kd2_over_n", "n"], "note": "Cell frontier entry (exact distance for 234-26-7); bilayer weight-6 cell already has 36 entries at k 20..30." },
       "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
       "feasibility": "Bilayer weight-6 cell has headroom; existing BB families reach this regime.",
-      "novelty": { "claim": "First systematic k~25 frontier probe in bilayer weight-6", "against": "Existing 2D-bilayer weight-6 entries and holey surface codes." },
-      "expected_value": "A bilayer weight-6 code at k>=20 on the cell frontier would extend multi-logical 2D results.",
+      "novelty": { "claim": "Extend the bilayer weight-6 frontier beyond (k=20,d=8,n=190) / (k=26,d=7,n=234); not the first systematic k~25 probe in this cell.", "against": "Existing local-2d-bilayer weight-6 entries, including 190-20-8 and 234-26-7." },
+      "expected_value": "A bilayer weight-6 code on the cell frontier at kd^2/n > 6.7 would extend multi-logical 2D results.",
       "abandon_criterion": { "flat_fresh_rungs": 2, "trials_cap": 2000000 },
       "what_a_negative_would_teach": "Whether weight-6 bilayer constructions can reach k~25, or whether locality caps the cell."
     }

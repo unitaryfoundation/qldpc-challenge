@@ -28,11 +28,11 @@ latency are independent competitive metrics. No weighted aggregate score is used
 
 | k target | Baseline slug(s) | Description |
 |---|---|---|
-| 1 | `25-1-5`, `49-1-7`, `81-1-9`, `169-1-13` | Rotated surface codes |
+| 1 | `25-1-5`, `49-1-7`, `81-1-9`, `121-1-11`, `169-1-13`, `961-1-31` | Rotated surface codes (patches continue to distance 31) |
 | 5 | `101-5-5`, `197-5-7` | Dense-packed surface codes |
 | 25 | `598-25-4` | Holey rotated surface code |
-| 100 | `957-105-4` | Holey rotated surface code (k=105) |
-| Hyperbolic | `330-68-6`, `546-236-4` | Hyperbolic surface codes |
+| 100 | `944-105-4` | Holey rotated surface code (k=105, exact, 13 fewer qubits than `957-105-4`) |
+| Hyperbolic (bounded-degree reference) | `330-68-6`, `546-236-4` | Hyperbolic surface codes (not a 2D-track baseline) |
 
 For k values without a single-code baseline, the baseline is k independent rotated
 surface-code patches at the target distance, with total n = k * d^2.
@@ -44,13 +44,10 @@ surface-code patches at the target distance, with total n = k * d^2.
 - `research/campaigns/beat-surface-k50-w8-unrestricted/`
 - `research/campaigns/beat-surface-k100-w8-unrestricted/`
 
-Run one with:
-
-```
-python research/cyclic_gb.py --campaign research/campaigns/beat-surface-k10-w4-2d/campaign.json
-```
-
-(or any sweep script that accepts `--campaign`).
+These are direction cards awaiting a runner: each states a hypothesis, a cell, a bar,
+and a budget, but none carries a `run_contract`, and no sweep script in the tree
+can currently reach the 2D-local cells the first two cards aim at. They are not
+runnable via `--campaign` until a generator and a contract are added.
 
 ## Tiers
 
