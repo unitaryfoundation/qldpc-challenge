@@ -194,6 +194,29 @@ The replay is only quotable if it ends where the repository is, and
 parsed. The committed SVGs are the charts as of the date in their titles;
 regenerate them with the commands above.
 
+The same walk answers which cell has not moved (issue #4238). `cell_moves`
+replays the landings against each primary-track cell and records two dates.
+The frontier date is the last landing that changed the cell's nondominated
+set under the board's own (n, k, d, w) rule: an entry landing or revised while
+nondominated among the cell's members moves the cell, a nondominated entry
+removed or revised away moves it, and a dominated entry landing or leaving
+moves nothing. That rule is permissive on purpose (a high-rate low-distance
+code is beaten by nothing, and about seven entries in ten are nondominated in
+their cell today), so the frontier moves at most landings and the date mostly
+says whether the cell is being worked. The record date is the selective one:
+the last landing that changed the cell's best kd^2/n, raised by a new leader
+or lowered when the leader was revised or removed. A distance revision counts
+as movement on both, as it should: the cell's claim changed. Each entry's
+cells are read once from the board at HEAD and carried back through renames,
+so an entry that gained a layout later counts in its 2D cells from its first
+landing, and a path no longer on the board is skipped. `./qldpc targets`
+prints both per cell as the date, the days since, the board landings since,
+and the entry that moved it (`--no-staleness` leaves them out; a shallow clone
+has no history to replay and says so); `--stale` sorts the cells stalest
+first by the record date, then the frontier date. The landing count is the
+measure that survives a busy fortnight, when every cell's day count moves at
+once. The replay costs a few seconds beside the board load.
+
 ## Family concentration of the frontier: `family_concentration.py`
 
 `site/build.py` (`family_concentration`) measures, for every CSS primary-track

@@ -444,6 +444,7 @@ wasted ladder, so say where you are going before you start one:
 ./qldpc targets --claim weight-6/unrestricted --campaign <id> --ttl 180
 ./qldpc targets                        # live claims are marked on their cell
 ./qldpc targets --release weight-6/unrestricted
+./qldpc targets --stale                # cells stalest first: when the best kd2/n last changed (issue #4238)
 ```
 
 The claim is a note to other sessions and nothing more. It lives in a gitignored directory beside
