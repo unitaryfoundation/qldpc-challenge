@@ -63,6 +63,14 @@ exporting anything (`QLDPC_RUN_ID` pins it for a harness that needs to). The
 cell name is `<weight>/<locality>`; anything else is refused with the valid
 names rather than written as a claim no reader can find.
 
+If you are coordinating several agents rather than being one of them, read
+`AUTORESEARCH.md`, "Organizing the agents that run the loop", before handing
+out work: it splits the roles (research, engineering, orchestrator), gives
+each worker a fresh context and its own worktree with the staging and ledger
+mechanics that make that safe, runs a bake-off between routes at one matched
+screening budget, and treats a worker's survivor as a hypothesis until a
+second, independent run reproduces it (issue #4234).
+
 ```python
 import sys; sys.path[:0] = ["research/kit", "verify"]
 from bb import build_bb
@@ -161,6 +169,7 @@ session; without one the work stays local.
 | You need | Read |
 |---|---|
 | recording a screen so the next session does not repeat it | `campaigns/README.md` |
+| several agents at once: roles, fresh-context workers, bake-offs, independent review | `AUTORESEARCH.md`, "Organizing the agents that run the loop" |
 | constructors, group algebras, coset codes | `AUTORESEARCH.md` §1 |
 | the surrogate and its failure modes | §2 |
 | sweeping a family, the escalation gate | §3 |
