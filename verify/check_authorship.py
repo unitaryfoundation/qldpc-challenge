@@ -23,18 +23,18 @@ refutation binding exists to avoid. A refuted 'exact' claim must demote to
 upper_bound, and no correction may claim 'exact' at the new value without going
 through certification. New submissions are unaffected.
 
-Three more bindings exist for contributed artifacts, and they mirror the
+Four more bindings exist for contributed artifacts, and they mirror the
 refutation binding's credit model exactly: a change that ONLY adds a first
-`locality` block, ONLY a first `circuit` block, or ONLY a first `benchmark`
-block (the code had none), binds when that block's `contributed_by.by` lists
-the PR author. `provenance`
+`locality` block, ONLY a first `circuit` block, ONLY a first `benchmark`
+block, or ONLY a first `architecture` block (the code had none), binds when
+that block's `contributed_by.by` lists the PR author. `provenance`
 must be byte-identical apart from an append to notes -- in particular
 `authors` and `model` never change, so the credit lives beside the artifact
 (like witness_provenance.found_by) and can never widen the contributor's edit
 rights over the code: they are still not a listed author on the next PR, and
 any later change must itself pass a binding.
 
-A fourth binding covers the one field that carries no claim: a change that
+One more binding covers the one field that carries no claim: a change that
 ONLY corrects `family` binds for anyone. The schema says that tag is "used
 only as a filterable tag, never for ranking", and the verifier accepts any
 well-formed value, so a wrong one changes nothing about what an entry
@@ -384,6 +384,19 @@ def benchmark_binding(author, base_doc, new_doc):
                             "a benchmark block")
 
 
+def architecture_binding(author, base_doc, new_doc):
+    """Exactly a first `architecture` block credited to author (addition_binding).
+
+    Tier C metadata (issues #4601, #4674) is non-scoring like the benchmark
+    block it builds on, so a donated one moves no standing; the verifier
+    checks it against the entry and the board. The schema ties the block to
+    an existing benchmark block, so a donor to an entry that has neither adds
+    the two in separate PRs. Replacing one stays with the listed authors.
+    """
+    return addition_binding(author, base_doc, new_doc, "architecture",
+                            "an architecture block")
+
+
 def circuit_improvement_binding(author, base_doc, new_doc):
     """Does new_doc differ from base_doc by exactly a replacement of its
     circuit tier that raises the claimed fault distance, credited to author?
@@ -598,6 +611,7 @@ BINDINGS = (
     ("layout", layout_binding, "adding a first locality block to"),
     ("circuit", circuit_binding, "adding a first circuit block to"),
     ("benchmark", benchmark_binding, "adding a first benchmark block to"),
+    ("architecture", architecture_binding, "adding a first architecture block to"),
     ("circuit_improvement", circuit_improvement_binding,
      "raising the circuit fault distance of"),
     ("family", family_binding, "correcting the family tag of"),
@@ -625,6 +639,8 @@ def evident_binding(base_doc, new_doc):
         return "layout"
     if "benchmark" in new_doc and "benchmark" not in base_doc:
         return "benchmark"
+    if "architecture" in new_doc and "architecture" not in base_doc:
+        return "architecture"
     if (base_doc.get("family") != new_doc.get("family")
             and base_doc.get("distance") == new_doc.get("distance")):
         return "family"

@@ -51,3 +51,4 @@ For operational or architectural claims, state:
 - Total physical qubits (including ancillas).
 - Spacetime volume and decoder latency.
 - Whether the comparison is a documented claim or a verified result (the schema 0.6 `benchmark` block in `schema/code.schema.json` records these same fields and the verifier cross-checks them; its `status` field is `documented` until repository tooling can reproduce the comparison).
+- For a Tier C claim, the gadgets (surgery, switching, teleportation, gauge fixing) with their fault distances and resources, the magic-state protocol, and the algorithm-level estimate on both sides at the same logical count (the schema 0.7 `architecture` block, carried together with the `benchmark` block).

@@ -26,11 +26,12 @@ Two principles drive the format:
 
 ## Fields
 
-- `schema_version`: `"0.1"` through `"0.6"` (0.2 added the optional
+- `schema_version`: `"0.1"` through `"0.7"` (0.2 added the optional
   `witness_provenance` block, 0.3 the optional `provenance.search_budget`
   and `locality.modules` blocks, 0.4 the `stabilizer` code type, 0.5 the
-  list-of-points form of `circuit.ler`, 0.6 the optional `benchmark` block;
-  older files remain valid unchanged).
+  list-of-points form of `circuit.ler`, 0.6 the optional `benchmark` block,
+  0.7 the optional `architecture` block; older files remain valid
+  unchanged).
 - `name`: human-readable, e.g. `"[[72,6,6]] generalized weight-6 planar BB code"`.
 - `code_type`: `"CSS"` or `"stabilizer"` (0.4). The fields below describe a
   CSS entry; a stabilizer entry replaces `checks.X`/`checks.Z` with
@@ -292,6 +293,53 @@ Two principles drive the format:
   `n` and `k`, both qubit totals, their ratio, and whether the candidate
   meets the target with fewer physical qubits (`beats_baseline`). Recorded,
   not ranked.
+- `architecture` (optional; requires `schema_version: "0.7"` and a
+  `benchmark` block; issues #4601 and #4674): what fault-tolerant
+  computation on the code costs beyond the transversal gates of
+  `circuit.gates`, for the Beat the Surface Code campaign's Tier C. It
+  inherits the benchmark block's hardware track, noise model, decoder, and
+  surface-code baseline. Non-scoring, not displayed, and a wrong block fails
+  the document, never the code. At least one of the three parts is present.
+  - `gadgets`: up to 32 operations on blocks of this code, each with `kind`
+    (`lattice-surgery`, `code-switching`, `teleportation`, `gauge-fixing`,
+    `other`), `operation` (what it implements), `blocks` (blocks of this
+    code it acts on), optional `partner` (the board entry switched to or
+    merged with; `architecture_partner_on_board`), `fault_distance` (at most
+    `d`: `architecture_gadget_fault_distance`), `resources` (a resource
+    count whose `data_qubits` is at least `blocks` times `n`:
+    `architecture_gadget_data_qubits`, with totals adding up:
+    `architecture_qubit_totals`), optional `logical_error_rate`,
+    `reference`, and `notes`.
+  - `magic_states`: the non-Clifford supply, per factory: `protocol`
+    (`injection`, `distillation`, `cultivation`, `code-switching`, `other`),
+    `state` (`T`, `CCZ`, `Y`, `other`), optional `qubits_per_factory`,
+    `rounds_per_state`, `input_error_rate`, and `output_error_rate`, which
+    a distillation or cultivation protocol must lower
+    (`architecture_magic_state_gain`).
+  - `algorithm_estimate`: one `workload` costed on both sides at the same
+    `logical_qubits` and `logical_error_rate_target`, optional
+    `non_clifford_count` and `baseline_patch_distance` (when the computation
+    needs a larger patch than the memory benchmark used). `candidate` and
+    `baseline` each give `code_blocks`, `physical_qubits`, and optionally
+    the `logical_qubits` held (the workload's when omitted), `factories`,
+    `runtime_rounds`, and `spacetime_volume`. The verifier requires each
+    side's blocks to encode the logical qubits they hold
+    (`architecture_blocks_cover_logical_qubits`, with this entry's `k` and
+    the baseline's `k`), each side's physical count to cover its blocks'
+    data qubits (`architecture_physical_qubits_cover_blocks`, with `n` and
+    the baseline's `n`), and the candidate's factories to fit
+    (`architecture_factory_footprint`, with `qubits_per_factory`).
+  - `status` (`documented`, as for `benchmark`), `method` (up to 1000
+    characters: the constructions and their sources, the model behind each
+    error rate, how the baseline was costed, where the write-up lives),
+    optional `date` and `contributed_by` (required for a non-author's first
+    `architecture` block; the binding needs the `benchmark` block to exist
+    already).
+  The verifier records the reading in `computed.architecture`: each
+  gadget's kind, blocks, fault distance, and qubit total, the magic-state
+  protocol and output rate, and the estimate's physical qubits on both
+  sides with their ratio (and the spacetime ratio when both volumes are
+  given). Recorded, not ranked.
 - `provenance`: `authors`, `construction` (how it was built), optional
   `references`, `date`, `notes`, `model`.
   - `origin`: `"baseline"` for a literature seed or `"submission"` for a code

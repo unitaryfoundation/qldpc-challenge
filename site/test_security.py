@@ -76,6 +76,17 @@ def test_free_form_schema_fields_are_deliberately_covered():
         "properties/benchmark/properties/decoder/properties/parameters",
         "properties/benchmark/properties/method",
         "properties/benchmark/properties/noise_model/properties/description",
+        # architecture (schema 0.7, issue #4674): Tier C metadata the verifier
+        # checks and the site never renders.
+        "$defs/algorithmEstimate/properties/notes",
+        "$defs/algorithmEstimate/properties/reference",
+        "$defs/algorithmEstimate/properties/workload",
+        "$defs/architectureGadget/properties/notes",
+        "$defs/architectureGadget/properties/operation",
+        "$defs/architectureGadget/properties/reference",
+        "$defs/magicStateSupply/properties/notes",
+        "$defs/magicStateSupply/properties/reference",
+        "properties/architecture/properties/method",
     }
 
 
