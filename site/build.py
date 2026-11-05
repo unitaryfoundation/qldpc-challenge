@@ -894,7 +894,7 @@ box-shadow:0 1px 2px rgba(17,17,17,.25)}}
 color:var(--ink);min-width:2.4em;text-align:right}}
 .asofinput{{border:0;font:inherit;font-size:12px;padding:2px 4px;
 background:transparent;color:var(--ink);cursor:pointer}}
-.asofinput:focus{{outline:none}}
+.asofinput:focus-visible{{outline:2px solid var(--ac);outline-offset:1px}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -1414,11 +1414,17 @@ document.addEventListener('click',e=>{
   if(pe&&pg){const g=(geoMode==='with');
    pg.style.display=g?'':'none';pe.style.display=g?'none':'';}
  }
+ function syncAsOfUrl(v){
+  try{const u=new URL(location.href);
+   if(v)u.searchParams.set('asof',v);
+   else u.searchParams.delete('asof');
+   history.replaceState(null,'',u);}catch(e){}}
  function clearall(){q.value='';
   document.querySelectorAll('.ttab').forEach(t=>
    t.classList.toggle('active',t.dataset.q==='')); resetsliders();
   if(asof)asof.value='';
   updateStarsForDate('');
+  syncAsOfUrl('');
   apply();}
  var chipEl=document.getElementById('qchip');
  if(chipEl)chipEl.addEventListener('click',clearall);
@@ -1467,7 +1473,7 @@ document.addEventListener('click',e=>{
   if(!ao){
    rows.forEach(r=>{const s=r.querySelector('td.star');
     r.dataset.record=r._origRecord;
-    r.className=r._origClass;
+    r.classList.toggle('fr',r._origRecord==='1');
     if(s){s.innerHTML=r._origStar;s.title=r._origStarTitle;}});
    return;
   }
@@ -1495,7 +1501,7 @@ document.addEventListener('click',e=>{
    r.classList.toggle('fr',isRec);
    if(s){
     s.innerHTML=isRec?'&#9733;':'';
-    s.title=isRec?'record: Pareto-best in a computed cell among listed codes (board-relative, not a literature record) (as of '+ao+')':'';}
+    s.title=isRec?'record: Pareto-best among codes dated on or before '+ao+', using their current parameters (board-relative, not a literature record)':'';}
   });
  }
  // Primary-tracks grid: a cell's code-count chip filters the table to that
@@ -1509,17 +1515,13 @@ document.addEventListener('click',e=>{
  if(lit)lit.addEventListener('click',()=>{lit.classList.toggle('active');apply();});
  if(asof){asof.addEventListener('change',()=>{
    updateStarsForDate(asof.value);
-   try{const u=new URL(location.href);
-    if(asof.value)u.searchParams.set('asof',asof.value);
-    else u.searchParams.delete('asof');
-    history.replaceState(null,'',u);}catch(e){}
+   syncAsOfUrl(asof.value);
    apply();});
   if(asof.value)updateStarsForDate(asof.value);}
  if(clearasof){clearasof.addEventListener('click',()=>{
    if(asof)asof.value='';
    updateStarsForDate('');
-   try{const u=new URL(location.href);u.searchParams.delete('asof');
-    history.replaceState(null,'',u);}catch(e){}
+   syncAsOfUrl('');
    apply();});}
  if(rtog)rtog.addEventListener('click',()=>{rtog.classList.toggle('active');apply();});
  document.querySelectorAll('.geotab').forEach(g=>{
@@ -5355,9 +5357,11 @@ def board_controls(entries, records):
             'shown by itself in unrestricted cells that have layouts. A '
             'diagnostic, not a rank">swaps</button></nav>'
             f'<div class=filterrow>{wslider}{dslider}{nslider}{kslider}'
-            '<label class=wfilter title="roll the board back to a past date: '
-            'only codes dated on or before this day count, and frontier stars '
-            'are recomputed for that snapshot (upper bounds, not certified)">'
+            '<label class=wfilter title="table only: filters rows to codes whose '
+            'declared provenance date is on or before this day (literature '
+            'baselines use their publication year; entries with no date '
+            'disappear), and recomputes frontier stars among those codes using '
+            'their current parameters. Upper bounds, not certified.">'
             '<span class=wflabel>as of</span>'
             '<input type=date id=asof class=asofinput></label>'
             '<button type=button id=clearasof class=otog '
