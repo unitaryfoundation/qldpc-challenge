@@ -21,7 +21,7 @@
     "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
     "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
     "direction": {
-      "hypothesis": "An unrestricted weight-8 code can beat the cell frontier entry 184-50-10 (k=50, d=10, n=184, kd^2/n=27.2) on kd^2/n; target kd^2/n > 27.2 (e.g. k>=45, d>=13, n<=1000).",
+      "hypothesis": "An unrestricted weight-8 code can beat the cell frontier entry 184-50-10 (k=50, d=10, n=184, kd^2/n=27.2) on kd^2/n; target kd^2/n > 27.2 (e.g. d>=14 at k=45, n=300, or d>=23 at k=55, n=1000).",
       "cell": "unrestricted~weight-8",
       "family": "generalized-bicycle",
       "bar": { "slug": "184-50-10", "axes": ["kd2_over_n", "n"], "note": "Cell frontier entry (exact); unrestricted weight-8 cell already has high-k entries." },

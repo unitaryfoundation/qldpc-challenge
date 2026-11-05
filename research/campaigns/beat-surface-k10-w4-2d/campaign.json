@@ -14,7 +14,7 @@
     },
     "methods": {
       "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
-      "generators": ["research/local2d/boundary_engine.py::build_planar", "research/local2d/planar.py::grid_coordinates"],
+      "generators": [],
       "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
     },
     "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
@@ -23,7 +23,7 @@
     "direction": {
       "hypothesis": "A weight-4 2D-local code can beat the cell frontier entry 368-8-8 (k=8, d=8, n=368, kd^2/n=1.39) on kd^2/n; target kd^2/n > 1.39 (e.g. k>=8, d>=8, n<368), in a cell whose entries sit at 1.2-1.4 where Bravyi-Poulin-Terhal gives only a constant factor.",
       "cell": "local-2d-single~weight-4",
-      "family": "bivariate-bicycle",
+      "family": "other",
       "bar": { "slug": "368-8-8", "axes": ["kd2_over_n", "n"], "note": "Cell frontier entry (exact); 2D single-layer weight-4 entries currently reach 1.2-1.4." },
       "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
       "feasibility": "Weight-4 2D-local cell already populated; board_bar.py can price candidates before distance search; upside is a constant factor only.",

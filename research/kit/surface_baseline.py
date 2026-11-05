@@ -32,8 +32,6 @@ def extract(path):
     out = {"hx": HX, "hz": HZ}
     if "locality" in d and "coordinates" in d["locality"]:
         out["coords"] = np.array(d["locality"]["coordinates"])
-    if "layers" in d.get("locality", {}):
-        out["layers"] = np.array(d["locality"]["layers"])
     return out, d
 
 
