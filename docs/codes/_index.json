@@ -33,6 +33,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "5-1-3-b",
+      "n": 5,
+      "k": 1,
+      "d": 3,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "5-4-1",
       "n": 5,
       "k": 4,
