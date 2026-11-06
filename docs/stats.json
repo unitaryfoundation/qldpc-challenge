@@ -21,8 +21,8 @@
   },
   "novelty_audited": 766,
   "board_screen": {
-    "not_screened": 374,
     "distinct": 2493,
+    "not_screened": 374,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
