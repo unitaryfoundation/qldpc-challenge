@@ -3,6 +3,42 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/180-36-10.html">[[180,36,10]] — 180-36-10</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[180,36,10]] — lifted-product code from GFlowQEC</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the unrestricted / any-weight CSS cell at \(n=180\), where the existing entry <code>[[180,36,8]]</code> (<code>codes/180-36-8.json</code>) sets the bar. The GFlowQEC policy (arXiv:2611.06819v1) proposes lifted-product codes over \(G = \mathbb{Z}_6 \times S_3\) with \(n = 5|G| = 180\); its top-scoring draws have \(d_X = d_Z = 10\), which would beat the peer on distance alone.</p>
+<h4>What was searched</h4>
+<p>Reused a published GFlowQEC run (seed 0, oversample factor 10): 1,000 paid oracle calls producing 430 draws, of which 294 are certified top-scoring. Extracted the certified draws with \(d_X = d_Z = 10\) (14 draws) and converted one representative to this repository&#x27;s submission format. Witness extraction used the paper&#x27;s SAT ladder encoding at bound 10, yielding a weight-10 logical in each sector.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: lifted product of \(A = [g_1+g_2+g_3,\; e+g_4+g_5]\) and</li>
+<p>\(B = [h_1+h_2+h_3,\; e+h_4+h_5]\) with group-element indices <code>g = [24, 5, 28, 14, 18]</code>, <code>h = [24, 6, 34, 5, 19]</code> (index 24 is the identity) in the upstream <code>group_for(&quot;C6xS3&quot;)</code> element list.</p>
+<li>Upstream certified distances: \(d_X = 10\), \(d_Z = 10\) (exact, SAT ladder).</li>
+<li>This repository&#x27;s trusted gate: <code>passed: true</code>, refute found no lighter</li>
+<p>logical in 8,000 RIS trials; dedup reports WL-equivalence to <code>codes/180-36-8.json</code> (not an exact duplicate).</p>
+<li>Matched-depth audit (<code>research/audits/leader_audit.py pair</code>,</li>
+<p>200,000 trials, seed 51, pair depth 64) run on the candidate against <code>codes/180-36-8.json</code>.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Other draws from the same run have \(d_X = 10, d_Z \le 9\) and are also board-advancing on \(d\) but weaker; draws with \(d_X = 10, d_Z = 8\) and \(k = 38\) are dominated by smaller-\(n\) entries and were not submitted.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0 (per submission provenance). Upstream code and data: github.com/NunoMBatista/GFlowQEC @ a272569 (release v1.1), files <code>gflowqec/codes.py</code>, <code>gflowqec/certify.py</code>. Distance witnesses extracted with the upstream SAT ladder encoding; conversion to this repository&#x27;s schema done locally.</p>
+<h4>Reproduction</h4>
+<p>Rebuild \(H_X, H_Z\) with the upstream snippet:</p>
+<p>from gflowqec.codes import build code = build(&quot;C6xS3&quot;, [24, 5, 28, 14, 18, 24, 6, 34, 5, 19])</p>
+<p>then export <code>code.matrix_x</code> / <code>code.matrix_z</code> as <code>hx</code> / <code>hz</code> in an <code>.npz</code> and run <code>./qldpc submit</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/180-36-10.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/5-1-3-b.html">[[5,1,3]] — 5-1-3-b</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[5,1,3]] — non-CSS stabilizer code from a graph-state extension</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Aim: a non-CSS general stabilizer code in the <code>weight-4</code> / <code>unrestricted</code> cell. The paper &quot;Stabiliser codes over prime fields as weighted graphs and as quantum sets of lines&quot; (arXiv:2611.05489v1) gives an extension operation on quantum sets of lines that can raise k by 1 while keeping n small. Starting from a 4-qubit non-bipartite graph state (K4 minus one edge) and choosing extension vectors b, c yields a 5-qubit code with one logical qubit.</p>
+<h4>What was searched</h4>
+<p>Exhaustive enumeration of extension vectors b, c in F2^4 for several 4-vertex base graphs; roughly 4^4 * 2^8 candidates. Connected (non-direct-sum) codes with a non-CSS local-Hadamard certificate were kept. Screening distance with exact enumeration of S^perp / S for n &lt;= 5.</p>
+<h4>Evidence trail</h4>
+<p>Submitted code: n=5, k=1, d=3 (witness-backed upper bound). Witness Pauli: X on qubit 1, Z on qubits 3 and 4 (0-based), Pauli weight 3. The verifier&#x27;s refutation search found no lighter logical in 2700 RIS trials.</p>
+<h4>Dead ends</h4>
+<p>Most extension choices gave d &lt;= 2 or a disconnected stabilizer group. Larger base graphs (K6/K7) did not yield connected d &gt;= 4 codes under this operation.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: Python/numpy enumeration of graph-state extensions; distance by exact enumeration of S^perp \ S.</p>
+<h4>Reproduction</h4>
+<p>Base graph on 4 vertices with edges (0,1),(0,2),(0,3),(1,2),(1,3) (gmask 13), extension vectors b = 1100, c = 1111 (0-based, little-endian). Rebuild S = (A|B) from the multidimensional graph-state form of arXiv:2611.05489v1, section 4.3.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/5-1-3-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/34-8-5.html">[[34,8,5]] — 34-8-5</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h3>[[34,8,5]] priced calculus E-PEEL of codes/35-8-5.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Unrestricted weight-8 CSS cell. The priced construction calculus was applied one move deep to every CSS entry on the board, and this code is the E-PEEL of codes/35-8-5.json ([[35,8,5]], max check weight 8; itself Mathys Rennela&#x27;s priced-calculus E-PEEL of codes/36-8-6.json, a generalized bicycle code reconstructed from qecdb record 67a542959d65c7b409826a52). Peeling qubit 20 with the one Z check that touches it keeps k = 8 and keeps the witnessed distance bound at 5 while dropping one qubit. Max check weight stays 8.</p>
@@ -18,7 +54,7 @@
 <p>Model: Claude Fable 5.1 (Claude Code). Repo tooling: <code>research/kit/coordination.py</code>, <code>research/kit/submit.py</code>, <code>research/kit/surrogate.py</code>, <code>research/audits/leader_audit.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load codes/35-8-5.json, delete qubit 20 (0-based index in that file) together with its unique Z check b11, where the Z rows are numbered b1, b2, ... in file order after dropping rows dependent on earlier ones, as CodeState.from_challenge in machine/priced_calculus.py labels them, and relabel the surviving qubits in increasing order of their parent indices; in github.com/unitaryfoundation/code-calculus @ 1b9a942 this is apply_operation(state, {&#x27;op&#x27;: &#x27;E-PEEL&#x27;, &#x27;qubit&#x27;: 20, &#x27;sector&#x27;: &#x27;Z&#x27;, &#x27;row_id&#x27;: &#x27;b11&#x27;}). Then run research/audits/leader_audit.py ladder on the result with --ladder 1000000:101,102 10000000:103 to reproduce the confirmation rungs; the witnesses in the entry are the ones those runs validated.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/34-8-5.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/40-10-5.html">[[40,10,5]] — 40-10-5</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h3>[[40,10,5]] priced calculus E-PEEL of codes/41-10-5.json</h3>
+<section class=blk><h3><a href="codes/40-10-5.html">[[40,10,5]] — 40-10-5</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h3>[[40,10,5]] priced calculus E-PEEL of codes/41-10-5.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Unrestricted weight-8 CSS cell. The priced construction calculus was applied one move deep to every CSS entry on the board, and this code is the E-PEEL of codes/41-10-5.json ([[41,10,5]], max check weight 8; itself Mathys Rennela&#x27;s priced-calculus E-PEEL of codes/42-10-6.json, a generalized bicycle code reconstructed from qecdb record 67ac182d9d65c7b409826af2). Peeling qubit 22 with the one Z check that touches it keeps k = 10 and keeps the witnessed distance bound at 5 while dropping one qubit. Max check weight stays 8.</p>
 <h4>What was searched</h4>
@@ -33,7 +69,7 @@
 <p>Model: Claude Fable 5.1 (Claude Code). Repo tooling: <code>research/kit/coordination.py</code>, <code>research/kit/submit.py</code>, <code>research/kit/surrogate.py</code>, <code>research/audits/leader_audit.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load codes/41-10-5.json, delete qubit 22 (0-based index in that file) together with its unique Z check b5, where the Z rows are numbered b1, b2, ... in file order after dropping rows dependent on earlier ones, as CodeState.from_challenge in machine/priced_calculus.py labels them, and relabel the surviving qubits in increasing order of their parent indices; in github.com/unitaryfoundation/code-calculus @ 1b9a942 this is apply_operation(state, {&#x27;op&#x27;: &#x27;E-PEEL&#x27;, &#x27;qubit&#x27;: 22, &#x27;sector&#x27;: &#x27;Z&#x27;, &#x27;row_id&#x27;: &#x27;b5&#x27;}). Then run research/audits/leader_audit.py ladder on the result with --ladder 1000000:101,102 10000000:103 to reproduce the confirmation rungs; the witnesses in the entry are the ones those runs validated.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/40-10-5.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/40-6-6-b.html">[[40,6,6]] — 40-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details open><summary>note</summary><div class=notebody><h3>[[40,6,6]] priced calculus E-PEEL of codes/41-6-6.json</h3>
+<section class=blk><h3><a href="codes/40-6-6-b.html">[[40,6,6]] — 40-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-04 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1</div><details ><summary>note</summary><div class=notebody><h3>[[40,6,6]] priced calculus E-PEEL of codes/41-6-6.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Unrestricted weight-8 CSS cell. The priced construction calculus was applied one move deep to every CSS entry on the board, and this code is the E-PEEL of codes/41-6-6.json ([[41,6,6]], max check weight 7; itself a priced-calculus E-PEEL of codes/42-6-7.json, a Lin and Pryadko 2BGA code over SmallGroup(21,2)). Peeling qubit 40 with the one Z check that touches it keeps k = 6 and the witnessed distance bound d &lt;= 6 while dropping one qubit, so it sits one qubit to the left of its parent on the frontier. Max check weight stays 7.</p>
 <h4>What was searched</h4>
@@ -4466,6 +4502,30 @@ coords = grid_coordinates(20, 20, kept=info.get(&quot;kept_qubits&quot;))  # lay
 <p>Model: Beam 1.0. Repo verifier and submit tooling.</p>
 <h4>Reproduction</h4>
 <p>Take n=32 qubits indexed by x in F_2^5. Generators: for i=0..4, X on qubits with bit i of x = 1 and Z on qubits with bit i of π(x)=1; plus two global rows, replaced by combinations with the first balanced row to keep weight 3n/4. Use π(x)=A x with A the companion matrix of x^5+x+1.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-25-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/684-12-108.html">[[684,12,108]] — 684-12-108</a></h3><div class=kv style="color:var(--mut)">2026-10-27 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[684,12,108]] seed-weight-8 affine 2BGA at k=12, kd^2/n 204.6</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Advance the unrestricted weight-9plus cell&#x27;s frontier at n&lt;=684 with generalized-bicycle codes over the affine group: Same q=19 / seed-weight-8 sweet spot as the k=14 leader; this draw landed the k=12 corner, and the elite-neighborhood stage of the sweep climbed from exactly these exponent sets.</p>
+<h4>What was searched</h4>
+<p>One lane of an 11-lane unattended sweep over affine 2BGA seed vectors at n&lt;=684 (q in {17,19}, seed weights 6-20, ~300 draws per lane). Each draw was screened by a 400-trial numpy RIS reading behind a board prepass (CSS, connectivity, exact-fingerprint and WL dedup); the lane&#x27;s top band was re-read at fresh-seed 20,000-trial rungs and packaged by the kit&#x27;s submit path. The lane first claimed d&lt;=121; the four independent-seed confirmation rungs below, run for this submission, read lighter logicals, and the entry was repackaged at the lowest reading with the witness that set it. CI&#x27;s independent RIS-fast refutation search (8,000,000-trial class, PR CI, seed 827515911) then found a weight-108 Z logical the local ladder had missed, and the entry was corrected to the CI reading with CI&#x27;s witness carried. This candidate comes from the |a|=|b|=8 band at q=19.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (rerun 1) | 121 | | 20,000 (rerun 2) | 122 | | 20,000 (rerun 3) | 117 | | 20,000 (rerun 4) | 121 | | 20,000 (repackaging witness search) | 117 | | 8,000 (trusted-gate refutation, seed 854382162) | 117 | | CI RIS-fast refutation, seed 827515911 (8,000,000-trial class) | 108 | | 29,860 (gate_changed re-verification, seed 31051211) | 108 |</p>
+<p>The deepest rungs agree at the best bound: CI&#x27;s independent 8,000,000-trial-class refutation search and the fresh-seed gate_changed re-verification both read 108. The submitted witness reproduces it: X: d &lt;= 121 (upper_bound), Z: d &lt;= 108 (upper_bound).</p>
+<h4>Dead ends</h4>
+<ul>
+<li>k=10 draws at this cell repeat one WL signature (the board&#x27;s 684-10-90</li>
+<p>class); the k=10 corner was abandoned as a sampler trap.</p>
+<li>Unrestricted bivariate-bicycle trinomial/quadnomial pairs on 100 &lt; n &lt;= 240</li>
+<p>are closed by five lanes (~5,600 draws, no gate pass; 93% die in prepass as direct sums); non-abelian BBGA and metacyclic 2BGA at n &lt;= 320 closed with no gate pass.</p>
+<li>A [[544,12,16]]-class draw is dominated (the gate lists 170 dominators); it</li>
+<p>recurred twice independently and was recorded non-frontier, not staged for submission.</p>
+<li>The lane&#x27;s own deep readings did not survive independent seeds: every</li>
+<p>candidate on this sweep read 1-6 units lighter under the four fresh-seed confirmation rungs, and all were repackaged at the lower reading before submission. Screen readings sit higher still.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM-5.3-Flash. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Rebuild from committed kit code, verified bit-identical to the entry&#x27;s fingerprint before submission: with research/kit on sys.path, call metacyclic(q, q-1, r) from research/kit/group_algebra.py with q = 19 and r = 2 (the smallest primitive root mod 19), then build_2bga(mul, a, b) with a = [60, 67, 97, 154, 336, 191, 104, 227] and b = [103, 228, 254, 324, 107, 317, 4, 185]. Compare qldpc_verify.css_fingerprint of the result against the entry (research/kit/rebuild.py prints it). The ladder&#x27;s distance readings come from the kit&#x27;s numpy RIS surrogate, research/kit/surrogate.py::distance_rand, at 20,000 fresh-seed trials per side per rung.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-12-108.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/674-44-91.html">[[674,44,91]] — 674-44-91</a></h3><div class=kv style="color:var(--mut)">2026-10-26 &middot; submission note &middot; <a href="https://github.com/vaibhav-baj">@vaibhav-baj</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[674,44,91]] — weight-12 cyclic generalized bicycle at prime length 337, no imposed symmetry</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the kd²/n headline at check weight ≤ 12. The leader is <code>codes/674-44-89.json</code> ([[674,44,89]], w = 12, 517.1), the BCH-designed cyclic generalized bicycle at L = 337 whose claim came down from 95 in the October corrections. Its divisor has structural cap 129 (measured here with <code>circulant_gb_witness</code>, two seeds), so its distance is set by two-block logicals, not by the constituent code — which means other weight-6 pairs from the same family can land higher.</p>

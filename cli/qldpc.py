@@ -68,6 +68,7 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
 from campaign import curve_from_summary, write_curve  # noqa: E402
 from check_authorship import HANDLE  # noqa: E402
@@ -986,6 +987,12 @@ def pr_body(doc, report, args, out, note_out=None):
     else:
         lines += ["(Name the track and the cell it lands in, any entry it "
                   "dominates, and on which axis.)"]
+    peers = getattr(args, "_d_only_peers", None) or []
+    audit = getattr(args, "_peer_audit", None)
+    if peers and audit:
+        lines.append(f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
+                     f"peer audit (`research/audits/leader_audit.py pair`): "
+                     f"{peer_audit.summary(audit)}")
     lines += [
         f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight {wmax}, "
         f"locality class {comp.get('locality_class', 'unknown')}.",
@@ -1308,6 +1315,89 @@ def _result(args):
     return args._result
 
 
+def _claim_depth(args):
+    """Return (trials, pair_depth) the submitted distance claim rests on.
+
+    The RIS pass runs ``--trials`` per side; when the accelerator is built and
+    ``--fast-trials`` is positive its pass is the deeper one, at pair depth 8
+    (``build_submission``). A peer audit read shallower than this is an
+    instrument artifact, not a distance difference (AUTORESEARCH.md 5b).
+    """
+    trials = int(getattr(args, "trials", 0) or 0)
+    fast = int(getattr(args, "fast_trials", 0) or 0)
+    if hd._fast is not None and fast > 0:
+        return max(trials, fast), 8
+    return trials, None
+
+
+def _peer_audit_check(doc, report, args, res, slug):
+    """Refuse a d-only gain that carries no matched-depth peer audit (issue #4236).
+
+    The rule and the record are ``research/kit/peer_audit.py``'s, shared with
+    ``research/kit/promote.py`` so the two packaging paths cannot drift. The
+    peers are the board entries the gate would name as ``d_only_peers``: same
+    board, a cell no looser than the candidate's, the same n, k, and max check
+    weight, and a lower claimed d. Returns an exit code; 0 means proceed. A dry
+    run reports what the real run would refuse and proceeds, since the dry
+    run is how the document to audit is obtained.
+    """
+    peers = peer_audit.d_only_peers(_entry_for(doc, report), _load_board_entries())
+    audit = None
+    path = getattr(args, "peer_audit", "") or ""
+    if path:
+        try:
+            audit = peer_audit.load_audit(path)
+        except peer_audit.PeerAuditError as e:
+            print(f"\n{e}")
+            res["error"] = {"stage": "peer-audit", "message": str(e)}
+            return 1
+    args._d_only_peers, args._peer_audit = peers, audit
+    res["d_only_peers"] = list(peers)
+    res["peer_audit"] = None if audit is None else {
+        "path": path, "decision": audit.get("decision"),
+        "trials": audit.get("trials"), "seeds": audit.get("seeds"),
+        "pair_depth": audit.get("pair_depth"), "peers": audit.get("peers")}
+    if not peers:
+        if audit is not None:
+            print("  note: --peer-audit given, but no board entry is beaten on d "
+                  "alone; the audit is recorded in the result and not required")
+        return 0
+    trials, pair_depth = _claim_depth(args)
+    staged = None
+    if audit is None and not args.dry_run:
+        # the pair command needs a submission-shaped file; stage the verified
+        # document where the kit stages candidates (gitignored), so the
+        # refusal names a path that exists
+        staged = coordination.unique_path(
+            os.path.join(coordination.staging_dir(), f"{slug}.json"), doc)
+        with open(staged, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(doc, f, indent=1)
+            f.write("\n")
+    problems = peer_audit.blockers(
+        peers, audit, required_trials=trials, required_pair_depth=pair_depth,
+        candidate_path=staged or "<the verified document; --dry-run --json prints "
+                                 "it under doc>",
+        attach="re-run submit with --peer-audit <that file>")
+    if not problems:
+        print(f"  OK  gain over {', '.join(peers)} is on d alone and the "
+              f"matched-depth peer audit covers it: {peer_audit.summary(audit)}")
+        return 0
+    if args.dry_run:
+        res["would_refuse"] = problems
+        print("\n--dry-run: the real run would be refused on the peer audit:")
+        for p in problems:
+            print(f"  {p}")
+        return 0
+    print("\nsubmission refused; nothing written to the board:")
+    for p in problems:
+        print(f"  {p}")
+    if staged:
+        print(f"  the verified document was staged at {staged} for the audit")
+        res["staged"] = staged
+    res["error"] = {"stage": "peer-audit", "message": "; ".join(problems)}
+    return 1
+
+
 def cmd_submit(args):
     res = _result(args)
     res["stage"] = "build"
@@ -1364,6 +1454,9 @@ def cmd_submit(args):
     res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
                score=round(k * d * d / n, 3),
                earned_distance=report.get("earned_distance"))
+    rc = _peer_audit_check(doc, report, args, res, slug)
+    if rc:
+        return rc
     out = os.path.join(args.out, f"{slug}.json")
     circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
                                 "circuits", slug)
@@ -2085,20 +2178,15 @@ def campaign_rows(since):
 # member was screened, at what depth, and how it went. Advisory only -- the
 # gate remains the only thing that admits a code.
 
-def screening_rows(family="", params=None, verdicts=()):
-    """Experiment rows across committed summaries, filtered.
+def committed_summaries():
+    """Yield (campaign id, repo-relative path, summary) per research/campaigns/<id>/summary.json.
 
-    ``params`` matches as a subset: a row matches when every queried key is
-    present on it and compares equal, so a query on the ring alone finds
-    every member screened over that ring. Values compare as strings, since a
-    campaign that wrote l as "6" and one that wrote 6 screened the same
-    member.
+    The shared reader behind `screened` and `negatives`: a summary that does
+    not parse is skipped, so one broken file never hides the rest.
     """
     root = os.path.join(_ROOT, "research", "campaigns")
-    want = {str(k): str(v) for k, v in (params or {}).items()}
-    rows, quality, summaries = [], [], 0
     if not os.path.isdir(root):
-        return rows, quality, summaries
+        return
     for cid in sorted(os.listdir(root)):
         path = os.path.join(root, cid, "summary.json")
         if not os.path.exists(path):
@@ -2108,9 +2196,22 @@ def screening_rows(family="", params=None, verdicts=()):
                 summ = json.load(fh)
         except (OSError, ValueError):
             continue
+        yield summ.get("campaign_id") or cid, os.path.relpath(path, _ROOT), summ
+
+
+def screening_rows(family="", params=None, verdicts=()):
+    """Experiment rows across committed summaries, filtered.
+
+    ``params`` matches as a subset: a row matches when every queried key is
+    present on it and compares equal, so a query on the ring alone finds
+    every member screened over that ring. Values compare as strings, since a
+    campaign that wrote l as "6" and one that wrote 6 screened the same
+    member.
+    """
+    want = {str(k): str(v) for k, v in (params or {}).items()}
+    rows, quality, summaries = [], [], 0
+    for ident, rel, summ in committed_summaries():
         summaries += 1
-        rel = os.path.relpath(path, _ROOT)
-        ident = summ.get("campaign_id") or cid
         backfilled = bool(summ.get("backfilled"))
         for q in summ.get("screen_quality") or []:
             if family and q.get("family") != family:
@@ -2181,6 +2282,107 @@ def _print_registry_coverage(rows, quality):
         print("    no screen-quality rows: nothing committed yet pairs a screened "
               "distance with a gate verdict, so the screen's ordering is uncalibrated "
               "against the gate for every family.")
+
+
+def negative_rows(family="", params=None, match=""):
+    """Negative results across committed summaries, filtered (issue #4233).
+
+    A negative recorded inside an experiment carries that experiment's
+    family and params; one recorded outside any, the usual "closed family"
+    at the end of a run, carries neither, so under a family filter it stands
+    for every family its campaign ran, read off the experiments and the
+    direction card. A parameter query matches as a subset of the negative's
+    own params, as `screened` does, and a negative that recorded none does
+    not match one: the record does not say, and the query does not guess.
+    ``match`` is a case-insensitive substring over what, detail, the
+    assumptions, and revisit_if.
+    """
+    want = {str(k): str(v) for k, v in (params or {}).items()}
+    needle = (match or "").lower()
+    rows, summaries = [], 0
+    for ident, rel, summ in committed_summaries():
+        summaries += 1
+        card = summ.get("direction") or {}
+        ran = {e.get("family") for e in summ.get("experiments") or [] if e.get("family")}
+        if card.get("family"):
+            ran.add(card["family"])
+        for neg in summ.get("negative_results") or []:
+            if not isinstance(neg, dict):
+                continue
+            own = neg.get("family") or ""
+            if family and (own != family if own else family not in ran):
+                continue
+            got = {str(k): str(v) for k, v in (neg.get("params") or {}).items()}
+            if want and (not got or any(got.get(k) != v for k, v in want.items())):
+                continue
+            assumptions = [a for a in (neg.get("assumptions") or []) if isinstance(a, str)]
+            hay = " ".join([neg.get("what") or "", neg.get("detail") or "",
+                            " ".join(assumptions), neg.get("revisit_if") or ""]).lower()
+            if needle and needle not in hay:
+                continue
+            rows.append({
+                "campaign_id": ident, "path": rel,
+                "status": summ.get("status") or "",
+                "what": neg.get("what") or "", "detail": neg.get("detail") or "",
+                "assumptions": assumptions,
+                "revisit_if": neg.get("revisit_if") or "",
+                "family": own, "campaign_families": sorted(ran),
+                "params": neg.get("params") or {},
+                "what_a_negative_would_teach": card.get("what_a_negative_would_teach") or "",
+            })
+    return rows, summaries
+
+
+def cmd_negatives(args):
+    """List what earlier campaigns closed, with what each closure assumed.
+
+    The cross-campaign memory of issue #4233: `screened` says a member was
+    tried; this says why a route was closed, under which assumptions, and
+    what change would make it worth retrying, so a later session can tell
+    whether the reason still applies. Reads only committed summaries.
+    """
+    params = dict(_kv_pairs(args.param))
+    rows, summaries = negative_rows(family=args.family, params=params, match=args.match)
+    _result(args).update(query={"family": args.family, "params": params, "match": args.match},
+                         summaries_read=summaries, matches=len(rows), rows=rows)
+
+    what = args.family or "any family"
+    if params:
+        what += " at " + ", ".join(f"{k}={v}" for k, v in sorted(params.items()))
+    if args.match:
+        what += f" matching {args.match!r}"
+    if not rows:
+        print(f"{what}: no committed campaign summary records a negative result for it "
+              f"({summaries} read)")
+        return
+    typed = sum(1 for r in rows if r["assumptions"] or r["revisit_if"])
+    print(f"{what}: {_plural(len(rows), 'negative result')} across "
+          f"{_plural(summaries, 'campaign summary', 'campaign summaries')}, "
+          f"{typed} with assumptions or a revisit condition")
+    lim = None if args.full else max(1, args.limit)
+    for r in (rows if lim is None else rows[:lim]):
+        fam = r["family"] or ("/".join(r["campaign_families"]) + " (the campaign's)"
+                              if r["campaign_families"] else "")
+        pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
+        head = f"  {r['campaign_id']}  {r['what']}"
+        if fam:
+            head += f"  [{fam}]"
+        if pretty:
+            head += f"  {pretty}"
+        print(head)
+        if r["detail"]:
+            print(f"    {r['detail']}")
+        if r["assumptions"]:
+            print("    assumes: " + "; ".join(r["assumptions"]))
+        if r["revisit_if"]:
+            print(f"    revisit if: {r['revisit_if']}")
+        if not r["assumptions"] and not r["revisit_if"]:
+            tail = (f"; its direction card says a negative would teach: "
+                    f"{r['what_a_negative_would_teach']}"
+                    if r["what_a_negative_would_teach"] else "")
+            print(f"    no assumptions or revisit condition recorded{tail}")
+    if lim is not None and len(rows) > lim:
+        print(f"  ... {len(rows) - lim} more (--limit N, --full)")
 
 
 def cmd_screened(args):
@@ -2839,6 +3041,12 @@ def main(argv=None):
                    "input) and the accelerator pass (rejected with "
                    "--fast-trials 0). Preserves the witness and its weight, "
                    "not an `exact` confidence label.")
+    s.add_argument("--peer-audit", default="", metavar="FILE",
+                   help="the record research/audits/leader_audit.py pair --json-out "
+                        "wrote for this candidate; required when the gain over a "
+                        "board entry is on d alone (same n, k, and check weight), "
+                        "and it must be credible, at least as deep as this run's "
+                        "search, and cover every such entry (issue #4236)")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")
@@ -2907,6 +3115,28 @@ def main(argv=None):
                     help="print one JSON record on stdout instead of the "
                          "listing")
     sc.set_defaults(func=cmd_screened)
+
+    ng = sub.add_parser("negatives",
+                        help="what earlier campaigns closed and why, with the "
+                             "assumptions each negative depends on and the "
+                             "change that would make it worth retrying "
+                             "(committed campaign summaries only)")
+    ng.add_argument("--family", default="",
+                    help="family tag; a negative recorded outside an "
+                         "experiment stands for every family its campaign ran")
+    ng.add_argument("--param", action="append", default=[], metavar="K=V",
+                    help="parameter the negative must carry, repeatable; "
+                         "matched as a subset of the negative's own params")
+    ng.add_argument("--match", default="",
+                    help="text to find in what, detail, the assumptions, or "
+                         "revisit_if (case-insensitive)")
+    ng.add_argument("--limit", type=int, default=20,
+                    help="rows to print (default 20); --full for all")
+    ng.add_argument("--full", action="store_true")
+    ng.add_argument("--json", action="store_true",
+                    help="print one JSON record on stdout instead of the "
+                         "listing")
+    ng.set_defaults(func=cmd_negatives)
 
     cv = sub.add_parser("curve",
                         help="best-so-far verified efficiency against trials "

@@ -103,6 +103,7 @@ different field: maximize or minimize.)
 | `expected_value` | what a positive result is worth, as a statement: "a weight-6 2D-local code at k >= 8 would be the first in this cell". Never a number: a number would be a score, and TRACKS.md's own reasoning about kd^2/n is that one number must not stand in for a frontier |
 | `abandon_criterion` | when the ladder is dropped, in the terms `research/kit/escalation.py` enforces: `flat_fresh_rungs` (at least 2, its `MIN_FLAT_RUNGS`) agreeing at a bound below the bar, and a `trials_cap` per candidate, with an optional `note` |
 | `what_a_negative_would_teach` | the falsifiable content of a failure: what the next session may stop trying |
+| `non_monotonic` | optional, present only when the route is entered knowing its first candidates are worse than the bar: `why_worth_starting` (the signal, in a sentence), `regresses_on` (the axes they are expected to lose on), `precondition` (what must hold for the route to pay off, and the transform searched for to establish it), and optionally `base` (the board slug or staged intermediate it starts from). The stop stays `abandon_criterion`; section 3e of `research/AUTORESEARCH.md` says when to enter such a route and how to stage its intermediates (issue #4237) |
 
 `research/campaigns/bb-w6-n-le-100-trinomials/` is the first campaign filed
 with the card; its `summary.json` shows the block beside the ledger. Section
@@ -180,6 +181,34 @@ family is the finding. `summary.json` is the machine-readable half;
 survivors, frontier advances, negative results, families), and
 `./qldpc recent --json` hands the same fields to the next session as data,
 so a closed family is learned from the summary rather than from the report.
+
+A negative is reusable only with its preconditions (issue #4233).
+`record_negative(what, detail)` takes two more keywords: `assumptions`, a
+list of what the negative depends on (the family and check weight, the `n`
+range, the backend and trial depth, how the gate behaved), and `revisit_if`,
+the one concrete change that would make the route worth retrying, in prose,
+in the direction card's register. A negative recorded inside an experiment
+also carries that experiment's `family` and `params`.
+`schema/campaign_summary.schema.json` types the item; all four fields are
+optional, so a bare `{what, detail}` still validates, it just cannot say
+whether its reason still applies.
+
+```python
+led.record_negative(
+    "weight-6 trinomials at n <= 100 do not reach the bar",
+    "120 pairs, 400 numpy trials each: best kd^2/n 6.1 against 8.9",
+    assumptions=["weight-6 BB, trinomial a and b", "n in [40, 100]",
+                 "400 numpy RIS trials per candidate"],
+    revisit_if="a screen that reaches 1e5 trials per candidate, or weight-8 pairs")
+```
+
+`./qldpc negatives` reads them back across every committed summary.
+`--family` finds the negatives about a family (a bare one stands for every
+family its campaign ran), `--param k=v` matches a negative's own `params` as
+a subset, `--match` searches the text, and `--json` hands the rows over as
+data. Run it beside `./qldpc screened` before picking a direction:
+`screened` says a member was tried, `negatives` says why a route was closed
+and what would reopen it.
 
 `abandoned` keeps everything a run produced. Stopping early throws nothing
 away.
@@ -332,6 +361,8 @@ on the way out, so a reporting bug surfaces where the summary is written.
 ```
 qldpc screened --family generalized-bicycle --param ring=Z_341
 qldpc screened --param n_side=5 --param t=3 --json
+qldpc negatives --family generalized-bicycle
+qldpc negatives --match weight-8 --json
 ```
 
 Parameters match as a subset, so a query on the ring alone finds every member

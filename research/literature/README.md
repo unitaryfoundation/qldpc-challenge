@@ -49,9 +49,11 @@ seen" and carries `vN -> vM`.
 | `--batch N` | entries per page (default 100) |
 | `--limit N`, `--full` | rows printed per section (default 10) |
 | `--abstracts` | add the first 400 characters of each abstract |
-| `--dry-run` | poll and print without writing the ledger |
-| `--json` | emit the new and updated rows, with the query, the screen fingerprint and the scan record |
-| `--list [all\|screened-in\|unreviewed\|relevant\|not-relevant\|uncertain]` | read the ledger back without polling |
+| `--dry-run` | poll, review, or record without writing the ledger |
+| `--json` | emit the new and updated rows, with the query, the screen fingerprint and the scan record; with `--list`, the matching rows |
+| `--list [all\|screened-in\|unreviewed\|relevant\|not-relevant\|uncertain\|mechanisms\|untried\|tried]` | read the ledger back without polling |
+| `--mechanism TAG` | with `--review`, a transferable idea the paper carries (repeatable); with `--tried`, the one applied; with `--list`, keep only papers naming a mechanism containing TAG |
+| `--tried ID --where PLACE --outcome TEXT` | record that a mechanism of paper ID was applied here, where, and how it went |
 | `--ledger PATH` | use a different ledger file |
 
 The defaults walk at most 1000 entries per poll. A walk that ends on the page cap
@@ -189,8 +191,9 @@ read there. What stays is 379 bytes a row, so a year of polling is about
 | `tier` | `strong`, `candidate` or `background` |
 | `claimed_params` | parameters the abstract states about its own code, as `n`, `k`, `d` and `comparison`; never a distance, always a claim |
 | `first_seen`, `last_seen` | poll dates; `last_seen` is what the next window is derived from |
-| `review` | the current verdict: `status`, `reason`, `by`, `date`, and the `version` it was formed on |
+| `review` | the current verdict: `status`, `reason`, `by`, `date`, the `version` it was formed on, and `mechanisms` when the reviewer tagged the transferable idea |
 | `reviews` | superseded verdicts, oldest first |
+| `tried` | where a mechanism was applied in this repository: `mechanism`, `where`, `outcome`, `by`, `date`, oldest first; absent until something was tried |
 | `version_history` | present once a row has been seen at more than one version |
 
 A field is written only when it says something. No `review` key means
@@ -202,7 +205,10 @@ gap.
 Two budgets keep it that way, both asserted by `research/test_arxiv_watch.py`:
 a row with no verdict is at most 250 bytes, and a fully reviewed one with a
 reason at its 300-character cap is at most 800. A field added later that puts
-the bulk back fails the suite.
+the bulk back fails the suite. The mechanism tags and the tried records are
+opt-in and capped (60 characters a tag, 120 for where it was tried, 300 for the
+outcome), and a third budget bounds the row that carries them: a reviewed row
+with three tags and one tried record at every cap is at most 1600 bytes.
 
 The ledger is the dedup state, so deleting a row makes its paper new again, and
 editing one by hand is how a bad verdict becomes unexplainable. Change it
@@ -232,6 +238,109 @@ abstract only promised in v1. Recording a new verdict moves the old one into
 State a claim as a claim in the reason. "claims d = 15" is right; a bare `d = 15`
 in a reason is the same error the tool is built to avoid.
 
+A verdict can also name what in the paper transfers:
+
+```
+uv run --frozen python research/arxiv_watch.py --review 2609.30069 \
+    --status relevant \
+    --reason "pair-partition templates; claims [[90,21]] d = 11, admissible and undominated" \
+    --mechanism "pair partition" --mechanism "non-CSS from a CSS template"
+```
+
+A mechanism tag is the idea, not the result: a construction move, a symmetry,
+a way of choosing supports, a reduction, in the words a searcher here would use
+when deciding whether to try it. Tags are free text by design. A vocabulary
+fixed in advance would not match the transfers that turn out to matter, so the
+tool normalizes whitespace and compares case-insensitively and otherwise keeps
+what was typed, up to 60 characters. `--mechanism` alone, with no `--status`,
+restates the standing verdict as a new review that adds the tags, so a tag is a
+review in the history and never an edit of one, and tags accumulate across
+verdicts because a changed verdict does not change what the paper contains.
+
+## Recording what was tried here
+
+ECDSA.fail's most instructive failure (arXiv:2609.09582, the literature-guided
+hypothesis generation practice in its section 4.3.2) is that the architecture
+its best circuits rest on was in print before the challenge began and no agent
+transferred it; implementations appeared only after a later paper spelled out
+the adaptation, and then quickly. Its authors read that as cross-domain
+retrieval and abstraction being the bottleneck rather than implementation. The
+ledger's half of the fix is to make two things visible that a verdict does not
+carry: the mechanism a paper contains, above, and whether anyone here applied
+it. Without the second, a relevant paper whose idea was never tried looks the
+same as one whose idea was tried and did not work.
+
+```
+uv run --frozen python research/arxiv_watch.py --tried 2609.30069 \
+    --mechanism "pair partition" \
+    --where pair-partition-n-le-700 \
+    --outcome "every template at n <= 700 screened below the weight-10 bar at 2M trials"
+```
+
+`--tried` records `{mechanism, where, outcome, by, date}` on the row, under
+`tried`, beside the verdicts and separately from them. `--where` has to be
+something the next reader can open: an issue or PR reference (`#4235` or its
+GitHub URL), a campaign id under `research/campaigns/`, a board slug or its
+`codes/` path, or any committed path such as a fieldnote. A path under
+`research/candidates/` is refused, for the reason `verify/check_prose.py`
+refuses it in a note: the staging tree is gitignored, so a record pointing
+there says nothing a month later. The outcome is a sentence, free text, capped
+at 300 characters, and a claim in it is a claim ("screened below the bar at 2M
+trials", not "d = 9"). A mechanism tried without ever being tagged is accepted
+and noted, and counts as named by the record. Unset is not tried, and that is
+the actionable backlog:
+
+```
+uv run --frozen python research/arxiv_watch.py --list untried        # named, never applied here
+uv run --frozen python research/arxiv_watch.py --list tried          # applied, with the outcome
+uv run --frozen python research/arxiv_watch.py --list mechanisms     # grouped by mechanism
+uv run --frozen python research/arxiv_watch.py --list relevant --mechanism fold
+uv run --frozen python research/arxiv_watch.py --list untried --json  # the rows, for an agent
+```
+
+`--list mechanisms` groups the ledger by mechanism, each paper under it with
+its verdict and either `not tried here` or where it was tried and how it went.
+`--mechanism TAG` with any `--list` kind keeps the papers naming a mechanism
+that contains TAG, matched after the same normalization. All of it reads the
+ledger and nothing else; none of it is a claim about a paper, and a `tried`
+record that says a mechanism worked records that someone said so, not that the
+gate did.
+
+## Transferring a mechanism: the prerequisites pattern
+
+The sources most likely to matter for qLDPC codes are not qLDPC papers:
+classical coding theory (quasi-cyclic and algebraic constructions, product and
+concatenation moves), tensor-network heuristics, and surface-code tricks
+(folds, twists, lattice surgery of the layout rather than of the code). A
+mechanism from one of those domains rarely applies as stated. ECDSA.fail's
+participants found one framing productive (the same section 4.3.2): ask what
+would have to hold for the mechanism to work, then search for the transform
+that establishes it, rather than asking whether the mechanism applies.
+
+Given a mechanism M from domain D (a tagged paper) and a construction family F
+here (the samplers in `../kit/search.py`, the group-algebra and coset builders, the
+planar engine), the prompt has four parts, in order:
+
+1. State M in D's own terms, in two sentences: the object it acts on and what
+   it preserves or improves.
+2. List the prerequisites M needs from its object (a symmetry, a factorization,
+   a commuting pair, a bound on a weight, a cycle structure). Each one is a
+   checkable property, not a vibe.
+3. For each prerequisite, say whether F's codes have it as built, can be given
+   it by a transform the kit already has (a group change, a quotient, a
+   doubling, a graft, a layout), or cannot have it and why. The third answer,
+   written down, is the negative result; record it with
+   `campaign.Ledger.record_negative` so the next session does not repeat it.
+4. When every prerequisite is met or establishable, state what M becomes in F:
+   the constructor, its parameters, and the `(n, k, d)` it predicts. That is a
+   hypothesis for the loop in [`../AUTORESEARCH.md`](../AUTORESEARCH.md), and
+   nothing more until the gate passes it.
+
+Then record the attempt with `--tried`, whatever the outcome. The pattern is a
+prompt for a human or an agent reading the paper; nothing in the tool runs it,
+and a transfer written up this way is still triage until a candidate built from
+it has a `passed: true` verdict beside it.
+
 ## Following a lead
 
 A `relevant` verdict is a reading assignment, not a board change.
@@ -250,6 +359,9 @@ A `relevant` verdict is a reading assignment, not a board change.
    [`../AUTORESEARCH.md`](../AUTORESEARCH.md). Only `passed: true` makes it a
    find. A parameter claim in an abstract never becomes a board entry by being
    quoted.
+4. Record the attempt with `--tried`, naming the campaign, PR, or fieldnote it
+   produced and how it went, so the paper leaves the `--list untried` backlog
+   whether or not it worked.
 
 A published claim that cannot be reconstructed can still be recorded as a
 reference bar in [`../../TRACKS.md`](../../TRACKS.md), which is where the

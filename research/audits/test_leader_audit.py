@@ -469,3 +469,21 @@ def test_decide_is_order_sensitive():
         la.DECISION_INCONCLUSIVE,
         la.EXIT_OK,
     )
+
+
+def test_pair_writes_the_record_the_packaging_paths_consume(monkeypatch, entry, tmp_path):
+    """--json-out is what ./qldpc submit --peer-audit and promote.py read (issue #4236)."""
+    import peer_audit
+
+    peer = _write(tmp_path, "peer.json", 2)   # both claims hold at the stubbed reading
+    monkeypatch.setattr(la, "ris", lambda *a, **k: (WITNESS[0], WITNESS[1], WITNESS[2], 0.0))
+    args = _pair_args(entry, [peer], seeds=(1, 2))
+    args.json_out = str(tmp_path / "out" / "audit.json")
+    rc = la.cmd_pair(args)
+    rec = json.load(open(args.json_out))
+    assert rec["schema"] == peer_audit.AUDIT_SCHEMA
+    assert rec["decision"] == la.DECISION_CREDIBLE and rec["exit_code"] == rc == la.EXIT_OK
+    assert rec["peers"] == [str(peer)] and rec["candidate"] == str(entry)
+    assert (rec["trials"], rec["seeds"], rec["pair_depth"], rec["threads"]) == (2000, [1, 2], 10, 2)
+    assert [r["verdict"] for r in rec["results"]] == [la.VERDICT_HOLDS, la.VERDICT_HOLDS]
+    assert peer_audit.blockers(["[[4,2,2]] w=4 peer.json"], rec, required_trials=2000) == []

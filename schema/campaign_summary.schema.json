@@ -112,7 +112,48 @@
       "minimum": 0
     },
     "negative_results": {
-      "type": "array"
+      "type": "array",
+      "description": "What did not work and why, one item per closed route. what and detail are the finding. assumptions and revisit_if (issue #4233) are what make it reusable: the preconditions the negative depends on, and the concrete change that would make the route worth retrying. A negative without them says a door is closed; with them it says what would open it. family and params say which member of which family it is about, so ./qldpc negatives can answer by family and parameter; record_negative fills them from the open experiment. All four are optional, so earlier summaries still validate.",
+      "items": {
+        "type": "object",
+        "required": [
+          "what",
+          "detail"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "what": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "what the negative depends on, one per item: the construction family, the check weight, the n range, the backend and trial depth, how the gate behaved"
+          },
+          "revisit_if": {
+            "type": "string",
+            "minLength": 1,
+            "description": "the concrete change that would invalidate the negative, in prose, in the direction card's register: a weight-8 non-abelian LP with a seam of length at least 3, a distance backend that reaches depth 20 at 1e6 trials"
+          },
+          "family": {
+            "type": "string",
+            "minLength": 1,
+            "description": "the family tag the negative is about; defaults to the open experiment's"
+          },
+          "params": {
+            "type": "object",
+            "description": "the construction and run parameters the negative is about; defaults to the open experiment's"
+          }
+        }
+      }
     },
     "errors": {
       "type": "array",
@@ -333,6 +374,39 @@
               "minLength": 1,
               "maxLength": 600,
               "description": "The falsifiable content of a failure: what the next session may stop trying."
+            },
+            "non_monotonic": {
+              "type": "object",
+              "required": ["why_worth_starting", "regresses_on", "precondition"],
+              "additionalProperties": false,
+              "description": "Present only when the route is entered knowing its first candidates are worse than the bar on some axis (issue #4237): the statement of what made it worth starting. The stop is abandon_criterion, applied as for any ladder; a non-monotonic route gets no second stopping rule.",
+              "properties": {
+                "why_worth_starting": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "The signal, in a sentence: a lattice of small improvements that all fail the same way, a family whose parameter space is untouched, or a construction that would win only if a specific property held."
+                },
+                "regresses_on": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {"type": "string", "enum": ["n", "k", "d", "w", "kd2_over_n", "geometric_efficiency"]},
+                  "description": "The axes the route's first candidates are expected to be worse on than the bar."
+                },
+                "precondition": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 600,
+                  "description": "What must hold for the route to pay off, as checkable properties, and the transform searched for to establish them."
+                },
+                "base": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "description": "Where the route starts: a board slug, or the [[n,k,d]] of a staged off-frontier intermediate and the campaign whose summary records it under survivors."
+                }
+              }
             }
           }
         }

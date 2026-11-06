@@ -14,7 +14,9 @@ to discard it. The board ranks by Pareto frontier, not by the kd^2/n leader.
 A board-advancing code whose only strict gain over an entry is distance (d, with n,
 k and w no better) needs caution, not rejection. Both distances are upper bounds, so
 such a gain is where inflated bounds show up. Re-measure the peer and the candidate
-at matched depth (`research/audits/leader_audit.py pair`) before submitting it.
+at matched depth (`research/audits/leader_audit.py pair --json-out <file>`) before
+submitting it; `./qldpc submit --peer-audit <file>` and `research/kit/promote.py`'s
+`evidence.peer_audit` take that record and refuse a d-only gain without it.
 
 Dominated codes pass the gate but are not board-advancing. Record them as non-frontier
 results; do not submit them as frontier codes.

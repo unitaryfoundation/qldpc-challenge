@@ -1,0 +1,6158 @@
+{
+  "aborted_experiments": 0,
+  "authority": "candidates listed here passed verify/validate_candidate.py; nothing here is a board entry until a human reviews and submits it",
+  "budget": {
+    "consumed": {
+      "candidates_screened": 900,
+      "walltime_hours": 0.221
+    },
+    "declared": {
+      "candidates_screened": 20000,
+      "walltime_hours": 2
+    },
+    "remaining": {
+      "candidates_screened": 19100,
+      "walltime_hours": 1.779
+    }
+  },
+  "campaign_id": "cc-stabilizer-parents-2026-11-05",
+  "campaign_name": "code-calculus moves on stabilizer parents (issue #4478, direction 1)",
+  "contract_hash": null,
+  "direction": {
+    "abandon_criterion": {
+      "flat_fresh_rungs": 2,
+      "note": "one screen depth; a survivor is gated, not deepened, in this probe",
+      "trials_cap": 1000
+    },
+    "bar": {
+      "axes": [
+        "k",
+        "d"
+      ],
+      "note": "the stabilizer entry with the best kd^2/n at n <= 40; the stabilizer board ranks apart from the CSS board",
+      "slug": "40-9-6"
+    },
+    "budget": {
+      "candidates_screened": 20000,
+      "trials_per_candidate": 1000,
+      "walltime_hours": 2
+    },
+    "cell": "unrestricted~weight-any",
+    "expected_value": "A nondominated stabilizer child at d >= 3 would show that the calculus's moves transfer beyond CSS presentations and give the stabilizer board, which carries no certified distance, a frontier point with an auditable parent.",
+    "family": "other",
+    "feasibility": "54 stabilizer parents at n <= 40; a Pauli-weight RIS screen at 1000 trials reads a child in well under a second at these sizes, the gate accepts stabilizer documents, and the board's stabilizer entries all carry layouts or none, so children inherit what their parent has.",
+    "hypothesis": "Single-step symplectic moves (delete a generator, puncture a qubit, peel a qubit with one of its generators) on the board's stabilizer entries with n <= 40 reach stabilizer-board frontier points that code-calculus v0.1's CSS-only moves cannot express.",
+    "novelty": {
+      "against": "the stabilizer board's 226 entries, mostly codetables.de additive codes read as symplectic rows",
+      "claim": "a stabilizer code one symplectic move from a board stabilizer entry, nondominated on the stabilizer board"
+    },
+    "what_a_negative_would_teach": "That one deletion, puncture, or peel from a stabilizer entry with n <= 40 lands only on dominated points or at d <= 2, so the stabilizer board's small-n frontier is not reachable by its own entries' single-step children and a symplectic extension of the calculus would need depth or a different move set to pay."
+  },
+  "errors": [],
+  "experiments": [
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 4 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 5,
+        "parent": "5-1-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.1180559845848216e-08
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 5,
+        "parent": "5-1-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.6388928138961395e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 4 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "E-PEEL",
+        "n": 5,
+        "parent": "5-1-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.5161074568620987e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 4 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 5,
+        "parent": "5-1-3-b"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.483890193618006e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 4 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 5,
+        "parent": "5-1-3-b"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.192222245865398e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 4 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 1,
+        "move": "E-PEEL",
+        "n": 5,
+        "parent": "5-1-3-b"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.1527780012951955e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 2,
+        "move": "C-DELETE-CHECK",
+        "n": 8,
+        "parent": "8-2-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.8011143311030335e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 8 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 8,
+        "parent": "8-2-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.9327772962343363e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 2,
+        "move": "E-PEEL",
+        "n": 8,
+        "parent": "8-2-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.2616672190941043e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 8 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 2,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 8,
+        "parent": "8-3-2-mirror"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.847227733582258e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "5 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 5 screened at 1000 Pauli RIS trials, 5 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "C-DELETE-CHECK",
+        "n": 8,
+        "parent": "8-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 5,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.939721323653228e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "2 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 2 screened at 1000 Pauli RIS trials, 2 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 8,
+        "parent": "8-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 2,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.0369447560773957e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "5 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 5 screened at 1000 Pauli RIS trials, 5 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PEEL",
+        "n": 8,
+        "parent": "8-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 5,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.1688906751159164e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 2,
+        "move": "C-DELETE-CHECK",
+        "n": 10,
+        "parent": "10-2-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.1133337567249933e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 10,
+        "parent": "10-2-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.2038880312401387e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 2,
+        "move": "E-PEEL",
+        "n": 10,
+        "parent": "10-2-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.872181918679012e-10
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 5,
+        "move": "C-DELETE-CHECK",
+        "n": 11,
+        "parent": "11-5-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.222222974523902e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 5,
+        "move": "E-PUNCTURE",
+        "n": 11,
+        "parent": "11-5-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.0997205713970794e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 5,
+        "move": "E-PEEL",
+        "n": 11,
+        "parent": "11-5-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.408380042761564e-10
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "9 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 9 screened at 1000 Pauli RIS trials, 9 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "C-DELETE-CHECK",
+        "n": 12,
+        "parent": "12-3-3-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 9,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.3958354075956675e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "10 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 10 screened at 1000 Pauli RIS trials, 10 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 12,
+        "parent": "12-3-3-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 10,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.060001457317008e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 8 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PEEL",
+        "n": 12,
+        "parent": "12-3-3-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.307780621573329e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "C-DELETE-CHECK",
+        "n": 12,
+        "parent": "12-4-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.1827787299536998e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "E-PUNCTURE",
+        "n": 12,
+        "parent": "12-4-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0013391826736106952
+      },
+      "survivors": 4,
+      "verdict": "passed",
+      "verified_kd2_over_n": 4.090909090909091
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "8 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 8 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "E-PEEL",
+        "n": 12,
+        "parent": "12-4-4"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 8,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.175826618137459e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (12 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 13,
+        "parent": "13-1-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 5,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.000345280948895379
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "12 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 12 screened at 1000 Pauli RIS trials, 12 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 13,
+        "parent": "13-1-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 12,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.5508299434764518e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "11 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 11 screened at 1000 Pauli RIS trials, 11 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "C-DELETE-CHECK",
+        "n": 14,
+        "parent": "14-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 11,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.9861095956423216e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "12 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 12 screened at 1000 Pauli RIS trials, 12 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 14,
+        "parent": "14-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 12,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.956116951381167e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 3,
+        "move": "E-PEEL",
+        "n": 14,
+        "parent": "14-3-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.0994457018872101e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "6 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 6 screened at 1000 Pauli RIS trials, 6 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 10,
+        "move": "C-DELETE-CHECK",
+        "n": 16,
+        "parent": "16-10-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 6,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.372503836846186e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 10,
+        "move": "E-PUNCTURE",
+        "n": 16,
+        "parent": "16-10-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.1688906751159164e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 10,
+        "move": "E-PEEL",
+        "n": 16,
+        "parent": "16-10-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.986091077327729e-10
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "14 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 14 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 2,
+        "move": "C-DELETE-CHECK",
+        "n": 16,
+        "parent": "16-2-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 14,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.615828028259178e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "16 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 16 screened at 1000 Pauli RIS trials, 16 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 16,
+        "parent": "16-2-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 16,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.175834702534808e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 2,
+        "move": "E-PEEL",
+        "n": 16,
+        "parent": "16-2-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.2383356483446227e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "12 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 12 screened at 1000 Pauli RIS trials, 12 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "C-DELETE-CHECK",
+        "n": 16,
+        "parent": "16-4-4-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 12,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.6574945422924226e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "16 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 16 screened at 1000 Pauli RIS trials, 16 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "E-PUNCTURE",
+        "n": 16,
+        "parent": "16-4-4-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 16,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.268611246512996e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "4 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 4 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 4,
+        "k": 4,
+        "move": "E-PEEL",
+        "n": 16,
+        "parent": "16-4-4-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 4,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0014600895369464221
+      },
+      "survivors": 4,
+      "verdict": "passed",
+      "verified_kd2_over_n": 2.4
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (16 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 17,
+        "parent": "17-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 7,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.00037204351861469656
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "16 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 16 screened at 1000 Pauli RIS trials, 16 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 17,
+        "parent": "17-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 16,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.7941622192867928e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (17 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 18,
+        "parent": "18-1-6"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 6,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0004007055091723386
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "17 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 17 screened at 1000 Pauli RIS trials, 17 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 18,
+        "parent": "18-1-6"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 17,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.0138880548377833e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "17 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 17 screened at 1000 Pauli RIS trials, 17 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 18,
+        "parent": "18-2-5-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 17,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.4305578942100208e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "17 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 17 screened at 1000 Pauli RIS trials, 17 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 18,
+        "parent": "18-3-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 17,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.3030507792201308e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "19 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 19 screened at 1000 Pauli RIS trials, 19 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 20,
+        "parent": "20-2-6-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 19,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 4.189722757372591e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "19 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 19 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 20,
+        "parent": "20-3-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 19,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.010024875462776334
+      },
+      "survivors": 19,
+      "verdict": "passed",
+      "verified_kd2_over_n": 2.3684210526315788
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "19 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 19 screened at 1000 Pauli RIS trials, 19 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 4,
+        "move": "E-PUNCTURE",
+        "n": 20,
+        "parent": "20-4-5"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 19,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 4.745282543202241e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (20 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 21,
+        "parent": "21-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 7,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.000528650937493593
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "20 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 20 screened at 1000 Pauli RIS trials, 20 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 21,
+        "parent": "21-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 20,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.794170303684142e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (22 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 23,
+        "parent": "23-1-7-cyclic"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 7,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0005719587500061607
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "22 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 22 screened at 1000 Pauli RIS trials, 22 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 23,
+        "parent": "23-1-7-cyclic"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 22,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.0833411124638387e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (24 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 25,
+        "parent": "25-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 7,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0009321419675042206
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "24 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 24 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 25,
+        "parent": "25-1-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 24,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.453606511052284e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "25 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 25 screened at 1000 Pauli RIS trials, 25 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 8,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 26,
+        "parent": "26-2-8"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 25,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.171387814088828e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "26 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 26 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 27,
+        "parent": "27-2-6"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 26,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.014660902557774939
+      },
+      "survivors": 26,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.3846153846153846
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "26 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 26 screened at 1000 Pauli RIS trials, 26 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 5,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 27,
+        "parent": "27-3-5-cyclic"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 26,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 9.664444304588769e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "26 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 26 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 27,
+        "parent": "27-3-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 26,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.015652601388889405
+      },
+      "survivors": 26,
+      "verdict": "passed",
+      "verified_kd2_over_n": 4.3076923076923075
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "27 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 27 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 3,
+        "move": "E-PUNCTURE",
+        "n": 28,
+        "parent": "28-3-6"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 27,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.01886712221056061
+      },
+      "survivors": 27,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.6666666666666667
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "27 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 27 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 6,
+        "k": 4,
+        "move": "E-PUNCTURE",
+        "n": 28,
+        "parent": "28-4-6"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 4,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 27,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.016893537939726633
+      },
+      "survivors": 27,
+      "verdict": "passed",
+      "verified_kd2_over_n": 4.148148148148148
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (28 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 9,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 29,
+        "parent": "29-1-9-cyclic"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 9,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.000797506076390467
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "28 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 28 screened at 1000 Pauli RIS trials, 28 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 9,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 29,
+        "parent": "29-1-9-cyclic"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 28,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.9558259130765995e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "1 distinct children (30 duplicates folded), 0 pruned as dominated at the parent's d, 1 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 9,
+        "k": 1,
+        "move": "C-DELETE-CHECK",
+        "n": 31,
+        "parent": "31-1-9"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 9,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 1,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.0008544482177724906
+      },
+      "survivors": 0,
+      "verdict": "duplicate"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "30 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 30 screened at 1000 Pauli RIS trials, 30 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 9,
+        "k": 1,
+        "move": "E-PUNCTURE",
+        "n": 31,
+        "parent": "31-1-9"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 30,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.1527780012951955e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "7 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 7 screened at 1000 Pauli RIS trials, 7 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 25,
+        "move": "C-DELETE-CHECK",
+        "n": 32,
+        "parent": "32-25-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 7,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 4.74555741271211e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 25,
+        "move": "E-PUNCTURE",
+        "n": 32,
+        "parent": "32-25-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 2.141112215920455e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "3 distinct children (0 duplicates folded), 0 pruned as dominated at the parent's d, 3 screened at 1000 Pauli RIS trials, 3 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 3,
+        "k": 25,
+        "move": "E-PEEL",
+        "n": 32,
+        "parent": "32-25-3"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 3,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 1.2152789471050104e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "32 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 32 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 8,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 33,
+        "parent": "33-2-8"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 32,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.02229088284722012
+      },
+      "survivors": 32,
+      "verdict": "passed",
+      "verified_kd2_over_n": 1.6875
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "33 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 33 screened at 1000 Pauli RIS trials, 33 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 34,
+        "parent": "34-2-7-s"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 33,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 7.048608191932241e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "33 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 33 screened at 1000 Pauli RIS trials, 33 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 9,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 34,
+        "parent": "34-2-9"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 2,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 33,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 3.483607239710788e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "37 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 37 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 10,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 38,
+        "parent": "38-2-10"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 5,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 37,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.030591922916670834
+      },
+      "survivors": 37,
+      "verdict": "passed",
+      "verified_kd2_over_n": 4.72972972972973
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "37 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 37 screened at 1000 Pauli RIS trials, 37 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 8,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 38,
+        "parent": "38-2-8"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 1,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 37,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 8.47222205872337e-09
+      },
+      "survivors": 0,
+      "verdict": "not_run"
+    },
+    {
+      "contract_hash": null,
+      "family": "other",
+      "mode": "novel_generation",
+      "note": "38 distinct children (1 duplicates folded), 0 pruned as dominated at the parent's d, 38 screened at 1000 Pauli RIS trials, 0 nondominated at the screen but at d <= 2 and not gated",
+      "params": {
+        "d": 7,
+        "k": 2,
+        "move": "E-PUNCTURE",
+        "n": 39,
+        "parent": "39-2-7"
+      },
+      "screened": {
+        "backend": "numpy",
+        "d": 3,
+        "trials": 1000
+      },
+      "seed": 7,
+      "spent": {
+        "candidates_screened": 38,
+        "cpu_hours": 0,
+        "gpu_hours": 0,
+        "walltime_hours": 0.030138625300832146
+      },
+      "survivors": 38,
+      "verdict": "passed",
+      "verified_kd2_over_n": 0.9473684210526315
+    }
+  ],
+  "frontier_advances": 176,
+  "negative_results": [
+    {
+      "detail": "0 of the board's 226 stabilizer entries are CSS up to a local Clifford (the verifier refuses such submissions as CSS codes in disguise), so the library's CodeState cannot load any of them; the moves here are symplectic analogs written for this probe",
+      "what": "stabilizer parents are outside code-calculus v0.1's state model"
+    },
+    {
+      "detail": "1259 moves enumerated, 70 children nondominated at the screen but at d <= 2 (not gated, by design), 0 children with d >= 3 passed the gate, none of them nondominated on the stabilizer board",
+      "what": "C-DELETE-CHECK on stabilizer parents with n <= 40: no board-advancing child at d >= 3"
+    }
+  ],
+  "objective": {
+    "direction": "maximize",
+    "metric": "kd2_over_n"
+  },
+  "params": {},
+  "report": null,
+  "required_outputs": [],
+  "retracted": [],
+  "run_contract": null,
+  "screen_quality": [
+    {
+      "family": "other",
+      "note": "undefined: the rows carry no spread in the screen or in the verdict",
+      "pairs": 10,
+      "spearman": null
+    }
+  ],
+  "snapshot": {
+    "branch": "cc-v01-exploration",
+    "diff_sha256": "6b2f247892d45ea94477562c240df6090e4c952748ee13a07483f40de63bc7ef",
+    "dirty": true,
+    "head": "3441d963d7ed25cad54dad55766bfb78db3b1aa4",
+    "untracked_count": 6
+  },
+  "status": "completed",
+  "stopped_by": {
+    "detail": "still running",
+    "type": null
+  },
+  "summary_version": 1,
+  "survivors": [
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "4beb5073be9c97f9",
+      "k": 5,
+      "labels": [
+        "advances the weight-8 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 11,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "f298303ba37d03c7",
+      "k": 5,
+      "labels": [
+        "advances the weight-8 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 11,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "ab1216dd2d2fa799",
+      "k": 5,
+      "labels": [
+        "advances the weight-8 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 11,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "6750a109d26083c4",
+      "k": 5,
+      "labels": [
+        "advances the weight-8 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 11,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "unrestricted"
+      ],
+      "d": 3,
+      "fingerprint": "68e781dddeabee15",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x unrestricted stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 15,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "unrestricted"
+      ],
+      "d": 3,
+      "fingerprint": "791692b0cf4c0db1",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x unrestricted stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 15,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "unrestricted"
+      ],
+      "d": 3,
+      "fingerprint": "30673fc2320a4377",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x unrestricted stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 15,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "unrestricted"
+      ],
+      "d": 3,
+      "fingerprint": "3bc6ce144127afa5",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x unrestricted stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 15,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "0b2a5e918d96c7ae",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "e63785a0dd39340a",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "c89613fdf277df2a",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "5610225705f8e338",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "eac40760c6596b71",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "2aac693e0ef0da1b",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "f774f3ae49724730",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "3e1ae8eb625010cf",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "8a3f1f240bd928b9",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "2a29f624c0765997",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "622f27c9795bbfa3",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "46c97996bef7143f",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "ad07177adc5d6408",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "6e5c243021dae99f",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "417259166e636458",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "0221c9995a0c4f76",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "41dc534cdcdff950",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "6c6f09cbd48f2a22",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-single"
+      ],
+      "d": 3,
+      "fingerprint": "450e54d6af832941",
+      "k": 5,
+      "labels": [
+        "advances the weight-6 x local-2d-single stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 19,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "df3cc25ac1d22b43",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "f45ce42bf7f1977e",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "edc6a931f0564198",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "8aadc07655a6a10d",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "25ea577123719b6a",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7efaeef146315994",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "d2763ab338b3b6e6",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ac7dd5b8232210a9",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "21a8e70f2e84977c",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "2d7b44dfa673651a",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0b6660448de8c22a",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ef397bbcb27b360c",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1e436f9c434645e0",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0018ec13f1c700ff",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1d3cc5829319f118",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "8c61ef518280fb12",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "79aed3fad86fdd28",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "4549db4cd0d56240",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "9bcbf4c20438c804",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "e091637fc8ace180",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "16790b126cdde8ae",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "97aff8c2a8ba9f34",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "f196f52bab8e993e",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "8e8435fe44e58db2",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5635c62f58a7c780",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "94eecaa24212e95d",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "b0e4fb918cb602a2",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "6934c16dba373e8e",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "23a4f785df07793f",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "bcc6c65b46aebc26",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "fab914c981c1dd16",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "6f00332002ec7cd8",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "10497e8a61a7503d",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "4d1b27576069ba5b",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "f560962220d3efc0",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "4e3d42cd5030ff30",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "0f58079afd011145",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "690a1acffb12edd7",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "562a14d2b1ea1f1f",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "590a459bcdafbd84",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "66348ef319565f47",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "9ebf291ec1074ff3",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "4955a5e6a1df076f",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "0c812e03a3a19221",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "553626a7f4a3b7fa",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "3bce91d977b27a94",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "84b8dc8282b9d2de",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "6d7be0fa9bb64864",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "5e66ea716486a369",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "c7f4a7778140a81e",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "964a4bc68843e289",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "f88e51b708802ceb",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 26,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7882c1a75df7eb9e",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "c240974749e98945",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5fad3ac175a71521",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "21f0e4233dfe6ba1",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ac86cc4e0d60e3e5",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "b7c7a3095c4145a1",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "756f1549984e2537",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "be436cfa3509df62",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0be0b428646a2606",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "3405d671f4533bb4",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "929d9e1ba83d5c18",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "bb88d910b922b93c",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "a6d2f284c3443024",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "288291b08b0561d1",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "b0dcf6929ae092d3",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "e5dab0652aad72d0",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5e2ef1f9158a67bd",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "74e7cf58dd9078f3",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "674ce6469d17eca2",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1e4bcb1e7672b8ad",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "4b2f43b250d6c05b",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ef75ccec4fabf898",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "2a6a47fcda907b54",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5fbc713c6c728bea",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "780c6ddc0707b21b",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "9f906cbeec93ba24",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "aae179884954521e",
+      "k": 5,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[25,5,3]] w=6 25-5-3-cyclic.json; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "302352ad33a4408a",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "ed4c831ecbdccd9e",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "8085c13573c8763a",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "79ea608a876b87b1",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "b7010fd53463cd79",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "0354d7bb4ad98a49",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "d6c944fa3b33ed1a",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "c90faf78e4b0d5c0",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "383663f83b14d0e9",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "224cf6bd96055064",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "6774bed6d46041a2",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "138ccc59c6d973f7",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "3c7ecaecda5cd260",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "dd44ecb07a5a0e05",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "96b0c49e63a72397",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "00407525dd634882",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "7412f0b0ba36106c",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "2c544528202a4e72",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "89b72321a0c7742e",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "d448fcbe298d0535",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "6cf6e4b2848c4afb",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "12801a244e669362",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "c08675f3024f4e15",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "22b4d751ea8be530",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "38cadb47ae552321",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "783ef387e49aa573",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 4,
+      "fingerprint": "cef297dd9a1f7690",
+      "k": 7,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 27,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "b497954d7166f89c",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "d9f3207bb633120c",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0de087c383af7b6f",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1aaf280d78b80b17",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "bc334ce228ba33bf",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "3028c700038b4320",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "cf1b89e00381ec82",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "efb9ecdf00b7cb0c",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0c2dd347abb52c43",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "27aebe13a8f9035d",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7fa8d89ea3a6075e",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "a6ef56411b5928b5",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "801f8c49648eebae",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "a246295439923ae1",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "494b6f35327897f1",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1426ef54b692e2a6",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0ccbce65b533d7ba",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "63ec2d852ecf2c65",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "c9be035fa1f17d53",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "83a21d6f230fd2a7",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "f333de2ef7a14726",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "b34b799b4ae658f3",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7814ba119d4be91f",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ff25baaa80a8c15c",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "3a949d66f023d505",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "062657937bc01528",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "e737d707b9da28a5",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7efe990d849e0b20",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "03ee0082d55bd2e6",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "92ad7b74af90585a",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7493d164874e5514",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "a308b9310be0136a",
+      "k": 6,
+      "labels": [
+        "advances the weight-8 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 32,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "90b1a573d1d6cc6b",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "9f0a52f0994bdcc3",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "4573d460f7a0836b",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "8d2042dc9589ae65",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "e367e546d7bc2290",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "ec7672d4205cce52",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "252e1a9951f5101e",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "2935f2e018717ce9",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "93a73a5390bb7c31",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "3382cbf0658d5937",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "a845e2a28c4bf111",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "b558a0ccf7e4cd3d",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "41669c1ccd351546",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "d0b95a890d083026",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "8e8f3a5a989b82c6",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "39c3acc26c180176",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "9775e6bfefb621a2",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "0621025f1cb56193",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "e5a06d604d703496",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "7f89ae56cb6a8136",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "f20859217de84757",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "f25bfb2038b52ade",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "dc016439c06e184f",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "aeea0a5419e5f426",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "b179751d767bc972",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "e23d8ddf7f39cfb5",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "b9893aa18cfcd295",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "71dc52101723f6a7",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "13d2a0e1c29983de",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "4edebf046a3b8994",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "732c841e05c76132",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "b8cd663dd8ededdb",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "400ca4a47de314f6",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "36c7e8c74a1fd6c8",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "32a59a2bd812ae19",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "df3c019a79617011",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": false,
+      "board_advancing": false,
+      "cell": [
+        "weight-8",
+        "local-2d-bilayer"
+      ],
+      "d": 5,
+      "fingerprint": "73eaf3e87195f517",
+      "k": 7,
+      "labels": [
+        "not board-advancing stabilizer: dominated by [[30,7,5]] w=8 30-7-5.json and 1 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 37,
+      "weight_class": "weight-8"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "621076726f76fc81",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "bbcfaa3a3d1748e8",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "d46cee51cb8ec94d",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1e1a949d1191b95c",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "556a3af6e44087d0",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "aad20b9595d83221",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "93ee7e32d910a78f",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7746bddda927e7c2",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "57b49701c91b6a67",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "354c2c597f0d7cf8",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1b45288fb111b014",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "9ed3571644fe966f",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "3513d6503698fae9",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "6f4a7fc6db326f0d",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "bb962982bdbec52e",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "fa23ff44ed83dfd3",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "525cf97de048084b",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "1cc7dabc6569cfbd",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5a910b5428e8116f",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "6074e05741ea4063",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "92d48cf7d2da4ee3",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "f3064b9a17b25a2b",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "23ff9ee87c408544",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "e2cb4c69a6a010bb",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "934ea189673092df",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ce9125966a7f35b9",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "cddfd696ce7a568f",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "b14cabf0ed106a84",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "ec99ed50011b7d02",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "5644d6bad4107408",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "a78b406bcae2f44c",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "cf6e4220b7777c80",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "7c45d37cd15bff63",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "6b1f94ac21ae7500",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "191d42e4ae45d1df",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "eec6204b9b57db0b",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "13c6cc73ff9df8bc",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    },
+    {
+      "advanced_frontier": true,
+      "board_advancing": true,
+      "cell": [
+        "weight-6",
+        "local-2d-bilayer"
+      ],
+      "d": 3,
+      "fingerprint": "0f8720e6dae6c773",
+      "k": 4,
+      "labels": [
+        "advances the weight-6 x local-2d-bilayer stabilizer board",
+        "literature novelty UNVERIFIED"
+      ],
+      "n": 38,
+      "weight_class": "weight-6"
+    }
+  ]
+}
