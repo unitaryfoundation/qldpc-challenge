@@ -415,8 +415,7 @@ def write_tightenings(record, out_dir, *, by, record_name):
         if new is None:
             continue
         with open(os.path.join(out_dir, e["slug"] + ".json"), "w", encoding="utf-8") as f:
-            json.dump(new, f, indent=2)
-            f.write("\n")
+            f.write(json.dumps(new, indent=1) + "\n")     # the board's canonical form (verify/check_codes_format.py)
         written.append(e["slug"])
     return written
 
