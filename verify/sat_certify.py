@@ -47,6 +47,16 @@ every Z-logical. Pairing against X-logicals instead admits stabilizers as
 "solutions", and the giveaway was a reported weight-9 logical on a code whose
 checks have weight 9.
 
+With ``ladder`` (issue #4230) the same question is asked at W = 1, 2, ...
+up to d - 1 rather than at d - 1 alone. UNSAT at W is the theorem d >= W + 1
+whatever happens above it, so a ladder that times out still leaves a proven
+lower bound, recorded per side as ``proved_min`` and overall as ``d_lower``;
+the exact certificate is the case d_lower = d. Cost grows steeply with W
+(roughly 3-5x per rung on board entries), so the ladder ascends and stops at
+the first timeout rather than searching. The proof path runs per rung, and a
+partial certificate at proof_log carries the hash of each side's top UNSAT
+rung, which the replay regenerates at that side's proved_min - 1.
+
 The pairing set itself is the other half of that, and got this wrong for
 longer. It has to span all k logical classes. A set that misses a class
 cannot constrain the operators in it, so a logical lighter than the claim
@@ -374,22 +384,71 @@ def prove_side(H_opp, L, W, outdir, tag, *, tlim=600, keep_proof=False):
     return rec
 
 
-def certify(doc, tlim=600, proof_dir=None, slug=None):
+def _rung(H_opp, L, W, tlim, sym, proof_dir, tag):
+    """Ask one side's question at one weight, on both emitters when asked.
+
+    Returns ``(status, witness, proof_record, settled)``. ``proof_record`` is
+    None without ``proof_dir``; ``settled`` says the XOR path timed out and
+    the checked pure-CNF refutation decided the rung.
+    """
+    status, wit = _solve_side(H_opp, L, W, tlim, use_symmetry=sym)
+    pr, settled = None, False
+    if proof_dir is not None:
+        pr = prove_side(H_opp, L, W, proof_dir, tag, tlim=tlim)
+        # The two emitters answer the same question. A real disagreement is
+        # a bug in one of them and is reported rather than averaged. A
+        # timeout is not a verdict, so it is not a disagreement: the XOR
+        # path running out of budget where the proof path finishes is the
+        # proof path being faster, which on this encoding it sometimes is.
+        verdicts = {"SAT", "UNSAT"}
+        if (pr.get("status") in verdicts and status in verdicts
+                and pr["status"] != status):
+            raise ValueError(
+                f"W = {W}: the XOR encoding says {status} and the pure-CNF "
+                f"encoding says {pr['status']}; one of the two is wrong and "
+                f"neither verdict is usable until that is found")
+        # A refutation drat-trim has checked is stronger evidence than the
+        # incumbent path produces, so it settles a rung the incumbent left
+        # open rather than being discarded for not matching it.
+        if pr.get("proved") and status == "TIMEOUT":
+            status, settled = "UNSAT", True
+    return status, wit, pr, settled
+
+
+def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
+            budget=None, start=1):
     """Certify a submission doc's distance exactly, mirroring certify.certify.
 
     Returns per-side ``exact`` flags and an overall ``d_exact``. A SAT result
     means the claim is refuted and carries the witness that refutes it; a
-    timeout proves nothing and leaves the entry at its upper bound.
+    timeout at W = d - 1 proves nothing about exactness.
+
+    With ``ladder`` the question is asked at W = ``start``, ``start`` + 1, ...
+    up to d - 1 instead of at d - 1 alone, and each side stops at its first
+    timeout, at a refutation, or once ``budget`` seconds have gone into it
+    (issue #4230). UNSAT at W is the theorem d >= W + 1 whatever happens
+    above it, so the record then carries per side ``proved_min`` and the
+    ``ladder`` of rungs, and overall ``d_lower`` = min over sides, which is
+    d exactly when ``d_exact``. ``start`` above 1 resumes a ladder a
+    previous run left at ``start`` - 1 without re-proving the rungs below.
+    A partial record (``d_exact`` false, ``d_lower`` >= 2) is bound to the
+    entry's matrices by ``verification.checks_sha256`` so that a later
+    correction of the claim cannot strand it. Without ``ladder`` the record
+    is exactly what this function produced before.
     """
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
     d = int(doc["distance"]["d"])
-    W = d - 1
     k = n - gf2.rank(HX) - gf2.rank(HZ)
     out = {"name": doc.get("name"), "d": d, "solver": "CryptoMiniSat 5.14 SAT",
            "encoding": "selector", "sides": {}, "tlim_per_solve": tlim,
            "logical_classes": int(k)}
+    rungs = list(range(max(1, int(start)), d)) if ladder else [d - 1]
+    if not rungs:
+        rungs = [d - 1]
+    if ladder:
+        out["ladder"] = {"start": rungs[0], "budget_per_side": budget}
     # Symmetry breaking is applied only when the rotation is checked to fix
     # both row spaces, so a non-circulant entry degrades to the plain encoding
     # instead of being pruned by a constraint that does not hold for it.
@@ -404,58 +463,78 @@ def certify(doc, tlim=600, proof_dir=None, slug=None):
         # is not enough: a row lying in the rowspace it was reduced against
         # is a stabilizer and constrains nothing, which is exactly how this
         # failed before. L is ker(H_same) modulo rowspace(H_opp), so H_opp is
-        # what it has to be independent of.
+        # what it has to be independent of. The check holds at every rung:
+        # an UNSAT from a deficient pairing set is as meaningless at W = 5
+        # as at W = d - 1.
         spanned = (gf2.rank(np.vstack([H_opp, L])) - gf2.rank(H_opp)
                    if len(L) else 0)
         if spanned != k:
             raise ValueError(
                 f"{side} side: pairing set spans {spanned} of {k} logical "
                 f"classes, so UNSAT here would not mean no light logical")
-        status, wit = _solve_side(H_opp, L, W, tlim, use_symmetry=sym)
-        blk = {"value": d, "exact": status == "UNSAT",
-               "status": status, "secs": round(time.time() - t0, 1)}
+        history, proved, decider, last_pr = [], 1, None, None
+        status, wit, stopped_at = None, None, None
+        for W in rungs:
+            if budget is not None and history and time.time() - t0 > budget:
+                stopped_at = W
+                break
+            tag = (f"{n}-{k}-{d}-{side}-W{W}" if ladder
+                   else f"{n}-{k}-{d}-{side}")
+            r0 = time.time()
+            status, wit, pr, settled = _rung(H_opp, L, W, tlim, sym,
+                                             proof_dir, tag)
+            rung = {"W": W, "status": status,
+                    "secs": round(time.time() - r0, 1)}
+            if pr is not None:
+                rung["proof"] = ("verified" if pr.get("proved")
+                                 else pr.get("detail") or pr.get("status") or "?")
+                if (pr.get("cnf") or {}).get("sha256"):
+                    # Which formula this rung refuted, so a raised ladder
+                    # can carry the rung's proof forward without the block.
+                    rung["cnf_sha256"] = pr["cnf"]["sha256"]
+                if settled:
+                    rung["note"] = ("the XOR encoding timed out and the "
+                                    "checked pure-CNF refutation settled it")
+            history.append(rung)
+            last_pr = pr
+            if status != "UNSAT":
+                break
+            proved, decider = W + 1, pr
+        blk = {"value": d, "exact": proved >= d, "status": status,
+               "secs": round(time.time() - t0, 1)}
+        if ladder:
+            blk["proved_min"] = proved
+            blk["ladder"] = history
         if proof_dir is not None:
-            tag = f"{n}-{k}-{d}-{side}"
-            pr = prove_side(H_opp, L, W, proof_dir, tag, tlim=tlim)
-            # The two emitters answer the same question. A real
-            # disagreement is a bug in one of them and is reported rather
-            # than averaged. A timeout is not a verdict, so it is not a
-            # disagreement: the XOR path running out of budget where the
-            # proof path finishes is the proof path being faster, which on
-            # this encoding it sometimes is.
-            verdicts = {"SAT", "UNSAT"}
-            if (pr.get("status") in verdicts and status in verdicts
-                    and pr["status"] != status):
-                raise ValueError(
-                    f"{side} side: the XOR encoding says {status} and the "
-                    f"pure-CNF encoding says {pr['status']}; one of the two "
-                    f"is wrong and neither verdict is usable until that is "
-                    f"found")
-            # A refutation drat-trim has checked is stronger evidence than
-            # the incumbent path produces, so it settles a side the
-            # incumbent left open rather than being discarded for not
-            # matching it.
-            if pr.get("proved") and status == "TIMEOUT":
-                blk["exact"] = True
-                blk["status"] = "UNSAT"
-                blk["note"] = (f"no logical < {d} exists; the XOR encoding "
-                               f"timed out and the checked pure-CNF "
-                               f"refutation settled it")
-                status = "UNSAT"
-            blk["proof"] = pr
+            # The proof the side rests on is the top UNSAT rung's; with no
+            # UNSAT rung the record keeps the last attempt's, which says why.
+            blk["proof"] = decider if decider is not None else last_pr
         if status == "UNSAT":
-            blk["note"] = f"no logical < {d} exists"
+            blk["note"] = f"no logical < {proved} exists"
+            if stopped_at is not None:
+                blk["note"] += (f"; the {budget:g} s budget was spent before "
+                                f"W = {stopped_at}")
         elif status == "SAT":
-            blk["note"] = f"REFUTED: logical of weight <= {W} exists"
+            blk["note"] = f"REFUTED: logical of weight <= {history[-1]['W']} exists"
             blk["witness"] = wit
+        elif proved > 1:
+            blk["note"] = (f"no logical < {proved} exists; W = "
+                           f"{history[-1]['W']} {status}")
         out["sides"][side] = blk
         if status == "SAT":
             break
     out["d_exact"] = all(b.get("exact") for b in out["sides"].values()) \
         and len(out["sides"]) == 2
-    if proof_dir is not None:
+    if ladder:
+        out["d_lower"] = min(b["proved_min"] for b in out["sides"].values())
+    if proof_dir is not None or ladder:
         out["verification"] = _verification_block(
             out, slug=slug or f"{n}-{k}-{d}")
+        if ladder and not out["d_exact"]:
+            # A partial certificate is about these matrices, whatever the
+            # entry claims later; the hash is what the site honors it by.
+            from check_certs import checks_sha256
+            out["verification"]["checks_sha256"] = checks_sha256(doc)
     return out
 
 
@@ -468,15 +547,21 @@ def _verification_block(out, *, slug=None):
     """Decide the certificate's level from what the proof run produced.
 
     proof_log only when every side the certificate rests on carries a proof
-    drat-trim verified. Anything else stays at solver with the reason,
-    because a level is a claim about what a third party can check, not
-    about how hard we tried.
+    drat-trim verified: at W = d - 1 for an exact certificate, at each
+    side's top UNSAT rung for a partial one. Anything else stays at solver
+    with the reason, because a level is a claim about what a third party
+    can check, not about how hard we tried.
     """
     proofs = [b.get("proof") or {} for b in out["sides"].values()]
-    if not out.get("d_exact") or not proofs:
+    partial = not out.get("d_exact") and (out.get("d_lower") or 1) >= 2
+    if not (out.get("d_exact") or partial):
         return {"level": "solver",
                 "note": "no exact verdict, so there is nothing to carry a "
                         "proof for"}
+    if not any(proofs):
+        return {"level": "solver",
+                "note": "no proof path was run; a solver verdict with no "
+                        "artifact a third party can check"}
     if not all(p.get("proved") for p in proofs):
         why = "; ".join(sorted({p.get("detail") or p.get("status") or "?"
                                 for p in proofs if not p.get("proved")}))
@@ -494,7 +579,9 @@ def _verification_block(out, *, slug=None):
         # blob, and a formula regenerated from this entry and re-checked is
         # the same evidence without either problem. cnf_sha256 is what
         # makes the regeneration honest: a formula that does not hash to
-        # the recorded value is not the one that was refuted.
+        # the recorded value is not the one that was refuted. The replay
+        # regenerates each side at its proved_min - 1, which is d - 1 on an
+        # exact certificate.
         "replay": {
             "emit": f"python verify/replay_proofs.py {slug}",
             "check": "kissat --no-binary <side>.cnf <side>.proof; "
@@ -533,6 +620,16 @@ def _cli(argv=None):
                     help="per-solve time limit in seconds (default 600)")
     ap.add_argument("--json", action="store_true",
                     help="print the certificate instead of a summary line")
+    ap.add_argument("--ladder", action="store_true",
+                    help="ask W = 1, 2, ... up to d - 1 instead of d - 1 "
+                         "alone, so a timeout still leaves a proven lower "
+                         "bound d_lower (issue #4230)")
+    ap.add_argument("--budget", type=float, default=None,
+                    help="with --ladder: seconds per side before the ladder "
+                         "stops opening rungs (default: until a rung times out)")
+    ap.add_argument("--start", type=int, default=1,
+                    help="with --ladder: the first W to ask, to resume a "
+                         "ladder a previous certificate left at start - 1")
     args = ap.parse_args(argv)
 
     rc = 0
@@ -540,13 +637,15 @@ def _cli(argv=None):
         with open(path, encoding="utf-8") as f:
             doc = json.load(f)
         slug = os.path.splitext(os.path.basename(path))[0]
-        out = certify(doc, tlim=args.tlim, proof_dir=args.proof, slug=slug)
+        out = certify(doc, tlim=args.tlim, proof_dir=args.proof, slug=slug,
+                      ladder=args.ladder, budget=args.budget, start=args.start)
         if args.json:
             print(json.dumps(out, indent=2, sort_keys=True))
             continue
         v = out.get("verification") or {}
         line = (f"{os.path.basename(path)}: d_exact={out['d_exact']}"
-                f" level={v.get('level', 'solver')}")
+                + (f" d_lower={out['d_lower']}" if "d_lower" in out else "")
+                + f" level={v.get('level', 'solver')}")
         for side, blk in out["sides"].items():
             pr = blk.get("proof") or {}
             bits = [blk["status"]]

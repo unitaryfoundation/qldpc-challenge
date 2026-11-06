@@ -27,6 +27,18 @@ certificate may not claim a level it carries no evidence for. Claiming
 `proof_log` or `formal` requires an artifact that exists and a checker that
 produced it.
 
+A certificate with `d_exact: false` is a partial certificate (issue #4230):
+it proves `d >= d_lower`, the bound an ascending ladder of UNSAT verdicts
+reached below the claim, and the board shows the entry as an interval. The
+second rule is that the bound is backed and consistent: `d_lower` is the
+minimum of the sides' `proved_min`, each `proved_min` is one above the top
+UNSAT rung of that side's ladder, the certificate is bound to the entry's
+matrices by `checks_sha256` (so a correction of the claim cannot strand it),
+and the entry's witnessed distance is not below it. That last one is the
+free consistency check the issue asked for: a verified witness lighter than
+a proven bound means the witness verifier or the certificate is wrong, and
+it fails here rather than waiting for a reader to notice.
+
     python verify/check_certs.py            # validate every certificate
     python verify/check_certs.py --level    # print the level mix
 """
@@ -158,6 +170,103 @@ def evidence_problems(slug, cert):
     return out
 
 
+def _top_unsat(ladder):
+    """Return 1 + the largest W with an UNSAT verdict in a ladder, or 1."""
+    tops = [int(r["W"]) for r in ladder if r.get("status") == "UNSAT"]
+    return 1 + max(tops) if tops else 1
+
+
+def bound_problems(slug, cert):
+    """Rules for d_lower and the per-side bounds (issue #4230).
+
+    An exact certificate may carry ``d_lower`` only as ``d``. A partial one
+    (``d_exact`` false) must carry it, between 2 and ``d - 1``: proving
+    ``d >= 1`` proves nothing and is not filed, and ``d_lower == d`` is what
+    ``d_exact`` means. Each side's ``proved_min`` must be what its ladder
+    says, ``d_lower`` must be the minimum over sides, a SAT rung is a
+    refutation and not a certificate, the binding hash must be this entry's,
+    and the entry's witnessed distances may not sit below the proven bounds.
+    """
+    out = []
+    d = cert.get("d")
+    d_lower = cert.get("d_lower")
+    exact = bool(cert.get("d_exact"))
+    sides = cert.get("sides") or {}
+    if not isinstance(d, int):
+        return out
+    if exact:
+        if d_lower is not None and d_lower != d:
+            out.append(f"{slug}: d_exact with d_lower {d_lower} != d {d}; an exact "
+                       "certificate's lower bound is its distance")
+        for side, blk in sides.items():
+            pm = (blk or {}).get("proved_min")
+            if pm is not None and pm != d:
+                out.append(f"{slug}: {side} side is exact but proved_min is {pm}, not {d}")
+    else:
+        if d_lower is None:
+            return out                      # the schema already reports it
+        if d_lower < 2:
+            out.append(f"{slug}: partial certificate with d_lower {d_lower}; d >= 1 "
+                       "proves nothing and is not a certificate")
+        if d_lower >= d:
+            out.append(f"{slug}: partial certificate with d_lower {d_lower} >= d {d}; "
+                       "a bound that reaches the claim is d_exact, and one above it "
+                       "contradicts the verified witness")
+        if set(sides) != {"X", "Z"}:
+            out.append(f"{slug}: partial certificate needs both sides, has "
+                       f"{sorted(sides)}; a bound on one side bounds nothing")
+        mins = []
+        for side, blk in sides.items():
+            blk = blk or {}
+            pm = blk.get("proved_min")
+            if pm is None:
+                out.append(f"{slug}: {side} side of a partial certificate has no proved_min")
+                continue
+            mins.append(pm)
+            if blk.get("exact") and pm != d:
+                out.append(f"{slug}: {side} side is exact but proved_min is {pm}, not {d}")
+            if blk.get("status") == "SAT":
+                out.append(f"{slug}: {side} side is SAT; a logical lighter than the claim "
+                           "is a refutation, not a certificate")
+            ladder = blk.get("ladder")
+            if ladder is not None:
+                if any(r.get("status") == "SAT" for r in ladder):
+                    out.append(f"{slug}: {side} side ladder has a SAT rung; a logical "
+                               "lighter than the claim is a refutation, not a certificate")
+                want = _top_unsat(ladder)
+                if pm != want:
+                    out.append(f"{slug}: {side} side proved_min {pm} is not backed by its "
+                               f"ladder, whose top UNSAT rung gives {want}")
+        if mins and min(mins) != d_lower:
+            out.append(f"{slug}: d_lower {d_lower} is not the minimum of the sides' "
+                       f"proved_min {sorted(mins)}")
+        v = cert.get("verification") or {}
+        want = v.get("checks_sha256")
+        doc = _code_doc(slug)
+        if doc is None:
+            out.append(f"{slug}: partial certificate but codes/{slug}.json is not on the "
+                       "board, so there is nothing for the bound to be about")
+        else:
+            if want and want != checks_sha256(doc):
+                out.append(f"{slug}: partial certificate checks_sha256 does not match "
+                           f"codes/{slug}.json (recorded {str(want)[:16]}, the entry "
+                           f"hashes to {checks_sha256(doc)[:16]}); the bound is about "
+                           "some other matrix pair")
+            dist = doc.get("distance") or {}
+            if isinstance(dist.get("d"), int) and dist["d"] < d_lower:
+                out.append(f"{slug}: the entry's verified witness gives d <= {dist['d']} "
+                           f"but the certificate proves d >= {d_lower}; the witness "
+                           "verifier or the certificate is wrong (issue #4230)")
+            for side, blk in sides.items():
+                pm = (blk or {}).get("proved_min")
+                sv = (dist.get(side) or {}).get("value") if isinstance(dist.get(side), dict) else None
+                if isinstance(pm, int) and isinstance(sv, int) and sv < pm:
+                    out.append(f"{slug}: the entry's {side} witness gives d_{side} <= {sv} "
+                               f"but the certificate proves d_{side} >= {pm}; the "
+                               "witness verifier or the certificate is wrong (issue #4230)")
+    return out
+
+
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--level", action="store_true",
@@ -192,7 +301,7 @@ def main(argv):
         print("note: jsonschema unavailable; structural check skipped, "
               "evidence rules still enforced")
 
-    problems, mix = [], dict.fromkeys(LEVELS, 0)
+    problems, mix, partial = [], dict.fromkeys(LEVELS, 0), 0
     for path in certs:
         slug = os.path.splitext(os.path.basename(path))[0]
         with open(path, encoding="utf-8") as f:
@@ -202,14 +311,18 @@ def main(argv):
                 where = "/".join(str(p) for p in e.absolute_path) or "(root)"
                 problems.append(f"{slug}: {where}: {e.message}")
         problems.extend(evidence_problems(slug, cert))
+        problems.extend(bound_problems(slug, cert))
         lv = (cert.get("verification") or {}).get("level")
         if lv in mix:
             mix[lv] += 1
+        if not cert.get("d_exact"):
+            partial += 1
 
     if a.level:
         print(f"{len(certs)} certificates")
         for lv in LEVELS:
             print(f"  {mix[lv]:>4}  {lv}")
+        print(f"  {partial:>4}  partial (d_exact false, d_lower < d)")
         return 0
 
     if problems:
@@ -220,7 +333,8 @@ def main(argv):
             print(f"  ... and {len(problems) - 40} more")
         return 1
     print(f"ok: {len(certs)} certificates valid "
-          + ", ".join(f"{mix[lv]} {lv}" for lv in LEVELS))
+          + ", ".join(f"{mix[lv]} {lv}" for lv in LEVELS)
+          + (f"; {partial} partial" if partial else ""))
     return 0
 
 

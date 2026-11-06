@@ -147,9 +147,19 @@ def test_the_record_is_a_solver_level_certificate_the_schema_and_checker_accept(
         return {"lower_bound": 2, "upper_bound": None, "witness": None, "seconds": 60.0, "status": "timeout"}
 
     partial = T.certify(doc, root=None, tlim=60, threads=1, runner=slow, kmin={"X": 2})
-    jsonschema.validate(partial, schema)
     assert partial["d_exact"] is False
     assert all(b["status"] == "TIMEOUT" and b["lower_bound"] == 2 for b in partial["sides"].values())
+    # The raw record is not a certificate file: a filed partial certificate carries
+    # its d_lower and the binding hash (issue #4230), which the sweep adds before filing.
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(partial, schema)
+    spec = importlib.util.spec_from_file_location("certify_sweep_for_tropidist", os.path.join(_HERE, "certify_sweep.py"))
+    S = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(S)
+    filed = S.partial_certificate(partial, doc)
+    jsonschema.validate(filed, schema)
+    assert filed["d_lower"] == 2 and all(b["proved_min"] == 2 for b in filed["sides"].values())
+    assert filed["verification"]["checks_sha256"] == check_certs.checks_sha256(doc)
     stab = T.certify(_five_qubit(), root=None, tlim=60, threads=1, runner=runner)
     assert set(stab["sides"]) == {"P"} and stab["encoding"] == "pauli-mechanisms" and stab["d_exact"]
     jsonschema.validate(stab, schema)

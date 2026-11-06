@@ -4,7 +4,9 @@ tables) plus one detail page per code under docs/codes/<slug>.html.
 
 Pure Python, no framework. A code's displayed distance tier is earned, not
 self-declared: it shows d= only when a server certificate exists in
-certs/<slug>.json (d_exact), otherwise d<= (the witness upper bound the cheap
+certs/<slug>.json (d_exact), the interval d_lb <= d <= d when that file is a
+partial certificate (a proven lower bound below the witness, issue #4230),
+and otherwise d<= (the witness upper bound the cheap
 verifier confirmed). Detail pages expose the actual witness, certificate, and
 parity checks so the verification is transparent.
 """
@@ -22,6 +24,7 @@ import urllib.parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
 from qldpc_verify import board_reports, generator_supports, is_stabilizer
+from check_certs import checks_sha256  # noqa: E402
 from ler_verify import gate_point, points_of  # noqa: E402
 import ler_receipts as lr  # noqa: E402
 
@@ -1030,7 +1033,7 @@ header.hero{{padding:34px 0 30px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
-color:var(--mut)}}
+color:var(--mut)}}.b.lb{{background:#fef3c7;color:#92400e}}
 footer.foot{{margin-top:72px;border-top:1px solid var(--ln);
 background:linear-gradient(180deg,var(--soft),var(--bg));color:var(--mut);
 font-size:14px}}
@@ -1302,6 +1305,8 @@ document.addEventListener('click',e=>{
   // by a committed certificate; 'upper-bound' keeps the rest, which are the
   // ones a refutation could still move.
   if(t==='exact'||t==='certified')return r.dataset.tier==='exact';
+  // 'bounded': a proven lower bound below the witness (partial certificate)
+  if(t==='bounded'||t==='partial')return r.dataset.tier!=='exact'&&+r.dataset.dlb>=2;
   if(t==='upper-bound'||t==='unproven')return r.dataset.tier!=='exact';
   // Circuit tier (issue #731). 'with-circuit' keeps the entries that ship
   // verified syndrome-extraction memory circuits (the gear chip); the plain
@@ -1650,6 +1655,47 @@ def side_tiers(cert, doc):
     return tiers
 
 
+def cert_lower_bounds(cert, doc, slug=None):
+    """Return the proven lower bounds a certificate earns: {"d": lb, "X": lb_X, "Z": lb_Z}.
+
+    An honored exact certificate proves d on every side. A partial
+    certificate (issue #4230) proves ``d_lower`` overall and ``proved_min``
+    per side, and is honored by its binding hash rather than by the claim
+    it was made against: ``verification.checks_sha256`` must be this entry's
+    canonical (H_X, H_Z), so a correction of the entry's distance keeps the
+    bound. A bound above the entry's verified witness is a contradiction
+    (the witness verifier or the certificate is wrong); it is reported and
+    not shown, and verify/check_certs.py fails CI on it. Every value is None
+    when nothing is proved, and a bound of 1 is the trivial one and also
+    None. Stabilizer entries have no certifier for the partial tier.
+    """
+    out = {"d": None, "X": None, "Z": None}
+    if not cert or is_stabilizer(doc):
+        return out
+    d = doc["distance"]["d"]
+    if cert.get("d_exact") and cert_consistent(cert, doc):
+        return {"d": d, "X": d, "Z": d}
+    lb = cert.get("d_lower")
+    if not isinstance(lb, int) or lb < 2 or cert.get("d_exact"):
+        return out
+    want = (cert.get("verification") or {}).get("checks_sha256")
+    if want != checks_sha256(doc):
+        print(f"  warning: {slug or doc.get('name')}: partial certificate is bound to other "
+              f"matrices; not showing its lower bound")
+        return out
+    if lb > d:
+        print(f"  warning: {slug or doc.get('name')}: partial certificate proves d >= {lb} "
+              f"but the verified witness gives d <= {d}; not showing it (issue #4230)")
+        return out
+    out["d"] = lb
+    for side in ("X", "Z"):
+        pm = ((cert.get("sides") or {}).get(side) or {}).get("proved_min")
+        sv = (doc["distance"].get(side) or {}).get("value")
+        if isinstance(pm, int) and pm >= 2 and isinstance(sv, int) and pm <= sv:
+            out[side] = pm
+    return out
+
+
 def diag_sides(e):
     """Return the (side key, label) pairs of an entry's per-side diagnostics.
 
@@ -1690,8 +1736,12 @@ def asym_detail(e):
     tooltip and the code page so the two never drift.
     """
     def dside(side):
-        mark = "=" if e["tier_" + side] == "exact" else "&le;"
-        return f'd_{side} {mark} {e["d_" + side]}'
+        if e["tier_" + side] == "exact":
+            return f'd_{side} = {e["d_" + side]}'
+        lb = e.get("lb_" + side)
+        if lb and lb < e["d_" + side]:
+            return f'{lb} &le; d_{side} &le; {e["d_" + side]}'
+        return f'd_{side} &le; {e["d_" + side]}'
     return (f'{dside("X")}, {dside("Z")} &middot; '
             f'w_X = {e["w_X"]}, w_Z = {e["w_Z"]}')
 
@@ -1948,6 +1998,7 @@ def load_entries():
             w_z = max((len(s) for s in doc["checks"]["Z"]), default=0)
             asym = asym_ratio(d_x, d_z)
         tiers = side_tiers(cert, doc)
+        lbs = cert_lower_bounds(cert, doc, slug)
         # verifier diagnostics (issue #1844): girth per side, weight profiles,
         # bounded trapping-set counts, and, with a layout, the support diameter
         # of each stored witness. Displayed and sortable, never ranked.
@@ -1962,6 +2013,9 @@ def load_entries():
             "d_X": d_x, "d_Z": d_z,
             "tier_X": tiers.get("X"), "tier_Z": tiers.get("Z"),
             "tier_P": tiers.get("P"),
+            # proven lower bounds (issue #4230): d itself on the exact tier,
+            # a partial certificate's d_lower below it, else None
+            "d_lb": lbs["d"], "lb_X": lbs["X"], "lb_Z": lbs["Z"],
             "asym": asym,
             "w_X": w_x, "w_Z": w_z,
             "geo": round(geo, 4) if geo is not None else None,
@@ -2331,9 +2385,20 @@ def scatter(te, front, yacc, ylabel):
             + "".join(pts) + "</svg>")
 
 
-def badge(tier):
+def badge(tier, lb=None):
+    """The distance tier mark that precedes d: d =, lb &le; d &le;, or d &le;.
+
+    ``lb`` is the entry's proven lower bound (``d_lb``); below the witnessed
+    d on an upper-bound entry it turns the mark into the interval's left
+    half, so the cell reads "7 &le; d &le; 20" (issue #4230).
+    """
     if tier == "exact":
         return '<span class="b exact">d =</span>'
+    if lb and lb >= 2:
+        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+                f'logical lighter than {lb} exists on either side (an ascending '
+                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'bound">{lb} &le; d &le;</span>')
     return ('<span class="b ub" title="verified upper bound: an explicit '
             'logical of this weight, and independent refutation searches '
             'found nothing lighter">d &le;</span>')
@@ -2877,7 +2942,7 @@ def detail_page(e):
     else:
         P.append('<a class=back href="../index.html">&larr; back to the board</a>')
     P.append(f'<div class=codehead><span class="mono big">[[{n},{k},{d}]]</span> '
-             f'{badge(e["tier"])}'
+             f'{badge(e["tier"], e.get("d_lb"))}'
              + ('<span class="tchip stab" title="general (non-CSS) stabilizer '
                 'code: one Pauli-weight distance, ranked on the stabilizer '
                 'board">stabilizer</span>' if stab else '')
@@ -3025,6 +3090,25 @@ def detail_page(e):
                  f'<span class=cert-ok>exact, d = {d}</span> &middot; '
                  f'{html.escape(cert.get("solver",""))}</div>'
                  f'<div class=kv style="color:var(--mut)">{html.escape(notes)}</div>')
+    elif cert and e.get("d_lb"):
+        lb = e["d_lb"]
+        v = cert.get("verification") or {}
+        rungs = []
+        for side, blk in (cert.get("sides") or {}).items():
+            lad = (blk or {}).get("ladder") or []
+            if lad:
+                rungs.append(f'{side}: ' + " ".join(f'W={r["W"]} {r["status"]}' for r in lad)
+                             + f' (d_{side} &ge; {blk.get("proved_min")})')
+            elif (blk or {}).get("proved_min"):
+                rungs.append(f'{side}: d_{side} &ge; {blk["proved_min"]}')
+        P.append(f'<div class=kv><b>certificate</b> '
+                 f'<span class=cert-ok>partial, {lb} &le; d &le; {d}</span> &middot; '
+                 f'{html.escape(cert.get("solver", ""))} &middot; level '
+                 f'{html.escape(v.get("level", "solver"))} '
+                 '<span class=claimed>(a proven lower bound below the witnessed '
+                 'upper bound: no logical lighter than the bound exists on either '
+                 'side; the gap is what is still unproven)</span></div>'
+                 f'<div class=kv style="color:var(--mut)">{"; ".join(rungs)}</div>')
     elif stab:
         P.append('<div class=kv><b>certificate</b> '
                  '<span class=cert-no>none yet &middot; distance stands as a '
@@ -4159,7 +4243,13 @@ FAQ = [
      "certification is NP-hard and does not scale, so large codes carry a tight "
      "upper bound while small and moderate codes are certified exact. A d&le; "
      "record is provisional: if the true distance turns out lower, the entry "
-     "is corrected."),
+     "is corrected. Between the two, an entry can show an interval such as "
+     "7 &le; d &le; 20: the certifier asked for a logical of weight at most "
+     "W at W = 1, 2, ... and proved none exists up to W = 6 before running "
+     "out of time, so d &ge; 7 is a theorem about the code (a partial "
+     "certificate in certs/, bound to the entry's matrices by hash) while "
+     "d &le; 20 stays the witness. The gap is how much of the claim is "
+     "still unproven."),
     ("What does kd&sup2;/n mean, and is bigger always better?",
      "It is an encoding-efficiency ratio: logical qubits times distance squared, "
      "per physical qubit. It comes from the Bravyi-Poulin-Terhal bound, which "
@@ -5078,7 +5168,7 @@ def primary_tracks_grid(entries, records, code_type="CSS"):
                     f'data-geo="{"" if geo is None else geo}" '
                     f'data-geod="{geod}"{" data-ref=1" if ref else ""} '
                     f'data-n="{e["n"]}" data-k="{e["k"]}">'
-                    f'{badge(e["tier"])}'
+                    f'{badge(e["tier"], e.get("d_lb"))}'
                     f'<span class=gcode>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
                     f'<span class=geff>{e["eff"]:g}</span></a>')
             items = "".join(gitem(i, pos) for pos, i in enumerate(ranked))
@@ -5581,6 +5671,7 @@ def board_table(entries, records, lrec=frozenset()):
             f'data-ler="{e["ler"] if e["ler"] is not None else -1}" '
             f'data-lrec="{1 if i in lrec else 0}" '
             f'data-tier="{e["tier"]}" '
+            f'data-dlb="{e["d_lb"] or 1}" '
             f'data-circ="{1 if e["d_circ"] is not None else 0}" '
             f'data-origin="{"literature" if e["origin"] == "baseline" else "submitted"}" '
             f'data-model="{html.escape(e["model"].lower())}" '
@@ -5606,7 +5697,7 @@ def board_table(entries, records, lrec=frozenset()):
             + f'</td><td class="typecell col-type" data-label="type">{chips(e)}</td>'
             f'<td class="num col-n" data-label="n">{e["n"]}</td>'
             f'<td class="num col-k" data-label="k">{e["k"]}</td>'
-            f'<td class="num col-d" data-label="d">{badge(e["tier"])} {e["d"]}</td>'
+            f'<td class="num col-d" data-label="d">{badge(e["tier"], e.get("d_lb"))} {e["d"]}</td>'
             f'<td class="num m3" data-label="kd&sup2;/n">{e["eff"]}</td>'
             + (f'<td class="num m3" data-label="g" title="r = {e["geo_r"]}, {e["geo_rho"]} '
                f'layer{"s" if e["geo_rho"] != 1 else ""}'
@@ -5742,6 +5833,11 @@ def board_legend(asym=True):
             '(<span class="b ub">d &le;</span>): a verified logical of that '
             'weight; independent refutation searches found nothing lighter, '
             'but it is not a proof</span>'
+            '<span>interval (<span class="b lb">7 &le; d &le;</span>): the '
+            'same upper bound with a proven lower bound under it, from a '
+            'partial certificate in certs/ (an ascending ladder of UNSAT '
+            'verdicts that did not reach d &minus; 1); the gap is what could '
+            'still fall</span>'
             f'<span><span class=hexwrap style="margin-left:0">{HEX_MARK}</span> '
             'submitted through the challenge (not a novelty claim; '
             'unmarked = literature baseline)</span>'

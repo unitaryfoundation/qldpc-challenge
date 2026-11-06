@@ -218,3 +218,104 @@ def test_a_formal_certificate_bound_to_another_code_is_refused():
 def test_a_formal_certificate_for_an_absent_entry_is_refused():
     probs = C.evidence_problems("999-1-1", _formal())
     assert probs and "not on the board" in probs[0]
+
+
+# --- partial certificates: a proven lower bound below the claim (issue #4230) ----------------
+
+def _entry(slug):
+    with open(os.path.join(_ROOT, "codes", f"{slug}.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _partial(slug="72-12-6", d_lower=3, **over):
+    doc = _entry(slug)
+    d = doc["distance"]["d"]
+    ladder = [{"W": w, "status": "UNSAT", "secs": 0.1} for w in range(1, d_lower)] \
+        + [{"W": d_lower, "status": "TIMEOUT", "secs": 1.0}]
+    c = {"name": doc["name"], "d": d, "d_exact": False, "d_lower": d_lower,
+         "solver": "CryptoMiniSat 5.14 SAT", "tlim_per_solve": 1, "encoding": "selector",
+         "sides": {s: {"value": d, "exact": False, "status": "TIMEOUT", "secs": 1.0, "proved_min": d_lower,
+                       "ladder": copy.deepcopy(ladder), "note": f"no logical < {d_lower} exists; W = {d_lower} TIMEOUT"}
+                   for s in "XZ"},
+         "verification": {"level": "solver", "note": "no proof path was run",
+                          "checks_sha256": C.checks_sha256(doc)}}
+    c.update(over)
+    return c
+
+
+def _schema_errors(cert):
+    jsonschema = pytest.importorskip("jsonschema")
+    v = jsonschema.Draft202012Validator(C.load_schema())
+    return [e.message for e in v.iter_errors(cert)]
+
+
+def test_a_partial_certificate_passes_the_schema_and_both_rule_sets():
+    c = _partial()
+    assert _schema_errors(c) == []
+    assert C.evidence_problems("72-12-6", c) == []
+    assert C.bound_problems("72-12-6", c) == []
+
+
+def test_a_partial_certificate_names_its_bound_and_its_binding():
+    c = _partial()
+    del c["d_lower"]
+    assert any("d_lower" in e for e in _schema_errors(c))
+    c = _partial()
+    del c["verification"]["checks_sha256"]
+    assert any("checks_sha256" in e for e in _schema_errors(c))
+
+
+def test_a_bound_that_proves_nothing_or_reaches_the_claim_is_refused():
+    c = _partial(d_lower=1)
+    for blk in c["sides"].values():
+        blk["proved_min"], blk["ladder"] = 1, [{"W": 1, "status": "TIMEOUT", "secs": 1.0}]
+    assert any("proves nothing" in p for p in C.bound_problems("72-12-6", c))
+    c = _partial(d_lower=6)
+    assert any("reaches the claim" in p for p in C.bound_problems("72-12-6", c))
+
+
+def test_a_bound_its_ladder_does_not_back_is_refused():
+    c = _partial()
+    c["sides"]["X"]["proved_min"] = 4
+    probs = C.bound_problems("72-12-6", c)
+    assert any("not backed by its ladder" in p for p in probs)
+    c = _partial()
+    c["sides"]["Z"]["proved_min"] = 2
+    assert any("not the minimum" in p for p in C.bound_problems("72-12-6", c))
+
+
+def test_a_sat_rung_is_a_refutation_not_a_certificate():
+    c = _partial()
+    c["sides"]["X"]["ladder"][-1] = {"W": 3, "status": "SAT", "secs": 1.0}
+    assert any("refutation" in p for p in C.bound_problems("72-12-6", c))
+
+
+def test_a_partial_certificate_bound_to_another_code_is_refused():
+    c = _partial()
+    c["verification"]["checks_sha256"] = C.checks_sha256(_entry("16-6-4"))
+    probs = C.bound_problems("72-12-6", c)
+    assert probs and "some other matrix pair" in probs[0]
+    assert "not on the board" in C.bound_problems("999-1-1", _partial())[0]
+
+
+def test_a_witness_below_the_proven_bound_fails_loudly(monkeypatch):
+    """The free consistency check: a verified witness lighter than a proven bound is a bug, not a board update."""
+    c = _partial(d_lower=5)
+    doc = _entry("72-12-6")
+    doc["distance"] = {"d": 4, "X": {"value": 4}, "Z": {"value": 6}}
+    monkeypatch.setattr(C, "_code_doc", lambda slug: doc)
+    probs = C.bound_problems("72-12-6", c)
+    assert any("d <= 4" in p and "d >= 5" in p and "wrong" in p for p in probs)
+    assert any("d_X <= 4" in p and "d_X >= 5" in p for p in probs)
+    assert not any("d_Z" in p for p in probs)
+
+
+def test_an_exact_certificate_may_carry_only_its_own_distance_as_d_lower():
+    c = copy.deepcopy(BASE)
+    c["d_lower"] = c["d"]
+    assert C.bound_problems("72-12-6", c) == []
+    c["d_lower"] = c["d"] - 1
+    assert any("exact certificate's lower bound is its distance" in p for p in C.bound_problems("72-12-6", c))
+    c = copy.deepcopy(BASE)
+    c["sides"]["X"]["proved_min"] = c["d"] - 1
+    assert any("is exact but proved_min" in p for p in C.bound_problems("72-12-6", c))
