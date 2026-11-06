@@ -407,10 +407,12 @@ A general stabilizer code (`code_type: "stabilizer"`, `schema_version:
 - `distance.P` (required; `distance.X` and `distance.Z` forbidden):
   - `value`: the claimed minimum Pauli weight of a nontrivial logical
     operator. `distance.d` must equal it (`d_matches_pauli_side`).
-  - `confidence`: `"upper_bound"` or `"exact"`. The Pauli-weight certifier
-    is not available yet, so `exact` is accepted as `upper_bound`
+  - `confidence`: `"upper_bound"` or `"exact"`. `verify/` has no Pauli-weight
+    certifier, so `exact` is accepted as `upper_bound`
     (`distance_P_exact_flagged`), as CSS claims were before certification
-    existed.
+    existed. The certification sweep's tropidist backend
+    (`research/certs/tropidist_certify.py`) files the solver-level
+    certificate the site honors.
   - `witness`: one Pauli operator `{"X": [...], "Z": [...]}`. It must
     commute with every generator (lie in the normalizer, `ker (B | A)`), lie
     outside the row space of `S`, and have Pauli weight
