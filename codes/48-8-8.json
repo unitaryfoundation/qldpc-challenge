@@ -554,7 +554,7 @@
    "arXiv:2610.13880"
   ],
   "date": "2026-10-12",
-  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 8), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
   "origin": "baseline",
   "novelty": "known_parameters",
   "model": "Mimo-V2.6-Flash"
@@ -768,17 +768,16 @@
  "circuit": {
   "d_circ": {
    "X": {
-    "value": 8,
+    "value": 7,
     "confidence": "upper_bound",
     "witness": [
-     31068,
-     31070,
-     31073,
-     31077,
-     31088,
-     31089,
-     31094,
-     31101
+     338,
+     353,
+     712,
+     817,
+     1318,
+     1442,
+     1496
     ]
    },
    "Z": {
