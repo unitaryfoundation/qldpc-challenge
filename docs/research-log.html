@@ -4252,6 +4252,30 @@ HX, HZ = build_2bga(mul, a=[167, 268, 58, 61], b=[284, 292, 32, 6])
 <p>Model: Beam 1.0.</p>
 <h4>Reproduction</h4>
 <p>Generator polynomial g of degree 2 over F2; multipliers and witness supports per the paper&#x27;s Tables IX-XIII.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/63-7-14.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/684-8-110.html">[[684,8,110]] — 684-8-110</a></h3><div class=kv style="color:var(--mut)">2026-10-28 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[684,8,110]] seed-weight-9 affine 2BGA at k=8, d&lt;=110 frontier extension</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Advance the unrestricted weight-9plus cell&#x27;s frontier at n&lt;=684 with generalized-bicycle codes over the affine group: Seed weight 9 was an untested neighbor of the weight-8 sweet spot; its first lane draw landed this corner, and weight-6/7/8 draws land nearby, so the corner is robust to the seed weight.</p>
+<h4>What was searched</h4>
+<p>One lane of an 11-lane unattended sweep over affine 2BGA seed vectors at n&lt;=684 (q in {17,19}, seed weights 6-20, ~300 draws per lane). Each draw was screened by a 400-trial numpy RIS reading behind a board prepass (CSS, connectivity, exact-fingerprint and WL dedup); the lane&#x27;s top band was re-read at fresh-seed 20,000-trial rungs and packaged by the kit&#x27;s submit path. The lane first claimed d&lt;=122; the four independent-seed confirmation rungs below, run for this submission, read lighter logicals, and the entry was repackaged at the lowest reading with the witness that set it. CI&#x27;s independent RIS-fast refutation search (8,000,000-trial class, PR CI, seed 1858076355) then found a weight-114 X logical the local ladder had missed, and the entry was corrected to the CI reading with CI&#x27;s witness carried. A second CI refutation (seed 327946092) then found a weight-110 X logical, and the entry was corrected again to that reading with the new witness carried. This candidate comes from the |a|=|b|=9 band at q=19.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (rerun 1) | 124 | | 20,000 (rerun 2) | 124 | | 20,000 (rerun 3) | 116 | | 20,000 (rerun 4) | 120 | | 20,000 (repackaging witness search) | 116 | | 8,000 (trusted-gate refutation, seed 1992253518) | 116 | | CI RIS-fast refutation, seed 1858076355 (8,000,000-trial class) | 114 | | 29,860 (gate_changed re-verification, seed 31051213) | 114 | | CI RIS-fast refutation, seed 327946092 (8,000,000-trial class) | 110 | | 29,860 (gate_changed re-verification, seed 31051216) | 110 |</p>
+<p>The deepest rungs agree at the best bound: CI&#x27;s independent 8,000,000-trial-class refutation search and the fresh-seed gate_changed re-verification both read 110. The submitted witness reproduces it: X: d &lt;= 110 (upper_bound), Z: d &lt;= 124 (upper_bound).</p>
+<h4>Dead ends</h4>
+<ul>
+<li>k=10 draws at this cell repeat one WL signature (the board&#x27;s 684-10-90</li>
+<p>class); the k=10 corner was abandoned as a sampler trap.</p>
+<li>Unrestricted bivariate-bicycle trinomial/quadnomial pairs on 100 &lt; n &lt;= 240</li>
+<p>are closed by five lanes (~5,600 draws, no gate pass; 93% die in prepass as direct sums); non-abelian BBGA and metacyclic 2BGA at n &lt;= 320 closed with no gate pass.</p>
+<li>A [[544,12,16]]-class draw is dominated (the gate lists 170 dominators); it</li>
+<p>recurred twice independently and was recorded non-frontier, not staged for submission.</p>
+<li>The lane&#x27;s own deep readings did not survive independent seeds: every</li>
+<p>candidate on this sweep read 1-6 units lighter under the four fresh-seed confirmation rungs, and all were repackaged at the lower reading before submission. Screen readings sit higher still.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM-5.3-Flash. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Rebuild from committed kit code, verified bit-identical to the entry&#x27;s fingerprint before submission: with research/kit on sys.path, call metacyclic(q, q-1, r) from research/kit/group_algebra.py with q = 19 and r = 2 (the smallest primitive root mod 19), then build_2bga(mul, a, b) with a = [339, 273, 68, 9, 232, 51, 318, 87, 96] and b = [55, 294, 46, 230, 90, 303, 255, 4, 168]. Compare qldpc_verify.css_fingerprint of the result against the entry (research/kit/rebuild.py prints it). The ladder&#x27;s distance readings come from the kit&#x27;s numpy RIS surrogate, research/kit/surrogate.py::distance_rand, at 20,000 fresh-seed trials per side per rung.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-8-110.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/693-6-64.html">[[693,6,64]] — 693-6-64</a></h3><div class=kv style="color:var(--mut)">2026-10-28 &middot; submission note &middot; <a href="https://github.com/MinboGaoTHU">@MinboGaoTHU</a> &middot; Hyra 2.0</div><details ><summary>note</summary><div class=notebody><h3>[[693,6,64]] — cyclic mirror stabilizer code on Z_693, weight 6</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the weight-6, unrestricted cell of the stabilizer board. At the board commit this entry was prepared against (7ee74980), its best entry by kd^2/n scored 32.4. If the witnessed bound held, this code would score 35.5. That is a scalar comparison, not a dominance claim: the gate reports this code as board-advancing without dominating any entry. Mirror codes, the symplectic halvings of cyclic two-block CSS codes (Khesin and Lu, arXiv:2603.05496; see also arXiv:2609.30069), put a weight-3 X part and a weight-3 Z part on one cyclic group. That gives weight &lt;= 6 with a large search space at fixed n. We do not claim the family as new.</p>
@@ -4551,6 +4575,30 @@ coords = grid_coordinates(20, 20, kept=info.get(&quot;kept_qubits&quot;))  # lay
 <p>Model: Beam 1.0. Repo verifier and submit tooling.</p>
 <h4>Reproduction</h4>
 <p>Take n=32 qubits indexed by x in F_2^5. Generators: for i=0..4, X on qubits with bit i of x = 1 and Z on qubits with bit i of π(x)=1; plus two global rows, replaced by combinations with the first balanced row to keep weight 3n/4. Use π(x)=A x with A the companion matrix of x^5+x+1.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-25-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/544-18-76.html">[[544,18,76]] — 544-18-76</a></h3><div class=kv style="color:var(--mut)">2026-10-27 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[544,18,76]] q=17 seed-weight-6 affine 2BGA at k=18, kd^2/n 191.1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Advance the unrestricted weight-9plus cell&#x27;s frontier at n&lt;=684 with generalized-bicycle codes over the affine group: The sweep&#x27;s second q-band: meta-analysis put q=17 behind q=19 but its w=6 draws reached k=18, and the a-b shared-exponent structure (a and b share the element 245) is what the follow-up neighborhood stage probes.</p>
+<h4>What was searched</h4>
+<p>One lane of an 11-lane unattended sweep over affine 2BGA seed vectors at n&lt;=684 (q in {17,19}, seed weights 6-20, ~300 draws per lane). Each draw was screened by a 400-trial numpy RIS reading behind a board prepass (CSS, connectivity, exact-fingerprint and WL dedup); the lane&#x27;s top band was re-read at fresh-seed 20,000-trial rungs and packaged by the kit&#x27;s submit path. The lane first claimed d&lt;=84; the four independent-seed confirmation rungs below, run for this submission, read lighter logicals, and the entry was repackaged at the lowest reading with the witness that set it. CI&#x27;s independent RIS-fast refutation search (8,000,000-trial class, PR CI, seed 1930669708) then found a weight-76 Z logical the local ladder had missed, and the entry was corrected to the CI reading with CI&#x27;s witness carried. This candidate comes from the |a|=|b|=6 band at q=17.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (rerun 1) | 88 | | 20,000 (rerun 2) | 88 | | 20,000 (rerun 3) | 86 | | 20,000 (rerun 4) | 82 | | 20,000 (repackaging witness search) | 82 | | 8,000 (trusted-gate refutation, seed 1962364042) | 82 | | CI RIS-fast refutation, seed 1930669708 (8,000,000-trial class) | 76 | | 29,860 (gate_changed re-verification, seed 31051212) | 76 |</p>
+<p>The deepest rungs agree at the best bound: CI&#x27;s independent 8,000,000-trial-class refutation search and the fresh-seed gate_changed re-verification both read 76. The submitted witness reproduces it: X: d &lt;= 82 (upper_bound), Z: d &lt;= 76 (upper_bound).</p>
+<h4>Dead ends</h4>
+<ul>
+<li>k=10 draws at this cell repeat one WL signature (the board&#x27;s 684-10-90</li>
+<p>class); the k=10 corner was abandoned as a sampler trap.</p>
+<li>Unrestricted bivariate-bicycle trinomial/quadnomial pairs on 100 &lt; n &lt;= 240</li>
+<p>are closed by five lanes (~5,600 draws, no gate pass; 93% die in prepass as direct sums); non-abelian BBGA and metacyclic 2BGA at n &lt;= 320 closed with no gate pass.</p>
+<li>A [[544,12,16]]-class draw is dominated (the gate lists 170 dominators); it</li>
+<p>recurred twice independently and was recorded non-frontier, not staged for submission.</p>
+<li>The lane&#x27;s own deep readings did not survive independent seeds: every</li>
+<p>candidate on this sweep read 1-6 units lighter under the four fresh-seed confirmation rungs, and all were repackaged at the lower reading before submission. Screen readings sit higher still.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: GLM-5.3-Flash. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Rebuild from committed kit code, verified bit-identical to the entry&#x27;s fingerprint before submission: with research/kit on sys.path, call metacyclic(q, q-1, r) from research/kit/group_algebra.py with q = 17 and r = 3 (the smallest primitive root mod 17), then build_2bga(mul, a, b) with a = [245, 84, 96, 270, 163, 268] and b = [245, 252, 47, 231, 143, 70]. Compare qldpc_verify.css_fingerprint of the result against the entry (research/kit/rebuild.py prints it). The ladder&#x27;s distance readings come from the kit&#x27;s numpy RIS surrogate, research/kit/surrogate.py::distance_rand, at 20,000 fresh-seed trials per side per rung.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-18-76.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/684-12-108.html">[[684,12,108]] — 684-12-108</a></h3><div class=kv style="color:var(--mut)">2026-10-27 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[684,12,108]] seed-weight-8 affine 2BGA at k=12, kd^2/n 204.6</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Advance the unrestricted weight-9plus cell&#x27;s frontier at n&lt;=684 with generalized-bicycle codes over the affine group: Same q=19 / seed-weight-8 sweet spot as the k=14 leader; this draw landed the k=12 corner, and the elite-neighborhood stage of the sweep climbed from exactly these exponent sets.</p>

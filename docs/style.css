@@ -323,22 +323,12 @@ margin-right:3px;background:#fffbe0;border-left:3px solid var(--ac)}
 h2.track{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}
 .tcount{color:var(--mut);font-size:14px;font-weight:400}
-.plots{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:16px;margin:14px 0 4px;position:relative}
-.geotabs{position:absolute;top:2px;right:2px;z-index:6;display:flex;gap:6px}
-/* The plots were position:sticky here (#273) so the point<->row hover
-   highlight stayed visible while the table scrolled. But the opaque pinned
-   plots covered the table and leaderboard whenever plots + legend + table
-   outgrew the viewport (issue #302). The explorer was then fitted to one
-   viewport, which overflowed the same way once the legends grew; the board
-   now has a tall scroll box of its own instead (see .boardscroll). */
 .plot{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}
 .chartlegend{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
 padding:12px 16px;background:var(--soft);border:1px solid var(--ln);
 border-radius:10px;font-size:13px;color:var(--mut)}
 .chartlegend .ci{display:inline-flex;align-items:center;gap:7px}
-.plotx{text-align:center;font-size:13px;color:#334155;margin:2px 0 0}
 .cdot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
 /* Record-progress chart: running best kd^2/n per weight class over record
    events (ecdsa.fail-style). One full-width panel; the SVG scales down. */
@@ -482,12 +472,11 @@ box-shadow:0 0 0 3px rgba(54,0,108,.15)}
 .tracktabs{display:flex;gap:6px;margin:6px 0 10px;overflow-x:auto;
 -webkit-overflow-scrolling:touch;scrollbar-width:none}
 .tracktabs::-webkit-scrollbar{display:none}
-.ttab,.otog,.geotab{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
+.ttab,.otog{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
 cursor:pointer;border:1px solid var(--ln);background:#fff;color:var(--mut);
 font-family:inherit;white-space:nowrap}
-.geotab{font-size:12px;padding:4px 11px}
-.ttab:hover,.otog:hover,.geotab:hover{border-color:var(--ac);color:var(--ac)}
-.ttab.active,.otog.active,.geotab.active{background:var(--ac);border-color:var(--ac);color:#fff}
+.ttab:hover,.otog:hover{border-color:var(--ac);color:var(--ac)}
+.ttab.active,.otog.active{background:var(--ac);border-color:var(--ac);color:#fff}
 .filterrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}
 .searchhelp{font-size:12px;color:var(--mut);margin:0 0 14px}
 .searchhelp code{background:var(--soft);padding:1px 5px;border-radius:4px;
@@ -547,8 +536,7 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}
    instead of running the full length of the page. Its header pins to the top of
    this box (thead is position:sticky) while the rows scroll under it. The box
    takes most of a viewport, so the leaderboard is the first thing on screen
-   once the page is scrolled to it; the plots above it stay a short scroll away
-   for the row-hover -> point highlight. overflow:auto also carries the
+   once the page is scrolled to it. overflow:auto also carries the
    horizontal scroll on narrow screens (where the table sets its own min-width). */
 .boardscroll{max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}
@@ -556,14 +544,11 @@ border:1px solid var(--ln);border-radius:12px}
    LER frontier list (issue #3931); desktop keeps the bounded scroll box and
    the whole list, and never needs it. */
 .showall{display:none}
-/* The explorer (plots, legends, table) is plain flow. It used to be a flex
-   column capped at one viewport so plots and table shared the screen (#302),
-   with the board's box taking whatever was left above a 240px floor. Once the
-   plots and the two legends alone outgrew the viewport minus that floor, the
-   floor won over the cap: the box overflowed the capped column, and the
-   "how to" cards that follow it were laid out over the board's rows. No cap
-   on the column means nothing can overflow it; the board box above carries
-   its own height. */
+/* The explorer (legends, table) is plain flow. It used to be a flex column
+   capped at one viewport (#302); once its contents outgrew the viewport the
+   board's box overflowed the column and the "how to" cards that follow it
+   were laid out over the board's rows. No cap on the column means nothing
+   can overflow it; the board box above carries its own height. */
 @media(max-width:1000px){table.board{table-layout:auto;min-width:820px}}
 /* Narrow screens: rather than drop columns (and hide g, a headline metric)
    into a horizontal scroll, each row becomes a card so every field stays
