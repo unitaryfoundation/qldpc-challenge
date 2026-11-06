@@ -305,6 +305,16 @@ relabeling of the qubits are one code, and the board lists a code once. The
 `[[n,k,d]]` with an earlier entry; it is not a route for filing a second
 presentation of a code that is already on the board.
 
+`verify/verify_all.py` refuses two entries with the same stabilizer group,
+but it sees only the tree it verifies, which is how two PRs filed the same
+`[[12,5,2]]` minutes apart, one the X/Z swap of the other (#4064, #4069,
+issue #4107). CI therefore also compares a submission with every other open
+PR (`verify/check_pr_duplicates.py`): an entry whose stabilizer group,
+directly or through a local-Hadamard image such as its X/Z swap, is also
+added by an open PR fails the later of the two PRs and warns the earlier, so
+one of them merges and the other waits until it has landed or been
+withdrawn. A WL signature shared with an open PR is a warning on both.
+
 The gate's WL-signature collision is a flag, not a verdict. The question is
 settled when someone exhibits the permutation, as issue #2643 did for four
 pairs, and from then on the pair is a duplicate and this applies:
