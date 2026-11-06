@@ -1,0 +1,66 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 20000,
+      "walltime_hours": 2
+    },
+    "constraints": {
+      "n": [
+        1,
+        40
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "one screen depth; a survivor is gated, not deepened, in this probe",
+        "trials_cap": 1000
+      },
+      "bar": {
+        "axes": [
+          "k",
+          "d"
+        ],
+        "note": "the stabilizer entry with the best kd^2/n at n <= 40; the stabilizer board ranks apart from the CSS board",
+        "slug": "40-9-6"
+      },
+      "budget": {
+        "candidates_screened": 20000,
+        "trials_per_candidate": 1000,
+        "walltime_hours": 2
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A nondominated stabilizer child at d >= 3 would show that the calculus's moves transfer beyond CSS presentations and give the stabilizer board, which carries no certified distance, a frontier point with an auditable parent.",
+      "family": "other",
+      "feasibility": "54 stabilizer parents at n <= 40; a Pauli-weight RIS screen at 1000 trials reads a child in well under a second at these sizes, the gate accepts stabilizer documents, and the board's stabilizer entries all carry layouts or none, so children inherit what their parent has.",
+      "hypothesis": "Single-step symplectic moves (delete a generator, puncture a qubit, peel a qubit with one of its generators) on the board's stabilizer entries with n <= 40 reach stabilizer-board frontier points that code-calculus v0.1's CSS-only moves cannot express.",
+      "novelty": {
+        "against": "the stabilizer board's 226 entries, mostly codetables.de additive codes read as symplectic rows",
+        "claim": "a stabilizer code one symplectic move from a board stabilizer entry, nondominated on the stabilizer board"
+      },
+      "what_a_negative_would_teach": "That one deletion, puncture, or peel from a stabilizer entry with n <= 40 lands only on dominated points or at d <= 2, so the stabilizer board's small-n frontier is not reachable by its own entries' single-step children and a symplectic extension of the calculus would need depth or a different move set to pay."
+    },
+    "id": "cc-stabilizer-parents-2026-11-05",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "trials_per_candidate": 1000
+      }
+    },
+    "name": "code-calculus moves on stabilizer parents (issue #4478, direction 1)",
+    "notes": "Symplectic analogs of C-DELETE-CHECK, E-PUNCTURE, and E-PEEL applied once to each stabilizer board entry; see the fieldnote of 2026-11-05.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
