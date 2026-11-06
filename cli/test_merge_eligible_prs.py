@@ -501,9 +501,35 @@ def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypat
                         _reader(_code_document(model=""), _code_document(model="Claude Opus 5")))
     result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
     assert not result.eligible and result.metadata_errors
-    # a base entry without a model whose provenance the PR also edited: not inherited as it stands
+    # a base entry without a model whose provenance the PR also edited beyond notes: not inherited
     head = _code_document(model=None)
-    head["provenance"]["notes"] = "edited"
+    head["provenance"]["construction"] = "rewritten"
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head, _code_document(model=None)))
     result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
     assert not result.eligible and result.metadata_errors
+    # rewritten notes are an edit too; only an appended sentence is the shape the bindings admit
+    head = _code_document(model=None)
+    head["provenance"]["notes"] = "rewritten."
+    base = _code_document(model=None)
+    base["provenance"]["notes"] = "original."
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head, base))
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert not result.eligible and result.metadata_errors
+
+
+def test_a_refutation_that_appends_its_credit_to_notes_still_inherits_the_gap(monkeypatch):
+    """A circuit refutation appends a sentence to provenance.notes (its only admitted provenance change)."""
+    base = _code_document(model=None)
+    base["provenance"]["notes"] = "Built from the paper."
+    head = _code_document(model=None)
+    head["provenance"]["notes"] = "Built from the paper. Circuit fault distance corrected by @submitter."
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [{"filename": "codes/10-2-3.json", "status": "modified"}],
+    )
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head, base))
+    monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert result.eligible and result.metadata_errors == []
+    assert result.inherited_gaps == [("codes/10-2-3.json", "missing or empty provenance.model")]
