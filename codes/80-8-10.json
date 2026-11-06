@@ -846,6 +846,7 @@
    "Lin, Hsiang-Ku",
    "Pryadko, Leonid P."
   ],
+  "model": "human",
   "construction": "Two-block group algebra (2BGA) code over C_8 x C_5: a={1, s r^4}, b={1, r, r^2, s, s^3 r, s^2 r^6} (Lin & Pryadko, arXiv:2306.16400, Table 1).",
   "references": [
    "arXiv:2306.16400"
