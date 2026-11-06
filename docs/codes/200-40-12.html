@@ -66,11 +66,20 @@
 (3,14): 2040
 (3,16): 80</div></details>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/200-40-12">circuits/200-40-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[123377, 123402, 123434, 123441, 123628, 123670, 123707, 123715, 123728, 123776, 123778, 123807]</div></details>
+<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[123831, 123833, 123843, 123848, 123849, 123851, 123859, 123885, 123886, 123887, 123893, 123905]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Bhardwaj, Aditya and Ma, Muzhou and Meister, Nadine and King, Robbie and Bluvstein, Dolev and Preskill, John and Cain, Madelyn and Xu, Qian and Huang, Hsin-Yuan</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Mitten code (arXiv:2607.28795, Definition 4): lifted product LP(A,B) over F2[G], G = GAP SmallGroup(40,5) = C4 x D10, base matrices A = [a0|a1], B = [b0|b1] from Table XIII, entries as 0-based indices into Elements(G): a0=[10, 21, 29], a1=[0, 17, 18], b0=[2, 27, 38], b1=[0, 19, 21]. Block form H_X = [[L(a0),0,L(a1),0,R(b0*)],[0,L(a0),0,L(a1),R(b1*)]], H_Z = [[R(b0),R(b1),0,0,L(a0*)],[0,0,R(b0),R(b1),L(a1*)]] with L(g)b(h)=b(gh), R(g)b(h)=b(h g<sup>-1</sup>) and * the g-&gt;g<sup>-1</sup> involution (paper Definition 8). Check matrices taken from the authors&#x27; repository (github.com/a7b/yarn @ 82fb695a1e40, processor_codes/mitten). NOTE: for this code the Table XIII element indices correspond to a different (undocumented) ordering of Elements(G) than current GAP SmallGroup output, so the authors&#x27; published matrices are used verbatim; n, k, check weight 9 and the canonical logical operator weights of Table I were all verified against the paper.</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2607.28795">arXiv:2607.28795</a></div>
 <div class=kv><b>date</b> 2026</div>
 <div class=kv><b>notes</b> Literature baseline. Paper claims d = 12 (exact, via sQetch + BP+OSD estimators; not certified here). Seeded per issue #377.</div>

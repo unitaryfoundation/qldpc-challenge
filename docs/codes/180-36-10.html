@@ -70,11 +70,11 @@
 </section>
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/180-36-10">circuits/180-36-10/</a> &middot; canonical noise recipe, 10 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 10 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ</b> &le; 7 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
 <div class=kv><b>d_circ^X</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
 <details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[91846, 91847, 91880, 91881, 91900, 91901, 91904, 91906, 91917, 91919]</div></details>
-<div class=kv><b>d_circ^Z</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[91742, 91745, 91753, 91755, 91782, 91783, 91799, 91802, 91820, 91836]</div></details>
+<div class=kv><b>d_circ^Z</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[931, 1219, 1553, 1639, 2125, 2431, 6024]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
@@ -84,6 +84,7 @@
 <div class=kv><b>construction</b> lifted product over Z_6 x S_3 from GFlowQEC (arXiv:2611.06819v1), tuple [24, 5, 28, 14, 18, 24, 6, 34, 5, 19]</div>
 <div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0 <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>date</b> 2026-11-05</div>
+<div class=kv><b>notes</b>  Circuit fault distance corrected on 2026-11-06 by @vprusso: the Z-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 10), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).</div>
 <div class=kv><b>family</b> lifted product <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>

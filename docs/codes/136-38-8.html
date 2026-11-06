@@ -38,11 +38,20 @@
 (3,5): 18972
 (3,7): 2856</div></details>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/136-38-8">circuits/136-38-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[83616, 83619, 83622, 83624, 83637, 83638, 83661, 83667]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[83576, 83583, 83603, 83606, 83616, 83621, 83643, 83644]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Lee, Jong Yeon</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Cyclic all-one pair-partition CPM CSS construction (arXiv:2607.14091), instance PPS136_n136_k38_d8 (internal id j3l8_p17_00010): lift size p=17, (J,L)=(3,8), n=8*p=136, 3*p=51 checks per side, column weight 3, row weight 8. CPM exponent arrays (rows = CPM block-rows, columns = the 8 block-columns): E_X = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 2, 8, 10, 4, 1, 9, 6], [0, 16, 13, 12, 7, 10, 2, 5]], E_Z = [[0, 6, 7, 13, 7, 0, 13, 6], [0, 1, 4, 5, 0, 1, 4, 5], [0, 11, 10, 4, 4, 10, 11, 0]]. Lift convention per the authors&#x27; expand_and_verify_cpm_matrices.py (github.com/kasaikenta/pair-partition-cpm-css-codes @ 9c2a6f2): check a of block-row b on side S has support {8*((a - E_S[b][t]) mod 17) + t : t=0..7}. Source file https://kasai.ict.eng.isct.ac.jp/pair_partition_cpm_css_codes_data/contributed_codes/jong_yeon_lee/codes/PPS136_n136_k38_d8.cpm (sha256 2e91f898d06edf32773bc3a37129f17b2309ced5e24d21b384043d5d2740b2e3), expanded with the authors&#x27; own script.</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2607.14091">arXiv:2607.14091</a></div>
 <div class=kv><b>date</b> 2026</div>
 <div class=kv><b>notes</b> Literature baseline, seeded 2026-08-14. Listed as PPS136 [[136,38,8]] in the contributed-codes section (Jong Yeon Lee, 19 CPM-PP codes) of the Okada-Kasai pair-partition CPM catalogue (arXiv:2607.14091; catalogue page updated 2026-08-13), which reports the distance as exact. No public machine-verified distance certificate bundle covers this instance (checked master_manifest.json of certificate_bundles_20260805), so it is recorded here strictly as a witness-backed upper bound from this repo&#x27;s own 200000-trial RIS search per side (seed 11). Reproduction was validated end to end: the published .cpm file expanded with the authors&#x27; own script gives a CSS-orthogonal regular pair with the claimed k.</div>
