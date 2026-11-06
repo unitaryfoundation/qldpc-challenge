@@ -29,7 +29,7 @@
       "n": 5,
       "k": 1,
       "d": 3,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -109,7 +109,7 @@
       "n": 8,
       "k": 2,
       "d": 3,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -141,7 +141,7 @@
       "n": 8,
       "k": 3,
       "d": 3,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -261,7 +261,7 @@
       "n": 10,
       "k": 2,
       "d": 4,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -429,7 +429,7 @@
       "n": 11,
       "k": 5,
       "d": 3,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -573,7 +573,7 @@
       "n": 12,
       "k": 4,
       "d": 4,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -717,7 +717,7 @@
       "n": 13,
       "k": 1,
       "d": 5,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -853,7 +853,7 @@
       "n": 16,
       "k": 2,
       "d": 5,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -941,7 +941,7 @@
       "n": 17,
       "k": 1,
       "d": 7,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -2733,7 +2733,7 @@
       "n": 40,
       "k": 9,
       "d": 6,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -7413,7 +7413,7 @@
       "n": 90,
       "k": 21,
       "d": 10,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
