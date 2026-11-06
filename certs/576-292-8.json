@@ -1,0 +1,29 @@
+{
+  "d": 8,
+  "d_exact": true,
+  "encoding": "css-sides",
+  "logical_classes": 292,
+  "name": "Cornucopia [[576,292,8]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 0.6,
+      "status": "UNSAT",
+      "value": 8
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 0.7,
+      "status": "UNSAT",
+      "value": 8
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
