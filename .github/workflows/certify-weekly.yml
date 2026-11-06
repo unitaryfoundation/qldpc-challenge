@@ -3,10 +3,13 @@ name: certify-weekly
 # research/certs/todo.json orders every upper-bound entry by what certifying
 # it is worth and what it should cost (certification-queue.yml regenerates it
 # on Monday at 08:00); this is the job that works its head (issue #4148).
-# research/certs/certify_sweep.py opens entries in queue order and runs the
-# tropidist backend (research/certs/tropidist_certify.py, issue #4716) and
-# then verify/sat_certify.py with the proof path on what it closed, one time
-# limit per solve, until the job budget is spent. Every attempt, closed or not, is one
+# research/certs/certify_sweep.py opens entries in queue order and runs
+# verify/sat_certify.py with the proof path on each, one time limit per
+# solve, until the job budget is spent. The tropidist backend
+# (research/certs/tropidist_certify.py, issue #4716) is opt-in: a
+# workflow_dispatch run with backend set to tropidist or tropidist+sat
+# fetches the tool at its pinned commit and runs it; the scheduled run stays
+# on the SAT path. Every attempt, closed or not, is one
 # line of research/certs/attempts.jsonl, committed to main here so an entry
 # that timed out at this budget is not reopened at the same budget next week.
 # An entry it certified is left alone for 14 days while its PR lands, then
@@ -57,9 +60,9 @@ on:
         type: boolean
         default: false
       backend:
-        description: "sat, tropidist, or tropidist+sat"
+        description: "sat (default), tropidist, or tropidist+sat (opt-in, issue #4716)"
         required: false
-        default: "tropidist+sat"
+        default: "sat"
 
 concurrency:
   group: certify-weekly
@@ -78,6 +81,7 @@ jobs:
       DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
       TROPIDIST_REF: b03ec2d4077f287f89f97b5c2c16ce5ce17c2c58
       TROPIDIST_ROOT: /tmp/tropidist
+      BACKEND: ${{ github.event.inputs.backend || 'sat' }}
       OUT_DIR: /tmp/certify-sweep
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +100,8 @@ jobs:
           install -m 755 /tmp/kissat/build/kissat /usr/local/bin/kissat
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
-      - name: fetch tropidist at its pinned commit
+      - name: fetch tropidist at its pinned commit (opt-in backends only)
+        if: contains(env.BACKEND, 'tropidist')
         run: |
           set -euo pipefail
           git clone -q https://github.com/Fanerst/tropidist.git "$TROPIDIST_ROOT"
@@ -111,7 +116,6 @@ jobs:
           JOB_MINUTES: ${{ github.event.inputs.job_minutes || '240' }}
           SLUGS: ${{ github.event.inputs.slugs }}
           RETRY: ${{ github.event.inputs.retry }}
-          BACKEND: ${{ github.event.inputs.backend || 'tropidist+sat' }}
         run: |
           retry=""
           [ "$RETRY" = "true" ] && retry="--retry"
@@ -122,9 +126,11 @@ jobs:
           fi
           set +e
           case "$BACKEND" in sat|tropidist|tropidist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
+          tool=""
+          case "$BACKEND" in *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";; esac
           uv run --frozen --extra research python research/certs/certify_sweep.py run \
             --out-dir "$OUT_DIR" --tlim "$TLIM" --job-seconds $(( JOB_MINUTES * 60 )) \
-            --backend "$BACKEND" --tropidist "$TROPIDIST_ROOT" --threads 4 \
+            --backend "$BACKEND" $tool \
             ${SLUGS:+--slugs $SLUGS} $retry
           rc=$?
           set -e
