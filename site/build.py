@@ -699,22 +699,12 @@ margin-right:3px;background:#fffbe0;border-left:3px solid var(--ac)}}
 h2.track{{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}}
 .tcount{{color:var(--mut);font-size:14px;font-weight:400}}
-.plots{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:16px;margin:14px 0 4px;position:relative}}
-.geotabs{{position:absolute;top:2px;right:2px;z-index:6;display:flex;gap:6px}}
-/* The plots were position:sticky here (#273) so the point<->row hover
-   highlight stayed visible while the table scrolled. But the opaque pinned
-   plots covered the table and leaderboard whenever plots + legend + table
-   outgrew the viewport (issue #302). The explorer was then fitted to one
-   viewport, which overflowed the same way once the legends grew; the board
-   now has a tall scroll box of its own instead (see .boardscroll). */
 .plot{{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}}
 .chartlegend{{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
 padding:12px 16px;background:var(--soft);border:1px solid var(--ln);
 border-radius:10px;font-size:13px;color:var(--mut)}}
 .chartlegend .ci{{display:inline-flex;align-items:center;gap:7px}}
-.plotx{{text-align:center;font-size:13px;color:#334155;margin:2px 0 0}}
 .cdot{{width:12px;height:12px;border-radius:50%;flex:0 0 auto}}
 /* Record-progress chart: running best kd^2/n per weight class over record
    events (ecdsa.fail-style). One full-width panel; the SVG scales down. */
@@ -858,12 +848,11 @@ box-shadow:0 0 0 3px rgba(54,0,108,.15)}}
 .tracktabs{{display:flex;gap:6px;margin:6px 0 10px;overflow-x:auto;
 -webkit-overflow-scrolling:touch;scrollbar-width:none}}
 .tracktabs::-webkit-scrollbar{{display:none}}
-.ttab,.otog,.geotab{{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
+.ttab,.otog{{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
 cursor:pointer;border:1px solid var(--ln);background:#fff;color:var(--mut);
 font-family:inherit;white-space:nowrap}}
-.geotab{{font-size:12px;padding:4px 11px}}
-.ttab:hover,.otog:hover,.geotab:hover{{border-color:var(--ac);color:var(--ac)}}
-.ttab.active,.otog.active,.geotab.active{{background:var(--ac);border-color:var(--ac);color:#fff}}
+.ttab:hover,.otog:hover{{border-color:var(--ac);color:var(--ac)}}
+.ttab.active,.otog.active{{background:var(--ac);border-color:var(--ac);color:#fff}}
 .filterrow{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}}
 .searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px}}
 .searchhelp code{{background:var(--soft);padding:1px 5px;border-radius:4px;
@@ -923,8 +912,7 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}}
    instead of running the full length of the page. Its header pins to the top of
    this box (thead is position:sticky) while the rows scroll under it. The box
    takes most of a viewport, so the leaderboard is the first thing on screen
-   once the page is scrolled to it; the plots above it stay a short scroll away
-   for the row-hover -> point highlight. overflow:auto also carries the
+   once the page is scrolled to it. overflow:auto also carries the
    horizontal scroll on narrow screens (where the table sets its own min-width). */
 .boardscroll{{max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}}
@@ -932,14 +920,11 @@ border:1px solid var(--ln);border-radius:12px}}
    LER frontier list (issue #3931); desktop keeps the bounded scroll box and
    the whole list, and never needs it. */
 .showall{{display:none}}
-/* The explorer (plots, legends, table) is plain flow. It used to be a flex
-   column capped at one viewport so plots and table shared the screen (#302),
-   with the board's box taking whatever was left above a 240px floor. Once the
-   plots and the two legends alone outgrew the viewport minus that floor, the
-   floor won over the cap: the box overflowed the capped column, and the
-   "how to" cards that follow it were laid out over the board's rows. No cap
-   on the column means nothing can overflow it; the board box above carries
-   its own height. */
+/* The explorer (legends, table) is plain flow. It used to be a flex column
+   capped at one viewport (#302); once its contents outgrew the viewport the
+   board's box overflowed the column and the "how to" cards that follow it
+   were laid out over the board's rows. No cap on the column means nothing
+   can overflow it; the board box above carries its own height. */
 @media(max-width:1000px){{table.board{{table-layout:auto;min-width:820px}}}}
 /* Narrow screens: rather than drop columns (and hide g, a headline metric)
    into a horizontal scroll, each row becomes a card so every field stays
@@ -1233,7 +1218,7 @@ document.addEventListener('click',e=>{
 // Smart search over the unified board: space-separated terms, all must match.
 // A term is either a comparison (n/k/d/w/eff with >= <= > < =) or free text
 // matched against the code name, type, and authors. 'record' keeps frontier
-// records. The landscape scatter hides points that the table filters out.
+// records.
 (function(){
  const board=document.getElementById('mainboard');
  const q=document.getElementById('boardsearch');
@@ -1275,10 +1260,6 @@ document.addEventListener('click',e=>{
  // It also comes on by itself when the table is filtered to an unrestricted
  // cell in which some code ships a layout, the case the number was made for.
  const rtog=document.getElementById('routetoggle');
- // layout toggle (top right of the charts): '' = all, 'with' = only codes
- // with a verified layout (f defined), 'without' = only codes with none.
- // Clicking the active button clears it back to 'all'.
- let geoMode='';
  // The filters as the page loaded them: defaultValue is the markup's value
  // attribute, so a browser restoring form state on reload does not move the
  // baseline. Used by the card cap in apply().
@@ -1286,7 +1267,7 @@ document.addEventListener('click',e=>{
   const same=el=>!el||el.value===el.defaultValue;
   return !q.value.trim()&&same(wlo)&&same(whi)&&same(dlo)&&same(dhi)
    &&same(nlo)&&same(nhi)&&same(klo)&&same(khi)
-   &&!(lit&&lit.classList.contains('active'))&&geoMode==='';}
+   &&!(lit&&lit.classList.contains('active'));}
  // asym: X/Z distance asymmetry, so biased-noise candidates can
  // be pulled out by a threshold of the reader's choosing until the board
  // defines a label for them.
@@ -1346,46 +1327,18 @@ document.addEventListener('click',e=>{
   if(kfill){kfill.style.left=((b[0]-KMIN)/kspan*100)+'%';
    kfill.style.width=((b[1]-b[0])/kspan*100)+'%';}
   if(kval)kval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
- // Adaptive axes: fit each landscape scatter to the points the
- // filter leaves visible. Mirrors scatter() in build.py (sx/sy, _axis_step,
- // the x tick step); the server-rendered axes span every code and are the
- // no-JS view.
- function ystep(hi){for(const s of [1,2,5,10,20,50,100,200,500])if(hi/s<=6)return s;return 1000;}
- function rescale(svg){
-  const W=+svg.dataset.w,H=+svg.dataset.h,pl=+svg.dataset.pl,pr=+svg.dataset.pr,
-   pb=+svg.dataset.pb,pt=+svg.dataset.pt,grid=svg.querySelector('g.grid');
-  if(!W||!grid)return;
-  const pts=[...svg.querySelectorAll('circle[data-x]')].filter(c=>c.style.display!=='none');
-  if(!pts.length)return;
-  let nhi=0,yhi=0;
-  pts.forEach(c=>{nhi=Math.max(nhi,+c.dataset.x);yhi=Math.max(yhi,+c.dataset.y);});
-  nhi=nhi||1;yhi=yhi||1;
-  const sx=n=>pl+n/nhi*(W-pl-pr),sy=v=>H-pb-v/yhi*(H-pt-pb);
-  pts.forEach(c=>{c.setAttribute('cx',sx(+c.dataset.x).toFixed(1));
-   c.setAttribute('cy',sy(+c.dataset.y).toFixed(1));});
-  let g='';const xs=Math.max(1,Math.round(nhi/4/50)*50||50);
-  for(let gx=0;gx<=nhi;gx+=xs){const x=sx(gx).toFixed(0);
-   g+='<line x1="'+x+'" y1="'+pt+'" x2="'+x+'" y2="'+(H-pb)+'" stroke="#eef2f7"/>'
-    +'<text x="'+x+'" y="'+(H-pb+18)+'" font-size="12" fill="#475569" text-anchor="middle">'+gx+'</text>';}
-  const ys=ystep(yhi);
-  for(let gy=0;gy<=yhi+1e-9;gy+=ys){const y=sy(gy);
-   g+='<line x1="'+pl+'" y1="'+y.toFixed(0)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(0)+'" stroke="#eef2f7"/>'
-    +'<text x="'+(pl-8)+'" y="'+(y+4).toFixed(0)+'" font-size="12" fill="#475569" text-anchor="end">'+(+gy.toFixed(6))+'</text>';}
-  grid.innerHTML=g;
- }
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
   const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
   const litOn=lit&&lit.classList.contains('active');
-  const vis=new Set();let shown=0;
+  let shown=0;
   const ao=asof?asof.value:'';
   rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d,nn=+r.dataset.n,kk=+r.dataset.k;
    const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])
     &&(nn>=nb[0]&&nn<=nb[1])&&(kk>=kb[0]&&kk<=kb[1])
-    &&(geoMode===''||(geoMode==='with')===(+r.dataset.geo>=0))
     &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t))
     &&(!ao||!!r.dataset.date&&r.dataset.date<=ao);
-   r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
+   r.style.display=ok?'':'none';if(ok)shown++;});
   const cellTok=toks.find(t=>t.slice(0,18)==='cell:unrestricted~');
   const anyRoute=rows.some(r=>r.style.display===''&&+r.dataset.route>=0);
   board.classList.toggle('showroute',
@@ -1397,8 +1350,7 @@ document.addEventListener('click',e=>{
   // every-row test alone never held at load, which put every card within
   // the default weight on a phone (issue #3931). Walk current DOM order,
   // not the static rows array, so a sorted board collapses to its first
-  // cards, not its original ones. Chart dots key off vis, so capped cards
-  // stay plotted.
+  // cards, not its original ones.
   const capped=showall&&cardsmq.matches&&!allcards
    &&(shown===rows.length||atdefault());
   if(capped){let ci=0;board.querySelectorAll('tbody tr').forEach(r=>{
@@ -1411,13 +1363,6 @@ document.addEventListener('click',e=>{
   if(chip){var f=q.value.trim();
    chip.style.display=f?'':'none';
    if(f)chip.innerHTML='filtered: '+f.replace(/</g,'&lt;')+' <b>&times; clear</b>';}
-  document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
-   c.style.display=vis.has(c.dataset.code)?'':'none';});
-  document.querySelectorAll('.plots svg.plot').forEach(rescale);
-  // 'with layout' swaps the efficiency chart from kd^2/n to f (issue #276)
-  const pe=document.getElementById('ploteff'),pg=document.getElementById('plotgeo');
-  if(pe&&pg){const g=(geoMode==='with');
-   pg.style.display=g?'':'none';pe.style.display=g?'none':'';}
  }
  function syncAsOfUrl(v){
   try{const u=new URL(location.href);
@@ -1453,9 +1398,7 @@ document.addEventListener('click',e=>{
   if(dlo&&dhi){dlo.value=DMIN;dhi.value=DMAX;dpaint();}
   if(nlo&&nhi){nlo.value=NMIN;nhi.value=NMAX;npaint();}
   if(klo&&khi){klo.value=KMIN;khi.value=KMAX;kpaint();}
-  if(lit)lit.classList.remove('active');
-  geoMode='';document.querySelectorAll('.geotab').forEach(x=>
-   x.classList.remove('active'));}
+  if(lit)lit.classList.remove('active');}
  // Historical portal: recompute frontier (record) stars for the board as of a
  // given date. Only codes dated on or before `ao` participate; the Pareto rule
  // mirrors site/build.py's compute_records() (per cell + per code type).
@@ -1529,12 +1472,6 @@ document.addEventListener('click',e=>{
    syncAsOfUrl('');
    apply();});}
  if(rtog)rtog.addEventListener('click',()=>{rtog.classList.toggle('active');apply();});
- document.querySelectorAll('.geotab').forEach(g=>{
-  g.addEventListener('click',()=>{
-   geoMode=(geoMode===g.dataset.geo)?'':g.dataset.geo;
-   document.querySelectorAll('.geotab').forEach(x=>
-    x.classList.toggle('active',x.dataset.geo===geoMode));
-   apply();});});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
  if(dlo&&dhi){dlo.addEventListener('input',()=>{dpaint();apply();});
@@ -2312,79 +2249,6 @@ def ler_frontier(entries):
     return front
 
 
-def _axis_step(hi):
-    """A round tick step giving at most ~6 gridlines up to hi."""
-    for s in (1, 2, 5, 10, 20, 50, 100, 200, 500):
-        if hi / s <= 6:
-            return s
-    return 1000
-
-
-def scatter(te, front, yacc, ylabel):
-    """A landscape scatter of every code: x = n, y = yacc(e) (e.g. distance or
-    kd^2/n). Two complementary views are shown side by side, so codes that
-    coincide in one (e.g. same n and d but different k) separate in the other.
-    Suppressed below a handful of distinct (n, y) points (nothing to show).
-"""
-    if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
-        return ""
-    W, H = 520, 274
-    # x-axis label is shared below both plots, so the bottom pad only needs room
-    # for the tick numbers (drawn at H-pad_b+18), not a per-plot axis title.
-    pad_l, pad_r, pad_b, pad_t = 54, 12, 26, 22
-    nhi = max(e["n"] for e in te) or 1
-    yhi = max(yacc(e) for e in te) or 1
-
-    def sx(n):
-        return pad_l + n / nhi * (W - pad_l - pad_r)
-
-    def sy(v):
-        return H - pad_b - v / yhi * (H - pad_t - pad_b)
-
-    grid = []
-    xstep = max(1, round(nhi / 4 / 50) * 50 or 50)
-    for gx in range(0, int(nhi) + 1, xstep):
-        x = sx(gx)
-        grid.append(f'<line x1="{x:.0f}" y1="{pad_t}" x2="{x:.0f}" y2="{H-pad_b}" '
-                    f'stroke="#eef2f7"/><text x="{x:.0f}" y="{H-pad_b+18}" '
-                    f'font-size="12" fill="#475569" text-anchor="middle">{gx}</text>')
-    ystep = _axis_step(yhi)
-    gy = 0
-    while gy <= yhi + 1e-9:
-        y = sy(gy)
-        grid.append(f'<line x1="{pad_l}" y1="{y:.0f}" x2="{W-pad_r}" y2="{y:.0f}" '
-                    f'stroke="#eef2f7"/><text x="{pad_l-8}" y="{y+4:.0f}" '
-                    f'font-size="12" fill="#475569" text-anchor="end">{gy:g}</text>')
-        gy += ystep
-
-    pts = []
-    for i, e in enumerate(te):
-        f = i in front
-        col = EXACT if e["tier"] == "exact" else ACCENT
-        r = 6 if f else 4
-        fill = col if f else "#fff"
-        _tlabel = "exact" if e["tier"] == "exact" else "upper bound"
-        _geo = f'  g={e["geo"]:.3g}' if e["geo"] is not None else ""
-        tip = (f'[[{e["n"]},{e["k"]},{e["d"]}]]  kd2/n={e["eff"]}{_geo}\n'
-               f'{_tlabel}{", record" if f else ""}')
-        cx, cy = sx(e["n"]), sy(yacc(e))
-        raw = f'data-x="{e["n"]}" data-y="{yacc(e):g}"'
-        pts.append(f'<circle class=pt data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
-                   f'cy="{cy:.1f}" r="{r}" fill="{fill}" '
-                   f'stroke="{col}" stroke-width="2" pointer-events="none"/>')
-        pts.append(f'<circle class=hit data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
-                   f'cy="{cy:.1f}" r="12" '
-                   f'fill="transparent" data-tip="{html.escape(tip)}"/>')
-    y_mid = pad_t + (H - pad_t - pad_b) / 2
-    return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img" '
-            f'data-w="{W}" data-h="{H}" data-pl="{pad_l}" data-pr="{pad_r}" '
-            f'data-pb="{pad_b}" data-pt="{pad_t}">'
-            f'<g class=grid>{"".join(grid)}</g>'
-            + f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
-            f'text-anchor="middle" transform="rotate(-90 14 {y_mid:.0f})">{ylabel}</text>'
-            + "".join(pts) + "</svg>")
-
-
 def badge(tier, lb=None):
     """The distance tier mark that precedes d: d =, lb &le; d &le;, or d &le;.
 
@@ -2392,6 +2256,16 @@ def badge(tier, lb=None):
     d on an upper-bound entry it turns the mark into the interval's left
     half, so the cell reads "7 &le; d &le; 20" (issue #4230).
     """
+    if tier == "exact":
+        return '<span class="b exact">d =</span>'
+    if lb and lb >= 2:
+        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+                f'logical lighter than {lb} exists on either side (an ascending '
+                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'bound">{lb} &le; d &le;</span>')
+    return ('<span class="b ub" title="verified upper bound: an explicit '
+            'logical of this weight, and independent refutation searches '
+            'found nothing lighter">d &le;</span>')
     if tier == "exact":
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
@@ -5331,13 +5205,12 @@ BOARD_DEFAULT_W = 8
 
 
 def board_controls(entries, records):
-    """The board heading plus the search box, filter pills, and filter help. Lives
-    above the charts so filtering and the landscape view stay together; the JS
-    finds the table by id, so its position relative to the table is free. Filters:
+    """The board heading plus the search box, filter pills, and filter help. The
+    JS finds the table by id, so its position relative to the table is free. Filters:
     a 2D-local pill (locality is computed), a family-tag pill per family present,
     and the check-weight slider."""
     # A tab strip (All + 2D-local + one per family) for picking the view, in the
-    # OpenRouter rankings style. Each tab filters the table and charts; the active
+    # OpenRouter rankings style. Each tab filters the table; the active
     # tab is highlighted. The strip scrolls horizontally on narrow screens.
     tabs = ('<button type=button class="ttab active" data-q="" '
             'title="all codes">All</button>')
@@ -5478,56 +5351,6 @@ def board_controls(entries, records):
             'keeps the entries whose layout assigns every qubit to a module.'
             '</p>'
             '</section>')
-
-
-def charts_block(entries, records):
-    """The two landscape scatters side by side (stacked on narrow screens) with a
-    shared HTML legend below them. The legend is HTML, not drawn into the SVG, so
-    it keeps real font sizes and reflows on mobile."""
-    d_plot = scatter(entries, records, lambda e: e["d"], "Code Distance (d)")
-    eff_plot = scatter(entries, records, lambda e: e["eff"], "kd²/n")
-    # A second version of the efficiency scatter with y = f, only the codes
-    # that ship a layout. The "with layout" toggle swaps it in for the kd^2/n
-    # view (issue #276); both are rendered statically, JS flips display.
-    geo_idx = [i for i, e in enumerate(entries) if e["geo"] is not None]
-    f_plot = scatter([entries[i] for i in geo_idx],
-                     {j for j, i in enumerate(geo_idx) if i in records},
-                     lambda e: e["geo"], "g (geometric efficiency)")
-    if eff_plot:
-        eff_plot = eff_plot.replace('<svg ', '<svg id=ploteff ', 1)
-    if f_plot:
-        f_plot = f_plot.replace(
-            '<svg ', '<svg id=plotgeo style="display:none" ', 1)
-    if not d_plot and not eff_plot:
-        return ""
-    # layout toggle, top right of the charts (issue #276). "no layout" is a
-    # certification status -- such codes may still be local, nobody proved it
-    # -- so the label is neutral rather than "expander".
-    toggle = (
-        '<div class=geotabs role=group aria-label="filter by layout status">'
-        '<button type=button class=geotab data-geo=with '
-        'title="only codes with a verifier-accepted 2D layout; the efficiency '
-        'chart switches from kd&sup2;/n to the geometric efficiency g">'
-        'with layout</button>'
-        '<button type=button class=geotab data-geo=without '
-        'title="only codes without a verified layout; locality may exist but '
-        'is uncertified (not necessarily expander codes)">no layout</button>'
-        '</div>')
-    legend = (
-        '<div class=chartlegend>'
-        f'<span class=ci><span class=cdot style="background:{EXACT}"></span>'
-        'Certified exact</span>'
-        f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
-        'Upper bound</span>'
-        '<span class=ci><span class=cdot style="background:#475569"></span>'
-        'Filled = Pareto record</span>'
-        '<span class=ci><span class=cdot '
-        'style="background:#fff;border:2px solid #475569"></span>'
-        'Open = non-frontier</span>'
-        '</div>')
-    xlabel = '<div class=plotx>Physical Qubits (n)</div>'
-    return (f'<div class=plots>{toggle}{d_plot}{eff_plot}{f_plot}</div>'
-            f'{xlabel}{legend}')
 
 
 def board_table(entries, records, lrec=frozenset()):
@@ -5950,7 +5773,6 @@ def stabilizer_page(entries):
         P.append(primary_tracks_grid(entries, records, code_type="stabilizer"))
         P.append(board_controls(entries, records))
         P.append('<div class=explorer>')
-        P.append(charts_block(entries, records))
         P.append(board_legend(asym=False))
         P.append(board_table(entries, records, lrec))
         P.append('</div>')
@@ -6043,10 +5865,9 @@ def build():
     P.append(ler_frontier_panel(entries, lrec))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
-    P.append(charts_block(entries, records))
     P.append(board_legend(asym=True))
     P.append(board_table(entries, records, lrec))
-    P.append('</div>')  # close explorer (the plots+legend+table column)
+    P.append('</div>')  # close explorer (the legend+table column)
     # the three steps follow the board: 'climb the board' should be read after
     # the board has been seen, not before
     P.append('<div class=how>'

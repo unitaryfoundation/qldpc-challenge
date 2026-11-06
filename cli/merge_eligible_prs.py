@@ -194,6 +194,28 @@ def _read_code_document(repo: str, path: str, head_sha: str) -> Any:
         raise GitHubCLIError(f"{path} at {head_sha} is not valid JSON: {exc}") from exc
 
 
+def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, base: str) -> bool:
+    """Report whether the PR inherited this provenance gap from the base entry rather than introducing it.
+
+    True when the entry exists on ``base`` with the same missing field and the
+    PR left ``provenance`` byte-identical. A contribution to another author's
+    entry (a circuit tier, a layout, a lowered circuit distance) passes
+    verify/check_authorship.py only if it touches nothing in provenance but an
+    appended note, so its author cannot add the field; requiring it would block
+    every such PR on an omission the entry's author has to fix. A PR that adds
+    the entry, or that changed provenance, is still held to the rule.
+    """
+    try:
+        base_doc = _read_code_document(repo, path, base)
+    except GitHubCLIError:
+        return False                      # no base entry: the PR adds it
+    if not isinstance(base_doc, dict) or not isinstance(document, dict):
+        return False
+    if metadata_error(base_doc) != error:
+        return False
+    return base_doc.get("provenance") == document.get("provenance")
+
+
 @dataclass
 class Evaluation:
     number: int
@@ -205,6 +227,7 @@ class Evaluation:
     models: list[str] = field(default_factory=list)
     authors: list[str] = field(default_factory=list)
     metadata_errors: list[tuple[str, str]] = field(default_factory=list)
+    inherited_gaps: list[tuple[str, str]] = field(default_factory=list)
     pr_author: str = ""
     claim_paths: list[str] = field(default_factory=list)
 
@@ -241,10 +264,26 @@ def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
             too_many = too_many_codes_reason(code_paths)
             if too_many:
                 result.reasons.append(too_many)
+            added = {item.get("filename") for item in files if item.get("status") == "added"}
             for path in code_paths:
                 document = _read_code_document(repo, path, head_sha)
                 error = metadata_error(document)
                 if error:
+                    # a record this PR adds declares its own provenance; only a
+                    # record that existed on base can have inherited a gap
+                    inherited = path not in added and _inherited_metadata_gap(repo, path, document, error, base)
+                    if inherited:
+                        # The field was already missing on the base entry and
+                        # this PR left provenance alone: a contribution to an
+                        # existing entry (a circuit tier, a layout, a lowered
+                        # claim) whose author verify/check_authorship.py forbids
+                        # from editing provenance. The gap is the entry
+                        # author's to close and does not block the PR.
+                        result.inherited_gaps.append((path, error))
+                        result.models.append("(entry predates provenance.model)")
+                        authors = (document.get("provenance") or {}).get("authors") or []
+                        result.authors.extend(str(a) for a in authors)
+                        continue
                     result.metadata_errors.append((path, error))
                     result.reasons.append(f"{path}: {error}")
                     continue
@@ -377,6 +416,8 @@ def _format_result(result: Evaluation, action: str) -> str:
         models = ", ".join(sorted(set(result.models)))
         authors = ", ".join(sorted(set(result.authors)))
         details = f"PR author=@{result.pr_author}; model={models}; authors={authors}"
+        if result.inherited_gaps:
+            details += "; inherited gap: " + ", ".join(f"{p} ({e})" for p, e in result.inherited_gaps)
     return f"{action:<10} {status:<8} #{result.number} {result.title} — {details}"
 
 

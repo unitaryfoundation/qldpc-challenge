@@ -164,8 +164,10 @@ the proof_log record when that finishes and the tool's record otherwise. An
 entry the tool did not close is not retried with SAT in the same run (the
 paper's benchmark gives SAT little chance where the tool's search did not
 finish), and a tool error falls back to SAT. `--backend tropidist` runs the
-tool alone. The certify-weekly workflow clones the tool at the commit pinned
-in its `TROPIDIST_REF` and runs `tropidist+sat`.
+tool alone. The backend is opt-in: the scheduled certify-weekly run stays on
+the SAT path, and a workflow_dispatch run with `backend` set to `tropidist`
+or `tropidist+sat` fetches the tool at the commit pinned in `TROPIDIST_REF`
+and runs it.
 
 Measured on a laptop (one kernel thread; the tool's OpenMP build is not
 available on macOS) against entries the queue listed: 132-30-12 (band A,

@@ -160,6 +160,20 @@ def test_the_record_is_a_solver_level_certificate_the_schema_and_checker_accept(
     jsonschema.validate(filed, schema)
     assert filed["d_lower"] == 2 and all(b["proved_min"] == 2 for b in filed["sides"].values())
     assert filed["verification"]["checks_sha256"] == check_certs.checks_sha256(doc)
+    # an entry whose sides differ closes when each side closes at its own value (57 certified
+    # entries on the board have d_X != d_Z, 12-3-3 among them)
+    asym = json.loads(json.dumps(doc))
+    asym["distance"] = {"d": 3, "X": {"value": 3, "confidence": "upper_bound", "witness": [0, 1, 2]},
+                        "Z": {"value": 4, "confidence": "upper_bound", "witness": [0, 1, 2, 3]}}
+
+    def per_side(H, L, *, root, tlim, threads, kmin, tag):
+        value = 4 if tag.endswith(".Z") else 3
+        return {"lower_bound": value, "upper_bound": value, "witness": list(range(value)), "seconds": 0.1,
+                "status": "exact"}
+
+    cert_asym = T.certify(asym, root=None, tlim=60, threads=1, slug="7-1-3", runner=per_side)
+    assert cert_asym["d_exact"] is True and cert_asym["d"] == 3
+    assert cert_asym["sides"]["X"]["value"] == 3 and cert_asym["sides"]["Z"]["value"] == 4
     stab = T.certify(_five_qubit(), root=None, tlim=60, threads=1, runner=runner)
     assert set(stab["sides"]) == {"P"} and stab["encoding"] == "pauli-mechanisms" and stab["d_exact"]
     jsonschema.validate(stab, schema)

@@ -1636,25 +1636,23 @@
   "construction": "lifted product over Z_6 x S_3 from GFlowQEC (arXiv:2611.06819v1), tuple [24, 5, 28, 14, 18, 24, 6, 34, 5, 19]",
   "origin": "submission",
   "date": "2026-11-05",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the Z-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 10), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json)."
  },
  "family": "lifted-product",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 10,
+    "value": 7,
     "confidence": "upper_bound",
     "witness": [
-     91742,
-     91745,
-     91753,
-     91755,
-     91782,
-     91783,
-     91799,
-     91802,
-     91820,
-     91836
+     931,
+     1219,
+     1553,
+     1639,
+     2125,
+     2431,
+     6024
     ]
    },
    "X": {

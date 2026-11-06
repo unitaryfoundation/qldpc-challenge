@@ -1,560 +1,594 @@
 {
-  "schema_version": "0.2",
-  "name": "[[48,11,4]] reduction of [[49,11,4]]",
-  "code_type": "CSS",
-  "n": 48,
-  "k": 11,
-  "checks": {
-    "X": [
-      [
-        31,
-        37,
-        38,
-        43,
-        45,
-        46
-      ],
-      [
-        13,
-        27,
-        29,
-        41
-      ],
-      [
-        7,
-        8,
-        14,
-        17,
-        21,
-        23
-      ],
-      [
-        6,
-        13,
-        20,
-        21,
-        27,
-        34
-      ],
-      [
-        1,
-        2,
-        8,
-        9,
-        10,
-        22
-      ],
-      [
-        7,
-        9,
-        13,
-        16,
-        22,
-        29
-      ],
-      [
-        18,
-        32,
-        33,
-        40,
-        46
-      ],
-      [
-        20,
-        28,
-        30,
-        42
-      ],
-      [
-        38,
-        39,
-        40,
-        44,
-        45,
-        47
-      ],
-      [
-        4,
-        11,
-        16,
-        19,
-        24,
-        32
-      ],
-      [
-        0,
-        1,
-        6,
-        8,
-        14,
-        21
-      ],
-      [
-        5,
-        11,
-        18,
-        19,
-        26,
-        33
-      ],
-      [
-        4,
-        10,
-        12,
-        18
-      ],
-      [
-        18,
-        25,
-        26,
-        30,
-        31,
-        39
-      ],
-      [
-        3,
-        9,
-        12,
-        17,
-        19,
-        25
-      ],
-      [
-        2,
-        7,
-        9,
-        11,
-        15,
-        23
-      ],
-      [
-        34,
-        35,
-        38,
-        42,
-        43,
-        44
-      ],
-      [
-        36,
-        41,
-        42,
-        43,
-        44,
-        45
-      ]
-    ],
-    "Z": [
-      [
-        4,
-        5,
-        12,
-        19
-      ],
-      [
-        28,
-        30,
-        31,
-        36,
-        38,
-        44
-      ],
-      [
-        9,
-        15,
-        22,
-        25,
-        31,
-        37
-      ],
-      [
-        27,
-        34,
-        37,
-        41,
-        43
-      ],
-      [
-        11,
-        17,
-        23,
-        24,
-        25,
-        26
-      ],
-      [
-        0,
-        3,
-        7,
-        8,
-        9
-      ],
-      [
-        2,
-        4,
-        5,
-        10,
-        11
-      ],
-      [
-        4,
-        18,
-        19,
-        24,
-        25,
-        32
-      ],
-      [
-        0,
-        1,
-        8,
-        14
-      ],
-      [
-        1,
-        6,
-        8,
-        14,
-        20,
-        28
-      ],
-      [
-        28,
-        35,
-        37,
-        38,
-        42,
-        44
-      ],
-      [
-        10,
-        16,
-        18,
-        22,
-        26,
-        32
-      ],
-      [
-        26,
-        33,
-        39,
-        40
-      ],
-      [
-        7,
-        20,
-        23,
-        27,
-        28,
-        29
-      ],
-      [
-        14,
-        21,
-        28,
-        34,
-        36,
-        42
-      ],
-      [
-        24,
-        32,
-        38,
-        40,
-        44,
-        45
-      ],
-      [
-        2,
-        8,
-        13,
-        15,
-        21,
-        29
-      ],
-      [
-        31,
-        38,
-        39,
-        43,
-        45,
-        47
-      ],
-      [
-        37,
-        40,
-        46,
-        47
-      ]
-    ]
-  },
-  "distance": {
-    "d": 4,
-    "X": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        33,
-        39,
-        46,
-        47
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@dorakingx"
-        ],
-        "date": "2026-10-03",
-        "found_at_samples": 20000,
-        "survived_samples": 20000000,
-        "tool": "gf2_fast RIS ladder (verify/gf2_fast.cpp), both sides searched jointly",
-        "seeds": [
-          777001,
-          777138,
-          777275,
-          777412,
-          777549
-        ]
-      }
-    },
-    "Z": {
-      "value": 4,
-      "confidence": "upper_bound",
-      "witness": [
-        5,
-        26,
-        28,
-        30
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@dorakingx"
-        ],
-        "date": "2026-10-03",
-        "found_at_samples": 4000,
-        "survived_samples": 20000000,
-        "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
-        "seeds": [
-          7,
-          777001,
-          777138,
-          777275,
-          777412,
-          777549
-        ]
-      }
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@dorakingx"
-    ],
-    "construction": "Reduction of the board's codes/49-11-4.json ([[49,11,4]]) by 1 qubits at unchanged k, unchanged check-weight class and unchanged locality class, by one move applied to a fixpoint: graft a qubit away using a low-weight element of the stabilizer ROW SPACE. Let S be an element of the row space of H_X with support T and let a be in T. Replace one generator of the subset summing to S by S itself -- the span is unchanged, that generator being S plus the rest of the subset -- and add S into every other X row meeting a, so that a survives only in S. Then apply the CNOT fan-out from a to T\\{a}, which acts on the check matrices as H_X[:, b] ^= H_X[:, a] and H_Z[:, a] ^= H_Z[:, b] for each b in T\\{a}. Only S still meets a, so the first substitution turns S into the weight-1 stabilizer X_a and leaves every other X row alone; the second zeroes column a of H_Z, because commutation forces every Z row to meet T an even number of times. Qubit a is then disentangled and is deleted: n -> n-1, k unchanged, and the Z rows only LOSE an index, so their weights and support diameters cannot rise. The weight of S separates three regimes, and the difference is entirely in the clearing step R ^= S. |S| = 1: nothing is added anywhere, so the weights, the radius AND THE DISTANCE are all preserved exactly, and no distance search is needed -- this is the row-space form of the weight-1 stabilizer cleanup of Liang, Eberhardt and Chen (arXiv:2504.08887 Sec. III D step 4), which the implementation in research/local2d/boundary_engine.py applies only to literal weight-1 generator ROWS. |S| = 2: R loses a and toggles one other index, so its weight changes by 0 or -2 and can never rise. |S| >= 3: R can grow, so every touched row is checked against the code's weight class and its locality radius, measured in the source's own layout. This generalises the capped merge-graft I introduced with [[454,8,17]], which only ever built S from the generators a single qubit happens to lie in. Here the accepted grafts were . Low-weight row-space elements are enumerated as sums of at most three checks with a connected overlap pattern. Every graft with |S| >= 2 was accepted only if k was unchanged and a bit-packed RIS search found nothing lighter than 4, screened once and confirmed twice with independent seeds; those in-loop rungs are a filter, not the evidence. QUBIT POSITIONS ARE THE SOURCE'S: every surviving qubit keeps the coordinate it has in codes/49-11-4.json, so the layout is inherited rather than re-derived, and the reduction only deletes. The surviving qubits' indices into the source numbering are [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12]... (full list implied by the coordinates in this file).",
-    "references": [
-      "arXiv:2504.08887"
+ "schema_version": "0.2",
+ "name": "[[48,11,4]] reduction of [[49,11,4]]",
+ "code_type": "CSS",
+ "n": 48,
+ "k": 11,
+ "checks": {
+  "X": [
+   [
+    31,
+    37,
+    38,
+    43,
+    45,
+    46
+   ],
+   [
+    13,
+    27,
+    29,
+    41
+   ],
+   [
+    7,
+    8,
+    14,
+    17,
+    21,
+    23
+   ],
+   [
+    6,
+    13,
+    20,
+    21,
+    27,
+    34
+   ],
+   [
+    1,
+    2,
+    8,
+    9,
+    10,
+    22
+   ],
+   [
+    7,
+    9,
+    13,
+    16,
+    22,
+    29
+   ],
+   [
+    18,
+    32,
+    33,
+    40,
+    46
+   ],
+   [
+    20,
+    28,
+    30,
+    42
+   ],
+   [
+    38,
+    39,
+    40,
+    44,
+    45,
+    47
+   ],
+   [
+    4,
+    11,
+    16,
+    19,
+    24,
+    32
+   ],
+   [
+    0,
+    1,
+    6,
+    8,
+    14,
+    21
+   ],
+   [
+    5,
+    11,
+    18,
+    19,
+    26,
+    33
+   ],
+   [
+    4,
+    10,
+    12,
+    18
+   ],
+   [
+    18,
+    25,
+    26,
+    30,
+    31,
+    39
+   ],
+   [
+    3,
+    9,
+    12,
+    17,
+    19,
+    25
+   ],
+   [
+    2,
+    7,
+    9,
+    11,
+    15,
+    23
+   ],
+   [
+    34,
+    35,
+    38,
+    42,
+    43,
+    44
+   ],
+   [
+    36,
+    41,
+    42,
+    43,
+    44,
+    45
+   ]
+  ],
+  "Z": [
+   [
+    4,
+    5,
+    12,
+    19
+   ],
+   [
+    28,
+    30,
+    31,
+    36,
+    38,
+    44
+   ],
+   [
+    9,
+    15,
+    22,
+    25,
+    31,
+    37
+   ],
+   [
+    27,
+    34,
+    37,
+    41,
+    43
+   ],
+   [
+    11,
+    17,
+    23,
+    24,
+    25,
+    26
+   ],
+   [
+    0,
+    3,
+    7,
+    8,
+    9
+   ],
+   [
+    2,
+    4,
+    5,
+    10,
+    11
+   ],
+   [
+    4,
+    18,
+    19,
+    24,
+    25,
+    32
+   ],
+   [
+    0,
+    1,
+    8,
+    14
+   ],
+   [
+    1,
+    6,
+    8,
+    14,
+    20,
+    28
+   ],
+   [
+    28,
+    35,
+    37,
+    38,
+    42,
+    44
+   ],
+   [
+    10,
+    16,
+    18,
+    22,
+    26,
+    32
+   ],
+   [
+    26,
+    33,
+    39,
+    40
+   ],
+   [
+    7,
+    20,
+    23,
+    27,
+    28,
+    29
+   ],
+   [
+    14,
+    21,
+    28,
+    34,
+    36,
+    42
+   ],
+   [
+    24,
+    32,
+    38,
+    40,
+    44,
+    45
+   ],
+   [
+    2,
+    8,
+    13,
+    15,
+    21,
+    29
+   ],
+   [
+    31,
+    38,
+    39,
+    43,
+    45,
+    47
+   ],
+   [
+    37,
+    40,
+    46,
+    47
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    33,
+    39,
+    46,
+    47
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@dorakingx"
     ],
     "date": "2026-10-03",
-    "notes": "Derived from codes/49-11-4.json, not an independent construction; the source's authors are @vprusso and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[49,11,4]], [[50,10,4]], [[50,6,4]], [[64,10,4]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is unchanged at 4, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
-    "model": "Claude Opus 5 (Claude Code)",
-    "origin": "submission",
-    "novelty": "unknown"
+    "found_at_samples": 20000,
+    "survived_samples": 20000000,
+    "tool": "gf2_fast RIS ladder (verify/gf2_fast.cpp), both sides searched jointly",
+    "seeds": [
+     777001,
+     777138,
+     777275,
+     777412,
+     777549
+    ]
+   }
   },
-  "family": "local-sat-css",
-  "locality": {
-    "coordinates": [
-      [
-        0.0,
-        0.0
-      ],
-      [
-        1.0,
-        0.0
-      ],
-      [
-        2.0,
-        0.0
-      ],
-      [
-        4.0,
-        0.0
-      ],
-      [
-        5.0,
-        0.0
-      ],
-      [
-        6.0,
-        0.0
-      ],
-      [
-        0.0,
-        1.0
-      ],
-      [
-        1.0,
-        1.0
-      ],
-      [
-        2.0,
-        1.0
-      ],
-      [
-        3.0,
-        1.0
-      ],
-      [
-        4.0,
-        1.0
-      ],
-      [
-        5.0,
-        1.0
-      ],
-      [
-        6.0,
-        1.0
-      ],
-      [
-        0.0,
-        2.0
-      ],
-      [
-        1.0,
-        2.0
-      ],
-      [
-        2.0,
-        2.0
-      ],
-      [
-        3.0,
-        2.0
-      ],
-      [
-        4.0,
-        2.0
-      ],
-      [
-        5.0,
-        2.0
-      ],
-      [
-        6.0,
-        2.0
-      ],
-      [
-        0.0,
-        3.0
-      ],
-      [
-        1.0,
-        3.0
-      ],
-      [
-        2.0,
-        3.0
-      ],
-      [
-        3.0,
-        3.0
-      ],
-      [
-        4.0,
-        3.0
-      ],
-      [
-        5.0,
-        3.0
-      ],
-      [
-        6.0,
-        3.0
-      ],
-      [
-        0.0,
-        4.0
-      ],
-      [
-        1.0,
-        4.0
-      ],
-      [
-        2.0,
-        4.0
-      ],
-      [
-        3.0,
-        4.0
-      ],
-      [
-        4.0,
-        4.0
-      ],
-      [
-        5.0,
-        4.0
-      ],
-      [
-        6.0,
-        4.0
-      ],
-      [
-        0.0,
-        5.0
-      ],
-      [
-        1.0,
-        5.0
-      ],
-      [
-        2.0,
-        5.0
-      ],
-      [
-        3.0,
-        5.0
-      ],
-      [
-        4.0,
-        5.0
-      ],
-      [
-        5.0,
-        5.0
-      ],
-      [
-        6.0,
-        5.0
-      ],
-      [
-        0.0,
-        6.0
-      ],
-      [
-        1.0,
-        6.0
-      ],
-      [
-        2.0,
-        6.0
-      ],
-      [
-        3.0,
-        6.0
-      ],
-      [
-        4.0,
-        6.0
-      ],
-      [
-        5.0,
-        6.0
-      ],
-      [
-        6.0,
-        6.0
-      ]
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    26,
+    28,
+    30
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@dorakingx"
     ],
-    "interaction_radius": 4.0,
-    "layers": 1
+    "date": "2026-10-03",
+    "found_at_samples": 4000,
+    "survived_samples": 20000000,
+    "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
+    "seeds": [
+     7,
+     777001,
+     777138,
+     777275,
+     777412,
+     777549
+    ]
+   }
   }
+ },
+ "provenance": {
+  "authors": [
+   "@dorakingx"
+  ],
+  "construction": "Reduction of the board's codes/49-11-4.json ([[49,11,4]]) by 1 qubits at unchanged k, unchanged check-weight class and unchanged locality class, by one move applied to a fixpoint: graft a qubit away using a low-weight element of the stabilizer ROW SPACE. Let S be an element of the row space of H_X with support T and let a be in T. Replace one generator of the subset summing to S by S itself -- the span is unchanged, that generator being S plus the rest of the subset -- and add S into every other X row meeting a, so that a survives only in S. Then apply the CNOT fan-out from a to T\\{a}, which acts on the check matrices as H_X[:, b] ^= H_X[:, a] and H_Z[:, a] ^= H_Z[:, b] for each b in T\\{a}. Only S still meets a, so the first substitution turns S into the weight-1 stabilizer X_a and leaves every other X row alone; the second zeroes column a of H_Z, because commutation forces every Z row to meet T an even number of times. Qubit a is then disentangled and is deleted: n -> n-1, k unchanged, and the Z rows only LOSE an index, so their weights and support diameters cannot rise. The weight of S separates three regimes, and the difference is entirely in the clearing step R ^= S. |S| = 1: nothing is added anywhere, so the weights, the radius AND THE DISTANCE are all preserved exactly, and no distance search is needed -- this is the row-space form of the weight-1 stabilizer cleanup of Liang, Eberhardt and Chen (arXiv:2504.08887 Sec. III D step 4), which the implementation in research/local2d/boundary_engine.py applies only to literal weight-1 generator ROWS. |S| = 2: R loses a and toggles one other index, so its weight changes by 0 or -2 and can never rise. |S| >= 3: R can grow, so every touched row is checked against the code's weight class and its locality radius, measured in the source's own layout. This generalises the capped merge-graft I introduced with [[454,8,17]], which only ever built S from the generators a single qubit happens to lie in. Here the accepted grafts were . Low-weight row-space elements are enumerated as sums of at most three checks with a connected overlap pattern. Every graft with |S| >= 2 was accepted only if k was unchanged and a bit-packed RIS search found nothing lighter than 4, screened once and confirmed twice with independent seeds; those in-loop rungs are a filter, not the evidence. QUBIT POSITIONS ARE THE SOURCE'S: every surviving qubit keeps the coordinate it has in codes/49-11-4.json, so the layout is inherited rather than re-derived, and the reduction only deletes. The surviving qubits' indices into the source numbering are [0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12]... (full list implied by the coordinates in this file).",
+  "references": [
+   "arXiv:2504.08887"
+  ],
+  "date": "2026-10-03",
+  "notes": "Derived from codes/49-11-4.json, not an independent construction; the source's authors are @vprusso and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[49,11,4]], [[50,10,4]], [[50,6,4]], [[64,10,4]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is unchanged at 4, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "model": "Claude Opus 5 (Claude Code)",
+  "origin": "submission",
+  "novelty": "unknown"
+ },
+ "family": "local-sat-css",
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    4.0,
+    0.0
+   ],
+   [
+    5.0,
+    0.0
+   ],
+   [
+    6.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    3.0,
+    1.0
+   ],
+   [
+    4.0,
+    1.0
+   ],
+   [
+    5.0,
+    1.0
+   ],
+   [
+    6.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    5.0,
+    2.0
+   ],
+   [
+    6.0,
+    2.0
+   ],
+   [
+    0.0,
+    3.0
+   ],
+   [
+    1.0,
+    3.0
+   ],
+   [
+    2.0,
+    3.0
+   ],
+   [
+    3.0,
+    3.0
+   ],
+   [
+    4.0,
+    3.0
+   ],
+   [
+    5.0,
+    3.0
+   ],
+   [
+    6.0,
+    3.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    4.0,
+    4.0
+   ],
+   [
+    5.0,
+    4.0
+   ],
+   [
+    6.0,
+    4.0
+   ],
+   [
+    0.0,
+    5.0
+   ],
+   [
+    1.0,
+    5.0
+   ],
+   [
+    2.0,
+    5.0
+   ],
+   [
+    3.0,
+    5.0
+   ],
+   [
+    4.0,
+    5.0
+   ],
+   [
+    5.0,
+    5.0
+   ],
+   [
+    6.0,
+    5.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    6.0
+   ],
+   [
+    2.0,
+    6.0
+   ],
+   [
+    3.0,
+    6.0
+   ],
+   [
+    4.0,
+    6.0
+   ],
+   [
+    5.0,
+    6.0
+   ],
+   [
+    6.0,
+    6.0
+   ]
+  ],
+  "interaction_radius": 4.0,
+  "layers": 1
+ },
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     479,
+     555,
+     635,
+     687
+    ]
+   },
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     1,
+     6,
+     222,
+     3908
+    ]
+   }
+  },
+  "rounds": 4,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil + 4 span flags sequential extraction (max_flags=3 per check, 8 X + 7 Z edge-colored data CX layers per round, coloring candidate 0); generated by qldpc submit (research/circuit_autogen.py, seed 0), the first of up to 6 candidates whose RIS screen at 2 rounds found nothing below d; witnesses from RIS on ker(H_dem) at twice the gate's trial budget, validated in GF(2)",
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-06",
+   "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ }
 }
