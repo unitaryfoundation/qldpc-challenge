@@ -722,6 +722,7 @@
    "Lin, Hsiang-Ku",
    "Pryadko, Leonid P."
   ],
+  "model": "human",
   "construction": "Two-block group-algebra (2BGA) code over SmallGroup(48,2), archive row \"48 2 4 10 [2] [3,39]\" (Lin & Pryadko, arXiv:2306.16400; 2BGA-codes archive). Reconstructed here via an equivalent bivariate-bicycle presentation over F_2[x,y]/(x^16-1, y^3-1): A = 1 + y + x^2 y^2, B = 1 + x^3, H_X = [A|B], H_Z = [B^T|A^T]. An explicit CRT relabeling of the 48 group coordinates in each qubit block, plus an exchange of the two 48-qubit blocks, maps this presentation onto the archived row exactly -- the same CSS code up to qubit/check permutation.",
   "references": [
    "arXiv:2306.16400",
