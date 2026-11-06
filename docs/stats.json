@@ -7,8 +7,8 @@
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "literature": 493,
     "no_match": 2015,
+    "literature": 493,
     "parameters_only": 392,
     "not_derived": 4,
     "method": "isomorphism against the literature index",
@@ -22,8 +22,8 @@
   "novelty_audited": 766,
   "board_screen": {
     "distinct": 2493,
-    "review": 37,
     "not_screened": 374,
+    "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
     "caveat": "distinct means not permutation-equivalent to any seeded or literature entry on this board, not that the code is unpublished; review is a flag, not a verdict; nothing here is a novelty claim"
