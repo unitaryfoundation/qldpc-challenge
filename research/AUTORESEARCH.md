@@ -103,6 +103,157 @@ To watch the whole loop run once (build → package → the real verifier in-pro
 uv run python research/test_smoke.py
 ```
 
+## Organizing the agents that run the loop
+
+The loop above is written for one agent. Several now run it against this repository at once,
+and one session often spawns helpers, so who does what is a separate question from what gets
+done. Left to a session to invent, it has gone wrong in the ways the fieldnotes record:
+parallel sessions racing one shared checkout
+(`../fieldnotes/2026-09-08-check-deletion-campaign-retrospective.md`, "submit from isolated
+worktrees") and two of a sweep's advances turning out to be parameter duplicates of
+concurrent work (`../fieldnotes/2026-09-30-422-amplification-yield.md`). The open
+autoresearch write-up of ECDSA.fail (arXiv:2609.09582; the "parallel, role-separated, and
+clean-context agents" practice in its section 4.3 and the framework in its Algorithm 3)
+describes the organization that worked there, and the primitives it rests on already exist
+here: `kit/coordination.py` for per-run staging and advisory cell claims, `kit/campaign.py`
+for the shared ledger, and git worktrees for isolation. This section says how to combine
+them (issue #4234). Nothing in it changes what may be claimed: the gate decides, as above,
+and the rules of this section only decide where the budget goes and who reads which record.
+
+### Three roles
+
+- **A research agent owns one hypothesis**: one family at one parameter range, aimed at one
+  cell. It builds, calibrates the generator against a board entry (section 3), screens with
+  `search.screen`, works out why the screen came out as it did (a divisor that was never
+  shared, a lattice that decoupled, a ladder that was still descending), writes each
+  reading with `record_screen` and `record_verdict`, and stages the survivors. It returns
+  a compact conclusion, not a narrative: the parameters tried, the depth they were read
+  at, the best reading, the verdict, and one sentence on the mechanism. Everything else it
+  learned is in its ledger journal or is lost.
+- **An engineering agent turns survivors into clean artifacts**, one candidate at a time. It
+  packages (`submit.make_submission`, `submit.save_submission` with the `spec=`), runs the
+  gate (`coordination.py gate <path>`), runs the matched-depth audit when the gain is on `d`
+  alone (section 5b), and, when a human has authorized a submission, renders the note, the
+  `codes/` document, and the PR body with `kit/promote.py`. It never widens the search, and
+  it is the one that commits a sampler that is good enough to graduate into `kit/search.py`.
+- **An orchestrator allocates and stops.** It reads the shared record first (step 0 of the
+  loop), writes the direction card, hands each worker one hypothesis and one budget, merges
+  the workers' ledgers, stops a route that the direction card's abandon criterion or the
+  escalation gate's ladder facts (section 3b) say is stalled, and writes `summary.json`. It
+  does not screen or gate anything itself: its context is the one that has to stay small
+  and whole for the length of the campaign.
+
+One agent can play all three in turn, and in a single session usually does. The split is
+between concerns, and it matters most when the concerns are split across contexts, because
+each role then sees only what it needs.
+
+### One hypothesis per fresh-context worker, in its own worktree
+
+A worker that has read fifty ladders carries their conclusions into the fifty-first, and two
+workers sharing one transcript share one blind spot. So a worker starts with an empty
+context and gets exactly four things: the campaign file, its one hypothesis (family,
+parameter range, cell), a budget in the units the campaign spends, and the committed record
+for that family (`./qldpc screened --family <family>`, `./qldpc brief --cell <cell>`, and
+the `fieldnotes/` touching it). It gives back two: the path of its ledger journal and the
+compact conclusion above.
+
+What is isolated, and the mechanics this repository already has for each:
+
+- **The checkout.** `git worktree add <dir> <base>` gives the worker its own tree, so a
+  speculative rewrite of a sampler cannot change the baseline the other workers compare
+  against, and a worker that dies leaves nothing half-edited in the shared checkout.
+- **The staging directory.** `coordination.staging_dir()` is `research/candidates/<run_id>/`
+  under the worker's own checkout, so two workers writing `<n>-<k>-<d>.json` cannot
+  overwrite each other, and the directory name says which worker to ask. `run_id` is unique
+  per process; set `QLDPC_RUN_ID` when a harness wants a readable name or wants two processes
+  to share one shelf. Staging, the verdict cache, and the cell claims all live under the
+  checkout that wrote them: a claim made from a worktree is not listed by `./qldpc targets`
+  in another, so the orchestrator makes the cell claim from its own checkout and the workers
+  make none.
+- **The filename.** `coordination.unique_path(path, doc)` gives a second candidate with the
+  same `[[n,k,d]]` its own name, and `save_submission` refuses to write over a different
+  candidate at a path it is handed.
+- **The ledger.** `Ledger(camp, journal=f"{staging_dir()}/ledger.jsonl")`, one journal per
+  worker, because two processes appending to one file interleave partial lines. The
+  orchestrator folds them with `Ledger.merge`, which keys experiments by `(family, seed)` so
+  the same deterministic work is counted once, and unions survivors on the verifier's
+  fingerprint so one code found twice is one survivor.
+- **The gate verdict.** A gate run is per candidate and its verdict is written beside that
+  candidate (`<path>.verdict.json`). A worker reports candidates that passed, never a
+  family that did.
+
+Two costs follow from the isolation. A fresh process pays the gate's board pass once
+(421 s on the machine of section 3d), so a worker gates its survivors in one process rather
+than one process per candidate. The orchestrator, not the worker, is where duplicates
+between workers are caught: two workers given adjacent parameter ranges can stage the same
+code, and `Ledger.merge` folds the survivors, but it cannot fold two staged files, so the
+orchestrator checks the merged survivors' fingerprints before anything is packaged.
+
+### Bake-offs
+
+When several routes could spend the budget, give each the same screening budget first,
+compare them on one instrument, keep the best few, and only then deepen. The instrument is
+the `efficiency` field on `search.screen` records (`kd^2/n`, the board's per-cell headline
+figure), read at the same `trials=` and `backend=` for every route and compared within one
+cell, never across cells. The matched budget is what makes the comparison about the routes
+rather than about who spent more: `distance_rand` returns an upper bound that comes down
+with trials, so a route screened deeper looks worse at the screen, and a route whose
+ladder was fed more budget looks better at the ladder, and neither difference is a
+difference between the codes. Weigh each route's `screen_quality` from the ledger summary
+beside its efficiency: a family whose screen does not rank candidates the way the gate does
+cannot be deepened on the strength of its screen readings. `search.screen_adaptive` is the
+same idea inside one route (widening stages, dropping what cannot reach the target); the
+bake-off is across routes, and together they approximate a beam search over the campaign's
+families, which is how the ECDSA.fail participants described theirs.
+
+Deepen the survivors with the ladder and the escalation gate (section 3b), budgeted by the
+costs in section 3d, and record every route the bake-off dropped: a `record_screen` at the
+bake-off depth, `record_verdict("not_run")`, and a `record_negative` naming the route, so
+the next session sees that the route lost a comparison at that depth rather than that it was
+never tried.
+
+### A claim is a hypothesis until a second run reproduces it
+
+One worker's survivor is a hypothesis. It becomes a result when a second, independent run,
+with a fresh context and its own worktree, reaches the same code and the same bound.
+Independence means the second run shares none of the first's state: not its transcript, not
+its seeds, and not its verdict cache, which lives under the first worker's staging
+directory and is therefore not seen from another checkout. Three levels, in order of cost:
+
+1. **Rebuild from the recipe alone.** `python research/kit/rebuild.py --constructor
+   <module.function> --params '<json>'` prints the verifier's fingerprint of the code the
+   recipe builds; it must equal the `candidate.fingerprint` in the staged candidate's
+   `.verdict.json`. A code the recipe cannot rebuild is not a result, whatever its bound.
+2. **Re-measure at matched depth.** `research/audits/leader_audit.py screen <candidate>
+   [<peer> ...] --trials <N> --seeds <fresh seeds> --witness-dir <dir>` reads the candidate
+   and any peer it beats at one budget. For a gain on `d` alone this is already required
+   before packaging, as `leader_audit.py pair` (section 5b), and the `drop`, `redirect`,
+   `credible`, and `inconclusive` decisions there apply unchanged: `inconclusive` is no
+   information, never corroboration. Keep the witness directory; a lighter logical found
+   here is the most expensive object the campaign produces.
+3. **The gate, run by the reviewer.** `coordination.py gate <path>` from the reviewer's own
+   checkout, so the random search is spent again rather than served from the first
+   worker's cache.
+
+The ECDSA.fail teams also had agents from different model families read one another's
+conclusions before a claim was trusted. The equivalent here is a reviewer that reads the
+compact conclusion and the ledger journal and tries to break them, and its opinion has the
+status the escalation gate already gives a judgment model's verdict: advisory, kept in the
+staging journal, and never repo evidence. The evidence is the gate verdict beside the
+candidate and the witness files, and nothing a reviewer writes adds to or subtracts from
+them.
+
+### The shared state is the ledger
+
+ECDSA.fail's agents kept their shared state in hypothesis queues, iteration logs,
+scoreboards, and regression records rather than in any one agent's context. The equivalents
+here are the direction card (the hypothesis), the ledger journal (the iteration log),
+`./qldpc targets` and `./qldpc brief` (the scoreboard), and `./qldpc screened` (the record of
+what was tried, at what depth). Per-agent scratch notes have no equivalent, on purpose: a
+reading that is not in a journal is lost when the worker's context is, so the ledger is
+the only place a reading goes, and the merged `summary.json` is the only thing the campaign
+hands to the next one (`campaigns/README.md`, "Ending one").
+
 ## 1. Pick a direction and a family, build `(HX, HZ)`
 
 A **direction** is a concrete target: a track cell (locality class × weight class, e.g.
