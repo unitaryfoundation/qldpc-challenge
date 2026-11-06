@@ -562,7 +562,10 @@ results, but they do not sit on the frontier. See `TRACKS.md`.
 A board-advancing code whose only strict gain over an entry is d (same n, k and w)
 calls for caution, not rejection: both distances are upper bounds, so re-measure the
 peer and the candidate at matched depth (`research/audits/leader_audit.py pair`)
-before submitting.
+before submitting. `./qldpc submit` refuses such a gain unless `--peer-audit <file>`
+carries the record `pair --json-out` wrote: a `credible` decision, read at least as
+deep as the submission's own search, covering every such entry. Without one it
+stages the verified document and prints the `pair` command to run.
 
 ## Tips
 

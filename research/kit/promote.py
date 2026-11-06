@@ -72,6 +72,7 @@ for _rel in ("verify", "site", "cli", os.path.join("research", "kit")):
         sys.path.insert(0, _p)
 
 import escalation  # noqa: E402
+import peer_audit  # noqa: E402
 import qldpc as cli  # noqa: E402
 import qldpc_verify  # noqa: E402
 import validate_candidate as gate  # noqa: E402
@@ -631,12 +632,13 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
                        "document: " + "; ".join(verdict.get("labels") or []))
         return report
     novelty = (verdict.get("gates") or {}).get("novelty") or {}
-    if novelty.get("d_only_peers") and not evidence.get("peer_audit"):
-        blocked.append(
-            "the gate reports a d-only gain over "
-            + ", ".join(novelty["d_only_peers"])
-            + "; research/AUTORESEARCH.md requires a matched-depth peer audit "
-              "before packaging, and evidence.peer_audit records none")
+    # A d-only gain owes the matched-depth audit (issue #4236). The rule lives
+    # in research/kit/peer_audit.py, shared with ./qldpc submit; the depth the
+    # claim rests on is the ladder's deepest fresh rung.
+    blocked.extend(peer_audit.blockers(
+        novelty.get("d_only_peers") or [], evidence.get("peer_audit"),
+        required_trials=facts["deepest_fresh_trials"],
+        attach="put the record it writes in evidence.peer_audit"))
     ticked, reason = equivalence_finding(verdict, doc)
     if not ticked:
         blocked.append(reason)
@@ -708,7 +710,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             "ok": None,
             "skipped": "dry run: nothing was written for the checker to read"}
 
-    report["needs_human"] = needs_human(doc, verdict, body_file if write else None)
+    report["needs_human"] = needs_human(doc, verdict, body_file if write else None,
+                                        evidence=evidence)
     report["commands"] = _git_commands(slug, report["title"], code_rel, note_rel,
                                        body_file, base=base,
                                        extra=[repro_rel] if repro_rel else ())
@@ -716,7 +719,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     return report
 
 
-def needs_human(doc, verdict, body_file):
+def needs_human(doc, verdict, body_file, evidence=None):
     """List what this bundle still needs a person for, and why."""
     items = [{"item": "literature novelty",
               "why": "the gate deduplicates against this board only and labels "
@@ -736,6 +739,15 @@ def needs_human(doc, verdict, body_file):
                       "why": "the gate found the same Weisfeiler-Leman "
                              "signature; provenance.notes records a judgment "
                              "that only a person can make"})
+    gates = verdict.get("gates") or {}
+    peers = (gates.get("novelty") or {}).get("d_only_peers") or []
+    audit = (evidence or {}).get("peer_audit")
+    if peers and audit and not peer_audit.is_checkable(audit):
+        items.append({"item": f"the matched-depth peer audit over {', '.join(peers)}",
+                      "why": "evidence.peer_audit is prose, so its depth, seeds, "
+                             "and decision were not checked; "
+                             "research/audits/leader_audit.py pair --json-out "
+                             "writes a record that is"})
     if doc.get("code_type", "CSS") == "CSS" and "circuit" not in doc:
         items.append({"item": "the circuit tier",
                       "why": "this module does not generate memory circuits; "

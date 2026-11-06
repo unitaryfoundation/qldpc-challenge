@@ -122,7 +122,7 @@ on `d` alone at one identical budget:
 ```
 uv run --frozen python research/audits/leader_audit.py pair \
     <candidate>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers default to every `codes/` entry with the same n, k and max check
@@ -142,6 +142,14 @@ not a distance difference. One of four decisions comes out:
 Exit 2 when either side is refuted, so it gates like `ladder` and `screen`.
 Exit 3 when there is no peer at all: that candidate is not making a d-only gain,
 so this is not the question to ask of it -- use `screen`.
+
+`--json-out` writes the audit as a record (`qldpc-peer-audit/1`: the candidate,
+the peers measured, trials, seeds, pair depth, threads, the decision, the exit
+code, and each entry's reading). That file is what the two packaging paths
+consume: `./qldpc submit --peer-audit <file>` and `evidence.peer_audit` in
+`research/kit/promote.py` refuse a d-only gain without it, with a decision other
+than `credible`, read at fewer trials than the claim's own search, or not
+covering every peer the gate named (`research/kit/peer_audit.py`, issue #4236).
 
 ## The frontier over time: `frontier_history.py`
 
