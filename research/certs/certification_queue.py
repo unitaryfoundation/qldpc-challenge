@@ -101,6 +101,25 @@ def honored_certs(build):
     return out
 
 
+def interval_lower_bounds(build, slug, doc):
+    """{side: proved lower bound} from an interval certificate (d_exact false, issue #4718) on file, else {}.
+
+    The entry stays in the queue, since nothing is exact; the row carries what
+    the sweep has proved so a reader sees how far the entry is from closing.
+    """
+    path = os.path.join(CERTS, slug + ".json")
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            cert = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    if cert.get("d_exact") or not build.cert_consistent(cert, doc):
+        return {}
+    return build.cert_lower_bounds(cert)
+
+
 def peer_costs(honored):
     """(n, d, seconds) for every honored certificate that records per-side seconds."""
     rows = []
@@ -186,6 +205,9 @@ def build_queue(build, entries, records):
                                       "lp_vars": n + rank_kernel + 1,
                                       "lp_constraints": rank_kernel + 2,
                                       "milps_at_most": gens}
+        lower = interval_lower_bounds(build, slug, doc)
+        if lower:
+            rec["certified_lower_bound"] = lower
         median, count = peers_for(n, d, rows) if not stab else (None, 0)
         rec["peers"] = {"median_side_secs": median, "count": count}
         rec["band"] = band_for(rec["code_type"], n, d, median, count)

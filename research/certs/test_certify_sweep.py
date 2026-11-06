@@ -307,7 +307,7 @@ def test_the_tropidist_backend_admits_stabilizer_entries_and_hands_closed_css_en
         sat_calls.append(slug)
         return _record()
 
-    def tool(doc, tlim, slug):                          # the tropidist stand-in
+    def tool(doc, tlim, slug, kmin=None):               # the tropidist stand-in
         if slug == "css-closes":
             return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("UNSAT", None)})
         if slug == "css-open":
@@ -339,7 +339,8 @@ def test_the_tropidist_backend_admits_stabilizer_entries_and_hands_closed_css_en
     assert "tropidist backend" in body and "stabilizer" in body and "| stab | 5 | 2 | 3 | solver | tropidist |" in body
     assert "| css-closes | 12 | 2 | 2 | proof_log | sat |" in body
     summary = S.summary_markdown(m)
-    assert "| stab |" in summary and "d >= 1" not in summary, "the summary table lists what closed"
+    assert "| stab |" in summary and "| css-open |" not in summary, "the summary table lists what closed"
+    assert "css-open (" in summary, "an open entry within two of its claim is listed as an interval"
     # the tool alone never calls SAT; the SAT path alone still skips stabilizer entries
     sat_calls.clear()
     m2 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out2"), attempts_path=str(tmp_path / "a2.jsonl"),
@@ -369,3 +370,62 @@ def test_selection_for_the_tool_checks_the_pauli_side_against_d(tmp_path):
     assert [r["slug"] for r in chosen] == ["ok"] and skipped == {"side_mismatch": 1}
     chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes)
     assert chosen == [] and skipped == {"stabilizer": 2}
+
+
+def test_an_interval_certificate_is_filed_when_the_tool_gets_within_two_of_the_claim(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    css = {"n": 372, "k": 130, "code_type": "CSS",
+           "distance": {"d": 16, "X": {"value": 16}, "Z": {"value": 16}}}
+    for slug in ("near", "far", "half"):
+        _write(os.path.join(codes, slug + ".json"), css)
+    queue = {"date": "2026-11-06", "head": "q",
+             "entries": [_row("near", n=372, d=16), _row("far", n=372, d=16), _row("half", n=372, d=16)]}
+    seen_kmin = {}
+
+    def tool(doc, tlim, slug, kmin=None):
+        seen_kmin[slug] = kmin
+        if slug == "near":        # both sides one short of the claim
+            return _tool_record(slug, doc, tlim, sides={"X": ("TIMEOUT", 15), "Z": ("TIMEOUT", 15)})
+        if slug == "half":        # one side closed, the other two short
+            return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("TIMEOUT", 14)})
+        return _tool_record(slug, doc, tlim, sides={"X": ("TIMEOUT", 9), "Z": ("TIMEOUT", 15)})
+
+    attempts = str(tmp_path / "attempts.jsonl")
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=attempts, tlim=600, job_seconds=1000, certs_dir=certs,
+                    codes_dir=codes, certify_tropidist=tool, tools=lambda: {}, backend="tropidist")
+    assert m["outcomes"] == {"timeout": 3} and m["staged"] == [] and sorted(m["intervals"]) == ["half", "near"]
+    rows = {r["slug"]: r for r in S.load_jsonl(attempts)}
+    assert rows["near"]["interval"] and rows["half"]["interval"] and "interval" not in rows["far"]
+    with open(os.path.join(out, "certs", "near.json"), encoding="utf-8") as f:
+        cert = json.load(f)
+    assert cert["d_exact"] is False and cert["interval"] is True and cert["d_lower_bound"] == 15
+    assert cert["sides"]["X"]["lower_bound"] == 15 and cert["verification"]["level"] == "solver"
+    with open(os.path.join(out, "certs", "half.json"), encoding="utf-8") as f:
+        assert json.load(f)["d_lower_bound"] == 14
+    title, body = S.pr_text(m, staged=m["intervals"])
+    assert title.startswith("certs: certified lower bounds for 2 entries") and "#4718" in body
+    assert "| near | 372 | 2 | 16 | X TIMEOUT 0.2 s, d >= 15; Z TIMEOUT 0.2 s, d >= 15 |" in body
+    assert "interval certificates" in S.summary_markdown(m)
+    # stage copies the intervals into certs/; a later exact record replaces an interval, never the reverse
+    staged, skipped = S.stage(out, certs_dir=certs)
+    assert sorted(staged) == ["half", "near"] and skipped == []
+    _write(os.path.join(tmp_path / "out2" / "certs", "near.json"), {"d_exact": True})
+    _write(os.path.join(tmp_path / "out2" / "certs", "half.json"), {"d_exact": False, "interval": True})
+    assert S.stage(str(tmp_path / "out2"), certs_dir=certs) == (["half", "near"], [])
+    _write(os.path.join(tmp_path / "out3" / "certs", "near.json"), {"d_exact": False, "interval": True})
+    assert S.stage(str(tmp_path / "out3"), certs_dir=certs) == ([], ["near"])
+    # selection skips only an exact certificate, and a retry starts the tool one above the filed bound
+    chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes, stabilizer_ok=True)
+    assert [r["slug"] for r in chosen] == ["far", "half"] and skipped == {"certified": 1}
+    assert S.known_lower_bounds(certs, "half") == {} , "the stand-in exact file carries no sides"
+    with open(os.path.join(certs, "half.json"), "w", encoding="utf-8") as f:
+        json.dump(cert | {"sides": {"X": {"value": 16, "exact": True}, "Z": {"value": 16, "lower_bound": 14}}}, f)
+    assert S.known_lower_bounds(certs, "half") == {"X": 16, "Z": 14}
+    S.run_sweep(queue=queue, out_dir=str(tmp_path / "out4"), attempts_path=str(tmp_path / "a4.jsonl"), tlim=600,
+                job_seconds=1000, certs_dir=certs, codes_dir=codes, certify_tropidist=tool, tools=lambda: {},
+                backend="tropidist", slugs=["half", "far"])
+    assert seen_kmin["half"] == {"X": 17, "Z": 15} and seen_kmin["far"] is None
+    assert S.interval_worthy(_tool_record("x", css, 1, sides={"X": ("SAT", None), "Z": ("TIMEOUT", 15)})) is False
+    assert S.interval_worthy(_tool_record("x", css, 1, sides={"X": ("UNSAT", None), "Z": ("UNSAT", None)})) is False

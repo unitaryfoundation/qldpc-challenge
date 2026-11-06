@@ -78,6 +78,9 @@ SAT_CERTIFY = os.path.join(ROOT, "verify", "sat_certify.py")
 TROPIDIST_CERTIFY = os.path.join(HERE, "tropidist_certify.py")
 BACKENDS = ("sat", "tropidist", "tropidist+sat")
 WALL_FLOOR = 300
+# An interval certificate (issue #4718) is filed when every side the tool did
+# not close has a proved lower bound within this many thresholds of the claim.
+INTERVAL_SLACK = 2
 
 
 def wall_clock(tlim):
@@ -210,8 +213,9 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
             continue
-        if os.path.exists(os.path.join(certs_dir, slug + ".json")):
-            skip(slug, "certified", "certs/ already has a file for it")
+        filed = _read_json(os.path.join(certs_dir, slug + ".json"))
+        if filed is not None and filed.get("d_exact"):
+            skip(slug, "certified", "certs/ already has an exact certificate for it")
             continue
         values = {s: v.get("value") for s, v in (r.get("sides") or {}).items()}
         want = {"P"} if stab else {"X", "Z"}
@@ -234,6 +238,54 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
             continue
         chosen.append(r)
     return chosen, skipped, reasons
+
+
+def _read_json(path):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return None
+
+
+def interval_worthy(cert, slack=INTERVAL_SLACK):
+    """Decide whether this record is worth filing as an interval certificate (issue #4718).
+
+    Not exact, no side refuted, and every side that did not close has a
+    proved lower bound within ``slack`` of its claim, so the file says
+    "d is between L and the claim" rather than nothing.
+    """
+    if not cert or cert.get("d_exact"):
+        return False
+    sides = cert.get("sides") or {}
+    if not sides or any(b.get("status") == "SAT" for b in sides.values()):
+        return False
+    open_sides = [b for b in sides.values() if not b.get("exact")]
+    return bool(open_sides) and all(b.get("lower_bound") is not None and b.get("value") is not None
+                                    and b["lower_bound"] >= b["value"] - slack for b in open_sides)
+
+
+def interval_certificate(cert):
+    """Return the record as an interval certificate: d_exact false, the proved bounds kept per side."""
+    out = certificate(cert)
+    out["d_exact"] = False
+    out["interval"] = True
+    out["d_lower_bound"] = min(b["value"] if b.get("exact") else b["lower_bound"]
+                               for b in out["sides"].values())
+    return out
+
+
+def known_lower_bounds(certs_dir, slug):
+    """{side: lower bound} from an interval certificate already filed for the entry, else {}."""
+    filed = _read_json(os.path.join(certs_dir, slug + ".json"))
+    if not filed or filed.get("d_exact"):
+        return {}
+    out = {}
+    for side, blk in (filed.get("sides") or {}).items():
+        lb = blk.get("value") if blk.get("exact") else blk.get("lower_bound")
+        if lb is not None:
+            out[side] = int(lb)
+    return out
 
 
 def classify(cert):
@@ -289,16 +341,19 @@ def _side_summary(blk):
     return out
 
 
-def tropidist_in_subprocess(path, slug, tlim, root, threads, wall):
+def tropidist_in_subprocess(path, slug, tlim, root, threads, wall, kmin=None):
     """Run research/certs/tropidist_certify.py on one entry under a hard wall clock.
 
     Returns (record, error, killed) like certify_in_subprocess. Exit 0 and 1
     are verdicts (exact or not) with the record on stdout; exit 2 is the
     certifier refusing (no checkout, a pairing set that does not span k, a
-    vector the board rejects), reported from its last stderr line.
+    vector the board rejects), reported from its last stderr line. ``kmin``
+    maps a side to the threshold its search starts at (a filed lower bound).
     """
     cmd = [sys.executable, TROPIDIST_CERTIFY, path, "--tropidist", root, "--tlim", str(float(tlim)),
            "--threads", str(int(threads)), "--json"]
+    if kmin:
+        cmd += ["--kmin"] + [f"{side}={int(k)}" for side, k in sorted(kmin.items())]
     proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                             start_new_session=True)
     try:
@@ -402,14 +457,14 @@ def _sat_attempt(path, slug, tlim, wall, certify):
         shutil.rmtree(proof_dir, ignore_errors=True)
 
 
-def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist):
+def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist, kmin=None):
     """One tropidist attempt: (record, error, killed), in a subprocess or through the stand-in."""
     if certify_tropidist is None:
-        return tropidist_in_subprocess(path, slug, tlim, root, threads, tropidist_wall(tlim))
+        return tropidist_in_subprocess(path, slug, tlim, root, threads, tropidist_wall(tlim), kmin=kmin)
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
     try:
-        return certify_tropidist(doc, tlim=tlim, slug=slug), None, False
+        return certify_tropidist(doc, tlim=tlim, slug=slug, kmin=kmin), None, False
     except (ValueError, RuntimeError) as e:
         return None, str(e), False
 
@@ -460,7 +515,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     manifest = {"date": date, "head": head, "run": url, "tlim": tlim, "wall": wall, "job_seconds": job_seconds,
                 "queue_date": queue.get("date"), "queue_head": queue.get("head"), "backend": backend,
                 "selected": len(chosen), "skipped": dict(skipped), "tools": versions,
-                "results": [], "staged": [], "stopped_by_budget": False, "left": 0}
+                "results": [], "staged": [], "intervals": [], "stopped_by_budget": False, "left": 0}
     os.makedirs(os.path.join(out_dir, "certs"), exist_ok=True)
     t_start = time.time()
     for i, row in enumerate(chosen):
@@ -475,7 +530,9 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
         cert, error, killed, used, upgrade = None, None, False, "sat", None
         if use_tool:
             used = "tropidist"
-            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist)
+            start = {s: lb + 1 for s, lb in known_lower_bounds(certs_dir, slug).items()}
+            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist,
+                                                     kmin=start or None)
         if backend == "sat" or (backend == "tropidist+sat" and not stab
                                 and (error is not None or (cert is not None and classify(cert) == "exact"))):
             sat_cert, sat_error, sat_killed = _sat_attempt(path, slug, tlim, wall, certify)
@@ -494,6 +551,12 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
             if br:
                 append_jsonl(os.path.join(out_dir, "certs", BATCH_LOG), br)
             manifest["staged"].append(slug)
+        elif att["outcome"] == "timeout" and used == "tropidist" and interval_worthy(cert):
+            # the tool proved d >= L within INTERVAL_SLACK of the claim on every open side: file the interval
+            # (issue #4718); an exact certificate replaces it later, and the next run starts at L + 1
+            _write_json(os.path.join(out_dir, "certs", slug + ".json"), interval_certificate(cert))
+            manifest["intervals"].append(slug)
+            att["interval"] = True
         append_jsonl(attempts_path, att)
         manifest["results"].append(att)
         print(f"{slug}: {att['outcome']}" + (f" ({att['level']})" if att.get("level") else "")
@@ -536,6 +599,11 @@ def summary_markdown(m):
             lines.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
                          f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
         lines.append("")
+    intervals = [r for r in m["results"] if r.get("interval")]
+    if intervals:
+        lines.append("certified lower bounds filed (interval certificates): " + ", ".join(
+            f"{r['slug']} ({_sides_cell(r['sides'])})" for r in intervals))
+        lines.append("")
     for outcome in ("refuted", "timeout", "error"):
         rows = [r for r in m["results"] if r["outcome"] == outcome]
         if rows:
@@ -566,8 +634,10 @@ def _sides_cell(sides):
 def stage(out_dir, *, certs_dir=CERTS):
     """Copy the staged certificates into certs/ and append their batch rows.
 
-    A slug that gained a certificate in the meantime is left alone and
-    reported, so a race with another PR never overwrites a filed record.
+    A slug that gained an exact certificate in the meantime is left alone and
+    reported, so a race with another PR never overwrites a filed record. An
+    interval certificate on file is replaced, by an exact one or by a newer
+    interval (issue #4718); an exact one is never replaced by an interval.
     Returns (staged slugs, skipped slugs).
     """
     src = os.path.join(out_dir, "certs")
@@ -577,7 +647,8 @@ def stage(out_dir, *, certs_dir=CERTS):
             continue
         slug = name[:-5]
         dst = os.path.join(certs_dir, name)
-        if os.path.exists(dst):
+        filed = _read_json(dst) if os.path.exists(dst) else None
+        if os.path.exists(dst) and (filed is None or filed.get("d_exact")):
             skipped.append(slug)
             continue
         shutil.copyfile(os.path.join(src, name), dst)
@@ -605,10 +676,18 @@ def staged_slugs(out_dir, sub="certs"):
 def pr_text(m, staged=None):
     """(title, body) of the certs-only PR for a run manifest."""
     rows = [r for r in m["results"] if r["outcome"] == "exact" and (staged is None or r["slug"] in staged)]
+    intervals = [r for r in m["results"] if r.get("interval") and (staged is None or r["slug"] in staged)]
     n = len(rows)
     date = m["date"]
     noun = "entry" if n == 1 else "entries"
-    title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
+    if rows and intervals:
+        title = (f"certs: exact distances for {n} {noun} and certified lower bounds for {len(intervals)} "
+                 f"from the weekly certification sweep of {date}")
+    elif intervals:
+        title = (f"certs: certified lower bounds for {len(intervals)} "
+                 f"{'entry' if len(intervals) == 1 else 'entries'} from the weekly certification sweep of {date}")
+    else:
+        title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
     levels = Counter(r["level"] for r in rows)
     sat_rows = [r for r in rows if r.get("backend", "sat") == "sat"]
     tool_rows = [r for r in rows if r.get("backend") == "tropidist"]
@@ -659,6 +738,18 @@ def pr_text(m, staged=None):
     for r in rows:
         body.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
                     f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
+    if intervals:
+        body += ["",
+                 f"{len(intervals)} interval {'certificate' if len(intervals) == 1 else 'certificates'} "
+                 "(issue #4718): the tool did not close these entries, but on every open side it proved a lower "
+                 f"bound within {INTERVAL_SLACK} of the claim. Filed with d_exact false and the per-side lower "
+                 "bound, at the solver level; the site shows the certified lower bound on the code page and "
+                 "keeps the entry at d <=, the queue keeps the entry, and the next sweep starts its search one "
+                 "above the bound. An exact certificate replaces the file.",
+                 "",
+                 "| entry | n | k | d | sides |", "|---|---|---|---|---|"]
+        for r in intervals:
+            body.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {_sides_cell(r['sides'])} |")
     body += ["",
              "The attempt log research/certs/attempts.jsonl on main records this run's attempts, including the "
              "entries that did not close in budget.",

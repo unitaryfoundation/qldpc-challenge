@@ -155,3 +155,19 @@ uv run python research/certs/tropidist_certify.py codes/40-9-6.json --tropidist 
 uv run --extra research python research/certs/certify_sweep.py run --backend tropidist+sat \
     --tropidist /tmp/tropidist --threads 4 --tlim 600 --job-seconds 14400
 ```
+
+## Interval certificates
+
+When the tropidist backend does not close an entry but proves, on every side
+it left open, a lower bound within two of the claim, the sweep files an
+interval certificate (issue #4718): the tool's record with `d_exact` false,
+`interval` true, the per-side `lower_bound`, and `d_lower_bound`, the least
+bound over the sides, at `verification.level` `solver`. `schema/cert.schema.json`
+already admits the shape and `verify/check_certs.py` applies the same level
+rules. The site keeps the entry at `d <=` and shows "certified lower bound
+d >= L" on its code page (`site/build.py`, `certificate_row`); the queue
+keeps the entry and carries the bounds on its row as `certified_lower_bound`;
+the next sweep skips only exact certificates and starts the tool's search one
+above the filed bound (`--kmin`). `stage` replaces an interval file with an
+exact record or a newer interval and never replaces an exact record with an
+interval. The certs-only PR lists intervals in their own table.

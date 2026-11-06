@@ -2700,6 +2700,50 @@ def ldiam_cell_title(e):
     return parts + ". " + LDIAM_TIP
 
 
+def cert_lower_bounds(cert):
+    """{side: proved lower bound} of a certificate: a side's value when it is exact, else its lower_bound.
+
+    An interval certificate (d_exact false, research/certs/certify_sweep.py,
+    issue #4718) records what the certifier proved on the sides it did not
+    close; the entry stays at d <= and the code page shows the bound.
+    """
+    out = {}
+    for side, v in (cert.get("sides") or {}).items():
+        v = v or {}
+        lb = v.get("value") if v.get("exact") else v.get("lower_bound")
+        if lb is not None:
+            out[side] = int(lb)
+    return out
+
+
+def certificate_row(cert, doc, d, stab):
+    """The certificate row of a code page: exact, an interval, or none yet."""
+    if cert and cert.get("d_exact") and cert_consistent(cert, doc):
+        notes = cert_side_notes(cert)
+        return (f'<div class=kv><b>certificate</b> '
+                f'<span class=cert-ok>exact, d = {d}</span> &middot; '
+                f'{html.escape(cert.get("solver", ""))}</div>'
+                f'<div class=kv style="color:var(--mut)">{html.escape(notes)}</div>')
+    lower = cert_lower_bounds(cert) if cert and not cert.get("d_exact") and cert_consistent(cert, doc) else {}
+    if lower:
+        parts = ", ".join(f"d_{s} &ge; {lb}" for s, lb in sorted(lower.items()))
+        least = min(lower.values())
+        return (f'<div class=kv><b>certificate</b> '
+                f'<span class=cert-no>certified lower bound d &ge; {least} &middot; the distance stands '
+                f'as an upper bound (d &le; {d}) until a side closes</span> &middot; '
+                f'{html.escape(cert.get("solver", ""))}</div>'
+                f'<div class=kv style="color:var(--mut)">{parts}</div>')
+    if stab:
+        return ('<div class=kv><b>certificate</b> '
+                '<span class=cert-no>none yet &middot; distance stands as a '
+                'self-certified upper bound (d &le;); a stabilizer entry is '
+                'certified in Pauli weight by the sweep\'s tropidist backend '
+                '(research/certs/tropidist_certify.py)</span></div>')
+    return ('<div class=kv><b>certificate</b> '
+            '<span class=cert-no>none yet &middot; distance stands as a '
+            'self-certified upper bound (d &le;)</span></div>')
+
+
 def cert_side_notes(cert):
     """One line per certified side, for the certificate row of a code page.
 
@@ -2883,22 +2927,7 @@ def detail_page(e):
                          + " &middot; ".join(parts) + '</div>')
             P.append(f'<details><summary>{wit_sum}</summary>'
                      f'<div class=wit>{wit_body}</div></details>')
-    if cert and cert.get("d_exact"):
-        notes = cert_side_notes(cert)
-        P.append(f'<div class=kv><b>certificate</b> '
-                 f'<span class=cert-ok>exact, d = {d}</span> &middot; '
-                 f'{html.escape(cert.get("solver",""))}</div>'
-                 f'<div class=kv style="color:var(--mut)">{html.escape(notes)}</div>')
-    elif stab:
-        P.append('<div class=kv><b>certificate</b> '
-                 '<span class=cert-no>none yet &middot; distance stands as a '
-                 'self-certified upper bound (d &le;); the Pauli-weight '
-                 'certifier is not built yet, so stabilizer entries cannot '
-                 'earn d= for now</span></div>')
-    else:
-        P.append('<div class=kv><b>certificate</b> '
-                 '<span class=cert-no>none yet &middot; distance stands as a '
-                 'self-certified upper bound (d &le;)</span></div>')
+    P.append(certificate_row(cert, doc, d, stab))
     P.append('</section>')
 
     # the recipe at other sizes (issue #4031): display-only, like the

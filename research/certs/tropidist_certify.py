@@ -294,6 +294,8 @@ def main(argv=None):
     ap.add_argument("--tlim", type=float, default=600, help="seconds per side (default 600)")
     ap.add_argument("--threads", type=int, default=1)
     ap.add_argument("--json", action="store_true", help="print the record instead of a summary line")
+    ap.add_argument("--kmin", nargs="*", default=None, metavar="SIDE=K",
+                    help="start a side's search at threshold K, a lower bound proved earlier (e.g. X=15 Z=15)")
     a = ap.parse_args(argv)
     root = tropidist_root(a.tropidist)
     if root is None:
@@ -302,8 +304,15 @@ def main(argv=None):
     with open(a.path, encoding="utf-8") as f:
         doc = json.load(f)
     slug = os.path.splitext(os.path.basename(a.path))[0]
+    kmin = {}
+    for item in a.kmin or []:
+        side, _, value = item.partition("=")
+        if side not in ("X", "Z", "P") or not value.isdigit():
+            print(f"--kmin takes SIDE=K with SIDE one of X, Z, P; got {item!r}", file=sys.stderr)
+            return 2
+        kmin[side] = int(value)
     try:
-        out = certify(doc, root=root, tlim=a.tlim, threads=a.threads, slug=slug)
+        out = certify(doc, root=root, tlim=a.tlim, threads=a.threads, slug=slug, kmin=kmin or None)
     except (ValueError, TropidistError) as e:
         print(f"{slug}: {e}", file=sys.stderr)
         return 2
