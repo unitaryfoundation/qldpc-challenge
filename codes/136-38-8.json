@@ -1065,6 +1065,7 @@
   "authors": [
    "Lee, Jong Yeon"
   ],
+  "model": "human",
   "origin": "baseline",
   "construction": "Cyclic all-one pair-partition CPM CSS construction (arXiv:2607.14091), instance PPS136_n136_k38_d8 (internal id j3l8_p17_00010): lift size p=17, (J,L)=(3,8), n=8*p=136, 3*p=51 checks per side, column weight 3, row weight 8. CPM exponent arrays (rows = CPM block-rows, columns = the 8 block-columns): E_X = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 2, 8, 10, 4, 1, 9, 6], [0, 16, 13, 12, 7, 10, 2, 5]], E_Z = [[0, 6, 7, 13, 7, 0, 13, 6], [0, 1, 4, 5, 0, 1, 4, 5], [0, 11, 10, 4, 4, 10, 11, 0]]. Lift convention per the authors' expand_and_verify_cpm_matrices.py (github.com/kasaikenta/pair-partition-cpm-css-codes @ 9c2a6f2): check a of block-row b on side S has support {8*((a - E_S[b][t]) mod 17) + t : t=0..7}. Source file https://kasai.ict.eng.isct.ac.jp/pair_partition_cpm_css_codes_data/contributed_codes/jong_yeon_lee/codes/PPS136_n136_k38_d8.cpm (sha256 2e91f898d06edf32773bc3a37129f17b2309ced5e24d21b384043d5d2740b2e3), expanded with the authors' own script.",
   "date": "2026",
