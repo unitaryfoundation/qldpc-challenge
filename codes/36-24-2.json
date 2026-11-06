@@ -1,467 +1,497 @@
 {
-  "schema_version": "0.2",
-  "name": "[[36,24,2]] two-block code over C3 x S3",
-  "code_type": "CSS",
-  "n": 36,
-  "k": 24,
-  "checks": {
-    "X": [
-      [
-        0,
-        3,
-        8,
-        9,
-        14,
-        17,
-        18,
-        21,
-        26
-      ],
-      [
-        1,
-        5,
-        6,
-        11,
-        12,
-        16,
-        19,
-        23,
-        29
-      ],
-      [
-        1,
-        2,
-        5,
-        7,
-        11,
-        13,
-        20,
-        25,
-        31
-      ],
-      [
-        0,
-        3,
-        8,
-        9,
-        14,
-        17,
-        18,
-        21,
-        26
-      ],
-      [
-        0,
-        3,
-        4,
-        8,
-        10,
-        15,
-        22,
-        28,
-        33
-      ],
-      [
-        1,
-        5,
-        6,
-        11,
-        12,
-        16,
-        19,
-        23,
-        29
-      ],
-      [
-        4,
-        6,
-        10,
-        12,
-        15,
-        16,
-        24,
-        30,
-        34
-      ],
-      [
-        1,
-        2,
-        5,
-        7,
-        11,
-        13,
-        20,
-        25,
-        31
-      ],
-      [
-        0,
-        3,
-        8,
-        9,
-        14,
-        17,
-        18,
-        21,
-        26
-      ],
-      [
-        2,
-        7,
-        9,
-        13,
-        14,
-        17,
-        27,
-        32,
-        35
-      ],
-      [
-        0,
-        3,
-        4,
-        8,
-        10,
-        15,
-        22,
-        28,
-        33
-      ],
-      [
-        1,
-        5,
-        6,
-        11,
-        12,
-        16,
-        19,
-        23,
-        29
-      ],
-      [
-        4,
-        6,
-        10,
-        12,
-        15,
-        16,
-        24,
-        30,
-        34
-      ],
-      [
-        1,
-        2,
-        5,
-        7,
-        11,
-        13,
-        20,
-        25,
-        31
-      ],
-      [
-        2,
-        7,
-        9,
-        13,
-        14,
-        17,
-        27,
-        32,
-        35
-      ],
-      [
-        0,
-        3,
-        4,
-        8,
-        10,
-        15,
-        22,
-        28,
-        33
-      ],
-      [
-        4,
-        6,
-        10,
-        12,
-        15,
-        16,
-        24,
-        30,
-        34
-      ],
-      [
-        2,
-        7,
-        9,
-        13,
-        14,
-        17,
-        27,
-        32,
-        35
-      ]
-    ],
-    "Z": [
-      [
-        0,
-        3,
-        8,
-        18,
-        21,
-        22,
-        26,
-        28,
-        33
-      ],
-      [
-        1,
-        5,
-        11,
-        19,
-        20,
-        23,
-        25,
-        29,
-        31
-      ],
-      [
-        2,
-        7,
-        13,
-        20,
-        25,
-        27,
-        31,
-        32,
-        35
-      ],
-      [
-        0,
-        3,
-        8,
-        18,
-        21,
-        22,
-        26,
-        28,
-        33
-      ],
-      [
-        4,
-        10,
-        15,
-        22,
-        24,
-        28,
-        30,
-        33,
-        34
-      ],
-      [
-        1,
-        5,
-        11,
-        19,
-        20,
-        23,
-        25,
-        29,
-        31
-      ],
-      [
-        6,
-        12,
-        16,
-        19,
-        23,
-        24,
-        29,
-        30,
-        34
-      ],
-      [
-        2,
-        7,
-        13,
-        20,
-        25,
-        27,
-        31,
-        32,
-        35
-      ],
-      [
-        0,
-        3,
-        8,
-        18,
-        21,
-        22,
-        26,
-        28,
-        33
-      ],
-      [
-        9,
-        14,
-        17,
-        18,
-        21,
-        26,
-        27,
-        32,
-        35
-      ],
-      [
-        4,
-        10,
-        15,
-        22,
-        24,
-        28,
-        30,
-        33,
-        34
-      ],
-      [
-        1,
-        5,
-        11,
-        19,
-        20,
-        23,
-        25,
-        29,
-        31
-      ],
-      [
-        6,
-        12,
-        16,
-        19,
-        23,
-        24,
-        29,
-        30,
-        34
-      ],
-      [
-        2,
-        7,
-        13,
-        20,
-        25,
-        27,
-        31,
-        32,
-        35
-      ],
-      [
-        9,
-        14,
-        17,
-        18,
-        21,
-        26,
-        27,
-        32,
-        35
-      ],
-      [
-        4,
-        10,
-        15,
-        22,
-        24,
-        28,
-        30,
-        33,
-        34
-      ],
-      [
-        6,
-        12,
-        16,
-        19,
-        23,
-        24,
-        29,
-        30,
-        34
-      ],
-      [
-        9,
-        14,
-        17,
-        18,
-        21,
-        26,
-        27,
-        32,
-        35
-      ]
-    ]
-  },
-  "distance": {
-    "d": 2,
-    "X": {
-      "value": 2,
-      "confidence": "upper_bound",
-      "witness": [
-        22,
-        28
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1043
-        ]
-      }
-    },
-    "Z": {
-      "value": 2,
-      "confidence": "upper_bound",
-      "witness": [
-        18,
-        21
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@mathysrennela"
-        ],
-        "date": "2026-10-12",
-        "found_at_samples": 2000,
-        "survived_samples": 2000,
-        "tool": "research/kit/surrogate.lightest_logical",
-        "seeds": [
-          1044
-        ]
-      }
-    }
-  },
-  "provenance": {
-    "authors": [
-      "Lee, Gideon"
-    ],
-    "construction": "Two-block group-algebra code C(a,b) over C3 x S3 = SmallGroup(18, 3) (order 18), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 36; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 3, 4, 8, 10, 15}, b = {0, 3, 8} as element indices. Check weight 9. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
-    "references": [
-      "arXiv:2610.13880"
+ "schema_version": "0.2",
+ "name": "[[36,24,2]] two-block code over C3 x S3",
+ "code_type": "CSS",
+ "n": 36,
+ "k": 24,
+ "checks": {
+  "X": [
+   [
+    0,
+    3,
+    8,
+    9,
+    14,
+    17,
+    18,
+    21,
+    26
+   ],
+   [
+    1,
+    5,
+    6,
+    11,
+    12,
+    16,
+    19,
+    23,
+    29
+   ],
+   [
+    1,
+    2,
+    5,
+    7,
+    11,
+    13,
+    20,
+    25,
+    31
+   ],
+   [
+    0,
+    3,
+    8,
+    9,
+    14,
+    17,
+    18,
+    21,
+    26
+   ],
+   [
+    0,
+    3,
+    4,
+    8,
+    10,
+    15,
+    22,
+    28,
+    33
+   ],
+   [
+    1,
+    5,
+    6,
+    11,
+    12,
+    16,
+    19,
+    23,
+    29
+   ],
+   [
+    4,
+    6,
+    10,
+    12,
+    15,
+    16,
+    24,
+    30,
+    34
+   ],
+   [
+    1,
+    2,
+    5,
+    7,
+    11,
+    13,
+    20,
+    25,
+    31
+   ],
+   [
+    0,
+    3,
+    8,
+    9,
+    14,
+    17,
+    18,
+    21,
+    26
+   ],
+   [
+    2,
+    7,
+    9,
+    13,
+    14,
+    17,
+    27,
+    32,
+    35
+   ],
+   [
+    0,
+    3,
+    4,
+    8,
+    10,
+    15,
+    22,
+    28,
+    33
+   ],
+   [
+    1,
+    5,
+    6,
+    11,
+    12,
+    16,
+    19,
+    23,
+    29
+   ],
+   [
+    4,
+    6,
+    10,
+    12,
+    15,
+    16,
+    24,
+    30,
+    34
+   ],
+   [
+    1,
+    2,
+    5,
+    7,
+    11,
+    13,
+    20,
+    25,
+    31
+   ],
+   [
+    2,
+    7,
+    9,
+    13,
+    14,
+    17,
+    27,
+    32,
+    35
+   ],
+   [
+    0,
+    3,
+    4,
+    8,
+    10,
+    15,
+    22,
+    28,
+    33
+   ],
+   [
+    4,
+    6,
+    10,
+    12,
+    15,
+    16,
+    24,
+    30,
+    34
+   ],
+   [
+    2,
+    7,
+    9,
+    13,
+    14,
+    17,
+    27,
+    32,
+    35
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    3,
+    8,
+    18,
+    21,
+    22,
+    26,
+    28,
+    33
+   ],
+   [
+    1,
+    5,
+    11,
+    19,
+    20,
+    23,
+    25,
+    29,
+    31
+   ],
+   [
+    2,
+    7,
+    13,
+    20,
+    25,
+    27,
+    31,
+    32,
+    35
+   ],
+   [
+    0,
+    3,
+    8,
+    18,
+    21,
+    22,
+    26,
+    28,
+    33
+   ],
+   [
+    4,
+    10,
+    15,
+    22,
+    24,
+    28,
+    30,
+    33,
+    34
+   ],
+   [
+    1,
+    5,
+    11,
+    19,
+    20,
+    23,
+    25,
+    29,
+    31
+   ],
+   [
+    6,
+    12,
+    16,
+    19,
+    23,
+    24,
+    29,
+    30,
+    34
+   ],
+   [
+    2,
+    7,
+    13,
+    20,
+    25,
+    27,
+    31,
+    32,
+    35
+   ],
+   [
+    0,
+    3,
+    8,
+    18,
+    21,
+    22,
+    26,
+    28,
+    33
+   ],
+   [
+    9,
+    14,
+    17,
+    18,
+    21,
+    26,
+    27,
+    32,
+    35
+   ],
+   [
+    4,
+    10,
+    15,
+    22,
+    24,
+    28,
+    30,
+    33,
+    34
+   ],
+   [
+    1,
+    5,
+    11,
+    19,
+    20,
+    23,
+    25,
+    29,
+    31
+   ],
+   [
+    6,
+    12,
+    16,
+    19,
+    23,
+    24,
+    29,
+    30,
+    34
+   ],
+   [
+    2,
+    7,
+    13,
+    20,
+    25,
+    27,
+    31,
+    32,
+    35
+   ],
+   [
+    9,
+    14,
+    17,
+    18,
+    21,
+    26,
+    27,
+    32,
+    35
+   ],
+   [
+    4,
+    10,
+    15,
+    22,
+    24,
+    28,
+    30,
+    33,
+    34
+   ],
+   [
+    6,
+    12,
+    16,
+    19,
+    23,
+    24,
+    29,
+    30,
+    34
+   ],
+   [
+    9,
+    14,
+    17,
+    18,
+    21,
+    26,
+    27,
+    32,
+    35
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    22,
+    28
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
     ],
     "date": "2026-10-12",
-    "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
-    "origin": "baseline",
-    "novelty": "known_parameters",
-    "model": "Mimo-V2.6-Flash"
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1043
+    ]
+   }
   },
-  "family": "2bga-nonabelian"
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    18,
+    21
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-10-12",
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1044
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "Lee, Gideon"
+  ],
+  "construction": "Two-block group-algebra code C(a,b) over C3 x S3 = SmallGroup(18, 3) (order 18), elements numbered as in GAP Elements(SmallGroup(order,id)) with element 0 the identity. n = 2|G| = 36; H_X = [L(a)|R(b)], H_Z = [R(b)^T|L(a)^T]; a = {0, 3, 4, 8, 10, 15}, b = {0, 3, 8} as element indices. Check weight 9. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race.",
+  "references": [
+   "arXiv:2610.13880"
+  ],
+  "date": "2026-10-12",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "origin": "baseline",
+  "novelty": "known_parameters",
+  "model": "Mimo-V2.6-Flash"
+ },
+ "family": "2bga-nonabelian",
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     965,
+     990
+    ]
+   },
+   "X": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     24,
+     25
+    ]
+   }
+  },
+  "rounds": 2,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [6, 7, 5, 3, 2, 4, 8, 1, 9], Z-check term slots [2, 4, 5, 6, 7, 3, 1, 8, 0] over terms A_0..A_5, B_0..B_2); generated by qldpc submit (research/circuit_autogen.py, seed 0), the first of up to 6 candidates whose RIS screen at 2 rounds found nothing below d; witnesses from RIS on ker(H_dem) at twice the gate's trial budget, validated in GF(2)",
+  "contributed_by": {
+   "by": [
+    "@vprusso"
+   ],
+   "date": "2026-11-06",
+   "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  }
+ }
 }
