@@ -91,7 +91,7 @@ def test_stabilizer_code_page_shows_pauli_weight_and_generators(tmp_path):
     assert "<b>d</b> 3 &middot; witness Pauli weight 3" in page
     assert "X/Z asymmetry" not in page
     assert "d_X" not in page and "d_Z" not in page
-    assert "Pauli-weight certifier is not built yet" in page
+    assert "certified in Pauli weight by the sweep's tropidist backend" in page
     # the witness and every generator as Pauli strings
     wit = doc["distance"]["P"]["witness"]
     assert build.pauli_string(wit, 5) in page
