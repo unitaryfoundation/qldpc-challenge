@@ -653,7 +653,7 @@
   "origin": "submission",
   "date": "2026-10-17",
   "model": "Claude Fable 5.1",
-  "notes": "WL-signature match with 60-6-9 (coprime BB on Z_5 x Z_6, the same abelian group Z_30 as Z_5 x Z_3 x Z_2 here) is a collision, not an equivalence: a SAT search with verify/sat_certify.py (selector encoding, 600 s per solve) returned UNSAT for logicals of weight <= 9 on both the X and the Z side of this code, so no weight-9 logical exists here, while 60-6-9 carries a verified weight-9 witness; a permutation-equivalent code would share it. Distance is nevertheless filed as upper_bound; a 3 x 20M fresh-seed gf2_fast ladder found nothing below 10.",
+  "notes": "WL-signature match with 60-6-9 (coprime BB on Z_5 x Z_6, the same abelian group Z_30 as Z_5 x Z_3 x Z_2 here) is a collision, not an equivalence: a SAT search with verify/sat_certify.py (selector encoding, 600 s per solve) returned UNSAT for logicals of weight <= 9 on both the X and the Z side of this code, so no weight-9 logical exists here, while 60-6-9 carries a verified weight-9 witness; a permutation-equivalent code would share it. Distance is nevertheless filed as upper_bound; a 3 x 20M fresh-seed gf2_fast ladder found nothing below 10. Circuit fault distance corrected on 2026-11-06 by @vprusso: the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 6), with a proved lower bound of 5. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
   "search_budget": {
    "candidates_screened": 3044305,
    "ris_trials_per_side": 60000000,
@@ -665,15 +665,14 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 6,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     1852,
-     1854,
-     9041,
-     9096,
-     9111,
-     9229
+     5434,
+     5446,
+     5487,
+     5620,
+     5666
     ]
    },
    "X": {
