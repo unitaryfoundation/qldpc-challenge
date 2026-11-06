@@ -146,6 +146,21 @@ def changed_codes(base, root=ROOT):
     return changes
 
 
+def circuits_changed(base, root, slug):
+    """Report whether anything under circuits/<slug>/ changed vs base.
+
+    Fails closed (True) when the diff cannot be computed, as gate_changed.py
+    does.
+    """
+    try:
+        out = subprocess.check_output(
+            ["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD",
+             "--", f"circuits/{slug}"], cwd=root, text=True)
+        return bool(out.strip())
+    except Exception:
+        return True
+
+
 def code_for_circuit_path(path):
     """codes/<slug>.json for a path under circuits/<slug>/, else None."""
     if path.startswith("circuits/") and path.count("/") >= 2:
@@ -471,6 +486,88 @@ def circuit_improvement_binding(author, base_doc, new_doc):
     return True, ""
 
 
+def circuit_refutation_binding(author, base_doc, new_doc):
+    """Decide whether new_doc differs from base_doc by exactly a circuit-tier refutation credited to author.
+
+    Returns (ok, reason-if-not). A claimed d_circ is a witnessed upper bound, and an undetected logical
+    fault set lighter than the claim in the committed DEM falsifies it the
+    way a lighter logical falsifies a distance (issue #4717: exhaustive
+    search found such sets on entries whose schedules claimed d_circ = d).
+    The tier is penalty-only, so the correction lowers the entry's standing,
+    but it is a fact about the committed schedule, checked by
+    circuit_verify.py (the new witness is a fault set of exactly the new
+    weight in the committed .dem) and re-gated by gate_changed.py (which
+    searches for anything lighter than the new claim), so it binds for
+    anyone, as a distance refutation does. Exactly: circuit.d_circ no higher
+    on either side and strictly lower on at least one, each lowered side at
+    confidence upper_bound with a witness of exactly the new weight, every
+    other key of the circuit block unchanged (contributed_by, rounds, notes,
+    ler, stim_version), the committed circuits/<slug>/ artifacts untouched
+    (main() refuses the binding when they moved, since the witness indexes
+    the committed .dem), and outside the block only provenance.notes, which
+    may be appended to and must name @author, since circuitSideDistance has
+    no witness_provenance to carry the credit.
+    """
+    bc, nc = base_doc.get("circuit"), new_doc.get("circuit")
+    if not isinstance(bc, dict):
+        return False, "the entry has no circuit tier to refute"
+    if not isinstance(nc, dict):
+        return False, "the circuit tier was removed, not refuted"
+    for key in (set(base_doc) | set(new_doc)) - {"circuit", "provenance"}:
+        if base_doc.get(key) != new_doc.get(key):
+            return False, (f"field '{key}' changed (a circuit refutation "
+                           "lowers d_circ and appends to provenance.notes, "
+                           "nothing else)")
+    bp, np_ = base_doc.get("provenance") or {}, new_doc.get("provenance") or {}
+    for key in (set(bp) | set(np_)) - {"notes"}:
+        if bp.get(key) != np_.get(key):
+            return False, (f"provenance.{key} changed (only notes may be "
+                           "appended to)")
+    old_notes, new_notes = bp.get("notes", ""), np_.get("notes", "")
+    if not new_notes.startswith(old_notes):
+        return False, "provenance.notes may only be appended to"
+    if f"@{author}".lower() not in new_notes[len(old_notes):].lower():
+        return False, ("the appended provenance.notes do not name "
+                       f"@{author}, which is where a circuit refutation "
+                       "carries its credit")
+    if set(bc) != set(nc):
+        return False, ("the circuit block's keys changed (a refutation "
+                       "lowers d_circ and nothing else in the block)")
+    for key in set(bc) - {"d_circ"}:
+        if bc[key] != nc[key]:
+            return False, (f"circuit.{key} changed (a refutation lowers "
+                           "d_circ and nothing else in the block)")
+    bd, nd = bc.get("d_circ") or {}, nc.get("d_circ") or {}
+    if set(bd) != set(nd):
+        return False, "circuit.d_circ gained or lost a side"
+    lowered = 0
+    for side in sorted(bd):
+        bs, ns = bd[side] or {}, nd[side] or {}
+        bv, nv = bs.get("value"), ns.get("value")
+        if not isinstance(bv, int) or not isinstance(nv, int):
+            return False, f"circuit.d_circ.{side}.value is missing"
+        if nv > bv:
+            return False, (f"circuit.d_circ.{side} rose from {bv} to {nv} "
+                           "(a rise is the improvement binding, not a "
+                           "refutation)")
+        if nv == bv:
+            if bs != ns:
+                return False, (f"circuit.d_circ.{side} changed without its "
+                               "value decreasing")
+            continue
+        if ns.get("confidence") != "upper_bound":
+            return False, (f"circuit.d_circ.{side}.confidence must be "
+                           "upper_bound at the corrected value")
+        witness = ns.get("witness")
+        if not isinstance(witness, list) or len(witness) != nv:
+            return False, (f"circuit.d_circ.{side} witness does not have "
+                           f"exactly {nv} mechanisms")
+        lowered += 1
+    if lowered == 0:
+        return False, "no side's circuit fault distance strictly decreased"
+    return True, ""
+
+
 # The bindings a PR author who is not a listed author may still pass, with the
 # phrase each prints on success. Declaration order is report order, except for
 # the one `evident_binding` says the change was aiming for.
@@ -614,6 +711,8 @@ BINDINGS = (
     ("architecture", architecture_binding, "adding a first architecture block to"),
     ("circuit_improvement", circuit_improvement_binding,
      "raising the circuit fault distance of"),
+    ("circuit_refutation", circuit_refutation_binding,
+     "refuting the circuit fault distance of"),
     ("family", family_binding, "correcting the family tag of"),
     ("novelty", novelty_binding, "recording a literature match on"),
     ("rate", rate_binding, "adding measured-rate points to"),
@@ -629,6 +728,12 @@ def evident_binding(base_doc, new_doc):
             and isinstance(new_doc.get("circuit"), dict)
             and base_doc["circuit"].get("d_circ") != new_doc["circuit"].get("d_circ")
             and base_doc.get("distance") == new_doc.get("distance")):
+        bd = base_doc["circuit"].get("d_circ") or {}
+        nd = new_doc["circuit"].get("d_circ") or {}
+        if any(isinstance((nd.get(s) or {}).get("value"), int)
+               and isinstance((bd.get(s) or {}).get("value"), int)
+               and nd[s]["value"] < bd[s]["value"] for s in bd):
+            return "circuit_refutation"
         return "circuit_improvement"
     if (isinstance(base_doc.get("circuit"), dict)
             and isinstance(new_doc.get("circuit"), dict)
@@ -773,6 +878,7 @@ def main(argv):
                       f"{doc['distance']['d']}]], nothing else changed")
                 continue
             attempts = []
+            slug = os.path.splitext(os.path.basename(f))[0]
             for label, bind, phrase in BINDINGS:
                 # Renaming an entry is reserved to its listed authors, and the
                 # other three bindings enforce that only as a side effect of
@@ -784,6 +890,18 @@ def main(argv):
                     attempts.append((f"{label} binding failed: the file was "
                                      f"renamed from {base_path}; a family "
                                      "re-tag may not move an entry", True))
+                    continue
+                # A circuit refutation indexes the committed .dem, so the
+                # artifacts it refutes must be the ones on base; a diff under
+                # circuits/<slug>/ in the same change is a replacement,
+                # reserved to the listed authors.
+                if label == "circuit_refutation" and (
+                        base_path != f or circuits_changed(base, root, slug)):
+                    attempts.append((f"{label} binding failed: the entry was "
+                                     "renamed or its circuits/ artifacts "
+                                     "changed in the same diff; a circuit "
+                                     "refutation reads the committed "
+                                     "artifacts as they are", True))
                     continue
                 ok, why = bind(author, base_doc, doc)
                 if ok:
@@ -805,7 +923,9 @@ def main(argv):
               "or exactly a first-layout addition credited to them in "
               "locality.contributed_by.by, or exactly a first-circuit-tier "
               "addition or a d_circ-raising circuit-tier replacement credited "
-              "to them in circuit.contributed_by.by.")
+              "to them in circuit.contributed_by.by, or exactly a d_circ "
+              "refutation (values down with witnesses of the new weights, "
+              "credited in appended provenance.notes).")
         for f, hs, extra in violations:
             print(f"  {f}: authors {['@' + h for h in hs]} do not include "
                   f"@{author}" + (f"; {extra}" if extra else ""))

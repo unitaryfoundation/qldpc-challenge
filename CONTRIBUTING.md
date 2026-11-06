@@ -297,6 +297,29 @@ lower anywhere; both stay with the listed authors. The gate re-derives the
 committed detector error models and re-runs the circuit search on the new
 claim, as it does for a first donated tier.
 
+## Lowering a circuit fault distance already on the board
+
+Every `d_circ` is a witnessed upper bound, found by a randomized search, and
+an exhaustive search can find an undetected logical fault set lighter than
+the claim in the committed detector error model (issue #4717 found several on
+schedules that claimed `d_circ = d`). Correcting it is a refutation of the
+circuit tier, and it binds for anyone the way a distance refutation does.
+Lower the side (or sides) that came down to the weight of the fault set you
+found, store that fault set as the side's `witness` (indices into the
+committed `.dem`, exactly as many as the new value), keep `confidence` at
+`upper_bound`, and append a sentence to `provenance.notes` that names your
+`@handle`, which is where the credit lives, since the circuit side has no
+`witness_provenance`. Leave everything else alone: `verify/check_authorship.py`
+refuses a refutation that touches any other key of the `circuit` block
+(`contributed_by`, `rounds`, `notes`, `ler`), that raises a side, that changes
+a witness without lowering its value, that edits anything outside the block,
+or that replaces the files under `circuits/<slug>/` in the same diff, because
+the witness indexes the committed artifacts as they are. The gate re-derives
+the committed detector error models and searches for anything lighter than
+the corrected claim, as it does for every changed circuit claim.
+`research/audits/circuit_distance_bounds.py` produces such fault sets with a
+proved lower bound beside them.
+
 ## One code, one entry
 
 Two files whose check matrices generate the same stabilizer group up to a
