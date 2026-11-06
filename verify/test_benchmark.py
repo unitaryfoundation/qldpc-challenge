@@ -53,6 +53,8 @@ def test_the_block_requires_schema_0_6():
     doc["schema_version"] = "0.5"
     assert "schema_valid" in _failed(V.verify(doc, refute=False))
     assert V.structure_errors(doc)
+    doc["schema_version"] = "0.7"
+    assert V.verify(doc, refute=False)["ok"]
 
 
 def test_entries_without_the_block_are_untouched():

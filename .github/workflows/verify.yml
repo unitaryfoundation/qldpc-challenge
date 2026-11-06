@@ -83,6 +83,15 @@ jobs:
     timeout-minutes: 130
     env:
       PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
+      # The files whose change can alter a measured circuit.ler rate: the
+      # measured-rate tier of verify_all.py, ler_verify.py and the modules it
+      # imports (ler_tools.py, circuit_tools.py, gf2.py), the optional
+      # accelerator those load (gf2_fast.cpp, built by setup_gf2_fast.py
+      # through the Makefile), the decoder pin under decode/ that ler_tools
+      # mirrors, and the dependency pins. verify/test_ler_stack.py pins this
+      # list to the import closure of ler_verify.py, so a new import in the
+      # LER code fails the suite until the list names it.
+      LER_STACK: verify/verify_all.py verify/ler_verify.py verify/ler_tools.py verify/circuit_tools.py verify/gf2.py verify/gf2_fast.cpp verify/setup_gf2_fast.py decode pyproject.toml uv.lock Makefile
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
@@ -213,18 +222,23 @@ jobs:
             echo "self-tests naming an entry this PR changed: $slug_tests" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
           # A circuit.ler claim nothing in the PR touched can only go stale
-          # through the stack that measures it: the verifier sources, the
+          # through the stack that measures it: the measured-rate tier, the
           # decoder, the pinned dependencies (a stim bump in uv.lock) or the
-          # accelerator build. A PR that leaves all of those alone gets the
-          # --ler-base run; a PR that touches any of them re-measures every
-          # claim. The integrity manifest is a hash listing and cannot change a
-          # measurement, so re-pinning it does not count. A diff that cannot be
-          # computed exits non-zero and so counts as changed (fail closed).
-          # Tests, the policy checkers (check_*.py, the pre-push gate), and the
-          # test fixtures never measure a claim, so they are left out: with them
-          # in, a prose-checker edit scheduled the full re-measure, which ran
-          # past this job's 130-minute timeout on PR #3418.
-          if git diff --quiet "$base"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures' ':(exclude)verify/replay_formal.py'; then
+          # accelerator build, which is the LER_STACK list in this job's env.
+          # A PR that leaves all of those alone gets the --ler-base run; a PR
+          # that touches any of them re-measures every claim. Everything else
+          # under verify/ (the structural verifier, the circuit tier, the
+          # gate, the policy checkers, tests, fixtures, the integrity
+          # manifest) runs on every entry in the --ler-base pass as well and
+          # cannot change a measured rate, so it is left out. The list used
+          # to be all of verify/ minus tests, checkers, and fixtures: a
+          # prose-checker edit scheduled the full re-measure on PR #3418, and
+          # once those were excluded a schema-check edit did on #4653 and
+          # #4682, which with about an hour of self-tests runs past this
+          # job's 130-minute timeout. A diff that cannot be computed exits
+          # non-zero and so counts as changed (fail closed). $LER_STACK is
+          # unquoted so that it splits into one pathspec per entry.
+          if git diff --quiet "$base"...HEAD -- $LER_STACK; then
             ler_stack_changed=false
           else
             ler_stack_changed=true
@@ -242,7 +256,7 @@ jobs:
         # numbers the PR that introduced them had measured hours earlier. The
         # merge's own diff is what can have changed a claim: the entries it
         # touched (verify_all --ler-base handles those) and the stack that
-        # measures them (the same list the PR path uses above). A diff that
+        # measures them (the LER_STACK list in this job's env). A diff that
         # cannot be computed, including the all-zero `before` of a new branch
         # or a force push, counts as a stack change, so the fallback is the
         # full re-measure, never a skip.
@@ -250,7 +264,7 @@ jobs:
           before="${{ github.event.before }}"
           if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
             ler_stack_changed=true
-          elif git diff --quiet "$before"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures' ':(exclude)verify/replay_formal.py'; then
+          elif git diff --quiet "$before"...HEAD -- $LER_STACK; then
             ler_stack_changed=false
           else
             ler_stack_changed=true

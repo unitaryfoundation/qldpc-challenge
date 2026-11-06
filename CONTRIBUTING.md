@@ -370,6 +370,22 @@ reproduce such a measurement itself. The fields are listed in
 may add a first `benchmark` block to an entry, credited in
 `benchmark.contributed_by`, the way a layout or a circuit tier is donated.
 
+A Tier C claim, what fault-tolerant computation on the code costs beyond
+its transversal gates, goes in an optional `architecture` block
+(`schema_version: "0.7"`, issue #4674), carried only together with the
+`benchmark` block whose track, noise model, decoder, and baseline it uses:
+surgery, switching, teleportation, or gauge-fixing gadgets on blocks of
+the code with their fault distances and resources, the magic-state
+protocol, and an algorithm-level estimate of physical qubits, factories,
+and runtime against the surface-code baseline at the same logical count.
+The verifier checks the block against the entry and the board (no gadget
+claims a fault distance above `d`, every count covers the blocks it
+prices, a distillation protocol lowers the error rate), records the
+reading in `computed.architecture`, and ranks nothing by it. The fields
+are in `schema/SCHEMA.md`. A non-author may add a first `architecture`
+block to an entry that already carries a `benchmark` block, credited in
+`architecture.contributed_by`.
+
 ## Contribute with an LLM
 
 If you have an LLM or coding agent, it can do the whole loop: pick a target,

@@ -164,7 +164,7 @@ someone else's existing note is exempt.
   1. `uv run --extra certify python verify/validation_gate.py` must exit 0: the solved cases
      (Steane, Shor, [[4,2,2]], a direct sum, a local-Clifford image) verify and certify at their
      known parameters, each deliberately broken artifact is rejected for its own reason
-     (construction, weight, packaging, typing, witness, layout, benchmark), and the seeded baselines and
+     (construction, weight, packaging, typing, witness, layout, benchmark, architecture), and the seeded baselines and
      the mitten and ZSZ lifted-product entries reproduce their committed verdicts byte for byte.
   2. If a verdict changed by design, re-record it with `--update-golden` and say so in the PR;
      that diff is part of the review.

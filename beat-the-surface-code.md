@@ -53,7 +53,7 @@ runnable via `--campaign` until a generator and a contract are added.
 
 - Tier A — Code discovery (current board submissions).
 - Tier B — Memory benchmarking (circuit tier + LER).
-- Tier C — Fault-tolerant architecture (forward-looking).
+- Tier C — Fault-tolerant architecture (forward-looking; the schema 0.7 `architecture` block records gadgets, the magic-state supply, and algorithm-level estimates against the baseline).
 
 ## Evidence standards
 
