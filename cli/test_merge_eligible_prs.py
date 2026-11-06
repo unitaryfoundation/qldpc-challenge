@@ -388,7 +388,7 @@ def test_pr_eligibility_fails_closed_for_missing_model_or_check(monkeypatch):
     monkeypatch.setattr(
         merge_eligible_prs,
         "_read_code_document",
-        lambda _repo, _path, _sha: _code_document(model=None),
+        _reader(_code_document(model=None), _code_document(model="Claude Opus 5")),
     )
     monkeypatch.setattr(
         merge_eligible_prs,
@@ -442,3 +442,68 @@ def test_merge_command_is_squash_and_pinned_to_inspected_head(monkeypatch):
             "abc123",
         ]
     ]
+
+
+def _reader(head_doc, base_doc, head_sha="abc123", base="main"):
+    """Build a _read_code_document stand-in that serves the PR head and the base branch."""
+    def read(_repo, _path, ref):
+        if ref == head_sha:
+            return head_doc
+        if ref == base and base_doc is not None:
+            return base_doc
+        raise merge_eligible_prs.GitHubCLIError(f"no {_path} at {ref}")
+    return read
+
+
+def test_a_contribution_inherits_a_missing_model_from_the_base_entry(monkeypatch):
+    """Pass a circuit tier on an existing entry whose untouched provenance has no model.
+
+    verify/check_authorship.py forbids the contributor from adding the field,
+    so the gap is the entry author's and does not block the PR.
+    """
+    base_doc = _code_document(model=None)
+    head_doc = {"provenance": dict(base_doc["provenance"]),
+                "circuit": {"contributed_by": {"by": ["@submitter"], "date": "2026-11-06"}}}
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-3.json", "status": "modified"},
+            {"filename": "circuits/10-2-3/memory_x.stim", "status": "added"},
+        ],
+    )
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head_doc, base_doc))
+    monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
+
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+
+    assert result.eligible and result.reasons == [] and result.metadata_errors == []
+    assert result.inherited_gaps == [("codes/10-2-3.json", "missing or empty provenance.model")]
+    assert result.models == ["(entry predates provenance.model)"] and result.authors == ["@submitter"]
+    assert "inherited gap" in merge_eligible_prs._format_result(result, "DRY-RUN")
+    assert merge_eligible_prs.metadata_comment_body(result) is None
+
+
+def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypatch):
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [{"filename": "codes/10-2-3.json", "status": "added"}],
+    )
+    monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
+    # no base entry: the PR adds the code, so it declares the model
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(_code_document(model=None), None))
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert not result.eligible
+    assert result.metadata_errors == [("codes/10-2-3.json", "missing or empty provenance.model")]
+    # a base entry with a model that the PR blanked: the PR introduced the gap
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document",
+                        _reader(_code_document(model=""), _code_document(model="Claude Opus 5")))
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert not result.eligible and result.metadata_errors
+    # a base entry without a model whose provenance the PR also edited: not inherited as it stands
+    head = _code_document(model=None)
+    head["provenance"]["notes"] = "edited"
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head, _code_document(model=None)))
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert not result.eligible and result.metadata_errors
