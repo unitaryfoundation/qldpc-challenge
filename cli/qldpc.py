@@ -61,6 +61,7 @@ sys.path.insert(0, os.path.join(_ROOT, "verify"))
 sys.path.insert(0, os.path.join(_ROOT, "site"))
 sys.path.insert(0, os.path.join(_ROOT, "research"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "kit"))
+sys.path.insert(0, os.path.join(_ROOT, "research", "audits"))
 
 import gf2  # noqa: E402
 import heuristic_distance as hd  # noqa: E402
@@ -68,6 +69,7 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import frontier_history  # noqa: E402
 import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
 from campaign import curve_from_summary, write_curve  # noqa: E402
@@ -1660,6 +1662,70 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     return 0
 
 
+def _history_is_shallow(root):
+    """Return True when the clone's history is truncated, so a replay would misdate it."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=root,
+                             capture_output=True, text=True, check=False)
+    except OSError:
+        return True
+    return out.returncode != 0 or out.stdout.strip() != "false"
+
+
+def _cell_staleness(entries, today=None):
+    """Return ``({(L, W): {"frontier", "record"}}, landings)``, or ``(None, 0)``.
+
+    When each cell last moved, from the first-parent replay of ``codes/`` that
+    ``research/audits/frontier_history.py`` already does, with each entry's
+    cells read from the board as loaded here (issue #4238). ``frontier`` is
+    the last landing that changed the cell's nondominated set and ``record``
+    the last that changed its best kd^2/n; each carries ``days`` since and
+    ``landings_ago``, the number of board landings since, because a busy
+    fortnight moves every cell's day count at once and the landing count is
+    the one that says whether a cell is being worked. A shallow clone cannot
+    be replayed, so the answer there is None rather than a wrong date.
+    """
+    if _history_is_shallow(_ROOT):
+        print("  history is shallow (a truncated clone); cell staleness not computed",
+              file=sys.stderr)
+        return None, 0
+    classes = {f"codes/{e['slug']}.json": (e["locality_class"], e["weight_class"],
+                                           e.get("w"), e.get("code_type", "CSS"))
+               for e in entries if e.get("slug")}
+    print("  replaying codes/ history for cell staleness...", file=sys.stderr)
+    t0 = time.time()
+    moves, landed = frontier_history.cell_moves(_ROOT, classes)
+    print(f"  replayed {_plural(landed, 'landing')} in {time.time() - t0:.1f}s",
+          file=sys.stderr)
+    today = today or datetime.date.today()
+    for cell in moves.values():
+        for move in cell.values():
+            if move:
+                move["days"] = (today - datetime.date.fromisoformat(move["date"])).days
+                move["landings_ago"] = landed - move["landing"]
+    return moves, landed
+
+
+def _staleness_lines(cell):
+    """Two lines per cell: when its frontier and its record last moved, or that neither did."""
+    if not cell or not (cell.get("frontier") or cell.get("record")):
+        return ["never moved on record (no landing in codes/ history changed this "
+                "cell; entries no longer on the board are not classified)"]
+
+    def when(move):
+        return (f"{move['date']} ({_plural(move['days'], 'day')} ago, "
+                f"{_plural(move['landings_ago'], 'landing')} ago): {move['what']} "
+                f"{move['kind']}")
+
+    lines = []
+    f, r = cell.get("frontier"), cell.get("record")
+    lines.append("frontier last moved " + when(f) if f else "frontier never moved on record")
+    lines.append("record kd2/n last moved " + when(r)
+                 + (f" to {r['kd2_over_n']}" if r and "kd2_over_n" in r else "")
+                 if r else "record kd2/n never moved on record")
+    return lines
+
+
 def cmd_targets(args):
     """Print per-cell occupancy and frontier, so a newcomer can see what to aim at.
 
@@ -1713,11 +1779,30 @@ def cmd_targets(args):
                          f"{sorted({c[1] for c in by_cell})}; locality classes: "
                          f"{sorted({c[0] for c in by_cell})}")
 
+    stale = None
+    if getattr(args, "staleness", True) or getattr(args, "stale", False):
+        stale, landed = _cell_staleness(entries)
+        if stale is not None:
+            res["staleness"] = {f"{W}/{L}": stale[(L, W)]
+                                for (L, W) in by_cell if (L, W) in stale}
+            res["landings"] = landed
+            if getattr(args, "stale", False):
+                # stalest first by the record, then the frontier: a cell with no
+                # dated move on record sorts before any dated one
+                def age(cv):
+                    moves = stale.get(cv[0]) or {}
+                    return ((moves.get("record") or {}).get("date", ""),
+                            (moves.get("frontier") or {}).get("date", ""), cv[0])
+                rows.sort(key=age)
+
     for (L, W), peers in rows:
         front = [peers[i] for i in sorted(pareto(peers))]
         print(f"\n{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}")
         print(f"  {len(peers)} codes, {len(front)} nondominated, "
               f"best kd2/n {max(eff(e) for e in peers):.2f}")
+        if stale is not None:
+            for line in _staleness_lines(stale.get((L, W))):
+                print(f"  {line}")
         held = by_cell_name.get(f"{W}/{L}")
         if held:
             who = held["session_id"]
@@ -3218,9 +3303,19 @@ def main(argv=None):
                         f"a long ladder; a claim outliving its run is a squat")
     g.add_argument("--prune", action="store_true",
                    help="delete expired claims and report how many went")
+    g.add_argument("--staleness", action=argparse.BooleanOptionalAction, default=True,
+                   help="per cell, when its frontier and its best kd2/n last changed: "
+                        "the date, days since, board landings since, and the entry "
+                        "that moved it, from the first-parent history of codes/ "
+                        "(a few seconds; skipped in a shallow clone; issue #4238). "
+                        "--no-staleness leaves it out")
+    g.add_argument("--stale", action="store_true",
+                   help="sort cells stalest first, by the record date and then the "
+                        "frontier date")
     g.add_argument("--json", action="store_true",
                    help="print one JSON record on stdout instead of the "
-                        "listing; carries the live claims as data")
+                        "listing; carries the live claims as data, and the "
+                        "staleness per cell when asked for")
     g.set_defaults(func=cmd_targets)
 
     b = sub.add_parser("brief", help="one snapshot before a search: a cell's frontier "
