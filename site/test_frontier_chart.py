@@ -156,3 +156,58 @@ def test_front_page_frontier_section(tmp_path):
         key = (L, W) if T == "CSS" else (L, W, T)
         assert {s for s, r in by_slug.items() if ci in r["fr"]} == \
             {entries[i]["slug"] for i in fronts[key]}
+
+
+def _fam(slug, n, k, d, w, family, date, origin="submission", **kw):
+    e = _entry(slug, n, k, d, w, date=date, **kw)
+    e["family"], e["origin"] = family, origin
+    return e
+
+
+# One cell (unrestricted, weight-any) where the first code was a GB code and a
+# BB code now leads; the frontier holds two GB and one BB record, and one
+# dominated GB entry is off it.
+FAMILIES = [
+    _fam("90-8-10", 90, 8, 10, 6, "generalized-bicycle", "2025-01-01",
+         origin="baseline"),                                               # the literature's best
+    _fam("72-12-8", 72, 12, 8, 6, "bivariate-bicycle", "2025-06-01"),     # leader by kd^2/n, on it
+    _fam("60-4-8", 60, 4, 8, 6, "generalized-bicycle", "2025-03-01"),     # on it (cheapest n)
+    _fam("90-8-9", 90, 8, 9, 6, "generalized-bicycle", "2025-02-01"),     # dominated by 90-8-10
+    _fam("40-2-6", 40, 2, 6, 8, "other", "2025-04-01"),                    # untagged, on the frontier
+]
+
+
+def test_family_concentration_reads_the_cell_frontier_and_the_move():
+    """Shares are over the cell's records, not its members.
+
+    The leader and the incumbent are what the docstring says, and the caveat
+    travels with the number.
+    """
+    build = load_site_build()
+    fc = build.family_concentration(FAMILIES)
+    cell = fc["cells"]["unrestricted~weight-any"]
+    assert cell["members"] == 5 and cell["records"] == 4 and cell["families"] == 2
+    assert cell["untagged"] == 1 and cell["untagged_share"] == 0.25
+    assert cell["top"][0] == {"family": "generalized-bicycle", "records": 2, "share": 0.5}
+    assert cell["top1_share"] == 0.5 and cell["top2_share"] == 0.75
+    assert cell["hhi"] == round(0.5 ** 2 + 0.25 ** 2, 3)
+    assert cell["leader"]["slug"] == "72-12-8" and cell["incumbent"]["slug"] == "90-8-10"
+    assert cell["moved"] is True and fc["cells_moved"] == 1 == fc["cells_total"]
+    assert fc["global"]["records"] == 4 and fc["global"]["top2_share"] == 0.75
+    # a cell with no literature baseline has no incumbent and cannot have moved
+    fc2 = build.family_concentration([e for e in FAMILIES if e["origin"] != "baseline"])
+    c2 = fc2["cells"]["unrestricted~weight-any"]
+    assert c2["incumbent"] is None and c2["moved"] is False and fc2["cells_moved"] == 0
+    assert "self-declared" in fc["caveat"] and "self-declared" in build.FAMILY_CAVEAT
+
+
+def test_family_legend_item_carries_the_caveat_and_is_absent_without_data():
+    build = load_site_build()
+    fc = build.family_concentration(FAMILIES)
+    item = build.family_legend_item(fc["cells"]["unrestricted~weight-any"])
+    assert "declared family: generalized-bicycle 50% of records, top two 75%, HHI 0.31" in item
+    assert 'title="' in item and "self-declared" in item
+    assert build.family_legend_item(None) == "" and build.family_legend_item({"top": []}) == ""
+    assert build.frontier_legend(3).endswith("3 records</span>")
+    assert build.frontier_legend(3, fc["cells"]["unrestricted~weight-any"]).count("<span class=ci") == \
+        build.frontier_legend(3).count("<span class=ci") + 1

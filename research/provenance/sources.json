@@ -6,7 +6,9 @@
     "wang_pryadko_gb": "arXiv:2203.17216",
     "qcode_discovery_bb": "arXiv:2606.02418",
     "bravyi2024_bb": "arXiv:2308.07915",
-    "qecdb": "https://qecdb.org"
+    "qecdb": "https://qecdb.org",
+    "tripier2026_walking_cat": "arXiv:2604.19481",
+    "ye_delfosse2025_bb5": "arXiv:2503.22071"
   },
   "not_literature": {
     "deep_search_2026-09": "this project's own deep search, indexed to catch internal duplicates",

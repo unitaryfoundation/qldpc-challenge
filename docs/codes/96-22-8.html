@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>96</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>22</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>8</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>14.667</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>14.6667</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0092</div></div>
@@ -25,6 +25,7 @@
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[14, 20, 40, 43, 50, 52, 59, 60]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 4 &middot; H_Z 4 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -47,6 +48,15 @@
 (3,8): 18432
 (3,10): 1536</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 5.3852 &middot; Z 5.099 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/96-22-8">circuits/96-22-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[50928, 50930, 51453, 51462, 51468, 51479, 51499, 51509]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[49705, 49708, 49764, 49789, 50305, 50665, 51167, 51215]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
@@ -95,7 +105,13 @@ from group_algebra import build_2bga
 # a and b are element indices from github.com/gideonlsx/bicycle-race @ aed705a data/codes.jsonl
 HX, HZ = build_2bga(mul, a, b)   # mul from data/groups.jsonl, n = 2|G| = 96
 </pre>
-<p>Parameters are also spelled out in <code>provenance.construction</code> of <code>codes/96-22-8.json</code>.</p></div></section>
+<p>Parameters are also spelled out in <code>provenance.construction</code> of <code>codes/96-22-8.json</code>.</p>
+<h4>Circuit tier (contributed 2026-10-23, @willzeng)</h4>
+<p>The entry now ships flag-protected syndrome-extraction memory circuits with d_circ = 8 in both bases, equal to the code distance. The entry had no circuit tier before.</p>
+<p>Why the generator falls short. <code>research/circuit_autogen.py</code> cannot interleave this code (its two-block decomposition into commuting permutations fails on the non-abelian SmallGroup(48,24)), so it falls back to the generic sequential schedule, which measures d_circ = 3 (X) and 4 (Z) with a 3-minute RIS search per basis. The loss is hook errors: an X fault on a weight-8 ancilla after its j-th CNOT is a weight-(8-j) data error for one fault, and the exact hook-cost oracle of <code>fieldnotes/2026-09-18-hook-cost-and-flag-schedules.md</code> shows the best bare-ancilla CNOT order of every check still admits a single hook within 6 data errors of a logical, so no bare-ancilla schedule of this code can exceed 7.</p>
+<p>The schedule. X checks then Z checks each round, joint reset and measurement layers, one ancilla and two flag qubits per check (384 qubits in total). Flag A is coupled to the ancilla after the 1st and 7th data CNOT and flag B after the 2nd and 6th, so a hook after the 3rd to 6th CNOT flips both flags (3 faults to hide, including the two flag-measurement flips) and one after the 2nd or 7th flips flag A (2 faults). The reachable error sets below their weight are then, per check order: windows of 2 to 4 consecutive CNOTs inside positions 3 to 6 and the windows 2-6 and 3-7 at cost 2 (two hooks on one ancilla cancelling the flags), and the suffixes of length 3 to 5 plus the windows 2-4, 2-5, 4-7 and 5-7 at cost 3. Each check&#x27;s CNOT order and the 12 CX layers of each block (a proper edge coloring, no data qubit twice in a layer) were found by a SAT solver (CaDiCaL via python-sat) with the static constraints that every cost-2 set has hook cost at least 6 and every cost-3 set at least 5, and lazy constraints: after each solution, every combination of two to four such sets plus data errors reaching a nontrivial logical at fewer than 8 faults was located exactly by a meet-in-the-middle search over syndrome-and-logical keys and forbidden as a clause. Both blocks were admitted within 4 iterations; this code&#x27;s hook costs are high enough that the full distance is reachable, where the same construction stops at 7 for <code>[[64,18,8]]</code> (<code>notes/64-18-8.md</code>).</p>
+<p>Witnesses. The committed <code>circuit.d_circ</code> witnesses were constructed from the analysis: in the Z memory a double-flagged hook (ancilla fault plus the two flag-measurement flips) and the 5 data errors that complete its weight-3 remaining support to a logical; in the X memory a two-hook window on one ancilla (2 faults) and the 6 data errors that complete its weight-2 error set. Both are checked against the derived detector error models with the verifier&#x27;s GF(2) witness check. A measured logical error rate is NOT recorded in <code>circuit.ler</code>, and cannot be: the pinned BP+OSD decoder takes about 20 s per shot on these 51,000-mechanism detector error models, the tier&#x27;s PR-time replica budget of 120 s per basis buys about 25 shots, and the admissibility rule rejects a point CI cannot replicate within budget (the 26 entries with a measured rate on the board all have d &lt;= 5 and under about 7,000 mechanisms per memory). At p = 0.01 and p = 0.002 the 8-round memory is saturated (28 of 28 and 37 of 40 shots fail). The following is a local measurement that is inadmissible to the tier, not only outside it: 560 shots per basis is below the tier&#x27;s 10,000-shot floor (<code>MIN_SHOTS</code> in <code>verify/ler_tools.py</code>) on top of the replica-budget problem, so these numbers must not be copied into <code>circuit.ler</code>. At p = 0.001 with the pinned decoder (seed 7, 4 workers): Z memory 116 failures in 560 shots, per-round rate 0.0323 [0.0263, 0.0398]; X memory 122 failures in 560 shots, per-round rate 0.0345 [0.0282, 0.0424] (Wilson 95% intervals, per-round conversion as in <code>verify/ler_tools.py</code>). A 10-minute RIS search per basis on the committed detector error models finds nothing lighter than 8 (lightest found: 9 in the X memory, 8 in the Z memory).</p>
+<p>The scheduling scripts (hook-cost oracle, SAT scheduler, two-flag builder, witness constructor) are local staging output of this contribution and are not committed here; the method above is meant to be enough to rewrite them.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 48 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 48 (max weight 8)</div>
 <details><summary>H_X (48 checks, sparse supports)</summary><div class=wit>[0, 16, 31, 45, 48, 64, 72, 76]

@@ -1436,5 +1436,47 @@
    "date": "2026-10-13",
    "method": "Simulated annealing over integer-grid site assignments with the repo's own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier's own rule."
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     50928,
+     50930,
+     51453,
+     51462,
+     51468,
+     51479,
+     51499,
+     51509
+    ]
+   },
+   "Z": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     49705,
+     49708,
+     49764,
+     49789,
+     50305,
+     50665,
+     51167,
+     51215
+    ]
+   }
+  },
+  "rounds": 8,
+  "stim_version": "1.16.0",
+  "notes": "Flag-protected sequential extraction: X checks then Z checks each round with joint reset and measurement layers; per check one ancilla and two flag qubits (flag A coupled after the 1st and 7th data CNOT, flag B after the 2nd and 6th), so a hook after the 3rd to 6th CNOT flips both flags and one after the 2nd or 7th flips one. Each check's CNOT order and the 12 CX layers per block were chosen by SAT so that no combination of hooks (single, same-ancilla pairs, and pairs to quadruples across checks) and data errors reaches an X- or Z-type logical with fewer than 8 faults, using the exact hook-cost oracle of fieldnotes/2026-09-18; the recorded witnesses realize one flagged hook plus the data errors that complete it, so d_circ = 8 = d is exact for this schedule's hook mechanisms.",
+  "contributed_by": {
+   "by": [
+    "@willzeng"
+   ],
+   "date": "2026-10-23",
+   "method": "hook-cost CNOT ordering by SAT with exact lazy multi-hook constraints, two flags per check (after fieldnotes/2026-09-18), witnesses constructed from the hook analysis and checked on the DEM"
+  }
  }
 }

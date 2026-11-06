@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>149</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>21</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.268</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.26846</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>4</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>1.27</div></div>
@@ -23,6 +23,7 @@
 <details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[134, 135, 136]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; CryptoMiniSat 5.14.7 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 3 exists; Z: no logical &lt; 3 exists</div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 8 &middot; H_Z 8 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -62,9 +63,9 @@
 <svg class=lercurve viewBox="0 0 360 170" width=360 height=170 role=img aria-label="measured logical error rate against physical rate"><line x1=46 y1=142.0 x2=348 y2=142.0 class=grid/><text x=42 y=145.0 class=tick text-anchor=end>1e-2</text><line x1=46 y1=10.0 x2=348 y2=10.0 class=grid/><text x=42 y=13.0 class=tick text-anchor=end>1e-1</text><text x=46.0 y=156 class=tick text-anchor=middle>0.001</text><text x=348.0 y=156 class=tick text-anchor=middle>0.002</text><text x=197 y=168 class=tick text-anchor=middle>physical rate p</text><polyline class="lx" points="46.0,99.8 348.0,17.7"/><circle class="lx st-verified" cx=46.0 cy=99.8 r=4><title>X p=0.001: 0.0209/round, verified</title></circle><circle class="lx st-gate" cx=348.0 cy=17.7 r=4><title>X p=0.002: 0.0874/round, gate</title></circle><polyline class="lz" points="46.0,97.0 348.0,19.3"/><circle class="lz st-verified" cx=46.0 cy=97.0 r=4><title>Z p=0.001: 0.0219/round, verified</title></circle><circle class="lz st-gate" cx=348.0 cy=19.3 r=4><title>Z p=0.002: 0.085/round, gate</title></circle></svg>
 <table class=lerpts><thead><tr><th>basis</th><th>p</th><th>ler/round</th><th>95% CI</th><th>failures/shots</th><th>status</th></tr></thead><tbody>
 <tr class="st-gate"><td>X</td><td>0.002</td><td class=num>0.0874</td><td class=num>[0.0835, 0.0914]</td><td class=num>2190/10<sup>4</sup></td><td>verified at PR time</td></tr>
-<tr class="st-verified"><td>X</td><td>0.001</td><td class=num>0.0209</td><td class=num>[0.0193, 0.0227]</td><td class=num>601/10<sup>4</sup></td><td>verified post-merge (599/9999 replica shots, 2026-10-19)</td></tr>
+<tr class="st-verified"><td>X</td><td>0.001</td><td class=num>0.0209</td><td class=num>[0.0193, 0.0227]</td><td class=num>601/10<sup>4</sup></td><td>verified post-merge (599/9999 replica shots, 2026-11-02)</td></tr>
 <tr class="st-gate"><td>Z</td><td>0.002</td><td class=num>0.085</td><td class=num>[0.0812, 0.089]</td><td class=num>2142/10<sup>4</sup></td><td>verified at PR time</td></tr>
-<tr class="st-verified"><td>Z</td><td>0.001</td><td class=num>0.0219</td><td class=num>[0.0202, 0.0237]</td><td class=num>629/10<sup>4</sup></td><td>verified post-merge (609/9999 replica shots, 2026-10-19)</td></tr>
+<tr class="st-verified"><td>Z</td><td>0.001</td><td class=num>0.0219</td><td class=num>[0.0202, 0.0237]</td><td class=num>629/10<sup>4</sup></td><td>verified post-merge (609/9999 replica shots, 2026-11-02)</td></tr>
 </tbody></table>
 <div class=kv><span class=claimed>decoder bposd-cs-10; rates are compared across entries only at equal p; a point whose per-shot failure fraction would exceed 1/2 is not admitted</span></div>
 </section>

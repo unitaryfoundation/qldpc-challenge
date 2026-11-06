@@ -95,7 +95,7 @@ def test_only_formal_certificates_are_selected_and_the_real_one_is_replayable():
         assert rf.recipe_problems(cert["verification"]) == [], slug
     assert "72-12-6" in certs
     r = certs["72-12-6"]["verification"]["replay"]
-    assert r["repo"] == "github.com/VerifiedQC/Lean-QEC" and r["build"].startswith("git lfs pull")
+    assert r["repo"] == "github.com/vprusso/Lean-QEC" and r["build"].startswith("git lfs pull")
 
 
 def test_cli_list_and_json(repo, tmp_path, capsys, monkeypatch):

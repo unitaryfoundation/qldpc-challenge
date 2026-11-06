@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>7</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>1</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.286</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.28571</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>4</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.321</div></div>
@@ -23,6 +23,7 @@
 <details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[2, 4, 5]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: min over 1 Z-logical cosets = 3, all proven; Z: min over 1 X-logical cosets = 3, all proven</div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 4 &middot; H_Z 4 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -52,11 +53,11 @@
 </section>
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/7-1-3">circuits/7-1-3/</a> &middot; canonical noise recipe, 3 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 2 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
-<div class=kv><b>d_circ^X</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 2)</summary><div class=wit>[47, 78]</div></details>
-<div class=kv><b>d_circ^Z</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 2)</summary><div class=wit>[269, 270]</div></details>
+<div class=kv><b>d_circ</b> &le; 3 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[440, 442, 675]</div></details>
+<div class=kv><b>d_circ^Z</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[449, 454, 470]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 <div class=kv><b>transversal gates</b> 1 verified <span class=claimed>(qubit permutation, uniform Clifford, or block-to-block CX; action checked over GF(2) modulo stabilizers)</span></div>
 <div class=kv><b>logical Hadamard</b> H on every qubit &middot; X0 &rarr; Z0, Z0 &rarr; X0</div>

@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[60,4,8]] weight-5 two-block group-algebra code on MC(3,10,2), two-layer 2D-local layout",
  "code_type": "CSS",
  "n": 60,
@@ -720,5 +720,47 @@
    ]
   ],
   "layers": 2
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     20230,
+     20231,
+     20246,
+     20251,
+     20253,
+     20258,
+     20264,
+     20265
+    ]
+   },
+   "Z": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     20236,
+     20238,
+     20257,
+     20259,
+     20264,
+     20265,
+     20276,
+     20279
+    ]
+   }
+  },
+  "rounds": 8,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=2 per check, 6 data CX slots per round, X-check term slots [5, 3, 2, 1, 4], Z-check term slots [0, 2, 3, 4, 1] over terms A_0..A_2, B_0..B_1); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-04",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=2 per check, 6 data CX slots per round, X-check term slots [5, 3, 2, 1, 4], Z-check term slots [0, 2, 3, 4, 1] over terms A_0..A_2, B_0..B_1)"
+  }
  }
 }

@@ -233,7 +233,8 @@ def prescreen(HX, HZ, *, index=None, board=True):
 # (HX, HZ) that no edit to the document changes; everything else is a
 # document the code may still be fine under: a malformed field, a wrong
 # ``code_type``, a witness that does not verify, a layout that does not
-# cover the qubits.
+# cover the qubits, a benchmark or architecture block that contradicts the
+# entry.
 KINDS = {
     "construction": ("tanner_connected", "stabilizer_group_connected",
                      "css_commutation", "stabilizer_commutation",
@@ -244,6 +245,15 @@ KINDS = {
     "layout": ("coordinates_cover_all_qubits", "coordinates_uniform_dimension",
                "interaction_radius_within_claim", "site_occupancy_within_layers",
                "site_spacing_at_least_one", "modules_cover_all_qubits"),
+    "benchmark": ("benchmark_candidate_data_qubits", "benchmark_qubit_totals",
+                  "benchmark_baseline_on_board", "benchmark_baseline_k",
+                  "benchmark_baseline_data_qubits"),
+    "architecture": ("architecture_gadget_fault_distance", "architecture_gadget_data_qubits",
+                     "architecture_qubit_totals", "architecture_partner_on_board",
+                     "architecture_magic_state_gain",
+                     "architecture_blocks_cover_logical_qubits",
+                     "architecture_physical_qubits_cover_blocks",
+                     "architecture_factory_footprint"),
     "other": ("verifier_ran",),
 }
 CODE_KINDS = frozenset({"construction", "weight"})

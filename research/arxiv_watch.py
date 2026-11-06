@@ -21,7 +21,20 @@ codes v1 only promised. Superseded verdicts stay in the row's `reviews` list.
     python research/arxiv_watch.py --json             # rows plus query and scan
     python research/arxiv_watch.py --list unreviewed  # read the ledger back
     python research/arxiv_watch.py --review 2503.03827 \
-        --status relevant --reason "twisted-torus GB codes, n<=360"
+        --status relevant --reason "twisted-torus GB codes, n<=360" \
+        --mechanism "twisted-torus quotient"
+    python research/arxiv_watch.py --tried 2503.03827 \
+        --mechanism "twisted-torus quotient" --where gb-z341-probe \
+        --outcome "every quotient in n <= 700 screened below the cell bar"
+    python research/arxiv_watch.py --list untried      # mechanisms nobody applied here
+    python research/arxiv_watch.py --list mechanisms   # the ledger grouped by mechanism
+
+A verdict says whether a paper is worth reading; it does not say what in it
+transfers, or whether anyone here tried. `--mechanism` tags a verdict with the
+transferable idea (free text, not the result), and `--tried` records where a
+mechanism was applied in this repository and how it went, so a relevant paper
+whose idea was never tried is distinguishable from one whose idea was tried and
+did not work (issue #4235). Unset is the actionable backlog, `--list untried`.
 
 research/literature/README.md is the process around the tool: the query and why
 it is grouped as it is, the polling and rate-limit rules, the ledger format, the
@@ -576,6 +589,13 @@ def load_ledger(path=LEDGER):
 ROW_BUDGET_BYTES = 800
 UNREVIEWED_BUDGET_BYTES = 250
 REASON_MAX = 300
+# A mechanism tag and the place it was tried are written only when set, so the
+# common row keeps the two budgets above. This one bounds the opt-in row: a
+# reviewed row naming three mechanisms at the cap with one tried record at the
+# caps (issue #4235).
+MECHANISM_MAX = 60
+WHERE_MAX = 120
+TAGGED_ROW_BUDGET_BYTES = 1600
 
 
 def arxiv_link(row):
@@ -608,20 +628,41 @@ def slim_row(row):
             {k: v for k, v in p.items() if k != "context"} for p in params]
     review = row.get("review") or {}
     if review.get("status") and review["status"] != "unreviewed":
-        review = dict(review)
-        if review.get("reason"):
-            review["reason"] = review["reason"][:REASON_MAX]
-        out["review"] = review
-    prior = [dict(r) for r in (row.get("reviews") or [])]
-    for r in prior:
-        if r.get("reason"):
-            r["reason"] = r["reason"][:REASON_MAX]
+        out["review"] = _slim_review(review)
+    prior = [_slim_review(r) for r in (row.get("reviews") or [])]
     if prior:
         out["reviews"] = prior
+    tried = [t for t in (_slim_tried(t) for t in row.get("tried") or []) if t]
+    if tried:
+        out["tried"] = tried
     history = row.get("version_history") or []
     if len(history) > 1:
         out["version_history"] = history
     return out
+
+
+def _slim_review(review):
+    """Cap a verdict's reason and keep its mechanisms only when it names some."""
+    review = dict(review)
+    if review.get("reason"):
+        review["reason"] = review["reason"][:REASON_MAX]
+    mechanisms = _dedupe_mechanisms(review.get("mechanisms"))
+    if mechanisms:
+        review["mechanisms"] = mechanisms
+    else:
+        review.pop("mechanisms", None)
+    return review
+
+
+def _slim_tried(record):
+    """Cap a tried record's free text; a record naming no mechanism is dropped."""
+    mechanism = normalise_mechanism((record or {}).get("mechanism", ""))
+    if not mechanism:
+        return None
+    return {"mechanism": mechanism,
+            "where": str(record.get("where", ""))[:WHERE_MAX],
+            "outcome": str(record.get("outcome", ""))[:REASON_MAX],
+            "by": record.get("by", ""), "date": record.get("date", "")}
 
 
 def hydrate_row(row):
@@ -639,6 +680,8 @@ def hydrate_row(row):
                      "seen": row.get("first_seen", "")}])
     row.setdefault("review", {"status": "unreviewed", "reason": "",
                               "by": "", "date": "", "version": None})
+    row["review"].setdefault("mechanisms", [])
+    row.setdefault("tried", [])
     row.setdefault("triage", {"tier": row["tier"],
                               "claimed_params": row["claimed_params"],
                               "matched": [], "screened_in":
@@ -795,6 +838,7 @@ def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
                    "first_seen": prev["first_seen"] if prev else today,
                    "last_seen": today,
                    "reviews": list((prev or {}).get("reviews") or []),
+                   "tried": list((prev or {}).get("tried") or []),
                    "review": _carry_review(prev, p)}
             if len(row["version_history"]) > 1:
                 row["prior_version"] = row["version_history"][-2]["version"]
@@ -875,6 +919,16 @@ def render(rows, kind, limit, show_abstract=False):
             if rv.get("stale"):
                 line += "  -- predates this version, needs re-reading"
         print(f"       review: {line}")
+        mechanisms = mechanisms_of(r)
+        if mechanisms:
+            left = untried_mechanisms(r)
+            tail = "  (not tried here)" if len(left) == len(mechanisms) else ""
+            print(f"       mechanisms: {'; '.join(mechanisms)}{tail}")
+            if left and len(left) < len(mechanisms):
+                print(f"       not tried here: {'; '.join(left)}")
+        for t in r.get("tried") or []:
+            print(f"       tried: {t.get('mechanism', '')} in {t.get('where', '')} "
+                  f"({t.get('date', '')}, {t.get('by', '')}): {t.get('outcome', '')}")
         print(f"       {r['link']}")
         if show_abstract:
             print(f"       {r['abstract'][:400]}")
@@ -891,56 +945,290 @@ def normalise_key(text):
     return split_arxiv_id(key.strip())[0]
 
 
+# -- the transferable mechanism, and whether it was tried here (issue #4235) --
+#
+# A verdict says whether a paper is worth reading. What transfers out of it is
+# a mechanism (a construction move, a symmetry, a way of choosing supports),
+# and whether anyone here applied it is a separate fact from whether the paper
+# was relevant. Tags are free text by design: a taxonomy fixed in advance would
+# not match the transfers that turn out to matter, so two spellings of one
+# mechanism are compared after the same normalization the screen uses.
+
+def normalise_mechanism(text):
+    """Return one mechanism tag as the ledger keeps it: trimmed, single-spaced, capped."""
+    tag = re.sub(r"\s+", " ", str(text or "")).strip()
+    return tag[:MECHANISM_MAX].rstrip()
+
+
+def _mechanism_key(tag):
+    """Return the form under which two spellings of one mechanism are compared."""
+    return _norm(normalise_mechanism(tag)).strip()
+
+
+def _dedupe_mechanisms(tags):
+    """Normalize tags, dropping blanks and repeats; the first spelling is kept."""
+    seen = {}
+    for tag in tags or []:
+        clean = normalise_mechanism(tag)
+        if clean:
+            seen.setdefault(_mechanism_key(clean), clean)
+    return list(seen.values())
+
+
+def mechanisms_of(row):
+    """Every mechanism a row names, on its current verdict or in a tried record.
+
+    The verdict says what the paper carries and a tried record says what was
+    applied here; a mechanism tried without ever being tagged still counts as
+    named, so the two are unioned rather than one being authoritative.
+    """
+    review = row.get("review") or {}
+    tried = [t.get("mechanism", "") for t in row.get("tried") or []]
+    return _dedupe_mechanisms(list(review.get("mechanisms") or []) + tried)
+
+
+def untried_mechanisms(row):
+    """Return the mechanisms a row names that no tried record covers: the backlog."""
+    done = {_mechanism_key(t.get("mechanism", "")) for t in row.get("tried") or []}
+    return [m for m in mechanisms_of(row) if _mechanism_key(m) not in done]
+
+
+def _mechanism_matches(row, wanted):
+    """Return True when a mechanism the row names contains `wanted`."""
+    key = _mechanism_key(wanted)
+    return bool(key) and any(key in _mechanism_key(m) for m in mechanisms_of(row))
+
+
+# Where a mechanism was applied has to be something the next reader can open,
+# for the reason check_prose holds a note's citations to the PR tree: a
+# backlog entry pointing at a scratch directory that no longer exists records
+# nothing. The accepted shapes are an issue or PR reference, a campaign id, a
+# board slug, or a committed path.
+WORKING_OUTPUT = ("research/candidates", "research/out", "research/runs")
+ISSUE_REF = re.compile(
+    r"^(?:#|https?://github\.com/[\w.-]+/[\w.-]+/(?:pull|issues)/)(\d+)$")
+SLUG_RE = re.compile(r"^\d+-\d+-\d+(?:-[a-z0-9]+)?$")
+
+
+def resolve_where(where, root=None):
+    """Return (ok, what) for the place a mechanism was applied.
+
+    Accepted: an issue or PR reference (`#4235` or its GitHub URL), a campaign
+    id or directory under research/campaigns/, a board slug or its codes/
+    path, or any committed path in the repository. Refused, naming the
+    accepted shapes: gitignored working output, an absolute path, and anything
+    that does not exist.
+    """
+    root = root or _ROOT
+    text = (where or "").strip().rstrip("/")
+    if not text:
+        return False, "--where is empty"
+    m = ISSUE_REF.match(text)
+    if m:
+        return True, f"issue or PR #{m.group(1)}"
+    parts = text.replace("\\", "/").split("/")
+    if os.path.isabs(text) or ".." in parts:
+        return False, (f"{text} is not a path inside the repository; name the committed "
+                       "file, the campaign, or the PR")
+    if any(text == w or text.startswith(w + "/") for w in WORKING_OUTPUT):
+        return False, (f"{text} is gitignored working output and cannot be cited; name the "
+                       "campaign summary, the fieldnote, or the PR it became")
+    if "/" not in text and os.path.isdir(os.path.join(root, "research", "campaigns", text)):
+        return True, f"campaign research/campaigns/{text}"
+    if SLUG_RE.match(text) and os.path.exists(os.path.join(root, "codes", text + ".json")):
+        return True, f"board entry codes/{text}.json"
+    if os.path.exists(os.path.join(root, text)):
+        return True, f"path {text}"
+    return False, (f"{text} is not an issue or PR reference (#N), a campaign id under "
+                   "research/campaigns/, a board slug, or a committed path")
+
+
+def _missing(key, rows):
+    """Explain an id the ledger does not hold, without reaching for the network."""
+    near = sorted(k for k in rows if key in k or k in key)[:5]
+    hint = f"; did you mean {', '.join(near)}?" if near else ""
+    print(f"arXiv:{key} not in the ledger ({len(rows)} rows); run a poll "
+          f"covering its submission date first{hint}", file=sys.stderr)
+
+
 def cmd_review(args, path=LEDGER):
-    """Record a human verdict on one paper."""
+    """Record a human verdict on one paper, with the mechanisms it carries.
+
+    `--mechanism` alone, with no `--status`, restates the standing verdict as
+    a new review that adds the tags, so a tag is a review in the history and
+    never an edit of one. Tags accumulate across verdicts: they name what the
+    paper contains, which a changed verdict does not change.
+    """
     rows = load_ledger(path)
     key = normalise_key(args.review)
     if not key:
         print("--review needs an arXiv id", file=sys.stderr)
         return 2
     if key not in rows:
-        near = sorted(k for k in rows if key in k or k in key)[:5]
-        hint = f"; did you mean {', '.join(near)}?" if near else ""
-        print(f"arXiv:{key} not in the ledger ({len(rows)} rows); run a poll "
-              f"covering its submission date first{hint}", file=sys.stderr)
+        _missing(key, rows)
         return 1
     row = rows[key]
-    verdict = {"status": args.status, "reason": args.reason,
+    prior = row.get("review") or {}
+    had_verdict = prior.get("status", "unreviewed") != "unreviewed"
+    status, reason = args.status, args.reason
+    if status is None:
+        if not had_verdict:
+            print(f"arXiv:{key} has no verdict to tag; give --status and --reason "
+                  "with --mechanism", file=sys.stderr)
+            return 1
+        status, reason = prior["status"], prior.get("reason", "")
+    verdict = {"status": status, "reason": reason,
                "by": args.by or os.environ.get("USER", ""),
                "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
                "version": row.get("version")}
-    prior = row.get("review") or {}
-    if prior.get("status", "unreviewed") != "unreviewed":
+    mechanisms = _dedupe_mechanisms(
+        list(prior.get("mechanisms") or []) + list(getattr(args, "mechanism", None) or []))
+    if mechanisms:
+        verdict["mechanisms"] = mechanisms
+    tagged = f"; mechanisms: {'; '.join(mechanisms)}" if mechanisms else ""
+    if getattr(args, "dry_run", False):
+        print(f"dry run, not written -- arXiv:{key}: {status} ({reason}){tagged}")
+        return 0
+    if had_verdict:
         row["reviews"] = list(row.get("reviews") or []) + [prior]
     row["review"] = verdict
-    if getattr(args, "dry_run", False):
-        print(f"dry run, not written -- arXiv:{key}: {args.status} "
-              f"({args.reason})")
-        return 0
     save_ledger(rows, path)
-    print(f"arXiv:{key} v{row.get('version')}: {args.status} ({args.reason})")
+    print(f"arXiv:{key} v{row.get('version')}: {status} ({reason}){tagged}")
     return 0
+
+
+def cmd_tried(args, path=LEDGER):
+    """Record that a paper's mechanism was applied here, where, and how it went."""
+    rows = load_ledger(path)
+    key = normalise_key(args.tried)
+    if not key:
+        print("--tried needs an arXiv id", file=sys.stderr)
+        return 2
+    if key not in rows:
+        _missing(key, rows)
+        return 1
+    ok, what = resolve_where(args.where)
+    if not ok:
+        print(f"--where: {what}", file=sys.stderr)
+        return 1
+    row = rows[key]
+    where = args.where.strip().rstrip("/")[:WHERE_MAX]
+    outcome = args.outcome.strip()[:REASON_MAX]
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    by = args.by or os.environ.get("USER", "")
+    records = [{"mechanism": m, "where": where, "outcome": outcome, "by": by, "date": today}
+               for m in _dedupe_mechanisms(args.mechanism)]
+    tagged = {_mechanism_key(m) for m in (row.get("review") or {}).get("mechanisms") or []}
+    untagged = [r["mechanism"] for r in records if _mechanism_key(r["mechanism"]) not in tagged]
+    if getattr(args, "dry_run", False):
+        for r in records:
+            print(f"dry run, not written -- arXiv:{key}: tried {r['mechanism']} in "
+                  f"{where} ({what}): {outcome}")
+        return 0
+    row["tried"] = list(row.get("tried") or []) + records
+    save_ledger(rows, path)
+    for r in records:
+        print(f"arXiv:{key} v{row.get('version')}: tried {r['mechanism']} in {where} "
+              f"({what}): {outcome}")
+    if untagged:
+        print(f"note: {'; '.join(untagged)} is not among the verdict's mechanisms for "
+              f"arXiv:{key}; this record now names it", file=sys.stderr)
+    return 0
+
+
+LIST_KINDS = ("all", "screened-in", "unreviewed", *REVIEW_STATUSES,
+              "mechanisms", "untried", "tried")
+
+
+def _select(rows, want):
+    """Return the ledger rows a `--list` kind asks for."""
+    if want == "screened-in":
+        return [r for r in rows.values() if r["triage"]["screened_in"]]
+    if want == "all":
+        return list(rows.values())
+    if want == "mechanisms":
+        return [r for r in rows.values() if mechanisms_of(r)]
+    if want == "untried":
+        return [r for r in rows.values() if untried_mechanisms(r)]
+    if want == "tried":
+        return [r for r in rows.values() if r.get("tried")]
+    return [r for r in rows.values()
+            if (r.get("review") or UNREVIEWED).get("status") == want]
+
+
+def _newest_first(rows):
+    return sorted(rows, key=lambda r: (r.get("updated", ""), r["id"]), reverse=True)
+
+
+def render_mechanisms(rows, limit):
+    """Print the ledger grouped by mechanism, each paper with whether it was tried here."""
+    groups = {}
+    for r in rows:
+        for m in mechanisms_of(r):
+            groups.setdefault(_mechanism_key(m), (m, []))[1].append(r)
+    if not groups:
+        print("no mechanisms recorded; tag one with --review <id> --mechanism '...'")
+        return
+    ordered = sorted(groups.values(), key=lambda g: (-len(g[1]), _mechanism_key(g[0])))
+    backlog = sum(1 for r in rows if untried_mechanisms(r))
+    print(f"\n{len(groups)} mechanisms on {len(rows)} papers, {backlog} papers with one "
+          "not tried here:")
+    for name, papers in ordered[:limit]:
+        key = _mechanism_key(name)
+        waiting = [r for r in papers
+                   if key in {_mechanism_key(u) for u in untried_mechanisms(r)}]
+        print(f"\n  {name}: {len(papers)} paper(s), {len(waiting)} not tried here")
+        for r in _newest_first(papers):
+            rv = r.get("review") or UNREVIEWED
+            status = rv.get("status", "unreviewed")
+            if rv.get("version"):
+                status += f" (on v{rv['version']}, {rv.get('date', '')})"
+            print(f"    arXiv:{r['id']} v{r['version']}  {status}  {r['title']}")
+            hits = [t for t in r.get("tried") or []
+                    if _mechanism_key(t.get("mechanism", "")) == key]
+            if not hits:
+                print("        not tried here")
+            for t in hits:
+                print(f"        tried in {t.get('where', '')} ({t.get('date', '')}, "
+                      f"{t.get('by', '')}): {t.get('outcome', '')}")
+    if len(ordered) > limit:
+        print(f"  ... {len(ordered) - limit} more mechanisms (--limit N, --full)")
 
 
 def cmd_list(args, path=LEDGER):
-    """Print ledger rows filtered by review status, without polling."""
+    """Print ledger rows by review status, mechanism, or tried state, without polling."""
     rows = load_ledger(path)
     want = args.list
-    if want == "screened-in":
-        keep = [r for r in rows.values() if r["triage"]["screened_in"]]
-    elif want == "all":
-        keep = list(rows.values())
-    else:
-        keep = [r for r in rows.values()
-                if (r.get("review") or UNREVIEWED).get("status") == want]
-    print(f"ledger {path}: {len(rows)} papers, {len(keep)} matching {want}")
+    keep = _select(rows, want)
+    wanted = [m for m in (getattr(args, "mechanism", None) or []) if normalise_mechanism(m)]
+    if wanted:
+        keep = [r for r in keep if any(_mechanism_matches(r, m) for m in wanted)]
+    if getattr(args, "json", False):
+        payload = {"disclaimer": DISCLAIMER, "ledger": path, "list": want,
+                   "mechanism": wanted,
+                   "rows": [dict(slim_row(r), link=arxiv_link(r),
+                                 mechanisms=mechanisms_of(r),
+                                 untried=untried_mechanisms(r))
+                            for r in _newest_first(keep)]}
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        print(DISCLAIMER, file=sys.stderr)
+        return 0
+    naming = f" naming {' or '.join(wanted)}" if wanted else ""
+    print(f"ledger {path}: {len(rows)} papers, {len(keep)} matching {want}{naming}")
     limit = 10 ** 6 if args.full else max(1, args.limit)
-    render(keep, want, limit, args.abstracts)
+    if want == "mechanisms":
+        render_mechanisms(keep, limit)
+    else:
+        render(keep, want, limit, args.abstracts)
     return 0
 
 
+def _has_mechanism(args):
+    return bool(args.mechanism and any(normalise_mechanism(m) for m in args.mechanism))
+
+
 def main(argv=None):
-    """Poll arXiv, list the ledger, or record a verdict."""
+    """Poll arXiv, list the ledger, record a verdict, or record what was tried."""
     p = argparse.ArgumentParser(
         prog="arxiv_watch",
         description="poll arXiv for possibly board-relevant qLDPC papers")
@@ -957,12 +1245,13 @@ def main(argv=None):
     p.add_argument("--abstracts", action="store_true",
                    help="include the first 400 characters of each abstract")
     p.add_argument("--dry-run", action="store_true",
-                   help="poll and print without writing the ledger")
+                   help="poll, review, or record without writing the ledger")
     p.add_argument("--json", action="store_true",
-                   help="emit the new and updated rows as JSON")
+                   help="emit the new and updated rows as JSON (with --list, the "
+                        "matching rows)")
     p.add_argument("--ledger", default=LEDGER)
     p.add_argument("--list", nargs="?", const="unreviewed", default=None,
-                   choices=["all", "screened-in", "unreviewed", *REVIEW_STATUSES],
+                   choices=list(LIST_KINDS),
                    help="print ledger rows instead of polling")
     p.add_argument("--review", default=None,
                    help="record a verdict on this arXiv id instead of polling")
@@ -970,18 +1259,50 @@ def main(argv=None):
     p.add_argument("--reason", default=None,
                    help="a brief reason, required with --review")
     p.add_argument("--by", default="", help="who reviewed it (default $USER)")
+    p.add_argument("--mechanism", action="append", default=None, metavar="TAG",
+                   help="with --review, a transferable idea the paper carries (repeatable); "
+                        "with --tried, the one applied; with --list, keep only papers "
+                        "naming a mechanism containing TAG")
+    p.add_argument("--tried", default=None, metavar="ID",
+                   help="record that a mechanism of this arXiv id was applied here; needs "
+                        "--mechanism, --where and --outcome")
+    p.add_argument("--where", default=None,
+                   help="where it was applied: an issue or PR (#N), a campaign id, a board "
+                        "slug, or a committed path")
+    p.add_argument("--outcome", default=None, help="how it went, in a sentence")
     args = p.parse_args(argv)
 
     if args.list is not None:
+        if args.review is not None or args.tried is not None:
+            p.error("--list does not combine with --review or --tried")
         return cmd_list(args, args.ledger)
+    if args.tried is not None:
+        if not args.tried.strip():
+            p.error("--tried needs an arXiv id")
+        if args.review is not None:
+            p.error("--review and --tried are separate records; run them one at a time")
+        if args.status is not None or args.reason is not None:
+            p.error("--status and --reason only apply with --review")
+        if not _has_mechanism(args):
+            p.error("--tried requires --mechanism, the one that was applied")
+        if not (args.where or "").strip() or not (args.outcome or "").strip():
+            p.error("--tried requires --where and a non-empty --outcome")
+        return cmd_tried(args, args.ledger)
     if args.review is not None:
         if not args.review.strip():
             p.error("--review needs an arXiv id")
-        if args.status is None or args.reason is None or not args.reason.strip():
-            p.error("--review requires --status and a non-empty --reason")
+        if args.where is not None or args.outcome is not None:
+            p.error("--where and --outcome only apply with --tried")
+        tag_only = args.status is None and args.reason is None and _has_mechanism(args)
+        if not tag_only and (args.status is None or args.reason is None
+                             or not args.reason.strip()):
+            p.error("--review requires --status and a non-empty --reason, or --mechanism "
+                    "alone to tag the standing verdict")
         return cmd_review(args, args.ledger)
     if args.status is not None or args.reason is not None:
         p.error("--status and --reason only apply with --review")
+    if args.mechanism or args.where is not None or args.outcome is not None:
+        p.error("--mechanism, --where and --outcome apply with --review, --tried or --list")
 
     ledger = load_ledger(args.ledger)
     before = len(ledger)

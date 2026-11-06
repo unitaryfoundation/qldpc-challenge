@@ -321,8 +321,20 @@ def load_campaign(path):
 
 def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
                       direction="maximize", stopping=None, families=None,
-                      status="draft", **fields):
+                      status="draft", card=None, **fields):
     """Return a validated campaign definition with the required fields filled.
+
+    ``card`` is the direction card (issue #4028): why this campaign, where it
+    is aimed, what it must beat, what it may spend, when it is dropped, and
+    what a negative result would teach, as the ``direction`` block the schema
+    describes. A new campaign has to state it, so ``card=None`` is refused
+    here; ``direction: null`` in a committed file is reserved for the
+    campaigns defined before the card existed. (``direction`` on this
+    function is still the objective's maximize or minimize.) A campaign that
+    enters a route knowing its first candidates are worse than the bar adds
+    ``non_monotonic`` to the card, the statement of what made the route worth
+    starting (issue #4237, research/AUTORESEARCH.md section 3e); the stop stays
+    ``abandon_criterion``.
 
     The seven required fields are ``schema_version``, ``id``, ``name``,
     ``objective`` (``metric`` and ``direction``), ``budget``, and
@@ -344,12 +356,20 @@ def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
                                  families=["generalized-bicycle"])
         write_campaign(spec, "research/campaigns/gb-z341-probe/campaign.json")
     """
+    if card is None:
+        raise CampaignError(
+            "a new campaign states its direction card (issue #4028): pass "
+            "card={hypothesis, cell, family, bar, budget, feasibility, "
+            "novelty, expected_value, abandon_criterion, "
+            "what_a_negative_would_teach}; a null direction is reserved for "
+            "the campaigns defined before the card existed")
     c = {
         "schema_version": 1,
         "id": id,
         "name": name,
         "status": status,
         "objective": {"metric": metric, "direction": direction},
+        "direction": copy.deepcopy(card),
         "budget": dict(budget),
         "stopping": list(stopping) if stopping is not None
         else [{"type": "budget_exhausted"}],
@@ -430,6 +450,11 @@ class Campaign:
     @property
     def status(self):
         return self.c.get("status", "draft")
+
+    @property
+    def direction(self):
+        """The direction card (issue #4028), or None for a campaign defined before it."""
+        return self.c.get("direction")
 
     @property
     def run_contract(self):
@@ -1015,14 +1040,47 @@ class Ledger:
     mark_retracted = retract_survivor
     record_restate = restate_survivor
 
-    def record_negative(self, what, detail):
+    def record_negative(self, what, detail, *, assumptions=None, revisit_if=None,
+                        family=None, params=None):
         """Record something that did not work, and why.
 
         A closed family, a wall, a ladder that collapsed. This is the half of a
         campaign that survives a zero-submission run, and the next searcher
         pays for it twice if it is not written down.
+
+        ``assumptions`` and ``revisit_if`` (issue #4233) are what let a later
+        session reuse the negative rather than only find it: the
+        preconditions it depends on (the family and check weight, the n
+        range, the backend and trial depth, how the gate behaved), and the
+        one concrete change that would make the route worth retrying. Both
+        are optional; a negative with neither is still a record, only one
+        that cannot say whether its reason still applies. ``family`` and
+        ``params`` default to the open experiment's, so ``./qldpc negatives``
+        can answer by family and parameter.
         """
-        self.negative_results.append({"what": what, "detail": detail})
+        item = {"what": what, "detail": detail}
+        if assumptions is not None:
+            if (isinstance(assumptions, str) or not isinstance(assumptions, (list, tuple))
+                    or not assumptions
+                    or not all(isinstance(a, str) and a.strip() for a in assumptions)):
+                raise CampaignError(
+                    "record_negative: assumptions is a non-empty list of strings, "
+                    "one precondition each")
+            item["assumptions"] = list(assumptions)
+        if revisit_if is not None:
+            if not isinstance(revisit_if, str) or not revisit_if.strip():
+                raise CampaignError(
+                    "record_negative: revisit_if is a sentence naming the change "
+                    "that would make this worth retrying")
+            item["revisit_if"] = revisit_if
+        current = self._current or {}
+        family = current.get("family") if family is None else family
+        params = current.get("params") if params is None else params
+        if family:
+            item["family"] = family
+        if params:
+            item["params"] = dict(params)
+        self.negative_results.append(item)
 
     def record_error(self, what, detail):
         """Record that the open experiment crashed, as distinct from losing.
@@ -1186,6 +1244,11 @@ class Ledger:
             "snapshot": self.snapshot,
             "params": self.params,
             "objective": self.campaign.c["objective"],
+            # Why this campaign at all: the direction card (issue #4028),
+            # copied so a later session reading summaries alone can tell a
+            # direction abandoned for a reason from one nobody came back to.
+            # None for the campaigns defined before the card existed.
+            "direction": self.campaign.direction,
             # What the lanes were supposed to run at, beside what each one
             # did. Two summaries carrying the same contract_hash screened at
             # the same depth; that is the comparison AUTORESEARCH.md 5b

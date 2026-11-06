@@ -4,6 +4,7 @@
     "id": "multiband-d5-staircase-gaps",
     "name": "Multi-band dense-packed surface codes: fill the d=5 staircase gaps in local-2d-single / weight-4",
     "status": "completed",
+    "direction": null,
     "objective": { "metric": "kd2_over_n", "direction": "maximize", "target": 1.35 },
     "constraints": {
       "max_check_weight": 4,

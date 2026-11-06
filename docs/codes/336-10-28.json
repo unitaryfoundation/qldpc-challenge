@@ -4106,5 +4106,5 @@
    "notes": "CPU-hours spent on this fold's distance search after the mirror screen; excludes the 40-parent screen (about 3.5 CPU-h) and the board gate runs."
   }
  },
- "family": "2bga-coset"
+ "family": "other"
 }

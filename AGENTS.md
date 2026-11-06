@@ -14,7 +14,9 @@ to discard it. The board ranks by Pareto frontier, not by the kd^2/n leader.
 A board-advancing code whose only strict gain over an entry is distance (d, with n,
 k and w no better) needs caution, not rejection. Both distances are upper bounds, so
 such a gain is where inflated bounds show up. Re-measure the peer and the candidate
-at matched depth (`research/audits/leader_audit.py pair`) before submitting it.
+at matched depth (`research/audits/leader_audit.py pair --json-out <file>`) before
+submitting it; `./qldpc submit --peer-audit <file>` and `research/kit/promote.py`'s
+`evidence.peer_audit` take that record and refuse a d-only gain without it.
 
 Dominated codes pass the gate but are not board-advancing. Record them as non-frontier
 results; do not submit them as frontier codes.
@@ -158,6 +160,15 @@ someone else's existing note is exempt.
 ## Working on the repo itself
 
 - `verify/` is the trust anchor and is hash-pinned in CI (`verify/check_validator_integrity.py`).
-  Changing it is deliberate: re-pin with `--update` and get the diff reviewed.
+  Changing it is deliberate. The checklist, in order (issue #4030):
+  1. `uv run --extra certify python verify/validation_gate.py` must exit 0: the solved cases
+     (Steane, Shor, [[4,2,2]], a direct sum, a local-Clifford image) verify and certify at their
+     known parameters, each deliberately broken artifact is rejected for its own reason
+     (construction, weight, packaging, typing, witness, layout, benchmark, architecture), and the seeded baselines and
+     the mitten and ZSZ lifted-product entries reproduce their committed verdicts byte for byte.
+  2. If a verdict changed by design, re-record it with `--update-golden` and say so in the PR;
+     that diff is part of the review.
+  3. Re-pin with `python verify/check_validator_integrity.py --update`, which runs the gate
+     first and refuses otherwise, and get the manifest diff reviewed.
 - Submissions live in `codes/` (schema: `schema/code.schema.json`); the board/site is generated
   from them by `site/build.py`. See `CONTRIBUTING.md` and `TRACKS.md`.

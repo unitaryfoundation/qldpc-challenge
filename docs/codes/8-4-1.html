@@ -19,6 +19,7 @@
 <details><summary>witness operator (support, 1 qubits)</summary><div class=wit>[3]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 4 &middot; H_Z acyclic <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -61,7 +62,8 @@
 <h4>Tools</h4>
 <p>Model: Beam 1.0. The local verdict is <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
-<p>Reconstruct the parent board code, delete the named check, and recompute n, k, and the witness-backed distance. The resulting checks are the submitted ones.</p></div></section>
+<p>Reconstruct the parent board code, delete the named check, and recompute n, k, and the witness-backed distance. The resulting checks are the submitted ones.</p>
+<p>The -b variant is the same code up to a qubit permutation and is not kept separately.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 2 (max weight 4) &middot; <b style="min-width:auto">Z-checks</b> 2 (max weight 4)</div>
 <details><summary>H_X (2 checks, sparse supports)</summary><div class=wit>[4, 5, 6, 7]

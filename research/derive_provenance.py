@@ -41,6 +41,9 @@ entries that left, needs neither the index nor pynauty, and a later
 that are wrong (an unknown bucket, ``literature`` with no evidence, counts that
 disagree with the entries) and reports mere staleness loudly without failing,
 which is what this module docstring promised before it could deliver it.
+``--residual`` writes the list of ``not_derived`` entries as a tracking-issue
+body: the remainder only an index run can settle, which the weekly
+``provenance-top-up`` workflow keeps published (issue #4023).
 
 Two things this deliberately does not do. It does not write to ``codes/``,
 because a derived field that lives in the submission document would drift from
@@ -58,6 +61,7 @@ gates a submission, it only reports.
 import argparse
 import collections
 import csv
+import datetime
 import json
 import os
 import sys
@@ -81,6 +85,29 @@ def board_slugs():
     d = os.path.join(ROOT, "codes")
     return sorted(os.path.splitext(f)[0] for f in os.listdir(d)
                   if f.endswith(".json"))
+
+
+def stabilizer_slugs():
+    """Board entries the index checker has no method for: general stabilizer codes.
+
+    ``iso_check.py`` decides equivalence on the typed Tanner graph of a CSS pair
+    and skips every other entry, so no index run can move these out of
+    ``not_derived``. The residual list reports them apart and does not wait
+    on them.
+    """
+    d = os.path.join(ROOT, "codes")
+    out = set()
+    for f in os.listdir(d):
+        if not f.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(d, f), encoding="utf-8") as fh:
+                doc = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        if doc.get("code_type", "CSS") != "CSS":
+            out.add(f[:-5])
+    return out
 
 
 def derive(matches_csv, param_csv=None, covered=None):
@@ -208,6 +235,76 @@ def top_up():
     return 0
 
 
+def residual(path, run_url=None):
+    """Write the tracking-issue body listing the entries the index has not seen.
+
+    The list is what a later index run must cover; the weekly top-up only keeps
+    it honest as the board changes. General stabilizer entries, which the
+    checker cannot test, are listed apart and left out of the count. Prints
+    ``not_derived=N stabilizer_outside_method=S entries=M`` for the workflow
+    that decides whether the issue stays open.
+    """
+    with open(DERIVED, encoding="utf-8") as f:
+        payload = json.load(f)
+    table = payload["entries"]
+    c = counts(table)
+    stab = stabilizer_slugs()
+    pending = sorted(s for s, v in table.items() if v["bucket"] == "not_derived" and s not in stab)
+    outside = sorted(s for s, v in table.items() if v["bucket"] == "not_derived" and s in stab)
+    today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+    lines = [
+        f"As of {today}, the literature index has not been run against "
+        f"{len(pending):,} of the board's {len(table):,} entries. "
+        "research/provenance/derived.json records them as not_derived: not "
+        "checked, which is different from no_match (checked, nothing found). "
+        "Only an index run clears this list; the weekly top-up keeps it honest "
+        "as the board changes (issue #4023).",
+        "",
+        "| bucket | entries |",
+        "|---|---|",
+    ]
+    lines += [f"| {b} | {c[b]:,} |" for b in BUCKETS]
+    lines += [
+        "",
+        "To clear it: run research/provenance/iso_check.py with LITERATURE_INDEX "
+        "set, then `python research/derive_provenance.py --from-matches "
+        "isomorphism_matches.csv --from-params param_matches.csv --covered "
+        "<JSON list of the slugs the run saw>` (research/provenance/README.md). "
+        "Entries the run does not see stay not_derived.",
+        "",
+        f"<details><summary>{len(pending):,} entries not yet checked</summary>",
+        "",
+        " ".join(pending) if pending else "(none)",
+        "",
+        "</details>",
+        "",
+    ]
+    if outside:
+        lines += [
+            f"A further {len(outside):,} entries are general stabilizer codes, which the "
+            "checker's typed-Tanner-graph test does not cover (it decides CSS pairs only). "
+            "They stay not_derived until there is a method for them, and this issue does "
+            "not wait on them.",
+            "",
+            f"<details><summary>{len(outside):,} stabilizer entries outside the checker's method</summary>",
+            "",
+            " ".join(outside),
+            "",
+            "</details>",
+            "",
+        ]
+    lines += [
+        "Kept current by the provenance-top-up workflow"
+        + (f" ([this run]({run_url}))" if run_url else "")
+        + ": opened when the list is non-empty, edited in place while it stays "
+        "so, closed when it empties.",
+    ]
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"not_derived={len(pending)} stabilizer_outside_method={len(outside)} entries={len(table)}")
+    return 0
+
+
 def check():
     """Confirm the committed table covers exactly today's codes/."""
     if not os.path.exists(DERIVED):
@@ -277,9 +374,15 @@ def main(argv):
     ap.add_argument("--top-up", action="store_true",
                     help="record new board entries as not_derived and drop "
                          "departed ones; needs no index")
+    ap.add_argument("--residual", metavar="PATH",
+                    help="write the tracking-issue body listing the "
+                         "not_derived entries to PATH and print their count")
+    ap.add_argument("--run-url", help="workflow run to link from the --residual body")
     a = ap.parse_args(argv)
     if a.top_up:
         return top_up()
+    if a.residual:
+        return residual(a.residual, a.run_url)
     if a.check or not a.from_matches:
         return check()
     covered = None

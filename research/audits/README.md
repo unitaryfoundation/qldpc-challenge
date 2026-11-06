@@ -122,7 +122,7 @@ on `d` alone at one identical budget:
 ```
 uv run --frozen python research/audits/leader_audit.py pair \
     <candidate>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers default to every `codes/` entry with the same n, k and max check
@@ -142,6 +142,14 @@ not a distance difference. One of four decisions comes out:
 Exit 2 when either side is refuted, so it gates like `ladder` and `screen`.
 Exit 3 when there is no peer at all: that candidate is not making a d-only gain,
 so this is not the question to ask of it -- use `screen`.
+
+`--json-out` writes the audit as a record (`qldpc-peer-audit/1`: the candidate,
+the peers measured, trials, seeds, pair depth, threads, the decision, the exit
+code, and each entry's reading). That file is what the two packaging paths
+consume: `./qldpc submit --peer-audit <file>` and `evidence.peer_audit` in
+`research/kit/promote.py` refuse a d-only gain without it, with a decision other
+than `credible`, read at fewer trials than the claim's own search, or not
+covering every peer the gate named (`research/kit/peer_audit.py`, issue #4236).
 
 ## The frontier over time: `frontier_history.py`
 
@@ -193,6 +201,71 @@ The replay is only quotable if it ends where the repository is, and
 `git ls-tree -r HEAD -- codes/` read as (n, k, d), CSS only, with every blob
 parsed. The committed SVGs are the charts as of the date in their titles;
 regenerate them with the commands above.
+
+The same walk answers which cell has not moved (issue #4238). `cell_moves`
+replays the landings against each primary-track cell and records two dates.
+The frontier date is the last landing that changed the cell's nondominated
+set under the board's own (n, k, d, w) rule: an entry landing or revised while
+nondominated among the cell's members moves the cell, a nondominated entry
+removed or revised away moves it, and a dominated entry landing or leaving
+moves nothing. That rule is permissive on purpose (a high-rate low-distance
+code is beaten by nothing, and about seven entries in ten are nondominated in
+their cell today), so the frontier moves at most landings and the date mostly
+says whether the cell is being worked. The record date is the selective one:
+the last landing that changed the cell's best kd^2/n, raised by a new leader
+or lowered when the leader was revised or removed. A distance revision counts
+as movement on both, as it should: the cell's claim changed. Each entry's
+cells are read once from the board at HEAD and carried back through renames,
+so an entry that gained a layout later counts in its 2D cells from its first
+landing, and a path no longer on the board is skipped. `./qldpc targets`
+prints both per cell as the date, the days since, the board landings since,
+and the entry that moved it (`--no-staleness` leaves them out; a shallow clone
+has no history to replay and says so); `--stale` sorts the cells stalest
+first by the record date, then the frontier date. The landing count is the
+measure that survives a busy fortnight, when every cell's day count moves at
+once. The replay costs a few seconds beside the board load.
+
+## Family concentration of the frontier: `family_concentration.py`
+
+`site/build.py` (`family_concentration`) measures, for every CSS primary-track
+cell and for the global CSS frontier, the share of the frontier's records held
+by the top declared family and by the top two, the Herfindahl-Hirschman index
+over families, and whether the cell's leader (largest kd^2/n) belongs to a
+family other than that of the cell's earliest-dated member, which is where the
+search moved a cell (issue #4025). It reads the same `cell_frontiers` and
+`pareto` that award the star, and the site publishes it in `docs/stats.json`
+and beside the frontier map's legend. This script records a dated measurement,
+`family_concentration-<date>.json`, and prints the tables a fieldnote quotes,
+so the shape of the frontier is a time series rather than a snapshot.
+
+`family` is the board's one self-declared label (`research/AUTORESEARCH.md`:
+filterable, never ranked), so every number here measures the declared tag, not
+a property recovered from H; the derived provenance buckets under
+`research/provenance/` are the computed axis wherever they cover an entry.
+Nothing here ranks anything.
+
+```
+uv run python research/audits/family_concentration.py --markdown
+```
+
+## Who opened each cell and family: `cell_openings.py`
+
+Issue #4029 asked whether the board should flag the entry that first
+populates a cell, a family, or a geometry. The decision was no flag, and this
+script is the record that stands in its place: for every populated cell key
+(locality class, weight class, code type), the first entry by
+`provenance.date` (ties by slug), the first entry per declared family tag, and
+the first modular and 3D-layout entries, as `cell_openings-<date>.json` with
+a table. On the board of 2026-10-23 three entries open all 24 cells, because
+cells nest and the smallest, lowest-weight, most local code is in every cell
+it qualifies for (the Steane code opened every CSS cell in 1996), and the
+family half rests on the one self-declared label. First arrival is a fact
+about the board's history, not a property of a code, so it is recorded here
+and never shown as a badge, ranked, or scored.
+
+```
+uv run python research/audits/cell_openings.py --markdown
+```
 
 ## Limits
 
@@ -310,14 +383,29 @@ cyclic two-block family outright; every other flagged pair waits for a human
 that share a WL signature with different fingerprints, and every literature
 match in `research/provenance/derived.json`, and gives each one of four
 verdicts: `equivalent` with the permutation (nauty on the typed Tanner graph,
-or on the basis-independent hypergraph of all low-weight row-space vectors
-when the rank allows), re-verified on the row spaces with the negative
-control; `inequivalent` when a basis-independent invariant differs in both
-orientations (ranks, the dimension of the intersection of the X and Z row
-spaces, the exact low-weight enumerator); `gb_family_no` when the two-block
+or on the basis-independent hypergraph of all row-space vectors up to the
+check weight), re-verified on the row spaces with the negative control;
+`inequivalent` when a basis-independent invariant differs in both
+orientations (ranks, the dimension and weight enumerator of the intersection
+of the X and Z row spaces, the dimensions and weight enumerators of the two
+hulls, the per-weight counts of row-space vectors up to the check weight) or
+when those hypergraphs are not isomorphic; `gb_family_no` when the two-block
 decider finds no unit map, which is the family verdict and not a proof
 against other permutations; `undecided` otherwise. Equivalent pairs with two
 different distance claims are flagged, since the lighter witness transports.
+
+The vectors up to the check weight come from a Brouwer-Zimmermann enumeration
+(issue #4057): disjoint information sets are cut from the row space, every
+sum of at most t_i systematic rows of set i is formed (times every kernel
+combination for a partial last set), and a vector missed by all sets has
+weight at least the sum of the t_i + 1, so the list is complete once that sum
+exceeds the check weight, at any rank. The lists contain every check row, so
+they span, and an isomorphism of the hypergraphs they define is a permutation
+equivalence in both directions (Leon's argument); when the lists are exactly
+the check rows, the verdict is the Tanner comparison made decisive. The plan
+(sets, subset sizes, row sums, column-order seed) is kept in the record;
+`run --enum-budget` caps the row sums per row space, and a pair over the
+budget stays `undecided`.
 
 ```
 uv run --extra research python research/audits/permutation_audit.py run --out research/audits/permutation_audit-<date>.json
@@ -329,3 +417,57 @@ tables under `research/kit/groups/`; the QECDB matches are fetched from the
 database's API and the fetched rows are kept in the record. Nothing here is a
 gate input; `recheck` re-verifies every recorded permutation from the blob
 hashes it cites, as `permutation_equivalence.py` does for its ledger.
+
+## Reachability pruning for code-calculus moves: `cc_reachability.py`
+
+Direction 6 of issue #4478 asks whether a code-calculus move can be skipped
+before any distance search, by computing where its child must land and checking
+that region against the board. `cc_reachability.py` answers it for the three
+moves v0.1 found productive. For every CSS parent with `n <= N` it enumerates
+C-DELETE-CHECK, E-PEEL, and E-PUNCTURE with the library's own semantics, applies
+the structural refusals the gate would make (a dependent display, a bare qubit,
+a disconnected Tanner graph, k = 0), computes the child's exact `(n', k', w')`
+from ranks alone, and asks whether the optimistic child `(n', k', d_parent, w')`
+is dominated in the strictest cell it could land in. A child's distance never
+exceeds its parent's under these moves, so a dominated optimistic child cannot
+be board-advancing at any real distance and the move can be skipped.
+
+```
+uv run --frozen python research/audits/cc_reachability.py --n-cap 120 \
+    --out research/audits/cc_reachability-<date>.json [--sweep <frontier.jsonl>]
+```
+
+`--sweep` takes the frontier record of a gated sweep (one JSON object per line
+with the child's `n`, `k`, `w`, its `parent` slug, and the gate's
+`board_advancing`) and reports how the filter would have done on children the
+gate judged: a child pruned here and advancing there is a soundness failure
+unless the board moved in between. `cc_reachability-2026-11-05.json` is the
+record for `n <= 120`; its reading, with the stabilizer-parent probe of the
+same day, is `fieldnotes/2026-11-05-code-calculus-v0p1-directions-1-and-6.md`.
+
+## The finite-size map against the surface code: `surface_code_map.py`
+
+Issue #4601 (Beat the Surface Code) asks first for a structural map: for k
+logical qubits, which verified codes use fewer data qubits than the surface
+code at the same distance, in which cell, and with what verification status.
+`surface_code_map.py` reads the board through `site/build.py`'s loader and,
+for each k target (1, 10, 25, 50, 100), each track (2D single-layer, 2D
+bilayer, unrestricted) and each check-weight cap (4, 6, 8, any), finds at
+every d the smallest-n entry with at least k logical qubits and a distance
+bound of at least d, against k independent rotated surface-code patches,
+n = k d^2. It also records the price of 2D locality (n of the best 2D entry
+over n of the best unrestricted entry at the same k and d) and, for every k
+from 1 to 100, the best factor over d in each track. The record is
+`surface_code_map-<date>.json`; `--markdown` prints the tables a fieldnote
+quotes.
+
+```
+uv run python research/audits/surface_code_map.py --markdown
+uv run python research/audits/surface_code_map.py --out research/audits/surface_code_map-<date>.json
+```
+
+Read the tiers before quoting a factor: the baseline distance is exact,
+while a board entry at tier `ub` is a witness-backed upper bound and beats
+the surface code only if its bound is tight. The comparison counts data
+qubits only; the operational comparison in #4601 (total qubits at matched
+logical error rate) is Level 2 and is not computed here.

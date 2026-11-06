@@ -3,6 +3,7 @@
 - Parameters: [[n, k, d]] =
 - Tracks:
 - Distance confidence: upper_bound / exact
+- Surface-code parity bar (only when claiming `g >= 1`): 1 to 5, as listed in TRACKS.md under "Scalable families at surface-code parity"
 
 ### Checklist
 - [ ] One JSON file under `codes/`, conforming to `schema/code.schema.json`

@@ -42,11 +42,20 @@ OPENING = 90
 # the symplectic-halved variant of arXiv:2609.30069 on purpose: it is a
 # pair-partition CPM code built by a different recipe and belongs in the same
 # filter.
+#
+# "<family> base" names the family of the code an entry was derived from, not
+# the entry's own: "One amplification of [[126,20,11]] bivariate-bicycle base
+# by flagged [[4,2,2]] amplifier" is a distance-amplified code, and tagging it
+# `bivariate-bicycle` would put it in a filter it does not belong to. The two
+# bicycle patterns skip that phrasing.
+_NOT_BASE = r"(?![- ]base\b)"
 RULES = [
     ("pair-partition-cpm",
      re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
-    ("bivariate-bicycle", re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
-    ("generalized-bicycle", re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
+    ("bivariate-bicycle",
+     re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
+    ("generalized-bicycle",
+     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
 ]
 assert all(f in _FAMILIES for f, _ in RULES), \
     "a rule names a family the verifier does not accept"
@@ -114,6 +123,23 @@ def test_a_construction_that_names_its_family_carries_that_tag():
         f"{len(problems)} entries whose family tag contradicts their own "
         "construction text; a filter by family will not find them:\n"
         + "\n".join(problems[:20]))
+
+
+def test_a_derived_code_naming_its_base_family_is_not_a_contradiction():
+    def doc(family, construction):
+        return {"family": family, "provenance": {"construction": construction}}
+
+    derived = ("One amplification of [[126,20,11]] bivariate-bicycle base by "
+               "flagged [[4,2,2]] amplifier (arXiv:2609.37231).")
+    assert _contradictions("x", doc("other", derived)) == []
+    assert _contradictions("x", doc("distance-amplified", derived)) == []
+    assert _contradictions(
+        "x", doc("other", "Generalized-bicycle base, amplified once")) == []
+    # the entry's own family is still checked, including the word "based"
+    assert _contradictions(
+        "x", doc("other", "Bivariate-bicycle code (A = x^3 + y + y^2)"))
+    assert _contradictions(
+        "x", doc("other", "Bivariate-bicycle based CSS code, l=6 m=6"))
 
 
 def test_every_rule_family_has_a_site_label():

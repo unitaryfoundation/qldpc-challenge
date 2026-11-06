@@ -61,6 +61,7 @@ sys.path.insert(0, os.path.join(_ROOT, "verify"))
 sys.path.insert(0, os.path.join(_ROOT, "site"))
 sys.path.insert(0, os.path.join(_ROOT, "research"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "kit"))
+sys.path.insert(0, os.path.join(_ROOT, "research", "audits"))
 
 import gf2  # noqa: E402
 import heuristic_distance as hd  # noqa: E402
@@ -68,6 +69,8 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import frontier_history  # noqa: E402
+import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
 from campaign import curve_from_summary, write_curve  # noqa: E402
 from check_authorship import HANDLE  # noqa: E402
@@ -117,7 +120,7 @@ def load_checks(path):
         HX = _matrix_from_supports(doc["checks"]["X"], n)
         HZ = _matrix_from_supports(doc["checks"]["Z"], n)
         return HX, HZ, coords, doc
-    z = np.load(path, allow_pickle=True)
+    z = np.load(path, allow_pickle=False)
     coords = _pick(z, ("coords", "coordinates", "xy"))
     if coords is not None:
         coords = np.asarray(coords, dtype=float)
@@ -165,6 +168,295 @@ def _supports(H):
 
 
 # ----------------------------------------------------------------------------
+# reusing a draft's distance witnesses (--reuse-witnesses)
+# ----------------------------------------------------------------------------
+# An imported code arrives with its distance witnesses already found and
+# checked. Re-running the RIS search can replace a lighter imported witness
+# with a heavier one, so a run starts from the draft's witness and lets the
+# search replace it only with a strictly lighter one. The lighter witness is
+# the better claim, so this is the rule on every JSON re-submit.
+#
+# `--reuse-witnesses` is the strict form of the same rule: it starts from
+# the draft's witness, refuses the run when that witness cannot be used
+# (rather than searching for another one behind the user's back), and skips
+# the Python RIS search, which is the slow part on a large code. The
+# accelerator pass still runs, so the claim has the same depth behind it as
+# any other submit. The flag means "start from these", not "trust these".
+#
+# Three rules keep the reuse honest:
+#
+#   * The witness is the evidence and its weight is derived from it, so the
+#     weight comes from the witness and never from the draft's `value` field.
+#     A draft whose `value` disagrees with its witness is reported, not
+#     obeyed.
+#   * A draft whose witness cannot be used is refused (with the flag) or
+#     reported and ignored (without it), naming the side and the check that
+#     failed. There is no silent fallback: the user asked to keep the stored
+#     witness, and a fallback would hand them a different claim with nothing
+#     saying so.
+#   * The accelerator pass is not optional in reuse mode. It is the depth
+#     behind the claim -- research/kit/promote.py refuses to reuse a witness
+#     unless the ladder already spent the same budget -- so a run without it
+#     is refused rather than left with an unbacked claim.
+#
+# The reuse path preserves the witness and its weight. It does not preserve
+# the draft's `confidence` label: the document always records a
+# witness-backed `upper_bound`, which is what the draft's witness supports.
+
+# cli/qldpc.py's --fast-trials default is 2,000,000 accelerator trials per
+# side (run_side is invoked once per side with the full budget), on top of
+# 20,000 RIS trials per side. The same constant guards the reuse path here
+# (research/kit/promote.py: DEFAULT_MIN_DEEP_TRIALS).
+REUSE_MIN_FAST_TRIALS = 1_000_000
+
+# The keys the schema's witnessProvenance accepts, and the ones it requires.
+_WP_KEYS = ("found_by", "date", "found_at_samples", "survived_samples", "tool",
+             "seeds")
+_WP_REQUIRED = ("found_by", "date", "found_at_samples")
+
+
+class _WitnessError(ValueError):
+    """A draft's distance witness cannot be used."""
+
+
+def _reuse_index_list(side, lst, n):
+    """Return `lst` as qubit indices in [0, n), or refuse it.
+
+    An index outside the range is a message, not an IndexError: the usual
+    cause is a source that numbered its qubits from 1, and a traceback says
+    nothing about which witness was wrong.
+    """
+    if not isinstance(lst, (list, tuple)):
+        raise _WitnessError(
+            f"the {side} witness must be a list of qubit indices, got "
+            f"{type(lst).__name__}")
+    out = []
+    for idx in lst:
+        if (not isinstance(idx, (int, np.integer)) or isinstance(idx, bool)
+                or int(idx) < 0 or int(idx) >= n):
+            raise _WitnessError(
+                f"the {side} witness has index {idx!r} outside [0, {n}); this "
+                f"code's qubits are numbered from 0")
+        out.append(int(idx))
+    return out
+
+
+def _draft_claimed(draft, side):
+    """Return the draft's claimed distance value for `side`, or None."""
+    if not isinstance(draft, dict):
+        return None
+    return ((draft.get("distance") or {}).get(side) or {}).get("value")
+
+
+def _reuse_value_note(side, claimed, weight):
+    """Report a draft whose `value` disagrees with its own witness."""
+    if claimed is None or int(claimed) == int(weight):
+        return
+    print(f"  the draft's {side} value {claimed} does not match its witness "
+          f"weight {weight}; using the witness", flush=True)
+
+
+def _css_witnesses_from_draft(draft, HX, HZ, n):
+    """Return ((dX, witX, dZ, witZ), reason) from the draft's witnesses.
+
+    The witness tuple is None when the draft carries no usable witness, and
+    the reason says why, so the caller can either report it (the default
+    path, which searches anyway) or refuse the run (--reuse-witnesses,
+    where the user asked for this witness).
+    """
+    dist = draft.get("distance") or {}
+    xdoc = dist.get("X") or {}
+    zdoc = dist.get("Z") or {}
+    wx = xdoc.get("witness")
+    wz = zdoc.get("witness")
+    if wx is None and wz is None:
+        return None, ("the draft carries no distance witness "
+                      "(distance.X.witness / distance.Z.witness)")
+    if wx is None or wz is None:
+        missing = "Z" if wx is None else "X"
+        return None, (f"the draft carries a witness on one side only: "
+                      f"distance.{missing}.witness is missing")
+    try:
+        witX = np.zeros(n, dtype=np.int8)
+        for i in _reuse_index_list("X", wx, n):
+            witX[i] = 1
+        witZ = np.zeros(n, dtype=np.int8)
+        for i in _reuse_index_list("Z", wz, n):
+            witZ[i] = 1
+    except _WitnessError as e:
+        return None, str(e)
+    if not hd._valid_logical(witX, HZ, HX):
+        return None, ("the X witness is not a nontrivial logical of the "
+                      "rebuilt matrices (it does not commute with H_X, or it "
+                      "lies in the row space of H_Z)")
+    if not hd._valid_logical(witZ, HX, HZ):
+        return None, ("the Z witness is not a nontrivial logical of the "
+                      "rebuilt matrices (it does not commute with H_Z, or it "
+                      "lies in the row space of H_X)")
+    return (int(witX.sum()), witX, int(witZ.sum()), witZ), None
+
+
+def _pauli_witness_from_draft(draft, A, B, n):
+    """Return ((dP, witP), reason) from the draft's distance.P witness."""
+    pd = (draft.get("distance") or {}).get("P") or {}
+    pw = pd.get("witness")
+    if not isinstance(pw, dict):
+        return None, ("the draft carries no Pauli witness "
+                      "(distance.P.witness)")
+    try:
+        xlist = _reuse_index_list("P.X", pw.get("X") or [], n)
+        zlist = _reuse_index_list("P.Z", pw.get("Z") or [], n)
+    except _WitnessError as e:
+        return None, str(e)
+    if not xlist and not zlist:
+        return None, "the P witness is empty"
+    v = np.zeros(2 * n, dtype=np.int8)
+    for i in xlist:
+        v[i] = 1
+    for i in zlist:
+        v[n + i] = 1
+    if not hd.valid_pauli_logical(v, A, B):
+        return None, ("the P witness is not a nontrivial logical of the "
+                      "rebuilt matrices")
+    return (int(hd.pauli_weight_rows(v[None, :], n)[0]), v), None
+
+
+def _reuse_accelerator_requirement(args):
+    """Refuse a reuse run that would leave the claim without any depth.
+
+    The reused witness was found elsewhere; the depth behind the claim is
+    the accelerator pass this run makes. Skipping it (no accelerator built,
+    or `--fast-trials 0`) would file a bound with nothing behind it, which is
+    what research/kit/promote.py refuses to do.
+    """
+    if getattr(args, "reuse_witnesses", False):
+        if hd._fast is None:
+            raise SystemExit(
+                "--reuse-witnesses: the C++ accelerator is not built, so the "
+                "reused witness would be the only evidence behind the "
+                "claim; build it (make fast) or drop the flag")
+        if int(getattr(args, "fast_trials", 0)) <= 0:
+            raise SystemExit(
+                "--reuse-witnesses: --fast-trials 0 leaves the reused witness "
+                "without a deep pass behind it; give it the accelerator's "
+                "budget or drop the flag")
+        trials = int(args.fast_trials)
+        if trials < REUSE_MIN_FAST_TRIALS:
+            print(f"  --reuse-witnesses: {trials:,} accelerator trials is "
+                  f"below the {REUSE_MIN_FAST_TRIALS:,} per side that "
+                  f"research/kit/promote.py requires before it reuses a "
+                  f"witness; the claim will be thinner than a normal "
+                  f"submit's", flush=True)
+
+
+def _provenance(args, draft=None):
+    """Return the document's provenance block.
+
+    A run that reuses a draft's witnesses also keeps the draft's source
+    attribution: its construction text, its notes, its references and its
+    novelty are the description of the imported code, and a submitter who
+    re-imports it should not have to retype them. The draft is consulted
+    only in reuse mode, so an ordinary re-submit never copies someone else's
+    construction text under a new name.
+    """
+    reuse = getattr(args, "reuse_witnesses", False)
+    prov = {"authors": args.authors,
+            "construction": (args.construction
+                             or "contributed via qldpc submit"),
+            "origin": "submission",
+            "date": args.date or datetime.date.today().isoformat()}
+    if args.model:
+        prov["model"] = args.model
+    if args.notes:
+        prov["notes"] = args.notes
+    budget = search_budget_from_args(args)
+    if budget:
+        prov["search_budget"] = budget
+    if not reuse or not isinstance(draft, dict):
+        return prov
+    dprov = draft.get("provenance") or {}
+    if not args.construction and dprov.get("construction"):
+        prov["construction"] = dprov["construction"]
+    if not args.notes and dprov.get("notes"):
+        prov["notes"] = dprov["notes"]
+    refs = dprov.get("references")
+    if refs:
+        prov["references"] = list(refs)
+    novelty = dprov.get("novelty")
+    if novelty:
+        prov["novelty"] = novelty
+    elif dprov.get("origin") == "baseline" or dprov.get("references"):
+        # the draft already attributes the code to a published source, so
+        # the parameter set is in the literature by its own account. Say so
+        # rather than leaving the entry to imply a novelty claim it cannot
+        # support.
+        prov["novelty"] = "known_parameters"
+        print("  --reuse-witnesses: recording novelty: known_parameters "
+              "(the draft attributes the code to a published source)",
+              flush=True)
+    else:
+        print("  --reuse-witnesses: the draft declares no novelty; an "
+              "imported published code should carry novelty: "
+              "known_parameters", flush=True)
+    return prov
+
+
+def _reuse_witness_provenance(draft, side):
+    """Return the draft's witness_provenance for `side`, if it has one.
+
+    A block that does not fit the schema is dropped rather than written: the
+    document has to stay valid, and the block is a record of who found the
+    witness, not a claim the verifier checks.
+    """
+    if not isinstance(draft, dict):
+        return None
+    sd = (draft.get("distance") or {}).get(side) or {}
+    wp = sd.get("witness_provenance")
+    if not isinstance(wp, dict):
+        return None
+    if any(k not in _WP_KEYS for k in wp) or any(k not in wp
+                                                 for k in _WP_REQUIRED):
+        print(f"  dropping the draft's {side} witness_provenance: it does "
+              f"not fit the schema", flush=True)
+        return None
+    handles = wp.get("found_by")
+    if not (isinstance(handles, list) and handles
+            and all(isinstance(a, str) and HANDLE.fullmatch(a)
+                    for a in handles)):
+        print(f"  dropping the draft's {side} witness_provenance: "
+              f"found_by is not a list of @handles", flush=True)
+        return None
+    if not (isinstance(wp.get("date"), str)
+            and re.fullmatch(r"\d{4}-\d{2}-\d{2}", wp["date"])):
+        print(f"  dropping the draft's {side} witness_provenance: the date "
+              f"is not YYYY-MM-DD", flush=True)
+        return None
+    samples = wp.get("found_at_samples")
+    if not (isinstance(samples, int) and not isinstance(samples, bool)
+            and samples >= 1):
+        print(f"  dropping the draft's {side} witness_provenance: "
+              f"found_at_samples is not a positive integer", flush=True)
+        return None
+    return dict(wp)
+
+
+def _accelerator_witness_provenance(args):
+    """Return a witness_provenance for a witness the accelerator just found.
+
+    The draft's block describes the draft's witness, not this one, so it
+    cannot travel with it. This records the pass that produced the witness
+    that is actually in the document.
+    """
+    handles = [a for a in getattr(args, "authors", []) if HANDLE.fullmatch(a)]
+    if not handles:
+        return None
+    return {"found_by": handles,
+            "date": datetime.date.today().isoformat(),
+            "found_at_samples": int(getattr(args, "fast_trials", 0)),
+            "tool": "gf2_fast"}
+
+
+# ----------------------------------------------------------------------------
 # building the submission
 # ----------------------------------------------------------------------------
 def build_stabilizer_submission(A, B, args):
@@ -207,17 +499,46 @@ def build_stabilizer_submission(A, B, args):
     wmax = int(max(((A[i] | B[i]).sum() for i in range(A.shape[0])), default=0))
 
     print(f"  building stabilizer submission... n={n} k={k} w={wmax}", flush=True)
-    print(f"  searching for a Pauli-weight distance witness ({args.trials} RIS "
-          f"trials)...", flush=True)
-    dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials, seed=args.seed)
-    if dP is None:
-        raise SystemExit("RIS found no logical operator; cannot certify a distance")
+    reuse = getattr(args, "reuse_witnesses", False)
+    draft = getattr(args, "_draft", None)
+    wp_reused = None
+    dw = None
+    if isinstance(draft, dict):
+        dw, reason = _pauli_witness_from_draft(draft, A, B, n)
+        if dw is None:
+            if reuse:
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
+                                 f"to search for the witness instead")
+            print(f"  the draft's witness is not usable ({reason}); searching "
+                  f"for a witness instead", flush=True)
+    if reuse:
+        if dw is None:
+            raise SystemExit("--reuse-witnesses: the input carries no draft "
+                             "to take the witness from")
+        dP, witP = dw
+        _reuse_value_note("P", _draft_claimed(draft, "P"), dP)
+        wp_reused = _reuse_witness_provenance(draft, "P")
+        print(f"  reusing the draft's witness: d_P<={dP}", flush=True)
+    else:
+        print(f"  searching for a Pauli-weight distance witness "
+              f"({args.trials} RIS trials)...", flush=True)
+        dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials,
+                                            seed=args.seed)
+        if dw is not None and (dP is None or dw[0] < dP):
+            # the draft's witness can only be replaced by a strictly lighter
+            # one, so the document keeps the better of the two
+            _reuse_value_note("P", _draft_claimed(draft, "P"), dw[0])
+            dP, witP = dw
+            wp_reused = _reuse_witness_provenance(draft, "P")
+        if dP is None:
+            raise SystemExit("RIS found no logical operator; "
+                             "cannot certify a distance")
+    # accelerator on the symplectic doubling; runs on reused witnesses too.
+    # A reused witness that the accelerator lightens is a different witness,
+    # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
-        # accelerator on the symplectic doubling; its Hamming weight is an
-        # upper bound on the Pauli weight, so the proposal is mapped back,
-        # validated by gf2, and re-scored before it may tighten the claim
-        print(f"  accelerator pass on the doubled matrices ({args.fast_trials} "
-              f"trials)...", flush=True)
+        print(f"  accelerator pass on the doubled matrices "
+              f"({args.fast_trials} trials)...", flush=True)
         HX2, HZ2 = hd.doubled_matrices(A, B)
         wf, side, sup = hd._fast.distance_rand_witness(
             HX2, HZ2, args.fast_trials, args.seed, 8, 8)
@@ -228,23 +549,17 @@ def build_stabilizer_submission(A, B, args):
             wp = int(hd.pauli_weight_rows(v[None, :], n)[0])
             if wp < dP and hd.valid_pauli_logical(v, A, B):
                 dP, witP = wp, v
+                wp_reused = _accelerator_witness_provenance(args)
                 print(f"    accelerator tightened d to {wp}", flush=True)
-    print(f"  distance (RIS upper bound, Pauli weight) d<={dP}", flush=True)
+    print(f"  distance (witnessed upper bound, Pauli weight) d<={dP}",
+          flush=True)
 
-    dist = {"d": int(dP),
-            "P": {"value": int(dP), "confidence": "upper_bound",
-                  "witness": hd.pauli_witness(witP, n)}}
-    prov = {"authors": args.authors,
-            "construction": args.construction or "contributed via qldpc submit",
-            "origin": "submission",
-            "date": args.date or datetime.date.today().isoformat()}
-    if args.model:
-        prov["model"] = args.model
-    if args.notes:
-        prov["notes"] = args.notes
-    budget = search_budget_from_args(args)
-    if budget:
-        prov["search_budget"] = budget
+    pside = {"value": int(dP), "confidence": "upper_bound",
+             "witness": hd.pauli_witness(witP, n)}
+    if wp_reused:
+        pside["witness_provenance"] = wp_reused
+    dist = {"d": int(dP), "P": pside}
+    prov = _provenance(args, draft)
     gens = [{"X": _supports(A[i:i + 1])[0], "Z": _supports(B[i:i + 1])[0]}
             for i in range(A.shape[0])]
     doc = {
@@ -289,18 +604,51 @@ def build_submission(HX, HZ, args):
 
     # lightest logical on each side -> self-certifying distance upper bound.
     print(f"  building submission... n={n} k={k} w={wmax}", flush=True)
-    print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
-          flush=True)
-    dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
-    dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
-    if dX is None or dZ is None:
-        raise SystemExit("RIS found no logical operator on one side; "
-                         "cannot certify a distance")
-    # Let the C++ accelerator tighten the claim when it can. The Python search
-    # slows sharply with n, so on a large code it stops far above the lightest
-    # logical and the entry would claim a distance the submitter can already
-    # disprove. Anything the accelerator returns is checked by gf2 before it is
-    # used, and it is only adopted when it is strictly lighter.
+    reuse = getattr(args, "reuse_witnesses", False)
+    draft = getattr(args, "_draft", None)
+    wp_x = wp_z = None
+    dw = None
+    if isinstance(draft, dict):
+        dw, reason = _css_witnesses_from_draft(draft, HX, HZ, n)
+        if dw is None:
+            if reuse:
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
+                                 f"to search for the witnesses instead")
+            print(f"  the draft's witnesses are not usable ({reason}); "
+                  f"searching for them instead", flush=True)
+    if reuse:
+        if dw is None:
+            raise SystemExit("--reuse-witnesses: the input carries no draft "
+                             "to take the witnesses from")
+        dX, witX, dZ, witZ = dw
+        _reuse_value_note("X", _draft_claimed(draft, "X"), dX)
+        _reuse_value_note("Z", _draft_claimed(draft, "Z"), dZ)
+        wp_x = _reuse_witness_provenance(draft, "X")
+        wp_z = _reuse_witness_provenance(draft, "Z")
+        print(f"  reusing the draft's witnesses: d_X<={dX}, d_Z<={dZ}",
+              flush=True)
+    else:
+        print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
+              flush=True)
+        dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
+        dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
+        if dw is not None:
+            # the draft's witnesses can only be replaced by strictly lighter
+            # ones, so the document keeps the better of the two
+            if dX is None or dw[0] < dX:
+                _reuse_value_note("X", _draft_claimed(draft, "X"), dw[0])
+                dX, witX = dw[0], dw[1]
+                wp_x = _reuse_witness_provenance(draft, "X")
+            if dZ is None or dw[2] < dZ:
+                _reuse_value_note("Z", _draft_claimed(draft, "Z"), dw[2])
+                dZ, witZ = dw[2], dw[3]
+                wp_z = _reuse_witness_provenance(draft, "Z")
+        if dX is None or dZ is None:
+            raise SystemExit("RIS found no logical operator on one side; "
+                             "cannot certify a distance")
+    # Let the C++ accelerator tighten the claim (runs on reused witnesses too).
+    # A reused witness that the accelerator lightens is a different witness,
+    # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
         print(f"  accelerator pass ({args.fast_trials} trials)...", flush=True)
         wf, side, sup = hd._fast.distance_rand_witness(
@@ -313,37 +661,39 @@ def build_submission(HX, HZ, args):
             if int(v.sum()) < cur and hd._valid_logical(v, H_ker, H_row):
                 if side == "X":
                     dX, witX = int(v.sum()), v
+                    wp_x = _accelerator_witness_provenance(args)
                 else:
                     dZ, witZ = int(v.sum()), v
+                    wp_z = _accelerator_witness_provenance(args)
                 print(f"    accelerator tightened d_{side} to {int(v.sum())}",
                       flush=True)
     d = min(dX, dZ)
-    print(f"  distance (RIS upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
+    print(f"  distance (witnessed upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
           flush=True)
 
-    dist = {
-        "d": int(d),
-        "X": {"value": int(dX), "confidence": "upper_bound",
-              "witness": sorted(int(q) for q in np.where(witX)[0])},
-        "Z": {"value": int(dZ), "confidence": "upper_bound",
-              "witness": sorted(int(q) for q in np.where(witZ)[0])},
-    }
-    prov = {"authors": args.authors,
-            "construction": args.construction or "contributed via qldpc submit",
-            "origin": "submission",
-            "date": args.date or datetime.date.today().isoformat()}
-    if args.model:
-        prov["model"] = args.model
-    if args.notes:
-        prov["notes"] = args.notes
-    budget = search_budget_from_args(args)
-    if budget:
-        prov["search_budget"] = budget
+    xside = {"value": int(dX), "confidence": "upper_bound",
+             "witness": sorted(int(q) for q in np.where(witX)[0])}
+    zside = {"value": int(dZ), "confidence": "upper_bound",
+             "witness": sorted(int(q) for q in np.where(witZ)[0])}
+    if wp_x:
+        xside["witness_provenance"] = wp_x
+    if wp_z:
+        zside["witness_provenance"] = wp_z
+    dist = {"d": int(d), "X": xside, "Z": zside}
+    prov = _provenance(args, draft)
 
+    # witness_provenance (a 0.2 feature) requires 0.2 or later; a code
+    # tier that carries it must not be filed as 0.1.
+    if prov.get("search_budget"):
+        _sv = "0.3"
+    elif wp_x or wp_z:
+        _sv = "0.2"
+    else:
+        _sv = "0.1"
     doc = {
         # search_budget is a 0.3 feature; without it the document stays at
         # the oldest version that describes it, so older readers accept it.
-        "schema_version": "0.3" if budget else "0.1",
+        "schema_version": _sv,
         "name": args.name or f"[[{n},{k},{d}]]",
         "code_type": "CSS",
         "n": n, "k": int(k),
@@ -639,6 +989,12 @@ def pr_body(doc, report, args, out, note_out=None):
     else:
         lines += ["(Name the track and the cell it lands in, any entry it "
                   "dominates, and on which axis.)"]
+    peers = getattr(args, "_d_only_peers", None) or []
+    audit = getattr(args, "_peer_audit", None)
+    if peers and audit:
+        lines.append(f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
+                     f"peer audit (`research/audits/leader_audit.py pair`): "
+                     f"{peer_audit.summary(audit)}")
     lines += [
         f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight {wmax}, "
         f"locality class {comp.get('locality_class', 'unknown')}.",
@@ -873,13 +1229,19 @@ def schema_version_for(doc):
     """Return the oldest schema version that describes the document.
 
     0.4 for a stabilizer code, 0.3 with a search budget, 0.2 with a circuit
-    block, else 0.1.
+    block or a witness_provenance, else 0.1.
     """
     if doc.get("code_type") == "stabilizer":
         return "0.4"
     if (doc.get("provenance") or {}).get("search_budget"):
         return "0.3"
-    if doc.get("circuit"):
+    dist = doc.get("distance") or {}
+    has_wp = False
+    for side in ("X", "Z", "P"):
+        if isinstance(dist.get(side), dict) and dist[side].get(
+                "witness_provenance"):
+            has_wp = True
+    if has_wp or doc.get("circuit"):
         return "0.2"
     return "0.1"
 
@@ -955,6 +1317,89 @@ def _result(args):
     return args._result
 
 
+def _claim_depth(args):
+    """Return (trials, pair_depth) the submitted distance claim rests on.
+
+    The RIS pass runs ``--trials`` per side; when the accelerator is built and
+    ``--fast-trials`` is positive its pass is the deeper one, at pair depth 8
+    (``build_submission``). A peer audit read shallower than this is an
+    instrument artifact, not a distance difference (AUTORESEARCH.md 5b).
+    """
+    trials = int(getattr(args, "trials", 0) or 0)
+    fast = int(getattr(args, "fast_trials", 0) or 0)
+    if hd._fast is not None and fast > 0:
+        return max(trials, fast), 8
+    return trials, None
+
+
+def _peer_audit_check(doc, report, args, res, slug):
+    """Refuse a d-only gain that carries no matched-depth peer audit (issue #4236).
+
+    The rule and the record are ``research/kit/peer_audit.py``'s, shared with
+    ``research/kit/promote.py`` so the two packaging paths cannot drift. The
+    peers are the board entries the gate would name as ``d_only_peers``: same
+    board, a cell no looser than the candidate's, the same n, k, and max check
+    weight, and a lower claimed d. Returns an exit code; 0 means proceed. A dry
+    run reports what the real run would refuse and proceeds, since the dry
+    run is how the document to audit is obtained.
+    """
+    peers = peer_audit.d_only_peers(_entry_for(doc, report), _load_board_entries())
+    audit = None
+    path = getattr(args, "peer_audit", "") or ""
+    if path:
+        try:
+            audit = peer_audit.load_audit(path)
+        except peer_audit.PeerAuditError as e:
+            print(f"\n{e}")
+            res["error"] = {"stage": "peer-audit", "message": str(e)}
+            return 1
+    args._d_only_peers, args._peer_audit = peers, audit
+    res["d_only_peers"] = list(peers)
+    res["peer_audit"] = None if audit is None else {
+        "path": path, "decision": audit.get("decision"),
+        "trials": audit.get("trials"), "seeds": audit.get("seeds"),
+        "pair_depth": audit.get("pair_depth"), "peers": audit.get("peers")}
+    if not peers:
+        if audit is not None:
+            print("  note: --peer-audit given, but no board entry is beaten on d "
+                  "alone; the audit is recorded in the result and not required")
+        return 0
+    trials, pair_depth = _claim_depth(args)
+    staged = None
+    if audit is None and not args.dry_run:
+        # the pair command needs a submission-shaped file; stage the verified
+        # document where the kit stages candidates (gitignored), so the
+        # refusal names a path that exists
+        staged = coordination.unique_path(
+            os.path.join(coordination.staging_dir(), f"{slug}.json"), doc)
+        with open(staged, "w", encoding="utf-8", newline="\n") as f:
+            json.dump(doc, f, indent=1)
+            f.write("\n")
+    problems = peer_audit.blockers(
+        peers, audit, required_trials=trials, required_pair_depth=pair_depth,
+        candidate_path=staged or "<the verified document; --dry-run --json prints "
+                                 "it under doc>",
+        attach="re-run submit with --peer-audit <that file>")
+    if not problems:
+        print(f"  OK  gain over {', '.join(peers)} is on d alone and the "
+              f"matched-depth peer audit covers it: {peer_audit.summary(audit)}")
+        return 0
+    if args.dry_run:
+        res["would_refuse"] = problems
+        print("\n--dry-run: the real run would be refused on the peer audit:")
+        for p in problems:
+            print(f"  {p}")
+        return 0
+    print("\nsubmission refused; nothing written to the board:")
+    for p in problems:
+        print(f"  {p}")
+    if staged:
+        print(f"  the verified document was staged at {staged} for the audit")
+        res["staged"] = staged
+    res["error"] = {"stage": "peer-audit", "message": "; ".join(problems)}
+    return 1
+
+
 def cmd_submit(args):
     res = _result(args)
     res["stage"] = "build"
@@ -962,12 +1407,19 @@ def cmd_submit(args):
     if args.no_circuit and args.circuits:
         raise SystemExit("--no-circuit and --circuits contradict each other")
     HX, HZ, coords, _draft = load_checks(args.code)
+    if (getattr(args, "reuse_witnesses", False)
+            and not (isinstance(_draft, dict) and "checks" in _draft)):
+        raise SystemExit("--reuse-witnesses: the input carries no JSON draft "
+                         "to take witnesses from (only a .json draft carries "
+                         "distance witnesses); drop the flag")
+    _reuse_accelerator_requirement(args)
     if args.coords:                      # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
         coords = (_pick(cz, ("coords", "coordinates", "xy"))
                   if cz is not None else np.loadtxt(args.coords))
         coords = np.asarray(coords, dtype=float)
     args._coords = coords
+    args._draft = _draft
 
     stabilizer = (_draft or {}).get("code_type") == "stabilizer"
     if stabilizer:
@@ -1004,6 +1456,9 @@ def cmd_submit(args):
     res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
                score=round(k * d * d / n, 3),
                earned_distance=report.get("earned_distance"))
+    rc = _peer_audit_check(doc, report, args, res, slug)
+    if rc:
+        return rc
     out = os.path.join(args.out, f"{slug}.json")
     circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
                                 "circuits", slug)
@@ -1207,6 +1662,70 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     return 0
 
 
+def _history_is_shallow(root):
+    """Return True when the clone's history is truncated, so a replay would misdate it."""
+    try:
+        out = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=root,
+                             capture_output=True, text=True, check=False)
+    except OSError:
+        return True
+    return out.returncode != 0 or out.stdout.strip() != "false"
+
+
+def _cell_staleness(entries, today=None):
+    """Return ``({(L, W): {"frontier", "record"}}, landings)``, or ``(None, 0)``.
+
+    When each cell last moved, from the first-parent replay of ``codes/`` that
+    ``research/audits/frontier_history.py`` already does, with each entry's
+    cells read from the board as loaded here (issue #4238). ``frontier`` is
+    the last landing that changed the cell's nondominated set and ``record``
+    the last that changed its best kd^2/n; each carries ``days`` since and
+    ``landings_ago``, the number of board landings since, because a busy
+    fortnight moves every cell's day count at once and the landing count is
+    the one that says whether a cell is being worked. A shallow clone cannot
+    be replayed, so the answer there is None rather than a wrong date.
+    """
+    if _history_is_shallow(_ROOT):
+        print("  history is shallow (a truncated clone); cell staleness not computed",
+              file=sys.stderr)
+        return None, 0
+    classes = {f"codes/{e['slug']}.json": (e["locality_class"], e["weight_class"],
+                                           e.get("w"), e.get("code_type", "CSS"))
+               for e in entries if e.get("slug")}
+    print("  replaying codes/ history for cell staleness...", file=sys.stderr)
+    t0 = time.time()
+    moves, landed = frontier_history.cell_moves(_ROOT, classes)
+    print(f"  replayed {_plural(landed, 'landing')} in {time.time() - t0:.1f}s",
+          file=sys.stderr)
+    today = today or datetime.date.today()
+    for cell in moves.values():
+        for move in cell.values():
+            if move:
+                move["days"] = (today - datetime.date.fromisoformat(move["date"])).days
+                move["landings_ago"] = landed - move["landing"]
+    return moves, landed
+
+
+def _staleness_lines(cell):
+    """Two lines per cell: when its frontier and its record last moved, or that neither did."""
+    if not cell or not (cell.get("frontier") or cell.get("record")):
+        return ["never moved on record (no landing in codes/ history changed this "
+                "cell; entries no longer on the board are not classified)"]
+
+    def when(move):
+        return (f"{move['date']} ({_plural(move['days'], 'day')} ago, "
+                f"{_plural(move['landings_ago'], 'landing')} ago): {move['what']} "
+                f"{move['kind']}")
+
+    lines = []
+    f, r = cell.get("frontier"), cell.get("record")
+    lines.append("frontier last moved " + when(f) if f else "frontier never moved on record")
+    lines.append("record kd2/n last moved " + when(r)
+                 + (f" to {r['kd2_over_n']}" if r and "kd2_over_n" in r else "")
+                 if r else "record kd2/n never moved on record")
+    return lines
+
+
 def cmd_targets(args):
     """Print per-cell occupancy and frontier, so a newcomer can see what to aim at.
 
@@ -1260,11 +1779,30 @@ def cmd_targets(args):
                          f"{sorted({c[1] for c in by_cell})}; locality classes: "
                          f"{sorted({c[0] for c in by_cell})}")
 
+    stale = None
+    if getattr(args, "staleness", True) or getattr(args, "stale", False):
+        stale, landed = _cell_staleness(entries)
+        if stale is not None:
+            res["staleness"] = {f"{W}/{L}": stale[(L, W)]
+                                for (L, W) in by_cell if (L, W) in stale}
+            res["landings"] = landed
+            if getattr(args, "stale", False):
+                # stalest first by the record, then the frontier: a cell with no
+                # dated move on record sorts before any dated one
+                def age(cv):
+                    moves = stale.get(cv[0]) or {}
+                    return ((moves.get("record") or {}).get("date", ""),
+                            (moves.get("frontier") or {}).get("date", ""), cv[0])
+                rows.sort(key=age)
+
     for (L, W), peers in rows:
         front = [peers[i] for i in sorted(pareto(peers))]
         print(f"\n{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}")
         print(f"  {len(peers)} codes, {len(front)} nondominated, "
               f"best kd2/n {max(eff(e) for e in peers):.2f}")
+        if stale is not None:
+            for line in _staleness_lines(stale.get((L, W))):
+                print(f"  {line}")
         held = by_cell_name.get(f"{W}/{L}")
         if held:
             who = held["session_id"]
@@ -1725,20 +2263,15 @@ def campaign_rows(since):
 # member was screened, at what depth, and how it went. Advisory only -- the
 # gate remains the only thing that admits a code.
 
-def screening_rows(family="", params=None, verdicts=()):
-    """Experiment rows across committed summaries, filtered.
+def committed_summaries():
+    """Yield (campaign id, repo-relative path, summary) per research/campaigns/<id>/summary.json.
 
-    ``params`` matches as a subset: a row matches when every queried key is
-    present on it and compares equal, so a query on the ring alone finds
-    every member screened over that ring. Values compare as strings, since a
-    campaign that wrote l as "6" and one that wrote 6 screened the same
-    member.
+    The shared reader behind `screened` and `negatives`: a summary that does
+    not parse is skipped, so one broken file never hides the rest.
     """
     root = os.path.join(_ROOT, "research", "campaigns")
-    want = {str(k): str(v) for k, v in (params or {}).items()}
-    rows, quality, summaries = [], [], 0
     if not os.path.isdir(root):
-        return rows, quality, summaries
+        return
     for cid in sorted(os.listdir(root)):
         path = os.path.join(root, cid, "summary.json")
         if not os.path.exists(path):
@@ -1748,9 +2281,22 @@ def screening_rows(family="", params=None, verdicts=()):
                 summ = json.load(fh)
         except (OSError, ValueError):
             continue
+        yield summ.get("campaign_id") or cid, os.path.relpath(path, _ROOT), summ
+
+
+def screening_rows(family="", params=None, verdicts=()):
+    """Experiment rows across committed summaries, filtered.
+
+    ``params`` matches as a subset: a row matches when every queried key is
+    present on it and compares equal, so a query on the ring alone finds
+    every member screened over that ring. Values compare as strings, since a
+    campaign that wrote l as "6" and one that wrote 6 screened the same
+    member.
+    """
+    want = {str(k): str(v) for k, v in (params or {}).items()}
+    rows, quality, summaries = [], [], 0
+    for ident, rel, summ in committed_summaries():
         summaries += 1
-        rel = os.path.relpath(path, _ROOT)
-        ident = summ.get("campaign_id") or cid
         backfilled = bool(summ.get("backfilled"))
         for q in summ.get("screen_quality") or []:
             if family and q.get("family") != family:
@@ -1821,6 +2367,107 @@ def _print_registry_coverage(rows, quality):
         print("    no screen-quality rows: nothing committed yet pairs a screened "
               "distance with a gate verdict, so the screen's ordering is uncalibrated "
               "against the gate for every family.")
+
+
+def negative_rows(family="", params=None, match=""):
+    """Negative results across committed summaries, filtered (issue #4233).
+
+    A negative recorded inside an experiment carries that experiment's
+    family and params; one recorded outside any, the usual "closed family"
+    at the end of a run, carries neither, so under a family filter it stands
+    for every family its campaign ran, read off the experiments and the
+    direction card. A parameter query matches as a subset of the negative's
+    own params, as `screened` does, and a negative that recorded none does
+    not match one: the record does not say, and the query does not guess.
+    ``match`` is a case-insensitive substring over what, detail, the
+    assumptions, and revisit_if.
+    """
+    want = {str(k): str(v) for k, v in (params or {}).items()}
+    needle = (match or "").lower()
+    rows, summaries = [], 0
+    for ident, rel, summ in committed_summaries():
+        summaries += 1
+        card = summ.get("direction") or {}
+        ran = {e.get("family") for e in summ.get("experiments") or [] if e.get("family")}
+        if card.get("family"):
+            ran.add(card["family"])
+        for neg in summ.get("negative_results") or []:
+            if not isinstance(neg, dict):
+                continue
+            own = neg.get("family") or ""
+            if family and (own != family if own else family not in ran):
+                continue
+            got = {str(k): str(v) for k, v in (neg.get("params") or {}).items()}
+            if want and (not got or any(got.get(k) != v for k, v in want.items())):
+                continue
+            assumptions = [a for a in (neg.get("assumptions") or []) if isinstance(a, str)]
+            hay = " ".join([neg.get("what") or "", neg.get("detail") or "",
+                            " ".join(assumptions), neg.get("revisit_if") or ""]).lower()
+            if needle and needle not in hay:
+                continue
+            rows.append({
+                "campaign_id": ident, "path": rel,
+                "status": summ.get("status") or "",
+                "what": neg.get("what") or "", "detail": neg.get("detail") or "",
+                "assumptions": assumptions,
+                "revisit_if": neg.get("revisit_if") or "",
+                "family": own, "campaign_families": sorted(ran),
+                "params": neg.get("params") or {},
+                "what_a_negative_would_teach": card.get("what_a_negative_would_teach") or "",
+            })
+    return rows, summaries
+
+
+def cmd_negatives(args):
+    """List what earlier campaigns closed, with what each closure assumed.
+
+    The cross-campaign memory of issue #4233: `screened` says a member was
+    tried; this says why a route was closed, under which assumptions, and
+    what change would make it worth retrying, so a later session can tell
+    whether the reason still applies. Reads only committed summaries.
+    """
+    params = dict(_kv_pairs(args.param))
+    rows, summaries = negative_rows(family=args.family, params=params, match=args.match)
+    _result(args).update(query={"family": args.family, "params": params, "match": args.match},
+                         summaries_read=summaries, matches=len(rows), rows=rows)
+
+    what = args.family or "any family"
+    if params:
+        what += " at " + ", ".join(f"{k}={v}" for k, v in sorted(params.items()))
+    if args.match:
+        what += f" matching {args.match!r}"
+    if not rows:
+        print(f"{what}: no committed campaign summary records a negative result for it "
+              f"({summaries} read)")
+        return
+    typed = sum(1 for r in rows if r["assumptions"] or r["revisit_if"])
+    print(f"{what}: {_plural(len(rows), 'negative result')} across "
+          f"{_plural(summaries, 'campaign summary', 'campaign summaries')}, "
+          f"{typed} with assumptions or a revisit condition")
+    lim = None if args.full else max(1, args.limit)
+    for r in (rows if lim is None else rows[:lim]):
+        fam = r["family"] or ("/".join(r["campaign_families"]) + " (the campaign's)"
+                              if r["campaign_families"] else "")
+        pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
+        head = f"  {r['campaign_id']}  {r['what']}"
+        if fam:
+            head += f"  [{fam}]"
+        if pretty:
+            head += f"  {pretty}"
+        print(head)
+        if r["detail"]:
+            print(f"    {r['detail']}")
+        if r["assumptions"]:
+            print("    assumes: " + "; ".join(r["assumptions"]))
+        if r["revisit_if"]:
+            print(f"    revisit if: {r['revisit_if']}")
+        if not r["assumptions"] and not r["revisit_if"]:
+            tail = (f"; its direction card says a negative would teach: "
+                    f"{r['what_a_negative_would_teach']}"
+                    if r["what_a_negative_would_teach"] else "")
+            print(f"    no assumptions or revisit condition recorded{tail}")
+    if lim is not None and len(rows) > lim:
+        print(f"  ... {len(rows) - lim} more (--limit N, --full)")
 
 
 def cmd_screened(args):
@@ -2466,6 +3113,25 @@ def main(argv=None):
     c.add_argument("--circuit-seed", type=int, default=0)
     s.add_argument("--trials", type=int, default=20000,
                    help="RIS trials for the distance witness search")
+    s.add_argument("--reuse-witnesses", action="store_true",
+                   help="start from the distance witnesses already present in "
+                   "a JSON draft instead of searching for them again: the "
+                   "witnesses are validated against the rebuilt matrices, "
+                   "their weight is taken from the witness (a draft whose "
+                   "value disagrees is reported), and the accelerator pass "
+                   "still runs and may tighten the claim. CSS drafts reuse "
+                   "distance.X/Z, stabilizer drafts reuse distance.P. A draft "
+                   "whose witness cannot be used is refused, never replaced "
+                   "by a search. Requires a JSON draft (rejected for .npz "
+                   "input) and the accelerator pass (rejected with "
+                   "--fast-trials 0). Preserves the witness and its weight, "
+                   "not an `exact` confidence label.")
+    s.add_argument("--peer-audit", default="", metavar="FILE",
+                   help="the record research/audits/leader_audit.py pair --json-out "
+                        "wrote for this candidate; required when the gain over a "
+                        "board entry is on d alone (same n, k, and check weight), "
+                        "and it must be credible, at least as deep as this run's "
+                        "search, and cover every such entry (issue #4236)")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")
@@ -2534,6 +3200,28 @@ def main(argv=None):
                     help="print one JSON record on stdout instead of the "
                          "listing")
     sc.set_defaults(func=cmd_screened)
+
+    ng = sub.add_parser("negatives",
+                        help="what earlier campaigns closed and why, with the "
+                             "assumptions each negative depends on and the "
+                             "change that would make it worth retrying "
+                             "(committed campaign summaries only)")
+    ng.add_argument("--family", default="",
+                    help="family tag; a negative recorded outside an "
+                         "experiment stands for every family its campaign ran")
+    ng.add_argument("--param", action="append", default=[], metavar="K=V",
+                    help="parameter the negative must carry, repeatable; "
+                         "matched as a subset of the negative's own params")
+    ng.add_argument("--match", default="",
+                    help="text to find in what, detail, the assumptions, or "
+                         "revisit_if (case-insensitive)")
+    ng.add_argument("--limit", type=int, default=20,
+                    help="rows to print (default 20); --full for all")
+    ng.add_argument("--full", action="store_true")
+    ng.add_argument("--json", action="store_true",
+                    help="print one JSON record on stdout instead of the "
+                         "listing")
+    ng.set_defaults(func=cmd_negatives)
 
     cv = sub.add_parser("curve",
                         help="best-so-far verified efficiency against trials "
@@ -2615,9 +3303,19 @@ def main(argv=None):
                         f"a long ladder; a claim outliving its run is a squat")
     g.add_argument("--prune", action="store_true",
                    help="delete expired claims and report how many went")
+    g.add_argument("--staleness", action=argparse.BooleanOptionalAction, default=True,
+                   help="per cell, when its frontier and its best kd2/n last changed: "
+                        "the date, days since, board landings since, and the entry "
+                        "that moved it, from the first-parent history of codes/ "
+                        "(a few seconds; skipped in a shallow clone; issue #4238). "
+                        "--no-staleness leaves it out")
+    g.add_argument("--stale", action="store_true",
+                   help="sort cells stalest first, by the record date and then the "
+                        "frontier date")
     g.add_argument("--json", action="store_true",
                    help="print one JSON record on stdout instead of the "
-                        "listing; carries the live claims as data")
+                        "listing; carries the live claims as data, and the "
+                        "staleness per cell when asked for")
     g.set_defaults(func=cmd_targets)
 
     b = sub.add_parser("brief", help="one snapshot before a search: a cell's frontier "

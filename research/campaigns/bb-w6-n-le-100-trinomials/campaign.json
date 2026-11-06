@@ -1,0 +1,82 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 120,
+      "walltime_hours": 0.5
+    },
+    "constraints": {
+      "max_check_weight": 6,
+      "min_distance": 4,
+      "n": [
+        40,
+        100
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "a candidate whose 400-trial screen reads at or below 8.889 is not deepened at all; one that reads above it goes to the gate, and its ladder is dropped once two fresh-seed rungs agree at a bound below the bar or at 20,000 trials",
+        "trials_cap": 20000
+      },
+      "bar": {
+        "axes": [
+          "kd2_over_n"
+        ],
+        "note": "the best kd^2/n among weight-6 entries with n <= 100 (8.889); 98-6-12 at 8.816 is next, both seeded baselines",
+        "slug": "90-8-10"
+      },
+      "budget": {
+        "candidates_screened": 120,
+        "trials_per_candidate": 400,
+        "walltime_hours": 0.5
+      },
+      "cell": "unrestricted~weight-6",
+      "expected_value": "A weight-6 code at n <= 100 above 8.889 would be the first submitted entry to lead the unrestricted weight-6 cell at that size; the cell's two best entries there are seeded literature baselines.",
+      "family": "bivariate-bicycle",
+      "feasibility": "n <= 100 is far under BASE_MAX_N (700); bb.py builds a trinomial pair in milliseconds, the 400-trial numpy screen reads a candidate in under a second, and the gate runs in seconds at this size, so the whole campaign fits in minutes on a laptop with no accelerator.",
+      "hypothesis": "Random trinomial pairs on small tori Z_l x Z_m (n = 2lm <= 100) contain a weight-6 CSS code with kd^2/n above 8.889, the unrestricted weight-6 cell's best at n <= 100.",
+      "novelty": {
+        "against": "the bivariate-bicycle family of arXiv:2308.07915 and the board's seeded baselines at n <= 100 (90-8-10, 98-6-12, 84-6-10)",
+        "claim": "a trinomial bivariate-bicycle code at n <= 100 with kd^2/n above the cell's best there"
+      },
+      "what_a_negative_would_teach": "That 120 random trinomial pairs at n <= 100 under a 400-trial screen hold nothing above the seeded bar, so the small-torus trinomial space is, at this depth, already covered by the literature's own picks; the next session should spend its budget on larger tori or on four-term polynomials rather than re-sampling here."
+    },
+    "id": "bb-w6-n-le-100-trinomials",
+    "methods": {
+      "families": [
+        "bivariate-bicycle"
+      ],
+      "generators": [
+        "research/kit/search.py::sample_bb"
+      ],
+      "screening": {
+        "seeds": [
+          0
+        ],
+        "trials_per_candidate": 400
+      }
+    },
+    "name": "Weight-6 bivariate bicycle codes at n <= 100: can random trinomial pairs beat the cell's seeded bar?",
+    "notes": "The first campaign filed with a direction card (issue #4028). Small by design: it exists to show the card in a definition and a summary, on a question cheap enough to settle in minutes.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n",
+      "target": 8.889
+    },
+    "required_outputs": [
+      "experiment_ledger",
+      "negative_results",
+      "campaign_summary"
+    ],
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "target_reached"
+      },
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

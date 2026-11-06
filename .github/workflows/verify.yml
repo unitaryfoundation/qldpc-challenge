@@ -2,6 +2,7 @@ name: verify
 
 permissions:
   contents: read
+  pull-requests: read   # check_pr_duplicates.py lists the open PRs (issue #4107)
 
 on:
   pull_request:
@@ -58,8 +59,12 @@ jobs:
   # Compile-only coverage for the optional CUDA accelerator.  This deliberately
   # does not require a GPU and is advisory until the hosted toolkit install is
   # proven stable.
+  # Pinned to ubuntu-24.04 in every workflow (not ubuntu-latest): the label moved
+  # to ubuntu-26.04 on 2026-10-31, whose NVIDIA apt repo has no cuda-nvcc-12-6
+  # and whose default Python 3.14 has no pycryptosat wheel, so every run on
+  # main and on PRs failed before any entry was checked.
   ris-compile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
     steps:
@@ -72,12 +77,21 @@ jobs:
         run: nvcc -O3 -arch=sm_75 -c verify/ris_gpu.cu -o /dev/null
 
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # 90 min fast-pass cap (gate_changed.FAST_SECONDS) + ~30 min of fixed steps
     # + margin. Hitting this means a hang or a bug, not a large code.
     timeout-minutes: 130
     env:
       PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
+      # The files whose change can alter a measured circuit.ler rate: the
+      # measured-rate tier of verify_all.py, ler_verify.py and the modules it
+      # imports (ler_tools.py, circuit_tools.py, gf2.py), the optional
+      # accelerator those load (gf2_fast.cpp, built by setup_gf2_fast.py
+      # through the Makefile), the decoder pin under decode/ that ler_tools
+      # mirrors, and the dependency pins. verify/test_ler_stack.py pins this
+      # list to the import closure of ler_verify.py, so a new import in the
+      # LER code fails the suite until the list names it.
+      LER_STACK: verify/verify_all.py verify/ler_verify.py verify/ler_tools.py verify/circuit_tools.py verify/gf2.py verify/gf2_fast.cpp verify/setup_gf2_fast.py decode pyproject.toml uv.lock Makefile
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
@@ -208,18 +222,23 @@ jobs:
             echo "self-tests naming an entry this PR changed: $slug_tests" | tee -a "$GITHUB_STEP_SUMMARY"
           fi
           # A circuit.ler claim nothing in the PR touched can only go stale
-          # through the stack that measures it: the verifier sources, the
+          # through the stack that measures it: the measured-rate tier, the
           # decoder, the pinned dependencies (a stim bump in uv.lock) or the
-          # accelerator build. A PR that leaves all of those alone gets the
-          # --ler-base run; a PR that touches any of them re-measures every
-          # claim. The integrity manifest is a hash listing and cannot change a
-          # measurement, so re-pinning it does not count. A diff that cannot be
-          # computed exits non-zero and so counts as changed (fail closed).
-          # Tests, the policy checkers (check_*.py, the pre-push gate), and the
-          # test fixtures never measure a claim, so they are left out: with them
-          # in, a prose-checker edit scheduled the full re-measure, which ran
-          # past this job's 130-minute timeout on PR #3418.
-          if git diff --quiet "$base"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures'; then
+          # accelerator build, which is the LER_STACK list in this job's env.
+          # A PR that leaves all of those alone gets the --ler-base run; a PR
+          # that touches any of them re-measures every claim. Everything else
+          # under verify/ (the structural verifier, the circuit tier, the
+          # gate, the policy checkers, tests, fixtures, the integrity
+          # manifest) runs on every entry in the --ler-base pass as well and
+          # cannot change a measured rate, so it is left out. The list used
+          # to be all of verify/ minus tests, checkers, and fixtures: a
+          # prose-checker edit scheduled the full re-measure on PR #3418, and
+          # once those were excluded a schema-check edit did on #4653 and
+          # #4682, which with about an hour of self-tests runs past this
+          # job's 130-minute timeout. A diff that cannot be computed exits
+          # non-zero and so counts as changed (fail closed). $LER_STACK is
+          # unquoted so that it splits into one pathspec per entry.
+          if git diff --quiet "$base"...HEAD -- $LER_STACK; then
             ler_stack_changed=false
           else
             ler_stack_changed=true
@@ -237,7 +256,7 @@ jobs:
         # numbers the PR that introduced them had measured hours earlier. The
         # merge's own diff is what can have changed a claim: the entries it
         # touched (verify_all --ler-base handles those) and the stack that
-        # measures them (the same list the PR path uses above). A diff that
+        # measures them (the LER_STACK list in this job's env). A diff that
         # cannot be computed, including the all-zero `before` of a new branch
         # or a force push, counts as a stack change, so the fallback is the
         # full re-measure, never a skip.
@@ -245,16 +264,44 @@ jobs:
           before="${{ github.event.before }}"
           if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
             ler_stack_changed=true
-          elif git diff --quiet "$before"...HEAD -- verify decode pyproject.toml uv.lock Makefile ':(exclude)verify/validator_manifest.json' ':(exclude)verify/test_*.py' ':(exclude)verify/check_*.py' ':(exclude)verify/prepush_prose_check.sh' ':(exclude)verify/fixtures'; then
+          elif git diff --quiet "$before"...HEAD -- $LER_STACK; then
             ler_stack_changed=false
           else
             ler_stack_changed=true
           fi
           echo "ler_stack_changed=$ler_stack_changed" >> "$GITHUB_OUTPUT"
+      - name: provenance table staleness (advisory, issue #4023)
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: submitted
+        # research/provenance/derived.json cannot be regenerated here (the
+        # literature index is not shipped), so a code PR is never asked to
+        # update it; the weekly provenance-top-up workflow does. This only
+        # puts the backlog on the PR that grows it. Never fails.
+        run: |
+          out=$(python3 research/derive_provenance.py --check || true)
+          printf '%s\n' "$out"
+          stale=$(printf '%s\n' "$out" | sed -n 's/^derived provenance is STALE: //p')
+          if [ -n "$stale" ]; then
+            echo "::warning title=research/provenance/derived.json is behind the board::${stale} The weekly provenance-top-up workflow records them as not_derived; nothing to do in this PR."
+          fi
       - name: submission scope check (code data cannot change its own verifier)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
         working-directory: trusted
         run: uv run --frozen python verify/check_submission_scope.py --root ../submitted --base origin/${{ github.base_ref }}
+      - name: "duplicate check against the other open PRs (issue #4107)"
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
+        working-directory: trusted
+        # verify_all sees one tree. Two PRs that each added a presentation of
+        # the same code (#4064 and #4069, an X/Z swap apart) passed alone and
+        # merged minutes apart, and every run on main then failed on the pair
+        # until a removal landed (issue #4103). This compares the PR's entries
+        # with those of every other open PR under the identities verify_all
+        # files an entry under and refuses the later filing. The trusted copy
+        # runs, as for the scope check, and it runs on a verdict-cache hit too,
+        # because the other PRs are not in the digest.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --frozen python verify/check_pr_duplicates.py --root ../submitted --base origin/${{ github.base_ref }} --repo "${{ github.repository }}" --pr-number "${{ github.event.pull_request.number }}"
       - name: certificate levels (no cert may claim evidence it lacks)
         working-directory: submitted
         run: uv run --frozen python verify/check_certs.py

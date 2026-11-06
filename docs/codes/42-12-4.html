@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>42</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>12</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>4</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>4.571</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>4.57143</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>7</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0029</div></div>
@@ -23,6 +23,7 @@
 <details><summary>witness operator (support, 4 qubits)</summary><div class=wit>[14, 16, 37, 39]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 4</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 4 exists; Z: no logical &lt; 4 exists</div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 4 &middot; H_Z 4 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -60,6 +61,15 @@
 (3,10): 84</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 3.6056 &middot; Z 5.099 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/42-12-4">circuits/42-12-4/</a> &middot; canonical noise recipe, 4 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 4 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[10720, 10722, 10744, 10750]</div></details>
+<div class=kv><b>d_circ^Z</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[5083, 5084, 5131, 5132]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; simulated annealing over integer grid sites (research/local2d/fold_layout.py) &middot; 2026-09-19</div>
@@ -91,7 +101,8 @@
 <h4>Tools</h4>
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
-<p>Use GAP g := SmallGroup(21,2), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[3, 9], b=[2, 7, 13] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 42 - rank(HX) - rank(HZ) = 12. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div></section>
+<p>Use GAP g := SmallGroup(21,2), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[3, 9], b=[2, 7, 13] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 42 - rank(HX) - rank(HZ) = 12. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p>
+<p>The -b variant is the same code up to a qubit permutation and is not kept separately.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 21 (max weight 7) &middot; <b style="min-width:auto">Z-checks</b> 21 (max weight 7)</div>
 <details><summary>H_X (21 checks, sparse supports)</summary><div class=wit>[0, 11, 17, 21, 24, 34, 40]

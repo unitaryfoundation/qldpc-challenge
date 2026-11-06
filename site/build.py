@@ -367,6 +367,10 @@ LI_ICON = ('<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" 
            '1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C'
            '23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>')
 
+# Rows of the (n, k, LER) frontier a phone shows before its Show-all button
+# (issue #3931); the desktop list is short enough to show whole.
+LER_PHONE_ROWS = 5
+
 CSS = f"""
 :root{{--ink:#0f172a;--mut:#64748b;--ln:#d9dfe9;--ac:{ACCENT};--ex:{EXACT};
 --exb:{GREEN_BRIGHT};--dark:{DARK};--bg:#fbfbfd;--soft:#f8fafc}}
@@ -465,7 +469,7 @@ font-variant-numeric:tabular-nums}}
 .stat-ghost .sub{{font-size:12px;margin-top:4px;color:var(--mut)}}
 .stat-ghost .sub a{{font-family:'Space Mono',ui-monospace,monospace;
 color:var(--ink)}}
-.census{{display:grid;grid-template-columns:repeat(3,1fr);
+.census{{display:grid;grid-template-columns:repeat(5,1fr);
 border:1px solid var(--ln);border-radius:14px;background:var(--soft);
 overflow:hidden}}
 .census div{{padding:14px 18px;border-right:1px solid var(--ln)}}
@@ -877,6 +881,9 @@ border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer;
 box-shadow:0 1px 2px rgba(17,17,17,.25)}}
 .wfval{{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
 color:var(--ink);min-width:2.4em;text-align:right}}
+.asofinput{{border:0;font:inherit;font-size:12px;padding:2px 4px;
+background:transparent;color:var(--ink);cursor:pointer}}
+.asofinput:focus-visible{{outline:2px solid var(--ac);outline-offset:1px}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -900,24 +907,21 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}}
    cleanly. */
 /* The table is a bounded, internally scrolling box so the board stays compact
    instead of running the full length of the page. Its header pins to the top of
-   this box (thead is position:sticky) while the rows scroll under it.
-   overflow:auto also carries the horizontal scroll on narrow screens (where
-   the table sets its own min-width). */
-.boardscroll{{max-height:64vh;overflow:auto;-webkit-overflow-scrolling:touch;
+   this box (thead is position:sticky) while the rows scroll under it. The box
+   takes most of a viewport, so the leaderboard is the first thing on screen
+   once the page is scrolled to it. overflow:auto also carries the
+   horizontal scroll on narrow screens (where the table sets its own min-width). */
+.boardscroll{{max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}}
-/* "Show all" reveal for the collapsed mobile card list (issue #336);
-   desktop keeps the bounded scroll box and never needs it. */
+/* "Show all" reveal for the collapsed mobile card list (issue #336) and the
+   LER frontier list (issue #3931); desktop keeps the bounded scroll box and
+   the whole list, and never needs it. */
 .showall{{display:none}}
-/* On screens tall enough to fit the legend + a useful slice of the table,
-   size the explorer to exactly one viewport: the legend keeps its natural
-   height and the board's scroll box absorbs the remainder (issue #302).
-   Shorter screens keep normal flow and the 64vh box above applies, so the
-   flex column is never over-constrained into overlapping the leaderboard
-   below. Width gate matches the card-layout breakpoint. */
-@media(min-width:821px) and (min-height:800px){{
-.explorer{{display:flex;flex-direction:column;max-height:100vh}}
-.explorer>*{{flex:0 0 auto}}
-.explorer .boardscroll{{flex:1 1 auto;min-height:240px;max-height:none}}}}
+/* The explorer (legends, table) is plain flow. It used to be a flex column
+   capped at one viewport (#302); once its contents outgrew the viewport the
+   board's box overflowed the column and the "how to" cards that follow it
+   were laid out over the board's rows. No cap on the column means nothing
+   can overflow it; the board box above carries its own height. */
 @media(max-width:1000px){{table.board{{table-layout:auto;min-width:820px}}}}
 /* Narrow screens: rather than drop columns (and hide g, a headline metric)
    into a horizontal scroll, each row becomes a card so every field stays
@@ -936,6 +940,12 @@ padding:9px 12px 8px;background:var(--soft)}}
 font:inherit;font-size:14px;font-weight:600;color:var(--ac);
 background:var(--soft);border:1px solid var(--ln);border-radius:12px;
 cursor:pointer}}
+/* the (n, k, LER) frontier: two dozen rows of three lines each on a phone,
+   a screenful or more between the primary tracks and the board (issue
+   #3931). The first few rows, then the same Show-all reveal as the cards;
+   the list is static, so a CSS cap is safe here where the cards' was not. */
+.lerfront:not(.open) .latestlist li:nth-child(n+{LER_PHONE_ROWS + 1}){{display:none}}
+.lerfront.open .showall{{display:none}}
 .board td{{display:flex;justify-content:space-between;align-items:baseline;
 gap:16px;padding:3px 0;border:0;white-space:normal;text-align:right}}
 .board td::before{{content:attr(data-label);color:var(--mut);flex:0 0 auto;
@@ -996,7 +1006,10 @@ text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}}}
 header.hero{{padding:34px 0 30px}}
 .statsbar{{grid-template-columns:repeat(2,1fr);gap:10px}}
 .herosub{{grid-template-columns:1fr;gap:10px}}
-.census div{{padding:12px 14px}}.census b{{font-size:19px}}
+.census{{grid-template-columns:repeat(3,1fr)}}
+.census div{{padding:12px 10px;border-bottom:1px solid var(--ln)}}
+.census div:nth-child(3n){{border-right:0}}
+.census div:nth-last-child(-n+2){{border-bottom:0}}.census b{{font-size:19px}}
 .stat-card{{padding:14px 16px}}.stat-card .v{{font-size:27px}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
@@ -1209,6 +1222,15 @@ document.addEventListener('click',e=>{
  if(!board||!q)return;
  const count=document.getElementById('boardcount');
  const rows=[...board.querySelectorAll('tbody tr')];
+ const asof=document.getElementById('asof');
+ const clearasof=document.getElementById('clearasof');
+ rows.forEach(r=>{const s=r.querySelector('td.star');
+  r._origRecord=r.dataset.record;
+  r._origClass=r.className;
+  r._origStar=s?s.innerHTML:'';
+  r._origStarTitle=s?s.title:'';});
+ (function(){const p=new URLSearchParams(location.search).get('asof');
+  if(p&&asof)asof.value=p;})();
  // Phones render the rows as cards in normal page flow (no bounded scroll
  // box), so the full list buried the leaderboard below it (issue #336): show
  // the first few and a "Show all" button. The cap lives inside apply(), not
@@ -1235,6 +1257,14 @@ document.addEventListener('click',e=>{
  // It also comes on by itself when the table is filtered to an unrestricted
  // cell in which some code ships a layout, the case the number was made for.
  const rtog=document.getElementById('routetoggle');
+ // The filters as the page loaded them: defaultValue is the markup's value
+ // attribute, so a browser restoring form state on reload does not move the
+ // baseline. Used by the card cap in apply().
+ function atdefault(){
+  const same=el=>!el||el.value===el.defaultValue;
+  return !q.value.trim()&&same(wlo)&&same(whi)&&same(dlo)&&same(dhi)
+   &&same(nlo)&&same(nhi)&&same(klo)&&same(khi)
+   &&!(lit&&lit.classList.contains('active'));}
  // asym: X/Z distance asymmetry, so biased-noise candidates can
  // be pulled out by a threshold of the reader's choosing until the board
  // defines a label for them.
@@ -1297,32 +1327,50 @@ document.addEventListener('click',e=>{
   const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
   const litOn=lit&&lit.classList.contains('active');
   let shown=0;
+  const ao=asof?asof.value:'';
   rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d,nn=+r.dataset.n,kk=+r.dataset.k;
    const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])
     &&(nn>=nb[0]&&nn<=nb[1])&&(kk>=kb[0]&&kk<=kb[1])
-    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t));
+    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t))
+    &&(!ao||!!r.dataset.date&&r.dataset.date<=ao);
    r.style.display=ok?'':'none';if(ok)shown++;});
   const cellTok=toks.find(t=>t.slice(0,18)==='cell:unrestricted~');
   const anyRoute=rows.some(r=>r.style.display===''&&+r.dataset.route>=0);
   board.classList.toggle('showroute',
    (rtog&&rtog.classList.contains('active'))||(!!cellTok&&anyRoute));
   // Collapse only the unfiltered mobile card list; any narrowing shows every
-  // match (some may sit past the cap). Walk current DOM order, not the static
-  // rows array, so a sorted board collapses to its first cards, not its
-  // original ones.
-  const capped=showall&&cardsmq.matches&&!allcards&&shown===rows.length;
+  // match (some may sit past the cap). Unfiltered is every row shown, or the
+  // filters as the page loaded them: the weight slider starts at
+  // BOARD_DEFAULT_W (#2132), so the loaded view already hides rows and the
+  // every-row test alone never held at load, which put every card within
+  // the default weight on a phone (issue #3931). Walk current DOM order,
+  // not the static rows array, so a sorted board collapses to its first
+  // cards, not its original ones.
+  const capped=showall&&cardsmq.matches&&!allcards
+   &&(shown===rows.length||atdefault());
   if(capped){let ci=0;board.querySelectorAll('tbody tr').forEach(r=>{
    if(r.style.display===''&&++ci>CARDCAP)r.style.display='none';});}
-  if(showall)showall.style.display=capped?'':'none';
-  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
+  if(showall){showall.style.display=capped?'':'none';
+   if(capped)showall.textContent='Show all '+shown+' codes';}
+  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes'
+   +(ao?' (as of '+ao+')':'');
   var chip=document.getElementById('qchip');
   if(chip){var f=q.value.trim();
    chip.style.display=f?'':'none';
    if(f)chip.innerHTML='filtered: '+f.replace(/</g,'&lt;')+' <b>&times; clear</b>';}
  }
+ function syncAsOfUrl(v){
+  try{const u=new URL(location.href);
+   if(v)u.searchParams.set('asof',v);
+   else u.searchParams.delete('asof');
+   history.replaceState(null,'',u);}catch(e){}}
  function clearall(){q.value='';
   document.querySelectorAll('.ttab').forEach(t=>
-   t.classList.toggle('active',t.dataset.q==='')); resetsliders();apply();}
+   t.classList.toggle('active',t.dataset.q==='')); resetsliders();
+  if(asof)asof.value='';
+  updateStarsForDate('');
+  syncAsOfUrl('');
+  apply();}
  var chipEl=document.getElementById('qchip');
  if(chipEl)chipEl.addEventListener('click',clearall);
  var clrEl=document.getElementById('clearfilters');
@@ -1346,6 +1394,59 @@ document.addEventListener('click',e=>{
   if(nlo&&nhi){nlo.value=NMIN;nhi.value=NMAX;npaint();}
   if(klo&&khi){klo.value=KMIN;khi.value=KMAX;kpaint();}
   if(lit)lit.classList.remove('active');}
+ // Historical portal: recompute frontier (record) stars for the board as of a
+ // given date. Only codes dated on or before `ao` participate; the Pareto rule
+ // mirrors site/build.py's compute_records() (per cell + per code type).
+ function dominates(a,b){
+  return a.n<=b.n && a.k>=b.k && a.d>=b.d && a.w<=b.w &&
+   (a.n<b.n || a.k>b.k || a.d>b.d || a.w<b.w);}
+ function histPareto(list){
+  const front=new Set();
+  for(let i=0;i<list.length;i++){
+   let dom=false;
+   for(let j=0;j<list.length;j++){
+    if(i===j)continue;
+    if(dominates(list[j],list[i])){dom=true;break;}
+   }
+   if(!dom)front.add(list[i].row);
+  }
+  return front;
+ }
+ function updateStarsForDate(ao){
+  if(!ao){
+   rows.forEach(r=>{const s=r.querySelector('td.star');
+    r.dataset.record=r._origRecord;
+    r.classList.toggle('fr',r._origRecord==='1');
+    if(s){s.innerHTML=r._origStar;s.title=r._origStarTitle;}});
+   return;
+  }
+  const visible=rows.filter(r=>r.dataset.date && r.dataset.date<=ao);
+  const recordSet=new Set();
+  const cells=new Set();
+  visible.forEach(r=>(r.dataset.cells||'').split(/\\s+/).filter(Boolean)
+   .forEach(c=>cells.add(c)));
+  cells.forEach(cell=>{
+   const list=visible.filter(r=>(' '+(r.dataset.cells||'')+' ')
+     .indexOf(' '+cell+' ')>=0)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  const types=new Set(visible.map(r=>r.dataset.ct||'CSS'));
+  types.forEach(ct=>{
+   const list=visible.filter(r=>(r.dataset.ct||'CSS')===ct)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  rows.forEach(r=>{
+   const s=r.querySelector('td.star');
+   const isRec=recordSet.has(r) && !!r.dataset.date && r.dataset.date<=ao;
+   r.dataset.record=isRec?'1':'0';
+   r.classList.toggle('fr',isRec);
+   if(s){
+    s.innerHTML=isRec?'&#9733;':'';
+    s.title=isRec?'record: Pareto-best among codes dated on or before '+ao+', using their current parameters (board-relative, not a literature record)':'';}
+  });
+ }
  // Primary-tracks grid: a cell's code-count chip filters the table to that
  // (locality x weight) cell and scrolls it into view.
  document.querySelectorAll('[data-cell]').forEach(b=>{
@@ -1355,6 +1456,16 @@ document.addEventListener('click',e=>{
    const bd=document.getElementById('board');
    if(bd)bd.scrollIntoView({behavior:'smooth'});});});
  if(lit)lit.addEventListener('click',()=>{lit.classList.toggle('active');apply();});
+ if(asof){asof.addEventListener('change',()=>{
+   updateStarsForDate(asof.value);
+   syncAsOfUrl(asof.value);
+   apply();});
+  if(asof.value)updateStarsForDate(asof.value);}
+ if(clearasof){clearasof.addEventListener('click',()=>{
+   if(asof)asof.value='';
+   updateStarsForDate('');
+   syncAsOfUrl('');
+   apply();});}
  if(rtog)rtog.addEventListener('click',()=>{rtog.classList.toggle('active');apply();});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
@@ -1642,6 +1753,81 @@ def provenance_counts(slugs):
     return counts
 
 
+def multisize_table():
+    """The multi-size recipe table (research/repro/multisize.json), or {} when absent."""
+    path = os.path.join(ROOT, "research", "repro", "multisize.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def multisize_block(rec):
+    """The code page's "Recipe at other sizes" section for one lifted recipe (issue #4031).
+
+    Display-only: per size, the verifier's cheap structural checks on the
+    recipe rebuilt there (commutation, k >= 1, a connected Tanner graph, the
+    caps), with the numbers behind them and no distance. An empty string for
+    a recipe that was not lifted.
+    """
+    if not rec or rec.get("status") != "lifted" or not rec.get("sizes"):
+        return ""
+    own = rec.get("own") or {}
+    rows = []
+    for s in rec["sizes"]:
+        if "n" not in s:
+            rows.append(f'<li><b>{html.escape(s["label"])}</b>: does not build '
+                        f'({html.escape(str(s.get("error", "")))[:120]})</li>')
+            continue
+        failed = [c for c, ok in s["checks"].items() if not ok]
+        verdict = ("passes: commutes, encodes, connected, within the caps" if s["pass"] else
+                   "fails: " + ", ".join({"commutes": "checks do not commute", "encodes": "k = 0",
+                                           "connected": f"{s['components']} Tanner components",
+                                           "within_caps": "outside the caps"}[c] for c in failed))
+        rows.append(f'<li><b>{html.escape(s["label"])}</b>: [[{s["n"]},{s["k"]}]] w={s["w"]}, '
+                    f'{html.escape(verdict)}</li>')
+    repro = ("rebuilds this entry" if rec.get("reproduces_entry") else
+             "does not rebuild this entry's fingerprint" if rec.get("reproduces_entry") is False else
+             "entry not compared")
+    return ('<section class=blk><h3>Recipe at other sizes</h3>'
+            '<div class=kv style="color:var(--mut)">the stored construction recipe '
+            f'(<code>{html.escape(rec["constructor"])}</code>, {repro} at its own parameters) rebuilt at '
+            f'neighboring sizes ({html.escape(rec["rule"])}) and put through the verifier\'s cheap '
+            'structural checks only: no distance at any size, no ranking, no tier. A recipe that holds '
+            'up at other sizes is evidence of a construction rather than a tuned artifact; one that '
+            'does not is a fact about the recipe, not about this entry.</div>'
+            f'<div class=kv><b>passes at</b> {rec["passed"]} of {rec["tried"]} sizes'
+            + (f' &middot; own size [[{own["n"]},{own["k"]}]] w={own["w"]}' if "n" in own else "")
+            + '</div><ul class=kv>' + "".join(rows) + '</ul></section>')
+
+
+def board_screen_counts(slugs):
+    """Verdict counts from research/provenance/board_screen.json, or None.
+
+    The screen compares each CSS entry with the board's own seeded and
+    literature entries by exact fingerprint and Weisfeiler-Leman signature
+    (issue #4024). A rendered entry the screen has not seen counts as
+    not_screened, for the same reason provenance_counts keeps not_derived.
+    """
+    path = os.path.join(ROOT, "research", "provenance", "board_screen.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (OSError, ValueError):
+        return None
+    table = payload.get("entries") or {}
+    counts = {}
+    for slug in slugs:
+        verdict = (table.get(slug) or {}).get("verdict", "not_screened")
+        counts[verdict] = counts.get(verdict, 0) + 1
+    counts["reference_entries"] = (payload.get("reference") or {}).get("total")
+    counts["method"] = ("fingerprint and Weisfeiler-Leman signature against the "
+                        "board's seeded and literature entries")
+    counts["caveat"] = payload.get("caveat")
+    return counts
+
+
 def load_entries():
     entries = []
     # One memoized structural pass over the board (qldpc_verify.board_reports),
@@ -1709,7 +1895,7 @@ def load_entries():
         entries.append({
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "code_type": doc.get("code_type", "CSS"),
-            "eff": round(k * d * d / n, 3), "tier": tier,
+            "eff": float(f"{k * d * d / n:.6g}"), "tier": tier,
             "d_X": d_x, "d_Z": d_z,
             "tier_X": tiers.get("X"), "tier_Z": tiers.get("Z"),
             "tier_P": tiers.get("P"),
@@ -2514,6 +2700,26 @@ def ldiam_cell_title(e):
     return parts + ". " + LDIAM_TIP
 
 
+def cert_side_notes(cert):
+    """One line per certified side, for the certificate row of a code page.
+
+    The solver certifiers write a ``note`` per side ("no logical < d exists").
+    A formal certificate (schema tier ``formal``) carries only ``value`` and
+    ``exact`` per side, since its statement lives in the replayed theorem, so
+    the same sentence is built from those; certs/1000-406-6.json was the first
+    one and it stopped the site build with a KeyError.
+    """
+    out = []
+    for side, v in (cert.get("sides") or {}).items():
+        v = v or {}
+        note = v.get("note")
+        if not note and v.get("exact"):
+            note = f"no logical < {v.get('value', cert.get('d'))} exists"
+        if note:
+            out.append(f"{side}: {note}")
+    return "; ".join(out)
+
+
 def detail_page(e):
     doc, cert = e["doc"], e["cert"]
     n, k, d = e["n"], e["k"], e["d"]
@@ -2678,8 +2884,7 @@ def detail_page(e):
             P.append(f'<details><summary>{wit_sum}</summary>'
                      f'<div class=wit>{wit_body}</div></details>')
     if cert and cert.get("d_exact"):
-        notes = "; ".join(f'{s}: {v["note"]}' for s, v in
-                          cert.get("sides", {}).items())
+        notes = cert_side_notes(cert)
         P.append(f'<div class=kv><b>certificate</b> '
                  f'<span class=cert-ok>exact, d = {d}</span> &middot; '
                  f'{html.escape(cert.get("solver",""))}</div>'
@@ -2695,6 +2900,11 @@ def detail_page(e):
                  '<span class=cert-no>none yet &middot; distance stands as a '
                  'self-certified upper bound (d &le;)</span></div>')
     P.append('</section>')
+
+    # the recipe at other sizes (issue #4031): display-only, like the
+    # diagnostics below; present when the entry's repro manifest carries a
+    # recipe the kit can lift.
+    P.append(multisize_block((multisize_table().get("entries") or {}).get(e["slug"])))
 
     # diagnostics (issue #1844): decoder-friendliness read off H and the
     # spread of the stored witnesses read off the layout, as the verifier
@@ -3233,9 +3443,17 @@ def progress_panel(entries, best_geo_e):
     top = best_eff_at(entries)
     top_v = "&middot;" if top is None else f"{top['eff']:g}"
     n_base = sum(1 for e in entries if e["origin"] == "baseline")
+    # The two evidence counts the board can state about itself (issue #4024):
+    # distances with a certificate, and entries whose novelty anyone has
+    # looked at. provenance.novelty is the only field that says whether a
+    # code is new, and a metric that is never counted is never closed.
+    n_exact = sum(1 for e in entries if e["tier"] == "exact")
+    n_audited = sum(1 for e in entries if (e.get("novelty") or "unknown") != "unknown")
     counts = (("{:,}".format(len(entries)), "codes on the board"),
               ("{:,}".format(len(entries) - n_base), "submitted"),
-              ("{:,}".format(n_base), "literature baselines"))
+              ("{:,}".format(n_base), "literature baselines"),
+              ("{:,}".format(n_exact), "certified exact"),
+              ("{:,}".format(n_audited), "novelty audited"))
     census = "".join(f'<div><b>{v}</b><span>{lab}</span></div>'
                      for v, lab in counts)
     tier = (f'<div class=stat-ghost title="Best operational efficiency kd^2/n '
@@ -3245,7 +3463,11 @@ def progress_panel(entries, best_geo_e):
             f'<div class=l>best kd&sup2;/n at any weight</div></div>'
             f'<div class=census title="Codes with a verified distance witness; '
             f'submitted codes came through the challenge and are not '
-            f'necessarily novel parameter sets.">{census}</div>')
+            f'necessarily novel parameter sets. Certified exact: entries whose '
+            f'distance carries a certificate. Novelty audited: entries whose '
+            f'provenance.novelty is known_parameters or new_parameters rather '
+            f'than unaudited; new_parameters is a submitter or reviewer claim, '
+            f'not a verifier-proved fact.">{census}</div>')
     return (f'<section class=statsbar>{cards}</section>'
             f'<section class=herosub>{tier}</section>')
 
@@ -3906,6 +4128,9 @@ NOVELTY_LABEL = {
 }
 
 
+NOVELTY_BUCKETS = ("unknown", "known_parameters", "new_parameters")
+
+
 def novelty_label(v):
     return NOVELTY_LABEL.get(v, NOVELTY_LABEL["unknown"])
 
@@ -3958,6 +4183,92 @@ def cell_frontiers(entries):
     because hand-rolled copies of this relation drifted once)."""
     return {key: {idxs[j] for j in pareto([entries[i] for i in idxs])}
             for key, idxs in cells_by_key(entries).items()}
+
+
+FAMILY_CAVEAT = ("family is the one self-declared label on an entry, filterable and "
+                 "never ranked, so these shares measure the declared tag, not a "
+                 "property recovered from H; the derived provenance buckets are the "
+                 "computed axis wherever they cover an entry")
+
+
+def _family_shares(entries, idxs):
+    """Return the declared-family shares of one frontier: top family, top two, and HHI.
+
+    "other" is what an entry without a family tag renders as, not a family,
+    so it is reported as untagged: in the denominator of every share, out of
+    the top list and the HHI.
+    """
+    c = collections.Counter(entries[i]["family"] for i in idxs)
+    total = sum(c.values())
+    untagged = c.pop("other", 0)
+
+    def share(n):
+        return round(n / total, 3) if total else 0.0
+    top = c.most_common(2)
+    return {"records": total, "families": len(c),
+            "untagged": untagged, "untagged_share": share(untagged),
+            "top": [{"family": f, "records": n, "share": share(n)} for f, n in top],
+            "top1_share": share(top[0][1]) if top else 0.0,
+            "top2_share": share(sum(n for _, n in top)) if top else 0.0,
+            "hhi": round(sum((n / total) ** 2 for n in c.values()), 3) if total else 0.0}
+
+
+def family_concentration(entries):
+    """Measure how much of each CSS frontier one declared family holds (issue #4025).
+
+    For every CSS primary-track cell and for the global CSS frontier, the
+    share of the frontier's records held by the top family and the top two,
+    and the Herfindahl-Hirschman index over families, read off the same
+    cell_frontiers and pareto that award the star. Each cell also says
+    whether the search moved it: the leader (largest kd^2/n; ties to the
+    earliest date, then the slug) belongs to a family other than the
+    incumbent's, where the incumbent is the same leader taken over the cell's
+    literature baselines alone (provenance.origin baseline), the best the
+    seeded literature had there. Cells nest, so a code counts in every cell
+    it qualifies for.
+
+    family is the board's one self-declared label (FAMILY_CAVEAT), so this is
+    a diagnostic of the declared tag, displayed and never ranked.
+    """
+    by_cell = cells_by_key(entries)
+    fronts = cell_frontiers(entries)
+    css = [i for i, e in enumerate(entries) if e.get("code_type", "CSS") == "CSS"]
+    global_front = [css[j] for j in pareto([entries[i] for i in css])]
+    out, moved = {}, 0
+    for key in sorted(k for k in by_cell if len(k) == 2):
+        members = by_cell[key]
+
+        def rank(i):
+            return (-entries[i]["eff"], entries[i].get("date") or "~", entries[i]["slug"])
+        leader = min(members, key=rank)
+        baselines = [i for i in members if entries[i].get("origin") == "baseline"]
+        incumbent = min(baselines, key=rank) if baselines else None
+        rec = _family_shares(entries, sorted(fronts[key]))
+        rec["members"] = len(members)
+        rec["leader"] = {"slug": entries[leader]["slug"], "family": entries[leader]["family"],
+                         "eff": entries[leader]["eff"]}
+        rec["incumbent"] = ({"slug": entries[incumbent]["slug"],
+                             "family": entries[incumbent]["family"],
+                             "eff": entries[incumbent]["eff"]} if incumbent is not None else None)
+        rec["moved"] = (rec["incumbent"] is not None
+                        and rec["leader"]["family"] != rec["incumbent"]["family"])
+        moved += rec["moved"]
+        out[f"{key[0]}~{key[1]}"] = rec
+    return {"global": _family_shares(entries, global_front), "cells": out,
+            "cells_moved": moved, "cells_total": len(out),
+            "definitions": {
+                "frontier": "the per-cell and global CSS Pareto frontiers over (n, k, d, w), "
+                            "the same cell_frontiers and pareto that award the star; cells "
+                            "nest, so a code counts in every cell it qualifies for",
+                "leader": "the cell member with the largest kd^2/n (ties: earliest date, then slug)",
+                "incumbent": "the same leader over the cell's literature baselines alone "
+                             "(provenance.origin baseline); null when the cell has none",
+                "moved": "the leader's declared family differs from the incumbent's",
+                "untagged": "records rendered as family other, the default for an entry "
+                            "without a family tag; in every denominator, never a family",
+                "hhi": "sum of squared shares of the named families over the frontier's "
+                       "records, from 1/families (even split) to 1 (one family)"},
+            "caveat": FAMILY_CAVEAT}
 
 
 def compute_records(entries):
@@ -4130,15 +4441,33 @@ def frontier_map(rows, W=1040, H=400):
             f'coloured by distance band">{"".join(grid)}{"".join(pts)}</svg>')
 
 
-def frontier_legend(count):
-    """The map's legend: the seven distance bands, the size key, the count."""
+def family_legend_item(conc):
+    """Render a frontier's declared-family concentration as one legend item.
+
+    The declared-versus-computed caveat is its title (issue #4025).
+    """
+    if not conc or not conc.get("top"):
+        return ""
+    top = conc["top"][0]
+    return (f'<span class=ci title="{html.escape(FAMILY_CAVEAT)}">declared family: '
+            f'{html.escape(top["family"])} {round(100 * conc["top1_share"])}% of records, '
+            f'top two {round(100 * conc["top2_share"])}%, HHI {conc["hhi"]:.2f}</span>')
+
+
+def frontier_legend(count, conc=None):
+    """Render the map's legend.
+
+    The seven distance bands, the size key, the count, and the cell's
+    declared-family concentration when known.
+    """
     return ("".join(
         f'<span class=ci data-band="{i}"><span class=cdot '
         f'style="background:{FR_RAMP[i]}"></span>{html.escape(lab)}</span>'
         for i, (_, lab) in enumerate(D_BANDS))
         + '<span class=ci title="marker size: the cheaper the check, the bigger '
           'the dot">&#9679; size = check weight (w &le; 4 largest)</span>'
-        + f'<span class=ci>{count} records</span>')
+        + f'<span class=ci>{count} records</span>'
+        + family_legend_item(conc))
 
 
 # Client-side re-renderer for the record-progress chart: modes (record / all
@@ -4215,7 +4544,9 @@ function drawFrontier(){
  var L=BANDS.map(function(b,i){return '<span class=ci data-band="'+i+'"><span class=cdot style="background:'+RAMP[i]+'"></span>'+esc(b[1])+'</span>';}).join('');
  L+='<span class=ci title="marker size: the cheaper the check, the bigger the dot">&#9679; size = check weight (w &le; 4 largest)</span>';
  if(st.w!=='all')L+='<span class=ci>dimmed = added more than '+st.w+' days ago</span>';
- fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>';
+ var cc=C.conc&&C.conc[ci];
+ if(cc)L+='<span class=ci title="'+esc(C.caveat)+'">declared family: '+esc(cc.top)+' '+Math.round(cc.top1*100)+'% of records, top two '+Math.round(cc.top2*100)+'%, HHI '+cc.hhi.toFixed(2)+'</span>';
+ fleg.innerHTML=L+'<span class=ci>'+rows.length+' records</span>'+(cc?'':'');
 }
 function draw(){
  if(st.m==='frontier'){setView(true);drawFrontier();return;}
@@ -4456,15 +4787,32 @@ def record_chart(entries):
              "fr": fr_member[i]}
             for i, e in enumerate(entries)]
     rcseries = [[lab, cap, col] for lab, cap, col in RC_SERIES]
+    # Declared-family concentration per cell (issue #4025): the script appends
+    # it to the legend when the cell changes, so it is computed once here, by
+    # the same per-cell frontier, and never re-derived client-side.
+    fc = family_concentration(entries)
+    conc = [({"top": c["top"][0]["family"], "top1": c["top1_share"],
+              "top2": c["top2_share"], "hhi": c["hhi"]} if c and c.get("top") else None)
+            for c in (fc["cells"].get(f"{cell[0]}~{cell[1]}") if cell[2] == "CSS" else None
+                      for cell in fr_cells)]
     rccells = {"cells": [list(c) for c in fr_cells],
                "def": list(fr_cells[fr_default][:3]) if fr_cells else list(FR_DEFAULT_CELL),
                "ramp": FR_RAMP, "bands": [list(b) for b in D_BANDS],
-               "radius": [list(r) for r in FR_RADIUS]}
+               "radius": [list(r) for r in FR_RADIUS],
+               "conc": conc, "caveat": FAMILY_CAVEAT}
     fr_rows = [r for r in data if fr_default in r["fr"]] if fr_cells else []
     fr_plot = (frontier_map(fr_rows) if fr_rows else
                '<div style="padding:40px;color:#64748b">no codes in this cell</div>')
-    fr_legend = frontier_legend(len(fr_rows))
     dL, dW, dT = rccells["def"]
+    fr_legend = frontier_legend(len(fr_rows), fc["cells"].get(f"{dL}~{dW}") if dT == "CSS" else None)
+    g = fc["global"]
+    fr_shape = (f' Across the whole CSS frontier ({g["records"]:,} records) the top declared '
+                f'family, {html.escape(g["top"][0]["family"])}, holds {round(100 * g["top1_share"])}% '
+                f'and the top two {round(100 * g["top2_share"])}% (HHI {g["hhi"]:.2f}); the search '
+                f'has moved {fc["cells_moved"]} of {fc["cells_total"]} cells to a family other than '
+                f'the family of the best literature baseline there. family is the one self-declared label on an '
+                f'entry, so these read the declared tag, not anything recovered from H.'
+                if g.get("top") else "")
     types = sorted({c[2] for c in fr_cells})
 
     def cell_btns(attr, opts, label_of, cur):
@@ -4529,7 +4877,7 @@ def record_chart(entries):
             'computation. Colour is the distance band and size the check '
             'weight (cheaper checks draw bigger); the time windows dim older '
             'entries. Switch cells to see what a locality or weight class '
-            'reaches.</p>'
+            f'reaches.{fr_shape}</p>'
             + json_data_script("rcdata", data)
             + json_data_script("rcseries", rcseries)
             + json_data_script("rccells", rccells)
@@ -4693,7 +5041,9 @@ def ler_frontier_panel(entries, lrec):
     """The (n, k, LER) frontier as a list, lowest measured rate
     first. Separate from the primary tracks: those rank by kd^2/n over the
     (n, k, d, w) frontier, this one ignores d and w and ranks by what a
-    device-like simulation measured."""
+    device-like simulation measured. On a phone the list shows its first
+    LER_PHONE_ROWS rows behind a Show-all button (issue #3931); the CSS
+    does the capping, the button only opens the section."""
     if not lrec:
         return ""
     measured = [e for e in entries if e["ler"] is not None]
@@ -4722,6 +5072,13 @@ def ler_frontier_panel(entries, lrec):
     where = "; ".join(f'p = {p:g}' for p, _ in settings)
     decs = sorted({dec for _, dec in settings if dec})
     where += " with decoder " + ", ".join(html.escape(d) for d in decs) if decs else ""
+    more = ""
+    if len(rows) > LER_PHONE_ROWS:
+        more = ('<button type=button class="showall lershow">'
+                f'Show all {len(rows)} codes</button>'
+                '<script>(function(){var s=document.getElementById("lerfront"),'
+                'b=s&&s.querySelector(".lershow");if(b)b.addEventListener('
+                '"click",function(){s.classList.add("open");});})();</script>')
     return ('<section class="latest lerfront" id=lerfront>'
             '<h2 class=track>Logical error rate frontier '
             f'<span class=tcount>&middot; {len(rows)} of {len(measured)} '
@@ -4739,7 +5096,7 @@ def ler_frontier_panel(entries, lrec):
             'independent of the (n, k, d, w) frontier that awards the '
             'record star, and the rows below carry the <span class=lerchip>'
             'LER record</span> chip in the table.</p>'
-            f'<ol class=latestlist>{"".join(rows)}</ol></section>')
+            f'<ol class=latestlist>{"".join(rows)}</ol>{more}</section>')
 
 
 # Default upper bound of the Codes weight slider; see
@@ -4863,6 +5220,16 @@ def board_controls(entries, records):
             'shown by itself in unrestricted cells that have layouts. A '
             'diagnostic, not a rank">swaps</button></nav>'
             f'<div class=filterrow>{wslider}{dslider}{nslider}{kslider}'
+            '<label class=wfilter title="table only: filters rows to codes whose '
+            'declared provenance date is on or before this day (literature '
+            'baselines use their publication year; entries with no date '
+            'disappear), and recomputes frontier stars among those codes using '
+            'their current parameters. Upper bounds, not certified.">'
+            '<span class=wflabel>as of</span>'
+            '<input type=date id=asof class=asofinput></label>'
+            '<button type=button id=clearasof class=otog '
+            'title="clear the historical date and return to the current board">'
+            'current</button>'
             '<button type=button id=clearfilters class=otog '
             'title="reset search, sliders, and every active filter">'
             'clear filters</button></div>'
@@ -5022,6 +5389,7 @@ def board_table(entries, records, lrec=frozenset()):
             f'data-ldiam="{e["ldiam"] if e["ldiam"] is not None else -1}" '
             f'data-tracks="{html.escape(search_terms)}" '
             f'data-cells="{html.escape(cell_keys)}" '
+            f'data-ct="{html.escape(e.get("code_type", "CSS"))}" '
             f'data-record="{1 if fr else 0}" '
             f'data-ler="{e["ler"] if e["ler"] is not None else -1}" '
             f'data-lrec="{1 if i in lrec else 0}" '
@@ -5375,8 +5743,10 @@ def build():
     # the records climbing, the leaderboard shows who set them
     P.append(contributors_panel(entries))
     P.append(primary_tracks_grid(entries, records))
-    P.append(ler_frontier_panel(entries, lrec))
-    # the other board, in plain sight above the table it is kept apart from
+    # the other board, right after the primary tracks it is the counterpart
+    # of and above the two CSS-only rankings it is kept apart from. It used
+    # to follow the LER frontier, which on a phone is a screenful or more
+    # (issue #3931).
     ns = len(stab_entries)
     P.append('<div class=xboard>'
              f'<span><b>General (non-CSS) stabilizer codes</b> rank on their own '
@@ -5385,11 +5755,13 @@ def build():
              'entries below.</span>'
              '<a class=lbcta href="stabilizer.html">Stabilizer board &rarr;</a>'
              '</div>')
+    # the LER frontier directly above the table whose rows carry its chip
+    P.append(ler_frontier_panel(entries, lrec))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
     P.append(board_legend(asym=True))
     P.append(board_table(entries, records, lrec))
-    P.append('</div>')  # close explorer (the viewport-fitted table column)
+    P.append('</div>')  # close explorer (the legend+table column)
     # the three steps follow the board: 'climb the board' should be read after
     # the board has been seen, not before
     P.append('<div class=how>'
@@ -5461,6 +5833,19 @@ def build():
     prov = provenance_counts({e["slug"] for e in entries})
     if prov:
         stats["provenance"] = prov
+    # How much of the board anyone has cleared against the literature (issue
+    # #4024). Audited means known_parameters or new_parameters; the latter is
+    # a submitter or reviewer claim, not a verifier-proved fact. Over both
+    # boards, like verified_codes.
+    nov = collections.Counter((e.get("novelty") or "unknown") for e in all_entries)
+    stats["novelty"] = {b: nov.get(b, 0) for b in NOVELTY_BUCKETS}
+    stats["novelty_audited"] = len(all_entries) - stats["novelty"]["unknown"]
+    screen = board_screen_counts({e["slug"] for e in entries})
+    if screen:
+        stats["board_screen"] = screen
+    # The frontier's shape by declared family (issue #4025): per cell and
+    # global shares and HHI, with the declared-versus-computed caveat inside.
+    stats["family_concentration"] = family_concentration(all_entries)
     for cap in HERO_CAPS:
         be = best_eff_at(entries, cap)
         stats[f"best_kd2_over_n_w{cap}"] = be["eff"] if be else None

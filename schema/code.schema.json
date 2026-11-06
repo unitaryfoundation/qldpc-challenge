@@ -22,7 +22,9 @@
         "0.2",
         "0.3",
         "0.4",
-        "0.5"
+        "0.5",
+        "0.6",
+        "0.7"
       ]
     },
     "name": {
@@ -499,6 +501,267 @@
         }
       }
     },
+    "benchmark": {
+      "type": "object",
+      "description": "optional Tier B metadata for the Beat the Surface Code campaign (issues #4601 and #4603): one documented comparison of this entry against a surface-code baseline at matched logical count, under a stated hardware track, noise model, and decoder, with syndrome ancillas counted. Non-scoring: no track or ranking reads it. The schema holds the vocabulary and ranges; the verifier checks the block against the entry and the board (the candidate's data qubits equal n, every total is its data plus ancillas, the baseline exists on the board with at least this entry's k or is k rotated patches of the stated distance) and records the reading in computed.benchmark. Requires schema_version 0.6.",
+      "required": [
+        "hardware_track",
+        "noise_model",
+        "surface_baseline",
+        "decoder",
+        "resources",
+        "logical_error_rate",
+        "status",
+        "method"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "hardware_track": {
+          "enum": [
+            "2d-nearest-neighbor",
+            "bounded-degree",
+            "long-range",
+            "biased-noise",
+            "bosonic-hybrid"
+          ],
+          "description": "the hardware track of issue #4601 whose surface-code baseline this comparison uses"
+        },
+        "noise_model": {
+          "type": "object",
+          "required": [
+            "kind",
+            "p"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "circuit-level-depolarizing",
+                "phenomenological",
+                "code-capacity",
+                "biased-circuit-level",
+                "other"
+              ],
+              "description": "circuit-level depolarizing is the campaign's common benchmark; a phenomenological or code-capacity comparison is recorded as such and does not support an operational claim (issue #4601)"
+            },
+            "p": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.5,
+              "description": "physical error rate the comparison is made at"
+            },
+            "bias": {
+              "type": "number",
+              "minimum": 1,
+              "description": "dephasing bias eta = p_Z / p_X of a biased model; 1 when unbiased"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 400,
+              "description": "the recipe in one line when kind alone does not pin it: which operations carry noise, idling, measurement, and reset errors"
+            }
+          }
+        },
+        "surface_baseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "slug"
+              ]
+            },
+            {
+              "required": [
+                "patches"
+              ]
+            }
+          ],
+          "properties": {
+            "slug": {
+              "type": "string",
+              "pattern": "^[0-9]+-[0-9]+-[0-9]+(-[a-z0-9]+)?$",
+              "description": "a committed surface-code entry, codes/<slug>.json, encoding at least this entry's k; the verifier checks that it exists (benchmark_baseline_on_board, benchmark_baseline_k) and reads its n and k"
+            },
+            "patches": {
+              "type": "object",
+              "required": [
+                "d"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "d": {
+                  "type": "integer",
+                  "minimum": 3
+                }
+              },
+              "description": "k independent rotated surface-code patches of distance d, one per logical qubit of this entry, k d^2 data qubits in all: the baseline for a k with no single-code entry"
+            }
+          }
+        },
+        "decoder": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "implementation": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "package and version, or repository @ commit"
+            },
+            "parameters": {
+              "type": "string",
+              "maxLength": 400
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "required": [
+            "candidate",
+            "baseline"
+          ],
+          "additionalProperties": false,
+          "description": "physical resources of the two memory experiments; the verifier requires candidate.data_qubits = n (benchmark_candidate_data_qubits) and baseline.data_qubits equal to the baseline entry's n or to k d^2 (benchmark_baseline_data_qubits)",
+          "properties": {
+            "candidate": {
+              "$ref": "#/$defs/resourceCount"
+            },
+            "baseline": {
+              "$ref": "#/$defs/resourceCount"
+            }
+          }
+        },
+        "logical_error_rate": {
+          "type": "object",
+          "required": [
+            "target",
+            "candidate",
+            "per"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "target": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.5,
+              "description": "pL_target of the comparison: the rate both experiments are sized to reach"
+            },
+            "candidate": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.5
+            },
+            "baseline": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.5
+            },
+            "per": {
+              "enum": [
+                "round",
+                "shot"
+              ],
+              "description": "whether the rates are per syndrome round or per memory experiment"
+            },
+            "shots": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "status": {
+          "enum": [
+            "documented"
+          ],
+          "description": "documented: reported by the submitter from their own simulation, produced as method states. A verified status, reproduced by the repository's own tooling, is reserved until that tooling exists (issue #4601, Level 2)."
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "description": "how the numbers were produced: simulator, schedule source, where the baseline's numbers come from, and where the write-up lives"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "contributed_by": {
+          "$ref": "#/$defs/contributedBy",
+          "description": "who contributed this comparison, and when. Required when the contributor is not a listed author of the code: verify/check_authorship.py binds such a PR through this field, as it does for a layout or a circuit tier, so a donated comparison never widens edit rights over the code (issue #611)."
+        }
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "description": "optional Tier C metadata for the Beat the Surface Code campaign (issues #4601 and #4674): what fault-tolerant computation on this code costs beyond the transversal gates of circuit.gates. Up to three parts, at least one present: gadgets (surgery, switching, teleportation, or gauge-fixing protocols acting on blocks of this code, each with its fault distance and resources), magic_states (the factory or injection protocol that supplies non-Clifford states), and algorithm_estimate (the physical qubits, factories, and runtime of one workload on this code and on the surface-code baseline at the same logical count). The block builds on the benchmark block of the same entry, whose hardware track, noise model, decoder, and surface-code baseline it inherits, so an entry carries architecture only together with benchmark. Non-scoring: no track or ranking reads it. The schema holds the vocabulary and ranges; the verifier checks the block against the entry and the board (no gadget claims a fault distance above d, a gadget on b blocks counts at least b n data qubits, a partner code is on the board, the blocks of each side of the estimate encode the logical qubits they hold, the physical counts cover the data qubits of those blocks, the factories fit in the candidate's qubits, and a distillation protocol lowers the error rate) and records the reading in computed.architecture. Requires schema_version 0.7.",
+      "required": [
+        "status",
+        "method"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "gadgets"
+          ]
+        },
+        {
+          "required": [
+            "magic_states"
+          ]
+        },
+        {
+          "required": [
+            "algorithm_estimate"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gadgets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/architectureGadget"
+          },
+          "description": "fault-tolerant operations on blocks of this code beyond its transversal gates"
+        },
+        "magic_states": {
+          "$ref": "#/$defs/magicStateSupply"
+        },
+        "algorithm_estimate": {
+          "$ref": "#/$defs/algorithmEstimate"
+        },
+        "status": {
+          "enum": [
+            "documented"
+          ],
+          "description": "documented: reported by the submitter from their own analysis or simulation, produced as method states. A verified status, reproduced by the repository's own tooling, is reserved until that tooling exists (issue #4601, Level 3)."
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000,
+          "description": "how the numbers were produced: the gadget constructions and their sources, the simulator or analytic model behind each error rate, how the baseline was costed, and where the write-up lives"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "contributed_by": {
+          "$ref": "#/$defs/contributedBy",
+          "description": "who contributed this block, and when. Required when the contributor is not a listed author of the code: verify/check_authorship.py binds such a PR through this field, as for a layout, a circuit tier, or a benchmark block, so a donated block never widens edit rights over the code (issue #611)."
+        }
+      }
+    },
     "provenance": {
       "type": "object",
       "required": [
@@ -709,7 +972,9 @@
               "0.2",
               "0.3",
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           }
         }
@@ -736,7 +1001,9 @@
               "0.2",
               "0.3",
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           }
         }
@@ -756,7 +1023,9 @@
               "0.2",
               "0.3",
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           }
         }
@@ -782,7 +1051,9 @@
             "enum": [
               "0.3",
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           }
         }
@@ -808,7 +1079,9 @@
             "enum": [
               "0.3",
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           }
         }
@@ -864,7 +1137,9 @@
           "schema_version": {
             "enum": [
               "0.4",
-              "0.5"
+              "0.5",
+              "0.6",
+              "0.7"
             ]
           },
           "checks": {
@@ -910,6 +1185,44 @@
           "required": [
             "circuit"
           ]
+        }
+      }
+    },
+    {
+      "$comment": "the benchmark block (a 0.6 feature, issue #4603) requires schema_version 0.6 or later",
+      "if": {
+        "required": [
+          "benchmark"
+        ]
+      },
+      "then": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "0.6",
+              "0.7"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "$comment": "the architecture block (a 0.7 feature, issue #4674) builds on the benchmark block of the same entry, whose track, noise model, decoder, and baseline it inherits, and requires schema_version 0.7 or later",
+      "if": {
+        "required": [
+          "architecture"
+        ]
+      },
+      "then": {
+        "required": [
+          "benchmark"
+        ],
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "0.7"
+            ]
+          }
         }
       }
     }
@@ -1338,6 +1651,269 @@
         },
         "witness_provenance": {
           "$ref": "#/$defs/witnessProvenance"
+        }
+      }
+    },
+    "resourceCount": {
+      "type": "object",
+      "description": "physical resources of one memory experiment at the stated noise and target",
+      "required": [
+        "data_qubits",
+        "ancilla_qubits"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "data_qubits": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ancilla_qubits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "syndrome and flag qubits; 0 only for a comparison that counts data qubits alone, which method must say"
+        },
+        "total_qubits": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "data_qubits + ancilla_qubits; checked when present (benchmark_qubit_totals)"
+        },
+        "rounds": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "syndrome rounds in the memory experiment"
+        },
+        "spacetime_volume": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "total_qubits x rounds unless method says otherwise"
+        },
+        "decoder_latency_us": {
+          "type": "number",
+          "minimum": 0,
+          "description": "mean decoding time per round in microseconds, on the hardware method names"
+        }
+      }
+    },
+    "architectureGadget": {
+      "type": "object",
+      "description": "one fault-tolerant operation on blocks of this code that is not a transversal gate: a lattice-surgery merge or joint measurement, a switch to another code, a teleportation between blocks, or a gauge-fixing step. Its cost is a resourceCount of the data qubits it acts on (at least blocks x n, the blocks of this code, plus any routing region or partner code counted as data), the ancillas it adds, and the syndrome rounds it holds.",
+      "required": [
+        "kind",
+        "operation",
+        "blocks",
+        "fault_distance",
+        "resources"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "lattice-surgery",
+            "code-switching",
+            "teleportation",
+            "gauge-fixing",
+            "other"
+          ]
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "the logical operation implemented, e.g. 'joint Z Z measurement of logical qubits 0 and 1 across two blocks' or 'switch to the partner code and back'"
+        },
+        "blocks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64,
+          "description": "blocks of this code the gadget acts on; 1 for an in-block operation"
+        },
+        "partner": {
+          "type": "string",
+          "pattern": "^[0-9]+-[0-9]+-[0-9]+(-[a-z0-9]+)?$",
+          "description": "for a switch or a surgery with a different code, the board entry it switches to or merges with, codes/<slug>.json; the verifier checks that it exists (architecture_partner_on_board)"
+        },
+        "fault_distance": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "the claimed fault distance of the gadget: the fewest faults that corrupt its logical action undetected, under the benchmark's noise model. At most the entry's d (architecture_gadget_fault_distance), and an upper bound unless method says how it was established"
+        },
+        "resources": {
+          "$ref": "#/$defs/resourceCount",
+          "description": "data qubits (at least blocks x n: architecture_gadget_data_qubits), ancilla qubits, an optional total (architecture_qubit_totals), the rounds the gadget holds, and its spacetime volume"
+        },
+        "logical_error_rate": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.5,
+          "description": "the gadget's logical failure probability at the benchmark's noise model and physical rate"
+        },
+        "reference": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "the protocol's source: a paper, or a repository @ commit"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 400
+        }
+      }
+    },
+    "magicStateSupply": {
+      "type": "object",
+      "description": "the protocol that supplies non-Clifford resource states to this architecture, described per factory; algorithm_estimate.candidate.factories says how many run in parallel",
+      "required": [
+        "protocol",
+        "state",
+        "output_error_rate"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "protocol": {
+          "enum": [
+            "injection",
+            "distillation",
+            "cultivation",
+            "code-switching",
+            "other"
+          ]
+        },
+        "state": {
+          "enum": [
+            "T",
+            "CCZ",
+            "Y",
+            "other"
+          ]
+        },
+        "qubits_per_factory": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "physical qubits of one factory, data and ancilla; with algorithm_estimate.candidate.factories the footprint must fit in candidate.physical_qubits (architecture_factory_footprint)"
+        },
+        "rounds_per_state": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "syndrome rounds one factory takes per delivered state, on average"
+        },
+        "input_error_rate": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "error rate of the raw states the protocol consumes"
+        },
+        "output_error_rate": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "error rate of the states delivered; below input_error_rate for distillation and cultivation, which exist to lower it (architecture_magic_state_gain)"
+        },
+        "reference": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "the protocol's source: a paper, or a repository @ commit"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 400
+        }
+      }
+    },
+    "architectureCost": {
+      "type": "object",
+      "description": "the physical cost of one side of an algorithm estimate",
+      "required": [
+        "code_blocks",
+        "physical_qubits"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code_blocks": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "code blocks holding the logical qubits"
+        },
+        "logical_qubits": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "logical qubits the code blocks hold; the workload's count when omitted, lower in a hybrid architecture where method says where the rest live"
+        },
+        "physical_qubits": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "every physical qubit of this side: data, ancilla, routing, and factories"
+        },
+        "factories": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "magic-state factories running in parallel"
+        },
+        "runtime_rounds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "wall-clock of the computation in syndrome rounds"
+        },
+        "spacetime_volume": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "physical_qubits x runtime_rounds unless method says otherwise"
+        }
+      }
+    },
+    "algorithmEstimate": {
+      "type": "object",
+      "description": "the physical cost of one workload on this code and on the surface-code baseline of the benchmark block, at the same logical count: the architectural comparison of issue #4601, fewer physical qubits or less spacetime volume for the same computation at the same failure budget",
+      "required": [
+        "workload",
+        "logical_qubits",
+        "logical_error_rate_target",
+        "candidate",
+        "baseline"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workload": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "the computation costed: an algorithm and instance, or a synthetic workload such as '100 logical qubits and 10^8 T gates'"
+        },
+        "logical_qubits": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "logical qubits of the workload, the count both sides are sized for"
+        },
+        "non_clifford_count": {
+          "type": "number",
+          "minimum": 0,
+          "description": "non-Clifford gates of the workload: T gates, with CCZ gates counted as method says"
+        },
+        "logical_error_rate_target": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "the failure probability budget of the whole computation that both sides are sized to"
+        },
+        "baseline_patch_distance": {
+          "type": "integer",
+          "minimum": 3,
+          "description": "the rotated-patch distance the baseline side uses when it differs from benchmark.surface_baseline (a computation needs a lower per-round rate than a memory experiment, so a larger patch); the baseline then holds one logical qubit per patch of this distance"
+        },
+        "candidate": {
+          "$ref": "#/$defs/architectureCost",
+          "description": "this code: code_blocks blocks of this entry, so code_blocks x k covers the logical qubits held (architecture_blocks_cover_logical_qubits) and physical_qubits is at least code_blocks x n (architecture_physical_qubits_cover_blocks)"
+        },
+        "baseline": {
+          "$ref": "#/$defs/architectureCost",
+          "description": "the surface code: code_blocks copies of the benchmark baseline entry, or that many rotated patches of distance baseline_patch_distance or benchmark.surface_baseline.patches.d, checked the same way with the baseline's n and k"
+        },
+        "reference": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "where the estimate is worked out: a paper, or a repository @ commit"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 400
         }
       }
     }

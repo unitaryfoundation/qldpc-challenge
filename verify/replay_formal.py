@@ -25,6 +25,7 @@ import datetime
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -56,6 +57,25 @@ def formal_certs():
     return out
 
 
+def _replay_url(repo):
+    """Construct the clone URL from a recorded repo, or None if unsupported."""
+    if not isinstance(repo, str) or not repo or any(c.isspace() for c in repo):
+        return None
+    if "://" in repo or repo.startswith("git@"):
+        url = repo
+    else:
+        url = f"https://{repo}"
+    # Only transports that cannot execute arbitrary helpers are allowed; the
+    # commit is validated separately as a 40-hex SHA, so no option injection.
+    if "://" in url:
+        scheme = url.split("://", 1)[0].lower()
+        if scheme not in ("http", "https", "file"):
+            return None
+    elif not url.startswith("git@"):
+        return None
+    return url
+
+
 def recipe_problems(v):
     """Why a formal certificate cannot be replayed from what it records."""
     r = v.get("replay") or {}
@@ -64,6 +84,11 @@ def recipe_problems(v):
         return [f"replay block lacks {missing}"]
     if not r.get("theorem"):
         return ["replay block names no theorem"]
+    commit = r.get("commit")
+    if not (isinstance(commit, str) and re.fullmatch(r"[0-9a-f]{40}", commit)):
+        return ["replay commit is not a 40-hex SHA"]
+    if _replay_url(r.get("repo")) is None:
+        return ["replay repo is not a supported URL"]
     return []
 
 
@@ -149,12 +174,26 @@ def _read_pins(src):
 
 
 def _run(cmd, cwd, timeout, log, env=None):
-    log.write(f"$ {cmd}\n")
+    # `cmd` may be a shell string (a recorded build command, which is a shell
+    # command by construction) or a list of arguments. Lists are executed
+    # without a shell so that certificate-controlled values such as the
+    # repository URL or commit cannot inject shell syntax. Callers that pass
+    # attacker-controlled positionals also put `--end-of-options` ahead of them
+    # so a value beginning with `-` is not parsed as an option; commit and repo
+    # are validated in recipe_problems before any git call.
+    if isinstance(cmd, str):
+        display = cmd
+        shell = True
+    else:
+        display = " ".join(str(x) for x in cmd)
+        shell = False
+    log.write(f"$ {display}\n")
     log.flush()
     t = time.monotonic()
     try:
-        p = subprocess.run(cmd, shell=True, cwd=cwd, stdout=log, stderr=subprocess.STDOUT,
-                           timeout=timeout, env=env, check=False)
+        p = subprocess.run(cmd, shell=shell, cwd=cwd, stdout=log,
+                           stderr=subprocess.STDOUT, timeout=timeout,
+                           env=env, check=False)
         return p.returncode, time.monotonic() - t
     except subprocess.TimeoutExpired:
         return "timeout", time.monotonic() - t
@@ -176,7 +215,9 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
                 "seconds": 0.0, "mode": "head" if head else "pinned"}
     r = v["replay"]
     repo = r["repo"]
-    url = repo if "://" in repo or repo.startswith("git@") else f"https://{repo}"
+    url = _replay_url(repo)
+    if url is None:
+        url = repo
     base = workdir or tempfile.mkdtemp(prefix=f"formal-{slug}-")
     os.makedirs(base, exist_ok=True)
     src = os.path.join(base, "src")
@@ -191,16 +232,21 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
         result["pinned_commit"] = r["commit"]
     with open(logpath, "w", encoding="utf-8") as log:
         deadline = lambda: max(1, int(timeout - (time.monotonic() - t0)))  # noqa: E731
-        rc, _ = _run(f"git clone --quiet --no-checkout {url} src", base, deadline(), log)
+        rc, _ = _run(["git", "clone", "--quiet", "--no-checkout", "--end-of-options",
+                      url, "src"], base, deadline(), log)
         if rc != 0:
             result.update(status="clone_failed" if rc != "timeout" else "timeout")
         else:
             if head:
-                rc, _ = _run("git checkout --quiet origin/HEAD", src, deadline(), log)
+                rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options",
+                            "origin/HEAD"], src, deadline(), log)
                 detail = f"the default branch of {repo} could not be checked out"
             else:
-                rc, _ = _run(f"git fetch --quiet origin {r['commit']} >/dev/null 2>&1; "
-                             f"git checkout --quiet {r['commit']}", src, deadline(), log)
+                rc, _ = _run(["git", "fetch", "--quiet", "--end-of-options",
+                            "origin", r["commit"]], src, deadline(), log)
+                if rc == 0:
+                    rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options",
+                                r["commit"]], src, deadline(), log)
                 detail = f"commit {r['commit']} is not reachable from {repo}"
             if rc != 0:
                 result.update(status="checkout_failed" if rc != "timeout" else "timeout",
@@ -213,7 +259,7 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
                     except subprocess.CalledProcessError:
                         pass
                 # without LFS filters `git lfs pull` leaves pointer files
-                _run("git lfs install --local >/dev/null 2>&1 || true", src, deadline(), log)
+                _run(["git", "lfs", "install", "--local"], src, deadline(), log)
                 tc = r.get("toolchain")
                 if head:
                     # the branch's own pins are the point of this mode

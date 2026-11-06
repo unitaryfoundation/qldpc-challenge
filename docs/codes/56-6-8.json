@@ -735,5 +735,47 @@
    "date": "2026-09-19",
    "method": "simulated annealing over integer grid sites (research/local2d/fold_layout.py)"
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     25489,
+     25490,
+     25498,
+     25502,
+     25504,
+     25505,
+     25515,
+     25531
+    ]
+   },
+   "Z": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     25482,
+     25485,
+     25494,
+     25495,
+     25500,
+     25501,
+     25517,
+     25518
+    ]
+   }
+  },
+  "rounds": 8,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [5, 6, 1, 2, 3, 4], Z-check term slots [1, 0, 5, 3, 2, 4] over terms A_0..A_2, B_0..B_2); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-05",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [5, 6, 1, 2, 3, 4], Z-check term slots [1, 0, 5, 3, 2, 4] over terms A_0..A_2, B_0..B_2)"
+  }
  }
 }

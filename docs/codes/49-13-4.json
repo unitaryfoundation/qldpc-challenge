@@ -555,34 +555,37 @@
  },
  "circuit": {
   "d_circ": {
-   "Z": {
-    "value": 3,
+   "X": {
+    "value": 4,
     "confidence": "upper_bound",
     "witness": [
-     5021,
-     5024,
-     5134
+     7926,
+     7929,
+     10410,
+     10463
     ]
    },
-   "X": {
-    "value": 3,
+   "Z": {
+    "value": 4,
     "confidence": "upper_bound",
     "witness": [
-     398,
-     424,
-     699
+     10820,
+     10828,
+     10890,
+     10909
     ]
    }
   },
   "rounds": 4,
   "stim_version": "1.16.0",
-  "notes": "Generic sequential two-block extraction: one ancilla per check, X checks then Z checks each round with joint reset and measurement layers; the CX layer assignment (9 X + 9 Z CX layers per round) was chosen by a schedule-synthesis PPO agent (autoqec-sim schedule_env, experiments/schedule, seed 1, update 116 of 120) rewarded by the exact circuit fault distance of this memory experiment at 2 rounds, replacing the edge-coloring schedule whose fault distance was 2; the exact search (autoqec_sim.memory_objective.exact_dcirc, weight <= 4) and a 200,000-trial RIS pass at rounds = 4 both read 3 on each side; witnesses from RIS on the committed DEMs at twice the gate's trial budget, validated in GF(2)",
+  "notes": "Johnson-coil + 4 span flags sequential extraction (max_flags=4 per check, 8 X + 8 Z edge-colored data CX layers per round); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
   "contributed_by": {
    "by": [
-    "@vprusso"
+    "@vprusso",
+    "@FarLab"
    ],
-   "date": "2026-10-07",
-   "method": "schedule-synthesis PPO over CX layer assignments (autoqec-sim schedule_env) with the exact circuit fault distance as reward, verified by verify/circuit_verify.py before writing"
+   "date": "2026-10-31",
+   "method": "Johnson-coil + 4 span flags sequential extraction (max_flags=4 per check, 8 X + 8 Z edge-colored data CX layers per round)"
   }
  }
 }

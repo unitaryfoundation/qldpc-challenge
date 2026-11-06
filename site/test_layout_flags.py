@@ -157,3 +157,24 @@ def test_3d_layout_renders(tmp_path):
     assert "<b>bounding box</b> 5.0 &times; 5.0 &times; 1.0" in page
     assert "Verified 2D layout" not in page
     assert "Verified 2D layout" in _read(build, "codes", "72-6-6.html")
+
+
+def test_board_box_is_tall_and_the_explorer_is_uncapped():
+    """The "how to" cards must never be laid out over the board's rows.
+
+    The explorer (plots, legends, table) was a flex column capped at one
+    viewport, with the board's scroll box taking the remainder above a 240px
+    floor. Once the plots and the two legends alone outgrew the viewport
+    minus that floor, the box overflowed the capped column and the cards
+    after it covered the board. The column is plain flow now, so nothing can
+    overflow it, and the board box is most of a viewport tall so the table,
+    not its chrome, is what a visitor sees.
+    """
+    build = load_site_build()
+    css = build.CSS
+    assert "max-height:82vh" in css.split(".boardscroll{")[1].split("}")[0]
+    # no rule caps the explorer's height or turns it into a flex column
+    for rule in css.split("}"):
+        sel, _, body = rule.rpartition("{")
+        if ".explorer" in sel.split("/*")[-1] and "*/" not in sel.split("/*")[-1]:
+            assert "max-height" not in body and "flex" not in body, rule

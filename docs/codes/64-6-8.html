@@ -19,6 +19,7 @@
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[14, 15, 23, 25, 43, 46, 52, 59]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists; Z: no logical &lt; 8 exists</div>
 </section>
+
 <section class=blk><h3>Diagnostics</h3>
 <div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
 <div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 6 &middot; H_Z 6 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
@@ -46,6 +47,15 @@
 (3,6): 2848
 (3,8): 1536
 (3,10): 128</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/64-6-8">circuits/64-6-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[29059, 29061, 29098, 29104, 29105, 29106, 29108, 29116]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[29064, 29066, 29086, 29087, 29088, 29093, 29110, 29117]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

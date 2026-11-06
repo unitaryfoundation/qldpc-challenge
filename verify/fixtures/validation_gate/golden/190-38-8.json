@@ -1,0 +1,405 @@
+{
+ "doc_sha256": "cf45a8824f767d828b5a695bb5fd1c6d96b4466d800bff8649b65a13eb6654ab",
+ "report": {
+  "checks": [
+   {
+    "check": "schema_valid",
+    "detail": "",
+    "ok": true
+   },
+   {
+    "check": "qubit_indices_in_range",
+    "detail": "max index 189, n=190",
+    "ok": true
+   },
+   {
+    "check": "no_repeated_qubits_in_a_check",
+    "detail": "rows with repeats: []",
+    "ok": true
+   },
+   {
+    "check": "tanner_connected",
+    "detail": "Tanner graph has 1 connected component(s)",
+    "ok": true
+   },
+   {
+    "check": "stabilizer_group_connected",
+    "detail": "stabilizer group splits into 1 independent block(s) on disjoint qubit sets (sizes 190)",
+    "ok": true
+   },
+   {
+    "check": "css_commutation",
+    "detail": "H_X H_Z^T = 0 over GF(2)",
+    "ok": true
+   },
+   {
+    "check": "k_matches_claim",
+    "detail": "computed k=38, claimed 38",
+    "ok": true
+   },
+   {
+    "check": "k_at_least_1",
+    "detail": "computed k=38; a submission must encode >= 1 logical qubit",
+    "ok": true
+   },
+   {
+    "check": "check_weight_is_ldpc",
+    "detail": "max check weight 9",
+    "ok": true
+   },
+   {
+    "check": "model_version_specified",
+    "detail": "Claude Opus 4.8",
+    "ok": true
+   },
+   {
+    "check": "family_in_vocabulary",
+    "detail": "lifted-product",
+    "ok": true
+   },
+   {
+    "check": "distance_X_witness",
+    "detail": "weight=8 (claim 8), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "distance_Z_witness",
+    "detail": "weight=8 (claim 8), in_ker=True, nontrivial=True",
+    "ok": true
+   },
+   {
+    "check": "d_matches_min_side",
+    "detail": "min earned side = 8, claimed d = 8",
+    "ok": true
+   },
+   {
+    "check": "local_hadamard_css_images",
+    "detail": "1 local-Hadamard image(s) of this CSS code filed with it, so a Hadamard-relabelled copy collides with it whichever code_type it is submitted under",
+    "ok": true
+   }
+  ],
+  "computed": {
+   "code_type": "CSS",
+   "diagnostics": {
+    "row_space_intersection_dimension": 2,
+    "tanner_girth": {
+     "X": 4,
+     "Z": 4
+    },
+    "trapping_sets": {
+     "X": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        152
+       ],
+       [
+        1,
+        6,
+        38
+       ],
+       [
+        2,
+        2,
+        76
+       ],
+       [
+        2,
+        3,
+        2
+       ],
+       [
+        2,
+        4,
+        988
+       ],
+       [
+        2,
+        5,
+        102
+       ],
+       [
+        2,
+        7,
+        1158
+       ],
+       [
+        2,
+        8,
+        76
+       ],
+       [
+        2,
+        10,
+        76
+       ],
+       [
+        3,
+        2,
+        2
+       ],
+       [
+        3,
+        3,
+        912
+       ],
+       [
+        3,
+        4,
+        140
+       ],
+       [
+        3,
+        5,
+        8524
+       ],
+       [
+        3,
+        6,
+        3518
+       ],
+       [
+        3,
+        7,
+        1368
+       ],
+       [
+        3,
+        8,
+        24264
+       ],
+       [
+        3,
+        9,
+        3798
+       ],
+       [
+        3,
+        10,
+        2252
+       ],
+       [
+        3,
+        11,
+        6364
+       ],
+       [
+        3,
+        12,
+        532
+       ],
+       [
+        3,
+        13,
+        282
+       ],
+       [
+        3,
+        14,
+        228
+       ]
+      ]
+     },
+     "Z": {
+      "complete_through_size": 3,
+      "counts": [
+       [
+        1,
+        3,
+        152
+       ],
+       [
+        1,
+        6,
+        38
+       ],
+       [
+        2,
+        2,
+        152
+       ],
+       [
+        2,
+        3,
+        2
+       ],
+       [
+        2,
+        4,
+        836
+       ],
+       [
+        2,
+        5,
+        102
+       ],
+       [
+        2,
+        7,
+        1158
+       ],
+       [
+        2,
+        8,
+        38
+       ],
+       [
+        2,
+        10,
+        152
+       ],
+       [
+        3,
+        2,
+        2
+       ],
+       [
+        3,
+        3,
+        1368
+       ],
+       [
+        3,
+        4,
+        120
+       ],
+       [
+        3,
+        5,
+        7004
+       ],
+       [
+        3,
+        6,
+        3798
+       ],
+       [
+        3,
+        7,
+        704
+       ],
+       [
+        3,
+        8,
+        23412
+       ],
+       [
+        3,
+        9,
+        2762
+       ],
+       [
+        3,
+        10,
+        1720
+       ],
+       [
+        3,
+        11,
+        9324
+       ],
+       [
+        3,
+        12,
+        684
+       ],
+       [
+        3,
+        13,
+        662
+       ],
+       [
+        3,
+        14,
+        608
+       ],
+       [
+        3,
+        16,
+        38
+       ]
+      ]
+     },
+     "candidate_cap": 2000000,
+     "max_size": 3
+    },
+    "weight_profile": {
+     "X": {
+      "column": {
+       "max": 6,
+       "mean": 3.6,
+       "min": 3
+      },
+      "row": {
+       "max": 9,
+       "mean": 9.0,
+       "min": 9
+      }
+     },
+     "Z": {
+      "column": {
+       "max": 6,
+       "mean": 3.6,
+       "min": 3
+      },
+      "row": {
+       "max": 9,
+       "mean": 9.0,
+       "min": 9
+      }
+     }
+    }
+   },
+   "flags": {
+    "css": true,
+    "locality_class": "unrestricted",
+    "modular": false,
+    "stabilizer": false
+   },
+   "k": 38,
+   "locality_class": "unrestricted",
+   "max_check_weight": 9,
+   "n": 190,
+   "rank_HX": 76,
+   "rank_HZ": 76,
+   "weight_class": "weight-9plus"
+  },
+  "css_equivalent": {
+   "enumeration_capped": false,
+   "fingerprints": [
+    "51c77506a84527b5"
+   ],
+   "images": 1,
+   "of": "css",
+   "signatures": [
+    "8b0d346916936ba4"
+   ]
+  },
+  "earned_distance": {
+   "X": {
+    "tier": "upper_bound",
+    "value": 8
+   },
+   "Z": {
+    "tier": "upper_bound",
+    "value": 8
+   },
+   "d": {
+    "tier": "upper_bound",
+    "value": 8
+   }
+  },
+  "fingerprint": "3c2b34d4a6d48642",
+  "name": "[[190,38,8]] non-abelian lifted-product (mitten) code",
+  "ok": true,
+  "signature": {
+   "d": 8,
+   "hash": "8b0d346916936ba4",
+   "k": 38,
+   "n": 190
+  }
+ },
+ "slug": "190-38-8"
+}

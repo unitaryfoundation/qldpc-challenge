@@ -73,7 +73,9 @@ end the run. It cannot weaken the gate. Without one, nothing below changes.
    notes, fieldnotes) and `./qldpc screened --family <family>` (which members
    were already screened, at what depth, and what the gate said: the staging
    directory is gitignored, so this is the only committed record that a
-   family was tried and dropped), then the `fieldnotes/` entries touching
+   family was tried and dropped), `./qldpc negatives --family <family>` (why
+   earlier campaigns closed a route, under which assumptions, and what change
+   would make it worth retrying), then the `fieldnotes/` entries touching
    your intended family — blocked routes and calibration findings live there, and repeating
    them wastes the budget. Recent literature is part of that record:
    [`literature/README.md`](literature/README.md) is the arXiv watch, and its
@@ -101,12 +103,179 @@ To watch the whole loop run once (build → package → the real verifier in-pro
 uv run python research/test_smoke.py
 ```
 
+## Organizing the agents that run the loop
+
+The loop above is written for one agent. Several now run it against this repository at once,
+and one session often spawns helpers, so who does what is a separate question from what gets
+done. Left to a session to invent, it has gone wrong in the ways the fieldnotes record:
+parallel sessions racing one shared checkout
+(`../fieldnotes/2026-09-08-check-deletion-campaign-retrospective.md`, "submit from isolated
+worktrees") and two of a sweep's advances turning out to be parameter duplicates of
+concurrent work (`../fieldnotes/2026-09-30-422-amplification-yield.md`). The open
+autoresearch write-up of ECDSA.fail (arXiv:2609.09582; the "parallel, role-separated, and
+clean-context agents" practice in its section 4.3 and the framework in its Algorithm 3)
+describes the organization that worked there, and the primitives it rests on already exist
+here: `kit/coordination.py` for per-run staging and advisory cell claims, `kit/campaign.py`
+for the shared ledger, and git worktrees for isolation. This section says how to combine
+them (issue #4234). Nothing in it changes what may be claimed: the gate decides, as above,
+and the rules of this section only decide where the budget goes and who reads which record.
+
+### Three roles
+
+- **A research agent owns one hypothesis**: one family at one parameter range, aimed at one
+  cell. It builds, calibrates the generator against a board entry (section 3), screens with
+  `search.screen`, works out why the screen came out as it did (a divisor that was never
+  shared, a lattice that decoupled, a ladder that was still descending), writes each
+  reading with `record_screen` and `record_verdict`, and stages the survivors. It returns
+  a compact conclusion, not a narrative: the parameters tried, the depth they were read
+  at, the best reading, the verdict, and one sentence on the mechanism. Everything else it
+  learned is in its ledger journal or is lost.
+- **An engineering agent turns survivors into clean artifacts**, one candidate at a time. It
+  packages (`submit.make_submission`, `submit.save_submission` with the `spec=`), runs the
+  gate (`coordination.py gate <path>`), runs the matched-depth audit when the gain is on `d`
+  alone (section 5b), and, when a human has authorized a submission, renders the note, the
+  `codes/` document, and the PR body with `kit/promote.py`. It never widens the search, and
+  it is the one that commits a sampler that is good enough to graduate into `kit/search.py`.
+- **An orchestrator allocates and stops.** It reads the shared record first (step 0 of the
+  loop), writes the direction card, hands each worker one hypothesis and one budget, merges
+  the workers' ledgers, stops a route that the direction card's abandon criterion or the
+  escalation gate's ladder facts (section 3b) say is stalled, and writes `summary.json`. It
+  does not screen or gate anything itself: its context is the one that has to stay small
+  and whole for the length of the campaign.
+
+One agent can play all three in turn, and in a single session usually does. The split is
+between concerns, and it matters most when the concerns are split across contexts, because
+each role then sees only what it needs.
+
+### One hypothesis per fresh-context worker, in its own worktree
+
+A worker that has read fifty ladders carries their conclusions into the fifty-first, and two
+workers sharing one transcript share one blind spot. So a worker starts with an empty
+context and gets exactly four things: the campaign file, its one hypothesis (family,
+parameter range, cell), a budget in the units the campaign spends, and the committed record
+for that family (`./qldpc screened --family <family>`, `./qldpc brief --cell <cell>`, and
+the `fieldnotes/` touching it). It gives back two: the path of its ledger journal and the
+compact conclusion above.
+
+What is isolated, and the mechanics this repository already has for each:
+
+- **The checkout.** `git worktree add <dir> <base>` gives the worker its own tree, so a
+  speculative rewrite of a sampler cannot change the baseline the other workers compare
+  against, and a worker that dies leaves nothing half-edited in the shared checkout.
+- **The staging directory.** `coordination.staging_dir()` is `research/candidates/<run_id>/`
+  under the worker's own checkout, so two workers writing `<n>-<k>-<d>.json` cannot
+  overwrite each other, and the directory name says which worker to ask. `run_id` is unique
+  per process; set `QLDPC_RUN_ID` when a harness wants a readable name or wants two processes
+  to share one shelf. Staging, the verdict cache, and the cell claims all live under the
+  checkout that wrote them: a claim made from a worktree is not listed by `./qldpc targets`
+  in another, so the orchestrator makes the cell claim from its own checkout and the workers
+  make none.
+- **The filename.** `coordination.unique_path(path, doc)` gives a second candidate with the
+  same `[[n,k,d]]` its own name, and `save_submission` refuses to write over a different
+  candidate at a path it is handed.
+- **The ledger.** `Ledger(camp, journal=f"{staging_dir()}/ledger.jsonl")`, one journal per
+  worker, because two processes appending to one file interleave partial lines. The
+  orchestrator folds them with `Ledger.merge`, which keys experiments by `(family, seed)` so
+  the same deterministic work is counted once, and unions survivors on the verifier's
+  fingerprint so one code found twice is one survivor.
+- **The gate verdict.** A gate run is per candidate and its verdict is written beside that
+  candidate (`<path>.verdict.json`). A worker reports candidates that passed, never a
+  family that did.
+
+Two costs follow from the isolation. A fresh process pays the gate's board pass once
+(421 s on the machine of section 3d), so a worker gates its survivors in one process rather
+than one process per candidate. The orchestrator, not the worker, is where duplicates
+between workers are caught: two workers given adjacent parameter ranges can stage the same
+code, and `Ledger.merge` folds the survivors, but it cannot fold two staged files, so the
+orchestrator checks the merged survivors' fingerprints before anything is packaged.
+
+### Bake-offs
+
+When several routes could spend the budget, give each the same screening budget first,
+compare them on one instrument, keep the best few, and only then deepen. The instrument is
+the `efficiency` field on `search.screen` records (`kd^2/n`, the board's per-cell headline
+figure), read at the same `trials=` and `backend=` for every route and compared within one
+cell, never across cells. The matched budget is what makes the comparison about the routes
+rather than about who spent more: `distance_rand` returns an upper bound that comes down
+with trials, so a route screened deeper looks worse at the screen, and a route whose
+ladder was fed more budget looks better at the ladder, and neither difference is a
+difference between the codes. Weigh each route's `screen_quality` from the ledger summary
+beside its efficiency: a family whose screen does not rank candidates the way the gate does
+cannot be deepened on the strength of its screen readings. `search.screen_adaptive` is the
+same idea inside one route (widening stages, dropping what cannot reach the target); the
+bake-off is across routes, and together they approximate a beam search over the campaign's
+families, which is how the ECDSA.fail participants described theirs.
+
+Deepen the survivors with the ladder and the escalation gate (section 3b), budgeted by the
+costs in section 3d, and record every route the bake-off dropped: a `record_screen` at the
+bake-off depth, `record_verdict("not_run")`, and a `record_negative` naming the route, so
+the next session sees that the route lost a comparison at that depth rather than that it was
+never tried.
+
+### A claim is a hypothesis until a second run reproduces it
+
+One worker's survivor is a hypothesis. It becomes a result when a second, independent run,
+with a fresh context and its own worktree, reaches the same code and the same bound.
+Independence means the second run shares none of the first's state: not its transcript, not
+its seeds, and not its verdict cache, which lives under the first worker's staging
+directory and is therefore not seen from another checkout. Three levels, in order of cost:
+
+1. **Rebuild from the recipe alone.** `python research/kit/rebuild.py --constructor
+   <module.function> --params '<json>'` prints the verifier's fingerprint of the code the
+   recipe builds; it must equal the `candidate.fingerprint` in the staged candidate's
+   `.verdict.json`. A code the recipe cannot rebuild is not a result, whatever its bound.
+2. **Re-measure at matched depth.** `research/audits/leader_audit.py screen <candidate>
+   [<peer> ...] --trials <N> --seeds <fresh seeds> --witness-dir <dir>` reads the candidate
+   and any peer it beats at one budget. For a gain on `d` alone this is already required
+   before packaging, as `leader_audit.py pair` (section 5b), and the `drop`, `redirect`,
+   `credible`, and `inconclusive` decisions there apply unchanged: `inconclusive` is no
+   information, never corroboration. Keep the witness directory; a lighter logical found
+   here is the most expensive object the campaign produces.
+3. **The gate, run by the reviewer.** `coordination.py gate <path>` from the reviewer's own
+   checkout, so the random search is spent again rather than served from the first
+   worker's cache.
+
+The ECDSA.fail teams also had agents from different model families read one another's
+conclusions before a claim was trusted. The equivalent here is a reviewer that reads the
+compact conclusion and the ledger journal and tries to break them, and its opinion has the
+status the escalation gate already gives a judgment model's verdict: advisory, kept in the
+staging journal, and never repo evidence. The evidence is the gate verdict beside the
+candidate and the witness files, and nothing a reviewer writes adds to or subtracts from
+them.
+
+### The shared state is the ledger
+
+ECDSA.fail's agents kept their shared state in hypothesis queues, iteration logs,
+scoreboards, and regression records rather than in any one agent's context. The equivalents
+here are the direction card (the hypothesis), the ledger journal (the iteration log),
+`./qldpc targets` and `./qldpc brief` (the scoreboard), and `./qldpc screened` (the record of
+what was tried, at what depth). Per-agent scratch notes have no equivalent, on purpose: a
+reading that is not in a journal is lost when the worker's context is, so the ledger is
+the only place a reading goes, and the merged `summary.json` is the only thing the campaign
+hands to the next one (`campaigns/README.md`, "Ending one").
+
 ## 1. Pick a direction and a family, build `(HX, HZ)`
 
 A **direction** is a concrete target: a track cell (locality class × weight class, e.g.
 `unrestricted × weight-6`) plus a family/approach and a budget. If the user's direction is
 vague, translate it: look at the board (`codes/*.json`, the site, `TRACKS.md`) for a **sparse
 cell** or a **record to beat**, and aim there.
+
+Write the direction down before building. A campaign's `direction` block (the direction
+card, `research/campaigns/README.md`) holds the hypothesis, the cell and family, the entry to
+beat and on which axes, the budget in the units the run spends, why it is feasible here, what
+is claimed to be new and against what, what a positive result is worth as a statement, the
+abandon criterion `research/kit/escalation.py` can enforce, and what a negative result would
+teach. `scaffold_campaign(..., card={...})` writes it and `summary.json` carries it, so the next
+session can tell a direction abandoned for a reason from one nobody came back to.
+`research/campaigns/bb-w6-n-le-100-trinomials/campaign.json` is a filled-in example.
+
+When a direction closes, record the negative with what it assumed and what would reopen
+it: `led.record_negative(what, detail, assumptions=[...], revisit_if="...")` (issue #4233,
+`campaigns/README.md` "Ending one"). `./qldpc negatives --family <family>` reads these back
+across every committed campaign, so a later session learns not only that a route was tried
+but whether the reason it failed still applies. A negative without them records that a
+route failed, not whether the reason still holds.
 
 Track membership is **computed by the verifier**, not declared: the check-weight class
 (`weight-4`/`weight-6`/`weight-8`) is derived from the max row weight of `H_X`, `H_Z`, and the
@@ -322,6 +491,45 @@ what can be claimed. To evaluate it, run one campaign with the gate and one
 without, and compare trials-spent-to-abandon against the flat-settled point
 (the 2026-09-20 metric) on the same families.
 
+The same gate stops a route that was entered knowing it regresses (section 3e).
+What differs for such a route is not the stop but the card's statement of what
+made it worth starting.
+
+### 3d. Budgeting a sweep: what a rung costs, measured
+
+`research/cost/cost_table.md` (issue #4026; regenerated by `research/cost/measure.py`, see
+`research/cost/README.md`) measures, on one laptop, what each step of confirming a candidate
+costs at twenty board shapes that cover the cap corners. The constants are that machine's; the
+shape of the curve is what to budget from. Per cell, per candidate:
+
+| cell | n | gate (verify, refute, dedup) | RIS 20,000 trials per side (Python) | accelerator 2,000,000 trials | exact certification (60 s per MILP, 120 s cap per side) |
+|---|---|---|---|---|---|
+| w <= 8, n ~ 100 | 96 to 100 | 9 to 12 s | 13 to 20 s | 7 to 12 s | both sides exact in 8 to 26 s at d <= 10; d = 14 hits the cap |
+| w <= 8, n ~ 300 | 294 | 11 to 13 s | 75 to 85 s | 80 to 90 s | cap on both sides |
+| w <= 8, n ~ 700 | 682 to 700 | 14 to 18 s | 600 s at k = 20; 250 to 1,550 s implied from the 2,000-trial rate, growing with k | 270 to 800 s | cap |
+| w = 9 to 32, n ~ 700 | 682 to 700 | 18 to 45 s | 1,000 to 5,300 s implied (k = 352: 5,200 s) | 760 to 1,670 s | cap |
+| any w, n ~ 1,000 | 960 to 1,000 | 15 to 22 s | 900 to 1,350 s implied | 840 to 1,190 s | cap |
+| stabilizer (Pauli weight), n ~ 100 | 90 | 13 s | 72 s (one side) | 57 s | no certifier |
+| stabilizer, n ~ 700 | 662 to 761 | 20 to 36 s | 680 to 6,700 s implied, growing with k and w | 860 s to 53 min | no certifier |
+
+The gate is bounded whatever the shape: the structural pass is seconds, the refutation runs
+under a 10 s wall cap that its last trial can overrun (42 s at k = 352), and the board dedup is
+one warm lookup (the first gate call in a fresh process
+pays the board pass once, 421 s on that machine). What grows with shape is the deep rung and
+the certifier, so the deep rungs are the sweep's budget. At the `qldpc submit` default depth
+(20,000 RIS trials per side plus 2,000,000 accelerator trials) one candidate costs under a
+minute at n ~ 100, about 4 minutes at n ~ 300, between 13 minutes (w <= 8, small k) and 3.4
+hours (k = 352) at n ~ 700, and 45 to 65 minutes at n ~ 1,000. Exact certification closes in
+seconds at n ~ 100 for d <= 10 and nothing above that within the cap, so it is the post-hoc
+tier for standouts that `fieldnotes/2026-07-01-confirmation-is-the-bottleneck.md` already
+described, never a sweep step.
+
+Budget a sweep as survivors = hours x 3,600 / (deep-rung seconds for the cell), after a screen
+that costs nothing by comparison (the 400-trial numpy screen reads a candidate in well under a
+second at n ~ 100; `research/campaigns/bb-w6-n-le-100-trinomials/` screened 120 in 70 s), and
+plan the exact tier separately for the one or two codes the sweep would promote. A time in the
+table is a measurement on one machine, not a guarantee; CI runners are not that machine.
+
 ### 3c. Above check weight 8: sample the ideal, not the support
 
 Every one of the board's 25 most efficient entries is a cyclic generalized-bicycle code,
@@ -348,6 +556,94 @@ numpy-only; `research/cyclic_gb.py` is the full designed-divisor search stack (i
 fertile-ideal selection, deep confirmation) and needs sympy. Read it, and the construction strings
 of the `Z_341` and `Z_337` entries, before spending a large sweep here: the frontier codes came
 from many ideals and many words per ideal, not from one draw.
+
+### 3e. Non-monotonic routes: when to accept a temporary regression
+
+Everything above this point climbs. A candidate is kept when it reads above the bar and its
+ladder is dropped when it settles below, and the gate rewards exactly that. Climbing is the
+right default and the wrong only move. The ECDSA.fail write-up (arXiv:2609.09582, section
+4.3.3) puts the problem as "a scalar score rewards immediate progress but may suppress
+architectures that require temporary regressions", and its participants' answer was to
+restructure a component while tolerating a worse score, repair it afterward, and so reach
+circuit families that strict hill climbing had rejected. The board has the same shape:
+`research/audits/frontier_history.py --plot-history` draws the frontier's hypervolume as a
+step function, flat between the landings that changed a family, and the motto's "a code
+that beats no existing entry is still a frontier extension" already says that the
+frontier, not the leader, is the objective. Section 3b is the stopping half of this
+discipline; this section is the starting half (issue #4237).
+
+**When a route is worth entering worse.** Three signals, each a fact in the record rather
+than a feeling about the family:
+
+- A lattice of small improvements that all fail the same way. Every neighbor of the current
+  best settles at the same bound, or dies on the same check (the same divisor never shared,
+  the same lattice decoupling). `./qldpc screened --family <family>` and the campaign's
+  negative results are where that shows; climbing further on that lattice re-measures the
+  wall.
+- A family whose parameter space is untouched: no screened row, no fieldnote, no literature
+  verdict touching it. Its first candidates will read below a cell's tuned leaders, and at
+  that point the reading says nothing about the family.
+- A construction that would win only if a specific property held: a transform whose output
+  the cell has never seen, conditional on a symmetry, a factorization, a commuting pair, or
+  a layout the family does not have as built.
+
+**The precondition-search move.** For the third signal, do not ask whether the transform
+applies. Write down what would have to hold for it to work, as properties a script can
+check, then search for the transform that establishes them. ECDSA.fail reports this as the
+strategy that reached its best architecture: a construction that was in print before the
+challenge began went untransferred while the question was whether it applied, and the
+adaptation came once its prerequisites were stated and a construction establishing them
+was searched for. Here the same move reads "a weight-6 planar code at k >= 8 needs checks
+that commute across a seam; which quotient of which group gives a seam with that
+property?", which names a search, where "is there a weight-6 planar code at k >= 8" names
+none. Each prerequisite the family cannot be given is a negative result with its reason;
+record it with `record_negative` so the next session does not re-derive it.
+
+**Staging an intermediate without losing it.** The first candidate on such a route usually
+passes the gate and is dominated: `passed: true`, `board_advancing: false`, and
+`dominated_by` naming the entries that beat it. That is a fact to record, not a rejection.
+`AGENTS.md`'s rule holds, a dominated code is a non-frontier result and is never submitted
+as a frontier code, and when the code is the base of the next route the record has to say
+more than that:
+
+- Stage it as any other candidate (`save_submission` under `coordination.staging_dir()`,
+  then `coordination.py gate <path>`), so its witness and its `dominated_by` list are kept
+  beside it.
+- Record it in the ledger as a survivor that did not advance the frontier:
+  `led.record_candidate(doc, verdict)` keeps `board_advancing: false` and the gate's labels,
+  and `led.record_verdict("dominated")` marks the experiment's member, so the summary lists
+  it under `survivors` with `advanced_frontier: false` and `./qldpc screened` shows it to
+  the next session.
+- Say why it is expected to improve, in the experiment's `note=` while the route is open,
+  and as a `record_negative` whose text names the condition that would reopen it when the
+  route is parked. A parked route is a negative with a revisit condition, not a dead end.
+- Re-read `dominated_by` at every rung. The route has paid off when a candidate built from
+  the intermediate is no longer dominated in its cell, which the gate reports as
+  `board_advancing: true`; until then every reading is an upper bound on an intermediate
+  and is labeled as one.
+
+**The card.** A campaign that enters a route this way says so in its direction card:
+`direction.non_monotonic` holds `why_worth_starting` (which of the three signals, in a
+sentence), `regresses_on` (the axes the first candidates are expected to lose on),
+`precondition` (what must hold, and the transform searched for to establish it), and
+optionally `base` (the board slug or staged intermediate the route starts from). The stop
+is the card's existing `abandon_criterion`, applied through section 3b's gate exactly as
+for a climbing route: a non-monotonic route gets no second stopping rule, and a ladder that
+is still descending is still never abandoned. What the field adds is the statement of what
+made the route worth starting, so a later session reading `summary.json` can tell a route
+entered on purpose and parked from one that drifted off the frontier.
+
+```python
+card["non_monotonic"] = {
+    "why_worth_starting": "every weight-6 trinomial neighbor of 90-8-10 at n <= 100 "
+                          "settles at d = 10 by 20,000 trials; the lattice is a wall",
+    "regresses_on": ["d", "kd2_over_n"],
+    "precondition": "a four-term pair whose supports share a divisor of x^l - 1 of "
+                    "degree at least 4; search sparse multiples of such divisors, "
+                    "not random supports",
+    "base": "90-8-10",
+}
+```
 
 ## 4. Package a submission
 
@@ -400,6 +696,7 @@ wasted ladder, so say where you are going before you start one:
 ./qldpc targets --claim weight-6/unrestricted --campaign <id> --ttl 180
 ./qldpc targets                        # live claims are marked on their cell
 ./qldpc targets --release weight-6/unrestricted
+./qldpc targets --stale                # cells stalest first: when the best kd2/n last changed (issue #4238)
 ```
 
 The claim is a note to other sessions and nothing more. It lives in a gitignored directory beside
@@ -520,7 +817,7 @@ So measure both numbers at one budget before spending anything on packaging:
 ```bash
 uv run --frozen python research/audits/leader_audit.py pair \
     "$STAGING"/<n>-<k>-<d>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers are chosen automatically — every board entry with the same n, k and max check
@@ -538,6 +835,16 @@ is an instrument artifact, not a distance difference. One of four decisions come
 Exit code 2 means a claim was refuted on either side, so `pair` can gate a script exactly
 like `ladder` and `screen`. Keep `--witness-dir`: the lighter logical found in a refuted
 peer *is* the revision (see **The one rule** above).
+
+Both packaging paths enforce this (issue #4236). `./qldpc submit --peer-audit <file>` and
+`evidence.peer_audit` in `kit/promote.py` take the record `--json-out` writes, and refuse a
+d-only gain when no record is given, when its decision is not `credible`, when it was read
+at fewer trials than the claim's own search, or when it does not cover every peer the gate
+named. `submit` stages the verified document under the run's staging directory and prints
+the exact `pair` command when it refuses, and a dry run reports what the real run would
+refuse. The rule is one module, `kit/peer_audit.py`, shared by both paths so they cannot
+drift. Prose in `evidence.peer_audit`, from notes written before the record existed, is
+still accepted and reported as unchecked.
 
 ## 6. Confirm the distance exactly (optional, for a standout)
 
@@ -578,6 +885,49 @@ ledger need nothing beyond the default install; the ledger validates with
 That is the same invocation CI uses for the test suite. Without it `load_campaign` fails with
 `CampaignError: jsonschema is required to validate a campaign`, which reads like a broken kit
 rather than a missing flag.
+
+## 7. Circuit tier: search the schedule (optional, for an entry that has one)
+
+The code-search loop above finds codes. The circuit tier (`../TRACKS.md`) is the same
+shape one level down, and nobody has searched it: the 160-odd entries with
+`circuits/<slug>/` carry the standard schedules #1026 backfilled, and
+arXiv:2610.23832 and arXiv:2610.31352 found that standard schedules are far from what a
+search against a frozen evaluator reaches. `kit/circuit_search.py` is that search for one
+entry: `H`, the layout, the noise recipe, and the round count stay fixed; the schedule
+(interleaved two-block slot assignments, layout zigzag pattern pairs, edge-coloring orders
+of the generic sequential extraction, the first and last flagged first) is the search space;
+the evaluator is `verify/circuit_verify.py`, called and never edited.
+
+Flags are what close the gap to `d_circ = d` (issue #4231, where they did so on 249 board
+entries): every check gets up to `w // 2` Johnson-coil flag qubits, each coupled to the
+ancilla twice so that a hook fault on the ancilla in between flips it, plus up to four span
+flags on the outermost steps that break the three-hook blind spot of a pure coil. The
+generator sizes the flag count to the largest that keeps the memory circuits under the
+verifier's mechanism and file-size caps, so a flagged schedule costs qubits (one per flag per
+check) and never verifiability. `circuit_autogen.flag_intervals` is the definition and
+`flag_syndrome` the way to check a hook pattern against it.
+
+```
+uv run --extra research python research/kit/circuit_search.py 72-12-6 --attempts 12 --seconds 60
+uv run --extra research python research/kit/circuit_search.py 64-18-8 --attempts 6 --seconds 120 --ler
+```
+
+Each attempt is staged under `research/candidates/<run>/circuit-search/<slug>/attempt-NN/`
+with the four circuit files, the circuit block, the entry with the block in place, the
+verifier's verdict, and a `notes.md` saying what the schedule was and what the screen and
+the deep search read; `ledger.jsonl` has one line per attempt, improving or not, and
+`summary.json` the baseline, the ranking, and the survivors. Score is `d_circ` per basis,
+the lower basis first, read off the same RIS search the generator and the gate use at
+twice the gate's trial budget; `--ler` adds the per-round logical error rate at one grid
+rate for the baseline and every evaluated schedule, which is what separates two schedules
+at the same `d_circ`. Three things the loop cannot do, by construction: raise `d_circ`
+above `d` (the tier is penalty-only), promote anything (a survivor is staged for a human;
+promotion replaces the entry's `circuit` block and `circuits/<slug>/` in one PR with
+`circuit.contributed_by.by` naming the schedule's author, the binding
+`verify/check_authorship.py` checks), or settle a value (every `d_circ` is a witness-backed
+upper bound, and the gate's own refutation search is what a promoted schedule survives).
+Build on the staged lineage of earlier runs rather than starting fresh; the papers' records
+came from agents reading each other's attempts.
 
 ## Pitfalls (these are why the gate exists)
 
@@ -659,7 +1009,7 @@ something the next one should not have to re-learn.
 | File | What it gives you |
 |---|---|
 | `kit/css.py` | `compute_k`, `verify_css`, and the re-exported GF(2) core (`rref`, `rank`, `kernel_basis`, `logical_basis`, ...) shared with the verifier |
-| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
+| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session, and `record_negative(..., assumptions=, revisit_if=)` what makes a closed route reusable, read back by `./qldpc negatives` (issue #4233). Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
 | `kit/gf2poly.py` | GF(2) polynomials as ints: `factor_squarefree` (x^m - 1 over GF(2), no sympy), `designed_divisor`, `sparse_multiples`, `cyclic_gb`, `designed_k`; the designed-divisor route behind `search.sample_cyclic_gb` (section 3c) |
 | `kit/bb.py` | `build_bb`, `poly_matrix`, `KNOWN` (known BB codes to start from) |
 | `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt`; `small_group` reads a committed GAP SmallGroup table from `kit/groups/` (exported by `kit/groups/cayley_table.g`), `build_2bga_small_group` is its recipe form |
@@ -669,10 +1019,12 @@ something the next one should not have to re-learn.
 | `kit/prescreen.py` | `block_structure`, `identity`, `board_index`, `lookup`, `prescreen`: the two refusals the gate makes before any distance work (a direct sum, a code the board holds) and the WL flag it admits with, decided with the verifier's own arithmetic against the gate's own board index (issue #3620). `preflight`, `describe_preflight`: the verifier's structural half on a packaged document, the checks the gate's verify step would fail it on, in the verifier's words and sorted into a fault in the code or in the document (issue #3616). Run on a staged file: `python research/kit/prescreen.py <path>` |
 | `kit/escalation.py` | `rung_brief`, `apply_verdict`, `append_journal`, `exact_first` (certify small CSS candidates before the first deep rung), `cc_first` and `exact_or_cc_first` (the connected-cluster pre-stage beyond the certifier's band, a screen that aims the ladder and never ends it; a no-op without the Qubitserf build) — the rung-boundary escalation gate (step 3b): deterministic ladder facts + fenced judgment-model verdict; advisory only, never repo evidence |
 | `kit/submit.py` | `make_submission`, `save_submission`, `validate`, `write_recipe`, `read_recipe` (the spec kept beside a staged candidate), `write_repro_manifest` (the `repro/<slug>.json` manifest for `qldpc reproduce`) |
+| `kit/circuit_search.py` | `search(slug, ...)`: the circuit-tier schedule search of section 7, over every applicable family of `research/circuit_autogen.py`, staging every attempt with its verdict and notes under `research/candidates/`, scoring by `d_circ` per basis (and LER with `--ler`); `verify/circuit_verify.py` is called, never edited |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
 | `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
-| `kit/distance.py` | `exact_distance` (MILP, `d=`), `decoder_distance` (BP+OSD), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
+| `kit/peer_audit.py` | `d_only_peers`, `blockers`, `load_audit`, `record`: the matched-depth peer audit a d-only gain owes (section 5b), as one rule for `kit/promote.py` and `./qldpc submit --peer-audit`; reads the record `research/audits/leader_audit.py pair --json-out` writes (issue #4236) |
+| `kit/distance.py` | `exact_distance` (MILP, `d=`), `sat_exact_distance` (SAT, `d=`), `decoder_distance` (BP+OSD), `weight_one_logical_exists`, `sat_lower_bound`, `sat_screen` (SAT-based lower-bound screening helpers), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
 | `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap, through n = 8 with the nauty canonicalizer (pynauty, in the `research` extra; n <= 6 without it); exact distance uses the trusted SAT certifier |
 | `kit/products.py` | classical combining products: `hypergraph_product`, `lifted_product`, `balanced_product` + a sampler each; the lifted/balanced ones cover the multi-block protographs `kit/lp_protograph.py` specializes |
 | `kit/lp_protograph.py` | general lifted-product codes with matrix protographs, plus the SCE-paper protograph catalog (arXiv:2606.24808, Supplemental S7) |
@@ -680,6 +1032,9 @@ something the next one should not have to re-learn.
 | `kit/doubling.py` | free Z2 double-cover ("doubling") for bivariate bicycle codes: the `s=2` complement to `spectral.cover_k`, which handles odd covers only |
 | `kit/spectral.py` | spectral (Frobenius-orbit) screening for semisimple BB codes, from arXiv:2608.27565, restricted to the binary semisimple case: `cover_k` and the odd-cover machinery |
 | `kit/phantom.py` | the phantom-code construction of arXiv:2609.16542 — `build_phantom_outer` and the rest of the three consolidated pieces |
+| `kit/gauss_law.py` | the quantum Gauss's law codes of arXiv:2608.00165 — `classical_gauss_law_1d`, `optimal_1d_multiplicities` (Theorem III.5's optimal duplication counts) and `quantum_gauss_law_1d`, the CSS code `[[N d(d+1)/2, N, d]]`; the family's `kd^2/n = 2d/(d+1)` is below 2 by construction, so it is a construction, not a board lead |
+| `kit/tensor_network.py` | the tensor-network codes of arXiv:2009.10329 — `glue` (Theorem 1's index contraction, done at the group level), the SWO08 `[[6,1,3]]` block and the `[[11,1,3]]` code it produces; the block is non-CSS and the paper's 7-qubit state is not abelian, so the family is not submittable |
+| `kit/coset_gap.py` | the coset two-block codes `Q_G^H(ahat, bhat)` of arXiv:2606.17268 — `build(ell, m, s, ahat, bhat)` assembles the check matrices inside GAP (`SmallGroup`, `Core`, `Normalizer`, `LeftCosets`, `Representative`), so no coset-representative convention is re-derived in Python; `PAPER_INSTANCES` transcribes all 29 published instances, and every one reproduces its stated (n, k) |
 | `local2d/planar.py` | fast greedy open-boundary builder, exact planar distance (scipy MILP), `grid_coordinates` for the bilayer layout |
 | `local2d/boundary_engine.py` | the general open-boundary construction (`build_planar`), `reduce_weights`, `graft_r1`/`graft_r1_safe` (qubit removal) |
 | `local2d/transfer.py` | `distance_slope`: predict d(L) scaling from (f, g) before building large lattices |

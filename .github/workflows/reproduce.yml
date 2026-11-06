@@ -18,6 +18,8 @@ on:
       - "research/kit/gf2poly.py"
       - "research/kit/rebuild.py"
       - "research/kit/submit.py"
+      - "research/kit/multisize.py"
+      - "research/repro/multisize.json"
       - "repro/**"
       - ".github/workflows/reproduce.yml"
   schedule:
@@ -30,7 +32,7 @@ concurrency:
 
 jobs:
   reproduce:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +57,17 @@ jobs:
           done
           echo "$n manifest(s) run, $fails disagreed"
           [ "$fails" -eq 0 ]
+      - name: recipes at other sizes (display-only table; drift fails here, issue #4031)
+        # research/repro/multisize.json is what the code page shows under
+        # "Recipe at other sizes". It is derived from the manifests and the kit
+        # constructors. A committed verdict a fresh run no longer reproduces
+        # fails here: that is a constructor or a lift rule changing what a
+        # recipe does, and it belongs in the PR that changed it. A manifest the
+        # table has not caught up with passes as pending: a submission PR
+        # carries repro/<slug>.json and nothing under research/ (issue #3810),
+        # and site.yml regenerates the table on main after the merge. The
+        # scheduled run is strict, so a table that stayed behind fails there.
+        run: uv run --frozen --extra research python research/kit/multisize.py check ${{ github.event_name != 'pull_request' && '--strict' || '' }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,31 @@
+{
+  "name": "[[663,351,10]] C39 quintic cross product",
+  "d": 10,
+  "d_exact": true,
+  "solver": "Lean 4.35.0 / Std; structural proof and symmetry-reduced exact finite computation",
+  "sides": {
+    "X": {
+      "value": 10,
+      "exact": true,
+      "note": "Exact sector distance: proved lower bound and explicit nontrivial weight-10 witness."
+    },
+    "Z": {
+      "value": 10,
+      "exact": true,
+      "note": "Exact sector distance: proved lower bound and explicit nontrivial weight-10 witness."
+    }
+  },
+  "verification": {
+    "level": "formal",
+    "checker": "Lean 4.35.0 / Std; native_decide (generated evaluation axioms; compiler/runtime trusted)",
+    "checks_sha256": "98f34742a2c089d3797bdef1aa1b7d4cec19615bc72009947356edfc2c4fdc8f",
+    "replay": {
+      "theorem": "Qec663.code663_css_distance_certificate",
+      "build": "cd lean663 && python3 generate_candidate.py --check && python3 check_binding.py && python3 replay.py --fresh",
+      "toolchain": "leanprover/lean4:v4.35.0",
+      "repo": "https://github.com/hirobumii/qldpc-cyclic-xyz-evidence",
+      "commit": "d05578cd80278ee4aac1d00f869c701a5c71e111"
+    },
+    "note": "The theorem proves CSS commutation and exact sector and binary phase-free Pauli distances 10 for the unchanged literal matrices. C39 orbit coverage and the stabilizer reduction are proved; finite checks use native_decide. Lean 4.35 records per-computation native evaluation axioms, audited exactly alongside propext, Classical.choice and Quot.sound. Compiler/runtime are trusted. Rank is outside this theorem."
+  }
+}

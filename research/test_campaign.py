@@ -8,6 +8,7 @@ the schema doing its job, which is worth pinning because a campaign that
 validates loosely is a task two executors can read differently.
 """
 import copy
+import glob
 import json
 import os
 import sys
@@ -39,12 +40,28 @@ GOOD = {
         "id": "test-campaign",
         "name": "A campaign for the tests",
         "objective": {"metric": "kd2_over_n", "direction": "maximize"},
+        "direction": None,
         "constraints": {"max_check_weight": 8, "n": [100, 400],
                         "locality": "local-2d-bilayer"},
         "methods": {"families": ["bivariate-bicycle"]},
         "budget": {"cpu_hours": 10},
         "stopping": [{"type": "budget_exhausted"}],
     }
+}
+
+
+CARD = {
+    "hypothesis": "GB codes over Z_341 reach kd^2/n above the cell's bar at weight 6.",
+    "cell": "unrestricted~weight-6",
+    "family": "generalized-bicycle",
+    "bar": {"slug": "682-20-22", "axes": ["kd2_over_n"]},
+    "budget": {"cpu_hours": 2, "trials_per_candidate": 400},
+    "feasibility": "n = 682 is under BASE_MAX_N and group_algebra.py builds the family.",
+    "novelty": {"claim": "a weight-6 GB code above the cell's bar at n = 682",
+                "against": "the cyclic GB tables of arXiv:2306.16400"},
+    "expected_value": "A weight-6 code above the bar at n = 682 would lead the cell at that size.",
+    "abandon_criterion": {"flat_fresh_rungs": 2, "trials_cap": 20000},
+    "what_a_negative_would_teach": "That weight-6 GB over Z_341 is exhausted at this depth.",
 }
 
 
@@ -811,7 +828,7 @@ def test_dead_ends_survive_a_write_and_reload(tmp_path):
 
 def test_a_scaffold_is_a_valid_campaign_with_the_defaults_filled():
     from campaign import scaffold_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     c = spec["campaign"]
     assert c["schema_version"] == 1 and c["id"] == "gb-probe"
     assert c["objective"] == {"metric": "kd2_over_n", "direction": "maximize"}
@@ -826,13 +843,12 @@ def test_a_scaffold_has_no_default_budget():
     with pytest.raises(TypeError):
         scaffold_campaign("gb-probe", "GB probe")
     with pytest.raises(CampaignError, match="budget"):
-        scaffold_campaign("gb-probe", "GB probe", budget={})
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={})
 
 
 def test_scaffold_fields_pass_through_and_are_validated():
     from campaign import scaffold_campaign
-    spec = scaffold_campaign(
-        "gb-probe", "GB probe", budget={"candidates_screened": 50},
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"candidates_screened": 50},
         families=["generalized-bicycle"],
         objective={"target": 20},
         stopping=[{"type": "target_reached"}, {"type": "budget_exhausted"}],
@@ -841,10 +857,10 @@ def test_scaffold_fields_pass_through_and_are_validated():
     assert c["methods"] == {"families": ["generalized-bicycle"]}
     assert c["objective"]["target"] == 20 and c["constraints"] == {"n": [600, 700]}
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 1},
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
                           families=["not-a-family"])
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 1},
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
                           stopping=[{"type": "target_reached"}])   # no target
 
 
@@ -855,7 +871,7 @@ def test_a_bare_campaign_dict_is_told_about_the_wrapper():
 
 def test_write_campaign_round_trips_through_load_campaign(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2},
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2},
                              families=["generalized-bicycle"])
     path = tmp_path / "campaigns" / "gb-probe" / "campaign.json"
     assert write_campaign(spec, str(path)) == str(path)
@@ -869,7 +885,7 @@ def test_write_campaign_round_trips_through_load_campaign(tmp_path):
 
 def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     path = str(tmp_path / "campaign.json")
     write_campaign(spec, path)
     with pytest.raises(CampaignError, match="overwrite=True"):
@@ -881,7 +897,7 @@ def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
 
 def test_write_campaign_holds_the_directory_to_the_id(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     wrong = tmp_path / "campaigns" / "other-name" / "campaign.json"
     with pytest.raises(CampaignError, match="directory name"):
         write_campaign(spec, str(wrong))
@@ -891,7 +907,7 @@ def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     """The documented route for a run that does not want a directory yet."""
     from campaign import scaffold_campaign
     led = Ledger(Campaign(scaffold_campaign(
-        "adhoc", "ad hoc", budget={"candidates_screened": 10},
+        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
         families=["bivariate-bicycle"])))
     led.start_experiment("bivariate-bicycle", seed=1, params={"l": 6})
     led.record_screen(trials=1000, d=6, backend="numpy")
@@ -903,3 +919,178 @@ def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     assert summ["campaign_id"] == "adhoc"
     assert summ["experiments"][0]["screened"] == {"trials": 1000, "d": 6,
                                                   "backend": "numpy"}
+
+
+# -- the direction card (issue #4028) -----------------------------------------
+
+def test_a_new_campaign_must_state_its_direction_card():
+    from campaign import scaffold_campaign
+    with pytest.raises(CampaignError, match="direction card"):
+        scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
+    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
+    assert spec["campaign"]["direction"] == CARD
+    assert Campaign(spec).direction == CARD
+
+
+@pytest.mark.parametrize("damage", [
+    lambda c: c.pop("expected_value"),
+    lambda c: c.update(cell="weight-6"),
+    lambda c: c.update(family="not-a-family"),
+    lambda c: c["bar"].pop("axes"),
+    lambda c: c["abandon_criterion"].update(flat_fresh_rungs=1),
+    lambda c: c.update(expected_value=7),
+    lambda c: c.update(non_monotonic={"why_worth_starting": "a wall"}),
+    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, regresses_on=["score"])),
+    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, stop="never")),
+    lambda c: c.update(non_monotonic="entered worse on purpose"),
+])
+def test_a_malformed_card_is_rejected(damage):
+    from campaign import scaffold_campaign
+    card = copy.deepcopy(CARD)
+    damage(card)
+    with pytest.raises(CampaignError):
+        scaffold_campaign("gb-probe", "GB probe", card=card, budget={"cpu_hours": 2})
+
+
+def test_a_definition_before_the_card_carries_null_and_still_loads():
+    obj = copy.deepcopy(GOOD)
+    obj["campaign"]["direction"] = None
+    assert Campaign(validate_campaign(obj)).direction is None
+    obj["campaign"].pop("direction")
+    with pytest.raises(CampaignError):
+        validate_campaign(obj)                    # the key is required, null or not
+
+
+NON_MONOTONIC = {
+    "why_worth_starting": "every weight-6 neighbor of 682-20-22 settles at d = 22 by 20,000 trials",
+    "regresses_on": ["d", "kd2_over_n"],
+    "precondition": "supports sharing a divisor of x^341 - 1 of degree at least 4",
+    "base": "682-20-22",
+}
+
+
+def test_a_route_entered_worse_on_purpose_says_so_on_the_card(tmp_path):
+    """The optional field (issue #4237) validates in the definition and in the summary."""
+    from campaign import scaffold_campaign
+    card = dict(CARD, non_monotonic=NON_MONOTONIC)
+    spec = scaffold_campaign("gb-probe", "GB probe", card=card, budget={"cpu_hours": 2},
+                             families=["generalized-bicycle"])
+    assert spec["campaign"]["direction"]["non_monotonic"] == NON_MONOTONIC
+    assert spec["campaign"]["direction"]["abandon_criterion"] == CARD["abandon_criterion"]
+    minimal = dict(NON_MONOTONIC)
+    minimal.pop("base")                            # base is the one optional part
+    scaffold_campaign("gb-probe", "GB probe", card=dict(CARD, non_monotonic=minimal),
+                      budget={"cpu_hours": 2})
+    led = Ledger(Campaign(spec))
+    led.start_experiment("generalized-bicycle", seed=1, params={"m": 341},
+                         note="first rung expected below the bar; the lattice is a wall")
+    led.record_screen(trials=400, d=20, backend="numpy")
+    led.record_verdict("dominated")
+    led.end_experiment()
+    out = write_summary(led.summary(), str(tmp_path / "summary.json"))
+    assert json.load(open(out))["direction"]["non_monotonic"] == NON_MONOTONIC
+
+
+def test_the_summary_schema_carries_the_same_card_as_the_definition():
+    """The card is duplicated in the two schemas; a field added to one must reach the other."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root, "schema", "campaign.schema.json"), encoding="utf-8") as f:
+        definition = json.load(f)["properties"]["campaign"]["properties"]["direction"]
+    with open(os.path.join(root, "schema", "campaign_summary.schema.json"), encoding="utf-8") as f:
+        summary = json.load(f)["properties"]["direction"]
+    assert definition["oneOf"] == summary["oneOf"]
+    card = definition["oneOf"][1]
+    assert "non_monotonic" in card["properties"]
+    assert "non_monotonic" not in card["required"]
+
+
+def test_the_summary_carries_the_card(tmp_path):
+    from campaign import scaffold_campaign
+    led = Ledger(Campaign(scaffold_campaign(
+        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
+        families=["generalized-bicycle"])))
+    led.start_experiment("generalized-bicycle", seed=1, params={"m": 341})
+    led.record_screen(trials=400, d=6, backend="numpy")
+    led.record_verdict("not_run")
+    led.end_experiment()
+    s = led.summary()
+    assert s["direction"] == CARD
+    write_summary(s, str(tmp_path / "summary.json"))
+    assert json.load(open(tmp_path / "summary.json"))["direction"]["bar"]["slug"] == "682-20-22"
+
+
+def test_the_committed_campaigns_either_state_a_card_or_say_null():
+    for f in sorted(glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))):
+        c = load_campaign(f)
+        assert "direction" in c.c, f
+        if c.direction is not None:
+            assert c.direction["bar"]["slug"] and c.direction["what_a_negative_would_teach"]
+    cards = [load_campaign(f).direction for f in
+             glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))]
+    assert any(cards), "one committed campaign ships with the card filled in"
+
+
+# -- negatives that can be revisited (issue #4233) --------------------------
+#
+# A negative without its preconditions says a route failed; it cannot say
+# whether the reason still applies. record_negative takes the assumptions and
+# the revisit condition, the open experiment lends its family and params,
+# and the summary schema types the item while a bare {what, detail} still
+# validates.
+
+def test_a_negative_records_its_assumptions_and_revisit_condition(tmp_path):
+    """The typed negative survives the journal and validates in the summary."""
+    import campaign as C
+    j = tmp_path / "ledger.jsonl"
+    led = Ledger(Campaign(validate_campaign(camp())), journal=str(j))
+    led.start_experiment("bivariate-bicycle", seed=3, params={"l": 6, "m": 6})
+    led.spend(cpu_hours=1)
+    led.record_negative("weight-6 at n=72 is closed",
+                        "two flat rungs at d <= 6, below the bar",
+                        assumptions=["weight-6 BB on Z_6 x Z_6",
+                                     "numpy RIS at 2000 trials per candidate"],
+                        revisit_if="a backend that reaches 1e6 trials per candidate")
+    led.end_experiment()
+    neg = led.negative_results[0]
+    assert neg["family"] == "bivariate-bicycle"
+    assert neg["params"]["l"] == 6 and neg["params"]["m"] == 6
+    assert neg["assumptions"][1] == "numpy RIS at 2000 trials per candidate"
+    assert neg["revisit_if"].startswith("a backend")
+    C.validate_summary(led.summary())
+    back = Ledger.from_journal(Campaign(validate_campaign(camp())), str(j))
+    assert back.negative_results == [neg]
+    assert back.merge(led).negative_results == [neg]
+
+
+def test_a_negative_outside_an_experiment_takes_what_it_is_given():
+    import campaign as C
+    led = Ledger(Campaign(validate_campaign(camp())))
+    led.record_negative("closed family", "every draw collapsed")
+    assert led.negative_results[0] == {"what": "closed family",
+                                       "detail": "every draw collapsed"}
+    led.record_negative("S4 lift is closed", "no survivor below the bar",
+                        family="lifted-product", params={"G": "S4"})
+    assert led.negative_results[1]["family"] == "lifted-product"
+    assert led.negative_results[1]["params"] == {"G": "S4"}
+    C.validate_summary(led.summary())
+
+
+def test_a_malformed_negative_is_refused_where_it_is_recorded():
+    import campaign as C
+    import pytest
+    led = Ledger(Campaign(validate_campaign(camp())))
+    for bad in ({"assumptions": "one string, not a list"},
+                {"assumptions": []},
+                {"assumptions": ["ok", ""]},
+                {"revisit_if": "   "},
+                {"revisit_if": 3}):
+        with pytest.raises(C.CampaignError):
+            led.record_negative("w", "d", **bad)
+    assert led.negative_results == []
+    summary = led.summary()
+    summary["negative_results"] = [{"what": "w", "detail": "d", "mood": "sad"}]
+    with pytest.raises(C.CampaignError):
+        C.validate_summary(summary)
+    summary["negative_results"] = [{"what": "", "detail": "d"}]
+    with pytest.raises(C.CampaignError):
+        C.validate_summary(summary)

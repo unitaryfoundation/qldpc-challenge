@@ -46,6 +46,7 @@ See [`AGENTS.md`](AGENTS.md) for the precedence rule.
 | See which track cells are open right now | one command: `./qldpc targets` (add `--n 200` for what a code that size needs, `--claim <cell>` to note where you are aiming) |
 | Get one snapshot of a cell before searching it | `./qldpc brief --cell weight-6/unrestricted --family <tag>`: frontier and bar, what was screened, what landed, the fieldnotes |
 | Understand the boards and what to aim at | [`TRACKS.md`](TRACKS.md) — especially the "Reference bars" section |
+| Read the Beat the Surface Code campaign and baselines | [`beat-the-surface-code.md`](beat-the-surface-code.md) |
 | Point a coding agent at this repo | [`AGENTS.md`](AGENTS.md) |
 
 Before starting a search, `./qldpc recent` summarizes what landed lately
@@ -53,7 +54,9 @@ Before starting a search, `./qldpc recent` summarizes what landed lately
 begin from the community's current frontier of knowledge rather than
 rediscovering it; `--json` returns the same as one record. `./qldpc screened`
 answers the narrower question of whether a particular family member was
-already screened, at what depth, and what the gate said about it.
+already screened, at what depth, and what the gate said about it, and
+`./qldpc negatives` lists what earlier campaigns closed, what each closure
+assumed, and what change would make it worth retrying.
 
 ## Installation
 

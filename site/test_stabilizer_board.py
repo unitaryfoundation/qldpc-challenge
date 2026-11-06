@@ -143,3 +143,27 @@ def test_empty_stabilizer_board_still_renders(tmp_path):
     stab = _read(build, "stabilizer.html")
     assert "No stabilizer entries yet" in stab
     assert "0 verified codes," in _read(build, "index.html")
+
+
+def test_stats_carry_the_novelty_split_and_the_census_shows_it(tmp_path):
+    """The board publishes how much of its novelty field has been audited.
+
+    provenance.novelty is the only field that says whether a code is new
+    (issue #4024): the split and the audited count go to stats.json, and the
+    count sits on the stats bar's census beside the certified-exact count.
+    """
+    css_doc = _fixture("72-6-6.json")
+    css_doc["provenance"] = dict(css_doc["provenance"], novelty="known_parameters")
+    stab_doc = _fixture("5-1-3.json")          # no novelty field: unaudited
+    build = _build_board(tmp_path, {"72-6-6": css_doc, "5-1-3": stab_doc})
+
+    stats = json.loads(_read(build, "stats.json"))
+    assert stats["novelty"] == {"unknown": 1, "known_parameters": 1,
+                                "new_parameters": 0}
+    assert stats["novelty_audited"] == 1
+
+    index = _read(build, "index.html")
+    stab = _read(build, "stabilizer.html")
+    assert "<b>1</b><span>novelty audited</span>" in index
+    assert "<b>0</b><span>novelty audited</span>" in stab
+    assert "<span>certified exact</span>" in index and "<span>certified exact</span>" in stab

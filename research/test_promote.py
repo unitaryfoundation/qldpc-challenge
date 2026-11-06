@@ -586,3 +586,65 @@ def test_promote_all_takes_plans_with_or_without_a_recipe():
     with mock.patch.object(P, "promote", fake):
         P.promote_all([({}, {}), ({}, {}, RECIPE_72)])
     assert seen == [None, RECIPE_72]
+
+
+# ------------------------------------------------ the d-only gain's peer audit
+
+D_ONLY_PEER = "[[72,12,5]] w=6 72-12-5.json"
+
+
+def _d_only_verdict(doc, seed=None, **kw):
+    """Return a passing verdict whose only strict gain over one board entry is d."""
+    v = _passing_verdict(doc, seed, **kw)
+    v["gates"]["novelty"].update(advances_by=["d"], d_only_gain=True,
+                                 d_only_peers=[D_ONLY_PEER])
+    return v
+
+
+def _audit(**over):
+    rec = {"schema": "qldpc-peer-audit/1", "candidate": "cand.json",
+           "peers": ["codes/72-12-5.json"], "trials": 2_000_000, "seeds": [51, 52],
+           "pair_depth": 8, "threads": 8, "decision": "credible: both claims held",
+           "exit_code": 0, "results": [], "recorded": "2026-11-05"}
+    rec.update(over)
+    return rec
+
+
+def test_a_d_only_gain_without_an_audit_is_blocked_with_the_command(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False)
+    assert not rep["ok"]
+    block, = rep["blocked_by"]
+    assert D_ONLY_PEER in block and "leader_audit.py pair" in block
+    assert "--trials 2000000" in block            # the ladder's deepest fresh rung
+    assert block.endswith("put the record it writes in evidence.peer_audit")
+
+
+def test_a_checkable_audit_at_depth_discharges_the_gain(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit()), root=_farm(tmp_path),
+                    write=False)
+    assert rep["ok"], rep["blocked_by"]
+    assert not [i for i in rep["needs_human"] if "peer audit" in i["item"]]
+    flat = " ".join(rep["note_markdown"].split())
+    assert "credible: both claims held (matched depth: 2,000,000 trials" in flat
+
+
+def test_a_shallow_or_undecided_audit_is_blocked(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
+    root = _farm(tmp_path)
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit(trials=1_000_000)), root=root,
+                    write=False)
+    assert not rep["ok"] and "shallower than the 2,000,000" in rep["blocked_by"][0]
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit(decision="redirect: peer soft")),
+                    root=root, write=False)
+    assert not rep["ok"] and "distance revision" in rep["blocked_by"][0]
+
+
+def test_prose_evidence_still_passes_and_is_reported_as_unchecked(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
+    rep = P.promote(_doc(), _evidence(peer_audit="credible at 10M trials, seeds 4242, 5353"),
+                    root=_farm(tmp_path), write=False)
+    assert rep["ok"], rep["blocked_by"]
+    item, = [i for i in rep["needs_human"] if "peer audit" in i["item"]]
+    assert D_ONLY_PEER in item["item"] and "--json-out" in item["why"]

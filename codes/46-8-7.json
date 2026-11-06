@@ -1,0 +1,454 @@
+{
+ "schema_version": "0.3",
+ "name": "[[46,8,7]] E-PEEL of 47-8-7",
+ "code_type": "CSS",
+ "n": 46,
+ "k": 8,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    5,
+    10,
+    11,
+    24,
+    38,
+    41
+   ],
+   [
+    0,
+    2,
+    12,
+    19,
+    20,
+    25,
+    27,
+    39
+   ],
+   [
+    1,
+    2,
+    3,
+    7,
+    21,
+    26,
+    32,
+    40
+   ],
+   [
+    1,
+    4,
+    14,
+    16,
+    21,
+    23,
+    27,
+    44
+   ],
+   [
+    2,
+    5,
+    6,
+    16,
+    17,
+    28,
+    30,
+    42
+   ],
+   [
+    3,
+    4,
+    6,
+    12,
+    18,
+    29,
+    36,
+    43
+   ],
+   [
+    0,
+    4,
+    7,
+    13,
+    18,
+    24,
+    30,
+    45
+   ],
+   [
+    3,
+    5,
+    8,
+    13,
+    31,
+    33,
+    44
+   ],
+   [
+    4,
+    5,
+    9,
+    19,
+    25,
+    32,
+    34
+   ],
+   [
+    6,
+    7,
+    9,
+    10,
+    15,
+    26,
+    33,
+    39
+   ],
+   [
+    6,
+    7,
+    11,
+    21,
+    22,
+    27,
+    31,
+    34
+   ],
+   [
+    1,
+    8,
+    9,
+    12,
+    22,
+    35,
+    37,
+    45
+   ],
+   [
+    2,
+    9,
+    13,
+    14,
+    22,
+    28,
+    36,
+    38
+   ],
+   [
+    3,
+    10,
+    11,
+    14,
+    19,
+    29,
+    37,
+    42
+   ],
+   [
+    3,
+    4,
+    11,
+    15,
+    20,
+    30,
+    35,
+    38
+   ],
+   [
+    11,
+    12,
+    13,
+    17,
+    23,
+    32,
+    39
+   ],
+   [
+    1,
+    14,
+    15,
+    17,
+    18,
+    25,
+    33,
+    40
+   ],
+   [
+    8,
+    9,
+    17,
+    20,
+    21,
+    24,
+    36,
+    42
+   ],
+   [
+    0,
+    10,
+    18,
+    21,
+    28,
+    37,
+    43
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    4,
+    17,
+    23,
+    24,
+    25,
+    30,
+    43
+   ],
+   [
+    1,
+    7,
+    20,
+    24,
+    26,
+    27,
+    35,
+    40
+   ],
+   [
+    2,
+    9,
+    18,
+    25,
+    26,
+    28,
+    36,
+    45
+   ],
+   [
+    3,
+    10,
+    22,
+    26,
+    29,
+    31,
+    37,
+    38
+   ],
+   [
+    2,
+    4,
+    11,
+    27,
+    29,
+    30,
+    32,
+    38
+   ],
+   [
+    5,
+    13,
+    21,
+    24,
+    28,
+    31,
+    32,
+    44
+   ],
+   [
+    5,
+    7,
+    15,
+    26,
+    30,
+    33,
+    34,
+    41
+   ],
+   [
+    8,
+    11,
+    16,
+    23,
+    31,
+    35,
+    41,
+    42
+   ],
+   [
+    3,
+    9,
+    17,
+    32,
+    33,
+    35,
+    36,
+    42
+   ],
+   [
+    8,
+    10,
+    18,
+    24,
+    33,
+    37,
+    43
+   ],
+   [
+    0,
+    9,
+    11,
+    24,
+    34,
+    37,
+    38,
+    39
+   ],
+   [
+    12,
+    15,
+    19,
+    25,
+    29,
+    35,
+    39
+   ],
+   [
+    6,
+    13,
+    20,
+    30,
+    31,
+    36,
+    39
+   ],
+   [
+    12,
+    14,
+    21,
+    23,
+    27,
+    36,
+    37,
+    40
+   ],
+   [
+    1,
+    13,
+    15,
+    23,
+    33,
+    38,
+    40,
+    45
+   ],
+   [
+    2,
+    10,
+    17,
+    28,
+    39,
+    40,
+    41,
+    42
+   ],
+   [
+    3,
+    16,
+    18,
+    29,
+    30,
+    40,
+    43,
+    44
+   ],
+   [
+    5,
+    14,
+    20,
+    25,
+    38,
+    42,
+    44
+   ],
+   [
+    6,
+    19,
+    21,
+    26,
+    27,
+    34,
+    42,
+    43
+   ]
+  ]
+ },
+ "distance": {
+  "d": 7,
+  "X": {
+   "value": 7,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    10,
+    13,
+    14,
+    15,
+    37,
+    39
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-03",
+    "found_at_samples": 3000,
+    "survived_samples": 3000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  },
+  "Z": {
+   "value": 7,
+   "confidence": "upper_bound",
+   "witness": [
+    13,
+    18,
+    21,
+    23,
+    31,
+    36,
+    40
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-03",
+    "found_at_samples": 3000,
+    "survived_samples": 3000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     2
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@vprusso"
+  ],
+  "construction": "Priced construction calculus E-PEEL of codes/47-8-7.json ([[47,8,7]], max check weight 8; itself a priced-calculus E-PEEL of codes/48-8-8.json, a two-block group-algebra code over SmallGroup(24,4) from arXiv:2610.13880): delete qubit 23 (0-based index in the parent file) together with its unique Z check b7, and relabel the surviving qubits in increasing order of their parent indices. Consumer: github.com/unitaryfoundation/code-calculus @ 1b9a942, machine/priced_calculus.py.",
+  "references": [
+   "arXiv:2610.13880"
+  ],
+  "date": "2026-11-04",
+  "notes": "Single-step priced-calculus E-PEEL child of board entry 47-8-7. verify/validate_candidate.py found no board entry sharing this code's fingerprint or Weisfeiler-Leman signature, local-Hadamard images included.",
+  "model": "Claude Fable 5.1",
+  "origin": "submission",
+  "search_budget": {
+   "ris_trials_per_side": 10000000
+  }
+ }
+}
