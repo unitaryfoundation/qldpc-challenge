@@ -3,6 +3,28 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/960-20-40.html">[[960,20,40]] — 960-20-40</a></h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><p>[[960,20,40]]</p>
+<h3>[[960,20,40]] CLP code, check weight 6</h3>
+<p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
+<ul>
+<li>Search-time QDistRnd, 2 x 10^5 rounds per side: d &lt;= 56.</li>
+<li>This repository&#x27;s fast RIS search, 8M trials, seed 6980315: nothing below 42 on either side; weight-42 X-type witness.</li>
+<li>This repository&#x27;s orbit-fold search (pynauty automorphisms): 42 at 300 trials; weight-40 Z-type logical at 3000 trials, seed 1, carried as the witness; 30000 trials find nothing lighter.</li>
+<li>Classical construction: a coset lifted product code in the framework of arXiv:2610.12782 (Definition III.1), obtained by the search procedure described in that paper over the GAP SmallGroups library. No AI model.</li>
+</ul>
+<h4>Direction and hypothesis</h4>
+<p>Extension of the paper&#x27;s search to m = 240 at check weight 6, followed by an entry-resampling walk around the best W6rest pair. The walk keeps the group pair and layout fixed and resamples one or two entries of the protographs per step; this code is a neighbour of the W6rest m = 240 family.</p>
+<h4>This code</h4>
+<p>G = SmallGroup(480,1005), H = &lt;f3&gt; = C2, m = 240, n = 4m = 960, check weight 6, 1x1 over 2x2 layout. a = 1 + f1*f3*f4*f6^2*f7^4 + f1*f2*f3*f4*f6^2*f7;  B = [[1 + f4*f5*f6*f7^3, 1], [1, f4*f5*f6 + f4*f6*f7^2]].</p>
+<h4>Evidence trail</h4>
+<p>| stage | rounds / trials | result | |---|---|---| | search log | 2 x 10^5 QDistRnd per side | d &lt;= 56 | | this tool, fast RIS | 8M trials, seed 6980315 | nothing below 42 on either side; weight-42 X witness | | this tool, orbit-fold | 300 / 3000 / 30000 trials | 42 / weight-40 Z witness / nothing lighter |</p>
+<p>Not certified exact. The witnesses in the entry are the ones this tool found, checked by the verifier. [[960,20,40]] at check weight 6 has no dominator on the board; the nearest entry with k &gt;= 20 at n &lt;= 960 is [[960,24,38]].</p>
+<h4>Dead ends</h4>
+<p>The ten walker neighbours of the paper&#x27;s [[864,20]] code all fold to 36 under the orbit-fold search, matching the board&#x27;s entry; the m = 216 and m = 240 pair searches at K &gt;= 20 produced four sieve survivors, all refuted at 2.5 x 10^5 RIS trials or by the orbit-fold.</p>
+<h4>Tools</h4>
+<p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s gate_changed.py RIS search and heuristic_distance.py orbit-fold.</p>
+<h4>Reproduction</h4>
+<p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/960-20-40.md">raw markdown</a></div></details></section>
 <section class=blk><h3>tropidist backend: fast on moderate CSS and stabilizer codes, still times out on high-distance 2BGA</h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details open><summary>note</summary><div class=notebody><h4>TL;DR</h4>
 <p>tropidist (arXiv:2611.08247, pinned at commit <code>b03ec2d</code> of github.com/Fanerst/tropidist) closes moderate CSS and stabilizer entries in well under a second where the challenge&#x27;s MILP certifier takes tens of seconds, and it is the only exact certifier available for stabilizer codes. It does <b>not</b> make high-distance 2BGA entries tractable at the sweep&#x27;s 60–600 s budget: <code>[[544,18,76]]</code> reached only lower bound 19 in 600 s.</p>
 <h4>What ran</h4>
@@ -43,7 +65,7 @@
 <p>Rebuild \(H_X, H_Z\) with the upstream snippet:</p>
 <p>from gflowqec.codes import build code = build(&quot;C6xS3&quot;, [24, 5, 28, 14, 18, 24, 6, 34, 5, 19])</p>
 <p>then export <code>code.matrix_x</code> / <code>code.matrix_z</code> as <code>hx</code> / <code>hz</code> in an <code>.npz</code> and run <code>./qldpc submit</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/180-36-10.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/5-1-3-b.html">[[5,1,3]] — 5-1-3-b</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[5,1,3]] — non-CSS stabilizer code from a graph-state extension</h3>
+<section class=blk><h3><a href="codes/5-1-3-b.html">[[5,1,3]] — 5-1-3-b</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[5,1,3]] — non-CSS stabilizer code from a graph-state extension</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aim: a non-CSS general stabilizer code in the <code>weight-4</code> / <code>unrestricted</code> cell. The paper &quot;Stabiliser codes over prime fields as weighted graphs and as quantum sets of lines&quot; (arXiv:2611.05489v1) gives an extension operation on quantum sets of lines that can raise k by 1 while keeping n small. Starting from a 4-qubit non-bipartite graph state (K4 minus one edge) and choosing extension vectors b, c yields a 5-qubit code with one logical qubit.</p>
 <h4>What was searched</h4>
