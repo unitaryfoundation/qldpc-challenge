@@ -395,7 +395,8 @@ def tightened_doc(doc, entry, *, by, date, record_name):
     if not sentences:
         return None
     note = (f" Circuit fault distance corrected on {date} by {by}: " + "; ".join(sentences)
-            + f". Found by tropidist (arXiv:2611.08247) through research/audits/{record_name}.")
+            + ". Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model"
+            f" (record {record_name}).")
     prov = out.setdefault("provenance", {})
     prov["notes"] = (prov.get("notes") or "") + note
     return out
