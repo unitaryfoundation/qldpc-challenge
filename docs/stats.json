@@ -4,11 +4,11 @@
   "stabilizer_codes": 227,
   "certified_exact": 1161,
   "tracks": 12,
-  "best_kd2_over_n": 1456.855,
+  "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "no_match": 2015,
     "parameters_only": 392,
+    "no_match": 2015,
     "literature": 493,
     "not_derived": 2,
     "method": "isomorphism against the literature index",
@@ -108,7 +108,7 @@
         "leader": {
           "slug": "510-16-26",
           "family": "generalized-bicycle",
-          "eff": 21.208
+          "eff": 21.2078
         },
         "incumbent": {
           "slug": "360-12-24",
@@ -141,12 +141,12 @@
         "leader": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
-          "eff": 27.174
+          "eff": 27.1739
         },
         "incumbent": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
-          "eff": 27.174
+          "eff": 27.1739
         },
         "moved": false
       },
@@ -179,7 +179,7 @@
         "incumbent": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
-          "eff": 27.174
+          "eff": 27.1739
         },
         "moved": true
       },
@@ -240,7 +240,7 @@
         "leader": {
           "slug": "454-8-17",
           "family": "bivariate-bicycle",
-          "eff": 5.093
+          "eff": 5.09251
         },
         "incumbent": {
           "slug": "288-8-12",
@@ -273,7 +273,7 @@
         "leader": {
           "slug": "784-8-27",
           "family": "tile",
-          "eff": 7.439
+          "eff": 7.43878
         },
         "incumbent": {
           "slug": "288-8-12",
@@ -306,7 +306,7 @@
         "leader": {
           "slug": "784-8-27",
           "family": "tile",
-          "eff": 7.439
+          "eff": 7.43878
         },
         "incumbent": {
           "slug": "288-8-12",
@@ -377,7 +377,7 @@
         "incumbent": {
           "slug": "360-20-20",
           "family": "2bga-coset",
-          "eff": 22.222
+          "eff": 22.2222
         },
         "moved": false
       },
@@ -410,7 +410,7 @@
         "incumbent": {
           "slug": "584-150-18",
           "family": "pair-partition-cpm",
-          "eff": 83.219
+          "eff": 83.2192
         },
         "moved": false
       },
@@ -438,7 +438,7 @@
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",
-          "eff": 1456.855
+          "eff": 1456.85
         },
         "incumbent": {
           "slug": "492-170-20",

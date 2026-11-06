@@ -486,6 +486,186 @@ def test_the_ledger_can_be_read_back_by_status(tmp_path, capsys):
     assert "2609.00002" in out and "arXiv:2609.00001" not in out
 
 
+# --- the mechanism a paper carries, and whether it was tried here (#4235) ----
+
+def tag(path, arxiv_id, *mechanisms, status=None, reason=None, extra=()):
+    """Drive --review with --mechanism tags, with or without a fresh verdict."""
+    argv = ["--review", arxiv_id, "--ledger", path, *extra]
+    if status is not None:
+        argv += ["--status", status, "--reason", reason]
+    for m in mechanisms:
+        argv += ["--mechanism", m]
+    return W.main(argv)
+
+
+def tried(path, arxiv_id, mechanism, where, outcome, extra=()):
+    """Drive --tried as an operator would."""
+    return W.main(["--tried", arxiv_id, "--mechanism", mechanism, "--where", where,
+                   "--outcome", outcome, "--ledger", path, *extra])
+
+
+def test_a_verdict_can_name_the_mechanisms_the_paper_carries(tmp_path):
+    """The tag is the transferable idea, kept as typed up to whitespace and case repeats."""
+    path = seeded(tmp_path)
+    review(path, "2609.00001", "uncertain", "abstract only")
+    assert '"mechanisms"' not in open(path, encoding="utf-8").read()
+    assert '"tried"' not in open(path, encoding="utf-8").read()
+    assert tag(path, "2609.00001", " Pair  partition ", "pair partition", "mirror fold",
+               status="relevant", reason="templates for [[90,21]]") == 0
+    row = W.load_ledger(path)["2609.00001"]
+    assert row["review"]["status"] == "relevant"
+    assert row["review"]["mechanisms"] == ["Pair partition", "mirror fold"]
+    assert W.mechanisms_of(row) == ["Pair partition", "mirror fold"]
+    assert W.untried_mechanisms(row) == ["Pair partition", "mirror fold"]
+    assert row["tried"] == []
+
+
+def test_a_mechanism_alone_restates_the_standing_verdict_as_a_new_review(tmp_path):
+    """Tagging is a review in the history, never an edit of one, and tags accumulate."""
+    path = seeded(tmp_path)
+    review(path, "2609.00001", "relevant", "GB family, n<=288")
+    assert tag(path, "2609.00001", "twisted torus") == 0
+    row = W.load_ledger(path)["2609.00001"]
+    assert (row["review"]["status"], row["review"]["reason"]) == ("relevant", "GB family, n<=288")
+    assert row["review"]["mechanisms"] == ["twisted torus"]
+    assert [r["status"] for r in row["reviews"]] == ["relevant"]
+    assert "mechanisms" not in json.loads(open(path, encoding="utf-8").read())["reviews"][0]
+    review(path, "2609.00001", "uncertain", "needs the matrices")
+    row = W.load_ledger(path)["2609.00001"]
+    assert row["review"]["status"] == "uncertain"
+    assert row["review"]["mechanisms"] == ["twisted torus"]
+    assert tag(path, "2609.00001", "Twisted Torus", "coset quotient") == 0
+    assert W.load_ledger(path)["2609.00001"]["review"]["mechanisms"] == [
+        "twisted torus", "coset quotient"]
+
+
+def test_a_mechanism_cannot_be_tagged_on_an_unreviewed_paper(tmp_path, capsys):
+    """A tag without a verdict would be a verdict by the back door."""
+    path = seeded(tmp_path)
+    assert tag(path, "2609.00001", "twisted torus") == 1
+    assert "no verdict" in capsys.readouterr().err
+    assert W.load_ledger(path)["2609.00001"]["review"]["status"] == "unreviewed"
+    assert tag(path, "2609.00001", "twisted torus", status="relevant", reason="x",
+               extra=("--dry-run",)) == 0
+    assert W.load_ledger(path)["2609.00001"]["review"]["status"] == "unreviewed"
+
+
+def test_tried_records_where_a_mechanism_was_applied_and_survives_a_poll(tmp_path, monkeypatch):
+    """Application is tracked apart from relevance, and a version bump does not lose it."""
+    freeze_clock(monkeypatch)
+    path = seeded(tmp_path)
+    tag(path, "2609.00001", "pair partition", "mirror fold", status="relevant", reason="templates")
+    assert tried(path, "2609.00001", "pair partition", "smoke-bb-72",
+                 "ladders settled below the bar at 2M trials", extra=("--by", "me")) == 0
+    row = W.load_ledger(path)["2609.00001"]
+    assert row["tried"] == [{"mechanism": "pair partition", "where": "smoke-bb-72",
+                             "outcome": "ladders settled below the bar at 2M trials",
+                             "by": "me", "date": TODAY}]
+    assert W.untried_mechanisms(row) == ["mirror fold"]
+    _, updated, rows, _ = run(one_page([entry("2609.00001", version=2,
+                                              updated="2026-09-26")]), W.load_ledger(path))
+    bumped, = updated
+    assert bumped["tried"] == row["tried"]
+    assert bumped["review"]["mechanisms"] == ["pair partition", "mirror fold"]
+    assert bumped["review"]["stale"] is True
+    W.save_ledger(rows, path)
+    assert W.load_ledger(path)["2609.00001"]["tried"] == row["tried"]
+
+
+def test_where_must_be_something_a_reader_can_open(tmp_path, capsys):
+    """A backlog entry pointing at a vanished scratch directory records nothing."""
+    path = seeded(tmp_path)
+    for where in ("research/candidates/20260901-x/90-21-11.json",
+                  "research/campaigns/no-such-campaign", "/Users/me/scratch/run.log",
+                  "../outside", "9999-1-1"):
+        assert tried(path, "2609.00001", "pair partition", where, "x") == 1, where
+        assert "--where:" in capsys.readouterr().err
+    assert "tried" not in open(path, encoding="utf-8").read()
+    accepted = ("#4235", "https://github.com/unitaryfoundation/qldpc-challenge/pull/4235",
+                "smoke-bb-72", "codes/72-12-6.json", "72-12-6",
+                "fieldnotes/2026-09-20-screening-traps-at-n-900.md")
+    for where in accepted:
+        assert tried(path, "2609.00001", "pair partition", where, "x") == 0, where
+    assert [t["where"] for t in W.load_ledger(path)["2609.00001"]["tried"]] == list(accepted)
+
+
+def test_tried_needs_a_mechanism_a_place_and_an_outcome(tmp_path):
+    """Each half-record is a usage error, and the new flags do not fall through to a poll."""
+    path = seeded(tmp_path)
+    for argv in (["--tried", "2609.00001", "--where", "#1", "--outcome", "x"],
+                 ["--tried", "2609.00001", "--mechanism", "m", "--outcome", "x"],
+                 ["--tried", "2609.00001", "--mechanism", "m", "--where", "#1"],
+                 ["--tried", "2609.00001", "--mechanism", "m", "--where", "#1", "--outcome", " "],
+                 ["--tried", "", "--mechanism", "m", "--where", "#1", "--outcome", "x"],
+                 ["--review", "2609.00001", "--mechanism", "m", "--where", "#1"],
+                 ["--list", "untried", "--tried", "2609.00001"],
+                 ["--where", "#1"], ["--mechanism", "m"]):
+        with pytest.raises(SystemExit) as e:
+            W.main([*argv, "--ledger", path])
+        assert e.value.code == 2, argv
+    assert W.load_ledger(path)["2609.00001"]["tried"] == []
+
+
+def test_the_backlog_lists_papers_whose_mechanism_was_never_tried(tmp_path, capsys):
+    """Relevant-but-never-tried is distinguishable from tried-and-failed."""
+    path = seeded(tmp_path, [entry("2609.00001", title="Pair partitions"),
+                             entry("2609.00002", title="Mirror folds"),
+                             entry("2609.00003", title="A decoder")])
+    tag(path, "2609.00001", "pair partition", status="relevant", reason="a")
+    tag(path, "2609.00002", "mirror fold", "pair partition", status="relevant", reason="b")
+    review(path, "2609.00003", "not-relevant", "decoder")
+    tried(path, "2609.00002", "mirror fold", "#4235",
+          "the fold needs an involution the BB torus lacks")
+    capsys.readouterr()
+    assert W.main(["--list", "untried", "--ledger", path]) == 0
+    out = capsys.readouterr().out
+    assert "2 matching untried" in out and "2609.00003" not in out
+    assert "mechanisms: pair partition  (not tried here)" in out
+    assert "mechanisms: mirror fold; pair partition\n" in out
+    assert "not tried here: pair partition" in out
+    assert W.main(["--list", "tried", "--ledger", path]) == 0
+    out = capsys.readouterr().out
+    assert "1 matching tried" in out
+    assert "tried: mirror fold in #4235" in out and "involution" in out
+    assert W.main(["--list", "mechanisms", "--ledger", path]) == 0
+    out = capsys.readouterr().out
+    assert "2 mechanisms on 2 papers, 2 papers with one not tried here" in out
+    assert "pair partition: 2 paper(s), 2 not tried here" in out
+    assert "mirror fold: 1 paper(s), 0 not tried here" in out
+    assert "tried in #4235" in out
+    assert W.main(["--list", "relevant", "--mechanism", "FOLD", "--ledger", path]) == 0
+    out = capsys.readouterr().out
+    assert "1 matching relevant naming FOLD" in out
+    assert "2609.00002" in out and "arXiv:2609.00001" not in out
+    assert W.main(["--list", "untried", "--json", "--ledger", path]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert [r["id"] for r in payload["rows"]] == ["2609.00002", "2609.00001"]
+    assert payload["rows"][0]["untried"] == ["pair partition"]
+    assert payload["rows"][0]["tried"][0]["where"] == "#4235"
+    assert payload["rows"][1]["mechanisms"] == ["pair partition"]
+    assert "unverified claim" in payload["disclaimer"]
+
+
+def test_a_tagged_and_tried_row_stays_within_its_own_budget():
+    """The opt-in fields are capped too, so a tagged row has a known ceiling."""
+    row = {
+        "id": "2601.00001", "version": 2, "updated": "2026-01-02",
+        "title": "A paper", "first_seen": "2026-01-01", "last_seen": "2026-01-02",
+        "review": {"status": "relevant", "reason": "r" * 900, "by": "me",
+                   "date": "2026-01-02", "version": 2,
+                   "mechanisms": ["m" * 200, "n" * 200, "o" * 200, "M" * 200]},
+        "tried": [{"mechanism": "m" * 200, "where": "w" * 500, "outcome": "x" * 900,
+                   "by": "me", "date": "2026-01-02"},
+                  {"mechanism": "   ", "where": "dropped", "outcome": "no mechanism"}],
+    }
+    slim = W.slim_row(row)
+    blob = json.dumps(slim)
+    assert len(blob) <= W.TAGGED_ROW_BUDGET_BYTES, f"a tagged row grew to {len(blob)} bytes"
+    assert [len(m) for m in slim["review"]["mechanisms"]] == [W.MECHANISM_MAX] * 3
+    assert len(slim["tried"]) == 1
+    assert len(slim["tried"][0]["where"]) == W.WHERE_MAX
+    assert len(slim["tried"][0]["outcome"]) == W.REASON_MAX
+
 # --- the polling window ------------------------------------------------------
 
 def test_the_default_window_reaches_back_to_the_previous_poll():

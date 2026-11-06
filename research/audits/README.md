@@ -122,7 +122,7 @@ on `d` alone at one identical budget:
 ```
 uv run --frozen python research/audits/leader_audit.py pair \
     <candidate>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers default to every `codes/` entry with the same n, k and max check
@@ -142,6 +142,14 @@ not a distance difference. One of four decisions comes out:
 Exit 2 when either side is refuted, so it gates like `ladder` and `screen`.
 Exit 3 when there is no peer at all: that candidate is not making a d-only gain,
 so this is not the question to ask of it -- use `screen`.
+
+`--json-out` writes the audit as a record (`qldpc-peer-audit/1`: the candidate,
+the peers measured, trials, seeds, pair depth, threads, the decision, the exit
+code, and each entry's reading). That file is what the two packaging paths
+consume: `./qldpc submit --peer-audit <file>` and `evidence.peer_audit` in
+`research/kit/promote.py` refuse a d-only gain without it, with a decision other
+than `credible`, read at fewer trials than the claim's own search, or not
+covering every peer the gate named (`research/kit/peer_audit.py`, issue #4236).
 
 ## The frontier over time: `frontier_history.py`
 
@@ -409,6 +417,33 @@ tables under `research/kit/groups/`; the QECDB matches are fetched from the
 database's API and the fetched rows are kept in the record. Nothing here is a
 gate input; `recheck` re-verifies every recorded permutation from the blob
 hashes it cites, as `permutation_equivalence.py` does for its ledger.
+
+## Reachability pruning for code-calculus moves: `cc_reachability.py`
+
+Direction 6 of issue #4478 asks whether a code-calculus move can be skipped
+before any distance search, by computing where its child must land and checking
+that region against the board. `cc_reachability.py` answers it for the three
+moves v0.1 found productive. For every CSS parent with `n <= N` it enumerates
+C-DELETE-CHECK, E-PEEL, and E-PUNCTURE with the library's own semantics, applies
+the structural refusals the gate would make (a dependent display, a bare qubit,
+a disconnected Tanner graph, k = 0), computes the child's exact `(n', k', w')`
+from ranks alone, and asks whether the optimistic child `(n', k', d_parent, w')`
+is dominated in the strictest cell it could land in. A child's distance never
+exceeds its parent's under these moves, so a dominated optimistic child cannot
+be board-advancing at any real distance and the move can be skipped.
+
+```
+uv run --frozen python research/audits/cc_reachability.py --n-cap 120 \
+    --out research/audits/cc_reachability-<date>.json [--sweep <frontier.jsonl>]
+```
+
+`--sweep` takes the frontier record of a gated sweep (one JSON object per line
+with the child's `n`, `k`, `w`, its `parent` slug, and the gate's
+`board_advancing`) and reports how the filter would have done on children the
+gate judged: a child pruned here and advancing there is a soundness failure
+unless the board moved in between. `cc_reachability-2026-11-05.json` is the
+record for `n <= 120`; its reading, with the stabilizer-parent probe of the
+same day, is `fieldnotes/2026-11-05-code-calculus-v0p1-directions-1-and-6.md`.
 
 ## The finite-size map against the surface code: `surface_code_map.py`
 
