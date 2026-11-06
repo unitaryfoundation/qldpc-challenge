@@ -271,3 +271,101 @@ def test_the_wall_clock_kills_a_certifier_that_ignores_its_limit(tmp_path, monke
     rec, err, killed = S.certify_in_subprocess(os.path.join(codes, "slow.json"), "slow", 1, str(tmp_path / "p"),
                                                wall=10, script=str(bad))
     assert rec is None and not killed and err.startswith("ValueError: X side")
+
+
+def _tool_record(slug, doc, tlim, *, sides):
+    """Build a tropidist_certify record: solver level, per side exact or a timeout with its lower bound."""
+    blocks = {}
+    for side, (status, lb) in sides.items():
+        blk = {"value": doc["distance"]["d"], "status": status, "exact": status == "UNSAT", "secs": 0.2}
+        blk["note"] = f"no logical < {doc['distance']['d']} exists" if status == "UNSAT" else f"lower bound {lb}"
+        if status == "TIMEOUT":
+            blk["lower_bound"] = lb
+        blocks[side] = blk
+    return {"name": slug, "d": doc["distance"]["d"],
+            "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search",
+            "encoding": "pauli-mechanisms" if "P" in sides else "css-sides", "tlim_per_solve": tlim,
+            "logical_classes": doc["k"], "sides": blocks, "d_exact": all(s == "UNSAT" for s, _ in sides.values()),
+            "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel"}}
+
+
+def test_the_tropidist_backend_admits_stabilizer_entries_and_hands_closed_css_entries_to_sat(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    css = {"n": 12, "k": 2, "code_type": "CSS", "distance": {"d": 2, "X": {"value": 2}, "Z": {"value": 2}}}
+    for slug in ("css-closes", "css-open", "css-broken"):
+        _write(os.path.join(codes, slug + ".json"), css)
+    _write(os.path.join(codes, "stab.json"), {"n": 5, "k": 1, "code_type": "stabilizer",
+                                              "distance": {"d": 3, "P": {"value": 3}}})
+    queue = {"date": "2026-11-06", "head": "q",
+             "entries": [_row("css-closes"), _row("css-open"), _row("stab", code_type="stabilizer", d=3, n=5),
+                         _row("css-broken")]}
+    sat_calls = []
+
+    def certify(doc, tlim, proof_dir, slug):            # the SAT proof path: proof_log on everything it sees
+        sat_calls.append(slug)
+        return _record()
+
+    def tool(doc, tlim, slug):                          # the tropidist stand-in
+        if slug == "css-closes":
+            return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("UNSAT", None)})
+        if slug == "css-open":
+            return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("TIMEOUT", 1)})
+        if slug == "stab":
+            return _tool_record(slug, doc, tlim, sides={"P": ("UNSAT", None)})
+        raise RuntimeError("tropidist wrote no record")
+
+    attempts = str(tmp_path / "attempts.jsonl")
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=attempts, tlim=600, job_seconds=1000, certs_dir=certs,
+                    codes_dir=codes, certify=certify, certify_tropidist=tool, tools=lambda: {},
+                    backend="tropidist+sat")
+    rows = {r["slug"]: r for r in S.load_jsonl(attempts)}
+    # SAT runs only on what the tool closed (to upgrade) or could not run on (to fall back); never on a
+    # tool timeout, never on a stabilizer entry
+    assert sat_calls == ["css-closes", "css-broken"]
+    assert rows["css-closes"]["backend"] == "sat" and rows["css-closes"]["upgrade"] == "proof_log"
+    assert rows["css-closes"]["level"] == "proof_log"
+    assert rows["css-open"]["outcome"] == "timeout" and rows["css-open"]["backend"] == "tropidist"
+    assert rows["css-open"]["sides"]["Z"]["lower_bound"] == 1 and "upgrade" not in rows["css-open"]
+    assert rows["stab"]["outcome"] == "exact" and rows["stab"]["backend"] == "tropidist"
+    assert rows["stab"]["level"] == "solver" and set(rows["stab"]["sides"]) == {"P"}
+    assert rows["css-broken"]["backend"] == "sat" and rows["css-broken"]["outcome"] == "exact"
+    assert sorted(m["staged"]) == ["css-broken", "css-closes", "stab"] and m["backend"] == "tropidist+sat"
+    with open(os.path.join(out, "certs", "stab.json"), encoding="utf-8") as f:
+        cert = json.load(f)
+    assert cert["d_exact"] and cert["sides"]["P"]["exact"] and cert["verification"]["level"] == "solver"
+    title, body = S.pr_text(m, staged=m["staged"])
+    assert "tropidist backend" in body and "stabilizer" in body and "| stab | 5 | 2 | 3 | solver | tropidist |" in body
+    assert "| css-closes | 12 | 2 | 2 | proof_log | sat |" in body
+    summary = S.summary_markdown(m)
+    assert "| stab |" in summary and "d >= 1" not in summary, "the summary table lists what closed"
+    # the tool alone never calls SAT; the SAT path alone still skips stabilizer entries
+    sat_calls.clear()
+    m2 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out2"), attempts_path=str(tmp_path / "a2.jsonl"),
+                     tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, certify=certify,
+                     certify_tropidist=tool, tools=lambda: {}, backend="tropidist")
+    assert sat_calls == [] and m2["outcomes"] == {"exact": 2, "timeout": 1, "error": 1}
+    m3 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out3"), attempts_path=str(tmp_path / "a3.jsonl"),
+                     tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, certify=certify,
+                     tools=lambda: {}, backend="sat")
+    assert m3["skipped"] == {"stabilizer": 1} and sat_calls == ["css-closes", "css-open", "css-broken"]
+    with pytest.raises(ValueError):
+        S.run_sweep(queue=queue, out_dir=str(tmp_path / "out4"), attempts_path=str(tmp_path / "a4.jsonl"),
+                    tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, tools=lambda: {},
+                    backend="tropidist")
+
+
+def test_selection_for_the_tool_checks_the_pauli_side_against_d(tmp_path):
+    S = _script()
+    codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
+    for slug in ("ok", "off"):
+        _write(os.path.join(codes, slug + ".json"), {"n": 5})
+    off = _row("off", code_type="stabilizer", d=3)
+    off["sides"]["P"]["value"] = 4
+    queue = {"entries": [_row("ok", code_type="stabilizer", d=3), off]}
+    chosen, skipped, reasons = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes,
+                                        stabilizer_ok=True)
+    assert [r["slug"] for r in chosen] == ["ok"] and skipped == {"side_mismatch": 1}
+    chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes)
+    assert chosen == [] and skipped == {"stabilizer": 2}

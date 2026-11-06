@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Work the cheap head of the certification queue and stage what closes (issue #4148).
+r"""Work the cheap head of the certification queue and stage what closes (issue #4148).
 
 research/certs/todo.json orders every upper-bound entry by what certifying it
 is worth and what it should cost (certification_queue.py, issue #4027), and
@@ -34,7 +34,20 @@ rounds, and a 442-qubit, k = 234 instance ran nine minutes past a 60 s limit
 in testing. An entry killed at the wall clock is recorded as a timeout, with
 the kill in its note, and nothing of it is staged.
 
+With a tropidist checkout (research/certs/tropidist_certify.py, issue #4716)
+``--backend`` chooses what runs. ``tropidist`` runs that tool alone: it closes
+in seconds what the SAT path takes minutes over, its records are solver
+level, and it is the only certifier for stabilizer entries, which it admits.
+``tropidist+sat`` runs it first and hands a CSS entry it closed to the SAT
+proof path, filing the proof_log record when that finishes and the tool's
+record otherwise; an entry the tool did not close is not retried with SAT in
+the same run, and a tool error falls back to SAT. Every attempt row names
+the backend that produced it and, for a side that did not close, the lower
+bound the tool proved.
+
     uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
+    uv run --extra research python research/certs/certify_sweep.py run --backend tropidist+sat \\
+        --tropidist /tmp/tropidist --threads 4
     uv run python research/certs/certify_sweep.py stage --out-dir research/out/certify_sweep
     uv run python research/certs/certify_sweep.py pr-body --out-dir research/out/certify_sweep --out body.md
 """
@@ -62,12 +75,19 @@ BATCH_LOG = "proof_log_batch.jsonl"
 OUTCOMES = ("exact", "timeout", "refuted", "error")
 EXIT_REFUTED = 3
 SAT_CERTIFY = os.path.join(ROOT, "verify", "sat_certify.py")
+TROPIDIST_CERTIFY = os.path.join(HERE, "tropidist_certify.py")
+BACKENDS = ("sat", "tropidist", "tropidist+sat")
 WALL_FLOOR = 300
 
 
 def wall_clock(tlim):
     """Return the hard per-entry limit: six solves of tlim (two per side, three tools) plus setup."""
     return 6 * tlim + WALL_FLOOR
+
+
+def tropidist_wall(tlim):
+    """Return the hard per-entry limit of the tropidist backend: one run of tlim per side plus setup."""
+    return 2 * tlim + WALL_FLOOR
 
 
 def utc_today():
@@ -137,15 +157,17 @@ def load_queue(path=TODO):
 def _row_from_doc(slug, doc):
     """Build a queue-shaped row for a slug named on the command line but not in the queue."""
     dist = doc["distance"]
-    sides = {s: {"value": dist[s]["value"]} for s in ("X", "Z") if isinstance(dist.get(s), dict)}
+    sides = {s: {"value": dist[s]["value"]} for s in ("X", "Z", "P") if isinstance(dist.get(s), dict)}
     return {"slug": slug, "code_type": doc.get("code_type", "CSS"), "n": doc["n"], "k": doc["k"],
             "d": dist["d"], "sides": sides, "band": None, "position": None, "record": None}
 
 
-def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None):
+def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None,
+           stabilizer_ok=False):
     """Return the entries the sweep opens, in queue order, and why it passes over the rest.
 
-    Skipped: stabilizer entries (no certifier), entries that have a
+    Skipped: stabilizer entries unless ``stabilizer_ok`` (the SAT path has no
+    Pauli-weight certifier; the tropidist backend has), entries that have a
     certificate file already, entries whose side values differ from d (a
     certificate at d would not be honored), entries not on the board, an
     entry a previous attempt refuted, an entry a previous attempt certified
@@ -180,8 +202,10 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
 
     for r in rows:
         slug = r["slug"]
-        if r.get("code_type") != "CSS":
-            skip(slug, "stabilizer", "stabilizer entry: no Pauli-weight certifier yet")
+        stab = r.get("code_type") == "stabilizer"
+        if r.get("code_type") != "CSS" and not (stab and stabilizer_ok):
+            skip(slug, "stabilizer", "stabilizer entry: the SAT path has no Pauli-weight certifier; "
+                                     "the tropidist backend admits it")
             continue
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
@@ -190,7 +214,8 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
             skip(slug, "certified", "certs/ already has a file for it")
             continue
         values = {s: v.get("value") for s, v in (r.get("sides") or {}).items()}
-        if len(values) != 2 or any(v != r["d"] for v in values.values()):
+        want = {"P"} if stab else {"X", "Z"}
+        if set(values) != want or any(v != r["d"] for v in values.values()):
             skip(slug, "side_mismatch",
                  f"side values {values} differ from d = {r['d']}; a certificate at d would not be honored")
             continue
@@ -259,7 +284,39 @@ def _side_summary(blk):
         out["proof"] = proof
     if pr.get("solve_secs") is not None:
         out["proof_secs"] = round((pr.get("solve_secs") or 0) + (pr.get("check_secs") or 0), 1)
+    if blk.get("lower_bound") is not None:
+        out["lower_bound"] = blk["lower_bound"]
     return out
+
+
+def tropidist_in_subprocess(path, slug, tlim, root, threads, wall):
+    """Run research/certs/tropidist_certify.py on one entry under a hard wall clock.
+
+    Returns (record, error, killed) like certify_in_subprocess. Exit 0 and 1
+    are verdicts (exact or not) with the record on stdout; exit 2 is the
+    certifier refusing (no checkout, a pairing set that does not span k, a
+    vector the board rejects), reported from its last stderr line.
+    """
+    cmd = [sys.executable, TROPIDIST_CERTIFY, path, "--tropidist", root, "--tlim", str(float(tlim)),
+           "--threads", str(int(threads)), "--json"]
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                            start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=wall)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, 9)
+        except OSError:
+            proc.kill()
+        proc.communicate()
+        return None, None, True
+    if proc.returncode not in (0, 1) or not out.strip():
+        tail = (err or "").strip().splitlines()
+        return None, (tail[-1] if tail else f"tropidist_certify exit {proc.returncode}"), False
+    try:
+        return json.loads(out), None, False
+    except ValueError:
+        return None, f"tropidist_certify printed no record for {slug}", False
 
 
 def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None):
@@ -291,14 +348,22 @@ def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None):
         return None, f"sat_certify printed no record for {slug}", False
 
 
-def attempt_row(row, cert, *, tlim, date, head, url, secs, error=None, killed=False):
-    """One line of attempts.jsonl."""
+def attempt_row(row, cert, *, tlim, date, head, url, secs, error=None, killed=False, backend="sat",
+                upgrade=None):
+    """One line of attempts.jsonl.
+
+    ``backend`` names what produced the record; ``upgrade`` what the SAT path
+    did after the tool closed an entry.
+    """
     out = {"date": date, "head": head, "run": url, "slug": row["slug"], "n": row["n"], "k": row["k"],
            "d": row["d"], "band": row.get("band"), "position": row.get("position"), "tlim": tlim,
-           "secs": round(secs, 1)}
+           "secs": round(secs, 1), "backend": backend}
+    if upgrade:
+        out["upgrade"] = upgrade
     if killed:
+        wall = tropidist_wall(tlim) if backend == "tropidist" else wall_clock(tlim)
         out.update(outcome="timeout", level=None, sides={},
-                   note=f"killed at the {wall_clock(tlim)} s wall clock; the solver's own limit did not hold")
+                   note=f"killed at the {wall} s wall clock; the solver's own limit did not hold")
         return out
     if error is not None:
         out.update(outcome="error", level=None, sides={}, note=error[:500])
@@ -322,15 +387,62 @@ def _write_json(path, obj, indent=2):
         f.write("\n")
 
 
+def _sat_attempt(path, slug, tlim, wall, certify):
+    """One SAT-path attempt: (record, error, killed), in a subprocess or through the stand-in."""
+    proof_dir = tempfile.mkdtemp(prefix=f"certify-{slug}-")
+    try:
+        if certify is None:
+            return certify_in_subprocess(path, slug, tlim, proof_dir, wall)
+        with open(path, encoding="utf-8") as f:
+            doc = json.load(f)
+        return certify(doc, tlim=tlim, proof_dir=proof_dir, slug=slug), None, False
+    except ValueError as e:
+        return None, str(e), False
+    finally:
+        shutil.rmtree(proof_dir, ignore_errors=True)
+
+
+def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist):
+    """One tropidist attempt: (record, error, killed), in a subprocess or through the stand-in."""
+    if certify_tropidist is None:
+        return tropidist_in_subprocess(path, slug, tlim, root, threads, tropidist_wall(tlim))
+    with open(path, encoding="utf-8") as f:
+        doc = json.load(f)
+    try:
+        return certify_tropidist(doc, tlim=tlim, slug=slug), None, False
+    except (ValueError, RuntimeError) as e:
+        return None, str(e), False
+
+
+def _is_proof_log(cert):
+    return (cert is not None and classify(cert) == "exact"
+            and (cert.get("verification") or {}).get("level") == "proof_log")
+
+
 def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0, slugs=None,
-              retry=False, certs_dir=CERTS, codes_dir=CODES, certify=None, tools=None):
+              retry=False, certs_dir=CERTS, codes_dir=CODES, certify=None, tools=None,
+              backend="sat", tropidist=None, threads=1, certify_tropidist=None):
     """Open entries in queue order until the budget is spent; stage what closes.
 
     Returns the run manifest, which is also written to <out_dir>/run.json.
-    Each entry runs in a subprocess under ``wall_clock(tlim)``; a ``certify``
-    callable (the tests' stand-in) runs in-process instead. ``tools`` defaults
-    to verify/sat_certify.py's.
+    Each entry runs in a subprocess under a wall clock; ``certify`` and
+    ``certify_tropidist`` callables (the tests' stand-ins) run in-process
+    instead. ``tools`` defaults to verify/sat_certify.py's.
+
+    ``backend`` is one of BACKENDS. "sat" is verify/sat_certify.py with the
+    proof path. "tropidist" is research/certs/tropidist_certify.py on the
+    checkout ``tropidist`` with ``threads`` threads: solver-level records,
+    stabilizer entries admitted. "tropidist+sat" runs the tool first and hands
+    a CSS entry it closed to the SAT proof path, filing the proof_log record
+    when that finishes and the tool's otherwise; an entry the tool did not
+    close is not retried with SAT in the same run, and a tool error falls back
+    to SAT.
     """
+    if backend not in BACKENDS:
+        raise ValueError(f"backend must be one of {BACKENDS}")
+    use_tool = "tropidist" in backend
+    if use_tool and tropidist is None and certify_tropidist is None:
+        raise ValueError("the tropidist backend needs a checkout: --tropidist or TROPIDIST_ROOT")
     if tools is None:
         import sat_certify
         tools = sat_certify.tool_versions
@@ -338,12 +450,16 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     date, head, url = utc_today(), git_head(), run_url()
     last = last_attempts(load_jsonl(attempts_path))
     chosen, skipped, reasons = select(queue, last=last, tlim=tlim, today=date, certs_dir=certs_dir,
-                                      codes_dir=codes_dir, slugs=slugs, retry=retry)
+                                      codes_dir=codes_dir, slugs=slugs, retry=retry, stabilizer_ok=use_tool)
     if max_entries:
         chosen = chosen[:max_entries]
+    versions = dict(tools())
+    if use_tool and tropidist:
+        from tropidist_certify import tropidist_commit
+        versions["tropidist"] = tropidist_commit(tropidist)
     manifest = {"date": date, "head": head, "run": url, "tlim": tlim, "wall": wall, "job_seconds": job_seconds,
-                "queue_date": queue.get("date"), "queue_head": queue.get("head"),
-                "selected": len(chosen), "skipped": dict(skipped), "tools": tools(),
+                "queue_date": queue.get("date"), "queue_head": queue.get("head"), "backend": backend,
+                "selected": len(chosen), "skipped": dict(skipped), "tools": versions,
                 "results": [], "staged": [], "stopped_by_budget": False, "left": 0}
     os.makedirs(os.path.join(out_dir, "certs"), exist_ok=True)
     t_start = time.time()
@@ -354,22 +470,24 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
             break
         slug = row["slug"]
         path = os.path.join(codes_dir, slug + ".json")
-        proof_dir = tempfile.mkdtemp(prefix=f"certify-{slug}-")
+        stab = row.get("code_type") == "stabilizer"
         t0 = time.time()
-        cert, error, killed = None, None, False
-        try:
-            if certify is None:
-                cert, error, killed = certify_in_subprocess(path, slug, tlim, proof_dir, wall)
+        cert, error, killed, used, upgrade = None, None, False, "sat", None
+        if use_tool:
+            used = "tropidist"
+            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist)
+        if backend == "sat" or (backend == "tropidist+sat" and not stab
+                                and (error is not None or (cert is not None and classify(cert) == "exact"))):
+            sat_cert, sat_error, sat_killed = _sat_attempt(path, slug, tlim, wall, certify)
+            if cert is None:
+                cert, error, killed, used = sat_cert, sat_error, sat_killed, "sat"
+            elif _is_proof_log(sat_cert):
+                cert, used, upgrade = sat_cert, "sat", "proof_log"
             else:
-                with open(path, encoding="utf-8") as f:
-                    doc = json.load(f)
-                cert = certify(doc, tlim=tlim, proof_dir=proof_dir, slug=slug)
-        except ValueError as e:
-            error = str(e)
-        finally:
-            shutil.rmtree(proof_dir, ignore_errors=True)
+                upgrade = "sat " + (classify(sat_cert) if sat_cert is not None
+                                    else "killed" if sat_killed else f"error: {sat_error}"[:200])
         att = attempt_row(row, cert, tlim=tlim, date=date, head=head, url=url,
-                          secs=time.time() - t0, error=error, killed=killed)
+                          secs=time.time() - t0, error=error, killed=killed, backend=used, upgrade=upgrade)
         if att["outcome"] == "exact":
             _write_json(os.path.join(out_dir, "certs", slug + ".json"), certificate(cert))
             br = batch_row(slug, row["n"], cert)
@@ -413,10 +531,10 @@ def summary_markdown(m):
                                                         or "none"), ""]
     staged = [r for r in m["results"] if r["outcome"] == "exact"]
     if staged:
-        lines += ["| entry | n | k | d | level | X | Z |", "|---|---|---|---|---|---|---|"]
+        lines += ["| entry | n | k | d | level | backend | sides |", "|---|---|---|---|---|---|---|"]
         for r in staged:
             lines.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
-                         f"{_side_cell(r['sides'].get('X'))} | {_side_cell(r['sides'].get('Z'))} |")
+                         f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
         lines.append("")
     for outcome in ("refuted", "timeout", "error"):
         rows = [r for r in m["results"] if r["outcome"] == outcome]
@@ -435,7 +553,14 @@ def _side_cell(s):
         txt += f", proof {s.get('proof_secs')} s"
     elif s.get("proof"):
         txt += f", proof: {s['proof']}"
+    if s.get("lower_bound") is not None:
+        txt += f", d >= {s['lower_bound']}"
     return txt
+
+
+def _sides_cell(sides):
+    """One table cell for an entry's sides: X and Z, or the single Pauli side P."""
+    return "; ".join(f"{name} {_side_cell(sides.get(name))}" for name in sorted(sides or {}))
 
 
 def stage(out_dir, *, certs_dir=CERTS):
@@ -485,7 +610,9 @@ def pr_text(m, staged=None):
     noun = "entry" if n == 1 else "entries"
     title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
     levels = Counter(r["level"] for r in rows)
-    solver = [r for r in rows if r["level"] == "solver"]
+    sat_rows = [r for r in rows if r.get("backend", "sat") == "sat"]
+    tool_rows = [r for r in rows if r.get("backend") == "tropidist"]
+    solver = [r for r in sat_rows if r["level"] == "solver"]
     tools = m.get("tools") or {}
     run = f" ([run]({m['run']}))" if m.get("run") else ""
     body = [
@@ -494,15 +621,33 @@ def pr_text(m, staged=None):
         "(research/certs/certify_sweep.py, issue #4148). Every certified distance equals the distance the "
         "entry already claims on both sides, so no codes/ file changes and the diff is evidence quality only: "
         "these entries move from a witnessed upper bound to the exact tier.",
-        "",
-        f"The run is verify/sat_certify.py with --proof at {m['tlim']} s per solve on a GitHub-hosted runner, "
-        f"from main at {(m.get('head') or '?')[:12]}. Each side is asked at weight d - 1 twice in the same "
-        "process: once in the selector encoding with CryptoMiniSat, and once re-emitted as pure CNF (side_cnf, "
-        f"XOR chunk arity 5, no symmetry prefix), refuted by kissat {tools.get('kissat') or '?'}, and checked "
-        "by drat-trim. Regenerating every side's formula from the codes/ file on this branch reproduces the "
-        "recorded cnf_sha256, which is the check verify/replay_proofs.py makes before it re-solves. The workflow "
-        "ran that replay on the quick staged proof_log certificates before opening this PR.",
-        "",
+        ""]
+    if sat_rows:
+        body += [
+            f"The SAT path is verify/sat_certify.py with --proof at {m['tlim']} s per solve on a GitHub-hosted "
+            f"runner, from main at {(m.get('head') or '?')[:12]}. Each side is asked at weight d - 1 twice in the "
+            "same process: once in the selector encoding with CryptoMiniSat, and once re-emitted as pure CNF "
+            f"(side_cnf, XOR chunk arity 5, no symmetry prefix), refuted by kissat {tools.get('kissat') or '?'}, "
+            "and checked by drat-trim. Regenerating every side's formula from the codes/ file on this branch "
+            "reproduces the recorded cnf_sha256, which is the check verify/replay_proofs.py makes before it "
+            "re-solves. The workflow ran that replay on the quick staged proof_log certificates before opening "
+            "this PR.",
+            ""]
+    if tool_rows:
+        stabs = [r for r in tool_rows if "P" in (r.get("sides") or {})]
+        body += [
+            f"{len(tool_rows)} {'certificate is' if len(tool_rows) == 1 else 'certificates are'} from the "
+            f"tropidist backend (research/certs/tropidist_certify.py, issue #4716): github.com/Fanerst/tropidist "
+            f"at commit {(tools.get('tropidist') or 'unpinned')[:12]}, the exhaustive distance evaluators of "
+            f"arXiv:2611.08247, at {m['tlim']} s per side. Its lower bound is exhaustion inside the tool's kernel "
+            "with no replayable artifact, so these records are at the solver level, and the vector it returned "
+            "for each side was re-verified with verify/heuristic_distance.py before filing."
+            + (f" {len(stabs)} of them {'is a' if len(stabs) == 1 else 'are'} stabilizer "
+               f"{'entry' if len(stabs) == 1 else 'entries'}, certified in Pauli weight through the "
+               "three-mechanisms-per-qubit encoding that module describes; these are the board's first "
+               "stabilizer certificates." if stabs else ""),
+            ""]
+    body += [
         f"Filed in the #3666 shape: the run's own record with the per-side proof block removed, and for each "
         "proof_log certificate a row in certs/proof_log_batch.jsonl with the clause counts, proof and "
         f"trimmed-core sizes, and solve and check seconds. {levels.get('proof_log', 0)} at proof_log, "
@@ -510,10 +655,10 @@ def pr_text(m, staged=None):
         + (" (CryptoMiniSat closed both sides and the proof path did not finish on at least one side: "
            + ", ".join(r["slug"] for r in solver) + ")" if solver else "") + ".",
         "",
-        "| entry | n | k | d | level | X | Z |", "|---|---|---|---|---|---|---|"]
+        "| entry | n | k | d | level | backend | sides |", "|---|---|---|---|---|---|---|"]
     for r in rows:
         body.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
-                    f"{_side_cell(r['sides'].get('X'))} | {_side_cell(r['sides'].get('Z'))} |")
+                    f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
     body += ["",
              "The attempt log research/certs/attempts.jsonl on main records this run's attempts, including the "
              "entries that did not close in budget.",
@@ -557,6 +702,12 @@ def main(argv=None):
     r.add_argument("--max-entries", type=int, default=0, help="open at most this many (0: no cap)")
     r.add_argument("--slugs", nargs="*", default=None, help="try these instead of the queue head")
     r.add_argument("--retry", action="store_true", help="reopen entries that timed out at this budget")
+    r.add_argument("--backend", choices=BACKENDS, default="sat",
+                   help="sat (default), tropidist, or tropidist+sat (the tool first, then the SAT proof path "
+                        "on what it closed)")
+    r.add_argument("--tropidist", default=os.environ.get("TROPIDIST_ROOT"),
+                   help="the tropidist checkout (default: $TROPIDIST_ROOT)")
+    r.add_argument("--threads", type=int, default=1, help="threads per tropidist run (default 1)")
     s = sub.add_parser("stage", help="copy the staged certificates into certs/")
     s.add_argument("--out-dir", default=OUT_DIR)
     p = sub.add_parser("pr-body", help="write the certs-only PR body; prints its title")
@@ -569,7 +720,8 @@ def main(argv=None):
 
     if a.cmd == "run":
         m = run_sweep(queue=load_queue(a.queue), out_dir=a.out_dir, attempts_path=a.attempts, tlim=a.tlim,
-                      job_seconds=a.job_seconds, max_entries=a.max_entries, slugs=a.slugs, retry=a.retry)
+                      job_seconds=a.job_seconds, max_entries=a.max_entries, slugs=a.slugs, retry=a.retry,
+                      backend=a.backend, tropidist=a.tropidist, threads=a.threads)
         o = m["outcomes"]
         print(f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)} (staged under "
               f"{os.path.relpath(a.out_dir, ROOT)}), timeout {o.get('timeout', 0)}, refuted "

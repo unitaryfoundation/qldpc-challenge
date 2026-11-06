@@ -25,7 +25,8 @@ lists. This script writes ``todo.json`` from ``codes/`` and ``certs/``:
   October 2026 Perlmutter run closed at 2,400 s per solve. C: n <= 700 and
   d <= 24, beyond any peer but inside what the tier has reached (largest
   certified d is 19). D: everything else, which no certificate on main
-  resembles. P: a stabilizer code, for which no certifier exists yet.
+  resembles. P: a stabilizer code, which only the tropidist backend of the sweep
+  certifies (research/certs/tropidist_certify.py, Pauli weight, solver level).
   research/cost/cost_table.json, when present, is cross-checked: the nearest
   measured shape's certification status rides along;
 * the order: records first, then by band, then cheapest first (peer median,
@@ -64,7 +65,7 @@ BANDS = {
     "C": "n <= 700 and d <= 24: beyond any certified peer, inside what the SAT tier has "
          "reached (largest certified d is 19)",
     "D": "n > 700 or d > 24: nothing certified on main resembles it",
-    "P": "stabilizer code: no Pauli-weight certifier exists yet",
+    "P": "stabilizer code: certified in Pauli weight only by the sweep's tropidist backend (solver level)",
 }
 BAND_ORDER = {b: i for i, b in enumerate("ABCDP")}
 RULE = ("records first (on a cell frontier or the global one), then band A to D (P last), then "
@@ -171,7 +172,7 @@ def build_queue(build, entries, records):
                "cells": [f"{L}~{W}" for (L, W) in build.cells(e)], "sides": {}}
         if stab:
             rec["sides"]["P"] = {"value": (doc["distance"].get("P") or {}).get("value", d),
-                                 "note": "Pauli weight; no certifier"}
+                                 "note": "Pauli weight; tropidist backend only"}
         else:
             HX = V._matrix(doc["checks"]["X"], n)
             HZ = V._matrix(doc["checks"]["Z"], n)
