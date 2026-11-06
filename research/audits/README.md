@@ -471,3 +471,71 @@ while a board entry at tier `ub` is a witness-backed upper bound and beats
 the surface code only if its bound is tight. The comparison counts data
 qubits only; the operational comparison in #4601 (total qubits at matched
 logical error rate) is Level 2 and is not computed here.
+
+## Certified circuit-distance lower bounds: `circuit_distance_bounds.py`
+
+Every circuit-tier entry records `d_circ` per memory basis as a witnessed
+upper bound: a fault set `verify/circuit_verify.py` checked, found by a
+randomized search that cannot say the set is the lightest, and the gate's
+refutation step (`verify/gate_changed.py`) is a bounded search of the same
+kind. The audit of arXiv:2611.08247 (Cheng, Guo, and Pan) finds that
+circuit distances of schedules presented as distance-preserving are where
+published values most often overstate the truth, because the lightest fault
+sets combine hook errors from several checks. Their tool, tropidist
+(github.com/Fanerst/tropidist), proves circuit-distance lower bounds by
+exhaustive search after two reductions: it keeps the detectors of the memory
+basis (exact when every kept column lifts, which it checks) and collapses the
+rounds (a lower bound), then lifts the collapsed minimizers back to the
+circuit. Both reductions key on detector coordinates `(check, 0, round,
+type)`, which the board's committed circuits do not carry.
+
+`circuit_distance_bounds.py` (issue #4717) adds those coordinates in memory
+and runs the tool per basis. The check is the ancilla qubit the detector's
+measurements belong to (a flag qubit is its own check, so the collapse groups
+each flag with itself), the round is how many times that ancilla had been
+measured before (a closure that also reads data qubits sits one round after
+the last extraction), and the type is the ancilla's measurement basis, 0 for
+X and 3 for Z. A flag qubit, an ancilla that touches no data qubit, is typed
+by its own basis, by its check's basis, or by the memory basis, the first
+policy under which the tool's own `sector_is_exact` test passes; when none
+passes it searches the full detector error model. Detectors of the other type
+than the memory basis are shifted one round later, because the tool takes the
+type present at round 0 as the memory basis and a flag measured from the
+first round on puts both types there; those rows are dropped by the sector
+reduction before anything reads their round. A fault set the tool returns
+below the claim is mapped back to the committed `.dem`'s error instructions
+by its (detectors, observables) pair and checked with
+`verify/circuit_tools.witness_errors` before it is called a refutation.
+
+The record `circuit_distance_bounds-<date>.json` holds, per entry and basis,
+the claim, the proved lower bound, the lightest fault set's weight, the
+reduction used, and a verdict: `exact` when the lower bound meets the claim
+(the committed witness supplies the matching upper bound), `open` when it
+does not, `refuted` when a lighter verified fault set exists. Nothing here
+edits `codes/` or `circuits/`; the schema's `circuitSideDistance` still
+admits only `upper_bound`, and carrying an exact `d_circ` onto the board is
+a schema and verifier change for a later issue.
+
+```
+uv run python research/audits/circuit_distance_bounds.py --tropidist /tmp/tropidist --slugs 48-4-7 --tlim 120
+uv run python research/audits/circuit_distance_bounds.py --tropidist /tmp/tropidist --tlim 120 --jobs 4 \
+    --out research/audits/circuit_distance_bounds-<date>.json
+```
+
+The record of 2026-11-06 (`circuit_distance_bounds-2026-11-06.json`, 120 s
+per basis, one kernel thread, 7,308 tool seconds in all) covers the 273
+circuit-tier entries. The sector and time-collapse reductions applied to 544
+of the 546 basis problems (the two bases of 31-1-7 fell back to the full
+model). 227 entries are exact, 194 of them at the claimed d_circ = d; 11 are
+open, with proved lower bounds between 4 and 10 against claims of 7 to 16;
+and 35 are refuted, 33 of them generic sequential two-block extraction
+circuits without a contributed_by block and 2 flag-protected ones (48-8-8,
+X side 8 to 7, and 54-4-10, 10 to 8). The sequential circuits with claims
+of 12 to 14 mostly have circuit distance 6 or 7: 102-6-13 and 104-6-14 have
+7, 108-10-12, 108-16-12, 80-6-12, 90-12-12, and 108-8-13 (X side) have 6,
+80-8-12 has 5. Every refuting fault set was re-checked against the committed
+`.dem` with `verify/circuit_tools.witness_errors`. `--tighten OUT_DIR`
+writes the corrected `codes/` documents of the refuted entries in the shape
+of the circuit refutation binding (issue #4723): the refuted sides lowered to
+the verified fault sets at `upper_bound`, the rest of the circuit block
+untouched, and a sentence naming the refuter appended to `provenance.notes`.
