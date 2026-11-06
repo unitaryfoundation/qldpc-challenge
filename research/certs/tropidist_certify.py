@@ -281,8 +281,10 @@ def certify(doc, *, root, tlim=600, threads=1, slug=None, kmin=None, runner=None
         blk = side_block(doc, side, claim, rec, tlim=tlim)
         blk.setdefault("secs", round(time.time() - t0, 1))
         out["sides"][side] = blk
-    out["d_exact"] = all(b.get("exact") for b in out["sides"].values()) and \
-        all(b["value"] == d for b in out["sides"].values())
+    # Each side is asked at its own claimed value, so an entry whose sides differ
+    # (d_X = 3, d_Z = 4) closes when both close; d = min over the sides by schema,
+    # and the site honors the certificate side by side (cert_consistent).
+    out["d_exact"] = all(b.get("exact") for b in out["sides"].values())
     out["verification"] = {"level": LEVEL, "note": VERIFICATION_NOTE[:500]}
     return out
 
