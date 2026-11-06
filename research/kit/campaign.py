@@ -330,7 +330,11 @@ def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
     describes. A new campaign has to state it, so ``card=None`` is refused
     here; ``direction: null`` in a committed file is reserved for the
     campaigns defined before the card existed. (``direction`` on this
-    function is still the objective's maximize or minimize.)
+    function is still the objective's maximize or minimize.) A campaign that
+    enters a route knowing its first candidates are worse than the bar adds
+    ``non_monotonic`` to the card, the statement of what made the route worth
+    starting (issue #4237, research/AUTORESEARCH.md section 3e); the stop stays
+    ``abandon_criterion``.
 
     The seven required fields are ``schema_version``, ``id``, ``name``,
     ``objective`` (``metric`` and ``direction``), ``budget``, and

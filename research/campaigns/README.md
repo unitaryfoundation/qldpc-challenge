@@ -103,6 +103,7 @@ different field: maximize or minimize.)
 | `expected_value` | what a positive result is worth, as a statement: "a weight-6 2D-local code at k >= 8 would be the first in this cell". Never a number: a number would be a score, and TRACKS.md's own reasoning about kd^2/n is that one number must not stand in for a frontier |
 | `abandon_criterion` | when the ladder is dropped, in the terms `research/kit/escalation.py` enforces: `flat_fresh_rungs` (at least 2, its `MIN_FLAT_RUNGS`) agreeing at a bound below the bar, and a `trials_cap` per candidate, with an optional `note` |
 | `what_a_negative_would_teach` | the falsifiable content of a failure: what the next session may stop trying |
+| `non_monotonic` | optional, present only when the route is entered knowing its first candidates are worse than the bar: `why_worth_starting` (the signal, in a sentence), `regresses_on` (the axes they are expected to lose on), `precondition` (what must hold for the route to pay off, and the transform searched for to establish it), and optionally `base` (the board slug or staged intermediate it starts from). The stop stays `abandon_criterion`; section 3e of `research/AUTORESEARCH.md` says when to enter such a route and how to stage its intermediates (issue #4237) |
 
 `research/campaigns/bb-w6-n-le-100-trinomials/` is the first campaign filed
 with the card; its `summary.json` shows the block beside the ledger. Section
