@@ -894,8 +894,17 @@ arXiv:2610.23832 and arXiv:2610.31352 found that standard schedules are far from
 search against a frozen evaluator reaches. `kit/circuit_search.py` is that search for one
 entry: `H`, the layout, the noise recipe, and the round count stay fixed; the schedule
 (interleaved two-block slot assignments, layout zigzag pattern pairs, edge-coloring orders
-of the generic sequential extraction) is the search space; the evaluator is
-`verify/circuit_verify.py`, called and never edited.
+of the generic sequential extraction, the first and last flagged first) is the search space;
+the evaluator is `verify/circuit_verify.py`, called and never edited.
+
+Flags are what close the gap to `d_circ = d` (issue #4231, where they did so on 249 board
+entries): every check gets up to `w // 2` Johnson-coil flag qubits, each coupled to the
+ancilla twice so that a hook fault on the ancilla in between flips it, plus up to four span
+flags on the outermost steps that break the three-hook blind spot of a pure coil. The
+generator sizes the flag count to the largest that keeps the memory circuits under the
+verifier's mechanism and file-size caps, so a flagged schedule costs qubits (one per flag per
+check) and never verifiability. `circuit_autogen.flag_intervals` is the definition and
+`flag_syndrome` the way to check a hook pattern against it.
 
 ```
 uv run --extra research python research/kit/circuit_search.py 72-12-6 --attempts 12 --seconds 60
