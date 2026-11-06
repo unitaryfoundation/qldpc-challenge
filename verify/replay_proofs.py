@@ -90,19 +90,21 @@ def replay(slug, cert, work, tlim):
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
-    W = int(cert["d"]) - 1
     rep = {"slug": slug, "n": n, "sides": {}, "ok": True}
     for side, H_same, H_opp in (("X", HX, HZ), ("Z", HZ, HX)):
         want = _hashes(cert).get(side)
         if want is None:
             continue
+        # The rung the side rests on: d - 1 on an exact certificate, and
+        # the top UNSAT rung of a partial one's ladder (issue #4230).
+        W = int((cert["sides"].get(side) or {}).get("proved_min", cert["d"])) - 1
         t0 = time.time()
         L = _logicals(H_opp, H_same)
         clauses, nvars = side_cnf(H_opp, L, W)
         cnf = os.path.join(work, f"{slug}-{side}.cnf")
         proof = os.path.join(work, f"{slug}-{side}.proof")
         got = write_dimacs(clauses, nvars, cnf)
-        blk = {"cnf_sha256_matches": got == want}
+        blk = {"W": W, "cnf_sha256_matches": got == want}
         if got != want:
             # The recorded refutation was of a different formula than this
             # emitter now produces. That is a defect in the emitter or the

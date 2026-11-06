@@ -41,11 +41,26 @@ level, and it is the only certifier for stabilizer entries, which it admits.
 ``tropidist+sat`` runs it first and hands a CSS entry it closed to the SAT
 proof path, filing the proof_log record when that finishes and the tool's
 record otherwise; an entry the tool did not close is not retried with SAT in
-the same run, and a tool error falls back to SAT. Every attempt row names
+the same run unless a ladder is on, in which case the ladder runs on it and
+its record replaces the tool's when it proves at least as much, and a tool
+error falls back to SAT. Every attempt row names
 the backend that produced it and, for a side that did not close, the lower
 bound the tool proved.
 
+With ``--ladder SECONDS`` (issue #4230) the SAT path asks each side at
+W = 1, 2, ... up to d - 1 instead of at d - 1 alone, spending at most that
+many seconds per side. UNSAT at W is the theorem d >= W + 1 whatever happens
+above it, so an entry that does not close still leaves a proven lower bound,
+and the run stages it as a partial certificate (``d_exact`` false,
+``d_lower``), which the board shows as the interval d_lower <= d <= d. A
+partial certificate already in certs/ is reopened at its own d_lower when
+``--retry`` names it or the ladder budget is larger than the one it
+recorded, and replaced only when the new run raises the bound; the old rungs
+stay in the file. The tropidist backend's per-side lower bounds are filed the
+same way.
+
     uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
+    uv run --extra research python research/certs/certify_sweep.py run --tlim 120 --ladder 300
     uv run --extra research python research/certs/certify_sweep.py run --backend tropidist+sat \\
         --tropidist /tmp/tropidist --threads 4
     uv run python research/certs/certify_sweep.py stage --out-dir research/out/certify_sweep
@@ -72,7 +87,7 @@ TODO = os.path.join(HERE, "todo.json")
 ATTEMPTS = os.path.join(HERE, "attempts.jsonl")
 OUT_DIR = os.path.join(ROOT, "research", "out", "certify_sweep")
 BATCH_LOG = "proof_log_batch.jsonl"
-OUTCOMES = ("exact", "timeout", "refuted", "error")
+OUTCOMES = ("exact", "partial", "timeout", "refuted", "error")
 EXIT_REFUTED = 3
 SAT_CERTIFY = os.path.join(ROOT, "verify", "sat_certify.py")
 TROPIDIST_CERTIFY = os.path.join(HERE, "tropidist_certify.py")
@@ -80,9 +95,13 @@ BACKENDS = ("sat", "tropidist", "tropidist+sat")
 WALL_FLOOR = 300
 
 
-def wall_clock(tlim):
-    """Return the hard per-entry limit: six solves of tlim (two per side, three tools) plus setup."""
-    return 6 * tlim + WALL_FLOOR
+def wall_clock(tlim, ladder=None):
+    """Return the hard per-entry limit: six solves of tlim (two per side, three tools) plus setup.
+
+    A ladder adds its per-side budget twice: the rung it is on when the
+    budget runs out may still take its six solves.
+    """
+    return 6 * tlim + WALL_FLOOR + (2 * int(ladder) if ladder else 0)
 
 
 def tropidist_wall(tlim):
@@ -162,8 +181,19 @@ def _row_from_doc(slug, doc):
             "d": dist["d"], "sides": sides, "band": None, "position": None, "record": None}
 
 
+def _cert_on_file(certs_dir, slug):
+    path = os.path.join(certs_dir, slug + ".json")
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
 def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None,
-           stabilizer_ok=False):
+           stabilizer_ok=False, ladder=None):
     """Return the entries the sweep opens, in queue order, and why it passes over the rest.
 
     Skipped: stabilizer entries unless ``stabilizer_ok`` (the SAT path has no
@@ -174,10 +204,16 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
     whose PR has not landed (for ``AWAITING_DAYS`` days; after that the
     certificate was lost or its PR closed, and the entry is solved again),
     and, unless ``retry``, an entry that timed out or
-    errored at this time limit or a longer one. Naming ``slugs`` lifts the
-    attempt-based skips for those slugs and admits slugs outside the queue.
-    The first four skips hold either way: a certificate at d would change
-    nothing for those entries.
+    errored at this time limit or a longer one (with a ladder budget at least
+    ``ladder``). Naming ``slugs`` lifts the attempt-based skips for those
+    slugs and admits slugs outside the queue. The first four skips hold
+    either way: a certificate at d would change nothing for those entries.
+
+    A partial certificate on file (``d_exact`` false) is not a closed entry:
+    with ``ladder`` it is reopened at its own ``d_lower`` when ``retry`` or
+    ``slugs`` names it or the new budget is larger than the one it recorded,
+    and the row then carries ``start`` and ``raise_from``; otherwise it is
+    skipped as ``partial``.
     """
     by_slug = {r["slug"]: r for r in queue.get("entries", [])}
     if slugs:
@@ -210,9 +246,21 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
             continue
-        if os.path.exists(os.path.join(certs_dir, slug + ".json")):
+        on_file = _cert_on_file(certs_dir, slug)
+        if on_file is not None and (on_file.get("d_exact") or not on_file.get("d_lower")):
             skip(slug, "certified", "certs/ already has a file for it")
             continue
+        if on_file is not None:
+            had = ((on_file.get("ladder") or {}).get("budget_per_side") or 0)
+            if not ladder:
+                skip(slug, "partial", f"certs/ has a partial certificate (d >= {on_file['d_lower']}); "
+                                      "a ladder run raises it")
+                continue
+            if not (retry or slugs or ladder > had):
+                skip(slug, "partial", f"certs/ has a partial certificate (d >= {on_file['d_lower']}) from a "
+                                      f"{had:g} s ladder; --retry or a larger --ladder raises it")
+                continue
+            r = dict(r, start=int(on_file["d_lower"]), raise_from=on_file)
         values = {s: v.get("value") for s, v in (r.get("sides") or {}).items()}
         want = {"P"} if stab else {"X", "Z"}
         if set(values) != want or any(v != r["d"] for v in values.values()):
@@ -229,21 +277,125 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
                 skip(slug, "awaiting_pr", f"certified on {prev.get('date')}; its certificate has not landed")
                 continue
         if (prev and not retry and prev.get("outcome") in ("timeout", "error")
-                and (prev.get("tlim") or 0) >= tlim):
+                and (prev.get("tlim") or 0) >= tlim and (prev.get("ladder") or 0) >= (ladder or 0)):
             skip(slug, "attempted", f"{prev.get('outcome')} at {prev.get('tlim')} s per solve on {prev.get('date')}")
             continue
         chosen.append(r)
     return chosen, skipped, reasons
 
 
+def lower_bound_of(cert):
+    """Return the lower bound a record proves on both sides, or None.
+
+    ``d_lower`` when the SAT ladder wrote one; otherwise the minimum over the
+    two CSS sides of what each proved: d on a closed side, the tropidist
+    backend's ``lower_bound`` on an open one. None when a side proved nothing
+    or the record is not two-sided (the partial tier is CSS only).
+    """
+    sides = cert.get("sides") or {}
+    if isinstance(cert.get("d_lower"), int):
+        return cert["d_lower"]
+    if set(sides) != {"X", "Z"}:
+        return None
+    bounds = []
+    for blk in sides.values():
+        blk = blk or {}
+        if blk.get("status") == "SAT":
+            return None
+        b = cert.get("d") if blk.get("exact") else (blk.get("proved_min") or blk.get("lower_bound"))
+        if not isinstance(b, int):
+            return None
+        bounds.append(b)
+    return min(bounds)
+
+
 def classify(cert):
-    """exact, refuted, or timeout, from the certifier's record."""
+    """exact, refuted, partial, or timeout, from the certifier's record."""
     if cert.get("d_exact"):
         return "exact"
     statuses = {b.get("status") for b in (cert.get("sides") or {}).values()}
     if "SAT" in statuses:
         return "refuted"
+    lb = lower_bound_of(cert)
+    if lb is not None and lb >= 2:
+        return "partial"
     return "timeout"
+
+
+def partial_certificate(cert, doc):
+    """Return a partial record in the shape certs/ files (issue #4230).
+
+    The proof blocks go the way ``certificate`` sends them; every side gets
+    its ``proved_min`` (the ladder's, or the tropidist backend's
+    ``lower_bound``, or d on a closed side); ``d_lower`` is their minimum;
+    and ``verification.checks_sha256`` binds the bound to the entry's
+    matrices, which is what the site honors it by.
+    """
+    from check_certs import checks_sha256
+    out = certificate(cert)
+    for blk in out["sides"].values():
+        if blk.get("exact"):
+            blk["proved_min"] = out["d"]
+        elif not isinstance(blk.get("proved_min"), int):
+            blk["proved_min"] = blk.pop("lower_bound", None) or 1
+        blk.pop("lower_bound", None)
+    out["d_exact"] = False
+    out["d_lower"] = min(b["proved_min"] for b in out["sides"].values())
+    out.setdefault("verification", {"level": "solver"})
+    out["verification"]["checks_sha256"] = checks_sha256(doc)
+    return out
+
+
+def _top_rung(ladder):
+    """The top UNSAT rung of a ladder, or None."""
+    tops = [r for r in (ladder or []) if r.get("status") == "UNSAT"]
+    return max(tops, key=lambda r: int(r["W"])) if tops else None
+
+
+def raise_certificate(old, new):
+    """Merge a reopened partial certificate with the run that continued it.
+
+    Per side the old rungs below the new run's start are kept ahead of the
+    new ones, so the file shows the whole ascent, and ``proved_min`` is the
+    larger of the two. The level is decided from the merged ladders: proof_log
+    only when every side's top UNSAT rung was proof-checked and recorded the
+    formula it refuted, with ``cnf_sha256`` rebuilt from those rungs, since the
+    replay regenerates each side at its ``proved_min`` - 1. Returns the merged
+    record; ``new`` is returned unchanged when it is exact (the ladder
+    reached d - 1, and an exact certificate is its own evidence).
+    """
+    if new.get("d_exact"):
+        return new
+    out = copy.deepcopy(new)
+    start = int((new.get("ladder") or {}).get("start") or 1)
+    for side, blk in out["sides"].items():
+        prev = (old.get("sides") or {}).get(side) or {}
+        kept = [r for r in (prev.get("ladder") or []) if int(r["W"]) < start]
+        blk["ladder"] = kept + list(blk.get("ladder") or [])
+        blk["proved_min"] = max(int(prev.get("proved_min") or 1), int(blk.get("proved_min") or 1))
+        top = _top_rung(blk["ladder"])
+        if top is not None and int(top["W"]) + 1 == blk["proved_min"]:
+            tail = (blk.get("note") or "").split("; ", 1)
+            blk["note"] = f"no logical < {blk['proved_min']} exists" + (f"; {tail[1]}" if len(tail) > 1 else "")
+    out["d_lower"] = min(int(b["proved_min"]) for b in out["sides"].values())
+    tops = {s: _top_rung(b.get("ladder")) for s, b in out["sides"].items()}
+    verified = all(r is not None and r.get("proof") == "verified" and r.get("cnf_sha256")
+                   and int(r["W"]) + 1 == out["sides"][s]["proved_min"] for s, r in tops.items())
+    template = next((c["verification"] for c in (new, old)
+                     if (c.get("verification") or {}).get("level") == "proof_log"), None)
+    if verified and template:
+        v = copy.deepcopy(template)
+        v["cnf_sha256"] = ";".join(f"{s}={tops[s]['cnf_sha256']}" for s in sorted(tops))
+        out["verification"] = v
+    else:
+        out["verification"] = {"level": "solver",
+                               "note": "raised ladder; not every side's top rung carries a checked proof"}
+    out["verification"]["checks_sha256"] = (old.get("verification") or {}).get("checks_sha256") \
+        or (new.get("verification") or {}).get("checks_sha256")
+    out["ladder"] = {"start": int((old.get("ladder") or {}).get("start") or start),
+                     "budget_per_side": (new.get("ladder") or {}).get("budget_per_side"),
+                     "raised_from": int(old.get("d_lower") or 1)}
+    return out
 
 
 def certificate(cert):
@@ -286,6 +438,10 @@ def _side_summary(blk):
         out["proof_secs"] = round((pr.get("solve_secs") or 0) + (pr.get("check_secs") or 0), 1)
     if blk.get("lower_bound") is not None:
         out["lower_bound"] = blk["lower_bound"]
+    if blk.get("proved_min") is not None:
+        out["lower_bound"] = blk["proved_min"]
+    if blk.get("ladder"):
+        out["rungs"] = [f"{r['W']}:{r['status']}" for r in blk["ladder"]]
     return out
 
 
@@ -319,7 +475,7 @@ def tropidist_in_subprocess(path, slug, tlim, root, threads, wall):
         return None, f"tropidist_certify printed no record for {slug}", False
 
 
-def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None):
+def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None, ladder=None, start=1):
     """Run verify/sat_certify.py on one entry under a hard wall clock.
 
     Returns (record, error, killed): the certifier's JSON record, or the
@@ -328,6 +484,8 @@ def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None):
     as well as the Python parent.
     """
     cmd = [sys.executable, script or SAT_CERTIFY, path, "--proof", proof_dir, "--tlim", str(int(tlim)), "--json"]
+    if ladder:
+        cmd += ["--ladder", "--budget", str(float(ladder)), "--start", str(int(start or 1))]
     proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                             start_new_session=True)
     try:
@@ -349,7 +507,7 @@ def certify_in_subprocess(path, slug, tlim, proof_dir, wall, script=None):
 
 
 def attempt_row(row, cert, *, tlim, date, head, url, secs, error=None, killed=False, backend="sat",
-                upgrade=None):
+                upgrade=None, ladder=None):
     """One line of attempts.jsonl.
 
     ``backend`` names what produced the record; ``upgrade`` what the SAT path
@@ -360,8 +518,12 @@ def attempt_row(row, cert, *, tlim, date, head, url, secs, error=None, killed=Fa
            "secs": round(secs, 1), "backend": backend}
     if upgrade:
         out["upgrade"] = upgrade
+    if ladder:
+        out["ladder"] = ladder
+    if row.get("start"):
+        out["start"] = row["start"]
     if killed:
-        wall = tropidist_wall(tlim) if backend == "tropidist" else wall_clock(tlim)
+        wall = tropidist_wall(tlim) if backend == "tropidist" else wall_clock(tlim, ladder)
         out.update(outcome="timeout", level=None, sides={},
                    note=f"killed at the {wall} s wall clock; the solver's own limit did not hold")
         return out
@@ -370,8 +532,11 @@ def attempt_row(row, cert, *, tlim, date, head, url, secs, error=None, killed=Fa
         return out
     outcome = classify(cert)
     out["outcome"] = outcome
-    out["level"] = (cert.get("verification") or {}).get("level") if outcome == "exact" else None
+    out["level"] = (cert.get("verification") or {}).get("level") if outcome in ("exact", "partial") else None
     out["sides"] = {s: _side_summary(b) for s, b in cert["sides"].items()}
+    if outcome == "partial":
+        out["d_lower"] = lower_bound_of(cert)
+        out["note"] = f"proved d >= {out['d_lower']} below the claim"
     if outcome == "refuted":
         wits = {s: b.get("witness") for s, b in cert["sides"].items() if b.get("status") == "SAT"}
         out["witness"] = wits
@@ -387,15 +552,16 @@ def _write_json(path, obj, indent=2):
         f.write("\n")
 
 
-def _sat_attempt(path, slug, tlim, wall, certify):
+def _sat_attempt(path, slug, tlim, wall, certify, ladder=None, start=1):
     """One SAT-path attempt: (record, error, killed), in a subprocess or through the stand-in."""
     proof_dir = tempfile.mkdtemp(prefix=f"certify-{slug}-")
+    kw = {"ladder": True, "budget": ladder, "start": start or 1} if ladder else {}
     try:
         if certify is None:
-            return certify_in_subprocess(path, slug, tlim, proof_dir, wall)
+            return certify_in_subprocess(path, slug, tlim, proof_dir, wall, ladder=ladder, start=start)
         with open(path, encoding="utf-8") as f:
             doc = json.load(f)
-        return certify(doc, tlim=tlim, proof_dir=proof_dir, slug=slug), None, False
+        return certify(doc, tlim=tlim, proof_dir=proof_dir, slug=slug, **kw), None, False
     except ValueError as e:
         return None, str(e), False
     finally:
@@ -421,7 +587,7 @@ def _is_proof_log(cert):
 
 def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0, slugs=None,
               retry=False, certs_dir=CERTS, codes_dir=CODES, certify=None, tools=None,
-              backend="sat", tropidist=None, threads=1, certify_tropidist=None):
+              backend="sat", tropidist=None, threads=1, certify_tropidist=None, ladder=None):
     """Open entries in queue order until the budget is spent; stage what closes.
 
     Returns the run manifest, which is also written to <out_dir>/run.json.
@@ -437,6 +603,12 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     when that finishes and the tool's otherwise; an entry the tool did not
     close is not retried with SAT in the same run, and a tool error falls back
     to SAT.
+
+    ``ladder`` is the SAT path's per-side budget in seconds for the ascending
+    ladder (issue #4230); None asks at d - 1 alone. With it, an entry that
+    does not close is staged as a partial certificate when it proved d >= 2,
+    and a partial certificate on file is reopened at its d_lower and
+    replaced only when the run raises the bound.
     """
     if backend not in BACKENDS:
         raise ValueError(f"backend must be one of {BACKENDS}")
@@ -446,11 +618,12 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     if tools is None:
         import sat_certify
         tools = sat_certify.tool_versions
-    wall = wall_clock(tlim)
+    wall = wall_clock(tlim, ladder)
     date, head, url = utc_today(), git_head(), run_url()
     last = last_attempts(load_jsonl(attempts_path))
     chosen, skipped, reasons = select(queue, last=last, tlim=tlim, today=date, certs_dir=certs_dir,
-                                      codes_dir=codes_dir, slugs=slugs, retry=retry, stabilizer_ok=use_tool)
+                                      codes_dir=codes_dir, slugs=slugs, retry=retry, stabilizer_ok=use_tool,
+                                      ladder=ladder)
     if max_entries:
         chosen = chosen[:max_entries]
     versions = dict(tools())
@@ -458,6 +631,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
         from tropidist_certify import tropidist_commit
         versions["tropidist"] = tropidist_commit(tropidist)
     manifest = {"date": date, "head": head, "run": url, "tlim": tlim, "wall": wall, "job_seconds": job_seconds,
+                "ladder": ladder,
                 "queue_date": queue.get("date"), "queue_head": queue.get("head"), "backend": backend,
                 "selected": len(chosen), "skipped": dict(skipped), "tools": versions,
                 "results": [], "staged": [], "stopped_by_budget": False, "left": 0}
@@ -476,27 +650,57 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
         if use_tool:
             used = "tropidist"
             cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist)
+        # The SAT path runs alone, after a tool error, on an entry the tool
+        # closed (to carry it to proof_log), and, with a ladder, on an entry
+        # the tool left open: the ladder's rungs can be proof-checked, which
+        # the tool's bound cannot, and a bound at least as high replaces it.
+        tool_open = cert is not None and classify(cert) in ("partial", "timeout")
         if backend == "sat" or (backend == "tropidist+sat" and not stab
-                                and (error is not None or (cert is not None and classify(cert) == "exact"))):
-            sat_cert, sat_error, sat_killed = _sat_attempt(path, slug, tlim, wall, certify)
+                                and (error is not None or (cert is not None and classify(cert) == "exact")
+                                     or (bool(ladder) and tool_open))):
+            sat_cert, sat_error, sat_killed = _sat_attempt(path, slug, tlim, wall, certify, ladder=ladder,
+                                                           start=row.get("start", 1))
             if cert is None:
                 cert, error, killed, used = sat_cert, sat_error, sat_killed, "sat"
             elif _is_proof_log(sat_cert):
                 cert, used, upgrade = sat_cert, "sat", "proof_log"
+            elif (tool_open and sat_cert is not None and classify(sat_cert) in ("exact", "partial")
+                  and (lower_bound_of(sat_cert) or 1) >= (lower_bound_of(cert) or 1)):
+                cert, used, upgrade = sat_cert, "sat", f"ladder over tropidist d >= {lower_bound_of(cert) or 1}"
             else:
                 upgrade = "sat " + (classify(sat_cert) if sat_cert is not None
                                     else "killed" if sat_killed else f"error: {sat_error}"[:200])
         att = attempt_row(row, cert, tlim=tlim, date=date, head=head, url=url,
-                          secs=time.time() - t0, error=error, killed=killed, backend=used, upgrade=upgrade)
-        if att["outcome"] == "exact":
-            _write_json(os.path.join(out_dir, "certs", slug + ".json"), certificate(cert))
-            br = batch_row(slug, row["n"], cert)
-            if br:
-                append_jsonl(os.path.join(out_dir, "certs", BATCH_LOG), br)
-            manifest["staged"].append(slug)
+                          secs=time.time() - t0, error=error, killed=killed, backend=used, upgrade=upgrade,
+                          ladder=ladder)
+        if att["outcome"] == "timeout" and row.get("raise_from"):
+            att["note"] = (f"reopened at W = {row['start']}; the ladder did not rise above the filed "
+                           f"d >= {row['raise_from'].get('d_lower')}")
+        if att["outcome"] in ("exact", "partial"):
+            filed = certificate(cert)
+            if att["outcome"] == "partial":
+                with open(path, encoding="utf-8") as f:
+                    filed = partial_certificate(cert, json.load(f))
+            old = row.get("raise_from")
+            if old:
+                filed = raise_certificate(old, filed)
+                att["raised"] = {"from": int(old.get("d_lower") or 1), "to": lower_bound_of(filed) or filed["d"]}
+                if att["outcome"] == "partial" and att["raised"]["to"] <= att["raised"]["from"]:
+                    att["note"] = f"ladder did not rise above the filed d >= {att['raised']['from']}"
+                    filed = None
+                else:
+                    att["d_lower"] = lower_bound_of(filed)
+                    att["level"] = filed["verification"]["level"]
+            if filed is not None:
+                _write_json(os.path.join(out_dir, "certs", slug + ".json"), filed)
+                br = batch_row(slug, row["n"], cert)
+                if br and filed["verification"].get("level") == "proof_log":
+                    append_jsonl(os.path.join(out_dir, "certs", BATCH_LOG), br)
+                manifest["staged"].append(slug)
         append_jsonl(attempts_path, att)
         manifest["results"].append(att)
-        print(f"{slug}: {att['outcome']}" + (f" ({att['level']})" if att.get("level") else "")
+        print(f"{slug}: {att['outcome']}" + (f" d >= {att['d_lower']}" if att.get("d_lower") else "")
+              + (f" ({att['level']})" if att.get("level") else "")
               + f" in {att['secs']} s" + (f"; {att['note']}" if att.get("note") else ""), flush=True)
     manifest["opened"] = len(manifest["results"])
     manifest["seconds"] = round(time.time() - t_start, 1)
@@ -513,21 +717,22 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
 def counts_line(m):
     """Return the one-line tally the workflow puts in its commit message."""
     o = m.get("outcomes", {})
-    return (f"{m.get('opened', 0)} opened, exact {o.get('exact', 0)}, timeout {o.get('timeout', 0)}, "
-            f"refuted {o.get('refuted', 0)}, error {o.get('error', 0)}")
+    return (f"{m.get('opened', 0)} opened, exact {o.get('exact', 0)}, partial {o.get('partial', 0)}, "
+            f"timeout {o.get('timeout', 0)}, refuted {o.get('refuted', 0)}, error {o.get('error', 0)}")
 
 
 def summary_markdown(m):
     o = m.get("outcomes", {})
     lines = [f"## certification sweep of {m['date']}", "",
              f"main at {(m.get('head') or '?')[:12]}, queue of {m.get('queue_date')}, "
-             f"{m['tlim']} s per solve under a {m.get('wall')} s wall clock per entry, job budget "
-             f"{m['job_seconds']} s. "
+             f"{m['tlim']} s per solve under a {m.get('wall')} s wall clock per entry"
+             + (f", ladder budget {m['ladder']} s per side" if m.get("ladder") else "")
+             + f", job budget {m['job_seconds']} s. "
              f"Opened {m.get('opened', 0)} of {m['selected']} selected entries in {m.get('seconds', 0)} s"
              + (f"; stopped by the budget with {m['left']} left for the next run." if m.get("stopped_by_budget")
                 else "."), "",
-             f"exact {o.get('exact', 0)}, timeout {o.get('timeout', 0)}, refuted {o.get('refuted', 0)}, "
-             f"error {o.get('error', 0)}; skipped " + (", ".join(f"{k} {v}" for k, v in sorted(m["skipped"].items()))
+             f"exact {o.get('exact', 0)}, partial {o.get('partial', 0)}, timeout {o.get('timeout', 0)}, "
+             f"refuted {o.get('refuted', 0)}, error {o.get('error', 0)}; skipped " + (", ".join(f"{k} {v}" for k, v in sorted(m["skipped"].items()))
                                                         or "none"), ""]
     staged = [r for r in m["results"] if r["outcome"] == "exact"]
     if staged:
@@ -535,6 +740,13 @@ def summary_markdown(m):
         for r in staged:
             lines.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
                          f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
+        lines.append("")
+    partial = [r for r in m["results"] if r["outcome"] == "partial"]
+    if partial:
+        lines += ["| entry | n | k | d | proved | level | sides |", "|---|---|---|---|---|---|---|"]
+        for r in partial:
+            lines.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | d >= {r.get('d_lower')} | "
+                         f"{r.get('level')} | {_sides_cell(r['sides'])} |")
         lines.append("")
     for outcome in ("refuted", "timeout", "error"):
         rows = [r for r in m["results"] if r["outcome"] == outcome]
@@ -555,6 +767,8 @@ def _side_cell(s):
         txt += f", proof: {s['proof']}"
     if s.get("lower_bound") is not None:
         txt += f", d >= {s['lower_bound']}"
+    if s.get("rungs"):
+        txt += " (" + " ".join(s["rungs"]) + ")"
     return txt
 
 
@@ -578,8 +792,17 @@ def stage(out_dir, *, certs_dir=CERTS):
         slug = name[:-5]
         dst = os.path.join(certs_dir, name)
         if os.path.exists(dst):
-            skipped.append(slug)
-            continue
+            # A partial certificate is replaced only by a higher bound or an
+            # exact certificate; anything filed meanwhile that is not below
+            # what this run proved is left alone.
+            have = _cert_on_file(certs_dir, slug) or {}
+            with open(os.path.join(src, name), encoding="utf-8") as f:
+                mine = json.load(f)
+            better = (not have.get("d_exact") and have.get("d_lower") is not None
+                      and (mine.get("d_exact") or (mine.get("d_lower") or 1) > have["d_lower"]))
+            if not better:
+                skipped.append(slug)
+                continue
         shutil.copyfile(os.path.join(src, name), dst)
         staged.append(slug)
     batch = os.path.join(src, BATCH_LOG)
@@ -605,10 +828,18 @@ def staged_slugs(out_dir, sub="certs"):
 def pr_text(m, staged=None):
     """(title, body) of the certs-only PR for a run manifest."""
     rows = [r for r in m["results"] if r["outcome"] == "exact" and (staged is None or r["slug"] in staged)]
+    partial = [r for r in m["results"] if r["outcome"] == "partial" and (staged is None or r["slug"] in staged)]
     n = len(rows)
     date = m["date"]
     noun = "entry" if n == 1 else "entries"
-    title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
+    if rows and partial:
+        title = (f"certs: exact distances for {n} {noun} and lower bounds for {len(partial)} from the weekly "
+                 f"certification sweep of {date}")
+    elif partial:
+        title = (f"certs: proven lower bounds for {len(partial)} "
+                 f"{'entry' if len(partial) == 1 else 'entries'} from the weekly certification sweep of {date}")
+    else:
+        title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
     levels = Counter(r["level"] for r in rows)
     sat_rows = [r for r in rows if r.get("backend", "sat") == "sat"]
     tool_rows = [r for r in rows if r.get("backend") == "tropidist"]
@@ -616,11 +847,13 @@ def pr_text(m, staged=None):
     tools = m.get("tools") or {}
     run = f" ([run]({m['run']}))" if m.get("run") else ""
     body = [
-        f"Certificates for the {n} board {'entry' if n == 1 else 'entries'} that closed exact in the weekly "
-        f"certification sweep of {date}{run}, the head of research/certs/todo.json on that date "
-        "(research/certs/certify_sweep.py, issue #4148). Every certified distance equals the distance the "
-        "entry already claims on both sides, so no codes/ file changes and the diff is evidence quality only: "
-        "these entries move from a witnessed upper bound to the exact tier.",
+        (f"Certificates for the {n} board {'entry' if n == 1 else 'entries'} that closed exact"
+         + (f" and the {len(partial)} that gained a proven lower bound" if partial else "")
+         + f" in the weekly certification sweep of {date}{run}, the head of research/certs/todo.json on that "
+         "date (research/certs/certify_sweep.py, issue #4148). Every certified distance equals the distance "
+         "the entry already claims on both sides, so no codes/ file changes and the diff is evidence quality "
+         "only: these entries move from a witnessed upper bound to the exact tier"
+         + (", or from a bare upper bound to a proven interval." if partial else ".")),
         ""]
     if sat_rows:
         body += [
@@ -653,12 +886,29 @@ def pr_text(m, staged=None):
         f"trimmed-core sizes, and solve and check seconds. {levels.get('proof_log', 0)} at proof_log, "
         f"{levels.get('solver', 0)} at solver"
         + (" (CryptoMiniSat closed both sides and the proof path did not finish on at least one side: "
-           + ", ".join(r["slug"] for r in solver) + ")" if solver else "") + ".",
-        "",
-        "| entry | n | k | d | level | backend | sides |", "|---|---|---|---|---|---|---|"]
+           + ", ".join(r["slug"] for r in solver) + ")" if solver else "") + "."]
+    if rows:
+        body += ["", "| entry | n | k | d | level | backend | sides |", "|---|---|---|---|---|---|---|"]
     for r in rows:
         body.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | {r['level']} | "
                     f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
+    if partial:
+        raised = [r for r in partial if r.get("raised")]
+        body += ["",
+                 f"{len(partial)} partial {'certificate' if len(partial) == 1 else 'certificates'} (issue #4230): "
+                 f"the ladder asked each side at W = 1, 2, ... with {m.get('ladder')} s per side and did not reach "
+                 "d - 1, so the entry keeps its witnessed upper bound and gains the proven lower bound d_lower, "
+                 "the largest W + 1 at which both sides returned UNSAT. The board shows these as the interval "
+                 "d_lower <= d <= d. Each file is bound to its entry's matrices by verification.checks_sha256, "
+                 "so a later correction of the claim keeps the bound; verify/check_certs.py fails if a witness "
+                 "ever sits below it."
+                 + (f" {len(raised)} of them {'replaces' if len(raised) == 1 else 'replace'} a partial "
+                    "certificate already on file, with the old rungs kept ahead of the new ones." if raised else ""),
+                 "",
+                 "| entry | n | k | d | proved | level | sides |", "|---|---|---|---|---|---|---|"]
+        for r in partial:
+            body.append(f"| {r['slug']} | {r['n']} | {r['k']} | {r['d']} | d >= {r.get('d_lower')} | "
+                        f"{r.get('level')} | {_sides_cell(r['sides'])} |")
     body += ["",
              "The attempt log research/certs/attempts.jsonl on main records this run's attempts, including the "
              "entries that did not close in budget.",
@@ -708,6 +958,9 @@ def main(argv=None):
     r.add_argument("--tropidist", default=os.environ.get("TROPIDIST_ROOT"),
                    help="the tropidist checkout (default: $TROPIDIST_ROOT)")
     r.add_argument("--threads", type=int, default=1, help="threads per tropidist run (default 1)")
+    r.add_argument("--ladder", type=float, default=None, metavar="SECONDS",
+                   help="ask W = 1, 2, ... up to d - 1 with this many seconds per side, and stage what it "
+                        "proves below the claim as a partial certificate (issue #4230)")
     s = sub.add_parser("stage", help="copy the staged certificates into certs/")
     s.add_argument("--out-dir", default=OUT_DIR)
     p = sub.add_parser("pr-body", help="write the certs-only PR body; prints its title")
@@ -721,10 +974,12 @@ def main(argv=None):
     if a.cmd == "run":
         m = run_sweep(queue=load_queue(a.queue), out_dir=a.out_dir, attempts_path=a.attempts, tlim=a.tlim,
                       job_seconds=a.job_seconds, max_entries=a.max_entries, slugs=a.slugs, retry=a.retry,
+                      ladder=a.ladder or None,
                       backend=a.backend, tropidist=a.tropidist, threads=a.threads)
         o = m["outcomes"]
-        print(f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)} (staged under "
-              f"{os.path.relpath(a.out_dir, ROOT)}), timeout {o.get('timeout', 0)}, refuted "
+        print(f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)}, partial "
+              f"{o.get('partial', 0)} (staged under {os.path.relpath(a.out_dir, ROOT)}), timeout "
+              f"{o.get('timeout', 0)}, refuted "
               f"{o.get('refuted', 0)}, error {o.get('error', 0)}, left {m['left']}")
         return EXIT_REFUTED if o.get("refuted") else 0
     if a.cmd == "stage":

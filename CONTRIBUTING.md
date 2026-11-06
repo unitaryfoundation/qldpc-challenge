@@ -564,6 +564,15 @@ lesser result, it is the honest one, and `d <=` is what the board displays. If
 you have a certification approach that closes these, please open an issue; the
 two n = 180 codes above are a good regression test.
 
+What the weekly sweep can still prove about such a code is a lower bound
+(issue #4230): `verify/sat_certify.py --ladder` asks the same question at
+W = 1, 2, ... and stops at the first timeout, and UNSAT at W is the theorem
+d >= W + 1 whatever happens above it. The result is a partial certificate in
+`certs/` (`d_exact` false, `d_lower`), and the board shows the entry as the
+interval `d_lower <= d <= d`. The gap is how much of the claim is unproven;
+a later witness below `d_lower` fails `verify/check_certs.py`, since one of
+the two is then wrong.
+
 ## Reproducing an entry
 
 Every board entry is self-verifying: anyone can run the trusted gate against `codes/<slug>.json` and re-check its structure, `k`, witnesses, layout and distance upper bound. `qldpc reproduce` re-runs the whole evidence chain instead of that one stage, and writes down what happened.

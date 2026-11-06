@@ -67,10 +67,11 @@ opened is one line of `attempts.jsonl`, committed to `main` by the workflow:
 |---|---|
 | `slug`, `n`, `k`, `d`, `band`, `position` | the entry and where the queue had it |
 | `date`, `head`, `run`, `tlim` | when, from which commit, in which Actions run, at what limit per solve |
-| `outcome` | `exact` (both sides UNSAT at `d - 1`), `timeout` (a side did not finish, or the wall clock killed the entry), `refuted` (a side found a lighter logical; the witness is in `witness`), `error` (the certifier refused: a pairing set that does not span `k`, or the two encodings disagree) |
-| `level` | `proof_log` when drat-trim verified both sides' refutations, `solver` when CryptoMiniSat or tropidist closed both sides and no proof was checked |
-| `sides` | per side the status, the seconds, whether the proof was verified, and the `lower_bound` tropidist proved on a side that did not close |
+| `outcome` | `exact` (both sides UNSAT at `d - 1`), `partial` (both sides proved a bound of at least 2 below the claim; `d_lower` says which), `timeout` (a side did not finish, or the wall clock killed the entry), `refuted` (a side found a lighter logical; the witness is in `witness`), `error` (the certifier refused: a pairing set that does not span `k`, or the two encodings disagree) |
+| `level` | `proof_log` when drat-trim verified both sides' refutations (of the top UNSAT rung each, on a partial certificate), `solver` when CryptoMiniSat or tropidist closed both sides and no proof was checked |
+| `sides` | per side the status, the seconds, whether the proof was verified, the `lower_bound` the side proved when it did not close, and the ladder's `rungs` (`W:status`) |
 | `backend` | `sat` or `tropidist`: which certifier produced the row; `upgrade` says what the SAT path did after tropidist closed an entry |
+| `ladder`, `start`, `raised` | the per-side ladder budget in seconds; the rung a reopened partial certificate resumed at; `{from, to}` when the run raised a filed bound |
 
 The log is what keeps the sweep from reopening the same entries: an entry that
 timed out or errored at a limit is not reopened at that limit or a shorter one
@@ -95,9 +96,36 @@ step or a closed PR loses no solving, and `stage` records what it copied in
 
 ```
 uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
+uv run --extra research python research/certs/certify_sweep.py run --tlim 120 --ladder 300   # with partial certificates
 uv run python research/certs/certify_sweep.py stage --out-dir research/out/certify_sweep   # copy into certs/
 uv run python research/certs/certify_sweep.py pr-body --out-dir research/out/certify_sweep --out body.md
 ```
+
+### The ladder and partial certificates
+
+`--ladder SECONDS` (issue #4230) asks each side at W = 1, 2, ... up to
+`d - 1` instead of at `d - 1` alone, spending at most that many seconds per
+side (`--tlim` stays the limit per solve). UNSAT at W is the theorem
+`d >= W + 1` whatever happens above it, so an entry that does not close in
+budget still leaves a proven lower bound, and the run stages it as a partial
+certificate: `d_exact` false, `d_lower` the largest `W + 1` at which both
+sides returned UNSAT, per side `proved_min` and the `ladder` of rungs, and
+`verification.checks_sha256` binding the file to the entry's matrices. The
+board shows such an entry as the interval `d_lower <= d <= d`; the exact tier
+is the case `d_lower == d`. Cost grows three- to five-fold per rung on board
+entries, so ten minutes per entry proves about half the witnessed distance
+at n of a few hundred, and the ladder ascends and stops rather than searching.
+
+The weekly workflow runs with a ladder budget (its `ladder` input, 300 s per
+side by default; `0` turns it off). A partial certificate already in `certs/`
+is not a closed entry: the sweep reopens it at its own `d_lower` when
+`--retry` or `--slugs` names it or the ladder budget is larger than the one
+the file recorded, and `stage` replaces the file only when the run raised the
+bound or closed the entry, keeping the old rungs ahead of the new ones so the
+file shows the whole ascent. A run whose first new rung times out files
+nothing and says so in its attempt row. The tropidist backend's per-side
+`lower_bound` on a side that did not close is filed the same way, at the
+solver level and without a ladder.
 
 ## The tropidist backend
 

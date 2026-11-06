@@ -9,7 +9,12 @@ name: certify-weekly
 # (research/certs/tropidist_certify.py, issue #4716) is opt-in: a
 # workflow_dispatch run with backend set to tropidist or tropidist+sat
 # fetches the tool at its pinned commit and runs it; the scheduled run stays
-# on the SAT path. Every attempt, closed or not, is one
+# on the SAT path. The SAT path also runs as an ascending ladder (W = 1, 2,
+# ... up to d - 1, the ladder input's seconds per side; issue #4230) on what
+# it leaves open, so an entry that does not close still files a partial
+# certificate with the lower bound it proved, shown on the board as the
+# interval d_lower <= d <= d, and a later run with a larger budget raises it.
+# Every attempt, closed or not, is one
 # line of research/certs/attempts.jsonl, committed to main here so an entry
 # that timed out at this budget is not reopened at the same budget next week.
 # An entry it certified is left alone for 14 days while its PR lands, then
@@ -63,6 +68,10 @@ on:
         description: "sat (default), tropidist, or tropidist+sat (opt-in, issue #4716)"
         required: false
         default: "sat"
+      ladder:
+        description: "seconds per side for the ascending SAT ladder that files partial certificates (0: ask d - 1 only)"
+        required: false
+        default: "300"
 
 concurrency:
   group: certify-weekly
@@ -73,7 +82,8 @@ jobs:
     runs-on: ubuntu-24.04
     # job_minutes is when the sweep stops opening entries; the entry it is on
     # may run to six solves of tlim (two XOR solves, two kissat runs, two
-    # drat-trim checks) past that, plus the build and the replay.
+    # drat-trim checks) plus twice the ladder budget past that, plus the
+    # build and the replay.
     timeout-minutes: 350
     env:
       PYTHONUNBUFFERED: "1"
@@ -116,9 +126,12 @@ jobs:
           JOB_MINUTES: ${{ github.event.inputs.job_minutes || '240' }}
           SLUGS: ${{ github.event.inputs.slugs }}
           RETRY: ${{ github.event.inputs.retry }}
+          LADDER: ${{ github.event.inputs.ladder || '300' }}
         run: |
           retry=""
           [ "$RETRY" = "true" ] && retry="--retry"
+          ladder=""
+          case "$LADDER" in 0|"") ;; *[!0-9.]*) echo "invalid ladder: $LADDER"; exit 1;; *) ladder="--ladder $LADDER";; esac
           if [ -n "$SLUGS" ]; then
             for s in $SLUGS; do
               case "$s" in *[!A-Za-z0-9._-]*) echo "invalid slug: $s"; exit 1;; esac
@@ -131,7 +144,7 @@ jobs:
           uv run --frozen --extra research python research/certs/certify_sweep.py run \
             --out-dir "$OUT_DIR" --tlim "$TLIM" --job-seconds $(( JOB_MINUTES * 60 )) \
             --backend "$BACKEND" $tool \
-            ${SLUGS:+--slugs $SLUGS} $retry
+            ${SLUGS:+--slugs $SLUGS} $retry $ladder
           rc=$?
           set -e
           cat "$OUT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"

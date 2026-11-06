@@ -193,3 +193,60 @@ def test_a_short_pairing_set_is_refused_rather_than_certified():
             sat_certify.certify(doc, tlim=300)
     finally:
         sat_certify._logicals = full
+
+
+# --- the ascending ladder (issue #4230) --------------------------------------------------------
+
+def test_the_ladder_reaches_the_exact_verdict_and_records_every_rung():
+    res = sat_certify.certify(_doc("24-6-4"), tlim=300, ladder=True)
+    assert res["d_exact"] and res["d_lower"] == 4
+    for blk in res["sides"].values():
+        assert blk["exact"] and blk["proved_min"] == 4
+        assert [(r["W"], r["status"]) for r in blk["ladder"]] == [(1, "UNSAT"), (2, "UNSAT"), (3, "UNSAT")]
+    assert res["verification"]["level"] == "solver" and "checks_sha256" not in res["verification"]
+    assert res["ladder"] == {"start": 1, "budget_per_side": None}
+    # resumed at 3, the ladder asks only W = 3 and still closes
+    res = sat_certify.certify(_doc("24-6-4"), tlim=300, ladder=True, start=3)
+    assert res["d_exact"] and [r["W"] for r in res["sides"]["X"]["ladder"]] == [3]
+    # without the flag the record is what it always was
+    plain = sat_certify.certify(_doc("24-6-4"), tlim=300)
+    assert "d_lower" not in plain and "ladder" not in plain["sides"]["X"]
+
+
+def test_a_ladder_that_times_out_still_proves_a_lower_bound(monkeypatch):
+    real = sat_certify._solve_side
+
+    def above_two_times_out(H_opp, L, W, tlim, use_symmetry=False, prefix=25):
+        return ("TIMEOUT", None) if W >= 3 else real(H_opp, L, W, tlim, use_symmetry, prefix)
+
+    monkeypatch.setattr(sat_certify, "_solve_side", above_two_times_out)
+    doc = _doc("72-12-6")
+    res = sat_certify.certify(doc, tlim=300, ladder=True)
+    assert res["d_exact"] is False and res["d_lower"] == 3
+    for blk in res["sides"].values():
+        assert blk["status"] == "TIMEOUT" and blk["exact"] is False and blk["proved_min"] == 3
+        assert [(r["W"], r["status"]) for r in blk["ladder"]] == [(1, "UNSAT"), (2, "UNSAT"), (3, "TIMEOUT")]
+        assert blk["note"] == "no logical < 3 exists; W = 3 TIMEOUT"
+    import check_certs
+    assert res["verification"]["checks_sha256"] == check_certs.checks_sha256(doc)
+    assert res["verification"]["level"] == "solver"
+    assert check_certs.bound_problems("72-12-6", res) == []
+    # the same timeout without the ladder proves nothing and records no bound
+    plain = sat_certify.certify(doc, tlim=300)
+    assert plain["d_exact"] is False and "d_lower" not in plain
+
+
+def test_the_budget_stops_the_ladder_between_rungs(monkeypatch):
+    import time as _time
+
+    def slow_unsat(H_opp, L, W, tlim, use_symmetry=False, prefix=25):
+        _time.sleep(0.05)
+        return "UNSAT", None
+
+    monkeypatch.setattr(sat_certify, "_solve_side", slow_unsat)
+    res = sat_certify.certify(_doc("24-6-4"), tlim=300, ladder=True, budget=0.01)
+    for blk in res["sides"].values():
+        assert [r["W"] for r in blk["ladder"]] == [1] and blk["proved_min"] == 2
+        assert "budget was spent before W = 2" in blk["note"]
+    assert res["d_exact"] is False and res["d_lower"] == 2
+    assert res["ladder"]["budget_per_side"] == 0.01
