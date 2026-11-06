@@ -43,6 +43,15 @@
 (3,7): 980</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 7.2111 &middot; Z 7.2111 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/98-6-12">circuits/98-6-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[67721, 67722, 67748, 67750, 67767, 67776, 67777, 67789, 67795, 67805, 67808, 67809]</div></details>
+<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[67725, 67726, 67734, 67736, 67740, 67751, 67762, 67766, 67767, 67780, 67789, 67814]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; Simulated annealing over site assignments on an integer grid with the repo&#x27;s own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier&#x27;s rule. &middot; 2026-10-09</div>
@@ -53,7 +62,7 @@
 <div class=kv><b>authors</b> Zijian Liang and Ke Liu and Hao Song and Yu-An Chen</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+x<sup>-1</sup>y<sup>2</sup>, g(x,y)=1+y+x<sup>-2</sup>y<sup>-1</sup> on the abelian quotient group Z<sup>2</sup>/L with twist basis a_1=[0, 7], a_2=[7, 0] (n=2|det[a_1,a_2]|=2*49). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2503.03827">arXiv:2503.03827</a></div>
 <div class=kv><b>date</b> 2025</div>
 <div class=kv><b>notes</b> Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d&gt;20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery.</div>
