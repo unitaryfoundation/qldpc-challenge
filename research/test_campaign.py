@@ -1028,3 +1028,69 @@ def test_the_committed_campaigns_either_state_a_card_or_say_null():
     cards = [load_campaign(f).direction for f in
              glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))]
     assert any(cards), "one committed campaign ships with the card filled in"
+
+
+# -- negatives that can be revisited (issue #4233) --------------------------
+#
+# A negative without its preconditions says a route failed; it cannot say
+# whether the reason still applies. record_negative takes the assumptions and
+# the revisit condition, the open experiment lends its family and params,
+# and the summary schema types the item while a bare {what, detail} still
+# validates.
+
+def test_a_negative_records_its_assumptions_and_revisit_condition(tmp_path):
+    """The typed negative survives the journal and validates in the summary."""
+    import campaign as C
+    j = tmp_path / "ledger.jsonl"
+    led = Ledger(Campaign(validate_campaign(camp())), journal=str(j))
+    led.start_experiment("bivariate-bicycle", seed=3, params={"l": 6, "m": 6})
+    led.spend(cpu_hours=1)
+    led.record_negative("weight-6 at n=72 is closed",
+                        "two flat rungs at d <= 6, below the bar",
+                        assumptions=["weight-6 BB on Z_6 x Z_6",
+                                     "numpy RIS at 2000 trials per candidate"],
+                        revisit_if="a backend that reaches 1e6 trials per candidate")
+    led.end_experiment()
+    neg = led.negative_results[0]
+    assert neg["family"] == "bivariate-bicycle"
+    assert neg["params"]["l"] == 6 and neg["params"]["m"] == 6
+    assert neg["assumptions"][1] == "numpy RIS at 2000 trials per candidate"
+    assert neg["revisit_if"].startswith("a backend")
+    C.validate_summary(led.summary())
+    back = Ledger.from_journal(Campaign(validate_campaign(camp())), str(j))
+    assert back.negative_results == [neg]
+    assert back.merge(led).negative_results == [neg]
+
+
+def test_a_negative_outside_an_experiment_takes_what_it_is_given():
+    import campaign as C
+    led = Ledger(Campaign(validate_campaign(camp())))
+    led.record_negative("closed family", "every draw collapsed")
+    assert led.negative_results[0] == {"what": "closed family",
+                                       "detail": "every draw collapsed"}
+    led.record_negative("S4 lift is closed", "no survivor below the bar",
+                        family="lifted-product", params={"G": "S4"})
+    assert led.negative_results[1]["family"] == "lifted-product"
+    assert led.negative_results[1]["params"] == {"G": "S4"}
+    C.validate_summary(led.summary())
+
+
+def test_a_malformed_negative_is_refused_where_it_is_recorded():
+    import campaign as C
+    import pytest
+    led = Ledger(Campaign(validate_campaign(camp())))
+    for bad in ({"assumptions": "one string, not a list"},
+                {"assumptions": []},
+                {"assumptions": ["ok", ""]},
+                {"revisit_if": "   "},
+                {"revisit_if": 3}):
+        with pytest.raises(C.CampaignError):
+            led.record_negative("w", "d", **bad)
+    assert led.negative_results == []
+    summary = led.summary()
+    summary["negative_results"] = [{"what": "w", "detail": "d", "mood": "sad"}]
+    with pytest.raises(C.CampaignError):
+        C.validate_summary(summary)
+    summary["negative_results"] = [{"what": "", "detail": "d"}]
+    with pytest.raises(C.CampaignError):
+        C.validate_summary(summary)

@@ -54,7 +54,9 @@ Before starting a search, `./qldpc recent` summarizes what landed lately
 begin from the community's current frontier of knowledge rather than
 rediscovering it; `--json` returns the same as one record. `./qldpc screened`
 answers the narrower question of whether a particular family member was
-already screened, at what depth, and what the gate said about it.
+already screened, at what depth, and what the gate said about it, and
+`./qldpc negatives` lists what earlier campaigns closed, what each closure
+assumed, and what change would make it worth retrying.
 
 ## Installation
 

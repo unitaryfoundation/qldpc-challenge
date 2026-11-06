@@ -73,7 +73,9 @@ end the run. It cannot weaken the gate. Without one, nothing below changes.
    notes, fieldnotes) and `./qldpc screened --family <family>` (which members
    were already screened, at what depth, and what the gate said: the staging
    directory is gitignored, so this is the only committed record that a
-   family was tried and dropped), then the `fieldnotes/` entries touching
+   family was tried and dropped), `./qldpc negatives --family <family>` (why
+   earlier campaigns closed a route, under which assumptions, and what change
+   would make it worth retrying), then the `fieldnotes/` entries touching
    your intended family — blocked routes and calibration findings live there, and repeating
    them wastes the budget. Recent literature is part of that record:
    [`literature/README.md`](literature/README.md) is the arXiv watch, and its
@@ -116,6 +118,13 @@ abandon criterion `research/kit/escalation.py` can enforce, and what a negative 
 teach. `scaffold_campaign(..., card={...})` writes it and `summary.json` carries it, so the next
 session can tell a direction abandoned for a reason from one nobody came back to.
 `research/campaigns/bb-w6-n-le-100-trinomials/campaign.json` is a filled-in example.
+
+When a direction closes, record the negative with what it assumed and what would reopen
+it: `led.record_negative(what, detail, assumptions=[...], revisit_if="...")` (issue #4233,
+`campaigns/README.md` "Ending one"). `./qldpc negatives --family <family>` reads these back
+across every committed campaign, so a later session learns not only that a route was tried
+but whether the reason it failed still applies. A negative without them records that a
+route failed, not whether the reason still holds.
 
 Track membership is **computed by the verifier**, not declared: the check-weight class
 (`weight-4`/`weight-6`/`weight-8`) is derived from the max row weight of `H_X`, `H_Z`, and the
@@ -829,7 +838,7 @@ something the next one should not have to re-learn.
 | File | What it gives you |
 |---|---|
 | `kit/css.py` | `compute_k`, `verify_css`, and the re-exported GF(2) core (`rref`, `rank`, `kernel_basis`, `logical_basis`, ...) shared with the verifier |
-| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session. Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
+| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session, and `record_negative(..., assumptions=, revisit_if=)` what makes a closed route reusable, read back by `./qldpc negatives` (issue #4233). Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
 | `kit/gf2poly.py` | GF(2) polynomials as ints: `factor_squarefree` (x^m - 1 over GF(2), no sympy), `designed_divisor`, `sparse_multiples`, `cyclic_gb`, `designed_k`; the designed-divisor route behind `search.sample_cyclic_gb` (section 3c) |
 | `kit/bb.py` | `build_bb`, `poly_matrix`, `KNOWN` (known BB codes to start from) |
 | `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt`; `small_group` reads a committed GAP SmallGroup table from `kit/groups/` (exported by `kit/groups/cayley_table.g`), `build_2bga_small_group` is its recipe form |
