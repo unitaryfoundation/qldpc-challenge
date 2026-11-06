@@ -1,0 +1,131 @@
+{
+ "date": "2026-11-05",
+ "n_cap": 120,
+ "parents": 1009,
+ "parents_with_a_derivable_child": 612,
+ "parents_with_nothing_remaining": 411,
+ "parents_pruned_to_nothing": 14,
+ "seconds": 347.9,
+ "counts": {
+  "C-DELETE-CHECK": {
+   "derived": 17732,
+   "remaining": 16547,
+   "refused": 33603,
+   "pruned": 1185
+  },
+  "E-PEEL": {
+   "derived": 7550,
+   "remaining": 6420,
+   "pruned": 1130,
+   "refused": 965
+  },
+  "E-PUNCTURE": {
+   "derived": 27210,
+   "remaining": 26672,
+   "refused": 33876,
+   "pruned": 538
+  }
+ },
+ "refused": {
+  "E-PUNCTURE": {
+   "bare qubit": 6047,
+   "no rows left": 92,
+   "dependent display": 27314,
+   "disconnected": 423
+  },
+  "C-DELETE-CHECK": {
+   "dependent row": 33476,
+   "bare qubit": 98,
+   "disconnected": 29
+  },
+  "E-PEEL": {
+   "bare qubit": 252,
+   "disconnected": 529,
+   "dependent display": 184
+  }
+ },
+ "remaining_total": 49639,
+ "remaining_by_move_and_cell": {
+  "E-PUNCTURE weight-6 local-2d-single": 7848,
+  "C-DELETE-CHECK weight-6 local-2d-single": 4925,
+  "E-PUNCTURE weight-8 local-2d-single": 4873,
+  "E-PUNCTURE weight-9plus unrestricted": 4776,
+  "E-PUNCTURE weight-9plus local-2d-single": 3850,
+  "C-DELETE-CHECK weight-9plus local-2d-single": 3155,
+  "C-DELETE-CHECK weight-8 local-2d-single": 2696,
+  "E-PUNCTURE weight-4 local-2d-single": 2250,
+  "C-DELETE-CHECK weight-9plus unrestricted": 2175,
+  "C-DELETE-CHECK weight-4 local-2d-single": 2162,
+  "E-PUNCTURE weight-8 unrestricted": 2162,
+  "E-PEEL weight-6 local-2d-single": 1970,
+  "E-PEEL weight-9plus local-2d-single": 1312,
+  "E-PEEL weight-4 local-2d-single": 1274,
+  "E-PUNCTURE weight-6 unrestricted": 910,
+  "C-DELETE-CHECK weight-8 unrestricted": 755,
+  "C-DELETE-CHECK weight-6 unrestricted": 658,
+  "E-PEEL weight-8 local-2d-single": 656,
+  "E-PEEL weight-9plus unrestricted": 555,
+  "E-PEEL weight-6 unrestricted": 329,
+  "E-PEEL weight-8 unrestricted": 285,
+  "E-PEEL weight-4 unrestricted": 39,
+  "C-DELETE-CHECK weight-4 unrestricted": 21,
+  "E-PUNCTURE weight-4 unrestricted": 3
+ },
+ "remaining_by_parent_d": {
+  "1": 1248,
+  "2": 5366,
+  "3": 11331,
+  "4": 6562,
+  "5": 6622,
+  "6": 5095,
+  "7": 4255,
+  "8": 1514,
+  "9": 1552,
+  "10": 1064,
+  "11": 1148,
+  "12": 908,
+  "13": 454,
+  "14": 1176,
+  "15": 902,
+  "16": 324,
+  "17": 118
+ },
+ "soundness_vs_sweep": {
+  "checked": 664,
+  "pruned_and_advancing": 2,
+  "pruned_and_not_advancing": 58,
+  "kept_and_advancing": 232,
+  "kept_and_not_advancing": 372,
+  "parent_missing": 0,
+  "examples": [
+   {
+    "file": "53-12-6-5dcdcef47077a1d3.json",
+    "parent": "54-12-6-b",
+    "point": [
+     53,
+     12,
+     6,
+     8
+    ],
+    "cell": [
+     "weight-8",
+     "unrestricted"
+    ]
+   },
+   {
+    "file": "53-12-6.json",
+    "parent": "54-12-6-b",
+    "point": [
+     53,
+     12,
+     6,
+     8
+    ],
+    "cell": [
+     "weight-8",
+     "unrestricted"
+    ]
+   }
+  ]
+ }
+}
