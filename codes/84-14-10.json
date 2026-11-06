@@ -896,7 +896,7 @@
    "arXiv:2306.16400"
   ],
   "date": "2026-09-17",
-  "notes": "Reconstruction of a published Lin-Pryadko 2BGA code (SmallGroup(42,3), [[84,14,10]]). Checked against the current board: not an exact or WL-equivalent duplicate of any existing entry."
+  "notes": "Reconstruction of a published Lin-Pryadko 2BGA code (SmallGroup(42,3), [[84,14,10]]). Checked against the current board: not an exact or WL-equivalent duplicate of any existing entry. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 9), with a proved lower bound of 7; the Z-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 9), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json)."
  },
  "family": "generalized-bicycle",
  "locality": {
@@ -1251,33 +1251,29 @@
  "circuit": {
   "d_circ": {
    "X": {
-    "value": 9,
+    "value": 7,
     "confidence": "upper_bound",
     "witness": [
-     43812,
-     43843,
-     44058,
-     44212,
-     44812,
-     44861,
-     45677,
-     45721,
-     46589
+     3491,
+     3515,
+     3881,
+     4229,
+     4531,
+     5317,
+     6309
     ]
    },
    "Z": {
-    "value": 9,
+    "value": 7,
     "confidence": "upper_bound",
     "witness": [
-     47577,
-     47580,
-     47659,
-     47672,
-     47673,
-     47686,
-     47689,
-     47736,
-     47749
+     7863,
+     7876,
+     7943,
+     7948,
+     7983,
+     8075,
+     8172
     ]
    }
   },
