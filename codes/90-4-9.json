@@ -682,7 +682,7 @@
    "an internal weight-5 bivariate-bicycle evolutionary campaign in github.com/qiskit-community/qcode-discovery (branch weight5-campaigns, not part of a public branch at the time of this submission -- this submission's own distance/CSS claims are independently re-derived and re-verified using only this repository's tools and do not rely on that source being externally checkable)"
   ],
   "date": "2026-09-07",
-  "notes": "Independently corroborated with this repo's own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign's own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission's re-verification and packaging was done separately by Claude Sonnet 5.",
+  "notes": "Independently corroborated with this repo's own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign's own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission's re-verification and packaging was done separately by Claude Sonnet 5. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8; the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
   "model": [
    "GPT 5.6 Sol",
    "Claude Opus 5"
@@ -692,33 +692,31 @@
  "circuit": {
   "d_circ": {
    "X": {
-    "value": 9,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     11,
-     15,
-     54,
-     58,
-     63,
-     67,
-     91,
-     114,
-     116
+     285,
+     316,
+     836,
+     971,
+     977,
+     1193,
+     1197,
+     1660
     ]
    },
    "Z": {
-    "value": 9,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     60,
-     72,
-     174,
-     188,
-     567,
-     571,
+     51,
+     56,
+     972,
+     992,
      1231,
-     1245,
-     1646
+     1257,
+     1790,
+     1831
     ]
    }
   },
