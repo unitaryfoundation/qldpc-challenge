@@ -4,7 +4,7 @@
 Confirmation is the bottleneck (fieldnotes/2026-07-01-confirmation-is-the-bottleneck.md)
 and the repository has priced it by intuition. This script measures it: for a fixed
 grid of board entries chosen to cover the cap corners (BASE_MAX_N 700, MAX_N 1000,
-check weight 8 and 12/16/24/32, distance 40) and both code types, it records the
+check weight 8 and 12/16/24/32, distance near the extended cap of 40) and both code types, it records the
 wall time of
 
 * the gate, ``verify/validate_candidate.py``, end to end, split into the structural
@@ -67,14 +67,14 @@ GRID = [
     ("696-352-10", "w=12, k=352"),
     ("682-132-64", "w=24"),
     ("682-142-54", "w=32"),
-    ("960-24-40", "EXT_MAX_D corner (d=40), w=6, n=960"),
+    ("960-24-38", "extended range, w=6, n=960"),
     ("968-18-31", "w=8, n~1000"),
     ("1000-406-6", "MAX_N corner, w=8, k=406"),
-    # stabilizer (non-CSS): no certifier yet, Pauli-weight RIS
+    # stabilizer (non-CSS): verify/certify.py has no Pauli-weight formulation, Pauli-weight RIS
     ("90-21-10", "stabilizer, n~100"),
     ("672-28-30", "stabilizer, w=24, n~700"),
     ("761-1-39", "stabilizer, n>700, w=4"),
-    ("662-122-95", "stabilizer, w=32, large k"),
+    ("662-122-86", "stabilizer, w=32, large k"),
 ]
 CERTIFY_STATUSES = ("exact", "refuted", "milp_tlim", "wall_cap", "not_available", "error")
 
@@ -272,10 +272,17 @@ def render(table):
              f"Certification: MILP time limit {p['certify_tlim_s']} s per generator, wall cap "
              f"{p['certify_wall_s']} s per side. Times are this machine's, not a guarantee.",
              "",
-             f"| entry | type | n | k | d | w | gate | of which refute | RIS {ris:,}/side (measured, or "
+             f"| entry | type | n | k | d at measurement | w | gate | of which refute | RIS {ris:,}/side (measured, or "
              f"implied from a smaller count) | fast {fast[0]:,} | fast {fast[-1]:,} | submit search | "
              "certify X | certify Z |",
              "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    renamed = [e for e in table["entries"] if e.get("measured_slug")]
+    if renamed:
+        mapping = "; ".join(f"{e['measured_slug']} -> {e['slug']}" for e in renamed)
+        lines[2:2] = ["Current entry slugs are shown below. The d column is the claimed bound "
+                      "at measurement. For renamed entries, d and all "
+                      "timings still describe the original measured input; measured_slug "
+                      f"and blob in the JSON preserve its identity: {mapping}.", ""]
     for e in table["entries"]:
         g, r, c = e["gate"], e["rungs"], e["certify"]
         sides = ("P",) if e["code_type"] == "stabilizer" else ("X", "Z")

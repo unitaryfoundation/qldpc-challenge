@@ -19,8 +19,9 @@ This module is that search, symmetric with the code-search loop:
 * **searched**: the schedule. Candidates come from the families
   ``research/circuit_autogen.py`` knows (interleaved two-block slot
   assignments, layout zigzag pattern pairs, edge-coloring orders of the
-  generic sequential schedule), every applicable family rather than the
-  first, over as many seeds as the budget allows;
+  generic sequential schedule, each of the first and last flagged first
+  with Johnson-coil and span flags, issue #4231), every applicable family
+  rather than the first, over as many seeds as the budget allows;
 * **scored**: ``d_circ`` per basis, read off the same RIS search of the
   detector error model the generator and the gate use, at twice the gate's
   trial budget; the lower basis first, then the sum. The bound is what the
@@ -124,12 +125,15 @@ def baseline(doc, circuits_dir):
     return out
 
 
-def families(HX, HZ, coords, seed, only=FAMILIES):
-    """Every applicable schedule family as (name, label, candidate iterator)."""
+def families(HX, HZ, coords, seed, only=FAMILIES, rounds=None):
+    """Every applicable schedule family as (name, label, candidate iterator);
+    with `rounds` the two-block and generic families yield their flagged
+    variants first (circuit_autogen's Johnson-coil and span flags, issue
+    #4231), sized to fit the verifier's caps at that round count."""
     rng = np.random.default_rng(seed)
     out = []
     if "two-block" in only:
-        got = ca.two_block_candidates(HX, HZ, rng)
+        got = ca.two_block_candidates(HX, HZ, rng, rounds)
         if got is not None:
             out.append(("two-block", got[0], got[1]))
     if "layout" in only:
@@ -137,7 +141,7 @@ def families(HX, HZ, coords, seed, only=FAMILIES):
         if got is not None:
             out.append(("layout", got[0], got[1]))
     if "generic" in only:
-        label, it = ca.generic_candidates(HX, HZ, rng)
+        label, it = ca.generic_candidates(HX, HZ, rng, rounds)
         out.append(("generic", label, it))
     return out
 
@@ -216,7 +220,7 @@ def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, 
     ledger = os.path.join(run_dir, "ledger.jsonl")
     log(f"{slug}: committed d_circ X {base['d_circ']['X']}, Z {base['d_circ']['Z']} at rounds "
         f"{base['rounds']}; searching {attempts} schedules at rounds {rounds}, {seconds:g} s per basis")
-    fams = families(HX, HZ, coords_of(doc), seed, only)
+    fams = families(HX, HZ, coords_of(doc), seed, only, rounds)
     log("  families: " + ", ".join(f"{name} ({label})" for name, label, _ in fams))
     if ler:
         committed = {}

@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 4 qubits)</summary><div class=wit>[51, 54, 55, 56]</div></details>
 <div class=kv><b>d_Z</b> 4 &middot; witness weight 4 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 4 qubits)</summary><div class=wit>[49, 59, 69, 89]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 4</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 4 exists; Z: no logical &lt; 4 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 4</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 4 exists; Z: no logical &lt; 4 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -59,6 +59,15 @@
 (3,9): 900
 (3,10): 450
 (3,11): 2700</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/125-25-4">circuits/125-25-4/</a> &middot; canonical noise recipe, 4 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 4 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[16478, 16503, 17121, 17542]</div></details>
+<div class=kv><b>d_circ^Z</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[42096, 42098, 42500, 42503]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

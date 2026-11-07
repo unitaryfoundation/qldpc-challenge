@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>62</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>10</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>7</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>7.903</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>7.90323</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>7</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0188</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[8, 14, 29, 39, 45, 49, 60]</div></details>
 <div class=kv><b>d_Z</b> 7 &middot; witness weight 7 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[1, 13, 14, 19, 31, 50, 56]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 7</span> &middot; scipy/HiGHS cutoff IP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 7 exists; Z: no logical &lt; 7 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 7</span> &middot; scipy/HiGHS cutoff IP &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 7 exists; Z: no logical &lt; 7 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -60,6 +60,15 @@
 (3,9): 186
 (3,10): 31</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 8.9443 &middot; Z 5.831 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/62-10-7">circuits/62-10-7/</a> &middot; canonical noise recipe, 7 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 7 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[28458, 28463, 28466, 28502, 28504, 28507, 28516]</div></details>
+<div class=kv><b>d_circ^Z</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[28440, 28441, 28452, 28454, 28456, 28469, 28480]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

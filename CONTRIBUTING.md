@@ -297,6 +297,29 @@ lower anywhere; both stay with the listed authors. The gate re-derives the
 committed detector error models and re-runs the circuit search on the new
 claim, as it does for a first donated tier.
 
+## Lowering a circuit fault distance already on the board
+
+Every `d_circ` is a witnessed upper bound, found by a randomized search, and
+an exhaustive search can find an undetected logical fault set lighter than
+the claim in the committed detector error model (issue #4717 found several on
+schedules that claimed `d_circ = d`). Correcting it is a refutation of the
+circuit tier, and it binds for anyone the way a distance refutation does.
+Lower the side (or sides) that came down to the weight of the fault set you
+found, store that fault set as the side's `witness` (indices into the
+committed `.dem`, exactly as many as the new value), keep `confidence` at
+`upper_bound`, and append a sentence to `provenance.notes` that names your
+`@handle`, which is where the credit lives, since the circuit side has no
+`witness_provenance`. Leave everything else alone: `verify/check_authorship.py`
+refuses a refutation that touches any other key of the `circuit` block
+(`contributed_by`, `rounds`, `notes`, `ler`), that raises a side, that changes
+a witness without lowering its value, that edits anything outside the block,
+or that replaces the files under `circuits/<slug>/` in the same diff, because
+the witness indexes the committed artifacts as they are. The gate re-derives
+the committed detector error models and searches for anything lighter than
+the corrected claim, as it does for every changed circuit claim.
+`research/audits/circuit_distance_bounds.py` produces such fault sets with a
+proved lower bound beside them.
+
 ## One code, one entry
 
 Two files whose check matrices generate the same stabilizer group up to a
@@ -304,6 +327,16 @@ relabeling of the qubits are one code, and the board lists a code once. The
 `-b` suffix on a slug is for a different code that happens to share
 `[[n,k,d]]` with an earlier entry; it is not a route for filing a second
 presentation of a code that is already on the board.
+
+`verify/verify_all.py` refuses two entries with the same stabilizer group,
+but it sees only the tree it verifies, which is how two PRs filed the same
+`[[12,5,2]]` minutes apart, one the X/Z swap of the other (#4064, #4069,
+issue #4107). CI therefore also compares a submission with every other open
+PR (`verify/check_pr_duplicates.py`): an entry whose stabilizer group,
+directly or through a local-Hadamard image such as its X/Z swap, is also
+added by an open PR fails the later of the two PRs and warns the earlier, so
+one of them merges and the other waits until it has landed or been
+withdrawn. A WL signature shared with an open PR is a warning on both.
 
 The gate's WL-signature collision is a flag, not a verdict. The question is
 settled when someone exhibits the permutation, as issue #2643 did for four
@@ -342,6 +375,39 @@ file it: `verify/check_authorship.py` lets a non-author set `novelty` to
 `known_parameters` and append to `provenance.references`, and nothing else.
 The computed source for these matches is `research/provenance/derived.json`
 (issue #1204).
+
+## Recording a comparison against the surface code
+
+The Beat the Surface Code campaign (issue #4601) asks whether a code beats
+the surface code on physical qubits at matched logical count and logical
+error rate, with syndrome ancillas counted. An entry may carry one such
+comparison in an optional `benchmark` block (`schema_version: "0.6"`): the
+hardware track, the noise model and physical rate, the baseline (a committed
+surface-code entry or k rotated patches of a stated distance), the decoder,
+the resource counts of both memory experiments, the target and measured
+logical error rates, and the method. The verifier checks the block against
+the entry and the board, records what it says in `computed.benchmark`, and
+ranks nothing by it; `status` is `documented` until the repository can
+reproduce such a measurement itself. The fields are listed in
+`schema/SCHEMA.md`; the research note carries the write-up. A non-author
+may add a first `benchmark` block to an entry, credited in
+`benchmark.contributed_by`, the way a layout or a circuit tier is donated.
+
+A Tier C claim, what fault-tolerant computation on the code costs beyond
+its transversal gates, goes in an optional `architecture` block
+(`schema_version: "0.7"`, issue #4674), carried only together with the
+`benchmark` block whose track, noise model, decoder, and baseline it uses:
+surgery, switching, teleportation, or gauge-fixing gadgets on blocks of
+the code with their fault distances and resources, the magic-state
+protocol, and an algorithm-level estimate of physical qubits, factories,
+and runtime against the surface-code baseline at the same logical count.
+The verifier checks the block against the entry and the board (no gadget
+claims a fault distance above `d`, every count covers the blocks it
+prices, a distillation protocol lowers the error rate), records the
+reading in `computed.architecture`, and ranks nothing by it. The fields
+are in `schema/SCHEMA.md`. A non-author may add a first `architecture`
+block to an entry that already carries a `benchmark` block, credited in
+`architecture.contributed_by`.
 
 ## Contribute with an LLM
 
@@ -498,6 +564,15 @@ lesser result, it is the honest one, and `d <=` is what the board displays. If
 you have a certification approach that closes these, please open an issue; the
 two n = 180 codes above are a good regression test.
 
+What the weekly sweep can still prove about such a code is a lower bound
+(issue #4230): `verify/sat_certify.py --ladder` asks the same question at
+W = 1, 2, ... and stops at the first timeout, and UNSAT at W is the theorem
+d >= W + 1 whatever happens above it. The result is a partial certificate in
+`certs/` (`d_exact` false, `d_lower`), and the board shows the entry as the
+interval `d_lower <= d <= d`. The gap is how much of the claim is unproven;
+a later witness below `d_lower` fails `verify/check_certs.py`, since one of
+the two is then wrong.
+
 ## Reproducing an entry
 
 Every board entry is self-verifying: anyone can run the trusted gate against `codes/<slug>.json` and re-check its structure, `k`, witnesses, layout and distance upper bound. `qldpc reproduce` re-runs the whole evidence chain instead of that one stage, and writes down what happened.
@@ -535,7 +610,10 @@ results, but they do not sit on the frontier. See `TRACKS.md`.
 A board-advancing code whose only strict gain over an entry is d (same n, k and w)
 calls for caution, not rejection: both distances are upper bounds, so re-measure the
 peer and the candidate at matched depth (`research/audits/leader_audit.py pair`)
-before submitting.
+before submitting. `./qldpc submit` refuses such a gain unless `--peer-audit <file>`
+carries the record `pair --json-out` wrote: a `credible` decision, read at least as
+deep as the submission's own search, covering every such entry. Without one it
+stages the verified document and prints the `pair` command to run.
 
 ## Tips
 

@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>42</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>12</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>5</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>7.143</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>7.14286</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -44,11 +44,11 @@
 </section>
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/42-12-5">circuits/42-12-5/</a> &middot; canonical noise recipe, 5 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 4 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
-<div class=kv><b>d_circ^X</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[947, 950, 1198, 3219]</div></details>
-<div class=kv><b>d_circ^Z</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[11001, 11010, 11227, 11238]</div></details>
+<div class=kv><b>d_circ</b> &le; 5 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 5 &middot; fault-set witness of 5 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 5)</summary><div class=wit>[16674, 16678, 16685, 16698, 16709]</div></details>
+<div class=kv><b>d_circ^Z</b> 5 &middot; fault-set witness of 5 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 5)</summary><div class=wit>[16557, 16558, 16600, 16622, 16623]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>

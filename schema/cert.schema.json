@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://unitaryfoundation.github.io/qldpc-challenge/schema/cert.schema.json",
-  "title": "qLDPC challenge exact-distance certificate",
-  "description": "A certs/<slug>.json with d_exact true is what upgrades a board entry from a witnessed upper bound to an exact distance. The upper bound always ships an explicit logical operator anyone can re-verify in seconds; the lower bound is the harder direction and, until this schema, shipped only a solver's verdict and a sentence. `verification` makes the strength of that verdict explicit and lets a stronger one be attached without changing anything else (issue #2511).",
+  "title": "qLDPC challenge distance certificate",
+  "description": "A certs/<slug>.json with d_exact true is what upgrades a board entry from a witnessed upper bound to an exact distance. The upper bound always ships an explicit logical operator anyone can re-verify in seconds; the lower bound is the harder direction and, until this schema, shipped only a solver's verdict and a sentence. `verification` makes the strength of that verdict explicit and lets a stronger one be attached without changing anything else (issue #2511). A certificate with d_exact false is a partial certificate (issue #4230): it proves d >= d_lower, the largest bound an ascending ladder of UNSAT verdicts reached below the claim, and the board shows the entry as the interval d_lower <= d <= d. The exact tier is the special case d_lower == d.",
   "type": "object",
   "required": ["d", "d_exact", "solver", "sides", "verification"],
   "properties": {
@@ -10,7 +10,9 @@
     "d": { "type": "integer", "minimum": 1,
            "description": "the distance this certificate is about" },
     "d_exact": { "type": "boolean",
-                 "description": "true only when every side closed; a timeout proves nothing and leaves the entry at its upper bound" },
+                 "description": "true only when every side closed at W = d - 1; a timeout there proves nothing about exactness, and what was proved below the claim is d_lower" },
+    "d_lower": { "type": "integer", "minimum": 1,
+                 "description": "the proven lower bound: the largest W + 1 at which both sides returned UNSAT, so no nontrivial logical of weight <= W exists and d >= W + 1. The minimum of the sides' proved_min. Required when d_exact is false (a certificate that proves nothing is not filed) and equal to d when d_exact is true. A theorem about the code, not about the claim: when a refutation lowers d, d_lower stays, and a d below it is a bug in the witness verifier or in the certificate, which verify/check_certs.py reports (issue #4230)" },
     "solver": { "type": "string", "minLength": 1,
                 "description": "the solver and its version, stamped from what was loaded rather than hardcoded (#2349)" },
     "encoding": { "type": "string" },
@@ -28,7 +30,25 @@
           "status": { "type": "string" },
           "secs": { "type": "number", "minimum": 0 },
           "note": { "type": "string" },
-          "witness": { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+          "witness": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+          "proved_min": { "type": "integer", "minimum": 1,
+                          "description": "this side's proven lower bound: 1 + the largest W of a verified UNSAT rung of its ladder (1 when nothing was proved); equals the certificate's d on an exact side" },
+          "ladder": {
+            "type": "array",
+            "description": "the ascending rungs the certifier ran on this side, oldest first: W, the verdict, the seconds, and what the proof path made of it. An UNSAT at W implies UNSAT at every smaller W, so the top UNSAT rung is the one the bound rests on and the one a proof_log replay regenerates",
+            "items": {
+              "type": "object",
+              "required": ["W", "status"],
+              "properties": {
+                "W": { "type": "integer", "minimum": 1 },
+                "status": { "type": "string" },
+                "secs": { "type": "number", "minimum": 0 },
+                "proof": { "type": "string", "description": "'verified' when kissat refuted the pure-CNF rung and drat-trim checked it, else why not" },
+                "cnf_sha256": { "type": "string", "description": "sha256 of the pure-CNF formula this rung refuted, the same hash verification.cnf_sha256 carries for the top rung" },
+                "note": { "type": "string" }
+              }
+            }
+          }
         }
       }
     },
@@ -76,7 +96,7 @@
         },
         "checks_sha256": {
           "type": "string",
-          "description": "for formal: sha256 of this entry's canonical (H_X, H_Z), binding the theorem to this code rather than to one that resembles it. A formal proof is about a code defined inside the development, and a perfect proof about a different matrix pair certifies nothing here. The only maintainable way to hold the binding is to generate the formal definition from codes/<slug>.json rather than transcribe it."
+          "description": "for formal, and for every partial certificate (d_exact false): sha256 of this entry's canonical (H_X, H_Z), binding the statement to this code rather than to one that resembles it. A partial certificate's d_lower must survive a correction of the entry's d, so the site honors it by this hash rather than by the claim it was made against. A formal proof is about a code defined inside the development, and a perfect proof about a different matrix pair certifies nothing here. The only maintainable way to hold the binding is to generate the formal definition from codes/<slug>.json rather than transcribe it."
         },
         "note": { "type": "string", "maxLength": 500 }
       },
@@ -119,5 +139,15 @@
         }
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "d_exact": { "const": false } } },
+      "then": {
+        "required": ["d_lower"],
+        "properties": { "verification": { "required": ["checks_sha256"] } },
+        "description": "A partial certificate names the bound it proves and is bound to the code by hash, so a later correction of the claim cannot strand or misattribute it"
+      }
+    }
+  ]
 }

@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>152</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>42</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>8</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>17.684</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>17.6842</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[7, 38, 49, 60, 103, 106, 110, 141]</div></details>
 <div class=kv><b>d_Z</b> 8 &middot; witness weight 8 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[28, 29, 32, 37, 50, 54, 117, 119]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; CryptoMiniSat 5.14.7 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists; Z: no logical &lt; 8 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; CryptoMiniSat 5.14.7 SAT &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists; Z: no logical &lt; 8 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -38,11 +38,20 @@
 (3,5): 21660
 (3,7): 3192</div></details>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/152-42-8">circuits/152-42-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[93410, 93412, 93418, 93419, 93433, 93438, 93499, 93502]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[93404, 93407, 93450, 93455, 93505, 93506, 93525, 93527]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Lee, Jong Yeon</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Cyclic all-one pair-partition CPM CSS construction (arXiv:2607.14091), instance PPS152_n152_k42_d8 (internal id j3l8_p19_00016): lift size p=19, (J,L)=(3,8), n=8*p=152, 3*p=57 checks per side, column weight 3, row weight 8. CPM exponent arrays (rows = CPM block-rows, columns = the 8 block-columns): E_X = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 10, 9, 3, 7, 1, 18, 15], [0, 12, 17, 14, 8, 16, 13, 6]], E_Z = [[0, 15, 8, 4, 8, 0, 4, 15], [0, 1, 2, 6, 0, 1, 2, 6], [0, 6, 16, 7, 7, 16, 6, 0]]. Lift convention per the authors&#x27; expand_and_verify_cpm_matrices.py (github.com/kasaikenta/pair-partition-cpm-css-codes @ 9c2a6f2): check a of block-row b on side S has support {8*((a - E_S[b][t]) mod 19) + t : t=0..7}. Source file https://kasai.ict.eng.isct.ac.jp/pair_partition_cpm_css_codes_data/contributed_codes/jong_yeon_lee/codes/PPS152_n152_k42_d8.cpm (sha256 2c0b11059910a4353a746713100720db0e73214abcdd204973206d5af954a897), expanded with the authors&#x27; own script.</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2607.14091">arXiv:2607.14091</a></div>
 <div class=kv><b>date</b> 2026</div>
 <div class=kv><b>notes</b> Literature baseline, seeded 2026-08-14. Listed as PPS152 [[152,42,8]] in the contributed-codes section (Jong Yeon Lee, 19 CPM-PP codes) of the Okada-Kasai pair-partition CPM catalogue (arXiv:2607.14091; catalogue page updated 2026-08-13), which reports the distance as exact. No public machine-verified distance certificate bundle covers this instance (checked master_manifest.json of certificate_bundles_20260805), so it is recorded here strictly as a witness-backed upper bound from this repo&#x27;s own 200000-trial RIS search per side (seed 11). Reproduction was validated end to end: the published .cpm file expanded with the authors&#x27; own script gives a CSS-orthogonal regular pair with the claimed k.</div>

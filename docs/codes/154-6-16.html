@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>154</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>6</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>16</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>9.974</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>9.97403</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0049</div></div>
@@ -43,6 +43,15 @@
 (3,7): 1540</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 10.8167 &middot; Z 10.4403 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/154-6-16">circuits/154-6-16/</a> &middot; canonical noise recipe, 16 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 16 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 16 &middot; fault-set witness of 16 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 16)</summary><div class=wit>[127983, 127984, 127991, 127994, 128006, 128030, 128031, 128038, 128039, 128048, 128049, 128055, 128059, 128117, 128124, 128126]</div></details>
+<div class=kv><b>d_circ^Z</b> 16 &middot; fault-set witness of 16 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 16)</summary><div class=wit>[127975, 127978, 127986, 128000, 128017, 128026, 128027, 128038, 128056, 128059, 128078, 128092, 128102, 128113, 128118, 128124]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; Simulated annealing over site assignments on an integer grid with the repo&#x27;s own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier&#x27;s rule. &middot; 2026-10-03</div>
@@ -53,7 +62,7 @@
 <div class=kv><b>authors</b> Zijian Liang and Ke Liu and Hao Song and Yu-An Chen</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+x<sup>-1</sup>y<sup>2</sup>, g(x,y)=1+y+y<sup>-4</sup> on the abelian quotient group Z<sup>2</sup>/L with twist basis a_1=[0, 77], a_2=[1, 16] (n=2|det[a_1,a_2]|=2*77). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2503.03827">arXiv:2503.03827</a></div>
 <div class=kv><b>date</b> 2025</div>
 <div class=kv><b>notes</b> Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d&gt;20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery.</div>

@@ -661,6 +661,7 @@
     "verify_structural_s": 0.84
    },
    "k": 24,
+   "measured_slug": "960-24-40",
    "n": 960,
    "role": "EXT_MAX_D corner (d=40), w=6, n=960",
    "rungs": {
@@ -681,7 +682,7 @@
     "submit_search_extrapolated": true,
     "submit_search_s": 3875.57
    },
-   "slug": "960-24-40",
+   "slug": "960-24-38",
    "w": 6
   },
   {
@@ -914,6 +915,7 @@
     "verify_structural_s": 1.34
    },
    "k": 122,
+   "measured_slug": "662-122-95",
    "n": 662,
    "role": "stabilizer, w=32, large k",
    "rungs": {
@@ -930,7 +932,7 @@
     "submit_search_extrapolated": true,
     "submit_search_s": 9844.98
    },
-   "slug": "662-122-95",
+   "slug": "662-122-86",
    "w": 32
   }
  ],

@@ -187,7 +187,7 @@ def test_a_run_files_what_closes_logs_every_attempt_and_exits_three_on_a_refutat
     title, issue = S.refutation_text(m)
     assert "1 entry refuted" in title and "refutes" in issue and "weight 1" in issue
     summary = S.summary_markdown(m)
-    assert "exact 1, timeout 1, refuted 1, error 1" in summary and "| closes |" in summary
+    assert "exact 1, partial 0, timeout 1, refuted 1, error 1" in summary and "| closes |" in summary
     # the CLI exit code: 3 marks a refutation so the workflow reports it; 0 otherwise
     assert S.EXIT_REFUTED == 3
 
@@ -271,3 +271,329 @@ def test_the_wall_clock_kills_a_certifier_that_ignores_its_limit(tmp_path, monke
     rec, err, killed = S.certify_in_subprocess(os.path.join(codes, "slow.json"), "slow", 1, str(tmp_path / "p"),
                                                wall=10, script=str(bad))
     assert rec is None and not killed and err.startswith("ValueError: X side")
+
+
+def _tool_record(slug, doc, tlim, *, sides):
+    """Build a tropidist_certify record: solver level, per side exact or a timeout with its lower bound."""
+    blocks = {}
+    for side, (status, lb) in sides.items():
+        blk = {"value": doc["distance"]["d"], "status": status, "exact": status == "UNSAT", "secs": 0.2}
+        blk["note"] = f"no logical < {doc['distance']['d']} exists" if status == "UNSAT" else f"lower bound {lb}"
+        if status == "TIMEOUT":
+            blk["lower_bound"] = lb
+        blocks[side] = blk
+    return {"name": slug, "d": doc["distance"]["d"],
+            "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search",
+            "encoding": "pauli-mechanisms" if "P" in sides else "css-sides", "tlim_per_solve": tlim,
+            "logical_classes": doc["k"], "sides": blocks, "d_exact": all(s == "UNSAT" for s, _ in sides.values()),
+            "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel"}}
+
+
+def test_the_tropidist_backend_admits_stabilizer_entries_and_hands_closed_css_entries_to_sat(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    css = {"n": 12, "k": 2, "code_type": "CSS", "distance": {"d": 2, "X": {"value": 2}, "Z": {"value": 2}}}
+    for slug in ("css-closes", "css-open", "css-broken"):
+        _write(os.path.join(codes, slug + ".json"), css)
+    _write(os.path.join(codes, "stab.json"), {"n": 5, "k": 1, "code_type": "stabilizer",
+                                              "distance": {"d": 3, "P": {"value": 3}}})
+    queue = {"date": "2026-11-06", "head": "q",
+             "entries": [_row("css-closes"), _row("css-open"), _row("stab", code_type="stabilizer", d=3, n=5),
+                         _row("css-broken")]}
+    sat_calls = []
+
+    def certify(doc, tlim, proof_dir, slug):            # the SAT proof path: proof_log on everything it sees
+        sat_calls.append(slug)
+        return _record()
+
+    def tool(doc, tlim, slug):                          # the tropidist stand-in
+        if slug == "css-closes":
+            return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("UNSAT", None)})
+        if slug == "css-open":
+            return _tool_record(slug, doc, tlim, sides={"X": ("UNSAT", None), "Z": ("TIMEOUT", 1)})
+        if slug == "stab":
+            return _tool_record(slug, doc, tlim, sides={"P": ("UNSAT", None)})
+        raise RuntimeError("tropidist wrote no record")
+
+    attempts = str(tmp_path / "attempts.jsonl")
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=attempts, tlim=600, job_seconds=1000, certs_dir=certs,
+                    codes_dir=codes, certify=certify, certify_tropidist=tool, tools=lambda: {},
+                    backend="tropidist+sat")
+    rows = {r["slug"]: r for r in S.load_jsonl(attempts)}
+    # SAT runs only on what the tool closed (to upgrade) or could not run on (to fall back); never on a
+    # tool timeout, never on a stabilizer entry
+    assert sat_calls == ["css-closes", "css-broken"]
+    assert rows["css-closes"]["backend"] == "sat" and rows["css-closes"]["upgrade"] == "proof_log"
+    assert rows["css-closes"]["level"] == "proof_log"
+    assert rows["css-open"]["outcome"] == "timeout" and rows["css-open"]["backend"] == "tropidist"
+    assert rows["css-open"]["sides"]["Z"]["lower_bound"] == 1 and "upgrade" not in rows["css-open"]
+    assert rows["stab"]["outcome"] == "exact" and rows["stab"]["backend"] == "tropidist"
+    assert rows["stab"]["level"] == "solver" and set(rows["stab"]["sides"]) == {"P"}
+    assert rows["css-broken"]["backend"] == "sat" and rows["css-broken"]["outcome"] == "exact"
+    assert sorted(m["staged"]) == ["css-broken", "css-closes", "stab"] and m["backend"] == "tropidist+sat"
+    with open(os.path.join(out, "certs", "stab.json"), encoding="utf-8") as f:
+        cert = json.load(f)
+    assert cert["d_exact"] and cert["sides"]["P"]["exact"] and cert["verification"]["level"] == "solver"
+    title, body = S.pr_text(m, staged=m["staged"])
+    assert "tropidist backend" in body and "stabilizer" in body and "| stab | 5 | 2 | 3 | solver | tropidist |" in body
+    assert "| css-closes | 12 | 2 | 2 | proof_log | sat |" in body
+    summary = S.summary_markdown(m)
+    assert "| stab |" in summary and "d >= 1" not in summary, "the summary table lists what closed"
+    # the tool alone never calls SAT; the SAT path alone still skips stabilizer entries
+    sat_calls.clear()
+    m2 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out2"), attempts_path=str(tmp_path / "a2.jsonl"),
+                     tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, certify=certify,
+                     certify_tropidist=tool, tools=lambda: {}, backend="tropidist")
+    assert sat_calls == [] and m2["outcomes"] == {"exact": 2, "timeout": 1, "error": 1}
+    m3 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out3"), attempts_path=str(tmp_path / "a3.jsonl"),
+                     tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, certify=certify,
+                     tools=lambda: {}, backend="sat")
+    assert m3["skipped"] == {"stabilizer": 1} and sat_calls == ["css-closes", "css-open", "css-broken"]
+    with pytest.raises(ValueError):
+        S.run_sweep(queue=queue, out_dir=str(tmp_path / "out4"), attempts_path=str(tmp_path / "a4.jsonl"),
+                    tlim=600, job_seconds=1000, certs_dir=certs, codes_dir=codes, tools=lambda: {},
+                    backend="tropidist")
+
+
+def test_selection_for_the_tool_checks_the_pauli_side_against_d(tmp_path):
+    S = _script()
+    codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
+    for slug in ("ok", "off"):
+        _write(os.path.join(codes, slug + ".json"), {"n": 5})
+    off = _row("off", code_type="stabilizer", d=3)
+    off["sides"]["P"]["value"] = 4
+    queue = {"entries": [_row("ok", code_type="stabilizer", d=3), off]}
+    chosen, skipped, reasons = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes,
+                                        stabilizer_ok=True)
+    assert [r["slug"] for r in chosen] == ["ok"] and skipped == {"side_mismatch": 1}
+    chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes)
+    assert chosen == [] and skipped == {"stabilizer": 2}
+
+
+# --- partial certificates and the ladder (issue #4230) -----------------------------------------
+
+def _rung(W, status, proof=None, sha=None):
+    r = {"W": W, "status": status, "secs": 0.1}
+    if proof:
+        r["proof"] = proof
+    if sha:
+        r["cnf_sha256"] = sha
+    return r
+
+
+def _partial_record(d=6, d_lower=3, start=1, budget=10):
+    rec = _record(level="solver")
+    rec.update(d=d, d_exact=False, d_lower=d_lower, ladder={"start": start, "budget_per_side": budget})
+    for s in "XZ":
+        rec["sides"][s].update(exact=False, status="TIMEOUT", proved_min=d_lower,
+                               note=f"no logical < {d_lower} exists; W = {d_lower} TIMEOUT",
+                               ladder=[_rung(w, "UNSAT") for w in range(start, d_lower)] + [_rung(d_lower, "TIMEOUT")])
+    return rec
+
+
+_DOC = {"n": 12, "k": 2, "code_type": "CSS", "checks": {"X": [[0, 1, 2, 3]], "Z": [[4, 5, 6, 7]]},
+        "distance": {"d": 6, "X": {"value": 6}, "Z": {"value": 6}}}
+
+
+def test_a_partial_record_is_classified_filed_and_bound_to_its_entry():
+    S = _script()
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(_HERE)), "verify"))
+    import check_certs as C
+    rec = _partial_record()
+    assert S.lower_bound_of(rec) == 3 and S.classify(rec) == "partial"
+    filed = S.partial_certificate(rec, _DOC)
+    assert filed["d_exact"] is False and filed["d_lower"] == 3
+    assert "proof" not in filed["sides"]["X"] and filed["sides"]["Z"]["proved_min"] == 3
+    assert filed["verification"]["checks_sha256"] == C.checks_sha256(_DOC)
+    assert C.bound_problems("not-on-the-board", filed) == ["not-on-the-board: partial certificate but "
+                                                            "codes/not-on-the-board.json is not on the board, "
+                                                            "so there is nothing for the bound to be about"]
+    # the tropidist backend's shape: a closed side and an open one with the tool's lower bound, no ladder
+    tool = {"d": 6, "d_exact": False, "solver": "tropidist",
+            "sides": {"X": {"value": 6, "exact": True, "status": "UNSAT"},
+                      "Z": {"value": 6, "exact": False, "status": "TIMEOUT", "lower_bound": 4}},
+            "verification": {"level": "solver", "note": "x"}}
+    assert S.lower_bound_of(tool) == 4 and S.classify(tool) == "partial"
+    f2 = S.partial_certificate(tool, _DOC)
+    assert f2["d_lower"] == 4 and f2["sides"]["X"]["proved_min"] == 6 and f2["sides"]["Z"]["proved_min"] == 4
+    assert "lower_bound" not in f2["sides"]["Z"]
+    # a side that proved nothing is a timeout, a SAT side a refutation, whatever the other side proved
+    nothing = json.loads(json.dumps(tool))
+    nothing["sides"]["Z"].pop("lower_bound")
+    assert S.lower_bound_of(nothing) is None and S.classify(nothing) == "timeout"
+    sat = json.loads(json.dumps(tool))
+    sat["sides"]["Z"].update(status="SAT", witness=[1, 2])
+    assert S.classify(sat) == "refuted"
+    one = json.loads(json.dumps(tool))
+    one["sides"]["Z"]["lower_bound"] = 1
+    assert S.classify(one) == "timeout"
+
+
+def test_raising_a_partial_certificate_keeps_the_old_rungs_and_decides_the_level_from_the_top_ones():
+    S = _script()
+    sha = lambda w: str(w) * 64  # noqa: E731
+    old = {"d": 10, "d_exact": False, "d_lower": 4, "ladder": {"start": 1, "budget_per_side": 10},
+           "sides": {s: {"value": 10, "exact": False, "status": "TIMEOUT", "proved_min": 4,
+                         "note": "no logical < 4 exists; W = 4 TIMEOUT",
+                         "ladder": [_rung(w, "UNSAT", "verified", sha(w)) for w in (1, 2, 3)]
+                         + [_rung(4, "TIMEOUT", "kissat did not finish in 10s")]} for s in "XZ"},
+           "verification": {"level": "proof_log", "checker": "drat-trim x", "cnf_sha256": f"X={sha(3)};Z={sha(3)}",
+                            "replay": {"emit": "e", "check": "c"}, "checks_sha256": "h" * 64}}
+    new = {"d": 10, "d_exact": False, "d_lower": 5, "ladder": {"start": 4, "budget_per_side": 30},
+           "sides": {"X": {"value": 10, "exact": False, "status": "TIMEOUT", "proved_min": 6,
+                           "note": "no logical < 6 exists; W = 6 TIMEOUT",
+                           "ladder": [_rung(4, "UNSAT", "verified", sha(4)), _rung(5, "UNSAT", "verified", sha(5)),
+                                      _rung(6, "TIMEOUT", "kissat did not finish in 30s")]},
+                     "Z": {"value": 10, "exact": False, "status": "TIMEOUT", "proved_min": 5,
+                           "note": "no logical < 5 exists; W = 5 TIMEOUT",
+                           "ladder": [_rung(4, "UNSAT", "verified", sha(4)),
+                                      _rung(5, "TIMEOUT", "kissat did not finish in 30s")]}},
+           "verification": {"level": "proof_log", "checker": "drat-trim x", "cnf_sha256": f"X={sha(5)};Z={sha(4)}",
+                            "replay": {"emit": "e", "check": "c"}, "checks_sha256": "h" * 64}}
+    merged = S.raise_certificate(old, new)
+    assert merged["d_lower"] == 5 and merged["ladder"] == {"start": 1, "budget_per_side": 30, "raised_from": 4}
+    assert [r["W"] for r in merged["sides"]["X"]["ladder"]] == [1, 2, 3, 4, 5, 6]
+    assert [r["W"] for r in merged["sides"]["Z"]["ladder"]] == [1, 2, 3, 4, 5]
+    assert merged["sides"]["X"]["proved_min"] == 6 and merged["sides"]["Z"]["proved_min"] == 5
+    assert merged["sides"]["Z"]["note"] == "no logical < 5 exists; W = 5 TIMEOUT"
+    assert merged["verification"]["level"] == "proof_log"
+    assert merged["verification"]["cnf_sha256"] == f"X={sha(5)};Z={sha(4)}"
+    assert merged["verification"]["checks_sha256"] == "h" * 64
+    # the top rung of a side decided by the XOR path alone has no checked proof: solver
+    xor_only = json.loads(json.dumps(new))
+    xor_only["sides"]["Z"]["ladder"][0] = _rung(4, "UNSAT", "kissat did not finish in 30s")
+    xor_only["verification"] = {"level": "solver", "note": "proof path did not complete", "checks_sha256": "h" * 64}
+    m2 = S.raise_certificate(old, xor_only)
+    assert m2["verification"]["level"] == "solver" and m2["d_lower"] == 5
+    assert m2["verification"]["checks_sha256"] == "h" * 64
+    # a run that reached d - 1 is an exact certificate and is filed as it is
+    assert S.raise_certificate(old, {"d_exact": True, "x": 1}) == {"d_exact": True, "x": 1}
+
+
+def test_a_partial_certificate_on_file_is_reopened_only_by_a_ladder_that_can_raise_it(tmp_path):
+    S = _script()
+    codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
+    _write(os.path.join(codes, "p.json"), _DOC)
+    _write(os.path.join(certs, "p.json"), {"d": 6, "d_exact": False, "d_lower": 4,
+                                           "ladder": {"start": 1, "budget_per_side": 10}})
+    queue = {"entries": [_row("p", d=6)]}
+    for kw, key, hint in (({}, "partial", "a ladder run raises it"),
+                          ({"ladder": 10}, "partial", "--retry or a larger --ladder raises it")):
+        chosen, skipped, reasons = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes, **kw)
+        assert chosen == [] and dict(skipped) == {key: 1} and hint in reasons["p"]
+    for kw in ({"ladder": 20}, {"ladder": 10, "retry": True}, {"ladder": 10, "slugs": ["p"]}):
+        chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes, **kw)
+        assert [r["slug"] for r in chosen] == ["p"] and chosen[0]["start"] == 4
+        assert chosen[0]["raise_from"]["d_lower"] == 4
+    # an exact certificate on file closes the entry whatever the ladder
+    _write(os.path.join(certs, "p.json"), {"d": 6, "d_exact": True})
+    chosen, skipped, _ = S.select(queue, last={}, tlim=600, certs_dir=certs, codes_dir=codes, ladder=99, retry=True)
+    assert chosen == [] and dict(skipped) == {"certified": 1}
+    # a timeout logged by a run without a ladder does not hold a ladder run back
+    os.remove(os.path.join(certs, "p.json"))
+    last = {"p": {"outcome": "timeout", "tlim": 600, "date": "2026-11-01"}}
+    assert [r["slug"] for r in S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes)[0]] == []
+    assert [r["slug"] for r in S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                        ladder=10)[0]] == ["p"]
+    last = {"p": {"outcome": "timeout", "tlim": 600, "ladder": 10, "date": "2026-11-01"}}
+    assert S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes, ladder=10)[0] == []
+    assert [r["slug"] for r in S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                        ladder=20)[0]] == ["p"]
+
+
+def test_stage_replaces_a_partial_certificate_only_with_a_higher_or_exact_one(tmp_path):
+    S = _script()
+    certs = str(tmp_path / "certs")
+    os.makedirs(certs)
+    _write(os.path.join(certs, "p.json"), {"d": 6, "d_exact": False, "d_lower": 4})
+
+    def out(i, cert):
+        d = str(tmp_path / f"out{i}")
+        _write(os.path.join(d, "certs", "p.json"), cert)
+        return d
+    assert S.stage(out(1, {"d": 6, "d_exact": False, "d_lower": 4}), certs_dir=certs) == ([], ["p"])
+    assert S.stage(out(2, {"d": 6, "d_exact": False, "d_lower": 5}), certs_dir=certs) == (["p"], [])
+    with open(os.path.join(certs, "p.json"), encoding="utf-8") as f:
+        assert json.load(f)["d_lower"] == 5
+    assert S.stage(out(3, {"d": 6, "d_exact": True}), certs_dir=certs) == (["p"], [])
+    assert S.stage(out(4, {"d": 6, "d_exact": False, "d_lower": 5}), certs_dir=certs) == ([], ["p"])
+    with open(os.path.join(certs, "p.json"), encoding="utf-8") as f:
+        assert json.load(f)["d_exact"] is True
+
+
+def test_a_ladder_run_stages_a_partial_record_and_reopens_it_only_to_raise_it(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    _write(os.path.join(codes, "p.json"), _DOC)
+    queue = {"date": "2026-11-03", "head": "q", "entries": [_row("p", d=6)]}
+    seen = []
+
+    def certify(doc, tlim, proof_dir, slug, ladder=False, budget=None, start=1):
+        seen.append((ladder, budget, start))
+        return _partial_record(d_lower=3 if start == 1 else 3, start=start, budget=budget)
+
+    attempts = str(tmp_path / "attempts.jsonl")
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=attempts, tlim=600, job_seconds=1000, certs_dir=certs,
+                    codes_dir=codes, certify=certify, tools=lambda: {}, ladder=12)
+    assert seen == [(True, 12, 1)] and m["outcomes"] == {"partial": 1} and m["staged"] == ["p"]
+    row = S.load_jsonl(attempts)[-1]
+    assert row["outcome"] == "partial" and row["ladder"] == 12 and row["d_lower"] == 3 and row["level"] == "solver"
+    assert row["sides"]["X"]["rungs"] == ["1:UNSAT", "2:UNSAT", "3:TIMEOUT"]
+    with open(os.path.join(out, "certs", "p.json"), encoding="utf-8") as f:
+        filed = json.load(f)
+    assert filed["d_lower"] == 3 and "checks_sha256" in filed["verification"] and "proof" not in filed["sides"]["X"]
+    assert "| p | 12 | 2 | 6 | d >= 3 | solver |" in S.summary_markdown(m)
+    title, body = S.pr_text(m, staged=["p"])
+    assert title.startswith("certs: proven lower bounds for 1 entry") and "#4230" in body and "| p | 12 | 2 | 6 | d >= 3 |" in body
+    assert S.stage(out, certs_dir=certs) == (["p"], [])
+    # the same budget leaves it alone; a larger one reopens it at its bound, and a run that does not rise files nothing
+    m2 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out2"), attempts_path=attempts, tlim=600, job_seconds=1000,
+                     certs_dir=certs, codes_dir=codes, certify=certify, tools=lambda: {}, ladder=12)
+    assert m2["opened"] == 0 and dict(m2["skipped"]) == {"partial": 1}
+    m3 = S.run_sweep(queue=queue, out_dir=str(tmp_path / "out3"), attempts_path=attempts, tlim=600, job_seconds=1000,
+                     certs_dir=certs, codes_dir=codes, certify=certify, tools=lambda: {}, ladder=30)
+    assert seen[-1] == (True, 30, 3) and m3["outcomes"] == {"partial": 1} and m3["staged"] == []
+    assert "did not rise" in S.load_jsonl(attempts)[-1]["note"]
+
+
+def test_with_a_ladder_the_tool_backend_hands_open_entries_to_the_sat_ladder(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    for slug in ("open", "closed", "lower"):
+        _write(os.path.join(codes, slug + ".json"), _DOC)
+    queue = {"date": "2026-11-03", "head": "q", "entries": [_row(s, d=6) for s in ("open", "closed", "lower")]}
+
+    def tool(doc, tlim, slug):
+        rec = _record(level="solver")
+        rec["d"] = 6
+        if slug != "closed":
+            rec["d_exact"] = False
+            rec["sides"]["Z"].update(exact=False, status="TIMEOUT", lower_bound=4 if slug == "lower" else 2)
+        return rec
+
+    sat_calls = []
+
+    def sat(doc, tlim, proof_dir, slug, ladder=False, budget=None, start=1):
+        sat_calls.append(slug)
+        return _partial_record(d_lower=3, budget=budget)
+
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=str(tmp_path / "a.jsonl"), tlim=600, job_seconds=1000,
+                    certs_dir=certs, codes_dir=codes, certify=sat, certify_tropidist=tool, tools=lambda: {},
+                    backend="tropidist+sat", ladder=12)
+    # every entry reached the SAT path: the closed one for proof_log, the open ones for the ladder
+    assert sorted(sat_calls) == ["closed", "lower", "open"]
+    by = {r["slug"]: r for r in m["results"]}
+    # the ladder's d >= 3 beats the tool's d >= 2 and replaces it; the tool's d >= 4 stands
+    assert by["open"]["outcome"] == "partial" and by["open"]["backend"] == "sat" and by["open"]["d_lower"] == 3
+    assert by["open"]["upgrade"].startswith("ladder over tropidist d >= 2")
+    assert by["lower"]["outcome"] == "partial" and by["lower"]["backend"] == "tropidist" and by["lower"]["d_lower"] == 4
+    assert by["closed"]["outcome"] == "exact" and by["closed"]["backend"] == "tropidist"
+    assert sorted(m["staged"]) == ["closed", "lower", "open"]
+    with open(os.path.join(out, "certs", "lower.json"), encoding="utf-8") as f:
+        filed = json.load(f)
+    assert filed["d_lower"] == 4 and filed["sides"]["Z"]["proved_min"] == 4 and filed["sides"]["X"]["proved_min"] == 6
+    assert "checks_sha256" in filed["verification"]

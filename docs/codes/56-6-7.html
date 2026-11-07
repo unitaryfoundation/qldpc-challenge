@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[6, 14, 21, 28, 33, 42, 55]</div></details>
 <div class=kv><b>d_Z</b> 7 &middot; witness weight 7 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[15, 18, 20, 21, 31, 42, 44]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 7</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 7 exists; Z: no logical &lt; 7 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 7</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 7 exists; Z: no logical &lt; 7 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -52,6 +52,15 @@
 (3,8): 1344
 (3,10): 112</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 6.7082 &middot; Z 5.831 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/56-6-7">circuits/56-6-7/</a> &middot; canonical noise recipe, 7 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 7 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[31, 42, 272, 296, 775, 1651, 2870]</div></details>
+<div class=kv><b>d_circ^Z</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[22126, 22129, 22136, 22141, 22160, 22168, 22173]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

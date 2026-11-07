@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>119</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>17</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>6</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>5.143</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>5.14286</div></div>
 <div class=cell title="max check weight |supp X_i ∪ supp Z_i| (a Y factor counts one qubit)"><div class=l>w</div><div class=v>6</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0304</div></div>
 <div class=cell title="measured interaction radius: the largest check diameter in the layout, in units of the qubit spacing"><div class=l>r</div><div class=v>3.6056</div></div>
@@ -20,7 +20,7 @@
 <details><summary>witness operator (Pauli string, 6 qubits)</summary><div class=wit>IIIIIIZIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIIXIXIIIIIIIIIIIIIIZIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 X: [38, 40]
 Z: [6, 23, 55, 72]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;); the Pauli-weight certifier is not built yet, so stabilizer entries cannot earn d= for now</span></div>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;); a stabilizer entry is certified in Pauli weight by the certification sweep's tropidist backend (research/certs/tropidist_certify.py), a solver verdict rather than a machine-checked proof</span></div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>

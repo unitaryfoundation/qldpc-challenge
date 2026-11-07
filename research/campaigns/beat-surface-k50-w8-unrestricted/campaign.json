@@ -1,0 +1,36 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "beat-surface-k50-w8-unrestricted",
+    "name": "Beat the surface code at k=50, weight-8, unrestricted",
+    "status": "draft",
+    "objective": { "metric": "kd2_over_n", "direction": "maximize" },
+    "constraints": {
+      "locality": "unrestricted",
+      "max_check_weight": 8,
+      "n": [300, 1000],
+      "k": [45, 55],
+      "min_distance": 4
+    },
+    "methods": {
+      "families": ["bivariate-bicycle", "generalized-bicycle", "hypergraph-product", "lifted-product", "balanced-product", "quantum-tanner", "tile", "topological", "other"],
+      "generators": ["research/kit/search.py::sample_bb", "research/kit/search.py::sample_cyclic_gb"],
+      "screening": { "trials_per_candidate": 200000, "seeds": [51, 52, 53] }
+    },
+    "budget": { "cpu_hours": 40, "candidates_screened": 2000 },
+    "stopping": [{ "type": "frontier_advance" }, { "type": "budget_exhausted" }],
+    "required_outputs": ["experiment_ledger", "surviving_candidates", "research_note", "negative_results", "campaign_summary"],
+    "direction": {
+      "hypothesis": "An unrestricted weight-8 code can beat the cell frontier entry 184-50-10 (k=50, d=10, n=184, kd^2/n=27.2) on kd^2/n; target kd^2/n > 27.2 (e.g. d>=14 at k=45, n=300, or d>=23 at k=55, n=1000).",
+      "cell": "unrestricted~weight-8",
+      "family": "generalized-bicycle",
+      "bar": { "slug": "184-50-10", "axes": ["kd2_over_n", "n"], "note": "Cell frontier entry (exact); unrestricted weight-8 cell already has high-k entries." },
+      "budget": { "cpu_hours": 40, "candidates_screened": 2000, "trials_per_candidate": 200000 },
+      "feasibility": "Unrestricted weight-8 cell already has high-k entries; board_bar.py can price candidates.",
+      "novelty": { "claim": "Extend the unrestricted weight-8 frontier beyond (k=50,d=10,n=184); not the first systematic k~50 probe in this cell.", "against": "Existing unrestricted weight-8 entries, including 184-50-10." },
+      "expected_value": "An unrestricted weight-8 code on the cell frontier at kd^2/n > 27.2 would extend high-k results.",
+      "abandon_criterion": { "flat_fresh_rungs": 2, "trials_cap": 2000000 },
+      "what_a_negative_would_teach": "Whether unrestricted weight-8 constructions can reach k~50, or whether the cell saturates earlier."
+    }
+  }
+}

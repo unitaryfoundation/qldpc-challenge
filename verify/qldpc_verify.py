@@ -100,6 +100,24 @@ _FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
              "other"}
 _NOVELTY = {"unknown", "known_parameters", "new_parameters"}
 
+# Tier B benchmark metadata (issues #4601, #4603): optional and non-scoring.
+# The schema holds the vocabulary and ranges; benchmark_checks() below holds
+# the cross-field half. The required set is mirrored here so the minimal
+# structure check still enforces the shape when jsonschema is unavailable.
+_BENCHMARK_REQUIRED = ("hardware_track", "noise_model", "surface_baseline",
+                       "decoder", "resources", "logical_error_rate", "status",
+                       "method")
+_BENCHMARK_SCHEMA_VERSIONS = ("0.6", "0.7")
+
+# Tier C architecture metadata (issues #4601, #4674): optional, non-scoring,
+# and carried only together with a benchmark block, whose track, noise model,
+# decoder, and baseline it inherits. architecture_checks() below holds the
+# cross-field half; the required set, the parts, and the versions are
+# mirrored here for the minimal structure check.
+_ARCHITECTURE_REQUIRED = ("status", "method")
+_ARCHITECTURE_PARTS = ("gadgets", "magic_states", "algorithm_estimate")
+_ARCHITECTURE_SCHEMA_VERSIONS = ("0.7",)
+
 # Public CI resource limits. Finite by design so malformed or hostile JSON
 # cannot force unbounded work. The blocklength cap is a verification-budget
 # rule: above it the distance gate cannot stand behind a claim. It has two
@@ -591,6 +609,186 @@ def _board_code(slug):
         return None
 
 
+def _resource_total(block):
+    """Physical qubits of one memory experiment: the stated total, else data plus ancillas."""
+    return block.get("total_qubits", block["data_qubits"] + block["ancilla_qubits"])
+
+
+def benchmark_checks(doc, record):
+    """Check the optional ``benchmark`` block against the entry and the board.
+
+    Issues #4601 and #4603. Records the cross-field checks through ``record``
+    and returns the summary kept under ``report["computed"]["benchmark"]``.
+    The block is non-scoring, so nothing
+    here moves a verdict on the code; a block that contradicts the entry (the
+    candidate's data qubits are not ``n``, a total that is not its data plus
+    ancillas, a baseline that is not on the board or encodes fewer logical
+    qubits than this entry, a baseline count that is not the baseline's) fails
+    the document, the way a layout that does not cover the qubits does. The
+    schema holds the types and ranges; this is the cross-field half.
+    """
+    b = doc["benchmark"]
+    n, k = doc["n"], doc["k"]
+    cand, base = b["resources"]["candidate"], b["resources"]["baseline"]
+    record("benchmark_candidate_data_qubits", cand["data_qubits"] == n,
+           f"benchmark.resources.candidate.data_qubits={cand['data_qubits']}, n={n}")
+    bad_totals = [side for side, blk in (("candidate", cand), ("baseline", base))
+                  if "total_qubits" in blk
+                  and blk["total_qubits"] != blk["data_qubits"] + blk["ancilla_qubits"]]
+    record("benchmark_qubit_totals", not bad_totals,
+           "total_qubits = data_qubits + ancilla_qubits"
+           + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""))
+    sb = b["surface_baseline"]
+    bn = None
+    if "slug" in sb:
+        bdoc = _board_code(sb["slug"])
+        on_board = (isinstance(bdoc, dict)
+                    and all(isinstance(bdoc.get(f), int) for f in ("n", "k")))
+        record("benchmark_baseline_on_board", on_board,
+               f"codes/{sb['slug']}.json" + ("" if on_board else " is not a board entry"))
+        baseline = {"slug": sb["slug"]}
+        if on_board:
+            bn, bk = bdoc["n"], bdoc["k"]
+            record("benchmark_baseline_k", bk >= k,
+                   f"baseline k={bk}, entry k={k}: the baseline must encode "
+                   "at least as many logical qubits")
+            baseline.update(n=bn, k=bk)
+    else:
+        d = sb["patches"]["d"]
+        bn = k * d * d
+        baseline = {"patches": {"count": k, "d": d}, "n": bn, "k": k}
+    if bn is not None:
+        record("benchmark_baseline_data_qubits", base["data_qubits"] == bn,
+               f"benchmark.resources.baseline.data_qubits={base['data_qubits']}, "
+               f"baseline data qubits={bn}")
+    ler = b["logical_error_rate"]
+    ct, bt = _resource_total(cand), _resource_total(base)
+    meets = ler["candidate"] <= ler["target"]
+    return {"status": b["status"],
+            "hardware_track": b["hardware_track"],
+            "noise": {"kind": b["noise_model"]["kind"], "p": b["noise_model"]["p"]},
+            "baseline": baseline,
+            "candidate_total_qubits": ct,
+            "baseline_total_qubits": bt,
+            "qubit_ratio": round(bt / ct, 4) if ct else None,
+            "meets_target": bool(meets),
+            "fewer_qubits": bool(ct < bt),
+            "beats_baseline": bool(meets and ct < bt)}
+
+
+def _baseline_block(doc):
+    """Return (n, k) of one block of the benchmark baseline.
+
+    The entry's own n and k for a slug, (d^2, 1) for rotated patches, and
+    None when the slug is not on the board (benchmark_baseline_on_board has
+    failed already).
+    """
+    sb = doc["benchmark"]["surface_baseline"]
+    if "slug" in sb:
+        bdoc = _board_code(sb["slug"])
+        if (isinstance(bdoc, dict)
+                and all(isinstance(bdoc.get(f), int) for f in ("n", "k"))):
+            return bdoc["n"], bdoc["k"]
+        return None
+    d = sb["patches"]["d"]
+    return d * d, 1
+
+
+def architecture_checks(doc, record):
+    """Check the optional ``architecture`` block against the entry and the board.
+
+    Issues #4601 and #4674. The block is non-scoring, so nothing here moves a
+    verdict on the code; a block that contradicts the entry fails the
+    document, as a benchmark block does: a gadget cannot claim a fault
+    distance above ``d`` or act on b blocks with fewer than b n data qubits,
+    a partner code must be on the board, each side of the algorithm estimate
+    must hold its logical qubits in enough blocks and count at least their
+    data qubits, the factories must fit in the candidate's qubits, and a
+    distillation or cultivation protocol must deliver a lower error rate
+    than it consumes. The schema holds the types and ranges, and its rule
+    that ties the block to ``benchmark`` has already held when this runs.
+    """
+    a = doc["architecture"]
+    n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
+    out = {"status": a["status"]}
+    gadgets = a.get("gadgets") or []
+    if gadgets:
+        over = [g["operation"] for g in gadgets if g["fault_distance"] > d]
+        record("architecture_gadget_fault_distance", not over,
+               f"every gadget fault distance <= d={d}"
+               + (f"; above it: {', '.join(over)}" if over else ""))
+        short = [g["operation"] for g in gadgets
+                 if g["resources"]["data_qubits"] < g["blocks"] * n]
+        record("architecture_gadget_data_qubits", not short,
+               f"every gadget counts at least blocks x n={n} data qubits"
+               + (f"; short: {', '.join(short)}" if short else ""))
+        bad_totals = [g["operation"] for g in gadgets
+                      if "total_qubits" in g["resources"]
+                      and g["resources"]["total_qubits"]
+                      != g["resources"]["data_qubits"] + g["resources"]["ancilla_qubits"]]
+        record("architecture_qubit_totals", not bad_totals,
+               "total_qubits = data_qubits + ancilla_qubits"
+               + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""))
+        partners = sorted({g["partner"] for g in gadgets if "partner" in g})
+        if partners:
+            missing = [s for s in partners if not isinstance(_board_code(s), dict)]
+            record("architecture_partner_on_board", not missing,
+                   ", ".join(f"codes/{s}.json" for s in partners)
+                   + (f"; not a board entry: {', '.join(missing)}" if missing else ""))
+        out["gadgets"] = [{"kind": g["kind"], "operation": g["operation"],
+                           "blocks": g["blocks"], "fault_distance": g["fault_distance"],
+                           "total_qubits": _resource_total(g["resources"])}
+                          for g in gadgets]
+    ms = a.get("magic_states")
+    if ms is not None:
+        if ms["protocol"] in ("distillation", "cultivation") and "input_error_rate" in ms:
+            record("architecture_magic_state_gain",
+                   ms["output_error_rate"] < ms["input_error_rate"],
+                   f"{ms['protocol']} delivers {ms['output_error_rate']} from "
+                   f"{ms['input_error_rate']}")
+        out["magic_states"] = {"protocol": ms["protocol"], "state": ms["state"],
+                               "output_error_rate": ms["output_error_rate"]}
+    est = a.get("algorithm_estimate")
+    if est is not None:
+        base_nk = _baseline_block(doc)
+        if "baseline_patch_distance" in est:
+            pd = est["baseline_patch_distance"]
+            base_nk = (pd * pd, 1)
+        sides = [("candidate", est["candidate"], n, k)]
+        if base_nk is not None:
+            sides.append(("baseline", est["baseline"], base_nk[0], base_nk[1]))
+        held = {side: blk.get("logical_qubits", est["logical_qubits"])
+                for side, blk, _, _ in sides}
+        short = [f"{side}: {blk['code_blocks']} blocks x k={kk} < {held[side]}"
+                 for side, blk, _, kk in sides if blk["code_blocks"] * kk < held[side]]
+        record("architecture_blocks_cover_logical_qubits", not short,
+               f"code_blocks x k >= logical qubits held, {est['logical_qubits']} in the workload"
+               + (f"; short: {'; '.join(short)}" if short else ""))
+        short = [f"{side}: {blk['physical_qubits']} < {blk['code_blocks']} blocks x n={nn}"
+                 for side, blk, nn, _ in sides if blk["physical_qubits"] < blk["code_blocks"] * nn]
+        record("architecture_physical_qubits_cover_blocks", not short,
+               "physical_qubits >= code_blocks x n of the code"
+               + (f"; short: {'; '.join(short)}" if short else ""))
+        cand = est["candidate"]
+        if ms is not None and "factories" in cand and "qubits_per_factory" in ms:
+            footprint = cand["factories"] * ms["qubits_per_factory"]
+            record("architecture_factory_footprint", footprint <= cand["physical_qubits"],
+                   f"{cand['factories']} factories x {ms['qubits_per_factory']} qubits = "
+                   f"{footprint} within candidate.physical_qubits={cand['physical_qubits']}")
+        cp, bp = cand["physical_qubits"], est["baseline"]["physical_qubits"]
+        summary = {"workload": est["workload"], "logical_qubits": est["logical_qubits"],
+                   "target": est["logical_error_rate_target"],
+                   "baseline_block": ({"n": base_nk[0], "k": base_nk[1]} if base_nk else None),
+                   "candidate_physical_qubits": cp, "baseline_physical_qubits": bp,
+                   "qubit_ratio": round(bp / cp, 4), "fewer_qubits": bool(cp < bp)}
+        cv, bv = cand.get("spacetime_volume"), est["baseline"].get("spacetime_volume")
+        if cv and bv:
+            summary["spacetime_ratio"] = round(bv / cv, 4)
+            summary["less_spacetime"] = bool(cv < bv)
+        out["algorithm_estimate"] = summary
+    return out
+
+
 def structure_errors(doc):
     """Return a list of human-readable structural problems, or [] if the doc
     conforms. Uses jsonschema when installed, else a minimal key/type check."""
@@ -622,6 +820,26 @@ def structure_errors(doc):
                                       and "coordinates" in doc["locality"]
                                       and "layers" in doc["locality"]):
             errs.append("locality must have coordinates and layers")
+        if "benchmark" in doc:
+            if not isinstance(doc["benchmark"], dict):
+                errs.append("benchmark must be an object")
+            else:
+                errs += [f"benchmark missing field: {k}" for k in _BENCHMARK_REQUIRED
+                         if k not in doc["benchmark"]]
+                if doc.get("schema_version") not in _BENCHMARK_SCHEMA_VERSIONS:
+                    errs.append("benchmark requires schema_version 0.6 or later")
+        if "architecture" in doc:
+            if not isinstance(doc["architecture"], dict):
+                errs.append("architecture must be an object")
+            else:
+                errs += [f"architecture missing field: {k}" for k in _ARCHITECTURE_REQUIRED
+                         if k not in doc["architecture"]]
+                if not any(k in doc["architecture"] for k in _ARCHITECTURE_PARTS):
+                    errs.append("architecture needs gadgets, magic_states, or algorithm_estimate")
+                if "benchmark" not in doc:
+                    errs.append("architecture requires a benchmark block")
+                if doc.get("schema_version") not in _ARCHITECTURE_SCHEMA_VERSIONS:
+                    errs.append("architecture requires schema_version 0.7")
     if errs:
         return errs
     return resource_errors(doc)
@@ -1761,6 +1979,19 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
             record(label, ok, detail)
         if gcomputed is not None:
             report["computed"]["transversal_gates"] = gcomputed
+    # 12. Tier B benchmark metadata (issues #4601, #4603). Optional and
+    #     non-scoring: the schema holds the vocabulary and ranges, this checks
+    #     the block against the entry and the board and records what the
+    #     comparison says. Entries without the field are untouched, so no
+    #     committed verdict moves.
+    if "benchmark" in doc:
+        report["computed"]["benchmark"] = benchmark_checks(doc, record)
+    # 13. Tier C architecture metadata (issues #4601, #4674), carried only
+    #     together with a benchmark block (schema rule). Same contract:
+    #     optional, non-scoring, checked against the entry and the board,
+    #     recorded under computed.architecture.
+    if "architecture" in doc:
+        report["computed"]["architecture"] = architecture_checks(doc, record)
     # Layer-1 locality class (computed) + Layer-3 flags (verifier-proven only;
     # the exact-d flag is added at site-build time from certs/, since exactness
     # is certified separately, not by this trustless check). `css` is the

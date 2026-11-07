@@ -261,3 +261,126 @@ def test_gif_has_one_frame_per_snapshot(tmp_path):
     assert count == 3
     with Image.open(tmp_path / "f.gif") as im:
         assert im.format == "GIF" and im.n_frames == 3
+
+
+# -- when each cell's frontier last moved (issue #4238) -----------------------
+
+def _cells_of(e):
+    """Two nested weight cells in one locality, the way the board's cells nest."""
+    order = ["weight-6", "weight-8"]
+    return [("unrestricted", w) for w in order[order.index(e["weight_class"]):]]
+
+
+def _history(monkeypatch, log, blobs):
+    monkeypatch.setattr(fh, "git", lambda args, cwd: types.SimpleNamespace(
+        returncode=0, stdout=log.encode(), stderr=b""))
+    monkeypatch.setattr(fh, "fetch_params", lambda requests, cwd: blobs)
+
+
+def test_cell_moves_follow_each_cells_own_frontier(monkeypatch):
+    """A dominated landing moves nothing; a revision and a frontier removal do."""
+    log = "\n".join([
+        "C aaaa1111 2026-01-01T00:00:00+00:00", "A\tcodes/100-8-6.json",
+        "C bbbb2222 2026-01-02T00:00:00+00:00", "A\tcodes/100-8-5.json",    # dominated in w6
+        "C cccc3333 2026-01-03T00:00:00+00:00", "A\tcodes/90-8-6.json",     # w8 only
+        "C dddd4444 2026-01-04T00:00:00+00:00", "D\tcodes/100-8-5.json",    # dominated leaves
+        "C eeee5555 2026-01-05T00:00:00+00:00", "R100\tcodes/90-8-6.json\tcodes/90-8-5.json",
+        "C ffff6666 2026-01-06T00:00:00+00:00", "A\tnotes/not-a-code.md",
+    ])
+    blobs = {("aaaa1111", "codes/100-8-6.json"): (100, 8, 6, "CSS"),
+             ("bbbb2222", "codes/100-8-5.json"): (100, 8, 5, "CSS"),
+             ("cccc3333", "codes/90-8-6.json"): (90, 8, 6, "CSS"),
+             ("eeee5555", "codes/90-8-5.json"): (90, 8, 5, "CSS")}
+    _history(monkeypatch, log, blobs)
+    classes = {"codes/100-8-6.json": ("unrestricted", "weight-6", 6, "CSS"),
+               "codes/100-8-5.json": ("unrestricted", "weight-6", 6, "CSS"),
+               "codes/90-8-5.json": ("unrestricted", "weight-8", 8, "CSS")}
+    moves, landed = fh.cell_moves("unused", classes, cell_of=_cells_of)
+    assert landed == 5                                   # the notes/ landing is not one
+    w6 = moves[("unrestricted", "weight-6")]["frontier"]
+    w8 = moves[("unrestricted", "weight-8")]["frontier"]
+    # weight-6: the first landing moved it; the dominated add and its removal did not
+    assert (w6["date"], w6["landing"], w6["kind"]) == ("2026-01-01", 1, "landed")
+    assert w6["what"] == "[[100,8,6]] w=6 100-8-6"
+    # weight-8: 90-8-6 landed nondominated (n lower) and its revision moved the cell
+    # again, read at the renamed destination, with the class carried back
+    assert (w8["date"], w8["landing"], w8["kind"]) == ("2026-01-05", 5, "revised")
+    assert w8["what"] == "[[90,8,5]] w=8 90-8-5" and w8["commit"] == "eeee5555"
+    # the record: weight-6 is led by 100-8-6 (2.88) from landing 1 and never changes;
+    # weight-8 was raised by 90-8-6 (3.2) at landing 3 and lowered by its revision at 5
+    r6 = moves[("unrestricted", "weight-6")]["record"]
+    assert (r6["landing"], r6["kind"], r6["kd2_over_n"]) == (1, "raised", 2.88)
+    r8 = moves[("unrestricted", "weight-8")]["record"]
+    assert (r8["landing"], r8["kind"], r8["kd2_over_n"]) == (5, "lowered", 2.88)
+    assert r8["what"] == "[[100,8,6]] w=6 100-8-6"         # the leader after the lowering
+
+
+def test_a_frontier_member_removed_moves_its_cell(monkeypatch):
+    log = "\n".join([
+        "C aaaa1111 2026-01-01T00:00:00+00:00", "A\tcodes/100-8-6.json",
+        "C bbbb2222 2026-01-02T00:00:00+00:00", "A\tcodes/100-8-7.json",
+        "C cccc3333 2026-01-03T00:00:00+00:00", "D\tcodes/100-8-7.json",
+        "C dddd4444 2026-01-04T00:00:00+00:00", "D\tcodes/unknown.json",
+    ])
+    blobs = {("aaaa1111", "codes/100-8-6.json"): (100, 8, 6, "CSS"),
+             ("bbbb2222", "codes/100-8-7.json"): (100, 8, 7, "CSS")}
+    _history(monkeypatch, log, blobs)
+    classes = {"codes/100-8-6.json": ("unrestricted", "weight-6", 6, "CSS"),
+               "codes/100-8-7.json": ("unrestricted", "weight-6", 6, "CSS")}
+    moves, landed = fh.cell_moves("unused", classes, cell_of=_cells_of)
+    assert landed == 3                                   # a path never held is no landing
+    w6 = moves[("unrestricted", "weight-6")]["frontier"]
+    assert (w6["landing"], w6["kind"], w6["what"]) == (3, "removed", "[[100,8,7]] w=6 100-8-7")
+    r6 = moves[("unrestricted", "weight-6")]["record"]
+    assert (r6["landing"], r6["kind"], r6["what"]) == (3, "lowered", "[[100,8,6]] w=6 100-8-6")
+
+
+def test_cell_front_dominance_is_the_boards_rule():
+    import numpy as np
+    front = fh._CellFront(np)
+    front.put("a", (100, 8, 6, 6))
+    assert not front.dominated((100, 8, 6, 6))           # a point never dominates itself
+    assert not front.dominated((100, 8, 6, 6)) and front.dominated((100, 8, 5, 6))
+    assert front.dominated((110, 8, 6, 6)) and front.dominated((100, 7, 6, 8))
+    assert not front.dominated((90, 8, 5, 6))            # better on n, worse on d
+    assert front.best() == (2.88, "a")
+    front.drop("a")
+    assert not front.dominated((100, 8, 5, 6)) and front.best() is None
+    for i in range(70):                                  # growth past the first block
+        front.put(f"p{i}", (1000 - i, 1, 1, 6))
+    assert front.size == 71 and front.get("p69") == (931, 1, 1, 6)
+    assert front.dominated((1000, 1, 1, 6)) and not front.dominated((900, 1, 1, 6))
+
+
+def test_cell_moves_run_on_the_real_history():
+    """The replay the CLI column rests on finishes on the real history and dates the cell."""
+    out = subprocess.run(["git", "ls-tree", "-r", "HEAD", "--", "codes/"], cwd=fh._REPO,
+                         capture_output=True, text=True, check=True).stdout
+    paths = [line.split("\t")[1] for line in out.splitlines() if line.endswith(".json")]
+    # one class for every entry, so the board's own cells() puts them all in one cell
+    classes = {p: ("unrestricted", "weight-9plus", 99, "CSS") for p in paths}
+    moves, landed = fh.cell_moves(fh._REPO, classes)
+    assert landed > 0
+    cell, = moves
+    assert cell == ("unrestricted", "weight-any")
+    for move in moves[cell].values():
+        assert 1 <= move["landing"] <= landed
+    assert moves[cell]["frontier"]["kind"] in ("landed", "revised", "removed")
+    assert moves[cell]["record"]["kind"] in ("raised", "lowered")
+
+
+def test_a_rename_that_keeps_the_parameters_moves_nothing(monkeypatch):
+    """A slug-suffix rename re-keys the member; only a changed (n, k, d) is a move."""
+    log = "\n".join([
+        "C aaaa1111 2026-01-01T00:00:00+00:00", "A\tcodes/100-8-6.json",
+        "C bbbb2222 2026-01-02T00:00:00+00:00", "R100\tcodes/100-8-6.json\tcodes/100-8-6-b.json",
+    ])
+    blobs = {("aaaa1111", "codes/100-8-6.json"): (100, 8, 6, "CSS"),
+             ("bbbb2222", "codes/100-8-6-b.json"): (100, 8, 6, "CSS")}
+    _history(monkeypatch, log, blobs)
+    classes = {"codes/100-8-6-b.json": ("unrestricted", "weight-6", 6, "CSS")}
+    moves, landed = fh.cell_moves("unused", classes, cell_of=_cells_of)
+    assert landed == 2
+    cell = moves[("unrestricted", "weight-6")]
+    assert cell["frontier"]["landing"] == 1 and cell["record"]["landing"] == 1
+    assert cell["frontier"]["what"] == "[[100,8,6]] w=6 100-8-6"

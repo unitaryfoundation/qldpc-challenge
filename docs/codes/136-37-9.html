@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>136</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>37</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>9</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>22.037</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>22.0368</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>12</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[3, 40, 63, 71, 90, 95, 102, 124, 125]</div></details>
 <div class=kv><b>d_Z</b> 9 &middot; witness weight 9 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[16, 34, 44, 49, 53, 64, 77, 115, 124]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -69,6 +69,15 @@
 (3,11): 3856
 (3,12): 925
 (3,13): 106</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/136-37-9">circuits/136-37-9/</a> &middot; canonical noise recipe, 9 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 9 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[95727, 95733, 95772, 95776, 95783, 95819, 95822, 95823, 95838]</div></details>
+<div class=kv><b>d_circ^Z</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[95808, 95815, 95829, 95843, 95845, 95859, 95863, 95870, 95878]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/vprusso">@vprusso</a></div>

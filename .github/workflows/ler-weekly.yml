@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   replicate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
@@ -42,11 +42,18 @@ jobs:
         # point where failures are common replicates in seconds. The job
         # budget stops opening new entries at five hours, so a board longer
         # than one run is covered across weeks rather than timing out.
+        env:
+          SLUGS: ${{ github.event.inputs.slugs }}
         run: |
+          if [ -n "$SLUGS" ]; then
+            for s in $SLUGS; do
+              case "$s" in *[!A-Za-z0-9._-]*) echo "invalid slug: $s"; exit 1;; esac
+            done
+          fi
           uv run --frozen --extra research python verify/ler_replicate.py \
             --budget 1800 --seeds 3 --job-seconds 18000 \
             --head-sha "${{ github.sha }}" \
-            ${{ github.event.inputs.slugs && format('--slugs {0}', github.event.inputs.slugs) || '' }}
+            ${SLUGS:+--slugs $SLUGS}
       - name: commit the receipts and the rebuilt site (race-safe)
         run: |
           git config user.name "github-actions[bot]"

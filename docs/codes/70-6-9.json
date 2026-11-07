@@ -678,11 +678,15 @@
    "@MathysRennela"
   ],
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(35,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, abelian.zip, diswtabelian_wt7wtL3_order35_k6.txt, line 1. nonidentity supports a=[3, 14], b=[3, 13, 20].",
-  "references": [],
+  "references": [
+   "arXiv:2306.16400",
+   "arXiv:2604.19481"
+  ],
   "date": "2026-09-19",
   "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
   "model": "DeepSeek V4 Flash 0731",
-  "origin": "submission"
+  "origin": "submission",
+  "novelty": "known_parameters"
  },
  "family": "generalized-bicycle",
  "locality": {

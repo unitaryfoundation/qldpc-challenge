@@ -70,17 +70,16 @@ concurrency:
   group: layouts-weekly
   cancel-in-progress: false
 
-env:
-  PYTHONUNBUFFERED: "1"
-  CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT }}
-  OUT_DIR: ${{ runner.temp }}/layout-sweep
-
 jobs:
   sweep:
     # The schedule waits for the credit setting; a manual run may pass it as an input.
     if: github.event_name == 'workflow_dispatch' || vars.SWEEP_CREDIT != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 330
+    env:
+      PYTHONUNBUFFERED: "1"
+      CREDIT: ${{ github.event.inputs.credit || vars.SWEEP_CREDIT }}
+      OUT_DIR: /tmp/layout-sweep
     steps:
       - name: require the credited account and its token
         env:
@@ -113,6 +112,11 @@ jobs:
           set -euo pipefail
           stages=""
           [ "$STAGES" = "screen" ] && stages="--stages screen"
+          if [ -n "$SLUGS" ]; then
+            for s in $SLUGS; do
+              case "$s" in *[!A-Za-z0-9._-]*) echo "invalid slug: $s"; exit 1;; esac
+            done
+          fi
           uv run --frozen python research/local2d/layout_sweep.py run \
             --out-dir "$OUT_DIR" --credit "$CREDIT" --job-seconds $(( JOB_MINUTES * 60 )) \
             --entry-seconds "$ENTRY_SECONDS" --max-layouts "$MAX_LAYOUTS" $stages ${SLUGS:+--slugs $SLUGS}

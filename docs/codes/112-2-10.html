@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>112</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>2</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>10</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.786</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.78571</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>4</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0017</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[1, 5, 22, 24, 58, 62, 64, 68, 95, 104]</div></details>
 <div class=kv><b>d_Z</b> 10 &middot; witness weight 10 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[0, 14, 20, 26, 32, 46, 71, 72, 93, 106]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -40,6 +40,15 @@
 (3,2): 1008
 (3,4): 224</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 5.099 &middot; Z 8.9443 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/112-2-10">circuits/112-2-10/</a> &middot; canonical noise recipe, 10 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 10 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[420, 451, 770, 1728, 2290, 3053, 4810, 4814, 5746, 5754]</div></details>
+<div class=kv><b>d_circ^Z</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[37361, 37363, 37377, 37379, 37415, 37422, 37435, 37440, 37458, 37462]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

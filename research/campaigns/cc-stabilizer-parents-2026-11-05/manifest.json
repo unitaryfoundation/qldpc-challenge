@@ -1,0 +1,1550 @@
+{
+  "aborted_experiments": 0,
+  "authority": "this manifest records what ran; what a run is allowed to claim is still decided by verify/validate_candidate.py",
+  "campaign_id": "cc-stabilizer-parents-2026-11-05",
+  "consumed": {
+    "candidates_screened": 900,
+    "walltime_hours": 0.221
+  },
+  "errors": [],
+  "experiments": 73,
+  "logs": [],
+  "manifest_version": 1,
+  "negative_results": [
+    {
+      "detail": "0 of the board's 226 stabilizer entries are CSS up to a local Clifford (the verifier refuses such submissions as CSS codes in disguise), so the library's CodeState cannot load any of them; the moves here are symplectic analogs written for this probe",
+      "what": "stabilizer parents are outside code-calculus v0.1's state model"
+    },
+    {
+      "detail": "1259 moves enumerated, 70 children nondominated at the screen but at d <= 2 (not gated, by design), 0 children with d >= 3 passed the gate, none of them nondominated on the stabilizer board",
+      "what": "C-DELETE-CHECK on stabilizer parents with n <= 40: no board-advancing child at d >= 3"
+    }
+  ],
+  "params": {},
+  "seeds": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+  ],
+  "snapshot": {
+    "branch": "cc-v01-exploration",
+    "diff_sha256": "6b2f247892d45ea94477562c240df6090e4c952748ee13a07483f40de63bc7ef",
+    "dirty": true,
+    "head": "3441d963d7ed25cad54dad55766bfb78db3b1aa4",
+    "untracked_count": 6
+  },
+  "started_at": "2026-11-06T00:04:37.780308+00:00",
+  "survivor_verdicts": [
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 11
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 11
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 11
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 11
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 15
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 15
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 15
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 15
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 19
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 26
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 5,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 4,
+      "fingerprint": null,
+      "k": 7,
+      "n": 27
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 6,
+      "n": 32
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 5,
+      "fingerprint": null,
+      "k": 7,
+      "n": 37
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    },
+    {
+      "d": 3,
+      "fingerprint": null,
+      "k": 4,
+      "n": 38
+    }
+  ],
+  "written_at": "2026-11-06T00:17:55.174904+00:00"
+}

@@ -122,7 +122,7 @@ on `d` alone at one identical budget:
 ```
 uv run --frozen python research/audits/leader_audit.py pair \
     <candidate>.json --trials 2000000 --seeds 51 52 \
-    --pair-depth 64 --witness-dir <dir-for-witnesses>
+    --pair-depth 64 --witness-dir <dir-for-witnesses> --json-out <dir>/peer-audit.json
 ```
 
 The peers default to every `codes/` entry with the same n, k and max check
@@ -142,6 +142,14 @@ not a distance difference. One of four decisions comes out:
 Exit 2 when either side is refuted, so it gates like `ladder` and `screen`.
 Exit 3 when there is no peer at all: that candidate is not making a d-only gain,
 so this is not the question to ask of it -- use `screen`.
+
+`--json-out` writes the audit as a record (`qldpc-peer-audit/1`: the candidate,
+the peers measured, trials, seeds, pair depth, threads, the decision, the exit
+code, and each entry's reading). That file is what the two packaging paths
+consume: `./qldpc submit --peer-audit <file>` and `evidence.peer_audit` in
+`research/kit/promote.py` refuse a d-only gain without it, with a decision other
+than `credible`, read at fewer trials than the claim's own search, or not
+covering every peer the gate named (`research/kit/peer_audit.py`, issue #4236).
 
 ## The frontier over time: `frontier_history.py`
 
@@ -193,6 +201,29 @@ The replay is only quotable if it ends where the repository is, and
 `git ls-tree -r HEAD -- codes/` read as (n, k, d), CSS only, with every blob
 parsed. The committed SVGs are the charts as of the date in their titles;
 regenerate them with the commands above.
+
+The same walk answers which cell has not moved (issue #4238). `cell_moves`
+replays the landings against each primary-track cell and records two dates.
+The frontier date is the last landing that changed the cell's nondominated
+set under the board's own (n, k, d, w) rule: an entry landing or revised while
+nondominated among the cell's members moves the cell, a nondominated entry
+removed or revised away moves it, and a dominated entry landing or leaving
+moves nothing. That rule is permissive on purpose (a high-rate low-distance
+code is beaten by nothing, and about seven entries in ten are nondominated in
+their cell today), so the frontier moves at most landings and the date mostly
+says whether the cell is being worked. The record date is the selective one:
+the last landing that changed the cell's best kd^2/n, raised by a new leader
+or lowered when the leader was revised or removed. A distance revision counts
+as movement on both, as it should: the cell's claim changed. Each entry's
+cells are read once from the board at HEAD and carried back through renames,
+so an entry that gained a layout later counts in its 2D cells from its first
+landing, and a path no longer on the board is skipped. `./qldpc targets`
+prints both per cell as the date, the days since, the board landings since,
+and the entry that moved it (`--no-staleness` leaves them out; a shallow clone
+has no history to replay and says so); `--stale` sorts the cells stalest
+first by the record date, then the frontier date. The landing count is the
+measure that survives a busy fortnight, when every cell's day count moves at
+once. The replay costs a few seconds beside the board load.
 
 ## Family concentration of the frontier: `family_concentration.py`
 
@@ -386,3 +417,125 @@ tables under `research/kit/groups/`; the QECDB matches are fetched from the
 database's API and the fetched rows are kept in the record. Nothing here is a
 gate input; `recheck` re-verifies every recorded permutation from the blob
 hashes it cites, as `permutation_equivalence.py` does for its ledger.
+
+## Reachability pruning for code-calculus moves: `cc_reachability.py`
+
+Direction 6 of issue #4478 asks whether a code-calculus move can be skipped
+before any distance search, by computing where its child must land and checking
+that region against the board. `cc_reachability.py` answers it for the three
+moves v0.1 found productive. For every CSS parent with `n <= N` it enumerates
+C-DELETE-CHECK, E-PEEL, and E-PUNCTURE with the library's own semantics, applies
+the structural refusals the gate would make (a dependent display, a bare qubit,
+a disconnected Tanner graph, k = 0), computes the child's exact `(n', k', w')`
+from ranks alone, and asks whether the optimistic child `(n', k', d_parent, w')`
+is dominated in the strictest cell it could land in. A child's distance never
+exceeds its parent's under these moves, so a dominated optimistic child cannot
+be board-advancing at any real distance and the move can be skipped.
+
+```
+uv run --frozen python research/audits/cc_reachability.py --n-cap 120 \
+    --out research/audits/cc_reachability-<date>.json [--sweep <frontier.jsonl>]
+```
+
+`--sweep` takes the frontier record of a gated sweep (one JSON object per line
+with the child's `n`, `k`, `w`, its `parent` slug, and the gate's
+`board_advancing`) and reports how the filter would have done on children the
+gate judged: a child pruned here and advancing there is a soundness failure
+unless the board moved in between. `cc_reachability-2026-11-05.json` is the
+record for `n <= 120`; its reading, with the stabilizer-parent probe of the
+same day, is `fieldnotes/2026-11-05-code-calculus-v0p1-directions-1-and-6.md`.
+
+## The finite-size map against the surface code: `surface_code_map.py`
+
+Issue #4601 (Beat the Surface Code) asks first for a structural map: for k
+logical qubits, which verified codes use fewer data qubits than the surface
+code at the same distance, in which cell, and with what verification status.
+`surface_code_map.py` reads the board through `site/build.py`'s loader and,
+for each k target (1, 10, 25, 50, 100), each track (2D single-layer, 2D
+bilayer, unrestricted) and each check-weight cap (4, 6, 8, any), finds at
+every d the smallest-n entry with at least k logical qubits and a distance
+bound of at least d, against k independent rotated surface-code patches,
+n = k d^2. It also records the price of 2D locality (n of the best 2D entry
+over n of the best unrestricted entry at the same k and d) and, for every k
+from 1 to 100, the best factor over d in each track. The record is
+`surface_code_map-<date>.json`; `--markdown` prints the tables a fieldnote
+quotes.
+
+```
+uv run python research/audits/surface_code_map.py --markdown
+uv run python research/audits/surface_code_map.py --out research/audits/surface_code_map-<date>.json
+```
+
+Read the tiers before quoting a factor: the baseline distance is exact,
+while a board entry at tier `ub` is a witness-backed upper bound and beats
+the surface code only if its bound is tight. The comparison counts data
+qubits only; the operational comparison in #4601 (total qubits at matched
+logical error rate) is Level 2 and is not computed here.
+
+## Certified circuit-distance lower bounds: `circuit_distance_bounds.py`
+
+Every circuit-tier entry records `d_circ` per memory basis as a witnessed
+upper bound: a fault set `verify/circuit_verify.py` checked, found by a
+randomized search that cannot say the set is the lightest, and the gate's
+refutation step (`verify/gate_changed.py`) is a bounded search of the same
+kind. The audit of arXiv:2611.08247 (Cheng, Guo, and Pan) finds that
+circuit distances of schedules presented as distance-preserving are where
+published values most often overstate the truth, because the lightest fault
+sets combine hook errors from several checks. Their tool, tropidist
+(github.com/Fanerst/tropidist), proves circuit-distance lower bounds by
+exhaustive search after two reductions: it keeps the detectors of the memory
+basis (exact when every kept column lifts, which it checks) and collapses the
+rounds (a lower bound), then lifts the collapsed minimizers back to the
+circuit. Both reductions key on detector coordinates `(check, 0, round,
+type)`, which the board's committed circuits do not carry.
+
+`circuit_distance_bounds.py` (issue #4717) adds those coordinates in memory
+and runs the tool per basis. The check is the ancilla qubit the detector's
+measurements belong to (a flag qubit is its own check, so the collapse groups
+each flag with itself), the round is how many times that ancilla had been
+measured before (a closure that also reads data qubits sits one round after
+the last extraction), and the type is the ancilla's measurement basis, 0 for
+X and 3 for Z. A flag qubit, an ancilla that touches no data qubit, is typed
+by its own basis, by its check's basis, or by the memory basis, the first
+policy under which the tool's own `sector_is_exact` test passes; when none
+passes it searches the full detector error model. Detectors of the other type
+than the memory basis are shifted one round later, because the tool takes the
+type present at round 0 as the memory basis and a flag measured from the
+first round on puts both types there; those rows are dropped by the sector
+reduction before anything reads their round. A fault set the tool returns
+below the claim is mapped back to the committed `.dem`'s error instructions
+by its (detectors, observables) pair and checked with
+`verify/circuit_tools.witness_errors` before it is called a refutation.
+
+The record `circuit_distance_bounds-<date>.json` holds, per entry and basis,
+the claim, the proved lower bound, the lightest fault set's weight, the
+reduction used, and a verdict: `exact` when the lower bound meets the claim
+(the committed witness supplies the matching upper bound), `open` when it
+does not, `refuted` when a lighter verified fault set exists. Nothing here
+edits `codes/` or `circuits/`; the schema's `circuitSideDistance` still
+admits only `upper_bound`, and carrying an exact `d_circ` onto the board is
+a schema and verifier change for a later issue.
+
+```
+uv run python research/audits/circuit_distance_bounds.py --tropidist /tmp/tropidist --slugs 48-4-7 --tlim 120
+uv run python research/audits/circuit_distance_bounds.py --tropidist /tmp/tropidist --tlim 120 --jobs 4 \
+    --out research/audits/circuit_distance_bounds-<date>.json
+```
+
+The record of 2026-11-06 (`circuit_distance_bounds-2026-11-06.json`, 120 s
+per basis, one kernel thread, 7,308 tool seconds in all) covers the 273
+circuit-tier entries. The sector and time-collapse reductions applied to 544
+of the 546 basis problems (the two bases of 31-1-7 fell back to the full
+model). 227 entries are exact, 194 of them at the claimed d_circ = d; 11 are
+open, with proved lower bounds between 4 and 10 against claims of 7 to 16;
+and 35 are refuted, 33 of them generic sequential two-block extraction
+circuits without a contributed_by block and 2 flag-protected ones (48-8-8,
+X side 8 to 7, and 54-4-10, 10 to 8). The sequential circuits with claims
+of 12 to 14 mostly have circuit distance 6 or 7: 102-6-13 and 104-6-14 have
+7, 108-10-12, 108-16-12, 80-6-12, 90-12-12, and 108-8-13 (X side) have 6,
+80-8-12 has 5. Every refuting fault set was re-checked against the committed
+`.dem` with `verify/circuit_tools.witness_errors`. `--tighten OUT_DIR`
+writes the corrected `codes/` documents of the refuted entries in the shape
+of the circuit refutation binding (issue #4723): the refuted sides lowered to
+the verified fault sets at `upper_bound`, the rest of the circuit block
+untouched, and a sentence naming the refuter appended to `provenance.notes`.

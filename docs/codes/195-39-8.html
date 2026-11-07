@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[11, 36, 58, 59, 85, 105, 171, 181]</div></details>
 <div class=kv><b>d_Z</b> 8 &middot; witness weight 8 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[56, 58, 69, 73, 121, 134, 145, 154]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists (CryptoMiniSat, XOR + sequential-counter cardinality); Z: no logical &lt; 8 exists (CryptoMiniSat, XOR + sequential-counter cardinality)</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists (CryptoMiniSat, XOR + sequential-counter cardinality); Z: no logical &lt; 8 exists (CryptoMiniSat, XOR + sequential-counter cardinality)</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -66,6 +66,15 @@
 (3,12): 377
 (3,13): 726
 (3,14): 819</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/195-39-8">circuits/195-39-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[108889, 108893, 108896, 108902, 108903, 108932, 108940, 108943]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[108752, 108756, 108765, 108767, 108793, 108843, 108852, 108897]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/yhu1996">@yhu1996</a></div>

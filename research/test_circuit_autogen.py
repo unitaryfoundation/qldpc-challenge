@@ -180,7 +180,7 @@ def test_generate_two_block_verifies_at_full_distance(tmp_path):
     assert report["ok"], report
     assert report["earned_d_circ"]["d_circ"]["value"] == doc["distance"]["d"]
     assert block["rounds"] == doc["distance"]["d"]
-    assert "commuting permutation decomposition" in block["notes"]
+    assert "interleaved two-block extraction" in block["notes"]
 
 
 def test_generate_layout_schedule_verifies(tmp_path):
@@ -201,6 +201,104 @@ def test_generate_generic_fallback_verifies(tmp_path):
     report = _verify(doc, block, files, tmp_path)
     assert report["ok"], report
     assert 1 <= report["earned_d_circ"]["d_circ"]["value"] <= 3
+
+
+# ------------------------------------------------------------- flags (#4231)
+
+def test_flag_intervals_are_the_coil_plus_the_outer_spans():
+    assert ca.flag_intervals(6) == [(0, 3), (1, 4), (2, 5)]
+    assert ca.flag_intervals(6, max_flags=1) == [(0, 5)]
+    assert ca.flag_intervals(6, span_flags=4) == \
+        [(0, 3), (1, 4), (2, 5), (0, 5), (0, 4), (1, 5)]   # (1, 4) is a coil flag
+    assert ca.flag_intervals(1) == [] and ca.flag_intervals(6, 0) == []
+
+
+@pytest.mark.parametrize("w,max_flags", [(12, 6), (16, 4), (8, 4)])
+def test_pure_coil_has_a_three_hook_blind_spot_that_one_span_flag_closes(w, max_flags):
+    from itertools import combinations
+    coil = ca.flag_intervals(w, max_flags)
+    hooks = range(w - 1)            # a hook after the last step reaches no data qubit
+    unseen = [t for t in combinations(hooks, 3)
+              if not any(ca.flag_syndrome(coil, t))]
+    m = len(coil)
+    assert (0, m - 1 if m == w // 2 else m, w - m) in unseen
+    spanned = ca.flag_intervals(w, max_flags, span_flags=1)
+    assert all(any(ca.flag_syndrome(spanned, t)) for t in combinations(hooks, 3))
+    assert all(any(ca.flag_syndrome(spanned, t)) for t in combinations(hooks, 1))
+
+
+def _valid_decomposition(dec, A, B):
+    PA, PB = dec
+    m = A.shape[0]
+    for perms, M in ((PA, A), (PB, B)):
+        S = np.zeros_like(M)
+        for p in perms:
+            S[np.arange(m), p] += 1
+        assert (S == M).all()
+    assert all((pb[pa] == pa[pb]).all() for pa in PA for pb in PB)
+
+
+@pytest.mark.parametrize("slug", ["64-18-8", "96-40-4"])
+def test_invariant_decomposition_solves_the_sweeps_hard_two_block_codes(slug):
+    # The non-Abelian [[64,18,8]] and the high-centralizer Abelian [[96,40,4]]
+    # of issue #4231, on which commuting_decomposition() runs out of nodes.
+    HX, HZ = _mats(_doc(slug))
+    A, B, _ = ca.two_block_split(HX, HZ)
+    dec = ca.invariant_decomposition(A, B)
+    assert dec is not None
+    _valid_decomposition(dec, A, B)
+    _valid_decomposition(ca.decompose_two_block(A, B), A, B)
+
+
+def test_flagged_schedule_is_a_canonical_deterministic_circuit():
+    doc = _doc("18-4-4")
+    HX, HZ = _mats(doc)
+    A, B, zrow = ca.two_block_split(HX, HZ)
+    PA, PB = ca.decompose_two_block(A, B)
+    sx, sz = next(ca.interleaved_slots(len(PA), len(PB),
+                                       np.random.default_rng(0)))
+    layers = ca.interleaved_layers(PA, PB, zrow, sx, sz)
+    sch = ca.flagged(layers, max_flags=2, span_flags=1)
+    n_flags = sum(len(v) for v in sch.flags.values())
+    assert n_flags == (HX.shape[0] + HZ.shape[0]) * 3
+    for basis in ("Z", "X"):
+        skel = ca.build_memory(HX, HZ, 3, basis, sch)
+        assert ca.deterministic(skel)
+        assert skel.num_qubits == doc["n"] + HX.shape[0] + HZ.shape[0] + n_flags
+        noisy = ct.apply_noise(skel, doc["n"])
+        assert ct.strip_noise(noisy) == skel
+        dem = ct.derive_dem(noisy)
+        anchor = (HZ if basis == "Z" else HX).shape[0]
+        assert dem.num_detectors == \
+            ca.closure_detector_base(HX, HZ, 3, basis, sch.flags) + anchor
+        bare = ca.build_memory(HX, HZ, 3, basis, layers)
+        assert dem.num_detectors == bare.num_detectors + 3 * n_flags
+        opp = "X" if basis == "Z" else "Z"
+        wit = ca.readout_witness(dem, HX, HZ, 3, basis,
+                                 doc["distance"][opp]["witness"], sch.flags)
+        assert wit is not None and ct.witness_errors(dem, wit, len(wit)) == []
+
+
+def test_generate_flagged_steane_reaches_full_distance(tmp_path):
+    doc = _steane()
+    block, files, family = ca.generate(doc, **QUICK)
+    assert family == "generic sequential"
+    assert block["notes"].startswith("Johnson-coil")
+    report = _verify(doc, block, files, tmp_path)
+    assert report["ok"], report
+    assert report["earned_d_circ"]["d_circ"]["value"] == 3
+
+
+def test_generate_flagged_two_block_reaches_full_distance(tmp_path):
+    doc = _doc("18-4-4")
+    block, files, family = ca.generate(doc, **QUICK)
+    assert family.startswith("two-block interleaved")
+    assert block["notes"].startswith(
+        "Johnson-coil flagged interleaved two-block extraction")
+    report = _verify(doc, block, files, tmp_path)
+    assert report["ok"], report
+    assert report["earned_d_circ"]["d_circ"]["value"] == 4
+    assert all(v["value"] == 4 for v in block["d_circ"].values())
 
 
 def test_readout_flips_along_a_code_logical_are_a_witness():

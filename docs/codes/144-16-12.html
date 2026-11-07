@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 12 qubits)</summary><div class=wit>[12, 20, 21, 48, 56, 57, 75, 76, 93, 111, 112, 129]</div></details>
 <div class=kv><b>d_Z</b> 12 &middot; witness weight 12 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 12 qubits)</summary><div class=wit>[10, 11, 29, 46, 47, 65, 96, 101, 104, 132, 137, 140]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists; Z: no logical &lt; 12 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists; Z: no logical &lt; 12 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -49,6 +49,15 @@
 (3,9): 19536
 (3,11): 7848
 (3,13): 360</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/144-16-12">circuits/144-16-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[130634, 130635, 130638, 130641, 130651, 130667, 130670, 130717, 130724, 130726, 130741, 130745]</div></details>
+<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[130623, 130626, 130630, 130641, 130668, 130671, 130672, 130680, 130684, 130712, 130715, 130738]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

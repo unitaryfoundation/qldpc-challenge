@@ -47,6 +47,8 @@ def claims_dir(tmp_path, monkeypatch):
     """Point the claims primitives at a tmp directory and a stable run id."""
     monkeypatch.setattr(coordination, "CLAIMS", str(tmp_path / "claims"))
     monkeypatch.setenv(coordination.RUN_ID_ENV, "session-a")
+    # the stub board has no history to replay; keep the listing off git (issue #4238)
+    monkeypatch.setattr(qldpc, "_cell_staleness", lambda entries: (None, 0))
     return tmp_path / "claims"
 
 

@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>84</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>14</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>10</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>16.667</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>16.6667</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0122</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[2, 7, 11, 18, 38, 51, 52, 60, 65, 67]</div></details>
 <div class=kv><b>d_Z</b> 10 &middot; witness weight 10 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[15, 22, 31, 33, 40, 42, 44, 49, 58, 75]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -57,11 +57,11 @@
 </section>
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/84-14-10">circuits/84-14-10/</a> &middot; canonical noise recipe, 10 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 9 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
-<div class=kv><b>d_circ^X</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[43812, 43843, 44058, 44212, 44812, 44861, 45677, 45721, 46589]</div></details>
-<div class=kv><b>d_circ^Z</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[47577, 47580, 47659, 47672, 47673, 47686, 47689, 47736, 47749]</div></details>
+<div class=kv><b>d_circ</b> &le; 7 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[3491, 3515, 3881, 4229, 4531, 5317, 6309]</div></details>
+<div class=kv><b>d_circ^Z</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[7863, 7876, 7943, 7948, 7983, 8075, 8172]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
@@ -77,7 +77,7 @@
 <div class=kv><b>construction</b> 2BGA reconstruction from Lin-Pryadko catalogue github.com/QEC-pages/2BGA-codes @ 403d194c, SmallGroup(42,3), a=1+g8+g27, b=1+g3+g16+g39+g42</div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a></div>
 <div class=kv><b>date</b> 2026-09-17</div>
-<div class=kv><b>notes</b> Reconstruction of a published Lin-Pryadko 2BGA code (SmallGroup(42,3), [[84,14,10]]). Checked against the current board: not an exact or WL-equivalent duplicate of any existing entry.</div>
+<div class=kv><b>notes</b> Reconstruction of a published Lin-Pryadko 2BGA code (SmallGroup(42,3), [[84,14,10]]). Checked against the current board: not an exact or WL-equivalent duplicate of any existing entry. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 9), with a proved lower bound of 7; the Z-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 9), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).</div>
 <div class=kv><b>family</b> generalized bicycle <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>

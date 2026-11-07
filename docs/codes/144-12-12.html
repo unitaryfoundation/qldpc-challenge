@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 12 qubits)</summary><div class=wit>[54, 56, 60, 64, 67, 71, 126, 127, 130, 131, 133, 137]</div></details>
 <div class=kv><b>d_Z</b> 12 &middot; witness weight 12 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 12 qubits)</summary><div class=wit>[0, 10, 17, 72, 76, 78, 81, 82, 83, 84, 85, 138]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists (CryptoMiniSat, XOR + sequential-counter cardinality); Z: no logical &lt; 12 exists (CryptoMiniSat, XOR + sequential-counter cardinality)</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists (CryptoMiniSat, XOR + sequential-counter cardinality); Z: no logical &lt; 12 exists (CryptoMiniSat, XOR + sequential-counter cardinality)</div>
 </section>
 <section class=blk><h3>Recipe at other sizes</h3><div class=kv style="color:var(--mut)">the stored construction recipe (<code>bb.build_bb</code>, rebuilds this entry at its own parameters) rebuilt at neighboring sizes (l +- 1, m +- 1, and each side halved or doubled, same monomials (reduced modulo the new torus)) and put through the verifier's cheap structural checks only: no distance at any size, no ranking, no tier. A recipe that holds up at other sizes is evidence of a construction rather than a tuned artifact; one that does not is a fact about the recipe, not about this entry.</div><div class=kv><b>passes at</b> 4 of 8 sizes &middot; own size [[144,12]] w=6</div><ul class=kv><li><b>l=11, m=6</b>: [[132,0]] w=6, fails: k = 0</li><li><b>l=13, m=6</b>: [[156,0]] w=6, fails: k = 0</li><li><b>l=12, m=5</b>: [[120,0]] w=6, fails: k = 0</li><li><b>l=12, m=7</b>: [[168,0]] w=6, fails: k = 0</li><li><b>l=24, m=6</b>: [[288,12]] w=6, passes: commutes, encodes, connected, within the caps</li><li><b>l=12, m=12</b>: [[288,16]] w=6, passes: commutes, encodes, connected, within the caps</li><li><b>l=6, m=6</b>: [[72,12]] w=6, passes: commutes, encodes, connected, within the caps</li><li><b>l=12, m=3</b>: [[72,8]] w=6, passes: commutes, encodes, connected, within the caps</li></ul></section>
 <section class=blk><h3>Diagnostics</h3>
@@ -43,6 +43,15 @@
 (3,7): 1440</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 7.2801 &middot; Z 6.3246 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/144-12-12">circuits/144-12-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[99506, 99507, 99511, 99514, 99521, 99524, 99525, 99526, 99530, 99541, 99562, 99642]</div></details>
+<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[99508, 99509, 99511, 99513, 99528, 99529, 99531, 99532, 99540, 99551, 99645, 99647]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; Simulated annealing over site assignments on an integer grid with the repo&#x27;s own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier&#x27;s rule. &middot; 2026-10-03</div>
@@ -53,7 +62,7 @@
 <div class=kv><b>authors</b> Bravyi, Sergey and Cross, Andrew W. and Gambetta, Jay M. and Maslov, Dmitri and Rall, Patrick and Yoder, Theodore J.</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Bivariate bicycle code, orders (12, 6), A=x<sup>3</sup> + y<sup>2</sup> + y, B=x<sup>2</sup> + x + y<sup>3</sup> (periodic boundary conditions).</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2308.07915">arXiv:2308.07915</a></div>
 <div class=kv><b>date</b> 2023-08-15</div>
 <div class=kv><b>notes</b> Distance d=12 established in arXiv:2308.07915 (Table 3); witness here is a decoder-found logical operator of that weight (upper bound).</div>

@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 14 qubits)</summary><div class=wit>[10, 24, 38, 52, 67, 79, 94, 108, 122, 136, 150, 177, 178, 179]</div></details>
 <div class=kv><b>d_Z</b> 14 &middot; witness weight 14 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 14 qubits)</summary><div class=wit>[17, 30, 31, 42, 43, 44, 55, 100, 115, 129, 142, 167, 168, 183]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 14</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 14 exists; Z: no logical &lt; 14 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 14</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 14 exists; Z: no logical &lt; 14 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -40,6 +40,15 @@
 (3,2): 1764
 (3,4): 392</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 6.0828 &middot; Z 8.6023 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/196-2-14">circuits/196-2-14/</a> &middot; canonical noise recipe, 14 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 14 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 14 &middot; fault-set witness of 14 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 14)</summary><div class=wit>[92814, 92815, 92853, 92854, 92879, 92880, 92881, 92904, 92905, 92907, 92929, 92930, 92959, 92962]</div></details>
+<div class=kv><b>d_circ^Z</b> 14 &middot; fault-set witness of 14 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 14)</summary><div class=wit>[92837, 92838, 92842, 92869, 92870, 92897, 92898, 92925, 92926, 92956, 92979, 92980, 92981, 92983]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

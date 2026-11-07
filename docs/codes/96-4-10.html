@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>96</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>4</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>10</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>4.167</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>4.16667</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>5</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0144</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[7, 16, 24, 33, 37, 46, 73, 74, 78, 85]</div></details>
 <div class=kv><b>d_Z</b> 10 &middot; witness weight 10 (claimed exact)</div>
 <details><summary>witness operator (support, 10 qubits)</summary><div class=wit>[0, 1, 36, 37, 42, 43, 49, 50, 88, 89]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 10</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 10 exists; Z: no logical &lt; 10 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -55,6 +55,15 @@
 (3,7): 48</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 7.8102 &middot; Z 5.0 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/96-4-10">circuits/96-4-10/</a> &middot; canonical noise recipe, 10 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 10 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[40800, 40801, 40808, 40811, 40877, 40878, 40879, 40880, 40889, 40891]</div></details>
+<div class=kv><b>d_circ^Z</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[40829, 40830, 40849, 40864, 40865, 40866, 40875, 40883, 40890, 40891]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; Simulated annealing over site assignments on an integer grid with the repo&#x27;s own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier&#x27;s rule. &middot; 2026-10-04</div>
@@ -65,7 +74,7 @@
 <div class=kv><b>authors</b> Lin, Hsiang-Ku and Pryadko, Leonid P.</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Two-block group-algebra (2BGA) code over SmallGroup(48,2), archive row &quot;48 2 4 10 [2] [3,39]&quot; (Lin &amp; Pryadko, arXiv:2306.16400; 2BGA-codes archive). Reconstructed here via an equivalent bivariate-bicycle presentation over F_2[x,y]/(x<sup>16</sup>-1, y<sup>3</sup>-1): A = 1 + y + x<sup>2</sup> y<sup>2</sup>, B = 1 + x<sup>3</sup>, H_X = [A|B], H_Z = [B^T|A^T]. An explicit CRT relabeling of the 48 group coordinates in each qubit block, plus an exchange of the two 48-qubit blocks, maps this presentation onto the archived row exactly -- the same CSS code up to qubit/check permutation.</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a>, https://github.com/QEC-pages/2BGA-codes</div>
 <div class=kv><b>date</b> 2023</div>
 <div class=kv><b>notes</b> Literature baseline (arXiv:2306.16400, Lin &amp; Pryadko, 28 Jun 2023). This [[96,4,10]] instance is not in the paper&#x27;s own Table 1 (which stops at smaller cases) but in the paper&#x27;s companion enumeration archive, github.com/QEC-pages/2BGA-codes, abelian row &quot;SmallGroup(48,2), 48 2 4 10 [2] [3,39]&quot;. Reconstructed via an equivalent bivariate-bicycle presentation and independently re-verified with this repository&#x27;s own tools: CSS commutation and k=4 confirmed by direct rank computation; distance re-derived by randomized search (5,000 and 50,000 trials, d=10) and BP+OSD (200,000 trials, d_heuristic=10), then certified exact by MILP (d_X=d_Z=10, no lighter logical on either side; scipy/HiGHS, tlim=600s, 78s wall time). The archive&#x27;s own reported d&lt;=10 for this row is a QDistRnd probabilistic upper bound; the MILP result above independently certifies it exact. The verifier&#x27;s &#x27;literature novelty UNVERIFIED&#x27; label is by-design (validate_candidate.py performs no literature lookup) and is intentionally not overridden.</div>

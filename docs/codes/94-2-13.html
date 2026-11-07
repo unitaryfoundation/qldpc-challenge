@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>94</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>2</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>13</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>3.596</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>3.59574</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0043</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 13 qubits)</summary><div class=wit>[11, 13, 15, 32, 45, 54, 55, 57, 62, 78, 79, 90, 92]</div></details>
 <div class=kv><b>d_Z</b> 13 &middot; witness weight 13 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 13 qubits)</summary><div class=wit>[2, 16, 18, 22, 35, 38, 44, 47, 52, 64, 83, 86, 92]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 13</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 13 exists; Z: no logical &lt; 13 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 13</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 13 exists; Z: no logical &lt; 13 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -52,6 +52,15 @@
 (3,8): 2256
 (3,10): 188</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 7.6158 &middot; Z 7.8102 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/94-2-13">circuits/94-2-13/</a> &middot; canonical noise recipe, 13 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 13 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 13 &middot; fault-set witness of 13 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 13)</summary><div class=wit>[70407, 70408, 70417, 70428, 70435, 70444, 70457, 70460, 70461, 70469, 70489, 70492, 70498]</div></details>
+<div class=kv><b>d_circ^Z</b> 13 &middot; fault-set witness of 13 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 13)</summary><div class=wit>[70430, 70431, 70433, 70437, 70439, 70443, 70453, 70454, 70480, 70484, 70485, 70496, 70498]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

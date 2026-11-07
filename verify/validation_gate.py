@@ -17,7 +17,7 @@ evaluator-validation gate:
 2. broken artifacts with expected diagnoses: one deliberately broken document
    per failure class of the preflight taxonomy (research/kit/prescreen.py:
    construction and weight are the code's fault, packaging, typing, witness,
-   and layout the document's). The gate asserts the rejection, the check
+   layout, benchmark, and architecture the document's). The gate asserts the rejection, the check
    that fired, and the class, so a verifier that still rejects but for the
    wrong reason fails here;
 3. published reproductions: seeded baselines and the mitten and ZSZ lifted
@@ -71,6 +71,15 @@ KINDS = {
     "layout": ("coordinates_cover_all_qubits", "coordinates_uniform_dimension",
                "interaction_radius_within_claim", "site_occupancy_within_layers",
                "site_spacing_at_least_one", "modules_cover_all_qubits"),
+    "benchmark": ("benchmark_candidate_data_qubits", "benchmark_qubit_totals",
+                  "benchmark_baseline_on_board", "benchmark_baseline_k",
+                  "benchmark_baseline_data_qubits"),
+    "architecture": ("architecture_gadget_fault_distance", "architecture_gadget_data_qubits",
+                     "architecture_qubit_totals", "architecture_partner_on_board",
+                     "architecture_magic_state_gain",
+                     "architecture_blocks_cover_logical_qubits",
+                     "architecture_physical_qubits_cover_blocks",
+                     "architecture_factory_footprint"),
     "other": ("verifier_ran",),
 }
 CODE_KINDS = frozenset({"construction", "weight"})
@@ -279,12 +288,56 @@ def broken_layout():
     return doc
 
 
+def broken_benchmark():
+    doc = steane()
+    doc["schema_version"] = "0.6"
+    doc["benchmark"] = {                          # a comparison whose candidate is not this code
+        "hardware_track": "2d-nearest-neighbor",
+        "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
+        "surface_baseline": {"patches": {"d": 3}},
+        "decoder": {"name": "pymatching"},
+        "resources": {"candidate": {"data_qubits": 9, "ancilla_qubits": 8},   # 9 data qubits, n = 7
+                      "baseline": {"data_qubits": 9, "ancilla_qubits": 8}},
+        "logical_error_rate": {"target": 0.01, "candidate": 0.005, "per": "round"},
+        "status": "documented",
+        "method": "validation gate: the candidate's data-qubit count is not n",
+    }
+    return doc
+
+
+def broken_architecture():
+    doc = steane()
+    doc["schema_version"] = "0.7"
+    doc["benchmark"] = {                          # a consistent Tier B block to build on
+        "hardware_track": "2d-nearest-neighbor",
+        "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
+        "surface_baseline": {"patches": {"d": 3}},
+        "decoder": {"name": "pymatching"},
+        "resources": {"candidate": {"data_qubits": 7, "ancilla_qubits": 6},
+                      "baseline": {"data_qubits": 9, "ancilla_qubits": 8}},
+        "logical_error_rate": {"target": 0.01, "candidate": 0.005, "per": "round"},
+        "status": "documented",
+        "method": "validation gate: the comparison the architecture block builds on",
+    }
+    doc["architecture"] = {                       # a gadget claiming more protection than the code has
+        "gadgets": [{"kind": "lattice-surgery",
+                     "operation": "joint Z Z measurement across two blocks",
+                     "blocks": 2, "fault_distance": 5,              # d = 3
+                     "resources": {"data_qubits": 14, "ancilla_qubits": 12, "rounds": 5}}],
+        "status": "documented",
+        "method": "validation gate: the gadget's fault distance exceeds d",
+    }
+    return doc
+
+
 BROKEN = (("construction", broken_construction, "css_commutation"),
           ("weight", broken_weight, None),
           ("packaging", broken_packaging, "schema_valid"),
           ("typing", broken_typing, "stabilizer_code_is_not_css"),
           ("witness", broken_witness, "distance_X_witness"),
-          ("layout", broken_layout, "site_occupancy_within_layers"))
+          ("layout", broken_layout, "site_occupancy_within_layers"),
+          ("benchmark", broken_benchmark, "benchmark_candidate_data_qubits"),
+          ("architecture", broken_architecture, "architecture_gadget_fault_distance"))
 
 
 def run_broken():

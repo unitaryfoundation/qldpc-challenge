@@ -4,7 +4,9 @@ tables) plus one detail page per code under docs/codes/<slug>.html.
 
 Pure Python, no framework. A code's displayed distance tier is earned, not
 self-declared: it shows d= only when a server certificate exists in
-certs/<slug>.json (d_exact), otherwise d<= (the witness upper bound the cheap
+certs/<slug>.json (d_exact), the interval d_lb <= d <= d when that file is a
+partial certificate (a proven lower bound below the witness, issue #4230),
+and otherwise d<= (the witness upper bound the cheap
 verifier confirmed). Detail pages expose the actual witness, certificate, and
 parity checks so the verification is transparent.
 """
@@ -22,6 +24,7 @@ import urllib.parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
 from qldpc_verify import board_reports, generator_supports, is_stabilizer
+from check_certs import checks_sha256  # noqa: E402
 from ler_verify import gate_point, points_of  # noqa: E402
 import ler_receipts as lr  # noqa: E402
 
@@ -696,22 +699,12 @@ margin-right:3px;background:#fffbe0;border-left:3px solid var(--ac)}}
 h2.track{{font-size:24px;margin:48px 0 4px;padding-top:24px;
 border-top:1px solid var(--ln);scroll-margin-top:16px}}
 .tcount{{color:var(--mut);font-size:14px;font-weight:400}}
-.plots{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:16px;margin:14px 0 4px;position:relative}}
-.geotabs{{position:absolute;top:2px;right:2px;z-index:6;display:flex;gap:6px}}
-/* The plots were position:sticky here (#273) so the point<->row hover
-   highlight stayed visible while the table scrolled. But the opaque pinned
-   plots covered the table and leaderboard whenever plots + legend + table
-   outgrew the viewport (issue #302). The explorer was then fitted to one
-   viewport, which overflowed the same way once the legends grew; the board
-   now has a tall scroll box of its own instead (see .boardscroll). */
 .plot{{min-width:0;border:1px solid var(--ln);border-radius:12px;
 background:#fff;padding:8px}}
 .chartlegend{{display:flex;flex-wrap:wrap;gap:10px 20px;margin:10px 0 4px;
 padding:12px 16px;background:var(--soft);border:1px solid var(--ln);
 border-radius:10px;font-size:13px;color:var(--mut)}}
 .chartlegend .ci{{display:inline-flex;align-items:center;gap:7px}}
-.plotx{{text-align:center;font-size:13px;color:#334155;margin:2px 0 0}}
 .cdot{{width:12px;height:12px;border-radius:50%;flex:0 0 auto}}
 /* Record-progress chart: running best kd^2/n per weight class over record
    events (ecdsa.fail-style). One full-width panel; the SVG scales down. */
@@ -855,12 +848,11 @@ box-shadow:0 0 0 3px rgba(54,0,108,.15)}}
 .tracktabs{{display:flex;gap:6px;margin:6px 0 10px;overflow-x:auto;
 -webkit-overflow-scrolling:touch;scrollbar-width:none}}
 .tracktabs::-webkit-scrollbar{{display:none}}
-.ttab,.otog,.geotab{{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
+.ttab,.otog{{flex:0 0 auto;font-size:13px;padding:6px 13px;border-radius:999px;
 cursor:pointer;border:1px solid var(--ln);background:#fff;color:var(--mut);
 font-family:inherit;white-space:nowrap}}
-.geotab{{font-size:12px;padding:4px 11px}}
-.ttab:hover,.otog:hover,.geotab:hover{{border-color:var(--ac);color:var(--ac)}}
-.ttab.active,.otog.active,.geotab.active{{background:var(--ac);border-color:var(--ac);color:#fff}}
+.ttab:hover,.otog:hover{{border-color:var(--ac);color:var(--ac)}}
+.ttab.active,.otog.active{{background:var(--ac);border-color:var(--ac);color:#fff}}
 .filterrow{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}}
 .searchhelp{{font-size:12px;color:var(--mut);margin:0 0 14px}}
 .searchhelp code{{background:var(--soft);padding:1px 5px;border-radius:4px;
@@ -892,6 +884,9 @@ border-radius:50%;background:#fff;border:2px solid var(--ac);cursor:pointer;
 box-shadow:0 1px 2px rgba(17,17,17,.25)}}
 .wfval{{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:700;
 color:var(--ink);min-width:2.4em;text-align:right}}
+.asofinput{{border:0;font:inherit;font-size:12px;padding:2px 4px;
+background:transparent;color:var(--ink);cursor:pointer}}
+.asofinput:focus-visible{{outline:2px solid var(--ac);outline-offset:1px}}
 .plot circle.pt.xh{{stroke:#f59e0b;stroke-width:4;r:7}}
 .plot circle.hit{{cursor:pointer}}
 .star{{color:var(--ac);width:18px}}
@@ -917,8 +912,7 @@ overflow:hidden;text-overflow:ellipsis;min-width:0}}
    instead of running the full length of the page. Its header pins to the top of
    this box (thead is position:sticky) while the rows scroll under it. The box
    takes most of a viewport, so the leaderboard is the first thing on screen
-   once the page is scrolled to it; the plots above it stay a short scroll away
-   for the row-hover -> point highlight. overflow:auto also carries the
+   once the page is scrolled to it. overflow:auto also carries the
    horizontal scroll on narrow screens (where the table sets its own min-width). */
 .boardscroll{{max-height:82vh;overflow:auto;-webkit-overflow-scrolling:touch;
 border:1px solid var(--ln);border-radius:12px}}
@@ -926,14 +920,11 @@ border:1px solid var(--ln);border-radius:12px}}
    LER frontier list (issue #3931); desktop keeps the bounded scroll box and
    the whole list, and never needs it. */
 .showall{{display:none}}
-/* The explorer (plots, legends, table) is plain flow. It used to be a flex
-   column capped at one viewport so plots and table shared the screen (#302),
-   with the board's box taking whatever was left above a 240px floor. Once the
-   plots and the two legends alone outgrew the viewport minus that floor, the
-   floor won over the cap: the box overflowed the capped column, and the
-   "how to" cards that follow it were laid out over the board's rows. No cap
-   on the column means nothing can overflow it; the board box above carries
-   its own height. */
+/* The explorer (legends, table) is plain flow. It used to be a flex column
+   capped at one viewport (#302); once its contents outgrew the viewport the
+   board's box overflowed the column and the "how to" cards that follow it
+   were laid out over the board's rows. No cap on the column means nothing
+   can overflow it; the board box above carries its own height. */
 @media(max-width:1000px){{table.board{{table-layout:auto;min-width:820px}}}}
 /* Narrow screens: rather than drop columns (and hide g, a headline metric)
    into a horizontal scroll, each row becomes a card so every field stays
@@ -1027,7 +1018,7 @@ header.hero{{padding:34px 0 30px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
-color:var(--mut)}}
+color:var(--mut)}}.b.lb{{background:#fef3c7;color:#92400e}}
 footer.foot{{margin-top:72px;border-top:1px solid var(--ln);
 background:linear-gradient(180deg,var(--soft),var(--bg));color:var(--mut);
 font-size:14px}}
@@ -1227,13 +1218,22 @@ document.addEventListener('click',e=>{
 // Smart search over the unified board: space-separated terms, all must match.
 // A term is either a comparison (n/k/d/w/eff with >= <= > < =) or free text
 // matched against the code name, type, and authors. 'record' keeps frontier
-// records. The landscape scatter hides points that the table filters out.
+// records.
 (function(){
  const board=document.getElementById('mainboard');
  const q=document.getElementById('boardsearch');
  if(!board||!q)return;
  const count=document.getElementById('boardcount');
  const rows=[...board.querySelectorAll('tbody tr')];
+ const asof=document.getElementById('asof');
+ const clearasof=document.getElementById('clearasof');
+ rows.forEach(r=>{const s=r.querySelector('td.star');
+  r._origRecord=r.dataset.record;
+  r._origClass=r.className;
+  r._origStar=s?s.innerHTML:'';
+  r._origStarTitle=s?s.title:'';});
+ (function(){const p=new URLSearchParams(location.search).get('asof');
+  if(p&&asof)asof.value=p;})();
  // Phones render the rows as cards in normal page flow (no bounded scroll
  // box), so the full list buried the leaderboard below it (issue #336): show
  // the first few and a "Show all" button. The cap lives inside apply(), not
@@ -1260,10 +1260,6 @@ document.addEventListener('click',e=>{
  // It also comes on by itself when the table is filtered to an unrestricted
  // cell in which some code ships a layout, the case the number was made for.
  const rtog=document.getElementById('routetoggle');
- // layout toggle (top right of the charts): '' = all, 'with' = only codes
- // with a verified layout (f defined), 'without' = only codes with none.
- // Clicking the active button clears it back to 'all'.
- let geoMode='';
  // The filters as the page loaded them: defaultValue is the markup's value
  // attribute, so a browser restoring form state on reload does not move the
  // baseline. Used by the card cap in apply().
@@ -1271,7 +1267,7 @@ document.addEventListener('click',e=>{
   const same=el=>!el||el.value===el.defaultValue;
   return !q.value.trim()&&same(wlo)&&same(whi)&&same(dlo)&&same(dhi)
    &&same(nlo)&&same(nhi)&&same(klo)&&same(khi)
-   &&!(lit&&lit.classList.contains('active'))&&geoMode==='';}
+   &&!(lit&&lit.classList.contains('active'));}
  // asym: X/Z distance asymmetry, so biased-noise candidates can
  // be pulled out by a threshold of the reader's choosing until the board
  // defines a label for them.
@@ -1290,6 +1286,8 @@ document.addEventListener('click',e=>{
   // by a committed certificate; 'upper-bound' keeps the rest, which are the
   // ones a refutation could still move.
   if(t==='exact'||t==='certified')return r.dataset.tier==='exact';
+  // 'bounded': a proven lower bound below the witness (partial certificate)
+  if(t==='bounded'||t==='partial')return r.dataset.tier!=='exact'&&+r.dataset.dlb>=2;
   if(t==='upper-bound'||t==='unproven')return r.dataset.tier!=='exact';
   // Circuit tier (issue #731). 'with-circuit' keeps the entries that ship
   // verified syndrome-extraction memory circuits (the gear chip); the plain
@@ -1329,44 +1327,18 @@ document.addEventListener('click',e=>{
   if(kfill){kfill.style.left=((b[0]-KMIN)/kspan*100)+'%';
    kfill.style.width=((b[1]-b[0])/kspan*100)+'%';}
   if(kval)kval.textContent=(b[0]===b[1])?(''+b[0]):(b[0]+'\\u2013'+b[1]);}
- // Adaptive axes: fit each landscape scatter to the points the
- // filter leaves visible. Mirrors scatter() in build.py (sx/sy, _axis_step,
- // the x tick step); the server-rendered axes span every code and are the
- // no-JS view.
- function ystep(hi){for(const s of [1,2,5,10,20,50,100,200,500])if(hi/s<=6)return s;return 1000;}
- function rescale(svg){
-  const W=+svg.dataset.w,H=+svg.dataset.h,pl=+svg.dataset.pl,pr=+svg.dataset.pr,
-   pb=+svg.dataset.pb,pt=+svg.dataset.pt,grid=svg.querySelector('g.grid');
-  if(!W||!grid)return;
-  const pts=[...svg.querySelectorAll('circle[data-x]')].filter(c=>c.style.display!=='none');
-  if(!pts.length)return;
-  let nhi=0,yhi=0;
-  pts.forEach(c=>{nhi=Math.max(nhi,+c.dataset.x);yhi=Math.max(yhi,+c.dataset.y);});
-  nhi=nhi||1;yhi=yhi||1;
-  const sx=n=>pl+n/nhi*(W-pl-pr),sy=v=>H-pb-v/yhi*(H-pt-pb);
-  pts.forEach(c=>{c.setAttribute('cx',sx(+c.dataset.x).toFixed(1));
-   c.setAttribute('cy',sy(+c.dataset.y).toFixed(1));});
-  let g='';const xs=Math.max(1,Math.round(nhi/4/50)*50||50);
-  for(let gx=0;gx<=nhi;gx+=xs){const x=sx(gx).toFixed(0);
-   g+='<line x1="'+x+'" y1="'+pt+'" x2="'+x+'" y2="'+(H-pb)+'" stroke="#eef2f7"/>'
-    +'<text x="'+x+'" y="'+(H-pb+18)+'" font-size="12" fill="#475569" text-anchor="middle">'+gx+'</text>';}
-  const ys=ystep(yhi);
-  for(let gy=0;gy<=yhi+1e-9;gy+=ys){const y=sy(gy);
-   g+='<line x1="'+pl+'" y1="'+y.toFixed(0)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(0)+'" stroke="#eef2f7"/>'
-    +'<text x="'+(pl-8)+'" y="'+(y+4).toFixed(0)+'" font-size="12" fill="#475569" text-anchor="end">'+(+gy.toFixed(6))+'</text>';}
-  grid.innerHTML=g;
- }
  function apply(){
   const toks=q.value.toLowerCase().trim().split(/\\s+/).filter(Boolean);
   const wb=wbounds(),db=dbounds(),nb=nbounds(),kb=kbounds();
   const litOn=lit&&lit.classList.contains('active');
-  const vis=new Set();let shown=0;
+  let shown=0;
+  const ao=asof?asof.value:'';
   rows.forEach(r=>{const w=+r.dataset.w,d=+r.dataset.d,nn=+r.dataset.n,kk=+r.dataset.k;
    const ok=(w>=wb[0]&&w<=wb[1])&&(d>=db[0]&&d<=db[1])
     &&(nn>=nb[0]&&nn<=nb[1])&&(kk>=kb[0]&&kk<=kb[1])
-    &&(geoMode===''||(geoMode==='with')===(+r.dataset.geo>=0))
-    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t));
-   r.style.display=ok?'':'none';if(ok){shown++;vis.add(r.dataset.code);}});
+    &&(!litOn||r.dataset.origin==='literature')&&toks.every(t=>term(r,t))
+    &&(!ao||!!r.dataset.date&&r.dataset.date<=ao);
+   r.style.display=ok?'':'none';if(ok)shown++;});
   const cellTok=toks.find(t=>t.slice(0,18)==='cell:unrestricted~');
   const anyRoute=rows.some(r=>r.style.display===''&&+r.dataset.route>=0);
   board.classList.toggle('showroute',
@@ -1378,30 +1350,32 @@ document.addEventListener('click',e=>{
   // every-row test alone never held at load, which put every card within
   // the default weight on a phone (issue #3931). Walk current DOM order,
   // not the static rows array, so a sorted board collapses to its first
-  // cards, not its original ones. Chart dots key off vis, so capped cards
-  // stay plotted.
+  // cards, not its original ones.
   const capped=showall&&cardsmq.matches&&!allcards
    &&(shown===rows.length||atdefault());
   if(capped){let ci=0;board.querySelectorAll('tbody tr').forEach(r=>{
    if(r.style.display===''&&++ci>CARDCAP)r.style.display='none';});}
   if(showall){showall.style.display=capped?'':'none';
    if(capped)showall.textContent='Show all '+shown+' codes';}
-  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes';
+  if(count)count.textContent=shown+(shown===rows.length?'':' of '+rows.length)+' codes'
+   +(ao?' (as of '+ao+')':'');
   var chip=document.getElementById('qchip');
   if(chip){var f=q.value.trim();
    chip.style.display=f?'':'none';
    if(f)chip.innerHTML='filtered: '+f.replace(/</g,'&lt;')+' <b>&times; clear</b>';}
-  document.querySelectorAll('.plots svg.plot circle[data-code]').forEach(c=>{
-   c.style.display=vis.has(c.dataset.code)?'':'none';});
-  document.querySelectorAll('.plots svg.plot').forEach(rescale);
-  // 'with layout' swaps the efficiency chart from kd^2/n to f (issue #276)
-  const pe=document.getElementById('ploteff'),pg=document.getElementById('plotgeo');
-  if(pe&&pg){const g=(geoMode==='with');
-   pg.style.display=g?'':'none';pe.style.display=g?'none':'';}
  }
+ function syncAsOfUrl(v){
+  try{const u=new URL(location.href);
+   if(v)u.searchParams.set('asof',v);
+   else u.searchParams.delete('asof');
+   history.replaceState(null,'',u);}catch(e){}}
  function clearall(){q.value='';
   document.querySelectorAll('.ttab').forEach(t=>
-   t.classList.toggle('active',t.dataset.q==='')); resetsliders();apply();}
+   t.classList.toggle('active',t.dataset.q==='')); resetsliders();
+  if(asof)asof.value='';
+  updateStarsForDate('');
+  syncAsOfUrl('');
+  apply();}
  var chipEl=document.getElementById('qchip');
  if(chipEl)chipEl.addEventListener('click',clearall);
  var clrEl=document.getElementById('clearfilters');
@@ -1424,9 +1398,60 @@ document.addEventListener('click',e=>{
   if(dlo&&dhi){dlo.value=DMIN;dhi.value=DMAX;dpaint();}
   if(nlo&&nhi){nlo.value=NMIN;nhi.value=NMAX;npaint();}
   if(klo&&khi){klo.value=KMIN;khi.value=KMAX;kpaint();}
-  if(lit)lit.classList.remove('active');
-  geoMode='';document.querySelectorAll('.geotab').forEach(x=>
-   x.classList.remove('active'));}
+  if(lit)lit.classList.remove('active');}
+ // Historical portal: recompute frontier (record) stars for the board as of a
+ // given date. Only codes dated on or before `ao` participate; the Pareto rule
+ // mirrors site/build.py's compute_records() (per cell + per code type).
+ function dominates(a,b){
+  return a.n<=b.n && a.k>=b.k && a.d>=b.d && a.w<=b.w &&
+   (a.n<b.n || a.k>b.k || a.d>b.d || a.w<b.w);}
+ function histPareto(list){
+  const front=new Set();
+  for(let i=0;i<list.length;i++){
+   let dom=false;
+   for(let j=0;j<list.length;j++){
+    if(i===j)continue;
+    if(dominates(list[j],list[i])){dom=true;break;}
+   }
+   if(!dom)front.add(list[i].row);
+  }
+  return front;
+ }
+ function updateStarsForDate(ao){
+  if(!ao){
+   rows.forEach(r=>{const s=r.querySelector('td.star');
+    r.dataset.record=r._origRecord;
+    r.classList.toggle('fr',r._origRecord==='1');
+    if(s){s.innerHTML=r._origStar;s.title=r._origStarTitle;}});
+   return;
+  }
+  const visible=rows.filter(r=>r.dataset.date && r.dataset.date<=ao);
+  const recordSet=new Set();
+  const cells=new Set();
+  visible.forEach(r=>(r.dataset.cells||'').split(/\\s+/).filter(Boolean)
+   .forEach(c=>cells.add(c)));
+  cells.forEach(cell=>{
+   const list=visible.filter(r=>(' '+(r.dataset.cells||'')+' ')
+     .indexOf(' '+cell+' ')>=0)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  const types=new Set(visible.map(r=>r.dataset.ct||'CSS'));
+  types.forEach(ct=>{
+   const list=visible.filter(r=>(r.dataset.ct||'CSS')===ct)
+     .map(r=>({row:r,n:+r.dataset.n,k:+r.dataset.k,d:+r.dataset.d,w:+r.dataset.w}));
+   histPareto(list).forEach(r=>recordSet.add(r));
+  });
+  rows.forEach(r=>{
+   const s=r.querySelector('td.star');
+   const isRec=recordSet.has(r) && !!r.dataset.date && r.dataset.date<=ao;
+   r.dataset.record=isRec?'1':'0';
+   r.classList.toggle('fr',isRec);
+   if(s){
+    s.innerHTML=isRec?'&#9733;':'';
+    s.title=isRec?'record: Pareto-best among codes dated on or before '+ao+', using their current parameters (board-relative, not a literature record)':'';}
+  });
+ }
  // Primary-tracks grid: a cell's code-count chip filters the table to that
  // (locality x weight) cell and scrolls it into view.
  document.querySelectorAll('[data-cell]').forEach(b=>{
@@ -1436,13 +1461,17 @@ document.addEventListener('click',e=>{
    const bd=document.getElementById('board');
    if(bd)bd.scrollIntoView({behavior:'smooth'});});});
  if(lit)lit.addEventListener('click',()=>{lit.classList.toggle('active');apply();});
+ if(asof){asof.addEventListener('change',()=>{
+   updateStarsForDate(asof.value);
+   syncAsOfUrl(asof.value);
+   apply();});
+  if(asof.value)updateStarsForDate(asof.value);}
+ if(clearasof){clearasof.addEventListener('click',()=>{
+   if(asof)asof.value='';
+   updateStarsForDate('');
+   syncAsOfUrl('');
+   apply();});}
  if(rtog)rtog.addEventListener('click',()=>{rtog.classList.toggle('active');apply();});
- document.querySelectorAll('.geotab').forEach(g=>{
-  g.addEventListener('click',()=>{
-   geoMode=(geoMode===g.dataset.geo)?'':g.dataset.geo;
-   document.querySelectorAll('.geotab').forEach(x=>
-    x.classList.toggle('active',x.dataset.geo===geoMode));
-   apply();});});
  if(wlo&&whi){wlo.addEventListener('input',()=>{wpaint();apply();});
   whi.addEventListener('input',()=>{wpaint();apply();});wpaint();}
  if(dlo&&dhi){dlo.addEventListener('input',()=>{dpaint();apply();});
@@ -1563,6 +1592,47 @@ def side_tiers(cert, doc):
     return tiers
 
 
+def cert_lower_bounds(cert, doc, slug=None):
+    """Return the proven lower bounds a certificate earns: {"d": lb, "X": lb_X, "Z": lb_Z}.
+
+    An honored exact certificate proves d on every side. A partial
+    certificate (issue #4230) proves ``d_lower`` overall and ``proved_min``
+    per side, and is honored by its binding hash rather than by the claim
+    it was made against: ``verification.checks_sha256`` must be this entry's
+    canonical (H_X, H_Z), so a correction of the entry's distance keeps the
+    bound. A bound above the entry's verified witness is a contradiction
+    (the witness verifier or the certificate is wrong); it is reported and
+    not shown, and verify/check_certs.py fails CI on it. Every value is None
+    when nothing is proved, and a bound of 1 is the trivial one and also
+    None. Stabilizer entries have no certifier for the partial tier.
+    """
+    out = {"d": None, "X": None, "Z": None}
+    if not cert or is_stabilizer(doc):
+        return out
+    d = doc["distance"]["d"]
+    if cert.get("d_exact") and cert_consistent(cert, doc):
+        return {"d": d, "X": d, "Z": d}
+    lb = cert.get("d_lower")
+    if not isinstance(lb, int) or lb < 2 or cert.get("d_exact"):
+        return out
+    want = (cert.get("verification") or {}).get("checks_sha256")
+    if want != checks_sha256(doc):
+        print(f"  warning: {slug or doc.get('name')}: partial certificate is bound to other "
+              f"matrices; not showing its lower bound")
+        return out
+    if lb > d:
+        print(f"  warning: {slug or doc.get('name')}: partial certificate proves d >= {lb} "
+              f"but the verified witness gives d <= {d}; not showing it (issue #4230)")
+        return out
+    out["d"] = lb
+    for side in ("X", "Z"):
+        pm = ((cert.get("sides") or {}).get(side) or {}).get("proved_min")
+        sv = (doc["distance"].get(side) or {}).get("value")
+        if isinstance(pm, int) and pm >= 2 and isinstance(sv, int) and pm <= sv:
+            out[side] = pm
+    return out
+
+
 def diag_sides(e):
     """Return the (side key, label) pairs of an entry's per-side diagnostics.
 
@@ -1603,8 +1673,12 @@ def asym_detail(e):
     tooltip and the code page so the two never drift.
     """
     def dside(side):
-        mark = "=" if e["tier_" + side] == "exact" else "&le;"
-        return f'd_{side} {mark} {e["d_" + side]}'
+        if e["tier_" + side] == "exact":
+            return f'd_{side} = {e["d_" + side]}'
+        lb = e.get("lb_" + side)
+        if lb and lb < e["d_" + side]:
+            return f'{lb} &le; d_{side} &le; {e["d_" + side]}'
+        return f'd_{side} &le; {e["d_" + side]}'
     return (f'{dside("X")}, {dside("Z")} &middot; '
             f'w_X = {e["w_X"]}, w_Z = {e["w_Z"]}')
 
@@ -1861,6 +1935,7 @@ def load_entries():
             w_z = max((len(s) for s in doc["checks"]["Z"]), default=0)
             asym = asym_ratio(d_x, d_z)
         tiers = side_tiers(cert, doc)
+        lbs = cert_lower_bounds(cert, doc, slug)
         # verifier diagnostics (issue #1844): girth per side, weight profiles,
         # bounded trapping-set counts, and, with a layout, the support diameter
         # of each stored witness. Displayed and sortable, never ranked.
@@ -1871,10 +1946,13 @@ def load_entries():
         entries.append({
             "slug": slug, "name": doc["name"], "n": n, "k": k, "d": d,
             "code_type": doc.get("code_type", "CSS"),
-            "eff": round(k * d * d / n, 3), "tier": tier,
+            "eff": float(f"{k * d * d / n:.6g}"), "tier": tier,
             "d_X": d_x, "d_Z": d_z,
             "tier_X": tiers.get("X"), "tier_Z": tiers.get("Z"),
             "tier_P": tiers.get("P"),
+            # proven lower bounds (issue #4230): d itself on the exact tier,
+            # a partial certificate's d_lower below it, else None
+            "d_lb": lbs["d"], "lb_X": lbs["X"], "lb_Z": lbs["Z"],
             "asym": asym,
             "w_X": w_x, "w_Z": w_z,
             "geo": round(geo, 4) if geo is not None else None,
@@ -2171,82 +2249,30 @@ def ler_frontier(entries):
     return front
 
 
-def _axis_step(hi):
-    """A round tick step giving at most ~6 gridlines up to hi."""
-    for s in (1, 2, 5, 10, 20, 50, 100, 200, 500):
-        if hi / s <= 6:
-            return s
-    return 1000
+def badge(tier, lb=None):
+    """The distance tier mark that precedes d: d =, lb &le; d &le;, or d &le;.
 
-
-def scatter(te, front, yacc, ylabel):
-    """A landscape scatter of every code: x = n, y = yacc(e) (e.g. distance or
-    kd^2/n). Two complementary views are shown side by side, so codes that
-    coincide in one (e.g. same n and d but different k) separate in the other.
-    Suppressed below a handful of distinct (n, y) points (nothing to show).
-"""
-    if not te or len({(e["n"], round(yacc(e), 3)) for e in te}) < 4:
-        return ""
-    W, H = 520, 274
-    # x-axis label is shared below both plots, so the bottom pad only needs room
-    # for the tick numbers (drawn at H-pad_b+18), not a per-plot axis title.
-    pad_l, pad_r, pad_b, pad_t = 54, 12, 26, 22
-    nhi = max(e["n"] for e in te) or 1
-    yhi = max(yacc(e) for e in te) or 1
-
-    def sx(n):
-        return pad_l + n / nhi * (W - pad_l - pad_r)
-
-    def sy(v):
-        return H - pad_b - v / yhi * (H - pad_t - pad_b)
-
-    grid = []
-    xstep = max(1, round(nhi / 4 / 50) * 50 or 50)
-    for gx in range(0, int(nhi) + 1, xstep):
-        x = sx(gx)
-        grid.append(f'<line x1="{x:.0f}" y1="{pad_t}" x2="{x:.0f}" y2="{H-pad_b}" '
-                    f'stroke="#eef2f7"/><text x="{x:.0f}" y="{H-pad_b+18}" '
-                    f'font-size="12" fill="#475569" text-anchor="middle">{gx}</text>')
-    ystep = _axis_step(yhi)
-    gy = 0
-    while gy <= yhi + 1e-9:
-        y = sy(gy)
-        grid.append(f'<line x1="{pad_l}" y1="{y:.0f}" x2="{W-pad_r}" y2="{y:.0f}" '
-                    f'stroke="#eef2f7"/><text x="{pad_l-8}" y="{y+4:.0f}" '
-                    f'font-size="12" fill="#475569" text-anchor="end">{gy:g}</text>')
-        gy += ystep
-
-    pts = []
-    for i, e in enumerate(te):
-        f = i in front
-        col = EXACT if e["tier"] == "exact" else ACCENT
-        r = 6 if f else 4
-        fill = col if f else "#fff"
-        _tlabel = "exact" if e["tier"] == "exact" else "upper bound"
-        _geo = f'  g={e["geo"]:.3g}' if e["geo"] is not None else ""
-        tip = (f'[[{e["n"]},{e["k"]},{e["d"]}]]  kd2/n={e["eff"]}{_geo}\n'
-               f'{_tlabel}{", record" if f else ""}')
-        cx, cy = sx(e["n"]), sy(yacc(e))
-        raw = f'data-x="{e["n"]}" data-y="{yacc(e):g}"'
-        pts.append(f'<circle class=pt data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
-                   f'cy="{cy:.1f}" r="{r}" fill="{fill}" '
-                   f'stroke="{col}" stroke-width="2" pointer-events="none"/>')
-        pts.append(f'<circle class=hit data-code="{e["slug"]}" {raw} cx="{cx:.1f}" '
-                   f'cy="{cy:.1f}" r="12" '
-                   f'fill="transparent" data-tip="{html.escape(tip)}"/>')
-    y_mid = pad_t + (H - pad_t - pad_b) / 2
-    return (f'<svg viewBox="0 0 {W} {H}" class="plot" role="img" '
-            f'data-w="{W}" data-h="{H}" data-pl="{pad_l}" data-pr="{pad_r}" '
-            f'data-pb="{pad_b}" data-pt="{pad_t}">'
-            f'<g class=grid>{"".join(grid)}</g>'
-            + f'<text x="14" y="{y_mid:.0f}" font-size="13" fill="#334155" '
-            f'text-anchor="middle" transform="rotate(-90 14 {y_mid:.0f})">{ylabel}</text>'
-            + "".join(pts) + "</svg>")
-
-
-def badge(tier):
+    ``lb`` is the entry's proven lower bound (``d_lb``); below the witnessed
+    d on an upper-bound entry it turns the mark into the interval's left
+    half, so the cell reads "7 &le; d &le; 20" (issue #4230).
+    """
     if tier == "exact":
         return '<span class="b exact">d =</span>'
+    if lb and lb >= 2:
+        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+                f'logical lighter than {lb} exists on either side (an ascending '
+                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'bound">{lb} &le; d &le;</span>')
+    return ('<span class="b ub" title="verified upper bound: an explicit '
+            'logical of this weight, and independent refutation searches '
+            'found nothing lighter">d &le;</span>')
+    if tier == "exact":
+        return '<span class="b exact">d =</span>'
+    if lb and lb >= 2:
+        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+                f'logical lighter than {lb} exists on either side (an ascending '
+                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'bound">{lb} &le; d &le;</span>')
     return ('<span class="b ub" title="verified upper bound: an explicit '
             'logical of this weight, and independent refutation searches '
             'found nothing lighter">d &le;</span>')
@@ -2749,6 +2775,44 @@ def ldiam_cell_title(e):
     return parts + ". " + LDIAM_TIP
 
 
+CERT_LEVEL_LABELS = {
+    "solver": "level solver: a solver verdict, no artifact a third party can check without re-running the encoding",
+    "proof_log": "level proof_log: the refutation was re-checked by drat-trim and is replayed by CI",
+    "formal": "level formal: a machine-checked proof of the distance statement",
+}
+
+
+def cert_level_label(level):
+    """The certificate row's statement of what the verdict is worth (schema/cert.schema.json, verification.level).
+
+    A solver-level certificate, which is what every tropidist record and the
+    MILP and CryptoMiniSat records are, is labeled as a solver verdict rather
+    than as a machine-checked proof (issue #4939).
+    """
+    text = CERT_LEVEL_LABELS.get(level, f"level {level}")
+    return f'<span class=claimed>{html.escape(text)}</span>'
+
+
+def cert_side_notes(cert):
+    """One line per certified side, for the certificate row of a code page.
+
+    The solver certifiers write a ``note`` per side ("no logical < d exists").
+    A formal certificate (schema tier ``formal``) carries only ``value`` and
+    ``exact`` per side, since its statement lives in the replayed theorem, so
+    the same sentence is built from those; certs/1000-406-6.json was the first
+    one and it stopped the site build with a KeyError.
+    """
+    out = []
+    for side, v in (cert.get("sides") or {}).items():
+        v = v or {}
+        note = v.get("note")
+        if not note and v.get("exact"):
+            note = f"no logical < {v.get('value', cert.get('d'))} exists"
+        if note:
+            out.append(f"{side}: {note}")
+    return "; ".join(out)
+
+
 def detail_page(e):
     doc, cert = e["doc"], e["cert"]
     n, k, d = e["n"], e["k"], e["d"]
@@ -2770,7 +2834,7 @@ def detail_page(e):
     else:
         P.append('<a class=back href="../index.html">&larr; back to the board</a>')
     P.append(f'<div class=codehead><span class="mono big">[[{n},{k},{d}]]</span> '
-             f'{badge(e["tier"])}'
+             f'{badge(e["tier"], e.get("d_lb"))}'
              + ('<span class="tchip stab" title="general (non-CSS) stabilizer '
                 'code: one Pauli-weight distance, ranked on the stabilizer '
                 'board">stabilizer</span>' if stab else '')
@@ -2913,18 +2977,39 @@ def detail_page(e):
             P.append(f'<details><summary>{wit_sum}</summary>'
                      f'<div class=wit>{wit_body}</div></details>')
     if cert and cert.get("d_exact"):
-        notes = "; ".join(f'{s}: {v["note"]}' for s, v in
-                          cert.get("sides", {}).items())
+        notes = cert_side_notes(cert)
+        level = (cert.get("verification") or {}).get("level", "solver")
         P.append(f'<div class=kv><b>certificate</b> '
                  f'<span class=cert-ok>exact, d = {d}</span> &middot; '
-                 f'{html.escape(cert.get("solver",""))}</div>'
+                 f'{html.escape(cert.get("solver",""))} &middot; '
+                 f'{cert_level_label(level)}</div>'
                  f'<div class=kv style="color:var(--mut)">{html.escape(notes)}</div>')
+    elif cert and e.get("d_lb"):
+        lb = e["d_lb"]
+        v = cert.get("verification") or {}
+        rungs = []
+        for side, blk in (cert.get("sides") or {}).items():
+            lad = (blk or {}).get("ladder") or []
+            if lad:
+                rungs.append(f'{side}: ' + " ".join(f'W={r["W"]} {r["status"]}' for r in lad)
+                             + f' (d_{side} &ge; {blk.get("proved_min")})')
+            elif (blk or {}).get("proved_min"):
+                rungs.append(f'{side}: d_{side} &ge; {blk["proved_min"]}')
+        P.append(f'<div class=kv><b>certificate</b> '
+                 f'<span class=cert-ok>partial, {lb} &le; d &le; {d}</span> &middot; '
+                 f'{html.escape(cert.get("solver", ""))} &middot; level '
+                 f'{html.escape(v.get("level", "solver"))} '
+                 '<span class=claimed>(a proven lower bound below the witnessed '
+                 'upper bound: no logical lighter than the bound exists on either '
+                 'side; the gap is what is still unproven)</span></div>'
+                 f'<div class=kv style="color:var(--mut)">{"; ".join(rungs)}</div>')
     elif stab:
         P.append('<div class=kv><b>certificate</b> '
                  '<span class=cert-no>none yet &middot; distance stands as a '
-                 'self-certified upper bound (d &le;); the Pauli-weight '
-                 'certifier is not built yet, so stabilizer entries cannot '
-                 'earn d= for now</span></div>')
+                 'self-certified upper bound (d &le;); a stabilizer entry is '
+                 'certified in Pauli weight by the certification sweep\'s '
+                 'tropidist backend (research/certs/tropidist_certify.py), a '
+                 'solver verdict rather than a machine-checked proof</span></div>')
     else:
         P.append('<div class=kv><b>certificate</b> '
                  '<span class=cert-no>none yet &middot; distance stands as a '
@@ -4053,7 +4138,13 @@ FAQ = [
      "certification is NP-hard and does not scale, so large codes carry a tight "
      "upper bound while small and moderate codes are certified exact. A d&le; "
      "record is provisional: if the true distance turns out lower, the entry "
-     "is corrected."),
+     "is corrected. Between the two, an entry can show an interval such as "
+     "7 &le; d &le; 20: the certifier asked for a logical of weight at most "
+     "W at W = 1, 2, ... and proved none exists up to W = 6 before running "
+     "out of time, so d &ge; 7 is a theorem about the code (a partial "
+     "certificate in certs/, bound to the entry's matrices by hash) while "
+     "d &le; 20 stays the witness. The gap is how much of the claim is "
+     "still unproven."),
     ("What does kd&sup2;/n mean, and is bigger always better?",
      "It is an encoding-efficiency ratio: logical qubits times distance squared, "
      "per physical qubit. It comes from the Bravyi-Poulin-Terhal bound, which "
@@ -4972,7 +5063,7 @@ def primary_tracks_grid(entries, records, code_type="CSS"):
                     f'data-geo="{"" if geo is None else geo}" '
                     f'data-geod="{geod}"{" data-ref=1" if ref else ""} '
                     f'data-n="{e["n"]}" data-k="{e["k"]}">'
-                    f'{badge(e["tier"])}'
+                    f'{badge(e["tier"], e.get("d_lb"))}'
                     f'<span class=gcode>[[{e["n"]},{e["k"]},{e["d"]}]]</span>'
                     f'<span class=geff>{e["eff"]:g}</span></a>')
             items = "".join(gitem(i, pos) for pos, i in enumerate(ranked))
@@ -5135,13 +5226,12 @@ BOARD_DEFAULT_W = 8
 
 
 def board_controls(entries, records):
-    """The board heading plus the search box, filter pills, and filter help. Lives
-    above the charts so filtering and the landscape view stay together; the JS
-    finds the table by id, so its position relative to the table is free. Filters:
+    """The board heading plus the search box, filter pills, and filter help. The
+    JS finds the table by id, so its position relative to the table is free. Filters:
     a 2D-local pill (locality is computed), a family-tag pill per family present,
     and the check-weight slider."""
     # A tab strip (All + 2D-local + one per family) for picking the view, in the
-    # OpenRouter rankings style. Each tab filters the table and charts; the active
+    # OpenRouter rankings style. Each tab filters the table; the active
     # tab is highlighted. The strip scrolls horizontally on narrow screens.
     tabs = ('<button type=button class="ttab active" data-q="" '
             'title="all codes">All</button>')
@@ -5251,6 +5341,16 @@ def board_controls(entries, records):
             'shown by itself in unrestricted cells that have layouts. A '
             'diagnostic, not a rank">swaps</button></nav>'
             f'<div class=filterrow>{wslider}{dslider}{nslider}{kslider}'
+            '<label class=wfilter title="table only: filters rows to codes whose '
+            'declared provenance date is on or before this day (literature '
+            'baselines use their publication year; entries with no date '
+            'disappear), and recomputes frontier stars among those codes using '
+            'their current parameters. Upper bounds, not certified.">'
+            '<span class=wflabel>as of</span>'
+            '<input type=date id=asof class=asofinput></label>'
+            '<button type=button id=clearasof class=otog '
+            'title="clear the historical date and return to the current board">'
+            'current</button>'
             '<button type=button id=clearfilters class=otog '
             'title="reset search, sliders, and every active filter">'
             'clear filters</button></div>'
@@ -5272,56 +5372,6 @@ def board_controls(entries, records):
             'keeps the entries whose layout assigns every qubit to a module.'
             '</p>'
             '</section>')
-
-
-def charts_block(entries, records):
-    """The two landscape scatters side by side (stacked on narrow screens) with a
-    shared HTML legend below them. The legend is HTML, not drawn into the SVG, so
-    it keeps real font sizes and reflows on mobile."""
-    d_plot = scatter(entries, records, lambda e: e["d"], "Code Distance (d)")
-    eff_plot = scatter(entries, records, lambda e: e["eff"], "kd²/n")
-    # A second version of the efficiency scatter with y = f, only the codes
-    # that ship a layout. The "with layout" toggle swaps it in for the kd^2/n
-    # view (issue #276); both are rendered statically, JS flips display.
-    geo_idx = [i for i, e in enumerate(entries) if e["geo"] is not None]
-    f_plot = scatter([entries[i] for i in geo_idx],
-                     {j for j, i in enumerate(geo_idx) if i in records},
-                     lambda e: e["geo"], "g (geometric efficiency)")
-    if eff_plot:
-        eff_plot = eff_plot.replace('<svg ', '<svg id=ploteff ', 1)
-    if f_plot:
-        f_plot = f_plot.replace(
-            '<svg ', '<svg id=plotgeo style="display:none" ', 1)
-    if not d_plot and not eff_plot:
-        return ""
-    # layout toggle, top right of the charts (issue #276). "no layout" is a
-    # certification status -- such codes may still be local, nobody proved it
-    # -- so the label is neutral rather than "expander".
-    toggle = (
-        '<div class=geotabs role=group aria-label="filter by layout status">'
-        '<button type=button class=geotab data-geo=with '
-        'title="only codes with a verifier-accepted 2D layout; the efficiency '
-        'chart switches from kd&sup2;/n to the geometric efficiency g">'
-        'with layout</button>'
-        '<button type=button class=geotab data-geo=without '
-        'title="only codes without a verified layout; locality may exist but '
-        'is uncertified (not necessarily expander codes)">no layout</button>'
-        '</div>')
-    legend = (
-        '<div class=chartlegend>'
-        f'<span class=ci><span class=cdot style="background:{EXACT}"></span>'
-        'Certified exact</span>'
-        f'<span class=ci><span class=cdot style="background:{ACCENT}"></span>'
-        'Upper bound</span>'
-        '<span class=ci><span class=cdot style="background:#475569"></span>'
-        'Filled = Pareto record</span>'
-        '<span class=ci><span class=cdot '
-        'style="background:#fff;border:2px solid #475569"></span>'
-        'Open = non-frontier</span>'
-        '</div>')
-    xlabel = '<div class=plotx>Physical Qubits (n)</div>'
-    return (f'<div class=plots>{toggle}{d_plot}{eff_plot}{f_plot}</div>'
-            f'{xlabel}{legend}')
 
 
 def board_table(entries, records, lrec=frozenset()):
@@ -5460,10 +5510,12 @@ def board_table(entries, records, lrec=frozenset()):
             f'data-ldiam="{e["ldiam"] if e["ldiam"] is not None else -1}" '
             f'data-tracks="{html.escape(search_terms)}" '
             f'data-cells="{html.escape(cell_keys)}" '
+            f'data-ct="{html.escape(e.get("code_type", "CSS"))}" '
             f'data-record="{1 if fr else 0}" '
             f'data-ler="{e["ler"] if e["ler"] is not None else -1}" '
             f'data-lrec="{1 if i in lrec else 0}" '
             f'data-tier="{e["tier"]}" '
+            f'data-dlb="{e["d_lb"] or 1}" '
             f'data-circ="{1 if e["d_circ"] is not None else 0}" '
             f'data-origin="{"literature" if e["origin"] == "baseline" else "submitted"}" '
             f'data-model="{html.escape(e["model"].lower())}" '
@@ -5489,7 +5541,7 @@ def board_table(entries, records, lrec=frozenset()):
             + f'</td><td class="typecell col-type" data-label="type">{chips(e)}</td>'
             f'<td class="num col-n" data-label="n">{e["n"]}</td>'
             f'<td class="num col-k" data-label="k">{e["k"]}</td>'
-            f'<td class="num col-d" data-label="d">{badge(e["tier"])} {e["d"]}</td>'
+            f'<td class="num col-d" data-label="d">{badge(e["tier"], e.get("d_lb"))} {e["d"]}</td>'
             f'<td class="num m3" data-label="kd&sup2;/n">{e["eff"]}</td>'
             + (f'<td class="num m3" data-label="g" title="r = {e["geo_r"]}, {e["geo_rho"]} '
                f'layer{"s" if e["geo_rho"] != 1 else ""}'
@@ -5625,6 +5677,11 @@ def board_legend(asym=True):
             '(<span class="b ub">d &le;</span>): a verified logical of that '
             'weight; independent refutation searches found nothing lighter, '
             'but it is not a proof</span>'
+            '<span>interval (<span class="b lb">7 &le; d &le;</span>): the '
+            'same upper bound with a proven lower bound under it, from a '
+            'partial certificate in certs/ (an ascending ladder of UNSAT '
+            'verdicts that did not reach d &minus; 1); the gap is what could '
+            'still fall</span>'
             f'<span><span class=hexwrap style="margin-left:0">{HEX_MARK}</span> '
             'submitted through the challenge (not a novelty claim; '
             'unmarked = literature baseline)</span>'
@@ -5711,7 +5768,9 @@ def stabilizer_page(entries):
         'primary-track cells are computed the same way, but carry the code '
         'type, so a record here is never a record there</td></tr>'
         '<tr><td>certificate</td><td>MILP per side</td>'
-        '<td>not built yet: every entry stands as d &le;</td></tr>'
+        '<td>the certification sweep&rsquo;s tropidist backend, in Pauli '
+        'weight at the solver level (research/certs/tropidist_certify.py); '
+        'an entry without one stands as d &le;</td></tr>'
         '<tr><td>circuit tier</td><td>memory circuits per basis</td>'
         '<td>not accepted yet: syndrome extraction needs a general '
         'stabilizer-measurement schedule</td></tr>'
@@ -5737,7 +5796,6 @@ def stabilizer_page(entries):
         P.append(primary_tracks_grid(entries, records, code_type="stabilizer"))
         P.append(board_controls(entries, records))
         P.append('<div class=explorer>')
-        P.append(charts_block(entries, records))
         P.append(board_legend(asym=False))
         P.append(board_table(entries, records, lrec))
         P.append('</div>')
@@ -5830,10 +5888,9 @@ def build():
     P.append(ler_frontier_panel(entries, lrec))
     P.append(board_controls(entries, records))
     P.append('<div class=explorer>')
-    P.append(charts_block(entries, records))
     P.append(board_legend(asym=True))
     P.append(board_table(entries, records, lrec))
-    P.append('</div>')  # close explorer (the plots+legend+table column)
+    P.append('</div>')  # close explorer (the legend+table column)
     # the three steps follow the board: 'climb the board' should be read after
     # the board has been seen, not before
     P.append('<div class=how>'

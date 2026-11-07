@@ -1022,45 +1022,32 @@
    "ris_trials_per_side": 30000000,
    "cpu_hours": 3,
    "tool": "research/kit 2BGA sweep + gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": " Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 12), with a proved lower bound of 5; the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 12), with a proved lower bound of 5. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json)."
  },
  "family": "bivariate-bicycle",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 12,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     70413,
-     70419,
-     70423,
-     70433,
-     70449,
-     70450,
-     70455,
-     70463,
-     70470,
-     70476,
-     70478,
-     70481
+     177,
+     505,
+     863,
+     2109,
+     2673
     ]
    },
    "X": {
-    "value": 12,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     70213,
-     70239,
-     70245,
-     70246,
-     70304,
-     70331,
-     70336,
-     70402,
-     70412,
-     70424,
-     70456,
-     70476
+     1077,
+     1333,
+     1763,
+     2820,
+     3386
     ]
    }
   },

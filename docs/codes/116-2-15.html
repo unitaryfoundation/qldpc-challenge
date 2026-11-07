@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>116</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>2</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>15</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>3.879</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>3.87931</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -57,6 +57,15 @@
 (3,12): 6496
 (3,14): 2668
 (3,16): 290</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/116-2-15">circuits/116-2-15/</a> &middot; canonical noise recipe, 15 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 15 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 15 &middot; fault-set witness of 15 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 15)</summary><div class=wit>[132239, 132240, 132265, 132269, 132270, 132274, 132293, 132308, 132310, 132312, 132314, 132316, 132317, 132318, 132323]</div></details>
+<div class=kv><b>d_circ^Z</b> 15 &middot; fault-set witness of 15 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 15)</summary><div class=wit>[132219, 132220, 132230, 132233, 132235, 132242, 132270, 132273, 132279, 132281, 132282, 132283, 132284, 132285, 132286]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

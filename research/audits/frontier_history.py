@@ -260,25 +260,7 @@ def replay(repo, n_ref=1000):
     author date of a squash or merge landing can be days earlier, and a
     bucket keyed on it would file the landing into a week it did not land in.
     """
-    log = git(["log", "--first-parent", "--reverse", "--name-status",
-               "--format=C %H %cI", "--", "codes/"], repo)
-    if log.returncode != 0:
-        sys.exit(f"git log failed: {log.stderr.decode().strip()}")
-    commits = parse_log(log.stdout.decode())
-
-    requests = []
-    for sha, _, changes in commits:
-        for status, path, dest in changes:
-            # A rename is read at its destination: git reports a rewrite of an
-            # unrelated file as a rename when the similarity check matches, so
-            # carrying the source's value over invents one no blob has.
-            if status == "R" and dest and dest.endswith(".json"):
-                requests.append((sha, dest))
-            elif status in ("A", "M") and path.endswith(".json"):
-                requests.append((sha, path))
-    blobs = fetch_params(requests, repo)
-    replay.unparsed = sum(1 for v in blobs.values() if v is None)
-
+    commits, blobs = walk(repo)
     state = {}
     rows = []
     prev_front = set()
@@ -320,6 +302,261 @@ def replay(repo, n_ref=1000):
 
 
 replay.unparsed = 0
+
+
+def walk(repo):
+    """Return ``(commits, blobs)``: the first-parent landings and every changed blob's params.
+
+    ``commits`` is ``parse_log``'s list, oldest first; ``blobs`` maps each
+    ``(sha, path)`` that a landing added, modified, or renamed into to its
+    ``(n, k, d, code_type)`` or None. Shared by :func:`replay` and
+    :func:`cell_moves`, so the two read history one way.
+    """
+    log = git(["log", "--first-parent", "--reverse", "--name-status",
+               "--format=C %H %cI", "--", "codes/"], repo)
+    if log.returncode != 0:
+        sys.exit(f"git log failed: {log.stderr.decode().strip()}")
+    commits = parse_log(log.stdout.decode())
+
+    requests = []
+    for sha, _, changes in commits:
+        for status, path, dest in changes:
+            # A rename is read at its destination: git reports a rewrite of an
+            # unrelated file as a rename when the similarity check matches, so
+            # carrying the source's value over invents one no blob has.
+            if status == "R" and dest and dest.endswith(".json"):
+                requests.append((sha, dest))
+            elif status in ("A", "M") and path.endswith(".json"):
+                requests.append((sha, path))
+    blobs = fetch_params(requests, repo)
+    replay.unparsed = sum(1 for v in blobs.values() if v is None)
+    return commits, blobs
+
+
+def landings(commits, blobs):
+    """Yield ``(utc_day, sha, changes)`` per landing that changed a code blob.
+
+    ``changes`` is a list of ``(path, old, new, dest)`` with ``old`` and ``new``
+    the ``(n, k, d, code_type)`` the path held before and after the landing,
+    None on either side for an add or a removal, and ``dest`` the new path when
+    the landing renamed the file (a distance revision renames it to its new
+    slug), else None. A rename whose source was never held is an add at the
+    destination; one whose destination will not parse is a removal.
+    """
+    state = {}
+    for sha, date, changes in commits:
+        applied = []
+        for status, path, dest in changes:
+            if not path.endswith(".json") and not (dest or "").endswith(".json"):
+                continue
+            if status == "R":
+                old = state.pop(path, None)
+                new = blobs.get((sha, dest)) if dest else None
+                if new:
+                    state[dest] = new
+                    if old is not None:
+                        applied.append((path, old, new, dest))
+                    else:
+                        applied.append((dest, None, new, None))
+                elif old is not None:
+                    applied.append((path, old, None, None))
+            elif status == "D":
+                old = state.pop(path, None)
+                if old is not None:
+                    applied.append((path, old, None, None))
+            else:
+                new = blobs.get((sha, path))
+                old = state.get(path)
+                if new:
+                    if old != new:
+                        state[path] = new
+                        applied.append((path, old, new, None))
+                elif old is not None:
+                    state.pop(path)
+                    applied.append((path, old, None, None))
+        if applied:
+            yield utc_day(date), sha, applied
+
+
+class _CellFront:
+    """One cell's members as (n, k, d, w) rows, with the board's dominance test.
+
+    A growable array with a liveness mask rather than a dict rebuilt per check:
+    the replay asks "is this point beaten by any member" twice per touched cell
+    per landing, and a Python-level scan of a cell holding thousands of codes
+    at each of thousands of landings would take minutes where this takes
+    seconds. A point never dominates itself (no axis is strict), so the test
+    runs over all live rows, the point's own included.
+    """
+
+    def __init__(self, np):
+        self.np = np
+        self.rows = np.zeros((64, 4), dtype=np.int64)
+        self.alive = np.zeros(64, dtype=bool)
+        self.index = {}
+        self.size = 0
+
+    def put(self, path, point):
+        row = self.index.get(path)
+        if row is None:
+            if self.size == len(self.rows):
+                self.rows = self.np.concatenate([self.rows, self.np.zeros_like(self.rows)])
+                self.alive = self.np.concatenate([self.alive, self.np.zeros_like(self.alive)])
+            row = self.size
+            self.size += 1
+            self.index[path] = row
+        self.rows[row] = point
+        self.alive[row] = True
+
+    def get(self, path):
+        row = self.index.get(path)
+        return None if row is None else tuple(int(x) for x in self.rows[row])
+
+    def drop(self, path):
+        row = self.index.pop(path, None)
+        if row is not None:
+            self.alive[row] = False
+
+    def best(self):
+        """Return ``(kd^2/n, path)`` of the live member with the highest efficiency, or None."""
+        if not self.index:
+            return None
+        arr = self.rows[:self.size].astype(float)
+        eff = arr[:, 1] * arr[:, 2] * arr[:, 2] / arr[:, 0]
+        eff[~self.alive[:self.size]] = -1.0
+        row = int(eff.argmax())
+        path = next(p for p, r in self.index.items() if r == row)
+        return float(eff[row]), path
+
+    def dominated(self, point):
+        """Return True when a live member beats ``point`` on (n, k, d, w).
+
+        The board's own rule (site/build.py ``pareto``): n and w lower is
+        better, k and d higher, with at least one axis strict.
+        """
+        n, k, d, w = point
+        arr = self.rows[:self.size]
+        live = self.alive[:self.size]
+        weak = (arr[:, 0] <= n) & (arr[:, 1] >= k) & (arr[:, 2] >= d) & (arr[:, 3] <= w)
+        strict = (arr[:, 0] < n) | (arr[:, 1] > k) | (arr[:, 2] > d) | (arr[:, 3] < w)
+        return bool(self.np.any(live & weak & strict))
+
+
+def cell_moves(repo, classes, *, cell_of=None):
+    """Return ``({cell: last move}, landings)``: when each cell's frontier last changed.
+
+    ``classes`` maps a HEAD path (``codes/<slug>.json``) to ``(locality_class,
+    weight_class, w, code_type)``, the site's own reading of the entry; it is
+    carried back through renames, so a revised entry's earlier names count in
+    the same cells. A path no longer on the board cannot be classified and is
+    skipped: its removal did move a cell, but which one the record cannot say.
+    Classes are read once, at HEAD, so an entry that gained a layout later
+    counts in its 2D cells from its first landing.
+
+    A cell moves at a landing when its nondominated set changes: an entry
+    that is nondominated among the cell's members lands or is revised, or a
+    nondominated entry is removed or revised away. A dominated entry landing
+    changes nothing, and neither does its removal, so a batch of dominated
+    duplicates leaves every cell where it was. That is the board's own
+    frontier rule (site/build.py ``pareto``), applied per cell, with a
+    distance revision counting as the move it is.
+
+    Two dates come out per cell, because the frontier rule is permissive (on
+    the board today about seven entries in ten are nondominated in their
+    cell, since a high-rate low-distance code is beaten by nothing), so the
+    frontier moves at most landings. ``record`` is the selective one: the
+    last landing that changed the cell's best kd^2/n, up when a new leader
+    landed and down when the leader was revised or removed.
+
+    ``cell_of`` maps an entry row ``{locality_class, weight_class}`` to its
+    cells; the default is site/build.py's ``cells``. The result maps each
+    ``(locality_class, weight_class)`` cell to ``{"frontier": move, "record":
+    move}``, each move ``{"date", "commit", "landing", "what", "kind"}`` with
+    ``landing`` the 1-based index among the ``landings`` returned beside it,
+    so "landings ago" is their difference.
+    """
+    import numpy as np  # noqa: PLC0415  (the charts stay stdlib-only; this replay does not)
+
+    if cell_of is None:
+        site = os.path.join(_REPO, "site")
+        if site not in sys.path:
+            sys.path.insert(0, site)
+        from build import cells as cell_of  # noqa: PLC0415
+    commits, blobs = walk(repo)
+    classes = dict(classes)
+    for _sha, _date, changes in reversed(commits):
+        for status, path, dest in changes:
+            if status == "R" and dest in classes and path not in classes:
+                classes[path] = classes[dest]
+
+    members = {}            # cell -> _CellFront
+    last = {}
+    best = {}               # cell -> (kd^2/n, path) before the landing
+    count = 0
+    for date, sha, applied in landings(commits, blobs):
+        count += 1
+        touched = {}
+        for path, old, new, dest in applied:
+            cls = classes.get(dest or path) or classes.get(path)
+            if cls is None:
+                continue
+            loc, wc, w, _ct = cls
+            if w is None:
+                continue
+            for cell in cell_of({"locality_class": loc, "weight_class": wc}):
+                touched.setdefault(cell, []).append((path, old, new, dest, w))
+        for cell, changes in touched.items():
+            here = members.get(cell)
+            if here is None:
+                here = members[cell] = _CellFront(np)
+            moved = None
+            # removals first, judged against the cell as it stood: a
+            # nondominated member leaving changes the frontier, a dominated
+            # one leaving changes nothing (whatever beat it still beats
+            # everything it beat). A rename that keeps (n, k, d) only re-keys.
+            for path, old, new, dest, w in changes:
+                if old is None or here.get(path) is None:
+                    continue
+                point = here.get(path)
+                if dest and new and new[:3] == old[:3]:
+                    here.drop(path)
+                    here.put(dest, point)
+                    continue
+                if moved is None and not here.dominated(point):
+                    moved = (dest or path, old, new, w, "revised" if new else "removed")
+                here.drop(path)
+            for path, old, new, dest, w in changes:
+                if new is not None and not (dest and old and new[:3] == old[:3]):
+                    here.put(dest or path, (new[0], new[1], new[2], w))
+            # then additions, judged against the cell as it now stands: a
+            # dominated arrival joins no frontier and knocks nothing off one
+            for path, old, new, dest, w in changes:
+                if new is None or moved is not None or (dest and old and new[:3] == old[:3]):
+                    continue
+                if not here.dominated(here.get(dest or path)):
+                    moved = (dest or path, old, new, w, "revised" if old else "landed")
+            entry = last.setdefault(cell, {"frontier": None, "record": None})
+            if moved is not None:
+                path, old, new, w, kind = moved
+                shown = new or old
+                slug = os.path.basename(path)[:-5]
+                entry["frontier"] = {
+                    "date": date, "commit": sha[:9], "landing": count,
+                    "what": f"[[{shown[0]},{shown[1]},{shown[2]}]] w={w} {slug}",
+                    "kind": kind}
+            now = here.best()
+            before = best.get(cell)
+            if now is not None and (before is None or abs(now[0] - before[0]) > 1e-9):
+                eff, path = now
+                point = here.get(path)
+                slug = os.path.basename(path)[:-5]
+                entry["record"] = {
+                    "date": date, "commit": sha[:9], "landing": count,
+                    "what": f"[[{point[0]},{point[1]},{point[2]}]] w={point[3]} {slug}",
+                    "kind": ("raised" if before is None or eff > before[0] else "lowered"),
+                    "kd2_over_n": round(eff, 3)}
+            best[cell] = now
+    return last, count
 
 
 # Oldest -> newest: light-warm to dark-cool, so today's staircase is the

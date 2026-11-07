@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>48</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>8</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>8</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>10.667</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>10.6667</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0171</div></div>
@@ -57,6 +57,15 @@
 (3,13): 120</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 4.2426 &middot; Z 3.6056 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/48-8-8">circuits/48-8-8/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 7 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 7 &middot; fault-set witness of 7 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 7)</summary><div class=wit>[338, 353, 712, 817, 1318, 1442, 1496]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[31044, 31045, 31050, 31051, 31058, 31064, 31077, 31091]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Simulated annealing over integer-grid site assignments with the repo&#x27;s own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier&#x27;s own rule. &middot; 2026-10-13</div>
@@ -70,7 +79,7 @@
 <div class=kv><b>model</b> <span class=modelmark></span>Mimo-V2.6-Flash <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2610.13880">arXiv:2610.13880</a></div>
 <div class=kv><b>date</b> 2026-10-12</div>
-<div class=kv><b>notes</b> Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, &#x27;Bicycle Race&#x27;), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo&#x27;s own group data. Distance is an upper bound certified by the attached witnesses, not the paper&#x27;s exact distance.</div>
+<div class=kv><b>notes</b> Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, &#x27;Bicycle Race&#x27;), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo&#x27;s own group data. Distance is an upper bound certified by the attached witnesses, not the paper&#x27;s exact distance. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 8), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).</div>
 <div class=kv><b>family</b> 2bga-nonabelian <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>

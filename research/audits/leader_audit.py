@@ -30,7 +30,8 @@ so a soft claim cannot be refuted and lands on `inconclusive`.
   python research/audits/leader_audit.py screen --trials 2000000 --seeds 51 52 \
       --pair-depth 64 codes/672-20-32.json codes/922-18-31.json
   python research/audits/leader_audit.py pair research/candidates/<n>-<k>-<d>.json \
-      --trials 2000000 --seeds 51 52 --pair-depth 64 --witness-dir /tmp/pair
+      --trials 2000000 --seeds 51 52 --pair-depth 64 --witness-dir /tmp/pair \
+      --json-out /tmp/pair/audit.json
 
 A construction fixes n, k and w, so a candidate can only beat its board peer
 on d, and d is a bound that can be too high. `pair` decides which of the two
@@ -73,6 +74,7 @@ EXIT_OK = 0
 EXIT_REFUTED = 2
 EXIT_INVALID = 3
 
+import peer_audit  # noqa: E402
 import surrogate  # noqa: E402
 from css import compute_k, verify_css  # noqa: E402
 
@@ -475,6 +477,17 @@ def cmd_pair(args):
         )
     decision, rc = decide(results[0], results[1:])
     print(f"DECISION: {decision}", flush=True)
+    json_out = getattr(args, "json_out", None)
+    if json_out:
+        # The record the two packaging paths consume (research/kit/peer_audit.py,
+        # issue #4236): the budget, the decision, and the peers measured, so a
+        # d-only gain can be checked against the depth its claim rests on
+        # rather than taken on the word of a note.
+        _write_witness(json_out, peer_audit.record(
+            args.candidate, peers, results, decision, trials=args.trials,
+            seeds=args.seeds, pair_depth=args.pair_depth, threads=args.threads,
+            exit_code=rc))
+        print(f"wrote {json_out}", flush=True)
     return rc
 
 
@@ -556,6 +569,12 @@ def main(argv=None):
         default=None,
         help="directory to drop one witness file per entry, named after the entry's path "
         "within the repo so the candidate and its peer cannot overwrite each other",
+    )
+    pr.add_argument(
+        "--json-out",
+        default=None,
+        help="write the audit record (budget, seeds, pair depth, decision, peers) here; "
+        "./qldpc submit --peer-audit and promote.py's evidence.peer_audit take this file",
     )
     pr.set_defaults(func=cmd_pair)
 

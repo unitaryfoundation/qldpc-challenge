@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[0, 1, 24, 30, 31, 50, 59, 70, 87]</div></details>
 <div class=kv><b>d_Z</b> 9 &middot; witness weight 9 (claimed exact)</div>
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[1, 9, 35, 37, 50, 51, 65, 66, 72]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -57,11 +57,11 @@
 </section>
 <section class=blk><h3>Circuit tier</h3>
 <div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/90-4-9">circuits/90-4-9/</a> &middot; canonical noise recipe, 9 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 9 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
-<div class=kv><b>d_circ^X</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[11, 15, 54, 58, 63, 67, 91, 114, 116]</div></details>
-<div class=kv><b>d_circ^Z</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[60, 72, 174, 188, 567, 571, 1231, 1245, 1646]</div></details>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[285, 316, 836, 971, 977, 1193, 1197, 1660]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[51, 56, 972, 992, 1231, 1257, 1790, 1831]</div></details>
 <div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
@@ -78,7 +78,7 @@
 <div class=kv><b>model</b> <span class=modelmark></span>GPT 5.6 Sol, Claude Opus 5 <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>builds on</b> an internal weight-5 bivariate-bicycle evolutionary campaign in github.com/qiskit-community/qcode-discovery (branch weight5-campaigns, not part of a public branch at the time of this submission -- this submission&#x27;s own distance/CSS claims are independently re-derived and re-verified using only this repository&#x27;s tools and do not rely on that source being externally checkable)</div>
 <div class=kv><b>date</b> 2026-09-07</div>
-<div class=kv><b>notes</b> Independently corroborated with this repo&#x27;s own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign&#x27;s own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission&#x27;s re-verification and packaging was done separately by Claude Sonnet 5.</div>
+<div class=kv><b>notes</b> Independently corroborated with this repo&#x27;s own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign&#x27;s own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission&#x27;s re-verification and packaging was done separately by Claude Sonnet 5. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8; the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).</div>
 <div class=kv><b>family</b> bivariate bicycle <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>

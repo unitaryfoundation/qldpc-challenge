@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>82</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>22</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.415</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.41463</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>11</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -19,7 +19,7 @@
 <div class=kv><b>d_Z</b> 3 &middot; witness weight 3 (claimed upper_bound)</div>
 <div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; gf2_fast RIS in the packaging search; the ladder searched both sides jointly &middot; found at 4000 trials &middot; survived 2&times;10<sup>7</sup> trials &middot; 2026-09-15</div>
 <details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[34, 44, 69]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; scipy/HiGHS cutoff IP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 3 exists; Z: no logical &lt; 3 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; scipy/HiGHS cutoff IP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 3 exists; Z: no logical &lt; 3 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -97,6 +97,15 @@
 (3,22): 22
 (3,23): 7
 (3,24): 1</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/82-22-3">circuits/82-22-3/</a> &middot; canonical noise recipe, 3 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 3 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[170, 179, 412]</div></details>
+<div class=kv><b>d_circ^Z</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[16493, 16497, 16505]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/dorakingx">@dorakingx</a></div>

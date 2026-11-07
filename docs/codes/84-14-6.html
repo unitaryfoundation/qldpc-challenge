@@ -19,7 +19,7 @@
 <div class=kv><b>d_Z</b> 6 &middot; witness weight 6 (claimed upper_bound)</div>
 <div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 2000 trials &middot; survived 2000 trials &middot; 2026-10-12</div>
 <details><summary>witness operator (support, 6 qubits)</summary><div class=wit>[2, 4, 6, 9, 30, 33]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 6</span> &middot; CryptoMiniSat 5.14.7 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 6 exists; Z: no logical &lt; 6 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 6</span> &middot; CryptoMiniSat 5.14.7 SAT &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 6 exists; Z: no logical &lt; 6 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -55,6 +55,15 @@
 (3,8): 1008
 (3,9): 504
 (3,10): 42</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/84-14-6">circuits/84-14-6/</a> &middot; canonical noise recipe, 6 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 6 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 6 &middot; fault-set witness of 6 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 6)</summary><div class=wit>[32845, 32849, 32851, 32855, 32859, 32870]</div></details>
+<div class=kv><b>d_circ^Z</b> 6 &middot; fault-set witness of 6 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 6)</summary><div class=wit>[32844, 32849, 32852, 32855, 32858, 32870]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Lee, Gideon</div>

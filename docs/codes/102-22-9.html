@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>102</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>22</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>9</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>17.471</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>17.4706</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0086</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[3, 28, 32, 48, 51, 65, 84, 88, 97]</div></details>
 <div class=kv><b>d_Z</b> 9 &middot; witness weight 9 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 9 qubits)</summary><div class=wit>[16, 21, 38, 48, 54, 61, 68, 77, 90]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 9 exists; Z: no logical &lt; 9 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -76,9 +76,10 @@
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
 <div class=kv><b>provenance</b> submitted through the challenge</div>
-<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>novelty</b> known parameter set; see provenance notes</div>
 <div class=kv><b>construction</b> Reconstructed from qecdb.org record 6a422a11d15d481af09df8a3 (https://qecdb.org/codes/6a422a11d15d481af09df8a3); the record&#x27;s H field is read as binary symplectic rows and split by rowspace (rank(A|B) = rank(A) + rank(B)), keeping the lightest independent basis of each part; n, k and the check weight recomputed here, witnesses from the kit&#x27;s random search at the trials below. Database description: 2BGA w=8 wa=4 wb=4 G=SmallGroup(51, 1); arXiv:2306.16400; database distance claim d=9 (lower None, upper None).</div>
 <div class=kv><b>model</b> <span class=modelmark></span>Mimo-V2.6-Free <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>builds on</b> arXiv:2604.19481 (Tripier et al., the Walking Cat architecture, code Q102: this entry is that code up to a relabeling of the qubits, verified by Tanner-graph isomorphism with the row spaces mapped; the qecdb.org record this entry was reconstructed from attributes the construction to arXiv:2306.16400, whose database has no group of order 51)</div>
 <div class=kv><b>date</b> 2026-09-27</div>
 <div class=kv><b>notes</b> Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry.</div>
 <div class=kv><b>family</b> generalized bicycle <span class=claimed>(a tag, not a ranking)</span></div>

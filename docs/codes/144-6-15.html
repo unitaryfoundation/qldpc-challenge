@@ -42,11 +42,20 @@
 (3,8): 32400
 (3,10): 3240</div></details>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/144-6-15">circuits/144-6-15/</a> &middot; canonical noise recipe, 15 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 15 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 15 &middot; fault-set witness of 15 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 15)</summary><div class=wit>[123264, 123268, 123282, 123298, 123304, 123306, 123325, 123327, 123333, 123337, 123347, 123354, 123358, 123362, 123368]</div></details>
+<div class=kv><b>d_circ^Z</b> 15 &middot; fault-set witness of 15 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 15)</summary><div class=wit>[123166, 123183, 123222, 123251, 123264, 123268, 123279, 123281, 123296, 123323, 123332, 123338, 123343, 123370, 123401]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Liangdong Lu and Ruipan Yang and Guanmin Guo</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Bivariate bicycle code QC(A,B) on Z_8 x Z_9 with weight-4 generators A = 1 + x<sup>4</sup> y<sup>2</sup> + y<sup>4</sup> + y<sup>7</sup>, B = 1 + x<sup>2</sup> y<sup>6</sup> + x<sup>5</sup> y<sup>7</sup> + x<sup>7</sup> y<sup>8</sup> (weight-8 checks). Reproduction of Table 1 entry 9 of arXiv:2609.06572 (Lu, Yang, Guo).</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2609.06572">arXiv:2609.06572</a></div>
 <div class=kv><b>date</b> 2026-09-06</div>
 <div class=kv><b>notes</b> Seeded from the published census of arXiv:2609.06572, Table 1 entry 9, where d&gt;=15 is certified by exhaustive bit-mask verification (their Sections 4.2-4.3, cross-validated against Magma). Check matrices rebuilt independently with this repo&#x27;s kit; the witness here was found fresh by this repo&#x27;s RIS surrogate (upper bound d&lt;=15), which together with the paper&#x27;s certified lower bound pins the true distance at 15 pending server certification. Reproduced by @MathysRennela.</div>

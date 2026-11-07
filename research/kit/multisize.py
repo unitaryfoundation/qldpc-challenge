@@ -29,8 +29,19 @@ reproduces at neighboring sizes is evidence the entry is a construction
 rather than a tuned artifact; one that does not is a fact about the recipe,
 not a verdict on the entry.
 
-    uv run --extra research python research/kit/multisize.py run      # writes the table
-    uv run --extra research python research/kit/multisize.py check    # exit 1 on drift from the committed table
+The table is derived data, and a submission PR cannot carry it: the
+submission surface is the entry, its note, and its own ``repro/<slug>.json``
+(issue #3810), nothing under ``research/``. So the table is regenerated on
+main after every merge (``site.yml`` runs ``run`` before the site build and
+commits the result with the pages), and ``check`` fails only on drift, a
+committed verdict that a fresh run no longer reproduces, which is what a
+changed constructor or lift rule looks like. A manifest the table has not
+caught up with, or a row whose manifest is gone, is reported as pending and
+passes; ``--strict`` makes it fail too, for the scheduled run on main, where
+nothing should be pending.
+
+    uv run --extra research python research/kit/multisize.py run      # writes the table when its contents changed
+    uv run --extra research python research/kit/multisize.py check    # exit 1 when a committed verdict drifted
 """
 import argparse
 import datetime
@@ -209,6 +220,31 @@ def verdicts(table):
             for s, e in table["entries"].items()}
 
 
+def compare(new, was):
+    """Split a fresh verdict map against the committed one: (drifted, pending_add, pending_remove).
+
+    ``drifted`` holds the slugs both maps know whose verdicts differ: a
+    constructor or a lift rule changed what a recipe does, or an entry was
+    edited under its manifest. ``pending_add`` holds manifests the committed
+    table has not caught up with and ``pending_remove`` rows whose manifest is
+    gone; both are what a submission PR leaves behind, since it carries its
+    own ``repro/<slug>.json`` and nothing under ``research/`` (issue #3810),
+    and both clear when the table is regenerated on main after the merge.
+    """
+    both = set(new) & set(was)
+    return {s for s in both if new[s] != was[s]}, set(new) - set(was), set(was) - set(new)
+
+
+def unchanged(table, old):
+    """Report whether a fresh table carries the same rows and lift rules as the committed one.
+
+    ``date`` and ``head`` differ on every run and are not content; a run that
+    changes nothing else leaves the committed file alone, so the regeneration
+    on main does not rewrite the table on every merge.
+    """
+    return table["entries"] == old.get("entries") and table["lifts"] == old.get("lifts")
+
+
 def write(table, path=TABLE):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
@@ -235,13 +271,24 @@ def summary(table):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
-    r = sub.add_parser("run", help="rebuild every recipe at its sizes and write the table")
+    r = sub.add_parser("run", help="rebuild every recipe at its sizes and write the table when it changed")
     r.add_argument("--out", default=TABLE)
+    r.add_argument("--force", action="store_true", help="write even when no row or lift rule changed")
     c = sub.add_parser("check", help="recompute and compare with the committed table; exit 1 on drift")
     c.add_argument("--table", default=TABLE)
+    c.add_argument("--strict", action="store_true",
+                   help="also exit 1 when the table is behind the manifests (the scheduled run on main)")
     a = ap.parse_args(argv)
     table = build_table()
     if a.cmd == "run":
+        try:
+            with open(a.out, encoding="utf-8") as f:
+                old = json.load(f)
+        except (OSError, ValueError):
+            old = None
+        if old is not None and not a.force and unchanged(table, old):
+            print(f"{os.path.relpath(a.out, _ROOT)} unchanged ({len(table['entries'])} manifest(s))")
+            return 0
         write(table, a.out)
         print(f"wrote {os.path.relpath(a.out, _ROOT)}")
         print(summary(table))
@@ -252,13 +299,22 @@ def main(argv=None):
     except (OSError, ValueError):
         print("no committed multi-size table")
         return 1
-    new, was = verdicts(table), verdicts(old)
-    drift = {s for s in set(new) | set(was) if new.get(s) != was.get(s)}
-    if drift:
-        print("multi-size verdicts drifted for: " + " ".join(sorted(drift)))
+    drifted, added, removed = compare(verdicts(table), verdicts(old))
+    if added:
+        print("pending, manifest(s) the committed table has not caught up with (regenerated on main "
+              "after the merge): " + " ".join(sorted(added)))
+    if removed:
+        print("pending, table row(s) whose manifest is gone (regenerated on main after the merge): "
+              + " ".join(sorted(removed)))
+    if drifted:
+        print("multi-size verdicts drifted for: " + " ".join(sorted(drifted)))
         print(summary(table))
         return 1
-    print(f"ok: the committed multi-size table matches {len(new)} manifest(s)")
+    if a.strict and (added or removed):
+        print("the committed table is behind the manifests; run `research/kit/multisize.py run`")
+        return 1
+    print(f"ok: the committed multi-size table matches {len(set(old['entries']) & set(table['entries']))} "
+          f"manifest(s)")
     return 0
 
 

@@ -5,7 +5,16 @@ name: certify-weekly
 # on Monday at 08:00); this is the job that works its head (issue #4148).
 # research/certs/certify_sweep.py opens entries in queue order and runs
 # verify/sat_certify.py with the proof path on each, one time limit per
-# solve, until the job budget is spent. Every attempt, closed or not, is one
+# solve, until the job budget is spent. The tropidist backend
+# (research/certs/tropidist_certify.py, issue #4716) is opt-in: a
+# workflow_dispatch run with backend set to tropidist or tropidist+sat
+# fetches the tool at its pinned commit and runs it; the scheduled run stays
+# on the SAT path. The SAT path also runs as an ascending ladder (W = 1, 2,
+# ... up to d - 1, the ladder input's seconds per side; issue #4230) on what
+# it leaves open, so an entry that does not close still files a partial
+# certificate with the lower bound it proved, shown on the board as the
+# interval d_lower <= d <= d, and a later run with a larger budget raises it.
+# Every attempt, closed or not, is one
 # line of research/certs/attempts.jsonl, committed to main here so an entry
 # that timed out at this budget is not reopened at the same budget next week.
 # An entry it certified is left alone for 14 days while its PR lands, then
@@ -55,26 +64,35 @@ on:
         description: "reopen entries that timed out at this budget before"
         type: boolean
         default: false
+      backend:
+        description: "sat (default), tropidist, or tropidist+sat (opt-in, issue #4716)"
+        required: false
+        default: "sat"
+      ladder:
+        description: "seconds per side for the ascending SAT ladder that files partial certificates (0: ask d - 1 only)"
+        required: false
+        default: "300"
 
 concurrency:
   group: certify-weekly
   cancel-in-progress: false
 
-env:
-  PYTHONUNBUFFERED: "1"
-  # The same pins as proof-replay.yml, so the certificates this stages are
-  # produced by the solver and checker that replay them.
-  KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
-  DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
-  OUT_DIR: ${{ runner.temp }}/certify-sweep
-
 jobs:
   sweep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # job_minutes is when the sweep stops opening entries; the entry it is on
     # may run to six solves of tlim (two XOR solves, two kissat runs, two
-    # drat-trim checks) past that, plus the build and the replay.
+    # drat-trim checks) plus twice the ladder budget past that, plus the
+    # build and the replay.
     timeout-minutes: 350
+    env:
+      PYTHONUNBUFFERED: "1"
+      KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2
+      DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+      TROPIDIST_REF: b03ec2d4077f287f89f97b5c2c16ce5ce17c2c58
+      TROPIDIST_ROOT: /tmp/tropidist
+      BACKEND: ${{ github.event.inputs.backend || 'sat' }}
+      OUT_DIR: /tmp/certify-sweep
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,6 +110,15 @@ jobs:
           install -m 755 /tmp/kissat/build/kissat /usr/local/bin/kissat
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
+      - name: fetch tropidist at its pinned commit (opt-in backends only)
+        if: contains(env.BACKEND, 'tropidist')
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/Fanerst/tropidist.git "$TROPIDIST_ROOT"
+          git -C "$TROPIDIST_ROOT" checkout -q "$TROPIDIST_REF"
+          # the C kernels build on first use with cc; a code problem needs only numpy, which uv provides
+          uv run --frozen --extra research python research/certs/tropidist_certify.py codes/5-1-3.json \
+            --tropidist "$TROPIDIST_ROOT" --tlim 60
       - name: work the head of the queue
         id: sweep
         env:
@@ -99,13 +126,25 @@ jobs:
           JOB_MINUTES: ${{ github.event.inputs.job_minutes || '240' }}
           SLUGS: ${{ github.event.inputs.slugs }}
           RETRY: ${{ github.event.inputs.retry }}
+          LADDER: ${{ github.event.inputs.ladder || '300' }}
         run: |
           retry=""
           [ "$RETRY" = "true" ] && retry="--retry"
+          ladder=""
+          case "$LADDER" in 0|"") ;; *[!0-9.]*) echo "invalid ladder: $LADDER"; exit 1;; *) ladder="--ladder $LADDER";; esac
+          if [ -n "$SLUGS" ]; then
+            for s in $SLUGS; do
+              case "$s" in *[!A-Za-z0-9._-]*) echo "invalid slug: $s"; exit 1;; esac
+            done
+          fi
           set +e
+          case "$BACKEND" in sat|tropidist|tropidist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
+          tool=""
+          case "$BACKEND" in *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";; esac
           uv run --frozen --extra research python research/certs/certify_sweep.py run \
             --out-dir "$OUT_DIR" --tlim "$TLIM" --job-seconds $(( JOB_MINUTES * 60 )) \
-            ${SLUGS:+--slugs $SLUGS} $retry
+            --backend "$BACKEND" $tool \
+            ${SLUGS:+--slugs $SLUGS} $retry $ladder
           rc=$?
           set -e
           cat "$OUT_DIR/summary.md" >> "$GITHUB_STEP_SUMMARY"

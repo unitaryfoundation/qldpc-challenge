@@ -19,7 +19,7 @@
 <div class=kv><b>d_Z</b> 12 &middot; witness weight 12 (claimed upper_bound)</div>
 <div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 4000 trials &middot; survived 4000 trials &middot; 2026-10-12</div>
 <details><summary>witness operator (support, 12 qubits)</summary><div class=wit>[54, 56, 64, 72, 74, 76, 77, 86, 115, 123, 160, 176]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT</div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists; Z: no logical &lt; 12 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 12</span> &middot; CryptoMiniSat 5.14 SAT &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 12 exists; Z: no logical &lt; 12 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -55,6 +55,15 @@
 (3,8): 3195
 (3,9): 1080
 (3,10): 45</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/180-16-12">circuits/180-16-12/</a> &middot; canonical noise recipe, 12 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 12 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[130903, 130904, 130978, 130979, 131010, 131018, 131019, 131022, 131026, 131029, 131032, 131038]</div></details>
+<div class=kv><b>d_circ^Z</b> 12 &middot; fault-set witness of 12 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 12)</summary><div class=wit>[130894, 130897, 130929, 130930, 130935, 130942, 130955, 130968, 130975, 130979, 130995, 131012]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Rajpurohit, Rajendra Prasad and Lalitha, V. and Garani, Shayan Srinivasa and <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

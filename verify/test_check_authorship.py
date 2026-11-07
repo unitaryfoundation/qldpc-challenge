@@ -766,6 +766,7 @@ def main():
 
     _rate_cases()
     _circuit_improvement_cases()
+    _circuit_refutation_cases()
 
     print()
     if _fail:
@@ -988,6 +989,118 @@ def _circuit_improvement_cases():
             ["--author", "bob", "--root", td, "--base", "main"])
         check("after a merged improvement, @bob still cannot edit the code",
               rc != 0)
+
+
+def _circuit_refutation_cases():
+    """Exercise the circuit refutation binding (issue #4717).
+
+    Lowering a committed d_circ binds for anyone when the values go down
+    with witnesses of exactly the new weights at upper_bound, the block is
+    otherwise untouched, the committed circuits/ artifacts stay as they are,
+    and the appended provenance.notes name the refuter. A rise, a changed
+    witness without a lower value, a changed block key, moved artifacts, or
+    an edit outside the block stays with the listed authors (or is the
+    improvement binding's business).
+    """
+    print("\ncircuit refutation binding (issue #4717):")
+    base = copy.deepcopy(BASE_DOC)
+    base["schema_version"] = "0.2"
+    base["circuit"] = {
+        "d_circ": {"X": {"value": 6, "confidence": "upper_bound",
+                         "witness": [0, 1, 2, 3, 4, 5]},
+                   "Z": {"value": 6, "confidence": "upper_bound",
+                         "witness": [1, 2, 3, 4, 5, 6]}},
+        "rounds": 6, "stim_version": "1.16.0",
+        "notes": "edge-coloring schedule.",
+        "contributed_by": {"by": ["@alice"], "date": "2026-10-01",
+                           "method": "edge coloring"},
+    }
+    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"),
+            ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
+
+    def refuted(x=3, z=6, credit="@bob", confidence="upper_bound",
+                witness_len=None, note=" Circuit distance refuted by {credit}: "
+                "an undetected logical fault set of weight 3 in the committed "
+                "X-memory DEM."):
+        def edit():
+            d = copy.deepcopy(base)
+            for side, v in (("X", x), ("Z", z)):
+                if v != base["circuit"]["d_circ"][side]["value"]:
+                    w = v if witness_len is None else witness_len
+                    d["circuit"]["d_circ"][side] = {
+                        "value": v, "confidence": confidence,
+                        "witness": list(range(w))}
+            d["provenance"]["notes"] += note.format(credit=credit)
+            return d
+        return edit
+
+    def case(name, edit, ok, base_doc=base, files=(), **kw):
+        run_case(name, edit, ok, rename=False, base_doc=base_doc,
+                 base_files=stim, files=files, **kw)
+
+    case("non-author may lower one side's d_circ with a witness of the new "
+         "weight", refuted(), True)
+    case("lowering both sides binds", refuted(x=3, z=4), True)
+    case("the listed author binds as before", refuted(), True, author="alice")
+    def restamped():
+        d = refuted(x=6, note=" Re-stamped by {credit}.")()
+        d["circuit"]["d_circ"]["X"]["witness"] = [0, 1, 2, 3, 4, 7]
+        return d
+    case("the same d_circ with a changed witness is not a refutation",
+         restamped, False)
+    case("a rise on one side with a fall on the other is rejected",
+         refuted(x=3, z=7), False)
+    case("a witness that is not exactly the new weight is rejected",
+         refuted(witness_len=4), False)
+    case("a corrected value may not claim exact", refuted(confidence="exact"),
+         False)
+    case("appended notes that do not name the refuter are rejected",
+         refuted(note=" Circuit distance corrected."), False)
+    case("notes crediting someone else are rejected",
+         refuted(credit="@carol"), False)
+
+    def touches_contributed_by():
+        d = refuted()()
+        d["circuit"]["contributed_by"]["by"].append("@bob")
+        return d
+    case("a refutation that edits contributed_by is rejected",
+         touches_contributed_by, False)
+
+    def drops_rounds():
+        d = refuted()()
+        d["circuit"]["rounds"] = 5
+        return d
+    case("a refutation that changes rounds is rejected", drops_rounds, False)
+
+    def rewrites_notes():
+        d = refuted()()
+        d["provenance"]["notes"] = "rewritten by @bob."
+        return d
+    case("a refutation that rewrites provenance.notes is rejected",
+         rewrites_notes, False)
+
+    def touches_distance():
+        d = refuted()()
+        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
+                              "witness": [0, 1, 2, 3, 4]}
+        d["distance"]["d"] = 5
+        return d
+    case("a refutation that also edits the distance is rejected",
+         touches_distance, False)
+    case("a refutation that also replaces the committed circuits is rejected",
+         refuted(), False,
+         files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")])
+
+    check("the evident binding for a lowered d_circ is the refutation",
+          check_authorship.evident_binding(base, refuted()())
+          == "circuit_refutation")
+    ok, why = check_authorship.circuit_refutation_binding(
+        "bob", base, restamped())
+    check("a no-fall change names the reason",
+          not ok and "without its value decreasing" in why)
+    ok, why = check_authorship.circuit_refutation_binding(
+        "bob", base, refuted(x=3, z=7)())
+    check("a rise names the side", not ok and "d_circ.Z rose" in why)
 
 
 def test_main():

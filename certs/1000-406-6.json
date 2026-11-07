@@ -1,0 +1,29 @@
+{
+  "name": "[[1000,406,6]] algebraic Lean exact-distance certificate",
+  "d": 6,
+  "d_exact": true,
+  "solver": "Lean 4.35.0 / Std; algebraic distance proof",
+  "sides": {
+    "X": {
+      "value": 6,
+      "exact": true
+    },
+    "Z": {
+      "value": 6,
+      "exact": true
+    }
+  },
+  "verification": {
+    "level": "formal",
+    "checker": "Lean 4.35.0 / Std; kernel checked; standard axioms only",
+    "checks_sha256": "d9961cb09d58cd43c6c35b12192ba1fd84bb957d61fbcd686d4a2b34d885dd42",
+    "replay": {
+      "repo": "https://github.com/hirobumii/qldpc-cyclic-xyz-evidence",
+      "commit": "85f90f9ea2134faf4b637e7044fb540ffc4d3398",
+      "theorem": "Qldpc1000.certified_public_code",
+      "build": "cd lean1000 && python3 reproduce.py --toolchain-bin \"$(dirname \"$(command -v lean)\")\" --out replay-audit",
+      "toolchain": "leanprover/lean4:v4.35.0"
+    },
+    "note": "Based on Henryk Soboń's exact-distance proof, with algebraic/combinatorial replacements for local searches and edge-pair comparisons. Proves CSS commutation, full/stored kernel equivalence and exact sector and phase-free Pauli distances 6 for the unchanged literal matrices. Uses only propext, Classical.choice and Quot.sound; no native evaluation axioms. Rank/dimension is checked outside Lean. Full attribution and adaptations: lean1000/CREDITS.md in the replay repository."
+  }
+}

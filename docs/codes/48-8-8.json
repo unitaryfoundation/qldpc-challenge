@@ -554,7 +554,7 @@
    "arXiv:2610.13880"
   ],
   "date": "2026-10-12",
-  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance.",
+  "notes": "Parameters and construction taken from the public database of arXiv:2610.13880v1. Distance is an upper bound certified by the witnesses attached here. Parameters and blocks taken from the public code database of arXiv:2610.13880v1 (Lee, 'Bicycle Race'), github.com/gideonlsx/bicycle-race @ aed705a, CC BY 4.0; rebuilt here with the repo's own group data. Distance is an upper bound certified by the attached witnesses, not the paper's exact distance. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 8), with a proved lower bound of 7. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
   "origin": "baseline",
   "novelty": "known_parameters",
   "model": "Mimo-V2.6-Flash"
@@ -763,6 +763,47 @@
    ],
    "date": "2026-10-13",
    "method": "Simulated annealing over integer-grid site assignments with the repo's own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier's own rule."
+  }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 7,
+    "confidence": "upper_bound",
+    "witness": [
+     338,
+     353,
+     712,
+     817,
+     1318,
+     1442,
+     1496
+    ]
+   },
+   "Z": {
+    "value": 8,
+    "confidence": "upper_bound",
+    "witness": [
+     31044,
+     31045,
+     31050,
+     31051,
+     31058,
+     31064,
+     31077,
+     31091
+    ]
+   }
+  },
+  "rounds": 8,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [2, 6, 4, 5, 3, 8, 7, 1], Z-check term slots [2, 5, 3, 4, 6, 0, 1, 7] over terms A_0..A_4, B_0..B_2); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-05",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [2, 6, 4, 5, 3, 8, 7, 1], Z-check term slots [2, 5, 3, 4, 6, 0, 1, 7] over terms A_0..A_4, B_0..B_2)"
   }
  }
 }

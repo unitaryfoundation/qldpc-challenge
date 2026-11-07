@@ -17,7 +17,7 @@
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[6, 9, 13, 14, 22, 55, 70, 76]</div></details>
 <div class=kv><b>d_Z</b> 8 &middot; witness weight 8 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 8 qubits)</summary><div class=wit>[10, 16, 31, 40, 42, 69, 77, 78]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists; Z: no logical &lt; 8 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 8</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 8 exists; Z: no logical &lt; 8 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -56,11 +56,20 @@
 (3,14): 3200
 (3,16): 120</div></details>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/80-8-10">circuits/80-8-10/</a> &middot; canonical noise recipe, 8 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 8 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[51920, 51921, 51929, 51935, 51971, 51977, 51988, 51990]</div></details>
+<div class=kv><b>d_circ^Z</b> 8 &middot; fault-set witness of 8 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 8)</summary><div class=wit>[51929, 51930, 51942, 51946, 51976, 51983, 51986, 51987]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Lin, Hsiang-Ku and Pryadko, Leonid P.</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Two-block group algebra (2BGA) code over C_8 x C_5: a={1, s r<sup>4</sup>}, b={1, r, r<sup>2</sup>, s, s<sup>3</sup> r, s<sup>2</sup> r<sup>6</sup>} (Lin &amp; Pryadko, arXiv:2306.16400, Table 1).</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2306.16400">arXiv:2306.16400</a></div>
 <div class=kv><b>date</b> 2023</div>
 <div class=kv><b>notes</b> Literature baseline (arXiv:2306.16400, Lin &amp; Pryadko, 28 Jun 2023). Two-block group algebra code reconstructed from the published group presentation; distance d=10 taken from the paper&#x27;s Table 1 and certified by an explicit non-stabilizer witness on each side (regenerated via the research kit&#x27;s RIS search). Literature novelty confirmed by manual cross-check: arXiv:2306.16400 Table 1 explicitly reports the [[80,8,10]] parameters with W=6 (reconstructed checks have weight 8). The verifier&#x27;s &#x27;literature novelty UNVERIFIED&#x27; label is by-design (validate_candidate.py performs no literature lookup) and is intentionally not overridden.</div>

@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>42</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>8</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.714</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>1.71429</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1"><div class=l>g</div><div class=v>0.0011</div></div>
@@ -21,7 +21,7 @@
 <details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[4, 11, 18]</div></details>
 <div class=kv><b>d_Z</b> 3 &middot; witness weight 3 (claimed upper_bound)</div>
 <details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[0, 3, 15]</div></details>
-<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; scipy/HiGHS MILP</div><div class=kv style="color:var(--mut)">X: no logical &lt; 3 exists; Z: no logical &lt; 3 exists</div>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 3</span> &middot; scipy/HiGHS MILP &middot; <span class=claimed>level proof_log: the refutation was re-checked by drat-trim and is replayed by CI</span></div><div class=kv style="color:var(--mut)">X: no logical &lt; 3 exists; Z: no logical &lt; 3 exists</div>
 </section>
 
 <section class=blk><h3>Diagnostics</h3>
@@ -57,11 +57,11 @@
 <svg class=lercurve viewBox="0 0 360 170" width=360 height=170 role=img aria-label="measured logical error rate against physical rate"><line x1=46 y1=142.0 x2=348 y2=142.0 class=grid/><text x=42 y=145.0 class=tick text-anchor=end>1e-3</text><line x1=46 y1=98.0 x2=348 y2=98.0 class=grid/><text x=42 y=101.0 class=tick text-anchor=end>1e-2</text><line x1=46 y1=54.0 x2=348 y2=54.0 class=grid/><text x=42 y=57.0 class=tick text-anchor=end>1e-1</text><line x1=46 y1=10.0 x2=348 y2=10.0 class=grid/><text x=42 y=13.0 class=tick text-anchor=end>1e0</text><text x=46.0 y=156 class=tick text-anchor=middle>0.001</text><text x=176.1 y=156 class=tick text-anchor=middle>0.002</text><text x=348.0 y=156 class=tick text-anchor=middle>0.005</text><text x=197 y=168 class=tick text-anchor=middle>physical rate p</text><polyline class="lx" points="46.0,112.6 176.1,81.7 348.0,44.0"/><circle class="lx st-verified" cx=46.0 cy=112.6 r=4><title>X p=0.001: 0.00466/round, verified</title></circle><circle class="lx st-verified" cx=176.1 cy=81.7 r=4><title>X p=0.002: 0.0235/round, verified</title></circle><circle class="lx st-gate" cx=348.0 cy=44.0 r=4><title>X p=0.005: 0.169/round, gate</title></circle><polyline class="lz" points="46.0,114.2 176.1,82.8 348.0,44.5"/><circle class="lz st-verified" cx=46.0 cy=114.2 r=4><title>Z p=0.001: 0.00429/round, verified</title></circle><circle class="lz st-verified" cx=176.1 cy=82.8 r=4><title>Z p=0.002: 0.0221/round, verified</title></circle><circle class="lz st-gate" cx=348.0 cy=44.5 r=4><title>Z p=0.005: 0.164/round, gate</title></circle></svg>
 <table class=lerpts><thead><tr><th>basis</th><th>p</th><th>ler/round</th><th>95% CI</th><th>failures/shots</th><th>status</th></tr></thead><tbody>
 <tr class="st-gate"><td>X</td><td>0.005</td><td class=num>0.169</td><td class=num>[0.162, 0.176]</td><td class=num>3551/10<sup>4</sup></td><td>verified at PR time</td></tr>
-<tr class="st-verified"><td>X</td><td>0.002</td><td class=num>0.0235</td><td class=num>[0.0218, 0.0254]</td><td class=num>673/10<sup>4</sup></td><td>verified post-merge (659/9999 replica shots, 2026-10-26)</td></tr>
-<tr class="st-verified"><td>X</td><td>0.001</td><td class=num>0.00466</td><td class=num>[0.00414, 0.00524]</td><td class=num>277/2&times;10<sup>4</sup></td><td>verified post-merge (139/1.1&amp;times;10&lt;sup&gt;4&lt;/sup&gt; replica shots, 2026-10-26)</td></tr>
+<tr class="st-verified"><td>X</td><td>0.002</td><td class=num>0.0235</td><td class=num>[0.0218, 0.0254]</td><td class=num>673/10<sup>4</sup></td><td>verified post-merge (659/9999 replica shots, 2026-11-02)</td></tr>
+<tr class="st-verified"><td>X</td><td>0.001</td><td class=num>0.00466</td><td class=num>[0.00414, 0.00524]</td><td class=num>277/2&times;10<sup>4</sup></td><td>verified post-merge (139/1.1&amp;times;10&lt;sup&gt;4&lt;/sup&gt; replica shots, 2026-11-02)</td></tr>
 <tr class="st-gate"><td>Z</td><td>0.005</td><td class=num>0.164</td><td class=num>[0.158, 0.171]</td><td class=num>3488/10<sup>4</sup></td><td>verified at PR time</td></tr>
-<tr class="st-verified"><td>Z</td><td>0.002</td><td class=num>0.0221</td><td class=num>[0.0205, 0.0239]</td><td class=num>635/10<sup>4</sup></td><td>verified post-merge (629/9999 replica shots, 2026-10-26)</td></tr>
-<tr class="st-verified"><td>Z</td><td>0.001</td><td class=num>0.00429</td><td class=num>[0.00379, 0.00485]</td><td class=num>255/2&times;10<sup>4</sup></td><td>verified post-merge (175/1.2&amp;times;10&lt;sup&gt;4&lt;/sup&gt; replica shots, 2026-10-26)</td></tr>
+<tr class="st-verified"><td>Z</td><td>0.002</td><td class=num>0.0221</td><td class=num>[0.0205, 0.0239]</td><td class=num>635/10<sup>4</sup></td><td>verified post-merge (629/9999 replica shots, 2026-11-02)</td></tr>
+<tr class="st-verified"><td>Z</td><td>0.001</td><td class=num>0.00429</td><td class=num>[0.00379, 0.00485]</td><td class=num>255/2&times;10<sup>4</sup></td><td>verified post-merge (175/1.2&amp;times;10&lt;sup&gt;4&lt;/sup&gt; replica shots, 2026-11-02)</td></tr>
 </tbody></table>
 <div class=kv><span class=claimed>decoder bposd-cs-10; rates are compared across entries only at equal p; a point whose per-shot failure fraction would exceed 1/2 is not admitted</span></div>
 </section>

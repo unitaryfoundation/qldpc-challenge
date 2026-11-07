@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>11</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>3</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.455</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.45455</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -50,6 +50,15 @@
 (3,2): 44
 (3,3): 23
 (3,4): 6</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/11-3-3-c">circuits/11-3-3-c/</a> &middot; canonical noise recipe, 3 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 3 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[840, 843, 1206]</div></details>
+<div class=kv><b>d_circ^Z</b> 3 &middot; fault-set witness of 3 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 3)</summary><div class=wit>[1312, 1313, 1322]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>

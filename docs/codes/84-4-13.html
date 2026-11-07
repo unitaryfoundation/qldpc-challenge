@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>84</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>4</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>13</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>8.048</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>8.04762</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>9</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 <div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0048</div></div>
@@ -64,6 +64,15 @@
 (3,12): 672
 (3,13): 294</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 6.3246 &middot; Z 4.4721 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/84-4-13">circuits/84-4-13/</a> &middot; canonical noise recipe, 13 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 13 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 13 &middot; fault-set witness of 13 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 13)</summary><div class=wit>[98533, 98534, 98541, 98561, 98567, 98594, 98595, 98601, 98602, 98605, 98606, 98609, 98610]</div></details>
+<div class=kv><b>d_circ^Z</b> 13 &middot; fault-set witness of 13 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 13)</summary><div class=wit>[98515, 98516, 98538, 98542, 98551, 98552, 98557, 98560, 98563, 98565, 98567, 98569, 98591]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>

@@ -6,7 +6,7 @@
 <div class=cell title="physical qubits"><div class=l>n</div><div class=v>180</div></div>
 <div class=cell title="logical qubits"><div class=l>k</div><div class=v>20</div></div>
 <div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>11</div></div>
-<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>13.444</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>13.4444</div></div>
 <div class=cell title="max check weight"><div class=l>w</div><div class=v>7</div></div>
 <div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
 </div>
@@ -53,6 +53,15 @@
 (3,8): 4770
 (3,9): 1620
 (3,10): 360</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/180-20-11">circuits/180-20-11/</a> &middot; canonical noise recipe, 11 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 11 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 11 &middot; fault-set witness of 11 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 11)</summary><div class=wit>[119722, 119725, 119782, 119792, 119796, 119841, 119844, 119856, 119858, 119875, 119877]</div></details>
+<div class=kv><b>d_circ^Z</b> 11 &middot; fault-set witness of 11 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 11)</summary><div class=wit>[119749, 119750, 119762, 119766, 119819, 119833, 119834, 119860, 119861, 119867, 119878]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
 </section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> Lee, Gideon</div>
