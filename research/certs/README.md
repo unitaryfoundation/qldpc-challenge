@@ -183,3 +183,37 @@ uv run python research/certs/tropidist_certify.py codes/40-9-6.json --tropidist 
 uv run --extra research python research/certs/certify_sweep.py run --backend tropidist+sat \
     --tropidist /tmp/tropidist --threads 4 --tlim 600 --job-seconds 14400
 ```
+
+## Cross-checking the stabilizer certificates
+
+A stabilizer entry's certificate comes from the tropidist backend alone,
+at the solver level, so `stabilizer_crosscheck.py` (issue #4939) checks each
+one by means that share nothing with the tool: brute force over every Pauli
+operator of weight at most d - 1 when their number is within `--brute-max`
+(exact; feasible up to about n = 17 at d = 7), `verify/certify.py`'s HiGHS
+integer program on the same three-mechanisms-per-qubit encoding (exact when
+it finishes, a different solver on a different formulation), and
+`verify/heuristic_distance.py`'s randomized Pauli search at a stated trial
+budget (a consistency check, not a proof). A certificate is confirmed when
+brute force or the MILP finishes with nothing lighter and the search agrees,
+contradicted when any of the three exhibits a lighter nontrivial logical
+(re-verified with `valid_pauli_logical` and recorded), and unconfirmed
+otherwise. The record is `stabilizer_crosscheck-<date>.json`; a
+contradiction exits 3.
+
+```
+uv run --extra certify python research/certs/stabilizer_crosscheck.py --all --tlim 300 --trials 200000
+uv run --extra certify python research/certs/stabilizer_crosscheck.py --slugs 40-9-6 90-21-10
+```
+
+The run of 2026-11-06 (`stabilizer_crosscheck-2026-11-06.json`: 300 s per
+MILP solve, 200,000 RIS trials, brute force up to 2e7 Paulis) confirmed 10
+of the 11 certified entries and contradicted none. The nine entries with
+n <= 17 were confirmed by all three checks (brute force over at most 1.1e7
+Paulis, 17 s for 17-1-7; each MILP under 30 s). 40-9-6 has 1.7e8 Paulis
+below its distance, beyond the enumeration, and was confirmed by the MILP in
+34 minutes with the search agreeing. 90-21-10 is unconfirmed: the enumeration
+is out of reach (1.4e16 Paulis), each of the 42 MILP solves (one per logical
+representative) hit the 300 s limit, and the search's lightest logical at
+200,000 trials weighs 10, so that certificate rests on tropidist's verdict
+alone, with the heuristic bound agreeing.

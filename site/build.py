@@ -2775,6 +2775,24 @@ def ldiam_cell_title(e):
     return parts + ". " + LDIAM_TIP
 
 
+CERT_LEVEL_LABELS = {
+    "solver": "level solver: a solver verdict, no artifact a third party can check without re-running the encoding",
+    "proof_log": "level proof_log: the refutation was re-checked by drat-trim and is replayed by CI",
+    "formal": "level formal: a machine-checked proof of the distance statement",
+}
+
+
+def cert_level_label(level):
+    """The certificate row's statement of what the verdict is worth (schema/cert.schema.json, verification.level).
+
+    A solver-level certificate, which is what every tropidist record and the
+    MILP and CryptoMiniSat records are, is labeled as a solver verdict rather
+    than as a machine-checked proof (issue #4939).
+    """
+    text = CERT_LEVEL_LABELS.get(level, f"level {level}")
+    return f'<span class=claimed>{html.escape(text)}</span>'
+
+
 def cert_side_notes(cert):
     """One line per certified side, for the certificate row of a code page.
 
@@ -2960,9 +2978,11 @@ def detail_page(e):
                      f'<div class=wit>{wit_body}</div></details>')
     if cert and cert.get("d_exact"):
         notes = cert_side_notes(cert)
+        level = (cert.get("verification") or {}).get("level", "solver")
         P.append(f'<div class=kv><b>certificate</b> '
                  f'<span class=cert-ok>exact, d = {d}</span> &middot; '
-                 f'{html.escape(cert.get("solver",""))}</div>'
+                 f'{html.escape(cert.get("solver",""))} &middot; '
+                 f'{cert_level_label(level)}</div>'
                  f'<div class=kv style="color:var(--mut)">{html.escape(notes)}</div>')
     elif cert and e.get("d_lb"):
         lb = e["d_lb"]
@@ -2986,9 +3006,10 @@ def detail_page(e):
     elif stab:
         P.append('<div class=kv><b>certificate</b> '
                  '<span class=cert-no>none yet &middot; distance stands as a '
-                 'self-certified upper bound (d &le;); the Pauli-weight '
-                 'certifier is not built yet, so stabilizer entries cannot '
-                 'earn d= for now</span></div>')
+                 'self-certified upper bound (d &le;); a stabilizer entry is '
+                 'certified in Pauli weight by the certification sweep\'s '
+                 'tropidist backend (research/certs/tropidist_certify.py), a '
+                 'solver verdict rather than a machine-checked proof</span></div>')
     else:
         P.append('<div class=kv><b>certificate</b> '
                  '<span class=cert-no>none yet &middot; distance stands as a '
@@ -5747,7 +5768,9 @@ def stabilizer_page(entries):
         'primary-track cells are computed the same way, but carry the code '
         'type, so a record here is never a record there</td></tr>'
         '<tr><td>certificate</td><td>MILP per side</td>'
-        '<td>not built yet: every entry stands as d &le;</td></tr>'
+        '<td>the certification sweep&rsquo;s tropidist backend, in Pauli '
+        'weight at the solver level (research/certs/tropidist_certify.py); '
+        'an entry without one stands as d &le;</td></tr>'
         '<tr><td>circuit tier</td><td>memory circuits per basis</td>'
         '<td>not accepted yet: syndrome extraction needs a general '
         'stabilizer-measurement schedule</td></tr>'

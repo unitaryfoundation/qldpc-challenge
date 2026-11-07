@@ -112,8 +112,11 @@ Distance confidence is orthogonal to the tracks:
   exists. This is NP-hard and does not scale, so large codes carry tight upper
   bounds while small and moderate codes are certified exact. The board shows an
   `exact` claim as an upper bound until a maintainer runs `verify/certify.py`.
-  For a general stabilizer code the distance is a Pauli weight and the
-  certifier does not yet minimize it, so every stabilizer entry is `d<=`.
+  For a general stabilizer code the distance is a Pauli weight, which
+  `verify/certify.py` does not minimize. The certification sweep's tropidist
+  backend (`research/certs/tropidist_certify.py`, issue #4716) does, at the
+  solver level, so a stabilizer `d=` rests on a solver verdict rather than a
+  machine-checked proof, and an entry without one is `d<=`.
 
 Not a flag: first arrival. Issue #4029 asked whether the entry that first
 populates a cell, a family, or a geometry should carry an `opens` badge. The

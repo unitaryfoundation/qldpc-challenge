@@ -70,7 +70,7 @@ GRID = [
     ("960-24-38", "extended range, w=6, n=960"),
     ("968-18-31", "w=8, n~1000"),
     ("1000-406-6", "MAX_N corner, w=8, k=406"),
-    # stabilizer (non-CSS): no certifier yet, Pauli-weight RIS
+    # stabilizer (non-CSS): verify/certify.py has no Pauli-weight formulation, Pauli-weight RIS
     ("90-21-10", "stabilizer, n~100"),
     ("672-28-30", "stabilizer, w=24, n~700"),
     ("761-1-39", "stabilizer, n>700, w=4"),

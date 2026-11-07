@@ -509,8 +509,8 @@ shape of the curve is what to budget from. Per cell, per candidate:
 | w <= 8, n ~ 700 | 682 to 700 | 14 to 18 s | 600 s at k = 20; 250 to 1,550 s implied from the 2,000-trial rate, growing with k | 270 to 800 s | cap |
 | w = 9 to 32, n ~ 700 | 682 to 700 | 18 to 45 s | 1,000 to 5,300 s implied (k = 352: 5,200 s) | 760 to 1,670 s | cap |
 | any w, n ~ 1,000 | 960 to 1,000 | 15 to 22 s | 900 to 1,350 s implied | 840 to 1,190 s | cap |
-| stabilizer (Pauli weight), n ~ 100 | 90 | 13 s | 72 s (one side) | 57 s | no certifier |
-| stabilizer, n ~ 700 | 662 to 761 | 20 to 36 s | 680 to 6,700 s implied, growing with k and w | 860 s to 53 min | no certifier |
+| stabilizer (Pauli weight), n ~ 100 | 90 | 13 s | 72 s (one side) | 57 s | tropidist backend of the sweep, solver level (90-21-10 in 15 s) |
+| stabilizer, n ~ 700 | 662 to 761 | 20 to 36 s | 680 to 6,700 s implied, growing with k and w | 860 s to 53 min | tropidist backend only; nothing certified at this size yet |
 
 The gate is bounded whatever the shape: the structural pass is seconds, the refutation runs
 under a 10 s wall cap that its last trial can overrun (42 s at k = 352), and the board dedup is
