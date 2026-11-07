@@ -198,7 +198,7 @@ def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, bas
     """Report whether the PR inherited this provenance gap from the base entry rather than introducing it.
 
     True when the entry exists on ``base`` with the same missing field and the
-    PR left ``provenance`` byte-identical. A contribution to another author's
+    PR left ``provenance`` as it was, apart from appending to ``notes``. A contribution to another author's
     entry (a circuit tier, a layout, a lowered circuit distance) passes
     verify/check_authorship.py only if it touches nothing in provenance but an
     appended note, so its author cannot add the field; requiring it would block
@@ -213,7 +213,15 @@ def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, bas
         return False
     if metadata_error(base_doc) != error:
         return False
-    return base_doc.get("provenance") == document.get("provenance")
+    base_prov = base_doc.get("provenance") if isinstance(base_doc.get("provenance"), dict) else {}
+    head_prov = document.get("provenance") if isinstance(document.get("provenance"), dict) else {}
+    # The one provenance change the bindings admit from a non-author is an
+    # appended sentence in notes (a refutation's credit, a contribution's
+    # remark); everything else in provenance has to match the base.
+    if {k: v for k, v in base_prov.items() if k != "notes"} != {k: v for k, v in head_prov.items() if k != "notes"}:
+        return False
+    old_notes, new_notes = str(base_prov.get("notes") or ""), str(head_prov.get("notes") or "")
+    return new_notes.startswith(old_notes)
 
 
 @dataclass
