@@ -1,0 +1,25 @@
+{
+  "d": 14,
+  "d_exact": false,
+  "d_lower": 9,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 7,
+  "name": "[[62,7,14]]",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 9 after 300.0 s",
+      "proved_min": 9,
+      "secs": 300.0,
+      "status": "TIMEOUT",
+      "value": 14
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "checks_sha256": "39f9a896502264286d80fdf6d66a0412a2c822628c184186a02a7e75582301ee",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

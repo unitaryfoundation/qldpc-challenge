@@ -1,0 +1,25 @@
+{
+  "d": 16,
+  "d_exact": false,
+  "d_lower": 13,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 39,
+  "name": "[[180,39,16]] halved CPM pair-partition, (J,L)=(4,10), P=36",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 13 after 300.0 s",
+      "proved_min": 13,
+      "secs": 300.0,
+      "status": "TIMEOUT",
+      "value": 16
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "checks_sha256": "6e12002e31068db89df92d22ba2ff9e174ee63e680c1a2c64926bcb43e012232",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

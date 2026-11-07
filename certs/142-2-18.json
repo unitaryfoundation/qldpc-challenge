@@ -1,0 +1,25 @@
+{
+  "d": 18,
+  "d_exact": false,
+  "d_lower": 15,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 2,
+  "name": "[[142,2,18]]",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 15 after 300.0 s",
+      "proved_min": 15,
+      "secs": 300.0,
+      "status": "TIMEOUT",
+      "value": 18
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "checks_sha256": "ce64f40c60377ea43a7b940be44f8028202b8d2a09b17b46376f9819205c2bcf",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

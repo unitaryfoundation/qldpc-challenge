@@ -1,0 +1,25 @@
+{
+  "d": 22,
+  "d_exact": false,
+  "d_lower": 14,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 123,
+  "name": "[[488,123,22]] split Pauli-labelled circulant code (P = 61)",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 14 after 300.0 s",
+      "proved_min": 14,
+      "secs": 300.0,
+      "status": "TIMEOUT",
+      "value": 22
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "checks_sha256": "08cb67221906c5cb07bffce2fe43d58cceb3bddafecd4ffe75da5986c92f134f",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
