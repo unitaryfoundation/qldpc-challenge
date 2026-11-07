@@ -7213,7 +7213,7 @@
       "n": 89,
       "k": 1,
       "d": 15,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -8637,7 +8637,7 @@
       "n": 110,
       "k": 25,
       "d": 12,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
@@ -9165,7 +9165,7 @@
       "n": 120,
       "k": 27,
       "d": 12,
-      "tier": "ub",
+      "tier": "exact",
       "code_type": "stabilizer"
     },
     {
