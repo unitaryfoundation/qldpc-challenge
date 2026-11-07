@@ -37,7 +37,11 @@ matrices by `checks_sha256` (so a correction of the claim cannot strand it),
 and the entry's witnessed distance is not below it. That last one is the
 free consistency check the issue asked for: a verified witness lighter than
 a proven bound means the witness verifier or the certificate is wrong, and
-it fails here rather than waiting for a reader to notice.
+it fails here rather than waiting for a reader to notice. A stabilizer
+entry's partial certificate has the single Pauli-weight side `P` instead of
+`X` and `Z`, and its binding hash names the generator presentation
+(`checks.S`), since the tropidist backend is the only certifier it has
+(issue #4718).
 
     python verify/check_certs.py            # validate every certificate
     python verify/check_certs.py --level    # print the level mix
@@ -84,7 +88,7 @@ def _inside_tree(art):
 
 
 def checks_sha256(doc):
-    """Return the hash that binds a formal certificate to one code.
+    """Return the hash that binds a formal or partial certificate to one code.
 
     sha256 over the compact JSON of {"X": rows, "Z": rows} with every row's
     support sorted and the rows of each side sorted, so the hash names the
@@ -92,11 +96,20 @@ def checks_sha256(doc):
     and nothing about file formatting or row order. A formal proof is about
     a matrix pair defined inside a proof development; this is what ties
     that pair to codes/<slug>.json, and a certificate whose hash is not this
-    entry's is a proof about some other code.
+    entry's is a proof about some other code. A stabilizer entry (checks.S,
+    one X and Z support per generator) hashes {"S": rows} with each
+    generator's two supports sorted and the generators sorted (issue #4718);
+    the CSS form is unchanged, so every committed hash still matches.
     """
-    canon = {side: sorted(sorted(int(q) for q in row)
-                          for row in doc["checks"][side])
-             for side in ("X", "Z")}
+    checks = doc["checks"]
+    if "S" in checks and "X" not in checks:
+        canon = {"S": sorted([sorted(int(q) for q in row.get("X", [])),
+                              sorted(int(q) for q in row.get("Z", []))]
+                             for row in checks["S"])}
+    else:
+        canon = {side: sorted(sorted(int(q) for q in row)
+                              for row in checks[side])
+                 for side in ("X", "Z")}
     blob = json.dumps(canon, separators=(",", ":"), sort_keys=True)
     return hashlib.sha256(blob.encode("ascii")).hexdigest()
 
@@ -186,6 +199,8 @@ def bound_problems(slug, cert):
     says, ``d_lower`` must be the minimum over sides, a SAT rung is a
     refutation and not a certificate, the binding hash must be this entry's,
     and the entry's witnessed distances may not sit below the proven bounds.
+    The sides are X and Z for a CSS entry and the single Pauli-weight side P
+    for a stabilizer one (issue #4718).
     """
     out = []
     d = cert.get("d")
@@ -194,6 +209,8 @@ def bound_problems(slug, cert):
     sides = cert.get("sides") or {}
     if not isinstance(d, int):
         return out
+    doc = _code_doc(slug)
+    stab = doc is not None and doc.get("code_type") == "stabilizer"
     if exact:
         if d_lower is not None and d_lower != d:
             out.append(f"{slug}: d_exact with d_lower {d_lower} != d {d}; an exact "
@@ -212,7 +229,10 @@ def bound_problems(slug, cert):
             out.append(f"{slug}: partial certificate with d_lower {d_lower} >= d {d}; "
                        "a bound that reaches the claim is d_exact, and one above it "
                        "contradicts the verified witness")
-        if set(sides) != {"X", "Z"}:
+        if stab and set(sides) != {"P"}:
+            out.append(f"{slug}: partial certificate on a stabilizer entry needs the Pauli "
+                       f"side P, has {sorted(sides)}; a CSS side bounds nothing there")
+        elif not stab and set(sides) != {"X", "Z"}:
             out.append(f"{slug}: partial certificate needs both sides, has "
                        f"{sorted(sides)}; a bound on one side bounds nothing")
         mins = []
@@ -242,7 +262,6 @@ def bound_problems(slug, cert):
                        f"proved_min {sorted(mins)}")
         v = cert.get("verification") or {}
         want = v.get("checks_sha256")
-        doc = _code_doc(slug)
         if doc is None:
             out.append(f"{slug}: partial certificate but codes/{slug}.json is not on the "
                        "board, so there is nothing for the bound to be about")

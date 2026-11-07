@@ -57,7 +57,10 @@ partial certificate already in certs/ is reopened at its own d_lower when
 ``--retry`` names it or the ladder budget is larger than the one it
 recorded, and replaced only when the new run raises the bound; the old rungs
 stay in the file. The tropidist backend's per-side lower bounds are filed the
-same way.
+same way, on CSS entries and, with the single Pauli-weight side P, on
+stabilizer entries, and under that backend a partial certificate is reopened
+at its d_lower with the tool's ``--kmin`` when ``--retry`` or ``--slugs``
+names it or ``--tlim`` exceeds the recorded one (issue #4718).
 
     uv run --extra research python research/certs/certify_sweep.py run --tlim 600 --job-seconds 14400
     uv run --extra research python research/certs/certify_sweep.py run --tlim 120 --ladder 300
@@ -193,7 +196,7 @@ def _cert_on_file(certs_dir, slug):
 
 
 def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None,
-           stabilizer_ok=False, ladder=None):
+           stabilizer_ok=False, ladder=None, tool=False):
     """Return the entries the sweep opens, in queue order, and why it passes over the rest.
 
     Skipped: stabilizer entries unless ``stabilizer_ok`` (the SAT path has no
@@ -211,8 +214,12 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
 
     A partial certificate on file (``d_exact`` false) is not a closed entry:
     with ``ladder`` it is reopened at its own ``d_lower`` when ``retry`` or
-    ``slugs`` names it or the new budget is larger than the one it recorded,
-    and the row then carries ``start`` and ``raise_from``; otherwise it is
+    ``slugs`` names it or the new budget is larger than the one it recorded;
+    with the tropidist backend (``tool``) and no ladder it is reopened when
+    ``retry`` or ``slugs`` names it or ``tlim`` is larger than the
+    ``tlim_per_solve`` it recorded (issue #4718). A reopened row carries
+    ``start`` and ``raise_from``, and the certifier starts at ``start``
+    instead of re-proving the thresholds below it. Otherwise the entry is
     skipped as ``partial``.
     """
     by_slug = {r["slug"]: r for r in queue.get("entries", [])}
@@ -251,16 +258,24 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
             skip(slug, "certified", "certs/ already has a file for it")
             continue
         if on_file is not None:
+            lb = on_file["d_lower"]
             had = ((on_file.get("ladder") or {}).get("budget_per_side") or 0)
-            if not ladder:
-                skip(slug, "partial", f"certs/ has a partial certificate (d >= {on_file['d_lower']}); "
-                                      "a ladder run raises it")
+            had_tlim = on_file.get("tlim_per_solve") or 0
+            if ladder:
+                if not (retry or slugs or ladder > had):
+                    skip(slug, "partial", f"certs/ has a partial certificate (d >= {lb}) from a "
+                                          f"{had:g} s ladder; --retry or a larger --ladder raises it")
+                    continue
+            elif tool:
+                if not (retry or slugs or tlim > had_tlim):
+                    skip(slug, "partial", f"certs/ has a partial certificate (d >= {lb}) from a {had_tlim:g} s "
+                                          "per side run; --retry or a larger --tlim raises it")
+                    continue
+            else:
+                skip(slug, "partial", f"certs/ has a partial certificate (d >= {lb}); "
+                                      "a ladder run raises it, as does the tropidist backend")
                 continue
-            if not (retry or slugs or ladder > had):
-                skip(slug, "partial", f"certs/ has a partial certificate (d >= {on_file['d_lower']}) from a "
-                                      f"{had:g} s ladder; --retry or a larger --ladder raises it")
-                continue
-            r = dict(r, start=int(on_file["d_lower"]), raise_from=on_file)
+            r = dict(r, start=int(lb), raise_from=on_file)
         values = {s: v.get("value") for s, v in (r.get("sides") or {}).items()}
         want = {"P"} if stab else {"X", "Z"}
         if set(values) != want or any(v != r["d"] for v in values.values()):
@@ -288,14 +303,15 @@ def lower_bound_of(cert):
     """Return the lower bound a record proves on both sides, or None.
 
     ``d_lower`` when the SAT ladder wrote one; otherwise the minimum over the
-    two CSS sides of what each proved: d on a closed side, the tropidist
-    backend's ``lower_bound`` on an open one. None when a side proved nothing
-    or the record is not two-sided (the partial tier is CSS only).
+    sides of what each proved: d on a closed side, the tropidist backend's
+    ``lower_bound`` on an open one. The sides are X and Z for a CSS record
+    and the single Pauli-weight side P for a stabilizer one (issue #4718).
+    None when a side proved nothing or the record has some other side set.
     """
     sides = cert.get("sides") or {}
     if isinstance(cert.get("d_lower"), int):
         return cert["d_lower"]
-    if set(sides) != {"X", "Z"}:
+    if set(sides) not in ({"X", "Z"}, {"P"}):
         return None
     bounds = []
     for blk in sides.values():
@@ -362,7 +378,10 @@ def raise_certificate(old, new):
     formula it refuted, with ``cnf_sha256`` rebuilt from those rungs, since the
     replay regenerates each side at its ``proved_min`` - 1. Returns the merged
     record; ``new`` is returned unchanged when it is exact (the ladder
-    reached d - 1, and an exact certificate is its own evidence).
+    reached d - 1, and an exact certificate is its own evidence). A record
+    without ladders (the tropidist backend's, issue #4718) merges the same
+    way minus the rungs: ``proved_min`` is the larger of the two, no empty
+    ladder is written, and the file records the bound it was raised from.
     """
     if new.get("d_exact"):
         return new
@@ -371,9 +390,11 @@ def raise_certificate(old, new):
     for side, blk in out["sides"].items():
         prev = (old.get("sides") or {}).get(side) or {}
         kept = [r for r in (prev.get("ladder") or []) if int(r["W"]) < start]
-        blk["ladder"] = kept + list(blk.get("ladder") or [])
+        merged = kept + list(blk.get("ladder") or [])
+        if merged:
+            blk["ladder"] = merged
         blk["proved_min"] = max(int(prev.get("proved_min") or 1), int(blk.get("proved_min") or 1))
-        top = _top_rung(blk["ladder"])
+        top = _top_rung(blk.get("ladder"))
         if top is not None and int(top["W"]) + 1 == blk["proved_min"]:
             tail = (blk.get("note") or "").split("; ", 1)
             blk["note"] = f"no logical < {blk['proved_min']} exists" + (f"; {tail[1]}" if len(tail) > 1 else "")
@@ -388,13 +409,20 @@ def raise_certificate(old, new):
         v["cnf_sha256"] = ";".join(f"{s}={tops[s]['cnf_sha256']}" for s in sorted(tops))
         out["verification"] = v
     else:
+        any_ladder = any(b.get("ladder") for b in out["sides"].values())
         out["verification"] = {"level": "solver",
-                               "note": "raised ladder; not every side's top rung carries a checked proof"}
+                               "note": ("raised ladder; not every side's top rung carries a checked proof"
+                                        if any_ladder else
+                                        "raised by a later run of the tool that started at the filed bound; "
+                                        "solver verdicts on both runs")}
     out["verification"]["checks_sha256"] = (old.get("verification") or {}).get("checks_sha256") \
         or (new.get("verification") or {}).get("checks_sha256")
-    out["ladder"] = {"start": int((old.get("ladder") or {}).get("start") or start),
-                     "budget_per_side": (new.get("ladder") or {}).get("budget_per_side"),
-                     "raised_from": int(old.get("d_lower") or 1)}
+    if new.get("ladder") or old.get("ladder"):
+        out["ladder"] = {"start": int((old.get("ladder") or {}).get("start") or start),
+                         "budget_per_side": (new.get("ladder") or {}).get("budget_per_side"),
+                         "raised_from": int(old.get("d_lower") or 1)}
+    else:
+        out["raised_from"] = int(old.get("d_lower") or 1)
     return out
 
 
@@ -445,16 +473,23 @@ def _side_summary(blk):
     return out
 
 
-def tropidist_in_subprocess(path, slug, tlim, root, threads, wall):
+def tropidist_in_subprocess(path, slug, tlim, root, threads, wall, kmin=None, script=None):
     """Run research/certs/tropidist_certify.py on one entry under a hard wall clock.
+
+    ``kmin`` is a threshold already proved (a reopened partial certificate's
+    ``d_lower``, issue #4718), handed to the tool as ``--kmin`` so it does
+    not re-prove the thresholds below it. ``script`` replaces the certifier
+    (the tests' stand-in).
 
     Returns (record, error, killed) like certify_in_subprocess. Exit 0 and 1
     are verdicts (exact or not) with the record on stdout; exit 2 is the
     certifier refusing (no checkout, a pairing set that does not span k, a
     vector the board rejects), reported from its last stderr line.
     """
-    cmd = [sys.executable, TROPIDIST_CERTIFY, path, "--tropidist", root, "--tlim", str(float(tlim)),
+    cmd = [sys.executable, script or TROPIDIST_CERTIFY, path, "--tropidist", root, "--tlim", str(float(tlim)),
            "--threads", str(int(threads)), "--json"]
+    if kmin and int(kmin) > 1:
+        cmd += ["--kmin", str(int(kmin))]
     proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                             start_new_session=True)
     try:
@@ -568,14 +603,20 @@ def _sat_attempt(path, slug, tlim, wall, certify, ladder=None, start=1):
         shutil.rmtree(proof_dir, ignore_errors=True)
 
 
-def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist):
-    """One tropidist attempt: (record, error, killed), in a subprocess or through the stand-in."""
+def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist, start=None):
+    """One tropidist attempt: (record, error, killed), in a subprocess or through the stand-in.
+
+    ``start`` above 1 is a reopened partial certificate's ``d_lower``: the
+    tool starts every side there (issue #4718).
+    """
+    kmin = int(start) if start and int(start) > 1 else None
     if certify_tropidist is None:
-        return tropidist_in_subprocess(path, slug, tlim, root, threads, tropidist_wall(tlim))
+        return tropidist_in_subprocess(path, slug, tlim, root, threads, tropidist_wall(tlim), kmin=kmin)
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
+    kw = {"kmin": {side: kmin for side in ("X", "Z", "P")}} if kmin else {}
     try:
-        return certify_tropidist(doc, tlim=tlim, slug=slug), None, False
+        return certify_tropidist(doc, tlim=tlim, slug=slug, **kw), None, False
     except (ValueError, RuntimeError) as e:
         return None, str(e), False
 
@@ -608,7 +649,11 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     ladder (issue #4230); None asks at d - 1 alone. With it, an entry that
     does not close is staged as a partial certificate when it proved d >= 2,
     and a partial certificate on file is reopened at its d_lower and
-    replaced only when the run raises the bound.
+    replaced only when the run raises the bound. The tropidist backend files
+    its per-side lower bounds the same way, on CSS and stabilizer entries,
+    and reopens a partial certificate at its d_lower with the tool's
+    ``--kmin`` when ``retry`` or ``slugs`` names it or ``tlim`` exceeds the
+    recorded one (issue #4718).
     """
     if backend not in BACKENDS:
         raise ValueError(f"backend must be one of {BACKENDS}")
@@ -623,7 +668,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     last = last_attempts(load_jsonl(attempts_path))
     chosen, skipped, reasons = select(queue, last=last, tlim=tlim, today=date, certs_dir=certs_dir,
                                       codes_dir=codes_dir, slugs=slugs, retry=retry, stabilizer_ok=use_tool,
-                                      ladder=ladder)
+                                      ladder=ladder, tool=use_tool)
     if max_entries:
         chosen = chosen[:max_entries]
     versions = dict(tools())
@@ -649,7 +694,8 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
         cert, error, killed, used, upgrade = None, None, False, "sat", None
         if use_tool:
             used = "tropidist"
-            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist)
+            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist,
+                                                     start=row.get("start"))
         # The SAT path runs alone, after a tool error, on an entry the tool
         # closed (to carry it to proof_log), and, with a ladder, on an entry
         # the tool left open: the ladder's rungs can be proof-checked, which
@@ -674,7 +720,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
                           secs=time.time() - t0, error=error, killed=killed, backend=used, upgrade=upgrade,
                           ladder=ladder)
         if att["outcome"] == "timeout" and row.get("raise_from"):
-            att["note"] = (f"reopened at W = {row['start']}; the ladder did not rise above the filed "
+            att["note"] = (f"reopened at W = {row['start']}; the run did not rise above the filed "
                            f"d >= {row['raise_from'].get('d_lower')}")
         if att["outcome"] in ("exact", "partial"):
             filed = certificate(cert)
@@ -686,7 +732,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
                 filed = raise_certificate(old, filed)
                 att["raised"] = {"from": int(old.get("d_lower") or 1), "to": lower_bound_of(filed) or filed["d"]}
                 if att["outcome"] == "partial" and att["raised"]["to"] <= att["raised"]["from"]:
-                    att["note"] = f"ladder did not rise above the filed d >= {att['raised']['from']}"
+                    att["note"] = f"the run did not rise above the filed d >= {att['raised']['from']}"
                     filed = None
                 else:
                     att["d_lower"] = lower_bound_of(filed)
@@ -894,14 +940,23 @@ def pr_text(m, staged=None):
                     f"{r.get('backend', 'sat')} | {_sides_cell(r['sides'])} |")
     if partial:
         raised = [r for r in partial if r.get("raised")]
+        by_tool = [r for r in partial if r.get("backend") == "tropidist"]
+        by_ladder = [r for r in partial if r.get("backend") != "tropidist"]
+        how = []
+        if by_ladder:
+            how.append(f"the SAT ladder asked each side at W = 1, 2, ... with {m.get('ladder')} s per side and "
+                       f"did not reach d - 1 on {len(by_ladder)}, leaving the largest W + 1 at which both sides "
+                       "returned UNSAT as the proven lower bound")
+        if by_tool:
+            how.append(f"the tropidist backend did not finish {len(by_tool)} within {m['tlim']} s per side, and "
+                       "the threshold its exhaustive search had cleared is the proven lower bound (issue #4718; "
+                       "solver level, no proof artifact)")
         body += ["",
                  f"{len(partial)} partial {'certificate' if len(partial) == 1 else 'certificates'} (issue #4230): "
-                 f"the ladder asked each side at W = 1, 2, ... with {m.get('ladder')} s per side and did not reach "
-                 "d - 1, so the entry keeps its witnessed upper bound and gains the proven lower bound d_lower, "
-                 "the largest W + 1 at which both sides returned UNSAT. The board shows these as the interval "
-                 "d_lower <= d <= d. Each file is bound to its entry's matrices by verification.checks_sha256, "
-                 "so a later correction of the claim keeps the bound; verify/check_certs.py fails if a witness "
-                 "ever sits below it."
+                 + "; ".join(how) + ". Each entry keeps its witnessed upper bound and gains the proven lower bound "
+                 "d_lower, and the board shows it as the interval d_lower <= d <= d. Each file is bound to its "
+                 "entry's checks by verification.checks_sha256, so a later correction of the claim keeps the "
+                 "bound; verify/check_certs.py fails if a witness ever sits below it."
                  + (f" {len(raised)} of them {'replaces' if len(raised) == 1 else 'replace'} a partial "
                     "certificate already on file, with the old rungs kept ahead of the new ones." if raised else ""),
                  "",

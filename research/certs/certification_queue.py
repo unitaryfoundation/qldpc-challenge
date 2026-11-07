@@ -186,6 +186,10 @@ def build_queue(build, entries, records):
                                       "lp_vars": n + rank_kernel + 1,
                                       "lp_constraints": rank_kernel + 2,
                                       "milps_at_most": gens}
+        if e.get("d_lb"):
+            # a partial certificate on file (issue #4718): the entry stays in the
+            # queue, and the sweep reopens it at this bound rather than at 1
+            rec["certified_lower_bound"] = int(e["d_lb"])
         median, count = peers_for(n, d, rows) if not stab else (None, 0)
         rec["peers"] = {"median_side_secs": median, "count": count}
         rec["band"] = band_for(rec["code_type"], n, d, median, count)

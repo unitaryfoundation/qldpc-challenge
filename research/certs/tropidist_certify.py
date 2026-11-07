@@ -289,14 +289,47 @@ def certify(doc, *, root, tlim=600, threads=1, slug=None, kmin=None, runner=None
     return out
 
 
+def parse_kmin(text):
+    """Turn the --kmin argument into the per-side map certify() takes, or None.
+
+    A bare integer starts every side there; ``X=15,Z=14`` names the sides.
+    A threshold at or below 1 is no start at all. The value is a bound
+    already proved (a partial certificate's ``proved_min``, issue #4718), so
+    the search does not re-prove the cheap thresholds below it.
+    """
+    if text is None or str(text).strip() == "":
+        return None
+    text = str(text).strip()
+    if "=" not in text:
+        k = int(text)
+        return {side: k for side in ("X", "Z", "P")} if k > 1 else None
+    out = {}
+    for part in text.split(","):
+        side, _, value = part.partition("=")
+        side, value = side.strip(), value.strip()
+        if side not in ("X", "Z", "P") or not value:
+            raise ValueError(f"--kmin expects an integer or SIDE=K pairs with SIDE in X, Z, P; got {text!r}")
+        if int(value) > 1:
+            out[side] = int(value)
+    return out or None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("path", help="codes/<slug>.json")
     ap.add_argument("--tropidist", default=None, help=f"the checkout to run (default: ${ENV_ROOT})")
     ap.add_argument("--tlim", type=float, default=600, help="seconds per side (default 600)")
     ap.add_argument("--threads", type=int, default=1)
+    ap.add_argument("--kmin", default=None, metavar="K",
+                    help="start the search at a threshold already proved (a partial certificate's proved_min): "
+                         "an integer for every side, or per side as X=15,Z=14 (issue #4718)")
     ap.add_argument("--json", action="store_true", help="print the record instead of a summary line")
     a = ap.parse_args(argv)
+    try:
+        kmin = parse_kmin(a.kmin)
+    except ValueError as e:
+        print(str(e), file=sys.stderr)
+        return 2
     root = tropidist_root(a.tropidist)
     if root is None:
         print(f"no tropidist checkout: pass --tropidist or set {ENV_ROOT}", file=sys.stderr)
@@ -305,7 +338,7 @@ def main(argv=None):
         doc = json.load(f)
     slug = os.path.splitext(os.path.basename(a.path))[0]
     try:
-        out = certify(doc, root=root, tlim=a.tlim, threads=a.threads, slug=slug)
+        out = certify(doc, root=root, tlim=a.tlim, threads=a.threads, slug=slug, kmin=kmin)
     except (ValueError, TropidistError) as e:
         print(f"{slug}: {e}", file=sys.stderr)
         return 2

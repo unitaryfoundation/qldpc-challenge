@@ -153,7 +153,8 @@ def test_the_record_is_a_solver_level_certificate_the_schema_and_checker_accept(
     # its d_lower and the binding hash (issue #4230), which the sweep adds before filing.
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(partial, schema)
-    spec = importlib.util.spec_from_file_location("certify_sweep_for_tropidist", os.path.join(_HERE, "certify_sweep.py"))
+    spec = importlib.util.spec_from_file_location("certify_sweep_for_tropidist",
+                                                  os.path.join(_HERE, "certify_sweep.py"))
     S = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(S)
     filed = S.partial_certificate(partial, doc)
@@ -185,3 +186,14 @@ def test_the_tool_itself_certifies_the_five_qubit_code():
     root = T.tropidist_root()
     cert = T.certify(_five_qubit(), root=root, tlim=60, threads=1, slug="5-1-3")
     assert cert["d_exact"] and cert["sides"]["P"]["status"] == "UNSAT"
+
+
+def test_kmin_parses_to_the_per_side_map_the_certifier_takes():
+    """--kmin resumes above a filed partial certificate's d_lower (issue #4718)."""
+    T = _module()
+    assert T.parse_kmin(None) is None and T.parse_kmin("") is None and T.parse_kmin("1") is None
+    assert T.parse_kmin("15") == {"X": 15, "Z": 15, "P": 15}
+    assert T.parse_kmin("X=15, Z=14") == {"X": 15, "Z": 14}
+    assert T.parse_kmin("P=7") == {"P": 7}
+    with pytest.raises(ValueError):
+        T.parse_kmin("Y=3")
