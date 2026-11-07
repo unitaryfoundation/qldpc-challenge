@@ -1,0 +1,25 @@
+{
+  "d": 15,
+  "d_exact": false,
+  "d_lower": 13,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 100,
+  "name": "[[500,100,15]] mirror fold (symplectic halving) of a [[1000,200]] pair-partition CPM code",
+  "sides": {
+    "P": {
+      "exact": false,
+      "note": "lower bound 13 after 300.0 s",
+      "proved_min": 13,
+      "secs": 300.0,
+      "status": "TIMEOUT",
+      "value": 15
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 300.0,
+  "verification": {
+    "checks_sha256": "cbc0a4e92697a833ddc3ca3883ba7e5a606b01cfdbae3e8471d92f31fc17ec4c",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}
