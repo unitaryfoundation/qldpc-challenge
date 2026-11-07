@@ -65,7 +65,7 @@ def backfill_one(slug, *, by, method, circuits_root=None, rounds=None,
                       newline="\n") as f:
                 f.write(text)
         with open(code_path, "w", encoding="utf-8", newline="\n") as f:
-            json.dump(doc, f, indent=2)
+            json.dump(doc, f, indent=1)
             f.write("\n")
         rec["wrote"] = [os.path.relpath(code_path, _ROOT),
                         os.path.relpath(cdir, _ROOT)]
