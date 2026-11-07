@@ -319,3 +319,49 @@ def test_an_exact_certificate_may_carry_only_its_own_distance_as_d_lower():
     c = copy.deepcopy(BASE)
     c["sides"]["X"]["proved_min"] = c["d"] - 1
     assert any("is exact but proved_min" in p for p in C.bound_problems("72-12-6", c))
+
+
+# --- stabilizer partial certificates: the single Pauli side P (issue #4718) -------------------
+
+def _stab_partial(slug="90-21-10", d_lower=7, **over):
+    doc = _entry(slug)
+    d = doc["distance"]["d"]
+    c = {"name": doc["name"], "d": d, "d_exact": False, "d_lower": d_lower,
+         "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search", "tlim_per_solve": 600,
+         "encoding": "pauli-mechanisms",
+         "sides": {"P": {"value": d, "exact": False, "status": "TIMEOUT", "secs": 600.0, "proved_min": d_lower,
+                         "note": f"lower bound {d_lower} after 600 s"}},
+         "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel",
+                          "checks_sha256": C.checks_sha256(doc)}}
+    c.update(over)
+    return c
+
+
+def test_a_stabilizer_partial_certificate_has_the_pauli_side_and_passes():
+    c = _stab_partial()
+    assert _schema_errors(c) == []
+    assert C.evidence_problems("90-21-10", c) == []
+    assert C.bound_problems("90-21-10", c) == []
+
+
+def test_the_sides_of_a_partial_certificate_match_the_entry_kind():
+    css_sides = {s: {"value": 10, "exact": False, "status": "TIMEOUT", "proved_min": 7} for s in "XZ"}
+    probs = C.bound_problems("90-21-10", _stab_partial(sides=css_sides))
+    assert any("needs the Pauli side P" in p for p in probs)
+    pauli_side = {"P": {"value": 6, "exact": False, "status": "TIMEOUT", "proved_min": 3}}
+    probs = C.bound_problems("72-12-6", _partial(sides=pauli_side))
+    assert any("needs both sides" in p for p in probs)
+    # a bound above the entry's witnessed Pauli weight is the contradiction the checker reports
+    high = _stab_partial(d_lower=11, sides={"P": {"value": 10, "exact": False, "status": "TIMEOUT", "proved_min": 11}})
+    assert any("verified witness" in p for p in C.bound_problems("90-21-10", high))
+
+
+def test_the_stabilizer_binding_hash_names_the_generator_set_not_the_file():
+    doc = _entry("90-21-10")
+    same = copy.deepcopy(doc)
+    same["checks"]["S"] = [{"X": list(reversed(g["X"])), "Z": list(reversed(g["Z"]))}
+                           for g in reversed(doc["checks"]["S"])]
+    assert C.checks_sha256(doc) == C.checks_sha256(same)
+    assert len(C.checks_sha256(doc)) == 64
+    assert C.checks_sha256(doc) != C.checks_sha256(_entry("5-1-3"))
+    assert C.checks_sha256(doc) != C.checks_sha256(_entry("72-12-6"))

@@ -1593,7 +1593,7 @@ def side_tiers(cert, doc):
 
 
 def cert_lower_bounds(cert, doc, slug=None):
-    """Return the proven lower bounds a certificate earns: {"d": lb, "X": lb_X, "Z": lb_Z}.
+    """Return the proven lower bounds a certificate earns: {"d": lb, "X": lb_X, "Z": lb_Z, "P": lb_P}.
 
     An honored exact certificate proves d on every side. A partial
     certificate (issue #4230) proves ``d_lower`` overall and ``proved_min``
@@ -1604,16 +1604,22 @@ def cert_lower_bounds(cert, doc, slug=None):
     (the witness verifier or the certificate is wrong); it is reported and
     not shown, and verify/check_certs.py fails CI on it. Every value is None
     when nothing is proved, and a bound of 1 is the trivial one and also
-    None. Stabilizer entries have no certifier for the partial tier.
+    None. A stabilizer entry has the single Pauli-weight side P, bounded by
+    the certification sweep's tropidist backend (issue #4718).
     """
-    out = {"d": None, "X": None, "Z": None}
-    if not cert or is_stabilizer(doc):
+    out = {"d": None, "X": None, "Z": None, "P": None}
+    if not cert:
         return out
+    names = ("P",) if is_stabilizer(doc) else ("X", "Z")
     d = doc["distance"]["d"]
     if cert.get("d_exact") and cert_consistent(cert, doc):
-        return {"d": d, "X": d, "Z": d}
+        return dict(out, d=d, **{side: d for side in names})
     lb = cert.get("d_lower")
     if not isinstance(lb, int) or lb < 2 or cert.get("d_exact"):
+        return out
+    if set(cert.get("sides") or {}) != set(names):
+        print(f"  warning: {slug or doc.get('name')}: partial certificate has sides "
+              f"{sorted(cert.get('sides') or {})}, the entry has {list(names)}; not showing its lower bound")
         return out
     want = (cert.get("verification") or {}).get("checks_sha256")
     if want != checks_sha256(doc):
@@ -1625,7 +1631,7 @@ def cert_lower_bounds(cert, doc, slug=None):
               f"but the verified witness gives d <= {d}; not showing it (issue #4230)")
         return out
     out["d"] = lb
-    for side in ("X", "Z"):
+    for side in names:
         pm = ((cert.get("sides") or {}).get(side) or {}).get("proved_min")
         sv = (doc["distance"].get(side) or {}).get("value")
         if isinstance(pm, int) and pm >= 2 and isinstance(sv, int) and pm <= sv:
@@ -1952,7 +1958,7 @@ def load_entries():
             "tier_P": tiers.get("P"),
             # proven lower bounds (issue #4230): d itself on the exact tier,
             # a partial certificate's d_lower below it, else None
-            "d_lb": lbs["d"], "lb_X": lbs["X"], "lb_Z": lbs["Z"],
+            "d_lb": lbs["d"], "lb_X": lbs["X"], "lb_Z": lbs["Z"], "lb_P": lbs["P"],
             "asym": asym,
             "w_X": w_x, "w_Z": w_z,
             "geo": round(geo, 4) if geo is not None else None,
@@ -2260,8 +2266,8 @@ def badge(tier, lb=None):
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
         return (f'<span class="b lb" title="proven lower bound: a solver showed no '
-                f'logical lighter than {lb} exists on either side (an ascending '
-                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'logical lighter than {lb} exists on any side (a partial '
+                f'certificate in certs/), while the witness gives the upper '
                 f'bound">{lb} &le; d &le;</span>')
     return ('<span class="b ub" title="verified upper bound: an explicit '
             'logical of this weight, and independent refutation searches '
@@ -2270,8 +2276,8 @@ def badge(tier, lb=None):
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
         return (f'<span class="b lb" title="proven lower bound: a solver showed no '
-                f'logical lighter than {lb} exists on either side (an ascending '
-                f'UNSAT ladder in certs/), while the witness gives the upper '
+                f'logical lighter than {lb} exists on any side (a partial '
+                f'certificate in certs/), while the witness gives the upper '
                 f'bound">{lb} &le; d &le;</span>')
     return ('<span class="b ub" title="verified upper bound: an explicit '
             'logical of this weight, and independent refutation searches '

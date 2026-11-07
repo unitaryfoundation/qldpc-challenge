@@ -167,3 +167,27 @@ def test_stats_carry_the_novelty_split_and_the_census_shows_it(tmp_path):
     assert "<b>1</b><span>novelty audited</span>" in index
     assert "<b>0</b><span>novelty audited</span>" in stab
     assert "<span>certified exact</span>" in index and "<span>certified exact</span>" in stab
+
+
+def test_a_stabilizer_partial_certificate_shows_the_interval(tmp_path):
+    """A tropidist lower bound on the Pauli side P renders like a CSS partial certificate (issue #4718)."""
+    import sys
+    sys.path.insert(0, os.path.join(ROOT, "verify"))
+    import check_certs as C
+    doc = _fixture("5-1-3.json")
+    certs = tmp_path / "certs"
+    certs.mkdir()
+    cert = {"name": doc["name"], "d": 3, "d_exact": False, "d_lower": 2,
+            "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search", "tlim_per_solve": 60,
+            "encoding": "pauli-mechanisms",
+            "sides": {"P": {"value": 3, "exact": False, "status": "TIMEOUT", "secs": 60.0, "proved_min": 2,
+                            "note": "lower bound 2 after 60 s"}},
+            "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel",
+                             "checks_sha256": C.checks_sha256(doc)}}
+    with open(certs / "5-1-3.json", "w") as f:
+        json.dump(cert, f)
+    build = _build_board(tmp_path, {"5-1-3": doc})
+    page = _read(build, "codes", "5-1-3.html")
+    assert "partial, 2 &le; d &le; 3" in page and "P: d_P &ge; 2" in page
+    board = _read(build, "stabilizer.html")
+    assert "2 &le; d &le;</span> 3" in board

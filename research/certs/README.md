@@ -23,6 +23,7 @@ Per entry:
 | `peers` | the honored solver and proof_log certificates within 25% of its n and within 2 of its d: how many, and the median of their recorded seconds (worse side) |
 | `band` | A: three or more peers, median under 600 s. B: a peer under 3,600 s, or n <= 400 and d <= 16 (what the October 2026 Perlmutter run closed at 2,400 s per solve). C: n <= 700 and d <= 24, beyond any peer but inside what the tier has reached (largest certified d is 19). D: n > 700 or d > 24, which nothing certified on main resembles. P: stabilizer, tropidist backend only |
 | `measured_shape` | when `research/cost/cost_table.json` exists, the nearest measured shape and how its certification run ended there (exact, MILP limit, wall cap) |
+| `certified_lower_bound` | when `certs/<slug>.json` is a partial certificate, its `d_lower`: the entry stays in the queue, and the sweep reopens it at that bound (issue #4718) |
 | `position` | rank under the rule below |
 
 The rule, also in the file's `rule` field: records first, then band A to D with
@@ -125,7 +126,14 @@ bound or closed the entry, keeping the old rungs ahead of the new ones so the
 file shows the whole ascent. A run whose first new rung times out files
 nothing and says so in its attempt row. The tropidist backend's per-side
 `lower_bound` on a side that did not close is filed the same way, at the
-solver level and without a ladder.
+solver level and without a ladder, on CSS entries and on stabilizer entries
+(the single Pauli-weight side `P`, bound to the generator set by
+`checks_sha256`; issue #4718). Under `--backend tropidist` a partial
+certificate on file is reopened when `--retry` or `--slugs` names it or
+`--tlim` is larger than the `tlim_per_solve` it recorded, and the tool starts
+at the filed `d_lower` (`tropidist_certify.py --kmin`) instead of re-proving
+the thresholds below it; the file is replaced only when the bound rose, and
+records the bound it was raised from.
 
 ## The tropidist backend
 
@@ -180,6 +188,8 @@ sides in 600 s. Stabilizer entries 40-9-6 and 90-21-10 closed in under 15 s;
 
 ```
 uv run python research/certs/tropidist_certify.py codes/40-9-6.json --tropidist /tmp/tropidist --tlim 600
+uv run python research/certs/tropidist_certify.py codes/372-130-16.json --tropidist /tmp/tropidist \
+    --tlim 3600 --kmin 15     # resume above a filed partial certificate's d_lower
 uv run --extra research python research/certs/certify_sweep.py run --backend tropidist+sat \
     --tropidist /tmp/tropidist --threads 4 --tlim 600 --job-seconds 14400
 ```
