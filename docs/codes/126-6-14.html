@@ -45,6 +45,15 @@
 (3,7): 1260</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 8.6023 &middot; Z 9.2195 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/126-6-14">circuits/126-6-14/</a> &middot; canonical noise recipe, 14 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 14 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 14 &middot; fault-set witness of 14 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 14)</summary><div class=wit>[101940, 101942, 101963, 101982, 101986, 102000, 102018, 102021, 102034, 102035, 102043, 102047, 102051, 102052]</div></details>
+<div class=kv><b>d_circ^Z</b> 14 &middot; fault-set witness of 14 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 14)</summary><div class=wit>[101948, 101950, 101951, 101953, 101960, 101962, 101978, 102019, 102029, 102038, 102051, 102055, 102056, 102059]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Simulated annealing over integer-grid site assignments with the repo&#x27;s own research/local2d/fold_layout.search_layout, single layer at radius 4 then two layers at 7, plus a divisor scan of the two-block index convention Z_l x Z_m which gives the tighter embedding here; radius and per-site occupancy re-measured with the verifier&#x27;s own rule. &middot; 2026-10-13</div>
