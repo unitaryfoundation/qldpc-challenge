@@ -3,13 +3,17 @@ name: certify-weekly
 # research/certs/todo.json orders every upper-bound entry by what certifying
 # it is worth and what it should cost (certification-queue.yml regenerates it
 # on Monday at 08:00); this is the job that works its head (issue #4148).
-# research/certs/certify_sweep.py opens entries in queue order and runs
-# verify/sat_certify.py with the proof path on each, one time limit per
-# solve, until the job budget is spent. The tropidist backend
-# (research/certs/tropidist_certify.py, issue #4716) is opt-in: a
-# workflow_dispatch run with backend set to tropidist or tropidist+sat
-# fetches the tool at its pinned commit and runs it; the scheduled run stays
-# on the SAT path. The SAT path also runs as an ascending ladder (W = 1, 2,
+# research/certs/certify_sweep.py opens entries in queue order and runs the
+# tropidist backend (research/certs/tropidist_certify.py, issue #4716) on
+# each, then verify/sat_certify.py with the proof path on a CSS entry the
+# tool closed, one time limit per solve, until the job budget is spent.
+# That is tropidist+sat, the default since issue #4939 accepted the tool's
+# verdicts at the solver level: the run fetches the tool at its pinned
+# commit, files the proof_log record where SAT finishes and the tool's
+# solver-level record otherwise, and admits stabilizer entries, which only
+# the tool certifies. A workflow_dispatch run with backend set to sat stays
+# on the SAT path and skips the fetch; tropidist runs the tool alone. The
+# SAT path also runs as an ascending ladder (W = 1, 2,
 # ... up to d - 1, the ladder input's seconds per side; issue #4230) on what
 # it leaves open, so an entry that does not close still files a partial
 # certificate with the lower bound it proved, shown on the board as the
@@ -65,9 +69,9 @@ on:
         type: boolean
         default: false
       backend:
-        description: "sat (default), tropidist, or tropidist+sat (opt-in, issue #4716)"
+        description: "tropidist+sat (default), tropidist, or sat (issues #4716 and #4939)"
         required: false
-        default: "sat"
+        default: "tropidist+sat"
       ladder:
         description: "seconds per side for the ascending SAT ladder that files partial certificates (0: ask d - 1 only)"
         required: false
@@ -81,17 +85,18 @@ jobs:
   sweep:
     runs-on: ubuntu-24.04
     # job_minutes is when the sweep stops opening entries; the entry it is on
-    # may run to six solves of tlim (two XOR solves, two kissat runs, two
-    # drat-trim checks) plus twice the ladder budget past that, plus the
-    # build and the replay.
-    timeout-minutes: 350
+    # may run to the tool's two runs of tlim and then six SAT solves of tlim
+    # (two XOR solves, two kissat runs, two drat-trim checks) plus twice the
+    # ladder budget past that, plus the builds and the replay. 360 is the
+    # Actions ceiling.
+    timeout-minutes: 360
     env:
       PYTHONUNBUFFERED: "1"
       KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2
       DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
       TROPIDIST_REF: b03ec2d4077f287f89f97b5c2c16ce5ce17c2c58
       TROPIDIST_ROOT: /tmp/tropidist
-      BACKEND: ${{ github.event.inputs.backend || 'sat' }}
+      BACKEND: ${{ github.event.inputs.backend || 'tropidist+sat' }}
       OUT_DIR: /tmp/certify-sweep
     steps:
       - uses: actions/checkout@v4
@@ -110,7 +115,7 @@ jobs:
           install -m 755 /tmp/kissat/build/kissat /usr/local/bin/kissat
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
-      - name: fetch tropidist at its pinned commit (opt-in backends only)
+      - name: fetch tropidist at its pinned commit (skipped by backend sat)
         if: contains(env.BACKEND, 'tropidist')
         run: |
           set -euo pipefail
