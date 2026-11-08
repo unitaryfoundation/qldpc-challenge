@@ -3,7 +3,111 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/960-20-40.html">[[960,20,40]] — 960-20-40</a></h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details open><summary>note</summary><div class=notebody><p>[[960,20,40]]</p>
+<section class=blk><h3><a href="codes/17-10-1.html">[[17,10,1]] — 17-10-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[17,10,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-5 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PUNCTURE moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PUNCTURE of parent <code>18-4-4-b</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/17-10-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/25-16-1.html">[[25,16,1]] — 25-16-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[25,16,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-7 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PUNCTURE moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PUNCTURE of parent <code>26-8-4</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/25-16-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/35-21-1.html">[[35,21,1]] — 35-21-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[35,21,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-12 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PUNCTURE moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PUNCTURE of parent <code>36-16-4</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/35-21-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/41-27-1.html">[[41,27,1]] — 41-27-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[41,27,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-22 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PUNCTURE moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PUNCTURE of parent <code>42-16-6</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/41-27-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/52-13-5.html">[[52,13,5]] — 52-13-5</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[52,13,5]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PEEL moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PEEL of parent <code>53-13-5</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-13-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/54-12-7-b.html">[[54,12,7]] — 54-12-7-b</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[54,12,7]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PEEL moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PEEL of parent <code>55-12-7</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/54-12-7-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/60-18-6.html">[[60,18,6]] — 60-18-6</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[60,18,6]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PEEL moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PEEL of parent <code>61-18-6</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/60-18-6.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/62-18-7-b.html">[[62,18,7]] — 62-18-7-b</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[62,18,7]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PEEL moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PEEL of parent <code>63-18-7</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/62-18-7-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/960-20-40.html">[[960,20,40]] — 960-20-40</a></h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; submission note &middot; <a href="https://github.com/rajendrarajpurohit">@rajendrarajpurohit</a> &middot; human</div><details ><summary>note</summary><div class=notebody><p>[[960,20,40]]</p>
 <h3>[[960,20,40]] CLP code, check weight 6</h3>
 <p>Primary reference: <a href="https://arxiv.org/abs/2610.12782">arXiv:2610.12782</a>, *Coset Lifted Product Codes*, Rajpurohit, Lalitha, Garani. Data and scripts: https://github.com/rajendrarajpurohit/CLP_QLDPC.</p>
 <ul>
@@ -25,7 +129,7 @@
 <p>GAP 4.15.1 with SmallGroups and QDistRnd, the construction and driver scripts of the repository above, no LLM in the search loop. Witness and verification: this repository&#x27;s gate_changed.py RIS search and heuristic_distance.py orbit-fold.</p>
 <h4>Reproduction</h4>
 <p>gap/rebuild.g in the repository above, with G, H, a, B as given, rebuilds HX and HZ.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/960-20-40.md">raw markdown</a></div></details></section>
-<section class=blk><h3>tropidist backend: fast on moderate CSS and stabilizer codes, still times out on high-distance 2BGA</h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details open><summary>note</summary><div class=notebody><h4>TL;DR</h4>
+<section class=blk><h3>tropidist backend: fast on moderate CSS and stabilizer codes, still times out on high-distance 2BGA</h3><div class=kv style="color:var(--mut)">2026-11-06 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details ><summary>note</summary><div class=notebody><h4>TL;DR</h4>
 <p>tropidist (arXiv:2611.08247, pinned at commit <code>b03ec2d</code> of github.com/Fanerst/tropidist) closes moderate CSS and stabilizer entries in well under a second where the challenge&#x27;s MILP certifier takes tens of seconds, and it is the only exact certifier available for stabilizer codes. It does <b>not</b> make high-distance 2BGA entries tractable at the sweep&#x27;s 60–600 s budget: <code>[[544,18,76]]</code> reached only lower bound 19 in 600 s.</p>
 <h4>What ran</h4>
 <p>A small benchmark driver, one code at a time, comparing <code>verify/certify.py</code> (scipy/HiGHS MILP) against the tropidist adapter on the same entry with the same time limit:</p>
@@ -42,7 +146,7 @@
 </ul>
 <h4>Recommendation</h4>
 <p>Use tropidist as a routed backend, not a replacement: stabilizer entries and entries where MILP/SAT time out first, SAT/DRAT for proof-log certificates. Record timeouts as interval certificates (PR #4721) rather than discarding them. Keep the pinned commit (<code>b03ec2d</code>) and the smoke tests that ship with PR #4719.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-06-tropidist-backend-benchmark.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/180-36-10.html">[[180,36,10]] — 180-36-10</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[180,36,10]] — lifted-product code from GFlowQEC</h3>
+<section class=blk><h3><a href="codes/180-36-10.html">[[180,36,10]] — 180-36-10</a></h3><div class=kv style="color:var(--mut)">2026-11-05 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[180,36,10]] — lifted-product code from GFlowQEC</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the unrestricted / any-weight CSS cell at \(n=180\), where the existing entry <code>[[180,36,8]]</code> (<code>codes/180-36-8.json</code>) sets the bar. The GFlowQEC policy (arXiv:2611.06819v1) proposes lifted-product codes over \(G = \mathbb{Z}_6 \times S_3\) with \(n = 5|G| = 180\); its top-scoring draws have \(d_X = d_Z = 10\), which would beat the peer on distance alone.</p>
 <h4>What was searched</h4>

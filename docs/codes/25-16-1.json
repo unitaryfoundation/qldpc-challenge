@@ -1,0 +1,136 @@
+{
+ "schema_version": "0.2",
+ "name": "[[25,16,1]]",
+ "code_type": "CSS",
+ "n": 25,
+ "k": 16,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    2,
+    3,
+    24
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    24
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    24
+   ],
+   [
+    12,
+    13,
+    14,
+    15,
+    24
+   ],
+   [
+    16,
+    17,
+    18,
+    19,
+    24
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   [
+    1,
+    5,
+    9,
+    13,
+    17,
+    21,
+    24
+   ],
+   [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22,
+    24
+   ],
+   [
+    3,
+    7,
+    11,
+    15,
+    19,
+    23,
+    24
+   ]
+  ]
+ },
+ "distance": {
+  "d": 1,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    15,
+    23
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@MathysRennela"
+    ],
+    "date": "2026-11-07",
+    "found_at_samples": 300,
+    "survived_samples": 300,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     42
+    ]
+   }
+  },
+  "Z": {
+   "value": 1,
+   "confidence": "upper_bound",
+   "witness": [
+    23
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@MathysRennela"
+    ],
+    "date": "2026-11-07",
+    "found_at_samples": 300,
+    "survived_samples": 300,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     43
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "code-calculus v0.1 E-PUNCTURE of a CSS parent",
+  "origin": "submission",
+  "date": "2026-11-07",
+  "model": "Beam 1.0"
+ },
+ "family": "other"
+}
