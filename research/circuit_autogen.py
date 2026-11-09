@@ -996,7 +996,14 @@ def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6,
     rounds = max(int(rounds or d), d)
     family, cands = candidate_schedules(HX, HZ, coords, seed, rounds)
     log(f"schedule family: {family}")
-    first_notes, first_layers = next(cands)
+    try:
+        first_notes, first_layers = next(cands)
+    except StopIteration:
+        # A family (e.g. two-block) can claim the code but yield no
+        # admissible schedule; fall back to the generic sequential family.
+        family, cands = generic_candidates(HX, HZ, np.random.default_rng(seed), rounds)
+        first_notes, first_layers = next(cands)
+        log(f"schedule family: {family} (fallback)")
     _, dem = _dem_of(HX, HZ, rounds, "Z", first_layers)
     if dem is not None and dem.num_errors > MAX_DEM_MECHANISMS:
         raise CircuitUnavailable(
@@ -1026,6 +1033,12 @@ def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6,
     log(f"deep search at rounds={rounds}")
     block, files = finish(notes, layers, HX, HZ, d, rounds, wits, seed,
                           seconds, log)
+    for name, text in files.items():
+        if len(text.encode("utf-8")) > MAX_CIRCUIT_FILE_BYTES:
+            raise CircuitUnavailable(
+                f"{name} is {len(text.encode('utf-8'))} bytes, over the "
+                f"circuit-tier file cap of {MAX_CIRCUIT_FILE_BYTES}; pass "
+                f"--circuits with a leaner schedule or --no-circuit")
     return block, files, family
 
 
