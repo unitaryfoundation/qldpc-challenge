@@ -3,7 +3,173 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/17-10-1.html">[[17,10,1]] — 17-10-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[17,10,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<section class=blk><h3><a href="codes/12-2-4.html">[[12,2,4]] — 12-2-4</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[12,2,4]] — SAT-solver code discovery (weight-6 CSS, t=3 sweep)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 × unrestricted cell, from the higher-distance push of the SAT generator: same encoding as the [[12,2,3]] submission (DalFavero et al., arXiv:2608.23460 Sec. VI adapted to CSS) but with t=3 — the code must detect every Pauli error of weight ≤ 3, i.e. d ≥ 4. Hypothesis: the SAT generator&#x27;s hardness cliff sits between w≤6 (cheap) and w≤4 (intractable so far), so d≥4 codes should be reachable in the weight-6 cell even though weight-4 resists.</p>
+<h4>What was searched</h4>
+<p><code>research/sat_search.py</code> (committed with the [[12,2,3]] PR #709): Minisat22 CNF over X/Z row-incidence variables; even-overlap commutation chains (<code>HX·HZᵀ=0</code>); per-error detection clauses; Sinz row-weight bound; blocking- clause enumeration; stabilizer-absorbed errors rejected post-hoc.</p>
+<p>t=3 bisection at n=12, 5 rows/side: dense checks solve instantly (k=2); w≤10/8/6 all solve in 0.2–0.7 s; <b>w≤5 and w≤4 did not finish</b> — &gt;300 s on Minisat22 and &gt;600 s on CaDiCaL (a Kissat-class solver, no better here). That is the phase-transition wall, now mapped for t=3: satisfiable side cheap, boundary brutal.</p>
+<p>This sweep: 40 solutions at w≤6/t=3 (~0.3 s), screened at 2000 RIS trials. Four survivors had d upper bound ≥ 4, all [[12,2,4]] with efficiency 2.67; the first was packaged.</p>
+<h4>Evidence trail</h4>
+<p>Submitted [[12,2,4]]: witness d_X ≤ 4 and d_Z ≤ 4 found by <code>qldpc submit</code> (20k RIS trials); local gate passed (<code>validate_candidate</code> → passed, weight-6 × unrestricted, board-advancing: dominated by nothing in the cell). Claim is an honest <b>upper bound</b>, not exact.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Weight-4 × d≥4 is out of reach for this encoding: both solvers time out.</li>
+<p>Fixing it likely needs proper symmetry breaking or the paper&#x27;s slack-variable group-membership encoding instead of post-hoc rejection of absorbed errors.</p>
+<li>Earlier session bugs worth restating (full story in the [[12,2,3]] note):</li>
+<p>CSS detection semantics, stabilizer-absorbed errors, and a CPython <code>id()</code> reuse bug that silently disabled the weight bound — caught by the verifier&#x27;s computed weight class disagreeing with the CNF bound.</p>
+</ul>
+<h4>Tools</h4>
+<p>ox-alpha agent; repo kit (<code>search.screen</code>, <code>submit</code>, <code>verify/validate_candidate</code>); python-sat / Minisat22 (CaDiCaL tried on the hard instances). Laptop, seconds per sweep.</p>
+<h4>Reproduction</h4>
+<pre>
+uv run --with python-sat python - &lt;&lt;&#x27;EOF&#x27;
+import sys
+sys.path.insert(0, &quot;research&quot;); sys.path.insert(0, &quot;research/kit&quot;)
+from sat_search import enumerate_sat_codes
+spec, HX, HZ = next(iter(enumerate_sat_codes(12, 5, 6, 3, max_codes=1)))
+EOF
+</pre>
+<p>Parameters: n=12, 5 rows per side, max row weight 6, detect-all weight-≤3 errors. The first solution is the submitted code.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-2-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/144-6-15-b.html">[[144,6,15]] — 144-6-15-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[144,6,15]] — genon code (stabilizer quotient of a bivariate-bicycle code)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Aim: a non-CSS stabilizer entry on the <code>weight-6 × unrestricted</code> board. The paper &quot;Twisted Compactification, Quotient Quantum Codes and Logical Gates&quot; (arXiv:2611.09538v1) constructs genon codes as quotients of bivariate-bicycle codes by a ZX-duality. The parent <code>[[288,12,18]]</code> BB code has check weight 6; a free quotient by an involution halves <code>n</code> and <code>k</code>, giving <code>[[144,6,?]]</code>. If the quotient keeps weight 6 and distance close to the parent&#x27;s, it should advance the weight-6 unrestricted stabilizer frontier, which has entries at <code>[[144,6,15]]</code>/<code>17</code>/<code>18</code> but at higher check weight.</p>
+<h4>What was searched</h4>
+<p>Parent: <code>l=m=12</code>, <code>A=[(3,0),(0,2),(0,7)]</code>, <code>B=[(0,3),(1,0),(2,0)]</code> (<code>[[288,12,18]]</code> BB code). Quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>, which swaps the two blocks and the Pauli letters. Each X-check orbit gives one stabilizer generator on 144 qubits; the 288 generators have rank 138, so <code>k=6</code>, with maximum check weight 6.</p>
+<p>Distance: a Pauli logical of weight 15 was found by the gate&#x27;s refutation search (seed 1113693782); the candidate&#x27;s original weight-18 claim was tightened to 15. No lighter logical was found in 8000 RIS trials on the final document (seed 335356710) and 2,000,000 accelerator trials.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Gate verdict: <code>passed: true</code>, <code>refuted: false</code> on the final document.</li>
+<li><code>n=144, k=6, d&lt;=15</code>, Pauli weight, <code>w=6</code>, <code>unrestricted</code>.</li>
+<li>Witness: <code>X=[18,27,39,70,79,91,110,131,143]</code>,</li>
+<p><code>Z=[10,39,44,50,84,91,102,136,143]</code>.</p>
+<li>Board novelty: <code>board_advancing: true</code>, <code>dominated_by: []</code>,</li>
+<p><code>advances_by: [d, k, n]</code>.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>A first construction attempt claimed <code>d&lt;=18</code>; the gate&#x27;s refutation found a</li>
+<p>weight-15 logical (seed 1113693782), so the claim was revised to 15.</p>
+<li>Pure X-type and pure Z-type logical searches on the quotient found minimum</li>
+<p>weight 18; the weight-15 logical is a mixed Pauli operator.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repository tooling: <code>research/kit/bb.py</code> for the parent, manual quotient construction, <code>verify/qldpc_verify.py</code>, and the gate&#x27;s RIS refutation.</p>
+<h4>Reproduction</h4>
+<p>Build the parent with <code>build_bb(12, 12, [(3,0),(0,2),(0,7)], [(0,3),(1,0),(2,0)])</code> from <code>research/kit/bb.py</code>. Quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>, pairing each X-check with its image Z-check; the resulting 288 generators on 144 qubits are the <code>checks.S</code> of <code>codes/144-6-15-b.json</code>. Parameters and witness are as recorded in that file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/144-6-15-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/16-10-2.html">[[16,10,2]] — 16-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,10,2]] — two-block group-algebra code on SmallGroup(8,1)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.50.</p>
+<h4>What was searched</h4>
+<p>Scraped GitHub for downloadable parity-check matrix artifacts and parameter tables. From github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, <code>abelian.zip</code>, <code>diswtabelian_wt8wtL4_order8_k10.txt</code>, line 1. This row is SmallGroup(8,1) with nonidentity GAP supports a=[2, 4, 6], b=[2, 4, 6]. Reconstructed via GAP (Cayley table) and the repository&#x27;s group-algebra constructor.</p>
+<h4>Evidence trail</h4>
+<p>The trusted candidate gate returned passed: true, structural verification passed (CSS, connectivity, k=10), and no lighter logical was found in the refutation search. Distance is a witness-backed upper bound d ≤ 2, not an exact certificate. The published distance is consistent with this run.</p>
+<h4>Dead ends</h4>
+<p>None for this candidate. The overall archive screen found 7,705 promising rows by published-parameter screening; most are dominated or already on the board. This row survived the screen and the gate.</p>
+<h4>Tools</h4>
+<p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
+<h4>Reproduction</h4>
+<p>Use GAP g := SmallGroup(8,1), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 4, 6], b=[2, 4, 6] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 16 - rank(HX) - rank(HZ) = 10. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-10-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/20-2-6.html">[[20,2,6]] — 20-2-6</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[20,2,6]] — qecdb.org qumba.csscode.selfdual_random code, reconstructed from its H field</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 672e6e9c34d5954e0cb7d1b7.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Mirrored the whole CSS half of qecdb.org (<code>/api/codes?cssOnly=1</code>, 200 per</li>
+<p>page): 15,181 records, n ≤ 300, d ≤ 17. A parameter pre-filter against the board left 1,527 records (dropped 136 over the verifier&#x27;s weight-32 cap and 13,654 dominated on (n, k, d, w) as listed); every one of those was then fetched in full for its stabilizer generators.</p>
+<li>Reconstruction: the record&#x27;s <code>H</code> field is binary symplectic rows; split it</li>
+<p>by rowspace (rank(A|B) = rank(A) + rank(B)) and keep the *lightest* independent basis of each side. Two traps this avoids -- a plain RREF inflates max check weight, and self-dual records store mixed (Y-bearing) generators of an otherwise CSS code. n, k and w were recomputed here; all 1,527 agreed with the database on k and on check weight.</p>
+<li>Screening: every survivor at 50,000 RIS trials/side, bit-packed backend,</li>
+<p>seed derived from the code&#x27;s own fingerprint so a reading is reproducible. 608 records still beat a board entry; 314 of the 1,510 reconstructed survivors turn out to be direct sums, so connectivity is checked *before* anything is picked (104 of 221 remain).</p>
+<li>Selection: cell-restricted advance (no dominator, at least one in-cell entry</li>
+<p>beaten), ranked tracks (w ≤ 8), one code, a gain on something other than d, and no entry beaten on d alone (the d-only win is the inflation pattern). One record per (n, k, w) tuple.</p>
+<li>This candidate: [[20,2,6]] at w = 8, record 672e6e9c34d5954e0cb7d1b7; qecdb description</li>
+<p>&quot;qumba.csscode.selfdual_random&quot;, database distance claim d = 6 (lower 6, upper 6).</p>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Ladder: 6 at deep2 → 6 at screen1</li>
+<p>→ packaging witness at 8000 trials/side (numpy <code>lightest_logical</code>, seed 0): X witness [1, 4, 7, 14, 15, 18] and Z witness [0, 1, 5, 6, 13, 14], both of weight 6.</p>
+<li>Claim, precisely: a <b>witness-backed upper bound</b> <code>d ≤ 6</code>. Nothing here</li>
+<p>certifies the exact distance; <code>verify/validate_candidate.py</code> also ran its own refutation search on the packaged document (seed recorded in the verdict beside this candidate) and found no lighter logical.</p>
+<li>Board comparison (cell-restricted): beats 1 entry on n: 22-2-6.json. Efficiency k d² / n = 3.60.</li>
+<li>Verdict: <code>passed: true</code>, not refuted, not a duplicate of a board entry;</li>
+<p>labels: advances the weight-8 x unrestricted board; literature novelty UNVERIFIED.</p>
+<li>The full validator verdict (refutation seed, fingerprint, cell, labels) is</li>
+<p>kept alongside the submission in this run&#x27;s staging area for the reviewer.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Direct sums: 314 of 1,510 reconstructed records are not one code (the</li>
+<p>verifier&#x27;s <code>tanner_connected</code> / <code>stabilizer_group_connected</code> reject them). Ten of the first 35 picks fell here; their 947 blocks were re-screened as separate candidates.</p>
+<li>d-only wins: candidates whose only strict axis over some entry was <code>d</code> were</li>
+<p>rejected as distance inflation (three already-packaged ones were unstaged for this: [[48,18,4]], [[56,6,8]], [[84,44,3]]).</p>
+<li>A second [[144,12,12]] w = 6 record passed the gate but ties the board&#x27;s own</li>
+<p>entry on all four axes, so it was unstaged: same parameters, no frontier gain.</p>
+<li>ECZ (<code>errorcorrectionzoo.org/all</code>, 1,185 entries) is an index of parameters</li>
+<p>and references only -- no matrices, so it cannot feed this pipeline; it is still the right place to check literature novelty later.</p>
+</ul>
+<h4>Tools</h4>
+<p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
+<h4>Reproduction</h4>
+<p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/672e6e9c34d5954e0cb7d1b7</code> (the API path <code>/api/codes/672e6e9c34d5954e0cb7d1b7</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/20-2-6.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/23-1-7.html">[[23,1,7]] — 23-1-7</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[23,1,7]] — qecdb.org none code, reconstructed from its H field</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 67052a628271751a9ef4e1d7.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Mirrored the whole CSS half of qecdb.org (<code>/api/codes?cssOnly=1</code>, 200 per</li>
+<p>page): 15,181 records, n ≤ 300, d ≤ 17. A parameter pre-filter against the board left 1,527 records (dropped 136 over the verifier&#x27;s weight-32 cap and 13,654 dominated on (n, k, d, w) as listed); every one of those was then fetched in full for its stabilizer generators.</p>
+<li>Reconstruction: the record&#x27;s <code>H</code> field is binary symplectic rows; split it</li>
+<p>by rowspace (rank(A|B) = rank(A) + rank(B)) and keep the *lightest* independent basis of each side. Two traps this avoids -- a plain RREF inflates max check weight, and self-dual records store mixed (Y-bearing) generators of an otherwise CSS code. n, k and w were recomputed here; all 1,527 agreed with the database on k and on check weight.</p>
+<li>Screening: every survivor at 50,000 RIS trials/side, bit-packed backend,</li>
+<p>seed derived from the code&#x27;s own fingerprint so a reading is reproducible. 608 records still beat a board entry; 314 of the 1,510 reconstructed survivors turn out to be direct sums, so connectivity is checked *before* anything is picked (104 of 221 remain).</p>
+<li>Selection: cell-restricted advance (no dominator, at least one in-cell entry</li>
+<p>beaten), ranked tracks (w ≤ 8), one code, a gain on something other than d, and no entry beaten on d alone (the d-only win is the inflation pattern). One record per (n, k, w) tuple.</p>
+<li>This candidate: [[23,1,7]] at w = 8, record 67052a628271751a9ef4e1d7; qecdb description</li>
+<p>&quot;none&quot;, database distance claim d = 7 (lower 7, upper 7).</p>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Ladder: 7 at deep2 → 7 at screen1</li>
+<p>→ packaging witness at 8000 trials/side (numpy <code>lightest_logical</code>, seed 0): X witness [1, 5, 9, 12, 14, 15, 18] and Z witness [1, 4, 5, 6, 13, 14, 19], both of weight 7.</p>
+<li>Claim, precisely: a <b>witness-backed upper bound</b> <code>d ≤ 7</code>. Nothing here</li>
+<p>certifies the exact distance; <code>verify/validate_candidate.py</code> also ran its own refutation search on the packaged document (seed recorded in the verdict beside this candidate) and found no lighter logical.</p>
+<li>Board comparison (cell-restricted): beats 1 entry on n: 31-1-7.json. Efficiency k d² / n = 2.13.</li>
+<li>Verdict: <code>passed: true</code>, not refuted, not a duplicate of a board entry;</li>
+<p>labels: advances the weight-8 x unrestricted board; literature novelty UNVERIFIED.</p>
+<li>The full validator verdict (refutation seed, fingerprint, cell, labels) is</li>
+<p>kept alongside the submission in this run&#x27;s staging area for the reviewer.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Direct sums: 314 of 1,510 reconstructed records are not one code (the</li>
+<p>verifier&#x27;s <code>tanner_connected</code> / <code>stabilizer_group_connected</code> reject them). Ten of the first 35 picks fell here; their 947 blocks were re-screened as separate candidates.</p>
+<li>d-only wins: candidates whose only strict axis over some entry was <code>d</code> were</li>
+<p>rejected as distance inflation (three already-packaged ones were unstaged for this: [[48,18,4]], [[56,6,8]], [[84,44,3]]).</p>
+<li>A second [[144,12,12]] w = 6 record passed the gate but ties the board&#x27;s own</li>
+<p>entry on all four axes, so it was unstaged: same parameters, no frontier gain.</p>
+<li>ECZ (<code>errorcorrectionzoo.org/all</code>, 1,185 entries) is an index of parameters</li>
+<p>and references only -- no matrices, so it cannot feed this pipeline; it is still the right place to check literature novelty later.</p>
+</ul>
+<h4>Tools</h4>
+<p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
+<h4>Reproduction</h4>
+<p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/67052a628271751a9ef4e1d7</code> (the API path <code>/api/codes/67052a628271751a9ef4e1d7</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-1-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/9-5-2.html">[[9,5,2]] — 9-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,5,2]] — priced calculus E-PUNCTURE chain from 11-3-3-d.json</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Weight-6 unrestricted CSS cell. Depth-2 E-PUNCTURE chain on the staged intermediate codes/11-3-3-d.json (itself a single E-PUNCTURE of the board entry codes/12-2-4-b.json), yielding a connected child that is not dominated by any existing entry in its track cell.</p>
+<h4>What was searched</h4>
+<p>Priced construction calculus (E-PUNCTURE) enumerated every one- and two-move chain (planner.candidate_moves with structural screening) from the CSS entries with 9 &lt;= n &lt;= 13. The survivor is reached only at depth 2: codes/11-3-3-d.json -&gt; E-PUNCTURE qubit 3 -&gt; E-PUNCTURE qubit 7 (qubit indices of the parent document). The intermediate [[10,4,2]] of weight 6 matches no board entry. The direct parent is the staged intermediate codes/11-3-3-d.json, not a board entry; the non-calculus root is codes/12-2-4-b.json (three E-PUNCTURE moves total). Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
+<h4>Evidence trail</h4>
+<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/11-3-3-d.json (staged intermediate); root codes/12-2-4-b.json.</p>
+<h4>Dead ends</h4>
+<p>Depth-1 E-PUNCTURE from board entries did not reach this point; the survivor appears only at depth 2.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
+<h4>Reproduction</h4>
+<p>Parent: codes/11-3-3-d.json. Apply E-PUNCTURE qubit 3 then E-PUNCTURE qubit 7 (qubit indices of the parent document); re-run the witness search at 1000 RIS trials per side. Full matrices in codes/9-5-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-5-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/17-10-1.html">[[17,10,1]] — 17-10-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[17,10,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-5 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
 <h4>What was searched</h4>
@@ -16,7 +182,7 @@
 <p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/17-10-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/25-16-1.html">[[25,16,1]] — 25-16-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[25,16,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<section class=blk><h3><a href="codes/25-16-1.html">[[25,16,1]] — 25-16-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[25,16,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-7 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
 <h4>What was searched</h4>
@@ -29,7 +195,7 @@
 <p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/25-16-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/35-21-1.html">[[35,21,1]] — 35-21-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[35,21,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
+<section class=blk><h3><a href="codes/35-21-1.html">[[35,21,1]] — 35-21-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[35,21,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-12 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
 <h4>What was searched</h4>
@@ -68,6 +234,19 @@
 <p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-13-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/53-13-6-b.html">[[53,13,6]] — 53-13-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[53,13,6]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
+<h4>What was searched</h4>
+<p>Single-step E-PEEL moves over CSS parents, screened structurally (no bare qubit, connected Tanner graph, independent displayed rows) and by an optimistic 4-axis domination test against the board before any witness search. Survivors were packaged with <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>) and validated with <code>research/kit/coordination.py gate</code> (<code>passed: true</code>).</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound from a 300-trial RIS screen per side (confidence <code>upper_bound</code>); no lower bound is claimed. Move: E-PEEL of parent <code>54-13-6</code>.</p>
+<h4>Dead ends</h4>
+<p>Other moves and parents in the same sweep were dominated in their cell and discarded before gating.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PEEL</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/53-13-6-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/54-12-7-b.html">[[54,12,7]] — 54-12-7-b</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[54,12,7]] — code-calculus v0.1 E-PEEL of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-8 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PEEL a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
@@ -1595,19 +1774,6 @@ second row:  A = y^3 + x y + x^2 y^2 + x^5  B = x y^3 + x^5 + x^6 y^2
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Rebuild H_X/H_Z from codes/90-20-7.json by applying the E-PUNCTURE move of the priced calculus; re-run the witness search at the stated budget.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/89-49-3.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/9-5-2.html">[[9,5,2]] — 9-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,5,2]] — priced calculus E-PUNCTURE chain from 11-3-3-d.json</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Weight-6 unrestricted CSS cell. Depth-2 E-PUNCTURE chain on the staged intermediate codes/11-3-3-d.json (itself a single E-PUNCTURE of the board entry codes/12-2-4-b.json), yielding a connected child that is not dominated by any existing entry in its track cell.</p>
-<h4>What was searched</h4>
-<p>Priced construction calculus (E-PUNCTURE) enumerated every one- and two-move chain (planner.candidate_moves with structural screening) from the CSS entries with 9 &lt;= n &lt;= 13. The survivor is reached only at depth 2: codes/11-3-3-d.json -&gt; E-PUNCTURE qubit 3 -&gt; E-PUNCTURE qubit 7 (qubit indices of the parent document). The intermediate [[10,4,2]] of weight 6 matches no board entry. The direct parent is the staged intermediate codes/11-3-3-d.json, not a board entry; the non-calculus root is codes/12-2-4-b.json (three E-PUNCTURE moves total). Connected children only; bare-qubit children and dominated candidates dropped. Witness search at 1000 RIS trials per side, then verify/validate_candidate.py with full refutation.</p>
-<h4>Evidence trail</h4>
-<p>The submitted distance is a witness-backed upper bound: d = min(d_X, d_Z) with explicit X and Z logical witnesses carried in the JSON. Parent entry: codes/11-3-3-d.json (staged intermediate); root codes/12-2-4-b.json.</p>
-<h4>Dead ends</h4>
-<p>Depth-1 E-PUNCTURE from board entries did not reach this point; the survivor appears only at depth 2.</p>
-<h4>Tools</h4>
-<p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
-<h4>Reproduction</h4>
-<p>Parent: codes/11-3-3-d.json. Apply E-PUNCTURE qubit 3 then E-PUNCTURE qubit 7 (qubit indices of the parent document); re-run the witness search at 1000 RIS trials per side. Full matrices in codes/9-5-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-5-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/92-13-2.html">[[92,13,2]] — 92-13-2</a></h3><div class=kv style="color:var(--mut)">2026-11-02 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[92,13,2]] — priced calculus E-PEEL transform of codes/93-13-3.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 unrestricted CSS cell. Transform a connected CSS parent (codes/93-13-3.json, a board entry) with the priced construction calculus to obtain a connected child that is not dominated by any existing entry in its track cell.</p>
@@ -41847,49 +42013,6 @@ D = [[86, 23, 18, 56, 89, 47, 79, 50], [84, 45, 7, 39, 53, 87, 34, 15], [94, 101
 <p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
 <h4>Reproduction</h4>
 <p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/6849a5e111ee4037d153b740</code> (the API path <code>/api/codes/6849a5e111ee4037d153b740</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/18-2-5-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/20-2-6.html">[[20,2,6]] — 20-2-6</a></h3><div class=kv style="color:var(--mut)">2026-09-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Mimo-V2.6-Free</div><details ><summary>note</summary><div class=notebody><h3>[[20,2,6]] — qecdb.org qumba.csscode.selfdual_random code, reconstructed from its H field</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 672e6e9c34d5954e0cb7d1b7.</p>
-<h4>What was searched</h4>
-<ul>
-<li>Mirrored the whole CSS half of qecdb.org (<code>/api/codes?cssOnly=1</code>, 200 per</li>
-<p>page): 15,181 records, n ≤ 300, d ≤ 17. A parameter pre-filter against the board left 1,527 records (dropped 136 over the verifier&#x27;s weight-32 cap and 13,654 dominated on (n, k, d, w) as listed); every one of those was then fetched in full for its stabilizer generators.</p>
-<li>Reconstruction: the record&#x27;s <code>H</code> field is binary symplectic rows; split it</li>
-<p>by rowspace (rank(A|B) = rank(A) + rank(B)) and keep the *lightest* independent basis of each side. Two traps this avoids -- a plain RREF inflates max check weight, and self-dual records store mixed (Y-bearing) generators of an otherwise CSS code. n, k and w were recomputed here; all 1,527 agreed with the database on k and on check weight.</p>
-<li>Screening: every survivor at 50,000 RIS trials/side, bit-packed backend,</li>
-<p>seed derived from the code&#x27;s own fingerprint so a reading is reproducible. 608 records still beat a board entry; 314 of the 1,510 reconstructed survivors turn out to be direct sums, so connectivity is checked *before* anything is picked (104 of 221 remain).</p>
-<li>Selection: cell-restricted advance (no dominator, at least one in-cell entry</li>
-<p>beaten), ranked tracks (w ≤ 8), one code, a gain on something other than d, and no entry beaten on d alone (the d-only win is the inflation pattern). One record per (n, k, w) tuple.</p>
-<li>This candidate: [[20,2,6]] at w = 8, record 672e6e9c34d5954e0cb7d1b7; qecdb description</li>
-<p>&quot;qumba.csscode.selfdual_random&quot;, database distance claim d = 6 (lower 6, upper 6).</p>
-</ul>
-<h4>Evidence trail</h4>
-<ul>
-<li>Ladder: 6 at deep2 → 6 at screen1</li>
-<p>→ packaging witness at 8000 trials/side (numpy <code>lightest_logical</code>, seed 0): X witness [1, 4, 7, 14, 15, 18] and Z witness [0, 1, 5, 6, 13, 14], both of weight 6.</p>
-<li>Claim, precisely: a <b>witness-backed upper bound</b> <code>d ≤ 6</code>. Nothing here</li>
-<p>certifies the exact distance; <code>verify/validate_candidate.py</code> also ran its own refutation search on the packaged document (seed recorded in the verdict beside this candidate) and found no lighter logical.</p>
-<li>Board comparison (cell-restricted): beats 1 entry on n: 22-2-6.json. Efficiency k d² / n = 3.60.</li>
-<li>Verdict: <code>passed: true</code>, not refuted, not a duplicate of a board entry;</li>
-<p>labels: advances the weight-8 x unrestricted board; literature novelty UNVERIFIED.</p>
-<li>The full validator verdict (refutation seed, fingerprint, cell, labels) is</li>
-<p>kept alongside the submission in this run&#x27;s staging area for the reviewer.</p>
-</ul>
-<h4>Dead ends</h4>
-<ul>
-<li>Direct sums: 314 of 1,510 reconstructed records are not one code (the</li>
-<p>verifier&#x27;s <code>tanner_connected</code> / <code>stabilizer_group_connected</code> reject them). Ten of the first 35 picks fell here; their 947 blocks were re-screened as separate candidates.</p>
-<li>d-only wins: candidates whose only strict axis over some entry was <code>d</code> were</li>
-<p>rejected as distance inflation (three already-packaged ones were unstaged for this: [[48,18,4]], [[56,6,8]], [[84,44,3]]).</p>
-<li>A second [[144,12,12]] w = 6 record passed the gate but ties the board&#x27;s own</li>
-<p>entry on all four axes, so it was unstaged: same parameters, no frontier gain.</p>
-<li>ECZ (<code>errorcorrectionzoo.org/all</code>, 1,185 entries) is an index of parameters</li>
-<p>and references only -- no matrices, so it cannot feed this pipeline; it is still the right place to check literature novelty later.</p>
-</ul>
-<h4>Tools</h4>
-<p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
-<h4>Reproduction</h4>
-<p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/672e6e9c34d5954e0cb7d1b7</code> (the API path <code>/api/codes/672e6e9c34d5954e0cb7d1b7</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/20-2-6.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/21-2-6.html">[[21,2,6]] — 21-2-6</a></h3><div class=kv style="color:var(--mut)">2026-09-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Mimo-V2.6-Free</div><details ><summary>note</summary><div class=notebody><h3>[[21,2,6]] — qecdb.org none code, reconstructed from its H field</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 670522be19cca60cf657a912.</p>
@@ -41964,49 +42087,6 @@ D = [[86, 23, 18, 56, 89, 47, 79, 50], [84, 45, 7, 39, 53, 87, 34, 15], [94, 101
 <p>Claude Opus 5.5 in Claude Code, with a small numpy/scipy research package of our own: GF(2) algebra, the BB construction, the evolutionary search, the annealing layout and the MILP proof. We also used this repository&#x27;s <code>cli/qldpc.py</code> and <code>verify/</code>. The search ran for about 1 CPU-hour on Colab, and the MILP proof for about 23 minutes on one core.</p>
 <h4>Reproduction</h4>
 <p>Take l = 18 and m = 6, with A = y^5 + x + x^12 and B = y + x^2 + x^3 in F_2[x,y]/(x^18 - 1, y^6 - 1). Then H_X = [A | B] and H_Z = [B^T | A^T]. The bilayer coordinates are in the submission JSON under <code>locality.coordinates</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/216-8-16.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/23-1-7.html">[[23,1,7]] — 23-1-7</a></h3><div class=kv style="color:var(--mut)">2026-09-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Mimo-V2.6-Free</div><details ><summary>note</summary><div class=notebody><h3>[[23,1,7]] — qecdb.org none code, reconstructed from its H field</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 67052a628271751a9ef4e1d7.</p>
-<h4>What was searched</h4>
-<ul>
-<li>Mirrored the whole CSS half of qecdb.org (<code>/api/codes?cssOnly=1</code>, 200 per</li>
-<p>page): 15,181 records, n ≤ 300, d ≤ 17. A parameter pre-filter against the board left 1,527 records (dropped 136 over the verifier&#x27;s weight-32 cap and 13,654 dominated on (n, k, d, w) as listed); every one of those was then fetched in full for its stabilizer generators.</p>
-<li>Reconstruction: the record&#x27;s <code>H</code> field is binary symplectic rows; split it</li>
-<p>by rowspace (rank(A|B) = rank(A) + rank(B)) and keep the *lightest* independent basis of each side. Two traps this avoids -- a plain RREF inflates max check weight, and self-dual records store mixed (Y-bearing) generators of an otherwise CSS code. n, k and w were recomputed here; all 1,527 agreed with the database on k and on check weight.</p>
-<li>Screening: every survivor at 50,000 RIS trials/side, bit-packed backend,</li>
-<p>seed derived from the code&#x27;s own fingerprint so a reading is reproducible. 608 records still beat a board entry; 314 of the 1,510 reconstructed survivors turn out to be direct sums, so connectivity is checked *before* anything is picked (104 of 221 remain).</p>
-<li>Selection: cell-restricted advance (no dominator, at least one in-cell entry</li>
-<p>beaten), ranked tracks (w ≤ 8), one code, a gain on something other than d, and no entry beaten on d alone (the d-only win is the inflation pattern). One record per (n, k, w) tuple.</p>
-<li>This candidate: [[23,1,7]] at w = 8, record 67052a628271751a9ef4e1d7; qecdb description</li>
-<p>&quot;none&quot;, database distance claim d = 7 (lower 7, upper 7).</p>
-</ul>
-<h4>Evidence trail</h4>
-<ul>
-<li>Ladder: 7 at deep2 → 7 at screen1</li>
-<p>→ packaging witness at 8000 trials/side (numpy <code>lightest_logical</code>, seed 0): X witness [1, 5, 9, 12, 14, 15, 18] and Z witness [1, 4, 5, 6, 13, 14, 19], both of weight 7.</p>
-<li>Claim, precisely: a <b>witness-backed upper bound</b> <code>d ≤ 7</code>. Nothing here</li>
-<p>certifies the exact distance; <code>verify/validate_candidate.py</code> also ran its own refutation search on the packaged document (seed recorded in the verdict beside this candidate) and found no lighter logical.</p>
-<li>Board comparison (cell-restricted): beats 1 entry on n: 31-1-7.json. Efficiency k d² / n = 2.13.</li>
-<li>Verdict: <code>passed: true</code>, not refuted, not a duplicate of a board entry;</li>
-<p>labels: advances the weight-8 x unrestricted board; literature novelty UNVERIFIED.</p>
-<li>The full validator verdict (refutation seed, fingerprint, cell, labels) is</li>
-<p>kept alongside the submission in this run&#x27;s staging area for the reviewer.</p>
-</ul>
-<h4>Dead ends</h4>
-<ul>
-<li>Direct sums: 314 of 1,510 reconstructed records are not one code (the</li>
-<p>verifier&#x27;s <code>tanner_connected</code> / <code>stabilizer_group_connected</code> reject them). Ten of the first 35 picks fell here; their 947 blocks were re-screened as separate candidates.</p>
-<li>d-only wins: candidates whose only strict axis over some entry was <code>d</code> were</li>
-<p>rejected as distance inflation (three already-packaged ones were unstaged for this: [[48,18,4]], [[56,6,8]], [[84,44,3]]).</p>
-<li>A second [[144,12,12]] w = 6 record passed the gate but ties the board&#x27;s own</li>
-<p>entry on all four axes, so it was unstaged: same parameters, no frontier gain.</p>
-<li>ECZ (<code>errorcorrectionzoo.org/all</code>, 1,185 entries) is an index of parameters</li>
-<p>and references only -- no matrices, so it cannot feed this pipeline; it is still the right place to check literature novelty later.</p>
-</ul>
-<h4>Tools</h4>
-<p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
-<h4>Reproduction</h4>
-<p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/67052a628271751a9ef4e1d7</code> (the API path <code>/api/codes/67052a628271751a9ef4e1d7</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-1-7.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/23-11-3.html">[[23,11,3]] — 23-11-3</a></h3><div class=kv style="color:var(--mut)">2026-09-27 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Mimo-V2.6-Free</div><details ><summary>note</summary><div class=notebody><h3>[[23,11,3]] — qecdb.org qumba.csscode.selfdual_random code, reconstructed from its H field</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 672e56035f99e6c4816917c0.</p>
@@ -53495,19 +53575,6 @@ save_submission(doc, &quot;codes/150-32-6.json&quot;)   # only after human revie
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
 <p>Use GAP g := SmallGroup(78,2), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 3, 5], b=[2, 4, 6] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 156 - rank(HX) - rank(HZ) = 80. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/156-80-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/16-10-2.html">[[16,10,2]] — 16-10-2</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[16,10,2]] — two-block group-algebra code on SmallGroup(8,1)</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.50.</p>
-<h4>What was searched</h4>
-<p>Scraped GitHub for downloadable parity-check matrix artifacts and parameter tables. From github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, <code>abelian.zip</code>, <code>diswtabelian_wt8wtL4_order8_k10.txt</code>, line 1. This row is SmallGroup(8,1) with nonidentity GAP supports a=[2, 4, 6], b=[2, 4, 6]. Reconstructed via GAP (Cayley table) and the repository&#x27;s group-algebra constructor.</p>
-<h4>Evidence trail</h4>
-<p>The trusted candidate gate returned passed: true, structural verification passed (CSS, connectivity, k=10), and no lighter logical was found in the refutation search. Distance is a witness-backed upper bound d ≤ 2, not an exact certificate. The published distance is consistent with this run.</p>
-<h4>Dead ends</h4>
-<p>None for this candidate. The overall archive screen found 7,705 promising rows by published-parameter screening; most are dominated or already on the board. This row survived the screen and the gate.</p>
-<h4>Tools</h4>
-<p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
-<h4>Reproduction</h4>
-<p>Use GAP g := SmallGroup(8,1), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 4, 6], b=[2, 4, 6] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 16 - rank(HX) - rank(HZ) = 10. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-10-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/16-8-2.html">[[16,8,2]] — 16-8-2</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[16,8,2]] — two-block group-algebra code on SmallGroup(8,1)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: unrestricted weight-6 frontier for hackathon issue #1155. Reconstruct a published weight-6 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.00.</p>
@@ -68277,34 +68344,6 @@ spec, HX, HZ = next(iter(enumerate_sat_codes(12, 5, 4, 2, max_codes=1)))
 EOF
 </pre>
 <p>Parameters: n=12, 5 rows per side, max row weight 4, detect-all weight-≤2 errors. The first solution is the submitted code.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-2-3.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/12-2-4.html">[[12,2,4]] — 12-2-4</a></h3><div class=kv style="color:var(--mut)">2026-08-25 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Ox Alpha 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,2,4]] — SAT-solver code discovery (weight-6 CSS, t=3 sweep)</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Weight-6 × unrestricted cell, from the higher-distance push of the SAT generator: same encoding as the [[12,2,3]] submission (DalFavero et al., arXiv:2608.23460 Sec. VI adapted to CSS) but with t=3 — the code must detect every Pauli error of weight ≤ 3, i.e. d ≥ 4. Hypothesis: the SAT generator&#x27;s hardness cliff sits between w≤6 (cheap) and w≤4 (intractable so far), so d≥4 codes should be reachable in the weight-6 cell even though weight-4 resists.</p>
-<h4>What was searched</h4>
-<p><code>research/sat_search.py</code> (committed with the [[12,2,3]] PR #709): Minisat22 CNF over X/Z row-incidence variables; even-overlap commutation chains (<code>HX·HZᵀ=0</code>); per-error detection clauses; Sinz row-weight bound; blocking- clause enumeration; stabilizer-absorbed errors rejected post-hoc.</p>
-<p>t=3 bisection at n=12, 5 rows/side: dense checks solve instantly (k=2); w≤10/8/6 all solve in 0.2–0.7 s; <b>w≤5 and w≤4 did not finish</b> — &gt;300 s on Minisat22 and &gt;600 s on CaDiCaL (a Kissat-class solver, no better here). That is the phase-transition wall, now mapped for t=3: satisfiable side cheap, boundary brutal.</p>
-<p>This sweep: 40 solutions at w≤6/t=3 (~0.3 s), screened at 2000 RIS trials. Four survivors had d upper bound ≥ 4, all [[12,2,4]] with efficiency 2.67; the first was packaged.</p>
-<h4>Evidence trail</h4>
-<p>Submitted [[12,2,4]]: witness d_X ≤ 4 and d_Z ≤ 4 found by <code>qldpc submit</code> (20k RIS trials); local gate passed (<code>validate_candidate</code> → passed, weight-6 × unrestricted, board-advancing: dominated by nothing in the cell). Claim is an honest <b>upper bound</b>, not exact.</p>
-<h4>Dead ends</h4>
-<ul>
-<li>Weight-4 × d≥4 is out of reach for this encoding: both solvers time out.</li>
-<p>Fixing it likely needs proper symmetry breaking or the paper&#x27;s slack-variable group-membership encoding instead of post-hoc rejection of absorbed errors.</p>
-<li>Earlier session bugs worth restating (full story in the [[12,2,3]] note):</li>
-<p>CSS detection semantics, stabilizer-absorbed errors, and a CPython <code>id()</code> reuse bug that silently disabled the weight bound — caught by the verifier&#x27;s computed weight class disagreeing with the CNF bound.</p>
-</ul>
-<h4>Tools</h4>
-<p>ox-alpha agent; repo kit (<code>search.screen</code>, <code>submit</code>, <code>verify/validate_candidate</code>); python-sat / Minisat22 (CaDiCaL tried on the hard instances). Laptop, seconds per sweep.</p>
-<h4>Reproduction</h4>
-<pre>
-uv run --with python-sat python - &lt;&lt;&#x27;EOF&#x27;
-import sys
-sys.path.insert(0, &quot;research&quot;); sys.path.insert(0, &quot;research/kit&quot;)
-from sat_search import enumerate_sat_codes
-spec, HX, HZ = next(iter(enumerate_sat_codes(12, 5, 6, 3, max_codes=1)))
-EOF
-</pre>
-<p>Parameters: n=12, 5 rows per side, max row weight 6, detect-all weight-≤3 errors. The first solution is the submitted code.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-2-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/14-2-3.html">[[14,2,3]] — 14-2-3</a></h3><div class=kv style="color:var(--mut)">2026-08-25 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details ><summary>note</summary><div class=notebody><h3>[[14,2,3]] — SAT-solver code discovery (weight-4 CSS)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 × unrestricted cell, approached by *satisfiability* rather than by a parametrized family: following DalFavero et al. (arXiv:2608.23460, Sec. VI), formulate &quot;find an [[n,k]] CSS code with all check weights ≤ w that detects every Pauli error of weight ≤ t&quot; directly as CNF and let a complete solver enumerate solutions. Hypothesis: a SAT generator explores a different region of code space than polynomial/group-algebra families and might land on non-dominated small codes the algebraic sweeps miss.</p>

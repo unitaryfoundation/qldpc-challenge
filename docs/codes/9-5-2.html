@@ -14,11 +14,9 @@
 <section class=blk><h3>Distance</h3>
 <div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X &le; 2, d_Z &le; 2 &middot; w_X = 6, w_Z = 6 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
 <div class=kv><b>d_X</b> 2 &middot; witness weight 2 (claimed upper_bound)</div>
-<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 1000 trials &middot; survived 1000 trials &middot; 2026-11-02</div>
-<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[0, 4]</div></details>
+<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[1, 7]</div></details>
 <div class=kv><b>d_Z</b> 2 &middot; witness weight 2 (claimed upper_bound)</div>
-<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 1000 trials &middot; survived 1000 trials &middot; 2026-11-02</div>
-<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[0, 3]</div></details>
+<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[0, 1]</div></details>
 <div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
 </section>
 
@@ -44,22 +42,13 @@
 (3,1): 20
 (3,2): 19</div></details>
 </section>
-<section class=blk><h3>Circuit tier</h3>
-<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/9-5-2">circuits/9-5-2/</a> &middot; canonical noise recipe, 2 rounds, stim 1.16.0</div>
-<div class=kv><b>d_circ</b> &le; 2 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
-<div class=kv><b>d_circ^X</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 2)</summary><div class=wit>[407, 408]</div></details>
-<div class=kv><b>d_circ^Z</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
-<details><summary>witness fault set (mechanism indices in the committed .dem, 2)</summary><div class=wit>[155, 156]</div></details>
-<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
-</section>
 <section class=blk><h3>Construction &amp; provenance</h3>
 <div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
 <div class=kv><b>provenance</b> submitted through the challenge</div>
 <div class=kv><b>novelty</b> novelty not audited</div>
-<div class=kv><b>construction</b> E-PUNCTURE q=3 then E-PUNCTURE q=7 from 11-3-3-d.json</div>
+<div class=kv><b>construction</b> contributed via qldpc submit</div>
 <div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0 <span class=claimed>(claimed, not verified)</span></div>
-<div class=kv><b>date</b> 2026-11-02</div>
+<div class=kv><b>date</b> 2026-11-09</div>
 <div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
@@ -79,10 +68,10 @@
 <p>Parent: codes/11-3-3-d.json. Apply E-PUNCTURE qubit 3 then E-PUNCTURE qubit 7 (qubit indices of the parent document); re-run the witness search at 1000 RIS trials per side. Full matrices in codes/9-5-2.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 2 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 2 (max weight 6)</div>
-<details><summary>H_X (2 checks, sparse supports)</summary><div class=wit>[0, 1, 3, 4, 6, 7]
-[0, 2, 3, 5, 6, 8]</div></details>
-<details><summary>H_Z (2 checks, sparse supports)</summary><div class=wit>[0, 2, 3, 4, 7, 8]
-[0, 1, 4, 5, 6, 8]</div></details>
+<details><summary>H_X (2 checks, sparse supports)</summary><div class=wit>[0, 1, 2, 6, 7, 8]
+[3, 4, 5, 6, 7, 8]</div></details>
+<details><summary>H_Z (2 checks, sparse supports)</summary><div class=wit>[0, 2, 3, 5, 6, 8]
+[1, 2, 4, 5, 7, 8]</div></details>
 <div class=kv style="margin-top:10px"><b>Code ID</b> <code>9-5-2</code> &middot; <a href="9-5-2.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/9-5-2.json">raw on GitHub</a></div>
 </section>
 <script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>

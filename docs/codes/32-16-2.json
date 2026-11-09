@@ -437,5 +437,35 @@
    "date": "2026-10-02",
    "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     25,
+     26
+    ]
+   },
+   "Z": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     25,
+     26
+    ]
+   }
+  },
+  "rounds": 2,
+  "stim_version": "1.16.0",
+  "notes": "Data-to-data contraction/uncontraction morphing extraction (2 morphed block pairs [(0, 0), (1, 1)], 64 data-to-data CX/round, w_eff=4 ancilla CNOT steps/check, max_flags=1, span_flags=0, pos=start); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-09",
+   "method": "Data-to-data contraction/uncontraction morphing extraction (2 morphed block pairs [(0, 0), (1, 1)], 64 data-to-data CX/round, w_eff=4 ancilla CNOT steps/check, max_flags=1, span_flags=0, pos=start)"
+  }
  }
 }
