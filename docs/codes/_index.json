@@ -2329,6 +2329,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "36-6-6-b",
+      "n": 36,
+      "k": 6,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "36-6-6-m",
       "n": 36,
       "k": 6,
@@ -3457,6 +3465,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "47-1-11-b",
+      "n": 47,
+      "k": 1,
+      "d": 11,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "47-7-2",
       "n": 47,
       "k": 7,
@@ -4135,6 +4151,14 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "53-30-6",
+      "n": 53,
+      "k": 30,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "53-36-2",
@@ -4817,6 +4841,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "60-13-11-b",
+      "n": 60,
+      "k": 13,
+      "d": 11,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "60-13-12",
       "n": 60,
       "k": 13,
@@ -5111,6 +5143,14 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "62-33-7",
+      "n": 62,
+      "k": 33,
+      "d": 7,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "62-35-2",
@@ -5993,6 +6033,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "72-6-8-b",
+      "n": 72,
+      "k": 6,
+      "d": 8,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "72-6-9",
       "n": 72,
       "k": 6,
@@ -6329,6 +6377,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "74-29-10",
+      "n": 74,
+      "k": 29,
+      "d": 10,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "75-7-10",
       "n": 75,
       "k": 7,
@@ -6417,6 +6473,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "77-32-10",
+      "n": 77,
+      "k": 32,
+      "d": 10,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "78-4-9",
       "n": 78,
       "k": 4,
@@ -6465,6 +6529,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "78-19-13",
+      "n": 78,
+      "k": 19,
+      "d": 13,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "78-26-3",
       "n": 78,
       "k": 26,
@@ -6497,6 +6569,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "78-33-10",
+      "n": 78,
+      "k": 33,
+      "d": 10,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "78-44-3",
       "n": 78,
       "k": 44,
@@ -6519,6 +6599,14 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "79-20-13",
+      "n": 79,
+      "k": 20,
+      "d": 13,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "79-24-7",
@@ -6729,6 +6817,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "80-34-10",
+      "n": 80,
+      "k": 34,
+      "d": 10,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "80-36-5",
       "n": 80,
       "k": 36,
@@ -6823,6 +6919,14 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "81-35-10",
+      "n": 81,
+      "k": 35,
+      "d": 10,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "82-2-9",
@@ -20425,6 +20529,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "544-20-80",
+      "n": 544,
+      "k": 20,
+      "d": 80,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "545-73-3",
       "n": 545,
       "k": 73,
@@ -23245,6 +23357,14 @@
       "n": 684,
       "k": 14,
       "d": 54,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
+      "id": "684-14-107",
+      "n": 684,
+      "k": 14,
+      "d": 107,
       "tier": "ub",
       "code_type": "CSS"
     },
