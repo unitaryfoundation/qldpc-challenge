@@ -1463,6 +1463,11 @@
    "@MarinAndreGirard"
   ],
   "construction": "Random Clifford encoder (16-20 layers of random two-qubit Clifford gates on random qubit pairs) gives a parent [[60,16]] code; all of its logical operators of weight below 11 are enumerated and 3 logical operators are added as stabilizers (expurgation), chosen by solving over GF(2) so that each low-weight logical anticommutes with one of them. The generators listed here are a low-weight generating set of the same stabilizer group, found by an information-set search, to meet the weight-32 cap.",
+  "model": [
+   "Claude Opus 5.5",
+   "GPT-6.1-sol",
+   "Gemini 4 Argon"
+  ],
   "origin": "submission",
   "novelty": "unknown",
   "date": "2026-11-08",
