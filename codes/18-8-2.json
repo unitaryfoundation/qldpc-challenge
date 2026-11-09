@@ -286,5 +286,35 @@
    "date": "2026-09-19",
    "method": "simulated annealing over integer grid sites (research/local2d/fold_layout.py)"
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     1,
+     3
+    ]
+   },
+   "Z": {
+    "value": 2,
+    "confidence": "upper_bound",
+    "witness": [
+     68,
+     79
+    ]
+   }
+  },
+  "rounds": 2,
+  "stim_version": "1.16.0",
+  "notes": "Data-to-data contraction/uncontraction morphing extraction (1 morphed block pairs [(0, 0)], 18 data-to-data CX/round, w_eff=6 ancilla CNOT steps/check, max_flags=0, span_flags=0, pos=end); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C)",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-09",
+   "method": "Data-to-data contraction/uncontraction morphing extraction (1 morphed block pairs [(0, 0)], 18 data-to-data CX/round, w_eff=6 ancilla CNOT steps/check, max_flags=0, span_flags=0, pos=end)"
+  }
  }
 }
