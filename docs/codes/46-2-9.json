@@ -711,5 +711,49 @@
    "date": "2026-10-02",
    "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 9,
+    "confidence": "upper_bound",
+    "witness": [
+     33674,
+     33678,
+     33680,
+     33685,
+     33696,
+     33697,
+     33698,
+     33703,
+     33709
+    ]
+   },
+   "Z": {
+    "value": 9,
+    "confidence": "upper_bound",
+    "witness": [
+     33657,
+     33658,
+     33659,
+     33661,
+     33669,
+     33671,
+     33677,
+     33678,
+     33688
+    ]
+   }
+  },
+  "rounds": 9,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [1, 7, 3, 5, 8, 6, 4, 2], Z-check term slots [7, 1, 4, 2, 0, 5, 3, 6] over terms A_0..A_1, B_0..B_5); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-09",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [1, 7, 3, 5, 8, 6, 4, 2], Z-check term slots [7, 1, 4, 2, 0, 5, 3, 6] over terms A_0..A_1, B_0..B_5)"
+  }
  }
 }
