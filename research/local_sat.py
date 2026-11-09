@@ -767,8 +767,11 @@ def enumerate_local_sat_codes(
                 "layers": layers,
                 "seed": seed,
                 "index": count,
+                "sites": list(sites),
+                "anchors_x": list(anchors_x),
+                "anchors_z": list(anchors_z),
             }
-            yield (spec, HX, HZ, list(sites), anchors_x, anchors_z)
+            yield (spec, HX, HZ)
             count += 1
             stats["yielded"] = count
             solver_obj.add_clause(block)
