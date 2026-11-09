@@ -8082,7 +8082,8 @@
   "references": [
    "arXiv:2504.08887"
   ],
-  "novelty": "new_parameters"
+  "novelty": "new_parameters",
+  "model": "Beam 1.0"
  },
  "family": "other",
  "locality": {
