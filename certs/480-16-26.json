@@ -1,0 +1,27 @@
+{
+  "d": 26,
+  "d_exact": true,
+  "encoding": "css-sides",
+  "logical_classes": 16,
+  "name": "[[480,16,26]] weight-6 two-block group algebra code over C12 x Dic5",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 26 exists",
+      "status": "UNSAT",
+      "value": 26
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 26 exists",
+      "status": "UNSAT",
+      "value": 26
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 172800.0,
+  "verification": {
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; 16 threads per side; returned vectors (side X and Z) rechecked independently; run on a relabelled copy of the entry (permutation in the records). Records: github.com/TimoKellerMath/quantum-error-correction @ 77f905b6e8dd, two-block-and-amplified-codes/logs/trop480"
+  }
+}
