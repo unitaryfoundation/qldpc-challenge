@@ -1,0 +1,30 @@
+{
+ "name": "[[948,24,28]] [[4,2,2]]-amplified [[192,12,14]]",
+ "d": 28,
+ "d_exact": true,
+ "d_lower": 28,
+ "solver": "proof from the distance of the base 192-12-14: d_P = 2 d_P(base) for the [[4,2,2]] amplification (arXiv:2609.37231, Lemma 4), the entry audited by src/amp_audit.py, the base certified by exactA and exactB; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "this entry has the row spaces of Amp_4(S_X, S_Z) for a presentation (S_X, S_Z) of 192-12-14 (src/amp_audit.py: rows identical); a nontrivial logical of the amplified code contracts to nontrivial logicals of the base on two complementary sets of copies, so d_P = 2 d_P(base) for P = X, Z (README.md of the package, Proposition 3)",
+ "symmetry": false,
+ "logical_classes": 24,
+ "sides": {
+  "X": {
+   "value": 28,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "d_X = 2 d_X(192-12-14) = 2 * 14 by Proposition 3 of the package README; d_X(192-12-14) = 14: no nontrivial X-logical of weight <= 13 by exactA and exactB (certs/192-12-14.json of this PR); no search on this entry itself",
+   "proved_min": 28
+  },
+  "Z": {
+   "value": 28,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "d_Z = 2 d_Z(192-12-14) = 2 * 14 by Proposition 3 of the package README; d_Z(192-12-14) = 14: no nontrivial Z-logical of weight <= 13 by exactA and exactB (certs/192-12-14.json of this PR); no search on this entry itself",
+   "proved_min": 28
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) gives d_P = 2 d_P(192-12-14) for P = X, Z once src/amp_audit.py has checked that this entry is Amp_4 of a presentation of 192-12-14; base distance: certs/192-12-14.json of this PR; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object"
+ }
+}

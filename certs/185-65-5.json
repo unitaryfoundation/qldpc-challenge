@@ -1,0 +1,30 @@
+{
+ "name": "gap-185-65-5",
+ "d": 5,
+ "d_exact": true,
+ "d_lower": 5,
+ "solver": "graphlike_A, graphlike_B, exactA and exactB (source sha256 66a15ffb, 56d04349, 2d1f0d1a, e793e5b3), four independent exact programs; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "graph-like check matrices: shortest nontrivial cycles (graphlike_A, graphlike_B); anchored exhaustive search with exclusions, unit propagation, majority rule and lower bounds through W = d_side - 1, one anchor per orbit of the Tanner-graph automorphism group (exactA: orbit anchors; exactB: orbit anchors, own propagation and bounds); W - 1 searched when every logical of the side has even weight",
+ "symmetry": false,
+ "logical_classes": 65,
+ "sides": {
+  "X": {
+   "value": 5,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "graphlike_A and graphlike_B: d_X = 5, the length of a shortest homologically nontrivial cycle of the graph of H_Z (no nontrivial X-logical of weight <= 4); no nontrivial X-logical of weight <= 4 (W = 4; exactA 669 nodes, 0.000 s; exactB 669 nodes, 0.000 s); both find a word of weight 5 at W = 5, rechecked on the board matrices",
+   "proved_min": 5
+  },
+  "Z": {
+   "value": 5,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "graphlike_A and graphlike_B: d_Z = 5, the length of a shortest homologically nontrivial cycle of the graph of H_X (no nontrivial Z-logical of weight <= 4); no nontrivial Z-logical of weight <= 4 (W = 4; exactA 704 nodes, 0.000 s; exactB 704 nodes, 0.000 s); both find a word of weight 5 at W = 5, rechecked on the board matrices",
+   "proved_min": 5
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "four independently written programs (exhaustive search: completeness by Proposition 3.1 and Corollary 3.2 of weight6-exact-distances/exact_distances.pdf, generalized in README.md of the package, Proposition 4) give d_X = 5, d_Z = 5; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from this entry and reruns them; no replayable proof object"
+ }
+}

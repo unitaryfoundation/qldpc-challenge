@@ -1,0 +1,31 @@
+{
+ "name": "[[628,24,32]] [[4,2,2]]-amplified [[128,12,16]] 2BGA on C8xQ8",
+ "d": 32,
+ "d_exact": false,
+ "d_lower": 28,
+ "solver": "proof from the distance of the base 128-12-16: d_P = 2 d_P(base) for the [[4,2,2]] amplification (arXiv:2609.37231, Lemma 4), the entry audited by src/amp_audit.py, the lower bound of the base by exactA and exactB; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "this entry has the row spaces of Amp_4(S_X, S_Z) for a presentation (S_X, S_Z) of 128-12-16 (src/amp_audit.py: rows identical); a nontrivial logical of the amplified code contracts to nontrivial logicals of the base on two complementary sets of copies, so d_P = 2 d_P(base) for P = X, Z (README.md of the package, Proposition 3)",
+ "symmetry": false,
+ "logical_classes": 24,
+ "sides": {
+  "X": {
+   "value": 32,
+   "exact": false,
+   "status": "OPEN",
+   "note": "d_X = 2 d_X(128-12-16) and d_X(128-12-16) >= 14 (certs/128-12-16.json of this PR), so d_X >= 28; d_X(128-12-16) is even and at most 16, so d_X is 28 or 32",
+   "proved_min": 28
+  },
+  "Z": {
+   "value": 32,
+   "exact": false,
+   "status": "OPEN",
+   "note": "d_Z = 2 d_Z(128-12-16) and d_Z(128-12-16) >= 14 (certs/128-12-16.json of this PR), so d_Z >= 28; d_Z(128-12-16) is even and at most 16, so d_Z is 28 or 32",
+   "proved_min": 28
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) and src/amp_audit.py reduce both sides to those of 128-12-16, where this PR proves d >= 14; a partial certificate, 28 <= d <= 32; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object",
+  "checks_sha256": "adfea83094aa67a82f9cb2b0fb8febaa46d8bb2cf43b02b2b4ba6d50af722feb"
+ }
+}

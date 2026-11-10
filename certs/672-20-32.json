@@ -1,0 +1,31 @@
+{
+ "name": "[[672,20,32]]",
+ "d": 32,
+ "d_exact": false,
+ "d_lower": 26,
+ "solver": "exactA (source sha256 2d1f0d1a) and exactB (e793e5b3), two independent exhaustive searches, stopped below the claim; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "anchored exhaustive search with exclusions, unit propagation, majority rule and lower bounds, one anchor per orbit of the Tanner-graph automorphism group; W - 1 searched when every logical of the side has even weight",
+ "symmetry": true,
+ "logical_classes": 20,
+ "sides": {
+  "X": {
+   "value": 32,
+   "exact": false,
+   "status": "OPEN",
+   "note": "no nontrivial X-logical of weight <= 25: at W = 25 exactA (67028390 nodes, 201.86 s) and exactB (65398210 nodes, 247.01 s) find none (every X-logical has even weight); so d_X is even and 26 <= d_X <= 32 (the upper bound is the entry's witness)",
+   "proved_min": 26
+  },
+  "Z": {
+   "value": 32,
+   "exact": false,
+   "status": "OPEN",
+   "note": "no nontrivial Z-logical of weight <= 25: at W = 25 exactA (59984343 nodes, 205.22 s) and exactB (59684662 nodes, 229.44 s) find none (every Z-logical has even weight); so d_Z is even and 26 <= d_Z <= 32 (the upper bound is the entry's witness)",
+   "proved_min": 26
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exhaustive searches find no nontrivial logical of weight < 26 on either side (completeness: Proposition 4 of README.md of the package); a partial certificate, 26 <= d <= 32; programs, logs and the driver that reruns them: github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object",
+  "checks_sha256": "9d3add707a3e78ddeae7801df269007f7a0ae9c6d2cecdafdf3f39c0637b1a82"
+ }
+}

@@ -1,0 +1,30 @@
+{
+ "name": "[[118,14,8]]",
+ "d": 8,
+ "d_exact": true,
+ "d_lower": 8,
+ "solver": "proof from the distance of the base 25-7-4: d_P = 2 d_P(base) for the [[4,2,2]] amplification (arXiv:2609.37231, Lemma 4), the entry audited by src/amp_audit.py, the base certified by exactA and exactB and by its board certificate; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "this entry has the row spaces of Amp_4(S_X, S_Z) for a presentation (S_X, S_Z) of 25-7-4 (src/amp_audit.py: rows identical); a nontrivial logical of the amplified code contracts to nontrivial logicals of the base on two complementary sets of copies, so d_P = 2 d_P(base) for P = X, Z (README.md of the package, Proposition 3)",
+ "symmetry": false,
+ "logical_classes": 14,
+ "sides": {
+  "X": {
+   "value": 8,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "d_X = 2 d_X(25-7-4) = 2 * 4 by Proposition 3 of the package README; d_X(25-7-4) = 4: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package (no nontrivial X-logical of weight <= 3); no search on this entry itself",
+   "proved_min": 8
+  },
+  "Z": {
+   "value": 8,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "d_Z = 2 d_Z(25-7-4) = 2 * 4 by Proposition 3 of the package README; d_Z(25-7-4) = 4: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package (no nontrivial Z-logical of weight <= 3); no search on this entry itself",
+   "proved_min": 8
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) gives d_P = 2 d_P(25-7-4) for P = X, Z once src/amp_audit.py has checked that this entry is Amp_4 of a presentation of 25-7-4; base distance: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object"
+ }
+}
