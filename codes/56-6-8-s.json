@@ -1,0 +1,727 @@
+{
+ "schema_version": "0.4",
+ "name": "[[56,6,8]] fold of 112-12-8 (stabilizer, mirror code)",
+ "code_type": "stabilizer",
+ "n": 56,
+ "k": 6,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     0,
+     51,
+     54
+    ],
+    "Z": [
+     1,
+     5,
+     41
+    ]
+   },
+   {
+    "X": [
+     1,
+     50,
+     55
+    ],
+    "Z": [
+     0,
+     4,
+     40
+    ]
+   },
+   {
+    "X": [
+     0,
+     2,
+     53
+    ],
+    "Z": [
+     3,
+     39,
+     55
+    ]
+   },
+   {
+    "X": [
+     1,
+     3,
+     52
+    ],
+    "Z": [
+     2,
+     38,
+     54
+    ]
+   },
+   {
+    "X": [
+     2,
+     4,
+     55
+    ],
+    "Z": [
+     1,
+     37,
+     53
+    ]
+   },
+   {
+    "X": [
+     3,
+     5,
+     54
+    ],
+    "Z": [
+     0,
+     36,
+     52
+    ]
+   },
+   {
+    "X": [
+     1,
+     4,
+     6
+    ],
+    "Z": [
+     35,
+     51,
+     55
+    ]
+   },
+   {
+    "X": [
+     0,
+     5,
+     7
+    ],
+    "Z": [
+     34,
+     50,
+     54
+    ]
+   },
+   {
+    "X": [
+     3,
+     6,
+     8
+    ],
+    "Z": [
+     33,
+     49,
+     53
+    ]
+   },
+   {
+    "X": [
+     2,
+     7,
+     9
+    ],
+    "Z": [
+     32,
+     48,
+     52
+    ]
+   },
+   {
+    "X": [
+     5,
+     8,
+     10
+    ],
+    "Z": [
+     31,
+     47,
+     51
+    ]
+   },
+   {
+    "X": [
+     4,
+     9,
+     11
+    ],
+    "Z": [
+     30,
+     46,
+     50
+    ]
+   },
+   {
+    "X": [
+     7,
+     10,
+     12
+    ],
+    "Z": [
+     29,
+     45,
+     49
+    ]
+   },
+   {
+    "X": [
+     6,
+     11,
+     13
+    ],
+    "Z": [
+     28,
+     44,
+     48
+    ]
+   },
+   {
+    "X": [
+     9,
+     12,
+     14
+    ],
+    "Z": [
+     27,
+     43,
+     47
+    ]
+   },
+   {
+    "X": [
+     8,
+     13,
+     15
+    ],
+    "Z": [
+     26,
+     42,
+     46
+    ]
+   },
+   {
+    "X": [
+     11,
+     14,
+     16
+    ],
+    "Z": [
+     25,
+     41,
+     45
+    ]
+   },
+   {
+    "X": [
+     10,
+     15,
+     17
+    ],
+    "Z": [
+     24,
+     40,
+     44
+    ]
+   },
+   {
+    "X": [
+     13,
+     16,
+     18
+    ],
+    "Z": [
+     23,
+     39,
+     43
+    ]
+   },
+   {
+    "X": [
+     12,
+     17,
+     19
+    ],
+    "Z": [
+     22,
+     38,
+     42
+    ]
+   },
+   {
+    "X": [
+     15,
+     18,
+     20
+    ],
+    "Z": [
+     21,
+     37,
+     41
+    ]
+   },
+   {
+    "X": [
+     14,
+     19,
+     21
+    ],
+    "Z": [
+     20,
+     36,
+     40
+    ]
+   },
+   {
+    "X": [
+     17,
+     20,
+     22
+    ],
+    "Z": [
+     19,
+     35,
+     39
+    ]
+   },
+   {
+    "X": [
+     16,
+     21,
+     23
+    ],
+    "Z": [
+     18,
+     34,
+     38
+    ]
+   },
+   {
+    "X": [
+     19,
+     22,
+     24
+    ],
+    "Z": [
+     17,
+     33,
+     37
+    ]
+   },
+   {
+    "X": [
+     18,
+     23,
+     25
+    ],
+    "Z": [
+     16,
+     32,
+     36
+    ]
+   },
+   {
+    "X": [
+     21,
+     24,
+     26
+    ],
+    "Z": [
+     15,
+     31,
+     35
+    ]
+   },
+   {
+    "X": [
+     20,
+     25,
+     27
+    ],
+    "Z": [
+     14,
+     30,
+     34
+    ]
+   },
+   {
+    "X": [
+     23,
+     26,
+     28
+    ],
+    "Z": [
+     13,
+     29,
+     33
+    ]
+   },
+   {
+    "X": [
+     22,
+     27,
+     29
+    ],
+    "Z": [
+     12,
+     28,
+     32
+    ]
+   },
+   {
+    "X": [
+     25,
+     28,
+     30
+    ],
+    "Z": [
+     11,
+     27,
+     31
+    ]
+   },
+   {
+    "X": [
+     24,
+     29,
+     31
+    ],
+    "Z": [
+     10,
+     26,
+     30
+    ]
+   },
+   {
+    "X": [
+     27,
+     30,
+     32
+    ],
+    "Z": [
+     9,
+     25,
+     29
+    ]
+   },
+   {
+    "X": [
+     26,
+     31,
+     33
+    ],
+    "Z": [
+     8,
+     24,
+     28
+    ]
+   },
+   {
+    "X": [
+     29,
+     32,
+     34
+    ],
+    "Z": [
+     7,
+     23,
+     27
+    ]
+   },
+   {
+    "X": [
+     28,
+     33,
+     35
+    ],
+    "Z": [
+     6,
+     22,
+     26
+    ]
+   },
+   {
+    "X": [
+     31,
+     34,
+     36
+    ],
+    "Z": [
+     5,
+     21,
+     25
+    ]
+   },
+   {
+    "X": [
+     30,
+     35,
+     37
+    ],
+    "Z": [
+     4,
+     20,
+     24
+    ]
+   },
+   {
+    "X": [
+     33,
+     36,
+     38
+    ],
+    "Z": [
+     3,
+     19,
+     23
+    ]
+   },
+   {
+    "X": [
+     32,
+     37,
+     39
+    ],
+    "Z": [
+     2,
+     18,
+     22
+    ]
+   },
+   {
+    "X": [
+     35,
+     38,
+     40
+    ],
+    "Z": [
+     1,
+     17,
+     21
+    ]
+   },
+   {
+    "X": [
+     34,
+     39,
+     41
+    ],
+    "Z": [
+     0,
+     16,
+     20
+    ]
+   },
+   {
+    "X": [
+     37,
+     40,
+     42
+    ],
+    "Z": [
+     15,
+     19,
+     55
+    ]
+   },
+   {
+    "X": [
+     36,
+     41,
+     43
+    ],
+    "Z": [
+     14,
+     18,
+     54
+    ]
+   },
+   {
+    "X": [
+     39,
+     42,
+     44
+    ],
+    "Z": [
+     13,
+     17,
+     53
+    ]
+   },
+   {
+    "X": [
+     38,
+     43,
+     45
+    ],
+    "Z": [
+     12,
+     16,
+     52
+    ]
+   },
+   {
+    "X": [
+     41,
+     44,
+     46
+    ],
+    "Z": [
+     11,
+     15,
+     51
+    ]
+   },
+   {
+    "X": [
+     40,
+     45,
+     47
+    ],
+    "Z": [
+     10,
+     14,
+     50
+    ]
+   },
+   {
+    "X": [
+     43,
+     46,
+     48
+    ],
+    "Z": [
+     9,
+     13,
+     49
+    ]
+   },
+   {
+    "X": [
+     42,
+     47,
+     49
+    ],
+    "Z": [
+     8,
+     12,
+     48
+    ]
+   },
+   {
+    "X": [
+     45,
+     48,
+     50
+    ],
+    "Z": [
+     7,
+     11,
+     47
+    ]
+   },
+   {
+    "X": [
+     44,
+     49,
+     51
+    ],
+    "Z": [
+     6,
+     10,
+     46
+    ]
+   },
+   {
+    "X": [
+     47,
+     50,
+     52
+    ],
+    "Z": [
+     5,
+     9,
+     45
+    ]
+   },
+   {
+    "X": [
+     46,
+     51,
+     53
+    ],
+    "Z": [
+     4,
+     8,
+     44
+    ]
+   },
+   {
+    "X": [
+     49,
+     52,
+     54
+    ],
+    "Z": [
+     3,
+     7,
+     43
+    ]
+   },
+   {
+    "X": [
+     48,
+     53,
+     55
+    ],
+    "Z": [
+     2,
+     6,
+     42
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 8,
+  "P": {
+   "value": 8,
+   "confidence": "exact",
+   "witness": {
+    "X": [
+     0,
+     2,
+     16,
+     18,
+     41,
+     52,
+     54
+    ],
+    "Z": [
+     0,
+     2,
+     16,
+     18,
+     55
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@TimoKellerMath"
+  ],
+  "origin": "submission",
+  "novelty": "known_parameters",
+  "construction": "Halving of the two-block code [[112,12,8]] (codes/112-12-8.json) along the fixed-point-free ZX-duality that exchanges (1,h) and (2,c-h) (symplectic halving: Lee, Okada, Maskara, Kasai, Zhou, arXiv:2609.30069, Def. 3; Burton, Durso-Sabina, Brown, arXiv:2406.09951); equivalently the mirror code of Khesin and Lu (arXiv:2603.05496) with A = c - F_B, B = F_A. Parent: G = Z/28 x Z/2, element (a,b) with index 2a+b; qubit (1,h) -> index of h, (2,h) -> 56 + index of h; X-check g on (1, g+F_A) and (2, g+F_B), Z-check g on (1, g-F_B) and (2, g-F_A), F_A = {(0,0),(25,1),(27,0)}, F_B = {(0,0),(8,0),(26,0)}; this is codes/112-12-8.json after renumbering G (the board file numbers G by (i, j) -> 2i + j, which is the numbering of Definition 1). Involution: Psi(1,h) = (2, c-h), Psi(2,h) = (1, c-h) with c = (0,1). Fold: fold qubit i is (1,h) with h of index i; the X-check g gives the generator with X on g+F_A and Z on c-g-F_B (Y where they meet), in the order of the X-checks. n = 56, rank 50, k = 6; 56 generators of weight 6, no Y factors; not locally Clifford equivalent to a CSS code.",
+  "references": [
+   "arXiv:2609.30069",
+   "arXiv:2406.09951",
+   "arXiv:2603.05496",
+   "arXiv:2611.09538",
+   "arXiv:2611.08247"
+  ],
+  "date": "2026-11-10",
+  "model": "Claude Opus 5.5",
+  "notes": "Distance 8 is exact: no nontrivial logical of Pauli weight <= 7 by three independent exhaustive computations (tropidist b03ec2d4077f in the board's Pauli encoding, certs/56-6-8-s.json in the same pull request; a meet-in-the-middle search of ours; Magma V2.30-1 MinimumDistance), and the witness has weight 8. Programs, data and logs: github.com/TimoKellerMath/quantum-error-correction @ 207d1130035a, folded-stabilizer-codes/. Not locally Clifford equivalent to a CSS code: the generator-level parity system for single-qubit Cliffords has no solution (an odd cycle closes at qubit 4 with generators 1 and 6), and every generator is the only nontrivial stabilizer supported in its support, so no single-qubit Clifford makes the group CSS. At board commit 8042f9da no stabilizer entry dominates or equals it; it dominates the stabilizer entries 65-5-8 (on n and k) and 72-6-8-b (on n). It is a mirror code of Khesin and Lu (arXiv:2603.05496) with G = Z/28 x Z/2, A = {(0,1),(2,1),(20,1)}, B = {(0,0),(25,1),(27,0)}. It is not in their code table; their row [[56,6,8]] (over Z8 x Z7) is marked CSS there, so it is not equivalent to this code (see the local Clifford test). They describe their search over abelian |A| = |B| = 3 as almost exhaustive up to n = 300, so they may have met this code; it is not published. As G = Z/28 x Z/2, 112-12-8 is a bivariate bicycle code, and this fold is its quotient by the ZX-duality g -> c - g: a genon code in the sense of Hsin (arXiv:2611.09538), whose construction the board's genons 36-6-6-b and 72-6-8-b use; this code is not among the explicit codes of that paper. The parameters [[56,6,8]] are published for CSS codes (e.g. the board's 56-6-8), hence novelty known_parameters. On the CSS board the entry 56-6-8 has the same parameters and check weight; this code is not CSS under any single-qubit Cliffords, so it ranks on the stabilizer board only. Checked, not equivalent to an existing entry."
+ },
+ "family": "other"
+}
