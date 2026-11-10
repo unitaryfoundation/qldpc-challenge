@@ -1,0 +1,224 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[72,6,9]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"other","code_origin":"submission","code_tier":"exact","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-6"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../stabilizer.html">&larr; back to the stabilizer board</a>
+<div class=codehead><span class="mono big">[[72,6,9]]</span> <span class="b exact">d =</span><span class="tchip stab" title="general (non-CSS) stabilizer code: one Pauli-weight distance, ranked on the stabilizer board">stabilizer</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>72</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>6</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>9</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>6.75</div></div>
+<div class=cell title="max check weight |supp X_i ∪ supp Z_i| (a Y factor counts one qubit)"><div class=l>w</div><div class=v>6</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/72-6-9-s.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B72%2C6%2C9%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/72-6-9-s.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B72%2C6%2C9%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/72-6-9-s.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/72-6-9-s.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv style="color:var(--mut)">a general stabilizer code has no X and Z sides: d is the minimum Pauli weight of a nontrivial logical operator (a Y factor counts one qubit), and the witness is one Pauli operator that commutes with every generator and is not a product of them</div>
+<div class=kv><b>d</b> 9 &middot; witness Pauli weight 9 (3 Y factors; Hamming weight over 2n bits 12) (claimed exact)</div>
+<details><summary>witness operator (Pauli string, 9 qubits)</summary><div class=wit>XYIIIIIZZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIYIZIIZIYIIIIIIIIIIXIIIIIIIIIIIIII
+X: [0, 1, 39, 46, 57]
+Z: [1, 7, 8, 39, 41, 44, 46]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 9</span> &middot; tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">P: no logical &lt; 9 exists</div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the generator/qubit graph a decoder runs on (one graph, over the generator supports). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from S, never a ranking axis."><b>girth</b> S 4 <span class=claimed>(shortest cycle of the generator Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> S 6</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> S 6</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets S</b> (1,6)×72 (2,4)×12 (3,6)×24 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for S</summary><div class=wit>(1,6): 72
+(2,4): 12
+(2,8): 348
+(2,10): 336
+(3,6): 24
+(3,8): 264
+(3,10): 1704
+(3,12): 5216
+(3,14): 2208
+(3,16): 72</div></details>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/TimoKellerMath">@TimoKellerMath</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> Halving of the gross code [[144,12,12]] (codes/144-12-12.json) along a fixed-point-free ZX-duality that preserves the two blocks (symplectic halving: Lee, Okada, Maskara, Kasai, Zhou, arXiv:2609.30069, Def. 3; Burton, Durso-Sabina, Brown, arXiv:2406.09951, Thm. 3.5). Parent: G = Z/12 x Z/6, element (i,j) with index 6i+j; qubit (1,h) -&gt; index of h, (2,h) -&gt; 72 + index of h; X-check g on (1, g+F_A) and (2, g+F_B), Z-check g on (1, g-F_B) and (2, g-F_A), F_A = {(3,0),(0,1),(0,2)}, F_B = {(0,3),(1,0),(2,0)} (A = x<sup>3</sup>+y+y<sup>2</sup>, B = y<sup>3</sup>+x+x<sup>2</sup>; equal to codes/144-12-12.json). Involution: Psi(1,h) = (1, c1 + psi(h)), Psi(2,h) = (2, c2 + psi(h)) with the automorphism psi(1,0) = (3,4), psi(0,1) = (10,3) (psi<sup>2</sup> = 1), c1 = (1,2), c2 = (5,4); it maps the set of X-check supports onto the set of Z-check supports. Fold: Sigma = the parent qubits q with q &lt; Psi(q), in increasing order; fold qubit i is the i-th element sigma_i of Sigma; the X-check a gives the generator with X on {i : sigma_i in a} and Z on {i : Psi(sigma_i) in a}, in the order of the X-checks. n = 72, rank 66, k = 6, all 72 generators of weight 6 without Y; not locally Clifford equivalent to a CSS code.</div>
+<div class=kv><b>model</b> <span class=modelmark><svg class=modelicon viewBox="0 0 24 24" width="15" height="15" role="img" aria-label="Claude"><title>Claude</title><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg> </span>Claude Opus 5.5 <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2609.30069">arXiv:2609.30069</a>, <a href="https://arxiv.org/abs/2406.09951">arXiv:2406.09951</a>, <a href="https://arxiv.org/abs/2308.07915">arXiv:2308.07915</a>, <a href="https://arxiv.org/abs/2611.09538">arXiv:2611.09538</a>, <a href="https://arxiv.org/abs/2611.08247">arXiv:2611.08247</a></div>
+<div class=kv><b>date</b> 2026-11-10</div>
+<div class=kv><b>notes</b> Distance 9 is exact: no nontrivial logical of Pauli weight &lt;= 8 by four independent exhaustive computations (tropidist b03ec2d4077f in the board&#x27;s Pauli encoding, certs/72-6-9-s.json in the same pull request; Magma V2.30-1 MinimumDistance; a meet-in-the-middle search over all Paulis of weight &lt;= 4; a search over the logicals with at most four non-Y factors combined with d = 12 of the parent, certs/144-12-12.json), and exactly 24 logicals of weight 9. Programs, data and logs: github.com/TimoKellerMath/quantum-error-correction @ c203901854da, amplified-and-folded-codes/. The CSS entry 72-6-9 has the same parameters; this entry is a non-CSS code for the stabilizer board: the generator-level parity system for single-qubit Cliffords has no solution, and every generator is the only nontrivial stabilizer supported in its support, so no single-qubit Clifford makes the group CSS. It dominates the genon entry 72-6-8-b (same n, k and check weight, d &lt;= 8 by its witness), which is the fold of the same parent along a block-swapping ZX-duality; checked, not equivalent to an existing entry.</div>
+<div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/72-6-9-s.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[72,6,9]]: fold of the gross code along a block-preserving ZX-duality</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: check weight at most 6, unrestricted locality (no layout submitted), stabilizer board. A CSS code on 2m qubits with a fixed-point-free ZX-duality (an involution of the qubits mapping the X-checks onto the Z-checks) halves to a stabilizer code on m qubits (Burton, Durso-Sabina, Brown, arXiv:2406.09951, Thm. 3.5; the explicit symplectic halving is Def. 3 of Lee, Okada, Maskara, Kasai, Zhou, arXiv:2609.30069). Its nontrivial logicals correspond to the nontrivial Z-logicals of the parent, a logical with y Y factors and t X or Z factors to one of weight 2y + t, so d is at least half the parent&#x27;s distance and drops where lifts carry many Y. The genon entry 72-6-8-b is a fold of the gross code [[144,12,12]] along a duality that swaps the two blocks. Hypothesis: another duality of the same parent gives a larger distance.</p>
+<h4>What was searched</h4>
+<p>All affine fixed-point-free ZX-dualities (h -&gt; c + psi(h) on each block, psi an automorphism, swapping or preserving the blocks) of ten weight-6 abelian two-block parents with known distance, of length 144 to 756 (among them the gross and two-gross codes and the board entries 510-16-26 and 558-14-28), up to translations, each fold screened by information-set searches scored by Pauli weight (1e4 trials, Lee-Brickell and Stern). For the gross code there are 78 such involutions in five classes: four swap the blocks (psi = -1) and one preserves them; only the gross code has a block-preserving class. This code is the fold along it.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: provenance.construction; n = 72, rank 66, k = 6, all 72 generators of weight 6 without Y.</li>
+<li>Not CSS under single-qubit Cliffords: the generator-level parity system that the board&#x27;s verifier solves has no solution, and each generator is the only nontrivial stabilizer supported in its support, which lifts the statement to the whole group (Lemma 9 of the README of the package below).</li>
+<li>Lower bound 9, four independent exhaustive computations: (1) tropidist b03ec2d4077f in the board&#x27;s Pauli encoding, exact 9 in 1.8 s on one thread, recorded in certs/72-6-9-s.json (same pull request); (2) a meet-in-the-middle search over all 84,965,491 Paulis of weight at most 4 pairs none of them to a nontrivial logical, so no nontrivial logical has weight at most 8 (validated on [[5,1,3]] and on the board entries 13-1-5, 17-1-7, 21-1-7 and 72-6-8-b, where it finds 3, 5, 7, 7 and 8); (3) Magma V2.30-1 MinimumDistance: 9, in 411 s; (4) an exhaustive search over the logicals with at most 4 non-Y factors (least weight 12 for t = 0 and t = 4, none for t = 1, 2, 3) together with d = 12 of the parent (certs/144-12-12.json) and the parity of the lifts gives d &gt;= min(12, (12 + 6)/2) = 9.</li>
+<li>Upper bound: the witness. There are exactly 24 nontrivial logicals of weight 9 (exhaustive count), each with three Y factors; an information-set search with 1e5 trials (seed 20261110) found the same 24.</li>
+<li>Final claim: d = 9 exactly. The entry claims exact, which the verifier reads as upper_bound for stabilizer codes; the certificate in this pull request carries the exact tier.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>The four block-swapping dualities of the gross code give folds with d = 8 (three classes, exact by the meet-in-the-middle search; the class of g -&gt; (0,1) - g is the construction of 72-6-8-b) and d &lt;= 6 (the class of g -&gt; -g: four weight-6 logicals made of Y only).</li>
+<li>The same census on the two-gross code [[288,12,18]] gives only block-swapping classes, with d &lt;= 15 (one of them is the board&#x27;s 144-6-15-b).</li>
+<li>On the CSS board the parameters [[72,6,9]] at check weight 6 are not new (72-6-9); this code is new on the stabilizer board only, where it dominates 72-6-8-b on d (same n, k and check weight; d &lt;= 8 there by its witness).</li>
+</ul>
+<h4>Tools</h4>
+<p>Claude Opus 5.5 (Claude Code); Python (standard library) for the constructions and checks; C programs for the meet-in-the-middle search, the search over logicals with few non-Y factors, the count of the weight-9 logicals and the information-set search; Magma V2.30-1; tropidist (Cheng, Guo, Pan, arXiv:2611.08247) at the board&#x27;s pinned commit. About 30 CPU-minutes.</p>
+<h4>Reproduction</h4>
+<p>In <code>amplified-and-folded-codes/</code> of github.com/TimoKellerMath/quantum-error-correction @ c203901854da: <code>python3 src/rebuild.py</code> rebuilds this code from the parent and the involution and checks isotropy, k, the weights, the witnesses and the local Clifford test; <code>make quick</code> reruns the meet-in-the-middle and the few-non-Y searches and compares them with our logs; src/gross_k0_mindist.m is the Magma computation (gross_c4 is the name of this code in the instance files there).</p></div></section>
+<section class=blk><h3>Stabilizer generators</h3>
+<div class=kv><b>generators</b> 72 (max weight 6; 47 mixed X/Z) <span class=claimed>(one binary symplectic matrix S = (A | B); generator i is X on A_i and Z on B_i, Y where both)</span></div>
+<details><summary>generators (72, Pauli strings on 72 qubits)</summary><div class=wit>IXXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIXIIIIXIIIIIIIIIIIIIIIIIIIIIIII
+IIXXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIXIIIIXIIIIIIIIIIIIIIIIIIIIIII
+IIIXXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIXIIIIXIIIIIIIIIIIIIIIIIIIIII
+IIIIXXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIXIIIIIIIIXIIIIXIIIIIIIIIIIIIIIIIIIII
+XIIIIXIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIXZIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIII
+XXIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXIIIIIIZXIIIIIIIIIIIIIIIIIIIIIIIII
+ZIIIIIZXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXIXIIIZIIIIIIIIIIIIIIIIIIII
+ZIIIIIIIXIIIIIIIIIIIXIIIIIIIIIIIIIIIIZZIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIII
+IIIIIIIIXXIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIXIIXIIXIIIIIIIIIIIIIIIIIII
+IIIIIIIIIXXIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIXIIIIIIIXIIXIIIIIIIIIIIIIIIIII
+IIIIIIXIIIXIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIXIIIIIIIXIIXIIIIIIIIIIIIIIIII
+IIIIIIXXIIIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIXZIIIIIIIIIXIIIIIIIIIIIIIIII
+IIIIIIIIIIIIXXIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIXZIIIIXIIIIIIIIIIIIIII
+IIIIIIIZIIIIZXIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIXIIIZIIIIIIIIIIIIIIII
+IIIIZIIZIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZIIIIIIXIIIIIIIIIIIIIIIIIII
+IIIIIIIIIIIIIIXXIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIIIIXIIIXIIIIIIIIIIIIII
+IIIIIIIIIIIXIIIXIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIIIIXIIIXIIIIIIIIIIIII
+IIIIIIIIIIIXXIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIIIIXIIIXIIIIIIIIIIII
+IIIIIIIIIIIIIIIIIXXIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIXIIXIIIXIIIIIIIIIII
+IIIIIIIIIIIIIIIIIIXXIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIXZIIIIIXIIIIIIIIII
+IIIIIIIIIIIIIZIIIIZXIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIXZIIIIIIIIIIIIIII
+IIIIIZIIIIZIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZIIIIIXIIIIIIIIIIIIII
+IIIIIZIIIIIIIIIIXIIIIIIIIIIIXIIIIIIIZZIIIIIIIIIIIIIIIIIIIIXIIIIIIIIIIIII
+IIIIIIIIIIIIIIIIXXIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIXIIIIIIXIIXIIIIIIIII
+IIIIIIIIIIIIIIIIIIIIXXIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIXIIXIIXIIIIIIII
+IIIIIIIIIIIIIIIIIIIIIXXIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIXIIXIIXIIIIIII
+IIIIIIIIIIIIIIIIIIIIIIXXIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIXIIIIIXIIIIII
+IIIIIIIIIIIIIIIIIIIZIIZXIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIXIIIIZIIIIIIIIII
+IIIIIIZIIIIZIIIIIIIZIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIIIIIZZIIIIIIIIIIIIIIII
+IIIZIIZIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIZZIIIIIIIIIIIIIIIIIXIIIIIIIII
+IIIIZIIIIZIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZIIIIIIIIIIIIXIIIIIIII
+IIIIZIIIIIIIIIIIIIIIIIIIXIIIIIIIXIIIZIIIIZIIIIIIIIIIIIIIIIIIIIIIXIIIIIII
+IIIIIIIIIIIIIIIIIIIIIIIIXXIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIIIXIIXXIIIII
+IIIIIIIIIIIIIIIIIIIIIIIIIXXIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIXZIIIIIXIIII
+IIIIIIIIIIIIIIIIIIIIIIIZIZXIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIXIIIZIIIIII
+IIIIIIIIIIIIZIIIIZIIIIIZIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIIZIIZIIIIIIIIIIII
+IIIIIIIIIIIIIIIIIIZIIZIIIIZIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZZIIIIIIIIII
+IIIIIIIIIIZIIIIZIIZIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIZZIIIIIIIIIIIIIIIII
+IIZIIIIIIIZIIIIIIIIIIIIIIIIIXIIIIIIIIIIIIIZZIIIIIIIIIIIIIIIIIIIIIIXIIIII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIXXIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIIIXIIIXXIII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIXIXIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXZIIIXII
+IIIIIIIIIIIIIIIIIIIIIIIIIIZXIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIXIZIIII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIZIIZXIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIXIZII
+IIIIIIIIIIIIIIIIIIIIIIZIZIIZIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZZIIIIII
+IIIIIIIIIIIZIIIIZIIIIIZIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIIIIIZZIIIIIIIIIIII
+IIIZIIIIZIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZIIIIIIIIIIIIIIIIIIXIII
+IIIZIIIIIIIIIIIIIIIIIIIIIIIIIIXIIIIXIIIIZZIIIIIIIIIIIIIIIIIIIIIIIIIIIXII
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXXIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXZIIXI
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXXIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXZIX
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIXZI
+IIIIIIIIIIIIIIIIIIIIIIIIIZIIZIIZIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIZZIIII
+IIIIIIIIIIIIIIIIIZIIZIIIIZIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIZIZIIIIIIIII
+IIIIIIIIIZIIIIZIIZIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIIZZIIIIIIIIIIIIIIIIII
+IZIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIXIIIIIIIIIZIIIZIIIIIIIIIIIIIIIIIIIIIIIXI
+XIZIIIIIIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZZIIIIIIIIIIIIIIIIIIIIIIX
+IXZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIXIIIIZZIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZI
+IIXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIXZ
+IIIXIIIIIIIIIIIIIIIIIIIIIIIIIZIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIZZII
+IIIIXIIIIIIIIIIIIIIIIZIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZZIIIIIII
+IIIIIXIIIIIIIIIZIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIZIIIIIIIIIIZZIIIIIIIIIIIII
+IIIIIIXIIIIIIIIIZIIIIIIIZIIIIIIIIIIIXIIIIIIIIIIZIIIIIIIIIIIIIIZIIIIIIIII
+IIIIIIIXZIIIIIIIZIIIIIIIIIIIIIIIIIIIIXIZIIIIIIIIIIIIZIIIIIIIIIIIIIIIIIII
+ZIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIIIXIIXIIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIZ
+IIIIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIZXIIIXIIIIIIIIIIIIIIIIIIIIIIIIIIIIZIIX
+IIIIIIIIIXIIIIIIIIIIIIIIIIIIIIZIIIZIIIIIXIIIIIIIIIIIIIIIIIIIIIIZIIIIIIZI
+IIIIIIIIIIXIIIIIIIIIIIIIZIIIIIZIIIIIIIIIIXIIIIIIIIIIIIIIIZIIIIIIIIZIIIII
+IIIIIIIIIIIXIIIIIIIIIIIIIIIIZIIIZIIIXIIIIIXIIIIIIIIIIIIIIIIIIIIIIIIIZIII
+IIIIIIIIIIIIXIIIIIIIZIIIIIIIZIIIIIIIIXIIIIIXIIIIIIIIIIIIIIIIIIIZIIIIIIII
+IIIIIIIIIIIIIXZIIIIIZIIIIIIIIIIIIIIIIIXIIIIIXIIIIIIIIIIIIZIIIIIIIIIIIIII
+IZIIIIIZIIIIIIZIIIIIIIIIIIIIIIIIIIIIIIIXIIIIIXIZIIIIIIIIIIIIIIIIIIIIIIII
+IZIIIIIIIIIIIIXIIIIIIIIIIIIIIIIIIIIZIIZZXIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+IIIIIIIIIIIIIIIXIIIIIIIIIIIIIIIIZIIZIIIIIXIIIIXIIIIIIIIIIIIIIIIIIIIIIIIZ</div></details>
+<details><summary>symplectic rows (A | B) (72, sparse supports)</summary><div class=wit>X: [1, 2, 16, 39, 42, 47]  Z: []
+X: [2, 3, 17, 40, 43, 48]  Z: []
+X: [3, 4, 18, 41, 44, 49]  Z: []
+X: [4, 5, 19, 36, 45, 50]  Z: []
+X: [0, 5, 37, 51]  Z: [13, 38]
+X: [0, 1, 38, 46]  Z: [5, 45]
+X: [7, 45, 47]  Z: [0, 6, 51]
+X: [8, 20, 48]  Z: [0, 37, 38]
+X: [8, 9, 21, 46, 49, 52]  Z: []
+X: [9, 10, 22, 42, 50, 53]  Z: []
+X: [6, 10, 23, 43, 51, 54]  Z: []
+X: [6, 7, 44, 55]  Z: [19, 45]
+X: [12, 13, 50, 56]  Z: [23, 51]
+X: [13, 51]  Z: [7, 12, 37, 55]
+X: [14, 52]  Z: [4, 7, 44, 45]
+X: [14, 15, 24, 47, 53, 57]  Z: []
+X: [11, 15, 25, 48, 54, 58]  Z: []
+X: [11, 12, 26, 49, 55, 59]  Z: []
+X: [17, 18, 27, 53, 56, 60]  Z: []
+X: [18, 19, 54, 61]  Z: [26, 55]
+X: [19, 55]  Z: [13, 18, 44, 56]
+X: [57]  Z: [5, 10, 13, 50, 51]
+X: [16, 28, 58]  Z: [5, 36, 37]
+X: [16, 17, 29, 52, 59, 62]  Z: []
+X: [20, 21, 30, 57, 60, 63]  Z: []
+X: [21, 22, 31, 58, 61, 64]  Z: []
+X: [22, 23, 59, 65]  Z: [27, 56]
+X: [23, 56]  Z: [19, 22, 50, 61]
+X: []  Z: [6, 11, 19, 36, 54, 55]
+X: [20, 62]  Z: [3, 6, 43, 44]
+X: [63]  Z: [4, 9, 12, 49, 50]
+X: [24, 32, 64]  Z: [4, 36, 41]
+X: [24, 25, 33, 62, 65, 66]  Z: []
+X: [25, 26, 60, 67]  Z: [31, 61]
+X: [26, 61]  Z: [23, 25, 54, 65]
+X: []  Z: [12, 17, 23, 43, 56, 59]
+X: []  Z: [18, 21, 26, 49, 60, 61]
+X: []  Z: [10, 15, 18, 41, 53, 54]
+X: [28, 66]  Z: [2, 10, 42, 43]
+X: [28, 29, 34, 63, 67, 68]  Z: []
+X: [27, 29, 64, 69]  Z: [33, 65]
+X: [27, 65]  Z: [26, 29, 59, 67]
+X: [31, 67]  Z: [27, 30, 60, 69]
+X: []  Z: [22, 24, 27, 53, 64, 65]
+X: []  Z: [11, 16, 22, 42, 58, 59]
+X: [68]  Z: [3, 8, 11, 48, 49]
+X: [30, 35, 69]  Z: [3, 40, 41]
+X: [30, 31, 66, 70]  Z: [34, 67]
+X: [32, 33, 68, 71]  Z: [35, 69]
+X: [33, 69]  Z: [31, 32, 64, 70]
+X: []  Z: [25, 28, 31, 58, 66, 67]
+X: []  Z: [17, 20, 25, 48, 60, 62]
+X: []  Z: [9, 14, 17, 40, 52, 53]
+X: [32, 70]  Z: [1, 9, 42, 46]
+X: [0, 71]  Z: [2, 15, 47, 48]
+X: [1, 34]  Z: [2, 39, 40, 70]
+X: [2, 34, 70]  Z: [33, 66, 71]
+X: [3]  Z: [29, 33, 62, 68, 69]
+X: [4]  Z: [21, 29, 52, 63, 64]
+X: [5]  Z: [15, 21, 46, 57, 58]
+X: [6, 36]  Z: [16, 24, 47, 62]
+X: [7, 37]  Z: [8, 16, 39, 52]
+X: [35, 38]  Z: [0, 8, 46, 71]
+X: [8, 35, 39, 71]  Z: [34, 68]
+X: [9, 40]  Z: [30, 34, 63, 70]
+X: [10, 41]  Z: [24, 30, 57, 66]
+X: [11, 36, 42]  Z: [28, 32, 68]
+X: [12, 37, 43]  Z: [20, 28, 63]
+X: [13, 38, 44]  Z: [14, 20, 57]
+X: [39, 45]  Z: [1, 7, 14, 47]
+X: [14, 40]  Z: [1, 35, 38, 39]
+X: [15, 41, 46]  Z: [32, 35, 71]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>72-6-9-s</code> &middot; <a href="72-6-9-s.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/72-6-9-s.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>
