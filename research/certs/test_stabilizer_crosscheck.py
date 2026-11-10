@@ -51,6 +51,7 @@ def test_the_milp_and_the_search_agree_with_the_certificate():
     assert w == 3 and ok
 
 
+@pytest.mark.board
 def test_the_record_names_a_verdict_per_entry(tmp_path):
     pytest.importorskip("scipy")
     M = _module()

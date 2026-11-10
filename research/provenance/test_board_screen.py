@@ -9,6 +9,8 @@ import json
 import os
 import sys
 
+import pytest
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 
@@ -48,6 +50,7 @@ def test_counts_follow_the_entries():
     assert c["wl_matches_by_audit"] == {"not_audited": c["wl_matches"]}
 
 
+@pytest.mark.board
 def test_the_committed_record_is_well_formed_and_describes_the_board():
     """check() hard-fails only on a malformed record; staleness exits 0 loudly."""
     assert os.path.exists(bs.SCREEN), "the board screen record is committed beside derived.json"

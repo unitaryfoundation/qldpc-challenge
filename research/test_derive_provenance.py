@@ -97,6 +97,7 @@ def test_a_bounds_only_source_lands_in_parameters_only(tmp_path):
     assert table[slug]["bucket"] == "parameters_only"
 
 
+@pytest.mark.board
 def test_every_board_slug_is_bucketed(tmp_path):
     """No entry may be missing from the table; absence would read as zero."""
     table, _ = dp.derive(matches(tmp_path, []))
@@ -104,6 +105,7 @@ def test_every_board_slug_is_bucketed(tmp_path):
     assert all(v["bucket"] in dp.BUCKETS for v in table.values())
 
 
+@pytest.mark.board
 def test_the_committed_table_matches_the_board():
     """The shipped table must describe today's codes/, or say so loudly."""
     assert dp.check() == 0
@@ -243,6 +245,7 @@ def test_not_derived_is_distinct_from_no_match(tmp_path):
     assert any(v == "not_derived" for v in buckets.values())
 
 
+@pytest.mark.board
 def test_the_residual_body_lists_every_unchecked_entry(tmp_path, capsys):
     """The tracking issue is the published remainder (issue #4023).
 

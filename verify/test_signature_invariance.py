@@ -89,6 +89,7 @@ def test_the_equivalence_test_decides_rather_than_flags():
     assert equivalent(a, load("390-82-38")) is None
 
 
+@pytest.mark.board
 def test_the_board_scan_names_the_pairs_it_finds():
     """The scan names the known pair, and the real board holds none since #4143."""
     pair = [os.path.join(_ROOT, "codes", "390-82-31.json"), os.path.join(FIXTURES, "390-82-31-b.json")]

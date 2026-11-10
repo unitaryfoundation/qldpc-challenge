@@ -92,6 +92,14 @@ jobs:
       # list to the import closure of ler_verify.py, so a new import in the
       # LER code fails the suite until the list names it.
       LER_STACK: verify/verify_all.py verify/ler_verify.py verify/ler_tools.py verify/circuit_tools.py verify/gf2.py verify/gf2_fast.cpp verify/setup_gf2_fast.py decode pyproject.toml uv.lock Makefile
+      # The directories that hold submitted data rather than code: an entry,
+      # its circuit tier, its note or fieldnote, its repro manifest, its
+      # certificate. This is check_submission_scope.py's SUBMISSION_SURFACE,
+      # and verify/test_data_surface.py pins the two together. A pull request
+      # whose every changed file is under one of these is data-only: it skips
+      # the full self-test suite and runs the two narrower steps described in
+      # `detect changed code submissions` below.
+      DATA_SURFACE: codes circuits notes fieldnotes repro certs
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
@@ -173,18 +181,35 @@ jobs:
           else
             codes_changed=true
           fi
-          # A PR whose every changed file lives under codes/, circuits/, notes/ or
-          # fieldnotes/ cannot have touched the stack the self-tests exercise: the
-          # scope check forbids combining code data with verify/, workflows, schema
-          # or run_tests.py, and no self-test reads the committed prose (notes/ and
-          # fieldnotes/ are checked by the prose workflow). So the self-tests are
-          # skipped for it -- except the tests that name an entry it changed,
-          # which are computed below (issue #2940). Anything else changed -> they
-          # all run.
-          if [ "$codes_changed" = true ] && git diff --quiet "$base"...HEAD -- ':(exclude)codes' ':(exclude)circuits' ':(exclude)notes' ':(exclude)fieldnotes'; then
-            only_codes=true
+          # A PR whose every changed file lives in the submission surface
+          # (DATA_SURFACE in this job's env) cannot have touched the stack the
+          # self-tests exercise: it changed no test, no module a test imports,
+          # no workflow and no pin. So the full suite is skipped for it, and
+          # two narrower steps run in its place: the tests marked `board`,
+          # which read the committed data as a whole, and the tests that name
+          # an entry it changed (issue #2940), computed below. Anything else
+          # changed -> the whole suite runs.
+          #
+          # The rule used to list codes/, circuits/, notes/ and fieldnotes/
+          # and to require a codes/ or circuits/ change, which was two entries
+          # short of what the scope check lets a submission carry. So a PR
+          # that added a certificate, beside its entry or alone, ran every
+          # self-test: about an hour of CI per PR, for a suite in which a
+          # few tests open anything under certs/. The certificate checker is
+          # not among the things skipped. It is its own step below and runs
+          # on every event.
+          #
+          # A diff that cannot be computed exits non-zero, which the first
+          # test reads as a data change and the second as a change outside
+          # the data, so the suite runs (fail closed). $DATA_SURFACE and
+          # $outside are unquoted so that they split into one pathspec per
+          # entry.
+          outside=""
+          for d in $DATA_SURFACE; do outside="$outside :(exclude)$d"; done
+          if ! git diff --quiet "$base"...HEAD -- $DATA_SURFACE && git diff --quiet "$base"...HEAD -- $outside; then
+            data_only=true
           else
-            only_codes=false
+            data_only=false
           fi
           # Skipping the suite for such a PR is right about the stack, but a
           # self-test can name an entry by slug, and issue #2940 is what that
@@ -199,24 +224,36 @@ jobs:
           # #2901 on #2901 itself. Only the slugs come from the PR's diff;
           # the files it can name are this tree's own tests, filtered to
           # that shape below before anything reaches pytest.
+          #
+          # A certificate and a repro manifest are named for their entry too
+          # (certs/<slug>.json, certs/heuristic/<slug>.json, repro/<slug>.json),
+          # and a test can pin what one of them says, so their slugs are read
+          # the same way.
+          #
+          # The shape filter used to admit only a test directly under one of
+          # the four directories. research/ has since grown subdirectories
+          # (audits/, certs/, cost/, local2d/, provenance/) that hold 17 test
+          # files, most of which name entries, and every one of them was
+          # dropped here without a word. A path may now pass through
+          # directories on the way to its test_*.py.
           slug_tests=""
-          if [ "$codes_changed" = true ]; then
-            slugs=$(git diff --name-status --diff-filter=AMDRT "$base"...HEAD -- codes circuits \
-                      | cut -f2- | tr '\t' '\n' \
-                      | sed -n -e 's|^codes/\(.*\)\.json$|\1|p' \
-                               -e 's|^circuits/\([^/]*\)/.*|\1|p' | sort -u)
-            for slug in $slugs; do
-              # Both spellings of one entry: the slug the file is named for,
-              # and the [[n,k,d]] form a test may cite instead. -F keeps a
-              # slug that looks like a pattern (and one that starts with a
-              # dash) from meaning anything to grep.
-              slug_tests="$slug_tests $(grep -rlF --include='test_*.py' \
-                            -e "$slug" -e "${slug//-/,}" \
-                            research verify site cli || true)"
-            done
-          fi
+          slugs=$(git diff --name-status --diff-filter=AMDRT "$base"...HEAD -- codes circuits certs repro \
+                    | cut -f2- | tr '\t' '\n' \
+                    | sed -n -e 's|^codes/\(.*\)\.json$|\1|p' \
+                             -e 's|^circuits/\([^/]*\)/.*|\1|p' \
+                             -e 's|^certs/\(.*/\)\{0,1\}\([^/]*\)\.json$|\2|p' \
+                             -e 's|^repro/\([^/]*\)\.json$|\1|p' | sort -u)
+          for slug in $slugs; do
+            # Both spellings of one entry: the slug the file is named for,
+            # and the [[n,k,d]] form a test may cite instead. -F keeps a
+            # slug that looks like a pattern (and one that starts with a
+            # dash) from meaning anything to grep.
+            slug_tests="$slug_tests $(grep -rlF --include='test_*.py' \
+                          -e "$slug" -e "${slug//-/,}" \
+                          research verify site cli || true)"
+          done
           slug_tests=$(printf '%s\n' $slug_tests \
-                         | grep -E '^(research|verify|site|cli)/test_[A-Za-z0-9_.]+\.py$' \
+                         | grep -E '^(research|verify|site|cli)/([A-Za-z0-9_]+/)*test_[A-Za-z0-9_.]+\.py$' \
                          | sort -u | tr '\n' ' ' | sed 's/ *$//' || true)
           if [ -n "$slug_tests" ]; then
             echo "self-tests naming an entry this PR changed: $slug_tests" | tee -a "$GITHUB_STEP_SUMMARY"
@@ -244,7 +281,7 @@ jobs:
             ler_stack_changed=true
           fi
           echo "codes_changed=$codes_changed" >> "$GITHUB_OUTPUT"
-          echo "only_codes=$only_codes" >> "$GITHUB_OUTPUT"
+          echo "data_only=$data_only" >> "$GITHUB_OUTPUT"
           echo "slug_tests=$slug_tests" >> "$GITHUB_OUTPUT"
           echo "ler_stack_changed=$ler_stack_changed" >> "$GITHUB_OUTPUT"
       - name: detect what the merge changed (push to main)
@@ -348,21 +385,36 @@ jobs:
         working-directory: submitted
         continue-on-error: true
         run: make fast
-      - name: self-tests (every verify/ and research/ test_*.py; skipped for codes-only PRs)
-        if: github.event_name != 'pull_request' || steps.changes.outputs.only_codes != 'true'
+      - name: self-tests (every test_*.py run_tests.py collects; skipped for data-only PRs)
+        if: github.event_name != 'pull_request' || steps.changes.outputs.data_only != 'true'
         working-directory: submitted
         # --durations: the job's biggest fixed cost, which used to report one total
         run: uv run --frozen --extra research python run_tests.py --durations=20
-      - name: "self-tests that name an entry this PR changed (issue #2940)"
-        if: github.event_name == 'pull_request' && steps.changes.outputs.only_codes == 'true' && steps.changes.outputs.slug_tests != ''
+      - name: self-tests that read the committed data as a whole (data-only PRs)
+        if: github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true'
         working-directory: submitted
-        # The complement of the step above: the suite is skipped for a
-        # codes-only PR, and this runs the tests whose source names a slug the
-        # PR changed, so editing an entry can no longer break a test that pins
-        # it and have CI shrug (#2901 -> #2940). A grep-list of this tree's own
-        # test files, not paths the PR invented; it arrives through the
-        # environment rather than ${{ }} in the script, because an environment
-        # variable is never re-parsed as shell.
+        # A data-only PR skips the suite above, and until this step that meant
+        # no test reading the board as a set ran before the merge. #5249, #5250
+        # and #5251 each added one genon entry, each passed here, and
+        # verify/test_family_tag_consistency.py then failed on main until #5275:
+        # the push to main was the first run of a test any of the three could
+        # have failed in review. `-m board` selects the tests marked as reading
+        # the committed data as a whole (conftest.py says which tests get the
+        # mark). The marked set is the cheap one on purpose, seconds in all, so
+        # the fast path stays fast: a test that pays for a full board pass is
+        # left out and still runs on the push.
+        run: uv run --frozen --extra research python run_tests.py -m board --durations=20
+      - name: "self-tests that name an entry this PR changed (issue #2940)"
+        if: github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true' && steps.changes.outputs.slug_tests != ''
+        working-directory: submitted
+        # The other half of what replaces the suite for a data-only PR: the
+        # tests whose source names a slug the PR changed, under codes/,
+        # circuits/, certs/ or repro/, so editing an entry or its certificate
+        # can no longer break a test that pins it and have CI shrug (#2901 ->
+        # #2940). A grep-list of this tree's own test files, not paths the PR
+        # invented; it arrives through the environment rather than ${{ }} in
+        # the script, because an environment variable is never re-parsed as
+        # shell.
         env:
           SLUG_TESTS: ${{ steps.changes.outputs.slug_tests }}
         run: uv run --frozen --extra research pytest -q $SLUG_TESTS

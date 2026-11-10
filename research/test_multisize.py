@@ -9,6 +9,8 @@ import json
 import os
 import sys
 
+import pytest
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 sys.path.insert(0, os.path.join(_HERE, "kit"))
@@ -60,6 +62,7 @@ def test_unchanged_ignores_the_date_and_head_of_a_run():
     assert not ms.unchanged(dict(fresh, lifts={}), old)
 
 
+@pytest.mark.board
 def test_the_committed_table_has_no_drift_from_a_fresh_run():
     """A verdict the table records must still come out of the kit.
 

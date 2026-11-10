@@ -32,6 +32,7 @@ def _one_small():
     return slug, certs[slug]
 
 
+@pytest.mark.board
 def test_every_proof_log_certificate_is_replayable():
     """A proof_log entry without recipe and hash cannot be audited."""
     for p in os.listdir(os.path.join(_ROOT, "certs")):
