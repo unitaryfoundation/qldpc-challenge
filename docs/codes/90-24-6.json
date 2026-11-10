@@ -1065,5 +1065,43 @@
   "novelty": "known_parameters",
   "model": "Mimo-V2.6-Flash"
  },
- "family": "generalized-bicycle"
+ "family": "generalized-bicycle",
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 6,
+    "confidence": "upper_bound",
+    "witness": [
+     48175,
+     48178,
+     48198,
+     48204,
+     48222,
+     48235
+    ]
+   },
+   "Z": {
+    "value": 6,
+    "confidence": "upper_bound",
+    "witness": [
+     48177,
+     48178,
+     48195,
+     48199,
+     48205,
+     48224
+    ]
+   }
+  },
+  "rounds": 6,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [6, 7, 5, 3, 2, 4, 8, 1, 9], Z-check term slots [2, 4, 5, 6, 7, 3, 1, 8, 0] over terms A_0..A_5, B_0..B_2); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-09",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [6, 7, 5, 3, 2, 4, 8, 1, 9], Z-check term slots [2, 4, 5, 6, 7, 3, 1, 8, 0] over terms A_0..A_5, B_0..B_2)"
+  }
+ }
 }
