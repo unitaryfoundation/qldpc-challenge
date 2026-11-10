@@ -1082,5 +1082,51 @@
    "date": "2026-08-20",
    "method": "Simulated annealing over integer-grid site assignments (spectral initialization, Metropolis moves with softmax cost, max-focused hill-climb polish); 22 independent runs converged to radius 5.0 or 5.099. Search driven by Claude Fable 5."
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 10,
+    "confidence": "upper_bound",
+    "witness": [
+     48135,
+     48136,
+     48160,
+     48161,
+     48174,
+     48177,
+     48187,
+     48188,
+     48207,
+     48209
+    ]
+   },
+   "Z": {
+    "value": 10,
+    "confidence": "upper_bound",
+    "witness": [
+     48133,
+     48137,
+     48147,
+     48170,
+     48171,
+     48180,
+     48181,
+     48195,
+     48207,
+     48215
+    ]
+   }
+  },
+  "rounds": 10,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [5, 6, 1, 2, 3, 4], Z-check term slots [1, 0, 5, 3, 2, 4] over terms A_0..A_2, B_0..B_2); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-09",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [5, 6, 1, 2, 3, 4], Z-check term slots [1, 0, 5, 3, 2, 4] over terms A_0..A_2, B_0..B_2)"
+  }
  }
 }
