@@ -1,0 +1,32 @@
+{
+ "name": "[[600,24,26]]",
+ "d": 26,
+ "d_exact": true,
+ "d_lower": 26,
+ "solver": "anchored exhaustive search with exclusions, two independent implementations (vsearch_orb.c, cluster2.c; github.com/TimoKellerMath/quantum-error-correction @ 2be467a7bd36, weight6-exact-distances)",
+ "encoding": "cluster growth through unsatisfied X-checks with exclusions, unit propagation, majority rule over the Z-checks and sums of two overlapping Z-checks (Z side; the X side with X and Z exchanged); anchors: one per orbit of a Tanner-graph automorphism group of order 150 (two orbits per block), earlier orbits excluded (implementation A), the first block excluded for the anchors in the second block (implementation B); search through W = d - 2, parity of ker H_X and of ker H_Z",
+ "symmetry": true,
+ "logical_classes": 24,
+ "sides": {
+  "X": {
+   "value": 26,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 893.4,
+   "note": "no nontrivial X-logical operator of weight <= 24 (W = 24); every element of ker H_Z has even weight (all column weights 3), so d_X >= 26. implementation A: 64150467 nodes, 392 s; implementation B: 441841057 generated states, 501 s",
+   "proved_min": 26
+  },
+  "Z": {
+   "value": 26,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 756.9,
+   "note": "no nontrivial Z-logical operator of weight <= 24 (W = 24); every element of ker H_X has even weight (all column weights 3), so d_Z >= 26. implementation A: 63555645 nodes, 345 s; implementation B: 419918519 generated states, 412 s",
+   "proved_min": 26
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exhaustive searches find no nontrivial X- or Z-logical operator of weight <= 24; d = 26 is Theorem 4.1 of weight6-exact-distances/exact_distances.pdf (completeness: Lemmas 2.1 to 2.5, Proposition 3.1, Corollary 3.2) at github.com/TimoKellerMath/quantum-error-correction @ 2be467a7bd36, where weight6-exact-distances/src/codes.py rebuilds the instances and make search reruns the searches; no replayable proof object"
+ }
+}
