@@ -10,6 +10,8 @@ import importlib.util
 import json
 import os
 
+import pytest
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 
@@ -40,6 +42,7 @@ def test_bands_follow_the_documented_thresholds():
     assert Q.peers_for(100, 10, [(90, 9, 5.0, "a"), (120, 12, 7.0, "b"), (200, 10, 1.0, "c")]) == (6.0, 2)
 
 
+@pytest.mark.board
 def test_the_committed_queue_is_the_upper_bound_set_in_order():
     Q = _script()
     q = _queue()

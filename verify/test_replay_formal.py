@@ -87,6 +87,7 @@ def test_a_certificate_without_a_recipe_is_unreplayable():
     assert res["status"] == "unreplayable" and "lacks" in res["detail"]
 
 
+@pytest.mark.board
 def test_only_formal_certificates_are_selected_and_the_real_one_is_replayable():
     certs = rf.formal_certs()
     assert certs, "the board carries at least one formal certificate"

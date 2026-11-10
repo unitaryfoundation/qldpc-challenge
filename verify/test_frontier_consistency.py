@@ -85,6 +85,7 @@ def test_mirror_requires_planar_layout():
                                     expected="unrestricted")
 
 
+@pytest.mark.board
 def test_mirror_matches_the_verifier_on_a_board_sample():
     # spot-check real layouts the fixtures may not resemble; the exhaustive
     # per-entry comparison is the weekly audit's job

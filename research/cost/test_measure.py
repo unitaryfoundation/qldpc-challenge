@@ -10,6 +10,8 @@ import importlib.util
 import json
 import os
 
+import pytest
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 
@@ -26,6 +28,7 @@ def _table():
         return json.load(f)
 
 
+@pytest.mark.board
 def test_every_grid_entry_is_on_the_board():
     M = _script()
     slugs = [s for s, _ in M.GRID]

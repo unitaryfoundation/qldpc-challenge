@@ -24,10 +24,12 @@ BASE = {"d": 12, "d_exact": True, "solver": "CryptoMiniSat 5.14.7 SAT",
         "verification": {"level": "solver"}}
 
 
+@pytest.mark.board
 def test_every_committed_certificate_declares_a_level():
     assert C.main([]) == 0, "certs/ does not validate"
 
 
+@pytest.mark.board
 def test_the_board_claims_no_level_it_cannot_evidence():
     """Every level the board claims has the evidence that level requires.
 

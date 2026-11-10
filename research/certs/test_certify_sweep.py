@@ -209,6 +209,7 @@ def test_the_budget_stops_opening_entries_and_reports_what_is_left(tmp_path):
     assert m["opened"] == 2 and m["selected"] == 2
 
 
+@pytest.mark.board
 def test_a_real_certificate_on_a_tiny_board_entry_passes_the_certificate_checker(tmp_path):
     """The certifier's record, stripped and filed, is one verify/check_certs.py accepts."""
     pytest.importorskip("pycryptosat")

@@ -22,6 +22,8 @@ import os
 import re
 import sys
 
+import pytest
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 sys.path.insert(0, _HERE)
@@ -123,6 +125,7 @@ def _contradictions(slug, doc):
     return out
 
 
+@pytest.mark.board
 def test_a_construction_that_names_its_family_carries_that_tag():
     problems = []
     for slug, doc in _entries():
