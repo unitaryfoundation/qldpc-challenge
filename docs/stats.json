@@ -7,8 +7,8 @@
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "literature": 493,
     "no_match": 2015,
+    "literature": 493,
     "parameters_only": 392,
     "not_derived": 17,
     "method": "isomorphism against the literature index",
