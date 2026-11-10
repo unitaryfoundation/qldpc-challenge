@@ -1,6 +1,6 @@
 {
  "schema_version": "0.3",
- "name": "[[504,18,40]]",
+ "name": "[[504,18,38]]",
  "code_type": "CSS",
  "n": 504,
  "k": 18,
@@ -5051,7 +5051,7 @@
   ]
  },
  "distance": {
-  "d": 40,
+  "d": 38,
   "X": {
    "value": 40,
    "confidence": "upper_bound",
@@ -5099,68 +5099,59 @@
    ]
   },
   "Z": {
-   "value": 58,
+   "value": 38,
    "confidence": "upper_bound",
    "witness": [
-    5,
-    7,
-    26,
-    28,
-    30,
-    34,
+    6,
+    10,
     36,
-    37,
-    45,
-    47,
-    52,
-    65,
-    68,
-    86,
-    90,
-    94,
-    97,
-    98,
-    103,
-    106,
-    107,
-    112,
-    115,
-    119,
-    121,
-    124,
-    137,
-    158,
-    179,
-    187,
-    188,
-    191,
-    208,
-    210,
-    230,
+    48,
+    53,
+    66,
+    67,
+    74,
+    77,
+    127,
+    150,
+    156,
+    198,
+    227,
+    228,
     236,
-    239,
-    248,
-    251,
-    276,
-    288,
-    296,
-    308,
-    334,
-    350,
-    358,
-    384,
-    388,
-    389,
-    397,
+    240,
+    249,
+    257,
+    269,
+    292,
+    295,
+    305,
+    317,
+    318,
+    319,
+    351,
+    354,
+    380,
+    392,
     398,
-    423,
-    424,
-    438,
-    457,
-    461,
-    473,
-    478
-   ]
+    407,
+    415,
+    436,
+    462,
+    471,
+    483,
+    501
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     2
+    ]
+   }
   }
  },
  "provenance": {
@@ -5176,7 +5167,8 @@
    "ris_trials_per_side": 20000000,
    "cpu_hours": 50.0,
    "tool": "residue-table divisor enumeration + research/kit/surrogate gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 58 -> 38 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2)."
  },
  "family": "generalized-bicycle"
 }
