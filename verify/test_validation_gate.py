@@ -35,7 +35,6 @@ def test_the_direct_sum_and_the_clifford_image_are_diagnosed():
     assert cases["Shor code under a local Hadamard is sent back as its CSS image"]["image_named"]
 
 
-@pytest.mark.board
 def test_every_reproduction_has_a_golden_that_matches():
     rows = {r["slug"]: r for r in G.run_reproductions()}
     assert set(rows) == set(G.REPRODUCTIONS)

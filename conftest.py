@@ -65,6 +65,15 @@ def pytest_configure(config):
     The full suite hides the cost of a test that needs the whole board loaded
     and deduplicated, because an earlier test has usually paid for the load
     they share. Such a test takes minutes alone and does not belong here.
+
+    Do not mark a test whose repair lies outside the data: a data-only pull
+    request cannot carry it, since check_submission_scope.py refuses one that
+    also touches verify/. verify/test_validation_gate.py compares the bytes of
+    eleven pinned entries with goldens under verify/fixtures/, so a pull
+    request that legitimately corrects one of those entries fails it, and only
+    a maintainer's re-pin can turn it green (#4227 with #4288, #4818 with
+    #4808, #4967 with #4963). That test stays unmarked; it still runs on main
+    and on any pull request that touches code.
     """
     config.addinivalue_line(
         "markers",
