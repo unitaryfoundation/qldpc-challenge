@@ -1,0 +1,22 @@
+{
+  "d": 9,
+  "d_exact": true,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 6,
+  "name": "[[72,6,9]] fold of the gross code (stabilizer)",
+  "sides": {
+    "P": {
+      "exact": true,
+      "note": "no logical < 9 exists",
+      "secs": 1.8,
+      "status": "UNSAT",
+      "value": 9
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 600.0,
+  "verification": {
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; pauli-mechanisms problem, one thread, run by the submitter at the board's pinned commit; the vector it returned was rechecked independently of the tool. Records: github.com/TimoKellerMath/quantum-error-correction @ c203901854da, amplified-and-folded-codes/logs/tropidist"
+  }
+}
