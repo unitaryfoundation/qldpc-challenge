@@ -1,10 +1,10 @@
 {
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
-  "literature": 493,
-  "no_match": 2015,
-  "not_derived": 207,
-  "parameters_only": 425
+  "literature": 490,
+  "no_match": 2032,
+  "not_derived": 204,
+  "parameters_only": 431
  },
  "derivation_version": 1,
  "entries": {
@@ -3089,6 +3089,16 @@
     }
    ]
   },
+  "144-6-15-b": {
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "codetables:[[144,6]]",
+     "ref": "https://codetables.de -- bounds only, no construction to compare",
+     "source": "codetables"
+    }
+   ]
+  },
   "144-6-17": {
    "bucket": "parameters_only",
    "matches": [
@@ -3637,21 +3647,8 @@
    "matches": []
   },
   "16-10-2": {
-   "bucket": "literature",
-   "matches": [
-    {
-     "id": "2bga:SmallGroup(8,1):a[2,4,6]:b[2,4,6]",
-     "ref": "arXiv:2306.16400",
-     "source": "lin_pryadko_2bga_abelian",
-     "xz_swapped": false
-    },
-    {
-     "id": "2bga:SmallGroup(8,2):a[2,3,5]:b[2,3,5]",
-     "ref": "arXiv:2306.16400",
-     "source": "lin_pryadko_2bga_abelian",
-     "xz_swapped": false
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "16-10-3": {
    "bucket": "not_derived",
@@ -4466,7 +4463,7 @@
    ]
   },
   "17-10-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "170-16-10": {
@@ -4992,8 +4989,14 @@
    "matches": []
   },
   "180-36-10": {
-   "bucket": "not_derived",
-   "matches": []
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "codetables:[[180,36]]",
+     "ref": "https://codetables.de -- bounds only, no construction to compare",
+     "source": "codetables"
+    }
+   ]
   },
   "180-36-8": {
    "bucket": "parameters_only",
@@ -6100,15 +6103,8 @@
    ]
   },
   "20-2-6": {
-   "bucket": "literature",
-   "matches": [
-    {
-     "id": "qecdb:672e6e9c34d5954e0cb7d1b7",
-     "ref": "https://qecdb.org",
-     "source": "qecdb",
-     "xz_swapped": false
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "20-2-6-s": {
    "bucket": "not_derived",
@@ -6900,15 +6896,8 @@
    "matches": []
   },
   "23-1-7": {
-   "bucket": "literature",
-   "matches": [
-    {
-     "id": "qecdb:67052a628271751a9ef4e1d7",
-     "ref": "https://qecdb.org",
-     "source": "qecdb",
-     "xz_swapped": false
-    }
-   ]
+   "bucket": "no_match",
+   "matches": []
   },
   "23-1-7-cyclic": {
    "bucket": "not_derived",
@@ -7652,7 +7641,7 @@
    ]
   },
   "25-16-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "25-5-3-cyclic": {
@@ -10238,7 +10227,7 @@
    "matches": []
   },
   "35-21-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "35-5-4": {
@@ -10667,6 +10656,26 @@
    ]
   },
   "36-6-6": {
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "qecdb:6a207b802be1616b0252acfa",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:6a207b802be1616b0252acfa",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "codetables:[[36,6]]",
+     "ref": "https://codetables.de -- bounds only, no construction to compare",
+     "source": "codetables"
+    }
+   ]
+  },
+  "36-6-6-b": {
    "bucket": "parameters_only",
    "matches": [
     {
@@ -11875,7 +11884,7 @@
    "matches": []
   },
   "41-27-1": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "41-27-2": {
@@ -12769,6 +12778,31 @@
    "matches": []
   },
   "47-1-11": {
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "qecdb:6705b8fe8271751a9ef4eaf1",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:6705b8fe8271751a9ef4eaf1",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:672e0d5af64e9dba7c503a1e",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:672e0d5af64e9dba7c503a1e",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    }
+   ]
+  },
+  "47-1-11-b": {
    "bucket": "parameters_only",
    "matches": [
     {
@@ -13968,7 +14002,7 @@
    "matches": []
   },
   "52-13-5": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "52-15-7": {
@@ -14104,6 +14138,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "53-13-6-b": {
+   "bucket": "no_match",
+   "matches": []
+  },
   "53-14-5": {
    "bucket": "no_match",
    "matches": []
@@ -14114,6 +14152,10 @@
   },
   "53-21-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "53-30-6": {
+   "bucket": "not_derived",
    "matches": []
   },
   "53-36-2": {
@@ -14204,7 +14246,7 @@
    "matches": []
   },
   "54-12-7-b": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "54-13-6": {
@@ -14413,7 +14455,11 @@
    "matches": []
   },
   "544-18-76": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
+   "matches": []
+  },
+  "544-20-80": {
+   "bucket": "no_match",
    "matches": []
   },
   "545-73-3": {
@@ -15309,6 +15355,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "60-13-11-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "60-13-12": {
    "bucket": "not_derived",
    "matches": []
@@ -15334,8 +15384,29 @@
    "matches": []
   },
   "60-18-6": {
-   "bucket": "not_derived",
-   "matches": []
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "qecdb:679cedd45a99a6b92bb92197",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:679cedd45a99a6b92bb92197",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:67a32bf05a99a6b92bb9232d",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    },
+    {
+     "id": "qecdb:67a32bf05a99a6b92bb9232d",
+     "ref": "https://qecdb.org",
+     "source": "qecdb"
+    }
+   ]
   },
   "60-19-10": {
    "bucket": "not_derived",
@@ -15783,7 +15854,7 @@
    "matches": []
   },
   "62-18-7-b": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "62-2-11": {
@@ -15844,6 +15915,10 @@
   },
   "62-31-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "62-33-7": {
+   "bucket": "not_derived",
    "matches": []
   },
   "62-35-2": {
@@ -17334,7 +17409,7 @@
    "matches": []
   },
   "684-12-108": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "684-12-45": {
@@ -17346,6 +17421,10 @@
    "matches": []
   },
   "684-12-54": {
+   "bucket": "no_match",
+   "matches": []
+  },
+  "684-14-107": {
    "bucket": "no_match",
    "matches": []
   },
@@ -17378,7 +17457,7 @@
    "matches": []
   },
   "684-8-110": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "684-8-54": {
@@ -18142,6 +18221,16 @@
     }
    ]
   },
+  "72-6-8-b": {
+   "bucket": "parameters_only",
+   "matches": [
+    {
+     "id": "codetables:[[72,6]]",
+     "ref": "https://codetables.de -- bounds only, no construction to compare",
+     "source": "codetables"
+    }
+   ]
+  },
   "72-6-9": {
    "bucket": "literature",
    "matches": [
@@ -18327,6 +18416,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "74-29-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "749-155-3": {
    "bucket": "no_match",
    "matches": []
@@ -18460,6 +18553,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "77-32-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "773-25-10": {
    "bucket": "no_match",
    "matches": []
@@ -18482,6 +18579,10 @@
     }
    ]
   },
+  "78-19-13": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "78-26-3": {
    "bucket": "literature",
    "matches": [
@@ -18503,6 +18604,10 @@
   },
   "78-27-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "78-33-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "78-4-10": {
@@ -18620,6 +18725,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "79-20-13": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "79-24-7": {
    "bucket": "no_match",
@@ -18863,6 +18972,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "80-34-10": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-34-5": {
    "bucket": "no_match",
    "matches": []
@@ -19059,6 +19172,10 @@
   },
   "81-31-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "81-35-10": {
+   "bucket": "not_derived",
    "matches": []
   },
   "81-9-8": {
@@ -20829,7 +20946,7 @@
    "matches": []
   },
   "960-20-40": {
-   "bucket": "not_derived",
+   "bucket": "no_match",
    "matches": []
   },
   "960-24-38": {
