@@ -1,0 +1,22 @@
+{
+  "d": 8,
+  "d_exact": true,
+  "encoding": "pauli-mechanisms",
+  "logical_classes": 6,
+  "name": "[[48,6,8]] fold of 96-12-9 (stabilizer, mirror code)",
+  "sides": {
+    "P": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 0.2,
+      "status": "UNSAT",
+      "value": 8
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 600.0,
+  "verification": {
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; pauli-mechanisms problem, one thread, run by the submitter at the board's pinned commit; the vector it returned was rechecked independently of the tool. Records: github.com/TimoKellerMath/quantum-error-correction @ 207d1130035a, folded-stabilizer-codes/logs/tropidist"
+  }
+}

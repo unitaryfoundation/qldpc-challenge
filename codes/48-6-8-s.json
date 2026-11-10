@@ -1,0 +1,683 @@
+{
+ "schema_version": "0.4",
+ "name": "[[48,6,8]] fold of 96-12-9 (stabilizer, mirror code)",
+ "code_type": "stabilizer",
+ "n": 48,
+ "k": 6,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     0,
+     28,
+     47
+    ],
+    "Z": [
+     4,
+     8,
+     42,
+     45
+    ]
+   },
+   {
+    "X": [
+     1,
+     29,
+     44
+    ],
+    "Z": [
+     7,
+     11,
+     41,
+     44
+    ]
+   },
+   {
+    "X": [
+     2,
+     30,
+     45
+    ],
+    "Z": [
+     6,
+     10,
+     40,
+     47
+    ]
+   },
+   {
+    "X": [
+     3,
+     31,
+     46
+    ],
+    "Z": [
+     5,
+     9,
+     43,
+     46
+    ]
+   },
+   {
+    "X": [
+     4,
+     16,
+     35
+    ],
+    "Z": [
+     0,
+     4,
+     38,
+     41
+    ]
+   },
+   {
+    "X": [
+     5,
+     17,
+     32
+    ],
+    "Z": [
+     3,
+     7,
+     37,
+     40
+    ]
+   },
+   {
+    "X": [
+     6,
+     18,
+     33
+    ],
+    "Z": [
+     2,
+     6,
+     36,
+     43
+    ]
+   },
+   {
+    "X": [
+     7,
+     19,
+     34
+    ],
+    "Z": [
+     1,
+     5,
+     39,
+     42
+    ]
+   },
+   {
+    "X": [
+     8,
+     20,
+     39
+    ],
+    "Z": [
+     0,
+     12,
+     34,
+     37
+    ]
+   },
+   {
+    "X": [
+     9,
+     21,
+     36
+    ],
+    "Z": [
+     3,
+     15,
+     33,
+     36
+    ]
+   },
+   {
+    "X": [
+     10,
+     22,
+     37
+    ],
+    "Z": [
+     2,
+     14,
+     32,
+     39
+    ]
+   },
+   {
+    "X": [
+     11,
+     23,
+     38
+    ],
+    "Z": [
+     1,
+     13,
+     35,
+     38
+    ]
+   },
+   {
+    "X": [
+     12,
+     24,
+     43
+    ],
+    "Z": [
+     8,
+     12,
+     33,
+     46
+    ]
+   },
+   {
+    "X": [
+     13,
+     25,
+     40
+    ],
+    "Z": [
+     11,
+     15,
+     32,
+     45
+    ]
+   },
+   {
+    "X": [
+     14,
+     26,
+     41
+    ],
+    "Z": [
+     10,
+     14,
+     35,
+     44
+    ]
+   },
+   {
+    "X": [
+     15,
+     27,
+     42
+    ],
+    "Z": [
+     9,
+     13,
+     34,
+     47
+    ]
+   },
+   {
+    "X": [
+     15,
+     16,
+     44
+    ],
+    "Z": [
+     26,
+     29,
+     36,
+     40
+    ]
+   },
+   {
+    "X": [
+     12,
+     17,
+     45
+    ],
+    "Z": [
+     25,
+     28,
+     39,
+     43
+    ]
+   },
+   {
+    "X": [
+     13,
+     18,
+     46
+    ],
+    "Z": [
+     24,
+     31,
+     38,
+     42
+    ]
+   },
+   {
+    "X": [
+     14,
+     19,
+     47
+    ],
+    "Z": [
+     27,
+     30,
+     37,
+     41
+    ]
+   },
+   {
+    "X": [
+     3,
+     20,
+     32
+    ],
+    "Z": [
+     22,
+     25,
+     32,
+     36
+    ]
+   },
+   {
+    "X": [
+     0,
+     21,
+     33
+    ],
+    "Z": [
+     21,
+     24,
+     35,
+     39
+    ]
+   },
+   {
+    "X": [
+     1,
+     22,
+     34
+    ],
+    "Z": [
+     20,
+     27,
+     34,
+     38
+    ]
+   },
+   {
+    "X": [
+     2,
+     23,
+     35
+    ],
+    "Z": [
+     23,
+     26,
+     33,
+     37
+    ]
+   },
+   {
+    "X": [
+     7,
+     24,
+     36
+    ],
+    "Z": [
+     18,
+     21,
+     32,
+     44
+    ]
+   },
+   {
+    "X": [
+     4,
+     25,
+     37
+    ],
+    "Z": [
+     17,
+     20,
+     35,
+     47
+    ]
+   },
+   {
+    "X": [
+     5,
+     26,
+     38
+    ],
+    "Z": [
+     16,
+     23,
+     34,
+     46
+    ]
+   },
+   {
+    "X": [
+     6,
+     27,
+     39
+    ],
+    "Z": [
+     19,
+     22,
+     33,
+     45
+    ]
+   },
+   {
+    "X": [
+     11,
+     28,
+     40
+    ],
+    "Z": [
+     17,
+     30,
+     40,
+     44
+    ]
+   },
+   {
+    "X": [
+     8,
+     29,
+     41
+    ],
+    "Z": [
+     16,
+     29,
+     43,
+     47
+    ]
+   },
+   {
+    "X": [
+     9,
+     30,
+     42
+    ],
+    "Z": [
+     19,
+     28,
+     42,
+     46
+    ]
+   },
+   {
+    "X": [
+     10,
+     31,
+     43
+    ],
+    "Z": [
+     18,
+     31,
+     41,
+     45
+    ]
+   },
+   {
+    "X": [
+     12,
+     31,
+     32
+    ],
+    "Z": [
+     10,
+     13,
+     20,
+     24
+    ]
+   },
+   {
+    "X": [
+     13,
+     28,
+     33
+    ],
+    "Z": [
+     9,
+     12,
+     23,
+     27
+    ]
+   },
+   {
+    "X": [
+     14,
+     29,
+     34
+    ],
+    "Z": [
+     8,
+     15,
+     22,
+     26
+    ]
+   },
+   {
+    "X": [
+     15,
+     30,
+     35
+    ],
+    "Z": [
+     11,
+     14,
+     21,
+     25
+    ]
+   },
+   {
+    "X": [
+     0,
+     19,
+     36
+    ],
+    "Z": [
+     6,
+     9,
+     16,
+     20
+    ]
+   },
+   {
+    "X": [
+     1,
+     16,
+     37
+    ],
+    "Z": [
+     5,
+     8,
+     19,
+     23
+    ]
+   },
+   {
+    "X": [
+     2,
+     17,
+     38
+    ],
+    "Z": [
+     4,
+     11,
+     18,
+     22
+    ]
+   },
+   {
+    "X": [
+     3,
+     18,
+     39
+    ],
+    "Z": [
+     7,
+     10,
+     17,
+     21
+    ]
+   },
+   {
+    "X": [
+     4,
+     23,
+     40
+    ],
+    "Z": [
+     2,
+     5,
+     16,
+     28
+    ]
+   },
+   {
+    "X": [
+     5,
+     20,
+     41
+    ],
+    "Z": [
+     1,
+     4,
+     19,
+     31
+    ]
+   },
+   {
+    "X": [
+     6,
+     21,
+     42
+    ],
+    "Z": [
+     0,
+     7,
+     18,
+     30
+    ]
+   },
+   {
+    "X": [
+     7,
+     22,
+     43
+    ],
+    "Z": [
+     3,
+     6,
+     17,
+     29
+    ]
+   },
+   {
+    "X": [
+     8,
+     27,
+     44
+    ],
+    "Z": [
+     1,
+     14,
+     24,
+     28
+    ]
+   },
+   {
+    "X": [
+     9,
+     24,
+     45
+    ],
+    "Z": [
+     0,
+     13,
+     27,
+     31
+    ]
+   },
+   {
+    "X": [
+     10,
+     25,
+     46
+    ],
+    "Z": [
+     3,
+     12,
+     26,
+     30
+    ]
+   },
+   {
+    "X": [
+     11,
+     26,
+     47
+    ],
+    "Z": [
+     2,
+     15,
+     25,
+     29
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 8,
+  "P": {
+   "value": 8,
+   "confidence": "exact",
+   "witness": {
+    "X": [
+     0,
+     2,
+     8,
+     10,
+     16,
+     18,
+     24,
+     26
+    ],
+    "Z": [
+     0,
+     2,
+     8,
+     10,
+     16,
+     18,
+     24,
+     26
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@TimoKellerMath"
+  ],
+  "origin": "submission",
+  "novelty": "known_parameters",
+  "construction": "Halving of the two-block code [[96,12,9]] (codes/96-12-9.json) along the fixed-point-free ZX-duality that exchanges (1,h) and (2,c-h) (symplectic halving: Lee, Okada, Maskara, Kasai, Zhou, arXiv:2609.30069, Def. 3; Burton, Durso-Sabina, Brown, arXiv:2406.09951); equivalently the mirror code of Khesin and Lu (arXiv:2603.05496) with A = c - F_B, B = F_A. Parent: G = Z/3 x Z/4 x Z/4, element (a,b,e) with index 16a+4b+e; qubit (1,h) -> index of h, (2,h) -> 48 + index of h; X-check g on (1, g+F_A) and (2, g+F_B), Z-check g on (1, g-F_B) and (2, g-F_A), F_A = {(0,0,0),(1,3,0),(2,3,3)}, F_B = {(0,0,0),(0,3,0),(1,2,3),(1,3,2)}; this is codes/96-12-9.json after renumbering G (the board file numbers G by GAP's Elements(SmallGroup(48,20))). Involution: Psi(1,h) = (2, c-h), Psi(2,h) = (1, c-h) with c = (0,1,0). Fold: fold qubit i is (1,h) with h of index i; the X-check g gives the generator with X on g+F_A and Z on c-g-F_B (Y where they meet), in the order of the X-checks. n = 48, rank 42, k = 6; 32 generators of weight 7 and 16 of weight 6; 16 Y factors, one in each of 16 generators; not locally Clifford equivalent to a CSS code.",
+  "references": [
+   "arXiv:2609.30069",
+   "arXiv:2406.09951",
+   "arXiv:2603.05496",
+   "arXiv:1904.02703",
+   "arXiv:2611.08247"
+  ],
+  "date": "2026-11-10",
+  "model": "Claude Opus 5.5",
+  "notes": "Distance 8 is exact: no nontrivial logical of Pauli weight <= 7 by three independent exhaustive computations (tropidist b03ec2d4077f in the board's Pauli encoding, certs/48-6-8-s.json in the same pull request; a meet-in-the-middle search of ours; Magma V2.30-1 MinimumDistance), and the witness has weight 8. Programs, data and logs: github.com/TimoKellerMath/quantum-error-correction @ 207d1130035a, folded-stabilizer-codes/. Not locally Clifford equivalent to a CSS code: the generator-level parity system for single-qubit Cliffords has no solution (qubit 4 carries X, Y and Z), and every generator is the only nontrivial stabilizer supported in its support, so no single-qubit Clifford makes the group CSS. At board commit 8042f9da no stabilizer entry dominates or equals it; it dominates the stabilizer entries 50-6-8 (on n and w). It is a mirror code of Khesin and Lu (arXiv:2603.05496) on Z/3 x Z/4 x Z/4 with |A| = 4, |B| = 3 and is not in their code table. The parameters [[48,6,8]] are published only for CSS codes of check weight 8 or more (Panteleev, Kalachev, arXiv:1904.02703; the board's CSS entry 48-6-8 has check weight 9), hence novelty known_parameters. On the CSS board the entry 48-6-8 has the same n, k and d at check weight 9; the board ranks the two types separately. Checked, not equivalent to an existing entry."
+ },
+ "family": "other"
+}
