@@ -31,6 +31,21 @@ spec, HX, HZ = next(iter(enumerate_sat_codes(12, 5, 6, 3, max_codes=1)))
 EOF
 </pre>
 <p>Parameters: n=12, 5 rows per side, max row weight 6, detect-all weight-≤3 errors. The first solution is the submitted code.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-2-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/12-8-2.html">[[12,8,2]] — 12-8-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[12,8,2]] — Space-group topological code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Topological CSS code from a space group (arXiv:2606.20548). Targets the weight-8 unrestricted cell.</p>
+<h4>What was searched</h4>
+<p>Reconstructed via group-algebra permutation representations; CSS commutation and k verified. Distance matches the paper&#x27;s SAT-certified values.</p>
+<h4>Evidence trail</h4>
+<p>Distance d=2 (upper bound). Gate passed (passed: true). Board-advancing per gate novelty.</p>
+<h4>Dead ends</h4>
+<p>Other rows in the paper&#x27;s table did not commute under the standard construction.</p>
+<h4>Tools</h4>
+<p>Reconstructed with GAP/Python. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>arXiv:2606.20548, Table row [[12,8,2]].</p>
+<h4>Benchmark comparison (optional, Tier B/C)</h4>
+<p>Not applicable. EOF</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-8-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/144-6-15-b.html">[[144,6,15]] — 144-6-15-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[144,6,15]] — genon code (stabilizer quotient of a bivariate-bicycle code)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aim: a non-CSS stabilizer entry on the <code>weight-6 × unrestricted</code> board. The paper &quot;Twisted Compactification, Quotient Quantum Codes and Logical Gates&quot; (arXiv:2611.09538v1) constructs genon codes as quotients of bivariate-bicycle codes by a ZX-duality. The parent <code>[[288,12,18]]</code> BB code has check weight 6; a free quotient by an involution halves <code>n</code> and <code>k</code>, giving <code>[[144,6,?]]</code>. If the quotient keeps weight 6 and distance close to the parent&#x27;s, it should advance the weight-6 unrestricted stabilizer frontier, which has entries at <code>[[144,6,15]]</code>/<code>17</code>/<code>18</code> but at higher check weight.</p>
@@ -57,7 +72,7 @@ EOF
 <p>Model: Beam 1.0. Repository tooling: <code>research/kit/bb.py</code> for the parent, manual quotient construction, <code>verify/qldpc_verify.py</code>, and the gate&#x27;s RIS refutation.</p>
 <h4>Reproduction</h4>
 <p>Build the parent with <code>build_bb(12, 12, [(3,0),(0,2),(0,7)], [(0,3),(1,0),(2,0)])</code> from <code>research/kit/bb.py</code>. Quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>, pairing each X-check with its image Z-check; the resulting 288 generators on 144 qubits are the <code>checks.S</code> of <code>codes/144-6-15-b.json</code>. Parameters and witness are as recorded in that file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/144-6-15-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/16-10-2.html">[[16,10,2]] — 16-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,10,2]] — two-block group-algebra code on SmallGroup(8,1)</h3>
+<section class=blk><h3><a href="codes/16-10-2.html">[[16,10,2]] — 16-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[16,10,2]] — two-block group-algebra code on SmallGroup(8,1)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.50.</p>
 <h4>What was searched</h4>
@@ -70,6 +85,21 @@ EOF
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
 <p>Use GAP g := SmallGroup(8,1), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 4, 6], b=[2, 4, 6] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 16 - rank(HX) - rank(HZ) = 10. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-10-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/192-130-3.html">[[192,130,3]] — 192-130-3</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[192,130,3]] — FCC K=12 lattice code (L=4)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the unrestricted / weight-9plus cell with a high-rate constant-distance CSS code. The FCC lattice has 3L^3 edges but only L^3 independent stabilizer constraints, leaving ~2/3 of degrees of freedom as logical qubits (arXiv:2603.20294).</p>
+<h4>What was searched</h4>
+<p>Construction: qubits on edges of the L=4 face-centered cubic lattice; Z-stabilizers on vertices (weight 12), X-stabilizers on octahedral voids (weight 12). Parameters k = 2L^3+2 = 130, n = 3L^3 = 192, d = 3 proven by exhaustive elimination of all weight-1 and weight-2 vectors plus constructive weight-3 logicals (arXiv:2603.20294 Appendix B).</p>
+<h4>Evidence trail</h4>
+<p>Distance d = 3 (upper bound): witness-backed weight-3 logicals on both X and Z sides. CSS commutation verified; k recomputed by GF(2) rank. Gate passed (passed: true).</p>
+<h4>Dead ends</h4>
+<p>L=2 instance refuted (weight-2 logical found). L=8 exceeds submission n cap (1000).</p>
+<h4>Tools</h4>
+<p>Reconstructed from arXiv:2603.20294 Appendix A Python code. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>Build from arXiv:2603.20294 Appendix A (build(L) with L=4). Check matrices H_X, H_Z as in paper.</p>
+<h4>Benchmark comparison (optional, Tier B/C)</h4>
+<p>Not applicable.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/192-130-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/20-2-6.html">[[20,2,6]] — 20-2-6</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[20,2,6]] — qecdb.org qumba.csscode.selfdual_random code, reconstructed from its H field</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. The hypothesis was that the public parameter tables sit in front of this board: qecdb.org indexes 15,181 CSS codes with matrices, and sweeping all of them against the board&#x27;s own 1,513 CSS entries should surface records whose parameters dominate an entry -- if the matrices survive reconstruction and the distance readings hold up. This candidate is record 672e6e9c34d5954e0cb7d1b7.</p>
@@ -156,6 +186,36 @@ EOF
 <p>opencode/mimo-v2.6-flash-free (opencode) driving the repo&#x27;s own kit (<code>research/kit/</code>: <code>css</code>, <code>surrogate</code>, <code>submit</code>, <code>search</code>) and the untouched <code>verify/</code> stack; the bit-packed C++ RIS backend behind <code>distance_rand(backend=&quot;fast&quot;)</code> for the screens, numpy for the packaging witnesses. Whole scrape: ~25 minutes wall clock on a 10-core laptop.</p>
 <h4>Reproduction</h4>
 <p>1. <code>GET https://qecdb.org/api/codes?cssOnly=1&amp;pageSize=200&amp;page=N</code> for the list, <code>GET https://qecdb.org/codes/67052a628271751a9ef4e1d7</code> (the API path <code>/api/codes/67052a628271751a9ef4e1d7</code>) for the generators. 2. Parse <code>H</code> into binary symplectic rows; set A = rows with no Y, B = rows with Y only in their X half ... in practice: build the [A|B] matrix and split by rowspace, taking the lightest independent basis of each part (rank over GF(2), greedy lightest-first). 3. Verify <code>H_X H_Zᵀ = 0</code>, recompute <code>k = n − rank(H_X) − rank(H_Z)</code>, take <code>w = max</code> row weight. 4. Screen: `distance_rand(HX, HZ, trials=50000, seed=int(fingerprint,16) % 2**31, backend=&quot;fast&quot;)`, then the same at 2,000,000 trials, then package with <code>submit.make_submission(HX, HZ, trials=8000, seed=0)</code>. 5. Run <code>verify/validate_candidate.py</code> on the packaged document; keep only <code>passed: true</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-1-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/24-10-4.html">[[24,10,4]] — 24-10-4</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[24,10,4]] — Space-group topological code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Topological CSS code from a space group (arXiv:2606.20548). Targets the weight-8 unrestricted cell.</p>
+<h4>What was searched</h4>
+<p>Reconstructed via group-algebra permutation representations; CSS commutation and k verified. Distance matches the paper&#x27;s SAT-certified values.</p>
+<h4>Evidence trail</h4>
+<p>Distance d=4 (upper bound). Gate passed (passed: true). Board-advancing per gate novelty.</p>
+<h4>Dead ends</h4>
+<p>Other rows in the paper&#x27;s table did not commute under the standard construction.</p>
+<h4>Tools</h4>
+<p>Reconstructed with GAP/Python. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>arXiv:2606.20548, Table row [[24,10,4]].</p>
+<h4>Benchmark comparison (optional, Tier B/C)</h4>
+<p>Not applicable. EOF</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/24-10-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/32-6-6.html">[[32,6,6]] — 32-6-6</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[32,6,6]] — Space-group topological code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Topological CSS code from a space group (arXiv:2606.20548). Targets the weight-8 unrestricted cell.</p>
+<h4>What was searched</h4>
+<p>Reconstructed via group-algebra permutation representations; CSS commutation and k verified. Distance matches the paper&#x27;s SAT-certified values.</p>
+<h4>Evidence trail</h4>
+<p>Distance d=6 (upper bound). Gate passed (passed: true). Board-advancing per gate novelty.</p>
+<h4>Dead ends</h4>
+<p>Other rows in the paper&#x27;s table did not commute under the standard construction.</p>
+<h4>Tools</h4>
+<p>Reconstructed with GAP/Python. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>arXiv:2606.20548, Table row [[32,6,6]].</p>
+<h4>Benchmark comparison (optional, Tier B/C)</h4>
+<p>Not applicable. EOF</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-6-6.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/36-6-6-b.html">[[36,6,6]] — 36-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[36,6,6]] — genon code (stabilizer quotient of a 6x6 bivariate-bicycle code)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aim: a non-CSS stabilizer entry on the <code>weight-6 × unrestricted</code> board. Quotient of a 6x6 bivariate-bicycle code by the ZX-duality <code>D_{(0,1)}: g -&gt; (0,1)-g</code> (arXiv:2611.09538v1) gives a <code>[[36,6,?]]</code> stabilizer code with check weight 6.</p>
@@ -190,6 +250,118 @@ EOF
 <p>Model: Beam 1.0. Repository tooling: <code>research/kit/bb.py</code>, manual quotient construction, <code>verify/qldpc_verify.py</code>, gate RIS refutation.</p>
 <h4>Reproduction</h4>
 <p>Build parent with <code>build_bb(12,6,[(3,0),(0,1),(0,2)],[(0,3),(1,0),(2,0)])</code> from <code>research/kit/bb.py</code>, quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>. Parameters and witness are in <code>codes/72-6-8-b.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/72-6-8-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/804-12-9.html">[[804,12,9]] — 804-12-9</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[804,12,9]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[804,12,9]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 9 on either side; submitted witness weight 9.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/804-12-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/812-20-7.html">[[812,20,7]] — 812-20-7</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[812,20,7]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[812,20,7]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 7 on either side; submitted witness weight 7.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/812-20-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/836-20-7.html">[[836,20,7]] — 836-20-7</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[836,20,7]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[836,20,7]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 7 on either side; submitted witness weight 7.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/836-20-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/848-8-11.html">[[848,8,11]] — 848-8-11</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[848,8,11]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[848,8,11]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 11 on either side; submitted witness weight 11.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/848-8-11.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/849-21-7.html">[[849,21,7]] — 849-21-7</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[849,21,7]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[849,21,7]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 7 on either side; submitted witness weight 7.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/849-21-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/861-13-9.html">[[861,13,9]] — 861-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[861,13,9]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[861,13,9]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 9 on either side; submitted witness weight 9.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/861-13-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/870-6-13.html">[[870,6,13]] — 870-6-13</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[870,6,13]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[870,6,13]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 13 on either side; submitted witness weight 13.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/870-6-13.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/898-22-7.html">[[898,22,7]] — 898-22-7</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[898,22,7]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[898,22,7]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 7 on either side; submitted witness weight 7.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/898-22-7.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/9-5-2.html">[[9,5,2]] — 9-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,5,2]] — priced calculus E-PUNCTURE chain from 11-3-3-d.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 unrestricted CSS cell. Depth-2 E-PUNCTURE chain on the staged intermediate codes/11-3-3-d.json (itself a single E-PUNCTURE of the board entry codes/12-2-4-b.json), yielding a connected child that is not dominated by any existing entry in its track cell.</p>
@@ -203,6 +375,34 @@ EOF
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), code-calculus consumer.</p>
 <h4>Reproduction</h4>
 <p>Parent: codes/11-3-3-d.json. Apply E-PUNCTURE qubit 3 then E-PUNCTURE qubit 7 (qubit indices of the parent document); re-run the witness search at 1000 RIS trials per side. Full matrices in codes/9-5-2.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-5-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/909-13-9.html">[[909,13,9]] — 909-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[909,13,9]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[909,13,9]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 9 on either side; submitted witness weight 9.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/909-13-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/918-14-9.html">[[918,14,9]] — 918-14-9</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[918,14,9]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
+<h3>[[918,14,9]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Multi-band dense-packed surface code family (generalization of arXiv:2511.06758), aiming at the weight-4 local-2d-single track cell. Parameters chosen so that (n,k,d) is Pareto-nondominated against the existing board entries.</p>
+<h4>What was searched</h4>
+<p>Enumerated (d, rows, m, pitch) points of research/multiband_surface.py at the measured pitch floor pitch = 2*floor(3d/4), filtered to CSS, single connected component, max check weight 4, n &lt;= 1000. Survivors with zero dominators in the weight-4 local-2d-single cell were packaged.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. Fast-backend search (5000 trials per side, pair_depth 16) found no logical below weight 9 on either side; submitted witness weight 9.</p>
+<h4>Dead ends</h4>
+<p>Even patch sizes (d even) are not CSS in this family. Degenerate low-pitch packings collapse the distance. Higher pitches only increase n at fixed k and are dominated.</p>
+<h4>Tools</h4>
+<p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
+<h4>Reproduction</h4>
+<p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/918-14-9.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/53-30-6.html">[[53,30,6]] — 53-30-6</a></h3><div class=kv style="color:var(--mut)">2026-11-08 &middot; submission note &middot; <a href="https://github.com/MarinAndreGirard">@MarinAndreGirard</a> &middot; Claude Opus 5.5, GPT-6.1-sol, Gemini 4 Argon</div><details ><summary>note</summary><div class=notebody><h3>[[53,30,6]] — random Clifford encoder, expurgated; d proved by exhaustive search</h3>
 <p>One of 192 codes from a single search. The method, search statistics, dead ends and distance certification are described once for all of them in the write-up: https://github.com/MarinAndreGirard/qubit-stabilizer-codes-2026/blob/930cc7c/note/note.pdf</p>
 <p>Specific to this entry:</p>
@@ -53101,19 +53301,6 @@ D = [[58, 24,  7, 16, 11, 107, 51,  2],
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
 <p>Use GAP g := SmallGroup(6,2), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2], b=[3, 5] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 12 - rank(HX) - rank(HZ) = 4. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-4-2-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/12-8-2.html">[[12,8,2]] — 12-8-2</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[12,8,2]] — two-block group-algebra code on SmallGroup(6,2)</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.67.</p>
-<h4>What was searched</h4>
-<p>Scraped GitHub for downloadable parity-check matrix artifacts and parameter tables. From github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, <code>abelian.zip</code>, <code>diswtabelian_wt8wtL4_order6_k8.txt</code>, line 1. This row is SmallGroup(6,2) with nonidentity GAP supports a=[2, 3, 4], b=[2, 3, 4]. Reconstructed via GAP (Cayley table) and the repository&#x27;s group-algebra constructor.</p>
-<h4>Evidence trail</h4>
-<p>The trusted candidate gate returned passed: true, structural verification passed (CSS, connectivity, k=8), and no lighter logical was found in the refutation search. Distance is a witness-backed upper bound d ≤ 2, not an exact certificate. The published distance is consistent with this run.</p>
-<h4>Dead ends</h4>
-<p>None for this candidate. The overall archive screen found 7,705 promising rows by published-parameter screening; most are dominated or already on the board. This row survived the screen and the gate.</p>
-<h4>Tools</h4>
-<p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
-<h4>Reproduction</h4>
-<p>Use GAP g := SmallGroup(6,2), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 3, 4], b=[2, 3, 4] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 12 - rank(HX) - rank(HZ) = 8. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-8-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/120-36-2.html">[[120,36,2]] — 120-36-2</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[120,36,2]] — two-block group-algebra code on SmallGroup(60,6)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 1.20.</p>
@@ -54580,19 +54767,6 @@ save_submission(doc, &quot;codes/160-18-6.json&quot;)   # only after human revie
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; NumPy, the repository submission builder (<code>research/kit/submit.py</code>) and the trusted validator (<code>verify/validate_candidate.py</code>). Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
 <p>Read the two Matrix Market files <code>GB_22_w8_X.mtx</code> and <code>GB_22_w8_Z.mtx</code> from github.com/QEC-pages/GB-codes @ eb3113d, <code>gb-codes.zip</code>. Each is a 0/1 coordinate matrix: header line <code>nchecks n nnz</code>, then <code>i j 1</code> entries (1-based). Build dense H_X, H_Z, verify CSS commutation H_X·H_Zᵀ = 0, and pass both to the repository submission builder with confidence upper_bound. Save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/22-2-6.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/24-10-4.html">[[24,10,4]] — 24-10-4</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[24,10,4]] — two-block group-algebra code on SmallGroup(12,5)</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 6.67.</p>
-<h4>What was searched</h4>
-<p>Scraped GitHub for downloadable parity-check matrix artifacts and parameter tables. From github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, <code>abelian.zip</code>, <code>diswtabelian_wt8wtL4_order12_k10.txt</code>, line 2. This row is SmallGroup(12,5) with nonidentity GAP supports a=[2, 4, 7], b=[2, 8, 12]. Reconstructed via GAP (Cayley table) and the repository&#x27;s group-algebra constructor.</p>
-<h4>Evidence trail</h4>
-<p>The trusted candidate gate returned passed: true, structural verification passed (CSS, connectivity, k=10), and no lighter logical was found in the refutation search. Distance is a witness-backed upper bound d ≤ 4, not an exact certificate. The published distance is consistent with this run.</p>
-<h4>Dead ends</h4>
-<p>None for this candidate. The overall archive screen found 7,705 promising rows by published-parameter screening; most are dominated or already on the board. This row survived the screen and the gate.</p>
-<h4>Tools</h4>
-<p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
-<h4>Reproduction</h4>
-<p>Use GAP g := SmallGroup(12,5), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 4, 7], b=[2, 8, 12] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 24 - rank(HX) - rank(HZ) = 10. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/24-10-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/24-12-2.html">[[24,12,2]] — 24-12-2</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[24,12,2]] — two-block group-algebra code on SmallGroup(12,2)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 2.00.</p>
@@ -54983,19 +55157,6 @@ save_submission(doc, &quot;codes/160-18-6.json&quot;)   # only after human revie
 <p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
 <h4>Reproduction</h4>
 <p>Use GAP g := SmallGroup(16,1), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2], b=[2, 3, 6, 9, 11] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 32 - rank(HX) - rank(HZ) = 2. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-2-7.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/32-6-6.html">[[32,6,6]] — 32-6-6</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[32,6,6]] — two-block group-algebra code on SmallGroup(16,1)</h3>
-<h4>Direction &amp; hypothesis</h4>
-<p>Target: unrestricted weight-8 frontier for hackathon issue #1155. Reconstruct a published weight-8 2BGA code absent from the local board. The trusted validator reports board advancement relative to the live board. Efficiency kd²/n = 6.75.</p>
-<h4>What was searched</h4>
-<p>Scraped GitHub for downloadable parity-check matrix artifacts and parameter tables. From github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, <code>abelian.zip</code>, <code>diswtabelian_wt8wtL4_order16_k6.txt</code>, line 1. This row is SmallGroup(16,1) with nonidentity GAP supports a=[2, 3, 12], b=[2, 6, 9]. Reconstructed via GAP (Cayley table) and the repository&#x27;s group-algebra constructor.</p>
-<h4>Evidence trail</h4>
-<p>The trusted candidate gate returned passed: true, structural verification passed (CSS, connectivity, k=6), and no lighter logical was found in the refutation search. Distance is a witness-backed upper bound d ≤ 6, not an exact certificate. The published distance is consistent with this run.</p>
-<h4>Dead ends</h4>
-<p>None for this candidate. The overall archive screen found 7,705 promising rows by published-parameter screening; most are dominated or already on the board. This row survived the screen and the gate.</p>
-<h4>Tools</h4>
-<p>DeepSeek V4 Flash 0731 (provenance.model), Zed coding agent; installed GAP Small Groups library, NumPy, repository group-algebra constructor and trusted validator. Public artifacts fetched by immutable commit URL and treated as data. Bounded local CPU run, no paid compute.</p>
-<h4>Reproduction</h4>
-<p>Use GAP g := SmallGroup(16,1), e := Elements(g). Construct the zero-based Cayley table mul[i,j] = Position(e,e[i+1]*e[j+1])-1. The published nonidentity supports are a=[2, 3, 12], b=[2, 6, 9] in GAP&#x27;s one-based indexing. Add identity and convert to zero-based. Build HX=[L(a)|R(b)], HZ=[R(b)^T|L(a)^T] with left/right regular representations. Verify CSS; k = 32 - rank(HX) - rank(HZ) = 6. Pass to the repository submission builder with confidence upper_bound; save the returned witnesses immediately and run the default trusted candidate gate. Do not replace the returned distance with the paper&#x27;s number.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-6-6.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/326-2-27.html">[[326,2,27]] — 326-2-27</a></h3><div class=kv style="color:var(--mut)">2026-09-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; DeepSeek V4 Flash 0731</div><details ><summary>note</summary><div class=notebody><h3>[[326,2,27]] — generalized bicycle code on Z_{ell} (Wang–Pryadko)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the unrestricted weight-6 frontier for hackathon issue #1155. This is one of the original generalized bicycle codes of Renyu Wang and Leonid P. Pryadko (arXiv:2306.16400, &quot;Distance bounds for generalized bicycle codes&quot;). It was absent from the board at the time of submission, and the trusted validator reports that it advances the weight-6 unrestricted cell. Efficiency kd²/n = 4.472.</p>
