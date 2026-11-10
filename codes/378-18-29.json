@@ -3828,44 +3828,50 @@
    ]
   },
   "Z": {
-   "value": 34,
+   "value": 29,
    "confidence": "upper_bound",
    "witness": [
-    0,
-    8,
     10,
-    20,
-    25,
-    63,
-    70,
+    31,
+    34,
+    36,
+    38,
     80,
-    84,
-    108,
-    116,
-    118,
-    123,
-    144,
-    149,
-    165,
-    175,
+    105,
+    120,
+    137,
+    157,
+    158,
     178,
-    204,
+    181,
+    182,
+    192,
+    196,
     209,
-    212,
-    216,
-    240,
-    247,
-    264,
-    271,
-    290,
-    293,
-    297,
-    309,
-    338,
-    341,
-    343,
-    345
-   ]
+    223,
+    242,
+    254,
+    257,
+    258,
+    282,
+    304,
+    319,
+    355,
+    366,
+    370,
+    377
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -3882,7 +3888,7 @@
    "cpu_hours": 5.0,
    "tool": "research/kit/search.py + gf2_fast on Brev n2d-highcpu-64"
   },
-  "notes": "Not equivalent to 378-18-27.json despite the shared Weisfeiler-Leman signature: at a matched budget (research/audits/leader_audit.py pair, 10,000,000 gf2_fast trials per seed, seeds 7, pair depth 8) the peer reads d <= 27 and this code d <= 29; equivalent codes have equal distance, so a weight-27 logical would exist here too. The pair audit's decision was 'credible: both claims held at matched depth'."
+  "notes": "Not equivalent to 378-18-27.json despite the shared Weisfeiler-Leman signature: at a matched budget (research/audits/leader_audit.py pair, 10,000,000 gf2_fast trials per seed, seeds 7, pair depth 8) the peer reads d <= 27 and this code d <= 29; equivalent codes have equal distance, so a weight-27 logical would exist here too. The pair audit's decision was 'credible: both claims held at matched depth'. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 34 -> 29 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "bivariate-bicycle"
 }
