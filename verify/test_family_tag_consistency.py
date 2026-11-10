@@ -49,6 +49,12 @@ OPENING = 90
 # `bivariate-bicycle` would put it in a filter it does not belong to. The two
 # bicycle patterns skip that phrasing.
 _NOT_BASE = r"(?![- ]base\b)"
+# "quotient of ... <family>" names the base family the same way: "Genon code:
+# quotient of the [[288,12,18]] bivariate-bicycle code by the ZX-duality
+# D_{(0,1)}" is a non-CSS quotient, not a bivariate-bicycle code. A family
+# named after "quotient of" in the opening is the operand of the quotient, so
+# it does not have to agree with the tag.
+_DERIVED_FROM = re.compile(r"\bquotient of\b", re.I)
 RULES = [
     ("pair-partition-cpm",
      re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
@@ -107,6 +113,8 @@ def _contradictions(slug, doc):
         if _excused(tag, family):
             continue          # `continue`, not `break`: later rules apply too
         m = pat.search(con[:OPENING])
+        if m and _DERIVED_FROM.search(con[:m.start()]):
+            continue          # the family is the quotient's operand
         if m:
             out.append(
                 f"  {slug}: construction names {family!r} "
@@ -135,6 +143,11 @@ def test_a_derived_code_naming_its_base_family_is_not_a_contradiction():
     assert _contradictions("x", doc("distance-amplified", derived)) == []
     assert _contradictions(
         "x", doc("other", "Generalized-bicycle base, amplified once")) == []
+    genon = ("Genon code: quotient of the [[288,12,18]] bivariate-bicycle code "
+             "by the ZX-duality D_{(0,1)}: g -> (0,1)-g (arXiv:2611.09538v1).")
+    assert _contradictions("x", doc("other", genon)) == []
+    assert _contradictions(
+        "x", doc("other", "Bivariate-bicycle code, quotient by D_{(0,1)}"))
     # the entry's own family is still checked, including the word "based"
     assert _contradictions(
         "x", doc("other", "Bivariate-bicycle code (A = x^3 + y + y^2)"))
