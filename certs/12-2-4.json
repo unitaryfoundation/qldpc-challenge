@@ -2,12 +2,13 @@
   "d": 4,
   "d_exact": true,
   "encoding": "selector",
+  "logical_classes": 2,
   "name": "[[12,2,4]]",
   "sides": {
     "X": {
       "exact": true,
       "note": "no logical < 4 exists",
-      "secs": 0.0,
+      "secs": 0.1,
       "status": "UNSAT",
       "value": 4
     },
@@ -19,14 +20,14 @@
       "value": 4
     }
   },
-  "solver": "CryptoMiniSat 5.14.7 SAT",
+  "solver": "CryptoMiniSat 5.14 SAT",
   "symmetry": false,
-  "tlim_per_solve": 900,
+  "tlim_per_solve": 120,
   "verification": {
-    "checker": "drat-trim sha256:f58f63b0f76945d4",
-    "cnf_sha256": "X=bf88a4c0bf8afba3ffa166e1398bac3edc18445a1a49d4c9701fc2638f747ae6;Z=5ceaa04526c9ada9bb0daef0b9d1f2ab233fb26cd9af96cbead93d5caa170806",
+    "checker": "drat-trim sha256:e17cd2e8de37c4c4",
+    "cnf_sha256": "X=04646e485b4ac6e4cf8c6a36575bb30e4076f85938b4d138246270e9ef339fa7;Z=74656e48d668ed8e425530b4987d1a22e8d5eacf3fee721bc57d46b442a35770",
     "level": "proof_log",
-    "note": "pure-CNF re-encoding refuted by kissat and checked by drat-trim; the XOR path agrees. The formula is regenerated from this entry and re-checked by CI rather than stored: a refutation nobody opens is not evidence, and the trimmed cores run to 95.8 MB as text. Confirms the formula is unsatisfiable, not that it asks the distance question",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
     "replay": {
       "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
       "emit": "python verify/replay_proofs.py 12-2-4",
