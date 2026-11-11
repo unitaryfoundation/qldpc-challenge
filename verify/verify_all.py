@@ -41,7 +41,32 @@ every claim also runs weekly on a schedule, so no measured rate on the board
 goes more than a week without being re-derived from scratch. Cost: an entry
 nobody touches is re-measured weekly rather than on every merge, and a
 failing scheduled run reverts nothing on its own; it is a signal to a
-maintainer, not a gate."""
+maintainer, not a gate.
+
+The circuit tier is cheap per entry and not cheap in total. On the hosted
+runner on 2026-11-10 it took 44.5 minutes of a 48-minute run, 718 entries at
+about 4 s each, against 3.4 minutes for the structural pass over all 3,160
+entries; with a gate that may use 90 minutes, a pull request that added one
+code no longer fit the verify job's 130-minute cap. With --circuit-base REF
+the tier runs only for entries whose codes/<slug>.json or circuits/<slug>/
+changed since REF, the diff --ler-base uses.
+
+That skip may be used in fewer places than the LER one, and where it may be
+used it loses nothing. Fewer places: a measured rate can only go stale
+through the LER stack, but any file of the verifier can change a circuit
+verdict, so verify.yml passes --circuit-base only on a data-only pull request
+(every changed file under the submission surface), where the verifier is the
+base branch's byte for byte. Loses nothing: circuit_verify is deterministic
+and reads the entry and its circuits/<slug>/ directory and nothing else, so
+on an unchanged entry it can only repeat the verdict that the run on the base
+branch reached on the same bytes with the same verifier. A sampled rate at
+least gains statistics from a re-run; this gains nothing. A push to main, a
+scheduled run, and a pull request that changes anything outside the
+submission surface still run the whole tier, so every state of main is
+checked in full and a verifier change is checked against every entry before
+it merges. A diff that cannot be computed falls back to checking everything.
+The structural pass and the collision scan are never skipped: they are the
+part of this file that needs the whole board, and they are the cheap part."""
 
 import argparse
 import os
@@ -56,15 +81,28 @@ from ler_verify import summary_rate, verify_ler
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def ler_slugs_to_measure(base, code_root):
-    """Slugs whose codes/<slug>.json or circuits/<slug>/ differ from git ref
-    `base`, or None when the diff is unavailable (then every claim is
-    re-measured -- the failure mode must cost time, never coverage)."""
+def _changed_slugs(base, code_root, fallback):
+    """Return the slugs whose codes/<slug>.json or circuits/<slug>/ differ from `base`.
+
+    None when the diff is unavailable, and None means "every entry": the
+    failure mode must cost time, never coverage. `fallback` says what the
+    caller then does, for the log.
+    """
     changed = changed_code_paths(base, code_root)
     if changed is None:
-        print(f"note: could not diff vs {base}; re-measuring every ler claim")
+        print(f"note: could not diff vs {base}; {fallback}")
         return None
     return {os.path.splitext(os.path.basename(p))[0] for p in changed}
+
+
+def ler_slugs_to_measure(base, code_root):
+    """Return the entries --ler-base re-measures the ler claim of, or None for all."""
+    return _changed_slugs(base, code_root, "re-measuring every ler claim")
+
+
+def circuit_slugs_to_check(base, code_root):
+    """Return the entries --circuit-base re-runs the circuit tier of, or None for all."""
+    return _changed_slugs(base, code_root, "checking every circuit tier")
 
 
 def main(argv=None):
@@ -76,10 +114,18 @@ def main(argv=None):
                     help="re-measure circuit.ler claims only for entries whose "
                          "codes/<slug>.json or circuits/<slug>/ changed since "
                          "this git ref (PR runs); omit to re-measure every claim")
+    ap.add_argument("--circuit-base", default=None, metavar="REF",
+                    help="run the circuit tier only for entries whose "
+                         "codes/<slug>.json or circuits/<slug>/ changed since "
+                         "this git ref. Only sound when the verifier is the "
+                         "one REF was checked with (data-only PR runs); omit "
+                         "to check every circuit tier")
     args = ap.parse_args(argv)
     code_root = os.path.abspath(args.root)
     ler_slugs = (ler_slugs_to_measure(args.ler_base, code_root)
                  if args.ler_base else None)
+    circuit_slugs = (circuit_slugs_to_check(args.circuit_base, code_root)
+                     if args.circuit_base else None)
     # One structural pass per tree, shared with every other consumer. The
     # reports are the memoized objects other callers in this process read, so
     # each is copied before the circuit tier writes a verdict into it.
@@ -90,6 +136,7 @@ def main(argv=None):
         print("no submissions found")
         return 0
     failed = []
+    skipped_circuits = 0
     sigs = {}
     fps = {}
     for e, is_code in entries:
@@ -110,13 +157,20 @@ def main(argv=None):
         if rep["ok"] and is_code and doc.get("circuit"):
             slug = e["slug"]
             circuits_dir = os.path.join(code_root, "circuits", slug)
-            crep = verify_circuit(doc, circuits_dir)
-            if crep["ok"]:
-                circ = (f", d_circ<="
-                        f"{crep['earned_d_circ']['d_circ']['value']}")
+            if circuit_slugs is not None and slug not in circuit_slugs:
+                # Not a pass on this run's evidence: the line says so, and
+                # prints no d_circ, because none was earned here.
+                circ = ", circuit unchanged since base (checked on the base branch)"
+                skipped_circuits += 1
             else:
-                rep["ok"] = False
-                rep["checks"] += [c for c in crep["checks"] if not c["ok"]]
+                crep = verify_circuit(doc, circuits_dir)
+                if crep["ok"]:
+                    circ = (f", d_circ<="
+                            f"{crep['earned_d_circ']['d_circ']['value']}")
+                else:
+                    rep["ok"] = False
+                    rep["checks"] += [c for c in crep["checks"]
+                                      if not c["ok"]]
             # measured-rate tier: an ler claim is re-measured,
             # never trusted; a missing decoder fails the claim rather than
             # skipping it, so an unverifiable number cannot merge.
@@ -183,6 +237,9 @@ def main(argv=None):
         for h, v in soft.items():
             print(f"  {h}: {', '.join(v)}")
 
+    if skipped_circuits:
+        print(f"\ncircuit tier not re-run for {skipped_circuits} entries "
+              f"unchanged since {args.circuit_base}")
     print(f"\n{len(entries)-len(failed)}/{len(entries)} passed")
     return 1 if (failed or identical) else 0
 
