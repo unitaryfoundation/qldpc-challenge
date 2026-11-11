@@ -114,6 +114,19 @@
 <p>qLDPC library (QTCode.random), challenge research kit, gf2_fast. Model: Beam 1.0.</p>
 <h4>Reproduction</h4>
 <p>Group PSL(2,8), seed code repetition length 2, random seed 2, bipartite False.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/324-2-18.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/36-2-6-b.html">[[36,2,6]] — 36-2-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-11 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[36,2,6]] — quantum Tanner code over PSL(2,5)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Aimed at the weight-4 unrestricted CSS cell with a small quantum Tanner code. PSL(2,5) with a length-2 repetition seed code yields n=36, d=6 at weight 4.</p>
+<h4>What was searched</h4>
+<p>Random quantum Tanner codes over PSL(2,5) with RepetitionCode(2), seeds 0..11, bipartite and non-bipartite variants, screened at 300 trials per side and re-screened at 10,000 trials per side.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound d&lt;=6 on both X and Z sides. Full gate refutation passed on a fresh seed.</p>
+<h4>Dead ends</h4>
+<p>Rep-3 instances over the same group landed at w=6 with d around 3-6 and did not advance their cell. Non-bipartite variants did not improve d.</p>
+<h4>Tools</h4>
+<p>qLDPC library (QTCode.random), challenge research kit, gf2_fast. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>Group PSL(2,5), seed code repetition length 2, random seed 9, bipartite False.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-2-6-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/434-62-13.html">[[434,62,13]] — 434-62-13</a></h3><div class=kv style="color:var(--mut)">2026-11-11 &middot; submission note &middot; <a href="https://github.com/TimoKellerMath">@TimoKellerMath</a> &middot; Claude Opus 5.5</div><details ><summary>note</summary><div class=notebody><h3>[[434,62,13]]: weight-6 pair-partition code on a sparse 6 x 14 template, lift P = 31</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, check weight at most 6, unrestricted locality (no layout submitted). Pair-partition (PP) CPM codes hold the largest kd^2/n of the board at check weights 7 and 8 (990-198-17, 994-142-40). We asked whether the PP rule gives good codes at check weight 6 on sparse templates whose block columns have degree 2 or 3: six rows of weight 6 on 14 columns (8 of degree 3 and 6 of degree 2, since 36 = 8 x 3 + 6 x 2) give design rate 1 - 12/14 = 1/7. Hypothesis: a large distance needs a pairing with at least 3 free exponent directions, i.e. first Betti number b_1 &gt;= 3 of the pairing square complex X (template rows and columns, one square per pair), whose classes in H^1(X; Z_P) are the lifts; the five PP leaders at weights 7 and 8 that we examined have b_1 = 3 to 6, and the smaller weight-6 shapes admit no such pairing (Dead ends), so we searched 6 x 14.</p>
