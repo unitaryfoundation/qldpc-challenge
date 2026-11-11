@@ -78,9 +78,16 @@ jobs:
 
   verify:
     runs-on: ubuntu-24.04
-    # 90 min fast-pass cap (gate_changed.FAST_SECONDS) + ~30 min of fixed steps
-    # + margin. Hitting this means a hang or a bug, not a large code.
-    timeout-minutes: 130
+    # Two paths are long. A data-only PR runs verify_all.py with the circuit
+    # tier scoped to its own entries (#5359) and the gate, up to its 90 min
+    # fast-pass cap (gate_changed.FAST_SECONDS). A push to main and a PR that
+    # changes anything outside the submission surface run the self-tests and
+    # verify_all.py over the whole circuit tier: on 2026-11-11 the self-tests
+    # took 43-67 min and verify_all.py 58 min on the push of 1d1232325, and at
+    # 130 min the job was cancelled with verify_all.py still running after
+    # 61-84 min on the push of 3ec6c3adb, on #5337 and on #5359's own run.
+    # Hitting this means a hang or a bug, not a large code.
+    timeout-minutes: 240
     env:
       PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
       # The files whose change can alter a measured circuit.ler rate: the
