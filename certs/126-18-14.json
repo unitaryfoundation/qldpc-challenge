@@ -25,6 +25,7 @@
  },
  "verification": {
   "level": "solver",
-  "note": "two independently written programs (exhaustive search: completeness by Proposition 3.1 and Corollary 3.2 of weight6-exact-distances/exact_distances.pdf, generalized in README.md of the package, Proposition 4) give d_X = 14, d_Z = 14; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from this entry and reruns them; no replayable proof object"
+  "note": "two independently written programs (exhaustive search: completeness by Proposition 3.1 and Corollary 3.2 of weight6-exact-distances/exact_distances.pdf, generalized in README.md of the package, Proposition 4) give d_X = 14, d_Z = 14; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from this entry and reruns them; no replayable proof object; tropidist b03ec2d4077f agrees (2.9 s, 2.6 s)",
+  "checks_sha256": "55fd4675ad781e3514238c0e6f98cd438d972474152853698220ea8c33316ee3"
  }
 }

@@ -24,6 +24,7 @@
  },
  "verification": {
   "level": "solver",
-  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 3, d_Z = 1 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/10-5-1.json and reruns both; no replayable proof object"
+  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 3, d_Z = 1 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/10-5-1.json and reruns both; no replayable proof object",
+  "checks_sha256": "584421b001b50df2916a4218bc636e377eab71aea3bb9611084bb704a9fcfd62"
  }
 }

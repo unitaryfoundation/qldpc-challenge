@@ -1,30 +1,38 @@
 {
- "name": "[[118,14,8]]",
- "d": 8,
- "d_exact": true,
- "d_lower": 8,
- "solver": "proof from the distance of the base 25-7-4: d_P = 2 d_P(base) for the [[4,2,2]] amplification (arXiv:2609.37231, Lemma 4), the entry audited by src/amp_audit.py, the base certified by exactA and exactB and by its board certificate; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
- "encoding": "this entry has the row spaces of Amp_4(S_X, S_Z) for a presentation (S_X, S_Z) of 25-7-4 (src/amp_audit.py: rows identical); a nontrivial logical of the amplified code contracts to nontrivial logicals of the base on two complementary sets of copies, so d_P = 2 d_P(base) for P = X, Z (README.md of the package, Proposition 3)",
- "symmetry": false,
- "logical_classes": 14,
- "sides": {
-  "X": {
-   "value": 8,
-   "exact": true,
-   "status": "UNSAT",
-   "note": "d_X = 2 d_X(25-7-4) = 2 * 4 by Proposition 3 of the package README; d_X(25-7-4) = 4: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package (no nontrivial X-logical of weight <= 3); no search on this entry itself",
-   "proved_min": 8
+  "d": 8,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 14,
+  "name": "[[118,14,8]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 0.7,
+      "status": "UNSAT",
+      "value": 8
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 8 exists",
+      "secs": 0.8,
+      "status": "UNSAT",
+      "value": 8
+    }
   },
-  "Z": {
-   "value": 8,
-   "exact": true,
-   "status": "UNSAT",
-   "note": "d_Z = 2 d_Z(25-7-4) = 2 * 4 by Proposition 3 of the package README; d_Z(25-7-4) = 4: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package (no nontrivial Z-logical of weight <= 3); no search on this entry itself",
-   "proved_min": 8
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 600,
+  "verification": {
+    "checker": "drat-trim sha256:e17cd2e8de37c4c4",
+    "checks_sha256": "6435d23a26d4d4227fde5dc098aedda235ee8a5c91e2268d4a637ecc3286e95a",
+    "cnf_sha256": "X=a55e762215a579af6c61f5cd560239fc80ef9b684f4a6a67b51809c6af0d550c;Z=55131267aff27691c0745aa93e0e1bd8998c0849e3eeb748cc170a4f9f714154",
+    "level": "proof_log",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
+    "replay": {
+      "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+      "emit": "python verify/replay_proofs.py 118-14-8",
+      "emitter": "verify/sat_certify.py side_cnf, XOR chunk arity 5, no symmetry prefix"
+    }
   }
- },
- "verification": {
-  "level": "solver",
-  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) gives d_P = 2 d_P(25-7-4) for P = X, Z once src/amp_audit.py has checked that this entry is Amp_4 of a presentation of 25-7-4; base distance: certs/25-7-4.json of this board, confirmed by exactA and exactB of the package; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object"
- }
 }

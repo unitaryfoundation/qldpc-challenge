@@ -5,26 +5,34 @@
  "d_lower": 20,
  "solver": "proof from the distance of the base 84-14-10: d_P = 2 d_P(base) for the [[6,4,2]] amplification (arXiv:2609.37231, Lemma 4), the entry audited by src/amp_audit.py, the base certified by exactA and exactB and by its board certificate; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
  "encoding": "this entry has the row spaces of Amp_6(S_X, S_Z) for a presentation (S_X, S_Z) of 84-14-10 (src/amp_audit.py: rows identical); a nontrivial logical of the amplified code contracts to nontrivial logicals of the base on two complementary sets of copies, so d_P = 2 d_P(base) for P = X, Z (README.md of the package, Proposition 3)",
+ "derived_from": {
+  "base": "84-14-10",
+  "base_checks_sha256": "d987bad1e29a36061e9dfbf76e395bc766bf6c25729681430ffc830e7d9ba6e5",
+  "construction": "Amp_6: the [[6,4,2]] amplification of a presentation of the base (this entry's row spaces equal those of Amp_6(S_X, S_Z))",
+  "relation": "d_X = 2 d_X(base), d_Z = 2 d_Z(base)",
+  "reference": "arXiv:2609.37231, Lemma 4; Proposition 3 of README.md of the package named in solver"
+ },
  "symmetry": false,
  "logical_classes": 56,
  "sides": {
   "X": {
    "value": 20,
    "exact": true,
-   "status": "UNSAT",
+   "status": "DERIVED",
    "note": "d_X = 2 d_X(84-14-10) = 2 * 10 by Proposition 3 of the package README; d_X(84-14-10) = 10: certs/84-14-10.json of this board, confirmed by exactA and exactB of the package (no nontrivial X-logical of weight <= 9); no search on this entry itself",
    "proved_min": 20
   },
   "Z": {
    "value": 20,
    "exact": true,
-   "status": "UNSAT",
+   "status": "DERIVED",
    "note": "d_Z = 2 d_Z(84-14-10) = 2 * 10 by Proposition 3 of the package README; d_Z(84-14-10) = 10: certs/84-14-10.json of this board, confirmed by exactA and exactB of the package (no nontrivial Z-logical of weight <= 9); no search on this entry itself",
    "proved_min": 20
   }
  },
  "verification": {
   "level": "solver",
-  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) gives d_P = 2 d_P(84-14-10) for P = X, Z once src/amp_audit.py has checked that this entry is Amp_6 of a presentation of 84-14-10; base distance: certs/84-14-10.json of this board, confirmed by exactA and exactB of the package; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object"
+  "note": "Proposition 3 of README.md of the package (after Liang, Gu, Chen, Eisert, Wang, arXiv:2609.37231, Lemma 4) gives d_P = 2 d_P(84-14-10) for P = X, Z once src/amp_audit.py has checked that this entry is Amp_6 of a presentation of 84-14-10; base distance: certs/84-14-10.json of this board, confirmed by exactA and exactB of the package; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object",
+  "checks_sha256": "6ef2c46a0592dd75467870b1c02a6127590223878365beb9b636dc948e49c6d1"
  }
 }

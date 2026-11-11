@@ -1,30 +1,38 @@
 {
- "name": "[[34,5,2]] priced-calculus deletion",
- "d": 2,
- "d_exact": true,
- "d_lower": 2,
- "solver": "graphlike_A (source sha256 66a15ffb) and graphlike_B (56d04349), two independent exact programs for graph-like check matrices; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
- "encoding": "every column of H_X and of H_Z has weight at most 2, so a nontrivial logical of minimum weight is a circuit of the check graph; graphlike_A: breadth-first trees with logical annotations (Horton-type candidate set); graphlike_B: shortest paths in the double covers defined by the logical operators of the other type",
- "symmetry": false,
- "logical_classes": 5,
- "sides": {
-  "X": {
-   "value": 2,
-   "exact": true,
-   "status": "UNSAT",
-   "note": "graphlike_A and graphlike_B: d_X = 2, the length of a shortest homologically nontrivial cycle of the graph of H_Z (no nontrivial X-logical of weight <= 1); words of weight 2 rechecked",
-   "proved_min": 2
+  "d": 2,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 5,
+  "name": "[[34,5,2]] priced-calculus deletion",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 2 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 2
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 2 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 2
+    }
   },
-  "Z": {
-   "value": 2,
-   "exact": true,
-   "status": "UNSAT",
-   "note": "graphlike_A and graphlike_B: d_Z = 2, the length of a shortest homologically nontrivial cycle of the graph of H_X (no nontrivial Z-logical of weight <= 1); words of weight 2 rechecked",
-   "proved_min": 2
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 600,
+  "verification": {
+    "checker": "drat-trim sha256:e17cd2e8de37c4c4",
+    "checks_sha256": "583a84f71e7f72687931dbe3093dd4d87138a17b6996651b14d34c4bbdd1b0d6",
+    "cnf_sha256": "X=26e7f02412e7cad85b7ff4cd9f3665153af66a1fd65b5d3cda83c702beab5640;Z=70904e3f450139f3393a223701f4d1bf50fd9604ab6ebc45a04ca4a42493a55d",
+    "level": "proof_log",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
+    "replay": {
+      "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+      "emit": "python verify/replay_proofs.py 34-5-2",
+      "emitter": "verify/sat_certify.py side_cnf, XOR chunk arity 5, no symmetry prefix"
+    }
   }
- },
- "verification": {
-  "level": "solver",
-  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 2, d_Z = 2 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/34-5-2.json and reruns both; no replayable proof object"
- }
 }

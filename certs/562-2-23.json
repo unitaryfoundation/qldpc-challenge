@@ -25,6 +25,7 @@
  },
  "verification": {
   "level": "solver",
-  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 23, d_Z = 23 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/562-2-23.json and reruns both; no replayable proof object"
+  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 23, d_Z = 23 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/562-2-23.json and reruns both; no replayable proof object",
+  "checks_sha256": "93b769694bc35bb9e202a49f3c6e9059e5409e39fb8bd4acd0fa49e1b3ae7eac"
  }
 }
