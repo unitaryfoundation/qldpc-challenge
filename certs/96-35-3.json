@@ -1,30 +1,30 @@
 {
   "d": 3,
   "d_exact": true,
-  "encoding": "selector",
+  "encoding": "css-sides",
   "logical_classes": 35,
   "name": "[[96,35,3]]",
   "sides": {
     "X": {
       "exact": true,
-      "note": "no logical < 3 exists",
-      "secs": 0.1,
+      "note": "no logical < 4 exists",
+      "secs": 0.3,
       "status": "UNSAT",
-      "value": 3
+      "value": 4
     },
     "Z": {
       "exact": true,
       "note": "no logical < 3 exists",
-      "secs": 0.1,
+      "secs": 0.3,
       "status": "UNSAT",
       "value": 3
     }
   },
-  "solver": "CryptoMiniSat 5.14.7 SAT",
-  "symmetry": false,
-  "tlim_per_solve": 120,
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 600.0,
   "verification": {
+    "checks_sha256": "ef19a506a56fbff701b70adc61ad96c9cf899e462567af451152ab501b670ad3",
     "level": "solver",
-    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
   }
 }
