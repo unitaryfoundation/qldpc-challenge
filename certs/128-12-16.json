@@ -1,0 +1,31 @@
+{
+ "name": "[[128,12,16]] 2BGA on C8xQ8",
+ "d": 16,
+ "d_exact": false,
+ "d_lower": 14,
+ "solver": "exactA (source sha256 2d1f0d1a) and exactB (e793e5b3), two independent exhaustive searches, stopped below the claim; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "anchored exhaustive search with exclusions, unit propagation, majority rule and lower bounds, one anchor per orbit of the Tanner-graph automorphism group; W - 1 searched when every logical of the side has even weight",
+ "symmetry": true,
+ "logical_classes": 12,
+ "sides": {
+  "X": {
+   "value": 16,
+   "exact": false,
+   "status": "OPEN",
+   "note": "no nontrivial X-logical of weight <= 13: at W = 12 exactA (30003003 nodes, 428.33 s) and exactB (14723198 nodes, 284.5 s) find none (every X-logical has even weight); so d_X is even and 14 <= d_X <= 16 (the upper bound is the entry's witness)",
+   "proved_min": 14
+  },
+  "Z": {
+   "value": 16,
+   "exact": false,
+   "status": "OPEN",
+   "note": "no nontrivial Z-logical of weight <= 13: at W = 12 exactA (29095329 nodes, 409.55 s) and exactB (14657335 nodes, 272.22 s) find none (every Z-logical has even weight); so d_Z is even and 14 <= d_Z <= 16 (the upper bound is the entry's witness)",
+   "proved_min": 14
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exhaustive searches find no nontrivial logical of weight < 14 on either side (completeness: Proposition 4 of README.md of the package); a partial certificate, 14 <= d <= 16; programs, logs and the driver that reruns them: github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11; no replayable proof object; tropidist b03ec2d4077f also stops at 14 on both sides (900 s per side)",
+  "checks_sha256": "7472ad1cfe54841095c147acb914bed3f449554528904e7b01d5621fc6a489fc"
+ }
+}

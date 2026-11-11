@@ -1,0 +1,31 @@
+{
+ "name": "[[676,2,26]] rotated toric code (26x26 torus)",
+ "d": 26,
+ "d_exact": true,
+ "d_lower": 26,
+ "solver": "graphlike_A (source sha256 66a15ffb) and graphlike_B (56d04349), two independent exact programs for graph-like check matrices; github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11",
+ "encoding": "every column of H_X and of H_Z has weight at most 2, so a nontrivial logical of minimum weight is a circuit of the check graph; graphlike_A: breadth-first trees with logical annotations (Horton-type candidate set); graphlike_B: shortest paths in the double covers defined by the logical operators of the other type",
+ "symmetry": false,
+ "logical_classes": 2,
+ "sides": {
+  "X": {
+   "value": 26,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "graphlike_A and graphlike_B: d_X = 26, the length of a shortest homologically nontrivial cycle of the graph of H_Z (no nontrivial X-logical of weight <= 25); words of weight 26 rechecked",
+   "proved_min": 26
+  },
+  "Z": {
+   "value": 26,
+   "exact": true,
+   "status": "UNSAT",
+   "note": "graphlike_A and graphlike_B: d_Z = 26, the length of a shortest homologically nontrivial cycle of the graph of H_X (no nontrivial Z-logical of weight <= 25); words of weight 26 rechecked",
+   "proved_min": 26
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exact programs (proofs: README.md of the package, Propositions 1 and 2) give d_X = 26, d_Z = 26 on the matrices of this entry; programs, data and logs at github.com/TimoKellerMath/quantum-error-correction @ ae52261bfdbd, board-certificates-2026-11, where src/certify.py rebuilds the instance from codes/676-2-26.json and reruns both; no replayable proof object",
+  "checks_sha256": "e6bad8ad1eb80780c1df789fba17321faf34abb6ec43aa704fde3598ca88ef5c"
+ }
+}
