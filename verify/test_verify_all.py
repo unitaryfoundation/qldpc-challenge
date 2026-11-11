@@ -10,9 +10,12 @@ this tests the routing, not stim.
 of this file covers it: which entries are checked, that nothing but the
 circuit tier is skipped, and that the flag is void once a file of the
 verifier stack differs from REF. --circuit-record PATH is the same skip for
-runs on main, from a record of passes keyed by content, and the last part
+runs on main, from a record of passes keyed by content, and the third part
 covers that: what a record line vouches for, that a failure is never
 stored, and that verify.yml hands the record to no pull request.
+--circuit-jobs N checks the tier in worker processes, and the part after
+that covers it with a stand-in the workers can import: every entry checked
+once, the serial verdicts, and a worker that fails ending the run.
 """
 import json
 import os
@@ -551,6 +554,163 @@ def test_unwritable_record_is_reported_and_does_not_change_the_verdict(tmp_path,
     assert "WARNING: could not write the circuit record" in capsys.readouterr().out
 
 
+# --circuit-jobs: the same checks in worker processes. A worker cannot see a
+# monkeypatched lambda, so the stand-in is a module-level function it imports,
+# steered by a field of the entry and leaving a mark per call on disk.
+
+_BAD_CIRC = dict(OK_CIRC, ok=False, checks=[{"check": "dem_matches", "ok": False}])
+
+
+def _pool_circuit(doc, circuits_dir):
+    """Stand in for verify_circuit inside a worker process."""
+    marks = os.environ["VERIFY_ALL_TEST_MARKS"]
+    with open(os.path.join(marks, f"{doc['name']}.{os.getpid()}"), "a") as f:
+        f.write("x")
+    how = doc.get("pool")
+    if how == "raise":
+        raise RuntimeError(f"worker failed on {doc['name']}")
+    if how == "die":
+        os._exit(3)
+    return json.loads(json.dumps(_BAD_CIRC if how == "bad" else OK_CIRC))
+
+
+def _pool_repo(tmp_path, monkeypatch, **how):
+    """Return (root, marks dir) for the three-entry repo, with `pool` set on the named entries."""
+    root = _repo(tmp_path / "repo")
+    for name, value in how.items():
+        slug = name.replace("_", "-")
+        _commit(root, f"codes/{slug}.json",
+                json.dumps({"name": slug, "circuit": {"ler": LER}, "pool": value}))
+    marks = tmp_path / "marks"
+    marks.mkdir()
+    monkeypatch.setenv("VERIFY_ALL_TEST_MARKS", str(marks))
+    monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(OK_REP)))
+    monkeypatch.setattr(VA, "verify_circuit", _pool_circuit)
+    monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
+    monkeypatch.setattr(VA, "circuit_stack_changed", lambda base: False)
+    return root, marks
+
+
+def _marks(marks):
+    """Return (sorted entry names checked, the set of pids that checked them); clears the marks."""
+    names, pids = [], set()
+    for mark in sorted(os.listdir(marks)):
+        name, pid = mark.rsplit(".", 1)
+        names += [name] * len((marks / mark).read_text())
+        pids.add(int(pid))
+        (marks / mark).unlink()
+    return names, pids
+
+
+def _pass_lines(out):
+    return [ln for ln in out.splitlines() if ln[:4] in ("PASS", "FAIL") and "-1-1.json" in ln]
+
+
+def test_pool_checks_every_circuit_once_and_prints_the_serial_verdicts(tmp_path, monkeypatch, capsys):
+    root, marks = _pool_repo(tmp_path, monkeypatch)
+    assert VA.main(["--root", root]) == 0
+    serial = _pass_lines(capsys.readouterr().out)
+    names, pids = _marks(marks)
+    assert names == ["a-1-1", "b-1-1", "c-1-1"] and pids == {os.getpid()}
+
+    assert VA.main(["--root", root, "--circuit-jobs", "2"]) == 0
+    out = capsys.readouterr().out
+    names, pids = _marks(marks)
+    assert names == ["a-1-1", "b-1-1", "c-1-1"]                  # once each, none in the loop
+    assert os.getpid() not in pids and 1 <= len(pids) <= 2
+    assert _pass_lines(out) == serial and len(serial) == 3       # same lines, same order
+    assert "circuit tier: checking 3 entries in 2 processes" in out
+
+
+def test_pool_fails_the_entry_a_worker_reports_bad(tmp_path, monkeypatch, capsys):
+    root, marks = _pool_repo(tmp_path, monkeypatch, b_1_1="bad")
+    assert VA.main(["--root", root, "--circuit-jobs", "2"]) == 1
+    lines = _pass_lines(capsys.readouterr().out)
+    assert [ln[:4] for ln in lines] == ["PASS", "FAIL", "PASS"]
+    assert "dem_matches" in lines[1]
+
+
+@pytest.mark.parametrize("how", ["raise", "die"])
+def test_pool_worker_that_does_not_finish_ends_the_run(tmp_path, monkeypatch, capsys, how):
+    """No report is no verdict: the run stops with an error and prints no PASS for anything."""
+    root, marks = _pool_repo(tmp_path, monkeypatch, b_1_1=how)
+    with pytest.raises(Exception) as err:
+        VA.main(["--root", root, "--circuit-jobs", "2"])
+    assert not isinstance(err.value, AssertionError)
+    assert _pass_lines(capsys.readouterr().out) == []
+
+
+def test_pool_checks_only_what_the_flags_leave(tmp_path, monkeypatch, capsys):
+    """--circuit-base and the record choose the entries; the pool only runs them."""
+    root, marks = _pool_repo(tmp_path, monkeypatch)
+    record = str(tmp_path / "circuit-record" / "record.json")
+    assert VA.main(["--root", root, "--circuit-base", "main", "--circuit-jobs", "2"]) == 0
+    assert _marks(marks)[0] == ["a-1-1", "b-1-1"]                # c is unchanged since main
+    argv = ["--root", root, "--circuit-record", record, "--circuit-jobs", "2"]
+    assert VA.main(argv) == 0
+    assert _marks(marks)[0] == ["a-1-1", "b-1-1", "c-1-1"]
+    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]   # the pool's passes are recorded
+    capsys.readouterr()
+    assert VA.main(argv) == 0
+    assert _marks(marks)[0] == []
+    assert "circuit tier: checking" not in capsys.readouterr().out   # nothing to check, no pool
+
+
+def test_pool_records_passes_as_they_arrive(tmp_path, monkeypatch):
+    """A run that stops after the pool keeps every pass the pool earned.
+
+    The stop is at the first entry's rate replica, before the loop has
+    reported anything, so only the pool can have written these lines. The
+    same stop without a pool leaves the one pass the loop had reached.
+    """
+    root, marks = _pool_repo(tmp_path, monkeypatch)
+    record = str(tmp_path / "circuit-record" / "record.json")
+    monkeypatch.setattr(VA, "RECORD_FLUSH_EVERY", 1)
+
+    def cut_off(doc, d):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(VA, "verify_ler", cut_off)
+    with pytest.raises(KeyboardInterrupt):
+        VA.main(["--root", root, "--circuit-record", record])
+    assert sorted(_passes(record)) == ["a-1-1"]
+    os.remove(record)
+    with pytest.raises(KeyboardInterrupt):
+        VA.main(["--root", root, "--circuit-record", record, "--circuit-jobs", "2"])
+    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]
+
+
+def test_no_pool_unless_asked_and_worth_it(tmp_path, monkeypatch):
+    root, marks = _pool_repo(tmp_path, monkeypatch)
+
+    def no_pool(*args, **kwargs):
+        raise AssertionError("a pool was started")
+
+    monkeypatch.setattr(VA, "check_circuits_in_pool", no_pool)
+    assert VA.main(["--root", root]) == 0                        # the default is this process
+    assert VA.main(["--root", root, "--circuit-jobs", "1"]) == 0
+    # One circuit to check is not worth a pool, whatever was asked for.
+    for slug in ("b-1-1", "c-1-1"):
+        _commit(root, f"codes/{slug}.json", json.dumps({"name": slug}))
+    assert VA.main(["--root", root, "--circuit-jobs", "4"]) == 0
+    assert _marks(marks)[1] == {os.getpid()}
+
+
+def test_circuit_workers():
+    assert VA.circuit_workers(1, 100) == 1
+    assert VA.circuit_workers(4, 100) == 4
+    assert VA.circuit_workers(4, 3) == 3                          # never more than the jobs
+    assert VA.circuit_workers(4, 0) == 1 and VA.circuit_workers(0, 0) == 1
+    cpus = getattr(os, "process_cpu_count", os.cpu_count)() or 1
+    assert VA.circuit_workers(0, 10_000) == cpus                  # 0 is one per CPU
+
+
+def test_negative_circuit_jobs_is_refused(tmp_path, monkeypatch):
+    root, _ = _pool_repo(tmp_path, monkeypatch)
+    with pytest.raises(SystemExit):
+        VA.main(["--root", root, "--circuit-jobs", "-1"])
+
+
 # Which run gets which flag is a few lines of shell and a few `if:` lines
 # inside verify.yml, so run the shell and read the conditions back.
 
@@ -610,10 +770,10 @@ def test_every_pull_request_sweep_passes_circuit_base(tmp_path):
     steps = _workflow_steps()
     for name in _PR_SWEEPS:
         argv = _verify_all_argv(_script(steps[name]), tmp_path)
-        assert argv[-2:] == ["--circuit-base", "origin/main"], (name, argv)
+        assert argv[argv.index("--circuit-base") + 1] == "origin/main", (name, argv)
         assert argv[argv.index("--ler-base") + 1] == "origin/main", (name, argv)
     argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request")
-    assert argv == ["--circuit-base", "origin/main"], argv
+    assert argv == ["--circuit-base", "origin/main", "--circuit-jobs", "0"], argv
 
 
 def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
@@ -625,11 +785,12 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
     full = _script(steps[_FULL_SWEEP])
     assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request")
     for event in ("push", "schedule", "workflow_dispatch"):
-        assert _verify_all_argv(full, tmp_path, EVENT_NAME=event) == ["--circuit-record", _RECORD]
+        assert _verify_all_argv(full, tmp_path, EVENT_NAME=event) == [
+            "--circuit-record", _RECORD, "--circuit-jobs", "0"]
     push = _code(steps[_PUSH_SWEEP])
     assert any(ln.startswith("        if: github.event_name == 'push' && ") for ln in push)
     run = next(ln for ln in push if "verify/verify_all.py" in ln)
-    assert run.endswith(f" --circuit-record {_RECORD}") and "--circuit-base" not in run
+    assert f" --circuit-record {_RECORD} " in run and "--circuit-base" not in run
 
 
 def test_every_sweep_is_scoped_one_way_or_the_other():
@@ -641,6 +802,9 @@ def test_every_sweep_is_scoped_one_way_or_the_other():
     for name in sweeps:
         text = "\n".join(_code(steps[name]))
         assert "--circuit-base" in text or "--circuit-record" in text, name
+        # And each checks what it does run in one process per CPU.
+        run = next(ln for ln in _code(steps[name]) if "verify/verify_all.py" in ln)
+        assert run.endswith(" --circuit-jobs 0"), name
 
 
 def test_the_record_is_restored_and_saved_only_on_main():

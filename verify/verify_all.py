@@ -94,13 +94,31 @@ is missing, unreadable, or made under another stack is an empty one: the
 failure mode costs time, never coverage. The file is rewritten as the run
 goes, so a run that stops early leaves what it had earned on disk.
 
+Those two flags leave the runs that must check every circuit: a pull request
+that edits the verifier, the first run on main after such a merge, and the
+weekly one. They still grow with the board, so --circuit-jobs N spreads the
+tier over N processes (0 means one per CPU). Each check reads one entry and
+its own directory, shares nothing with another, and peaks near 330 MB on the
+largest circuits on the board, so the verdicts are the serial ones and four
+workers fit a hosted runner with room. On a laptop on 2026-11-11 four
+workers checked 30 board entries in 43 s where one process took 143 s, with
+the same output line for line, and the whole board, 735 circuits, in 21
+minutes with the structural pass. The pool runs to completion before the
+first entry is reported, so the measured-rate tier,
+which samples against a wall-clock budget, never shares the CPUs with it. A
+worker that raises or dies ends the run with an error: no verdict is ever
+filled in for it. Without the flag nothing changes, and every check runs in
+this process as before.
+
 The structural pass and the collision scan are never skipped: they are the
 part of this file that needs the whole board, and they are the cheap part."""
 
 import argparse
+import concurrent.futures
 import hashlib
 import importlib.metadata
 import json
+import multiprocessing
 import os
 import subprocess
 import sys
@@ -199,8 +217,11 @@ def circuit_stack_changed(base, root=ROOT):
 
 
 def _file_digest(path):
+    h = hashlib.sha256()
     with open(path, "rb") as f:
-        return hashlib.file_digest(f, "sha256").digest()
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.digest()
 
 
 def circuit_stack_digest(root=ROOT):
@@ -296,6 +317,44 @@ def save_circuit_record(path, stack, passed):
         print(f"WARNING: could not write the circuit record to {path}: {e}")
 
 
+def circuit_workers(requested, jobs):
+    """Return how many processes check `jobs` circuits: at least 1, at most one per job.
+
+    `requested` is --circuit-jobs, where 0 asks for one per CPU this process
+    may use. 1 means no pool at all.
+    """
+    if requested == 0:
+        requested = getattr(os, "process_cpu_count", os.cpu_count)() or 1
+    return max(1, min(requested, jobs))
+
+
+def check_circuits_in_pool(jobs, workers, on_report=None):
+    """Run verify_circuit for each (slug, doc, circuits_dir) job in `workers` processes.
+
+    Returns {slug: report}. A worker that raises, or dies and breaks the
+    pool, raises here, so a check that did not finish can only end the run.
+    Workers are spawned rather than forked: a fork would inherit a parent
+    that holds every report on the board. `on_report(slug, report)` is
+    called in this process as each check finishes.
+    """
+    reports = {}
+    pool = concurrent.futures.ProcessPoolExecutor(
+        max_workers=workers, mp_context=multiprocessing.get_context("spawn"))
+    try:
+        futures = {pool.submit(verify_circuit, doc, circuits_dir): slug
+                   for slug, doc, circuits_dir in jobs}
+        for done, future in enumerate(concurrent.futures.as_completed(futures), 1):
+            slug = futures[future]
+            reports[slug] = future.result()
+            if on_report is not None:
+                on_report(slug, reports[slug])
+            if done % 50 == 0 or done == len(futures):
+                print(f"circuit tier: {done}/{len(futures)} checked", flush=True)
+    finally:
+        pool.shutdown(wait=True, cancel_futures=True)
+    return reports
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=ROOT,
@@ -317,7 +376,13 @@ def main(argv=None):
                          "says passed it on the same bytes under the same "
                          "verifier stack, and write the record back with this "
                          "run's passes. A trusted input: for runs on main only")
+    ap.add_argument("--circuit-jobs", default=1, type=int, metavar="N",
+                    help="check the circuit tier in N processes, before any "
+                         "entry is reported; 0 means one per CPU. The default "
+                         "of 1 checks each entry in this process, in order")
     args = ap.parse_args(argv)
+    if args.circuit_jobs < 0:
+        ap.error("--circuit-jobs must be 0 (one per CPU) or a positive count")
     code_root = os.path.abspath(args.root)
     ler_slugs = (ler_slugs_to_measure(args.ler_base, code_root)
                  if args.ler_base else None)
@@ -343,6 +408,63 @@ def main(argv=None):
     if not entries:
         print("no submissions found")
         return 0
+    keys = {}
+
+    def entry_key(slug, entry_path, circuits_dir):
+        """Return the record key of one entry, computed once; None without a record."""
+        if recorded is None:
+            return None
+        if slug not in keys:
+            keys[slug] = circuit_entry_key(stack, entry_path, circuits_dir)
+        return keys[slug]
+
+    def record_pass(slug, key):
+        """Note a pass and write the record every RECORD_FLUSH_EVERY of them."""
+        nonlocal unwritten
+        if key is None or passed.get(slug) == key:
+            return
+        passed[slug] = key
+        unwritten += 1
+        if unwritten >= RECORD_FLUSH_EVERY:
+            # Carry what the old record still vouches for: a run cut off
+            # here must not cost the entries it had not reached yet.
+            save_circuit_record(args.circuit_record, stack, {**recorded, **passed})
+            unwritten = 0
+
+    # --circuit-jobs: the circuits the loop below would check, checked ahead
+    # of it in a pool. The selection repeats the loop's own conditions, and
+    # if the two ever disagree the cost is time: an entry missing from
+    # circuit_reports is checked in the loop as before, and a report nobody
+    # asks for is dropped. Passes go into the record as they arrive, so a
+    # run cut off inside the pool keeps them.
+    circuit_reports = {}
+    if args.circuit_jobs != 1:
+        jobs = []
+        for e, is_code in entries:
+            if not is_code or e["size_error"] or e["load_error"]:
+                continue
+            if not (e["report"]["ok"] and e["doc"].get("circuit")):
+                continue
+            slug = e["slug"]
+            if circuit_slugs is not None and slug not in circuit_slugs:
+                continue
+            circuits_dir = os.path.join(code_root, "circuits", slug)
+            key = entry_key(slug, e["path"], circuits_dir)
+            if key is not None and recorded.get(slug) == key:
+                continue
+            jobs.append((slug, e["doc"], circuits_dir))
+        workers = circuit_workers(args.circuit_jobs, len(jobs))
+        if workers > 1:
+            print(f"circuit tier: checking {len(jobs)} entries in {workers} processes",
+                  flush=True)
+
+            def pooled(slug, crep):
+                # keys holds every job's key already (None without a record).
+                if crep["ok"]:
+                    record_pass(slug, keys.get(slug))
+
+            circuit_reports = check_circuits_in_pool(jobs, workers, pooled)
+
     failed = []
     skipped_circuits = 0
     recorded_circuits = 0
@@ -372,8 +494,7 @@ def main(argv=None):
                 circ = ", circuit unchanged since base (checked on the base branch)"
                 skipped_circuits += 1
             else:
-                key = (circuit_entry_key(stack, p, circuits_dir)
-                       if recorded is not None else None)
+                key = entry_key(slug, p, circuits_dir)
                 if key is not None and recorded.get(slug) == key:
                     # The same rule as above: no d_circ is printed, because
                     # this run did not earn one.
@@ -381,6 +502,8 @@ def main(argv=None):
                     recorded_circuits += 1
                     passed[slug] = key
                     crep = {"ok": True, "skipped": True}
+                elif slug in circuit_reports:
+                    crep = circuit_reports.pop(slug)
                 else:
                     crep = verify_circuit(doc, circuits_dir)
                 if crep.get("skipped"):
@@ -388,16 +511,7 @@ def main(argv=None):
                 elif crep["ok"]:
                     circ = (f", d_circ<="
                             f"{crep['earned_d_circ']['d_circ']['value']}")
-                    if key is not None:
-                        passed[slug] = key
-                        unwritten += 1
-                        if unwritten >= RECORD_FLUSH_EVERY:
-                            # Carry what the old record still vouches for:
-                            # a run cut off here must not cost the entries
-                            # it had not reached yet.
-                            save_circuit_record(args.circuit_record, stack,
-                                                {**recorded, **passed})
-                            unwritten = 0
+                    record_pass(slug, key)
                 else:
                     rep["ok"] = False
                     rep["checks"] += [c for c in crep["checks"]

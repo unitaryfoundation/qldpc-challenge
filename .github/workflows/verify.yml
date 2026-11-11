@@ -435,6 +435,12 @@ jobs:
         # on the same bytes with the same verifier, so it is run for the
         # entries the PR changed and skipped for the rest.
         #
+        # --circuit-jobs 0, here and on the three sweeps below: the entries
+        # whose tier does run are checked in one process per CPU, and all of
+        # them before the measured-rate tier starts, so a sampled rate never
+        # shares the CPUs with the pool. A check reads one entry and its own
+        # directory, so the verdicts are the serial ones.
+        #
         # "The same verifier" is verify_all's to check, not this file's: it
         # compares its own CIRCUIT_STACK with the base branch's and checks
         # every circuit if any file differs, so the flag is passed on every
@@ -446,7 +452,7 @@ jobs:
         env:
           BASE_REF: origin/${{ github.base_ref }}
         run: |
-          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF"
+          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
       - name: verify all submissions (LER stack unchanged)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: submitted
@@ -465,7 +471,7 @@ jobs:
         env:
           BASE_REF: origin/${{ github.base_ref }}
         run: |
-          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" --circuit-base "$BASE_REF"
+          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
       # The circuit record: which entries have passed the circuit tier on
       # main, on which bytes, under which verifier. A run on main has no base
       # branch to lean on, and re-running the tier for every entry on every
@@ -507,7 +513,7 @@ jobs:
         # merge did not touch keeps the rate the PR that introduced it
         # measured; a base that cannot be diffed makes verify_all re-measure
         # everything (its own fail-open rule), so a skip is never silent.
-        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json
+        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --circuit-jobs 0
       - name: verify all submissions (full LER re-measure)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true') || (github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed == 'true' && steps.verdict.outputs.cache-hit != 'true')
         working-directory: submitted
@@ -527,7 +533,7 @@ jobs:
           else
             circuit="--circuit-record ../circuit-record/record.json"
           fi
-          uv run --frozen --extra research python verify/verify_all.py $circuit
+          uv run --frozen --extra research python verify/verify_all.py $circuit --circuit-jobs 0
       # always(): a sweep that fails on one entry still earned its other
       # passes, and only passes are in the file. hashFiles: a sweep that
       # never ran wrote nothing to save.
