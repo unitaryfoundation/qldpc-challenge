@@ -1,30 +1,30 @@
 {
   "d": 6,
   "d_exact": true,
-  "encoding": "selector",
+  "encoding": "css-sides",
   "logical_classes": 258,
   "name": "[[960,258,6]] planar hyperbolic {5,6}",
   "sides": {
     "X": {
       "exact": true,
-      "note": "no logical < 6 exists",
-      "secs": 67.3,
+      "note": "no logical < 7 exists",
+      "secs": 3.3,
       "status": "UNSAT",
-      "value": 6
+      "value": 7
     },
     "Z": {
       "exact": true,
       "note": "no logical < 6 exists",
-      "secs": 128.3,
+      "secs": 3.0,
       "status": "UNSAT",
       "value": 6
     }
   },
-  "solver": "CryptoMiniSat 5.14.7 SAT",
-  "symmetry": false,
-  "tlim_per_solve": 120,
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 600.0,
   "verification": {
+    "checks_sha256": "975fa4129e990320f556c376d523ccba22472dccb13f9b11acbfe249cc8046b8",
     "level": "solver",
-    "note": "selector-encoded, one solve per side; no refutation artifact accompanies this run"
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
   }
 }
