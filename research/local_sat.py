@@ -538,8 +538,11 @@ def enumerate_local_sat_codes(
     stats=None,
     budget_check=None,
 ):
-    """Yield ``(spec, HX, HZ, coordinates, anchors_x, anchors_z)`` for distinct
+    """Yield ``(spec, HX, HZ)`` for distinct
     CSS codes whose checks are all local under the returned layout.
+
+    The layout (``sites``, ``anchors_x``, ``anchors_z``) travels inside
+    ``spec``; consumers that need it should read it from there.
 
     Parameters
     ----------
@@ -767,8 +770,11 @@ def enumerate_local_sat_codes(
                 "layers": layers,
                 "seed": seed,
                 "index": count,
+                "sites": list(sites),
+                "anchors_x": list(anchors_x),
+                "anchors_z": list(anchors_z),
             }
-            yield (spec, HX, HZ, list(sites), anchors_x, anchors_z)
+            yield (spec, HX, HZ)
             count += 1
             stats["yielded"] = count
             solver_obj.add_clause(block)

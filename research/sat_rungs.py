@@ -100,7 +100,10 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
         budget_check=budget_check)
     found, seen, best_k = [], 0, None
     try:
-        for spec, HX, HZ, sites, ax, az in gen:
+        for spec, HX, HZ in gen:
+            sites = spec.get("sites")
+            ax = spec.get("anchors_x")
+            az = spec.get("anchors_z")
             # A new model starts a new formula's conflict count.
             spent["base"] = spent["conflicts"]
             seen += 1

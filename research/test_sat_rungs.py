@@ -20,7 +20,7 @@ import sat_rungs  # noqa: E402
 
 def _codes(**kw):
     stats = {}
-    out = [(HX.copy(), HZ.copy()) for _, HX, HZ, _, _, _ in
+    out = [(HX.copy(), HZ.copy()) for _, HX, HZ in
            local_sat.enumerate_local_sat_codes(
                4, 5, 6, 2, 2.0, solver="cadical195", stream=True,
                shared_t3=True, max_codes=12, stats=stats, **kw)]
