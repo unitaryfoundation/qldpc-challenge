@@ -1,0 +1,351 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[294,42,11]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"pair-partition-cpm","code_origin":"submission","code_tier":"exact","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-6"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../index.html">&larr; back to the board</a>
+<div class=codehead><span class="mono big">[[294,42,11]]</span> <span class="b exact">d =</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>294</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>42</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>11</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>17.2857</div></div>
+<div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
+<div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/294-42-11.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B294%2C42%2C11%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/294-42-11.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B294%2C42%2C11%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/294-42-11.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/294-42-11.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X = 11, d_Z = 11 &middot; w_X = 6, w_Z = 6 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
+<div class=kv><b>d_X</b> 11 &middot; witness weight 11 (claimed exact)</div>
+<details><summary>witness operator (support, 11 qubits)</summary><div class=wit>[18, 23, 39, 121, 166, 197, 207, 213, 220, 230, 254]</div></details>
+<div class=kv><b>d_Z</b> 11 &middot; witness weight 11 (claimed exact)</div>
+<details><summary>witness operator (support, 11 qubits)</summary><div class=wit>[0, 40, 62, 124, 163, 180, 193, 252, 272, 278, 289]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-ok>exact, d = 11</span> &middot; exhaustive search, two independent implementations (exactA, exactB; sources github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src, sha256 2d1f0d1a55d9..., e793e5b34eb6...; records github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4, pair-partition-and-two-block-codes/294-42-11/records) &middot; <span class=claimed>level solver: a solver verdict, no artifact a third party can check without re-running the encoding</span></div><div class=kv style="color:var(--mut)">X: no nontrivial X-logical of weight &lt;= 10 (W = 10): exactA 4284 nodes, 0.01 s; exactB 4721 nodes, 0.00 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_X = 11; Z: no nontrivial Z-logical of weight &lt;= 10 (W = 10): exactA 4069 nodes, 0.01 s; exactB 4873 nodes, 0.01 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_Z = 11</div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 6 &middot; H_Z 6 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> H_X 6 &middot; H_Z 6</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> H_X 2&ndash;3 (mean 2.571) &middot; H_Z 2&ndash;3 (mean 2.571)</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_X</b> (1,2)×126 (2,2)×126 (3,2)×168 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_X</summary><div class=wit>(1,2): 126
+(1,3): 168
+(2,2): 126
+(2,3): 1008
+(2,4): 756
+(3,2): 168
+(3,3): 3087
+(3,4): 7938
+(3,5): 4851
+(3,6): 1512
+(3,7): 504</div></details>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_Z</b> (1,2)×126 (2,2)×126 (3,2)×168 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_Z</summary><div class=wit>(1,2): 126
+(1,3): 168
+(2,2): 126
+(2,3): 1008
+(2,4): 756
+(3,2): 168
+(3,3): 3087
+(3,4): 7938
+(3,5): 4851
+(3,6): 1512
+(3,7): 504</div></details>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/TimoKellerMath">@TimoKellerMath</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> new parameter set claimed by submitter</div>
+<div class=kv><b>construction</b> Pair-partition CPM CSS code (the pair-partition rule and girth rule of Okada-Kasai, arXiv:2607.14091) on a sparse 6x14 template of check weight 6, cyclic lift P = 21 (Z_21), n = 14P = 294, k = 2P = 42, design rate 1/7. Template: 6 block rows per type on 14 block columns, every block row of weight 6, every block column of degree 2 or 3 on each side (8 of degree 3, 6 of degree 2; the degree-2 columns of a side form a connected unicyclic graph on its rows). Block columns per block row: X = [[0,1,2,4,5,12], [0,2,3,5,7,13], [1,2,4,8,9,10], [3,4,6,7,9,10], [5,6,7,11,12,13], [8,9,10,11,12,13]], Z = [[0,1,2,3,5,6], [0,2,3,7,8,11], [0,3,4,7,9,13], [1,4,5,6,12,13], [4,6,8,9,10,12], [5,7,8,10,11,12]]. Qubit u*P + s is position s in Z_21 of block column u; X-check (i,r), r in Z_21, acts on the qubits u*P + ((r + e_iu) mod P), u in X_i, Z-check (j,r) on u*P + ((r + f_ju) mod P), u in Z_j; checks in the order i*P + r. Exponents (u:e per block row): X0: 0:0 1:0 2:0 4:0 5:0 12:0; X1: 0:0 2:20 3:0 5:14 7:0 13:0; X2: 1:0 2:14 4:19 8:14 9:19 10:0; X3: 3:10 4:0 6:16 7:11 9:20 10:12; X4: 5:0 6:7 7:9 11:8 12:2 13:19; X5: 8:1 9:5 10:1 11:1 12:0 13:5; Z0: 0:0 1:0 2:14 3:15 5:14 6:0; Z1: 0:0 2:0 3:0 7:1 8:0 11:0; Z2: 0:0 3:11 4:0 7:11 9:0 13:0; Z3: 1:0 4:19 5:19 6:14 12:0 13:5; Z4: 4:0 6:5 8:16 9:20 10:1 12:0; Z5: 5:0 7:7 8:1 10:8 11:8 12:0. Every overlap of an X-row and a Z-row of the template has 0, 2 or 4 block columns and splits into pairs {u,v} with e_iu - f_ju = e_iv - f_jv, so H_X H_Z^T = 0; the pairing satisfies the girth rule (no pair in two cells of one row or one column of the pairing array), and no two checks of one type share two qubits. rank H_X = rank H_Z = 6P = 126; every check has weight 6; qubit (X, Z)-degrees (2,2) on 42, (2,3) on 84, (3,2) on 84 and (3,3) on 84 qubits. The pairing square complex (template rows and columns, one square per pair) has first Betti number 3 and torsion-free H_1; the exponents are a class of H<sup>1</sup> with values in Z_21.</div>
+<div class=kv><b>model</b> <span class=modelmark><svg class=modelicon viewBox="0 0 24 24" width="15" height="15" role="img" aria-label="Claude"><title>Claude</title><path fill="#D97757" d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></svg> </span>Claude Opus 5.5 <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2607.14091">arXiv:2607.14091</a>, https://kasai.ict.eng.isct.ac.jp/pair_partition_cpm_css_codes_20260714.html, <a href="https://arxiv.org/abs/2609.30069">arXiv:2609.30069</a>, <a href="https://arxiv.org/abs/2609.35601">arXiv:2609.35601</a>, <a href="https://arxiv.org/abs/2610.19451">arXiv:2610.19451</a>, <a href="https://arxiv.org/abs/quant-ph/0701020">arXiv:quant-ph/0701020</a>, <a href="https://arxiv.org/abs/0901.4129">arXiv:0901.4129</a>, <a href="https://arxiv.org/abs/1611.07164">arXiv:1611.07164</a>, <a href="https://arxiv.org/abs/2611.08247">arXiv:2611.08247</a></div>
+<div class=kv><b>date</b> 2026-11-11</div>
+<div class=kv><b>notes</b> Exact distance: d_X = d_Z = 11. Two independently written exhaustive searches (exactA, exactB), anchored at the translations of Z_21, find no nontrivial logical of weight &lt;= 10 on either side (records and the certificate certs/294-42-11.json); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, give the same value on both sides. Definitions, records and a rebuild script: github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4, pair-partition-and-two-block-codes/294-42-11/ and pair-partition-and-two-block-codes/src/rebuild.py. Novelty claim: new parameters only. No entry of board commit 82a52ee51 has n = 294 and k = 42, no published code with these parameters is known to us (literature search of 2026-11-11: see the note), at that commit no CSS entry dominates or equals it in (n, k, d, w), and it dominates 30 entries (see the note). Construction and attribution: a CPM lift of a sparse 6x14 template (check weight 6, column degrees 2 and 3) whose X/Z row overlaps are made even by pair partitions with the girth rule of Okada and Kasai (arXiv:2607.14091); their codes and Kasai&#x27;s catalogue use all-one JxL templates with check weight L &gt;= 8, as do arXiv:2609.30069 and arXiv:2609.35601. Relation to the board (export 82a52ee51): CPM lifts whose X/Z row overlaps split into pairs of equal exponent difference are common on the board at check weights 4 to 8, among them two-block and bicycle codes, the [[6N,2N+2,6]] family of arXiv:2610.19451 (all-one 2x6 template, d = 6) and irregular templates such as 260-58-6 and the 14x28 lifts 280-20-8 to 700-50-8 at check weight 6; entries tagged pair-partition-cpm occur only at check weight &gt;= 7 (e.g. 990-198-17, 994-142-40, 972-166-34). In the layouts tested (consecutive or interleaved blocks of the stored qubit order), no entry of check weight 6 is a lift of a template with column degrees 2 and 3 (computed). No entry has these n and k; checked, not equivalent to an existing entry.</div>
+<div class=kv><b>family</b> pair-partition CPM <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/294-42-11.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[294,42,11]]: weight-6 pair-partition code on a sparse 6 x 14 template, lift P = 21</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: CSS, check weight at most 6, unrestricted locality (no layout submitted). Pair-partition (PP) CPM codes hold the largest kd^2/n of the board at check weights 7 and 8 (990-198-17, 994-142-40). We asked whether the PP rule gives good codes at check weight 6 on sparse templates whose block columns have degree 2 or 3: six rows of weight 6 on 14 columns (8 of degree 3 and 6 of degree 2, since 36 = 8 x 3 + 6 x 2) give design rate 1 - 12/14 = 1/7. Hypothesis: a large distance needs a pairing with at least 3 free exponent directions, i.e. first Betti number b_1 &gt;= 3 of the pairing square complex X (template rows and columns, one square per pair), whose classes in H^1(X; Z_P) are the lifts; the five PP leaders at weights 7 and 8 that we examined have b_1 = 3 to 6, and the smaller weight-6 shapes admit no such pairing (Dead ends), so we searched 6 x 14.</p>
+<p>Attribution. The code is a CPM lift of a sparse 6 x 14 template (check weight 6, column degrees 2 and 3) whose X/Z row overlaps are made even by pair partitions with the girth rule of Okada and Kasai (arXiv:2607.14091); their codes and Kasai&#x27;s catalogue (44 codes) use all-one J x L templates with check weight L &gt;= 8, as do the follow-ups arXiv:2609.30069 (Lee, Okada, Maskara, Kasai, Zhou: the design-rate count; its App. A applies the bounds of MacKay-Davey and of Smarandache-Vontobel, arXiv:0901.4129, whose cofactor words give our structural bounds; its outlook names irregular templates) and arXiv:2609.35601. Quasi-cyclic CSS codes from circulant permutation matrices go back to Hagiwara and Imai (arXiv:quant-ph/0701020). Relation to the board (export 82a52ee51): CPM lifts whose X/Z row overlaps split into pairs of equal exponent difference are common on the board at check weights 4 to 8, among them two-block and bicycle codes, the [[6N,2N+2,6]] family of arXiv:2610.19451 (all-one 2 x 6 template, d = 6) and irregular templates such as 260-58-6 and the 14 x 28 lifts 280-20-8 to 700-50-8 at check weight 6; entries tagged pair-partition-cpm occur only at check weight &gt;= 7 (e.g. 990-198-17, 994-142-40, 972-166-34). In the layouts tested (consecutive or interleaved blocks of the stored qubit order), no entry of check weight 6 is a lift of a template with column degrees 2 and 3 (computed). 990-198-17 (MicheldeMessieres) enumerates one-side templates with columns of degree 2 or 3 (J = 3, 4 exhaustively, J = 5 sampled), ranks them by its generalization of App. A of arXiv:2609.30069 to sparse templates, records that its pairings with 5 free dimensions carry a forced weight-5 logical through the two degree-2 columns, and finds no weight-6 template with J &lt;= 4 that reaches its target; 994-142-40 uses 6 x 14 templates of rate 1/7 and asks for at least 3 free exponent directions, and notes/972-166-34.md (jacksongquera) has the pairing square complex and its free directions. Ours: the 6 x 14 census at check weight 6, the template, pairing, cocycle class and lift of this code, and its exact distance.</p>
+<h4>What was searched</h4>
+<p>Template census (6,14,6): one side&#x27;s templates (6 rows of weight 6 on 14 block columns, every column of degree 2 or 3, the 6 degree-2 columns a connected unicyclic graph on the rows) up to permutations, 19756 classes; X/Z pairs with even overlaps admitting pairings under the girth rule, 4755087 labelled pairs; 12954 pair classes with a pairing of b_1 &gt;= 3, of which a seeded sample of 600 was processed (4056 pairing orbits). 3835 orbits were dropped because a cofactor word of weight below 16 is a logical in every lift whose P is prime to the torsion of H_1(X; Z) (3208 of them have torsion-free H_1; the other lifts of the remaining 627 were not examined); 221 were kept. Lifts of the kept orbits: for P = 5 to 71 (n = 14P &lt;= 994) the classes of H^1(X; Z_P) giving connected lifts, up to units (a seeded sample of 24 per P where there were more than 40): 356432 lifts, 18616 with structural upper bound &gt;= 16 (cofactor words and lifted cycles), 5665 of them screened by a Stern information-set search with 3000 iterations per side (at most 3 per pairing and P), and 83 again with 6e4 iterations per side. The 33167 control lifts of 56 orbits with b_1 = 1 and 2 never reached structural bound 16. About 60 CPU-hours with 32 workers on our compute server, 55 of them for the template census. This code has the smallest n among the 5665 screened lifts whose upper bound is 11.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: provenance.construction (template, P = 21, exponents); rank H_X = rank H_Z = 126, k = 42; every check of weight 6; qubit (X, Z)-degrees (2,2) on 42, (2,3) on 84, (3,2) on 84 and (3,3) on 84 qubits; no two checks of one type share two qubits. The pairing has b_1 = 3 with torsion-free H_1. Rebuilt from the definition by several independently written scripts, with identical results.</li>
+<li>Symmetry (computed with Magma): the words of weight 6 of rowsp H_X and of rowsp H_Z are exactly the checks, and the permutation automorphism group of the code is Z_21 (the translations), D_21 with the X/Z exchange.</li>
+<li>Upper bound: a Stern information-set search with 3000 iterations per side found words of weight 11 on both sides (3224 hits and 392 distinct words on side Z, 3146 and 396 on side X) and nothing lighter; the entry carries one witness per side.</li>
+<li>Lower bound: exactA (pattern classes of the 6 check orbits under Z_21, 186 jobs) and exactB (one anchor per qubit orbit, earlier orbits excluded, 14 runs) find no nontrivial logical of weight &lt;= 10 on either side (W = 10; the all-one vector lies in neither row space, so every weight &lt;= 10 was searched): exactA 4069 / 4284 nodes, exactB 4873 / 4721 nodes (sides Z / X), 0.03 CPU-s in all, single-threaded on a laptop; a rerun on byte-identical copies reproduced every node count.</li>
+<li>Third-party exact tools, single-threaded and without symmetry: dist-m4ri 0.16.1 at commit 4cc9c126e314 (connected clusters; Dumer, Kovalev, Pryadko, arXiv:1611.07164) finds no logical below 11 and enumerates 399 logicals of weight 11 per side (0.16 s and 0.14 s for sides Z and X); tropidist b03ec2d4077f (Cheng, Guo, Pan, arXiv:2611.08247) returns exact 11 on both sides (1.5 s and 0.2 s).</li>
+<li>Final claim: d_X = d_Z = 11 exactly (computed; Theorem 5 of the package README, with the completeness proofs of both programs), kd^2/n = 17.29; certs/294-42-11.json records exactA and exactB at level solver.</li>
+<li>Board placement (the cell and Pareto rules of the board&#x27;s site/build.py, re-implemented, at 82a52ee51): on the frontier of the unrestricted cells weight-6 (1085 members), weight-8 and any, with no dominator and no tie; the largest d of a CSS entry with n &lt;= 294, k &gt;= 42 and check weight &lt;= 6 is 6. It dominates 30 entries, 26 of them in the weight-6 cell and the others in the weight-8 and any cells. Among them are 382-36-10, 384-36-10, 378-26-10 and 330-22-9 (exact, check weight 6; better on n, k and d); 300-28-8 and 400-35-8 (exact, check weight 7; better on n, k, d and w).</li>
+<li>Novelty claim, new parameters only: no published code and no board entry has these parameters, and the code dominates the entries stated above. Literature search of 2026-11-11: arXiv with the papers above and their follow-ups, Kasai&#x27;s catalogue, our catalogue of the code tables of 76 papers, the board at 82a52ee51 with notes and open pull requests, web searches for the parameters; not checked: QECdb, Google Scholar full text, journal-only papers.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Smaller weight-6 shapes: 4 x 9 and 5 x 11 templates (degree-2 columns forming a forest) admit no girth-rule pairing with b_1 &gt;= 3 (computed, exhaustive). On 4 x 9 every lift of prime order 11 &lt;= P &lt;= 113 that we checked has a cofactor logical of weight &lt;= 15; the best 5 x 11 lift with b_1 = 2 screened at n = 660, k = 64, d &lt;= 13.</li>
+<li>No screened lift has an upper bound above 15, so our target d &gt;= 16 at n &lt;= 1000 was not met; the 12951 structural survivors that were not screened belong to pairings whose screened lifts all have upper bounds &lt;= 15.</li>
+<li>More free directions did not help beyond 4: the 6 kept pairings with b_1 = 5 have structural bounds &lt;= 14 at every P; of the pairings with a screened lift, 5 of 9 with b_1 = 4 reached 15, and 1 of 29 with b_1 = 3.</li>
+<li>A cycle of length l of degree-2 X-columns with holonomy h lifts to a word of weight l ord(h) in ker H_X (likewise for Z); unless it is a stabilizer it is a logical, so d &lt;= l ord(h). In the best template (742-106-15) both cycles have zero holonomy and lift to checks of the other type, so large holonomy is not necessary.</li>
+</ul>
+<h4>Tools</h4>
+<p>Claude Opus 5.5 (Claude Code); Python (standard library) for the template census, the pairings, Smith forms and cocycle classes; a C program for the lifts, ranks, structural bounds and the Stern search; exactA and exactB, our two independently written exhaustive programs with completeness proofs (sources and notes at github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src/; they refine the complete searches of Dumer, Kovalev and Pryadko and of Okada and Kasai); Magma for the automorphism groups; dist-m4ri and tropidist as third-party checks.</p>
+<h4>Reproduction</h4>
+<p>In <code>pair-partition-and-two-block-codes/</code> of github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4: <code>python3 src/rebuild.py</code> rebuilds H_X and H_Z of this code from <code>294-42-11/definition.json</code> (template rows, P, exponents, pairing) and checks the matrices, k, the witnesses and the records of both exact searches in <code>294-42-11/records/</code> (<code>make rerun</code> reruns the searches); the third-party runs are in <code>294-42-11/third_tools/</code>; <code>python3 src/rebuild.py --entry FILE</code>, with FILE this entry, checks it against the package. By hand: the lift rule, template and exponents of provenance.construction.</p></div></section>
+<section class=blk><h3>Parity checks</h3>
+<div class=kv><b>X-checks</b> 126 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 126 (max weight 6)</div>
+<details><summary>H_X (126 checks, sparse supports)</summary><div class=wit>[0, 21, 42, 84, 105, 252]
+[1, 22, 43, 85, 106, 253]
+[2, 23, 44, 86, 107, 254]
+[3, 24, 45, 87, 108, 255]
+[4, 25, 46, 88, 109, 256]
+[5, 26, 47, 89, 110, 257]
+[6, 27, 48, 90, 111, 258]
+[7, 28, 49, 91, 112, 259]
+[8, 29, 50, 92, 113, 260]
+[9, 30, 51, 93, 114, 261]
+[10, 31, 52, 94, 115, 262]
+[11, 32, 53, 95, 116, 263]
+[12, 33, 54, 96, 117, 264]
+[13, 34, 55, 97, 118, 265]
+[14, 35, 56, 98, 119, 266]
+[15, 36, 57, 99, 120, 267]
+[16, 37, 58, 100, 121, 268]
+[17, 38, 59, 101, 122, 269]
+[18, 39, 60, 102, 123, 270]
+[19, 40, 61, 103, 124, 271]
+[20, 41, 62, 104, 125, 272]
+[0, 62, 63, 119, 147, 273]
+[1, 42, 64, 120, 148, 274]
+[2, 43, 65, 121, 149, 275]
+[3, 44, 66, 122, 150, 276]
+[4, 45, 67, 123, 151, 277]
+[5, 46, 68, 124, 152, 278]
+[6, 47, 69, 125, 153, 279]
+[7, 48, 70, 105, 154, 280]
+[8, 49, 71, 106, 155, 281]
+[9, 50, 72, 107, 156, 282]
+[10, 51, 73, 108, 157, 283]
+[11, 52, 74, 109, 158, 284]
+[12, 53, 75, 110, 159, 285]
+[13, 54, 76, 111, 160, 286]
+[14, 55, 77, 112, 161, 287]
+[15, 56, 78, 113, 162, 288]
+[16, 57, 79, 114, 163, 289]
+[17, 58, 80, 115, 164, 290]
+[18, 59, 81, 116, 165, 291]
+[19, 60, 82, 117, 166, 292]
+[20, 61, 83, 118, 167, 293]
+[21, 56, 103, 182, 208, 210]
+[22, 57, 104, 183, 209, 211]
+[23, 58, 84, 184, 189, 212]
+[24, 59, 85, 185, 190, 213]
+[25, 60, 86, 186, 191, 214]
+[26, 61, 87, 187, 192, 215]
+[27, 62, 88, 188, 193, 216]
+[28, 42, 89, 168, 194, 217]
+[29, 43, 90, 169, 195, 218]
+[30, 44, 91, 170, 196, 219]
+[31, 45, 92, 171, 197, 220]
+[32, 46, 93, 172, 198, 221]
+[33, 47, 94, 173, 199, 222]
+[34, 48, 95, 174, 200, 223]
+[35, 49, 96, 175, 201, 224]
+[36, 50, 97, 176, 202, 225]
+[37, 51, 98, 177, 203, 226]
+[38, 52, 99, 178, 204, 227]
+[39, 53, 100, 179, 205, 228]
+[40, 54, 101, 180, 206, 229]
+[41, 55, 102, 181, 207, 230]
+[73, 84, 142, 158, 209, 222]
+[74, 85, 143, 159, 189, 223]
+[75, 86, 144, 160, 190, 224]
+[76, 87, 145, 161, 191, 225]
+[77, 88, 146, 162, 192, 226]
+[78, 89, 126, 163, 193, 227]
+[79, 90, 127, 164, 194, 228]
+[80, 91, 128, 165, 195, 229]
+[81, 92, 129, 166, 196, 230]
+[82, 93, 130, 167, 197, 210]
+[83, 94, 131, 147, 198, 211]
+[63, 95, 132, 148, 199, 212]
+[64, 96, 133, 149, 200, 213]
+[65, 97, 134, 150, 201, 214]
+[66, 98, 135, 151, 202, 215]
+[67, 99, 136, 152, 203, 216]
+[68, 100, 137, 153, 204, 217]
+[69, 101, 138, 154, 205, 218]
+[70, 102, 139, 155, 206, 219]
+[71, 103, 140, 156, 207, 220]
+[72, 104, 141, 157, 208, 221]
+[105, 133, 156, 239, 254, 292]
+[106, 134, 157, 240, 255, 293]
+[107, 135, 158, 241, 256, 273]
+[108, 136, 159, 242, 257, 274]
+[109, 137, 160, 243, 258, 275]
+[110, 138, 161, 244, 259, 276]
+[111, 139, 162, 245, 260, 277]
+[112, 140, 163, 246, 261, 278]
+[113, 141, 164, 247, 262, 279]
+[114, 142, 165, 248, 263, 280]
+[115, 143, 166, 249, 264, 281]
+[116, 144, 167, 250, 265, 282]
+[117, 145, 147, 251, 266, 283]
+[118, 146, 148, 231, 267, 284]
+[119, 126, 149, 232, 268, 285]
+[120, 127, 150, 233, 269, 286]
+[121, 128, 151, 234, 270, 287]
+[122, 129, 152, 235, 271, 288]
+[123, 130, 153, 236, 272, 289]
+[124, 131, 154, 237, 252, 290]
+[125, 132, 155, 238, 253, 291]
+[169, 194, 211, 232, 252, 278]
+[170, 195, 212, 233, 253, 279]
+[171, 196, 213, 234, 254, 280]
+[172, 197, 214, 235, 255, 281]
+[173, 198, 215, 236, 256, 282]
+[174, 199, 216, 237, 257, 283]
+[175, 200, 217, 238, 258, 284]
+[176, 201, 218, 239, 259, 285]
+[177, 202, 219, 240, 260, 286]
+[178, 203, 220, 241, 261, 287]
+[179, 204, 221, 242, 262, 288]
+[180, 205, 222, 243, 263, 289]
+[181, 206, 223, 244, 264, 290]
+[182, 207, 224, 245, 265, 291]
+[183, 208, 225, 246, 266, 292]
+[184, 209, 226, 247, 267, 293]
+[185, 189, 227, 248, 268, 273]
+[186, 190, 228, 249, 269, 274]
+[187, 191, 229, 250, 270, 275]
+[188, 192, 230, 251, 271, 276]
+[168, 193, 210, 231, 272, 277]</div></details>
+<details><summary>H_Z (126 checks, sparse supports)</summary><div class=wit>[0, 21, 56, 78, 119, 126]
+[1, 22, 57, 79, 120, 127]
+[2, 23, 58, 80, 121, 128]
+[3, 24, 59, 81, 122, 129]
+[4, 25, 60, 82, 123, 130]
+[5, 26, 61, 83, 124, 131]
+[6, 27, 62, 63, 125, 132]
+[7, 28, 42, 64, 105, 133]
+[8, 29, 43, 65, 106, 134]
+[9, 30, 44, 66, 107, 135]
+[10, 31, 45, 67, 108, 136]
+[11, 32, 46, 68, 109, 137]
+[12, 33, 47, 69, 110, 138]
+[13, 34, 48, 70, 111, 139]
+[14, 35, 49, 71, 112, 140]
+[15, 36, 50, 72, 113, 141]
+[16, 37, 51, 73, 114, 142]
+[17, 38, 52, 74, 115, 143]
+[18, 39, 53, 75, 116, 144]
+[19, 40, 54, 76, 117, 145]
+[20, 41, 55, 77, 118, 146]
+[0, 42, 63, 148, 168, 231]
+[1, 43, 64, 149, 169, 232]
+[2, 44, 65, 150, 170, 233]
+[3, 45, 66, 151, 171, 234]
+[4, 46, 67, 152, 172, 235]
+[5, 47, 68, 153, 173, 236]
+[6, 48, 69, 154, 174, 237]
+[7, 49, 70, 155, 175, 238]
+[8, 50, 71, 156, 176, 239]
+[9, 51, 72, 157, 177, 240]
+[10, 52, 73, 158, 178, 241]
+[11, 53, 74, 159, 179, 242]
+[12, 54, 75, 160, 180, 243]
+[13, 55, 76, 161, 181, 244]
+[14, 56, 77, 162, 182, 245]
+[15, 57, 78, 163, 183, 246]
+[16, 58, 79, 164, 184, 247]
+[17, 59, 80, 165, 185, 248]
+[18, 60, 81, 166, 186, 249]
+[19, 61, 82, 167, 187, 250]
+[20, 62, 83, 147, 188, 251]
+[0, 74, 84, 158, 189, 273]
+[1, 75, 85, 159, 190, 274]
+[2, 76, 86, 160, 191, 275]
+[3, 77, 87, 161, 192, 276]
+[4, 78, 88, 162, 193, 277]
+[5, 79, 89, 163, 194, 278]
+[6, 80, 90, 164, 195, 279]
+[7, 81, 91, 165, 196, 280]
+[8, 82, 92, 166, 197, 281]
+[9, 83, 93, 167, 198, 282]
+[10, 63, 94, 147, 199, 283]
+[11, 64, 95, 148, 200, 284]
+[12, 65, 96, 149, 201, 285]
+[13, 66, 97, 150, 202, 286]
+[14, 67, 98, 151, 203, 287]
+[15, 68, 99, 152, 204, 288]
+[16, 69, 100, 153, 205, 289]
+[17, 70, 101, 154, 206, 290]
+[18, 71, 102, 155, 207, 291]
+[19, 72, 103, 156, 208, 292]
+[20, 73, 104, 157, 209, 293]
+[21, 103, 124, 140, 252, 278]
+[22, 104, 125, 141, 253, 279]
+[23, 84, 105, 142, 254, 280]
+[24, 85, 106, 143, 255, 281]
+[25, 86, 107, 144, 256, 282]
+[26, 87, 108, 145, 257, 283]
+[27, 88, 109, 146, 258, 284]
+[28, 89, 110, 126, 259, 285]
+[29, 90, 111, 127, 260, 286]
+[30, 91, 112, 128, 261, 287]
+[31, 92, 113, 129, 262, 288]
+[32, 93, 114, 130, 263, 289]
+[33, 94, 115, 131, 264, 290]
+[34, 95, 116, 132, 265, 291]
+[35, 96, 117, 133, 266, 292]
+[36, 97, 118, 134, 267, 293]
+[37, 98, 119, 135, 268, 273]
+[38, 99, 120, 136, 269, 274]
+[39, 100, 121, 137, 270, 275]
+[40, 101, 122, 138, 271, 276]
+[41, 102, 123, 139, 272, 277]
+[84, 131, 184, 209, 211, 252]
+[85, 132, 185, 189, 212, 253]
+[86, 133, 186, 190, 213, 254]
+[87, 134, 187, 191, 214, 255]
+[88, 135, 188, 192, 215, 256]
+[89, 136, 168, 193, 216, 257]
+[90, 137, 169, 194, 217, 258]
+[91, 138, 170, 195, 218, 259]
+[92, 139, 171, 196, 219, 260]
+[93, 140, 172, 197, 220, 261]
+[94, 141, 173, 198, 221, 262]
+[95, 142, 174, 199, 222, 263]
+[96, 143, 175, 200, 223, 264]
+[97, 144, 176, 201, 224, 265]
+[98, 145, 177, 202, 225, 266]
+[99, 146, 178, 203, 226, 267]
+[100, 126, 179, 204, 227, 268]
+[101, 127, 180, 205, 228, 269]
+[102, 128, 181, 206, 229, 270]
+[103, 129, 182, 207, 230, 271]
+[104, 130, 183, 208, 210, 272]
+[105, 154, 169, 218, 239, 252]
+[106, 155, 170, 219, 240, 253]
+[107, 156, 171, 220, 241, 254]
+[108, 157, 172, 221, 242, 255]
+[109, 158, 173, 222, 243, 256]
+[110, 159, 174, 223, 244, 257]
+[111, 160, 175, 224, 245, 258]
+[112, 161, 176, 225, 246, 259]
+[113, 162, 177, 226, 247, 260]
+[114, 163, 178, 227, 248, 261]
+[115, 164, 179, 228, 249, 262]
+[116, 165, 180, 229, 250, 263]
+[117, 166, 181, 230, 251, 264]
+[118, 167, 182, 210, 231, 265]
+[119, 147, 183, 211, 232, 266]
+[120, 148, 184, 212, 233, 267]
+[121, 149, 185, 213, 234, 268]
+[122, 150, 186, 214, 235, 269]
+[123, 151, 187, 215, 236, 270]
+[124, 152, 188, 216, 237, 271]
+[125, 153, 168, 217, 238, 272]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>294-42-11</code> &middot; <a href="294-42-11.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/294-42-11.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>
