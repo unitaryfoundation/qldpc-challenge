@@ -1,0 +1,448 @@
+{
+ "schema_version": "0.4",
+ "name": "[[33,2,7]] fold of 66-4-10 (stabilizer, mirror code)",
+ "code_type": "stabilizer",
+ "n": 33,
+ "k": 2,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     0,
+     18,
+     22
+    ],
+    "Z": [
+     0,
+     15,
+     27
+    ]
+   },
+   {
+    "X": [
+     1,
+     19,
+     23
+    ],
+    "Z": [
+     10,
+     14,
+     26
+    ]
+   },
+   {
+    "X": [
+     2,
+     20,
+     24
+    ],
+    "Z": [
+     9,
+     13,
+     25
+    ]
+   },
+   {
+    "X": [
+     3,
+     21,
+     25
+    ],
+    "Z": [
+     8,
+     12,
+     24
+    ]
+   },
+   {
+    "X": [
+     4,
+     11,
+     26
+    ],
+    "Z": [
+     7,
+     11,
+     23
+    ]
+   },
+   {
+    "X": [
+     5,
+     12,
+     27
+    ],
+    "Z": [
+     6,
+     21,
+     22
+    ]
+   },
+   {
+    "X": [
+     6,
+     13,
+     28
+    ],
+    "Z": [
+     5,
+     20,
+     32
+    ]
+   },
+   {
+    "X": [
+     7,
+     14,
+     29
+    ],
+    "Z": [
+     4,
+     19,
+     31
+    ]
+   },
+   {
+    "X": [
+     8,
+     15,
+     30
+    ],
+    "Z": [
+     3,
+     18,
+     30
+    ]
+   },
+   {
+    "X": [
+     9,
+     16,
+     31
+    ],
+    "Z": [
+     2,
+     17,
+     29
+    ]
+   },
+   {
+    "X": [
+     10,
+     17,
+     32
+    ],
+    "Z": [
+     1,
+     16,
+     28
+    ]
+   },
+   {
+    "X": [
+     0,
+     11,
+     29
+    ],
+    "Z": [
+     4,
+     16,
+     22
+    ]
+   },
+   {
+    "X": [
+     1,
+     12,
+     30
+    ],
+    "Z": [
+     3,
+     15,
+     32
+    ]
+   },
+   {
+    "X": [
+     2,
+     13,
+     31
+    ],
+    "Z": [
+     2,
+     14,
+     31
+    ]
+   },
+   {
+    "X": [
+     3,
+     14,
+     32
+    ],
+    "Z": [
+     1,
+     13,
+     30
+    ]
+   },
+   {
+    "X": [
+     4,
+     15,
+     22
+    ],
+    "Z": [
+     0,
+     12,
+     29
+    ]
+   },
+   {
+    "X": [
+     5,
+     16,
+     23
+    ],
+    "Z": [
+     10,
+     11,
+     28
+    ]
+   },
+   {
+    "X": [
+     6,
+     17,
+     24
+    ],
+    "Z": [
+     9,
+     21,
+     27
+    ]
+   },
+   {
+    "X": [
+     7,
+     18,
+     25
+    ],
+    "Z": [
+     8,
+     20,
+     26
+    ]
+   },
+   {
+    "X": [
+     8,
+     19,
+     26
+    ],
+    "Z": [
+     7,
+     19,
+     25
+    ]
+   },
+   {
+    "X": [
+     9,
+     20,
+     27
+    ],
+    "Z": [
+     6,
+     18,
+     24
+    ]
+   },
+   {
+    "X": [
+     10,
+     21,
+     28
+    ],
+    "Z": [
+     5,
+     17,
+     23
+    ]
+   },
+   {
+    "X": [
+     7,
+     11,
+     22
+    ],
+    "Z": [
+     5,
+     11,
+     26
+    ]
+   },
+   {
+    "X": [
+     8,
+     12,
+     23
+    ],
+    "Z": [
+     4,
+     21,
+     25
+    ]
+   },
+   {
+    "X": [
+     9,
+     13,
+     24
+    ],
+    "Z": [
+     3,
+     20,
+     24
+    ]
+   },
+   {
+    "X": [
+     10,
+     14,
+     25
+    ],
+    "Z": [
+     2,
+     19,
+     23
+    ]
+   },
+   {
+    "X": [
+     0,
+     15,
+     26
+    ],
+    "Z": [
+     1,
+     18,
+     22
+    ]
+   },
+   {
+    "X": [
+     1,
+     16,
+     27
+    ],
+    "Z": [
+     0,
+     17,
+     32
+    ]
+   },
+   {
+    "X": [
+     2,
+     17,
+     28
+    ],
+    "Z": [
+     10,
+     16,
+     31
+    ]
+   },
+   {
+    "X": [
+     3,
+     18,
+     29
+    ],
+    "Z": [
+     9,
+     15,
+     30
+    ]
+   },
+   {
+    "X": [
+     4,
+     19,
+     30
+    ],
+    "Z": [
+     8,
+     14,
+     29
+    ]
+   },
+   {
+    "X": [
+     5,
+     20,
+     31
+    ],
+    "Z": [
+     7,
+     13,
+     28
+    ]
+   },
+   {
+    "X": [
+     6,
+     21,
+     32
+    ],
+    "Z": [
+     6,
+     12,
+     27
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 7,
+  "P": {
+   "value": 7,
+   "confidence": "exact",
+   "witness": {
+    "X": [
+     0,
+     1,
+     10,
+     11,
+     15,
+     16,
+     30
+    ],
+    "Z": [
+     1,
+     11,
+     15
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@TimoKellerMath"
+  ],
+  "origin": "submission",
+  "novelty": "unknown",
+  "construction": "Halving of the two-block code [[66,4,10]] (codes/66-4-10.json) along the fixed-point-free ZX-duality that exchanges (1,h) and (2,c-h) (symplectic halving: Lee, Okada, Maskara, Kasai, Zhou, arXiv:2609.30069, Def. 3; Burton, Durso-Sabina, Brown, arXiv:2406.09951); equivalently the mirror code of Khesin and Lu (arXiv:2603.05496) with A = c - F_B, B = F_A. Parent: G = Z/3 x Z/11, element (a,b) with index 11a+b; qubit (1,h) -> index of h, (2,h) -> 33 + index of h; X-check g on (1, g+F_A) and (2, g+F_B), Z-check g on (1, g-F_B) and (2, g-F_A), F_A = {(0,0),(1,7),(2,0)}, F_B = {(0,0),(1,6),(2,7)}; this is codes/66-4-10.json after renumbering G (the board file numbers G by GAP's Elements(SmallGroup(33,1))). Involution: Psi(1,h) = (2, c-h), Psi(2,h) = (1, c-h) with c = (0,0). Fold: fold qubit i is (1,h) with h of index i; the X-check g gives the generator with X on g+F_A and Z on c-g-F_B (Y where they meet), in the order of the X-checks. n = 33, rank 31, k = 2; 25 generators of weight 6, 7 of weight 5 and 1 of weight 4; 9 Y factors in 8 generators; not locally Clifford equivalent to a CSS code.",
+  "references": [
+   "arXiv:2609.30069",
+   "arXiv:2406.09951",
+   "arXiv:2603.05496",
+   "arXiv:2611.08247"
+  ],
+  "date": "2026-11-10",
+  "model": "Claude Opus 5.5",
+  "notes": "Distance 7 is exact: no nontrivial logical of Pauli weight <= 6 by three independent exhaustive computations (tropidist b03ec2d4077f in the board's Pauli encoding, certs/33-2-7.json in the same pull request; a meet-in-the-middle search of ours; Magma V2.30-1 MinimumDistance), and the witness has weight 7. Programs, data and logs: github.com/TimoKellerMath/quantum-error-correction @ 207d1130035a, folded-stabilizer-codes/. Not locally Clifford equivalent to a CSS code: the generator-level parity system for single-qubit Cliffords has no solution (qubit 0 carries X, Y and Z), and every generator is the only nontrivial stabilizer supported in its support, so no single-qubit Clifford makes the group CSS. At board commit 8042f9da no stabilizer entry dominates or equals it; it dominates the stabilizer entries 34-2-7-s (on n). It is a mirror code of Khesin and Lu (arXiv:2603.05496) with G = Z/3 x Z/11, A = {(0,0),(1,4),(2,5)}, B = {(0,0),(1,7),(2,0)}, not in their code table (they describe their search over abelian |A| = |B| = 3 as almost exhaustive up to n = 300); in the sources of our literature check (summarized in the README of folded-stabilizer-codes/) we found no published code with the parameters [[33,2,7]]. The tables of codetables.de list a [[33,2,10]] code, a dense code without weight restriction. No CSS entry dominates or equals it either. Checked, not equivalent to an existing entry."
+ },
+ "family": "other"
+}
