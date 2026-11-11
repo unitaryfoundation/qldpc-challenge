@@ -1,0 +1,32 @@
+{
+ "name": "[[322,46,12]] weight-6 pair-partition CPM code on a sparse 6x14 template, P = 23",
+ "d": 12,
+ "d_exact": true,
+ "d_lower": 12,
+ "solver": "exhaustive search, two independent implementations (exactA, exactB; sources github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src, sha256 2d1f0d1a55d9..., e793e5b34eb6...; records github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4, pair-partition-and-two-block-codes/322-46-12/records)",
+ "encoding": "cluster growth through unsatisfied checks of the constraining matrix (H_X for Z-logicals, H_Z for X-logicals), with exclusions and unit propagation, and a majority rule over the rows of the other matrix and the sums of two of them that share a qubit; anchors: pattern classes of the 6 check orbits under the translations of Z_23 (exactA, 186 jobs), one anchor per qubit orbit with the earlier orbits excluded (exactB, 14 runs); search through W = d - 1 = 11, no parity reduction",
+ "symmetry": true,
+ "logical_classes": 46,
+ "sides": {
+  "X": {
+   "value": 12,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.02,
+   "note": "no nontrivial X-logical of weight <= 11 (W = 11): exactA 10045 nodes, 0.01 s; exactB 11722 nodes, 0.01 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_X = 12",
+   "proved_min": 12
+  },
+  "Z": {
+   "value": 12,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.03,
+   "note": "no nontrivial Z-logical of weight <= 11 (W = 11): exactA 13305 nodes, 0.01 s; exactB 15797 nodes, 0.02 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_Z = 12",
+   "proved_min": 12
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "exactA and exactB (independently written exhaustive searches) find no nontrivial logical of weight <= 11 on either side, so d = 12 with the witnesses of the entry (Theorem 5 of pair-partition-and-two-block-codes/README.md). Programs, completeness proofs: github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src; records: same repository @ 2a15e549f6f4, pair-partition-and-two-block-codes/322-46-12. No replayable proof object"
+ }
+}
