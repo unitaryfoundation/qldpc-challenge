@@ -1,0 +1,32 @@
+{
+ "name": "[[672,28,24]] weight-6 two-block group algebra code over C28 x Dic3",
+ "d": 24,
+ "d_exact": true,
+ "d_lower": 24,
+ "solver": "anchored exhaustive search with exclusions, two independent implementations (exactA.c, exactB.c; github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src)",
+ "encoding": "cluster growth through unsatisfied X-checks with exclusions, unit propagation, majority rule over the Z-checks and sums of two overlapping Z-checks (Z side; the X side with X and Z exchanged); anchors: one per orbit of a Tanner-graph automorphism group of order 168 (four qubit orbits of size 168, two per block), earlier orbits excluded; search through weight d - 2 = 22 (program parameter W = d - 1 = 23), parity of ker H_X and of ker H_Z",
+ "symmetry": true,
+ "logical_classes": 28,
+ "sides": {
+  "X": {
+   "value": 24,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 31.96,
+   "note": "no nontrivial X-logical operator of weight <= 22 (W = 23, weights <= 22 searched); every element of ker H_Z has even weight (all column weights 3), so d_X >= 24. exactA 7199307 nodes, 14.9 s; exactB 7370526 nodes, 17.0 s; anchors 0, 168, 336, 504, one per orbit, earlier orbits excluded. dist-m4ri 0.16.1 without symmetry: no X-logical of weight <= 22",
+   "proved_min": 24
+  },
+  "Z": {
+   "value": 24,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 32.65,
+   "note": "no nontrivial Z-logical operator of weight <= 22 (W = 23, weights <= 22 searched); every element of ker H_X has even weight (all column weights 3), so d_Z >= 24. exactA 7345978 nodes, 15.3 s; exactB 7507311 nodes, 17.4 s; anchors 0, 168, 336, 504, one per orbit, earlier orbits excluded. dist-m4ri 0.16.1 without symmetry: no Z-logical of weight <= 22",
+   "proved_min": 24
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exhaustive searches find no nontrivial X- or Z-logical operator of weight <= 22, and every logical has even weight, so d = 24 with the witnesses; completeness: exactA_NOTES.md, exactB_NOTES.md in two-block-and-amplified-codes/src at github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1; records: same repository @ 2a15e549f6f4, pair-partition-and-two-block-codes/672-28-24/records; no replayable proof object"
+ }
+}
