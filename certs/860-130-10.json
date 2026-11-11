@@ -1,0 +1,29 @@
+{
+  "d": 10,
+  "d_exact": true,
+  "encoding": "css-sides",
+  "logical_classes": 130,
+  "name": "[[860,130,10]] [[4,2,2]] amplification of 185-65-5",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 10 exists",
+      "secs": 2.9,
+      "status": "UNSAT",
+      "value": 10
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 10 exists",
+      "secs": 1.3,
+      "status": "UNSAT",
+      "value": 10
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 600.0,
+  "verification": {
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; css-sides problems, one thread, run by the submitter at the board's pinned commit; the vectors it returned were rechecked independently of the tool. Records: github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/logs/tropidist"
+  }
+}

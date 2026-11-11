@@ -57,8 +57,13 @@ concurrency:
 
 jobs:
   # Compile-only coverage for the optional CUDA accelerator.  This deliberately
-  # does not require a GPU and is advisory until the hosted toolkit install is
-  # proven stable.
+  # does not require a GPU.  On pull requests, skip installing CUDA when neither
+  # verify/ris_gpu.cu nor this workflow changed (fail closed when the diff
+  # cannot be computed); push, schedule, and workflow_dispatch always compile.
+  # Step-level continue-on-error on the hosted toolkit install keeps transient
+  # runner apt mirror outages advisory without marking the check run FAILURE
+  # (job-level continue-on-error still turns the PR check rollup red), while a
+  # real nvcc compile failure after a clean toolkit install still fails the job.
   # Pinned to ubuntu-24.04 in every workflow (not ubuntu-latest): the label moved
   # to ubuntu-26.04 on 2026-10-31, whose NVIDIA apt repo has no cuda-nvcc-12-6
   # and whose default Python 3.14 has no pycryptosat wheel, so every run on
@@ -66,14 +71,35 @@ jobs:
   ris-compile:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - uses: Jimver/cuda-toolkit@v0.2.19
+        with:
+          fetch-depth: 0
+      - name: detect CUDA RIS changes
+        if: github.event_name == 'pull_request'
+        id: ris
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+        run: |
+          if git diff --quiet "$BASE_REF"...HEAD -- verify/ris_gpu.cu .github/workflows/verify.yml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: install CUDA toolkit
+        if: github.event_name != 'pull_request' || steps.ris.outputs.changed == 'true'
+        id: cuda
+        continue-on-error: true
+        uses: Jimver/cuda-toolkit@v0.2.19
         with:
           method: network
           sub-packages: '["nvcc"]'
+      - name: note skipped CUDA compile on toolkit install flake
+        if: (github.event_name != 'pull_request' || steps.ris.outputs.changed == 'true') && steps.cuda.outcome != 'success'
+        run: |
+          echo "::warning title=CUDA toolkit install failed (advisory)::Hosted apt mirror failed while installing cuda-nvcc; skipping nvcc check."
       - name: compile CUDA RIS accelerator
+        if: (github.event_name != 'pull_request' || steps.ris.outputs.changed == 'true') && steps.cuda.outcome == 'success'
         run: nvcc -O3 -arch=sm_75 -c verify/ris_gpu.cu -o /dev/null
 
   verify:

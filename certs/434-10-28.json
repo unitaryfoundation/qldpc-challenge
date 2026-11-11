@@ -1,0 +1,32 @@
+{
+ "name": "[[434,10,28]]",
+ "d": 28,
+ "d_exact": true,
+ "d_lower": 28,
+ "solver": "anchored exhaustive search with exclusions, two independent implementations (vsearch_orb.c, cluster2.c; github.com/TimoKellerMath/quantum-error-correction @ 2be467a7bd36, weight6-exact-distances)",
+ "encoding": "cluster growth through unsatisfied X-checks with exclusions, unit propagation, majority rule over the Z-checks and sums of two overlapping Z-checks; anchors: pattern anchoring under the cyclic translations (implementation A), one anchor per block (implementation B); search through W = d - 2, parity of ker H_X",
+ "symmetry": true,
+ "logical_classes": 10,
+ "sides": {
+  "X": {
+   "value": 28,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.0,
+   "note": "d_X = d_Z by the qubit permutation (block 1, i) -> (block 2, -i), (block 2, i) -> (block 1, -i), which maps the X-check i onto the Z-check -i and the Z-check i onto the X-check -i (Lemma 2.3 of weight6-exact-distances/exact_distances.pdf, checked by weight6-exact-distances/src/codes.py); no search was run on this side",
+   "proved_min": 28
+  },
+  "Z": {
+   "value": 28,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 6852.9,
+   "note": "no nontrivial Z-logical operator of weight <= 26 (W = 26); every element of ker H_X has even weight (all column weights 3), so d_Z >= 28. implementation A: 392845105 nodes, 1942 s; implementation B: 5211396272 generated states, 4911 s",
+   "proved_min": 28
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "two independently written exhaustive searches find no nontrivial Z-logical operator of weight <= 26 (X side by the X/Z exchange, Lemma 2.3); d = 28 is Theorem 4.1 of weight6-exact-distances/exact_distances.pdf (completeness: Lemmas 2.1 to 2.5, Proposition 3.1, Corollary 3.2) at github.com/TimoKellerMath/quantum-error-correction @ 2be467a7bd36, where weight6-exact-distances/src/codes.py rebuilds the instances and make search reruns the searches; no replayable proof object"
+ }
+}
