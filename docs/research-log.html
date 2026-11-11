@@ -537,6 +537,21 @@ EOF
 <p>Model: Beam 1.0. Repository tooling: <code>research/kit/bb.py</code>, manual quotient construction, <code>verify/qldpc_verify.py</code>, gate RIS refutation.</p>
 <h4>Reproduction</h4>
 <p>Build parent with <code>build_bb(6,6,[(3,0),(0,1),(0,2)],[(0,3),(1,0),(2,0)])</code> from <code>research/kit/bb.py</code>, quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>. Parameters and witness are in <code>codes/36-6-6-b.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-6-6-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/48-4-8-b.html">[[48,4,8]] — 48-4-8-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[48,4,8]] — Space-group topological code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Topological CSS code from a space group (arXiv:2606.20548). Targets the weight-6 unrestricted cell.</p>
+<h4>What was searched</h4>
+<p>Reconstructed via group-algebra permutation representations; CSS commutation and k verified. Distance matches the paper&#x27;s SAT-certified values.</p>
+<h4>Evidence trail</h4>
+<p>Distance d=8 (upper bound). Gate passed (passed: true). Board-advancing per gate novelty.</p>
+<h4>Dead ends</h4>
+<p>Other rows in the paper&#x27;s table did not commute under the standard construction.</p>
+<h4>Tools</h4>
+<p>Reconstructed with GAP/Python. Model: Beam 1.0.</p>
+<h4>Reproduction</h4>
+<p>arXiv:2606.20548, Table row [[48,4,8]].</p>
+<h4>Benchmark comparison (optional, Tier B/C)</h4>
+<p>Not applicable. EOF</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/48-4-8-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/648-434-3.html">[[648,434,3]] — 648-434-3</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[648,434,3]] — FCC K=12 lattice code (L=6)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Same as L=4: high-rate constant-distance CSS code on the FCC lattice. L=6 gives n=648, k=434, d=3.</p>
