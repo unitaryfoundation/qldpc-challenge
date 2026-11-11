@@ -1353,6 +1353,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "25-1-9",
+      "n": 25,
+      "k": 1,
+      "d": 9,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "25-5-3-cyclic",
       "n": 25,
       "k": 5,
@@ -1927,6 +1935,22 @@
       "d": 6,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "32-6-6-b",
+      "n": 32,
+      "k": 6,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "32-6-6-c",
+      "n": 32,
+      "k": 6,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "32-8-4",
@@ -2721,6 +2745,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "40-3-9",
+      "n": 40,
+      "k": 3,
+      "d": 9,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "40-4-8",
       "n": 40,
       "k": 4,
@@ -3327,6 +3359,22 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "44-10-6",
+      "n": 44,
+      "k": 10,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "44-10-6-b",
+      "n": 44,
+      "k": 10,
+      "d": 6,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "44-22-2",
@@ -4391,6 +4439,14 @@
       "d": 3,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "55-5-9",
+      "n": 55,
+      "k": 5,
+      "d": 9,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "55-12-6",
@@ -6409,6 +6465,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "75-3-15",
+      "n": 75,
+      "k": 3,
+      "d": 15,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "75-7-10",
       "n": 75,
       "k": 7,
@@ -7367,6 +7431,14 @@
       "d": 6,
       "tier": "exact",
       "code_type": "CSS"
+    },
+    {
+      "id": "88-15-9",
+      "n": 88,
+      "k": 15,
+      "d": 9,
+      "tier": "ub",
+      "code_type": "stabilizer"
     },
     {
       "id": "88-24-4",
