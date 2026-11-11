@@ -1,0 +1,32 @@
+{
+ "name": "[[518,74,14]] weight-6 pair-partition CPM code on a sparse 6x14 template, P = 37",
+ "d": 14,
+ "d_exact": true,
+ "d_lower": 14,
+ "solver": "exhaustive search, two independent implementations (exactA, exactB; sources github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src, sha256 2d1f0d1a55d9..., e793e5b34eb6...; records github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4, pair-partition-and-two-block-codes/518-74-14/records)",
+ "encoding": "cluster growth through unsatisfied checks of the constraining matrix (H_X for Z-logicals, H_Z for X-logicals), with exclusions and unit propagation, and a majority rule over the rows of the other matrix and the sums of two of them that share a qubit; anchors: pattern classes of the 6 check orbits under the translations of Z_37 (exactA, 186 jobs), one anchor per qubit orbit with the earlier orbits excluded (exactB, 14 runs); search through W = d - 1 = 13, parity: the all-one vector lies in both row spaces, so weights <= 12 were searched",
+ "symmetry": true,
+ "logical_classes": 74,
+ "sides": {
+  "X": {
+   "value": 14,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.07,
+   "note": "no nontrivial X-logical of weight <= 13 (W = 13, searched 12 by parity): exactA 30004 nodes, 0.03 s; exactB 34536 nodes, 0.04 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_X = 14",
+   "proved_min": 14
+  },
+  "Z": {
+   "value": 14,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.06,
+   "note": "no nontrivial Z-logical of weight <= 13 (W = 13, searched 12 by parity): exactA 25174 nodes, 0.03 s; exactB 31399 nodes, 0.03 s (on a laptop; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_Z = 14",
+   "proved_min": 14
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "exactA and exactB (independently written exhaustive searches) find no nontrivial logical of weight <= 13 on either side, so d = 14 with the witnesses of the entry (Theorem 5 of pair-partition-and-two-block-codes/README.md). Programs, completeness proofs: github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src; records: same repository @ 2a15e549f6f4, pair-partition-and-two-block-codes/518-74-14. No replayable proof object"
+ }
+}
