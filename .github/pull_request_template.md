@@ -15,3 +15,11 @@
 
 ### What frontier does this advance?
 (Which track, and which existing entry does it beat or extend, and on which axis.)
+
+## Challenge operation (fill this in only if this PR touches verify/, .github/, schema/, decode/, Makefile, pyproject.toml, uv.lock, run_tests.py, site/build.py, or verify/validator_manifest.json)
+
+- Behaviour change:
+- Invariant / threshold affected (old -> new):
+- Lighter alternative considered and why rejected:
+- Who must approve (named code owner):
+- What the agent did not do (if an agent assisted):

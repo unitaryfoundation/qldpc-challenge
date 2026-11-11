@@ -21,6 +21,68 @@ submitting it; `./qldpc submit --peer-audit <file>` and `research/kit/promote.py
 Dominated codes pass the gate but are not board-advancing. Record them as non-frontier
 results; do not submit them as frontier codes.
 
+## Two tiers of change — decide which one you are in before acting
+
+Every change to this repository is one of two tiers. The tiers are not a matter of
+degree; they are a difference in kind, and an agent must not apply the standards of
+one to the other.
+
+**Tier 0 — Code submission.** The diff touches only the submission surface:
+`codes/`, `circuits/`, `notes/`, `fieldnotes/`, `repro/`, `certs/`. It adds or
+edits data; the base branch's trusted verifier judges it. Agents may assist freely —
+run searches, stage candidates, prepare PRs. The cost of a mistake is one bad entry,
+caught by the gate and the board. Mechanical checks (verify passes, format ok) are
+the bar.
+
+**Tier 1 — Challenge operation.** The diff touches anything in the trusted closure
+(`.github/workflows/`, `verify/`, `decode/`, `schema/`, `site/build.py`, `Makefile`,
+`pyproject.toml`, `uv.lock`, `run_tests.py`, `verify/validator_manifest.json`) or any
+path outside the submission surface. It changes the rules that judge *every* entry,
+now and in the future. The cost of a mistake is the whole board. Mechanical checks
+are the *floor*, never the conclusion: they prove internal consistency, not that the
+change should ship.
+
+Run `uv run python verify/check_submission_scope.py --classify --base <base>` to
+classify a diff objectively rather than by inspection. If it prints tier 1, switch
+to the Tier 1 standard and do not proceed autonomously.
+
+### Agent review policy (Tier 1)
+
+- An agent must **not** post an "Approve" review on a Tier 1 PR, must **not**
+  rubber-stamp a re-pin of `validator_manifest.json`, and must **not** merge, push,
+  or commit a Tier 1 change without an explicit human maintainer instruction that
+  names that change.
+- When asked to review a Tier 1 PR, the agent's job is to produce an impact
+  analysis and request human review — not to approve.
+- An agent in unattended mode (`research/AUTORESEARCH.md`) must not touch Tier 1
+  files at all, not even to "fix" a failing test or "update" a workflow. A needed
+  Tier 1 change is reported as an item for a human, the same way staged candidates
+  are reported.
+- If an agent finds itself about to approve a Tier 1 PR, it stops and re-reads
+  this section.
+
+### Prohibited framing (Tier 1)
+
+An agent must not say or imply "X is fine because the hash matches / the tests pass /
+the pin is intact / the manifest only moves one line" for a Tier 1 change. Those
+are preconditions, not conclusions. A Tier 1 conclusion must address behaviour:
+what changes for future submissions, which threshold or invariant moves (old → new),
+what failure mode is weakened or strengthened, and why the change beats the lighter
+alternative. A review that only cites mechanical checks is not a review of a
+Tier 1 change.
+
+### Tier 1 impact-analysis template
+
+When an agent analyses a Tier 1 change it must produce, in this order, and must not
+omit any item:
+
+1. **Behaviour change** — one sentence.
+2. **Invariant / threshold affected** — named, with old → new value.
+3. **Lighter alternative considered and rejected** — named, with why.
+4. **Who must approve** — named human maintainer (code owner).
+5. **What the agent did not do** — e.g. "did not approve; did not push; did not
+   re-pin."
+
 ## Choose the workflow before acting
 
 There are two supported workflows. The user's publication authorization determines which one
@@ -158,6 +220,10 @@ Locally, reproduce it with
 someone else's existing note is exempt.
 
 ## Working on the repo itself
+
+This is a Tier 1 activity: see "Two tiers of change" above. An agent does not
+start it without an explicit human instruction naming the change, and never
+approves or re-pins autonomously.
 
 - `verify/` is the trust anchor and is hash-pinned in CI (`verify/check_validator_integrity.py`).
   Changing it is deliberate. The checklist, in order (issue #4030):

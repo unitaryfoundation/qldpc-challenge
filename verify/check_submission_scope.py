@@ -25,6 +25,7 @@ leave with its evidence.
 
 Usage:
   python verify/check_submission_scope.py [--root PATH] [--base origin/main]
+  python verify/check_submission_scope.py --classify [--root PATH] [--base origin/main]
 """
 
 import os
@@ -122,6 +123,29 @@ def is_critical(path):
     return path in CRITICAL_FILES or any(path.startswith(p) for p in CRITICAL_PREFIXES)
 
 
+def classify(files):
+    """Classify a changed-file set into a tier.
+
+    Returns (tier, reasons) where tier is 1 (challenge operation) when any
+    changed path is verifier-critical, and 0 (code submission / non-critical)
+    otherwise. `reasons` lists the critical paths that forced tier 1.
+    """
+    reasons = [f for f in files if is_critical(f)]
+    return (1 if reasons else 0), reasons
+
+
+TIER_STANDARDS = {
+    0: ("Tier 0 - code submission / non-critical change.",
+        "Mechanical checks (verify passes, format ok) are the bar. "
+        "Agents may assist freely."),
+    1: ("Tier 1 - challenge operation.",
+        "Mechanical checks are the floor, never the conclusion. Requires a "
+        "stated behaviour change, a rejected lighter alternative, a named "
+        "invariant/threshold, and a human maintainer's judgment. Agents must "
+        "not approve, push, or re-pin autonomously."),
+}
+
+
 def outside_surface(files):
     """Return the changed paths a submission PR may not carry."""
     return [f for f in files if not f.startswith(SUBMISSION_SURFACE)]
@@ -157,11 +181,34 @@ def main(argv):
     if "--base" in argv:
         i = argv.index("--base")
         base = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
+
+    classify_mode = "--classify" in argv
+    if classify_mode:
+        argv = [a for a in argv if a != "--classify"]
 
     files = changed_files(base, root)
+    if files is None:
+        print("could not diff vs %s; failing closed" % base)
+        return 1
+    if classify_mode:
+        tier, reasons = classify(files)
+        name, standard = TIER_STANDARDS[tier]
+        print("tier: %d" % tier)
+        print("classification: %s" % name)
+        if reasons:
+            print("reasons (verifier-critical paths):")
+            for f in reasons:
+                print("  %s" % f)
+        else:
+            print("reasons: none (no verifier-critical paths changed)")
+        print("required standard: %s" % standard)
+        # Informational only: never fail the classify mode itself.
+        return 0
+
     added = added_files(base, root)
     deleted = deleted_files(base, root)
-    if files is None or added is None or deleted is None:
+    if added is None or deleted is None:
         return 1
     codes = [f for f in files if is_code_submission(f)]
     new_codes = [f for f in added if is_code_submission(f)]
