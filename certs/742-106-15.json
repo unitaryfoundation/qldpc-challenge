@@ -1,0 +1,32 @@
+{
+ "name": "[[742,106,15]] weight-6 pair-partition CPM code on a sparse 6x14 template, P = 53",
+ "d": 15,
+ "d_exact": true,
+ "d_lower": 15,
+ "solver": "exhaustive search, two independent implementations (exactA, exactB; sources github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src, sha256 2d1f0d1a55d9..., e793e5b34eb6...; records github.com/TimoKellerMath/quantum-error-correction @ 2a15e549f6f4, pair-partition-and-two-block-codes/742-106-15/records)",
+ "encoding": "cluster growth through unsatisfied checks of the constraining matrix (H_X for Z-logicals, H_Z for X-logicals), with exclusions and unit propagation, and a majority rule over the rows of the other matrix and the sums of two of them that share a qubit; anchors: pattern classes of the 6 check orbits under the translations of Z_53 (exactA, 186 jobs), one anchor per qubit orbit with the earlier orbits excluded (exactB, 14 runs); search through W = d - 1 = 14, no parity reduction",
+ "symmetry": true,
+ "logical_classes": 106,
+ "sides": {
+  "X": {
+   "value": 15,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.46,
+   "note": "no nontrivial X-logical of weight <= 14 (W = 14): exactA 156789 nodes, 0.23 s; exactB 175740 nodes, 0.23 s (on our compute server; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_X = 15",
+   "proved_min": 15
+  },
+  "Z": {
+   "value": 15,
+   "exact": true,
+   "status": "UNSAT",
+   "secs": 0.49,
+   "note": "no nontrivial Z-logical of weight <= 14 (W = 14): exactA 140548 nodes, 0.21 s; exactB 185616 nodes, 0.28 s (on our compute server; a rerun on byte-identical copies reproduced the node counts); dist-m4ri 0.16.1 and tropidist b03ec2d4077f, run without symmetry, also give d_Z = 15",
+   "proved_min": 15
+  }
+ },
+ "verification": {
+  "level": "solver",
+  "note": "exactA and exactB (independently written exhaustive searches) find no nontrivial logical of weight <= 14 on either side, so d = 15 with the witnesses of the entry (Theorem 5 of pair-partition-and-two-block-codes/README.md). Programs, completeness proofs: github.com/TimoKellerMath/quantum-error-correction @ aaa18674c9a1, two-block-and-amplified-codes/src; records: same repository @ 2a15e549f6f4, pair-partition-and-two-block-codes/742-106-15. No replayable proof object"
+ }
+}
