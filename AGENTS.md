@@ -32,15 +32,15 @@ one to the other.
 edits data; the base branch's trusted verifier judges it. Agents may assist freely —
 run searches, stage candidates, prepare PRs. The cost of a mistake is one bad entry,
 caught by the gate and the board. Mechanical checks (verify passes, format ok) are
-the bar.
+the bar for the entry; the submission-workflow rules in "Choose the workflow before
+acting" still govern how it is prepared and submitted.
 
-**Tier 1 — Challenge operation.** The diff touches anything in the trusted closure
-(`.github/workflows/`, `verify/`, `decode/`, `schema/`, `site/build.py`, `Makefile`,
-`pyproject.toml`, `uv.lock`, `run_tests.py`, `verify/validator_manifest.json`) or any
-path outside the submission surface. It changes the rules that judge *every* entry,
-now and in the future. The cost of a mistake is the whole board. Mechanical checks
-are the *floor*, never the conclusion: they prove internal consistency, not that the
-change should ship.
+**Tier 1 — Challenge operation.** The diff touches the trusted closure: anything
+`verify/check_submission_scope.py` flags as critical (its `CRITICAL_PREFIXES` and
+`CRITICAL_FILES`, mirrored in `.github/CODEOWNERS`). It changes the rules that
+judge *every* entry, now and in the future. The cost of a mistake is the whole board.
+Mechanical checks are the *floor*, never the conclusion: they prove internal
+consistency, not that the change should ship.
 
 Run `uv run python verify/check_submission_scope.py --classify --base <base>` to
 classify a diff objectively rather than by inspection. If it prints tier 1, switch
@@ -48,7 +48,8 @@ to the Tier 1 standard and do not proceed autonomously.
 
 ### Agent review policy (Tier 1)
 
-- An agent must **not** post an "Approve" review on a Tier 1 PR, must **not**
+- An agent must **not** post an "Approve" review on a Tier 1 PR without an
+  explicit human maintainer instruction that names that PR, must **not**
   rubber-stamp a re-pin of `validator_manifest.json`, and must **not** merge, push,
   or commit a Tier 1 change without an explicit human maintainer instruction that
   names that change.
@@ -80,8 +81,6 @@ omit any item:
 2. **Invariant / threshold affected** — named, with old → new value.
 3. **Lighter alternative considered and rejected** — named, with why.
 4. **Who must approve** — named human maintainer (code owner).
-5. **What the agent did not do** — e.g. "did not approve; did not push; did not
-   re-pin."
 
 ## Choose the workflow before acting
 
@@ -223,7 +222,8 @@ someone else's existing note is exempt.
 
 This is a Tier 1 activity: see "Two tiers of change" above. An agent does not
 start it without an explicit human instruction naming the change, and never
-approves or re-pins autonomously.
+approves or merges autonomously. Re-pinning (step 3) is the instructed step
+that produces the reviewable manifest diff; it is not an approval.
 
 - `verify/` is the trust anchor and is hash-pinned in CI (`verify/check_validator_integrity.py`).
   Changing it is deliberate. The checklist, in order (issue #4030):

@@ -36,7 +36,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CRITICAL_PREFIXES = (
-    ".github/workflows/",
+    ".github/",
     "decode/",
     "schema/",
     "verify/",
@@ -134,18 +134,6 @@ def classify(files):
     return (1 if reasons else 0), reasons
 
 
-TIER_STANDARDS = {
-    0: ("Tier 0 - code submission / non-critical change.",
-        "Mechanical checks (verify passes, format ok) are the bar. "
-        "Agents may assist freely."),
-    1: ("Tier 1 - challenge operation.",
-        "Mechanical checks are the floor, never the conclusion. Requires a "
-        "stated behaviour change, a rejected lighter alternative, a named "
-        "invariant/threshold, and a human maintainer's judgment. Agents must "
-        "not approve, push, or re-pin autonomously."),
-}
-
-
 def outside_surface(files):
     """Return the changed paths a submission PR may not carry."""
     return [f for f in files if not f.startswith(SUBMISSION_SURFACE)]
@@ -189,20 +177,21 @@ def main(argv):
 
     files = changed_files(base, root)
     if files is None:
-        print("could not diff vs %s; failing closed" % base)
         return 1
     if classify_mode:
         tier, reasons = classify(files)
-        name, standard = TIER_STANDARDS[tier]
         print("tier: %d" % tier)
-        print("classification: %s" % name)
+        if tier == 0:
+            print("classification: Tier 0 - code submission / non-critical change.")
+        else:
+            print("classification: Tier 1 - challenge operation.")
         if reasons:
             print("reasons (verifier-critical paths):")
             for f in reasons:
                 print("  %s" % f)
         else:
             print("reasons: none (no verifier-critical paths changed)")
-        print("required standard: %s" % standard)
+        print("required standard: see AGENTS.md, \"Two tiers of change\".")
         # Informational only: never fail the classify mode itself.
         return 0
 
