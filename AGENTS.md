@@ -57,14 +57,14 @@ to the Tier 1 standard and do not proceed autonomously.
   rubber-stamp a re-pin of `validator_manifest.json`, and must **not** merge, push,
   or commit a Tier 1 change without an explicit human maintainer instruction that
   names that change.
-- When asked to review a Tier 1 PR, the agent's job is to produce an impact
-  analysis and request human review — not to approve.
+- When asked to review a Tier 1 PR without such an instruction, the agent's
+  job is to produce an impact analysis and request human review — not to approve.
 - An agent in unattended mode (`research/AUTORESEARCH.md`) must not touch Tier 1
   files at all, not even to "fix" a failing test or "update" a workflow. A needed
   Tier 1 change is reported as an item for a human, the same way staged candidates
   are reported.
-- If an agent finds itself about to approve a Tier 1 PR, it stops and re-reads
-  this section.
+- If an agent finds itself about to approve a Tier 1 PR without such an
+  instruction, it stops and re-reads this section.
 
 ### Prohibited framing (Tier 1)
 

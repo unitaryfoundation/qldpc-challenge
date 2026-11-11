@@ -15,15 +15,3 @@
 
 ### What frontier does this advance?
 (Which track, and which existing entry does it beat or extend, and on which axis.)
-
-<!-- Challenge operation: fill this in only if this PR is Tier 1 per `verify/check_submission_scope.py --classify`
-(see `.github/CODEOWNERS` and AGENTS.md "Two tiers of change"). Delete this comment and the block
-below if it does not apply, or uncomment and complete it if it does.
-
-## Challenge operation
-
-- Behaviour change:
-- Invariant / threshold affected (old -> new):
-- Lighter alternative considered and why rejected:
-- Who must approve (named code owner):
--->
