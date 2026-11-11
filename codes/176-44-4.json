@@ -2168,5 +2168,39 @@
    "date": "2026-10-03",
    "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
   }
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     1582,
+     1586,
+     16712,
+     16722
+    ]
+   },
+   "Z": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     6559,
+     6562,
+     16466,
+     16477
+    ]
+   }
+  },
+  "rounds": 4,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-11",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3)"
+  }
  }
 }
