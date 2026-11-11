@@ -27,13 +27,17 @@ Every change to this repository is one of two tiers. The tiers are not a matter 
 degree; they are a difference in kind, and an agent must not apply the standards of
 one to the other.
 
-**Tier 0 — Code submission.** The diff touches only the submission surface:
-`codes/`, `circuits/`, `notes/`, `fieldnotes/`, `repro/`, `certs/`. It adds or
-edits data; the base branch's trusted verifier judges it. Agents may assist freely —
-run searches, stage candidates, prepare PRs. The cost of a mistake is one bad entry,
-caught by the gate and the board. Mechanical checks (verify passes, format ok) are
-the bar for the entry; the submission-workflow rules in "Choose the workflow before
-acting" still govern how it is prepared and submitted.
+**Tier 0 — Code submission / non-critical change.** The diff touches no
+verifier-critical path (anything `verify/check_submission_scope.py` flags as
+critical; see `.github/CODEOWNERS`). The common case is a code submission: the
+diff touches only the submission surface (`codes/`, `circuits/`, `notes/`,
+`fieldnotes/`, `repro/`, `certs/`) and adds or edits data, which the base branch's
+trusted verifier judges. It may also touch non-critical files such as `research/`,
+`docs/`, `README.md`, or `AGENTS.md`. Agents may assist freely — run searches,
+stage candidates, prepare PRs. The cost of a mistake is one bad entry, caught by
+the gate and the board. Mechanical checks (verify passes, format ok) are the bar for
+the entry; the submission-workflow rules in "Choose the workflow before acting" still
+govern how it is prepared and submitted.
 
 **Tier 1 — Challenge operation.** The diff touches the trusted closure: anything
 `verify/check_submission_scope.py` flags as critical (its `CRITICAL_PREFIXES` and
