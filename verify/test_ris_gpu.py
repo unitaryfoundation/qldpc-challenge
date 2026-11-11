@@ -371,3 +371,98 @@ def test_gpu_recover_blocks_without_a_logical_write_nothing():
             assert weight is not None, (slug, side, "GPU committed an operator that is not a logical")
             assert weight == res["best_weight"], (slug, side, weight, res["best_weight"])
             assert weight == claimed, (slug, side, weight, claimed)
+
+
+# -- ris-compile workflow routing and step-level advisory policy -------------
+
+_WORKFLOW = os.path.join(ROOT, ".github", "workflows", "verify.yml")
+
+
+def _ris_compile_block():
+    """Return the lines of the `ris-compile:` job in verify.yml."""
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    start = lines.index("  ris-compile:")
+    end = next(i for i in range(start + 1, len(lines))
+               if lines[i].strip() and not lines[i].startswith(" " * 4)
+               and not lines[i].lstrip().startswith("#"))
+    return lines[start:end]
+
+
+def _ris_detect_script():
+    """Extract the `run: |` shell of `detect CUDA RIS changes`."""
+    lines = _ris_compile_block()
+    header = lines.index("      - name: detect CUDA RIS changes")
+    run = next(i for i in range(header + 1, len(lines)) if lines[i] == "        run: |")
+    body = []
+    for line in lines[run + 1:]:
+        if line.strip() and not line.startswith(" " * 10):
+            break
+        body.append(line[10:])
+    return "\n".join(body) + "\n"
+
+
+def _run_ris_detect(tmp_path, change, base_ref="origin/main"):
+    repo = tmp_path / "repo"
+    repo.mkdir(parents=True)
+
+    def git(*args):
+        subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
+                       cwd=repo, check=True, capture_output=True, text=True)
+
+    git("init", "-q", "-b", "work")
+    for rel, content in {
+        "codes/a-1-1.json": '{"n": 1}\n',
+        "circuits/a-1-1/memory_x.stim": "TICK\n",
+        "verify/ris_gpu.cu": "int x = 0;\n",
+        "verify/qldpc_verify.py": "x = 1\n",
+        ".github/workflows/verify.yml": "name: verify\n",
+    }.items():
+        p = repo / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content)
+    git("add", "-A")
+    git("commit", "-q", "-m", "base")
+    git("update-ref", "refs/remotes/origin/main", "HEAD")
+
+    for rel, content in change.items():
+        p = repo / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content)
+    git("add", "-A")
+    git("commit", "-q", "-m", "pr")
+
+    out = tmp_path / "github_output"
+    out.write_text("")
+    env = dict(os.environ, BASE_REF=base_ref, GITHUB_OUTPUT=str(out))
+    done = subprocess.run(["bash", "--noprofile", "--norc", "-e", "-c", _ris_detect_script()],
+                          cwd=repo, env=env, capture_output=True, text=True, check=False)
+    assert done.returncode == 0, done.stderr
+    return dict(line.split("=", 1) for line in out.read_text().splitlines())
+
+
+def test_ris_compile_skips_unrelated_prs_and_runs_when_cuda_or_workflow_changes(tmp_path):
+    assert _run_ris_detect(tmp_path / "data", {"codes/a-1-1.json": '{"n": 2}\n',
+                                               "circuits/a-1-1/memory_x.stim": "# new\n"}) == {"changed": "false"}
+    assert _run_ris_detect(tmp_path / "py", {"verify/qldpc_verify.py": "x = 2\n"}) == {"changed": "false"}
+    assert _run_ris_detect(tmp_path / "cu", {"verify/ris_gpu.cu": "int x = 1;\n"}) == {"changed": "true"}
+    assert _run_ris_detect(tmp_path / "wf", {".github/workflows/verify.yml": "name: v2\n"}) == {"changed": "true"}
+    # Fail closed if the base ref is missing or unusable.
+    assert _run_ris_detect(tmp_path / "noref", {"codes/a-1-1.json": '{"n": 2}\n'},
+                           base_ref="origin/no-such-branch") == {"changed": "true"}
+
+
+def test_ris_compile_advisory_is_step_level_on_toolkit_install_only():
+    """Job-level continue-on-error still marks the CheckRun FAILURE on PR rollups.
+
+    Keep continue-on-error on the flaky hosted toolkit install step instead,
+    and let nvcc fail normally once the toolkit installed cleanly.
+    """
+    block = _ris_compile_block()
+    assert "    continue-on-error: true" not in block
+    cuda_idx = block.index("      - name: install CUDA toolkit")
+    nvcc_idx = block.index("      - name: compile CUDA RIS accelerator")
+    cuda_step = block[cuda_idx:nvcc_idx]
+    nvcc_step = block[nvcc_idx:]
+    assert "        continue-on-error: true" in cuda_step
+    assert "        continue-on-error: true" not in nvcc_step
