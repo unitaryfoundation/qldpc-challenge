@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[108,12,7]]",
  "code_type": "CSS",
  "n": 108,
@@ -1350,5 +1350,45 @@
    ]
   ],
   "layers": 2
+ },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 7,
+    "confidence": "upper_bound",
+    "witness": [
+     42667,
+     42671,
+     42692,
+     42703,
+     42710,
+     42735,
+     42757
+    ]
+   },
+   "Z": {
+    "value": 7,
+    "confidence": "upper_bound",
+    "witness": [
+     2098,
+     2104,
+     9848,
+     11021,
+     11025,
+     11031,
+     11061
+    ]
+   }
+  },
+  "rounds": 7,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-11",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3)"
+  }
  }
 }
