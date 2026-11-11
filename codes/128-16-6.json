@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[128,16,6]]",
  "code_type": "CSS",
  "n": 128,
@@ -1071,5 +1071,43 @@
   "model": "DeepSeek V4 Flash 0731",
   "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry."
  },
- "family": "generalized-bicycle"
+ "family": "generalized-bicycle",
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "value": 6,
+    "confidence": "upper_bound",
+    "witness": [
+     19612,
+     19613,
+     19620,
+     19656,
+     19749,
+     20586
+    ]
+   },
+   "Z": {
+    "value": 6,
+    "confidence": "upper_bound",
+    "witness": [
+     248,
+     272,
+     594,
+     1769,
+     1916,
+     2302
+    ]
+   }
+  },
+  "rounds": 6,
+  "stim_version": "1.16.0",
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-11",
+   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 7 data CX slots per round, X-check term slots [6, 3, 5, 4, 2, 1], Z-check term slots [0, 3, 2, 1, 5, 4] over terms A_0..A_1, B_0..B_3)"
+  }
+ }
 }
