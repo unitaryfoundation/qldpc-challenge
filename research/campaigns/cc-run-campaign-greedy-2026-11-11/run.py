@@ -57,7 +57,8 @@ def main():
                              structural=True, reduce_display=True, reduce_by_domination=True,
                              sector_targeted=True, target_sector=ts,
                              support_search={"budget": args.budget, "max_weight": 3},
-                             sector_swap=True, ranking="pareto")
+                             sector_swap=True, ranking="pareto",
+                             deep_verify=True)
             except Exception as e:
                 print(f"  {slug} step{step}: plan error {e}", flush=True)
                 break
