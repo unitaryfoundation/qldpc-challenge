@@ -103,3 +103,53 @@ Model: Beam 1.0. Author: @MathysRennela. code-calculus v0.2rc
 gate (`verify/validate_candidate.py`), and the staged-candidate pipeline
 (described in each merged PR's note; no committed script is cited here —
 the method is the four-step recipe above).
+
+## Extension campaign (same day, admissibility-fixed supports)
+
+The ~50 inadmissible d=1 parents were not dead ends: the fix is linear,
+not search. The added support must be B + e with e disjoint from B (every
+bare qubit stays covered), parity(e and r) = parity(B and r) for every
+same-sector check r (commutation), and B + e outside the added sector's
+row space (independence). Solve the GF(2) system, then take the lightest
+element of the solution coset found by a bounded random walk over the
+kernel. Parents whose system is inconsistent (a check row fully inside
+the bare set with odd parity) have no single-check fix — 25 of the
+population, recorded as genuinely closed under this mechanism.
+
+Results over the same d=1 population:
+
+| Outcome | Count |
+| --- | --- |
+| Additional conversions staged (admissibility-fixed) | 77 |
+| Non-dominated, gate-passed, submitted | 35 PRs (10 merged, 25 in CI at write time: #5532-#5567) |
+| Exact duplicates of the first wave or newer board entries, refused by the gate | 13 |
+| Inconsistent GF(2) system (no single-check fix exists) | 25 |
+| Converted but dominated (kept staged, not submitted) | remaining |
+
+The converted points now reach [[58,31,2]] (w=11); the largest n where
+the whole pipeline (bare-set scan, GF(2) fix, witness inheritance,
+weight-2 pair scan, full gate) ran end to end is n=898.
+
+## Multi-check strict improvement at d=2 (first verified finds)
+
+The greedy set-cover over admissible checks was run against 52 real d=2
+codes with n <= 20 (weight-2 class enumeration is O(n^2) there): 4 codes
+yielded a verified d=2 -> d=3 strict improvement, 3 passed the gate:
+
+- [[9,1,3]] from `codes/9-4-2.json` (3 checks) — submitted (#5567);
+- [[10,2,3]] and [[18,4,3]] — gate-passed but dominated by existing
+  entries on max check weight (board w=4 and 5 vs. our w=5 and 7), so
+  recorded here rather than submitted.
+
+Cost is real: 2-4 checks, i.e. 2-4 in k, and the yield is under 10% of
+parents. But this is the first mechanical, witness-backed d=2 -> d=3
+strict improvement the cell has produced on board parents.
+
+## Updated cumulative totals for v0.2rc C-ADD-CHECK
+
+50 board-advancing submissions across the two waves (15 + 35), all
+C-ADD-CHECK strict improvement, all with the rule named in the PR title,
+provenance.model "Beam 1.0", author @MathysRennela. The cell that went
+0/736 in October is now the highest-yield strict-improvement mechanism on
+the board — its productive regime is exactly the codes whose
+minimum-weight classes are enumerable at the parent's own scale.
