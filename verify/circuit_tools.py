@@ -259,12 +259,11 @@ def dem_matches(derived, committed, rtol=1e-9, atol=1e-12):
     return True
 
 
-def dem_columns(dem):
-    """One (detector_ids, observable_ids) pair per error instruction, in file
-    order -- the sparse columns of H_dem / L, and the objects witness indices
-    point at."""
+def _columns_from_instructions(flat):
+    """dem_columns of a flattened DEM, one stim object per target. This is the
+    definition; _columns_from_text is a faster way to the same answer."""
     cols = []
-    for inst in dem.flattened():
+    for inst in flat:
         if inst.type != "error":
             continue
         ds, ls = [], []
@@ -274,6 +273,58 @@ def dem_columns(dem):
             elif t.is_logical_observable_id():
                 ls.append(int(t.val))
         cols.append((ds, ls))
+    return cols
+
+
+def _columns_from_text(flat):
+    """dem_columns of a flattened DEM read off stim's own text for it, or
+    None when a line is not in the one form this reads.
+
+    Flattened, a DEM prints one instruction per line with absolute indices,
+    and an untagged error is `error(p) T T ...`, each T being `D<int>`,
+    `L<int>` or the separator `^`. Anything else on an error line returns
+    None rather than a guess: a tag (which may contain any text; stim escapes
+    line breaks inside one, so a tag cannot start a line of its own), a token
+    of another shape, a line with no closing parenthesis."""
+    cols = []
+    try:
+        for line in str(flat).split("\n"):
+            if not line.startswith("error"):
+                continue
+            if not line.startswith("error("):
+                return None
+            ds, ls = [], []
+            for tok in line[line.index(")") + 1:].split():
+                kind = tok[0]
+                if kind == "D":
+                    ds.append(int(tok[1:]))
+                elif kind == "L":
+                    ls.append(int(tok[1:]))
+                elif tok != "^":
+                    return None
+            cols.append((ds, ls))
+    except ValueError:
+        return None
+    return cols
+
+
+def dem_columns(dem):
+    """One (detector_ids, observable_ids) pair per error instruction, in file
+    order -- the sparse columns of H_dem / L, and the objects witness indices
+    point at.
+
+    A circuit-tier DEM has on the order of 1e5 mechanisms and 1e6 targets,
+    and one stim object per target made this walk a fifth of the circuit
+    tier (issue #5409). The columns are therefore read from the text stim
+    prints for the flattened model, which is one call into stim instead of
+    several per target. The object walk is kept as the definition and as the
+    fallback: it runs whenever the text is not in the plain form
+    _columns_from_text reads, or the text yields a different number of
+    columns than stim counts errors."""
+    flat = dem.flattened()
+    cols = _columns_from_text(flat)
+    if cols is None or len(cols) != flat.num_errors:
+        cols = _columns_from_instructions(flat)
     return cols
 
 

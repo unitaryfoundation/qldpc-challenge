@@ -548,3 +548,102 @@ def test_the_mechanisms_are_walked_once_per_basis(seed, monkeypatch):
     rep = cv.verify_circuit(doc, cdir)
     assert rep["ok"], [c for c in rep["checks"] if not c["ok"]]
     assert len(walks) == 2, walks
+
+
+def test_columns_read_from_text_are_the_columns():
+    """dem_columns reads the text stim prints for the flattened model. The
+    walk over stim's objects is the definition, and the two agree on every
+    form a model can take, repeat blocks and detector shifts included; a
+    tagged error is left to the walk."""
+    import random
+    rng = random.Random(54091)
+    read = declined = 0
+    for case in range(400):
+        items = _dem_items(rng, tags=case % 4 == 0)
+        dem = _dem(items)
+        if case % 5 == 0:
+            dem = stim.DetectorErrorModel(
+                f"repeat 3 {{\n{dem}\nshift_detectors 7\n}}\n{dem}")
+        flat = dem.flattened()
+        want = ct._columns_from_instructions(flat)
+        assert len(want) == flat.num_errors
+        assert ct.dem_columns(dem) == want, items
+        text = ct._columns_from_text(flat)
+        if any(name == "error" and tag for name, tag, _, _ in items):
+            assert text is None, items
+            declined += 1
+        else:
+            assert text == want, items
+            read += 1
+    assert read > 200 and declined > 40, (read, declined)
+
+
+class _Printed:
+    """Stands in for a flattened DEM that prints as the given text."""
+
+    def __init__(self, text):
+        self.text = text
+
+    def __str__(self):
+        return self.text
+
+
+def test_text_reader_declines_a_line_it_cannot_read():
+    assert ct._columns_from_text(_Printed(
+        "error(0.1) D0 ^ L1 D2\ndetector(1, 2) D5\nerror(0.5)\n"
+        "logical_observable L0\nerror(0.25) L2 L2")) == [
+            ([0, 2], [1]), ([], []), ([], [2, 2])]
+    for text in ("error[t](0.1) D0",          # a tag
+                 "error D0",                  # no argument
+                 "error(0.1 D0",              # no closing parenthesis
+                 "error(0.1) D0 X3",          # another kind of target
+                 "error(0.1) D0 rec[-1]",
+                 "error(0.1) D0 ^^",
+                 "error(0.1) D0 Dx",          # not an index
+                 "error(0.1) D0 D",
+                 "error(0.1) L1.5"):
+        assert ct._columns_from_text(_Printed(text)) is None, text
+        assert ct._columns_from_text(_Printed(
+            "error(0.1) D0\n" + text + "\nerror(0.1) D1")) is None, text
+
+
+def test_dem_columns_falls_back_to_the_walk(monkeypatch):
+    """Whatever the text reader returns, dem_columns answers with the
+    columns: a refusal, or a column count stim does not confirm, sends it to
+    the walk over stim's objects."""
+    dem = stim.DetectorErrorModel(
+        "error(0.1) D0 L0\nerror(0.2) D1 ^ D2\ndetector D3")
+    want = [([0], [0]), ([1, 2], [])]
+    assert ct.dem_columns(dem) == want
+    for wrong in (None, [], want[:1], want + [([9], [])]):
+        with monkeypatch.context() as m:
+            m.setattr(ct, "_columns_from_text", lambda flat, w=wrong: w)
+            assert ct.dem_columns(dem) == want, wrong
+    # text that looks like DEM inside a tag adds no column and hides none
+    tagged = stim.DetectorErrorModel(
+        "error[x\\nerror(0.5) L1](0.1) D0 L0\nerror(0.2) D1")
+    assert ct._columns_from_text(tagged.flattened()) is None
+    assert ct.dem_columns(tagged) == [([0], [0]), ([1], [])]
+    quiet = stim.DetectorErrorModel(
+        "detector[x\\nerror(0.5) L1] D0\nerror(0.2) D1")
+    assert ct._columns_from_text(quiet.flattened()) == [([1], [])]
+    assert ct.dem_columns(quiet) == [([1], [])]
+
+
+def test_dem_columns_reads_plain_models_from_text(monkeypatch):
+    """The point of the text reader is that the walk does not run: on a model
+    without tags, which every derived DEM of a canonical circuit is, the walk
+    is never reached."""
+    def walk(flat):
+        raise AssertionError("the object walk ran on a plain model")
+    monkeypatch.setattr(ct, "_columns_from_instructions", walk)
+    HX = _matrix(BASE_DOC["checks"]["X"], N)
+    HZ = _matrix(BASE_DOC["checks"]["Z"], N)
+    dem = ct.derive_dem(ct.apply_noise(
+        ct.build_css_memory(HX, HZ, rounds=2, basis="Z"), N))
+    cols = ct.dem_columns(dem)
+    assert len(cols) == dem.num_errors > 100
+    H, L = ct.dem_matrices(dem)
+    assert H.shape == (dem.num_detectors, len(cols))
+    assert all(sorted(H[:, j].nonzero()[0]) == sorted(set(ds))
+               for j, (ds, _) in enumerate(cols))
