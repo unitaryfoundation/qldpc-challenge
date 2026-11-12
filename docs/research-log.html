@@ -16,6 +16,25 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-7-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/13-7-2.html">[[13,7,2]] — 13-7-2</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[13,7,2]] — C-ADD-CHECK strict improvement of 13-9-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert the parent (<code>codes/13-9-1.json</code>, d=2) by C-ADD-CHECK strict improvement (Proposition 18.3, code calculus v0.2rc): every minimum-weight logical class of the parent is killed by the added checks, so the child&#x27;s distance is at least d+1.</p>
+<h4>What was searched</h4>
+<p>For d=1 parents: the minimum-weight classes are the bare (weight-1) logicals, enumerated in O(n); the added check supports are their union (plus a GF(2)-solved parity correction when the bare set alone is inadmissible). For d=2 parents: the weight-2 logical classes are enumerated (O(n^2)) and a greedy set-cover over admissible checks kills them within the check budget.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/13-9-1.json</code>.</li>
+<li>Child witnesses: inherited from the parent where still valid, plus</li>
+<p>fresh witnesses at the child&#x27;s distance found by bounded scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Parents whose bare-logical set gave an inadmissible check support were fixed by a parity correction solved over GF(2); parents whose system is inconsistent have no single-check fix and were skipped. Multi-check greedy at d=2 succeeds on only a minority of parents (the weight-2 class count grows quickly with n).</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc.</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/13-9-1.json</code>; add the recorded checks to obtain this entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/13-7-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/13-9-1.html">[[13,9,1]] — 13-9-1</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[13,9,1]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
@@ -29,7 +48,7 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/13-9-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/14-10-1.html">[[14,10,1]] — 14-10-1</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[14,10,1]] — code-calculus v0.2rc greedy gated</h3>
+<section class=blk><h3><a href="codes/14-10-1.html">[[14,10,1]] — 14-10-1</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[14,10,1]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
 <h4>What was searched</h4>
@@ -120,6 +139,25 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-12-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/23-14-2.html">[[23,14,2]] — 23-14-2</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[23,14,2]] — C-ADD-CHECK strict improvement of 23-16-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert the parent (<code>codes/23-16-1.json</code>, d=2) by C-ADD-CHECK strict improvement (Proposition 18.3, code calculus v0.2rc): every minimum-weight logical class of the parent is killed by the added checks, so the child&#x27;s distance is at least d+1.</p>
+<h4>What was searched</h4>
+<p>For d=1 parents: the minimum-weight classes are the bare (weight-1) logicals, enumerated in O(n); the added check supports are their union (plus a GF(2)-solved parity correction when the bare set alone is inadmissible). For d=2 parents: the weight-2 logical classes are enumerated (O(n^2)) and a greedy set-cover over admissible checks kills them within the check budget.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/23-16-1.json</code>.</li>
+<li>Child witnesses: inherited from the parent where still valid, plus</li>
+<p>fresh witnesses at the child&#x27;s distance found by bounded scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Parents whose bare-logical set gave an inadmissible check support were fixed by a parity correction solved over GF(2); parents whose system is inconsistent have no single-check fix and were skipped. Multi-check greedy at d=2 succeeds on only a minority of parents (the weight-2 class count grows quickly with n).</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc.</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/23-16-1.json</code>; add the recorded checks to obtain this entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-14-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/23-15-2.html">[[23,15,2]] — 23-15-2</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[23,15,2]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
@@ -172,6 +210,25 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/24-17-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/25-15-2-b.html">[[25,15,2]] — 25-15-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[25,15,2]] — C-ADD-CHECK strict improvement of 25-17-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert the parent (<code>codes/25-17-1.json</code>, d=2) by C-ADD-CHECK strict improvement (Proposition 18.3, code calculus v0.2rc): every minimum-weight logical class of the parent is killed by the added checks, so the child&#x27;s distance is at least d+1.</p>
+<h4>What was searched</h4>
+<p>For d=1 parents: the minimum-weight classes are the bare (weight-1) logicals, enumerated in O(n); the added check supports are their union (plus a GF(2)-solved parity correction when the bare set alone is inadmissible). For d=2 parents: the weight-2 logical classes are enumerated (O(n^2)) and a greedy set-cover over admissible checks kills them within the check budget.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/25-17-1.json</code>.</li>
+<li>Child witnesses: inherited from the parent where still valid, plus</li>
+<p>fresh witnesses at the child&#x27;s distance found by bounded scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Parents whose bare-logical set gave an inadmissible check support were fixed by a parity correction solved over GF(2); parents whose system is inconsistent have no single-check fix and were skipped. Multi-check greedy at d=2 succeeds on only a minority of parents (the weight-2 class count grows quickly with n).</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc.</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/25-17-1.json</code>; add the recorded checks to obtain this entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/25-15-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/25-17-1.html">[[25,17,1]] — 25-17-1</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[25,17,1]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
@@ -2600,6 +2657,25 @@ EOF
 <p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/17-10-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/17-9-2.html">[[17,9,2]] — 17-9-2</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[17,9,2]] — C-ADD-CHECK strict improvement of 17-10-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert the parent (<code>codes/17-10-1.json</code>, d=2) by C-ADD-CHECK strict improvement (Proposition 18.3, code calculus v0.2rc): every minimum-weight logical class of the parent is killed by the added check, so the child&#x27;s distance is at least d+1.</p>
+<h4>What was searched</h4>
+<p>For d=1 parents: the minimum-weight classes are the bare (weight-1) logicals, enumerated in O(n); the added check support is their union (plus a GF(2)-solved parity correction when the bare set alone is inadmissible). For d=2 parents: the weight-2 logical classes are enumerated (O(n^2)) and a greedy set-cover over admissible checks kills them within the check budget.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/17-10-1.json</code>.</li>
+<li>Child witnesses: inherited from the parent where still valid, plus</li>
+<p>fresh witnesses at the child&#x27;s distance found by bounded scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Parents whose bare-logical set gave an inadmissible check support were fixed by a parity correction solved over GF(2); parents whose system is inconsistent have no single-check fix and were skipped. Multi-check greedy at d=2 succeeds on only a minority of parents (the weight-2 class count grows quickly with n).</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc.</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/17-10-1.json</code>; add the recorded check to obtain this entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/17-9-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/25-16-1.html">[[25,16,1]] — 25-16-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[25,16,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-7 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
