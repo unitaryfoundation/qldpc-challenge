@@ -106,9 +106,24 @@ All 135 were submitted (one PR per code). As of the final tally:
 - 19 closed (collisions or dominated)
 - 10 still open (5487-5498)
 
-The 2D-local campaign (n <= 99) produced 116 board-advancing candidates
-but 0 passed the full gate (distance_not_refuted / site_occupancy). See
-code-calculus-dev issue #388.
+The 2D-local campaign (n <= 99) produced 99 deep-verified finds. After
+full-gate verification, ~153 of 593 checked candidates passed and a
+subset are board-advancing with non-colliding slugs. The 2D-local route
+remains productive but distance inflation is the dominant failure mode.
+See code-calculus-dev issue #388 (layout) and #375 (staged distance).
+
+## Campaign summary table
+
+| Campaign | n-cap | Gated | Deep-verified finds | Full-gate PASS | Board-advancing | New slugs |
+|---|---|---|---|---|---|---|
+| cc-greedy-gated | 10 | 65 | 38 | 29 | 20 | 3 (5-3-1, 6-3-1, 9-4-2) |
+| cc-greedy-ext | 28 | 286 | 215 | - | 170 distinct | 14 submitted |
+| cc-greedy-n20 | 20 | 182 | 68 | - | 47 | 0 (all collide) |
+| cc-greedy-n60 | 60 | 1281 | 166 | 216 | 168 | 135 |
+| cc-greedy-2dlocal-v2 | 99 | 1567 | 99 | 153+ | 153+ (unverified) | 0 submitted |
+
+Total merged to the board: 169 codes (unrestricted, d=1/d=2).
+Issues opened: code-calculus-dev #375, #388.
 
 ## Issues opened
 
