@@ -33,6 +33,23 @@ distinct (n, k, d, w) points (63 files) are mutually non-dominating.
 all verified board-advancing against the base board. The remaining 82 were
 not submitted (downgraded, colliding, or not yet attempted).
 
+## n <= 20 re-run (corrected script, staged deep-verify)
+
+Re-ran the greedy campaign with the staged deep-verify enabled (2k -> 20k ->
+200k -> 2M trials, stopping early on downgrade). Result: 182 candidates
+gated, 68 finds, 0 downgraded, 6 refused (collisions / d-only gains). All
+68 survived the deep pass without distance correction.
+
+However, all 30 non-colliding-screened survivors turned out to have slugs
+that collide with existing board entries after the deep pass, so no new
+submissions resulted from this run. The deep pass kept the distance unchanged
+but the (n,k,d) point was already occupied. This is the variant-collision
+case, not inflation.
+
+Net: the corrected pipeline prevents inflated distances (0 downgrades) but
+the board is now dense enough that most surviving points are variants of
+existing entries rather than new slugs.
+
 Each step calls machine.planner.plan with sector_targeted=True (target
 sector chosen per parent by infer_target_sector), sector_swap=True
 (E-LOCAL-HADAMARD at T=Q), support_search (bounded witness search to
