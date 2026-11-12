@@ -35,7 +35,7 @@
     "verify/refutation_cache.py": "3cf657d8e48b8dedab77157098a66f58ade10540eca08e0e88ef01e850091e6f",
     "verify/refute_board.py": "593baa851b890fcd0e5daaa3aec6823df012e7770940da19e1432143d04c6c7d",
     "verify/transversal_gates.py": "28d1cb573186be934182a58a72b8739331008530f8ee35060fc5fcb8d24def66",
-    "verify/validate_candidate.py": "0384e8c8a3f407060b7275cb3913ab12d77f7974827159905e989b6db2ceca50",
+    "verify/validate_candidate.py": "56af918e2200037f2a6d2cfab0199eaefdb4d988072a3a6f61977e778f44c128",
     "verify/validation_gate.py": "f74e230c6c772e777d2e4258f97f2316096f374224dfdefdafb30998f530ab3a",
     "verify/verify_all.py": "5a8c61d15c887b5cf12a23c37ceb0f81ceb26b5375d633211f64f32822517bc1",
     "verify/fixtures/17-1-7.json": "a514e65313456aa563e6708e097523bdb057d038de79a400cf816e269ddb5bab",

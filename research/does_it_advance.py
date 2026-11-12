@@ -138,7 +138,7 @@ def novelty(board, n, k, d, w, code_type="CSS", lc="unrestricted"):
         "dominated_by": dominators,
         "advances_by": advances_by,
         "d_only_gain": (bool(board_advancing) and advances_by == ["d"]
-                        and d > 1 and bool(d_only_peers)),
+                        and bool(d_only_peers)),
         "d_only_peers": d_only_peers,
         "beaten": dominated,
     }

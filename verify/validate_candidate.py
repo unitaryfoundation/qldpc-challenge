@@ -277,7 +277,6 @@ def validate_candidate(doc, *, seed=None, refute=True):
     d_only_peers = [desc for b, gains, desc in dominated
                     if gains == ["d"] and b.get("d", 0) > 1]
     d_only_gain = (bool(board_advancing) and advances_by == ["d"]
-                   and claimed_d is not None and claimed_d > 1
                    and bool(d_only_peers))
     g["novelty"] = {"cell": [wc, lc], "board": code_type,
                     "board_advancing": board_advancing,

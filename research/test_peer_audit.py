@@ -56,7 +56,8 @@ def test_d_only_peers_follow_the_gates_rule():
              _row("72-6-5-c", locality_class="local-2d-single"),  # stricter cell: counts
              _row("72-6-6-d", code_type="stabilizer"),         # the other board
              _row("71-6-6"),                                   # n differs: not d-only
-             _row("72-6-6-e", w=None)]                         # no weight recorded
+             _row("72-6-6-e", w=None),                         # no weight recorded
+             _row("72-6-1")]                                    # d = 1 placeholder: not a d-only peer
     assert PA.d_only_peers(CAND, board) == [PEER, "[[72,6,5]] w=6 72-6-5-c.json"]
     local = dict(CAND, locality_class="local-2d-single")
     assert PA.d_only_peers(local, [_row("72-6-6")]) == []     # an unrestricted peer is in a looser cell
