@@ -8,8 +8,8 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2032,
-    "literature": 490,
     "parameters_only": 395,
+    "literature": 490,
     "not_derived": 58,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
@@ -22,8 +22,8 @@
   "novelty_audited": 792,
   "board_screen": {
     "distinct": 2493,
-    "not_screened": 445,
     "review": 37,
+    "not_screened": 445,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
     "caveat": "distinct means not permutation-equivalent to any seeded or literature entry on this board, not that the code is unpublished; review is a flag, not a verdict; nothing here is a novelty claim"
