@@ -297,13 +297,17 @@ def verify_circuit(doc, circuits_dir):
         # gate, measured-rate decoder prior) takes on faith. Deterministic
         # linear scans; a malformed model fails here rather than corrupting
         # a later verdict silently.
-        lint = ct.dem_lint(derived)
+        # One walk over the mechanisms serves both the lint and the witness
+        # check; each used to make its own (issue #5409).
+        cols = ct.dem_columns(derived)
+        lint = ct.dem_lint(derived, cols)
         record(f"{side}_dem_structure", not lint,
                "; ".join(lint) or "detectability, observable coverage and "
                "probability bounds all hold")
         if lint:
             continue
-        werrs = ct.witness_errors(derived, claim["witness"], claim["value"])
+        werrs = ct.witness_errors(derived, claim["witness"], claim["value"],
+                                  cols)
         if claim["value"] > d:
             werrs.append(f"claimed d_circ {claim['value']} exceeds code "
                          f"distance d={d}: the tier is penalty-only, clamp "
