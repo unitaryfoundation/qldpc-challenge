@@ -25,6 +25,10 @@ def parents(n_cap):
         d = json.load(open(p))
         if d.get("code_type") != "CSS" or d["n"] > n_cap:
             continue
+        # Only 2D-local parents (carry a planar layout) so children stay 2D-local.
+        loc = d.get("locality")
+        if not (isinstance(loc, dict) and loc.get("coordinates")):
+            continue
         out.append((os.path.splitext(os.path.basename(p))[0], d))
     out.sort(key=lambda t: t[1]["n"])
     return out
