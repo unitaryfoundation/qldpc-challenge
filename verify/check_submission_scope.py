@@ -25,6 +25,7 @@ leave with its evidence.
 
 Usage:
   python verify/check_submission_scope.py [--root PATH] [--base origin/main]
+  python verify/check_submission_scope.py --classify [--root PATH] [--base origin/main]
 """
 
 import os
@@ -35,7 +36,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CRITICAL_PREFIXES = (
-    ".github/workflows/",
+    ".github/",
     "decode/",
     "schema/",
     "verify/",
@@ -122,6 +123,17 @@ def is_critical(path):
     return path in CRITICAL_FILES or any(path.startswith(p) for p in CRITICAL_PREFIXES)
 
 
+def classify(files):
+    """Classify a changed-file set into a tier.
+
+    Returns (tier, reasons) where tier is 1 (challenge operation) when any
+    changed path is verifier-critical, and 0 (code submission / non-critical)
+    otherwise. `reasons` lists the critical paths that forced tier 1.
+    """
+    reasons = [f for f in files if is_critical(f)]
+    return (1 if reasons else 0), reasons
+
+
 def outside_surface(files):
     """Return the changed paths a submission PR may not carry."""
     return [f for f in files if not f.startswith(SUBMISSION_SURFACE)]
@@ -157,11 +169,35 @@ def main(argv):
     if "--base" in argv:
         i = argv.index("--base")
         base = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
+
+    classify_mode = "--classify" in argv
+    if classify_mode:
+        argv = [a for a in argv if a != "--classify"]
 
     files = changed_files(base, root)
+    if files is None:
+        return 1
+    if classify_mode:
+        tier, reasons = classify(files)
+        print("tier: %d" % tier)
+        if tier == 0:
+            print("classification: Tier 0 - code submission / non-critical change.")
+        else:
+            print("classification: Tier 1 - challenge operation.")
+        if reasons:
+            print("reasons (verifier-critical paths):")
+            for f in reasons:
+                print("  %s" % f)
+        else:
+            print("reasons: none (no verifier-critical paths changed)")
+        print("required standard: see AGENTS.md, \"Two tiers of change\".")
+        # Informational only: never fail the classify mode itself.
+        return 0
+
     added = added_files(base, root)
     deleted = deleted_files(base, root)
-    if files is None or added is None or deleted is None:
+    if added is None or deleted is None:
         return 1
     codes = [f for f in files if is_code_submission(f)]
     new_codes = [f for f in added if is_code_submission(f)]
