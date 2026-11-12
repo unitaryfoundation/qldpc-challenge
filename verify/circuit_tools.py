@@ -231,16 +231,25 @@ def dem_matches(derived, committed, rtol=1e-9, atol=1e-12):
     metadata the distance tier never reads, and their last ulps are
     architecture-sensitive (e.g. FMA contraction on arm64 vs x86), so exact
     byte equality would reject an honest artifact generated on another
-    machine while a real tamper still exceeds any plausible tolerance."""
+    machine while a real tamper still exceeds any plausible tolerance.
+
+    An instruction pair stim itself calls equal needs no second look: equal
+    means the same type, the same targets in the same order and the same
+    arguments, and each rule below then holds trivially. Only the pairs that
+    differ somewhere are taken apart, which is the minority (those whose
+    probability lost its last digits in the committed file's text), and they
+    are compared target by target with stim's own equality rather than through
+    one string per target (issue #5409)."""
     da = list(derived.flattened())
     ca = list(committed.flattened())
     if len(da) != len(ca):
         return False
     for x, y in zip(da, ca):
+        if x == y:
+            continue
         if x.type != y.type:
             return False
-        if [str(t) for t in x.targets_copy()] != \
-           [str(t) for t in y.targets_copy()]:
+        if x.targets_copy() != y.targets_copy():
             return False
         ax, ay = x.args_copy(), y.args_copy()
         if len(ax) != len(ay) or any(
@@ -268,8 +277,11 @@ def dem_columns(dem):
     return cols
 
 
-def dem_lint(dem):
+def dem_lint(dem, cols=None):
     """Structural-integrity errors of a derived DEM, [] iff well formed.
+    `cols` is dem_columns(dem) when the caller already has it (the walk over
+    every mechanism is the expensive part, and circuit_verify needs the same
+    columns for the witness check); nothing else may be passed there.
 
     The three error-severity properties from emlint's check taxonomy
     (github.com/MathysRennela/emlint; implemented here on dem_columns rather
@@ -292,7 +304,8 @@ def dem_lint(dem):
     enters only through DEM length, which MAX_DEM_MECHANISMS bounds.
     """
     errs = []
-    cols = dem_columns(dem)
+    if cols is None:
+        cols = dem_columns(dem)
     probs = [inst.args_copy()[0] for inst in dem.flattened()
              if inst.type == "error"]
     bad_det = [j for j, (ds, ls) in enumerate(cols) if not ds and ls]
@@ -330,12 +343,16 @@ def dem_matrices(dem):
     return H, L
 
 
-def witness_errors(dem, witness, value):
+def witness_errors(dem, witness, value, cols=None):
     """GF(2) check of a d_circ claim against a DEM: [] iff `witness` is a
     strictly increasing list of error-instruction indices whose detector sets
     XOR to nothing (undetected) and whose observable sets do not (flips a
-    logical), with |witness| = value. Sparse and O(|witness| * degree)."""
-    cols = dem_columns(dem)
+    logical), with |witness| = value. The check itself is sparse and
+    O(|witness| * degree); reading the columns is O(mechanisms), so a caller
+    that already holds dem_columns(dem) passes it as `cols`, and nothing else
+    may be passed there."""
+    if cols is None:
+        cols = dem_columns(dem)
     idx = [int(i) for i in witness]
     if idx != sorted(set(idx)):
         return ["witness indices must be strictly increasing and distinct"]
