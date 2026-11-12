@@ -1,28 +1,28 @@
 {
-  "verified_codes": 3363,
-  "css_codes": 3107,
+  "verified_codes": 3366,
+  "css_codes": 3110,
   "stabilizer_codes": 256,
   "certified_exact": 1644,
   "tracks": 12,
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "no_match": 2032,
-    "parameters_only": 395,
-    "not_derived": 190,
     "literature": 490,
+    "parameters_only": 395,
+    "no_match": 2032,
+    "not_derived": 193,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2541,
-    "known_parameters": 747,
+    "unknown": 2543,
+    "known_parameters": 748,
     "new_parameters": 75
   },
-  "novelty_audited": 822,
+  "novelty_audited": 823,
   "board_screen": {
     "distinct": 2493,
-    "not_screened": 577,
+    "not_screened": 580,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -71,7 +71,7 @@
         "top1_share": 0.383,
         "top2_share": 0.716,
         "hhi": 0.259,
-        "members": 315,
+        "members": 316,
         "leader": {
           "slug": "16-2-4",
           "family": "topological",
@@ -104,7 +104,7 @@
         "top1_share": 0.237,
         "top2_share": 0.432,
         "hhi": 0.142,
-        "members": 785,
+        "members": 787,
         "leader": {
           "slug": "510-16-26",
           "family": "generalized-bicycle",
@@ -137,7 +137,7 @@
         "top1_share": 0.313,
         "top2_share": 0.458,
         "hhi": 0.145,
-        "members": 1202,
+        "members": 1204,
         "leader": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
@@ -170,7 +170,7 @@
         "top1_share": 0.312,
         "top2_share": 0.442,
         "hhi": 0.136,
-        "members": 1374,
+        "members": 1376,
         "leader": {
           "slug": "330-66-12",
           "family": "lifted-product",
@@ -203,7 +203,7 @@
         "top1_share": 0.401,
         "top2_share": 0.75,
         "hhi": 0.283,
-        "members": 302,
+        "members": 303,
         "leader": {
           "slug": "16-2-4",
           "family": "topological",
@@ -236,7 +236,7 @@
         "top1_share": 0.304,
         "top2_share": 0.575,
         "hhi": 0.177,
-        "members": 434,
+        "members": 436,
         "leader": {
           "slug": "454-8-17",
           "family": "bivariate-bicycle",
@@ -269,7 +269,7 @@
         "top1_share": 0.265,
         "top2_share": 0.514,
         "hhi": 0.146,
-        "members": 504,
+        "members": 506,
         "leader": {
           "slug": "784-8-27",
           "family": "tile",
@@ -302,7 +302,7 @@
         "top1_share": 0.262,
         "top2_share": 0.509,
         "hhi": 0.143,
-        "members": 511,
+        "members": 513,
         "leader": {
           "slug": "784-8-27",
           "family": "tile",
@@ -335,7 +335,7 @@
         "top1_share": 0.368,
         "top2_share": 0.688,
         "hhi": 0.24,
-        "members": 352,
+        "members": 353,
         "leader": {
           "slug": "16-2-4",
           "family": "topological",
@@ -368,7 +368,7 @@
         "top1_share": 0.249,
         "top2_share": 0.404,
         "hhi": 0.117,
-        "members": 1162,
+        "members": 1164,
         "leader": {
           "slug": "960-24-38",
           "family": "2bga-coset",
@@ -401,7 +401,7 @@
         "top1_share": 0.312,
         "top2_share": 0.446,
         "hhi": 0.137,
-        "members": 2192,
+        "members": 2195,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -434,7 +434,7 @@
         "top1_share": 0.36,
         "top2_share": 0.476,
         "hhi": 0.156,
-        "members": 3107,
+        "members": 3110,
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",
