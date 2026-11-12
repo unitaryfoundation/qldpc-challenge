@@ -93,35 +93,38 @@ def main():
                 import subprocess as _sp
                 downgraded = False
                 for trials in (2000, 20000, 200000, 2000000):
-                    dr = _sp.run(["./qldpc", "submit", path,
-                                  "--authors", "@mathysrennela", "--model", "Beam 1.0",
-                                  "--family", "other",
-                                  "--construction", "code-calculus v0.2rc greedy gated",
-                                  "--reuse-witnesses", "--no-circuit",
-                                  "--fast-trials", str(trials), "--dry-run"],
-                                 cwd=ROOT, capture_output=True, text=True)
-                    out = (dr.stdout or "") + (dr.stderr or "")
-                    m = None
-                    for line in out.splitlines():
-                        if "would write" in line and "codes/" in line:
-                            m = line.split("codes/")[-1].replace(".json", "")
+                    for seed in (1, 2, 3):
+                        dr = _sp.run(["./qldpc", "submit", path,
+                                      "--authors", "@mathysrennela", "--model", "Beam 1.0",
+                                      "--family", "other",
+                                      "--construction", "code-calculus v0.2rc greedy gated",
+                                      "--reuse-witnesses", "--no-circuit",
+                                      "--fast-trials", str(trials), "--seed", str(seed),
+                                      "--dry-run"],
+                                     cwd=ROOT, capture_output=True, text=True)
+                        out = (dr.stdout or "") + (dr.stderr or "")
+                        m = None
+                        for line in out.splitlines():
+                            if "would write" in line and "codes/" in line:
+                                m = line.split("codes/")[-1].replace(".json", "")
+                                break
+                        deep_d = None
+                        if m:
+                            parts = m.split("-")
+                            if len(parts) >= 3:
+                                try:
+                                    deep_d = int(parts[2])
+                                except ValueError:
+                                    deep_d = None
+                        if deep_d is not None and deep_d != cand_d:
+                            print(f"  DOWNGRADED {os.path.basename(path)} at {trials} trials seed {seed}: {cand_d} -> {deep_d}, skipping", flush=True)
+                            downgraded = True
                             break
-                    deep_d = None
-                    if m:
-                        parts = m.split("-")
-                        if len(parts) >= 3:
-                            try:
-                                deep_d = int(parts[2])
-                            except ValueError:
-                                deep_d = None
-                    if deep_d is not None and deep_d != cand_d:
-                        print(f"  DOWNGRADED {os.path.basename(path)} at {trials} trials: {cand_d} -> {deep_d}, skipping", flush=True)
-                        downgraded = True
-                        break
-                    if deep_d is None:
-                        # refused or collision; skip
-                        print(f"  REFUSED/COLLISION {os.path.basename(path)} at {trials} trials, skipping", flush=True)
-                        downgraded = True
+                        if deep_d is None:
+                            print(f"  REFUSED/COLLISION {os.path.basename(path)} at {trials} trials seed {seed}, skipping", flush=True)
+                            downgraded = True
+                            break
+                    if downgraded:
                         break
                 if downgraded:
                     continue
