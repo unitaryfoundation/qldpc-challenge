@@ -94,6 +94,27 @@ The candidates are 1-3 step compositions of:
 Staged survivors are gitignored working output (local staging only); the
 campaign definition is research/campaigns/cc-run-campaign-greedy-2026-11-11/campaign.json.
 
+## Final submission results
+
+The n <= 60 unrestricted greedy campaign (corrected script, staged
+deep-verify) produced 166 deep-verified finds. After full-gate verification
+(distance_not_refuted with fresh seeds), 216 of 542 candidates passed and
+168 were board-advancing, of which 135 had new (non-colliding) slugs.
+
+All 135 were submitted (one PR per code). As of the final tally:
+- 169 merged by maintainers
+- 19 closed (collisions or dominated)
+- 10 still open (5487-5498)
+
+The 2D-local campaign (n <= 99) produced 116 board-advancing candidates
+but 0 passed the full gate (distance_not_refuted / site_occupancy). See
+code-calculus-dev issue #388.
+
+## Issues opened
+
+- code-calculus-dev #375: staged distance checks and auto-variant naming
+- code-calculus-dev #388: layout inheritance violates site_occupancy
+
 ## Lessons learned
 
 1. A 1000-trial RIS screen overestimates distance for many codes; the
