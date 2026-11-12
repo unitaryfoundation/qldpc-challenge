@@ -1,0 +1,58 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "cc-run-campaign-greedy-2026-11-11",
+    "name": "Greedy multi-step campaigns via code-calculus v0.2 run_campaign",
+    "status": "draft",
+    "objective": {
+      "metric": "kd2_over_n",
+      "direction": "maximize"
+    },
+    "constraints": {
+      "n": [1, 100],
+      "max_check_weight": 8
+    },
+    "budget": {
+      "candidates_screened": 2000,
+      "walltime_hours": 4
+    },
+    "stopping": [
+      { "type": "budget_exhausted" }
+    ],
+    "direction": {
+      "hypothesis": "Using code-calculus v0.2's run_campaign greedy loop (plan, pick top survivor, apply, repeat for 5 steps) with Pareto ranking and domination pruning on CSS parents with n <= 100 produces deeper children than single-step campaigns.",
+      "cell": "unrestricted~weight-6",
+      "family": "other",
+      "bar": {
+        "slug": "90-8-10",
+        "axes": ["kd2_over_n"],
+        "note": "best kd^2/n among unrestricted weight-6 entries with n <= 100"
+      },
+      "budget": {
+        "candidates_screened": 2000,
+        "trials_per_candidate": 1000,
+        "walltime_hours": 4
+      },
+      "feasibility": "run_campaign composes plan steps greedily and records per-step records; each step's survivor is exported and gated independently.",
+      "novelty": {
+        "claim": "Multi-step greedy CSS children that are board-advancing",
+        "against": "fieldnotes/2026-11-02-code-calculus-v0p1-campaigns.md (depth-2 chains productive but expensive)"
+      },
+      "expected_value": "A greedy 5-step survivor that beats the single-step frontier would show that composition via run_campaign pays.",
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "trials_cap": 2000,
+        "note": "drop a lineage once a step yields no non-prune survivor"
+      },
+      "what_a_negative_would_teach": "That greedy composition without a distance bound does not beat single-step enumeration at these sizes, consistent with direction 6's finding."
+    },
+    "methods": {
+      "families": ["other"],
+      "generators": ["research/kit/search.py::sample_css"],
+      "screening": {
+        "trials_per_candidate": 1000
+      }
+    },
+    "notes": "Uses code-calculus-dev run_campaign."
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "cc-sector-swap-css-2026-11-11",
+    "name": "CSS children via code-calculus v0.2 sector swap, support search, and bounded sector search",
+    "status": "draft",
+    "objective": {
+      "metric": "kd2_over_n",
+      "direction": "maximize"
+    },
+    "constraints": {
+      "n": [1, 120],
+      "max_check_weight": 8
+    },
+    "budget": {
+      "candidates_screened": 5000,
+      "walltime_hours": 4
+    },
+    "stopping": [
+      { "type": "budget_exhausted" }
+    ],
+    "direction": {
+      "hypothesis": "Using code-calculus v0.2's E-LOCAL-HADAMARD sector swap at T=Q (which exchanges the stronger sector into the target at unchanged full distance) together with bounded support search and Pareto ranking, CSS children of board entries with n <= 120 reach frontier points that the v0.1 single-move campaigns missed because they could not exploit a stronger opposite sector.",
+      "cell": "unrestricted~weight-6",
+      "family": "other",
+      "bar": {
+        "slug": "90-8-10",
+        "axes": ["kd2_over_n"],
+        "note": "best kd^2/n among unrestricted weight-6 entries with n <= 100"
+      },
+      "budget": {
+        "candidates_screened": 5000,
+        "trials_per_candidate": 1000,
+        "walltime_hours": 4
+      },
+      "feasibility": "The v0.2 consumer exposes sector_swap, support_search, bounded_sector_search, and Pareto ranking; parents are the board's CSS entries with n <= 120, and the gate validates children unchanged.",
+      "novelty": {
+        "claim": "CSS children reached by a sector swap followed by peel/puncture/deletion, with the stronger sector exploited for a target-sector distance gain",
+        "against": "the v0.1 campaigns of fieldnotes/2026-11-02-code-calculus-v0p1-campaigns.md, which used only single moves and no sector swap"
+      },
+      "expected_value": "A child whose target-sector distance improves after a sector swap would be the first evidence that E-LOCAL-HADAMARD at T=Q pays on this board; the full distance is unchanged, so the gain is in which sector carries the bound.",
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "trials_cap": 2000,
+        "note": "drop a parent lineage once two fresh-seed rungs agree below the parent's distance"
+      },
+      "what_a_negative_would_teach": "That exploiting the stronger sector via a swap does not create board-advancing children at these sizes, so the v0.1 result (zero E-LOCAL-HADAMARD survivors) stands even with the v0.2 search machinery."
+    },
+    "methods": {
+      "families": ["other"],
+      "generators": ["research/kit/search.py::sample_css"],
+      "screening": {
+        "trials_per_candidate": 1000
+      }
+    },
+    "notes": "Uses code-calculus-dev at its latest commit for sector_swap, support_search, bounded_sector_search, run_campaign, and Pareto ranking. See research/audits for the reachability record."
+  }
+}

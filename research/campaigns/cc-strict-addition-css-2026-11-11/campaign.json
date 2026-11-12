@@ -1,0 +1,58 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "cc-strict-addition-css-2026-11-11",
+    "name": "C-ADD-CHECK strict improvement using code-calculus v0.2 admissible-added-checks",
+    "status": "draft",
+    "objective": {
+      "metric": "distance",
+      "direction": "maximize"
+    },
+    "constraints": {
+      "n": [1, 40],
+      "max_check_weight": 6
+    },
+    "budget": {
+      "candidates_screened": 2000,
+      "walltime_hours": 2
+    },
+    "stopping": [
+      { "type": "budget_exhausted" }
+    ],
+    "direction": {
+      "hypothesis": "Using code-calculus v0.2's admissible_added_checks and strict_improvement_feasible (cheap-first witness screening), valid C-ADD-CHECK moves with weight <= 6 on CSS parents with n <= 40 produce children with d' >= d+1, where v0.1 found 0/736.",
+      "cell": "unrestricted~weight-6",
+      "family": "other",
+      "bar": {
+        "slug": "10-2-3-b",
+        "axes": ["d"],
+        "note": "parents are small CSS entries; strict improvement means d child >= d parent + 1"
+      },
+      "budget": {
+        "candidates_screened": 2000,
+        "trials_per_candidate": 1000,
+        "walltime_hours": 2
+      },
+      "feasibility": "admissible_added_checks enumerates valid supports up to weight 6; strict_improvement_feasible kills survivors that keep a minimum-weight logical; only survivors need a witness search.",
+      "novelty": {
+        "claim": "A CSS code one check addition away from a board entry with strictly larger distance",
+        "against": "fieldnotes/2026-11-02-code-calculus-v0p1-campaigns.md (0/736 strict improvements)"
+      },
+      "expected_value": "Any strict improvement would be the first on this board from C-ADD-CHECK and would reopen a move the v0.1 campaigns closed.",
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "trials_cap": 2000,
+        "note": "drop the addition route if no strict improvement survives the cheap-first screen across 2000 candidates"
+      },
+      "what_a_negative_would_teach": "That the v0.1 zero (0/736) was not a search-depth artifact: even with the v0.2 cheap-first feasibility check and admissible enumeration, no support kills every minimum-weight logical class at these sizes."
+    },
+    "methods": {
+      "families": ["other"],
+      "generators": ["research/kit/search.py::sample_css"],
+      "screening": {
+        "trials_per_candidate": 1000
+      }
+    },
+    "notes": "Uses code-calculus-dev admissible_added_checks and strict_improvement_feasible. C-ADD-CHECK raises k? No: it lowers k by 1; strict improvement requires distance increase."
+  }
+}

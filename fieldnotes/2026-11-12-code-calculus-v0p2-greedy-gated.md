@@ -1,0 +1,105 @@
+---
+title: "code-calculus v0.2 greedy gated campaigns: 20+ distinct board-advancing points from C-DELETE-CHECK, E-PEEL, E-PUNCTURE"
+date: 2026-11-12
+author: "@MathysRennela"
+topics: [code-calculus, priced-calculus, greedy, sector-swap, board-advancing, deletion, peel, puncture]
+---
+
+# code-calculus v0.2 greedy gated campaigns
+
+This note records the first board-advancing output of the v0.2 greedy
+campaigns that compose the calculus's three productive moves with the new
+sector-targeted search, sector swap, support search, and Pareto ranking.
+
+## What was run
+
+Two campaigns, both driven by research/campaigns/cc-run-campaign-greedy-2026-11-11/run.py
+on CSS parents from codes/:
+
+- cc-greedy-gated (n <= 10, 3 steps, budget 16): 38 board-advancing
+  candidate files, 20 distinct (n, k, d) points.
+- cc-greedy-ext (n <= 28, 3 steps, budget 32): 215 board-advancing
+  candidate files, 170 distinct (n, k, d) points. Stopped at n = 28.
+
+Total across both runs: 253 board-advancing candidate files, 177 distinct
+(n, k, d) points.
+
+Excluding the submitted points, the remaining staged candidates number 243
+files / 174 distinct points. Their Pareto frontier is 96 distinct
+(n, k, d, w, cell) points (112 files); ignoring the locality cell, 51
+distinct (n, k, d, w) points (63 files) are mutually non-dominating.
+
+14 of these frontier points were submitted as PRs (5385, 5391, 5395-5407),
+all verified board-advancing against the base board. The remaining 82 were
+not submitted (downgraded, colliding, or not yet attempted).
+
+Each step calls machine.planner.plan with sector_targeted=True (target
+sector chosen per parent by infer_target_sector), sector_swap=True
+(E-LOCAL-HADAMARD at T=Q), support_search (bounded witness search to
+tighten the ledger), and ranking="pareto" with domination pruning. The
+top non-prune survivor is applied with apply_operation, exported via
+export_challenge_entry (witness-backed upper bounds only), and validated
+with verify/validate_candidate.py through coordination.gate_and_record.
+Only gate-passing candidates are counted.
+
+## Moves involved
+
+The candidates are 1-3 step compositions of:
+
+- C-DELETE-CHECK
+- E-PEEL
+- E-PUNCTURE
+- occasional E-LOCAL-HADAMARD sector swap
+
+## Distinct advancing points (n <= 10 run)
+
+(5,3,1), (6,3,1), (7,5,1), (8,4,2), (8,5,1) x3,
+(8,6,1) x4, (9,2,3) x2, (9,3,3) x2, (9,4,2),
+(9,6,1) x5, (10,3,3) x5, (10,4,2), (10,4,3) x4,
+(10,4,4), (10,6,1), (10,7,1), (11,3,3), (11,3,4),
+(11,4,3), (12,6,2).
+
+## What did not work
+
+- cc-sector-swap-css alone (n <= 200): 0 board-advancing; every gated
+  child was an exact duplicate or a refutation.
+- cc-strict-addition-css: 0 feasible strict improvements across ~1,159
+  admissible supports (n <= 20), consistent with v0.1's 0/736.
+- cc-glue-css: 0 successful glues in the probe (seam certificate not
+  satisfiable without a proper seam enumerator).
+
+## Reproduction
+
+    QLDPC_RUN_ID=cc-greedy-gated uv run --extra research \
+      python research/campaigns/cc-run-campaign-greedy-2026-11-11/run.py \
+      --n-cap 10 --steps 3 --budget 16
+
+Staged survivors are gitignored working output (local staging only); the
+campaign definition is research/campaigns/cc-run-campaign-greedy-2026-11-11/campaign.json.
+
+## Lessons learned
+
+1. A 1000-trial RIS screen overestimates distance for many codes; the
+   2M-trial deep pass corrects it downward, turning screened
+   board-advancing points into dominated ones. Board-advancing status must
+   be checked on the corrected distance, not the screened one.
+2. Greedy multi-step composition (C-DELETE-CHECK, E-PEEL, E-PUNCTURE with
+   sector swap and Pareto ranking) is the productive route; sector-swap
+   alone, strict C-ADD-CHECK, and E-GLUE produced nothing at tested sizes.
+3. Using --force on submit overwrites existing codes when a downgraded slug
+   collides. Variant suffixes (e.g. 10-7-1-d) are required for same
+   (n,k,d) codes.
+4. d-only gains require a matched-depth peer audit (research/AUTORESEARCH.md
+   section 5b) before submission.
+
+## Suggested improvements
+
+- Code calculus: add a staged distance check to the ledger (try increasing
+  trial counts until the claimed distance is reached or refuted) and a
+  confidence field on witnesses, so transport can distinguish screened from
+  deep bounds.
+- Sweep scripts: deep-verify every gate-passing candidate before staging;
+  skip candidates whose corrected distance differs from the screened one;
+  never use --force; auto-append variant suffixes on slug collision.
+- Increase default screening depth for d >= 2 candidates, or filter by a
+  minimum trial count before claiming board-advancing.
