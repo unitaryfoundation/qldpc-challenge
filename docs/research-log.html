@@ -73,6 +73,23 @@
 <p>qLDPC library (QTCode.random), challenge research kit (surrogate, prescreen, submit), gf2_fast accelerator. Model: Beam 1.0.</p>
 <h4>Reproduction</h4>
 <p>Group: PSL(2,5); seed code: repetition code of length 2; bipartite construction; random seed 0. Rebuild with <code>QTCode.random(PSL(2,5), RepetitionCode(2), seed=0, bipartite=True)</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/30-2-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/320-10-28.html">[[320,10,28]] — 320-10-28</a></h3><div class=kv style="color:var(--mut)">2026-11-11 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[320,10,28]] — bivariate bicycle code found by random search</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Track cell <code>weight-8</code> × <code>unrestricted</code>, CSS board. Random bivariate bicycle codes on larger tori (l up to 16, m up to 12) were screened for codes whose parameters are not dominated by existing entries, especially high-distance points at moderate n.</p>
+<h4>What was searched</h4>
+<p>A sweep of 200 random bivariate bicycle candidates with four monomials per polynomial, torus sizes l in [8,16], m in [6,12], n in [100,700], max check weight 8, screened at 300 RIS trials per side. Survivors were then re-screened at higher trial counts and submitted to the trusted validation gate. The gate&#x27;s refutation pass found a lighter logical than the initial witness, and the candidate was repackaged at that depth.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Surrogate screen: d &lt;= 40 at 300 trials.</li>
+<li>Gate refutation: found a logical of weight 28; final claim d &lt;= 28.</li>
+<li>Final claim: upper bound d &lt;= 28, witness-backed, not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>Most random candidates were either board duplicates, WL-equivalent to existing entries, or dominated after the gate&#x27;s refutation search. The initial witness over-claimed the distance and had to be tightened.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Repo tooling: research/kit/search.py, research/kit/surrogate.py, research/kit/coordination.py, verify/validate_candidate.py.</p>
+<h4>Reproduction</h4>
+<p>Bivariate bicycle code on Z_16 x Z_10 with polynomials A and B as in the staged candidate&#x27;s repro manifest; rebuild with research/kit/bb.py::build_bb.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/320-10-28.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/322-46-12.html">[[322,46,12]] — 322-46-12</a></h3><div class=kv style="color:var(--mut)">2026-11-11 &middot; submission note &middot; <a href="https://github.com/TimoKellerMath">@TimoKellerMath</a> &middot; Claude Opus 5.5</div><details ><summary>note</summary><div class=notebody><h3>[[322,46,12]]: weight-6 pair-partition code on a sparse 6 x 14 template, lift P = 23</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, check weight at most 6, unrestricted locality (no layout submitted). Pair-partition (PP) CPM codes hold the largest kd^2/n of the board at check weights 7 and 8 (990-198-17, 994-142-40). We asked whether the PP rule gives good codes at check weight 6 on sparse templates whose block columns have degree 2 or 3: six rows of weight 6 on 14 columns (8 of degree 3 and 6 of degree 2, since 36 = 8 x 3 + 6 x 2) give design rate 1 - 12/14 = 1/7. Hypothesis: a large distance needs a pairing with at least 3 free exponent directions, i.e. first Betti number b_1 &gt;= 3 of the pairing square complex X (template rows and columns, one square per pair), whose classes in H^1(X; Z_P) are the lifts; the five PP leaders at weights 7 and 8 that we examined have b_1 = 3 to 6, and the smaller weight-6 shapes admit no such pairing (Dead ends), so we searched 6 x 14.</p>
