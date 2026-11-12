@@ -456,22 +456,29 @@ jobs:
         # and reads one entry and its circuits/<slug>/ directory, and on
         # 2026-11-10 re-running it for the 718 entries that carry a circuit
         # took 44.5 of this step's 48 minutes on every PR, which with a
-        # 90-minute gate no longer fit this job's cap. A data-only PR changed
-        # nothing outside the submission surface, so for an entry it did not
-        # touch the tier could only repeat what the push run on the base
-        # branch found on the same bytes with the same verifier; it is run
-        # for the entries the PR changed and skipped for the rest. A PR that
-        # changed anything else gets no flag and the whole tier, and so does
-        # every push to main and every scheduled run (the steps below).
-        # verify_all.py's docstring has the argument in full. The value
-        # arrives through the environment, as SLUG_TESTS does above.
+        # 90-minute gate no longer fit this job's cap. For an entry the PR
+        # did not touch, the tier can only repeat what the base branch found
+        # on the same bytes with the same verifier, so it is run for the
+        # entries the PR changed and skipped for the rest.
+        #
+        # --circuit-jobs 0, here and on the three sweeps below: the entries
+        # whose tier does run are checked in one process per CPU, and all of
+        # them before the measured-rate tier starts, so a sampled rate never
+        # shares the CPUs with the pool. A check reads one entry and its own
+        # directory, so the verdicts are the serial ones.
+        #
+        # "The same verifier" is verify_all's to check, not this file's: it
+        # compares its own CIRCUIT_STACK with the base branch's and checks
+        # every circuit if any file differs, so the flag is passed on every
+        # pull request. Here the verifier is the trusted tree, which is the
+        # base branch, so the two always agree. This step used to pass the
+        # flag only when the PR was data-only. verify_all.py's docstring has
+        # the argument in full. The value arrives through the environment,
+        # as SLUG_TESTS does above.
         env:
-          DATA_ONLY: ${{ steps.changes.outputs.data_only }}
           BASE_REF: origin/${{ github.base_ref }}
         run: |
-          circuit_base=""
-          if [ "$DATA_ONLY" = "true" ]; then circuit_base="--circuit-base $BASE_REF"; fi
-          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" $circuit_base
+          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
       - name: verify all submissions (LER stack unchanged)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: submitted
@@ -479,19 +486,52 @@ jobs:
         # alone cannot have changed what any existing ler claim measures, so it
         # re-measures nothing (the diff vs base is empty under codes/ and circuits/).
         #
-        # This step runs the PR's own verifier, so --circuit-base is passed
-        # only when the PR is data-only (a certificate, a note): then that
-        # verifier is the base branch's, no entry changed, and the circuit
-        # tier has nothing to add to the base branch's own run. A PR that
-        # edits the verifier, a test or a workflow is not data-only and
-        # re-runs the tier on every entry, which is the case it exists for.
+        # This step runs the PR's own verifier, and --circuit-base is only
+        # sound while that verifier is the base branch's. verify_all decides
+        # that itself, from the diff of its CIRCUIT_STACK against the base:
+        # a PR that edits the verifier, the schema, a dependency pin or
+        # this file has the tier run on every entry, which is the case it
+        # exists for, and a PR that edits a test, the site or research/
+        # does not repeat the base branch's run. It used to: the flag was
+        # withheld from every PR that was not data-only.
         env:
-          DATA_ONLY: ${{ steps.changes.outputs.data_only }}
           BASE_REF: origin/${{ github.base_ref }}
         run: |
-          circuit_base=""
-          if [ "$DATA_ONLY" = "true" ]; then circuit_base="--circuit-base $BASE_REF"; fi
-          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" $circuit_base
+          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
+      # The circuit record: which entries have passed the circuit tier on
+      # main, on which bytes, under which verifier. A run on main has no base
+      # branch to lean on, and re-running the tier for every entry on every
+      # merge grows with the board (223 entries carried a circuit on
+      # 2026-11-04, 740 a week later, about 4 s each). With the record, a
+      # push re-runs the entries no run on main has passed on these bytes
+      # under this verifier and nothing else. verify_all.py's docstring has
+      # the argument; what this file owes it is where the record may come
+      # from and go to.
+      #
+      # This cache IS trusted, unlike the search cache below, so it is kept
+      # to main at both ends. It is restored only on a push, and the only
+      # pushes this workflow runs on are to main. It is saved only from a
+      # run on main that is not a pull request. GitHub scopes a cache to the
+      # ref that wrote it, so no pull request can write an entry a run on
+      # main will read, and no pull request step is handed the record: the
+      # sweeps above pass --circuit-base and never --circuit-record.
+      # verify/test_verify_all.py reads these conditions back.
+      #
+      # The scheduled run and a manual dispatch do not restore it. They
+      # check every circuit and write the record afresh, so nothing in it
+      # is more than a week from a from-scratch check, and an evicted cache
+      # costs one full sweep rather than coverage.
+      #
+      # The key is per run and attempt because cache entries are immutable;
+      # the prefix is what lets a later run find the newest record.
+      - name: restore the circuit record (push to main)
+        if: github.event_name == 'push'
+        uses: actions/cache/restore@v4
+        with:
+          path: circuit-record
+          key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            circuit-record-
       - name: verify all submissions (push to main, LER scoped to the merge)
         if: github.event_name == 'push' && steps.merge.outputs.ler_stack_changed != 'true'
         working-directory: submitted
@@ -499,11 +539,36 @@ jobs:
         # merge did not touch keeps the rate the PR that introduced it
         # measured; a base that cannot be diffed makes verify_all re-measure
         # everything (its own fail-open rule), so a skip is never silent.
-        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }}
+        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --circuit-jobs 0
       - name: verify all submissions (full LER re-measure)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true') || (github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed == 'true' && steps.verdict.outputs.cache-hit != 'true')
         working-directory: submitted
-        run: uv run --frozen --extra research python verify/verify_all.py
+        # Four kinds of run reach this step, and the circuit tier is scoped
+        # for each as the steps above scope it. A pull request gets
+        # --circuit-base, which verify_all voids when the verifier stack
+        # differs from the base (nearly every file of the LER stack is in
+        # that stack, so in practice this is the whole tier). A run on main
+        # gets the record: a push restored it above, and a scheduled or
+        # dispatched run finds none, checks everything and writes a new one.
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: origin/${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            circuit="--circuit-base $BASE_REF"
+          else
+            circuit="--circuit-record ../circuit-record/record.json"
+          fi
+          uv run --frozen --extra research python verify/verify_all.py $circuit --circuit-jobs 0
+      # always(): a sweep that fails on one entry still earned its other
+      # passes, and only passes are in the file. hashFiles: a sweep that
+      # never ran wrote nothing to save.
+      - name: save the circuit record (runs on main)
+        if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && hashFiles('circuit-record/record.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: circuit-record
+          key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
       # A completed refutation, carried between runs of the same PR (issue
       # #2633). gate_changed.py diffs against the base branch, so a PR that
       # adds a code has a non-empty diff on every push, and a push that only
