@@ -41,6 +41,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "5-3-1",
+      "n": 5,
+      "k": 3,
+      "d": 1,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "5-4-1",
       "n": 5,
       "k": 4,
