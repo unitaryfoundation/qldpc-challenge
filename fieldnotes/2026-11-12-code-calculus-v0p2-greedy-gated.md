@@ -107,10 +107,11 @@ All 135 were submitted (one PR per code). As of the final tally:
 - 10 still open (5487-5498)
 
 The 2D-local campaign (n <= 99) produced 99 deep-verified finds. After
-full-gate verification, ~153 of 593 checked candidates passed and a
-subset are board-advancing with non-colliding slugs. The 2D-local route
-remains productive but distance inflation is the dominant failure mode.
-See code-calculus-dev issue #388 (layout) and #375 (staged distance).
+full-gate verification, 153 of 593 checked candidates passed but 0 are
+submittable: distance_not_refuted (fresh-seed refutation) rejects all of
+them. The multi-seed deep-verify (issue #409) reduced but did not
+eliminate inflation. The 2D-local route remains blocked on distance
+verification. See code-calculus-dev issues #375, #388, #409.
 
 ## Campaign summary table
 
