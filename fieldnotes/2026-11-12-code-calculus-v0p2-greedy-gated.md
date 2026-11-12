@@ -121,15 +121,39 @@ verification. See code-calculus-dev issues #375, #388, #409.
 | cc-greedy-ext | 28 | 286 | 215 | - | 170 distinct | 14 submitted |
 | cc-greedy-n20 | 20 | 182 | 68 | - | 47 | 0 (all collide) |
 | cc-greedy-n60 | 60 | 1281 | 166 | 216 | 168 | 135 |
+| cc-greedy-n61-100 | 100 | 339 | 28 | 12 | 12 | 12 (5579-5590) |
 | cc-greedy-2dlocal-v2 | 99 | 1567 | 99 | 153+ | 153+ (unverified) | 0 submitted |
 
 Total merged to the board: 169 codes (unrestricted, d=1/d=2).
 Issues opened: code-calculus-dev #375, #388.
 
+## n = 61-100 unrestricted greedy extension
+
+The unrestricted greedy pipeline was extended past the n <= 60 sweep with
+the staged deep-verify kept on. Of 339 gate-called candidates, 28 passed
+the gate, 16 of those were refused or collided at the deep-verify stage
+(variant/collision slugs), and 12 survived as board-advancing new slugs,
+each from a 3-step chain off one of four parents:
+
+| Parent | Chain produced |
+|---|---|
+| 64-34-2 | 64-35-2, 64-36-2, 64-37-2 |
+| 68-36-2 | 68-37-2, 68-38-2, 68-39-2 |
+| 72-39-1 | 69-50-1, 70-48-1, 71-44-1 |
+| 76-40-2 | 76-41-2, 76-42-2, 76-43-2 |
+
+All 12 were submitted as one-code PRs (#5579 to #5590) with the rule
+named in the PR title. The deep pass produced 0 downgrades; the 12 are
+9 d=2 points and 3 d=1 points.
+
 ## Issues opened
 
 - code-calculus-dev #375: staged distance checks and auto-variant naming
 - code-calculus-dev #388: layout inheritance violates site_occupancy
+- code-calculus-dev #430: 2D-local distance inflation follow-up
+- code-calculus-dev #431: E-GLUE seam enumerator / row-id minting
+- code-calculus-dev #432: exporter/run_campaign auto-variant + staged deep-verify
+- code-calculus-dev #433: default screening depth for d >= 2
 
 ## Lessons learned
 
