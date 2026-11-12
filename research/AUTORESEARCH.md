@@ -821,7 +821,9 @@ uv run --frozen python research/audits/leader_audit.py pair \
 ```
 
 The peers are chosen automatically — every board entry with the same n, k and max check
-weight and a lower claimed d — or name them with `--peer`. Both sides get the same trials,
+weight and a lower claimed d that is not itself a placeholder (a d = 1 entry is not a
+suspect distance claim, so beating one on d alone owes no audit) — or name them with
+`--peer`. Both sides get the same trials,
 seeds and `--pair-depth`: a number read on your candidate at a deeper budget than the peer
 is an instrument artifact, not a distance difference. One of four decisions comes out:
 

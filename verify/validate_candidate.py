@@ -29,11 +29,12 @@ The gate, per candidate (a schema-shaped submission ``doc``):
   dedup    -- not an exact duplicate of a board entry (WL-equivalent is flagged)
   novelty  -- LABEL only: does it advance its own primary-track cell? (literature
               novelty is out of scope here). A win whose only strict axis is d,
-              over a board entry equal in n, k and w, is also reported as
-              ``d_only_gain`` together with ``d_only_peers``, the entries it beat.
-              The label names those peers whenever the candidate beats one of
-              them on d alone -- even if it gained on another axis over a
-              different entry -- and tells you to re-measure at matched depth.
+              over a board entry equal in n, k and w and not itself a d = 1
+              placeholder, is also reported as ``d_only_gain`` together with
+              ``d_only_peers``, the entries it beat. The label names those peers
+              whenever the candidate beats one of them on d alone -- even if it
+              gained on another axis over a different entry -- and tells you to
+              re-measure at matched depth.
 
 ``passed`` is True iff the verifier accepts it (structure + witnesses), it is not
 refuted, and it is not an exact board duplicate. Novelty is a label, not a pass
@@ -270,8 +271,14 @@ def validate_candidate(doc, *, seed=None, refute=True):
     # where the instruction to re-measure lives, so it must not go quiet just
     # because the candidate is also good somewhere else.
     advances_by = sorted({ax for _, gains, _ in dominated for ax in gains})
-    d_only_peers = [desc for _, gains, desc in dominated if gains == ["d"]]
-    d_only_gain = bool(board_advancing) and advances_by == ["d"]
+    # A d = 1 code is a placeholder, not a real distance claim: beating one
+    # on d alone is not the suspect (inflated-bound) pattern, so it is not a
+    # d-only peer and does not by itself make the gain d-only.
+    d_only_peers = [desc for b, gains, desc in dominated
+                    if gains == ["d"] and b.get("d", 0) > 1]
+    d_only_gain = (bool(board_advancing) and advances_by == ["d"]
+                   and claimed_d is not None and claimed_d > 1
+                   and bool(d_only_peers))
     g["novelty"] = {"cell": [wc, lc], "board": code_type,
                     "board_advancing": board_advancing,
                     "dominated_by": dominators, "advances_by": advances_by,

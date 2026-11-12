@@ -4,7 +4,9 @@ AGENTS.md and research/AUTORESEARCH.md section 5b require that a candidate whose
 only strict gain over a board entry is d (same n, k, and max check weight) be
 re-measured beside that entry at one budget with ``research/audits/leader_audit.py
 pair`` before it is packaged: both distances are witness-backed upper bounds, and
-a gain on d alone is where an inflated bound shows up. Two paths package a
+a gain on d alone is where an inflated bound shows up. A d = 1 entry is a
+placeholder, not a suspect distance claim, so it is never a d-only peer: beating
+one on d alone owes no audit. Two paths package a
 candidate, ``research/kit/promote.py`` and ``./qldpc submit``, and both call this
 module, so the rule cannot drift between them (issue #4236).
 
@@ -89,6 +91,8 @@ def d_only_peers(candidate, board):
     recorded weight cannot be compared and is skipped.
     """
     n, k, d, w = candidate["n"], candidate["k"], candidate["d"], candidate.get("w")
+    if d is None or d <= 1:
+        return []
     code_type = candidate.get("code_type", "CSS")
     wc = _WEIGHT_ORDER.get(candidate.get("weight_class"), 9)
     lc = _LOCAL_ORDER.get(candidate.get("locality_class"), 9)
@@ -99,7 +103,9 @@ def d_only_peers(candidate, board):
         if _WEIGHT_ORDER.get(b.get("weight_class"), 9) > wc \
                 or _LOCAL_ORDER.get(b.get("locality_class"), 9) > lc:
             continue
-        if (b["n"], b["k"], b["w"]) == (n, k, w) and b["d"] < d:
+        # a d = 1 entry is a placeholder, not a real distance claim: beating it
+        # on d alone is not the suspect (inflated-bound) pattern.
+        if (b["n"], b["k"], b["w"]) == (n, k, w) and b.get("d", 0) > 1 and b["d"] < d:
             out.append(describe(b))
     return out
 
