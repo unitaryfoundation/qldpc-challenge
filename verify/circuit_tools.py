@@ -90,24 +90,32 @@ def strip_noise(circuit):
 
 def skeleton_errors(skeleton):
     """Gate-set conformance of a noiseless skeleton: [] iff every instruction
-    is an allowed one (see module docstring)."""
+    is an allowed one (see module docstring).
+
+    Whether a gate NAME is allowed is settled the first time it is met.
+    Whether a unitary gate's TARGETS are all qubits is a property of each
+    instruction, so every one is read until that name has been reported: a
+    classically controlled gate after a plain one of the same name is as far
+    outside the set as one that comes first. Each failure is named once per
+    gate name."""
     errs = []
-    seen = set()
+    unitary = {}                  # gate name -> is it a unitary gate
+    reported = set()              # unitary names already reported
     for inst in skeleton.flattened():
         name = inst.name
-        if name in seen:
-            continue
-        seen.add(name)
         if name in ANNOTATIONS or name in MEASURES or name in RESET_FLIP:
             continue
-        gd = stim.gate_data(name)
-        if gd.is_unitary:
-            if any(not t.is_qubit_target for t in inst.targets_copy()):
-                errs.append(f"{name} with a non-qubit target (classical "
-                            f"control) is outside the circuit-tier gate set")
-            continue
-        errs.append(f"instruction {name} is outside the circuit-tier gate set "
-                    f"(unitary gates, R, RX, M, MX, and annotations)")
+        if name not in unitary:
+            unitary[name] = stim.gate_data(name).is_unitary
+            if not unitary[name]:
+                errs.append(f"instruction {name} is outside the circuit-tier "
+                            f"gate set (unitary gates, R, RX, M, MX, and "
+                            f"annotations)")
+        if unitary[name] and name not in reported and any(
+                not t.is_qubit_target for t in inst.targets_copy()):
+            reported.add(name)
+            errs.append(f"{name} with a non-qubit target (classical "
+                        f"control) is outside the circuit-tier gate set")
     return errs
 
 

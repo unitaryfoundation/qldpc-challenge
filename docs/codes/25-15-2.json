@@ -1,0 +1,120 @@
+{
+ "schema_version": "0.2",
+ "name": "[[25,16,1]]",
+ "code_type": "CSS",
+ "n": 25,
+ "k": 15,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    2,
+    3,
+    24
+   ],
+   [
+    4,
+    5,
+    6,
+    7,
+    24
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    24
+   ],
+   [
+    12,
+    13,
+    14,
+    15,
+    24
+   ],
+   [
+    16,
+    17,
+    18,
+    19,
+    24
+   ],
+   [
+    20,
+    21,
+    22,
+    23,
+    24
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    4,
+    8,
+    12,
+    16,
+    20,
+    24
+   ],
+   [
+    1,
+    5,
+    9,
+    13,
+    17,
+    21,
+    24
+   ],
+   [
+    2,
+    6,
+    10,
+    14,
+    18,
+    22,
+    24
+   ],
+   [
+    3,
+    7,
+    11,
+    15,
+    19,
+    23,
+    24
+   ]
+  ]
+ },
+ "distance": {
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    15,
+    23
+   ]
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1
+   ]
+  },
+  "d": 2
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "C-ADD-CHECK strict improvement (code calculus v0.2rc): added one check killing every minimum-weight logical of parent codes/25-16-1.json",
+  "origin": "submission",
+  "date": "2026-11-07",
+  "model": "Beam 1.0"
+ },
+ "family": "other"
+}

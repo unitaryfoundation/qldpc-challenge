@@ -647,3 +647,59 @@ def test_dem_columns_reads_plain_models_from_text(monkeypatch):
     assert H.shape == (dem.num_detectors, len(cols))
     assert all(sorted(H[:, j].nonzero()[0]) == sorted(set(ds))
                for j, (ds, _) in enumerate(cols))
+
+
+# ---------------------------------------- gate set: every instruction is read
+
+def test_classical_control_is_refused_wherever_it_appears():
+    """The gate-set check reads every instruction. It used to read the first
+    instruction of each gate name, so a classically controlled gate after a
+    plain one of the same name passed it, and the noise recipe step then
+    raised on the DEPOLARIZE2 it tried to place."""
+    plain = "R 0 1\nTICK\nCX 0 1\nTICK\nM 0\nTICK\n"
+    assert ct.skeleton_errors(stim.Circuit(plain + "CX 1 0\nTICK\nM 1")) == []
+    for late in ("CX rec[-1] 1", "CZ rec[-1] 1", "CX sweep[0] 1",
+                 "CX 0 1 rec[-1] 1"):
+        circuit = stim.Circuit(plain + late + "\nTICK\nM 1")
+        errs = ct.skeleton_errors(circuit)
+        name = late.split()[0]
+        assert errs == [f"{name} with a non-qubit target (classical control) "
+                        f"is outside the circuit-tier gate set"], (late, errs)
+        # the recipe check reports it and does not raise (the mixed
+        # instruction also reuses a qubit within its layer, a second error)
+        assert ct.noise_recipe_errors(circuit, 2)[:1] == errs, late
+    # still refused where it always was: on the first instruction of a name
+    assert ct.skeleton_errors(stim.Circuit(
+        "R 0 1\nTICK\nCX rec[-1] 1\nTICK\nM 0 1")) != []
+
+
+def test_gate_set_errors_are_named_once_per_gate():
+    """One line per offending gate name, however often it recurs: the report
+    of a long circuit stays readable."""
+    circuit = stim.Circuit(
+        "R 0 1\nTICK\nCX 0 1\nTICK\nM 0\nTICK\nCX rec[-1] 1\nTICK\n"
+        "CX rec[-1] 0\nTICK\nMR 0\nTICK\nCZ sweep[1] 0\nTICK\nMR 1\nTICK\n"
+        "CX 0 1\nTICK\nM 0 1")
+    errs = ct.skeleton_errors(circuit)
+    assert len(errs) == 3, errs
+    assert sum("CX with a non-qubit target" in e for e in errs) == 1
+    assert sum("CZ with a non-qubit target" in e for e in errs) == 1
+    assert sum("instruction MR is outside" in e for e in errs) == 1
+
+
+def test_late_classical_control_fails_the_entry_cleanly(seed, tmp_path):
+    """End to end: a feedback gate appended after the final measurements
+    leaves every detector deterministic, so the verifier reaches the noise
+    recipe step. That step must fail the entry, not raise out of
+    verify_circuit, where it would end the whole sweep on a traceback."""
+    doc, sd = seed
+    d = _tampered_dir(sd, tmp_path, "memory_z.stim",
+                      lambda text: text.rstrip("\n") + "\nTICK\nCX rec[-1] 0\n")
+    report = cv.verify_circuit(doc, d)
+    assert not report["ok"]
+    assert _status(report, "Z_detectors_deterministic")
+    assert not _status(report, "Z_noise_recipe_canonical")
+    detail = next(c["detail"] for c in report["checks"]
+                  if c["check"] == "Z_noise_recipe_canonical")
+    assert "CX with a non-qubit target" in detail, detail
+    assert _status(report, "X_noise_recipe_canonical")     # X is untouched
