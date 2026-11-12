@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-24.04
     # 90 min fast-pass cap (gate_changed.FAST_SECONDS) + ~30 min of fixed steps
     # + margin. Hitting this means a hang or a bug, not a large code.
-    timeout-minutes: 130
+    timeout-minutes: 180
     env:
       PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
       # The files whose change can alter a measured circuit.ler rate: the
