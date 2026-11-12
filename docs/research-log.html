@@ -2613,6 +2613,25 @@ EOF
 <p>Model: Beam 1.0. Author: @mathysrennela. Harness: OpenCode. Repo tooling: <code>research/kit/submit.py</code>, <code>research/kit/coordination.py</code>, <code>research/kit/prescreen.py</code>, <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Load the parent CSS entry, build a <code>CodeState</code> via <code>CodeState.from_challenge</code>, enumerate <code>E-PUNCTURE</code> candidates with the code-calculus planner, apply with <code>apply_operation</code>, and package the surviving child with <code>make_submission</code>. Library: <code>github.com/MathysRennela/code-calculus</code> (v0.1).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/25-16-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/35-20-2.html">[[35,20,2]] — 35-20-2</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[35,20,2]] — C-ADD-CHECK strict improvement of 35-21-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/35-21-1.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/35-21-1.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/35-21-1.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/35-20-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/35-21-1.html">[[35,21,1]] — 35-21-1</a></h3><div class=kv style="color:var(--mut)">2026-11-07 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[35,21,1]] — code-calculus v0.1 E-PUNCTURE of a CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted a Pareto opening in the unrestricted / weight-12 cell via the priced construction calculus (<code>unitaryfoundation/code-calculus</code> v0.1): E-PUNCTURE a qubit (or check) of a CSS parent, recomputing ranks, connectivity, and max check weight. The child is board-advancing when its (n,k,d,w) is nondominated in its cell.</p>
@@ -6454,6 +6473,25 @@ HX, HZ = build_2bga(mul, a=[167, 268, 58, 61], b=[284, 292, 32, 6])
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), machine/priced_calculus.py and machine/planner.py from github.com/MathysRennela/code-calculus-dev @ 5084747d90dee5fd3927f66bca33bbe3198ba67d (<code>machine/priced_calculus.py</code>, <code>machine/planner.py</code>). Gate: verify/validate_candidate.py. Approx compute: a few minutes on CPU.</p>
 <h4>Reproduction</h4>
 <p>Parent: codes/12-2-4.json (or 12-2-4-b.json). Apply a depth-2 chain of C-DELETE-CHECK / E-PEEL per the priced calculus consumer; the survivor is the staged candidate validated by the gate. Full matrices in codes/11-8-1.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-8-1-c.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/13-6-2.html">[[13,6,2]] — 13-6-2</a></h3><div class=kv style="color:var(--mut)">2026-10-29 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[13,6,2]] — C-ADD-CHECK strict improvement of 13-7-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/13-7-1.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/13-7-1.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/13-7-1.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/13-6-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/13-7-1.html">[[13,7,1]] — 13-7-1</a></h3><div class=kv style="color:var(--mut)">2026-10-29 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[13,7,1]] — priced-calculus deletion/peel chain from a small CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-4 local-2d-single board cell; aim at a board-advancing point by deforming a small high-distance CSS parent with the priced construction calculus. Hypothesis: a depth-3 chain of C-DELETE-CHECK / E-PEEL moves on a d&gt;=3 parent lands a d&gt;=1 survivor at n=13.</p>
@@ -6621,6 +6659,25 @@ HX, HZ = build_2bga(mul, a=[167, 268, 58, 61], b=[284, 292, 32, 6])
 <p>Model: Beam 1.0. Harness: research/kit, machine/priced_calculus.py and machine/planner.py from github.com/MathysRennela/code-calculus-dev. Gate: verify/validate_candidate.py.</p>
 <h4>Reproduction</h4>
 <p>Parent: a high-rate CSS entry (n~40-70). Depth-2 chain of C-DELETE-CHECK per the priced calculus consumer. Full matrices in codes/58-32-1.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/58-32-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/9-6-2.html">[[9,6,2]] — 9-6-2</a></h3><div class=kv style="color:var(--mut)">2026-10-29 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,6,2]] — C-ADD-CHECK strict improvement of 9-7-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/9-7-1.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/9-7-1.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/9-7-1.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-6-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/9-7-1.html">[[9,7,1]] — 9-7-1</a></h3><div class=kv style="color:var(--mut)">2026-10-29 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[9,7,1]] — priced-calculus deletion/peel chain from a 12-qubit CSS parent</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 local-2d board cell; aim at a board-advancing point by deforming a small high-distance CSS parent with the priced construction calculus. Hypothesis: a depth-3 chain of single-check deletion (C-DELETE-CHECK) and peel (E-PEEL) moves on a d&gt;=4 parent lands a d&gt;=1 survivor at n=9.</p>
@@ -8490,6 +8547,25 @@ b = [14, 70, 111, 186, 211, 310]
 <p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
 <h4>Reproduction</h4>
 <p>Start from <code>codes/12-10-1.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-8-2-c.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/12-8-2-d.html">[[12,8,2]] — 12-8-2-d</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,8,2]] — C-ADD-CHECK strict improvement of 12-9-1-b</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/12-9-1-b.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/12-9-1-b.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/12-9-1-b.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-8-2-d.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/12-9-1-b.html">[[12,9,1]] — 12-9-1-b</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,9,1]] — priced-calculus C-DELETE-CHECK</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aimed at a thin (n,k,d) cell. Derived by a single C-DELETE-CHECK move of the priced construction calculus from a parent entry, keeping only instances with a connected Tanner graph and fresh X/Z witnesses.</p>
@@ -8661,6 +8737,25 @@ b = [14, 70, 111, 186, 211, 310]
 <p>Model: Beam 1.0. Priced construction calculus consumer (E-PEEL cell). Challenge verifier <code>verify/qldpc_verify.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Operation: E-PEEL q=0 Z from 8-6-2.json. Witnesses as stored in the entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/7-6-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/8-4-2-b.html">[[8,4,2]] — 8-4-2-b</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[8,4,2]] — C-ADD-CHECK strict improvement of 8-5-1-b</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/8-5-1-b.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/8-5-1-b.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/8-5-1-b.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/8-4-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/8-4-2-c.html">[[8,4,2]] — 8-4-2-c</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[8,4,2]] — C-ADD-CHECK strict improvement of 8-6-1</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Convert a d=1 parent (<code>codes/8-6-1.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
@@ -10705,6 +10800,25 @@ E_z = [[113, 58, 99, 76, 64, 82, 38, 100],
 <p>Model: Beam 1.0. The local verdict is <code>verify/validate_candidate.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Reconstruct the parent board code, delete the named check, and recompute n, k, and the witness-backed distance. The resulting checks are the submitted ones.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/14-7-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/14-8-2-b.html">[[14,8,2]] — 14-8-2-b</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[14,8,2]] — C-ADD-CHECK strict improvement of 14-9-1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Convert a d=1 parent (<code>codes/14-9-1.json</code>) to d=2 by C-ADD-CHECK: the parent&#x27;s distance is 1, so its minimum-weight logicals are bare (weight-1) qubits. Adding a single check in the opposite sector whose support contains every bare logical qubit kills them all by anticommutation, raising that sector&#x27;s distance to at least 2 (Proposition 18.3, code calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>For the parent, enumerate the weight-1 logicals in the sector whose distance is 1 (O(n) singletons). If their union is an admissible check support (commutes with the sector&#x27;s own checks, independent in the added sector), build the child and verify witnesses. No exponential search was needed.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Parent: <code>codes/14-9-1.json</code> (d=1, upper bound).</li>
+<li>Child witnesses: inherited from the parent where still valid, plus a</li>
+<p>weight-2 witness in the converted sector found by pair scan.</p>
+<li>Verified by <code>verify/validate_candidate.py</code> (passed: true), including the</li>
+<p>random-seed refutation pass.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Codes where the bare-qubit support was inadmissible (commutation or independence failed) were skipped; some d=1 codes have bare logicals in both sectors and need two checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. Construction calculus v0.2rc (C-ADD-CHECK strict improvement).</p>
+<h4>Reproduction</h4>
+<p>Start from <code>codes/14-9-1.json</code>, add one check in the opposite sector with support = sorted list of qubits q such that {q} is a weight-1 logical of the parent in the d=1 sector.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/14-8-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/14-9-1.html">[[14,9,1]] — 14-9-1</a></h3><div class=kv style="color:var(--mut)">2026-10-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[14,9,1]] C-DELETE-CHECK a1 from 14-8-2.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Board-advancing code found by the priced construction calculus. Operation: C-DELETE-CHECK applied to a board entry, raising k / lowering check weight while keeping a witness-backed distance. Rule used: C-DELETE-CHECK.</p>

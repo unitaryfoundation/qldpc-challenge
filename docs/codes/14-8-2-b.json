@@ -1,0 +1,95 @@
+{
+ "schema_version": "0.1",
+ "name": "[[14,9,1]] (C-ADD-CHECK d=1->d=2)",
+ "code_type": "CSS",
+ "n": 14,
+ "k": 8,
+ "checks": {
+  "X": [
+   [
+    0,
+    1,
+    4,
+    6,
+    7,
+    8,
+    11,
+    13
+   ],
+   [
+    0,
+    1,
+    2,
+    5,
+    7,
+    8,
+    9,
+    12
+   ],
+   [
+    3,
+    10
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    1,
+    2,
+    4,
+    7,
+    8,
+    9,
+    11
+   ],
+   [
+    1,
+    2,
+    3,
+    5,
+    8,
+    9,
+    10,
+    12
+   ],
+   [
+    2,
+    3,
+    4,
+    6,
+    9,
+    10,
+    11,
+    13
+   ]
+  ]
+ },
+ "distance": {
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    1,
+    8
+   ]
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    1
+   ]
+  },
+  "d": 2
+ },
+ "provenance": {
+  "authors": [
+   "@MathysRennela"
+  ],
+  "construction": "C-ADD-CHECK strict improvement (code calculus v0.2rc): added one check killing all weight-1 logicals of parent codes/14-9-1.json",
+  "origin": "submission",
+  "date": "2026-10-19",
+  "model": "Beam 1.0"
+ }
+}
