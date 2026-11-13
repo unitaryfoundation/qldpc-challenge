@@ -4762,7 +4762,7 @@
   "construction": "SCE (arXiv:2606.24808v2) lifted product",
   "origin": "submission",
   "date": "2026-11-13",
-  "model": "human",
+  "model": "Beam 1.0",
   "notes": "SCE code",
   "references": [
    "arXiv:2606.24808v2"
