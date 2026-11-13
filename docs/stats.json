@@ -1,6 +1,6 @@
 {
-  "verified_codes": 3438,
-  "css_codes": 3182,
+  "verified_codes": 3441,
+  "css_codes": 3185,
   "stabilizer_codes": 256,
   "certified_exact": 1644,
   "tracks": 12,
@@ -8,22 +8,22 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2032,
-    "parameters_only": 395,
+    "not_derived": 268,
     "literature": 490,
-    "not_derived": 265,
+    "parameters_only": 395,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2610,
-    "known_parameters": 753,
+    "unknown": 2611,
+    "known_parameters": 755,
     "new_parameters": 75
   },
-  "novelty_audited": 828,
+  "novelty_audited": 830,
   "board_screen": {
-    "not_screened": 652,
-    "distinct": 2493,
+    "not_screened": 655,
     "review": 37,
+    "distinct": 2493,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
     "caveat": "distinct means not permutation-equivalent to any seeded or literature entry on this board, not that the code is unpublished; review is a flag, not a verdict; nothing here is a novelty claim"
@@ -118,10 +118,10 @@
         "moved": true
       },
       "local-2d-bilayer~weight-8": {
-        "records": 643,
+        "records": 644,
         "families": 13,
-        "untagged": 131,
-        "untagged_share": 0.204,
+        "untagged": 132,
+        "untagged_share": 0.205,
         "top": [
           {
             "family": "generalized-bicycle",
@@ -131,13 +131,13 @@
           {
             "family": "topological",
             "records": 93,
-            "share": 0.145
+            "share": 0.144
           }
         ],
         "top1_share": 0.311,
-        "top2_share": 0.456,
-        "hhi": 0.144,
-        "members": 1214,
+        "top2_share": 0.455,
+        "hhi": 0.143,
+        "members": 1215,
         "leader": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
@@ -151,26 +151,26 @@
         "moved": false
       },
       "local-2d-bilayer~weight-any": {
-        "records": 716,
+        "records": 719,
         "families": 15,
-        "untagged": 169,
-        "untagged_share": 0.236,
+        "untagged": 172,
+        "untagged_share": 0.239,
         "top": [
           {
             "family": "generalized-bicycle",
             "records": 222,
-            "share": 0.31
+            "share": 0.309
           },
           {
             "family": "topological",
             "records": 93,
-            "share": 0.13
+            "share": 0.129
           }
         ],
-        "top1_share": 0.31,
-        "top2_share": 0.44,
-        "hhi": 0.135,
-        "members": 1386,
+        "top1_share": 0.309,
+        "top2_share": 0.438,
+        "hhi": 0.134,
+        "members": 1389,
         "leader": {
           "slug": "330-66-12",
           "family": "lifted-product",
@@ -401,7 +401,7 @@
         "top1_share": 0.31,
         "top2_share": 0.441,
         "hhi": 0.135,
-        "members": 2255,
+        "members": 2256,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -434,7 +434,7 @@
         "top1_share": 0.358,
         "top2_share": 0.473,
         "hhi": 0.154,
-        "members": 3182,
+        "members": 3185,
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",

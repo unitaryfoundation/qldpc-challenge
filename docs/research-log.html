@@ -772,6 +772,12 @@
 <p>Start from <code>codes/185-67-2.json</code>, apply <code>E-PUNCTURE</code> on the target sector, and repeat greedily with Pareto ranking and staged deep-verify.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/184-70-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/33-7-1.html">[[33,7,1]] — 33-7-1</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[33,7,1]] code-calculus v0.2rc greedy gated</h3>
 <p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/33-7-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/39-4-7.html">[[39,4,7]] — 39-4-7</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[39,4,7]] code-calculus v0.2rc greedy gated</h3>
+<p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/39-4-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/41-30-1.html">[[41,30,1]] — 41-30-1</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[41,30,1]] code-calculus v0.2rc greedy gated</h3>
+<p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/41-30-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/53-31-2.html">[[53,31,2]] — 53-31-2</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[53,31,2]] code-calculus v0.2rc greedy gated</h3>
+<p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/53-31-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/12-7-2.html">[[12,7,2]] — 12-7-2</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,7,2]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
@@ -2644,6 +2650,145 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-4-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3>C-ADD-CHECK strict improvement is tractable at d=1: 15 board-advancing d=1 -&gt; d=2 conversions merged, 0 inadmissible-free fixes needed</h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>C-ADD-CHECK strict improvement is tractable at d=1</h3>
+<p>The 2026-10-19 fieldnote reported 0 strict improvements out of 736 valid C-ADD-CHECK additions for n &lt;= 10, and the judgment layer records the strict-improvement cell as conditional on a hypothesis that was &quot;hard to come by&quot;. This fieldnote records the region where that hypothesis is in fact cheap, and the campaign that harvested it.</p>
+<h4>The cheap region: d = 1 parents</h4>
+<p>At d = 1 the minimum-weight logicals are bare (weight-1) qubits, so Proposition 18.3&#x27;s condition — every minimum-weight class killed — reduces to an O(n) combinatorial fact, not an exponential one:</p>
+<ul>
+<li>enumerate the qubits q such that {q} is a weight-1 logical of the parent</li>
+<p>in the d=1 sector (commutes with the opposite sector&#x27;s checks, outside the same sector&#x27;s span): O(n) singleton tests;</p>
+<li>add ONE check in the OPPOSITE sector whose support is exactly that set</li>
+<p>of bare qubits: it anticommutes with every bare logical, so no weight-1 class survives and the converted sector&#x27;s distance is at least 2;</p>
+<li>the added support commutes with the parent&#x27;s own sector checks</li>
+<p>automatically whenever every bare qubit avoids them (parity 0), so the only admissibility risk is same-sector independence.</p>
+</ul>
+<p>No exponential enumeration, no SAT solver, no exact-distance oracle beyond the parent&#x27;s own weight-1 witness. The method scales to the largest d=1 codes on the board (n up to 898) — the feasibility check is O(n) and the new weight-2 witness is an O(n^2) pair scan.</p>
+<h4>Campaign results (2026-11-12)</h4>
+<p>Population: every <code>codes/</code> entry with declared distance 1 and a valid weight-1 witness (80 entries, n from 4 to 898).</p>
+<p>| Outcome | Count | Notes | | --- | --- | --- | | Single-check conversion, gate passed, staged | 20 | admissible support = the bare set | | Board-advancing (not dominated), submitted | 15 | 15 PRs, ALL MERGED (#5509-5529) | | Exact duplicate of a newer board entry | 1 | 12-6-2.json landed mid-campaign; gate refused | | Inadmissible bare-set support | ~50 | commutation parity or same-sector independence failed | | No bare logicals found | 2 | distance-1 source outside the bare-qubit mechanism |</p>
+<p>The 15 merged conversions: [[8,4,2]] x2 variants, [[9,6,2]], [[10,5,2]], [[10,6,2]] x2 variants, [[10,7,2]], [[11,7,2]], [[12,5,2]], [[12,7,2]], [[12,8,2]] x2 variants, [[13,6,2]], [[14,8,2]], [[35,20,2]]. Each costs exactly 1 in k for +1 in d; every one passed <code>verify/validate_candidate.py</code> including the random-seed refutation, and CI&#x27;s deep verify run reproduced every distance claim without downgrade.</p>
+<h4>What the single-check method cannot do</h4>
+<ul>
+<li><b>d &gt;= 2 parents</b>: tested 23 real d=2 codes with single-check strict</li>
+<p>improvement: 0/23. The weight-2 logical classes are too numerous for one support to hit all of them (median 6 minimum-weight logicals among successful small-code conversions vs. far more here).</p>
+<li><b>Multi-check rescue at d=2</b>: a greedy set-cover over admissible checks</li>
+<p>(kill the most surviving weight-2 logicals per step, at most 4 checks) verified 2 strict improvements in 20 real small d=2 codes (cost 2 and 4 checks). Real, but the k price rises with the check count and the enumeration of weight-2 classes is O(n^2) — viable to n of a few hundred only for the witness scan, not the class enumeration.</p>
+<li><b>Inadmissible bare sets</b>: ~50 d=1 codes failed admissibility. The fix</li>
+<p>is linear, not search: the added support must be B + e with e disjoint from B (so every bare qubit stays covered), parity(e and r) = parity(B and r) for every same-sector check r (commutation), and B + e outside the added sector&#x27;s span (independence) — a min-weight coset representative problem, not a guess.</p>
+</ul>
+<h4>Why the old 0/736 result and this are consistent</h4>
+<p>The 736 additions were sampled on random small parents (n &lt;= 10) whose minimum-weight logical counts were median 6 — the region where the hypothesis is expensive. Here the same cell holds wherever the parent has a small bare set and an admissible covering support, and d=1 parents are exactly the codes where the bare set is the whole minimum-weight class. The cell was never vacuous; it was being searched in the wrong regime.</p>
+<h4>Boundary and reopening conditions</h4>
+<ul>
+<li>Claimed region: CSS parents with distance exactly 1 and a valid weight-1</li>
+<p>witness, any n (no oracle ceiling needed — the method never enumerates the logical space).</p>
+<li>Reopen d &gt;= 2 with: a class-enumeration method below C(n,d) (SAT/ILP or</li>
+<p>orbit folding under code automorphisms), and a willingness to spend 2-4 in k per strict improvement.</p>
+<li>All distances remain witness-backed upper bounds; the strict-improvement</li>
+<p>claim d&#x27; &gt;= d+1 is justified by the calculus cell (Proposition 18.3) plus the exhaustive single-sector weight-1 scan, which at d=1 IS the exhaustive minimum-weight-class enumeration the hypothesis requires.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Author: @MathysRennela. code-calculus v0.2rc (<code>strict_improvement_feasible</code>, <code>admissible_added_checks</code>), the challenge gate (<code>verify/validate_candidate.py</code>), and the staged-candidate pipeline (described in each merged PR&#x27;s note; no committed script is cited here — the method is the four-step recipe above).</p>
+<h4>Extension campaign (same day, admissibility-fixed supports)</h4>
+<p>The ~50 inadmissible d=1 parents were not dead ends: the fix is linear, not search. The added support must be B + e with e disjoint from B (every bare qubit stays covered), parity(e and r) = parity(B and r) for every same-sector check r (commutation), and B + e outside the added sector&#x27;s row space (independence). Solve the GF(2) system, then take the lightest element of the solution coset found by a bounded random walk over the kernel. Parents whose system is inconsistent (a check row fully inside the bare set with odd parity) have no single-check fix — 25 of the population, recorded as genuinely closed under this mechanism.</p>
+<p>Results over the same d=1 population:</p>
+<p>| Outcome | Count | | --- | --- | | Additional conversions staged (admissibility-fixed) | 77 | | Non-dominated, gate-passed, submitted | 35 PRs (10 merged, 25 in CI at write time: #5532-#5567) | | Exact duplicates of the first wave or newer board entries, refused by the gate | 13 | | Inconsistent GF(2) system (no single-check fix exists) | 25 | | Converted but dominated (kept staged, not submitted) | remaining |</p>
+<p>The converted points now reach [[58,31,2]] (w=11); the largest n where the whole pipeline (bare-set scan, GF(2) fix, witness inheritance, weight-2 pair scan, full gate) ran end to end is n=898.</p>
+<h4>Multi-check strict improvement at d=2 (first verified finds)</h4>
+<p>The greedy set-cover over admissible checks was run against 52 real d=2 codes with n &lt;= 20 (weight-2 class enumeration is O(n^2) there): 4 codes yielded a verified d=2 -&gt; d=3 strict improvement, 3 passed the gate:</p>
+<ul>
+<li>[[9,1,3]] from <code>codes/9-4-2.json</code> (3 checks) — submitted (#5567);</li>
+<li>[[10,2,3]] and [[18,4,3]] — gate-passed but dominated by existing</li>
+<p>entries on max check weight (board w=4 and 5 vs. our w=5 and 7), so recorded here rather than submitted.</p>
+</ul>
+<p>Cost is real: 2-4 checks, i.e. 2-4 in k, and the yield is under 10% of parents. But this is the first mechanical, witness-backed d=2 -&gt; d=3 strict improvement the cell has produced on board parents.</p>
+<h4>Updated cumulative totals for v0.2rc C-ADD-CHECK</h4>
+<p>50 board-advancing submissions across the two waves (15 + 35), all C-ADD-CHECK strict improvement, all with the rule named in the PR title, provenance.model &quot;Beam 1.0&quot;, author @MathysRennela. The cell that went 0/736 in October is now the highest-yield strict-improvement mechanism on the board — its productive regime is exactly the codes whose minimum-weight classes are enumerable at the parent&#x27;s own scale.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-12-c-add-check-d1-to-d2-campaign.md">raw markdown</a></div></details></section>
+<section class=blk><h3>code-calculus v0.2 greedy gated campaigns: 20+ distinct board-advancing points from C-DELETE-CHECK, E-PEEL, E-PUNCTURE</h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; fieldnote &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details ><summary>note</summary><div class=notebody><h3>code-calculus v0.2 greedy gated campaigns</h3>
+<p>This note records the first board-advancing output of the v0.2 greedy campaigns that compose the calculus&#x27;s three productive moves with the new sector-targeted search, sector swap, support search, and Pareto ranking.</p>
+<h4>What was run</h4>
+<p>Two campaigns, both driven by research/campaigns/cc-run-campaign-greedy-2026-11-11/run.py on CSS parents from codes/:</p>
+<ul>
+<li>cc-greedy-gated (n &lt;= 10, 3 steps, budget 16): 38 board-advancing</li>
+<p>candidate files, 20 distinct (n, k, d) points.</p>
+<li>cc-greedy-ext (n &lt;= 28, 3 steps, budget 32): 215 board-advancing</li>
+<p>candidate files, 170 distinct (n, k, d) points. Stopped at n = 28.</p>
+</ul>
+<p>Total across both runs: 253 board-advancing candidate files, 177 distinct (n, k, d) points.</p>
+<p>Excluding the submitted points, the remaining staged candidates number 243 files / 174 distinct points. Their Pareto frontier is 96 distinct (n, k, d, w, cell) points (112 files); ignoring the locality cell, 51 distinct (n, k, d, w) points (63 files) are mutually non-dominating.</p>
+<p>14 of these frontier points were submitted as PRs (5385, 5391, 5395-5407), all verified board-advancing against the base board. The remaining 82 were not submitted (downgraded, colliding, or not yet attempted).</p>
+<h4>n &lt;= 20 re-run (corrected script, staged deep-verify)</h4>
+<p>Re-ran the greedy campaign with the staged deep-verify enabled (2k -&gt; 20k -&gt; 200k -&gt; 2M trials, stopping early on downgrade). Result: 182 candidates gated, 68 finds, 0 downgraded, 6 refused (collisions / d-only gains). All 68 survived the deep pass without distance correction.</p>
+<p>However, all 30 non-colliding-screened survivors turned out to have slugs that collide with existing board entries after the deep pass, so no new submissions resulted from this run. The deep pass kept the distance unchanged but the (n,k,d) point was already occupied. This is the variant-collision case, not inflation.</p>
+<p>Net: the corrected pipeline prevents inflated distances (0 downgrades) but the board is now dense enough that most surviving points are variants of existing entries rather than new slugs.</p>
+<p>Each step calls machine.planner.plan with sector_targeted=True (target sector chosen per parent by infer_target_sector), sector_swap=True (E-LOCAL-HADAMARD at T=Q), support_search (bounded witness search to tighten the ledger), and ranking=&quot;pareto&quot; with domination pruning. The top non-prune survivor is applied with apply_operation, exported via export_challenge_entry (witness-backed upper bounds only), and validated with verify/validate_candidate.py through coordination.gate_and_record. Only gate-passing candidates are counted.</p>
+<h4>Moves involved</h4>
+<p>The candidates are 1-3 step compositions of:</p>
+<ul>
+<li>C-DELETE-CHECK</li>
+<li>E-PEEL</li>
+<li>E-PUNCTURE</li>
+<li>occasional E-LOCAL-HADAMARD sector swap</li>
+</ul>
+<h4>Distinct advancing points (n &lt;= 10 run)</h4>
+<p>(5,3,1), (6,3,1), (7,5,1), (8,4,2), (8,5,1) x3, (8,6,1) x4, (9,2,3) x2, (9,3,3) x2, (9,4,2), (9,6,1) x5, (10,3,3) x5, (10,4,2), (10,4,3) x4, (10,4,4), (10,6,1), (10,7,1), (11,3,3), (11,3,4), (11,4,3), (12,6,2).</p>
+<h4>What did not work</h4>
+<ul>
+<li>cc-sector-swap-css alone (n &lt;= 200): 0 board-advancing; every gated</li>
+<p>child was an exact duplicate or a refutation.</p>
+<li>cc-strict-addition-css: 0 feasible strict improvements across ~1,159</li>
+<p>admissible supports (n &lt;= 20), consistent with v0.1&#x27;s 0/736.</p>
+<li>cc-glue-css: 0 successful glues in the probe (seam certificate not</li>
+<p>satisfiable without a proper seam enumerator).</p>
+</ul>
+<h4>Reproduction</h4>
+<p>QLDPC_RUN_ID=cc-greedy-gated uv run --extra research \ python research/campaigns/cc-run-campaign-greedy-2026-11-11/run.py \ --n-cap 10 --steps 3 --budget 16</p>
+<p>Staged survivors are gitignored working output (local staging only); the campaign definition is research/campaigns/cc-run-campaign-greedy-2026-11-11/campaign.json.</p>
+<h4>Final submission results</h4>
+<p>The n &lt;= 60 unrestricted greedy campaign (corrected script, staged deep-verify) produced 166 deep-verified finds. After full-gate verification (distance_not_refuted with fresh seeds), 216 of 542 candidates passed and 168 were board-advancing, of which 135 had new (non-colliding) slugs.</p>
+<p>All 135 were submitted (one PR per code). As of the final tally:</p>
+<ul>
+<li>169 merged by maintainers</li>
+<li>19 closed (collisions or dominated)</li>
+<li>10 still open (5487-5498)</li>
+</ul>
+<p>The 2D-local campaign (n &lt;= 99) produced 99 deep-verified finds. After full-gate verification, 153 of 593 checked candidates passed but 0 are submittable: distance_not_refuted (fresh-seed refutation) rejects all of them. The multi-seed deep-verify (issue #409) reduced but did not eliminate inflation. The 2D-local route remains blocked on distance verification. See code-calculus-dev issues #375, #388, #409.</p>
+<h4>Campaign summary table</h4>
+<p>| Campaign | n-cap | Gated | Deep-verified finds | Full-gate PASS | Board-advancing | New slugs | |---|---|---|---|---|---|---| | cc-greedy-gated | 10 | 65 | 38 | 29 | 20 | 3 (5-3-1, 6-3-1, 9-4-2) | | cc-greedy-ext | 28 | 286 | 215 | - | 170 distinct | 14 submitted | | cc-greedy-n20 | 20 | 182 | 68 | - | 47 | 0 (all collide) | | cc-greedy-n60 | 60 | 1281 | 166 | 216 | 168 | 135 | | cc-greedy-n61-100 | 100 | 339 | 28 | 12 | 12 | 12 (5579-5590) | | cc-greedy-n99-400 | 400 | 842 | 28 | 60 | 59 | 59 | | cc-greedy-2dlocal-v2 | 99 | 1567 | 99 | 153+ | 153+ (unverified) | 0 submitted |</p>
+<p>Total merged to the board: 169 codes (unrestricted, d=1/d=2). Issues opened: code-calculus-dev #375, #388.</p>
+<h4>n = 61-100 unrestricted greedy extension</h4>
+<p>The unrestricted greedy pipeline was extended past the n &lt;= 60 sweep with the staged deep-verify kept on. Of 339 gate-called candidates, 28 passed the gate, 16 of those were refused or collided at the deep-verify stage (variant/collision slugs), and 12 survived as board-advancing new slugs, each from a 3-step chain off one of four parents:</p>
+<p>| Parent | Chain produced | |---|---| | 64-34-2 | 64-35-2, 64-36-2, 64-37-2 | | 68-36-2 | 68-37-2, 68-38-2, 68-39-2 | | 72-39-1 | 69-50-1, 70-48-1, 71-44-1 | | 76-40-2 | 76-41-2, 76-42-2, 76-43-2 |</p>
+<p>All 12 were submitted as one-code PRs (#5579 to #5590) with the rule named in the PR title. The deep pass produced 0 downgrades; the 12 are 9 d=2 points and 3 d=1 points.</p>
+<h4>n = 99-400 unrestricted greedy extension</h4>
+<p>The pipeline was extended to n = 99-400 with 4-step chains and support budget 128. Of 930 parents processed (reaching n ~ 310), 842 candidates were gate-called, 28 passed the gate, and 59 survived as board-advancing new slugs (all d=2). The deep pass produced 24 downgrades and 33 refusals/collisions. Zero plan errors or preflight refusals.</p>
+<p>The 59 new points come from 17 parent chains, split between C-DELETE-CHECK (n fixed, k increases) and E-PUNCTURE (n decreases, k increases). The best kd^2/n reaches 2.28 (100-54-2) and 2.22 (108-57-2).</p>
+<p>Combined totals across all unrestricted runs (n=6 to n~310):</p>
+<ul>
+<li>206 board-advancing codes (135 from n&lt;=60, 12 from n=61-100, 59 from n=99-400)</li>
+<li>0 downgrades in the n=61-100 run, 24 in the n=99-400 run</li>
+<li>17 distinct parent chains identified</li>
+</ul>
+<h4>Issues opened</h4>
+<ul>
+<li>code-calculus-dev #375: staged distance checks and auto-variant naming</li>
+<li>code-calculus-dev #388: layout inheritance violates site_occupancy</li>
+<li>code-calculus-dev #430: 2D-local distance inflation follow-up</li>
+<li>code-calculus-dev #431: E-GLUE seam enumerator / row-id minting</li>
+<li>code-calculus-dev #432: exporter/run_campaign auto-variant + staged deep-verify</li>
+<li>code-calculus-dev #433: default screening depth for d &gt;= 2</li>
+</ul>
+<h4>Lessons learned</h4>
+<p>1. A 1000-trial RIS screen overestimates distance for many codes; the 2M-trial deep pass corrects it downward, turning screened board-advancing points into dominated ones. Board-advancing status must be checked on the corrected distance, not the screened one. 2. Greedy multi-step composition (C-DELETE-CHECK, E-PEEL, E-PUNCTURE with sector swap and Pareto ranking) is the productive route; sector-swap alone, strict C-ADD-CHECK, and E-GLUE produced nothing at tested sizes. 3. Using --force on submit overwrites existing codes when a downgraded slug collides. Variant suffixes (e.g. 10-7-1-d) are required for same (n,k,d) codes. 4. d-only gains require a matched-depth peer audit (research/AUTORESEARCH.md section 5b) before submission.</p>
+<h4>Suggested improvements</h4>
+<ul>
+<li>Code calculus: add a staged distance check to the ledger (try increasing</li>
+<p>trial counts until the claimed distance is reached or refuted) and a confidence field on witnesses, so transport can distinguish screened from deep bounds.</p>
+<li>Sweep scripts: deep-verify every gate-passing candidate before staging;</li>
+<p>skip candidates whose corrected distance differs from the screened one; never use --force; auto-append variant suffixes on slug collision.</p>
+<li>Increase default screening depth for d &gt;= 2 candidates, or filter by a</li>
+<p>minimum trial count before claiming board-advancing.</p>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-12-code-calculus-v0p2-greedy-gated.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/100-2-10-b.html">[[100,2,10]] — 100-2-10-b</a></h3><div class=kv style="color:var(--mut)">2026-11-11 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[100,2,10]] weight-4 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 4 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
