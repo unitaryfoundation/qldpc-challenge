@@ -48,7 +48,11 @@ Useful flags:
 
 - `--model "Claude Opus 4.8"` what produced the code, named to a specific
   version, not a bare vendor name (self-reported, shown on the board as a claim,
-  not verified; if you name a model the verifier requires a version);
+  not verified; if you name a model the verifier requires a version). If you do
+  not know the exact model/version that produced the code, omit `--model`
+  entirely; do not write `"human"` as a placeholder -- `"human"` is a claim that
+  a person, not a model, authored the code, and misusing it corrupts the
+  board's model attribution;
 - `--construction "..."` how it was built (polynomials, group, search);
 - `--family bivariate-bicycle` the construction family, a filterable tag from a
   fixed vocabulary (see TRACKS.md); it is never used for ranking;
