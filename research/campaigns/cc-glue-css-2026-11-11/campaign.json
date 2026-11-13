@@ -1,0 +1,58 @@
+{
+  "campaign": {
+    "schema_version": 1,
+    "id": "cc-glue-css-2026-11-11",
+    "name": "E-GLUE pair gluing using code-calculus v0.2 glue transformers",
+    "status": "draft",
+    "objective": {
+      "metric": "kd2_over_n",
+      "direction": "maximize"
+    },
+    "constraints": {
+      "n": [1, 60],
+      "max_check_weight": 8
+    },
+    "budget": {
+      "candidates_screened": 1000,
+      "walltime_hours": 2
+    },
+    "stopping": [
+      { "type": "budget_exhausted" }
+    ],
+    "direction": {
+      "hypothesis": "Using code-calculus v0.2's E-GLUE transformer (glued distance from class pairs, with factor witnesses carried through the seam) on pairs of small CSS codes with n <= 60 yields board-advancing glued codes, where v0.1 E-GRAFT found 0 survivors.",
+      "cell": "unrestricted~weight-6",
+      "family": "other",
+      "bar": {
+        "slug": "10-2-3-b",
+        "axes": ["kd2_over_n"],
+        "note": "any glued child that is nondominated on the CSS board"
+      },
+      "budget": {
+        "candidates_screened": 1000,
+        "trials_per_candidate": 1000,
+        "walltime_hours": 2
+      },
+      "feasibility": "E-GLUE is admitted as a conditional cell with a transformer at exact distance; the consumer carries factor witnesses through the seam and computes glued distance from class pairs.",
+      "novelty": {
+        "claim": "A CSS code obtained by gluing two board entries via E-GLUE",
+        "against": "fieldnotes/2026-11-02-code-calculus-v0p1-campaigns.md (E-GRAFT 0 survivors)"
+      },
+      "expected_value": "A board-advancing glued code would be the first construction-family survivor from a calculus glue move on this board.",
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "trials_cap": 2000,
+        "note": "drop if no glued child passes the gate across 1000 pairs"
+      },
+      "what_a_negative_would_teach": "That gluing two CSS codes does not land on the frontier at these sizes, consistent with v0.1's E-GRAFT result, and that the glue move's value lies elsewhere."
+    },
+    "methods": {
+      "families": ["other"],
+      "generators": ["research/kit/search.py::sample_css"],
+      "screening": {
+        "trials_per_candidate": 1000
+      }
+    },
+    "notes": "Uses code-calculus-dev E-GLUE. Pair selection and seam qubits are enumerated by the run script."
+  }
+}
