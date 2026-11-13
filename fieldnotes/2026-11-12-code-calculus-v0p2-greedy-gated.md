@@ -122,6 +122,7 @@ verification. See code-calculus-dev issues #375, #388, #409.
 | cc-greedy-n20 | 20 | 182 | 68 | - | 47 | 0 (all collide) |
 | cc-greedy-n60 | 60 | 1281 | 166 | 216 | 168 | 135 |
 | cc-greedy-n61-100 | 100 | 339 | 28 | 12 | 12 | 12 (5579-5590) |
+| cc-greedy-n99-400 | 400 | 842 | 28 | 60 | 59 | 59 |
 | cc-greedy-2dlocal-v2 | 99 | 1567 | 99 | 153+ | 153+ (unverified) | 0 submitted |
 
 Total merged to the board: 169 codes (unrestricted, d=1/d=2).
@@ -145,6 +146,24 @@ each from a 3-step chain off one of four parents:
 All 12 were submitted as one-code PRs (#5579 to #5590) with the rule
 named in the PR title. The deep pass produced 0 downgrades; the 12 are
 9 d=2 points and 3 d=1 points.
+
+## n = 99-400 unrestricted greedy extension
+
+The pipeline was extended to n = 99-400 with 4-step chains and support
+budget 128. Of 930 parents processed (reaching n ~ 310), 842 candidates
+were gate-called, 28 passed the gate, and 59 survived as board-advancing
+new slugs (all d=2). The deep pass produced 24 downgrades and 33
+refusals/collisions. Zero plan errors or preflight refusals.
+
+The 59 new points come from 17 parent chains, split between
+C-DELETE-CHECK (n fixed, k increases) and E-PUNCTURE (n decreases,
+k increases). The best kd^2/n reaches 2.28 (100-54-2) and 2.22
+(108-57-2).
+
+Combined totals across all unrestricted runs (n=6 to n~310):
+- 206 board-advancing codes (135 from n<=60, 12 from n=61-100, 59 from n=99-400)
+- 0 downgrades in the n=61-100 run, 24 in the n=99-400 run
+- 17 distinct parent chains identified
 
 ## Issues opened
 
