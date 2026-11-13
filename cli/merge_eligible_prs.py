@@ -331,7 +331,8 @@ def metadata_comment_body(result: Evaluation) -> str | None:
     for path, error in relevant:
         lines.append(f"- `{path}`: `{error}`.")
     if any("provenance.model" in error for _, error in relevant):
-        lines.append("Add a non-empty `provenance.model` value (an exact model version or `human`) to the code JSON.")
+        lines.append("Add a non-empty `provenance.model` value (an exact model version, or omit it; "
+             "`human` claims a person, not a model, produced the code) to the code JSON.")
     if any("provenance.authors" in error for _, error in relevant):
         lines.append(
             "Add one or more non-empty names to `provenance.authors`; the `verify` check validates the author binding."

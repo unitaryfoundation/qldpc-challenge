@@ -182,6 +182,11 @@ Two more, same reason:
 - What you claim in the body must match the file in the diff. A distance is `upper_bound`
   until a certificate says otherwise — do not call a witnessed bound "certified", and do
   not put a distance in the filename that the JSON does not support.
+- Model attribution must be honest. `provenance.model` is `"human"` only when a person,
+  not a model, produced the code. If you do not know the exact model/version, omit the
+  field (or write `"unspecified"`) instead of claiming `"human"`; claiming `"human"` for
+  a model-produced code corrupts the board's model attribution and is treated as a
+  misattribution in review.
 - Delete the drafting scaffolding before asking for review: HTML comments, unticked
   checklist boxes, session URLs. If a checklist box is not true, make it true or say why
   (`qldpc submit` ticks the equivalence box itself when its board dedup finds nothing). The drafted body also carries parenthetical prompts (e.g. "(Name the

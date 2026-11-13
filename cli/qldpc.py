@@ -3031,8 +3031,11 @@ def main(argv=None):
                    help="how the code was built (family, polynomials, search)")
     s.add_argument("--model", default="",
                    help="self-reported model that produced it, named to a specific "
-                        "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'), or "
-                        "'human' (claimed, not verified; the verifier requires a "
+                        "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'). If "
+                        "you do not know the exact model/version, omit this flag; "
+                        "do not use 'human' as a placeholder -- 'human' claims a "
+                        "person, not a model, produced the code. "
+                        "'human' is claimed, not verified; the verifier requires a "
                         "version if a model is named)")
     s.add_argument("--notes", default="")
     s.add_argument("--note-file", default="",

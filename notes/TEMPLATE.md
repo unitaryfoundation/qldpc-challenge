@@ -34,7 +34,9 @@ approaches that produced k=0 or low d, tuning that failed. Numbers > prose.
 
 ## Tools
 
-Model and version (matches provenance.model), agent/harness setup, repo
+Model and version (matches provenance.model). Write "human" only if a person, not a
+model, produced the code; if the exact model/version is unknown, omit the field or
+write "unspecified" instead of claiming "human". Agent/harness setup, repo
 tooling used (kit modules, gf2_fast, decoders), approximate compute.
 
 ## Reproduction
