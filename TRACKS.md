@@ -73,7 +73,9 @@ generic advance: `validate_candidate` returns `advances_by: ["d"]` in
 `d_only_gain` is the stricter of the two: it is true only when nothing but `d`
 was gained anywhere on the board. The label is keyed on `d_only_peers` instead,
 so it still names those entries — and still tells you to re-measure them — when
-the candidate also beat some other entry on `k`, or `w`, or `n`.
+the candidate also beat some other entry on `k`, or `w`, or `n`. A `d = 1` entry
+is a placeholder, not a suspect distance claim: it is not a `d_only_peer`, so
+beating one on `d` alone does not carry the audit duty.
 The matched-depth pair audit (`research/audits/leader_audit.py pair`) then
 re-measures the candidate and that entry on the same trials, seeds and pair
 depth, and its `redirect` verdict — the board's number, not the candidate's, was

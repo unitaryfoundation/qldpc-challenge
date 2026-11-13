@@ -1,6 +1,6 @@
 """`qldpc submit` enforces the matched-depth peer audit a d-only gain owes (issue #4236).
 
-The board's [[12,4,2]] checks go in as an .npz and the code tier is searched for
+The board's [[12,4,3]] checks go in as an .npz and the code tier is searched for
 real; the board is a stub holding one entry the candidate beats on d alone, so
 the test is about the refusal and the record, not about today's board.
 """
@@ -14,14 +14,14 @@ from qldpc_verify import _matrix
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FAST = ["--trials", "300", "--fast-trials", "0", "--no-circuit"]
-PEER_ROW = {"slug": "12-4-1", "n": 12, "k": 4, "d": 1, "w": 6, "code_type": "CSS",
-            "eff": 0.333, "weight_class": "weight-6", "locality_class": "unrestricted"}
-PEER = "[[12,4,1]] w=6 12-4-1.json"
+PEER_ROW = {"slug": "12-4-2", "n": 12, "k": 4, "d": 2, "w": 6, "code_type": "CSS",
+            "eff": 0.667, "weight_class": "weight-6", "locality_class": "unrestricted"}
+PEER = "[[12,4,2]] w=6 12-4-2.json"
 
 
 @pytest.fixture(scope="module")
 def npz(tmp_path_factory):
-    doc = json.load(open(os.path.join(ROOT, "codes", "12-4-2.json")))
+    doc = json.load(open(os.path.join(ROOT, "codes", "12-4-3.json")))
     n = doc["n"]
     path = tmp_path_factory.mktemp("in") / "bb12.npz"
     np.savez(path, hx=_matrix(doc["checks"]["X"], n), hz=_matrix(doc["checks"]["Z"], n))
@@ -42,7 +42,7 @@ def _record(capsys):
 
 def _audit(path, **over):
     rec = {"schema": "qldpc-peer-audit/1", "candidate": "cand.json",
-           "peers": ["codes/12-4-1.json"], "trials": 300, "seeds": [51, 52],
+           "peers": ["codes/12-4-2.json"], "trials": 300, "seeds": [51, 52],
            "pair_depth": 10, "threads": 8, "decision": "credible: both claims held",
            "exit_code": 0, "results": [], "recorded": "2026-11-05"}
     rec.update(over)
@@ -88,7 +88,7 @@ def test_a_credible_audit_at_depth_lets_the_submission_through(npz, capsys, tmp_
     assert record["d_only_peers"] == [PEER]
     assert record["peer_audit"] == {"path": audit, "decision": "credible: both claims held",
                                     "trials": 300, "seeds": [51, 52], "pair_depth": 10,
-                                    "peers": ["codes/12-4-1.json"]}
+                                    "peers": ["codes/12-4-2.json"]}
     assert "matched-depth peer audit covers it" in err
     body = open(record["body_file"], encoding="utf-8").read()
     assert f"- Gain over {PEER} is on d alone; matched-depth peer audit" in body

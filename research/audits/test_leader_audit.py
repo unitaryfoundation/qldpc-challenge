@@ -403,17 +403,24 @@ def test_pair_without_a_d_only_peer_is_a_usage_error(monkeypatch, entry, capsys)
     assert "not the suspect pattern" in capsys.readouterr().err
 
 
-def test_select_peers_takes_only_equal_n_k_w_with_a_lower_d(monkeypatch, entry, tmp_path):
-    """The peer set is exactly the entries a d-only gain would be measured against."""
+def test_select_peers_takes_only_equal_n_k_w_with_a_lower_d(monkeypatch, tmp_path):
+    """The peer set is exactly the entries a d-only gain would be measured against.
+
+    A d = 1 entry is a placeholder, not a suspect distance claim, so beating one
+    on d alone is not the pattern the audit exists for: the peer set skips it.
+    """
     board = tmp_path / "codes"
     board.mkdir()
     doc = json.loads(json.dumps(FIXTURE))
+    # candidate claims d = 3 so a d = 2 peer can be a d-only gain (1 < 2 < 3)
+    candidate = _write(tmp_path, "cand.json", 3)
     variants = {
-        "peer.json": {"n": 4, "k": 2, "d": 1},  # the d-only peer
+        "peer.json": {"n": 4, "k": 2, "d": 2},  # the d-only peer
+        "placeholder.json": {"n": 4, "k": 2, "d": 1},  # d = 1: not a d-only peer
         "heavier.json": {"n": 4, "k": 2, "d": 3},  # not lower d: no gain over it
-        "other-n.json": {"n": 5, "k": 2, "d": 1},  # different n: not a d-only tie
-        "other-k.json": {"n": 4, "k": 1, "d": 1},  # different k: a structural win too
-        "weight-1.json": {"n": 4, "k": 2, "d": 1},  # different check weight
+        "other-n.json": {"n": 5, "k": 2, "d": 2},  # different n: not a d-only tie
+        "other-k.json": {"n": 4, "k": 1, "d": 2},  # different k: a structural win too
+        "weight-1.json": {"n": 4, "k": 2, "d": 2},  # different check weight
     }
     for name, over in variants.items():
         variant = json.loads(json.dumps(doc))
@@ -424,7 +431,7 @@ def test_select_peers_takes_only_equal_n_k_w_with_a_lower_d(monkeypatch, entry, 
         (board / name).write_text(json.dumps(variant))
 
     monkeypatch.setattr(la, "_CODES", str(board))
-    peers = la.select_peers(entry)
+    peers = la.select_peers(candidate)
     assert peers == [str(board / "peer.json")], peers
 
 

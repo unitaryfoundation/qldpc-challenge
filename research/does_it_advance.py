@@ -18,10 +18,12 @@ Mirrored, including the parts that are easy to get wrong:
   axes against) kills `board_advancing`. An entry it wins on gives one `gains`
   list, and the union of those lists is `advances_by`.
 * **the two d-only questions, kept apart exactly as TRACKS.md does.**
-  `d_only_gain` is `advances_by == ["d"]` -- the board yielded on nothing but
-  d anywhere. `d_only_peers` is per-entry: entries beaten while tied on n, k and
-  w. A candidate can have d-only peers while not being d_only_gain, and the
-  gate's label keys on the peers.
+  `d_only_gain` is `advances_by == ["d"]` with a non-empty peer set -- the board
+  yielded on nothing but d somewhere, over a non-placeholder entry. `d_only_peers`
+  is per-entry: entries beaten while tied on n, k and w, excluding d = 1
+  placeholders (a placeholder is not a suspect distance claim). A candidate can
+  have d-only peers while not being d_only_gain, and the gate's label keys on
+  the peers.
 
 This is a pre-filter, not evidence. It reads the board's *claimed* numbers, and
 every one of them is itself an upper bound. Distance comes from the gate.
@@ -127,14 +129,16 @@ def novelty(board, n, k, d, w, code_type="CSS", lc="unrestricted"):
 
     board_advancing = not dominators
     advances_by = sorted({ax for _, gains in dominated for ax in gains})
-    d_only_peers = [b for b, gains in dominated if gains == ["d"]]
+    d_only_peers = [b for b, gains in dominated
+                    if gains == ["d"] and b.get("d", 0) > 1]
     return {
         "cell": [wc, lc],
         "board": code_type,
         "board_advancing": board_advancing,
         "dominated_by": dominators,
         "advances_by": advances_by,
-        "d_only_gain": bool(board_advancing) and advances_by == ["d"],
+        "d_only_gain": (bool(board_advancing) and advances_by == ["d"]
+                        and bool(d_only_peers)),
         "d_only_peers": d_only_peers,
         "beaten": dominated,
     }

@@ -179,6 +179,14 @@ def main():
         check("still passes (the flag is a label, not a pass condition)",
               vd4["passed"])
 
+        V._board_entries = lambda: [peer(4, 1)]            # d = 1 placeholder: not a d-only peer
+        vdp = V.validate_candidate(good, seed=SEED, refute=False)
+        novp = vdp["gates"]["novelty"]
+        check("a d = 1 placeholder is not a d-only peer",
+              novp["d_only_peers"] == [])
+        check("so a gain over it alone is not d-only",
+              novp["d_only_gain"] is False)
+
         V._board_entries = lambda: [peer(4, 9)]            # board entry dominates
         vd3 = V.validate_candidate(good, seed=SEED, refute=False)
         check("dominated -> no advance, no d-only flag",

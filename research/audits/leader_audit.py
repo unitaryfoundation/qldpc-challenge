@@ -413,6 +413,10 @@ def select_peers(candidate):
                 continue
             if _doc_weight(bdoc) != w or int(bdoc["distance"]["d"]) >= d_claim:
                 continue
+            # placeholders (d = 1) are not d-only peers: beating one on d alone
+            # is not the suspect inflated-bound pattern.
+            if int(bdoc["distance"]["d"]) <= 1:
+                continue
         except (OSError, ValueError, KeyError, TypeError, IndexError):
             continue  # a broken board file never blocks a candidate
         peers.append(path)
@@ -558,7 +562,8 @@ def main(argv=None):
         nargs="+",
         default=None,
         help="board entry/entries to compare against; default is every codes/ entry with the "
-        "same n, k and max check weight and a lower claimed d (the d-only peers)",
+        "same n, k and max check weight and a lower claimed d (the d-only peers; "
+        "d = 1 placeholders are never peers)",
     )
     pr.add_argument("--trials", type=int, default=2_000_000)
     pr.add_argument("--seeds", type=int, nargs="+", default=[51])
