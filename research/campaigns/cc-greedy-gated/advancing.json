@@ -416,5 +416,841 @@
       "unrestricted"
     ],
     "w_max": 5
+  },
+  {
+    "file": "21-2-6.json",
+    "n": 21,
+    "k": 2,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "21-3-6.json",
+    "n": 21,
+    "k": 3,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-single board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "23-2-6.json",
+    "n": 23,
+    "k": 2,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "29-8-6.json",
+    "n": 29,
+    "k": 8,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "29-9-7-a00965c7bc31aaf7.json",
+    "n": 29,
+    "k": 9,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "29-9-7.json",
+    "n": 29,
+    "k": 9,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "30-4-7.json",
+    "n": 30,
+    "k": 4,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-single board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "33-2-7.json",
+    "n": 33,
+    "k": 2,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "33-7-7.json",
+    "n": 33,
+    "k": 7,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "33-8-2.json",
+    "n": 33,
+    "k": 8,
+    "d": 2,
+    "cell": [
+      "weight-4",
+      "unrestricted board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "34-8-2.json",
+    "n": 34,
+    "k": 8,
+    "d": 2,
+    "cell": [
+      "weight-4",
+      "unrestricted board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "34-8-5.json",
+    "n": 34,
+    "k": 8,
+    "d": 5,
+    "cell": [
+      "weight-8",
+      "unrestricted board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "34-9-2.json",
+    "n": 34,
+    "k": 9,
+    "d": 2,
+    "cell": [
+      "weight-4",
+      "unrestricted board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "35-12-6.json",
+    "n": 35,
+    "k": 12,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "35-2-8.json",
+    "n": 35,
+    "k": 2,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "35-5-6.json",
+    "n": 35,
+    "k": 5,
+    "d": 6,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "35-8-5.json",
+    "n": 35,
+    "k": 8,
+    "d": 5,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "35-8-6-7ca16c2a7674dd09.json",
+    "n": 35,
+    "k": 8,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 5
+  },
+  {
+    "file": "35-8-6.json",
+    "n": 35,
+    "k": 8,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 5
+  },
+  {
+    "file": "39-10-8.json",
+    "n": 39,
+    "k": 10,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "39-13-6.json",
+    "n": 39,
+    "k": 13,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "39-2-8.json",
+    "n": 39,
+    "k": 2,
+    "d": 8,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "39-4-7.json",
+    "n": 39,
+    "k": 4,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "39-4-8.json",
+    "n": 39,
+    "k": 4,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "39-7-8.json",
+    "n": 39,
+    "k": 7,
+    "d": 8,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "40-12-6.json",
+    "n": 40,
+    "k": 12,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "41-10-7.json",
+    "n": 41,
+    "k": 10,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "41-11-6-1b7a998afa8f2d53.json",
+    "n": 41,
+    "k": 11,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "41-11-6.json",
+    "n": 41,
+    "k": 11,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "41-12-7.json",
+    "n": 41,
+    "k": 12,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "41-15-6.json",
+    "n": 41,
+    "k": 15,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "41-30-6.json",
+    "n": 41,
+    "k": 30,
+    "d": 6,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 22
+  },
+  {
+    "file": "41-31-6.json",
+    "n": 41,
+    "k": 31,
+    "d": 6,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 24
+  },
+  {
+    "file": "43-9-7.json",
+    "n": 43,
+    "k": 9,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "45-9-9.json",
+    "n": 45,
+    "k": 9,
+    "d": 9,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "46-15-7.json",
+    "n": 46,
+    "k": 15,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "47-13-6.json",
+    "n": 47,
+    "k": 13,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "47-14-6.json",
+    "n": 47,
+    "k": 14,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "47-14-8.json",
+    "n": 47,
+    "k": 14,
+    "d": 8,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 9
+  },
+  {
+    "file": "47-15-8.json",
+    "n": 47,
+    "k": 15,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "47-16-7.json",
+    "n": 47,
+    "k": 16,
+    "d": 7,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 9
+  },
+  {
+    "file": "47-17-6.json",
+    "n": 47,
+    "k": 17,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "47-8-7.json",
+    "n": 47,
+    "k": 8,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 5
+  },
+  {
+    "file": "47-9-8.json",
+    "n": 47,
+    "k": 9,
+    "d": 8,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "48-4-7.json",
+    "n": 48,
+    "k": 4,
+    "d": 7,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "49-5-7.json",
+    "n": 49,
+    "k": 5,
+    "d": 7,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "49-7-9.json",
+    "n": 49,
+    "k": 7,
+    "d": 9,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "51-11-9.json",
+    "n": 51,
+    "k": 11,
+    "d": 9,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "51-5-7.json",
+    "n": 51,
+    "k": 5,
+    "d": 7,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "51-9-10.json",
+    "n": 51,
+    "k": 9,
+    "d": 10,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "53-10-9.json",
+    "n": 53,
+    "k": 10,
+    "d": 9,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "53-11-7.json",
+    "n": 53,
+    "k": 11,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "53-13-6.json",
+    "n": 53,
+    "k": 13,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "53-16-8.json",
+    "n": 53,
+    "k": 16,
+    "d": 8,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 9
+  },
+  {
+    "file": "53-18-6.json",
+    "n": 53,
+    "k": 18,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "53-31-6.json",
+    "n": 53,
+    "k": 31,
+    "d": 6,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 18
+  },
+  {
+    "file": "53-5-7.json",
+    "n": 53,
+    "k": 5,
+    "d": 7,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "53-7-9.json",
+    "n": 53,
+    "k": 7,
+    "d": 9,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "54-18-6.json",
+    "n": 54,
+    "k": 18,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "55-11-7.json",
+    "n": 55,
+    "k": 11,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "55-11-8.json",
+    "n": 55,
+    "k": 11,
+    "d": 8,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "55-15-8.json",
+    "n": 55,
+    "k": 15,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "55-18-7.json",
+    "n": 55,
+    "k": 18,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "55-19-8.json",
+    "n": 55,
+    "k": 19,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "unrestricted board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "55-21-6.json",
+    "n": 55,
+    "k": 21,
+    "d": 6,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "55-5-7.json",
+    "n": 55,
+    "k": 5,
+    "d": 7,
+    "cell": [
+      "weight-4",
+      "local-2d-single board"
+    ],
+    "w_max": 4
+  },
+  {
+    "file": "55-7-10.json",
+    "n": 55,
+    "k": 7,
+    "d": 10,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "58-8-7.json",
+    "n": 58,
+    "k": 8,
+    "d": 7,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 5
+  },
+  {
+    "file": "59-13-6.json",
+    "n": 59,
+    "k": 13,
+    "d": 6,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 6
+  },
+  {
+    "file": "59-13-9.json",
+    "n": 59,
+    "k": 13,
+    "d": 9,
+    "cell": [
+      "weight-8",
+      "unrestricted board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "59-14-8.json",
+    "n": 59,
+    "k": 14,
+    "d": 8,
+    "cell": [
+      "weight-8",
+      "unrestricted board"
+    ],
+    "w_max": 7
+  },
+  {
+    "file": "59-16-9.json",
+    "n": 59,
+    "k": 16,
+    "d": 9,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 9
+  },
+  {
+    "file": "59-19-7.json",
+    "n": 59,
+    "k": 19,
+    "d": 7,
+    "cell": [
+      "weight-8",
+      "unrestricted board"
+    ],
+    "w_max": 8
+  },
+  {
+    "file": "59-23-6.json",
+    "n": 59,
+    "k": 23,
+    "d": 6,
+    "cell": [
+      "weight-9plus",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 9
+  },
+  {
+    "file": "59-8-8.json",
+    "n": 59,
+    "k": 8,
+    "d": 8,
+    "cell": [
+      "weight-6",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 5
+  },
+  {
+    "file": "59-9-11.json",
+    "n": 59,
+    "k": 9,
+    "d": 11,
+    "cell": [
+      "weight-8",
+      "local-2d-bilayer board"
+    ],
+    "w_max": 8
   }
 ]
