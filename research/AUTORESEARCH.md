@@ -848,6 +848,45 @@ refuse. The rule is one module, `kit/peer_audit.py`, shared by both paths so the
 drift. Prose in `evidence.peer_audit`, from notes written before the record existed, is
 still accepted and reported as unchecked.
 
+## 5c. Valid is not frontier: a dominated code is recorded, not submitted
+
+`passed: true` says the code is valid: it verifies, a fresh refutation did not lower its
+distance, and it is not already on the board. It says nothing about where the code sits.
+Whether any entry in the candidate's track cell dominates it on (n, k, d, w) is
+`gates.novelty.board_advancing`, and the gate reports that as a label, with `dominated_by`
+naming the entries, never as a pass condition. The two are kept apart on purpose: a dominated
+code is still a code worth recording, and the gate is not where the submission decision
+belongs.
+
+The decision belongs to the packaging paths, and both make it (issue #5700). `kit/promote.py`
+refuses a candidate whose verdict says `board_advancing: false`, naming the dominators, and
+`./qldpc submit`, which runs the verifier rather than the gate, computes the same list from the
+board the site sees and refuses the same way. The rule is one module, `kit/frontier.py`, so the
+two cannot drift. `--allow-non-frontier` (`allow_non_frontier=True` in `promote`) files the
+entry anyway, as a record: the PR body then names the dominators and says the entry claims no
+frontier advance, and `./qldpc submit --dry-run` reports what the real run would refuse. A
+verdict with no novelty block at all is refused either way, because the opt-in is a decision
+about a known dominator, not a way past a missing one.
+
+What this means for a campaign:
+
+- Promote `led.frontier_survivors()`, never `led.survivors`. The rows
+  `led.non_frontier_survivors()` returns carry their `dominated_by` and belong in the summary
+  (`non_frontier_survivors` counts them beside `frontier_advances`) and the fieldnote, not in
+  PRs. A campaign's find count is `frontier_advances`.
+- Pre-screen with `research/does_it_advance.py --n N --k K --d D --w W` before paying for the
+  gate. It reads the board's claimed numbers and answers the same question for free, so a
+  candidate with an empty `advances_by` never reaches the gate.
+- Re-run the gate against a fresh `origin/main` right before promoting, and regenerate the
+  PR body's frontier section from that run. Entries land continuously, `board_advancing` is a
+  claim about `codes/` at a point in time, and `validate_cached` recomputes it on every call,
+  so a candidate that advanced the board at search time may not at submission time.
+- Within one batch, drop the candidates another candidate of the same batch dominates before
+  any PR is opened; `frontier.within_batch(rows)` names them. Two PRs where one dominates the
+  other make a frontier claim only one of them can keep.
+- A d-only gain still owes the matched-depth audit of 5b. Board-advancing does not discharge
+  it, and the audit does not make a dominated code board-advancing.
+
 ## 6. Confirm the distance exactly (optional, for a standout)
 
 The surrogate and the gate both certify an *upper bound*. To go further on a code the human wants
@@ -1011,7 +1050,7 @@ something the next one should not have to re-learn.
 | File | What it gives you |
 |---|---|
 | `kit/css.py` | `compute_k`, `verify_css`, and the re-exported GF(2) core (`rref`, `rank`, `kernel_basis`, `logical_basis`, ...) shared with the verifier |
-| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `record_screen` is what writes a screening depth and `record_verdict` what says how it ended — the two calls that make a run visible to the next session, and `record_negative(..., assumptions=, revisit_if=)` what makes a closed route reusable, read back by `./qldpc negatives` (issue #4233). Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
+| `kit/campaign.py` | `Ledger`, `load_campaign`, `write_summary`, `write_manifest`: the campaign contract and the **screening registry**. `Ledger.frontier_survivors` and `Ledger.non_frontier_survivors` split the validated rows into the ones a driver may promote and the dominated ones, each with its `dominated_by`; the summary counts both (section 5c, issue #5700). `record_screen` is what writes a screening depth and `record_verdict` what says how it ended: the two calls that make a run visible to the next session, and `record_negative(..., assumptions=, revisit_if=)` what makes a closed route reusable, read back by `./qldpc negatives` (issue #4233). Validates against `schema/campaign.schema.json` with `jsonschema`, a base dependency, so it runs under a bare `uv run`; see [`campaigns/README.md`](campaigns/README.md) |
 | `kit/gf2poly.py` | GF(2) polynomials as ints: `factor_squarefree` (x^m - 1 over GF(2), no sympy), `designed_divisor`, `sparse_multiples`, `cyclic_gb`, `designed_k`; the designed-divisor route behind `search.sample_cyclic_gb` (section 3c) |
 | `kit/bb.py` | `build_bb`, `poly_matrix`, `KNOWN` (known BB codes to start from) |
 | `kit/group_algebra.py` | `build_2bga` + group builders: `perm_group`, `cyclic_product`, `dihedral`, `metacyclic`, `sym`, `alt`; `small_group` reads a committed GAP SmallGroup table from `kit/groups/` (exported by `kit/groups/cayley_table.g`), `build_2bga_small_group` is its recipe form |
@@ -1024,8 +1063,9 @@ something the next one should not have to re-learn.
 | `kit/circuit_search.py` | `search(slug, ...)`: the circuit-tier schedule search of section 7, over every applicable family of `research/circuit_autogen.py`, staging every attempt with its verdict and notes under `research/candidates/`, scoring by `d_circ` per basis (and LER with `--ler`); `verify/circuit_verify.py` is called, never edited |
 | `kit/rebuild.py` | runs a `{constructor, params}` recipe and prints the verifier's fingerprint; the construction stage of `qldpc reproduce` |
 | `kit/coordination.py` | `run_id`, `session_id`, `staging_dir`, `unique_path`, `validate_cached`: collision-safe staging and refutation reuse when several sessions run at once. `gate_and_record`, `PreflightFailure`, `quarantine`: the gate from a staged file, refused before it runs when the verifier's structural half would fail the document, with the verdict or the preflight report kept beside the candidate (issue #3616) (`session_id` is the shell a claim belongs to, `run_id` the process that wrote it). `claim`, `release`, `read_claim`, `live_claims`, `prune_claims`: advisory, expiring cell claims (`qldpc targets --claim`): a note to other sessions, never a lock, and never read by `verify/` |
-| `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Writes files; never runs git or gh |
+| `kit/promote.py` | `promote`, `promote_all`, `script_for`: the submission tail for a candidate the gate already passed. Renders `codes/<slug>.json`, `notes/<slug>.md`, the PR body, and `repro/<slug>.json` when the candidate was staged with a recipe, from one evidence record, runs the gate and `check_prose` in order, and returns one JSON report. Refuses a candidate the gate labels dominated unless `allow_non_frontier=True` (`--allow-non-frontier`) files it as a non-frontier record (section 5c). Writes files; never runs git or gh |
 | `kit/peer_audit.py` | `d_only_peers`, `blockers`, `load_audit`, `record`: the matched-depth peer audit a d-only gain owes (section 5b), as one rule for `kit/promote.py` and `./qldpc submit --peer-audit`; reads the record `research/audits/leader_audit.py pair --json-out` writes (issue #4236) |
+| `kit/frontier.py` | `dominators`, `blockers`, `body_line`, `within_batch`: the board-advancing rule as a refusal (section 5c), one module for `kit/promote.py` and `./qldpc submit`. `dominators` is the gate's cell filter and dominance test over board-shaped rows, `within_batch` the same over the candidates of one batch (issue #5700) |
 | `kit/distance.py` | `exact_distance` (MILP, `d=`), `sat_exact_distance` (SAT, `d=`), `decoder_distance` (BP+OSD), `weight_one_logical_exists`, `sat_lower_bound`, `sat_screen` (SAT-based lower-bound screening helpers), `qubitserf_screen`/`resolve_screen` (exact distance via the out-of-band Qubitserf build; a screen, never a certifier) — needs the `research` extra |
 | `kit/census_css.py` | exhaustive small CSS-code census up to qubit permutations and global X/Z swap, through n = 8 with the nauty canonicalizer (pynauty, in the `research` extra; n <= 6 without it); exact distance uses the trusted SAT certifier |
 | `kit/products.py` | classical combining products: `hypergraph_product`, `lifted_product`, `balanced_product` + a sampler each; the lifted/balanced ones cover the multi-block protographs `kit/lp_protograph.py` specializes |

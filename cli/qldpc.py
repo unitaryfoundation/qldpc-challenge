@@ -69,6 +69,7 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import frontier  # noqa: E402
 import frontier_history  # noqa: E402
 import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
@@ -995,6 +996,11 @@ def pr_body(doc, report, args, out, note_out=None):
         lines.append(f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
                      f"peer audit (`research/audits/leader_audit.py pair`): "
                      f"{peer_audit.summary(audit)}")
+    dominated_by = getattr(args, "_non_frontier", None) or []
+    if dominated_by:
+        # --allow-non-frontier: the dominators, where the reviewer reads the
+        # claim, and that the entry is a record and not a frontier advance.
+        lines.append(frontier.body_line(dominated_by))
     lines += [
         f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight {wmax}, "
         f"locality class {comp.get('locality_class', 'unknown')}.",
@@ -1169,13 +1175,15 @@ def validate_authors(authors, anonymous=False):
     return normalized
 
 
-def dry_run_summary(doc, report, out):
+def dry_run_summary(doc, report, out, novelty=None):
     """Print a screen-sized preview of what submit would write.
 
     The parameters and score, the distance claim per side, the computed track
-    cells, and the provenance the contributor chose. Replaces the old
-    truncated JSON prefix, which never reached the fields a contributor
-    actually wants to confirm (issue #637).
+    cells, the frontier verdict, and the provenance the contributor chose.
+    Replaces the old truncated JSON prefix, which never reached the fields a
+    contributor actually wants to confirm (issue #637). ``novelty`` is what
+    ``_frontier_check`` recorded: a dominated code is shown as one here, so a
+    dry run read by eye says what the real run would refuse (issue #5700).
     """
     comp = report.get("computed", {})
     entry = _entry_for(doc, report)
@@ -1200,6 +1208,14 @@ def dry_run_summary(doc, report, out):
         f"  distance     d <= {dist['d']} (upper_bound)",
         "               " + "  |  ".join(per_side),
     ]
+    if novelty is not None:
+        doms = novelty.get("dominated_by") or []
+        lines.append("  frontier     " + (
+            "board-advancing: no entry in its track cell dominates it" if not doms
+            else f"NOT board-advancing: dominated by {', '.join(doms)}"
+            + (" (filed as a non-frontier record)"
+               if novelty.get("filed_as_non_frontier") else
+               "; the real run refuses this without --allow-non-frontier")))
     circ = doc.get("circuit")
     if circ:
         dc = circ["d_circ"]
@@ -1400,6 +1416,51 @@ def _peer_audit_check(doc, report, args, res, slug):
     return 1
 
 
+def _frontier_check(doc, report, args, res):
+    """Refuse a code an entry in its track cell dominates (AGENTS.md, The motto).
+
+    The gate labels novelty and never refuses on it: ``passed`` certifies a
+    valid code and ``board_advancing`` a frontier one. This path writes the
+    frontier claim into a PR body, so this is where the label is a condition
+    (issue #5700). The rule is ``research/kit/frontier.py``'s, shared with
+    ``research/kit/promote.py``; the board is the one the site sees, the same
+    rows the peer audit and the body's frontier section read, and a tie on
+    all of (n, k, d, w) is not dominance. ``--allow-non-frontier`` files the
+    entry anyway, and the body then names the dominators and calls it a
+    record. Returns an exit code; 0 means proceed. A dry run reports what the
+    real run would refuse and proceeds, as the peer audit's does.
+    """
+    doms = frontier.dominators(_entry_for(doc, report), _load_board_entries())
+    allowed = bool(getattr(args, "allow_non_frontier", False))
+    args._non_frontier = list(doms) if (doms and allowed) else []
+    res["novelty"] = {"board_advancing": not doms, "dominated_by": list(doms),
+                      "filed_as_non_frontier": bool(doms and allowed)}
+    if not doms:
+        if allowed:
+            print("  note: --allow-non-frontier given, but no entry in its track "
+                  "cell dominates this code; the flag is not needed")
+        return 0
+    if allowed:
+        print(f"  note: not board-advancing: dominated in its track cell by "
+              f"{', '.join(doms)}; filed as a non-frontier record "
+              f"(--allow-non-frontier), which the PR body says")
+        return 0
+    problems = frontier.blockers(
+        doms, False, attach="re-run submit with --allow-non-frontier to file "
+                            "it as a non-frontier record")
+    if args.dry_run:
+        res.setdefault("would_refuse", []).extend(problems)
+        print("\n--dry-run: the real run would be refused as not board-advancing:")
+        for p in problems:
+            print(f"  {p}")
+        return 0
+    print("\nsubmission refused; nothing written to the board:")
+    for p in problems:
+        print(f"  {p}")
+    res["error"] = {"stage": "frontier", "message": "; ".join(problems)}
+    return 1
+
+
 def cmd_submit(args):
     res = _result(args)
     res["stage"] = "build"
@@ -1459,6 +1520,9 @@ def cmd_submit(args):
     rc = _peer_audit_check(doc, report, args, res, slug)
     if rc:
         return rc
+    rc = _frontier_check(doc, report, args, res)
+    if rc:
+        return rc
     out = os.path.join(args.out, f"{slug}.json")
     circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
                                 "circuits", slug)
@@ -1480,7 +1544,7 @@ def cmd_submit(args):
                    would_write_circuits=circuits_dir if circuit_files else None,
                    doc=doc)
         if not args.json:
-            print(dry_run_summary(doc, report, out))
+            print(dry_run_summary(doc, report, out, novelty=res.get("novelty")))
         return 0
     res["stage"] = "write"
     os.makedirs(args.out, exist_ok=True)
@@ -1614,10 +1678,17 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     create = ["gh", "pr", "create", "--title", title]
     create += ["--body-file", body_file] if body_file else ["--fill"]
     checkout = ["git", "checkout", "-b", branch] + ([base_ref] if base_ref else [])
+    # The scope check CI runs, on the commit and before the push: a branch
+    # started from an earlier submit branch rather than from main carries that
+    # branch's entry too, and the PR it opens is the multi-code PR issue #5700
+    # saw (#5653). Caught here it costs a `git checkout`, not a review.
+    scope = [sys.executable, os.path.join("verify", "check_submission_scope.py"),
+             "--base", base_ref or "origin/main"]
     cmds = [
         checkout,
         add,
         ["git", "commit", "-m", title],
+        scope,
         ["git", "push", "-u", "origin", branch],
         create,
     ]
@@ -3135,6 +3206,14 @@ def main(argv=None):
                         "board entry is on d alone (same n, k, and check weight), "
                         "and it must be credible, at least as deep as this run's "
                         "search, and cover every such entry (issue #4236)")
+    s.add_argument("--allow-non-frontier", action="store_true",
+                   help="submit a code that an entry in its track cell dominates "
+                        "on (n, k, d, w). Without it such a code is refused with "
+                        "the entry named: it passes the gate and is a non-frontier "
+                        "result (AGENTS.md, The motto), and the greedy campaigns of "
+                        "issue #5700 filed dozens of them as frontier advances. "
+                        "With it the PR body names the dominators and calls the "
+                        "entry a record, not an advance")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
                    help="gf2_fast trials used to tighten the claim "
                         "(0 disables the accelerator)")

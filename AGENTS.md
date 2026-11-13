@@ -19,7 +19,11 @@ submitting it; `./qldpc submit --peer-audit <file>` and `research/kit/promote.py
 `evidence.peer_audit` take that record and refuse a d-only gain without it.
 
 Dominated codes pass the gate but are not board-advancing. Record them as non-frontier
-results; do not submit them as frontier codes.
+results; do not submit them as frontier codes. `passed: true` certifies a valid code and
+`gates.novelty.board_advancing` a frontier one, and the gate labels the second without
+refusing on it, so `./qldpc submit` and `research/kit/promote.py` make the refusal: a
+dominated candidate is refused with its dominators named unless `--allow-non-frontier`
+files it as a non-frontier record, which the PR body then says (issue #5700).
 
 ## Two tiers of change — decide which one you are in before acting
 

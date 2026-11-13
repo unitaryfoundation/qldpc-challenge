@@ -1094,3 +1094,39 @@ def test_a_malformed_negative_is_refused_where_it_is_recorded():
     summary["negative_results"] = [{"what": "", "detail": "d"}]
     with pytest.raises(C.CampaignError):
         C.validate_summary(summary)
+
+
+# -- valid is not frontier (issue #5700) ------------------------------------
+
+def test_survivors_split_into_frontier_and_non_frontier_rows():
+    import campaign as C
+
+    led = Ledger(Campaign(validate_campaign(camp())))
+    led.start_experiment("bivariate-bicycle")
+    held = passed_verdict(advancing=False)
+    held["gates"]["novelty"]["dominated_by"] = ["[[72,12,6]] w=6 72-12-6.json"]
+    led.record_candidate(doc(), held)
+    led.record_candidate(doc(n=144, k=12, d=12), passed_verdict(advancing=True))
+    led.end_experiment()
+    assert [r["n"] for r in led.frontier_survivors()] == [144]
+    row, = led.non_frontier_survivors()
+    assert row["n"] == 200 and row["dominated_by"] == ["[[72,12,6]] w=6 72-12-6.json"]
+    assert led.frontier_survivors()[0]["dominated_by"] == []
+    s = led.summary()
+    assert len(s["survivors"]) == 2
+    assert s["frontier_advances"] == 1 and s["non_frontier_survivors"] == 1
+    C.validate_summary(s)
+
+
+def test_the_split_survives_a_journal_round_trip(tmp_path):
+    c = Campaign(validate_campaign(camp()))
+    led = Ledger(c, journal=str(tmp_path / "journal.jsonl"))
+    led.start_experiment("bivariate-bicycle")
+    held = passed_verdict(advancing=False)
+    held["gates"]["novelty"]["dominated_by"] = ["[[72,12,6]] w=6 72-12-6.json"]
+    led.record_candidate(doc(), held)
+    led.end_experiment()
+    back = Ledger.from_journal(c, str(tmp_path / "journal.jsonl"))
+    assert back.frontier_survivors() == []
+    assert back.non_frontier_survivors()[0]["dominated_by"] == ["[[72,12,6]] w=6 72-12-6.json"]
+    assert back.summary()["non_frontier_survivors"] == 1

@@ -25,6 +25,13 @@ spec is kept beside the candidate, and promotion turns it into the
 `repro/<slug>.json` that `qldpc reproduce` rebuilds the entry from (issue
 #2955).
 
+`passed: true` is a valid code, not a frontier one. A survivor the gate labels
+`board_advancing: false` is a non-frontier result: record it with its
+`dominated_by`, report it apart from the finds, and do not promote it. Both
+packaging paths refuse one without `--allow-non-frontier`
+([`AUTORESEARCH.md` 5c](AUTORESEARCH.md#5c-valid-is-not-frontier-a-dominated-code-is-recorded-not-submitted),
+issue #5700).
+
 Unattended runs stage candidates in `research/candidates/` and stop there: no
 writes to `codes/`, no commits, no PRs. A human decides what lands. Several
 sessions stage there at once, so take a run directory from

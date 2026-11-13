@@ -648,3 +648,87 @@ def test_prose_evidence_still_passes_and_is_reported_as_unchecked(tmp_path, monk
     assert rep["ok"], rep["blocked_by"]
     item, = [i for i in rep["needs_human"] if "peer audit" in i["item"]]
     assert D_ONLY_PEER in item["item"] and "--json-out" in item["why"]
+
+
+# --------------------------------------------- the frontier refusal (#5700)
+
+DOMINATOR = "[[72,12,7]] w=6 72-12-7.json"
+
+
+def _dominated_verdict(doc, seed=None, **kw):
+    """Return a passing verdict for a code one board entry dominates."""
+    v = _passing_verdict(doc, seed, **kw)
+    v["labels"] = ["does not advance its weight-6 x unrestricted board cell",
+                   "literature novelty UNVERIFIED"]
+    v["gates"]["novelty"].update(board_advancing=False, advances_by=[],
+                                 dominated_by=[DOMINATOR])
+    return v
+
+
+def test_a_dominated_code_is_blocked_with_its_dominators_named(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False)
+    assert not rep["ok"]
+    block, = rep["blocked_by"]
+    assert block.startswith(f"not board-advancing: dominated in its track cell by {DOMINATOR}")
+    assert "non-frontier result" in block and "allow_non_frontier=True" in block
+    assert rep["frontier"] == {"board_advancing": False, "dominated_by": [DOMINATOR],
+                               "advances_by": [], "filed_as_non_frontier": False}
+    assert rep["slug"] is None                     # refused before any file was named
+
+
+def test_the_opt_in_files_a_dominated_code_as_a_non_frontier_record(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
+                    allow_non_frontier=True)
+    assert rep["ok"], rep["blocked_by"]
+    assert rep["frontier"]["filed_as_non_frontier"]
+    assert (f"- Non-frontier result: dominated in its track cell by {DOMINATOR}. "
+            f"Filed with --allow-non-frontier") in rep["body_markdown"]
+    item, = [i for i in rep["needs_human"] if i["item"] == "the non-frontier filing"]
+    assert DOMINATOR in item["why"]
+
+
+def test_a_non_frontier_body_passes_the_prose_gate_on_disk(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path),
+                    body_dir=str(tmp_path / "bodies"), allow_non_frontier=True)
+    assert rep["ok"], rep["blocked_by"]
+    assert rep["gates"]["check_prose"]["ok"], rep["gates"]["check_prose"]["output"]
+    with open(rep["body_file"], encoding="utf-8") as f:
+        assert DOMINATOR in f.read()
+
+
+def test_an_advancing_code_records_the_label_and_no_opt_in(tmp_path, monkeypatch):
+    monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
+                    allow_non_frontier=True)
+    assert rep["ok"] and rep["frontier"] == {
+        "board_advancing": True, "dominated_by": [], "advances_by": ["n"],
+        "filed_as_non_frontier": False}
+    assert "Non-frontier result" not in rep["body_markdown"]
+    assert not [i for i in rep["needs_human"] if i["item"] == "the non-frontier filing"]
+
+
+def test_a_verdict_that_never_decided_the_frontier_is_blocked_even_with_the_opt_in(
+        tmp_path, monkeypatch):
+    def unlabeled(doc, seed=None, **kw):
+        v = _passing_verdict(doc, seed, **kw)
+        del v["gates"]["novelty"]
+        return v
+    monkeypatch.setattr(P.gate, "validate_candidate", unlabeled)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
+                    allow_non_frontier=True)
+    assert not rep["ok"] and "never decided" in rep["blocked_by"][0]
+
+
+def test_the_command_line_flag_reaches_the_bundle(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
+    plan = tmp_path / "plan.json"
+    plan.write_text(json.dumps({"candidate": _doc(), "evidence": _evidence()}))
+    common = [str(plan), "--root", _farm(tmp_path), "--dry-run"]
+    assert P.main(common) == 1
+    assert "not board-advancing" in json.loads(capsys.readouterr().out)[0]["blocked_by"][0]
+    assert P.main(common + ["--allow-non-frontier"]) == 0
+    rep, = json.loads(capsys.readouterr().out)
+    assert rep["frontier"]["filed_as_non_frontier"]
