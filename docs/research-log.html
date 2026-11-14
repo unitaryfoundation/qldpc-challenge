@@ -2098,6 +2098,19 @@
 <p>code-calculus-dev (latest), research/kit coordination.</p>
 <h4>Reproduction</h4>
 <p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-8-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/37-13-2-b.html">[[37,13,2]] — 37-13-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[37,13,2]] — add-check improvement of a 2D-local code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Improve <code>codes/37-15-1</code> by adding a check that kills all weight-1 logicals, keeping the 2D-local bilayer layout.</p>
+<h4>What was searched</h4>
+<p>C-ADD-CHECK strict improvement (code calculus v0.2rc): one added check on the parent code; screened and validated by the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 621334035, no lighter logical in 3980 RIS trials per side). Distance is an upper bound.</p>
+<h4>Dead ends</h4>
+<p>Not applicable.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Parent code <code>codes/37-15-1</code>; added check as in the submitted JSON.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/37-13-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/37-13-2.html">[[37,13,2]] — 37-13-2</a></h3><div class=kv style="color:var(--mut)">2026-11-12 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[37,13,2]] — code-calculus v0.2rc greedy gated</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
@@ -3952,6 +3965,19 @@ EOF
 <p>Model: Beam 1.0. Repository tooling: <code>research/kit/bb.py</code>, manual quotient construction, <code>verify/qldpc_verify.py</code>, gate RIS refutation.</p>
 <h4>Reproduction</h4>
 <p>Build parent with <code>build_bb(6,6,[(3,0),(0,1),(0,2)],[(0,3),(1,0),(2,0)])</code> from <code>research/kit/bb.py</code>, quotient by <code>D_{(0,1)}: g -&gt; (0,1)-g</code>. Parameters and witness are in <code>codes/36-6-6-b.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-6-6-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/42-6-6-c.html">[[42,6,6]] — 42-6-6-c</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[42,6,6]] — space-group code from arXiv:2606.20548</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Reconstruct a space-group code from arXiv:2606.20548 (table row [[42,6,6]], group 7x3 semidirect point group) via group-algebra permutation representation on cosets.</p>
+<h4>What was searched</h4>
+<p>Reconstruction from the published table row; no parameter sweep.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 196301097, no lighter logical in 4180 RIS trials per side). Distance is an upper bound. WL-equivalent to the on-board <code>42-6-6b.json</code> entry but not an exact duplicate.</p>
+<h4>Dead ends</h4>
+<p>Not applicable.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Group 7x3 semidirect point group, permutation representation on cosets T; matrices in the submitted JSON.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/42-6-6-c.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/48-4-8-b.html">[[48,4,8]] — 48-4-8-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[48,4,8]] — Space-group topological code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Topological CSS code from a space group (arXiv:2606.20548). Targets the weight-6 unrestricted cell.</p>
