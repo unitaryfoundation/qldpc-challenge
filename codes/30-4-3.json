@@ -1,457 +1,362 @@
 {
-  "schema_version": "0.5",
-  "name": "[[30,4,3]] reduction of [[34,4,3]]",
-  "code_type": "CSS",
-  "n": 30,
-  "k": 4,
-  "checks": {
-    "X": [
-      [
-        0,
-        5,
-        6
-      ],
-      [
-        11,
-        12,
-        17,
-        18
-      ],
-      [
-        6,
-        7,
-        12,
-        13
-      ],
-      [
-        18,
-        19,
-        22,
-        26
-      ],
-      [
-        13,
-        14,
-        19,
-        20
-      ],
-      [
-        8,
-        9,
-        14,
-        15
-      ],
-      [
-        20,
-        21,
-        23,
-        24
-      ],
-      [
-        3,
-        4,
-        9,
-        10
-      ],
-      [
-        15,
-        16,
-        21
-      ],
-      [
-        24,
-        25,
-        28,
-        29
-      ],
-      [
-        0,
-        1
-      ],
-      [
-        2,
-        3
-      ],
-      [
-        27,
-        28
-      ]
+ "schema_version": "0.2",
+ "name": "[[30,4,3]]",
+ "code_type": "CSS",
+ "n": 30,
+ "k": 4,
+ "checks": {
+  "X": [
+   [
+    7,
+    8,
+    14,
+    15
+   ],
+   [
+    16,
+    17,
+    21,
+    22
+   ],
+   [
+    0,
+    1,
+    4,
+    5
+   ],
+   [
+    11,
+    12,
+    18,
+    19
+   ],
+   [
+    23,
+    24,
+    26,
+    27
+   ],
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    12,
+    13,
+    19,
+    20
+   ],
+   [
+    24,
+    25,
+    27,
+    28
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    15,
+    16,
+    17,
+    18
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    10,
+    11,
+    12,
+    13
+   ],
+   [
+    17,
+    18,
+    19,
+    20,
+    22,
+    23,
+    24,
+    25
+   ],
+   [
+    14,
+    15,
+    16,
+    21
+   ],
+   [
+    26,
+    27,
+    28,
+    29
+   ]
+  ],
+  "Z": [
+   [
+    7,
+    8,
+    14,
+    15
+   ],
+   [
+    16,
+    17,
+    21,
+    22
+   ],
+   [
+    0,
+    1,
+    4,
+    5
+   ],
+   [
+    11,
+    12,
+    18,
+    19
+   ],
+   [
+    23,
+    24,
+    26,
+    27
+   ],
+   [
+    1,
+    2,
+    5,
+    6
+   ],
+   [
+    12,
+    13,
+    19,
+    20
+   ],
+   [
+    24,
+    25,
+    27,
+    28
+   ],
+   [
+    8,
+    9,
+    10,
+    11,
+    15,
+    16,
+    17,
+    18
+   ],
+   [
+    3,
+    4,
+    5,
+    6,
+    10,
+    11,
+    12,
+    13
+   ],
+   [
+    17,
+    18,
+    19,
+    20,
+    22,
+    23,
+    24,
+    25
+   ],
+   [
+    14,
+    15,
+    16,
+    21
+   ],
+   [
+    26,
+    27,
+    28,
+    29
+   ]
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "X": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": [
+    7,
+    8,
+    9
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
     ],
-    "Z": [
-      [
-        0,
-        1,
-        6,
-        7
-      ],
-      [
-        12,
-        13,
-        18,
-        19
-      ],
-      [
-        22,
-        26
-      ],
-      [
-        7,
-        8,
-        13,
-        14
-      ],
-      [
-        19,
-        20,
-        22,
-        23
-      ],
-      [
-        2,
-        3,
-        8,
-        9
-      ],
-      [
-        23,
-        24,
-        27,
-        28
-      ],
-      [
-        9,
-        10,
-        15,
-        16
-      ],
-      [
-        5,
-        6,
-        11,
-        12
-      ],
-      [
-        11,
-        17
-      ],
-      [
-        4,
-        10
-      ],
-      [
-        16,
-        21,
-        24,
-        29
-      ],
-      [
-        25,
-        29
-      ]
-    ]
+    "date": "2026-11-14",
+    "found_at_samples": 20000,
+    "tool": "gf2_fast"
+   }
   },
-  "distance": {
-    "d": 3,
-    "X": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        20,
-        23,
-        27
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@dorakingx"
-        ],
-        "date": "2026-09-15",
-        "found_at_samples": 20000,
-        "survived_samples": 20000000,
-        "tool": "gf2_fast RIS ladder (verify/gf2_fast.cpp), both sides searched jointly",
-        "seeds": [
-          777001,
-          777138,
-          777275,
-          777412,
-          777549
-        ]
-      }
-    },
-    "Z": {
-      "value": 3,
-      "confidence": "upper_bound",
-      "witness": [
-        4,
-        8,
-        9
-      ],
-      "witness_provenance": {
-        "found_by": [
-          "@dorakingx"
-        ],
-        "date": "2026-09-15",
-        "found_at_samples": 4000,
-        "survived_samples": 20000000,
-        "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
-        "seeds": [
-          7,
-          777001,
-          777138,
-          777275,
-          777412,
-          777549
-        ]
-      }
-    }
-  },
-  "provenance": {
-    "authors": [
-      "@dorakingx"
-    ],
-    "construction": "Reduction of the board's codes/34-4-3.json ([[34,4,3]]) by 4 qubits at unchanged k, unchanged check-weight class and unchanged locality class, by one move applied to a fixpoint: graft a qubit away using a low-weight element of the stabilizer ROW SPACE. Let S be an element of the row space of H_X with support T and let a be in T. Replace one generator of the subset summing to S by S itself -- the span is unchanged, that generator being S plus the rest of the subset -- and add S into every other X row meeting a, so that a survives only in S. Then apply the CNOT fan-out from a to T\\{a}, which acts on the check matrices as H_X[:, b] ^= H_X[:, a] and H_Z[:, a] ^= H_Z[:, b] for each b in T\\{a}. Only S still meets a, so the first substitution turns S into the weight-1 stabilizer X_a and leaves every other X row alone; the second zeroes column a of H_Z, because commutation forces every Z row to meet T an even number of times. Qubit a is then disentangled and is deleted: n -> n-1, k unchanged, and the Z rows only LOSE an index, so their weights and support diameters cannot rise. The weight of S separates three regimes, and the difference is entirely in the clearing step R ^= S. |S| = 1: nothing is added anywhere, so the weights, the radius AND THE DISTANCE are all preserved exactly, and no distance search is needed -- this is the row-space form of the weight-1 stabilizer cleanup of Liang, Eberhardt and Chen (arXiv:2504.08887 Sec. III D step 4), which the implementation in research/local2d/boundary_engine.py applies only to literal weight-1 generator ROWS. |S| = 2: R loses a and toggles one other index, so its weight changes by 0 or -2 and can never rise. |S| >= 3: R can grow, so every touched row is checked against the code's weight class and its locality radius, measured in the source's own layout. This generalises the capped merge-graft I introduced with [[454,8,17]], which only ever built S from the generators a single qubit happens to lie in. Here the accepted grafts were |S| = 2: 2, |S| = 4: 2. Low-weight row-space elements are enumerated as sums of at most three checks with a connected overlap pattern. Every graft with |S| >= 2 was accepted only if k was unchanged and a bit-packed RIS search found nothing lighter than 3, screened once and confirmed twice with independent seeds; those in-loop rungs are a filter, not the evidence. QUBIT POSITIONS ARE THE SOURCE'S: every surviving qubit keeps the coordinate it has in codes/34-4-3.json, so the layout is inherited rather than re-derived, and the reduction only deletes. The surviving qubits' indices into the source numbering are [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]... (full list implied by the coordinates in this file).",
-    "references": [
-      "arXiv:2504.08887"
-    ],
-    "date": "2026-09-15",
-    "notes": "Derived from codes/34-4-3.json, not an independent construction; the source's authors are @mathysrennela and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[34,4,3]], [[36,4,3]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 3, against 1.41421 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
-    "model": "Claude Opus 5 (Claude Code)",
-    "origin": "submission",
-    "novelty": "unknown"
-  },
-  "locality": {
-    "coordinates": [
-      [
-        1.0,
-        0.0
-      ],
-      [
-        2.0,
-        0.0
-      ],
-      [
-        3.0,
-        0.0
-      ],
-      [
-        4.0,
-        0.0
-      ],
-      [
-        5.0,
-        0.0
-      ],
-      [
-        0.0,
-        1.0
-      ],
-      [
-        1.0,
-        1.0
-      ],
-      [
-        2.0,
-        1.0
-      ],
-      [
-        3.0,
-        1.0
-      ],
-      [
-        4.0,
-        1.0
-      ],
-      [
-        5.0,
-        1.0
-      ],
-      [
-        0.0,
-        2.0
-      ],
-      [
-        1.0,
-        2.0
-      ],
-      [
-        2.0,
-        2.0
-      ],
-      [
-        3.0,
-        2.0
-      ],
-      [
-        4.0,
-        2.0
-      ],
-      [
-        5.0,
-        2.0
-      ],
-      [
-        0.0,
-        3.0
-      ],
-      [
-        1.0,
-        3.0
-      ],
-      [
-        2.0,
-        3.0
-      ],
-      [
-        3.0,
-        3.0
-      ],
-      [
-        4.0,
-        3.0
-      ],
-      [
-        2.0,
-        4.0
-      ],
-      [
-        3.0,
-        4.0
-      ],
-      [
-        4.0,
-        4.0
-      ],
-      [
-        5.0,
-        4.0
-      ],
-      [
-        1.0,
-        5.0
-      ],
-      [
-        3.0,
-        5.0
-      ],
-      [
-        4.0,
-        5.0
-      ],
-      [
-        5.0,
-        5.0
-      ]
-    ],
-    "interaction_radius": 3.0,
-    "layers": 1
-  },
-  "circuit": {
-    "d_circ": {
-      "X": {
-        "value": 3,
-        "confidence": "upper_bound",
-        "witness": [
-          23,
-          24,
-          36
-        ]
-      },
-      "Z": {
-        "value": 3,
-        "confidence": "upper_bound",
-        "witness": [
-          100,
-          125,
-          172
-        ]
-      }
-    },
-    "rounds": 3,
-    "stim_version": "1.16.0",
-    "notes": "Generic sequential two-block extraction: one ancilla per check, X checks then Z checks each round with joint reset/measure layers; CX layers are a proper edge coloring of each Tanner graph (4 X + 4 Z CX layers per round, schedule seed 0; hook-aware orders: every CNOT order suffix needs >= d-1 further data errors to complete a logical, layered by min-conflicts search). Screened by RIS on ker(H_dem) and an observable-constrained seeded BP+OSD search; witnesses validated in GF(2).",
-    "contributed_by": {
-      "by": [
-        "@vprusso"
-      ],
-      "date": "2026-09-16",
-      "method": "generic CSS memory schedule: one ancilla per check, CX layers from a bipartite edge coloring, CNOT orders filtered by a hook-error criterion; screened by RIS on ker(H_dem) and an observable-constrained seeded BP+OSD search"
-    },
-    "ler": {
-      "X": [
-        {
-          "p": 0.005,
-          "shots": 10000,
-          "failures": 2134,
-          "seed": 20261006,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.084658432,
-          "ci95": [
-            0.080867587,
-            0.088628128
-          ]
-        },
-        {
-          "p": 0.002,
-          "shots": 10000,
-          "failures": 407,
-          "seed": 20261006,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.013952383,
-          "ci95": [
-            0.012650828,
-            0.015386079
-          ]
-        },
-        {
-          "p": 0.001,
-          "shots": 10000,
-          "failures": 115,
-          "seed": 7,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.003863104,
-          "ci95": [
-            0.003217282,
-            0.004637986
-          ]
-        }
-      ],
-      "Z": [
-        {
-          "p": 0.005,
-          "shots": 10000,
-          "failures": 2211,
-          "seed": 20261006,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.08841187,
-          "ci95": [
-            0.084501178,
-            0.09250579
-          ]
-        },
-        {
-          "p": 0.002,
-          "shots": 10000,
-          "failures": 427,
-          "seed": 20261006,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.0146589,
-          "ci95": [
-            0.013321725,
-            0.016128455
-          ]
-        },
-        {
-          "p": 0.001,
-          "shots": 10000,
-          "failures": 141,
-          "seed": 7,
-          "decoder": "bposd-cs-10",
-          "ler_per_round": 0.004744885,
-          "ci95": [
-            0.004021811,
-            0.005597267
-          ]
-        }
-      ]
-    }
+  "Z": {
+   "value": 7,
+   "confidence": "upper_bound",
+   "witness": [
+    0,
+    4,
+    11,
+    12,
+    13,
+    16,
+    21
+   ]
   }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "code-calculus v0.2rc greedy gated",
+  "origin": "submission",
+  "date": "2026-11-14",
+  "model": "Beam 1.0",
+  "notes": "Generated by the priced construction calculus. Distance is reported only with witness-backed upper bounds; lower interval bounds are kept in the separate local ledger. The layout is inherited from the parent and restricted to the qubits the child kept."
+ },
+ "family": "other",
+ "locality": {
+  "coordinates": [
+   [
+    4.0,
+    0.0
+   ],
+   [
+    5.0,
+    0.0
+   ],
+   [
+    6.0,
+    0.0
+   ],
+   [
+    3.0,
+    2.0
+   ],
+   [
+    4.0,
+    2.0
+   ],
+   [
+    5.0,
+    2.0
+   ],
+   [
+    6.0,
+    2.0
+   ],
+   [
+    0.0,
+    4.0
+   ],
+   [
+    1.0,
+    4.0
+   ],
+   [
+    2.0,
+    4.0
+   ],
+   [
+    3.0,
+    4.0
+   ],
+   [
+    4.0,
+    4.0
+   ],
+   [
+    5.0,
+    4.0
+   ],
+   [
+    6.0,
+    4.0
+   ],
+   [
+    0.0,
+    6.0
+   ],
+   [
+    1.0,
+    6.0
+   ],
+   [
+    2.0,
+    6.0
+   ],
+   [
+    3.0,
+    6.0
+   ],
+   [
+    4.0,
+    6.0
+   ],
+   [
+    5.0,
+    6.0
+   ],
+   [
+    6.0,
+    6.0
+   ],
+   [
+    2.0,
+    8.0
+   ],
+   [
+    3.0,
+    8.0
+   ],
+   [
+    4.0,
+    8.0
+   ],
+   [
+    5.0,
+    8.0
+   ],
+   [
+    6.0,
+    8.0
+   ],
+   [
+    4.0,
+    10.0
+   ],
+   [
+    5.0,
+    10.0
+   ],
+   [
+    6.0,
+    10.0
+   ],
+   [
+    6.0,
+    12.0
+   ]
+  ],
+  "layers": 1
+ }
 }
