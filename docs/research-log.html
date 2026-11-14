@@ -4067,6 +4067,19 @@ EOF
 <p>Beam 1.0, OpenCode harness, research/kit/surrogate.py (gf2_fast backend), research/multiband_surface.py.</p>
 <h4>Reproduction</h4>
 <p>Rebuild with research/multiband_surface.py build at the parameters recorded in the staged candidate (local staging output, gitignored). The candidate JSON carries n, k, checks, coordinates, and witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/836-20-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/848-8-11-b.html">[[848,8,11]] — 848-8-11-b</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[848,8,11]] — multi-band dense-packed surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Extend the two-band packing of arXiv:2511.06758 to five horizontal bands of square surface-code patches (d=11) at pitch 16, with 2 patches per even band and 1 per odd band, odd bands half-pitch staggered.</p>
+<h4>What was searched</h4>
+<p>One construction with parameters (d, rows, m, pitch) = (11, 5, 2, 16), at the measured pitch floor 2*floor(3d/4)=16. k=8 by exact GF(2) rank; max check weight 4; one connected component.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 107914784, no lighter logical in 8000 RIS trials per side). Distance is an upper bound.</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this single construction.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Parameters (d, rows, m, pitch) = (11, 5, 2, 16); matrices in the submitted JSON. Builder: <code>research/multiband_surface.py</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/848-8-11-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/848-8-11.html">[[848,8,11]] — 848-8-11</a></h3><div class=kv style="color:var(--mut)">2026-11-09 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><p>--- title: &quot;[[848,8,11]] multi-band dense-packed surface code&quot; date: 2026-11-09 author: &quot;@mathysrennela&quot; model: &quot;Beam 1.0&quot; ---</p>
 <h3>[[848,8,11]] — multi-band dense-packed surface code</h3>
 <h4>Direction &amp; hypothesis</h4>
