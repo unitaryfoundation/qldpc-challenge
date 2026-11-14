@@ -1,29 +1,29 @@
 {
-  "verified_codes": 3441,
-  "css_codes": 3185,
+  "verified_codes": 3442,
+  "css_codes": 3186,
   "stabilizer_codes": 256,
   "certified_exact": 1644,
   "tracks": 12,
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "no_match": 2032,
-    "not_derived": 268,
-    "literature": 490,
     "parameters_only": 395,
+    "no_match": 2032,
+    "not_derived": 269,
+    "literature": 490,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2611,
+    "unknown": 2612,
     "known_parameters": 755,
     "new_parameters": 75
   },
   "novelty_audited": 830,
   "board_screen": {
-    "not_screened": 655,
-    "review": 37,
     "distinct": 2493,
+    "not_screened": 656,
+    "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
     "caveat": "distinct means not permutation-equivalent to any seeded or literature entry on this board, not that the code is unpublished; review is a flag, not a verdict; nothing here is a novelty claim"
@@ -104,7 +104,7 @@
         "top1_share": 0.237,
         "top2_share": 0.432,
         "hhi": 0.142,
-        "members": 791,
+        "members": 792,
         "leader": {
           "slug": "510-16-26",
           "family": "generalized-bicycle",
@@ -137,7 +137,7 @@
         "top1_share": 0.311,
         "top2_share": 0.455,
         "hhi": 0.143,
-        "members": 1215,
+        "members": 1216,
         "leader": {
           "slug": "184-50-10",
           "family": "pair-partition-cpm",
@@ -170,7 +170,7 @@
         "top1_share": 0.309,
         "top2_share": 0.438,
         "hhi": 0.134,
-        "members": 1389,
+        "members": 1390,
         "leader": {
           "slug": "330-66-12",
           "family": "lifted-product",
@@ -368,7 +368,7 @@
         "top1_share": 0.25,
         "top2_share": 0.405,
         "hhi": 0.117,
-        "members": 1186,
+        "members": 1187,
         "leader": {
           "slug": "960-24-38",
           "family": "2bga-coset",
@@ -401,7 +401,7 @@
         "top1_share": 0.31,
         "top2_share": 0.441,
         "hhi": 0.135,
-        "members": 2256,
+        "members": 2257,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -434,7 +434,7 @@
         "top1_share": 0.358,
         "top2_share": 0.473,
         "hhi": 0.154,
-        "members": 3185,
+        "members": 3186,
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",
