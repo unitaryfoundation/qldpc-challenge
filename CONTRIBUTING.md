@@ -53,6 +53,10 @@ Useful flags:
   entirely; do not write `"human"` as a placeholder -- `"human"` is a claim that
   a person, not a model, authored the code, and misusing it corrupts the
   board's model attribution;
+- `--harness "OpenCode agent harness"` (optional) the agent harness or tooling
+  that ran the model, recorded separately in `provenance.harness` so model
+  attribution stays clean. Omit it when no harness was involved or when the
+  harness is already named inside `--model`;
 - `--construction "..."` how it was built (polynomials, group, search);
 - `--family bivariate-bicycle` the construction family, a filterable tag from a
   fixed vocabulary (see TRACKS.md); it is never used for ranking;

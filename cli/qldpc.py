@@ -368,6 +368,8 @@ def _provenance(args, draft=None):
             "date": args.date or datetime.date.today().isoformat()}
     if args.model:
         prov["model"] = args.model
+    if getattr(args, "harness", ""):
+        prov["harness"] = args.harness
     if args.notes:
         prov["notes"] = args.notes
     budget = search_budget_from_args(args)
@@ -3108,6 +3110,12 @@ def main(argv=None):
                         "person, not a model, produced the code. "
                         "'human' is claimed, not verified; the verifier requires a "
                         "version if a model is named)")
+    s.add_argument("--harness", default="",
+                   help="optional, self-reported agent harness or tooling that ran "
+                        "the model, e.g. 'OpenCode agent harness'. Recorded in "
+                        "provenance.harness, separate from --model so model "
+                        "attribution stays clean. Omit when no harness was involved "
+                        "or when the harness is already named inside --model.")
     s.add_argument("--notes", default="")
     s.add_argument("--note-file", default="",
                    help="markdown research note staged as notes/<slug>.md and "

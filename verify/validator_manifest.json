@@ -12,7 +12,7 @@
     "verify/gf2_fast.cpp": "434919c1c2877a416ab871765129177ddfc53f8fb7ead9a5092686ff870e3cd3",
     "decode/distance.py": "5fa33da0aa0106949ce96ba4199724eef6f63416607557fcd843dbfbb71ffc5d",
     "schema/cert.schema.json": "ea6600e9b13603f42f4b2681eccb153f3f68bfa272f0d0a096d139ef1005042c",
-    "schema/code.schema.json": "b0ddc7722af7731b9c1f872835fcd8b44e7a6ffa5c0db31c35f66494ebc69036",
+    "schema/code.schema.json": "8f0ccd7f2c9a3afd7e37f3eda82e1beba2ccfb493c1a2704f03170d2621881ac",
     "verify/build_receipt.py": "e748231cd0bd9a9a96023a1349763ed214b7ea894336834e76afb0c065a80afd",
     "verify/check_authorship.py": "366bcf703ea92ad72f78d1d380535746558a0783ec9a86251945f1c617614a62",
     "verify/check_certs.py": "72a2cbfd3f31f648ca91282954318379140aa1e9eb4044eac16d3c2196a8c93b",
