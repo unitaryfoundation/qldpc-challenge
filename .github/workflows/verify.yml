@@ -444,6 +444,36 @@ jobs:
         env:
           SLUG_TESTS: ${{ steps.changes.outputs.slug_tests }}
         run: uv run --frozen --extra research pytest -q $SLUG_TESTS
+      # A completed refutation, carried between runs of the same PR (issue
+      # #2633). gate_changed.py diffs against the base branch, so a PR that
+      # adds a code has a non-empty diff on every push, and a push that only
+      # fixed prose re-paid the whole search.
+      #
+      # This cache is NOT trusted. A run executes the PR's own copy of this
+      # workflow, and the submitted tree's accelerator build runs before any
+      # gate, so a contributor can write whatever they like here. Only a
+      # refutation is ever served back, and the gate re-validates its witness
+      # against the candidate before believing it, so a planted record either
+      # proves the claimed distance wrong or is discarded. A clean result is
+      # never stored, because there would be nothing to re-check.
+      #
+      # restore-keys is a PR-scoped prefix because the primary key is per run
+      # and attempt, so the prefix is what makes a later run see an earlier
+      # one's record at all. GitHub scopes caches to the PR's own ref, so the
+      # prefix cannot reach another PR's entries.
+      #
+      # It is restored here, before the sweep and not just before the gate
+      # that reads it, so that nothing untrusted is unpacked between the step
+      # that fills the board memo and the step that reads it (see the sweep
+      # below). verify/test_verify_all.py reads that order back.
+      - name: restore completed searches
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: search-cache
+          key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            gate-search-${{ github.event.pull_request.number }}-
       - name: verify all submissions (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: trusted
@@ -475,9 +505,35 @@ jobs:
         # flag only when the PR was data-only. verify_all.py's docstring has
         # the argument in full. The value arrives through the environment,
         # as SLUG_TESTS does above.
+        #
+        # QLDPC_BOARD_CACHE: this step and the gate below are two processes
+        # that each need a structural pass over the whole board, the sweep
+        # to verify it and the gate to compare its candidate with every
+        # entry. Each used to pay for it: 287 s and then 298 s on a 13-minute
+        # run that added one [[9,3,2]] code (#5568), and the two together
+        # were 10 of the 15 minutes of a typical submission (issue #5578).
+        # With the variable set the sweep writes each entry's report under
+        # its bytes and the validator closure digest, and the gate, started
+        # from the same trusted tree, reads them and verifies only what it
+        # does not find.
+        #
+        # What the gate reads is what this job's own trusted verifier
+        # computed minutes earlier from the bytes in front of it, and three
+        # things keep it so. The directory is under the runner's temp
+        # directory and is removed here, at the start of the step that fills
+        # it, so nothing an earlier step left can be in it. No step that can
+        # run on a code submission sits between this one and the gate: the
+        # untrusted search cache is unpacked above for that reason. And no
+        # cache action saves or restores the directory, so nothing crosses
+        # from one run to another. qldpc_verify.board_cache_dir has the rule
+        # that CI reads no memo it was not handed; this is the one place it
+        # is handed one. verify/test_verify_all.py reads these conditions
+        # back.
         env:
           BASE_REF: origin/${{ github.base_ref }}
+          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo
         run: |
+          rm -rf "$QLDPC_BOARD_CACHE"
           uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
       - name: verify all submissions (LER stack unchanged)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
@@ -569,34 +625,15 @@ jobs:
         with:
           path: circuit-record
           key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
-      # A completed refutation, carried between runs of the same PR (issue
-      # #2633). gate_changed.py diffs against the base branch, so a PR that
-      # adds a code has a non-empty diff on every push, and a push that only
-      # fixed prose re-paid the whole search.
-      #
-      # This cache is NOT trusted. A run executes the PR's own copy of this
-      # workflow, and the submitted tree's accelerator build runs before any
-      # gate, so a contributor can write whatever they like here. Only a
-      # refutation is ever served back, and the gate re-validates its witness
-      # against the candidate before believing it, so a planted record either
-      # proves the claimed distance wrong or is discarded. A clean result is
-      # never stored, because there would be nothing to re-check.
-      #
-      # restore-keys is a PR-scoped prefix because the primary key is per run
-      # and attempt, so the prefix is what makes a later run see an earlier
-      # one's record at all. GitHub scopes caches to the PR's own ref, so the
-      # prefix cannot reach another PR's entries.
-      - name: restore completed searches
-        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
-        with:
-          path: search-cache
-          key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: |
-            gate-search-${{ github.event.pull_request.number }}-
+      # The search cache this gate reads was restored above, before the
+      # sweep. QLDPC_BOARD_CACHE is the directory the sweep filled: the
+      # gate's dedup and frontier checks read the board's reports from it
+      # and do not verify the board a second time.
       - name: distance refutation gate (trusted verifier for code changes)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: trusted
+        env:
+          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo
         run: uv run --frozen --extra research python verify/gate_changed.py --code-root ../submitted origin/${{ github.base_ref || 'main' }} --receipt-dir ../receipts --search-cache ../search-cache --pr-number "${{ github.event.pull_request.number }}" --pr-author "${{ github.event.pull_request.user.login }}" --base-sha "${{ github.event.pull_request.base.sha }}" --head-sha "${{ github.event.pull_request.head.sha }}"
       # Saved on failure as well as success, which is the case this exists
       # for: five of the six measured re-gatings were failure -> success, so a

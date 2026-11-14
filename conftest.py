@@ -35,9 +35,43 @@ def _no_board_memo(monkeypatch):
     for a structural pass would depend on what the developer's last campaign
     left behind, and the tests that count `verify` calls would pass or fail
     on that. CI never has the directory, so this is also what makes a local
-    run resemble CI. A test that wants the memo sets the variable itself.
+    run resemble CI. A test that wants the memo sets the variable itself, or
+    asks for `board_memo` below.
     """
     monkeypatch.setenv("QLDPC_BOARD_CACHE", "")
+
+
+@pytest.fixture(scope="session")
+def session_board_memo(tmp_path_factory):
+    """Return a board memo directory that starts empty and lasts one pytest session."""
+    return str(tmp_path_factory.mktemp("board-memo"))
+
+
+@pytest.fixture
+def board_memo(_no_board_memo, session_board_memo, monkeypatch):
+    """Share one structural pass over the committed board between the tests that ask.
+
+    Several tests check the gate against the real board: they stage one
+    candidate and need every committed entry beside it, for dedup and for the
+    frontier. Each used to pay for the whole pass, because the in-process
+    snapshot holds one board state and is lost to a probe written into
+    codes/, to another test's small board, and to every gate started in a
+    subprocess. On the hosted runner that was eight passes in a suite run,
+    30 of its 39 minutes (issue #5578).
+
+    The directory is new in every session, so what a test reads from it was
+    computed in this session, by this checkout's verifier, from the bytes on
+    disk: the hermeticity `_no_board_memo` exists for is kept, and a run on a
+    developer's machine still resembles CI. The variable is set in the
+    environment, so a subprocess the test starts inherits it.
+
+    Ask for this only in a test that leaves the verifier alone. A test that
+    replaces `qldpc_verify.verify`, or anything it calls, and then reads a
+    board would write the replaced answer here, under the real entry's key,
+    for every later test to read.
+    """
+    monkeypatch.setenv("QLDPC_BOARD_CACHE", session_board_memo)
+    return session_board_memo
 
 
 def pytest_configure(config):

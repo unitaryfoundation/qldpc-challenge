@@ -8,7 +8,7 @@ disk as well.
 What has to hold for that to be safe, and is pinned here one condition at a
 time: a hit is byte-identical to a fresh pass, a key covers the validator and
 not just the board, one changed entry re-verifies one entry rather than the
-board, and CI never reads it.
+board, and CI reads no memo except one the job itself named.
 """
 import json
 import os
@@ -139,18 +139,49 @@ def test_the_closure_digest_follows_the_manifest(tmp_path):
     assert Q.validator_closure_digest(str(tmp_path / "gone.json")) == "no-manifest"
 
 
-def test_ci_never_reads_the_memo(board, memo, monkeypatch):
+def test_ci_has_no_memo_it_was_not_given(board, monkeypatch):
     """Keep a runner answering from the board in front of it.
 
-    Its cache is cold anyway, so it gains nothing and would only acquire a
-    way to be answered by something else.
+    With the variable unset a checkout has its default memo and CI has none,
+    so nothing a runner happens to find is ever read.
     """
-    fresh(board)
+    monkeypatch.delenv("QLDPC_BOARD_CACHE", raising=False)
+    monkeypatch.delenv("CI", raising=False)
+    assert Q.board_cache_dir().endswith(Q.BOARD_CACHE_DIRNAME)
     monkeypatch.setenv("CI", "true")
     assert Q.board_cache_dir() is None
     calls = count_passes(monkeypatch)
     fresh(board)
-    assert len(calls) == 2
+    fresh(board)
+    assert len(calls) == 4, "with no memo, every pass verifies every entry"
+
+
+def test_a_job_can_point_its_processes_at_one_memo(board, memo, monkeypatch):
+    """One job, several processes, one pass (issue #5578).
+
+    The sweep and the gate are two processes over the same board, and each
+    used to verify all of it. A directory the job names is read in CI too:
+    the first pass fills it and the next process answers from it.
+    """
+    monkeypatch.setenv("CI", "true")
+    assert Q.board_cache_dir() == str(memo)
+    calls = count_passes(monkeypatch)
+    want = shape(fresh(board))
+    assert len(calls) == 2, "the job's first pass verifies both entries"
+    Q._CLOSURE_DIGEST.clear()                  # as the job's next process would start
+    assert shape(fresh(board)) == want
+    assert len(calls) == 2, "and its second pass verifies nothing"
+
+
+@pytest.mark.parametrize("ci", [None, "true"])
+def test_an_empty_value_turns_the_memo_off_everywhere(board, monkeypatch, ci):
+    """What conftest.py relies on to keep the suite hermetic, in CI or out of it."""
+    if ci is None:
+        monkeypatch.delenv("CI", raising=False)
+    else:
+        monkeypatch.setenv("CI", ci)
+    monkeypatch.setenv("QLDPC_BOARD_CACHE", "")
+    assert Q.board_cache_dir() is None
 
 
 def test_an_unreadable_entry_is_a_miss_and_not_a_crash(board, memo, monkeypatch):
