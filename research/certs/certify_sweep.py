@@ -196,7 +196,8 @@ def _cert_on_file(certs_dir, slug):
 
 
 def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, retry=False, today=None,
-           stabilizer_ok=False, ladder=None, tool=False):
+           stabilizer_ok=False, ladder=None, tool=False, records_only=False, bands=None, max_gap=None,
+           min_gap=None):
     """Return the entries the sweep opens, in queue order, and why it passes over the rest.
 
     Skipped: stabilizer entries unless ``stabilizer_ok`` (the SAT path has no
@@ -256,6 +257,22 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
         on_file = _cert_on_file(certs_dir, slug)
         if on_file is not None and (on_file.get("d_exact") or not on_file.get("d_lower")):
             skip(slug, "certified", "certs/ already has a file for it")
+            continue
+        if records_only and not r.get("record"):
+            skip(slug, "not_record", "not on a cell or global frontier")
+            continue
+        if bands is not None and r.get("band") not in bands:
+            skip(slug, "band", f"band {r.get('band')} not in {sorted(bands)}")
+            continue
+        _lb = 1
+        if on_file is not None and on_file.get("d_lower") is not None:
+            _lb = int(on_file["d_lower"])
+        _gap = int(r.get("d") or 0) - _lb
+        if max_gap is not None and _gap > max_gap:
+            skip(slug, "gap", f"gap {_gap} > {max_gap}")
+            continue
+        if min_gap is not None and _gap < min_gap:
+            skip(slug, "gap", f"gap {_gap} < {min_gap}")
             continue
         if on_file is not None:
             lb = on_file["d_lower"]
@@ -628,7 +645,8 @@ def _is_proof_log(cert):
 
 def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0, slugs=None,
               retry=False, certs_dir=CERTS, codes_dir=CODES, certify=None, tools=None,
-              backend="sat", tropidist=None, threads=1, certify_tropidist=None, ladder=None):
+              backend="sat", tropidist=None, threads=1, certify_tropidist=None, ladder=None,
+              records_only=False, bands=None, max_gap=None, min_gap=None):
     """Open entries in queue order until the budget is spent; stage what closes.
 
     Returns the run manifest, which is also written to <out_dir>/run.json.
@@ -668,7 +686,8 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     last = last_attempts(load_jsonl(attempts_path))
     chosen, skipped, reasons = select(queue, last=last, tlim=tlim, today=date, certs_dir=certs_dir,
                                       codes_dir=codes_dir, slugs=slugs, retry=retry, stabilizer_ok=use_tool,
-                                      ladder=ladder, tool=use_tool)
+                                      ladder=ladder, tool=use_tool, records_only=records_only, bands=bands,
+                                      max_gap=max_gap, min_gap=min_gap)
     if max_entries:
         chosen = chosen[:max_entries]
     versions = dict(tools())
@@ -1006,6 +1025,16 @@ def main(argv=None):
                    help="stop opening entries after this long (default 14400)")
     r.add_argument("--max-entries", type=int, default=0, help="open at most this many (0: no cap)")
     r.add_argument("--slugs", nargs="*", default=None, help="try these instead of the queue head")
+    r.add_argument("--records-only", action="store_true",
+                   help="open only entries that are on a cell or global frontier (record: true)")
+    r.add_argument("--band", nargs="*", default=None, metavar="BAND",
+                   help="restrict to these bands (A B C D P); default: all")
+    r.add_argument("--max-gap", type=int, default=None,
+                   help="open only entries whose d - (filed lower bound or 1) is at most this (cheap-to-close filter)")
+    r.add_argument("--min-gap", type=int, default=None,
+                   help="open only entries whose gap is at least this (skip nearly-closed entries)")
+    r.add_argument("--dry-run", action="store_true",
+                   help="print the selected entries and estimated cost, then exit without running")
     r.add_argument("--retry", action="store_true", help="reopen entries that timed out at this budget")
     r.add_argument("--backend", choices=BACKENDS, default="sat",
                    help="sat (default), tropidist, or tropidist+sat (the tool first, then the SAT proof path "
@@ -1027,10 +1056,27 @@ def main(argv=None):
     a = ap.parse_args(argv)
 
     if a.cmd == "run":
-        m = run_sweep(queue=load_queue(a.queue), out_dir=a.out_dir, attempts_path=a.attempts, tlim=a.tlim,
+        q = load_queue(a.queue)
+        last = last_attempts(load_jsonl(a.attempts))
+        chosen, skipped, reasons = select(q, last=last, tlim=a.tlim, today=utc_today(), certs_dir=CERTS,
+                                          codes_dir=CODES, slugs=a.slugs, retry=a.retry,
+                                          stabilizer_ok=("tropidist" in a.backend), ladder=a.ladder or None,
+                                          tool=("tropidist" in a.backend), records_only=a.records_only,
+                                          bands=a.band, max_gap=a.max_gap, min_gap=a.min_gap)
+        if a.max_entries:
+            chosen = chosen[:a.max_entries]
+        if a.dry_run:
+            est = sum(wall_clock(a.tlim, a.ladder or None) for _ in chosen)
+            print(f"selected {len(chosen)} (skipped {sum(skipped.values())}): "
+                  f"estimated wall {est} s ({est/3600:.1f} h)")
+            for r in chosen:
+                print(f"  {r['slug']}  band={r.get('band')}  n={r['n']}  d={r['d']}  record={bool(r.get('record'))}")
+            return 0
+        m = run_sweep(queue=q, out_dir=a.out_dir, attempts_path=a.attempts, tlim=a.tlim,
                       job_seconds=a.job_seconds, max_entries=a.max_entries, slugs=a.slugs, retry=a.retry,
                       ladder=a.ladder or None,
-                      backend=a.backend, tropidist=a.tropidist, threads=a.threads)
+                      backend=a.backend, tropidist=a.tropidist, threads=a.threads,
+                      records_only=a.records_only, bands=a.band, max_gap=a.max_gap, min_gap=a.min_gap)
         o = m["outcomes"]
         print(f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)}, partial "
               f"{o.get('partial', 0)} (staged under {os.path.relpath(a.out_dir, ROOT)}), timeout "
