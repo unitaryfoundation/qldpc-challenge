@@ -1393,6 +1393,7 @@ def _peer_audit_check(doc, report, args, res, slug):
             f.write("\n")
     problems = peer_audit.blockers(
         peers, audit, required_trials=trials, required_pair_depth=pair_depth,
+        candidate_d=doc["distance"]["d"],
         candidate_path=staged or "<the verified document; --dry-run --json prints "
                                  "it under doc>",
         attach="re-run submit with --peer-audit <that file>")
