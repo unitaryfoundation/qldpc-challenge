@@ -1,28 +1,28 @@
 {
-  "verified_codes": 3446,
-  "css_codes": 3190,
+  "verified_codes": 3447,
+  "css_codes": 3191,
   "stabilizer_codes": 256,
   "certified_exact": 1644,
   "tracks": 12,
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "parameters_only": 395,
     "no_match": 2032,
+    "parameters_only": 395,
     "literature": 490,
-    "not_derived": 273,
+    "not_derived": 274,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2614,
+    "unknown": 2615,
     "known_parameters": 757,
     "new_parameters": 75
   },
   "novelty_audited": 832,
   "board_screen": {
+    "not_screened": 661,
     "distinct": 2493,
-    "not_screened": 660,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -368,7 +368,7 @@
         "top1_share": 0.25,
         "top2_share": 0.405,
         "hhi": 0.117,
-        "members": 1189,
+        "members": 1190,
         "leader": {
           "slug": "960-24-38",
           "family": "2bga-coset",
@@ -401,7 +401,7 @@
         "top1_share": 0.309,
         "top2_share": 0.441,
         "hhi": 0.135,
-        "members": 2261,
+        "members": 2262,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -434,7 +434,7 @@
         "top1_share": 0.358,
         "top2_share": 0.472,
         "hhi": 0.154,
-        "members": 3190,
+        "members": 3191,
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",
