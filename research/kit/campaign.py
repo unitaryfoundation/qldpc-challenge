@@ -946,6 +946,9 @@ class Ledger:
                             or (gates.get("verify") or {}).get("weight_class"),
             "cell": novelty.get("cell"),
             "board_advancing": novelty.get("board_advancing"),
+            # the entries that beat it, in the gate's words, so a survivor
+            # that did not advance the frontier says who holds it (issue #5700)
+            "dominated_by": list(novelty.get("dominated_by") or []),
             "fingerprint": (verdict.get("candidate") or {}).get("fingerprint"),
             "advanced_frontier": bool(advanced_frontier),
             "labels": list(verdict.get("labels") or []),
@@ -963,6 +966,25 @@ class Ledger:
         if advanced_frontier:
             self.frontier_advances += 1
         return row
+
+    def frontier_survivors(self):
+        """Return the survivor rows the gate labeled board-advancing.
+
+        These are the rows a driver may promote. ``survivors`` is every
+        validated code; promoting all of them is how the greedy campaign of
+        issue #5700 filed dominated codes as frontier submissions.
+        """
+        return [r for r in self.survivors if r.get("advanced_frontier")]
+
+    def non_frontier_survivors(self):
+        """Return the survivor rows the gate labeled dominated.
+
+        Valid codes and non-frontier results (AGENTS.md, The motto): each row
+        carries ``dominated_by`` in the gate's words. They belong in the
+        summary and the fieldnote, never in a PR; ``kit/promote.py`` and
+        ``./qldpc submit`` refuse them without ``--allow-non-frontier``.
+        """
+        return [r for r in self.survivors if not r.get("advanced_frontier")]
 
     def _find_survivor(self, key):
         """Locate a recorded survivor by fingerprint, identity tuple, or index."""
@@ -1271,6 +1293,10 @@ class Ledger:
             "survivors": self.survivors,
             "retracted": self.retracted,
             "frontier_advances": self.frontier_advances,
+            # The split a reader needs before trusting a find count: the
+            # survivors that advanced the frontier are the finds, and these
+            # passed the gate and are dominated, each row naming by whom.
+            "non_frontier_survivors": len(self.non_frontier_survivors()),
             "negative_results": self.negative_results,
             # Crashes beside, not among, the negatives. An experiment that
             # aborted is counted here and flagged on its row, so "N

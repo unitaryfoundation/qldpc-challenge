@@ -109,7 +109,13 @@
     },
     "frontier_advances": {
       "type": "integer",
-      "minimum": 0
+      "minimum": 0,
+      "description": "Survivors the gate labeled board-advancing: the campaign's finds. Every other survivor passed the gate and is dominated in its track cell."
+    },
+    "non_frontier_survivors": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Survivors the gate labeled dominated (gates.novelty.board_advancing false). Valid codes and non-frontier results per AGENTS.md: their rows under survivors carry dominated_by, and they are recorded here rather than submitted (issue #5700). Optional, so earlier summaries still validate."
     },
     "negative_results": {
       "type": "array",

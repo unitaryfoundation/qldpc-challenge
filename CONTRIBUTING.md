@@ -609,7 +609,11 @@ A code is worth submitting if it is board-advancing: under the track's constrain
 (check weight, locality), no entry dominates it over (n, k, d, w). Such a code
 extends the frontier even when it beats no existing entry, and it need not beat the
 cell's kd^2/n leader. Dominated codes pass the gate and are recorded as non-frontier
-results, but they do not sit on the frontier. See `TRACKS.md`.
+results, but they do not sit on the frontier. See `TRACKS.md`. Both packaging paths
+hold that line: `./qldpc submit` and `research/kit/promote.py` refuse a code that an
+entry in its cell dominates on (n, k, d, w), naming the entry, unless
+`--allow-non-frontier` is passed, which files it as a non-frontier record and says so
+in the PR body (issue #5700). A dry run reports what the real run would refuse.
 
 A board-advancing code whose only strict gain over an entry is d (same n, k and w)
 calls for caution, not rejection: both distances are upper bounds, so re-measure the

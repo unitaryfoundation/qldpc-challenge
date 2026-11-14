@@ -37,6 +37,14 @@ What it does NOT do, on purpose:
   ``DEFAULT_MIN_DEEP_TRIALS`` trials per side on a fresh seed and settled
   there: the depth is required, not the repetition. A ladder rung reading
   BELOW the claimed distance is a blocker, not a rounding difference.
+* **It never files a dominated code as a frontier claim.** The gate labels
+  novelty and never refuses on it: ``passed`` certifies a valid code, and
+  ``gates.novelty.board_advancing`` says whether any entry in its track cell
+  dominates it. The bundle is refused when that label is false, with the
+  dominators named, unless ``allow_non_frontier`` (``--allow-non-frontier``)
+  files it as a non-frontier record, in which case the PR body says so. The
+  rule is ``research/kit/frontier.py``'s, shared with ``./qldpc submit``
+  (issue #5700).
 * **It never runs git or gh.** Publication authorization is a human's, per
   ``AGENTS.md``; the report carries the exact command sequence and
   ``--script`` writes it out, so no campaign has to invent one again.
@@ -72,6 +80,7 @@ for _rel in ("verify", "site", "cli", os.path.join("research", "kit")):
         sys.path.insert(0, _p)
 
 import escalation  # noqa: E402
+import frontier  # noqa: E402
 import peer_audit  # noqa: E402
 import qldpc as cli  # noqa: E402
 import qldpc_verify  # noqa: E402
@@ -450,7 +459,7 @@ def equivalence_finding(verdict, doc):
 
 
 def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
-            repro_rel=None, reproducible=False):
+            repro_rel=None, reproducible=False, frontier_record=None):
     """Render the PR body from the verified document and the gate's own verdict.
 
     Same sections as ``.github/pull_request_template.md`` and the same frontier
@@ -501,6 +510,10 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
     front = cli.frontier_summary(doc, report)
     if front:
         lines += [""] + front
+    if (frontier_record or {}).get("filed_as_non_frontier"):
+        # The gate's own dominators, where the reviewer reads the claim: this
+        # entry is a record of a valid code and claims no frontier advance.
+        lines += ["", frontier.body_line(frontier_record["dominated_by"])]
     lines += ["",
               f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight "
               f"{wmax}, locality class {comp.get('locality_class', 'unknown')}. "
@@ -570,7 +583,7 @@ def _run_check_prose(root, body_file, files, pr_author=None):
 def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             min_deep_trials=DEFAULT_MIN_DEEP_TRIALS, pr_author=None,
             body_dir=None, write=True, force=False, seed=None, base="main",
-            recipe=None):
+            recipe=None, allow_non_frontier=False):
     """Build one submission bundle and return its report.
 
     The order is fixed and is the point: evidence, then the trusted gate on the
@@ -584,11 +597,16 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     final document so its ``artifact_sha256`` is the committed file's; a spec
     without a ``{constructor, params}`` recipe gives a manifest whose
     construction stage says ``not_reproducible`` (issue #2955, item 3).
+
+    ``allow_non_frontier`` files a candidate the gate labels dominated
+    (``board_advancing: false``) as a non-frontier record instead of refusing
+    it; ``report["frontier"]`` carries the label, the dominators, and whether
+    the opt-in was used, and the PR body names the dominators (issue #5700).
     """
     report = {"schema": REPORT_SCHEMA, "ok": False, "slug": None, "title": None,
               "branch": None, "files": {}, "body_file": None, "gates": {},
               "blocked_by": [], "needs_human": [], "commands": [],
-              "ladder": None}
+              "ladder": None, "frontier": None}
     blocked = report["blocked_by"]
 
     problems = check_evidence(evidence)
@@ -639,6 +657,23 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         novelty.get("d_only_peers") or [], evidence.get("peer_audit"),
         required_trials=facts["deepest_fresh_trials"],
         attach="put the record it writes in evidence.peer_audit"))
+    # A dominated code is a valid code and a non-frontier result (AGENTS.md,
+    # The motto). The gate labels it and never refuses on it; this is where a
+    # frontier claim gets written into a PR body, so this is where the label
+    # becomes a condition (issue #5700). The rule is research/kit/frontier.py's,
+    # shared with ./qldpc submit.
+    advancing = novelty.get("board_advancing")
+    dominated_by = list(novelty.get("dominated_by") or [])
+    report["frontier"] = {
+        "board_advancing": advancing,
+        "dominated_by": dominated_by,
+        "advances_by": list(novelty.get("advances_by") or []),
+        "filed_as_non_frontier": bool(allow_non_frontier) and advancing is False,
+    }
+    blocked.extend(frontier.blockers(
+        dominated_by, advancing, allowed=allow_non_frontier,
+        attach=f"pass allow_non_frontier=True ({frontier.FLAG}) to file it as a "
+               f"non-frontier record, which the PR body then says"))
     ticked, reason = equivalence_finding(verdict, doc)
     if not ticked:
         blocked.append(reason)
@@ -672,7 +707,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         return report
     body = pr_body(doc, report_verify, verdict, evidence, facts,
                    code_rel=code_rel, note_rel=note_rel, repro_rel=repro_rel,
-                   reproducible=recipe_from_spec(recipe) is not None)
+                   reproducible=recipe_from_spec(recipe) is not None,
+                   frontier_record=report["frontier"])
     report["title"] = bundle_title(doc, evidence)
     report["files"] = {"code": code_rel, "note": note_rel}
     if repro_rel:
@@ -711,7 +747,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             "skipped": "dry run: nothing was written for the checker to read"}
 
     report["needs_human"] = needs_human(doc, verdict, body_file if write else None,
-                                        evidence=evidence)
+                                        evidence=evidence,
+                                        frontier_record=report["frontier"])
     report["commands"] = _git_commands(slug, report["title"], code_rel, note_rel,
                                        body_file, base=base,
                                        extra=[repro_rel] if repro_rel else ())
@@ -719,7 +756,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     return report
 
 
-def needs_human(doc, verdict, body_file, evidence=None):
+def needs_human(doc, verdict, body_file, evidence=None, frontier_record=None):
     """List what this bundle still needs a person for, and why."""
     items = [{"item": "literature novelty",
               "why": "the gate deduplicates against this board only and labels "
@@ -739,6 +776,14 @@ def needs_human(doc, verdict, body_file, evidence=None):
                       "why": "the gate found the same Weisfeiler-Leman "
                              "signature; provenance.notes records a judgment "
                              "that only a person can make"})
+    if (frontier_record or {}).get("filed_as_non_frontier"):
+        doms = ", ".join(frontier_record.get("dominated_by") or []) or "a cell entry"
+        items.append({"item": "the non-frontier filing",
+                      "why": f"the gate reports this code is dominated by {doms}; "
+                             f"it was packaged with allow_non_frontier, so the "
+                             f"body calls it a record and not a frontier "
+                             f"advance; confirm that a record is what is wanted "
+                             f"before opening the PR"})
     gates = verdict.get("gates") or {}
     peers = (gates.get("novelty") or {}).get("d_only_peers") or []
     audit = (evidence or {}).get("peer_audit")
@@ -806,6 +851,13 @@ def main(argv=None):
     ap.add_argument("--base", default="main")
     ap.add_argument("--force", action="store_true",
                     help="overwrite an existing codes/<slug>.json or note")
+    ap.add_argument("--allow-non-frontier", action="store_true",
+                    help="package a candidate the gate labels dominated "
+                         "(gates.novelty.board_advancing false) as a "
+                         "non-frontier record; without it such a candidate is "
+                         "refused with its dominators named, and with it the "
+                         "PR body names them and claims no frontier advance "
+                         "(AGENTS.md, The motto; issue #5700)")
     ap.add_argument("--dry-run", action="store_true",
                     help="render and gate without writing any file")
     ap.add_argument("--json", default=None, metavar="FILE",
@@ -821,7 +873,8 @@ def main(argv=None):
                           authors=args.authors, date=args.date,
                           min_deep_trials=args.min_deep_trials,
                           pr_author=args.pr_author, write=not args.dry_run,
-                          force=args.force, seed=args.seed, base=args.base)
+                          force=args.force, seed=args.seed, base=args.base,
+                          allow_non_frontier=args.allow_non_frontier)
     text = json.dumps(reports, indent=1)
     print(text)
     if args.json:
