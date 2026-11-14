@@ -4,7 +4,11 @@ With --ler-base REF only entries whose codes/<slug>.json or circuits/<slug>/
 changed since REF are re-measured (PR runs); without it every claim is (pushes
 to main). An unusable ref falls back to re-measuring everything, so a broken
 diff can only cost time, never coverage. The verifiers themselves are faked:
-this tests the routing, not stim.
+this tests the routing, not stim. --ler-sample K re-measures K seeded claims
+in place of all of them, for a run that changed the stack that measures
+them; the last part of the file covers which claims that is, that it adds to
+--ler-base and never narrows a failed diff, and which runs verify.yml gives
+it to.
 
 --circuit-base REF routes the circuit tier the same way, and the second half
 of this file covers it: which entries are checked, that nothing but the
@@ -719,10 +723,12 @@ _WORKFLOW = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 _PR_SWEEPS = ("verify all submissions (trusted verifier for code changes)",
               "verify all submissions (LER stack unchanged)")
 _PUSH_SWEEP = "verify all submissions (push to main, LER scoped to the merge)"
-_FULL_SWEEP = "verify all submissions (full LER re-measure)"
+_FULL_SWEEP = "verify all submissions (LER stack changed, or the weekly run)"
 _RESTORE = "restore the circuit record (push to main)"
 _SAVE = "save the circuit record (runs on main)"
 _RECORD = "../circuit-record/record.json"
+# What verify.yml's env block hands the stack sweep's script besides the event.
+_SAMPLE_ENV = {"LER_SAMPLE": "3", "PR_NUMBER": "5578", "RUN_ID": "43263400509"}
 
 
 def _workflow_steps():
@@ -772,8 +778,10 @@ def test_every_pull_request_sweep_passes_circuit_base(tmp_path):
         argv = _verify_all_argv(_script(steps[name]), tmp_path)
         assert argv[argv.index("--circuit-base") + 1] == "origin/main", (name, argv)
         assert argv[argv.index("--ler-base") + 1] == "origin/main", (name, argv)
-    argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request")
-    assert argv == ["--circuit-base", "origin/main", "--circuit-jobs", "0"], argv
+    argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request",
+                            **_SAMPLE_ENV)
+    assert argv[argv.index("--circuit-base") + 1] == "origin/main", argv
+    assert argv[-2:] == ["--circuit-jobs", "0"], argv
 
 
 def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
@@ -783,10 +791,12 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
         assert not any("--circuit-record" in ln for ln in _code(steps[name])), name
         assert "--circuit-record" not in _verify_all_argv(_script(steps[name]), tmp_path), name
     full = _script(steps[_FULL_SWEEP])
-    assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request")
+    assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request",
+                                                      **_SAMPLE_ENV)
     for event in ("push", "schedule", "workflow_dispatch"):
-        assert _verify_all_argv(full, tmp_path, EVENT_NAME=event) == [
-            "--circuit-record", _RECORD, "--circuit-jobs", "0"]
+        argv = _verify_all_argv(full, tmp_path, EVENT_NAME=event, BEFORE="abc123", **_SAMPLE_ENV)
+        assert argv[-4:] == ["--circuit-record", _RECORD, "--circuit-jobs", "0"], (event, argv)
+        assert "--circuit-base" not in argv, (event, argv)
     push = _code(steps[_PUSH_SWEEP])
     assert any(ln.startswith("        if: github.event_name == 'push' && ") for ln in push)
     run = next(ln for ln in push if "verify/verify_all.py" in ln)
@@ -826,3 +836,148 @@ def test_the_record_is_restored_and_saved_only_on_main():
         assert clause in cond.split(" && "), (clause, cond)
     assert "        uses: actions/cache/save@v4" in steps[_SAVE]
     assert "        uses: actions/cache@v4" not in "\n".join(steps[_RESTORE] + steps[_SAVE])
+
+
+# --ler-sample (issue #5578): a run that changed the stack that measures the
+# claims used to re-measure every one of them before the merge, and no longer
+# fit the job. It now re-measures a few, and the weekly runs re-measure all.
+
+def _claims_repo(tmp_path, n=12):
+    """Build a board of `n` entries that carry an ler claim and one that does not."""
+    root = str(tmp_path)
+    slugs = [f"s{i:02d}-1-1" for i in range(n)]
+    for s in slugs:
+        _write(root, f"codes/{s}.json", json.dumps({"name": s, "circuit": {"ler": LER}}))
+    _write(root, "codes/plain-1-1.json", json.dumps({"name": "plain-1-1"}))
+    return root, slugs
+
+
+def test_sample_measures_k_claims_and_says_which(tmp_path, monkeypatch, capsys):
+    root, slugs = _claims_repo(tmp_path)
+    rc, measured = _run(monkeypatch, ["--root", root, "--ler-sample", "3", "--ler-seed", "5578"])
+    assert rc == 0 and len(measured) == 3 and set(measured) < set(slugs)
+    out = capsys.readouterr().out
+    assert f"re-measuring a sample of 3 of 12 claims (seed 5578): {', '.join(measured)}" in out
+    skipped = [ln for ln in out.splitlines() if "ler outside this run's sample" in ln]
+    assert len(skipped) == 9 and all(ln.startswith("PASS") for ln in skipped)
+    assert not any("plain-1-1" in ln for ln in skipped), "an entry with no claim is not a skipped claim"
+
+
+def test_the_same_seed_draws_the_same_claims(tmp_path, monkeypatch):
+    """A re-run of one pull request cannot re-roll a claim that failed."""
+    root, _ = _claims_repo(tmp_path)
+    argv = ["--root", root, "--ler-sample", "3", "--ler-seed", "5578"]
+    assert _run(monkeypatch, argv)[1] == _run(monkeypatch, argv)[1]
+
+
+def test_the_sample_moves_with_the_seed(tmp_path, monkeypatch):
+    """No claim is out of the sample's reach: other pull requests draw other claims."""
+    root, slugs = _claims_repo(tmp_path)
+    seen = set()
+    for seed in range(40):
+        measured = _run(monkeypatch, ["--root", root, "--ler-sample", "3", "--ler-seed", str(seed)])[1]
+        assert len(measured) == 3
+        seen |= set(measured)
+    assert seen == set(slugs)
+
+
+def test_ler_sample_depends_on_nothing_but_its_arguments():
+    claims = [f"s{i:02d}-1-1" for i in range(12)]
+    want = VA.ler_sample(claims, 3, 5578)
+    assert VA.ler_sample(list(reversed(claims)), 3, 5578) == want, "not on the order given"
+    assert VA.ler_sample(claims + claims, 3, 5578) == want, "nor on a slug given twice"
+    assert VA.ler_sample(claims, 0, 5578) == set()
+    assert VA.ler_sample(claims, 99, 5578) == set(claims)
+    assert VA.ler_sample([], 3, 5578) == set()
+    # Pinned, so that a change to how the draw is made is a deliberate one:
+    # it changes which claims every open pull request re-measures.
+    assert sorted(want) == PINNED_SAMPLE
+
+
+def test_sample_adds_to_what_the_base_selects(tmp_path, monkeypatch, capsys):
+    """Entries the run changed are re-measured whether or not they are drawn."""
+    root = _repo(tmp_path)                            # a and b changed since main; c did not
+    base = ["--root", root, "--ler-base", "main"]
+    assert _run(monkeypatch, [*base, "--ler-sample", "0"])[1] == ["a-1-1", "b-1-1"]
+    for seed in range(8):
+        measured = _run(monkeypatch, [*base, "--ler-sample", "1", "--ler-seed", str(seed)])[1]
+        assert {"a-1-1", "b-1-1"} <= set(measured), (seed, measured)
+    assert _run(monkeypatch, [*base, "--ler-sample", "3"])[1] == ["a-1-1", "b-1-1", "c-1-1"]
+    assert "and every entry changed since main" in capsys.readouterr().out
+
+
+def test_sample_never_narrows_a_base_that_cannot_be_diffed(tmp_path, monkeypatch, capsys):
+    """The fallback is everything, and a sample of it would be a silent skip."""
+    root = _repo(tmp_path)
+    rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "no-such-ref",
+                                      "--ler-sample", "1"])
+    assert rc == 0 and measured == ["a-1-1", "b-1-1", "c-1-1"]
+    out = capsys.readouterr().out
+    assert "re-measuring every ler claim" in out and "a sample of" not in out
+
+
+def test_a_sampled_claim_that_fails_fails_the_run(tmp_path, monkeypatch):
+    """And one outside the sample does not: that is the cost the weekly runs carry."""
+    root, slugs = _claims_repo(tmp_path)
+    bad = slugs[0]
+    drawn = next(s for s in range(200) if bad in VA.ler_sample(slugs, 3, s))
+    missed = next(s for s in range(200) if bad not in VA.ler_sample(slugs, 3, s))
+
+    def run(seed):
+        monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(OK_REP)))
+        monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
+        monkeypatch.setattr(VA, "verify_ler", lambda doc, d: (
+            {"ok": True} if doc["name"] != bad else
+            {"ok": False, "checks": [{"check": "ler_replicates", "ok": False}]}))
+        return VA.main(["--root", root, "--ler-sample", "3", "--ler-seed", str(seed)])
+
+    assert run(drawn) == 1
+    assert run(missed) == 0
+
+
+def test_negative_ler_sample_is_refused(tmp_path, monkeypatch):
+    root, _ = _claims_repo(tmp_path)
+    with pytest.raises(SystemExit):
+        _run(monkeypatch, ["--root", root, "--ler-sample", "-1"])
+
+
+def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
+    """Run the stack sweep's shell for each kind of run and read the LER flags back."""
+    lines = _workflow_steps()[_FULL_SWEEP]
+    for line in ('          LER_SAMPLE: "3"',
+                 "          BEFORE: ${{ github.event.before }}",
+                 "          PR_NUMBER: ${{ github.event.pull_request.number }}",
+                 "          RUN_ID: ${{ github.run_id }}"):
+        assert line in lines, line
+    script = _script(lines)
+    pr = _verify_all_argv(script, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
+    assert pr == ["--ler-base", "origin/main", "--ler-sample", "3", "--ler-seed", "5578",
+                  "--circuit-base", "origin/main", "--circuit-jobs", "0"], pr
+    push = _verify_all_argv(script, tmp_path, EVENT_NAME="push", BEFORE="abc123", **_SAMPLE_ENV)
+    assert push == ["--ler-base", "abc123", "--ler-sample", "3", "--ler-seed", "43263400509",
+                    "--circuit-record", _RECORD, "--circuit-jobs", "0"], push
+    # No LER flag at all means every claim: the weekly run, a manual dispatch,
+    # and a push whose `before` cannot be diffed.
+    for env in ({"EVENT_NAME": "schedule"}, {"EVENT_NAME": "workflow_dispatch"},
+                {"EVENT_NAME": "push"}, {"EVENT_NAME": "push", "BEFORE": "0" * 40}):
+        argv = _verify_all_argv(script, tmp_path, **env, **_SAMPLE_ENV)
+        assert argv == ["--circuit-record", _RECORD, "--circuit-jobs", "0"], (env, argv)
+
+
+def test_the_flags_the_workflow_passes_are_ones_verify_all_takes(tmp_path, monkeypatch):
+    """A seed is a pull request number or a run id, which is a large integer."""
+    root = _repo(tmp_path)
+    rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "main", "--ler-sample", "3",
+                                      "--ler-seed", "43263400509"])
+    assert rc == 0 and measured == ["a-1-1", "b-1-1", "c-1-1"]
+
+
+def test_only_the_stack_sweep_samples():
+    """Every other sweep either diffs against a base it can trust or re-measures everything."""
+    steps = _workflow_steps()
+    users = {name for name, lines in steps.items()
+             if any("--ler-sample" in ln for ln in _code(lines))}
+    assert users == {_FULL_SWEEP}, sorted(users)
+
+
+PINNED_SAMPLE = ["s04-1-1", "s05-1-1", "s11-1-1"]
