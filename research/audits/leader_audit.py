@@ -89,6 +89,37 @@ def load_entry(path):
     return n, int(doc["k"]), HX, HZ, doc
 
 
+def _certs_dir_for(entry):
+    base = os.path.dirname(os.path.abspath(entry))
+    cand = os.path.join(os.path.dirname(base), "certs")
+    if os.path.isdir(cand):
+        return cand
+    return os.path.join(_REPO, "certs")
+
+
+def certified_lower_bound(entry):
+    """Return the proven lower bound a board entry's certificate earns, or None."""
+    slug = os.path.splitext(os.path.basename(entry))[0]
+    path = os.path.join(_certs_dir_for(entry), slug + ".json")
+    try:
+        with open(path) as fh:
+            cert = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(cert, dict):
+        return None
+    if cert.get("d_exact"):
+        try:
+            with open(entry) as fh:
+                doc = json.load(fh)
+            return int(doc["distance"]["d"])
+        except (OSError, ValueError, KeyError, TypeError):
+            return None
+    lb = cert.get("d_lower")
+    if isinstance(lb, int) and lb >= 2:
+        return lb
+    return None
+
 def _rows_to_dense(rows, n):
     M = np.zeros((len(rows), n), dtype=np.int8)
     for i, row in enumerate(rows):
@@ -352,8 +383,8 @@ def _measure(entry, trials, seeds, threads, pair_depth, witness_dir=None):
         "claim": claim,
         "weight": best["weight"],
         "verdict": _verdict(best["weight"], claim),
+        "certified_lb": certified_lower_bound(entry),
     }
-
 
 def cmd_screen(args):
     rows = []
@@ -416,6 +447,12 @@ def select_peers(candidate):
             # placeholders (d = 1) are not d-only peers: beating one on d alone
             # is not the suspect inflated-bound pattern.
             if int(bdoc["distance"]["d"]) <= 1:
+                continue
+            # A peer whose distance is already certified at or above the
+            # candidate's claim cannot be beaten on d: the gain is impossible,
+            # not merely unaudited. Skip it (issue #4230 lower bounds).
+            plb = certified_lower_bound(path)
+            if plb is not None and plb >= d_claim:
                 continue
         except (OSError, ValueError, KeyError, TypeError, IndexError):
             continue  # a broken board file never blocks a candidate
