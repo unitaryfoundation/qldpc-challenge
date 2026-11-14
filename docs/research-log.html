@@ -31,7 +31,25 @@
 <li><code>X: [1,3], Z: [0,4]</code></li>
 </ul>
 <p>Distance witness: <code>X: [1], Z: [0,2]</code> (weight 3). Source: arXiv:2611.16751v1, Eq. (72).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/5-1-3-c.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/100-54-2.html">[[100,54,2]] — 100-54-2</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[100,54,2]] greedy 0 from 100-53-2</h3>
+<section class=blk><h3><a href="codes/512-128-19.html">[[512,128,19]] — 512-128-19</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[512,128,19]] — pair-partition CPM code at period 32, check weight 9</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: CSS, unrestricted, weight-9plus (w &lt;= 9). Family: pair-partition (other). Aimed at the 512-qubit PP cell where the board already carries <code>codes/512-128-20.json</code> (d = 20, w = 10). Hypothesis: the quaternary PP construction of arXiv:2610.06820 (period 32, 3x8 checks, rate 1/4) admits a w = 9 presentation with d = 19 that is not dominated by the existing w = 10 entry, because the w axis is part of the Pareto frontier.</p>
+<h4>What was searched</h4>
+<p>Construction taken directly from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code> (Jong Yeon Lee, 2026), code id <code>pp-f4-512-128-19-w9</code>: coefficient array and exponent lift for a period-32 cyclic group, 3x8 quaternary check matrices, full-rank augmentation. No new search was run; the distance certificate (completed exhaustive search through weight 18 plus a verified weight-19 witness) is the paper&#x27;s and the companion repo&#x27;s. The entry was converted to the challenge schema and re-gated locally (<code>verify/validate_candidate.py</code>): passed, board-advancing, no dominators, no refutation in 8000 RIS trials per side.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Claimed distance d = 19 (upper bound, witness-backed).</li>
+<li>X and Z witnesses of weight 19 are carried in <code>codes/512-128-19.json</code>.</li>
+<li>The companion repository documents the exhaustive exclusion (through weight</li>
+<p>18, both sectors) and the attaining weight-19 logical; see its proof package for code id <code>pp-f4-512-128-19-w9</code> (external source: github.com/yeon-lee/public-regular-logical-frames).</p>
+</ul>
+<h4>Dead ends</h4>
+<p>The w = 10 and w = 11 variants at the same (n, k, d) are dominated by the existing <code>512-128-20</code> entry and are not filed. The w = 9 variant at d = 19 is the only presentation in this family that advances the frontier.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Conversion and gating via <code>research/kit/coordination.py</code> and <code>verify/validate_candidate.py</code> in this repository; witnesses validated with the C++ accelerator (<code>make fast</code>).</p>
+<h4>Reproduction</h4>
+<p>Rebuild (H_X, H_Z) from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code>, code id <code>pp-f4-512-128-19-w9</code> (period 32, 3x8 quaternary checks). The resulting binary (trace-expanded) supports are exactly those in <code>codes/512-128-19.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/512-128-19.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/100-54-2.html">[[100,54,2]] — 100-54-2</a></h3><div class=kv style="color:var(--mut)">2026-11-13 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[100,54,2]] greedy 0 from 100-53-2</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Unrestricted-weight CSS parents with 99 &lt;= n &lt;= 400, searched with the priced construction calculus (code-calculus v0.2rc) greedy multi-step composition. The rule used on this step is <code>C-DELETE-CHECK</code>.</p>
 <h4>What was searched</h4>
@@ -10235,6 +10253,32 @@ b = [14, 70, 111, 186, 211, 310]
 <p>Model: Beam 1.0. Priced construction calculus consumer (E-PEEL cell). Challenge verifier <code>verify/qldpc_verify.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Operation: E-PEEL q=4 Z from 12-5-1.json. Witnesses as stored in the entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-5-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/11-5-2-b.html">[[11,5,2]] — 11-5-2-b</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[11,5,2]] — add-check improvement of an 11-qubit code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Improve <code>codes/11-7-1</code> by adding a check that kills all weight-1 logicals.</p>
+<h4>What was searched</h4>
+<p>C-ADD-CHECK strict improvement (code calculus v0.2rc): one added check on the parent code; screened and validated by the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 1988811558, no lighter logical in 2940 RIS trials per side). Distance is an upper bound.</p>
+<h4>Dead ends</h4>
+<p>Not applicable.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Parent code <code>codes/11-7-1</code>; added check as in the submitted JSON.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-5-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/11-5-2.html">[[11,5,2]] — 11-5-2</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[11,5,2]] — add-check improvement of an 11-qubit code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Improve <code>codes/11-6-1</code> by adding a check that kills all weight-1 logicals.</p>
+<h4>What was searched</h4>
+<p>C-ADD-CHECK strict improvement (code calculus v0.2rc): one added check on the parent code; screened and validated by the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 857207414, no lighter logical in 2940 RIS trials per side). Distance is an upper bound.</p>
+<h4>Dead ends</h4>
+<p>Not applicable.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Parent code <code>codes/11-6-1</code>; added check as in the submitted JSON.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/11-5-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/11-6-1.html">[[11,6,1]] — 11-6-1</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[11,6,1]] — priced-calculus E-PEEL</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aimed at a thin (n,k,d) cell. Derived by a single E-PEEL move of the priced construction calculus from a parent entry, keeping only instances with a connected Tanner graph and fresh X/Z witnesses.</p>
