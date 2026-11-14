@@ -826,3 +826,88 @@ def test_the_record_is_restored_and_saved_only_on_main():
         assert clause in cond.split(" && "), (clause, cond)
     assert "        uses: actions/cache/save@v4" in steps[_SAVE]
     assert "        uses: actions/cache@v4" not in "\n".join(steps[_RESTORE] + steps[_SAVE])
+
+
+# The board memo (issue #5578): on a code submission the sweep and the gate
+# are two processes that each need the whole board, and the job hands them one
+# directory so the second does not verify it again. What makes that safe is
+# where the directory comes from and what can touch it, which is this file's
+# to say, so read it back.
+
+_CODE_SWEEP = _PR_SWEEPS[0]
+_GATE = "distance refutation gate (trusted verifier for code changes)"
+_SEARCH_RESTORE = "restore completed searches"
+_MEMO = "          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo"
+
+
+def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
+    """Filled by the trusted sweep, read by the trusted gate, named nowhere else."""
+    steps = _workflow_steps()
+    users = [name for name, lines in steps.items()
+             if any("QLDPC_BOARD_CACHE" in ln for ln in _code(lines))]
+    assert users == [_CODE_SWEEP, _GATE], users
+    for name in users:
+        assert _MEMO in steps[name], name
+        assert "        working-directory: trusted" in steps[name], name
+    # Nothing saves or restores it, so no run reads what another wrote.
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        code = _code(f.read().splitlines())
+    assert [ln for ln in code if "board-memo" in ln] == [_MEMO, _MEMO]
+
+
+def test_the_sweep_empties_the_board_memo_before_filling_it(tmp_path):
+    """Whatever an earlier step left in the directory is gone before the first report is written."""
+    script = _script(_workflow_steps()[_CODE_SWEEP])
+    assert script.splitlines()[0] == 'rm -rf "$QLDPC_BOARD_CACHE"'
+    memo = tmp_path / "board-memo"
+    (memo / "ab").mkdir(parents=True)
+    (memo / "ab" / "planted.json").write_text("{}")
+    _verify_all_argv(script, tmp_path, QLDPC_BOARD_CACHE=str(memo))
+    assert not memo.exists()
+
+
+def _cannot_run_on_a_code_submission(cond):
+    """Say whether an `if:` rules out a pull request that changes codes/ or circuits/."""
+    rules_out = {"github.event_name == 'push'", "github.event_name == 'schedule'",
+                 "github.event_name == 'workflow_dispatch'",
+                 "github.event_name != 'pull_request'",
+                 "steps.changes.outputs.codes_changed != 'true'"}
+    alternatives = [alt.strip().strip("()") for alt in cond.split(" || ")]
+    return bool(cond) and all(rules_out & set(alt.split(" && ")) for alt in alternatives)
+
+
+def test_nothing_runs_between_the_sweep_and_its_gate_on_a_code_submission():
+    """The gate reads what the sweep wrote, so no step of that run may come between them.
+
+    The untrusted search cache in particular is unpacked before the sweep,
+    not just before the gate that reads it.
+    """
+    steps = _workflow_steps()
+    names = list(steps)
+    lo, hi = names.index(_CODE_SWEEP), names.index(_GATE)
+    assert names.index(_SEARCH_RESTORE) < lo < hi
+    for name in names[lo + 1:hi]:
+        cond = next((ln[len("        if: "):] for ln in steps[name]
+                     if ln.startswith("        if: ")), "")
+        assert _cannot_run_on_a_code_submission(cond), (name, cond)
+    # _workflow_steps only sees named steps: make sure there is no other kind here.
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    span = lines[lines.index(f"      - name: {_CODE_SWEEP}"):lines.index(f"      - name: {_GATE}")]
+    assert all(ln.startswith("      - name: ") for ln in span if ln.startswith("      - "))
+
+
+@pytest.mark.parametrize("cond, expected", [
+    ("github.event_name == 'push'", True),
+    ("always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'", True),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'", True),
+    ("github.event_name == 'schedule' || (github.event_name == 'push' && steps.merge.outputs.x == 'true')", True),
+    ("", False),
+    ("always()", False),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'", False),
+    ("github.event_name == 'push' || github.event_name == 'pull_request'", False),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true'", False),
+])
+def test_the_condition_reader_fails_closed(cond, expected):
+    """The reader above is the check, so it has to refuse what it does not recognise."""
+    assert _cannot_run_on_a_code_submission(cond) is expected
