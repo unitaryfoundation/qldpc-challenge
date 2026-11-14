@@ -36,6 +36,7 @@ import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 _VERIFY = os.path.join(_ROOT, "verify")
+_CERTS = os.path.join(_ROOT, "certs")
 if _VERIFY not in sys.path:
     sys.path.insert(0, _VERIFY)
 
@@ -79,6 +80,36 @@ def describe(entry):
     """Return a board row as the gate's novelty block describes a peer."""
     slug = entry.get("slug") or peer_slug(entry.get("name", ""))
     return f"[[{entry['n']},{entry['k']},{entry['d']}]] w={entry['w']} {slug}.json"
+
+
+def certified_lower_bound(slug):
+    """Return the proven lower bound a board entry's certificate earns, or None.
+
+    Reads certs/<slug>.json. An exact certificate proves the entry's d; a partial
+    one proves d_lower; a missing or unreadable file proves nothing. The honoring
+    rule matches site/build.py cert_lower_bounds at the level a reader can check
+    without the entry's matrices.
+    """
+    path = os.path.join(_CERTS, (slug if slug.endswith(".json") else slug + ".json"))
+    try:
+        with open(path, encoding="utf-8") as fh:
+            cert = json.load(fh)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(cert, dict):
+        return None
+    if cert.get("d_exact"):
+        try:
+            with open(os.path.join(_ROOT, "codes", (slug if slug.endswith(".json") else slug + ".json")),
+                      encoding="utf-8") as fh:
+                doc = json.load(fh)
+            return int(doc["distance"]["d"])
+        except (OSError, ValueError, KeyError, TypeError):
+            return None
+    lb = cert.get("d_lower")
+    if isinstance(lb, int) and not isinstance(lb, bool) and lb >= 2:
+        return lb
+    return None
 
 
 def d_only_peers(candidate, board):
@@ -158,7 +189,7 @@ def _positive_int(value):
 
 
 def blockers(peers, audit, *, required_trials=None, required_pair_depth=None,
-             candidate_path="<candidate>.json", attach=""):
+             candidate_path="<candidate>.json", attach="", candidate_d=None):
     """Return why ``audit`` does not discharge the d-only gain over ``peers``.
 
     An empty list means it does. No peers means there is nothing to discharge.
@@ -171,6 +202,17 @@ def blockers(peers, audit, *, required_trials=None, required_pair_depth=None,
     peers = list(peers or [])
     if not peers:
         return []
+    # A peer whose distance is already certified at or above the candidate's
+    # claim cannot be beaten on d: the gain is impossible, not merely unaudited
+    # (issue #4230 lower bounds). This holds whether or not an audit exists.
+    if candidate_d is not None:
+        for p in peers:
+            lb = certified_lower_bound(peer_slug(p))
+            if lb is not None and lb >= candidate_d:
+                return [f"peer {p} carries a certified lower bound d >= {lb}, "
+                        f"which already meets or exceeds the candidate's claimed "
+                        f"d = {candidate_d}: the d-only gain is impossible, not "
+                        f"just unaudited"]
     names = ", ".join(peers)
     if not audit:
         cmd = pair_command(candidate_path, trials=required_trials or DEFAULT_TRIALS,

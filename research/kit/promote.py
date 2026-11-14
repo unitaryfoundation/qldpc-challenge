@@ -638,6 +638,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     blocked.extend(peer_audit.blockers(
         novelty.get("d_only_peers") or [], evidence.get("peer_audit"),
         required_trials=facts["deepest_fresh_trials"],
+        candidate_d=doc["distance"]["d"],
         attach="put the record it writes in evidence.peer_audit"))
     ticked, reason = equivalence_finding(verdict, doc)
     if not ticked:
