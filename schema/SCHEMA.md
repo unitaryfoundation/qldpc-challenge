@@ -341,7 +341,7 @@ Two principles drive the format:
   sides with their ratio (and the spacetime ratio when both volumes are
   given). Recorded, not ranked.
 - `provenance`: `authors`, `construction` (how it was built), optional
-  `references`, `date`, `notes`, `model`.
+  `references`, `date`, `notes`, `model`, `harness`.
   - `origin`: `"baseline"` for a literature seed or `"submission"` for a code
     contributed through the challenge. This is provenance, not a novelty claim.
   - `novelty`: optional literature status for submissions:
