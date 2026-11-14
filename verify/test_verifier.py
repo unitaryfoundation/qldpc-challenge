@@ -17,6 +17,7 @@ import json
 import os
 import sys
 import tempfile
+import pytest
 import qldpc_verify
 
 verify = qldpc_verify.verify
@@ -480,11 +481,16 @@ def main():
     check("distinct codes have distinct WL signatures",
           rep(other)["signature"]["hash"] != r1["signature"]["hash"])
 
-    # every shipped example/code still verifies
+    # every shipped example/code still verifies. The board goes through
+    # board_reports, the one structural pass every consumer shares, which is
+    # verify(doc) per entry: this loop used to make that pass a second time
+    # on its own, once per pytest entry point below (issue #5578). The
+    # fixtures are few and are verified here directly.
     print("\nshipped submissions still verify:")
-    paths = (sorted(glob.glob(os.path.join(ROOT, "codes", "*.json")))
-             + sorted(glob.glob(os.path.join(ROOT, "verify", "fixtures", "*.json"))))
-    for p in paths:
+    for e in qldpc_verify.board_reports(os.path.join(ROOT, "codes")):
+        check(f"{os.path.basename(e['path'])} verifies",
+              e["report"] is not None and e["report"]["ok"])
+    for p in sorted(glob.glob(os.path.join(ROOT, "verify", "fixtures", "*.json"))):
         doc = json.load(open(p))
         r = verify(doc)
         check(f"{os.path.basename(p)} verifies", r["ok"])
@@ -546,17 +552,24 @@ def main():
     return 1 if _fail else 0
 
 
-# pytest entry points
+# pytest entry points. board_memo (conftest.py): main() reads every committed
+# entry and replaces nothing in the verifier.
+@pytest.mark.usefixtures("board_memo")
 def test_adversarial():
     assert main() == 0
 
 
+@pytest.mark.usefixtures("board_memo")
 def test_main():
     """pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 
 if __name__ == "__main__":
+    # Run as a script, answer from this checkout's verifier and nothing else:
+    # the default disk memo is keyed on the pinned closure, which an unpinned
+    # local edit to the verifier does not move.
+    os.environ.setdefault(qldpc_verify.BOARD_CACHE_ENV, "")
     sys.exit(main())
 
 

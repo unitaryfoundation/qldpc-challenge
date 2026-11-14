@@ -146,13 +146,18 @@ def test_the_site_s_inputs_are_in_the_report(board, path):
         assert found, f"{e['slug']}: the site reads {path} and it is absent"
 
 
-def test_the_gate_does_not_read_the_diagnostics_block(board):
+def test_the_gate_does_not_read_the_diagnostics_block(board, board_memo, monkeypatch):
     """The claim that makes issue #2616's option 2 safe for the gate.
 
     `_board_entries` digests each report into the fields dedup and novelty
     use. If the girth, weight profile or trapping sets ever reach that digest,
     moving the block becomes a change to the gate and not an optimization.
+
+    This is the one test here that reads the committed board, and `board`
+    has just replaced the in-process snapshot with its two entries, so the
+    session's memo is turned back on for it (conftest.py's `board_memo`).
     """
+    monkeypatch.setenv("QLDPC_BOARD_CACHE", board_memo)
     entries = V._board_entries()
     assert entries, "expected the committed board, not an empty read"
     keys = set()
