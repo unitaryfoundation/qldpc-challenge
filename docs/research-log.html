@@ -10300,6 +10300,19 @@ b = [14, 70, 111, 186, 211, 310]
 <p>Model: Beam 1.0. Priced construction calculus consumer (C-DELETE-CHECK cell). Challenge verifier <code>verify/qldpc_verify.py</code>.</p>
 <h4>Reproduction</h4>
 <p>Operation: C-DELETE-CHECK b1 from 12-9-1.json. Witnesses as stored in the entry.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-10-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/12-4-2-e.html">[[12,4,2]] — 12-4-2-e</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,4,2]] — 2D-local code from a check deletion</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Derive a weight-4 / local-2d-single code by deleting a check (a2) from <code>codes/12-4-2-c.json</code>.</p>
+<h4>What was searched</h4>
+<p>C-DELETE-CHECK a2 from <code>codes/12-4-2-c.json</code>; screened and validated by the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Passes <code>verify/validate_candidate.py</code> with <code>passed: true</code> (refutation seed 880069316, no lighter logical in 2980 RIS trials per side). Distance is an upper bound.</p>
+<h4>Dead ends</h4>
+<p>Not applicable.</p>
+<h4>Tools</h4>
+<p>Beam 1.0 via the OpenCode harness. <code>provenance.model = &quot;Beam 1.0&quot;</code>.</p>
+<h4>Reproduction</h4>
+<p>Parent code <code>codes/12-4-2-c.json</code> with check a2 removed; matrices in the submitted JSON.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/12-4-2-e.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/12-5-1-b.html">[[12,5,1]] — 12-5-1-b</a></h3><div class=kv style="color:var(--mut)">2026-10-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[12,5,1]] — priced-calculus C-DELETE-CHECK</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aimed at a thin (n,k,d) cell. Derived by a single C-DELETE-CHECK move of the priced construction calculus from a parent entry, keeping only instances with a connected Tanner graph and fresh X/Z witnesses.</p>
