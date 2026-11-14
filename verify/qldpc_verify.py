@@ -2032,7 +2032,8 @@ _BOARD_CACHE = {}
 
 # Where the per-entry disk memo lives, a sibling of the verdict cache under
 # the already-gitignored research/candidates/ (issue #2582). Overridable so a
-# caller can point it at a scratch directory; empty or CI disables it.
+# caller can point it at a scratch directory; empty disables it, and CI has
+# none unless a job names a directory of its own (board_cache_dir).
 BOARD_CACHE_ENV = "QLDPC_BOARD_CACHE"
 BOARD_CACHE_DIRNAME = os.path.join("research", "candidates", ".boardcache")
 _CLOSURE_DIGEST = {}
@@ -2083,18 +2084,36 @@ def validator_closure_digest(manifest_path=None):
 def board_cache_dir():
     """Return the disk-memo directory, or None when it is turned off.
 
-    Off in CI, deliberately. The argument that this memo is safe is that a
-    local one's trust level equals the local checkout's, which is already
-    total: anyone who can write it can edit verify/validate_candidate.py
-    directly. That argument does not extend to a runner, and a fresh runner's
-    cache is cold anyway, so CI gains nothing and would only acquire a way to
-    be answered by something other than the board in front of it.
+    A directory named in QLDPC_BOARD_CACHE is the memo wherever the process
+    runs, and an empty value turns the memo off. With the variable unset, a
+    checkout gets research/candidates/.boardcache and CI gets nothing.
+
+    CI has no memo by default, deliberately. The argument that the default
+    one is safe is that a local memo's trust level equals the local
+    checkout's, which is already total: anyone who can write it can edit
+    verify/validate_candidate.py directly. That argument does not extend to
+    a runner, so a runner is never answered from a directory it happened to
+    find.
+
+    A job may name one of its own (issue #5578). The reason the memo used to
+    be off in CI without exception was that a fresh runner's cache is cold,
+    so it gained nothing. That held while a job made one pass. A job now
+    starts several processes that each need the whole board: the sweep, then
+    the gate, and in the self-tests every gate subprocess and every test
+    whose own small board evicted the in-process snapshot. Each paid for the
+    pass again, 3.6 to 6.3 minutes a time on a hosted runner at 3,366
+    entries, twice per code submission and eight times per suite run. A
+    directory the job creates empty and that only its own verifier writes
+    holds nothing but reports that verifier computed, in this job, from
+    bytes it read itself, under the key _memo_path gives them. Nothing
+    crosses from one run to the next. Keeping the directory that way is the
+    job's to arrange: verify.yml wipes it in the step that first writes it.
     """
-    if os.environ.get("CI"):
-        return None
     override = os.environ.get(BOARD_CACHE_ENV)
     if override is not None:
         return override or None
+    if os.environ.get("CI"):
+        return None
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(root, BOARD_CACHE_DIRNAME)
 
@@ -2185,9 +2204,10 @@ def board_reports(code_dir):
     and 0.72 s after one entry's bytes changed. Each key also covers the
     pinned validation closure (validator_closure_digest), because codes/ can
     be byte-identical while this file is not. It lives under the gitignored
-    research/candidates/.boardcache and is off in CI, where it would gain
-    nothing and could only answer with something other than the board in
-    front of the runner.
+    research/candidates/.boardcache. CI has none by default, so a runner
+    cannot be answered by something other than the board in front of it; a
+    job whose processes would each pay the pass points them at one directory
+    it created empty (board_cache_dir).
 
     The memo key is a digest of the file names and the exact bytes the pass
     verifies, so a changed file re-verifies the board however it was written
