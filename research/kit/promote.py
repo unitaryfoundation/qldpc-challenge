@@ -260,8 +260,6 @@ def build_doc(candidate, evidence, facts, *, authors=None, date=None):
         prov["model"] = tools["model"]
     if tools.get("harness"):
         prov["harness"] = tools["harness"]
-    if evidence.get("harness"):
-        prov["harness"] = evidence["harness"]
     if evidence.get("equivalence"):
         prov["notes"] = evidence["equivalence"]
     prov.setdefault("origin", "submission")

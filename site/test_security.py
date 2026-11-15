@@ -50,6 +50,7 @@ def test_free_form_schema_fields_are_deliberately_covered():
         "properties/provenance/properties/construction",
         "properties/provenance/properties/model/oneOf/0",
         "properties/provenance/properties/model/oneOf/1/items",
+        "properties/provenance/properties/harness",
         "properties/provenance/properties/notes",
         "properties/provenance/properties/references/items",
         # search_budget (schema 0.3): free text about how a code was found.
@@ -138,6 +139,7 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
         "authors": ["@safe-author", f"Alice {close_script}"],
         "construction": f"New construction {attr_breakout}",
         "model": [model, "Model 6.0"] if model_as_list else model,
+        "harness": f"harness {attr_breakout}",
         "references": [f"arxiv:{attr_breakout}"],
         "notes": f"Notes {attr_breakout}",
     })
