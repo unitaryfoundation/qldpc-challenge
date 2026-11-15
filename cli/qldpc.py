@@ -3115,7 +3115,9 @@ def main(argv=None):
                         "the model, e.g. 'OpenCode agent harness'. Recorded in "
                         "provenance.harness, separate from --model so model "
                         "attribution stays clean. Omit when no harness was involved "
-                        "or when the harness is already named inside --model.")
+                        "or when the harness is already named inside --model. "
+                        "May be given without --model to credit tooling alone; "
+                        "provenance.harness is then recorded with no subject.")
     s.add_argument("--notes", default="")
     s.add_argument("--note-file", default="",
                    help="markdown research note staged as notes/<slug>.md and "
