@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 500,
+      "cpu_hours": 100,
+      "gpu_hours": 20000,
+      "walltime_hours": 480
+    },
+    "constraints": {
+      "max_check_weight": 9,
+      "n": [
+        1,
+        16384
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "stop a ladder early when a rung is refuted",
+        "trials_cap": 300000000
+      },
+      "bar": {
+        "axes": [
+          "d",
+          "kd2_over_n"
+        ],
+        "note": "top leaders and high-distance entries, not a single cell",
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "gpu_hours": 20000,
+        "trials_per_candidate": 300000000,
+        "walltime_hours": 480
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A corrected board frontier and a dated audit record, preventing campaigns from chasing soft bars.",
+      "family": "other",
+      "feasibility": "leader_audit.py ladder supports escalating trials and writes witnesses on every new best; GPU runs the 300M rung.",
+      "hypothesis": "The board's top leaders by kd^2/n and all entries with d>=12 can be re-measured to 300M trials, exposing soft claims and correcting the frontier.",
+      "novelty": {
+        "against": "the committed codes/ entries and their recorded witnesses",
+        "claim": "corrected distance readings for the board's most influential entries"
+      },
+      "what_a_negative_would_teach": "That the board's top claims are already tight at 300M trials, so future work should target construction rather than verification."
+    },
+    "id": "board-truth-deep-sweep-gpu-2026-11-15",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "trials_per_candidate": 300000000
+      }
+    },
+    "name": "Deep board-truth sweep of top leaders and high-distance entries",
+    "notes": "Top 200 by kd^2/n plus all entries with d>=12. Refuted entries are filed as distance revisions, not new submissions.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
