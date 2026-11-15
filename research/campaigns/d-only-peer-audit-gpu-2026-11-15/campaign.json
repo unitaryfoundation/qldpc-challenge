@@ -1,0 +1,68 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 1000,
+      "cpu_hours": 100,
+      "gpu_hours": 15000,
+      "walltime_hours": 360
+    },
+    "constraints": {
+      "max_check_weight": 9,
+      "n": [
+        1,
+        1000
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "none; this is an audit backlog rather than a search",
+        "trials_cap": 300000000
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "note": "d-only gains are compared against same (n,k,w) peers, not a single global bar",
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "gpu_hours": 15000,
+        "trials_per_candidate": 300000000,
+        "walltime_hours": 360
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A clean split of real gains from inflated or soft claims, preventing d-only submissions without evidence.",
+      "family": "other",
+      "feasibility": "leader_audit.py pair already implements the matched-depth comparison and writes a consumable JSON record; GPU makes 300M trials practical.",
+      "hypothesis": "Every d-only gain on the board can be classified as credible, redirect, drop, or inconclusive by a 300M-trial matched-depth pair audit.",
+      "novelty": {
+        "against": "the board's current d-only peer set",
+        "claim": "a complete peer-audit record for every d-only gain"
+      },
+      "what_a_negative_would_teach": "That the board's d-only gains are predominantly soft claims, justifying stricter audit requirements before submission."
+    },
+    "id": "d-only-peer-audit-gpu-2026-11-15",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "trials_per_candidate": 300000000
+      }
+    },
+    "name": "Matched-depth peer audits for d-only gains",
+    "notes": "Consumes and produces research/audits/peer-audit-*.json. A decision other than credible blocks submission unless a distance revision is filed.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

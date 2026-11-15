@@ -1,0 +1,68 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 5000,
+      "cpu_hours": 200,
+      "gpu_hours": 30000,
+      "walltime_hours": 720
+    },
+    "constraints": {
+      "max_check_weight": 8,
+      "n": [
+        1,
+        99
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "drop the route if the first 50 candidates are all drop or inconclusive at 300M trials",
+        "trials_cap": 300000000
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "note": "largest g on the board at d=4; 2D-local candidates are compared on d and g within their cell",
+        "slug": "957-105-4"
+      },
+      "budget": {
+        "gpu_hours": 30000,
+        "trials_per_candidate": 300000000,
+        "walltime_hours": 720
+      },
+      "cell": "local-2d-single~weight-8",
+      "expected_value": "Either a submittable 2D-local code-calculus family with credible witnesses, or a documented closure of the 2D-local route that saves all future GPU spend on it.",
+      "family": "other",
+      "feasibility": "Candidates and parents already exist from cc-greedy-2dlocal-v2; leader_audit.py pair runs both sides at matched depth, and verify/ris_gpu.py reaches 300M trials per side on A100/H20 nodes.",
+      "hypothesis": "The 2D-local code-calculus candidates that pass a 2M-trial deep pass are credible at 300M trials on matched seeds and pair depth, and the inflation seen in cc-greedy-2dlocal-v2 is a screening-depth artifact rather than a real distance loss.",
+      "novelty": {
+        "against": "the 2D-local frontier and the inflation result of fieldnotes/2026-11-12-code-calculus-v0p2-greedy-gated.md",
+        "claim": "a credible 2D-local code-calculus candidate at d>=3 with a 300M-trial witness"
+      },
+      "what_a_negative_would_teach": "That the 2D-local code-calculus distance claims are inflated by construction, not merely under-verified, so the route should be closed rather than deepened."
+    },
+    "id": "cc-2dlocal-deep-verify-gpu-2026-11-15",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "trials_per_candidate": 300000000
+      }
+    },
+    "name": "Deep-verify 2D-local code-calculus candidates at GPU depth",
+    "notes": "CPU enumerates and gates; GPU resolves matched-depth distance only. No candidate is submitted without a credible peer audit.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
