@@ -224,6 +224,9 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
     skipped as ``partial``.
     """
     by_slug = {r["slug"]: r for r in queue.get("entries", [])}
+    if isinstance(bands, str):
+        bands = [bands]
+    named = set(slugs or [])
     if slugs:
         rows = []
         for slug in slugs:
@@ -258,22 +261,23 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
         if on_file is not None and (on_file.get("d_exact") or not on_file.get("d_lower")):
             skip(slug, "certified", "certs/ already has a file for it")
             continue
-        if records_only and not r.get("record"):
-            skip(slug, "not_record", "not on a cell or global frontier")
-            continue
-        if bands is not None and r.get("band") not in bands:
-            skip(slug, "band", f"band {r.get('band')} not in {sorted(bands)}")
-            continue
-        _lb = 1
-        if on_file is not None and on_file.get("d_lower") is not None:
-            _lb = int(on_file["d_lower"])
-        _gap = int(r.get("d") or 0) - _lb
-        if max_gap is not None and _gap > max_gap:
-            skip(slug, "gap", f"gap {_gap} > {max_gap}")
-            continue
-        if min_gap is not None and _gap < min_gap:
-            skip(slug, "gap", f"gap {_gap} < {min_gap}")
-            continue
+        if slug not in named:
+            if records_only and not r.get("record"):
+                skip(slug, "not_record", "not on a cell or global frontier")
+                continue
+            if bands is not None and r.get("band") not in bands:
+                skip(slug, "band", f"band {r.get('band')} not in {sorted(bands)}")
+                continue
+            _lb = 1
+            if on_file is not None and on_file.get("d_lower") is not None:
+                _lb = int(on_file["d_lower"])
+            _gap = int(r.get("d") or 0) - _lb
+            if max_gap is not None and _gap > max_gap:
+                skip(slug, "gap", f"gap {_gap} > {max_gap}")
+                continue
+            if min_gap is not None and _gap < min_gap:
+                skip(slug, "gap", f"gap {_gap} < {min_gap}")
+                continue
         if on_file is not None:
             lb = on_file["d_lower"]
             had = ((on_file.get("ladder") or {}).get("budget_per_side") or 0)
@@ -698,6 +702,7 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
                 "ladder": ladder,
                 "queue_date": queue.get("date"), "queue_head": queue.get("head"), "backend": backend,
                 "selected": len(chosen), "skipped": dict(skipped), "tools": versions,
+                "records_only": records_only, "bands": bands, "max_gap": max_gap, "min_gap": min_gap,
                 "results": [], "staged": [], "stopped_by_budget": False, "left": 0}
     os.makedirs(os.path.join(out_dir, "certs"), exist_ok=True)
     t_start = time.time()
