@@ -35,10 +35,10 @@
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, unrestricted, weight-9plus (w &lt;= 9). Family: pair-partition (other). Aimed at the 512-qubit PP cell where the board already carries <code>codes/512-128-20.json</code> (d = 20, w = 10). Hypothesis: the quaternary PP construction of arXiv:2610.06820 (period 32, 3x8 checks, rate 1/4) admits a w = 9 presentation with d = 19 that is not dominated by the existing w = 10 entry, because the w axis is part of the Pareto frontier.</p>
 <h4>What was searched</h4>
-<p>Construction taken directly from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code> (Jong Yeon Lee, 2026), code id <code>pp-f4-512-128-19-w9</code>: coefficient array and exponent lift for a period-32 cyclic group, 3x8 quaternary check matrices, full-rank augmentation. No new search was run; the distance certificate (completed exhaustive search through weight 18 plus a verified weight-19 witness) is the paper&#x27;s and the companion repo&#x27;s. The entry was converted to the challenge schema and re-gated locally (<code>verify/validate_candidate.py</code>): passed, board-advancing, no dominators, no refutation in 8000 RIS trials per side.</p>
+<p>Construction taken directly from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code> (Jong Yeon Lee, 2026), code id <code>pp-f4-512-128-19-w9</code>: coefficient array and exponent lift for a period-32 cyclic group, 3x8 quaternary check matrices, full-rank augmentation. No new search was run in this repository. The companion repository claims an exhaustive exclusion through weight 18 plus a verified weight-19 witness, but that certificate is not included or replayed through the Challenge&#x27;s own verification process, so this entry records distance 19 as an upper bound. The entry was converted to the challenge schema and re-gated locally (<code>verify/validate_candidate.py</code>): passed, board-advancing, no dominators, no refutation in 8000 RIS trials per side.</p>
 <h4>Evidence trail</h4>
 <ul>
-<li>Claimed distance d = 19 (upper bound, witness-backed).</li>
+<li>Claimed distance d = 19 (upper bound, witness-backed; exactness claimed only in the companion repository).</li>
 <li>X and Z witnesses of weight 19 are carried in <code>codes/512-128-19.json</code>.</li>
 <li>The companion repository documents the exhaustive exclusion (through weight</li>
 <p>18, both sectors) and the attaining weight-19 logical; see its proof package for code id <code>pp-f4-512-128-19-w9</code> (external source: github.com/yeon-lee/public-regular-logical-frames).</p>
@@ -66144,15 +66144,15 @@ HX, HZ = build_2bga(mul, a, b)  # n=640, k=16, w=10
 <p>It dominates <code>676-51-4</code> on (n, k, d, w).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/672-51-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/72-14-8.html">[[72,14,8]] — 72-14-8</a></h3><div class=kv style="color:var(--mut)">2026-09-15 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a></div><details ><summary>note</summary><div class=notebody><h3>[[72,14,8]] — weight-8 bivariate bicycle on Z_6 x Z_6</h3>
 <h4>Direction &amp; hypothesis</h4>
-<p>Targeted the unrestricted / weight-8 cell at n=72. The existing best weight-8 code at this length was [[72,10,9]] (eff=11.2). Weight-8 BB codes on small grids are underexplored relative to the canonical weight-6 [[72,12,6]] (eff=6), and the algebraic structure theory of arXiv:2609.06572 shows that weight-4 generator polynomials on Z_6 x Z_6 can reach k=14 with exact d=8.</p>
+<p>Targeted the unrestricted / weight-8 cell at n=72. The existing best weight-8 code at this length was [[72,10,9]] (eff=11.2). Weight-8 BB codes on small grids are underexplored relative to the canonical weight-6 [[72,12,6]] (eff=6), and the algebraic structure theory of arXiv:2609.06572 shows that weight-4 generator polynomials on Z_6 x Z_6 can reach k=14 with d=8 (upper bound).</p>
 <h4>What was searched</h4>
 <p>Reconstructed the [[72,14,8]] code from the census of arXiv:2609.06572 (Lu, Yang, Guo, Sep 2026). The paper&#x27;s pipeline sampled 2x10^4 constant-term-normalized pairs (A,B) with wt(A)=wt(B)=4 on the (6,6) grid, screened for k in [4,40] and d&gt;=6, then certified all distances exactly via bit-mask DFS with translation-symmetry pruning. The submitted code is the top entry from their Table 2: A = 1 + x^4 y^4 + y^5 + x y^5, B = 1 + x^4 y + x y^2 + x^3 y^2.</p>
 <h4>Evidence trail</h4>
 <ul>
 <li>CSS commutation: verified (H_X H_Z^T = 0 over GF(2))</li>
 <li>k = 14: computed as n - rank(H_X) - rank(H_Z) = 72 - 36 - 22 = 14</li>
-<li>d_X = 8, d_Z = 8: exact, certified by the paper&#x27;s bit-mask DFS (no logical</li>
-<p>operator of weight &lt;= 7 exists); independently confirmed by 20000 RIS trials in the qldpc-challenge verifier (seed 1556915526, no lighter found)</p>
+<li>d_X = 8, d_Z = 8: upper bound, witness-backed. The paper reports an exact</li>
+<p>certification via bit-mask DFS, but that certificate is not included or replayed through the Challenge; the Challenge records distance 8 as an upper bound. Independently, 20000 RIS trials in the qldpc-challenge verifier (seed 1556915526) found no lighter logical.</p>
 <li>Lightest X-logical: weight 8, explicit witness included in submission JSON</li>
 <li>Lightest Z-logical: weight 8, explicit witness included in submission JSON</li>
 <li>Dominates at n=72: [[72,8,10]] (k=8 &lt; 14), [[72,8,7]] (k=8, d=7 &lt; 8),</li>

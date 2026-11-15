@@ -58,11 +58,11 @@
 <div class=kv><b>authors</b> <a href="https://github.com/MathysRennela">@MathysRennela</a></div>
 <div class=kv><b>provenance</b> submitted through the challenge</div>
 <div class=kv><b>novelty</b> known parameter set; see provenance notes</div>
-<div class=kv><b>construction</b> Pair-partition (Okada-Kasai style) quaternary CSS code from arXiv:2610.06820 (Jong Yeon Lee), period-32 PP construction, w=9. Exact distance certified by completed exhaustive search in the companion repo.</div>
+<div class=kv><b>construction</b> Pair-partition (Okada-Kasai style) quaternary CSS code from arXiv:2610.06820 (Jong Yeon Lee), period-32 PP construction, w=9. Distance d=19 is an upper bound backed by the weight-19 X/Z witnesses in this entry; an exact-distance claim is made in the companion repository (github.com/yeon-lee/public-regular-logical-frames, code id pp-f4-512-128-19-w9) but is not certified by the Challenge&#x27;s own verification process.</div>
 <div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0 <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2610.06820">arXiv:2610.06820</a></div>
 <div class=kv><b>date</b> 2026-11-14</div>
-<div class=kv><b>notes</b> Literature reproduction of a published code from arXiv:2610.06820 (Table 1 / Appendix D). Exact distance certified by completed exhaustive search in the companion repo (evidence_type: completed exhaustive search plus independently checkable physical witness).</div>
+<div class=kv><b>notes</b> Literature reproduction of a published code from arXiv:2610.06820 (Table 1 / Appendix D). Distance confidence is upper_bound (witness-backed); the companion repository documents an exhaustive exclusion through weight 18, but no Challenge certificate is included, so the entry is treated as an upper-bound candidate.</div>
 <div class=kv><b>family</b> pair-partition CPM <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
@@ -71,10 +71,10 @@
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, unrestricted, weight-9plus (w &lt;= 9). Family: pair-partition (other). Aimed at the 512-qubit PP cell where the board already carries <code>codes/512-128-20.json</code> (d = 20, w = 10). Hypothesis: the quaternary PP construction of arXiv:2610.06820 (period 32, 3x8 checks, rate 1/4) admits a w = 9 presentation with d = 19 that is not dominated by the existing w = 10 entry, because the w axis is part of the Pareto frontier.</p>
 <h4>What was searched</h4>
-<p>Construction taken directly from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code> (Jong Yeon Lee, 2026), code id <code>pp-f4-512-128-19-w9</code>: coefficient array and exponent lift for a period-32 cyclic group, 3x8 quaternary check matrices, full-rank augmentation. No new search was run; the distance certificate (completed exhaustive search through weight 18 plus a verified weight-19 witness) is the paper&#x27;s and the companion repo&#x27;s. The entry was converted to the challenge schema and re-gated locally (<code>verify/validate_candidate.py</code>): passed, board-advancing, no dominators, no refutation in 8000 RIS trials per side.</p>
+<p>Construction taken directly from the companion repository <code>github.com/yeon-lee/public-regular-logical-frames</code> (Jong Yeon Lee, 2026), code id <code>pp-f4-512-128-19-w9</code>: coefficient array and exponent lift for a period-32 cyclic group, 3x8 quaternary check matrices, full-rank augmentation. No new search was run in this repository. The companion repository claims an exhaustive exclusion through weight 18 plus a verified weight-19 witness, but that certificate is not included or replayed through the Challenge&#x27;s own verification process, so this entry records distance 19 as an upper bound. The entry was converted to the challenge schema and re-gated locally (<code>verify/validate_candidate.py</code>): passed, board-advancing, no dominators, no refutation in 8000 RIS trials per side.</p>
 <h4>Evidence trail</h4>
 <ul>
-<li>Claimed distance d = 19 (upper bound, witness-backed).</li>
+<li>Claimed distance d = 19 (upper bound, witness-backed; exactness claimed only in the companion repository).</li>
 <li>X and Z witnesses of weight 19 are carried in <code>codes/512-128-19.json</code>.</li>
 <li>The companion repository documents the exhaustive exclusion (through weight</li>
 <p>18, both sectors) and the attaining weight-19 logical; see its proof package for code id <code>pp-f4-512-128-19-w9</code> (external source: github.com/yeon-lee/public-regular-logical-frames).</p>

@@ -66,24 +66,25 @@
 <div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
 <div class=kv><b>provenance</b> submitted through the challenge</div>
 <div class=kv><b>novelty</b> novelty not audited</div>
-<div class=kv><b>construction</b> Weight-8 bivariate bicycle on Z_6 x Z_6. A = 1 + x<sup>4</sup> y<sup>4</sup> + y<sup>5</sup> + x y<sup>5</sup>, B = 1 + x<sup>4</sup> y + x y<sup>2</sup> + x<sup>3</sup> y<sup>2</sup>. From Lu, Yang, Guo (2026), arXiv:2609.06572, Table 2 entry 1. Exact distance certified by bit-mask DFS.</div>
+<div class=kv><b>construction</b> Weight-8 bivariate bicycle on Z_6 x Z_6. A = 1 + x<sup>4</sup> y<sup>4</sup> + y<sup>5</sup> + x y<sup>5</sup>, B = 1 + x<sup>4</sup> y + x y<sup>2</sup> + x<sup>3</sup> y<sup>2</sup>. From Lu, Yang, Guo (2026), arXiv:2609.06572, Table 2 entry 1. Distance is an upper bound backed by a weight-8 witness; an &#x27;exact&#x27; claim based on the author&#x27;s bit-mask DFS is not certified by the Challenge.</div>
 <div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/2609.06572">arXiv:2609.06572</a></div>
 <div class=kv><b>date</b> 2026-09-15</div>
+<div class=kv><b>notes</b> Distance confidence is upper_bound (witness-backed). The &#x27;exact distance certified by bit-mask DFS&#x27; claim refers to an author-provided search, not a Challenge certificate.</div>
 <div class=kv><b>family</b> bivariate bicycle <span class=claimed>(a tag, not a ranking)</span></div>
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
 <section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/72-14-8.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[72,14,8]] — weight-8 bivariate bicycle on Z_6 x Z_6</h3>
 <h4>Direction &amp; hypothesis</h4>
-<p>Targeted the unrestricted / weight-8 cell at n=72. The existing best weight-8 code at this length was [[72,10,9]] (eff=11.2). Weight-8 BB codes on small grids are underexplored relative to the canonical weight-6 [[72,12,6]] (eff=6), and the algebraic structure theory of arXiv:2609.06572 shows that weight-4 generator polynomials on Z_6 x Z_6 can reach k=14 with exact d=8.</p>
+<p>Targeted the unrestricted / weight-8 cell at n=72. The existing best weight-8 code at this length was [[72,10,9]] (eff=11.2). Weight-8 BB codes on small grids are underexplored relative to the canonical weight-6 [[72,12,6]] (eff=6), and the algebraic structure theory of arXiv:2609.06572 shows that weight-4 generator polynomials on Z_6 x Z_6 can reach k=14 with d=8 (upper bound).</p>
 <h4>What was searched</h4>
 <p>Reconstructed the [[72,14,8]] code from the census of arXiv:2609.06572 (Lu, Yang, Guo, Sep 2026). The paper&#x27;s pipeline sampled 2x10^4 constant-term-normalized pairs (A,B) with wt(A)=wt(B)=4 on the (6,6) grid, screened for k in [4,40] and d&gt;=6, then certified all distances exactly via bit-mask DFS with translation-symmetry pruning. The submitted code is the top entry from their Table 2: A = 1 + x^4 y^4 + y^5 + x y^5, B = 1 + x^4 y + x y^2 + x^3 y^2.</p>
 <h4>Evidence trail</h4>
 <ul>
 <li>CSS commutation: verified (H_X H_Z^T = 0 over GF(2))</li>
 <li>k = 14: computed as n - rank(H_X) - rank(H_Z) = 72 - 36 - 22 = 14</li>
-<li>d_X = 8, d_Z = 8: exact, certified by the paper&#x27;s bit-mask DFS (no logical</li>
-<p>operator of weight &lt;= 7 exists); independently confirmed by 20000 RIS trials in the qldpc-challenge verifier (seed 1556915526, no lighter found)</p>
+<li>d_X = 8, d_Z = 8: upper bound, witness-backed. The paper reports an exact</li>
+<p>certification via bit-mask DFS, but that certificate is not included or replayed through the Challenge; the Challenge records distance 8 as an upper bound. Independently, 20000 RIS trials in the qldpc-challenge verifier (seed 1556915526) found no lighter logical.</p>
 <li>Lightest X-logical: weight 8, explicit witness included in submission JSON</li>
 <li>Lightest Z-logical: weight 8, explicit witness included in submission JSON</li>
 <li>Dominates at n=72: [[72,8,10]] (k=8 &lt; 14), [[72,8,7]] (k=8, d=7 &lt; 8),</li>
