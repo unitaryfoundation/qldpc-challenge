@@ -732,3 +732,17 @@ def test_the_command_line_flag_reaches_the_bundle(tmp_path, monkeypatch, capsys)
     assert P.main(common + ["--allow-non-frontier"]) == 0
     rep, = json.loads(capsys.readouterr().out)
     assert rep["frontier"]["filed_as_non_frontier"]
+
+
+def test_build_doc_carries_harness_from_tools():
+    facts = P.ladder_facts(SETTLED, 6)
+    doc = P.build_doc(_doc(), _evidence(), facts, authors=["@tester"])
+    assert doc["provenance"].get("harness") == "pytest"
+
+
+def test_build_doc_omits_harness_without_tools_harness():
+    ev = _evidence()
+    ev["tools"] = {"model": "MiMo-V2.6-Flash"}
+    facts = P.ladder_facts(SETTLED, 6)
+    doc = P.build_doc(_doc(), ev, facts, authors=["@tester"])
+    assert "harness" not in doc["provenance"]

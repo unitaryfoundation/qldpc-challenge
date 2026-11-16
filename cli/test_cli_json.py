@@ -143,3 +143,21 @@ def test_without_json_the_human_output_is_unchanged(npz, capsys, tmp_path):
     assert "next: open a PR with this file" in text
     assert "git checkout -b submit-12-4-2" in text
     assert not text.lstrip().startswith("{")
+
+
+def test_harness_flag_lands_in_provenance(npz, capsys, tmp_path):
+    out = str(tmp_path / "codes")
+    rc = qldpc.main(["submit", npz, "--authors", "@me", "--dry-run", "--json",
+                     "--out", out, "--harness", "OpenCode agent harness", *FAST])
+    record, err = _record(capsys)
+    assert rc == 0 and record["ok"]
+    assert record["doc"]["provenance"].get("harness") == "OpenCode agent harness"
+
+
+def test_harness_absent_without_flag(npz, capsys, tmp_path):
+    out = str(tmp_path / "codes")
+    rc = qldpc.main(["submit", npz, "--authors", "@me", "--dry-run", "--json",
+                     "--out", out, *FAST])
+    record, err = _record(capsys)
+    assert rc == 0 and record["ok"]
+    assert "harness" not in record["doc"]["provenance"]
