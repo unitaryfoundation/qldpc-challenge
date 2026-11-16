@@ -1018,7 +1018,7 @@ header.hero{{padding:34px 0 30px}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
 border-radius:5px;font-family:ui-monospace,monospace}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
-color:var(--mut)}}.b.lb{{background:#fef3c7;color:#92400e}}
+color:var(--mut)}}.b.ivl{{background:#fef3c7;color:#92400e}}
 footer.foot{{margin-top:72px;border-top:1px solid var(--ln);
 background:linear-gradient(180deg,var(--soft),var(--bg));color:var(--mut);
 font-size:14px}}
@@ -2266,7 +2266,7 @@ def badge(tier, lb=None):
     if tier == "exact":
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
-        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+        return (f'<span class="b ivl" title="proven lower bound: a solver showed no '
                 f'logical lighter than {lb} exists on any side (a partial '
                 f'certificate in certs/), while the witness gives the upper '
                 f'bound">{lb} &le; d &le;</span>')
@@ -2276,7 +2276,7 @@ def badge(tier, lb=None):
     if tier == "exact":
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
-        return (f'<span class="b lb" title="proven lower bound: a solver showed no '
+        return (f'<span class="b ivl" title="proven lower bound: a solver showed no '
                 f'logical lighter than {lb} exists on any side (a partial '
                 f'certificate in certs/), while the witness gives the upper '
                 f'bound">{lb} &le; d &le;</span>')
@@ -5689,7 +5689,7 @@ def board_legend(asym=True):
             '(<span class="b ub">d &le;</span>): a verified logical of that '
             'weight; independent refutation searches found nothing lighter, '
             'but it is not a proof</span>'
-            '<span>interval (<span class="b lb">7 &le; d &le;</span>): the '
+            '<span>interval (<span class="b ivl">7 &le; d &le;</span>): the '
             'same upper bound with a proven lower bound under it, from a '
             'partial certificate in certs/ (an ascending ladder of UNSAT '
             'verdicts that did not reach d &minus; 1); the gap is what could '
