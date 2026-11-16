@@ -765,12 +765,12 @@
   "authors": [
    "@mathysrennela"
   ],
-  "construction": "Weight-8 bivariate bicycle on Z_6 x Z_6. A = 1 + x^4 y^4 + y^5 + x y^5, B = 1 + x^4 y + x y^2 + x^3 y^2. From Lu, Yang, Guo (2026), arXiv:2609.06572, Table 2 entry 1. Exact distance certified by bit-mask DFS.",
+  "construction": "Weight-8 bivariate bicycle on Z_6 x Z_6. A = 1 + x^4 y^4 + y^5 + x y^5, B = 1 + x^4 y + x y^2 + x^3 y^2. From Lu, Yang, Guo (2026), arXiv:2609.06572, Table 2 entry 1. Distance is an upper bound backed by a weight-8 witness; an 'exact' claim based on the author's bit-mask DFS is not certified by the Challenge.",
   "references": [
    "arXiv:2609.06572"
   ],
   "date": "2026-09-15",
-  "notes": ""
+  "notes": "Distance confidence is upper_bound (witness-backed). The 'exact distance certified by bit-mask DFS' claim refers to an author-provided search, not a Challenge certificate."
  },
  "family": "bivariate-bicycle",
  "locality": {

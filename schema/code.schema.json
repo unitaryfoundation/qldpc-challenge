@@ -815,6 +815,11 @@
           ],
           "description": "optional, self-reported: the AI model that produced the code, named to a specific version (e.g. 'Claude Opus 4.8', not a bare 'Claude'), or 'human'. Claimed, not verified -- there is no way to certify which model generated a result, but if one is named the verifier requires a version so the claim is reproducible. May also be a list when a code was produced by an ensemble of models rather than a single one; the site joins them for display."
         },
+        "harness": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "optional, self-reported: the agent harness or tooling that ran the model (e.g. 'OpenCode agent harness'). Independent of provenance.model so a code's model attribution stays clean while still crediting the harness; claimed, not verified. Omit when no harness was involved or when the harness is already named inside provenance.model."
+        },
         "references": {
           "type": "array",
           "items": {

@@ -1033,3 +1033,122 @@ def test_only_the_stack_sweep_samples():
 
 
 PINNED_SAMPLE = ["s04-1-1", "s05-1-1", "s11-1-1"]
+
+
+# The board memo (issue #5578): on a code submission the sweep and the gate
+# are two processes that each need the whole board, and the job hands them one
+# directory so the second does not verify it again. What makes that safe is
+# where the directory comes from and what can touch it, which is this file's
+# to say, so read it back.
+
+_CODE_SWEEP = _PR_SWEEPS[0]
+_GATE = "distance refutation gate (trusted verifier for code changes)"
+_SEARCH_RESTORE = "restore completed searches"
+_MEMO = "          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo"
+
+
+def _every_workflow():
+    """Return {file name: its lines without comments} for every workflow in the repository."""
+    directory = os.path.dirname(_WORKFLOW)
+    code = {}
+    for name in sorted(os.listdir(directory)):
+        with open(os.path.join(directory, name), encoding="utf-8") as f:
+            code[name] = _code(f.read().splitlines())
+    return code
+
+
+def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
+    """Filled by the trusted sweep, read by the trusted gate, named nowhere else."""
+    steps = _workflow_steps()
+    users = [name for name, lines in steps.items()
+             if any("QLDPC_BOARD_CACHE" in ln for ln in _code(lines))]
+    assert users == [_CODE_SWEEP, _GATE], users
+    for name in users:
+        assert _MEMO in steps[name], name
+        assert "        working-directory: trusted" in steps[name], name
+        assert not any("continue-on-error" in ln for ln in _code(steps[name])), name
+
+    def cond(name):
+        return next(ln for ln in steps[name] if ln.startswith("        if: "))
+
+    # The gate runs exactly when the sweep ran, and only after it succeeded:
+    # the same `if:`, with no always() to outlive a sweep that failed.
+    assert cond(_GATE) == cond(_CODE_SWEEP) and "always()" not in cond(_GATE)
+    # Every mention in every workflow, not only in the named steps of this
+    # one: no job-level or workflow-level env sets it, and no other workflow.
+    workflows = _every_workflow()
+    mentions = [(wf, ln.strip()) for wf, lines in workflows.items()
+                for ln in lines if "QLDPC_BOARD_CACHE" in ln]
+    assert mentions == [("verify.yml", _MEMO.strip()),
+                        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+                        ("verify.yml", _MEMO.strip())], mentions
+    # Nothing saves or restores it, so no run reads what another wrote: in
+    # this workflow the runner's temp directory is named by those two lines
+    # and by no cache or artifact path.
+    temp = [ln for ln in workflows["verify.yml"]
+            if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln or "board-memo" in ln]
+    assert temp == [_MEMO, _MEMO], temp
+
+
+def test_the_sweep_empties_the_board_memo_before_filling_it(tmp_path):
+    """Whatever an earlier step left in the directory is gone before the first report is written."""
+    script = _script(_workflow_steps()[_CODE_SWEEP])
+    assert script.splitlines()[0] == 'rm -rf "$QLDPC_BOARD_CACHE"'
+    memo = tmp_path / "board-memo"
+    (memo / "ab").mkdir(parents=True)
+    (memo / "ab" / "planted.json").write_text("{}")
+    _verify_all_argv(script, tmp_path, QLDPC_BOARD_CACHE=str(memo))
+    assert not memo.exists()
+
+
+def _cannot_run_on_a_code_submission(cond):
+    """Say whether an `if:` rules out a pull request that changes codes/ or circuits/."""
+    rules_out = {"github.event_name == 'push'", "github.event_name == 'schedule'",
+                 "github.event_name == 'workflow_dispatch'",
+                 "github.event_name != 'pull_request'",
+                 "steps.changes.outputs.codes_changed != 'true'"}
+    alternatives = [alt.strip().strip("()") for alt in cond.split(" || ")]
+    return bool(cond) and all(rules_out & set(alt.split(" && ")) for alt in alternatives)
+
+
+def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
+    """The gate reads what the sweep wrote, so what runs between them is pinned.
+
+    On a code submission that is one step: the restore of the search cache,
+    which a contributor can write. It is handed the path search-cache in the
+    workspace and nothing else, and it sits immediately before the gate that
+    reads it. Every other step between the two belongs to some other kind of
+    run.
+    """
+    steps = _workflow_steps()
+    names = list(steps)
+    lo, hi = names.index(_CODE_SWEEP), names.index(_GATE)
+    assert lo < hi and names[hi - 1] == _SEARCH_RESTORE
+    restore = _code(steps[_SEARCH_RESTORE])
+    assert "        uses: actions/cache/restore@v4" in restore
+    assert [ln.strip() for ln in restore if ln.strip().startswith("path:")] == ["path: search-cache"]
+    for name in names[lo + 1:hi - 1]:
+        cond = next((ln[len("        if: "):] for ln in steps[name]
+                     if ln.startswith("        if: ")), "")
+        assert _cannot_run_on_a_code_submission(cond), (name, cond)
+    # _workflow_steps only sees named steps: make sure there is no other kind here.
+    with open(_WORKFLOW, encoding="utf-8") as f:
+        lines = f.read().splitlines()
+    span = lines[lines.index(f"      - name: {_CODE_SWEEP}"):lines.index(f"      - name: {_GATE}")]
+    assert all(ln.startswith("      - name: ") for ln in span if ln.startswith("      - "))
+
+
+@pytest.mark.parametrize("cond, expected", [
+    ("github.event_name == 'push'", True),
+    ("always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'", True),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'", True),
+    ("github.event_name == 'schedule' || (github.event_name == 'push' && steps.merge.outputs.x == 'true')", True),
+    ("", False),
+    ("always()", False),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'", False),
+    ("github.event_name == 'push' || github.event_name == 'pull_request'", False),
+    ("github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true'", False),
+])
+def test_the_condition_reader_fails_closed(cond, expected):
+    """The reader above is the check, so it has to refuse what it does not recognise."""
+    assert _cannot_run_on_a_code_submission(cond) is expected

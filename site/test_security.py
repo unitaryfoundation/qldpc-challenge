@@ -50,6 +50,7 @@ def test_free_form_schema_fields_are_deliberately_covered():
         "properties/provenance/properties/construction",
         "properties/provenance/properties/model/oneOf/0",
         "properties/provenance/properties/model/oneOf/1/items",
+        "properties/provenance/properties/harness",
         "properties/provenance/properties/notes",
         "properties/provenance/properties/references/items",
         # search_budget (schema 0.3): free text about how a code was found.
@@ -138,6 +139,7 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
         "authors": ["@safe-author", f"Alice {close_script}"],
         "construction": f"New construction {attr_breakout}",
         "model": [model, "Model 6.0"] if model_as_list else model,
+        "harness": f"harness {attr_breakout}",
         "references": [f"arxiv:{attr_breakout}"],
         "notes": f"Notes {attr_breakout}",
     })
@@ -204,3 +206,28 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
     assert "\\u003c/script\\u003e" in index.lower()
     assert {"cmdata", "lbwdata", "rcdata", "rcseries"} <= data.keys()
     assert "qldpcXssRegression" in json.dumps(data["rcdata"])
+
+
+def test_harness_line_renders_claimed_mark(tmp_path):
+    build = load_site_build()
+    fixture = os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")
+    with open(fixture) as f:
+        doc = json.loads(f.read()) if False else json.load(f)
+    import copy
+    doc = copy.deepcopy(doc)
+    doc.setdefault("provenance", {})["harness"] = "OpenCode agent harness"
+    codes = tmp_path / "codes"
+    codes.mkdir()
+    with open(codes / "72-6-6.json", "w") as f:
+        json.dump(doc, f)
+    build.ROOT = str(tmp_path)
+    build.DOCS = str(tmp_path / "docs")
+    build.CERTS = str(tmp_path / "certs")
+    build.build()
+    pages = []
+    for path in glob.glob(os.path.join(build.DOCS, "**", "*.html"), recursive=True):
+        with open(path) as f:
+            pages.append(f.read())
+    rendered = "\n".join(pages)
+    assert "OpenCode agent harness" in rendered
+    assert "(claimed, not verified)" in rendered

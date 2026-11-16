@@ -16,6 +16,12 @@ import qldpc
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# `qldpc submit` loads the committed board for its frontier comparison. The
+# stub below replaces the CLI's own `verify` for the candidate; the board's
+# entries are still verified by qldpc_verify, so the session's memo
+# (conftest.py's `board_memo`) holds real reports.
+pytestmark = pytest.mark.usefixtures("board_memo")
+
 
 def _steane():
     H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.uint8)

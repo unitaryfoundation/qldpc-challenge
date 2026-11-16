@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 2000,
+      "cpu_hours": 300,
+      "gpu_hours": 25000,
+      "walltime_hours": 600
+    },
+    "constraints": {
+      "max_check_weight": 9,
+      "n": [
+        60,
+        1000
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "pivot to fresh constructions only if transforms yield only d<=4 among the first 100 candidates",
+        "trials_cap": 300000000
+      },
+      "bar": {
+        "axes": [
+          "d",
+          "kd2_over_n"
+        ],
+        "note": "mitten/ZSZ high-rate bar; Kasai [[9216,4612,<=48]] and [[16384,4142,<=40]] remain bars only",
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "gpu_hours": 25000,
+        "trials_per_candidate": 300000000,
+        "walltime_hours": 600
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A checkable high-rate code above d=5, or a documented finding that transforms do not create distance and that fresh constructions are required.",
+      "family": "other",
+      "feasibility": "Seeded high-rate parents (mitten, ZSZ-LP, Pauli-CPM) are available; code-calculus peel/puncture/delete generate variants on CPU; GPU RIS witnesses distances that CPU cannot reach.",
+      "hypothesis": "Code-calculus transforms or fresh Pauli-CPM-style constructions can produce d>=7 high-rate codes whose distances are witnessed at 300M trials, not just d=1/d=2 variants.",
+      "novelty": {
+        "against": "the unrestricted high-rate frontier and the Kasai bars",
+        "claim": "a gate-passed high-rate code with d>=7 and a 300M-trial witness"
+      },
+      "what_a_negative_would_teach": "That code-calculus moves raise k and lower w but do not create distance at high rate, confirming the v0.1/v0.2 negative results and directing budget to new constructions."
+    },
+    "id": "high-rate-witness-gpu-2026-11-15",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "trials_per_candidate": 300000000
+      }
+    },
+    "name": "High-rate high-distance witness search on GPU",
+    "notes": "Requires d>=7 for submission consideration. d-only gains require a matched-depth peer audit before packaging.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

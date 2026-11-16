@@ -23,6 +23,7 @@ import os
 import sys
 
 import numpy as np
+import pytest
 import gf2
 from bb import build_bb
 from submit import make_submission
@@ -67,6 +68,13 @@ def main():
     check("not a board duplicate", vg["gates"]["dedup"]["exact_duplicate_of"] is None)
     check("computed cell is weight-6 x unrestricted",
           vg["gates"]["novelty"]["cell"] == ["weight-6", "unrestricted"])
+
+    print("1c. a document carrying harness passes packaging:")
+    harness_doc = copy.deepcopy(good)
+    harness_doc["provenance"]["harness"] = "OpenCode agent harness"
+    vh = V.validate_candidate(harness_doc, seed=SEED)
+    check("passes", vh["passed"])
+    check("verifies", vh["gates"]["verify"]["ok"])
 
     print("1b. a code compared against ITSELF reports no novelty verdict:")
     # Validating a doc already on the board makes the dedup gate fire. The
@@ -201,10 +209,14 @@ def main():
     return 1 if _fail else 0
 
 
+# board_memo (conftest.py): the gate compares its candidate with every
+# committed entry, and main() never replaces the verifier, only _board_entries.
+@pytest.mark.usefixtures("board_memo")
 def test_validate_candidate():
     assert main() == 0
 
 
+@pytest.mark.usefixtures("board_memo")
 def test_main():
     """pytest entry point; the suite body lives in main()."""
     assert main() == 0
