@@ -56,6 +56,11 @@ by saving matrices and parentage during the initial analysis.
 - **Exact (n,k,d) matching is rare:** the planner produces many children per
   parent, but only a few match a specific Pareto target. Dedup and the
   incremental Pareto filter keep this manageable.
+- **Trial depth matters:** the gate's 8000-trial witness search can miss
+  weight-1 logicals. The unified pass now defaults to 20000 trials per side
+  (`TRIALS=20000`) to catch shallow logicals at staging time, avoiding
+  wasted gating/promotion on codes that collapse to d=1 under deeper search.
+  The 2M-trial accelerator pass (`qldpc submit`) remains the final authority.
 - **Board growth invalidates domination:** codes non-dominated at analysis time
   may be dominated by newer board entries at gate time. The gate is the final
   arbiter.

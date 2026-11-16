@@ -22,7 +22,7 @@ Environment variables (all optional, sensible defaults):
   N_MAX         only process parents with n <= N_MAX (default: 1000)
   WORKERS       multiprocessing workers (default: 4)
   CHUNK_SIZE    parents per checkpoint (default: 25)
-  TRIALS        witness-search trials per side (default: 1000)
+  TRIALS        witness-search trials per side (default: 20000)
   SKIP_DOMINATED  skip parents dominated by the board (default: 0)
 
 Usage:
@@ -58,7 +58,7 @@ OUT_PARETO = os.environ.get('OUT_PARETO', os.path.join(OUT_DIR, 'pareto_frontier
 N_MAX = int(os.environ.get('N_MAX', '1000'))
 WORKERS = int(os.environ.get('WORKERS', '4'))
 CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
-TRIALS = int(os.environ.get('TRIALS', '1000'))
+TRIALS = int(os.environ.get('TRIALS', '20000'))
 SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '0') == '1'
 
 sys.path.insert(0, CALCULUS)
