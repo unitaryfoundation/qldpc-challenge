@@ -16,10 +16,10 @@ entry, so the research gate's notion of a duplicate and CI's notion of a pass
 could drift without any test noticing. Now one implementation produces the
 report and this file only layers the circuit and measured-rate tiers on top
 and accumulates the fingerprint and signature collisions. The pass is still
-paid in full in CI: board_reports's disk memo is off there, and the
-collision detection below is inherently a scan of the submitted tree, which
-is the untrusted input. The memo only spares a developer who has already
-verified these bytes in another process.
+paid in full by this sweep in CI: no run there starts from a memo another
+run wrote, and the collision detection below is inherently a scan of the
+submitted tree, which is the untrusted input. The memo only spares a process
+that comes after one which has already verified these bytes.
 
 The one expensive thing here is the measured-rate tier: a circuit.ler claim is
 re-measured by a sampled replica (ler_verify), ~2 x 120 s per entry at the wall
@@ -34,14 +34,38 @@ merge). A diff that cannot be computed falls back to re-measuring everything.
 
 Two things make the skip safe, and one is a cost. Safe: an unchanged claim
 can only go stale through the verifier stack (a stim bump in uv.lock, a
-ler_tools edit), and verify.yml routes any run whose diff touches that stack,
-PR or push, to the unflagged full re-measure; check_submission_scope.py keeps
-such a change out of a PR that also carries code data. The full re-measure of
-every claim also runs weekly on a schedule, so no measured rate on the board
-goes more than a week without being re-derived from scratch. Cost: an entry
-nobody touches is re-measured weekly rather than on every merge, and a
-failing scheduled run reverts nothing on its own; it is a signal to a
-maintainer, not a gate.
+ler_tools edit), and check_submission_scope.py keeps such a change out of a
+PR that also carries code data. And the claims are re-derived weekly
+whatever changed, by two runs. verify.yml's scheduled run re-measures every
+claim here and fails its check when one does not replicate; it counts only
+when it finishes, and on 2026-11-09 it was cancelled at the job's cap.
+ler-weekly.yml replicates every point of a claim with a longer budget and
+three seeds, stalest entries first inside a five-hour budget, which on
+2026-11-09 was the whole board in about two hours; it commits receipts and
+keeps a tracking issue, and fails no check. So a measured rate is normally
+re-derived within a week, and that is a property of those two runs finishing,
+not of this file. Cost: an entry nobody touches is re-measured weekly rather
+than on every merge, and a failing scheduled run reverts nothing on its own;
+it is a signal to a maintainer, not a gate.
+
+A run whose diff touches that stack used to re-measure every claim before the
+merge, on the pull request and again on the push that merged it. That is the
+board's whole measured-rate tier: 26 entries and 55 to 65 minutes on a hosted
+runner on 2026-11-12, beside an hour of self-tests, in a job capped at 130
+minutes. Three of the five such runs that week were cancelled at the cap, and
+none of them had found a failure (issue #5578). With --ler-sample K such a
+run re-measures K claims, chosen by --ler-seed, and whatever --ler-base
+selects. The sample is a smoke test of the measurement path, not a
+re-derivation of the board. A stack change that breaks the path for every
+claim, or for most of them, fails on the sample. One that moves the rate of
+a few claims usually does not: with 3 of 26 drawn, a change that affects one
+claim leaves it undrawn 88 times in 100, and one that affects five leaves all
+five undrawn about half the time. Those are found by the weekly runs, up to a
+week later, where they used to be found before the merge. That is what this
+flag gives up, and it leans on the weekly runs finishing. The full re-measure
+of every claim stays one manual dispatch of verify.yml away, for a change
+that warrants it (a stim bump). A diff that cannot be computed still
+re-measures everything: the sample never narrows a fallback.
 
 The circuit tier is cheap per entry and not cheap in total. On the hosted
 runner on 2026-11-10 it took 44.5 minutes of a 48-minute run, 718 entries at
@@ -154,6 +178,26 @@ def ler_slugs_to_measure(base, code_root):
 def circuit_slugs_to_check(base, code_root):
     """Return the entries --circuit-base re-runs the circuit tier of, or None for all."""
     return _changed_slugs(base, code_root, "checking every circuit tier")
+
+
+def ler_sample(claims, k, seed):
+    """Return the `k` of `claims` (slugs) that --ler-sample re-measures under `seed`.
+
+    The claims are ordered by a hash of the seed and the slug and the first k
+    are taken. So the choice depends on nothing but its arguments: not the
+    Python version, not the order the board was read in. A seed is the pull
+    request's number or the run's id, and a re-run of the same pull request
+    draws the same claims, so a failing one cannot be re-rolled away.
+
+    The draw is public. Anyone can compute which claims a number selects, so
+    this is a spot check against an honest mistake in the stack, not a defence
+    against an author who wants a particular claim left alone. What bounds
+    that case is the weekly re-measure of every claim, and the review a change
+    to the stack gets. Asking for more claims than there are returns them all.
+    """
+    ranked = sorted(set(claims), key=lambda slug: hashlib.sha256(
+        f"ler-sample\0{seed}\0{slug}".encode()).digest())
+    return set(ranked[:max(0, k)])
 
 
 # Every file a circuit verdict can depend on besides the entry and its
@@ -364,6 +408,17 @@ def main(argv=None):
                     help="re-measure circuit.ler claims only for entries whose "
                          "codes/<slug>.json or circuits/<slug>/ changed since "
                          "this git ref (PR runs); omit to re-measure every claim")
+    ap.add_argument("--ler-sample", default=None, type=int, metavar="K",
+                    help="re-measure K circuit.ler claims chosen by --ler-seed, "
+                         "and those --ler-base selects, in place of every "
+                         "claim: for a run that changed the stack that "
+                         "measures them. The rest are left to the weekly runs. "
+                         "Never narrows a --ler-base whose diff cannot be "
+                         "computed")
+    ap.add_argument("--ler-seed", default=0, type=int, metavar="N",
+                    help="what --ler-sample draws with (the pull request "
+                         "number or the run id); the same seed draws the same "
+                         "claims")
     ap.add_argument("--circuit-base", default=None, metavar="REF",
                     help="run the circuit tier only for entries whose "
                          "codes/<slug>.json or circuits/<slug>/ changed since "
@@ -383,6 +438,11 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if args.circuit_jobs < 0:
         ap.error("--circuit-jobs must be 0 (one per CPU) or a positive count")
+    if args.ler_sample is not None and args.ler_sample < 1:
+        # Zero would be a way to ask for no re-measurement at all. Nothing
+        # needs it: leaving the flag out is how a run says "only what
+        # --ler-base selects".
+        ap.error("--ler-sample must be a positive count")
     code_root = os.path.abspath(args.root)
     ler_slugs = (ler_slugs_to_measure(args.ler_base, code_root)
                  if args.ler_base else None)
@@ -408,6 +468,26 @@ def main(argv=None):
     if not entries:
         print("no submissions found")
         return 0
+    # --ler-sample: the claims this run re-measures in place of all of them.
+    # ler_slugs is None when no --ler-base was given, and also when one was
+    # given and its diff failed. Only the first is the sample's to narrow: a
+    # diff that cannot be computed re-measures everything, as it always did.
+    ler_skip_note = ", ler unchanged since base (re-measured on main)"
+    if args.ler_sample is not None and not (args.ler_base and ler_slugs is None):
+        # An entry that parses to something other than an object, or whose
+        # circuit block is not one, carries no claim to draw. The loop below
+        # reports it as the failure it is.
+        claims = sorted(e["slug"] for e, is_code in entries
+                        if is_code and isinstance(e["doc"], dict)
+                        and isinstance(e["doc"].get("circuit"), dict)
+                        and e["doc"]["circuit"].get("ler"))
+        sampled = ler_sample(claims, args.ler_sample, args.ler_seed)
+        ler_slugs = (ler_slugs or set()) | sampled
+        ler_skip_note = ", ler outside this run's sample (re-measured weekly)"
+        print(f"ler tier: re-measuring a sample of {len(sampled)} of {len(claims)} "
+              f"claims (seed {args.ler_seed}): {', '.join(sorted(sampled)) or 'none'}"
+              + (f"; and every entry changed since {args.ler_base}" if args.ler_base else ""),
+              flush=True)
     keys = {}
 
     def entry_key(slug, entry_path, circuits_dir):
@@ -521,7 +601,7 @@ def main(argv=None):
             # skipping it, so an unverifiable number cannot merge.
             if rep["ok"] and (doc["circuit"] or {}).get("ler"):
                 if ler_slugs is not None and slug not in ler_slugs:
-                    circ += ", ler unchanged since base (re-measured on main)"
+                    circ += ler_skip_note
                     lrep = {"ok": True, "skipped": True}
                 else:
                     lrep = verify_ler(doc, circuits_dir)
