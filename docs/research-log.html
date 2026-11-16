@@ -3,6 +3,23 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3>QEDist vs tropidist: head-to-head on 31 CSS entries</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details open><summary>note</summary><div class=notebody><p>A first head-to-head comparison of the two solver-tier exact-distance backends on 31 CSS board entries (<code>4 &lt;= d &lt;= 20</code>, <code>50 &lt;= n &lt;= 300</code>), 60 s budget, 4 workers. QEDist adapter from PR #5819; tropidist pinned at <code>b03ec2d</code> (<code>research/certs/tropidist_certify.py</code>).</p>
+<h4>Results</h4>
+<p>| Metric | QEDist | tropidist | |---|---:|---:| | Entries completed | 30 / 31 | 30 / 31 | | Median wall time | 0.39 s | 1.41 s | | Total wall time | 103 s | 261 s | | Faster on | 30 / 30 comparable | 0 / 30 | | Exact matches vs claimed d | 30 / 30 | 30 / 30 | | Mismatches | 0 | 0 |</p>
+<ul>
+<li>Both failed on the same hard entry (<code>204-18-18</code>, d=18): QEDist incomplete at</li>
+<p>60 s, tropidist timed out at 120 s.</p>
+<li>Largest gap: <code>107-33-7</code> (n=107, d=7) — tropidist 8.0 s vs QEDist 0.4 s.</li>
+</ul>
+<h4>Limits observed</h4>
+<ul>
+<li>QEDist is CSS-only and caps the cutoff at 64: it refused <code>544-18-76</code></li>
+<p>(d=76) outright, where tropidist at least reached lower bound 19 in 600 s.</p>
+<li>tropidist remains the only exact certifier for stabilizer codes and for</li>
+<p>d &gt; 64.</p>
+</ul>
+<h4>Implication</h4>
+<p>QEDist is the faster backend for moderate CSS codes (and supports an LP tensor-block profile up to 8192 qubits), but it does not supersede tropidist: stabilizer entries and high-distance entries still need tropidist, and proof-log certificates still need the SAT/DRAT path. The recommended shape is a routed backend (QEDist for CSS with d &lt;= 64, tropidist otherwise), implemented as a follow-up module under research/certs/ (not yet written). Neither is a replacement for the trusted verifier.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-15-qedist-vs-tropidist-benchmark.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/23-2-5.html">[[23,2,5]] — 23-2-5</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[23,2,5]] code-calculus v0.2rc greedy gated</h3>
 <p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-2-5.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/5-1-3-c.html">[[5,1,3]] — 5-1-3-c</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[5,1,3]] — five-qubit perfect code in the paper&#x27;s stabilizer form</h3>
@@ -31,7 +48,7 @@
 <li><code>X: [1,3], Z: [0,4]</code></li>
 </ul>
 <p>Distance witness: <code>X: [1], Z: [0,2]</code> (weight 3). Source: arXiv:2611.16751v1, Eq. (72).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/5-1-3-c.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/512-128-19.html">[[512,128,19]] — 512-128-19</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[512,128,19]] — pair-partition CPM code at period 32, check weight 9</h3>
+<section class=blk><h3><a href="codes/512-128-19.html">[[512,128,19]] — 512-128-19</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[512,128,19]] — pair-partition CPM code at period 32, check weight 9</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, unrestricted, weight-9plus (w &lt;= 9). Family: pair-partition (other). Aimed at the 512-qubit PP cell where the board already carries <code>codes/512-128-20.json</code> (d = 20, w = 10). Hypothesis: the quaternary PP construction of arXiv:2610.06820 (period 32, 3x8 checks, rate 1/4) admits a w = 9 presentation with d = 19 that is not dominated by the existing w = 10 entry, because the w axis is part of the Pareto frontier.</p>
 <h4>What was searched</h4>
