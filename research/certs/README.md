@@ -102,6 +102,12 @@ uv run python research/certs/certify_sweep.py stage --out-dir research/out/certi
 uv run python research/certs/certify_sweep.py pr-body --out-dir research/out/certify_sweep --out body.md
 ```
 
+Targeted runs (issue #4230): `--records-only` opens only entries on a cell or
+global frontier, `--band A B ...` restricts to those bands, and `--max-gap N` /
+`--min-gap N` filter by `d - (filed lower bound or 1)`. Naming a slug with
+`--slugs` lifts these filters for that slug, so a named entry is never dropped
+by them.
+
 ### The ladder and partial certificates
 
 `--ladder SECONDS` (issue #4230) asks each side at W = 1, 2, ... up to
