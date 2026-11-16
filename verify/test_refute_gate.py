@@ -20,6 +20,7 @@ import json
 import os
 import sys
 import numpy as np
+import pytest
 import gf2
 import qldpc_verify
 import heuristic_distance
@@ -253,6 +254,9 @@ def test_structural_gb_pass():
     assert not _fail, _fail
 
 
+# board_memo (conftest.py): each gate below is a new process that needs the
+# whole board beside its probe, and the probe itself changes the board.
+@pytest.mark.usefixtures("board_memo")
 def test_structural_stage_ordering():
     """Stage 1 (circulant-GB) runs first and short-circuits ONLY on a hit.
 
@@ -469,6 +473,7 @@ def _fold_fixture_doc(claim):
     }
 
 
+@pytest.mark.usefixtures("board_memo")
 def test_orbit_fold_stage_ordering():
     """Stage 1b (orbit-fold) runs on every symmetric code, before the general
     battery, and short-circuits ONLY on a validated hit (audit of 2026-10-08).

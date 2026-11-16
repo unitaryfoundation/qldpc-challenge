@@ -76,19 +76,31 @@ def _prose_after_snippet():
 
 
 @pytest.fixture(scope="module")
-def board():
+def board(session_board_memo):
     """The board's entries, loaded once for the module.
 
     Not just an assertion input: loading it here warms the memoized structural
     pass over `codes/` that `validate_candidate` shares, which is the difference
     between a gate call costing 0.3 s and costing minutes. Requesting this from
     the gate test is what keeps that ordering.
+
+    The load reads the session's board memo (conftest.py), so it pays for the
+    pass only when no earlier test has. Set by hand rather than monkeypatched:
+    a module fixture outlives pytest's function-scoped monkeypatch.
     """
     for p in ("research/kit", "verify", "site"):
         if p not in sys.path:
             sys.path.insert(0, os.path.join(ROOT, p))
     from build import load_entries
-    entries = load_entries()
+    was = os.environ.get("QLDPC_BOARD_CACHE")
+    os.environ["QLDPC_BOARD_CACHE"] = session_board_memo
+    try:
+        entries = load_entries()
+    finally:
+        if was is None:
+            os.environ.pop("QLDPC_BOARD_CACHE", None)
+        else:
+            os.environ["QLDPC_BOARD_CACHE"] = was
     assert entries, f"could not load the board from {ROOT}"
     return entries
 
@@ -182,6 +194,7 @@ def test_documented_parameters_match_the_page(doc):
         f"[[{doc['n']},{doc['k']},{doc['distance']['d']}]]")
 
 
+@pytest.mark.usefixtures("board_memo")
 def test_page_claim_agrees_with_the_gate(doc, board):
     """The page's stated expectation and the gate must say the same thing.
 
