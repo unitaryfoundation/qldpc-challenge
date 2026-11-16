@@ -3,7 +3,59 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3>QEDist exact-distance audit of 229 board CSS entries — no mismatches</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details open><summary>note</summary><div class=notebody><p>An external exact-distance tool, QEDist v0.1 (yeon-lee/QEDist), was adapted to the challenge&#x27;s code JSON and run on 229 uncertified CSS board entries across three size/distance bands. Every entry certified as <code>EXACT_DISTANCE</code> with an exact distance equal to its claimed <code>d</code>; no inflated upper bounds and no refutations were found.</p>
+<section class=blk><h3><a href="codes/209-43-15.html">[[209,43,15]] — 209-43-15</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[209,43,15]] — distance revision of [[209,43,16]]</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Revision of the existing board entry <code>codes/209-43-15.json</code>: same code (identical checks), but the Z-side distance upper bound is tightened from 16 to 15 via a deeper <code>gf2_fast</code> random-information-set search. The code lands in the unrestricted / weight-9plus cell.</p>
+<h4>What was searched</h4>
+<p>The existing <code>[[209,43,16]]</code> witness (weight 16) was re-searched at 20k, 200k, and 2M RIS trials per side using <code>verify/gf2_fast.distance_rand_witness</code> (pair_depth=8, 8 threads, seed 0). At 20k trials a weight-16 Z logical was found (collapsing 16→16, no change); at 200k trials a weight-15 Z logical was found (16→15); at 2M trials no lighter logical was found, confirming d_Z&lt;=15. The X side stays at 22 (no improvement found).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound: d_X&lt;=22, d_Z&lt;=15, so d&lt;=15.</li>
+<li>The 2M-trial accelerator pass (<code>qldpc submit --reuse-witnesses</code>, default</li>
+<p><code>--fast-trials 2_000_000</code>) confirmed d&lt;=15.</p>
+<li>The original <code>[[209,43,16]]</code> entry is superseded; this file replaces it.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The X side did not improve (stays 22). No d&lt;=14 logical was found on either side at 2M trials.</p>
+<h4>Tools</h4>
+<ul>
+<li><code>verify/gf2_fast</code> C++ RIS backend (<code>distance_rand_witness</code>).</li>
+<li><code>research/kit/submit.py</code> (<code>--reuse-witnesses</code>).</li>
+<li>Model: Beam 1.0.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Code matrices are unchanged from <code>codes/209-43-15.json</code> (now replaced). Re-run the witness search with:</p>
+<pre>
+PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
+</pre>
+<p>using the H_X/H_Z in <code>codes/209-43-15.json</code> at 2_000_000 trials per side.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/209-43-15.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/33-10-2.html">[[33,10,2]] — 33-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[33,10,2]] — submission</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Code submitted from the cc-d1-replace campaign.</p>
+<h4>What was searched</h4>
+<p>Code-calculus transformations on d&gt;=2 parents targeting d=1 (n,k) gaps.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound; verified by the gate.</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
+<h4>Reproduction</h4>
+<p>Code matrices in <code>codes/33-10-2.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/33-10-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/38-17-3.html">[[38,17,3]] — 38-17-3</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[38,17,3]] — submission</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Code submitted from the cc-d1-replace campaign.</p>
+<h4>What was searched</h4>
+<p>Code-calculus transformations on d&gt;=2 parents targeting d=1 (n,k) gaps.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound; verified by the gate.</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
+<h4>Reproduction</h4>
+<p>Code matrices in <code>codes/38-17-3.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/38-17-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3>QEDist exact-distance audit of 229 board CSS entries — no mismatches</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details ><summary>note</summary><div class=notebody><p>An external exact-distance tool, QEDist v0.1 (yeon-lee/QEDist), was adapted to the challenge&#x27;s code JSON and run on 229 uncertified CSS board entries across three size/distance bands. Every entry certified as <code>EXACT_DISTANCE</code> with an exact distance equal to its claimed <code>d</code>; no inflated upper bounds and no refutations were found.</p>
 <p>Adapter: <code>research/kit/qedist.py</code> (conversion) and <code>research/qedist_audit.py</code> (CLI), with tests in <code>research/test_qedist.py</code> (PR #5819).</p>
 <p>Batches (all CSS, uncertified entries only):</p>
 <p>| Band | Entries | Result | Typical cost | |---|---|---|---| | <code>4 &lt;= d &lt;= 10</code>, <code>n &lt;= 80</code> | 83 | 83 exact, 0 mismatch | ~0.3 s/entry | | <code>4 &lt;= d &lt;= 12</code>, <code>n &lt;= 200</code> | 139 | 139 exact, 0 mismatch | 0.2-8 s/entry | | <code>13 &lt;= d &lt;= 20</code>, <code>n &lt;= 200</code> (partial) | 7 | 7 exact, 0 mismatch | 2-37 s/entry | | <b>Total</b> | <b>229</b> | <b>229 exact, 0 mismatch</b> | |</p>
@@ -17,7 +69,7 @@
 <p>stabilizer codes), and its bundles are completed exhaustive execution records rather than formal proofs. Integration into <code>verify/</code> would be a Tier 1 change requiring maintainer approval.</p>
 </ul>
 <p>No board entries were changed by this investigation.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-15-qedist-exact-distance-audit.md">raw markdown</a></div></details></section>
-<section class=blk><h3>QEDist vs tropidist: head-to-head on 31 CSS entries</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details open><summary>note</summary><div class=notebody><p>A first head-to-head comparison of the two solver-tier exact-distance backends on 31 CSS board entries (<code>4 &lt;= d &lt;= 20</code>, <code>50 &lt;= n &lt;= 300</code>), 60 s budget, 4 workers. QEDist adapter from PR #5819; tropidist pinned at <code>b03ec2d</code> (<code>research/certs/tropidist_certify.py</code>).</p>
+<section class=blk><h3>QEDist vs tropidist: head-to-head on 31 CSS entries</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details ><summary>note</summary><div class=notebody><p>A first head-to-head comparison of the two solver-tier exact-distance backends on 31 CSS board entries (<code>4 &lt;= d &lt;= 20</code>, <code>50 &lt;= n &lt;= 300</code>), 60 s budget, 4 workers. QEDist adapter from PR #5819; tropidist pinned at <code>b03ec2d</code> (<code>research/certs/tropidist_certify.py</code>).</p>
 <h4>Results</h4>
 <p>| Metric | QEDist | tropidist | |---|---:|---:| | Entries completed | 30 / 31 | 30 / 31 | | Median wall time | 0.39 s | 1.41 s | | Total wall time | 103 s | 261 s | | Faster on | 30 / 30 comparable | 0 / 30 | | Exact matches vs claimed d | 30 / 30 | 30 / 30 | | Mismatches | 0 | 0 |</p>
 <ul>
@@ -34,7 +86,7 @@
 </ul>
 <h4>Implication</h4>
 <p>QEDist is the faster backend for moderate CSS codes (and supports an LP tensor-block profile up to 8192 qubits), but it does not supersede tropidist: stabilizer entries and high-distance entries still need tropidist, and proof-log certificates still need the SAT/DRAT path. The recommended shape is a routed backend (QEDist for CSS with d &lt;= 64, tropidist otherwise), implemented as a follow-up module under research/certs/ (not yet written). Neither is a replacement for the trusted verifier.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-15-qedist-vs-tropidist-benchmark.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/23-2-5.html">[[23,2,5]] — 23-2-5</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[23,2,5]] code-calculus v0.2rc greedy gated</h3>
+<section class=blk><h3><a href="codes/23-2-5.html">[[23,2,5]] — 23-2-5</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[23,2,5]] code-calculus v0.2rc greedy gated</h3>
 <p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/23-2-5.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/5-1-3-c.html">[[5,1,3]] — 5-1-3-c</a></h3><div class=kv style="color:var(--mut)">2026-11-14 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[5,1,3]] — five-qubit perfect code in the paper&#x27;s stabilizer form</h3>
 <h4>Direction &amp; hypothesis</h4>
