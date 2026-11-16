@@ -68,10 +68,19 @@ def board_memo(_no_board_memo, session_board_memo, monkeypatch):
     Ask for this only in a test that leaves the verifier alone. A test that
     replaces `qldpc_verify.verify`, or anything it calls, and then reads a
     board would write the replaced answer here, under the real entry's key,
-    for every later test to read.
+    for every later test to read. The first half of that is checked when the
+    test ends: this fixture is torn down before `monkeypatch` undoes
+    anything, so a `verify` the test replaced is still in place and fails
+    the test. A function `verify` calls, or a replacement the test put back
+    by hand, is not seen; for those the rule is all there is.
     """
+    import qldpc_verify
+    real = qldpc_verify.verify
     monkeypatch.setenv("QLDPC_BOARD_CACHE", session_board_memo)
-    return session_board_memo
+    yield session_board_memo
+    assert qldpc_verify.verify is real, (
+        "a test that holds board_memo replaced qldpc_verify.verify: the session's "
+        "board memo may now hold reports the real verifier did not compute")
 
 
 def pytest_configure(config):

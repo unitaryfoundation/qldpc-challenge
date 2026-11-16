@@ -840,6 +840,16 @@ _SEARCH_RESTORE = "restore completed searches"
 _MEMO = "          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo"
 
 
+def _every_workflow():
+    """Return {file name: its lines without comments} for every workflow in the repository."""
+    directory = os.path.dirname(_WORKFLOW)
+    code = {}
+    for name in sorted(os.listdir(directory)):
+        with open(os.path.join(directory, name), encoding="utf-8") as f:
+            code[name] = _code(f.read().splitlines())
+    return code
+
+
 def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     """Filled by the trusted sweep, read by the trusted gate, named nowhere else."""
     steps = _workflow_steps()
@@ -849,10 +859,28 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     for name in users:
         assert _MEMO in steps[name], name
         assert "        working-directory: trusted" in steps[name], name
-    # Nothing saves or restores it, so no run reads what another wrote.
-    with open(_WORKFLOW, encoding="utf-8") as f:
-        code = _code(f.read().splitlines())
-    assert [ln for ln in code if "board-memo" in ln] == [_MEMO, _MEMO]
+        assert not any("continue-on-error" in ln for ln in _code(steps[name])), name
+
+    def cond(name):
+        return next(ln for ln in steps[name] if ln.startswith("        if: "))
+
+    # The gate runs exactly when the sweep ran, and only after it succeeded:
+    # the same `if:`, with no always() to outlive a sweep that failed.
+    assert cond(_GATE) == cond(_CODE_SWEEP) and "always()" not in cond(_GATE)
+    # Every mention in every workflow, not only in the named steps of this
+    # one: no job-level or workflow-level env sets it, and no other workflow.
+    workflows = _every_workflow()
+    mentions = [(wf, ln.strip()) for wf, lines in workflows.items()
+                for ln in lines if "QLDPC_BOARD_CACHE" in ln]
+    assert mentions == [("verify.yml", _MEMO.strip()),
+                        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+                        ("verify.yml", _MEMO.strip())], mentions
+    # Nothing saves or restores it, so no run reads what another wrote: in
+    # this workflow the runner's temp directory is named by those two lines
+    # and by no cache or artifact path.
+    temp = [ln for ln in workflows["verify.yml"]
+            if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln or "board-memo" in ln]
+    assert temp == [_MEMO, _MEMO], temp
 
 
 def test_the_sweep_empties_the_board_memo_before_filling_it(tmp_path):
@@ -876,17 +904,23 @@ def _cannot_run_on_a_code_submission(cond):
     return bool(cond) and all(rules_out & set(alt.split(" && ")) for alt in alternatives)
 
 
-def test_nothing_runs_between_the_sweep_and_its_gate_on_a_code_submission():
-    """The gate reads what the sweep wrote, so no step of that run may come between them.
+def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
+    """The gate reads what the sweep wrote, so what runs between them is pinned.
 
-    The untrusted search cache in particular is unpacked before the sweep,
-    not just before the gate that reads it.
+    On a code submission that is one step: the restore of the search cache,
+    which a contributor can write. It is handed the path search-cache in the
+    workspace and nothing else, and it sits immediately before the gate that
+    reads it. Every other step between the two belongs to some other kind of
+    run.
     """
     steps = _workflow_steps()
     names = list(steps)
     lo, hi = names.index(_CODE_SWEEP), names.index(_GATE)
-    assert names.index(_SEARCH_RESTORE) < lo < hi
-    for name in names[lo + 1:hi]:
+    assert lo < hi and names[hi - 1] == _SEARCH_RESTORE
+    restore = _code(steps[_SEARCH_RESTORE])
+    assert "        uses: actions/cache/restore@v4" in restore
+    assert [ln.strip() for ln in restore if ln.strip().startswith("path:")] == ["path: search-cache"]
+    for name in names[lo + 1:hi - 1]:
         cond = next((ln[len("        if: "):] for ln in steps[name]
                      if ln.startswith("        if: ")), "")
         assert _cannot_run_on_a_code_submission(cond), (name, cond)

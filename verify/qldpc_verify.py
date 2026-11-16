@@ -2104,10 +2104,19 @@ def board_cache_dir():
     pass again, 3.6 to 6.3 minutes a time on a hosted runner at 3,366
     entries, twice per code submission and eight times per suite run. A
     directory the job creates empty and that only its own verifier writes
-    holds nothing but reports that verifier computed, in this job, from
-    bytes it read itself, under the key _memo_path gives them. Nothing
+    holds nothing but reports that verifier computed in this job. Nothing
     crosses from one run to the next. Keeping the directory that way is the
     job's to arrange: verify.yml wipes it in the step that first writes it.
+
+    One condition comes with sharing it. A report is filed under its
+    entry's bytes and the validator closure (_memo_path), and that is not
+    all a report depends on: verify() also reads other entries from its own
+    checkout's codes/ (_board_code: a benchmark's baseline, an
+    architecture's partners, the parent of a declared relabeling). So the
+    processes that share a directory must run from one checkout whose
+    codes/ does not change between them. The sweep and the gate of one job
+    do: both run from the trusted tree. A memo carried from one state of the
+    board to another would need those entries in its key as well.
     """
     override = os.environ.get(BOARD_CACHE_ENV)
     if override is not None:

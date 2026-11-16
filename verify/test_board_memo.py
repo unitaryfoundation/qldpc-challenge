@@ -211,9 +211,12 @@ def test_two_entries_with_the_same_bytes_share_one_memo_entry(tmp_path, memo,
                                                               monkeypatch):
     """The key is the content, so a byte-identical copy is already answered.
 
-    Worth pinning rather than discovering: the report depends on the bytes
-    alone, since path and slug are attached outside the memo and verify()
-    reads only the parsed document.
+    Worth pinning rather than discovering: the report does not depend on the
+    path or the slug, which are attached outside the memo. It does depend on
+    more than the entry's own bytes when the entry names another one (a
+    benchmark baseline, an architecture partner, a relabeling's parent),
+    which verify() reads from its own checkout's codes/; board_cache_dir
+    says what that asks of the processes that share a memo.
     """
     d = tmp_path / "codes"
     d.mkdir()

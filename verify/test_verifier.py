@@ -486,7 +486,15 @@ def main():
     # verify(doc) per entry: this loop used to make that pass a second time
     # on its own, once per pytest entry point below (issue #5578). The
     # fixtures are few and are verified here directly.
+    #
+    # The in-process snapshot is dropped first. It is whatever the last
+    # caller in this process left, and a test that had replaced verify() and
+    # then read codes/ would have left reports this check must not believe.
+    # What answers instead is a fresh pass, or under pytest the session's
+    # memo, which only tests that leave the verifier alone may write
+    # (conftest.py's board_memo checks that they did).
     print("\nshipped submissions still verify:")
+    qldpc_verify._BOARD_CACHE.clear()
     for e in qldpc_verify.board_reports(os.path.join(ROOT, "codes")):
         check(f"{os.path.basename(e['path'])} verifies",
               e["report"] is not None and e["report"]["ok"])
