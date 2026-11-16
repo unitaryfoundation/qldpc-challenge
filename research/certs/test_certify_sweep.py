@@ -691,3 +691,56 @@ def test_the_subprocess_runner_hands_the_tool_its_start_threshold(tmp_path):
     assert err is None and not killed and rec["argv"][-2:] == ["--kmin", "7"]
     rec, _, _ = S.tropidist_in_subprocess("codes/x.json", "x", 60, "/nowhere", 1, wall=20, kmin=1, script=str(echo))
     assert "--kmin" not in rec["argv"]
+
+
+def test_targeted_filters_skip_records_bands_and_gap(tmp_path):
+    S = _script()
+    codes, certs = str(tmp_path / "codes"), str(tmp_path / "certs")
+    for slug in ("rec", "nonrec", "bandA", "bandB", "nocert", "partial"):
+        _write(os.path.join(codes, slug + ".json"), {"n": 12})
+    _write(os.path.join(certs, "partial.json"), {"d_exact": False, "d_lower": 3})
+    rows = [_row(s) for s in ("rec", "nonrec", "bandA", "bandB", "nocert", "partial")]
+    rows[0]["record"] = True
+    rows[1]["record"] = False
+    rows[2]["band"] = "A"
+    rows[3]["band"] = "B"
+    rows[4]["d"] = 5
+    rows[5]["d"] = 5
+    for i in (4, 5):
+        rows[i]["sides"] = {"X": {"value": 5}, "Z": {"value": 5}}
+    queue = {"entries": rows}
+    last = {}
+    today = "2026-10-26"
+
+    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                       today=today, records_only=True)
+    slugs = [r["slug"] for r in chosen]
+    assert "nonrec" not in slugs
+    assert "rec" in slugs
+
+    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                       today=today, bands=["A"])
+    slugs = [r["slug"] for r in chosen]
+    assert "bandB" not in slugs
+    assert "bandA" in slugs
+
+    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                       today=today, max_gap=2)
+    slugs = [r["slug"] for r in chosen]
+    assert "nocert" not in slugs
+    assert skipped.get("gap", 0) >= 1
+
+    chosen, skipped, reasons = S.select(queue, last=last, tlim=600, certs_dir=certs, codes_dir=codes,
+                                       today=today, min_gap=4)
+    slugs = [r["slug"] for r in chosen]
+    assert "nocert" in slugs
+    assert "partial" not in slugs
+
+
+def test_dry_run_returns_zero_and_leaves_out_dir_empty(tmp_path):
+    S = _script()
+    out = tmp_path / "out"
+    rc = S.main(["run", "--out-dir", str(out), "--dry-run"])
+    assert rc == 0
+    if out.exists():
+        assert list(out.iterdir()) == []

@@ -1032,12 +1032,15 @@ def main(argv=None):
     r.add_argument("--slugs", nargs="*", default=None, help="try these instead of the queue head")
     r.add_argument("--records-only", action="store_true",
                    help="open only entries that are on a cell or global frontier (record: true)")
-    r.add_argument("--band", nargs="*", default=None, metavar="BAND",
-                   help="restrict to these bands (A B C D P); default: all")
+    r.add_argument("--band", nargs="+", choices=["A", "B", "C", "D", "P"], default=None, metavar="BAND",
+                   help="restrict to these bands (A B C D P); default: all. A bare --band is rejected.")
     r.add_argument("--max-gap", type=int, default=None,
-                   help="open only entries whose d - (filed lower bound or 1) is at most this (cheap-to-close filter)")
+                   help="open only entries whose d - (filed lower bound or 1) is at most this. "
+                        "For an uncertified entry with no certificate this is d - 1 (a filter on d, "
+                        "not on cost); it counts ladder rungs only when a partial certificate is on file.")
     r.add_argument("--min-gap", type=int, default=None,
-                   help="open only entries whose gap is at least this (skip nearly-closed entries)")
+                   help="open only entries whose d - (filed lower bound or 1) is at least this "
+                        "(skip nearly-closed entries)")
     r.add_argument("--dry-run", action="store_true",
                    help="print the selected entries and estimated cost, then exit without running")
     r.add_argument("--retry", action="store_true", help="reopen entries that timed out at this budget")
@@ -1063,17 +1066,22 @@ def main(argv=None):
     if a.cmd == "run":
         q = load_queue(a.queue)
         last = last_attempts(load_jsonl(a.attempts))
-        chosen, skipped, reasons = select(q, last=last, tlim=a.tlim, today=utc_today(), certs_dir=CERTS,
-                                          codes_dir=CODES, slugs=a.slugs, retry=a.retry,
-                                          stabilizer_ok=("tropidist" in a.backend), ladder=a.ladder or None,
-                                          tool=("tropidist" in a.backend), records_only=a.records_only,
-                                          bands=a.band, max_gap=a.max_gap, min_gap=a.min_gap)
-        if a.max_entries:
-            chosen = chosen[:a.max_entries]
         if a.dry_run:
-            est = sum(wall_clock(a.tlim, a.ladder or None) for _ in chosen)
+            chosen, skipped, reasons = select(q, last=last, tlim=a.tlim, today=utc_today(), certs_dir=CERTS,
+                                              codes_dir=CODES, slugs=a.slugs, retry=a.retry,
+                                              stabilizer_ok=("tropidist" in a.backend), ladder=a.ladder or None,
+                                              tool=("tropidist" in a.backend), records_only=a.records_only,
+                                              bands=a.band, max_gap=a.max_gap, min_gap=a.min_gap)
+            if a.max_entries:
+                chosen = chosen[:a.max_entries]
+            wall = wall_clock(a.tlim, a.ladder or None)
+            est = len(chosen) * wall
+            capped = est > a.job_seconds
+            if capped:
+                est = a.job_seconds
             print(f"selected {len(chosen)} (skipped {sum(skipped.values())}): "
-                  f"estimated wall {est} s ({est/3600:.1f} h)")
+                  f"estimated wall {est} s ({est/3600:.1f} h) worst case"
+                  + (" (capped by --job-seconds)" if capped else ""))
             for r in chosen:
                 print(f"  {r['slug']}  band={r.get('band')}  n={r['n']}  d={r['d']}  record={bool(r.get('record'))}")
             return 0
