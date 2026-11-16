@@ -23,7 +23,19 @@ def test_the_badge_reads_as_an_interval_below_the_witness():
     assert 'class="b ub"' in build.badge("ub") and 'class="b ub"' in build.badge("ub", None)
     assert 'class="b ub"' in build.badge("ub", 1), "d >= 1 is the trivial bound and earns nothing"
     mark = build.badge("ub", 7)
-    assert 'class="b lb"' in mark and mark.endswith(">7 &le; d &le;</span>")
+    assert 'class="b ivl"' in mark and mark.endswith(">7 &le; d &le;</span>")
+
+
+def test_no_badge_modifier_is_also_a_standalone_rule():
+    """`.b.lb` once shared its modifier with `.lb`, the leaderboard card, and the
+    interval badge took the card's margin, border and radius."""
+    import re
+    build = load_site_build()
+    marks = build.badge("exact") + build.badge("ub") + build.badge("ub", 7)
+    modifiers = {c for cls in re.findall(r'class="([^"]+)"', marks) for c in cls.split()} - {"b"}
+    assert modifiers == {"exact", "ub", "ivl"}
+    for name in modifiers:
+        assert not re.search(r"(?<![\w.-])\." + name + r"(?![\w-])", build.CSS), name
 
 
 def test_a_partial_certificate_is_honored_by_its_binding_hash_not_by_the_claim():
