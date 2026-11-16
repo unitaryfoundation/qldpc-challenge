@@ -1988,6 +1988,7 @@ def load_entries():
             # (the #643 binding). None for self-laid-out and layout-less codes.
             "layout_cb": (doc.get("locality") or {}).get("contributed_by"),
             "model": _model_str(doc["provenance"].get("model", "")),
+            "harness": doc["provenance"].get("harness", ""),
             "date": doc["provenance"].get("date", ""),
             "construction": doc["provenance"].get("construction", ""),
             "note_md": load_note(slug),
@@ -3274,6 +3275,11 @@ def detail_page(e):
         P.append('<div class=kv><b>model</b> '
                  '<span class=claimed>classical construction (no AI model)</span>'
                  '</div>')
+    harness = pr.get("harness", "")
+    if harness:
+        P.append('<div class=kv><b>harness</b> '
+                 f'{html.escape(harness)} '
+                 '<span class=claimed>(claimed, not verified)</span></div>')
     if pr.get("references"):
         refs = [cite(r, rel="../") for r in pr["references"]]
         # A baseline IS the cited paper's code; a submission only builds on the

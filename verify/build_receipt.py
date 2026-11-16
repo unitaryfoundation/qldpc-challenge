@@ -81,6 +81,10 @@ def make_receipt(doc, path, verdict, *, gate, repo_root, pr_number=None,
                 "value": prov.get("model"),
                 "status": "self_reported",
             },
+            "harness": {
+                "value": prov.get("harness"),
+                "status": "self_reported",
+            },
             "novelty": {
                 "value": prov.get("novelty"),
                 "status": "self_reported",

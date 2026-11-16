@@ -69,6 +69,13 @@ def main():
     check("computed cell is weight-6 x unrestricted",
           vg["gates"]["novelty"]["cell"] == ["weight-6", "unrestricted"])
 
+    print("1c. a document carrying harness passes packaging:")
+    harness_doc = copy.deepcopy(good)
+    harness_doc["provenance"]["harness"] = "OpenCode agent harness"
+    vh = V.validate_candidate(harness_doc, seed=SEED)
+    check("passes", vh["passed"])
+    check("verifies", vh["gates"]["verify"]["ok"])
+
     print("1b. a code compared against ITSELF reports no novelty verdict:")
     # Validating a doc already on the board makes the dedup gate fire. The
     # novelty verdict is withheld rather than reported as "not board-advancing",
