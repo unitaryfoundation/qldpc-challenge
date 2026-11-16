@@ -229,3 +229,17 @@ is out of reach (1.4e16 Paulis), each of the 42 MILP solves (one per logical
 representative) hit the 300 s limit, and the search's lightest logical at
 200,000 trials weighs 10, so that certificate rests on tropidist's verdict
 alone, with the heuristic bound agreeing.
+
+## The QEDist backend
+
+`qedist_certify.py` (this PR) runs QEDist (yeon-lee/QEDist) on a CSS entry and
+files a solver-level certificate in the #3666 shape, mirroring
+`tropidist_certify.py`. QEDist is faster than tropidist on moderate CSS codes
+(median 0.39 s vs 1.41 s on a 31-entry benchmark, see fieldnote
+`2026-11-15-qedist-vs-tropidist-benchmark.md`) and supports an LP
+tensor-block profile up to 8192 qubits, but it is CSS-only and caps the cutoff
+at 64 (d <= 65). Use it for CSS entries with d <= 64, especially LP codes;
+use tropidist for stabilizer entries and d > 64.
+
+    uv run python research/certs/qedist_certify.py codes/<slug>.json \
+        --qedist /path/to/qedist --tlim 60 --threads 4 --json
