@@ -48,7 +48,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `build_96_8_12_2bga.py` | rebuild | the [[96,8,12]] 2BGA code on D_4 x Z_6 from the paper's supports |
 | `build_dense_surface.py` | rebuild | the dense-packed surface entries ([[101,5,5]] and its larger sizes) as (HX, HZ, coords) |
 | `foldbound.py` | audit | distance upper bound by folding a code onto a symmetric subspace; a refuter, not a layout tool |
-| `annihilator_sweep.py` | audit | the annihilator attack over the board's uncertified block-shaped entries (issue #2706) |
+| `qedist_audit.py` | audit | certify a challenge CSS code's exact distance with the optional external QEDist tool (research/kit/qedist.py); evidence only, not board certification || `annihilator_sweep.py` | audit | the annihilator attack over the board's uncertified block-shaped entries (issue #2706) |
 | `board_bar.py` | audit | the smallest undominated d for a candidate (n, k, w), read off the board before any distance search |
 | `does_it_advance.py` | audit | mirror of the gate's novelty block: would this candidate beat the board, and on which axes, before paying for the gate |
 | `derive_provenance.py` | audit | literature-versus-discovered provenance for every entry from the isomorphism check (issue #1279) |
