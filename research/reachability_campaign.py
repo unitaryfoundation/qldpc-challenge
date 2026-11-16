@@ -95,15 +95,15 @@ def process_parent(args):
         d_ub = min(x for x in (ux, uz) if x is not None) if any(x is not None for x in (ux, uz)) else pdoc['distance']['d']
         if d_ub is None:
             d_ub = pdoc['distance']['d']
-        if (n, k, d_ub) in seen:
-            continue
-        # compute w, lc, wc
+        # compute w, lc, wc before dedup so the key includes them
         allw = [len(r.support) for r in cs.rows]
         w = max(allw) if allw else 0
         wc = 'weight-4' if w <= 4 else 'weight-6' if w <= 6 else 'weight-8' if w <= 8 else 'weight-9plus'
         pl = pdoc.get('locality')
         lc = pl['locality_class'] if (pl and pl.get('locality_class')) else 'unrestricted'
         if not lc: lc = 'unrestricted'
+        if (n, k, d_ub, w, lc, wc) in seen:
+            continue
         # checks (relabel Q to 0..n-1)
         relabel = {q: i for i, q in enumerate(sorted(cs.Q))}
         checks = cs.to_challenge_checks(relabel=relabel)
@@ -113,7 +113,7 @@ def process_parent(args):
             'parent_n': pdoc['n'], 'parent_file': ppath,
             'parent_d': pdoc['distance']['d'],
         })
-        seen.add((n, k, d_ub))
+        seen.add((n, k, d_ub, w, lc, wc))
     return {'ppath': ppath, 'parent_n': pdoc['n'], 'children': children, 'error': None}
 
 
@@ -135,14 +135,37 @@ def in_cell(e, L, W):
     if locidx(e['lc']) > locidx(L): return False
     if wstart(e['wc']) > wc_list.index(W): return False
     return True
+_LOCAL_ORDER = ['local-2d-single', 'local-2d-bilayer', 'unrestricted']
+_WEIGHT_ORDER = ['weight-4', 'weight-6', 'weight-8', 'weight-any']
+
+def _lidx(x):
+    return _LOCAL_ORDER.index(x) if x in _LOCAL_ORDER else len(_LOCAL_ORDER) - 1
+
+def _widx(x):
+    return _WEIGHT_ORDER.index(x) if x in _WEIGHT_ORDER else len(_WEIGHT_ORDER) - 1
+
 def dominated(r, universe):
-    for L in locality_members(r['lc']):
-        for W in weight_members(r['wc']):
-            for e in universe:
-                if e is r: continue
-                if not in_cell(e, L, W): continue
-                if e['n'] <= r['n'] and e['k'] >= r['k'] and e['d'] >= r['d'] and e['w'] <= r['w']:
-                    return True
+    """Canonical cell-aware domination (matches research/kit/frontier.py and the gate).
+
+    e dominates r only if e is no looser than r on both locality and weight
+    (stricter-or-equal cell membership), no worse on all four axes, and strictly
+    better on at least one. A tie on all four is not dominance.
+    """
+    for e in universe:
+        if e is r:
+            continue
+        if e.get('code_type', 'CSS') != r.get('code_type', 'CSS'):
+            continue
+        if not (_widx(e.get('wc', e.get('weight_class'))) <= _widx(r['wc'])
+                and _lidx(e.get('lc', e.get('locality_class'))) <= _lidx(r['lc'])):
+            continue
+        ew = e.get('w')
+        rw = r.get('w')
+        if ew is None or rw is None:
+            continue
+        if (e['n'] <= r['n'] and e['k'] >= r['k'] and e['d'] >= r['d'] and ew <= rw
+                and (e['n'] < r['n'] or e['k'] > r['k'] or e['d'] > r['d'] or ew < rw)):
+            return True
     return False
 def update_pareto(frontier, new_entry):
     """Add new_entry to frontier if not dominated; remove dominated entries."""
@@ -152,6 +175,18 @@ def update_pareto(frontier, new_entry):
     if not dominated(new_entry, frontier):
         frontier.append(new_entry)
         return True
+    return False
+
+def better_variant(w, lc, wc, pw, plc, pwc):
+    """Return True if (w,lc,wc) is a strictly better variant than (pw,plc,pwc)."""
+    if w != pw:
+        return w < pw
+    li, pli = _lidx(lc), _lidx(plc)
+    if li != pli:
+        return li < pli
+    wi, pwi = _widx(wc), _widx(pwc)
+    if wi != pwi:
+        return wi < pwi
     return False
 
 def checks_to_matrices(checks, n):
@@ -166,7 +201,7 @@ def checks_to_matrices(checks, n):
             HZ[i, q] = 1
     return HX, HZ
 
-def save_ckpt(idx, reachable, results, seen, pareto, css_total):
+def save_ckpt(idx, reachable, results, seen, pareto, css_total, best_variants=None):
     ck = {
         'idx': idx,
         'reachable': {str(n): [list(v) for v in vals] for n, vals in reachable.items()},
@@ -174,6 +209,7 @@ def save_ckpt(idx, reachable, results, seen, pareto, css_total):
         'seen_targets': [list(t) for t in seen],
         'pareto_frontier': pareto,
         'css_total': css_total,
+        'best_variants': [[list(bk), bv[0], bv[1], bv[2], bv[3]] for bk, bv in (best_variants or {}).items()],
     }
     tmp = CKPT + '.tmp'
     with open(tmp, 'w') as f:
@@ -225,7 +261,8 @@ def main():
     # load checkpoint
     reachable = {}  # n -> set of tuples
     results = {}
-    seen_targets = set()  # (n,k,d) tuples
+    seen_targets = set()  # (n,k,d,...) tuples
+    best_variants = {}    # (n,k,d_ub) -> (w, lc, wc, path) best staged variant
     pareto_frontier = []  # list of entry dicts
     start_idx = 0
 
@@ -238,8 +275,14 @@ def main():
             for n, vals in ck.get('results', {}).items():
                 results[int(n)] = set(tuple(v) for v in vals)
             for t in ck.get('seen_targets', []):
-                seen_targets.add(tuple(t))
+                seen_targets.add(tuple(t))  # old 3-tuples simply never match new keys
             pareto_frontier = ck.get('pareto_frontier', [])
+            for bv in ck.get('best_variants', []):
+                try:
+                    bk = tuple(bv[0])
+                    best_variants[bk] = (bv[1], bv[2], bv[3], bv[4])
+                except Exception:
+                    pass
             print('resumed: idx=%d, %d reachable n, %d results n, %d seen, %d pareto' %
                   (start_idx, len(reachable), len(results), len(seen_targets), len(pareto_frontier)), flush=True)
         except Exception as e:
@@ -265,19 +308,43 @@ def main():
         except Exception as e:
             print('pareto file load failed:', e, flush=True)
 
-    # load existing board entries for domination check
-    board_entries = []
-    for _, d in docs:
-        if d.get('code_type') != 'CSS': continue
-        checks = d['checks']
-        allc = []
-        if 'X' in checks: allc += checks['X']
-        if 'Z' in checks: allc += checks['Z']
-        w = max(len(c) for c in allc) if allc else 0
-        wc = 'weight-4' if w<=4 else 'weight-6' if w<=6 else 'weight-8' if w<=8 else 'weight-9plus'
-        lc = d.get('locality', {}).get('locality_class', 'unreachable') if d.get('locality') else 'unrestricted'
-        if not lc: lc = 'unrestricted'
-        board_entries.append({'n': d['n'], 'k': d['k'], 'd': d['distance']['d'], 'w': w, 'lc': lc, 'wc': wc})
+    # load existing board entries for domination check (via verifier computed fields)
+    sys.path.insert(0, CH + '/verify')
+    try:
+        import qldpc_verify as _V
+        board_entries = []
+        for e in _V.board_reports(os.path.join(CH, 'codes')):
+            doc, rep = e['doc'], e['report']
+            if doc is None or rep is None or doc.get('code_type') != 'CSS':
+                continue
+            comp = rep.get('computed', {})
+            checks = doc['checks']
+            allc = []
+            if 'X' in checks: allc += checks['X']
+            if 'Z' in checks: allc += checks['Z']
+            w = comp.get('max_check_weight')
+            if w is None:
+                w = max((len(c) for c in allc), default=0)
+            wc = comp.get('weight_class')
+            if not wc:
+                wc = 'weight-4' if w <= 4 else 'weight-6' if w <= 6 else 'weight-8' if w <= 8 else 'weight-9plus'
+            lc = comp.get('locality_class') or 'unrestricted'
+            if not lc:
+                lc = 'unrestricted'
+            board_entries.append({'n': doc['n'], 'k': doc['k'], 'd': doc['distance']['d'],
+                                 'w': w, 'lc': lc, 'wc': wc, 'code_type': 'CSS'})
+    except Exception:
+        board_entries = []
+        for _, d in docs:
+            if d.get('code_type') != 'CSS': continue
+            checks = d['checks']
+            allc = []
+            if 'X' in checks: allc += checks['X']
+            if 'Z' in checks: allc += checks['Z']
+            w = max(len(c) for c in allc) if allc else 0
+            wc = 'weight-4' if w<=4 else 'weight-6' if w<=6 else 'weight-8' if w<=8 else 'weight-9plus'
+            lc = 'unrestricted'
+            board_entries.append({'n': d['n'], 'k': d['k'], 'd': d['distance']['d'], 'w': w, 'lc': lc, 'wc': wc, 'code_type': 'CSS'})
 
     # checklist tracking (optional, self-contained)
     checklist_path = os.path.join(OUT_DIR, 'pareto_checklist.json')
@@ -361,8 +428,12 @@ def main():
             for child in res['children']:
                 n = child['n']; k = child['k']; d_ub = child['d_ub']
                 w = child['w']; lc = child['lc']; wc = child['wc']
-                key = (n, k, d_ub)
+                key = (n, k, d_ub, w, lc, wc)
                 if key in seen_targets:
+                    continue
+                bkey = (n, k, d_ub)
+                prev = best_variants.get(bkey)
+                if prev is not None and not better_variant(w, lc, wc, prev[0], prev[1], prev[2]):
                     continue
                 # save matrix
                 try:
@@ -381,6 +452,13 @@ def main():
                     })
                     print('SAVED: %d-%d-%d (parent n=%d) -> %s' % (n, k, d_ub, child['parent_n'], path), flush=True)
                     seen_targets.add(key)
+                    # track best variant for this (n,k,d_ub)
+                    bkey = (n, k, d_ub)
+                    prev = best_variants.get(bkey)
+                    if prev is not None and prev[3] and os.path.exists(prev[3]) and prev[3] != path:
+                        try: os.remove(prev[3])
+                        except Exception: pass
+                    best_variants[bkey] = (w, lc, wc, path)
                     missing.discard(n)
                     if has_checklist:
                         try:
@@ -402,7 +480,7 @@ def main():
                     update_pareto(pareto_frontier, entry)
 
         # checkpoint after chunk
-        save_ckpt(idx, reachable, results, seen_targets, pareto_frontier, len(css_parents_sorted))
+        save_ckpt(idx, reachable, results, seen_targets, pareto_frontier, len(css_parents_sorted), best_variants)
         write_outputs(reachable, results, pareto_frontier)
         elapsed = time.time() - t0
         rate = idx / elapsed if elapsed > 0 else 0
@@ -411,7 +489,7 @@ def main():
               (idx, total, len(seen_targets), len(pareto_frontier), len(reachable), rate*60, eta/60), flush=True)
 
     # final
-    save_ckpt(total, reachable, results, seen_targets, pareto_frontier, total)
+    save_ckpt(total, reachable, results, seen_targets, pareto_frontier, total, best_variants)
     write_outputs(reachable, results, pareto_frontier)
     print('=== DONE ===')
     print('parents processed:', total)
