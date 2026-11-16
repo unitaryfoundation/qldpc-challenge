@@ -568,10 +568,17 @@ jobs:
         # docstring says what a sample shows and what it leaves to the weekly
         # runs. The seed is the pull request's number, so every run of one
         # pull request draws the same claims and a re-run cannot re-roll a
-        # failing one; a push draws its own with its run id. A push whose
-        # `before` cannot be diffed passes no LER flag and re-measures
-        # everything, as it always did. verify/test_verify_all.py runs this
-        # script for each kind and reads the flags back.
+        # failing one; a push draws its own with its run id. Closing a pull
+        # request and opening another does draw again: the sample is a smoke
+        # test, not a lottery an author cannot enter twice. A push with no
+        # `before` to diff against (empty, or all zeros) passes no LER flag
+        # and re-measures everything, as it always did; one whose `before`
+        # is set but cannot be diffed passes the flags, and verify_all
+        # re-measures everything on its own rule. A push that is superseded
+        # while queued never runs, as was already true of the full
+        # re-measure, so the pull request's run is the one to count on.
+        # verify/test_verify_all.py runs this script for each kind and reads
+        # the flags and this step's `if:` back.
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: origin/${{ github.base_ref }}

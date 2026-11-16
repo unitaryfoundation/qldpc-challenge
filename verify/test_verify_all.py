@@ -898,7 +898,7 @@ def test_sample_adds_to_what_the_base_selects(tmp_path, monkeypatch, capsys):
     """Entries the run changed are re-measured whether or not they are drawn."""
     root = _repo(tmp_path)                            # a and b changed since main; c did not
     base = ["--root", root, "--ler-base", "main"]
-    assert _run(monkeypatch, [*base, "--ler-sample", "0"])[1] == ["a-1-1", "b-1-1"]
+    assert _run(monkeypatch, base)[1] == ["a-1-1", "b-1-1"]
     for seed in range(8):
         measured = _run(monkeypatch, [*base, "--ler-sample", "1", "--ler-seed", str(seed)])[1]
         assert {"a-1-1", "b-1-1"} <= set(measured), (seed, measured)
@@ -935,10 +935,60 @@ def test_a_sampled_claim_that_fails_fails_the_run(tmp_path, monkeypatch):
     assert run(missed) == 0
 
 
-def test_negative_ler_sample_is_refused(tmp_path, monkeypatch):
+@pytest.mark.parametrize("k", ["-1", "0"])
+def test_a_sample_of_nothing_is_refused(tmp_path, monkeypatch, k):
+    """Zero would be a flag that turns the re-measure off; leaving the flag out is not that."""
     root, _ = _claims_repo(tmp_path)
     with pytest.raises(SystemExit):
-        _run(monkeypatch, ["--root", root, "--ler-sample", "-1"])
+        _run(monkeypatch, ["--root", root, "--ler-sample", k])
+
+
+def test_an_entry_that_is_not_an_object_fails_cleanly_under_a_sample(tmp_path, monkeypatch, capsys):
+    """The draw reads every entry before the loop does, so it must not be what trips on a bad one."""
+    root, _ = _claims_repo(tmp_path)
+    _write(root, "codes/list-1-1.json", "[]")
+    _write(root, "codes/odd-1-1.json", json.dumps({"name": "odd-1-1", "circuit": "not an object"}))
+    bad = {"ok": False, "checks": [{"check": "schema_valid", "ok": False}],
+           "computed": {}, "earned_distance": {}}
+
+    def verify(doc):
+        well_formed = isinstance(doc, dict) and isinstance(doc.get("circuit", {}), dict)
+        return json.loads(json.dumps(OK_REP if well_formed else bad))
+
+    monkeypatch.setattr(QV, "verify", verify)
+    monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
+    monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
+    assert VA.main(["--root", root, "--ler-sample", "3", "--ler-seed", "1"]) == 1
+    out = capsys.readouterr().out
+    assert "FAIL  codes/list-1-1.json" in out and "FAIL  codes/odd-1-1.json" in out
+    assert "a sample of 3 of 12 claims" in out, "neither bad entry is a claim to draw"
+
+
+def test_each_kind_of_run_reaches_the_sweep_meant_for_it():
+    """The `if:` lines decide who is sampled and who re-measures everything, so pin them."""
+    steps = _workflow_steps()
+
+    def cond(name):
+        return next(ln for ln in steps[name] if ln.startswith("        if: "))[len("        if: "):]
+
+    assert set(cond(_FULL_SWEEP).split(" || ")) == {
+        "github.event_name == 'schedule'",
+        "github.event_name == 'workflow_dispatch'",
+        "(github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true')",
+        "(github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'"
+        " && steps.changes.outputs.ler_stack_changed == 'true'"
+        " && steps.verdict.outputs.cache-hit != 'true')",
+    }
+    # The complements: a push or a pull request that left the stack alone.
+    assert cond(_PUSH_SWEEP) == ("github.event_name == 'push'"
+                                 " && steps.merge.outputs.ler_stack_changed != 'true'")
+    assert cond(_PR_SWEEPS[1]) == ("github.event_name == 'pull_request'"
+                                   " && steps.changes.outputs.codes_changed != 'true'"
+                                   " && steps.changes.outputs.ler_stack_changed != 'true'"
+                                   " && steps.verdict.outputs.cache-hit != 'true'")
+    assert cond(_PR_SWEEPS[0]) == ("github.event_name == 'pull_request'"
+                                   " && steps.changes.outputs.codes_changed == 'true'"
+                                   " && steps.verdict.outputs.cache-hit != 'true'")
 
 
 def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
@@ -957,7 +1007,9 @@ def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
     assert push == ["--ler-base", "abc123", "--ler-sample", "3", "--ler-seed", "43263400509",
                     "--circuit-record", _RECORD, "--circuit-jobs", "0"], push
     # No LER flag at all means every claim: the weekly run, a manual dispatch,
-    # and a push whose `before` cannot be diffed.
+    # and a push with no `before` to diff against. (A `before` that is set
+    # but cannot be diffed gets the flags, and verify_all's own fallback:
+    # test_sample_never_narrows_a_base_that_cannot_be_diffed.)
     for env in ({"EVENT_NAME": "schedule"}, {"EVENT_NAME": "workflow_dispatch"},
                 {"EVENT_NAME": "push"}, {"EVENT_NAME": "push", "BEFORE": "0" * 40}):
         argv = _verify_all_argv(script, tmp_path, **env, **_SAMPLE_ENV)
