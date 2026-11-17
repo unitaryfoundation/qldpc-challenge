@@ -34,7 +34,7 @@ where rank depends on rows and m).
 
 The reachability campaign's bottleneck was the single-threaded save phase
 (make_submission running surrogate at 8000-20000 trials per child). Three
-changes (all in research/reachability_campaign.py, Tier 0):
+changes (all in the reachability campaign script, Tier 0):
 
 1. **Screening depth 2000** (TRIALS default, was 20000): ~10x faster saves.
    Survivors deep-confirmed at 20000+ before promotion.
@@ -75,4 +75,4 @@ Multiband: enumerate (d, rows, m, pitch) via multiband_surface.params(),
 filter by missing n / css / connected / k>=1, build with multiband_surface.build(),
 stage with make_submission (trials=500) + save_submission.
 
-Campaign: `uv run --extra research python -u research/reachability_campaign.py --resume`
+Campaign: `uv run --extra research python -u -m research.reachability_campaign --resume`
