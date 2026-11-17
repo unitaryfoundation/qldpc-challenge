@@ -2385,6 +2385,33 @@ hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/99-53-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Circuit-filling pilot: 25 first tiers from 50 entries</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>A pilot of the circuit-filling campaign: run <code>research/circuit_autogen.generate</code> on 50 CSS entries (n &lt;= 200) that had no circuit tier, stage the results, and promote the survivors. Outcome: **25 of 50 (50%) produced a verifiable first circuit tier**, all promoted as individual PRs (#6203-#6227). The other 25 hit structural limits (mechanism/file caps or no claim within the clamp).</p>
+<p>This follows the earlier Proxima-guided scheduling work (#6150): that note covered improving existing circuit tiers; this one covers donating first tiers to entries that had none.</p>
+<h4>Pilot design</h4>
+<ul>
+<li>Sample: 50 entries drawn stratified by family from the 946 eligible entries</li>
+<p>(CSS, no circuit tier, n &lt;= 200).</p>
+<li>Generator: `research/circuit_autogen.generate(doc, rounds=d, seed=0,</li>
+<p>max_candidates=2, seconds=60)`.</p>
+<li>Each candidate verified with <code>verify/circuit_verify.py</code>; survivors staged under</li>
+<p><code>research/candidates/pilot-circuit-fill/&lt;slug&gt;/</code>.</p>
+</ul>
+<h4>Results</h4>
+<p>| Outcome | Count | |---|---| | OK (verifiable first tier) | 25 | | No claim within clamp | 10 | | Mechanism cap exceeded | 10 | | Verify fail | 2 | | File cap exceeded | 1 | | Error (MemoryError) | 1 |</p>
+<p>Representative survivors: <code>21-2-6</code> (d_circ 6), <code>67-6-5</code> (5), <code>46-8-7</code> (7), <code>72-36-2</code> (2), <code>96-12-9</code> (9). Full list and PR numbers in the session log.</p>
+<h4>Cost</h4>
+<p>~4 h wall clock for 50 entries (~5 min/entry). At that rate the full 946-entry eligible pool is ~80 h, with an expected ~50% success rate before filtering.</p>
+<h4>Filter recommendation</h4>
+<p>Tighten the bulk-campaign filter to <code>n &lt;= 120</code> and <code>d &lt;= 12</code>. The pilot&#x27;s failures were dominated by high-round (&gt;= 15) and large (&gt;= 150 qubit) entries hitting the 135k-mechanism / 12 MB file caps or finding no claim within the clamp. A tighter filter should push the OK rate well above 50%.</p>
+<h4>Proxima status</h4>
+<p>The pilot used the existing <code>two-block</code> and <code>generic</code> schedule families. A Proxima-style proximity scorer (DEM-level min-weight completion, monomial permutation search for bicycle codes) is still unbuilt. The gating experiment remains a bake-off: proximity ranking vs. RIS screening on the same entries and budget. If proximity wins, invest in the port; otherwise the current families are sufficient for baseline fill.</p>
+<h4>Tools</h4>
+<ul>
+<li><code>research/circuit_autogen.py</code> (<code>generate</code>), <code>verify/circuit_verify.py</code>,</li>
+<p><code>verify/check_authorship.py</code></p>
+<li>Model: Beam 1.0</li>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-circuit-fill-pilot.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Multiband surface-code fills and campaign scalability</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Two parallel efforts: (1) a multiband dense-packed surface-code construction that fills missing n&#x27;s with weight-4, 2D-local codes, and (2) scalability improvements to the reachability campaign (gf2_fast pre-filter, parallel saves, screening-depth reduction). The multiband sweep found 73 fillable missing n&#x27;s; 56 codes were built and staged. The campaign is running with the faster code.</p>
 <h4>Multiband fills</h4>
@@ -2409,6 +2436,30 @@ hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
 <h4>Reproduction</h4>
 <p>Multiband: enumerate (d, rows, m, pitch) via multiband params(), filter by missing n / css / connected / k&gt;=1, build, stage with make_submission (trials=500) + save_submission.</p>
 <p>Campaign: uv run --extra research python -u reachability_campaign.py --resume</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-multiband-fill-and-scalability.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Proxima-guided syndrome-extraction scheduling: 33 circuit-tier improvements</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Using the scheduling ideas from *Proxima* (arXiv:2611.19715) — optimizing syndrome-extraction circuit (SEC) schedules via a DEM-level proximity surrogate — I ran <code>research/kit/circuit_search.py</code> over every committed entry whose circuit tier read <code>d_circ &lt; d</code>. That is 36 CSS entries. The search staged candidate schedules for 34 of them as individual circuit-tier PRs (replacing <code>circuits/&lt;slug&gt;/</code> and the <code>circuit</code> block, with <code>circuit.contributed_by</code> crediting <code>@mathysrennela</code>). Of those 34 PRs, <b>33 merged</b> into <code>main</code> and 1 (<code>#6145</code>, <code>64-20-8</code>) did not raise <code>d_circ</code> above the committed <code>5/5</code> tier. The remaining entry <code>52-13-5</code> did not yield a claimable improvement.</p>
+<h4>What the paper gave us</h4>
+<p>Proxima targets the circuit tier, not the code: it does not change <code>n</code>, <code>k</code>, <code>d</code>, or <code>w</code>, but it can raise <code>d_circ</code> toward <code>d</code> and lower the logical error rate by reordering the CNOTs in each syndrome-extraction round. Its key contributions used here:</p>
+<ul>
+<li>The schedule is the degree of freedom: at a fixed round count there is a</li>
+<p>large space of valid gate orderings, and a bad one drives <code>d_circ</code> well below the code distance.</p>
+<li>Validity is encoded as constraints (qubit conflict, depth, XX/ZZ</li>
+<p>consistency), which <code>research/kit/circuit_search.py</code> already enforces for its two-block and generic-sequential families.</p>
+<li>Schedules are screened cheaply at 2 rounds and then searched deeply at the</li>
+<p>full round count, exactly the ladder the existing tool runs.</p>
+</ul>
+<h4>Method</h4>
+<p>1. Enumerated committed entries with <code>d_circ &lt; d</code> (36 entries). 2. For each, ran <code>research/kit/circuit_search.py</code> (1-3 attempts, 5-15 s per basis) over the two-block interleaved and generic-sequential families. 3. Bound survivors with <code>verify/check_authorship.py</code> and submitted them as one PR per entry, gated by CI&#x27;s <code>verify/circuit_verify.py</code> check. 4. For entries where CI&#x27;s deeper DEM search found weight-4 or weight-5 undetected fault sets below the initial <code>d_circ</code> estimate (<code>#5911</code>, <code>#5925</code>, <code>#5934</code>, <code>#5970</code>, <code>#6143</code>, <code>#6144</code>), the bounds were tightened before landing; <code>#6145</code> (<code>64-20-8</code>) remained at <code>5/5</code> and did not land.</p>
+<h4>Results</h4>
+<p>33 circuit-tier improvements landed on <code>main</code>, e.g.</p>
+<p>| Slug | Before (X/Z) | After (X/Z) | |------|--------------|-------------| | 102-6-13 | 7/7 | 13/13 | | 80-8-12 | 5/5 | 12/12 | | 90-4-9 | 8/8 | 9/9 | | 88-4-13 | 7/6 | 13/13 | | 182-32-9 | 6/6 | 9/9 |</p>
+<p>Merged PRs (33): <code>#5891</code> (<code>90-4-9</code>), <code>#5900</code> (<code>80-6-12</code>), <code>#5901</code> (<code>98-26-7</code>), <code>#5903</code> (<code>54-4-10</code>), <code>#5904</code> (<code>108-10-12</code>), <code>#5906</code> (<code>90-12-12</code>), <code>#5907</code> (<code>104-6-14</code>), <code>#5909</code> (<code>108-16-12</code>), <code>#5911</code> (<code>64-21-7</code>), <code>#5912</code> (<code>62-18-7-b</code>), <code>#5914</code> (<code>96-6-13</code>), <code>#5915</code> (<code>54-12-7-b</code>), <code>#5916</code> (<code>108-8-12-b</code>), <code>#5918</code> (<code>90-10-11</code>), <code>#5919</code> (<code>53-13-6-b</code>), <code>#5921</code> (<code>84-10-12</code>), <code>#5922</code> (<code>98-6-14-b</code>), <code>#5924</code> (<code>80-8-12</code>), <code>#5925</code> (<code>62-21-6</code>), <code>#5927</code> (<code>108-8-13</code>), <code>#5928</code> (<code>98-6-14</code>), <code>#5929</code> (<code>160-36-6</code>), <code>#5931</code> (<code>168-28-10</code>), <code>#5933</code> (<code>102-6-13</code>), <code>#5934</code> (<code>63-21-7</code>), <code>#5964</code> (<code>180-36-10</code>), <code>#5968</code> (<code>60-18-6</code>), <code>#5970</code> (<code>63-20-7</code>), <code>#5972</code> (<code>88-4-13</code>), <code>#5974</code> (<code>84-40-6</code>), <code>#6143</code> (<code>42-16-6</code>), <code>#6144</code> (<code>62-20-6</code>), and <code>#6147</code> (<code>182-32-9</code>). <code>#6145</code> (<code>64-20-8</code>) did not raise <code>d_circ</code> above <code>5/5</code>, and <code>52-13-5</code> stayed at its committed bound across 3 deeper attempts.</p>
+<h4>Tools</h4>
+<ul>
+<li><code>research/kit/circuit_search.py</code>, <code>verify/circuit_verify.py</code>,</li>
+<p><code>verify/check_authorship.py</code></p>
+<li>Model: Beam 1.0</li>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-proxima-circuit-tier.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Row-permutation symmetry break (row_sort) for local_sat</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>Row-permutation symmetry break for <code>local_sat</code></h3>
 <h4>Why</h4>
 <p><code>research/local_sat.py</code> already breaks the D4 (grid isometry) and X&lt;-&gt;Z symmetries via the static <code>lex</code> lex-leader, but it does <b>not</b> quotient by permutations of the generator rows. A code&#x27;s check set is unordered, so two models that differ only by a row permutation are the same code; the solver was spending enumeration rounds rediscovering them. On small complete instances (<code>side=2, G=2, t=1</code>) this inflated the model count from 15 to 25 (40% duplicates).</p>
