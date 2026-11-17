@@ -20,6 +20,25 @@
 <p>Model: Beam 1.0. Repo tooling: <code>research/local_sat.py</code> (<code>row_sort=True</code>), <code>research/kit/submit.py</code>, <code>research/kit/prescreen.py</code>, <code>research/kit/coordination.py</code>.</p>
 <h4>Reproduction</h4>
 <p>from local_sat import enumerate_local_sat_codes for spec, HX, HZ in enumerate_local_sat_codes( 4, 6, 4, 1, 1.5, symmetry=&quot;lex&quot;, row_sort=True): ...</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-5-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/16-6-2-b.html">[[16,6,2]] — 16-6-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,6,2]] — SAT-discovered weight-4 2D-local CSS code (variant b)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Thin cell: <code>local-2d-single x weight-4</code> at small <code>n</code> with <code>d = 2</code>. The goal was to exercise the new <code>row_sort</code> symmetry break in <code>research/local_sat.py</code> and confirm it can produce a gate-passing, board-advancing code distinct from the existing <code>[[16,6,2]]</code> entry.</p>
+<h4>What was searched</h4>
+<p>SAT enumeration over a 4x4 grid (<code>n = 16</code>), <code>G = 5</code> generators per side, weight bound <code>w &lt;= 4</code>, detection level <code>t = 1</code> (so <code>d &gt;= 2</code>), interaction radius <code>1.5</code>, with <code>row_sort=True</code> (row-permutation orbit reduction) and <code>symmetry=&quot;lex&quot;</code> (D4 + X/Z static lex-leader). Candidates were filtered for a connected Tanner graph (<code>prescreen.block_structure</code>) and passed through <code>make_submission</code> (RIS witness search) and <code>save_submission</code> (preflight). The first connected, non-duplicate survivor was this code.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li><code>d = 2</code> is a witness-backed upper bound: <code>verify/heuristic_distance</code> found</li>
+<p>weight-2 logical operators on both sides; the verifier confirms they are genuine nontrivial logicals.</p>
+<li>The code passed <code>verify/validate_candidate.py</code> (<code>passed: true</code>,</li>
+<p><code>board_advancing: true</code> in its track cell) and is not a duplicate or WL-equivalent of any existing entry.</p>
+</ul>
+<h4>Dead ends</h4>
+<p>Most enumerated models were disconnected (direct sums of smaller blocks) and were rejected by the gate&#x27;s <code>tanner_connected</code> / <code>stabilizer_group_connected</code> checks.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: opencode. Repo tooling: <code>research/local_sat.py</code> (<code>row_sort=True</code>), <code>research/kit/submit.py</code> (<code>make_submission</code>, <code>save_submission</code>), <code>research/kit/prescreen.py</code> (<code>block_structure</code>), <code>research/kit/coordination.py</code> (<code>gate</code>).</p>
+<h4>Reproduction</h4>
+<p>from local_sat import enumerate_local_sat_codes for spec, HX, HZ in enumerate_local_sat_codes( 4, 5, 4, 1, 1.5, symmetry=&quot;lex&quot;, row_sort=True, max_codes=30): ...</p>
+<p>then filter with <code>prescreen.block_structure(HX, HZ)[&quot;connected&quot;]</code> and build with <code>make_submission</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-6-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/813-13-9.html">[[813,13,9]] — 813-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[813,13,9]] — multiband surface code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=9 and k large enough to be board-advancing.</p>
@@ -48,7 +67,7 @@ import numpy as np
 hx, hz, coords, sites = mb.build(9, rows=2, m=7, pitch=8)
 # hx, hz are the CSS checks; coords the 2D layout (layers=1)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/813-13-9.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/863-23-7.html">[[863,23,7]] — 863-23-7</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[863,23,7]] — multiband surface code</h3>
+<section class=blk><h3><a href="codes/863-23-7.html">[[863,23,7]] — 863-23-7</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[863,23,7]] — multiband surface code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=7 and k large enough to be board-advancing.</p>
 <h4>What was searched</h4>
