@@ -26,3 +26,10 @@ from local_sat import lex_symmetry_selftest  # noqa: E402
 def test_lex_yields_at_most_one_per_d4xz_orbit():
     stats = lex_symmetry_selftest()
     assert stats["lex_yields"] == stats["lex_group_orbits"] > 0
+
+
+def test_row_sort_yields_sorted_rows():
+    from local_sat import row_sort_symmetry_selftest
+    stats = row_sort_symmetry_selftest()
+    assert stats["unsorted"] == 0
+    assert stats["models"] > 0
