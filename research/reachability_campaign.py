@@ -22,7 +22,12 @@ Environment variables (all optional, sensible defaults):
   N_MAX         only process parents with n <= N_MAX (default: 1000)
   WORKERS       multiprocessing workers (default: 4)
   CHUNK_SIZE    parents per checkpoint (default: 25)
-  TRIALS        witness-search trials per side (default: 20000)
+  TRIALS        base witness-search trials per side (default: 20000)
+  TRIALS_PER_D  additional trials per unit of claimed d (default: 2000)
+  DEEP_RUNG_MIN_D  claimed d at which the mandatory deep rung applies (default: 20)
+  DEEP_RUNG_BASE   deep-rung base trials (default: 200000)
+  DEEP_RUNG_PER_D   deep-rung trials per unit d (default: 20000)
+  DEEP_RUNG_CAP    deep-rung budget cap (default: 2000000)
   SKIP_DOMINATED  skip parents dominated by the board (default: 0)
 
 Usage:
@@ -60,6 +65,41 @@ WORKERS = int(os.environ.get('WORKERS', '4'))
 CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
 TRIALS = int(os.environ.get('TRIALS', '20000'))
 SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '0') == '1'
+
+# --- screening budget: depth-proportional, not flat -------------------------
+# A flat per-side witness budget under-screens deep-gap claims: the ledger
+# transports (or falls back to the parent's) distance upper bound, and the
+# search's real job is to TIGHTEN that bound toward the true distance before
+# staging. Tightening work grows with the gap between the inherited bound
+# and the truth — the 2026-11-17 submission sweep measured it: 24 codes
+# earned d 1-3 lower than predicted, and 15 candidate attempts were refuted
+# outright, ALL inside the largest run (10% refutation rate), with the worst
+# gap at [[445,85,59]] (a weight-20 logical against a claimed 59). Scale the
+# per-side budget with the inherited bound and force the deep rungs for high
+# claims so overclaims die at search time instead of at the gate.
+TRIALS_PER_D = int(os.environ.get('TRIALS_PER_D', '2000'))
+DEEP_RUNG_MIN_D = int(os.environ.get('DEEP_RUNG_MIN_D', '20'))
+DEEP_RUNG_BASE = int(os.environ.get('DEEP_RUNG_BASE', '200000'))
+DEEP_RUNG_PER_D = int(os.environ.get('DEEP_RUNG_PER_D', '20000'))
+DEEP_RUNG_CAP = int(os.environ.get('DEEP_RUNG_CAP', '2000000'))
+
+
+def screening_trials(d_claim):
+    """Per-side witness-search budget for a claimed distance upper bound.
+
+    ``trials(d) = TRIALS + TRIALS_PER_D * d``, with a mandatory deep rung
+    ``DEEP_RUNG_BASE + DEEP_RUNG_PER_D * d`` for d >= DEEP_RUNG_MIN_D,
+    capped at DEEP_RUNG_CAP. The search runs its whole budget and keeps
+    the lightest operator seen (see make_submission), so a larger budget
+    only tightens; the recorded ``found_at_samples``/``survived_samples``
+    per side state exactly which budget the claim survived.
+    """
+    d = max(int(d_claim) if d_claim else 0, 1)
+    t = TRIALS + TRIALS_PER_D * d
+    if d >= DEEP_RUNG_MIN_D:
+        t = max(t, DEEP_RUNG_BASE + DEEP_RUNG_PER_D * d)
+    return min(t, DEEP_RUNG_CAP)
+
 
 sys.path.insert(0, CALCULUS)
 sys.path.insert(0, CH + '/research/kit')
@@ -112,6 +152,14 @@ def process_parent(args):
             'checks': checks,
             'parent_n': pdoc['n'], 'parent_file': ppath,
             'parent_d': pdoc['distance']['d'],
+            # depth-proportional screening budget: the loosest inherited
+            # side drives it, so a high X bound deepens the search even
+            # when the Z side is tight (the filed d is min(d_X, d_Z), but
+            # a loose side still misreports its half of the claim)
+            'screen_trials': screening_trials(max(
+                ux if ux is not None else d_ub,
+                uz if uz is not None else d_ub,
+                d_ub)),
         })
         seen.add((n, k, d_ub, w, lc, wc))
     return {'ppath': ppath, 'parent_n': pdoc['n'], 'children': children, 'error': None}
@@ -442,7 +490,8 @@ def main():
                                          name='[[%d,%d,%d]] unified' % (n, k, d_ub),
                                          construction='Unified analyze+stage from parent n=%d.' % child['parent_n'],
                                          authors=['mathysrennela'], family='code-calculus',
-                                         confidence='upper_bound', trials=TRIALS)
+                                         confidence='upper_bound',
+                                         trials=child['screen_trials'])
                     path = unique_path('%s/%d-%d-%d.json' % (stg, n, k, d_ub), doc)
                     save_submission(doc, path, spec={
                         'constructor': 'planner.plan',
