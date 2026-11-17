@@ -8157,106 +8157,98 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    22,
-    34,
-    333,
-    356,
-    375,
-    400,
-    416,
-    418,
-    436,
-    438,
-    453,
-    464,
-    465,
-    478,
-    506,
-    523,
-    540,
-    569,
-    586,
+    4,
+    10,
+    330,
+    353,
+    372,
+    397,
+    413,
+    415,
+    433,
+    435,
+    472,
+    475,
+    484,
+    503,
+    520,
+    537,
+    566,
+    583,
+    603,
     606,
     609,
-    612,
-    632,
-    655,
-    672,
-    698,
-    717,
+    629,
+    652,
+    669,
+    695,
+    714,
+    734,
     737,
-    740,
-    783,
-    803
-   ],
-   "witness_provenance": {
-    "found_by": [
-     "@dorakingx"
-    ],
-    "date": "2026-09-17",
-    "found_at_samples": 20000000,
-    "survived_samples": 20000000,
-    "tool": "Clifford witness transform",
-    "seeds": [
-     777001,
-     777138,
-     777275,
-     777412,
-     777549
-    ]
-   }
-  },
-  "Z": {
-   "value": 31,
-   "confidence": "upper_bound",
-   "witness": [
-    101,
-    164,
-    184,
-    204,
-    210,
-    224,
-    227,
-    244,
-    250,
-    256,
-    267,
-    273,
-    279,
-    304,
-    307,
-    310,
-    313,
-    316,
-    319,
-    322,
-    324,
-    345,
-    641,
-    666,
-    691,
-    709,
-    730,
-    732,
-    753,
-    774,
-    795
+    780,
+    800
    ],
    "witness_provenance": {
     "found_by": [
      "@vprusso"
     ],
-    "date": "2026-09-25",
+    "date": "2026-10-17",
     "found_at_samples": 300000000,
-    "survived_samples": 300000000,
-    "tool": "Clifford witness transform",
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     4102
+     2
+    ]
+   }
+  },
+  "Z": {
+   "value": 30,
+   "confidence": "upper_bound",
+   "witness": [
+    123,
+    186,
+    206,
+    226,
+    232,
+    246,
+    249,
+    266,
+    272,
+    289,
+    295,
+    301,
+    326,
+    329,
+    332,
+    335,
+    338,
+    341,
+    346,
+    367,
+    663,
+    688,
+    712,
+    731,
+    752,
+    754,
+    775,
+    796,
+    817,
+    836
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     2
     ]
    }
   }
@@ -8271,7 +8263,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-10-15",
-  "notes": "Recursive derivative of merged codes/920-18-31.json, not an independent construction. The original codes/924-18-31.json construction is credited to @e-eight. The merged parent reductions are credited to @dorakingx with Claude Opus 5 (Claude Code), and the codes/920-18-31.json contribution and this 21-step continuation to [[899,18,d<=31]] are credited to @DennisWayo with GPT-5 (Codex). The new chain preserves k=18, maximum check weight 8, local-2d-bilayer geometry, interaction radius 4.242640687119285, and transformed X/Z logical witnesses of weight 31 while deleting 21 additional physical qubits. Two independent CI-style fire passes used seeds 2026101501 and 2027101504. Each pass ran the structural detector, 132880 ordinary RIS trials, and 8000000 RIS-fast trials. Neither pass found a logical below weight 31; RIS-fast reached weight 31 in both passes. The combined post-reduction attack budget was 265760 ordinary RIS trials plus 16000000 RIS-fast trials. Distance remains an upper bound, not an exact claim, and literature novelty is unverified.\n\nReduction trace from [[920,18,d<=31]] to [[899,18,d<=31]]:\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [0, 465], removing source qubit 0. The row-space element used source rows [341]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [456, 459, 917], removing source qubit 459. The row-space element used source rows [466]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [20, 459, 464, 482], removing source qubit 459. The row-space element used source rows [375, 2, 357]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [0, 463], removing source qubit 0. The row-space element used source rows [341]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [20, 458, 463, 481], removing source qubit 458. The row-space element used source rows [341, 356]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [433, 436, 891, 914], removing source qubit 436. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [21, 41, 458, 476, 500], removing source qubit 476. The row-space element used source rows [387]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [20, 519], removing source qubit 20. The row-space element used source rows [360]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [19, 517], removing source qubit 19. The row-space element used source rows [342]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [19, 61, 455, 518], removing source qubit 455. The row-space element used source rows [376]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [393, 434, 824, 844, 890], removing source qubit 434. The row-space element used source rows [392]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [436, 889], removing source qubit 889. The row-space element used source rows [442]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [17, 59, 82, 491, 534], removing source qubit 17. The row-space element used source rows [392]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [408, 411, 452, 862, 885, 903], removing source qubit 411. The row-space element used source rows [423]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [448, 451, 903], removing source qubit 451. The row-space element used source rows [457]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [367, 883], removing source qubit 883. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [389, 903], removing source qubit 903. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [17, 59, 532], removing source qubit 17. The row-space element used source rows [427]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [33, 465, 487], removing source qubit 487. The row-space element used source rows [371]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [387, 430, 859, 900], removing source qubit 430. The row-space element used source rows [408]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [16, 56, 79, 485, 527], removing source qubit 16. The row-space element used source rows [408]. Distance remains a witness-backed upper bound.",
+  "notes": "Recursive derivative of merged codes/920-18-31.json, not an independent construction. The original codes/924-18-31.json construction is credited to @e-eight. The merged parent reductions are credited to @dorakingx with Claude Opus 5 (Claude Code), and the codes/920-18-31.json contribution and this 21-step continuation to [[899,18,d<=31]] are credited to @DennisWayo with GPT-5 (Codex). The new chain preserves k=18, maximum check weight 8, local-2d-bilayer geometry, interaction radius 4.242640687119285, and transformed X/Z logical witnesses of weight 31 while deleting 21 additional physical qubits. Two independent CI-style fire passes used seeds 2026101501 and 2027101504. Each pass ran the structural detector, 132880 ordinary RIS trials, and 8000000 RIS-fast trials. Neither pass found a logical below weight 31; RIS-fast reached weight 31 in both passes. The combined post-reduction attack budget was 265760 ordinary RIS trials plus 16000000 RIS-fast trials. Distance remains an upper bound, not an exact claim, and literature novelty is unverified.\n\nReduction trace from [[920,18,d<=31]] to [[899,18,d<=31]]:\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [0, 465], removing source qubit 0. The row-space element used source rows [341]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [456, 459, 917], removing source qubit 459. The row-space element used source rows [466]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [20, 459, 464, 482], removing source qubit 459. The row-space element used source rows [375, 2, 357]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [0, 463], removing source qubit 0. The row-space element used source rows [341]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [20, 458, 463, 481], removing source qubit 458. The row-space element used source rows [341, 356]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [433, 436, 891, 914], removing source qubit 436. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [21, 41, 458, 476, 500], removing source qubit 476. The row-space element used source rows [387]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [20, 519], removing source qubit 20. The row-space element used source rows [360]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [19, 517], removing source qubit 19. The row-space element used source rows [342]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [19, 61, 455, 518], removing source qubit 455. The row-space element used source rows [376]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [393, 434, 824, 844, 890], removing source qubit 434. The row-space element used source rows [392]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [436, 889], removing source qubit 889. The row-space element used source rows [442]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [17, 59, 82, 491, 534], removing source qubit 17. The row-space element used source rows [392]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [408, 411, 452, 862, 885, 903], removing source qubit 411. The row-space element used source rows [423]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [448, 451, 903], removing source qubit 451. The row-space element used source rows [457]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [367, 883], removing source qubit 883. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [389, 903], removing source qubit 903. The row-space element used source rows [443]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [17, 59, 532], removing source qubit 17. The row-space element used source rows [427]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on X-type row-space stabilizer support [33, 465, 487], removing source qubit 487. The row-space element used source rows [371]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [387, 430, 859, 900], removing source qubit 430. The row-space element used source rows [408]. Distance remains a witness-backed upper bound.\n\nDerived by a one-qubit Clifford reduction on Z-type row-space stabilizer support [16, 56, 79, 485, 527], removing source qubit 16. The row-space element used source rows [408]. Distance remains a witness-backed upper bound. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): X side 31 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2); Z side 31 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "GPT-5 (Codex)",
   "origin": "submission",
   "novelty": "new_parameters"
