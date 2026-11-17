@@ -3,7 +3,75 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/209-43-15.html">[[209,43,15]] — 209-43-15</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[209,43,15]] — distance revision of [[209,43,16]]</h3>
+<section class=blk><h3><a href="codes/813-13-9.html">[[813,13,9]] — 813-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[813,13,9]] — multiband surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=9 and k large enough to be board-advancing.</p>
+<h4>What was searched</h4>
+<p>Enumerated multiband configurations over d in {3,5,7,9,11}, rows in {2..5}, m in {2..15}, pitch in {d-1, 2*(3d//4), d+1}. For each, computed n, k (exact GF(2) rank), weight, CSS commutation, and Tanner connectivity via research/multiband_surface.py. Kept configs with n in the missing set (no existing CSS code at that n), k&gt;=1, CSS commuting, connected (no direct sum), and weight&lt;=32. Screened survivors at 500 RIS trials per side (research/kit/surrogate.lightest_logical); kept those where the surrogate found a witness at the claimed d. This config: d=9, rows=2, m=7, pitch=8 gives n=813, k=13, weight 4, connected.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound: d_X&lt;=9, d_Z&lt;=9, so d&lt;=9 (500 trials/side,</li>
+<p>seeds 0 and 1, tool research/kit/surrogate.lightest_logical).</p>
+<li>Verified by the gate (passed: true, board-advancing).</li>
+<li>2D-local, single layer; coordinates provided in the locality block.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>Lower d values (3,5,7) produced more missing-n hits but lower distance; d=11+ configs either exceeded n=1000 or failed connectivity. Weight-4 is fixed by the surface-code construction (no weight tuning available).</p>
+<h4>Tools</h4>
+<ul>
+<li>research/multiband_surface.py (build, params, connected).</li>
+<li>research/kit/submit.py (make_submission, 500-trial screening).</li>
+<li>Model: Beam 1.0.</li>
+</ul>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+import numpy as np
+hx, hz, coords, sites = mb.build(9, rows=2, m=7, pitch=8)
+# hx, hz are the CSS checks; coords the 2D layout (layers=1)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/813-13-9.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/863-23-7.html">[[863,23,7]] — 863-23-7</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[863,23,7]] — multiband surface code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=7 and k large enough to be board-advancing.</p>
+<h4>What was searched</h4>
+<p>Enumerated multiband configurations over d in {3,5,7,9,11}, rows in {2..5}, m in {2..15}, pitch in {d-1, 2*(3d//4), d+1}. For each, computed n, k (exact GF(2) rank), weight, CSS commutation, and Tanner connectivity via research/multiband_surface.py. Kept configs with n in the missing set (no existing CSS code at that n), k&gt;=1, CSS commuting, connected (no direct sum), and weight&lt;=32. Screened survivors at 500 RIS trials per side (research/kit/surrogate.lightest_logical); kept those where the surrogate found a witness at the claimed d. This config: d=7, rows=2, m=12, pitch=6 gives n=863, k=23, weight 4, connected, single layer.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound: d_X&lt;=7, d_Z&lt;=7, so d&lt;=7 (500 trials/side,</li>
+<p>seeds 0 and 1, tool research/kit/surrogate.lightest_logical).</p>
+<li>Verified by the gate (passed: true, board-advancing).</li>
+<li>2D-local, single layer; coordinates provided in the locality block.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>Lower d values (3,5) produced more missing-n hits but lower distance; d=9+ configs with n in the missing set were rarer and often failed connectivity at higher row counts. Weight-4 is fixed by the surface-code construction.</p>
+<h4>Tools</h4>
+<ul>
+<li>research/multiband_surface.py (build, params, connected).</li>
+<li>research/kit/submit.py (make_submission, 500-trial screening).</li>
+<li>Model: Beam 1.0.</li>
+</ul>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
+# hx, hz are the CSS checks; coords the 2D layout (layers=1)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/863-23-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/145-18-8.html">[[145,18,8]] — 145-18-8</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[145,18,8]] — submission</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Code submitted from the reachability campaign.</p>
+<h4>What was searched</h4>
+<p>See the candidate provenance for construction details.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound; verified by the gate.</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
+<h4>Reproduction</h4>
+<p>Code matrices in <code>codes/145-18-8.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/145-18-8.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/209-43-15.html">[[209,43,15]] — 209-43-15</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[209,43,15]] — distance revision of [[209,43,16]]</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Revision of the existing board entry <code>codes/209-43-15.json</code>: same code (identical checks), but the Z-side distance upper bound is tightened from 16 to 15 via a deeper <code>gf2_fast</code> random-information-set search. The code lands in the unrestricted / weight-9plus cell.</p>
 <h4>What was searched</h4>
@@ -29,7 +97,7 @@
 PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
 </pre>
 <p>using the H_X/H_Z in <code>codes/209-43-15.json</code> at 2_000_000 trials per side.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/209-43-15.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/33-10-2.html">[[33,10,2]] — 33-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[33,10,2]] — submission</h3>
+<section class=blk><h3><a href="codes/33-10-2.html">[[33,10,2]] — 33-10-2</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[33,10,2]] — submission</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Code submitted from the cc-d1-replace campaign.</p>
 <h4>What was searched</h4>
@@ -42,7 +110,7 @@ PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
 <p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
 <h4>Reproduction</h4>
 <p>Code matrices in <code>codes/33-10-2.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/33-10-2.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/38-17-3.html">[[38,17,3]] — 38-17-3</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[38,17,3]] — submission</h3>
+<section class=blk><h3><a href="codes/38-17-3.html">[[38,17,3]] — 38-17-3</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[38,17,3]] — submission</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Code submitted from the cc-d1-replace campaign.</p>
 <h4>What was searched</h4>
@@ -55,6 +123,19 @@ PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
 <p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
 <h4>Reproduction</h4>
 <p>Code matrices in <code>codes/38-17-3.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/38-17-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/70-48-2.html">[[70,48,2]] — 70-48-2</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[70,48,2]] — submission</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Code submitted from the cc-d1-replace campaign.</p>
+<h4>What was searched</h4>
+<p>Code-calculus transformations on d&gt;=2 parents targeting d=1 (n,k) gaps.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound; verified by the gate.</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
+<h4>Reproduction</h4>
+<p>Code matrices in <code>codes/70-48-2.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/70-48-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3>QEDist exact-distance audit of 229 board CSS entries — no mismatches</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details ><summary>note</summary><div class=notebody><p>An external exact-distance tool, QEDist v0.1 (yeon-lee/QEDist), was adapted to the challenge&#x27;s code JSON and run on 229 uncertified CSS board entries across three size/distance bands. Every entry certified as <code>EXACT_DISTANCE</code> with an exact distance equal to its claimed <code>d</code>; no inflated upper bounds and no refutations were found.</p>
 <p>Adapter: <code>research/kit/qedist.py</code> (conversion) and <code>research/qedist_audit.py</code> (CLI), with tests in <code>research/test_qedist.py</code> (PR #5819).</p>
 <p>Batches (all CSS, uncertified entries only):</p>
