@@ -1,0 +1,195 @@
+{
+  "schema_version": "0.2",
+  "name": "[[16,6,2]] SAT local 2D with row_sort (variant b)",
+  "code_type": "CSS",
+  "n": 16,
+  "k": 6,
+  "checks": {
+    "X": [
+      [
+        6,
+        9,
+        14,
+        15
+      ],
+      [
+        6,
+        8,
+        12,
+        13
+      ],
+      [
+        3,
+        6,
+        7,
+        9
+      ],
+      [
+        1,
+        5,
+        10,
+        11
+      ],
+      [
+        0,
+        2,
+        4,
+        9
+      ]
+    ],
+    "Z": [
+      [
+        5,
+        11,
+        14,
+        15
+      ],
+      [
+        5,
+        10,
+        12,
+        13
+      ],
+      [
+        3,
+        7
+      ],
+      [
+        1,
+        2,
+        4,
+        10
+      ],
+      [
+        0,
+        6,
+        8,
+        9
+      ]
+    ]
+  },
+  "distance": {
+    "d": 2,
+    "X": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        1,
+        2
+      ],
+      "witness_provenance": {
+        "found_by": [
+          "@mathysrennela"
+        ],
+        "date": "2026-11-17",
+        "found_at_samples": 500,
+        "survived_samples": 500,
+        "tool": "research/kit/surrogate.lightest_logical",
+        "seeds": [
+          0
+        ]
+      }
+    },
+    "Z": {
+      "value": 2,
+      "confidence": "upper_bound",
+      "witness": [
+        1,
+        11
+      ],
+      "witness_provenance": {
+        "found_by": [
+          "@mathysrennela"
+        ],
+        "date": "2026-11-17",
+        "found_at_samples": 500,
+        "survived_samples": 500,
+        "tool": "research/kit/surrogate.lightest_logical",
+        "seeds": [
+          1
+        ]
+      }
+    }
+  },
+  "provenance": {
+    "authors": [
+      "@mathysrennela"
+    ],
+    "construction": "SAT local 2D with row_sort",
+    "references": [],
+    "date": "2026-11-17",
+    "notes": "",
+    "model": "Beam 1.0"
+  },
+  "family": "local-sat-css",
+  "locality": {
+    "coordinates": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0
+      ],
+      [
+        2.0,
+        0.0
+      ],
+      [
+        3.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0
+      ],
+      [
+        1.0,
+        1.0
+      ],
+      [
+        2.0,
+        1.0
+      ],
+      [
+        3.0,
+        1.0
+      ],
+      [
+        0.0,
+        2.0
+      ],
+      [
+        1.0,
+        2.0
+      ],
+      [
+        2.0,
+        2.0
+      ],
+      [
+        3.0,
+        2.0
+      ],
+      [
+        0.0,
+        3.0
+      ],
+      [
+        1.0,
+        3.0
+      ],
+      [
+        2.0,
+        3.0
+      ],
+      [
+        3.0,
+        3.0
+      ]
+    ],
+    "interaction_radius": 2.8284271247461903,
+    "layers": 1
+  }
+}
