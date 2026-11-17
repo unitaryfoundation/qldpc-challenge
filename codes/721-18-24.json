@@ -6431,53 +6431,43 @@
  "distance": {
   "d": 24,
   "X": {
-   "value": 33,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": [
-    28,
-    31,
-    126,
-    144,
-    162,
-    164,
-    179,
-    293,
-    296,
-    316,
-    331,
-    334,
-    336,
-    351,
-    355,
-    369,
+    15,
+    255,
+    275,
+    291,
+    313,
+    327,
+    329,
+    348,
     392,
     406,
-    429,
+    432,
     446,
-    448,
     463,
     466,
-    505,
+    469,
+    486,
+    506,
     520,
-    541,
-    542,
-    561,
-    581,
-    598,
-    618,
-    691,
-    693
+    543,
+    560,
+    577,
+    580,
+    617,
+    634
    ],
    "witness_provenance": {
     "found_by": [
-     "@MathysRennela"
+     "@vprusso"
     ],
-    "date": "2026-10-16",
-    "found_at_samples": 1200,
-    "survived_samples": 1200,
-    "tool": "research/kit/surrogate.lightest_logical",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     3
+     1
     ]
    }
   },
@@ -6534,7 +6524,7 @@
    "arXiv:2504.09171"
   ],
   "date": "2026-10-16",
-  "notes": "",
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): X side 33 -> 24 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "origin": "submission",
   "model": "MiMo-V2.6-Flash (OpenCode agent harness)"
  },
