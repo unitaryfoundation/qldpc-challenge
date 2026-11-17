@@ -3,6 +3,19 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/155-80-1.html">[[155,80,1]] — 155-80-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[155,80,1]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 8.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=2, d_Z&lt;=1, so d&lt;=1. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/155-80-1.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/16-5-2.html">[[16,5,2]] — 16-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,5,2]] — SAT-discovered weight-4 2D-local CSS code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Thin cell: <code>local-2d-single x weight-4</code> at small <code>n</code> with <code>d = 2</code>. Follow-up to the <code>[[16,6,2]]</code> submission (PR #5838), using the same <code>row_sort</code> SAT search to find additional distinct, non-WL-equivalent codes in the same cell.</p>
@@ -39,7 +52,46 @@
 <h4>Reproduction</h4>
 <p>from local_sat import enumerate_local_sat_codes for spec, HX, HZ in enumerate_local_sat_codes( 4, 5, 4, 1, 1.5, symmetry=&quot;lex&quot;, row_sort=True, max_codes=30): ...</p>
 <p>then filter with <code>prescreen.block_structure(HX, HZ)[&quot;connected&quot;]</code> and build with <code>make_submission</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-6-2-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/273-43-1.html">[[273,43,1]] — 273-43-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[273,43,1]] — Unified analyze+stage from parent n=274.</h3>
+<section class=blk><h3><a href="codes/189-122-1.html">[[189,122,1]] — 189-122-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[189,122,1]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 17.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=1, d_Z&lt;=1, so d&lt;=1. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/189-122-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/189-29-1.html">[[189,29,1]] — 189-29-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[189,29,1]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 4.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=2, d_Z&lt;=1, so d&lt;=1. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/189-29-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/199-102-1.html">[[199,102,1]] — 199-102-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[199,102,1]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 8.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=2, d_Z&lt;=1, so d&lt;=1. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/199-102-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/273-43-1.html">[[273,43,1]] — 273-43-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[273,43,1]] — Unified analyze+stage from parent n=274.</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
