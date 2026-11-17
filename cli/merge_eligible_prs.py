@@ -25,7 +25,7 @@ from urllib.parse import quote, urlencode
 DEFAULT_REPO = "unitaryfoundation/qldpc-challenge"
 DEFAULT_BASE = "main"
 PAGE_SIZE = 100
-REQUIRED_CHECKS = ("verify", "prose")
+REQUIRED_CHECKS = ("verify", "prose", "codes-format")
 # One entry per PR. Everything the board files for an entry hangs off its slug
 # (`notes/<slug>.md`, `circuits/<slug>/`, `certs/<slug>.json`), so a PR touching
 # two records is a batch whose provenance has to be read one entry at a time.
@@ -169,7 +169,7 @@ def metadata_error(document: Any) -> str | None:
 
 
 def check_failures(runs: list[dict[str, Any]], head_sha: str) -> list[str]:
-    """Require latest verify/prose runs on this exact SHA to have succeeded."""
+    """Require the latest verify, prose, and codes-format runs on this exact SHA to have succeeded."""
     failures: list[str] = []
     for check_name in REQUIRED_CHECKS:
         matching = [run for run in runs if run.get("name") == check_name and run.get("head_sha") == head_sha]
@@ -461,7 +461,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
             "Maintainer tool: report eligible code PRs. Report-only unless --merge is "
-            "given; only current-head verify and prose successes are accepted."
+            "given; only current-head verify, prose, and codes-format successes are accepted."
         )
     )
     parser.add_argument("--repo", default=DEFAULT_REPO, help="GitHub owner/repo")

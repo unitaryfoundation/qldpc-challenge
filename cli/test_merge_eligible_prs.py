@@ -38,6 +38,14 @@ def _successful_checks(head_sha="abc123"):
             "conclusion": "success",
             "started_at": "2026-09-25T10:01:00Z",
         },
+        {
+            "id": 3,
+            "name": "codes-format",
+            "head_sha": head_sha,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T10:02:00Z",
+        },
     ]
 
 
@@ -338,6 +346,7 @@ def test_checks_require_success_on_the_current_head():
     assert failures == [
         "missing verify check on current head",
         "missing prose check on current head",
+        "missing codes-format check on current head",
     ]
 
 
