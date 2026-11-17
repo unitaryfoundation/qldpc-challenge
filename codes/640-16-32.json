@@ -5171,44 +5171,53 @@
    ]
   },
   "Z": {
-   "value": 34,
+   "value": 32,
    "confidence": "upper_bound",
    "witness": [
-    7,
-    12,
-    17,
-    25,
-    71,
+    2,
+    29,
+    49,
+    51,
+    52,
     82,
-    84,
-    92,
-    96,
-    112,
-    142,
-    169,
-    170,
-    189,
-    231,
-    262,
-    270,
-    277,
-    282,
-    296,
-    297,
-    388,
-    391,
-    394,
-    396,
-    404,
+    109,
+    120,
+    136,
+    137,
+    150,
+    151,
+    155,
+    184,
+    190,
+    201,
+    214,
+    248,
+    258,
+    283,
+    289,
+    310,
+    349,
+    408,
     417,
-    437,
-    528,
-    543,
-    556,
-    562,
-    576,
-    592
-   ]
+    453,
+    470,
+    482,
+    532,
+    603,
+    613,
+    626
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-07",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -5225,7 +5234,7 @@
    "arXiv:2610.12782"
   ],
   "novelty": "new_parameters",
-  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "notes": "New parameter set, not in arXiv:2610.12782. Found by the paper's search procedure extended from m <= 100 to 120 <= m <= 250 (pairs (G,H) with H cyclic, core free, [G:N_G(H)] in {2,3,4}), weight 6 shape |a| = 3 with B entry weights 2 1 / 1 2 or 1 2 / 2 1. Screened with QDistRnd, 10^6 rounds per side; the witness here is from this tool's own RIS search. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-11-07 (witnesses by @vprusso): Z side 34 -> 32 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "model": "human"
  },
  "family": "2bga-coset"
