@@ -1,6 +1,6 @@
 {
  "schema_version": "0.2",
- "name": "[[914,18,31]] reduction of [[922,18,31]]",
+ "name": "[[914,18,30]] reduction of [[922,18,31]]",
  "code_type": "CSS",
  "n": 914,
  "k": 18,
@@ -8262,7 +8262,7 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
    "value": 31,
    "confidence": "upper_bound",
@@ -8317,55 +8317,49 @@
    }
   },
   "Z": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    14,
-    18,
-    24,
-    27,
-    31,
-    44,
-    51,
-    54,
-    57,
-    76,
-    84,
-    104,
-    107,
-    477,
-    486,
-    489,
-    493,
-    495,
-    501,
-    505,
-    509,
-    511,
-    514,
-    516,
-    518,
-    520,
-    533,
-    536,
-    538,
-    541,
-    561
+    85,
+    148,
+    168,
+    188,
+    194,
+    208,
+    211,
+    228,
+    234,
+    240,
+    251,
+    257,
+    288,
+    291,
+    294,
+    297,
+    300,
+    303,
+    306,
+    308,
+    633,
+    658,
+    683,
+    701,
+    721,
+    723,
+    744,
+    765,
+    786,
+    828
    ],
    "witness_provenance": {
     "found_by": [
-     "@dorakingx"
+     "@vprusso"
     ],
-    "date": "2026-10-14",
-    "found_at_samples": 1000000,
-    "survived_samples": 20000000,
-    "tool": "gf2_fast RIS ladder (verify/gf2_fast.cpp), both sides searched jointly",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     991001,
-     991138,
-     991275,
-     991412,
-     991549
+     2
     ]
    }
   }
@@ -8379,7 +8373,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-10-14",
-  "notes": "Derived from codes/922-18-31.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[920,18,31]], [[921,18,31]], [[922,18,31]], [[924,18,31]], [[968,18,31]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 6.7082, against 4.24264 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "notes": "Derived from codes/922-18-31.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[920,18,31]], [[921,18,31]], [[922,18,31]], [[924,18,31]], [[968,18,31]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 6.7082, against 4.24264 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 31 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "Claude Opus 5 (Claude Code)",
   "origin": "submission",
   "novelty": "unknown"

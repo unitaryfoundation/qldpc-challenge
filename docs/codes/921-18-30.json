@@ -8335,7 +8335,7 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
    "value": 31,
    "confidence": "upper_bound",
@@ -8392,53 +8392,49 @@
    }
   },
   "Z": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    109,
-    172,
-    192,
-    212,
-    218,
-    232,
-    235,
-    252,
-    258,
-    264,
-    275,
-    281,
-    287,
-    312,
-    315,
-    318,
-    321,
-    324,
-    327,
-    330,
-    332,
-    353,
-    660,
-    685,
-    710,
-    728,
-    749,
-    751,
-    772,
-    793,
-    814
+    131,
+    194,
+    214,
+    234,
+    240,
+    254,
+    257,
+    274,
+    280,
+    297,
+    303,
+    334,
+    337,
+    340,
+    343,
+    346,
+    349,
+    354,
+    682,
+    707,
+    731,
+    746,
+    750,
+    771,
+    773,
+    794,
+    815,
+    836,
+    855,
+    878
    ],
    "witness_provenance": {
     "found_by": [
      "@vprusso"
     ],
-    "date": "2026-09-25",
+    "date": "2026-10-17",
     "found_at_samples": 300000000,
-    "survived_samples": 16078680,
-    "tool": "Clifford transform + gf2_fast RIS",
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     4102,
-     2026101118,
-     2027101121
+     2
     ]
    }
   }
@@ -8452,7 +8448,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-10-11",
-  "notes": "Derivative contribution, not an independent tile construction. The source [[922,18,d<=31]] reduction is credited to @dorakingx, the underlying [[924,18,31]] tile construction to @e-eight, the transformed weight-31 X witness to @dorakingx, and the transformed weight-31 Z witness to @vprusso. The current official verifier recomputes k=18, maximum check weight 8, bilayer locality, and interaction radius 4.242640687119285. Two independent CI-style fire passes used base seeds 2026101111 and 2027101114. Each pass ran the structural detectors, ordinary RIS, and 8000000 RIS-fast trials. Neither pass found a logical below weight 31; RIS-fast reached weight 31 in both passes. Total post-reduction RIS search: 16078680 trials. Distance remains a witness-backed upper bound, not an exact-distance claim.",
+  "notes": "Derivative contribution, not an independent tile construction. The source [[922,18,d<=31]] reduction is credited to @dorakingx, the underlying [[924,18,31]] tile construction to @e-eight, the transformed weight-31 X witness to @dorakingx, and the transformed weight-31 Z witness to @vprusso. The current official verifier recomputes k=18, maximum check weight 8, bilayer locality, and interaction radius 4.242640687119285. Two independent CI-style fire passes used base seeds 2026101111 and 2027101114. Each pass ran the structural detectors, ordinary RIS, and 8000000 RIS-fast trials. Neither pass found a logical below weight 31; RIS-fast reached weight 31 in both passes. Total post-reduction RIS search: 16078680 trials. Distance remains a witness-backed upper bound, not an exact-distance claim. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 31 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "GPT-5 (Codex)",
   "origin": "submission",
   "novelty": "new_parameters",
