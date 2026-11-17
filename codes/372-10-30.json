@@ -4153,42 +4153,51 @@
    }
   },
   "Z": {
-   "value": 32,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    18,
-    26,
-    30,
-    32,
-    36,
-    40,
-    48,
-    56,
-    64,
-    77,
-    88,
-    90,
-    200,
+    97,
+    101,
+    109,
+    134,
+    148,
+    152,
+    162,
+    166,
+    168,
+    182,
+    191,
     215,
-    223,
-    224,
+    221,
+    227,
+    236,
     239,
+    242,
+    251,
+    263,
+    266,
     269,
-    276,
-    278,
-    289,
+    272,
     293,
-    301,
-    302,
-    305,
-    328,
+    296,
+    299,
+    314,
+    317,
     329,
-    344,
-    356,
-    359,
-    362,
-    369
-   ]
+    365,
+    368
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-07",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -4205,7 +4214,7 @@
    "arXiv:2610.12782"
   ],
   "novelty": "known_parameters",
-  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 32 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The trusted gate (CI seed 752741155 and an independent run with seed 20261104) found weight 30 X-type logicals; the claim is lowered to 30 and the paper's Table II will adopt 30.",
+  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 32 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. The trusted gate (CI seed 752741155 and an independent run with seed 20261104) found weight 30 X-type logicals; the claim is lowered to 30 and the paper's Table II will adopt 30. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-11-07 (witnesses by @vprusso): Z side 32 -> 30 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "model": "human"
  },
  "family": "2bga-coset"
