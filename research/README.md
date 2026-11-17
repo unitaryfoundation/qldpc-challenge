@@ -52,6 +52,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `board_bar.py` | audit | the smallest undominated d for a candidate (n, k, w), read off the board before any distance search |
 | `does_it_advance.py` | audit | mirror of the gate's novelty block: would this candidate beat the board, and on which axes, before paying for the gate |
 | `derive_provenance.py` | audit | literature-versus-discovered provenance for every entry from the isomorphism check (issue #1279) |
+| `reachability_campaign.py` | canonical | unified reachability campaign driver: enumerates parents, runs the distance ladder, and stages candidates (issue #5822) |
 | `arxiv_watch.py` | audit | arXiv triage for papers that may carry a board-relevant code; claims, never distances |
 | `circuit_autogen.py` | canonical | memory-circuit generation behind `qldpc submit` (issue #1848); flagged schedules (Johnson-coil and span flags) and the invariant two-block decomposition of the issue #4231 sweep |
 | `circuit_backfill.py` | canonical | the same circuit path over board entries that have no circuit tier (issue #1026) |
