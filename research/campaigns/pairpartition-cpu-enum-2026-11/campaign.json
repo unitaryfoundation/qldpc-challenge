@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 2000,
+      "cpu_hours": 250
+    },
+    "constraints": {
+      "max_check_weight": 9,
+      "n": [
+        60,
+        600
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "pivot to fresh constructions if transforms yield only d<=4 among first 100",
+        "trials_cap": 2000000
+      },
+      "bar": {
+        "axes": [
+          "d",
+          "kd2_over_n"
+        ],
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 250,
+        "trials_per_candidate": 2000000
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A durable staged survivor list that the GPU pass resolves, replacing the 13 lost survivors.",
+      "family": "other",
+      "feasibility": "Camp 2 enumerated 1101 constructions in 34 CPU-hr; 2M-trial screen settles survivors.",
+      "hypothesis": "Fresh irregular pair-partition / non-abelian LP constructions screen to d>=7 at n<=600 and survive to GPU resolution.",
+      "novelty": {
+        "against": "high-rate-witness-gpu-2026-11-15 partial run",
+        "claim": "irregular-template pair-partition instances and non-abelian LP survivors staged for GPU witness"
+      },
+      "what_a_negative_would_teach": "That code-calculus moves raise k and lower w but do not create distance at high rate."
+    },
+    "id": "pairpartition-cpu-enum-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "seeds": [
+          11,
+          12
+        ],
+        "trials_per_candidate": 2000000
+      }
+    },
+    "name": "Pair-partition / Pauli-CPM CPU enumeration (n<=600)",
+    "notes": "CPU half only; GPU resolution is a separate pass. Feeds high-rate-witness-gpu-2026-11-15.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

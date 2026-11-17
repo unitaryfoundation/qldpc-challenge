@@ -1,0 +1,66 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 100,
+      "cpu_hours": 400
+    },
+    "constraints": {
+      "locality": "local-2d-single",
+      "max_check_weight": 8,
+      "n": [
+        1,
+        200
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "stop a rung when RAM binds; not a distance ladder",
+        "trials_cap": 1
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "slug": "16-6-2"
+      },
+      "budget": {
+        "cpu_hours": 400,
+        "trials_per_candidate": 1
+      },
+      "cell": "local-2d-single~weight-8",
+      "expected_value": "A committed wallmap.json that prevents re-probing unspecified walls.",
+      "family": "other",
+      "feasibility": "local_sat.py is exact SAT; RAM binds before cores, so workers are memory-capped.",
+      "hypothesis": "Completing t=2 and selectively probing t=3 yields a precise, reproducible wall map for 2D-local SAT.",
+      "novelty": {
+        "against": "sat-2dlocal-t2plus wall claim",
+        "claim": "a specified wall (grid, G, weight, t, radius, solver, budget) instead of an unspecified one"
+      },
+      "what_a_negative_would_teach": "That the t=3 walls are fundamental to this solver/construction, not parameter accidents."
+    },
+    "id": "sat-2dlocal-wallmap-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "generators": [
+        "research/local_sat.py",
+        "research/sat_rungs.py"
+      ]
+    },
+    "name": "2D-local SAT wall map (t=2 completion + t=3 selective)",
+    "notes": "CPU-only. Exact SAT; no GPU.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

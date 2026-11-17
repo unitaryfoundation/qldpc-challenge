@@ -1,0 +1,64 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 500,
+      "cpu_hours": 100
+    },
+    "constraints": {
+      "n": [
+        1,
+        200
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "not a search; run until backlog exhausted or budget spent",
+        "trials_cap": 1
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 100,
+        "trials_per_candidate": 1
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A more evidence-complete board for Campaigns 3/4 to measure against.",
+      "family": "other",
+      "feasibility": "circuit_backfill.py and qedist_audit.py are deterministic CPU work.",
+      "hypothesis": "Backfilling circuits and QEDist-certifying small entries tightens the board's evidence base.",
+      "novelty": {
+        "against": "board entries lacking circuit tier or certs",
+        "claim": "circuit artifacts and exact-distance cert evidence for small entries"
+      },
+      "what_a_negative_would_teach": "That the missing artifacts are not recoverable from the committed matrices."
+    },
+    "id": "circuit-backfill-and-certs-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "generators": [
+        "research/circuit_backfill.py",
+        "research/qedist_audit.py"
+      ]
+    },
+    "name": "Circuit-tier backfill and small exact-distance certs",
+    "notes": "CPU-only. No new codes.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
