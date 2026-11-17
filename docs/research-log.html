@@ -3,6 +3,19 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/131-53-1.html">[[131,53,1]] — 131-53-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[131,53,1]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 7.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=1, d_Z&lt;=1, so d&lt;=1. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/131-53-1.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/155-62-1.html">[[155,62,1]] — 155-62-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[155,62,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -29,7 +42,7 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/155-80-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/16-5-2.html">[[16,5,2]] — 16-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,5,2]] — SAT-discovered weight-4 2D-local CSS code</h3>
+<section class=blk><h3><a href="codes/16-5-2.html">[[16,5,2]] — 16-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[16,5,2]] — SAT-discovered weight-4 2D-local CSS code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Thin cell: <code>local-2d-single x weight-4</code> at small <code>n</code> with <code>d = 2</code>. Follow-up to the <code>[[16,6,2]]</code> submission (PR #5838), using the same <code>row_sort</code> SAT search to find additional distinct, non-WL-equivalent codes in the same cell.</p>
 <h4>What was searched</h4>
@@ -365,6 +378,21 @@ hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
 <h4>Reproduction</h4>
 <p>Multiband: enumerate (d, rows, m, pitch) via multiband params(), filter by missing n / css / connected / k&gt;=1, build, stage with make_submission (trials=500) + save_submission.</p>
 <p>Campaign: uv run --extra research python -u reachability_campaign.py --resume</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-multiband-fill-and-scalability.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Row-permutation symmetry break (row_sort) for local_sat</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>Row-permutation symmetry break for <code>local_sat</code></h3>
+<h4>Why</h4>
+<p><code>research/local_sat.py</code> already breaks the D4 (grid isometry) and X&lt;-&gt;Z symmetries via the static <code>lex</code> lex-leader, but it does <b>not</b> quotient by permutations of the generator rows. A code&#x27;s check set is unordered, so two models that differ only by a row permutation are the same code; the solver was spending enumeration rounds rediscovering them. On small complete instances (<code>side=2, G=2, t=1</code>) this inflated the model count from 15 to 25 (40% duplicates).</p>
+<h4>What was added</h4>
+<ul>
+<li><code>row_sort=False</code> parameter on <code>build_local_cnf</code> and</li>
+<p><code>enumerate_local_sat_codes</code>, plus <code>add_row_sort_clauses(cnf, emit)</code> which enforces, for each side, that adjacent generator rows are lexicographically non-decreasing in their incidence vector. Cost is O(n) aux vars per adjacent row pair per side.</p>
+<li><code>--row-sort</code> flag on <code>research/sat_rungs.py</code>.</li>
+<li><code>row_sort_symmetry_selftest()</code> and a regression test in</li>
+<p><code>research/test_local_sat.py</code>.</p>
+</ul>
+<h4>Soundness fix</h4>
+<p>An initial version used the existing *superset* blocking scheme (<code>[-v for v in incidence_vars if v in model]</code>), which blocks any model whose incidence support contains a found model&#x27;s. Combined with row_sort&#x27;s changed discovery order this dropped 3 valid orbits. Switching to *exact* incidence blocking when <code>row_sort=True</code> (block only the exact incidence pattern) restored completeness: 0 missing orbits, 17 distinct orbits vs 13 without row_sort.</p>
+<h4>What it achieved</h4>
+<p>A bounded search (<code>side=4, G=5, t=1, row_sort=True</code>) produced a connected, non-duplicate, board-advancing code <code>[[16,6,2]]</code> (local-2d-single x weight-4, <code>passed: true</code>, <code>board_advancing: true</code>), submitted as PR #5838. The optimization is opt-in (<code>row_sort=False</code> default) and does not change default behavior.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-row-sort-symmetry-break.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/145-18-8.html">[[145,18,8]] — 145-18-8</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[145,18,8]] — submission</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Code submitted from the reachability campaign.</p>

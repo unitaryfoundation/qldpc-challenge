@@ -1,28 +1,28 @@
 {
-  "verified_codes": 3488,
-  "css_codes": 3231,
+  "verified_codes": 3489,
+  "css_codes": 3232,
   "stabilizer_codes": 257,
   "certified_exact": 1644,
   "tracks": 12,
   "best_kd2_over_n": 1456.85,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
+    "literature": 490,
     "parameters_only": 395,
     "no_match": 2032,
-    "not_derived": 314,
-    "literature": 490,
+    "not_derived": 315,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2654,
+    "unknown": 2655,
     "known_parameters": 759,
     "new_parameters": 75
   },
   "novelty_audited": 834,
   "board_screen": {
     "distinct": 2493,
-    "not_screened": 701,
+    "not_screened": 702,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -30,9 +30,9 @@
   },
   "family_concentration": {
     "global": {
-      "records": 1637,
+      "records": 1638,
       "families": 15,
-      "untagged": 384,
+      "untagged": 385,
       "untagged_share": 0.235,
       "top": [
         {
@@ -382,10 +382,10 @@
         "moved": false
       },
       "unrestricted~weight-8": {
-        "records": 1108,
+        "records": 1109,
         "families": 14,
-        "untagged": 226,
-        "untagged_share": 0.204,
+        "untagged": 227,
+        "untagged_share": 0.205,
         "top": [
           {
             "family": "generalized-bicycle",
@@ -401,7 +401,7 @@
         "top1_share": 0.303,
         "top2_share": 0.432,
         "hhi": 0.13,
-        "members": 2294,
+        "members": 2295,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -415,9 +415,9 @@
         "moved": false
       },
       "unrestricted~weight-any": {
-        "records": 1637,
+        "records": 1638,
         "families": 15,
-        "untagged": 384,
+        "untagged": 385,
         "untagged_share": 0.235,
         "top": [
           {
@@ -434,7 +434,7 @@
         "top1_share": 0.352,
         "top2_share": 0.465,
         "hhi": 0.149,
-        "members": 3231,
+        "members": 3232,
         "leader": {
           "slug": "674-170-76-b",
           "family": "generalized-bicycle",
