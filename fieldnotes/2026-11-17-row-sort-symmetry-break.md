@@ -5,15 +5,14 @@ author: "@mathysrennela"
 model: "Beam 1.0"
 topics: [sat, 2d-local, symmetry-breaking, scalability]
 related:
-  - research/local_sat.py
-  - research/sat_rungs.py
+  - local_sat.py, sat_rungs.py (research/, PR #5839)
 ---
 
 # Row-permutation symmetry break for `local_sat`
 
 ## Why
 
-`research/local_sat.py` already breaks the D4 (grid isometry) and X<->Z
+`local_sat.py` (research/, PR #5839) already breaks the D4 (grid isometry) and X<->Z
 symmetries via the static `lex` lex-leader, but it does **not** quotient by
 permutations of the generator rows. A code's check set is unordered, so two
 models that differ only by a row permutation are the same code; the solver
@@ -28,9 +27,9 @@ instances (`side=2, G=2, t=1`) this inflated the model count from 15 to 25
   enforces, for each side, that adjacent generator rows are lexicographically
   non-decreasing in their incidence vector. Cost is O(n) aux vars per
   adjacent row pair per side.
-- `--row-sort` flag on `research/sat_rungs.py`.
+- `--row-sort` flag on `sat_rungs.py` (research/, PR #5839).
 - `row_sort_symmetry_selftest()` and a regression test in
-  `research/test_local_sat.py`.
+  `test_local_sat.py` (research/, PR #5839).
 
 ## Soundness fix
 
