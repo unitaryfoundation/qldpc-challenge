@@ -3,6 +3,23 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/16-5-2.html">[[16,5,2]] — 16-5-2</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[16,5,2]] — SAT-discovered weight-4 2D-local CSS code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Thin cell: <code>local-2d-single x weight-4</code> at small <code>n</code> with <code>d = 2</code>. Follow-up to the <code>[[16,6,2]]</code> submission (PR #5838), using the same <code>row_sort</code> SAT search to find additional distinct, non-WL-equivalent codes in the same cell.</p>
+<h4>What was searched</h4>
+<p>SAT enumeration with <code>research/local_sat.py</code> (<code>row_sort=True</code>, <code>symmetry=&quot;lex&quot;</code>) over a 4x4 grid, weight bound <code>w &lt;= 4</code>, detection level <code>t = 1</code>. Candidates were filtered for a connected Tanner graph (<code>prescreen.block_structure</code>) and passed through <code>make_submission</code> / <code>save_submission</code>.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li><code>d = 2</code> is a witness-backed upper bound (weight-2 logicals on both sides).</li>
+<li>The code passed <code>verify/validate_candidate.py</code> (<code>passed: true</code>,</li>
+<p><code>board_advancing: true</code>) and is not a duplicate or WL-equivalent of any existing entry.</p>
+</ul>
+<h4>Caveat</h4>
+<p>This entry is board-advancing as of the current main, but would become dominated by <code>[[16,6,2]]</code> (PR #5838) on <code>k</code> if that PR merges first.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Repo tooling: <code>research/local_sat.py</code> (<code>row_sort=True</code>), <code>research/kit/submit.py</code>, <code>research/kit/prescreen.py</code>, <code>research/kit/coordination.py</code>.</p>
+<h4>Reproduction</h4>
+<p>from local_sat import enumerate_local_sat_codes for spec, HX, HZ in enumerate_local_sat_codes( 4, 6, 4, 1, 1.5, symmetry=&quot;lex&quot;, row_sort=True): ...</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-5-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/813-13-9.html">[[813,13,9]] — 813-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[813,13,9]] — multiband surface code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=9 and k large enough to be board-advancing.</p>
@@ -58,7 +75,7 @@ import multiband_surface as mb
 hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
 # hx, hz are the CSS checks; coords the 2D layout (layers=1)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/863-23-7.md">raw markdown</a></div></details></section>
-<section class=blk><h3>Multiband surface-code fills and campaign scalability</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<section class=blk><h3>Multiband surface-code fills and campaign scalability</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Two parallel efforts: (1) a multiband dense-packed surface-code construction that fills missing n&#x27;s with weight-4, 2D-local codes, and (2) scalability improvements to the reachability campaign (gf2_fast pre-filter, parallel saves, screening-depth reduction). The multiband sweep found 73 fillable missing n&#x27;s; 56 codes were built and staged. The campaign is running with the faster code.</p>
 <h4>Multiband fills</h4>
 <p>the multiband module implements the (rows, m, pitch) packing from arXiv:2511.06758 (Fujiu et al.). Enumerating d in {3,5,7,9,11}, rows in {2..5}, m in {2..15}, pitch in {d-1, 2*(3d//4), d+1} found 73 missing n&#x27;s fillable with weight-4, connected, 2D-local codes (d=3 to 13). 56 were built and staged (trials=500, surrogate screening). These satisfy the weight cap (&lt;=32 standard, &lt;=8 for n&gt;700) that blocked the earlier parity-check fills.</p>
@@ -160,6 +177,40 @@ PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
 <p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
 <h4>Reproduction</h4>
 <p>Code matrices in <code>codes/70-48-2.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/70-48-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Reachability campaign session: distance revisions, failed fills, and re-gating</h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>A session on the reachability campaign and surrounding tooling. The campaign itself (research/reachability_campaign.py) is healthy and progressing (idx 1450/3235, ~8.4 parents/min, ETA ~3.5h at session end). The highest-value outputs were two distance revisions found by re-running the gf2_fast ladder on existing board entries, plus a clear (negative) result on cheap d&gt;=2 fills.</p>
+<h4>What worked</h4>
+<h5>Distance revisions (2 PRs)</h5>
+<p>Re-running <code>verify/gf2_fast.distance_rand_witness</code> at 20k -&gt; 200k -&gt; 2M RIS trials on two reachability-campaign children collapsed their Z-side bounds:</p>
+<ul>
+<li><code>[[209,43,16]]</code> -&gt; <code>[[209,43,15]]</code> (found weight-15 at 200k; 2M confirmed)</li>
+<li><code>[[287,34,34]]</code> -&gt; <code>[[287,34,30]]</code> (found weight-30 only at 2M)</li>
+</ul>
+<p>Both are same-checks revisions of existing entries, submitted as PRs #5824 and #5825. The X sides did not improve (22 and 37 respectively).</p>
+<h5>Passing d&gt;=2 submissions (4 PRs)</h5>
+<p>After regenerating refuted candidates from their checks (make_submission) and re-gating, only 4 codes passed the gate as board-advancing d&gt;=2:</p>
+<ul>
+<li><code>[[145,18,8]]</code> (reachability) — PR #5827</li>
+<li><code>[[33,10,2]]</code>, <code>[[38,17,3]]</code>, <code>[[70,48,2]]</code> (cc-d1-replace) — PRs #5828-5830</li>
+</ul>
+<h4>What did not work (and why)</h4>
+<h5>Cheap d&gt;=2 fills for missing n&#x27;s</h5>
+<p>All 352 missing n&#x27;s are &gt;=86. The parity-check construction <code>[[n,n-2,2]]</code> has check weight n, and the 7-cycle construction has weight ~0.57n. The verifier caps max check weight at 32 (standard) / 8 (n&gt;700). Every candidate was rejected by preflight (<code>schema_valid (weight)</code>). <b>0 of 350 fills succeeded.</b> Filling missing n&#x27;s requires a bounded-weight (&lt;=32) d&gt;=2 search, not a one-line construction.</p>
+<h5>Code-calculus reductions as d&gt;=2 producers</h5>
+<p><code>cc_find_miss2.py</code> (C-DELETE-CHECK / E-PEEL / E-PUNCTURE on d&gt;=2 parents) produced 256 candidates, but the gate refuted all of them to d=1 (0 passed as d&gt;=2). The reductions remove structure and lower distance. They are useful for d=1 gap-fillers, not d&gt;=2.</p>
+<h5>C-ADD-CHECK lifting d=1 -&gt; d&gt;=2</h5>
+<p>Enumerated all admissible added checks (max_weight 4, then 8) on 56 small d=1 codes: 16,812+ checks, 0 survivors. A single added check almost never eliminates every weight-1 logical.</p>
+<h4>Re-gating matters</h4>
+<p>The board grew (2 revisions) between the first gating pass and the re-gate. 58 of 95 &quot;ready&quot; candidates were reclassified as dominated. Always re-gate before promoting; stale verdicts overstate board-advancing status.</p>
+<h4>Tools used</h4>
+<ul>
+<li><code>verify/gf2_fast</code> (distance_rand_witness) for the ladder.</li>
+<li><code>research/kit/coordination.py gate</code> for verdicts.</li>
+<li><code>research/kit/submit.py</code> (--reuse-witnesses, --fast-trials 200000).</li>
+<li><code>verify/check_prose.py</code>, <code>verify/prepush_prose_check.sh</code>.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Campaign: <code>uv run --extra research python -u research/reachability_campaign.py --resume</code> Ladder: <code>PYTHONPATH=verify python -c &quot;import gf2_fast; ...&quot;</code> at 20k/200k/2M trials. Gating: <code>uv run --extra research python research/kit/coordination.py gate &lt;candidate&gt;</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-16-reachability-session.md">raw markdown</a></div></details></section>
 <section class=blk><h3>QEDist exact-distance audit of 229 board CSS entries — no mismatches</h3><div class=kv style="color:var(--mut)">2026-11-15 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam Free</div><details ><summary>note</summary><div class=notebody><p>An external exact-distance tool, QEDist v0.1 (yeon-lee/QEDist), was adapted to the challenge&#x27;s code JSON and run on 229 uncertified CSS board entries across three size/distance bands. Every entry certified as <code>EXACT_DISTANCE</code> with an exact distance equal to its claimed <code>d</code>; no inflated upper bounds and no refutations were found.</p>
 <p>Adapter: <code>research/kit/qedist.py</code> (conversion) and <code>research/qedist_audit.py</code> (CLI), with tests in <code>research/test_qedist.py</code> (PR #5819).</p>
 <p>Batches (all CSS, uncertified entries only):</p>
