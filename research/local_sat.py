@@ -764,7 +764,10 @@ def enumerate_local_sat_codes(
             anchors_z = [
                 next(i for i in range(n) if az[(g, i)] in model) for g in range(G)
             ]
-            block = [-v for v in incidence_vars if v in model]
+            if row_sort:
+                block = [(-v if v in model else v) for v in incidence_vars]
+            else:
+                block = [-v for v in incidence_vars if v in model]
 
             if symmetry == "orbit":
                 # yield only the canonical representative of each orbit
