@@ -130,6 +130,35 @@
 <h4>Reproduction</h4>
 <p>from local_sat import enumerate_local_sat_codes for spec, HX, HZ in enumerate_local_sat_codes( 4, 5, 4, 1, 1.5, symmetry=&quot;lex&quot;, row_sort=True, max_codes=30): ...</p>
 <p>then filter with <code>prescreen.block_structure(HX, HZ)[&quot;connected&quot;]</code> and build with <code>make_submission</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/16-6-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/169-49-3.html">[[169,49,3]] — 169-49-3</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[169,49,3]] octahedron-graph incidence hypergraph product</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>unrestricted / weight-6</code> frontier at <code>d = 3</code> using <code>research/kit/products.py</code> (<code>products.hypergraph_product(H1, H2)</code>). For a connected <code>Delta</code>-regular graph <code>G = (V, E)</code> of girth <code>g</code>, dropping 1 redundant vertex row from the <code>|V| x |E|</code> vertex-edge incidence matrix yields a full-row-rank <code>(|V|-1) x |E|</code> parity-check matrix <code>H</code> with row weight <code>Delta</code>, column weight <code>&lt;= 2</code>, cycle-space dimension <code>k_1 = |E| - |V| + 1</code>, and classical distance <code>d_1 = g</code>. Its symmetric hypergraph product has check weight <code>w = Delta + 2</code>, <code>n = |E|^2 + (|V|-1)^2</code>, <code>k = (|E| - |V| + 1)^2</code>, and distance <code>d = g</code> by Tillich-Zemor Theorem 1 (arXiv:0903.0566).</p>
+<h4>What was searched</h4>
+<p>Screened symmetric and asymmetric hypergraph products of full and row-reduced vertex-edge incidence matrices of regular graphs (<code>K_4</code>, <code>K_5</code>, octahedron <code>K_{2,2,2}</code>, <code>K_{3,3}</code>, <code>K_{4,4}</code>, Petersen, Heawood) with <code>Delta &lt;= 4</code> (`w &lt;= 6<code>). For the 4-regular octahedron graph </code>K_{2,2,2}` (6 vertices, 12 edges, girth 3), the <code>5 x 12</code> full-row-rank incidence matrix gives <code>[[169,49,3]]</code> at check weight <code>w = 6</code> (<code>kd^2/n = 2.609</code>), saving 11 physical qubits over the unreduced <code>6 x 12</code> incidence product <code>[[180,50,3]]</code>.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 3 | | 200,000 (fast RIS seed 101) | 3 | | 200,000 (fast RIS seed 102) | 3 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 3 (upper_bound), Z: d &lt;= 3 (upper_bound).</p>
+<p>Distance <code>d = 3</code> follows from Tillich-Zemor Theorem 1 (cycle-space girth 3 of <code>K_{2,2,2}</code>) and was independently checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 3 on both sides in 0.05 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>The unreduced <code>6 x 12</code> incidence matrix of <code>K_{2,2,2}</code> gives <code>[[180,50,3]]</code></li>
+<p>(<code>kd^2/n = 2.500</code>), which does not beat <code>codes/175-44-3.json</code> on <code>n</code>.</p>
+<li>Symmetric HGP of <code>K_5</code> (<code>[[116,36,3]]</code>) and <code>K_{4,4}</code> (<code>[[305,81,4]]</code>) are</li>
+<p>already dominated by existing board entries.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/kit/products.py</code>, <code>research/kit/rebuild.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Reproducible via <code>./qldpc reproduce 169-49-3 --construction</code> (<code>repro/169-49-3.json</code>), or directly:</p>
+<pre>
+import sys, numpy as np; sys.path.insert(0, &#x27;research/kit&#x27;)
+from products import hypergraph_product
+edges = [(u, v) for u in range(6) for v in range(u+1, 6) if u + v != 5]
+H = np.zeros((6, len(edges)), dtype=np.int8)
+for j, (u, v) in enumerate(edges): H[u, j] = H[v, j] = 1
+hx, hz = hypergraph_product(H[:-1], H[:-1])
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/169-49-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/189-122-1.html">[[189,122,1]] — 189-122-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[189,122,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -364,6 +393,33 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/243-12-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/250-100-3.html">[[250,100,3]] — 250-100-3</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[250,100,3]] K6 incidence hypergraph product</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>unrestricted / weight-8</code> frontier at <code>d = 3, k = 100</code> using <code>research/kit/products.py</code> (<code>products.hypergraph_product(H1, H2)</code>). For the 5-regular complete graph <code>K_6</code> (6 vertices, 15 edges, girth 3), dropping 1 redundant vertex row from the <code>6 x 15</code> vertex-edge incidence matrix yields a full-row-rank <code>5 x 15</code> matrix <code>H</code> (<code>k_1 = 10, d_1 = 3</code>, row weight 5, column weight <code>&lt;= 2</code>), whose symmetric hypergraph product has <code>n = 15^2 + 5^2 = 250</code>, <code>k = 10^2 = 100</code>, <code>d = 3</code>, and max check weight <code>w = 5 + 2 = 7</code>.</p>
+<h4>What was searched</h4>
+<p>Screened symmetric and asymmetric hypergraph products of regular-graph incidence matrices with <code>Delta in {5, 6}</code> (<code>w in {7, 8}</code>) across <code>K_6</code>, <code>K_7</code>, <code>K_{4,5}</code>, <code>K_{5,5}</code>, <code>K_{5,6}</code>, and <code>K_{6,6}</code>. For <code>K_6 x K_6</code> with 1 redundant vertex row dropped per factor, <code>products.hypergraph_product</code> produces <code>[[250,100,3]]</code> (<code>kd^2/n = 3.600</code>, max check weight 7).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 3 | | 200,000 (fast RIS seed 101) | 3 | | 200,000 (fast RIS seed 102) | 3 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 3 (upper_bound), Z: d &lt;= 3 (upper_bound).</p>
+<p>Distance <code>d = 3</code> follows from Tillich-Zemor Theorem 1 (cycle-space girth 3 of <code>K_6</code>) and was independently checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 3 on both sides in 0.10 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>The unreduced <code>6 x 15</code> incidence matrix of <code>K_6</code> gives <code>[[261,101,3]]</code></li>
+<p>(<code>kd^2/n = 3.483</code>), paying 11 extra physical qubits for 1 logical qubit.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/kit/products.py</code>, <code>research/kit/rebuild.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Reproducible via <code>./qldpc reproduce 250-100-3 --construction</code> (<code>repro/250-100-3.json</code>), or directly:</p>
+<pre>
+import sys, itertools, numpy as np; sys.path.insert(0, &#x27;research/kit&#x27;)
+from products import hypergraph_product
+edges = list(itertools.combinations(range(6), 2))
+H = np.zeros((6, len(edges)), dtype=np.int8)
+for j, (u, v) in enumerate(edges): H[u, j] = H[v, j] = 1
+hx, hz = hypergraph_product(H[:-1], H[:-1])
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/250-100-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/251-128-1.html">[[251,128,1]] — 251-128-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[251,128,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1066,6 +1122,30 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/359-155-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/360-25-4.html">[[360,25,4]] — 360-25-4</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[360,25,4]] even-d multiband dense-packed surface code (d=4, rows=3, m=13, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>local-2d-single / weight-4</code> frontier at <code>d = 4, k = 25</code> via the even-<code>d</code> (<code>rows = 3, pitch = d - 2</code>) regime of <code>research/multiband_surface.py</code> (Open Problem 4 of <code>fieldnotes/2026-09-01-multiband-dense-packing-method.md</code>). Because the even-<code>d</code> law <code>n(4, m) = 28m - 4, k = 2m - 1</code> saves <code>10m - 8</code> qubits relative to punctured <code>d = 5</code> two-band codes (<code>38m - 14</code>), the qubit savings grow linearly with <code>m</code>.</p>
+<h4>What was searched</h4>
+<p>Evaluated the <code>d = 4, rows = 3, pitch = 2</code> ladder across <code>m in {2..33}</code> in <code>research/multiband_surface.py</code> and compared against the verified board in <code>local-2d-single / weight-4</code>. At <code>m = 13</code>, the construction yields <code>[[360,25,4]]</code> (<code>kd^2/n = 1.111</code>, max check weight 4, single-layer 2D coordinates).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 4 | | 200,000 (fast RIS seed 101) | 4 | | 200,000 (fast RIS seed 102) | 4 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 4 (upper_bound), Z: d &lt;= 4 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 4 on both sides in 0.19 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>At <code>d = 4, rows = 3, pitch = 2</code>, rungs <code>m = 21..26</code> (`n = 584..724, k =</li>
+<p>41..51<code>) are dominated by </code>codes/565-51-4.json`.</p>
+<li>Even pitches <code>pitch &gt;= 4</code> at <code>d = 4</code> collapse below distance 4.</li>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(4, rows=3, m=13, pitch=2, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/360-25-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/366-19-4.html">[[366,19,4]] — 366-19-4</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[366,19,4]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1313,6 +1393,35 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/383-199-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/384-96-15.html">[[384,96,15]] — 384-96-15</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[384,96,15]] — GF(4) pair-partition code at even lift P = 24</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: <code>weight-9plus</code> x <code>unrestricted</code> (CSS), at rate <code>k/n = 1/4</code> (<code>n = 16P</code>, <code>k = 4P</code>, <code>w = 10</code>). Inspired by arXiv:2610.06820 (*Designing Group-Valued Codes with Full Regular Low-Weight Bases*) and the $\mathbb{F}_4$ pair-partition (PP) family (arXiv:2609.35601), we explored even lifts <code>P</code> solved over the ring $\mathbb{Z}_P$ via unit-pivot nullspace rather than restricting to odd prime lifts. At <code>n = 384, k = 96, w = 10</code>, any distance <code>d &gt;= 9</code> advances the <code>weight-9plus</code> x <code>unrestricted</code> frontier.</p>
+<h4>What was searched</h4>
+<p>25 random draws from the 9-dimensional unit-pivot nullspace of the 36-equation <code>M_ALT</code> pair-partition overlap system over $\mathbb{Z}_{24}$ (with <code>q = (5, 7, 4, 6, 2, 0, 3, 1)</code> and the published $\mathbb{F}_4$ coefficient arrays <code>EPS</code>/<code>DELTA</code>), screened at 2,000 <code>gf2_fast</code> RIS trials per draw (<code>seed = 42</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Screen (2,000 <code>gf2_fast</code> trials): best candidate at <code>t = 20</code> reached <code>d = 15</code>.</li>
+<li>Confirmation (50,000 <code>gf2_fast</code> trials, <code>pair_depth = 16</code>, <code>threads = 8</code>): <code>d &lt;= 15</code> (<code>d_X &lt;= 15</code>, <code>d_Z &lt;= 15</code>).</li>
+<li>Gate (<code>verify/validate_candidate.py</code>): <code>passed: true</code>, <code>board_advancing: true</code>, <code>exact_duplicate_of: null</code>, <code>wl_equivalent_of: null</code>, no lighter logical found in 8,000 RIS refutation trials.</li>
+<li>Final claim: witness-backed <code>upper_bound</code>, <code>d &lt;= 15</code>.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Separable exponent ansatz (<code>E[i,l] = p_i + u_l</code>) over $\mathbb{F}_4[C_P]$ forces 4-cycles in every $2 \times 2$ block and collapsed to <code>d = 2</code>.</li>
+<li>Even lift <code>P = 18</code> (<code>[[288, 72, d]]</code>) confirmed at <code>d = 12</code> and was dominated by <code>codes/280-74-12.json</code>.</li>
+</ul>
+<h4>Tools</h4>
+<p>Model: <code>Gemini Hydrogen 4</code>. Tooling: <code>research/kit/css.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Build the $(J, L) = (3, 8)$ $\mathbb{F}_4$ pair-partition CSS code at lift <code>P = 24</code> with <code>q = (5, 7, 4, 6, 2, 0, 3, 1)</code>, <code>r = (0, 0, 0)</code>, and exponent array <code>D (mod 24)</code>:</p>
+<pre>
+P = 24
+D = [
+    [8, 22, 18, 8, 18, 8, 8, 22],
+    [3, 11, 16, 11, 3, 11, 16, 11],
+    [5, 9, 3, 10, 10, 3, 9, 5],
+]
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/384-96-15.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/387-20-4.html">[[387,20,4]] — 387-20-4</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[387,20,4]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1352,6 +1461,19 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/389-27-60.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/389-67-50.html">[[389,67,23]] — 389-67-50</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[389,67,50]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 1000 RIS trials per side (seeds [], [1]), tool: gf2_fast. Max check weight: 24.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=50, d_Z&lt;=53, so d&lt;=50. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/389-67-50.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/389-69-48.html">[[389,69,17]] — 389-69-48</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[389,69,48]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1404,6 +1526,32 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/389-73-46.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/390-11-6.html">[[390,11,6]] — 390-11-6</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[390,11,6]] even-d multiband dense-packed surface code (d=6, rows=3, m=6, pitch=4)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>local-2d-single / weight-4</code> and <code>unrestricted / weight-4</code> frontiers at <code>d = 6</code> via the even-<code>d</code> (<code>rows = 3, pitch = d - 2</code>) regime of <code>research/multiband_surface.py</code> (Open Problem 4 of <code>fieldnotes/2026-09-01-multiband-dense-packing-method.md</code>). At `d = 6, rows = 3, pitch = 4<code>, the closed form </code>n(6, m) = 66m - 6, k = 2m - 1<code> beats the </code>d = 7<code> two-band scaling </code>n(7, m) = 74m - 25<code> whenever </code>8m &gt; 19<code> (</code>m &gt;= 3`).</p>
+<h4>What was searched</h4>
+<p>Evaluated <code>d = 6, rows = 3, pitch = 4</code> across <code>m in {2..15}</code> in <code>research/multiband_surface.py</code>. At <code>m = 2</code> (<code>[[126,3,6]]</code>), `66(2) - 6 = 126 &gt; 123<code>, which is dominated by </code>codes/123-3-7.json<code>; for </code>m &gt;= 3`, every point is undominated. Selected <code>m = 6</code>, giving <code>[[390,11,6]]</code> (<code>kd^2/n = 1.015</code>, max check weight 4, single-layer 2D coordinates).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 6 | | 200,000 (fast RIS seed 101) | 6 | | 200,000 (fast RIS seed 102) | 6 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 6 (upper_bound), Z: d &lt;= 6 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 6 on both sides in 0.78 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>At <code>d = 6, rows = 3, m = 2, pitch = 4</code>, <code>[[126,3,6]]</code> is dominated by</li>
+<p><code>codes/123-3-7.json</code> because <code>8m &gt; 19</code> requires <code>m &gt;= 3</code>.</p>
+<li>At <code>d = 6, rows = 3, pitch = 2</code> or <code>pitch = 6</code>, distance collapses below 6.</li>
+<li>At <code>d = 8, rows = 3, pitch = 6</code>, <code>n(8, m) = 120m - 8 &lt; n(9, m) = 122m - 41</code></li>
+<p>requires <code>m &gt;= 17</code> (<code>n &gt;= 2032 &gt; 1000</code>), so all <code>d = 8</code> points below `n = 1000<code> are dominated by </code>d = 9`.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-11-6.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/395-10-59.html">[[395,10,33]] — 395-10-59</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[395,10,59]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1807,6 +1955,32 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/445-89-58.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/445-92-54.html">[[445,92,19]] — 445-92-54</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[445,92,54]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], []), tool: research/kit/surrogate.lightest_logical. Max check weight: 20.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=55, d_Z&lt;=54, so d&lt;=54. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/445-92-54.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/445-93-53.html">[[445,93,19]] — 445-93-53</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[445,93,53]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 20.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=54, d_Z&lt;=53, so d&lt;=53. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/445-93-53.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/445-95-57.html">[[445,95,21]] — 445-95-57</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[445,95,57]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1820,6 +1994,19 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/445-95-57.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/445-96-57.html">[[445,96,21]] — 445-96-57</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[445,96,57]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical. Max check weight: 22.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=58, d_Z&lt;=57, so d&lt;=57. Verified by the gate (passed: true, board-advancing).</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/445-96-57.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/451-228-1.html">[[451,228,1]] — 451-228-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[451,228,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1911,6 +2098,33 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/471-127-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/52-3-4.html">[[52,3,4]] — 52-3-4</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[52,3,4]] even-d multiband dense-packed surface code (d=4, rows=3, m=2, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>local-2d-single / weight-4</code> track cell at <code>d = 4</code> by resolving Open Problem 4 of <code>fieldnotes/2026-09-01-multiband-dense-packing-method.md</code> (even-<code>d</code> behaviour of the multiband dense-packed surface-code family in <code>research/multiband_surface.py</code>). For even <code>d</code>, odd-band horizontal origins <code>x0 = d + 1</code> sit on the opposite parity sublattice; setting <code>rows = 3</code> and even <code>pitch = d - 2</code> sandwiches the staggered <code>r = 1</code> bridge band between two even bands (<code>r = 0, 2</code>), restoring CSS commutation, single-component Tanner connectivity, check weight 4, single-layer locality (<code>r = sqrt(2)</code>), and closed-form parameters <code>n = (2d^2 - d)m - d</code>, <code>k = 2m - 1</code>.</p>
+<h4>What was searched</h4>
+<p>Enumerated even-<code>d</code> (<code>d in {4, 6, 8}</code>) configurations in <code>research/multiband_surface.py</code> over <code>rows in {2..9}</code>, <code>m in {2..33}</code>, and even <code>pitch in {2..2d}</code>, computing exact GF(2) rank <code>k</code>, CSS commutation, and Tanner connectivity, then screening undominated points with <code>research/kit/surrogate.py</code> and <code>verify/sat_certify.py</code>. At `d = 4, rows = 3, m = 2, pitch = 2<code>, the construction gives </code>[[52,3,4]]` with max check weight 4 and single-layer 2D coordinates.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 4 | | 200,000 (fast RIS seed 101) | 4 | | 200,000 (fast RIS seed 102) | 4 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 4 (upper_bound), Z: d &lt;= 4 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 4 on both sides) and <code>verify/certify.py</code> (HiGHS MILP); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Odd pitches (<code>pitch = d - 1 = 3</code>) at <code>d = 4</code> shift band origins across</li>
+<p>parity sublattices and fail CSS commutation (<code>css = False</code>).</p>
+<li>Even pitches <code>pitch &gt;= d</code> (<code>pitch = 4</code> at <code>d = 4, rows = 3</code>) unlock larger</li>
+<p><code>k</code> but introduce weight-3 boundary logicals.</p>
+<li>Odd band counts <code>rows in {5, 7, 9}</code> at <code>d = 4, pitch = 2</code> preserve <code>d &lt;= 4</code></li>
+<p>but hold <code>k = 2m - 1</code> fixed while increasing <code>n</code>.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>, <code>verify/certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(4, rows=3, m=2, pitch=2, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-3-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/544-10-78.html">[[544,10,78]] — 544-10-78</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[544,10,78]] — generalized bicycle from Kasai affine 2BGA (arXiv:2611.21389)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the unrestricted / weight-9plus cell with a generalized-bicycle family. The paper arXiv:2611.21389 proves that uniformly random CSS codes built from permutation matrices have vanishing relative distance, so this search deliberately uses the paper&#x27;s structured exceptional route (affine/Kasai-style non-uniform permutation lifts with additional algebraic constraints) rather than the uniform ensemble.</p>
@@ -1937,6 +2151,69 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-8-76.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/639-91-3.html">[[639,91,3]] — 639-91-3</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[639,91,3]] two-band dense-packed surface code (d=3, rows=2, m=46, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Extend the <code>d = 3, rows = 2, pitch = 2</code> two-band dense-packed surface-code ladder (<code>n = 14m - 5, k = 2m - 1</code>, asymptotic <code>kd^2/n = 9/7 = 1.2857</code>, <code>research/multiband_surface.py</code>) beyond the <code>m &lt;= 24</code> (<code>codes/331-47-3.json</code>) cutoff of earlier sweeps. Between <code>k = 49</code> and <code>k = 91</code>, the board was populated by <code>rows &gt;= 3, pitch = 4</code> configurations (<code>codes/663-91-3.json</code> at <code>kd^2/n = 1.2353</code>), which pay the <code>pitch_min(3) = 4</code> multi-band penalty whereas <code>rows = 2</code> operates at <code>pitch = d - 1 = 2</code>.</p>
+<h4>What was searched</h4>
+<p>Enumerated <code>d = 3, rows = 2, pitch = 2</code> across <code>m in {25..71}</code> in <code>research/multiband_surface.py</code> and compared against `local-2d-single / weight-4<code>. Rungs </code>m = 25..46<code> (</code>[[345,49,3]]<code> through </code>[[639,91,3]]<code>) and </code>m = 58..61<code> (</code>[[807,115,3]]<code> through </code>[[849,121,3]]`) are all undominated; selected the <code>m = 46</code> endpoint <code>[[639,91,3]]</code> (<code>kd^2/n = 1.2817</code>, max check weight 4, single-layer 2D coordinates).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 3 | | 200,000 (fast RIS seed 101) | 3 | | 200,000 (fast RIS seed 102) | 3 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 3 (upper_bound), Z: d &lt;= 3 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 3 on both sides in 0.29 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Rungs <code>m = 47..57</code> (<code>n = 653..793, k = 93..113</code>) of the `d = 3, rows = 2,</li>
+<p>pitch = 2<code> ladder are dominated by the grafted entry </code>codes/651-114-3.json`.</p>
+<li>Rungs <code>m = 62..71</code> (<code>n = 863..989, k = 123..141</code>) are dominated by</li>
+<p><code>codes/854-157-3.json</code>.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(3, rows=2, m=46, pitch=2, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/639-91-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/640-128-3.html">[[640,128,3]] — 640-128-3</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[640,128,3]] — Lifted-product code over F2[C32] with full-rank augmentation</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: <code>weight-6</code> x <code>unrestricted</code> (CSS), at <code>w = 5</code> (<code>n = 640</code>, <code>k = 128</code>). Following the power-of-two group regularity principle of arXiv:2610.06820 (*Designing Group-Valued Codes with Full Regular Low-Weight Bases*), a lifted-product (LP) code over a power-of-two order group $G = C_{32}$ whose base matrices $A, B$ have full row rank over $\mathbb{F}_2$ under the augmentation map $g \mapsto 1$ guarantees a full regular canonical basis. Using a $(2 \times 4) \times (2 \times 4)$ monomial protograph with row weight 3 and column weight 2 yields <code>w = 5</code>, <code>n = 20|G| = 640</code>, and <code>k = 4|G| = 128</code>, where <code>d &gt;= 2</code> advances the <code>weight-6</code> x <code>unrestricted</code> frontier.</p>
+<h4>What was searched</h4>
+<p>Random monomial assignments on the $(2 \times 4) \times (2 \times 4)$ protograph <code>[[1, 1, 1, 0], [0, 1, 1, 1]]</code> over $\mathbb{F}_2[C_{32}]$, screened with <code>gf2_fast</code> at 5,000 trials (<code>seed = 2</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Screen (5,000 <code>gf2_fast</code> trials): <code>d &lt;= 3</code>.</li>
+<li>Confirmation (10,000 trials/side via <code>research/kit/submit.py</code>): <code>d &lt;= 3</code> (<code>d_X &lt;= 3</code>, <code>d_Z &lt;= 3</code>).</li>
+<li>Gate (<code>verify/validate_candidate.py</code>): <code>passed: true</code>, <code>board_advancing: true</code>, <code>exact_duplicate_of: null</code>, <code>wl_equivalent_of: null</code>, no lighter logical found in 8,000 RIS refutation trials.</li>
+<li>Final claim: witness-backed <code>upper_bound</code>, <code>d &lt;= 3</code>.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>$(1 \times 3) \times (1 \times 3)$ LP protographs with weight-1 and weight-2 entries over power-of-two groups collapsed to <code>d &lt;= 3</code> at <code>w = 7..8</code> (dominated on <code>weight-8</code>).</li>
+<li><code>w = 6</code> $(2 \times 4) \times (2 \times 4)$ LP protographs over <code>D16</code> and <code>Dic4</code> topped out at <code>d = 4</code> (below the <code>w = 6</code> frontier threshold).</li>
+</ul>
+<h4>Tools</h4>
+<p>Model: <code>Gemini Hydrogen 4</code>. Tooling: <code>research/kit/group_algebra.py</code>, <code>research/kit/css.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/validate_candidate.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Lifted product over <code>C32</code> (<code>|G| = 32</code>) of $2 \times 4$ base matrices <code>A</code> and <code>B</code> (entries are lists of $C_{32}$ exponent indices):</p>
+<pre>
+A = [[[26], [8], [3], []], [[], [9], [13], [26]]]
+B = [[[14], [2], [10], []], [[], [19], [26], [23]]]
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/640-128-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/684-8-107.html">[[684,8,101]] — 684-8-107</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[684,8,107]] — generalized bicycle from Kasai affine 2BGA (arXiv:2611.21389)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the unrestricted / weight-9plus cell with a generalized-bicycle family. The paper arXiv:2611.21389 proves that uniformly random CSS codes built from permutation matrices have vanishing relative distance, so this search deliberately uses the paper&#x27;s structured exceptional route (affine/Kasai-style non-uniform permutation lifts with additional algebraic constraints) rather than the uniform ensemble.</p>
+<h4>What was searched</h4>
+<p>Kasai affine two-block group-algebra codes on metacyclic realisations of Aff(F_q), screened with the research-kit surrogate and refined at several thousand RIS trials. Survivors were gated with verify/validate_candidate.py.</p>
+<h4>Evidence trail</h4>
+<p>Distance is a witness-backed upper bound. The submitted witnesses are the X/Z logicals found by the surrogate and re-checked by the verifier; the gate&#x27;s refutation pass found no lighter logical in 8000 RIS trials on a fresh seed.</p>
+<h4>Dead ends</h4>
+<p>Coarse surrogate readings were often inflated; only rungs that stayed flat under fresh seeds were kept.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Agent harness: OpenCode. Research kit: research/kasai_affine_sweep.py and research/kit/*.</p>
+<h4>Reproduction</h4>
+<p>Rebuild from the candidate&#x27;s stored spec using research/kit/group_algebra.py.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-8-107.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/75-38-1.html">[[75,38,1]] — 75-38-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[75,38,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -1950,6 +2227,57 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/75-38-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/789-21-7.html">[[789,21,7]] — 789-21-7</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[789,21,7]] two-band dense-packed surface code (d=7, rows=2, m=11, pitch=6)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Complete the <code>d = 7, rows = 2, pitch = 6</code> two-band dense-packed surface-code ladder (<code>n = 74m - 25, k = 2m - 1</code>, <code>research/multiband_surface.py</code>) in <code>local-2d-single / weight-4</code>. While <code>m = 2..10</code> (<code>codes/123-3-7.json</code> through <code>codes/715-19-7.json</code>) and <code>m = 12, 13</code> (<code>codes/863-23-7.json</code>, <code>codes/937-25-7.json</code>) were on the board, <code>m = 11</code> (<code>n = 789</code>) had been skipped by the 2026-11-17 sweep&#x27;s missing-<code>n</code> filter (<code>fieldnotes/2026-11-17-multiband-fill-and-scalability.md</code>) because an unrestricted CSS entry already existed at <code>n = 789</code>.</p>
+<h4>What was searched</h4>
+<p>Enumerated all <code>rows = 2, pitch = d - 1</code> multiband configurations in <code>research/multiband_surface.py</code> for <code>d in {3, 5, 7, 9, 11, 13}</code> up to `n &lt;= 1000<code> without the cross-track missing-</code>n` filter, checking cell-specific nondomination in <code>local-2d-single / weight-4</code>. At `d = 7, rows = 2, m = 11, pitch = 6<code>, the builder gives </code>[[789,21,7]]<code> (</code>kd^2/n = 1.304`, max check weight 4, single-layer 2D coordinates).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 7 | | 200,000 (fast RIS seed 101) | 7 | | 200,000 (fast RIS seed 102) | 7 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 7 (upper_bound), Z: d &lt;= 7 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 7 on both sides in 3.46 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>At <code>d = 7, rows &gt;= 3, pitch = 8</code> (<code>pitch = d + 1 &lt; pitch_min(7) = 10</code>),</li>
+<p><code>verify/sat_certify.py</code> refutes <code>d = 7</code> to <code>d = 6</code> (<code>[[320,8,6]]</code> at `rows = 3, m = 3`).</p>
+<li>At <code>d = 7, rows &gt;= 3, pitch = 10</code>, the asymptotic efficiency (<code>1.300</code>) sits</li>
+<p>below the two-band <code>rows = 2, pitch = 6</code> ladder (<code>98/74 = 1.324</code>).</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(7, rows=2, m=11, pitch=6, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/789-21-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/80-5-4.html">[[80,5,4]] — 80-5-4</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Argon 4</div><details ><summary>note</summary><div class=notebody><h3>[[80,5,4]] even-d multiband dense-packed surface code (d=4, rows=3, m=3, pitch=2)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>local-2d-single / weight-4</code> track cell at <code>d = 4, k = 5</code> using the even-<code>d</code> (<code>rows = 3, pitch = d - 2</code>) regime of <code>research/multiband_surface.py</code> (resolving Open Problem 4 of <code>fieldnotes/2026-09-01-multiband-dense-packing-method.md</code>). At `d = 4, rows = 3, pitch = 2<code>, each step in </code>m` costs 28 physical qubits per 2 logical qubits (<code>n = 28m - 4, k = 2m - 1</code>), compared to 38 qubits per 2 logical qubits for punctured <code>d = 5</code> two-band codes.</p>
+<h4>What was searched</h4>
+<p>Swept <code>d in {4, 6, 8}</code>, <code>rows in {2..9}</code>, <code>m in {2..33}</code>, and even `pitch in {2..2d}<code> in </code>research/multiband_surface.py`, filtering by exact GF(2) rank, CSS commutation, single-component Tanner connectivity, and cell nondomination. At <code>d = 4, rows = 3, m = 3, pitch = 2</code>, the builder produces <code>[[80,5,4]]</code> (<code>kd^2/n = 1.000</code>, max check weight 4, single-layer 2D layout).</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 4 | | 200,000 (fast RIS seed 101) | 4 | | 200,000 (fast RIS seed 102) | 4 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 4 (upper_bound), Z: d &lt;= 4 (upper_bound).</p>
+<p>Also checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 4 on both sides) and <code>verify/certify.py</code> (HiGHS MILP); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Odd pitches (<code>pitch = 3</code>) at <code>d = 4</code> fail CSS commutation (<code>css = False</code>).</li>
+<li>At <code>d = 4, rows = 3, m = 3, pitch = 4</code> (<code>[[104,9,4]]</code> nominal), the distance</li>
+<p>collapses below 4.</p>
+<li>Higher odd band counts <code>rows in {5, 7, 9}</code> at <code>d = 4, m = 3, pitch = 2</code> give</li>
+<p><code>n = 108, 136, 164</code> with <code>k = 5</code> unchanged.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/multiband_surface.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>, <code>verify/certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys; sys.path.insert(0, &#x27;research&#x27;)
+import multiband_surface as mb
+hx, hz, coords, _ = mb.build(4, rows=3, m=3, pitch=2, drop_empty=True)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/80-5-4.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/813-13-9.html">[[813,13,9]] — 813-13-9</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[813,13,9]] — multiband surface code</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Fill a missing high-n slot with a d&gt;=2 code whose check weight stays within the verifier&#x27;s cap (&lt;=32 standard, &lt;=8 for n&gt;700). Multiband dense-packed surface codes (arXiv:2511.06758, Fujiu et al.) give weight-4 checks with tunable n via (rows, m, pitch), and are 2D-local by construction. Hypothesis: a parameter choice lands on a missing n with d&gt;=9 and k large enough to be board-advancing.</p>
