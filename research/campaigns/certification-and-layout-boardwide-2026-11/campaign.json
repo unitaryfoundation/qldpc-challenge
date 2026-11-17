@@ -1,0 +1,74 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 2000,
+      "cpu_hours": 1500,
+      "gpu_hours": 3000,
+      "walltime_hours": 720
+    },
+    "constraints": {
+      "max_check_weight": 32,
+      "n": [
+        1,
+        16384
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "drop a ladder when two fresh-seed rungs agree below the bar or the trial cap binds",
+        "trials_cap": 300000000
+      },
+      "bar": {
+        "axes": [
+          "d",
+          "geometric_efficiency"
+        ],
+        "note": "entries lacking a certificate or a verified layout",
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 1500,
+        "gpu_hours": 3000,
+        "trials_per_candidate": 300000000,
+        "walltime_hours": 720
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A board where every frontier entry carries either a certificate or a documented reason it cannot be certified, and where geometric-efficiency clubs (D=3, stabilizer 2D) gain their first members.",
+      "family": "other",
+      "feasibility": "certification_queue.py and certify_sweep.py drive certs; layout assignment reuses verify/qldpc_verify.py layout checks. GPU verifies witnesses for laid-out constructions.",
+      "hypothesis": "A coordinated pass can (a) honor certificates for board entries that lack them and (b) attach honest layouts to entries that have none, opening the geometric-efficiency frontiers that currently have no members.",
+      "novelty": {
+        "against": "committed codes/ entries, certs/, and the layout tier",
+        "claim": "honored certificates and honest layouts for entries that currently have neither"
+      },
+      "what_a_negative_would_teach": "That certification and layout assignment are bottlenecked by time rather than method, justifying larger budgets or revised caps."
+    },
+    "id": "certification-and-layout-boardwide-2026-11",
+    "methods": {
+      "families": [
+        "other",
+        "topological"
+      ]
+    },
+    "name": "Board-wide certification and layout campaign",
+    "notes": "Part A: work the certification queue (research/certs/todo.json) with sat_certify/tropidist and file honored certs. Part B: construct and verify honest 2D/3D layouts for entries that have none, targeting the empty geometric-efficiency clubs (D=3, stabilizer 2D). GPU resolves witnesses for laid-out constructions. No verifier changes.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "required_outputs": [
+      "experiment_ledger",
+      "campaign_summary",
+      "negative_results",
+      "surviving_candidates"
+    ],
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
