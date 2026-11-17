@@ -342,12 +342,47 @@ def _reuse_accelerator_requirement(args):
                 "without a deep pass behind it; give it the accelerator's "
                 "budget or drop the flag")
         trials = int(args.fast_trials)
-        if trials < REUSE_MIN_FAST_TRIALS:
-            print(f"  --reuse-witnesses: {trials:,} accelerator trials is "
-                  f"below the {REUSE_MIN_FAST_TRIALS:,} per side that "
-                  f"research/kit/promote.py requires before it reuses a "
-                  f"witness; the claim will be thinner than a normal "
-                  f"submit's", flush=True)
+        floor = int(getattr(args, "min_fast_trials", REUSE_MIN_FAST_TRIALS) or 0)
+        if trials < floor:
+            raise SystemExit(
+                f"--reuse-witnesses: {trials:,} accelerator trials is below "
+                f"the {floor:,} per side that research/kit/promote.py requires "
+                "before it reuses a witness; raise --fast-trials, or lower "
+                "--min-fast-trials to say the thinner claim is intended")
+
+
+def _accelerator_requirement(args):
+    """Refuse to skip the accelerator pass silently.
+
+    ``--fast-trials N`` with N > 0 names the depth the claim is supposed to
+    have. When the C++ accelerator is not built the pass used to be skipped
+    without a word and the entry filed at RIS depth alone, which is how the
+    generalized-bicycle filings of 2026-11-17 reached CI with claims its own
+    pass refuted by a factor of two or three. Filing without the pass is
+    still possible, but only by asking for it with ``--fast-trials 0``, which
+    the PR body then records.
+    """
+    fast = int(getattr(args, "fast_trials", 0) or 0)
+    if fast > 0 and hd._fast is None:
+        raise SystemExit(
+            "the C++ accelerator (verify/gf2_fast) is not built, so the "
+            f"--fast-trials {fast:,} pass would not run and the claim would "
+            "rest on the RIS pass alone; build it (make fast) or pass "
+            "--fast-trials 0 to file without it, which the PR body then says")
+
+
+def _depth_line(args):
+    """One line on the search depth behind the claim, for the PR body."""
+    trials = int(getattr(args, "trials", 0) or 0)
+    fast = int(getattr(args, "fast_trials", 0) or 0)
+    reused = bool(getattr(args, "reuse_witnesses", False))
+    parts = ["witnesses reused from the draft" if reused
+             else f"RIS {trials:,} trials per side"]
+    if fast > 0 and hd._fast is not None:
+        parts.append(f"accelerator {fast:,} trials per side at pair depth 8")
+    else:
+        parts.append("no accelerator pass (--fast-trials 0)")
+    return "; ".join(parts)
 
 
 def _provenance(args, draft=None):
@@ -950,6 +985,7 @@ def pr_body(doc, report, args, out, note_out=None):
            if stab else ""),
         f"- Distance confidence: {conf_line}"
         + (" (Pauli weight, one side)" if stab else ""),
+        f"- Local search depth: {_depth_line(args)}",
     ]
     circ = doc.get("circuit")
     if circ:
@@ -1476,6 +1512,7 @@ def cmd_submit(args):
                          "to take witnesses from (only a .json draft carries "
                          "distance witnesses); drop the flag")
     _reuse_accelerator_requirement(args)
+    _accelerator_requirement(args)
     if args.coords:                      # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
         coords = (_pick(cz, ("coords", "coordinates", "xy"))
@@ -3225,8 +3262,14 @@ def main(argv=None):
                         "With it the PR body names the dominators and calls the "
                         "entry a record, not an advance")
     s.add_argument("--fast-trials", type=int, default=2_000_000,
-                   help="gf2_fast trials used to tighten the claim "
-                        "(0 disables the accelerator)")
+                   help="gf2_fast trials used to tighten the claim. 0 disables "
+                        "the accelerator and the PR body says so; a positive "
+                        "budget is refused when the accelerator is not built, "
+                        "so the pass is never skipped silently")
+    s.add_argument("--min-fast-trials", type=int, default=REUSE_MIN_FAST_TRIALS,
+                   help="the accelerator budget a --reuse-witnesses run must "
+                        "have (default: research/kit/promote.py's floor); "
+                        "lower it to file a thinner claim knowingly")
     s.add_argument("--seed", type=int, default=0)
     s.add_argument("--out", default=os.path.join(_ROOT, "codes"))
     s.add_argument("--force", action="store_true",
