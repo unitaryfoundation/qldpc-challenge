@@ -4856,46 +4856,39 @@
    }
   },
   "Z": {
-   "value": 21,
+   "value": 20,
    "confidence": "upper_bound",
    "witness": [
-    243,
-    245,
-    247,
-    248,
-    262,
-    268,
-    275,
-    278,
-    294,
-    327,
-    569,
-    570,
-    573,
-    589,
-    590,
-    592,
-    599,
-    600,
-    628,
-    629,
-    655
+    4,
+    6,
+    21,
+    27,
+    33,
+    36,
+    44,
+    86,
+    103,
+    334,
+    335,
+    351,
+    352,
+    353,
+    354,
+    360,
+    368,
+    388,
+    389,
+    425
    ],
    "witness_provenance": {
     "found_by": [
-     "@dorakingx"
+     "@vprusso"
     ],
-    "date": "2026-10-12",
-    "found_at_samples": 4000,
-    "survived_samples": 20000000,
-    "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     7,
-     777001,
-     777138,
-     777275,
-     777412,
-     777549
+     1
     ]
    }
   }
@@ -4909,7 +4902,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-10-12",
-  "notes": "Derived from codes/670-8-20.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[670,8,20]], [[679,8,20]], [[722,8,20]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is unchanged at 4, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "notes": "Derived from codes/670-8-20.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[670,8,20]], [[679,8,20]], [[722,8,20]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is unchanged at 4, so the reduced code is no less local than the source. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 21 -> 20 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "model": "Claude Opus 5 (Claude Code)",
   "origin": "submission",
   "novelty": "unknown"

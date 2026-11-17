@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[512,8,20]]",
  "code_type": "CSS",
  "n": 512,
@@ -4703,32 +4703,42 @@
  "distance": {
   "d": 20,
   "X": {
-   "value": 22,
+   "value": 21,
    "confidence": "upper_bound",
    "witness": [
-    29,
-    44,
-    47,
-    93,
-    141,
-    157,
-    173,
-    189,
-    190,
-    206,
-    221,
-    237,
-    271,
-    283,
-    286,
-    317,
-    332,
-    381,
-    413,
-    430,
-    477,
-    493
-   ]
+    30,
+    61,
+    62,
+    78,
+    124,
+    125,
+    140,
+    156,
+    172,
+    187,
+    219,
+    249,
+    250,
+    285,
+    302,
+    333,
+    349,
+    396,
+    459,
+    475,
+    491
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-24",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   },
   "Z": {
    "value": 20,
@@ -4764,7 +4774,8 @@
   "construction": "contributed via qldpc submit",
   "origin": "submission",
   "date": "2026-10-18",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-24 (witnesses by @vprusso): X side 22 -> 21 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "bivariate-bicycle",
  "locality": {
