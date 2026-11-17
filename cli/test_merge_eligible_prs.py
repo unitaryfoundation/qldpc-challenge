@@ -527,8 +527,7 @@ def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypat
 
 
 def test_a_replacement_circuit_that_lowers_a_side_is_blocked(monkeypatch):
-    """#5911 and #5934 (2026-11-17): an author replaced their entry's circuit with a worse
-    one and the loop merged it."""
+    """#5911 and #5934 (2026-11-17): an author replaced their entry's circuit with a worse one."""
     def doc(x, z):
         d = _code_document()
         d["circuit"] = {"d_circ": {"X": {"value": x}, "Z": {"value": z}}, "rounds": 7}
