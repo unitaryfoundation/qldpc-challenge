@@ -66,7 +66,7 @@ CONF_CHUNK = 250_000   # conflicts per solve call; the wall is checked between
 def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
              conflicts=None, wall_hours=None, k_min=0, max_models=None,
              out_dir=None, exact_on_reject=True, nonempty_rows=True,
-             verbose=True):
+             row_sort=False, verbose=True):
     """Run one rung and return its record.
 
     ``conflicts`` caps the conflicts spent on one formula (one model's
@@ -96,7 +96,7 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
         side, G, w, t, radius, solver=solver, layers=layers,
         conf_budget=chunk, stream=True, shared_t3=(t >= 2),
         max_codes=max_models, nonempty_rows=nonempty_rows,
-        exact_on_reject=exact_on_reject, stats=stats,
+        row_sort=row_sort, exact_on_reject=exact_on_reject, stats=stats,
         budget_check=budget_check)
     found, seen, best_k = [], 0, None
     try:
@@ -186,13 +186,17 @@ def main(argv=None):
                     help="block the whole model on a post-check rejection "
                          "(the pre-#2703 behavior) instead of adding the "
                          "exact detection constraint")
+    ap.add_argument("--row-sort", action="store_true",
+                    help="enforce non-decreasing generator rows (row-permutation "
+                         "symmetry break)")
     a = ap.parse_args(argv)
 
     rec = run_rung(a.side, a.G, a.w, a.t, a.radius, layers=a.layers,
                    solver=a.solver, conflicts=a.conflicts,
                    wall_hours=a.wall_hours, k_min=a.k_min,
                    max_models=a.max_models,
-                   out_dir=a.out_dir, exact_on_reject=not a.block_on_reject)
+                   out_dir=a.out_dir, exact_on_reject=not a.block_on_reject,
+                   row_sort=a.row_sort)
     os.makedirs(os.path.dirname(a.log), exist_ok=True)
     with open(a.log, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, sort_keys=True) + "\n")

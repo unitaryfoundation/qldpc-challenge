@@ -61,7 +61,8 @@ def _grid_sites(side):
 
 
 def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
-                    shared_t3=False, layers=1, nonempty_rows=False):
+                    shared_t3=False, layers=1, nonempty_rows=False,
+                    row_sort=False):
     """Build the locality-constrained CNF and return its variable maps.
 
     Returns a dict with keys: ``sites``, ``n``, ``G``, ``xr``, ``zr``, ``ax``,
@@ -335,6 +336,12 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
         cls.append(lits)
         return cls
 
+    if row_sort:
+        _n_vars = add_row_sort_clauses({"n": n, "G": G, "xr": xr, "zr": zr,
+                                        "n_vars": len(aux)}, emit)
+    else:
+        _n_vars = len(aux)
+
     own_vars = set(aux.values())
     # distinct-code blocking: freeze only the check-incidence pattern, so
     # anchor/counter re-derivations of the SAME code stay reachable and
@@ -353,7 +360,7 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
         "incidence_vars": incidence_vars,
         "iter_errors": iter_errors,
         "detect_clauses": detect_clauses,
-        "n_vars": len(aux),  # highest var allocated; static symmetry aux starts above this
+        "n_vars": _n_vars,  # highest var allocated; static symmetry aux starts above this
     }
 
 
@@ -515,6 +522,33 @@ def add_static_symmetry_clauses(cnf, emit):
     return aux_count
 
 
+def add_row_sort_clauses(cnf, emit):
+    n = cnf["n"]; G = cnf["G"]
+    rowmaps = (cnf["xr"], cnf["zr"])
+    aux_count = cnf.get("n_vars") or max(max(m.values()) for m in (cnf["xr"], cnf["zr"], cnf["ax"], cnf["az"]))
+    for side in range(2):
+        rowmap = rowmaps[side]
+        for g in range(G - 1):
+            a = [rowmap[(g, q)] for q in range(n)]
+            b = [rowmap[(g + 1, q)] for q in range(n)]
+            eq_prev = aux_count + 1; aux_count += 1
+            emit([eq_prev])
+            for i in range(n):
+                ai = a[i]; bi = b[i]
+                emit([-eq_prev, -ai, bi])
+                eq_i = aux_count + 1; aux_count += 1
+                emit([-eq_i, eq_prev])
+                emit([-eq_i, -ai, bi])
+                emit([-eq_i, ai, -bi])
+                emit([-eq_prev, -ai, -bi, eq_i])
+                emit([-eq_prev, ai, bi, eq_i])
+                eq_prev = eq_i
+    return aux_count
+
+
+    return aux_count
+
+
 def enumerate_local_sat_codes(
     n_side,
     n_generators,
@@ -534,6 +568,7 @@ def enumerate_local_sat_codes(
     max_rounds=None,
     shared_t3=False,
     nonempty_rows=False,
+    row_sort=False,
     exact_on_reject=False,
     stats=None,
     budget_check=None,
@@ -649,13 +684,14 @@ def enumerate_local_sat_codes(
         cnf = build_local_cnf(
             n_side, n_generators, max_weight, t, radius, sink=solver_obj,
             shared_t3=shared_t3, layers=layers, nonempty_rows=nonempty_rows,
+            row_sort=row_sort,
         )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, solver_obj.add_clause)
     else:
         cnf = build_local_cnf(n_side, n_generators, max_weight, t, radius,
                               shared_t3=shared_t3, layers=layers,
-                              nonempty_rows=nonempty_rows)
+                              nonempty_rows=nonempty_rows, row_sort=row_sort)
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, cnf["clauses"].append)
         solver_obj = solver_map[solver](bootstrap_with=cnf["clauses"])
@@ -901,3 +937,16 @@ if __name__ == "__main__":
     search_local_sat(
         n_side=4, n_generators=4, max_weight=3, t=1, radius=1.5, count=20, seed=11
     )
+
+
+def row_sort_symmetry_selftest(side=4, G=5, t=1, radius=1.5, weight=4, cap=60):
+    models = 0; bad = 0
+    for spec, HX, HZ in enumerate_local_sat_codes(
+            side, G, weight, t, radius,
+            symmetry="lex", row_sort=True, max_codes=cap, conf_budget=200000):
+        models += 1
+        for side_rows in (HX, HZ):
+            for g in range(len(side_rows) - 1):
+                if tuple(side_rows[g]) > tuple(side_rows[g + 1]):
+                    bad += 1
+    return {"models": models, "unsorted": bad}
