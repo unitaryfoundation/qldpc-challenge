@@ -3079,50 +3079,43 @@
    }
   },
   "Z": {
-   "value": 30,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": [
-    16,
-    19,
-    28,
-    46,
-    52,
-    55,
-    73,
-    78,
+    0,
+    21,
+    26,
+    36,
+    41,
+    47,
+    49,
+    56,
+    88,
     89,
-    110,
-    113,
-    115,
+    103,
+    112,
     124,
-    135,
-    144,
-    159,
-    173,
-    177,
+    139,
+    146,
+    175,
+    179,
     180,
-    182,
-    199,
-    204,
-    209,
-    211,
-    226,
+    183,
+    215,
+    222,
     233,
-    235,
-    240,
-    244,
-    251
+    248,
+    250
    ],
    "witness_provenance": {
     "found_by": [
-     "@FarLab"
+     "@vprusso"
     ],
-    "date": "2026-10-14",
-    "found_at_samples": 120,
-    "survived_samples": 120,
-    "tool": "research/kit/surrogate.lightest_logical",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     778
+     2
     ]
    }
   }
@@ -3136,7 +3129,7 @@
    "arXiv:2306.16400"
   ],
   "date": "2026-10-14",
-  "notes": "",
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 30 -> 24 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "origin": "submission",
   "model": "Gemini 4 Argon"
  },
