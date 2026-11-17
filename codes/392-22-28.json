@@ -3967,42 +3967,49 @@
    ]
   },
   "Z": {
-   "value": 32,
+   "value": 28,
    "confidence": "upper_bound",
    "witness": [
-    7,
-    32,
-    35,
-    41,
-    43,
-    72,
-    92,
-    94,
-    108,
-    111,
-    112,
-    122,
-    124,
-    127,
-    147,
-    191,
-    219,
-    220,
-    240,
-    270,
+    8,
+    10,
+    23,
+    31,
+    45,
+    61,
+    63,
+    84,
+    98,
+    100,
+    128,
+    140,
+    163,
+    176,
+    179,
+    190,
+    222,
+    224,
+    225,
+    236,
+    244,
     271,
     285,
-    286,
-    287,
-    288,
-    323,
-    332,
-    334,
-    348,
-    355,
-    374,
-    390
-   ]
+    299,
+    306,
+    352,
+    353,
+    364
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     2
+    ]
+   }
   }
  },
  "provenance": {
@@ -4018,7 +4025,8 @@
    "ris_trials_per_side": 10000000,
    "cpu_hours": 4.0,
    "tool": "research/kit/search.py + gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 32 -> 28 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2)."
  },
  "family": "bivariate-bicycle"
 }
