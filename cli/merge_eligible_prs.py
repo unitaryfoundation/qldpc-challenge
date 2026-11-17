@@ -16,6 +16,8 @@ import argparse
 import json
 import subprocess
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import quote, urlencode
@@ -194,6 +196,30 @@ def _read_code_document(repo: str, path: str, head_sha: str) -> Any:
         raise GitHubCLIError(f"{path} at {head_sha} is not valid JSON: {exc}") from exc
 
 
+_CACHE_MISS = object()
+_THREAD_LOCAL = threading.local()
+
+
+def _code_doc_cache() -> dict[tuple[int, str, str, str], Any]:
+    cache = getattr(_THREAD_LOCAL, "cache", None)
+    if cache is None:
+        cache = {}
+        _THREAD_LOCAL.cache = cache
+    return cache
+
+
+def _cached_read_code_document(repo: str, path: str, ref: str) -> Any:
+    reader = _read_code_document
+    key = (id(reader), repo, path, ref)
+    cache = _code_doc_cache()
+    cached = cache.get(key, _CACHE_MISS)
+    if cached is not _CACHE_MISS:
+        return cached
+    result = reader(repo, path, ref)
+    cache[key] = result
+    return result
+
+
 def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, base: str) -> bool:
     """Report whether the PR inherited this provenance gap from the base entry rather than introducing it.
 
@@ -206,7 +232,7 @@ def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, bas
     the entry, or that changed provenance, is still held to the rule.
     """
     try:
-        base_doc = _read_code_document(repo, path, base)
+        base_doc = _cached_read_code_document(repo, path, base)
     except GitHubCLIError:
         return False                      # no base entry: the PR adds it
     if not isinstance(base_doc, dict) or not isinstance(document, dict):
@@ -241,6 +267,7 @@ class Evaluation:
 
 
 def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
+    _code_doc_cache().clear()
     number = int(pr["number"])
     head_sha = (pr.get("head") or {}).get("sha") or ""
     result = Evaluation(
@@ -274,7 +301,7 @@ def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
                 result.reasons.append(too_many)
             added = {item.get("filename") for item in files if item.get("status") == "added"}
             for path in code_paths:
-                document = _read_code_document(repo, path, head_sha)
+                document = _cached_read_code_document(repo, path, head_sha)
                 error = metadata_error(document)
                 if error:
                     # a record this PR adds declares its own provenance; only a
@@ -452,16 +479,34 @@ def main(argv: list[str] | None = None) -> int:
 
     overall_error = False
     evaluations: list[Evaluation] = []
+
+    # Drafts are reported (and skipped) up front so the parallel evaluation
+    # below only handles PRs that actually need API work.
     for pr in prs:
         if pr.get("draft"):
             number = pr.get("number", "?")
             print(f"SKIP       BLOCKED  #{number} draft PR")
-            continue
+
+    non_draft_prs = [pr for pr in prs if not pr.get("draft")]
+
+    def _safe_evaluate(pr: dict[str, Any]) -> tuple[str, Any]:
         try:
-            evaluations.append(evaluate_pr(args.repo, pr, args.base))
+            return ("ok", evaluate_pr(args.repo, pr, args.base))
         except (GitHubCLIError, KeyError, ValueError) as exc:
-            overall_error = True
-            print(f"ERROR      BLOCKED  #{pr.get('number', '?')} could not verify PR: {exc}")
+            return ("error", exc)
+
+    if non_draft_prs:
+        max_workers = min(8, len(non_draft_prs))
+        if max_workers < 1:
+            max_workers = 1
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            outcomes = list(executor.map(_safe_evaluate, non_draft_prs))
+        for pr, outcome in zip(non_draft_prs, outcomes):
+            if outcome[0] == "ok":
+                evaluations.append(outcome[1])
+            else:
+                overall_error = True
+                print(f"ERROR      BLOCKED  #{pr.get('number', '?')} could not verify PR: {outcome[1]}")
 
     block_overlapping_prs(evaluations)
     for result in evaluations:
