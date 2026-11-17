@@ -58,7 +58,31 @@ import multiband_surface as mb
 hx, hz, coords, sites = mb.build(7, rows=2, m=12, pitch=6)
 # hx, hz are the CSS checks; coords the 2D layout (layers=1)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/863-23-7.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/145-18-8.html">[[145,18,8]] — 145-18-8</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[145,18,8]] — submission</h3>
+<section class=blk><h3>Multiband surface-code fills and campaign scalability</h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Two parallel efforts: (1) a multiband dense-packed surface-code construction that fills missing n&#x27;s with weight-4, 2D-local codes, and (2) scalability improvements to the reachability campaign (gf2_fast pre-filter, parallel saves, screening-depth reduction). The multiband sweep found 73 fillable missing n&#x27;s; 56 codes were built and staged. The campaign is running with the faster code.</p>
+<h4>Multiband fills</h4>
+<p>the multiband module implements the (rows, m, pitch) packing from arXiv:2511.06758 (Fujiu et al.). Enumerating d in {3,5,7,9,11}, rows in {2..5}, m in {2..15}, pitch in {d-1, 2*(3d//4), d+1} found 73 missing n&#x27;s fillable with weight-4, connected, 2D-local codes (d=3 to 13). 56 were built and staged (trials=500, surrogate screening). These satisfy the weight cap (&lt;=32 standard, &lt;=8 for n&gt;700) that blocked the earlier parity-check fills.</p>
+<h5>Why multiband works where parity-check failed</h5>
+<p>Parity-check codes have weight = n (all-ones check), exceeding 32 for n&gt;32. Multiband surface codes have weight 4 (each check touches 4 data qubits), satisfying the cap for all n. The trade-off: k is smaller (n-k = 2*rank, where rank depends on rows and m).</p>
+<h4>Campaign scalability</h4>
+<p>The reachability campaign&#x27;s bottleneck was the single-threaded save phase (make_submission running surrogate at 8000-20000 trials per child). Three changes (all in the reachability campaign script, Tier 0):</p>
+<p>1. Screening depth 2000 (TRIALS default, was 20000): ~10x faster saves. Survivors deep-confirmed at 20000+ before promotion. 2. SKIP_DOMINATED on by default: skips parents already dominated by the board (heuristic). 3. Parallel save phase: make_submission + save_submission run in a worker pool, not single-threaded. Dedup stays centralized. 4. gf2_fast pre-filter: each child is screened with gf2_fast.distance_rand_witness before saving. Over-claimed children (lighter logical found) are skipped. This is a cheap upstream filter (2-5s per child in workers) that reduces downstream gating waste.</p>
+<p>Result: campaign rate improved from ~8.4 to ~13.7 parents/min (+63%).</p>
+<h5>gf2_fast as pre-filter, not gate</h5>
+<p>Making gf2_fast the gate itself would be a Tier 1 change (verify/ is hash-pinned). The pre-filter approach gets most of the speed benefit without touching the trust anchor. The gate remains numpy-based and authoritative.</p>
+<h4>Re-gating lesson</h4>
+<p>58 of 95 &quot;ready&quot; candidates were reclassified as dominated after the board grew (2 revisions). Always re-gate before promoting; stale verdicts overstate board-advancing status. The pre-filter (dominated + gf2_fast) should be run on all staged candidates before gating.</p>
+<h4>Tools</h4>
+<ul>
+<li>The multiband module (build, params, connected).</li>
+<li>gf2_fast (distance_rand_witness).</li>
+<li>The submit and coordination kits.</li>
+<li>Model: Beam 1.0.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Multiband: enumerate (d, rows, m, pitch) via multiband params(), filter by missing n / css / connected / k&gt;=1, build, stage with make_submission (trials=500) + save_submission.</p>
+<p>Campaign: uv run --extra research python -u reachability_campaign.py --resume</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-17-multiband-fill-and-scalability.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/145-18-8.html">[[145,18,8]] — 145-18-8</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[145,18,8]] — submission</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Code submitted from the reachability campaign.</p>
 <h4>What was searched</h4>
