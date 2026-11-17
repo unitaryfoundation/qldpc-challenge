@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[360,16,25]] CLP code, weight 7, SmallGroup(810,106)",
  "code_type": "CSS",
  "n": 360,
@@ -3284,36 +3284,46 @@
    ]
   },
   "Z": {
-   "value": 26,
+   "value": 25,
    "confidence": "upper_bound",
    "witness": [
-    7,
+    1,
+    2,
+    34,
     36,
-    97,
-    100,
-    106,
-    116,
+    44,
+    58,
+    61,
+    63,
+    66,
+    76,
+    83,
     124,
-    137,
-    151,
-    156,
-    162,
-    178,
-    185,
-    187,
-    188,
-    191,
-    216,
-    218,
-    240,
-    255,
-    279,
-    295,
-    308,
-    330,
-    333,
-    344
-   ]
+    181,
+    211,
+    214,
+    256,
+    260,
+    287,
+    298,
+    303,
+    321,
+    342,
+    347,
+    350,
+    355
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-07",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     2
+    ]
+   }
   }
  },
  "provenance": {
@@ -3327,7 +3337,7 @@
    "arXiv:2610.12782"
   ],
   "novelty": "known_parameters",
-  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 25 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani.",
+  "notes": "Table II of arXiv:2610.12782 lists this code with the two sided QDistRnd bound d <= 25 at 10^6 rounds; the witness here is from this tool's own search and the entry carries that value. Authors Rajendra Rajpurohit, V. Lalitha, Shayan Srinivasa Garani. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-11-07 (witnesses by @vprusso): Z side 26 -> 25 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "human"
  },
  "family": "2bga-coset"
