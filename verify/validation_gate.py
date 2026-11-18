@@ -24,8 +24,15 @@ evaluator-validation gate:
    product entries ("reconstructions checked against the authors' own
    matrices") re-run through the structural verifier and compared
    byte-for-byte with the committed verdicts under
-   verify/fixtures/validation_gate/golden/. A changed entry is reported as
-   such, distinct from a changed verdict.
+   verify/fixtures/validation_gate/golden/. The verdict is what is held, and
+   it carries the code's fingerprint (the reduced row echelon forms of its
+   check matrices), so an identical verdict is a verdict on the identical
+   stabilizer group. Each golden also records the sha256 of the entry file it
+   was taken from, which says why a verdict moved: on the recorded bytes the
+   verifier changed (``drift``); on other bytes the entry's change or the
+   verifier's may have moved it (``entry_changed``). An entry whose bytes
+   changed and whose verdict did not, a circuit tier added to it or its
+   prose edited, is still reproduced and passes (``match_entry_changed``).
 
 ``check_validator_integrity.py --update`` runs this gate first and refuses to
 re-pin unless it exits 0. The gate adds, removes, and loosens no check; it
@@ -390,18 +397,30 @@ def run_reproductions(update=False):
             continue
         with open(gp, encoding="utf-8") as f:
             golden = json.load(f)
-        if golden.get("doc_sha256") != sha:
-            out.append({"slug": slug, "status": "entry_changed", "ok": False,
-                        "detail": "the entry's bytes differ from when the golden verdict was recorded; "
-                                  "re-record with --update-golden after checking the entry's change"})
-        elif json.dumps(golden["report"], sort_keys=True, indent=1) == text:
+        same_bytes = golden.get("doc_sha256") == sha
+        same_verdict = json.dumps(golden["report"], sort_keys=True, indent=1) == text
+        diff = [c["check"] for c in rep["checks"]
+                if c not in golden["report"].get("checks", [])]
+        changed = f"; changed checks: {', '.join(diff[:6])}" if diff else ""
+        if same_verdict and same_bytes:
             out.append({"slug": slug, "status": "match", "ok": True})
-        else:
-            diff = [c["check"] for c in rep["checks"]
-                    if c not in golden["report"].get("checks", [])]
+        elif same_verdict:
+            # The gate holds the verifier to its committed verdicts. A verdict
+            # reproduced byte for byte, fingerprint included, is that claim
+            # kept, whatever else in the entry file moved (#5929 -> #6241).
+            out.append({"slug": slug, "status": "match_entry_changed", "ok": True,
+                        "detail": "the entry's bytes differ from when the golden verdict was recorded "
+                                  "and the verdict on them is identical; the next --update-golden "
+                                  "refreshes the recorded hash"})
+        elif same_bytes:
             out.append({"slug": slug, "status": "drift", "ok": False,
-                        "detail": "the verifier's verdict differs from the committed one"
-                                  + (f"; changed checks: {', '.join(diff[:6])}" if diff else "")})
+                        "detail": "the verifier's verdict differs from the committed one" + changed})
+        else:
+            out.append({"slug": slug, "status": "entry_changed", "ok": False,
+                        "detail": "the entry's bytes and the verdict on them both differ from the golden"
+                                  + changed + "; the entry's change or a verifier change moved the "
+                                  "verdict, so rule out the verifier before re-recording with "
+                                  "--update-golden"})
     return out
 
 
