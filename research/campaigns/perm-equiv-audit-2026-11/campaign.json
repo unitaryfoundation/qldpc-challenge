@@ -1,0 +1,64 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 500,
+      "cpu_hours": 50
+    },
+    "constraints": {
+      "n": [
+        1,
+        16384
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "not a search; run until backlog exhausted or budget spent",
+        "trials_cap": 1
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 50,
+        "trials_per_candidate": 1
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "Fewer wasted GPU resolutions on duplicates; cleaner submission dedup.",
+      "family": "other",
+      "feasibility": "permutation_audit.py / permutation_equivalence.py are pure combinatorial CPU work.",
+      "hypothesis": "Resolving possibly-equivalent flags and same-(n,k,w) WL matches removes duplicate submissions.",
+      "novelty": {
+        "against": "entries flagged possibly-equivalent",
+        "claim": "an equivalence record consumed by submit dedup and promote.py"
+      },
+      "what_a_negative_would_teach": "That the flagged entries are genuinely distinct."
+    },
+    "id": "perm-equiv-audit-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "generators": [
+        "research/audits/permutation_audit.py",
+        "research/audits/permutation_equivalence.py"
+      ]
+    },
+    "name": "Permutation / WL equivalence audit",
+    "notes": "CPU-only. Pure combinatorial audit.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}

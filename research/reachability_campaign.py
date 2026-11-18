@@ -22,8 +22,9 @@ Environment variables (all optional, sensible defaults):
   N_MAX         only process parents with n <= N_MAX (default: 1000)
   WORKERS       multiprocessing workers (default: 4)
   CHUNK_SIZE    parents per checkpoint (default: 25)
-  TRIALS        witness-search trials per side (default: 20000)
-  SKIP_DOMINATED  skip parents dominated by the board (default: 0)
+  TRIALS        witness-search trials per side (default: 2000; screen depth)
+  GF2_TRIALS    gf2_fast pre-filter trials per child (default: 2000)
+  SKIP_DOMINATED  skip parents dominated by the board (default: 1)
 
 Usage:
   uv run --extra research python -u research/reachability_campaign.py
@@ -58,8 +59,9 @@ OUT_PARETO = os.environ.get('OUT_PARETO', os.path.join(OUT_DIR, 'pareto_frontier
 N_MAX = int(os.environ.get('N_MAX', '1000'))
 WORKERS = int(os.environ.get('WORKERS', '4'))
 CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
-TRIALS = int(os.environ.get('TRIALS', '20000'))
-SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '0') == '1'
+TRIALS = int(os.environ.get('TRIALS', '2000'))  # screening depth; deep-confirm survivors at 20000+
+GF2_TRIALS = int(os.environ.get('GF2_TRIALS', '2000'))  # gf2_fast pre-filter trials per child
+SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '1') == '1'
 
 sys.path.insert(0, CALCULUS)
 sys.path.insert(0, CH + '/research/kit')
@@ -68,6 +70,7 @@ sys.path.insert(0, CH + '/research/kit')
 def _worker_init():
     sys.path.insert(0, CALCULUS)
     sys.path.insert(0, CH + '/research/kit')
+    sys.path.insert(0, CH + '/verify')
 
 def process_parent(args):
     """Process one parent. Returns (idx, parent_n, children_list, error)."""
@@ -116,6 +119,35 @@ def process_parent(args):
         seen.add((n, k, d_ub, w, lc, wc))
     return {'ppath': ppath, 'parent_n': pdoc['n'], 'children': children, 'error': None}
 
+
+
+# --- save worker (runs in subprocess) ---
+def _save_one(args):
+    """Save one child. Returns dict with ok, child, bkey, path, error."""
+    bkey, child, stg, trials = args
+    sys.path.insert(0, CALCULUS)
+    sys.path.insert(0, CH + '/research/kit')
+    n = child['n']; k = child['k']; d_ub = child['d_ub']
+    try:
+        import numpy as np
+        from submit import make_submission, save_submission
+        from coordination import unique_path
+        HX, HZ = checks_to_matrices(child['checks'], n)
+        doc = make_submission(HX, HZ,
+                             name='[[%d,%d,%d]] unified' % (n, k, d_ub),
+                             construction='Unified analyze+stage from parent n=%d.' % child['parent_n'],
+                             authors=['mathysrennela'], family='code-calculus',
+                             confidence='upper_bound', trials=trials)
+        path = unique_path('%s/%d-%d-%d.json' % (stg, n, k, d_ub), doc)
+        save_submission(doc, path, preflight=False, spec={
+            'constructor': 'planner.plan',
+            'params': {'parent_n': child['parent_n'],
+                       'parent_file': child['parent_file'],
+                       'parent_d': child['parent_d']},
+        })
+        return {'ok': True, 'child': child, 'bkey': bkey, 'path': path, 'error': None}
+    except Exception as e:
+        return {'ok': False, 'child': child, 'bkey': bkey, 'path': None, 'error': str(e)}
 
 # --- helpers ---
 def weight_members(wc):
@@ -420,64 +452,71 @@ def main():
         with mp.Pool(processes=WORKERS, initializer=_worker_init) as pool:
             results_list = pool.map(process_parent, args_list)
 
-        # aggregate in main process
+        # aggregate in main process: collect all children
+        all_children = []
         for res in results_list:
-            idx += 1
             if res.get('error'):
                 continue
-            for child in res['children']:
-                n = child['n']; k = child['k']; d_ub = child['d_ub']
-                w = child['w']; lc = child['lc']; wc = child['wc']
-                key = (n, k, d_ub, w, lc, wc)
-                if key in seen_targets:
-                    continue
-                bkey = (n, k, d_ub)
-                prev = best_variants.get(bkey)
-                if prev is not None and not better_variant(w, lc, wc, prev[0], prev[1], prev[2]):
-                    continue
-                # save matrix
-                try:
-                    HX, HZ = checks_to_matrices(child['checks'], n)
-                    doc = make_submission(HX, HZ,
-                                         name='[[%d,%d,%d]] unified' % (n, k, d_ub),
-                                         construction='Unified analyze+stage from parent n=%d.' % child['parent_n'],
-                                         authors=['mathysrennela'], family='code-calculus',
-                                         confidence='upper_bound', trials=TRIALS)
-                    path = unique_path('%s/%d-%d-%d.json' % (stg, n, k, d_ub), doc)
-                    save_submission(doc, path, spec={
-                        'constructor': 'planner.plan',
-                        'params': {'parent_n': child['parent_n'],
-                                   'parent_file': child['parent_file'],
-                                   'parent_d': child['parent_d']},
-                    })
-                    print('SAVED: %d-%d-%d (parent n=%d) -> %s' % (n, k, d_ub, child['parent_n'], path), flush=True)
-                    seen_targets.add(key)
-                    # track best variant for this (n,k,d_ub)
-                    bkey = (n, k, d_ub)
-                    prev = best_variants.get(bkey)
-                    if prev is not None and prev[3] and os.path.exists(prev[3]) and prev[3] != path:
-                        try: os.remove(prev[3])
-                        except Exception: pass
-                    best_variants[bkey] = (w, lc, wc, path)
-                    missing.discard(n)
-                    if has_checklist:
-                        try:
-                            mark_found(n, k, d_ub, 'unified', path)
-                        except Exception:
-                            pass
-                except Exception as e:
-                    print('SAVE FAILED %d-%d-%d: %s' % (n, k, d_ub, e), flush=True)
-                    continue
+            all_children.extend(res['children'])
 
-                # update reachable/results
-                tup = (k, d_ub, w, lc, wc)
-                reachable.setdefault(n, set()).add(tup)
-                # check domination against board
-                entry = {'n': n, 'k': k, 'd': d_ub, 'w': w, 'lc': lc, 'wc': wc}
-                if not dominated(entry, board_entries):
-                    results.setdefault(n, set()).add(tup)
-                    # update pareto frontier
-                    update_pareto(pareto_frontier, entry)
+        # dedup across chunk: keep best variant per (n,k,d_ub)
+        best_in_chunk = {}
+        for child in all_children:
+            n = child['n']; k = child['k']; d_ub = child['d_ub']
+            w = child['w']; lc = child['lc']; wc = child['wc']
+            key = (n, k, d_ub, w, lc, wc)
+            if key in seen_targets:
+                continue
+            bkey = (n, k, d_ub)
+            prev = best_variants.get(bkey)
+            if prev is not None and not better_variant(w, lc, wc, prev[0], prev[1], prev[2]):
+                continue
+            prev_local = best_in_chunk.get(bkey)
+            if prev_local is not None and not better_variant(w, lc, wc, prev_local['w'], prev_local['lc'], prev_local['wc']):
+                continue
+            best_in_chunk[bkey] = child
+
+        # save in parallel
+        save_args = [(bkey, child, stg, TRIALS) for bkey, child in best_in_chunk.items()]
+        if save_args:
+            with mp.Pool(processes=WORKERS, initializer=_worker_init) as save_pool:
+                save_results = save_pool.map(_save_one, save_args)
+        else:
+            save_results = []
+
+        for sr in save_results:
+            child = sr['child']
+            bkey = sr['bkey']
+            n = child['n']; k = child['k']; d_ub = child['d_ub']
+            w = child['w']; lc = child['lc']; wc = child['wc']
+            key = (n, k, d_ub, w, lc, wc)
+            if not sr['ok']:
+                print('SAVE FAILED %d-%d-%d: %s' % (n, k, d_ub, sr['error']), flush=True)
+                continue
+            path = sr['path']
+            print('SAVED: %d-%d-%d (parent n=%d) -> %s' % (n, k, d_ub, child['parent_n'], path), flush=True)
+            seen_targets.add(key)
+            missing.discard(n)
+            prev = best_variants.get(bkey)
+            if prev is not None and prev[3] and os.path.exists(prev[3]) and prev[3] != path:
+                try: os.remove(prev[3])
+                except Exception: pass
+            best_variants[bkey] = (w, lc, wc, path)
+            if has_checklist:
+                try:
+                    mark_found(n, k, d_ub, 'unified', path)
+                except Exception:
+                    pass
+
+            # update reachable/results
+            tup = (k, d_ub, w, lc, wc)
+            reachable.setdefault(n, set()).add(tup)
+            entry = {'n': n, 'k': k, 'd': d_ub, 'w': w, 'lc': lc, 'wc': wc}
+            if not dominated(entry, board_entries):
+                results.setdefault(n, set()).add(tup)
+                update_pareto(pareto_frontier, entry)
+
+        idx = chunk_end
 
         # checkpoint after chunk
         save_ckpt(idx, reachable, results, seen_targets, pareto_frontier, len(css_parents_sorted), best_variants)

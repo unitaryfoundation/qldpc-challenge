@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Local guard for the two CI gates that most often fail on submission PRs:
+#   - codes format (json.dumps(doc, indent=1))
+#   - prose (cited paths must resolve)
+set -e
+
+# Codes format
+changed_codes=$(git diff --cached --name-only --diff-filter=AMR -- 'codes/*.json' || true)
+if [ -n "$changed_codes" ]; then
+    python3 verify/check_codes_format.py --files $changed_codes
+fi
+
+# Prose (file-level paths; PR-body citations are checked by prepush_prose_check.sh)
+changed_md=$(git diff --cached --name-only --diff-filter=AMR -- 'notes/*.md' 'fieldnotes/*.md' || true)
+if [ -n "$changed_md" ]; then
+    python3 verify/check_prose.py --files $changed_md
+fi

@@ -39,11 +39,97 @@ def test_every_reproduction_has_a_golden_that_matches():
     rows = {r["slug"]: r for r in G.run_reproductions()}
     assert set(rows) == set(G.REPRODUCTIONS)
     for slug, r in rows.items():
-        assert r["status"] == "match", (slug, r)
+        assert r["ok"] and r["status"] in ("match", "match_entry_changed"), (slug, r)
     for slug in G.REPRODUCTIONS:
         with open(G._golden_path(slug), encoding="utf-8") as f:
             g = json.load(f)
         assert g["slug"] == slug and g["doc_sha256"] and g["report"]["ok"]
+        # An identical verdict passes on changed bytes because the verdict
+        # names the code it is a verdict on.
+        assert g["report"]["fingerprint"], slug
+
+
+@pytest.fixture
+def one_reproduction(tmp_path, monkeypatch):
+    """Point the gate at one synthetic entry with a freshly recorded golden.
+
+    Nothing here reads the board: the entry is the gate's own Steane document,
+    so no committed entry can move these tests.
+    """
+    codes = tmp_path / "codes"
+    codes.mkdir()
+    monkeypatch.setattr(G, "CODES", str(codes))
+    monkeypatch.setattr(G, "GOLDEN_DIR", str(tmp_path / "golden"))
+    monkeypatch.setattr(G, "REPRODUCTIONS", ("s-1-3",))
+    entry = codes / "s-1-3.json"
+    entry.write_text(json.dumps(G.steane(), indent=1), encoding="utf-8")
+    assert G.run_reproductions(update=True) == [{"slug": "s-1-3", "status": "recorded", "ok": True}]
+    return entry
+
+
+def only_row():
+    (row,) = G.run_reproductions()
+    return row
+
+
+def break_the_verifier(monkeypatch):
+    """Make the verifier say something else about every document."""
+    real = G.V.verify
+
+    def changed(doc, **kw):
+        rep = real(doc, **kw)
+        rep["checks"][0] = dict(rep["checks"][0], detail="a changed verifier")
+        return rep
+
+    monkeypatch.setattr(G.V, "verify", changed)
+
+
+def test_an_unchanged_entry_matches(one_reproduction):
+    assert only_row() == {"slug": "s-1-3", "status": "match", "ok": True}
+
+
+def test_changed_bytes_with_an_identical_verdict_still_pass(one_reproduction):
+    """What #5929 did: the entry file moved, and nothing the verdict reports did."""
+    doc = json.loads(one_reproduction.read_text(encoding="utf-8"))
+    doc["provenance"]["construction"] += " (reworded)"
+    one_reproduction.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    row = only_row()
+    assert row["ok"] and row["status"] == "match_entry_changed", row
+    assert G.ok({"solved": [], "broken": [], "reproductions": [row]})
+
+
+def test_changed_bytes_with_a_changed_verdict_fail(one_reproduction):
+    """A different code under the same name is not a reproduction of the golden."""
+    one_reproduction.write_text(json.dumps(G.shor(), indent=1), encoding="utf-8")
+    row = only_row()
+    assert not row["ok"] and row["status"] == "entry_changed", row
+    assert "rule out the verifier" in row["detail"]
+
+
+def test_a_changed_verdict_on_the_recorded_bytes_is_drift(one_reproduction, monkeypatch):
+    break_the_verifier(monkeypatch)
+    row = only_row()
+    assert not row["ok"] and row["status"] == "drift", row
+    assert "schema_valid" in row["detail"]
+
+
+def test_a_changed_verifier_is_not_excused_by_a_changed_entry(one_reproduction, monkeypatch):
+    """Both moved: the verdict differs, so it fails, and the detail does not blame the entry alone."""
+    doc = json.loads(one_reproduction.read_text(encoding="utf-8"))
+    doc["provenance"]["construction"] += " (reworded)"
+    one_reproduction.write_text(json.dumps(doc, indent=1), encoding="utf-8")
+    assert only_row()["status"] == "match_entry_changed"
+    break_the_verifier(monkeypatch)
+    row = only_row()
+    assert not row["ok"] and row["status"] == "entry_changed", row
+    assert "or a verifier change" in row["detail"] and "schema_valid" in row["detail"]
+
+
+def test_re_recording_refreshes_the_recorded_hash(one_reproduction):
+    one_reproduction.write_text(json.dumps(G.steane(), indent=3), encoding="utf-8")
+    assert only_row()["status"] == "match_entry_changed"
+    G.run_reproductions(update=True)
+    assert only_row() == {"slug": "s-1-3", "status": "match", "ok": True}
 
 
 def test_the_golden_files_are_in_the_pinned_closure():

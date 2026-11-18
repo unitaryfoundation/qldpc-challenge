@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 1000,
+      "cpu_hours": 200
+    },
+    "constraints": {
+      "max_check_weight": 32,
+      "n": [
+        1,
+        16384
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "not a search; run until targets exhausted or budget spent",
+        "trials_cap": 2000000
+      },
+      "bar": {
+        "axes": [
+          "d"
+        ],
+        "note": "per-entry d claim under audit",
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 200,
+        "trials_per_candidate": 2000000
+      },
+      "cell": "unrestricted~weight-any",
+      "expected_value": "A smaller soft-leader backlog before any GPU spend, plus distance revisions where refuted.",
+      "family": "other",
+      "feasibility": "annihilator.py is pure CPU and found prior refutations in 20s/core against 8M-trial claims.",
+      "hypothesis": "Targeted distribution-based annihilator attacks refute claims that uniform RIS missed, on new and block-shaped entries.",
+      "novelty": {
+        "against": "the prior annihilator-sweep record",
+        "claim": "a distribution-aware refutation record for the board's uncertified block-shaped and new entries"
+      },
+      "what_a_negative_would_teach": "That uniform RIS already covered these entries and the annihilator adds nothing for them."
+    },
+    "id": "annihilator-targeted-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "seeds": [
+          11,
+          12
+        ],
+        "trials_per_candidate": 2000000
+      }
+    },
+    "name": "Annihilator targeted sweep (distribution-based refutation)",
+    "notes": "CPU-only. Output: research/audits/annihilator-targeted-*.json + distance revisions.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
