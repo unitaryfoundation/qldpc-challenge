@@ -1,6 +1,6 @@
 {
-  "verified_codes": 3657,
-  "css_codes": 3400,
+  "verified_codes": 3656,
+  "css_codes": 3399,
   "stabilizer_codes": 257,
   "certified_exact": 1646,
   "tracks": 12,
@@ -8,21 +8,21 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2402,
+    "not_derived": 89,
     "literature": 490,
     "parameters_only": 418,
-    "not_derived": 90,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2817,
+    "unknown": 2816,
     "known_parameters": 765,
     "new_parameters": 75
   },
   "novelty_audited": 840,
   "board_screen": {
     "distinct": 2445,
-    "not_screened": 918,
+    "not_screened": 917,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -401,7 +401,7 @@
         "top1_share": 0.29,
         "top2_share": 0.413,
         "hhi": 0.119,
-        "members": 2364,
+        "members": 2363,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -434,7 +434,7 @@
         "top1_share": 0.329,
         "top2_share": 0.433,
         "hhi": 0.13,
-        "members": 3400,
+        "members": 3399,
         "leader": {
           "slug": "682-140-82",
           "family": "generalized-bicycle",
