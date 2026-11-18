@@ -256,3 +256,18 @@ command on the Pauli-weight encoding:
 
     uv run python research/certs/qedist_stabilizer_certify.py codes/<slug>.json \
         --qedist /path/to/qedist --tlim 60 --threads 4 --json
+
+## Sweep backend
+
+`certify_sweep.py` now accepts `--backend qedist` (and `qedist+sat`), routing
+entries through `routed_certify.py` (QEDist for d <= 64, tropidist fallback for
+higher d).  Example:
+
+    uv run --extra research python research/certs/certify_sweep.py run \
+        --backend qedist+sat --qedist /path/to/qedist --tropidist /path/to/tropidist \
+        --threads 4 --tlim 600 --job-seconds 14400
+
+## Circuit fault-distance audit
+
+    uv run python research/audits/qedist_circuit_audit.py codes/<slug>.json \
+        --seconds 60 --json

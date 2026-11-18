@@ -557,6 +557,37 @@ def test_a_replacement_circuit_that_lowers_a_side_is_blocked(monkeypatch):
     assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
 
 
+def test_a_distance_revision_that_renames_the_entry_inherits_the_gap(monkeypatch):
+    """A distance revision files the record under its new slug (CONTRIBUTING.md,
+    "Correcting a distance already on the board"), so the base entry is read
+    under the name the PR replaced rather than taken for a new entry."""
+    base = _code_document(model=None)
+    head = _code_document(model=None)
+    head["provenance"]["notes"] = " Distance revision 2026-11-10: Z side 80 -> 75 (witness by @reviser)."
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/10-2-2.json", "previous_filename": "codes/10-2-3.json", "status": "renamed"},
+            {"filename": "notes/10-2-2.md", "previous_filename": "notes/10-2-3.md", "status": "renamed"},
+        ],
+    )
+
+    def read(_repo, path, ref):
+        if ref == "abc123" and path == "codes/10-2-2.json":
+            return head
+        if ref == "main" and path == "codes/10-2-3.json":
+            return base
+        raise merge_eligible_prs.GitHubCLIError(f"no {path} at {ref}")
+
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", read)
+    monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert result.eligible and result.metadata_errors == []
+    assert result.inherited_gaps == [("codes/10-2-2.json", "missing or empty provenance.model")]
+    assert merge_eligible_prs.metadata_comment_body(result) is None
+
+
 def test_a_refutation_that_appends_its_credit_to_notes_still_inherits_the_gap(monkeypatch):
     """A circuit refutation appends a sentence to provenance.notes (its only admitted provenance change)."""
     base = _code_document(model=None)

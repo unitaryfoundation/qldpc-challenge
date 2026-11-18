@@ -1,0 +1,172 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[38,4,7]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"other","code_origin":"submission","code_tier":"ub","locality_class":"local-2d-bilayer","page_type":"code_detail","weight_class":"weight-8"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../index.html">&larr; back to the board</a>
+<div class=codehead><span class="mono big">[[38,4,7]]</span> <span class="b ub" title="verified upper bound: an explicit logical of this weight, and independent refutation searches found nothing lighter">d &le;</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>38</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>4</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>7</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>5.15789</div></div>
+<div class=cell title="max check weight"><div class=l>w</div><div class=v>8</div></div>
+<div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
+<div class=cell title="geometric efficiency 4kd²/(nρ²r⁴) from the verified layout; surface code = 1; inherits the upper-bound distance tier"><div class=l>g</div><div class=v>0.0159</div></div>
+<div class=cell title="measured interaction radius: the largest check diameter in the layout, in units of the qubit spacing"><div class=l>r</div><div class=v>4.2426</div></div>
+<div class=cell title="physical layers (e.g. 2 for a flip-chip bilayer)"><div class=l>layers</div><div class=v>2</div></div>
+<div class=cell title="heuristic routing cost: 82 nearest-neighbor SWAPs per syndrome-extraction round to make every check&#x27;s support connected on the verified layout, at most 6 for one check. MST lower bound, not an optimal schedule: per check, the minimum-spanning-tree length of its support in lattice steps minus (|support| - 1). One lattice step is the layout&#x27;s minimum qubit spacing (1); qubits at most one step apart are nearest neighbors. A diagnostic, not a rank"><div class=l>swaps</div><div class=v>82</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/38-4-7.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B38%2C4%2C7%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/38-4-7.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B38%2C4%2C7%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/38-4-7.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/38-4-7.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X &le; 7, d_Z &le; 7 &middot; w_X = 8, w_Z = 8 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
+<div class=kv><b>d_X</b> 7 &middot; witness weight 7 (claimed upper_bound)</div>
+<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/FarLab">@FarLab</a> &middot; verify/ris_gpu.py &middot; found at 3&times;10<sup>8</sup> trials &middot; survived 3&times;10<sup>8</sup> trials &middot; 2026-11-16</div>
+<details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[0, 1, 15, 23, 24, 32, 36]</div></details>
+<div class=kv><b>d_Z</b> 7 &middot; witness weight 7 (claimed upper_bound)</div>
+<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/FarLab">@FarLab</a> &middot; verify/ris_gpu.py &middot; found at 3&times;10<sup>8</sup> trials &middot; survived 3&times;10<sup>8</sup> trials &middot; 2026-11-16</div>
+<details><summary>witness operator (support, 7 qubits)</summary><div class=wit>[0, 1, 5, 12, 29, 30, 34]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 4 &middot; H_Z 4 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> H_X 7&ndash;8 (mean 7.706) &middot; H_Z 7&ndash;8 (mean 7.765)</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> H_X 1&ndash;6 (mean 3.447) &middot; H_Z 1&ndash;6 (mean 3.474)</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_X</b> (1,1)×4 (2,1)×4 (3,1)×4 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_X</summary><div class=wit>(1,1): 4
+(1,2): 15
+(1,4): 4
+(1,5): 9
+(1,6): 6
+(2,1): 4
+(2,2): 15
+(2,3): 8
+(2,4): 47
+(2,5): 89
+(2,6): 72
+(2,7): 50
+(2,8): 36
+(2,9): 21
+(2,10): 6
+(3,1): 4
+(3,2): 30
+(3,3): 91
+(3,4): 297
+(3,5): 555
+(3,6): 696
+(3,7): 830
+(3,8): 689
+(3,9): 470
+(3,10): 205
+(3,11): 99
+(3,12): 43
+(3,13): 12</div></details>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_Z</b> (1,1)×4 (2,1)×4 (3,1)×4 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_Z</summary><div class=wit>(1,1): 4
+(1,2): 15
+(1,3): 1
+(1,5): 13
+(1,6): 5
+(2,1): 4
+(2,2): 13
+(2,3): 15
+(2,4): 27
+(2,5): 108
+(2,6): 77
+(2,7): 34
+(2,8): 42
+(2,9): 25
+(2,10): 5
+(3,1): 4
+(3,2): 21
+(3,3): 115
+(3,4): 259
+(3,5): 569
+(3,6): 752
+(3,7): 736
+(3,8): 734
+(3,9): 498
+(3,10): 210
+(3,11): 94
+(3,12): 49
+(3,13): 11
+(3,14): 1</div></details>
+<div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 4.4721 &middot; Z 4.2426 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
+</section>
+<section class=blk><h3>Verified 2D layout</h3>
+<div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
+<div class=layoutfig><svg viewBox="0 0 388 304" role="img" class="lofig" aria-label="verified 2D layout: 38 qubit sites and 34 checks"><polygon class="lo-chk lo-x" data-sites="0 8 9 10 16 17" points="194.0,278.0 194.0,278.0 362.0,278.0 278.0,110.0 194.0,194.0 110.0,110.0 110.0,194.0"/><polygon class="lo-chk lo-x" data-sites="1 2 8 13 15 17 19" points="26.0,194.0 110.0,278.0 278.0,110.0 194.0,110.0 194.0,26.0 110.0,110.0 26.0,110.0"/><polygon class="lo-chk lo-x" data-sites="2 3 4 5 12 14 16 17" points="110.0,278.0 278.0,194.0 278.0,278.0 362.0,278.0 362.0,194.0 362.0,110.0 278.0,26.0 278.0,110.0"/><polygon class="lo-chk lo-x" data-sites="3 4 12 13 14 16 19" points="278.0,278.0 362.0,278.0 362.0,194.0 362.0,110.0 278.0,26.0 194.0,26.0 194.0,110.0 194.0,110.0"/><polygon class="lo-chk lo-x" data-sites="0 4 5 11 15 17 19" points="26.0,194.0 194.0,278.0 278.0,194.0 278.0,110.0 278.0,26.0 278.0,26.0 194.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-x" data-sites="2 5 9 13 14 15 16" points="110.0,278.0 362.0,278.0 362.0,194.0 278.0,194.0 194.0,110.0 110.0,194.0 26.0,194.0"/><polygon class="lo-chk lo-x" data-sites="0 4 5 12 14 16 18" points="26.0,278.0 194.0,278.0 278.0,278.0 362.0,278.0 362.0,278.0 362.0,194.0 278.0,194.0 278.0,26.0"/><polygon class="lo-chk lo-x" data-sites="5 6 8 12 14 15" points="26.0,194.0 278.0,278.0 278.0,194.0 362.0,194.0 362.0,194.0 110.0,26.0 110.0,26.0 110.0,110.0"/><polygon class="lo-chk lo-x" data-sites="0 1 6 12 15 17 18" points="26.0,194.0 26.0,194.0 26.0,278.0 194.0,278.0 278.0,278.0 278.0,110.0 110.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-x" data-sites="0 4 7 13 14 16 19" points="194.0,278.0 362.0,278.0 362.0,194.0 362.0,26.0 362.0,26.0 278.0,26.0 194.0,26.0 194.0,110.0"/><polygon class="lo-chk lo-x" data-sites="1 4 5 7 8 12 13 17" points="278.0,278.0 278.0,194.0 278.0,110.0 362.0,26.0 278.0,26.0 194.0,110.0 110.0,110.0 26.0,110.0"/><polygon class="lo-chk lo-x" data-sites="0 5 8 9 14 16 18" points="26.0,278.0 194.0,278.0 362.0,278.0 362.0,194.0 278.0,194.0 110.0,110.0 110.0,194.0"/><polygon class="lo-chk lo-x" data-sites="0 3 9 13 15 16 17" points="26.0,194.0 110.0,194.0 110.0,194.0 194.0,278.0 362.0,278.0 362.0,110.0 278.0,110.0 194.0,110.0"/><polygon class="lo-chk lo-x" data-sites="3 8 10 12 14 15 16" points="278.0,278.0 362.0,278.0 362.0,194.0 362.0,110.0 110.0,110.0 194.0,194.0 26.0,194.0 26.0,194.0"/><polygon class="lo-chk lo-x" data-sites="2 10 12 17 18" points="26.0,278.0 110.0,278.0 278.0,278.0 278.0,278.0 278.0,110.0 278.0,110.0 194.0,194.0"/><polygon class="lo-chk lo-x" data-sites="5 8 11 13 15 18" points="26.0,194.0 26.0,278.0 278.0,194.0 194.0,110.0 194.0,110.0 110.0,110.0 26.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-x" data-sites="4 6 9 11 12 15 17 19" points="26.0,194.0 110.0,194.0 278.0,278.0 278.0,110.0 278.0,26.0 194.0,26.0 110.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-z" data-sites="1 2 3 6 10 11 12 15" points="26.0,194.0 110.0,278.0 278.0,278.0 194.0,194.0 362.0,110.0 110.0,26.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="1 2 3 7 10 11 13 17" points="110.0,278.0 194.0,194.0 362.0,110.0 278.0,110.0 362.0,26.0 194.0,110.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="2 4 5 7 11 13" points="194.0,110.0 110.0,278.0 278.0,194.0 362.0,26.0 362.0,26.0 278.0,26.0 278.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-z" data-sites="3 5 6 8 9 10 14" points="110.0,194.0 194.0,194.0 278.0,194.0 362.0,194.0 362.0,110.0 110.0,26.0 110.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 4 6 7 8 9 14" points="110.0,194.0 194.0,278.0 194.0,278.0 362.0,194.0 362.0,26.0 278.0,26.0 110.0,26.0 110.0,110.0"/><polygon class="lo-chk lo-z" data-sites="1 2 3 6 7 14 17" points="110.0,278.0 110.0,278.0 362.0,194.0 362.0,110.0 278.0,110.0 362.0,26.0 110.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="3 5 6 7 10 12 14" points="194.0,194.0 278.0,194.0 278.0,278.0 362.0,194.0 362.0,110.0 362.0,26.0 110.0,26.0"/><polygon class="lo-chk lo-z" data-sites="2 4 5 6 7 8 11 19" points="110.0,110.0 110.0,278.0 278.0,194.0 362.0,26.0 278.0,26.0 194.0,26.0 110.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-z" data-sites="1 3 5 6 9 11 15" points="26.0,194.0 110.0,194.0 278.0,194.0 362.0,110.0 110.0,26.0 26.0,26.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 3 5 7 8 16" points="194.0,278.0 278.0,194.0 362.0,278.0 362.0,278.0 362.0,110.0 362.0,110.0 362.0,26.0 110.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 4 7 9 10 16 17" points="110.0,194.0 194.0,194.0 194.0,194.0 194.0,278.0 362.0,278.0 362.0,26.0 278.0,110.0 278.0,26.0"/><polygon class="lo-chk lo-z" data-sites="1 5 6 8 10 11 15 18" points="26.0,194.0 26.0,278.0 194.0,194.0 278.0,194.0 110.0,110.0 110.0,26.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 1 2 9 11 18" points="26.0,278.0 110.0,278.0 194.0,278.0 110.0,194.0 110.0,194.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 1 3 4 6 7 8 11" points="26.0,110.0 110.0,110.0 194.0,278.0 362.0,110.0 362.0,26.0 278.0,26.0 110.0,26.0 26.0,26.0"/><polygon class="lo-chk lo-z" data-sites="1 2 6 8 10 11 17" points="110.0,278.0 194.0,194.0 194.0,194.0 278.0,110.0 110.0,26.0 26.0,26.0 110.0,110.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="0 1 3 7 9 10 11 13" points="110.0,194.0 194.0,278.0 194.0,194.0 362.0,110.0 362.0,26.0 194.0,110.0 26.0,26.0 26.0,110.0"/><polygon class="lo-chk lo-z" data-sites="1 3 4 7 11 13 19" points="26.0,110.0 194.0,110.0 362.0,110.0 362.0,26.0 278.0,26.0 194.0,26.0 26.0,26.0"/><circle class=lo-q2 data-s="0" cx="194.0" cy="278.0" r="9.2"/><circle class=lo-q data-s="0" cx="194.0" cy="278.0" r="6.0"/><circle class=lo-q2 data-s="1" cx="26.0" cy="110.0" r="9.2"/><circle class=lo-q data-s="1" cx="26.0" cy="110.0" r="6.0"/><circle class=lo-q2 data-s="2" cx="110.0" cy="278.0" r="9.2"/><circle class=lo-q data-s="2" cx="110.0" cy="278.0" r="6.0"/><circle class=lo-q2 data-s="3" cx="362.0" cy="110.0" r="9.2"/><circle class=lo-q data-s="3" cx="362.0" cy="110.0" r="6.0"/><circle class=lo-q2 data-s="4" cx="278.0" cy="26.0" r="9.2"/><circle class=lo-q data-s="4" cx="278.0" cy="26.0" r="6.0"/><circle class=lo-q2 data-s="5" cx="278.0" cy="194.0" r="9.2"/><circle class=lo-q data-s="5" cx="278.0" cy="194.0" r="6.0"/><circle class=lo-q2 data-s="6" cx="110.0" cy="26.0" r="9.2"/><circle class=lo-q data-s="6" cx="110.0" cy="26.0" r="6.0"/><circle class=lo-q2 data-s="7" cx="362.0" cy="26.0" r="9.2"/><circle class=lo-q data-s="7" cx="362.0" cy="26.0" r="6.0"/><circle class=lo-q2 data-s="8" cx="110.0" cy="110.0" r="9.2"/><circle class=lo-q data-s="8" cx="110.0" cy="110.0" r="6.0"/><circle class=lo-q2 data-s="9" cx="110.0" cy="194.0" r="9.2"/><circle class=lo-q data-s="9" cx="110.0" cy="194.0" r="6.0"/><circle class=lo-q2 data-s="10" cx="194.0" cy="194.0" r="9.2"/><circle class=lo-q data-s="10" cx="194.0" cy="194.0" r="6.0"/><circle class=lo-q2 data-s="11" cx="26.0" cy="26.0" r="9.2"/><circle class=lo-q data-s="11" cx="26.0" cy="26.0" r="6.0"/><circle class=lo-q2 data-s="12" cx="278.0" cy="278.0" r="9.2"/><circle class=lo-q data-s="12" cx="278.0" cy="278.0" r="6.0"/><circle class=lo-q2 data-s="13" cx="194.0" cy="110.0" r="9.2"/><circle class=lo-q data-s="13" cx="194.0" cy="110.0" r="6.0"/><circle class=lo-q2 data-s="14" cx="362.0" cy="194.0" r="9.2"/><circle class=lo-q data-s="14" cx="362.0" cy="194.0" r="6.0"/><circle class=lo-q2 data-s="15" cx="26.0" cy="194.0" r="9.2"/><circle class=lo-q data-s="15" cx="26.0" cy="194.0" r="6.0"/><circle class=lo-q2 data-s="16" cx="362.0" cy="278.0" r="9.2"/><circle class=lo-q data-s="16" cx="362.0" cy="278.0" r="6.0"/><circle class=lo-q2 data-s="17" cx="278.0" cy="110.0" r="9.2"/><circle class=lo-q data-s="17" cx="278.0" cy="110.0" r="6.0"/><circle class=lo-q data-s="18" cx="26.0" cy="278.0" r="6.0"/><circle class=lo-q data-s="19" cx="194.0" cy="26.0" r="6.0"/><line class=lo-r x1="278.0" y1="26.0" x2="26.0" y2="278.0"/><text class=lo-rt x="162.0" y="144.0" text-anchor="start">r = 4.243</text></svg><div class=lolegend><span><span class=sw style="background:#36006c"></span>X check</span><span><span class=sw style="background:#059669"></span>Z check</span><span><span class=dt></span>qubit site (20)</span><span><span class=rg></span>2 qubits stacked (2 layers)</span><span>dashed: the pair setting the interaction radius</span><span>hover a check to isolate its qubits; click to pin &mdash; repeated clicks cycle through overlapping checks; click empty space to release</span></div></div>
+<div class=kv><b>routing cost</b> 82 nearest-neighbor SWAPs per round in total, at most 6 for one check <span class=claimed>(heuristic: MST lower bound on the layout, with one lattice step = the minimum qubit spacing 1; not a rank)</span></div>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/FarLab">@FarLab</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> E-PEEL (code-calculus) of codes/40-4-8.json at qubits 19 and 20: the qubits are deleted and X checks 1, 18, 19 and Z checks 0, 18, 19 of the parent are dropped; the bilayer layout is the parent&#x27;s. Witnessed at 300,000,000 GPU RIS trials per side (pair depth 32).</div>
+<div class=kv><b>model</b> <span class=modelmark></span>Gemini 4 Carbon <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>harness</b> Antigravity <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>date</b> 2026-11-16</div>
+<div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/38-4-7.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[38,4,7]] two-qubit peel of [[40,4,8]] 2BGA, 2D-local bilayer</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: CSS, weight-8 x local-2d-bilayer. Campaign <code>research/campaigns/cc-2dlocal-deep-verify-gpu-2026-11-15/campaign.json</code> (issue #5812) asks whether 2D-local code-calculus children keep their distance at 300M trials or were inflated by shallow screening. A child inherits its parent&#x27;s bilayer layout, so if its distance holds it is a 2D-local frontier extension next to the parent.</p>
+<h4>What was searched</h4>
+<p>671 2D-local CSS parents from <code>codes/</code> (n &lt;= 99, check weight &lt;= 8). Each was expanded with the code-calculus moves C-DELETE-CHECK, E-PEEL, E-PUNCTURE and sector swap, up to 3 steps at beam 3, and every connected child was tightened with the <code>verify/gf2_fast.cpp</code> accelerator at 2,000,000 trials (seeds 11 and 12, pair depth 32). 5,990 children were screened; 1,039 were non-duplicate at d &gt;= 3, 996 of those were dominated on the board, and 35 remained after a within-batch Pareto filter. All 35 went to the GPU.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 2,000,000 (gf2_fast screen, seeds 11 and 12, lightest over both) | 7 | | 300,000,000 (verify/ris_gpu.py, seeds 51 and 52, lightest over both) | 7 | | 1,000,000 (gf2_fast, seed 9201) | 7 | | 1,000,000 (gf2_fast, seed 9202) | 7 |</p>
+<p>4 fresh-seed rung(s) agree at the best bound, the deepest of them at 300,000,000 trials per side. The submitted witness reproduces it: X: d &lt;= 7 (upper_bound), Z: d &lt;= 7 (upper_bound).</p>
+<p>Every rung used pair depth 32. The sides read d_X &lt;= 7 and d_Z &lt;= 7. None of the 35 GPU-measured children read lower at 300M trials than at 2M. <code>verify/gate_changed.py</code> was also replayed on this file as a new entry against the board at e289cf5 (seed 1930221233): one 29,560-trial Python RIS seed and the 4,434,000-trial fast pass found nothing lighter than 7; the orbit-fold pass found no symmetry to fold. The claim is a witness-backed upper bound, not an exact distance. The later fresh-seed rungs, the gate replay and the packaging were done after the search, in a separate Claude Code session (Claude Fable 5.2).</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Three of the 35 GPU-measured children had the WL signature of an existing</li>
+<p>entry (<code>codes/11-3-3-d.json</code>, <code>codes/15-3-3.json</code>, <code>codes/63-35-3.json</code>) and were dropped.</p>
+<li>The 35 files are 24 distinct codes by WL signature; of the 17 parameter</li>
+<p>points left after the drop, 13 have d = 3.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini 4 Carbon (Antigravity). Repo tooling: <code>verify/gf2_fast.cpp</code>, <code>verify/ris_gpu.py</code>, <code>verify/gate_changed.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>. Compute: one Brev node with 4x A100 80GB and 48 vCPUs; 48.6 CPU-hours for the campaign screen and 0.05 GPU-hours for this code&#x27;s 300M rung. The code-calculus moves come from the external code-calculus library (development snapshot of 2026-11-16).</p>
+<h4>Reproduction</h4>
+<p>Take <code>codes/40-4-8.json</code>. Delete qubits 19 and 20 (0-indexed) from every check, drop X checks 1, 18, 19 and Z checks 0, 18, 19 (0-indexed rows of the parent), and renumber the remaining 38 qubits in order. The layout is the parent&#x27;s coordinates with the deleted qubits removed. This is the code-calculus E-PEEL chain the campaign recorded (E-PEEL, then E-PEEL); the qubit and check indices were recovered afterwards by comparing the child with the parent, the match is unique, and rebuilding from this recipe reproduces the committed checks and coordinates.</p></div></section>
+<section class=blk><h3>Parity checks</h3>
+<div class=kv><b>X-checks</b> 17 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 17 (max weight 8)</div>
+<details><summary>H_X (17 checks, sparse supports)</summary><div class=wit>[0, 18, 23, 28, 29, 31, 32]
+[2, 3, 20, 27, 32, 33, 35]
+[3, 14, 19, 21, 24, 26, 33, 36]
+[4, 5, 19, 20, 22, 28, 34, 35]
+[5, 16, 21, 23, 26, 29, 35, 37]
+[6, 7, 20, 24, 31, 36, 37]
+[0, 7, 21, 22, 25, 28, 30, 36]
+[8, 9, 19, 22, 24, 26, 32, 37]
+[1, 9, 23, 25, 27, 30, 33, 37]
+[10, 11, 20, 21, 23, 24, 28, 35]
+[2, 11, 21, 25, 26, 29, 32, 34]
+[12, 13, 22, 23, 26, 28, 30]
+[4, 13, 23, 27, 29, 31, 34, 36]
+[14, 15, 24, 25, 27, 28, 32, 37]
+[6, 15, 19, 25, 29, 30, 33]
+[16, 17, 20, 26, 27, 30, 32, 34]
+[8, 17, 19, 21, 27, 31, 33, 35]</div></details>
+<details><summary>H_Z (17 checks, sparse supports)</summary><div class=wit>[1, 3, 4, 8, 15, 17, 19, 27]
+[2, 4, 6, 10, 16, 18, 20, 29]
+[3, 5, 7, 10, 11, 17, 20, 21]
+[4, 7, 8, 12, 18, 22, 31]
+[0, 5, 9, 10, 12, 13, 22, 23]
+[1, 3, 6, 8, 10, 14, 24, 33]
+[7, 9, 11, 14, 15, 24, 25]
+[3, 5, 8, 11, 12, 16, 26, 35]
+[2, 9, 13, 14, 16, 17, 26, 27]
+[0, 4, 7, 10, 12, 14, 28, 36]
+[0, 5, 11, 13, 15, 18, 28, 29]
+[1, 7, 9, 12, 15, 16, 30, 37]
+[0, 1, 6, 13, 17, 30, 31]
+[0, 2, 8, 11, 14, 16, 21, 32]
+[2, 3, 9, 15, 17, 18, 32, 33]
+[1, 4, 11, 13, 16, 18, 23, 34]
+[2, 4, 5, 10, 17, 34, 35]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>38-4-7</code> &middot; <a href="38-4-7.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/38-4-7.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>
