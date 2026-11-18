@@ -25,7 +25,3 @@ verify:
 
 example:
 	uv run python verify/qldpc_verify.py codes/72-12-6.json
-
-install-hooks:
-	git config core.hooksPath .githooks
-	@echo "git hooks enabled (.githooks)"
