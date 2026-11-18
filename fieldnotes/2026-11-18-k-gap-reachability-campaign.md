@@ -72,7 +72,7 @@ scheduling heuristic, not a verdict.
 
 The first submission batch failed twice before any PR opened: a stray
 untracked file in codes/ broke the board loader and left the PR body's
-frontier section as a TODO that the prose pre-flight refuses, and the
+frontier section as an unfilled placeholder that the prose pre-flight refuses, and the
 drafted bodies cited a repro manifest the ./qldpc submit flow does not
 write. Both were fixed by removing the stray file and writing per-code
 research notes (notes/<slug>.md) that describe the recipe inline. A
