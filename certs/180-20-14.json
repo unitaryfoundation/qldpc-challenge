@@ -1,0 +1,46 @@
+{
+  "name": "Exact-distance study of [[180,20,14]] (two public independent solvers)",
+  "d": 14,
+  "d_lower": 14,
+  "d_exact": true,
+  "solver": "Public exactA and exactB (TimoKellerMath/quantum-error-correction @ ae52261bfdbd; source sha256 pinned in PUBLIC_RESULTS.json)",
+  "encoding": "Independent anchored exhaustive low-weight nontrivial CSS logical searches over each X/Z sector at cap W=13, public external solvers exactA and exactB, one verified cyclic automorphism; matched independent output, no private engine source",
+  "symmetry": true,
+  "logical_classes": 20,
+  "sides": {
+    "X": {
+      "value": 14,
+      "exact": true,
+      "status": "UNSAT",
+      "proved_min": 14,
+      "note": "At W=13 both public solvers exhausted without a logical: exactA 129201 nodes; exactB 76724 nodes. Existing weight-14 witness verified.",
+      "ladder": [
+        {
+          "W": 13,
+          "status": "UNSAT",
+          "secs": 0.668,
+          "note": "exactA 129201 nodes; exactB 76724 nodes, both completed; same fixed code inputs"
+        }
+      ]
+    },
+    "Z": {
+      "value": 14,
+      "exact": true,
+      "status": "UNSAT",
+      "proved_min": 14,
+      "note": "At W=13 both public solvers exhausted without a logical: exactA 126902 nodes; exactB 77480 nodes. Existing weight-14 witness verified.",
+      "ladder": [
+        {
+          "W": 13,
+          "status": "UNSAT",
+          "secs": 0.711,
+          "note": "exactA 126902 nodes; exactB 77480 nodes, both completed; same fixed code inputs"
+        }
+      ]
+    }
+  },
+  "verification": {
+    "level": "solver",
+    "note": "Two independent public source programs returned UNSAT for both sectors. This is solver-level computational evidence, not a proof_log or formal certificate. See research/exact_distance_180_pair/INDEPENDENT_VERIFICATION.md and PUBLIC_RESULTS.json for pinned sources, input hashes, commands and run outputs."
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "claim": "independently run two public solvers on two public board entries; not a formal proof object",
+  "tools_repo": "https://github.com/TimoKellerMath/quantum-error-correction",
+  "tools_commit": "ae52261bfdbd",
+  "board_repo": "https://github.com/unitaryfoundation/qldpc-challenge",
+  "board_commit": "db19f655b4d2ecfde32c0e16b1bf178d8a5fcac2",
+  "sha256": {
+    "exactA.c": "2d1f0d1a55d9b9d71eff102eab6f131b4a6ff2da0e973518651877c3c3187856",
+    "exactB.c": "e793e5b34eb60098f9ff72d02f6608e4a7f5975fc8e4f02ada8b5213ad0ae1a1",
+    "180-18-14.json": "805fd91dd45c4af9eaa50c18ef60754702b655fe4cd779576719e15b1fcc63e1",
+    "180-20-14.json": "eec53895ef4c1b72c3ef428ed0445e81403c9370ad14c5b94c7676ef98e2549d"
+  },
+  "raw_colab_status_sha256": "3e33ed4710b3d9a8514c59aeecfd5592fbc9ea2579a2407367c9e2174d1393e1",
+  "cases": {
+    "180-18-14": {
+      "n": 180,
+      "k": 18,
+      "rankX": 81,
+      "rankZ": 81,
+      "witness_weight": 14,
+      "public_symmetry_check": "PASS"
+    },
+    "180-20-14": {
+      "n": 180,
+      "k": 20,
+      "rankX": 80,
+      "rankZ": 80,
+      "witness_weight": 14,
+      "public_symmetry_check": "PASS"
+    }
+  },
+  "results": {
+    "180-18-14_X_exactA": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=X W=13 Weff=13 verdict=none nodes=132154 leaves=0 wall=0.40 cpu=0.74 search=0.40 jobs=6 items=48 threads=2 mode=anchor",
+      "time_s": 0.399
+    },
+    "180-18-14_X_exactB": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=X W=13 searched=13 found=none nodes=71381 generated=275478 leaves=0 wall=0.29 cpu=0.57 setup=0.00 threads=2",
+      "time_s": 0.29
+    },
+    "180-18-14_Z_exactA": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=Z W=13 Weff=13 verdict=none nodes=122291 leaves=0 wall=0.39 cpu=0.75 search=0.39 jobs=6 items=48 threads=2 mode=anchor",
+      "time_s": 0.389
+    },
+    "180-18-14_Z_exactB": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=Z W=13 searched=13 found=none nodes=64370 generated=256057 leaves=0 wall=0.29 cpu=0.54 setup=0.00 threads=2",
+      "time_s": 0.295
+    },
+    "180-20-14_X_exactA": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=X W=13 Weff=13 verdict=none nodes=129201 leaves=0 wall=0.35 cpu=0.69 search=0.35 jobs=6 items=48 threads=2 mode=anchor",
+      "time_s": 0.356
+    },
+    "180-20-14_X_exactB": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=X W=13 searched=13 found=none nodes=76724 generated=290081 leaves=0 wall=0.31 cpu=0.60 setup=0.00 threads=2",
+      "time_s": 0.312
+    },
+    "180-20-14_Z_exactA": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=Z W=13 Weff=13 verdict=none nodes=126902 leaves=0 wall=0.38 cpu=0.70 search=0.38 jobs=6 items=48 threads=2 mode=anchor",
+      "time_s": 0.38
+    },
+    "180-20-14_Z_exactB": {
+      "returncode": 0,
+      "status": "EXHAUSTED_NO_LIGHTER_LOGICAL",
+      "result_line": "RESULT side=Z W=13 searched=13 found=none nodes=77480 generated=305083 leaves=0 wall=0.33 cpu=0.64 setup=0.00 threads=2",
+      "time_s": 0.331
+    }
+  },
+  "status": "TWO_PUBLIC_SOLVERS_ALL_SECTORS_PASS"
+}
