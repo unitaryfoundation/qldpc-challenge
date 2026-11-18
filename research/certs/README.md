@@ -249,3 +249,10 @@ use tropidist for stabilizer entries and d > 64.
 
     uv run python research/certs/qedist_certify.py codes/<slug>.json \
         --qedist /path/to/qedist --tlim 60 --threads 4 --json
+
+Stabilizer entries (code_type == "stabilizer") are handled by
+`qedist_stabilizer_certify.py`, which uses QEDist's `certify-stabilizer`
+command on the Pauli-weight encoding:
+
+    uv run python research/certs/qedist_stabilizer_certify.py codes/<slug>.json \
+        --qedist /path/to/qedist --tlim 60 --threads 4 --json

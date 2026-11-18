@@ -15,7 +15,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "research" / "kit"))
 
-from qedist import challenge_to_qedist, find_qedist  # noqa: E402
+from qedist import (  # noqa: E402
+    challenge_to_qedist,
+    challenge_stabilizer_to_qedist,
+    find_qedist,
+)
 
 
 class ConversionTests(unittest.TestCase):
@@ -43,6 +47,20 @@ class ConversionTests(unittest.TestCase):
     def test_missing_checks_rejected(self):
         with self.assertRaises(ValueError):
             challenge_to_qedist({"code_type": "CSS", "n": 4, "checks": {}})
+
+    def test_stabilizer_conversion(self):
+        doc = json.loads((ROOT / "codes" / "20-4-5.json").read_text())
+        out = challenge_stabilizer_to_qedist(doc)
+        self.assertEqual(out["schema"], "qedist.stabilizer.v1")
+        self.assertEqual(out["n"], 20)
+        self.assertEqual(len(out["stabilizers"]), 20)
+        self.assertIn("witnesses", out)
+        self.assertEqual(len(out["witnesses"][0]), 20)
+
+    def test_stabilizer_wrong_type_rejected(self):
+        doc = json.loads((ROOT / "codes" / "10-2-3-b.json").read_text())
+        with self.assertRaises(ValueError):
+            challenge_stabilizer_to_qedist(doc)
 
 
 @unittest.skipUnless(
