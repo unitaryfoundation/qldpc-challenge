@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[15,5,3]]",
  "code_type": "CSS",
  "n": 15,
@@ -215,6 +215,60 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2623,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.109767835,
+     "ci95": [
+      0.105155145,
+      0.114594619
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 828,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.029281317,
+     "ci95": [
+      0.027317886,
+      0.03138282
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2724,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.115375077,
+     "ci95": [
+      0.110570076,
+      0.120404293
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 850,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.030110181,
+     "ci95": [
+      0.028115348,
+      0.032243457
+     ]
+    }
+   ]
   }
  }
 }

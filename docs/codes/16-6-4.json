@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[16,6,4]] quantum Reed-Muller code, single-layer 2D-local layout",
  "code_type": "CSS",
  "n": 16,
@@ -250,6 +250,36 @@
    ],
    "date": "2026-11-18",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 4867,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.29807485,
+     "ci95": [
+      0.268217575,
+      0.355370279
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 4735,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.260095181,
+     "ci95": [
+      0.240506577,
+      0.286231674
+     ]
+    }
+   ]
   }
  }
 }

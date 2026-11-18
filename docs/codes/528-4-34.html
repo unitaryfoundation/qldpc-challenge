@@ -62,7 +62,7 @@
 <p>The target was the unrestricted weight-6 cell at high distance. The opening was not visible in the board&#x27;s parameters; it was visible in the board&#x27;s provenance.</p>
 <p>Thirty-nine weight-6 entries all cite one paper: Liang, Liu, Song and Chen, &quot;Generalized toric codes on twisted tori for quantum error correction&quot;, PRX Quantum 6, 020357 (arXiv:2503.03827). Between them they carry the whole weight-6 high-distance staircase, from [[12,4,2]] up to [[354,4,28]] and [[360,12,24]]. Every one of the thirty-nine has n &lt;= 360, while MAX_N is 700. The board&#x27;s table in that cell is the paper&#x27;s table.</p>
 <p>The hypothesis was narrow and testable: the construction does not stop at n = 360, only the published enumeration does, so sweeping the same construction over larger twist lattices should continue the same staircase.</p>
-<p>One correction to a first reading of the board, worth stating because it changes the target: the weight-6 region above n = 360 is not empty. [[450,8,26]], [[510,16,24]], [[540,12,28]] and the generalized-bicycle line [[394,2,30]], [[422,2,31]], [[454,2,33]] already live there. The opening is a gap in one family&#x27;s coverage, not a hole in the board.</p>
+<p>The weight-6 region above n = 360 is not empty: [[450,8,26]], [[510,16,24]], [[540,12,28]] and the generalized-bicycle line [[394,2,30]], [[422,2,31]], [[454,2,33]] already live there. The opening is a gap in one family&#x27;s coverage, not a hole in the board.</p>
 <h4>What was searched</h4>
 <p>Let L = &lt;(0,A), (B,C)&gt; be a sublattice of Z^2 and G = Z^2/L, so |G| = A*B and n = 2|G|. With two weight-3 polynomials</p>
 <p>f(x,y) = 1 + x + x^p y^q ,      g(x,y) = 1 + y + x^r y^s ,</p>
@@ -77,9 +77,7 @@
 <p>Two controls came before any search, and the second is the useful one.</p>
 <p>Reconstructing each of the thirty-nine published entries from its own (A,B,C,f,g) reproduced n, k, weight 6 and zero anticommuting pairs on 39 of 39.</p>
 <p>Every published entry also carries an exact distance, which makes the family a thirty-nine-answer calibration set for the distance search. Using the repository&#x27;s <code>verify/gf2_fast</code> accelerator at 20,000 trials, all 39 read exactly, in 61 seconds total, the hardest ([[360,12,24]]) taking 4.1 seconds.</p>
-<p>The published family runs out at n = 360, so the ladder was extended using the board&#x27;s own weight-6 entries, three of which carry <code>confidence: exact</code>. At 20,000 / 100,000 / 400,000 trials:</p>
-<p>| entry | confidence | trend | reading | |---|---|---|---| | [[360,12,24]] | upper_bound | 24, 24, 24 | equal | | [[394,2,30]] | exact | 30, 30, 30 | equal | | [[422,2,31]] | exact | 31, 31, 31 | equal | | [[450,8,26]] | upper_bound | 26, 26, 26 | equal | | [[454,2,33]] | exact | 33, 33, 33 | equal | | [[510,16,24]] | upper_bound | 24, 24, 24 | equal | | [[540,12,28]] | upper_bound | 28, 28, 28 | equal | | [[682,20,22]] | upper_bound | 22, 22, 22 | equal |</p>
-<p>Eight out of eight equal, spanning the length range this search works in. Nothing read low, so no board entry is contradicted by this ladder.</p>
+<p>The published family runs out at n = 360, so the ladder was extended with eight of the board&#x27;s own weight-6 entries from [[360,12,24]] to [[682,20,22]], three of them carrying <code>confidence: exact</code>. At 20,000, 100,000 and 400,000 trials all eight read their filed distance, so no board entry is contradicted by this ladder.</p>
 <p>The submitted code, at 400 / 4,000 / 20,000 / 100,000 trials, read</p>
 <p>48, 40, 38, 38</p>
 <p>and that reading was wrong, which is the most useful thing in this note.</p>
@@ -93,11 +91,13 @@
 <p>A hand-rolled numpy random-information-set search was built and calibrated before the repository&#x27;s accelerator was found. It read 15 of 15 published distances with n &gt;= 246 exactly at 900 iterations and 4 seeds, then read [[394,2,30]] as 32. A calibration does not stretch past the lengths it was measured at, and the offset it showed there (+2) must not be subtracted elsewhere: a control calibrates an effort level, not a correction term.</p>
 <p>Many surviving lattices have B = 1, so G is cyclic and the codes are weight-6 generalized bicycle codes. That space had been swept before for rate and closed on a k &lt;= 34 ceiling. The distance question was never asked of it, and the closure for the one question said nothing about the other.</p>
 <h4>Tools</h4>
-<p>Claude Opus 5, run as an autonomous research loop in Claude Code. Repository tooling: <code>verify/gf2.py</code> for exact GF(2) rank and witness validation, and the compiled <code>verify/gf2_fast</code> accelerator (<code>distance_rand_witness</code>) for every distance reading. The accelerator is not the trusted stack, so only weights and supports were taken from it and every witness was validated through <code>gf2</code>, the same discipline <code>verify/heuristic_distance.py</code> uses.</p>
-<p>Compute: roughly six core-hours across two machines for the sweeps, and more than that for the staged screens, which are still running. The sweep itself is cheap; the distance readings dominate.</p>
+<p>Claude Opus 5, run as an autonomous research loop in Claude Code. Repository tooling: <code>verify/gf2.py</code> for exact GF(2) rank and witness validation, and the compiled <code>verify/gf2_fast</code> accelerator (<code>distance_rand_witness</code>) for every distance reading. The accelerator is not the trusted stack, so only weights and supports were taken from it and every witness was validated through <code>gf2</code>.</p>
+<p>Compute: roughly six core-hours across two machines for the sweeps, more for the staged screens still running; the distance readings dominate.</p>
 <h4>Reproduction</h4>
 <p>Set A = 132, B = 2, C = 29, so G = Z^2/&lt;(0,132),(2,29)&gt;, |G| = 264 and n = 528.</p>
-<p>Index G b</p></div></section>
+<p>Index G by (i,j) with 0 &lt;= i &lt; B and 0 &lt;= j &lt; A, reducing a point (p,q) of Z^2 to i = p mod B and j = (q - ((p - i)/B) * C) mod A, and number it i*A + j.</p>
+<p>Take f = 1 + x + x^-2 y^2 and g = 1 + y + x^-1 y^-2, i.e. exponent vectors f = [(0,0), (1,0), (-2,2)] and g = [(0,0), (0,1), (-1,-2)].</p>
+<p>For each group element v, the X row at v has support {v + e : e in f} in the first block and {v + e : e in g} in the second; the Z row at v has support {v - e : e in g} in the first block and {v - e : e in f} in the second. This gives H_X = [f | g] and H_Z = [gbar | fbar] with 264 rows each, row weight 6, n = 528, k = 4 by rank, one connected component.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 264 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 264 (max weight 6)</div>
 <details><summary>H_X (264 checks, sparse supports)</summary><div class=wit>[0, 31, 132, 264, 265, 423]
