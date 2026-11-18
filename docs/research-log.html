@@ -1044,7 +1044,17 @@ hx, hz = hypergraph_product(H[:-1], H[:-1])
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/341-61-40.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/343-6-41.html">[[343,6,41]] — 343-6-41</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[343,6,41]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/343-6-39.html">[[343,6,39]] — 343-6-39</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[343,6,39]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-18: [[343,6,41]] -&gt; [[343,6,39]]</h4>
+<p>[[343,6,39]] supersedes the board&#x27;s [[343,6,41]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 29.41 to 26.61. Before this revision the entry recorded the X bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>X side 49 -&gt; 40: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 498,668,934 trials on this side on an NVIDIA L40, seed 1874872947.</li>
+<li>Z side 41 -&gt; 39: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 250,965,504 trials on this side on an NVIDIA L40, seed 259923321.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 49 | 40 | 498,668,934 | 1874872947 | | Z | 41 | 39 | 250,965,504 | 259923321 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/343-6-39.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[343,6,41]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -1056,7 +1066,7 @@ hx, hz = hypergraph_product(H[:-1], H[:-1])
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Code matrices and check weights are in <code>codes/343-6-41.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/343-6-41.md">raw markdown</a></div></details></section>
+<p>Code matrices and check weights are in <code>codes/343-6-39.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/343-6-39.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/343-8-6.html">[[343,8,6]] — 343-8-6</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[343,8,6]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -2314,7 +2324,17 @@ import sys; sys.path.insert(0, &#x27;research&#x27;)
 import multiband_surface as mb
 hx, hz, coords, _ = mb.build(4, rows=3, m=2, pitch=2, drop_empty=True)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-3-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/544-10-78.html">[[544,10,78]] — 544-10-78</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[544,10,78]] — generalized bicycle from Kasai affine 2BGA (arXiv:2611.21389)</h3>
+<section class=blk><h3><a href="codes/544-10-48.html">[[544,10,48]] — 544-10-48</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[544,10,48]] — generalized bicycle from Kasai affine 2BGA (arXiv:2611.21389)</h3>
+<h4>Revision 2026-11-18: [[544,10,78]] -&gt; [[544,10,48]]</h4>
+<p>[[544,10,48]] supersedes the board&#x27;s [[544,10,78]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 111.84 to 42.35. Before this revision the entry recorded the Z bound as having survived 8,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>X side 78 -&gt; 48: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 470,820,328 trials on this side on an NVIDIA L40, seed 1237119029.</li>
+<li>Z side 94 -&gt; 48: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 83,818,194 trials on this side on an NVIDIA L40, seed 1237119030.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 78 | 48 | 470,820,328 | 1237119029 | | Z | 94 | 48 | 83,818,194 | 1237119030 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/544-10-48.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[544,10,78]] — generalized bicycle from Kasai affine 2BGA (arXiv:2611.21389)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the unrestricted / weight-9plus cell with a generalized-bicycle family. The paper arXiv:2611.21389 proves that uniformly random CSS codes built from permutation matrices have vanishing relative distance, so this search deliberately uses the paper&#x27;s structured exceptional route (affine/Kasai-style non-uniform permutation lifts with additional algebraic constraints) rather than the uniform ensemble.</p>
 <h4>What was searched</h4>
@@ -2326,7 +2346,7 @@ hx, hz, coords, _ = mb.build(4, rows=3, m=2, pitch=2, drop_empty=True)
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Agent harness: OpenCode. Research kit: research/kasai_affine_sweep.py, research/kit/search.py, research/kit/surrogate.py, research/kit/coordination.py.</p>
 <h4>Reproduction</h4>
-<p>Rebuild with research/kit/group_algebra.py (metacyclic + build_2bga) from the candidate&#x27;s stored spec; parameters include q=17, monomials a=[...] and b=[...] as recorded in the candidate recipe.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-10-78.md">raw markdown</a></div></details></section>
+<p>Rebuild with research/kit/group_algebra.py (metacyclic + build_2bga) from the candidate&#x27;s stored spec; parameters include q=17, monomials a=[...] and b=[...] as recorded in the candidate recipe.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-10-48.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/544-136-17.html">[[544,136,17]] — 544-136-17</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[544,136,17]] — GF(4) pair-partition code at even lift P = 34</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target cell: <code>weight-9plus</code> x <code>unrestricted</code> (CSS), at rate <code>k/n = 1/4</code> (<code>n = 16P</code>, <code>k = 4P</code>, <code>w = 10</code>). Inspired by arXiv:2610.06820 (*Designing Group-Valued Codes with Full Regular Low-Weight Bases*) and the $\mathbb{F}_4$ pair-partition (PP) family (arXiv:2609.35601), we explored even lifts <code>P</code> solved over the ring $\mathbb{Z}_P$ via unit-pivot nullspace. At <code>n = 544, k = 136, w = 10</code>, any distance <code>d &gt;= 13</code> advances the <code>weight-9plus</code> x <code>unrestricted</code> frontier.</p>
