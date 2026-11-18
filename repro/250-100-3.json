@@ -1,0 +1,39 @@
+{
+  "artifact_sha256": "8d3fe21aa8c9818fc1081013cd631a646cc45debd5bcc32f040afc0fae321ea3",
+  "environment": {
+    "extras": [
+      "research"
+    ]
+  },
+  "manifest_version": "1",
+  "notes": "Emitted by research/kit/submit.write_repro_manifest from the screening spec; the construction stage replays the recipe with research/kit/rebuild.py and compares fingerprints.",
+  "slug": "250-100-3",
+  "stages": {
+    "certify": {
+      "reason": "above the certifier's demonstrated range",
+      "status": "not_applicable"
+    },
+    "circuits": {
+      "reason": "the entry has no circuit block",
+      "status": "not_applicable"
+    },
+    "construction": {
+      "args": [
+        "--constructor",
+        "products.hypergraph_product",
+        "--params",
+        "{\"H1\":[[1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,1,1,1,0,0,0,0,0,0],[0,1,0,0,0,1,0,0,0,1,1,1,0,0,0],[0,0,1,0,0,0,1,0,0,1,0,0,1,1,0],[0,0,0,1,0,0,0,1,0,0,1,0,1,0,1]],\"H2\":[[1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,1,1,1,1,0,0,0,0,0,0],[0,1,0,0,0,1,0,0,0,1,1,1,0,0,0],[0,0,1,0,0,0,1,0,0,1,0,0,1,1,0],[0,0,0,1,0,0,0,1,0,0,1,0,1,0,1]]}"
+      ],
+      "budget_seconds": 300,
+      "script": "research/kit/rebuild.py",
+      "status": "applicable"
+    },
+    "ler": {
+      "reason": "the entry has no measured rate",
+      "status": "not_applicable"
+    },
+    "verify": {
+      "status": "applicable"
+    }
+  }
+}

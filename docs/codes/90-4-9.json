@@ -1,9 +1,4 @@
 {
- "schema_version": "0.2",
- "name": "[[90,4,9]] weight-5 mixed-monomial BB code (LLM-guided evolutionary search)",
- "code_type": "CSS",
- "n": 90,
- "k": 4,
  "checks": {
   "X": [
    [
@@ -640,11 +635,55 @@
    ]
   ]
  },
+ "circuit": {
+  "d_circ": {
+   "X": {
+    "confidence": "upper_bound",
+    "value": 9,
+    "witness": [
+     34295,
+     34297,
+     34316,
+     34319,
+     34321,
+     34324,
+     34336,
+     34347,
+     34348
+    ]
+   },
+   "Z": {
+    "confidence": "upper_bound",
+    "value": 9,
+    "witness": [
+     34292,
+     34294,
+     34298,
+     34299,
+     34317,
+     34318,
+     34355,
+     34357,
+     34377
+    ]
+   }
+  },
+  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=2 per check, 6 data CX slots per round, X-check term slots [5, 3, 2, 1, 4], Z-check term slots [0, 2, 3, 4, 1] over terms A_0..A_2, B_0..B_1); found by research/kit/circuit_search.py (seed 0, 5 s per basis) over the committed schedule of 90-4-9",
+  "rounds": 9,
+  "stim_version": "1.16.0",
+  "contributed_by": {
+   "by": [
+    "@mathysrennela"
+   ],
+   "date": "2026-11-17",
+   "method": "Schedule search via research/kit/circuit_search.py (Beam 1.0)"
+  }
+ },
+ "code_type": "CSS",
  "distance": {
-  "d": 9,
   "X": {
-   "value": 9,
    "confidence": "exact",
+   "value": 9,
    "witness": [
     0,
     1,
@@ -658,8 +697,8 @@
    ]
   },
   "Z": {
-   "value": 9,
    "confidence": "exact",
+   "value": 9,
    "witness": [
     1,
     9,
@@ -671,67 +710,19 @@
     66,
     72
    ]
-  }
- },
- "provenance": {
-  "authors": [
-   "@cbjuan"
-  ],
-  "construction": "Bivariate bicycle code over F_2[x,y]/(x^5-1, y^9-1), weight-5 mixed-monomial polynomials A = 1 + x^2 y^8 + x^3 y^7, B = 1 + x^2 y^6, found by an LLM-guided evolutionary search (OpenEvolve, weight-5 mixed-monomial campaign) over CSS BB polynomial pairs. This connected (ell=5, m=9) presentation is BLISS-isomorphic to one of 2 identical connected components of a disconnected parent BB code (ell=10, m=9, k=8, n=180, A = 1 + x^4 y^8 + x^6 y^7, B = 1 + x^4 y^6) whose exact distance d=9 was established by MILP in the source repository; the component presentation used here was independently re-verified exact (d_X=d_Z=9, no lighter logical on either side) with this repository's own verify/certify.py (scipy/HiGHS MILP, tlim=600s, 70s wall time).",
-  "references": [
-   "an internal weight-5 bivariate-bicycle evolutionary campaign in github.com/qiskit-community/qcode-discovery (branch weight5-campaigns, not part of a public branch at the time of this submission -- this submission's own distance/CSS claims are independently re-derived and re-verified using only this repository's tools and do not rely on that source being externally checkable)"
-  ],
-  "date": "2026-09-07",
-  "notes": "Independently corroborated with this repo's own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign's own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission's re-verification and packaging was done separately by Claude Sonnet 5. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8; the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
-  "model": [
-   "GPT 5.6 Sol",
-   "Claude Opus 5"
-  ]
+  },
+  "d": 9
  },
  "family": "bivariate-bicycle",
- "circuit": {
-  "d_circ": {
-   "X": {
-    "value": 8,
-    "confidence": "upper_bound",
-    "witness": [
-     285,
-     316,
-     836,
-     971,
-     977,
-     1193,
-     1197,
-     1660
-    ]
-   },
-   "Z": {
-    "value": 8,
-    "confidence": "upper_bound",
-    "witness": [
-     51,
-     56,
-     972,
-     992,
-     1231,
-     1257,
-     1790,
-     1831
-    ]
-   }
-  },
-  "rounds": 9,
-  "stim_version": "1.16.0",
-  "notes": "Generic sequential two-block extraction: one ancilla per check, X checks then Z checks each round with joint reset/measure layers; CX layers are a proper edge coloring of each Tanner graph (5 X + 5 Z CX layers per round, schedule seed 0; hook-aware orders: every CNOT order suffix needs >= d-1 further data errors to complete a logical, with the exact completion cost, layered by min-conflicts search). Pairs of hooks on different ancillas of the same type are also constrained: an assignment pair is admitted only if every such hook pair needs >= d faults in total (2 + flags + completion cost). Screened by RIS on ker(H_dem) and an observable-constrained seeded BP+OSD search; witnesses validated in GF(2).",
+ "k": 4,
+ "locality": {
   "contributed_by": {
    "by": [
-    "@vprusso"
+    "@dorakingx"
    ],
-   "date": "2026-09-19",
-   "method": "generic CSS memory schedule with one flag qubit per check: CX layers from a bipartite edge coloring, the flag coupled to the ancilla after the first and the second-to-last CX slot and measured every round, slot assignments filtered by an exact hook-cost criterion over single, same-ancilla and cross-ancilla hook pairs; screened by RIS and a seeded BP+OSD search"
-  }
- },
- "locality": {
+   "date": "2026-10-04",
+   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
+  },
   "coordinates": [
    [
     3.0,
@@ -1094,14 +1085,25 @@
     7.0
    ]
   ],
-  "layers": 2,
   "interaction_radius": 5.0,
-  "contributed_by": {
-   "by": [
-    "@dorakingx"
-   ],
-   "date": "2026-10-04",
-   "method": "Simulated annealing over site assignments on an integer grid with the repo's own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier's rule."
-  }
- }
+  "layers": 2
+ },
+ "n": 90,
+ "name": "[[90,4,9]] weight-5 mixed-monomial BB code (LLM-guided evolutionary search)",
+ "provenance": {
+  "authors": [
+   "@cbjuan"
+  ],
+  "construction": "Bivariate bicycle code over F_2[x,y]/(x^5-1, y^9-1), weight-5 mixed-monomial polynomials A = 1 + x^2 y^8 + x^3 y^7, B = 1 + x^2 y^6, found by an LLM-guided evolutionary search (OpenEvolve, weight-5 mixed-monomial campaign) over CSS BB polynomial pairs. This connected (ell=5, m=9) presentation is BLISS-isomorphic to one of 2 identical connected components of a disconnected parent BB code (ell=10, m=9, k=8, n=180, A = 1 + x^4 y^8 + x^6 y^7, B = 1 + x^4 y^6) whose exact distance d=9 was established by MILP in the source repository; the component presentation used here was independently re-verified exact (d_X=d_Z=9, no lighter logical on either side) with this repository's own verify/certify.py (scipy/HiGHS MILP, tlim=600s, 70s wall time).",
+  "references": [
+   "an internal weight-5 bivariate-bicycle evolutionary campaign in github.com/qiskit-community/qcode-discovery (branch weight5-campaigns, not part of a public branch at the time of this submission -- this submission's own distance/CSS claims are independently re-derived and re-verified using only this repository's tools and do not rely on that source being externally checkable)"
+  ],
+  "date": "2026-09-07",
+  "notes": "Independently corroborated with this repo's own tools before submission: research/kit/surrogate.py distance_rand at 5,000 and 50,000 trials both returned d=9; research/kit/distance.py decoder_distance (BP+OSD, 200,000 injected-error trials) returned d_heuristic=9, verdict=corroborated; research/kit/distance.py exact_distance (scipy/HiGHS MILP) proved d_X=d_Z=9 exact. Per the source campaign's own per-candidate model-attribution log, this code was independently discovered by both GPT 5.6 Sol (first, chronologically, within the ensemble run) and Claude Opus 5 (rediscovered later, independently, in the same run) -- this is recorded as joint/dual attribution, not resolved to a single model. This submission's re-verification and packaging was done separately by Claude Sonnet 5. Circuit fault distance corrected on 2026-11-06 by @vprusso: the X-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8; the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 9), with a proved lower bound of 8. Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model (record circuit_distance_bounds-2026-11-06.json).",
+  "model": [
+   "GPT 5.6 Sol",
+   "Claude Opus 5"
+  ]
+ },
+ "schema_version": "0.2"
 }

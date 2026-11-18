@@ -5772,37 +5772,44 @@
    ]
   },
   "Z": {
-   "value": 27,
+   "value": 23,
    "confidence": "upper_bound",
    "witness": [
-    153,
-    169,
-    174,
-    185,
-    190,
+    71,
+    122,
+    138,
+    154,
+    160,
+    170,
+    173,
+    186,
     192,
-    204,
-    207,
+    205,
     211,
-    215,
-    216,
-    239,
-    242,
-    480,
-    516,
-    519,
-    528,
-    533,
-    537,
-    538,
-    541,
+    237,
+    240,
+    243,
+    246,
+    249,
+    487,
+    508,
+    523,
     542,
-    543,
-    549,
-    558,
-    562,
-    568
-   ]
+    559,
+    576,
+    594
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -5819,7 +5826,8 @@
    "cpu_hours": 15.0,
    "tool": "research/local2d/boundary_engine.py + research/kit/surrogate.py (gf2_fast)",
    "notes": "24-lattice sweep shared with the sibling entries; ~2M fast trials behind this entry's own claim"
-  }
+  },
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 27 -> 23 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "tile",
  "locality": {

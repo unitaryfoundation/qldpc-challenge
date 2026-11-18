@@ -3647,40 +3647,49 @@
    ]
   },
   "Z": {
-   "value": 30,
+   "value": 28,
    "confidence": "upper_bound",
    "witness": [
-    1,
-    22,
-    25,
+    19,
+    31,
     33,
-    34,
-    45,
-    49,
-    81,
+    67,
+    80,
     82,
-    84,
-    96,
-    106,
-    117,
-    120,
-    131,
-    146,
-    160,
-    165,
-    190,
-    237,
-    256,
-    264,
-    276,
-    281,
-    293,
-    315,
-    322,
-    323,
-    334,
-    358
-   ]
+    85,
+    115,
+    126,
+    139,
+    140,
+    141,
+    161,
+    163,
+    166,
+    174,
+    215,
+    223,
+    240,
+    258,
+    260,
+    261,
+    265,
+    273,
+    329,
+    339,
+    341,
+    344
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -3697,7 +3706,7 @@
    "cpu_hours": 13.9,
    "tool": "research/kit/search.py + gf2_fast on Brev n2d-highcpu-64"
   },
-  "notes": "Not equivalent to 360-18-27.json despite the shared Weisfeiler-Leman signature: at a matched budget (research/audits/leader_audit.py pair, 10000000 gf2_fast trials per seed, seeds 4242,5353, pair depth 8) the peer reads d <= 27 and this code d <= 28; equivalent codes have equal distance, so a weight-27 logical would exist here too. The pair audit's decision was 'credible: both claims held at matched depth'."
+  "notes": "Not equivalent to 360-18-27.json despite the shared Weisfeiler-Leman signature: at a matched budget (research/audits/leader_audit.py pair, 10000000 gf2_fast trials per seed, seeds 4242,5353, pair depth 8) the peer reads d <= 27 and this code d <= 28; equivalent codes have equal distance, so a weight-27 logical would exist here too. The pair audit's decision was 'credible: both claims held at matched depth'. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): Z side 30 -> 28 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "bivariate-bicycle"
 }

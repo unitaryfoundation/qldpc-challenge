@@ -6709,44 +6709,41 @@
    }
   },
   "Z": {
-   "value": 24,
+   "value": 22,
    "confidence": "upper_bound",
    "witness": [
-    96,
-    241,
-    245,
-    263,
-    280,
-    419,
-    456,
-    458,
-    474,
-    477,
-    495,
-    532,
-    608,
-    626,
-    644,
-    645,
-    647,
-    662,
-    683,
-    686,
-    704,
-    723,
+    101,
+    105,
+    109,
+    113,
+    117,
+    162,
+    170,
+    185,
+    193,
+    223,
+    227,
+    269,
+    273,
+    284,
+    307,
+    330,
+    353,
+    498,
+    699,
     741,
-    760
+    757,
+    780
    ],
    "witness_provenance": {
     "found_by": [
-     "@e-eight"
+     "@vprusso"
     ],
-    "date": "2026-10-28",
-    "found_at_samples": 3000,
-    "survived_samples": 3000,
-    "tool": "research/kit/surrogate.lightest_logical",
+    "date": "2026-10-31",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     4252
+     1
     ]
    }
   }
@@ -6759,7 +6756,7 @@
   "origin": "submission",
   "date": "2026-10-28",
   "model": "Claude Opus 5.5",
-  "notes": "Equivalence checked: the gate's dedup step found no exact duplicate and no WL-equivalent board entry (checked, not equivalent). Distance is an RIS upper bound: the X witness of weight 22 was found at 1M trials (seed 101, pair depth 64) and nothing lighter appeared in 6M further trials on seeds 102/201.",
+  "notes": "Equivalence checked: the gate's dedup step found no exact duplicate and no WL-equivalent board entry (checked, not equivalent). Distance is an RIS upper bound: the X witness of weight 22 was found at 1M trials (seed 101, pair depth 64) and nothing lighter appeared in 6M further trials on seeds 102/201. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-31 (witnesses by @vprusso): Z side 24 -> 22 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "search_budget": {
    "candidates_screened": 23744,
    "ris_trials_per_side": 5000000,

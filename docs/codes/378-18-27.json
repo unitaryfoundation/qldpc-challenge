@@ -3793,48 +3793,46 @@
  "distance": {
   "d": 27,
   "X": {
-   "value": 28,
+   "value": 27,
    "confidence": "upper_bound",
    "witness": [
-    14,
+    17,
+    27,
     33,
-    59,
-    63,
-    90,
-    99,
-    105,
-    127,
-    130,
-    137,
-    138,
-    144,
-    145,
-    152,
-    167,
-    170,
-    208,
-    217,
-    234,
-    239,
-    258,
-    262,
-    290,
-    298,
-    304,
+    37,
+    41,
+    60,
+    123,
+    134,
+    161,
+    179,
+    188,
+    199,
+    206,
+    249,
+    250,
+    256,
+    260,
+    268,
+    321,
+    324,
+    327,
+    331,
+    334,
     345,
-    346,
-    351
+    353,
+    354,
+    367
    ],
    "witness_provenance": {
     "found_by": [
-     "@mathysrennela"
+     "@vprusso"
     ],
-    "date": "2026-10-12",
-    "found_at_samples": 200000,
-    "survived_samples": 200000,
-    "tool": "surrogate.distance_rand_witness (gf2_fast, 8 threads)",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     555001
+     1
     ]
    }
   },
@@ -3893,7 +3891,7 @@
    "arXiv:2608.08996v1"
   ],
   "date": "2026-10-12",
-  "notes": "Reproduction of a code published in arXiv:2608.08996 Table 1 at n = 378, k = 18, w = 8 with a QDistEvol bound of 27; here the bound is measured at 27 on both sides rather than merely taken. No board entry shares (n, k), so this is a new parameter point rather than a distinct code at held parameters. Distance is a witness-backed upper bound at confidence upper_bound, not an exact certification.",
+  "notes": "Reproduction of a code published in arXiv:2608.08996 Table 1 at n = 378, k = 18, w = 8 with a QDistEvol bound of 27; here the bound is measured at 27 on both sides rather than merely taken. No board entry shares (n, k), so this is a new parameter point rather than a distinct code at held parameters. Distance is a witness-backed upper bound at confidence upper_bound, not an exact certification. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): X side 28 -> 27 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "model": "Space Bunny Alpha 1.0",
   "origin": "submission",
   "search_budget": {

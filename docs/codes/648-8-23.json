@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[648,8,23]]",
  "code_type": "CSS",
  "n": 648,
@@ -5901,35 +5901,45 @@
  "distance": {
   "d": 23,
   "X": {
-   "value": 25,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": [
-    214,
-    230,
+    208,
+    211,
+    224,
     232,
-    233,
     235,
-    238,
+    236,
     239,
-    240,
-    241,
-    246,
-    255,
+    245,
     256,
-    263,
-    265,
-    266,
-    559,
-    560,
-    564,
-    566,
-    577,
+    259,
+    279,
+    534,
+    535,
+    536,
+    554,
+    561,
+    565,
+    568,
+    578,
     579,
-    585,
-    586,
-    587,
-    589
-   ]
+    581,
+    593,
+    601,
+    602
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   },
   "Z": {
    "value": 23,
@@ -5968,7 +5978,8 @@
   "construction": "Tile code (Steffan, Choe, Breuckmann, Pereira, Eberhardt, arXiv:2504.09171) with box B = 3 on a 16 x 16 bulk, open boundaries as in the paper; X-tile {h00,h01,h11,h22,v02,v10,v20,v21}, Z-tile by their condition T2: the tile of codes/288-8-15.json and codes/338-8-16.json. Single-layer layout: each edge on its own integer site of the 45-degree rotated lattice, interaction radius 4.000.",
   "origin": "submission",
   "date": "2026-10-16",
-  "model": "Claude Opus 5.5"
+  "model": "Claude Opus 5.5",
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): X side 25 -> 24 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "tile",
  "locality": {

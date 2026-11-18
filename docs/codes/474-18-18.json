@@ -4127,13 +4127,12 @@
  "distance": {
   "d": 18,
   "X": {
-   "value": 20,
+   "value": 19,
    "confidence": "upper_bound",
    "witness": [
-    205,
+    202,
     218,
-    232,
-    233,
+    229,
     259,
     269,
     291,
@@ -4148,24 +4147,18 @@
     392,
     406,
     409,
-    454,
-    457
+    440,
+    454
    ],
    "witness_provenance": {
     "found_by": [
-     "@dorakingx"
+     "@vprusso"
     ],
-    "date": "2026-10-13",
-    "found_at_samples": 4000,
-    "survived_samples": 20000000,
-    "tool": "gf2_fast RIS in the packaging search; the ladder searched both sides jointly",
+    "date": "2026-10-17",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     7,
-     1381001,
-     1381138,
-     1381275,
-     1381412,
-     1381549
+     2
     ]
    }
   },
@@ -4219,7 +4212,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-10-13",
-  "notes": "Derived from codes/512-18-18.json, not an independent construction; the source's authors are @MathysRennela and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[511,18,18]], [[512,18,18]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 7, against 4.24264 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "notes": "Derived from codes/512-18-18.json, not an independent construction; the source's authors are @MathysRennela and the reduction is mine. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[511,18,18]], [[512,18,18]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 7, against 4.24264 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-17 (witnesses by @vprusso): X side 20 -> 19 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 2).",
   "model": "Claude Opus 5 (Claude Code)",
   "origin": "submission",
   "novelty": "unknown"
