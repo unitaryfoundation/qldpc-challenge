@@ -1,0 +1,76 @@
+{
+  "d": 3,
+  "d_exact": true,
+  "d_lower": 3,
+  "encoding": "selector",
+  "ladder": {
+    "budget_per_side": 1800.0,
+    "start": 1
+  },
+  "logical_classes": 49,
+  "name": "gap-89-49-3",
+  "sides": {
+    "X": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "5d6abd0ce7f8cef9cf7367e5758acc3f135000b64d62930fe1f458882f3776b6",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "4ed36ef502e23aea7c610be50862deafdb209d4ba8244fc7038e89068ba6169b",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 3 exists",
+      "proved_min": 3,
+      "secs": 0.4,
+      "status": "UNSAT",
+      "value": 3
+    },
+    "Z": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "e57839e0a8f887227f976d367715f0d999912d537f44b068bf1484791e99caee",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "7db0c56c1adbc291e0597f5a2259e1cf843f765f95a5c9ba580b00e82d08e183",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 3 exists",
+      "proved_min": 3,
+      "secs": 0.4,
+      "status": "UNSAT",
+      "value": 3
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 3600,
+  "verification": {
+    "checker": "drat-trim sha256:d38f0c10da6718bf",
+    "cnf_sha256": "X=4ed36ef502e23aea7c610be50862deafdb209d4ba8244fc7038e89068ba6169b;Z=7db0c56c1adbc291e0597f5a2259e1cf843f765f95a5c9ba580b00e82d08e183",
+    "level": "proof_log",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
+    "replay": {
+      "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+      "emit": "python verify/replay_proofs.py 89-49-3",
+      "emitter": "verify/sat_certify.py side_cnf, XOR chunk arity 5, no symmetry prefix"
+    }
+  }
+}

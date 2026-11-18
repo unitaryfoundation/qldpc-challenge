@@ -1,0 +1,33 @@
+{
+  "d": 22,
+  "d_exact": false,
+  "d_lower": 21,
+  "encoding": "css-sides",
+  "logical_classes": 16,
+  "name": "[[248,16,22]] two-block code over C62 x C2",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 21 after 3600.0 s",
+      "proved_min": 21,
+      "secs": 3600.0,
+      "status": "TIMEOUT",
+      "value": 22
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 21 after 3600.0 s",
+      "proved_min": 21,
+      "secs": 3600.1,
+      "status": "TIMEOUT",
+      "value": 22
+    }
+  },
+  "solver": "tropidist b03ec2d4077f (arXiv:2611.08247) exhaustive search",
+  "tlim_per_solve": 3600.0,
+  "verification": {
+    "checks_sha256": "20a500a33180575fe478418cf976c06e11609e770f0db833c3d32ef898a0a766",
+    "level": "solver",
+    "note": "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, weight-truncated DP, weight-bounded search; completeness proved in the paper, no replayable artifact), so this is a solver verdict; the vector it returned was re-verified by verify/heuristic_distance.py"
+  }
+}

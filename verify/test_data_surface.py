@@ -23,6 +23,7 @@ import re
 import subprocess
 
 import check_submission_scope as S
+import validation_gate as G
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
@@ -104,6 +105,13 @@ _BASE = {
     "research/audits/test_census.py": "SLUG = 'b-2-2'\n",
     "research/test_unrelated.py": "SLUG = 'z-9-9'\n",
     "research/audits/census.py": "SLUG = 'b-2-2'  # not a test file\n",
+    # An entry the validation gate keeps a golden verdict for. Nothing under
+    # test_*.py names it: the gate module lists the slug and the fixture is
+    # named for it.
+    "codes/g-4-4.json": '{"n": 4}',
+    "verify/validation_gate.py": "REPRODUCTIONS = ('g-4-4',)\n",
+    "verify/test_validation_gate.py": "import validation_gate\n",
+    "verify/fixtures/validation_gate/golden/g-4-4.json": '{"doc_sha256": "0"}',
 }
 
 
@@ -154,6 +162,7 @@ def run_step(root):
     out.write_text("")
     env = dict(os.environ, GITHUB_OUTPUT=str(out), GITHUB_STEP_SUMMARY=os.devnull,
                DATA_SURFACE=" ".join(workflow_env("DATA_SURFACE")),
+               GATE_GOLDENS=" ".join(workflow_env("GATE_GOLDENS")),
                LER_STACK=" ".join(workflow_env("LER_STACK")))
     # `bash -e`, without pipefail, is what GitHub gives a `run:` step that
     # names no shell, and no step in verify.yml names one.
@@ -225,3 +234,35 @@ def test_a_test_in_a_subdirectory_is_not_dropped(tmp_path):
 def test_removing_an_entry_still_runs_the_tests_that_name_it(tmp_path):
     got = detect(tmp_path, {"codes/a-1-1.json": None, "certs/a-1-1.json": None})
     assert got["data_only"] == "true" and got["slug_tests"] == "verify/test_pins.py"
+
+
+def test_the_workflow_reads_the_goldens_where_the_gate_keeps_them():
+    """GATE_GOLDENS is validation_gate.GOLDEN_DIR, and the test it selects exists."""
+    assert workflow_env("GATE_GOLDENS") == [os.path.relpath(G.GOLDEN_DIR, _ROOT).replace(os.sep, "/")], (
+        "GATE_GOLDENS in .github/workflows/verify.yml is not where verify/validation_gate.py "
+        "keeps its goldens; a data-only PR that changes a pinned entry would skip the gate's test"
+    )
+    script = step_script(_STEP)
+    assert '"$GATE_GOLDENS/$slug.json"' in script and "verify/test_validation_gate.py" in script
+    assert os.path.exists(os.path.join(_ROOT, "verify", "test_validation_gate.py"))
+
+
+def test_an_entry_with_a_golden_verdict_runs_the_validation_gate_test(tmp_path):
+    """The gate pins an entry's bytes from a fixture, so no test source names it.
+
+    #5929 changed the circuit tier of an entry the gate holds a golden for,
+    was data-only, and selected nothing; the gate's test then failed on main.
+    Either half of the entry selects it, since a circuit tier update rewrites
+    the entry's circuit block along with the files under circuits/.
+    """
+    for i, path in enumerate(["codes/g-4-4.json", "circuits/g-4-4/memory_x.stim"]):
+        got = detect(tmp_path / str(i), {path: '{"n": 44}'})
+        assert got["data_only"] == "true", path
+        assert got["slug_tests"] == "verify/test_validation_gate.py", path
+
+
+def test_an_entry_without_a_golden_does_not_run_the_validation_gate_test(tmp_path):
+    got = detect(tmp_path, {"codes/a-1-1.json": '{"n": 11}', "codes/g-4-4.json": '{"n": 44}'})
+    assert got["slug_tests"] == "verify/test_pins.py verify/test_validation_gate.py"
+    got = detect(tmp_path / "other", {"codes/c-3-3.json": '{"n": 3}'})
+    assert got["slug_tests"] == ""
