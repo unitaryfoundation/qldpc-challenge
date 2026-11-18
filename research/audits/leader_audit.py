@@ -60,7 +60,7 @@ import numpy as np
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.abspath(os.path.join(_HERE, "..", ".."))
 _CODES = os.path.join(_REPO, "codes")
-for _p in (os.path.join(_REPO, "research", "kit"), os.path.join(_REPO, "verify")):
+for _p in (os.path.join(_REPO, "research", "kit"), os.path.join(_REPO, "verify"), os.path.join(_REPO, "research", "certs")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
@@ -75,6 +75,12 @@ EXIT_REFUTED = 2
 EXIT_INVALID = 3
 
 import peer_audit  # noqa: E402
+try:
+    import qedist_certify  # noqa: E402
+    import qedist_stabilizer_certify  # noqa: E402
+except Exception:  # noqa: BLE001
+    qedist_certify = None
+    qedist_stabilizer_certify = None
 import surrogate  # noqa: E402
 from css import compute_k, verify_css  # noqa: E402
 
@@ -270,6 +276,53 @@ def _best_payload(entry, n, k, claim, best, verdict=None):
     return payload
 
 
+
+
+def _measure_qedist(entry, seconds, threads, qedist_root):
+    n, k_claim, HX, HZ, doc = load_entry(entry)
+    k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(entry))
+    if _reject_unusable(entry, k, k_claim, css_ok):
+        return None
+    claim = int(doc["distance"]["d"]) if "d" in (doc.get("distance") or {}) else int(doc["distance"]["P"]["value"])
+    code_type = doc.get("code_type", "CSS")
+    if code_type == "stabilizer":
+        if qedist_stabilizer_certify is None:
+            print("QEDist stabilizer certifier unavailable", file=sys.stderr)
+            return None
+        cert = qedist_stabilizer_certify.certify(doc, root=qedist_root, tlim=seconds, threads=threads)
+    else:
+        if qedist_certify is None:
+            print("QEDist certifier unavailable", file=sys.stderr)
+            return None
+        cert = qedist_certify.certify(doc, root=qedist_root, tlim=seconds, threads=threads)
+    d_exact = bool(cert.get("d_exact"))
+    refuted = False
+    weight = claim
+    for side, blk in (cert.get("sides") or {}).items():
+        if blk.get("status") == "SAT":
+            refuted = True
+            if blk.get("upper_bound") is not None:
+                weight = min(weight, int(blk["upper_bound"]))
+        if blk.get("upper_bound") is not None and int(blk["upper_bound"]) < claim:
+            refuted = True
+            weight = min(weight, int(blk["upper_bound"]))
+    if refuted:
+        verdict = VERDICT_REFUTED
+    elif d_exact:
+        verdict = VERDICT_HOLDS
+        weight = claim
+    else:
+        verdict = VERDICT_INCONCLUSIVE
+        lbs = [b.get("lower_bound") for b in (cert.get("sides") or {}).values() if b.get("lower_bound") is not None]
+        if lbs:
+            weight = min(lbs)
+    print(f"  QEDist: d_exact={d_exact} refuted={refuted}", flush=True)
+    return {
+        "entry": entry,
+        "stem": os.path.splitext(os.path.basename(entry))[0],
+        "n": n, "k": k, "w": w, "claim": claim, "weight": weight,
+        "verdict": verdict, "side": None, "support": [], "seed": None, "trials": 0,
+    }
 def cmd_ladder(args):
     n, k_claim, HX, HZ, doc = load_entry(args.entry)
     k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(args.entry))
@@ -359,7 +412,10 @@ def cmd_screen(args):
     rows = []
     print(f"  pair_depth={args.pair_depth} threads={args.threads}", flush=True)
     for entry in args.entries:
-        m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
+        if getattr(args, "backend", "ris") == "qedist":
+            m = _measure_qedist(entry, args.seconds, args.threads, args.qedist)
+        else:
+            m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
         if m is None:
             return EXIT_INVALID
         rows.append((m["stem"], m["n"], m["k"], m["w"], m["claim"], m["weight"], m["verdict"]))
@@ -469,7 +525,10 @@ def cmd_pair(args):
     results = []
     for entry in [args.candidate] + peers:
         print("-" * 72, flush=True)
-        m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
+        if getattr(args, "backend", "ris") == "qedist":
+            m = _measure_qedist(entry, args.seconds, args.threads, args.qedist)
+        else:
+            m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
         if m is None:
             return EXIT_INVALID
         results.append(m)
@@ -569,6 +628,9 @@ def main(argv=None):
     pr.add_argument("--seeds", type=int, nargs="+", default=[51])
     pr.add_argument("--threads", type=int, default=8)
     pr.add_argument("--pair-depth", type=int, default=10)
+    pr.add_argument("--backend", choices=("ris", "qedist"), default="ris")
+    pr.add_argument("--qedist", default=None)
+    pr.add_argument("--seconds", type=float, default=60.0)
     pr.add_argument(
         "--witness-dir",
         default=None,
