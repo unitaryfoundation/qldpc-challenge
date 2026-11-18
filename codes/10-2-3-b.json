@@ -87,7 +87,7 @@
   "origin": "submission",
   "date": "2026-09-27",
   "model": "Mimo-V2.6-Free",
-  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json`, a lighter-check companion to `codes/10-2-3.json` (same [[10,2,3]], max check weight 4 vs 6)."
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json`, a lighter-check companion to `codes/10-2-3-b.json` (same [[10,2,3]], max check weight 4 vs 6). LER data (X/Z, p=0.002/0.001) transferred from the equivalent base entry codes/10-2-3-b.json, whose circuit was verified by @FarLab."
  },
  "family": "topological",
  "locality": {
@@ -173,6 +173,84 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 3238,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.146831492,
+     "ci95": [
+      0.140852077,
+      0.15311423
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 802,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.028305498,
+     "ci95": [
+      0.02637943,
+      0.03036921
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 212,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.007168963,
+     "ci95": [
+      0.006263153,
+      0.008204779
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 3131,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.139822618,
+     "ci95": [
+      0.134121592,
+      0.145805391
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 722,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.02532802,
+     "ci95": [
+      0.023518874,
+      0.027273548
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 196,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.006620611,
+     "ci95": [
+      0.005753216,
+      0.007617852
+     ]
+    }
+   ]
   }
  }
 }

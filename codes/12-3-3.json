@@ -110,7 +110,7 @@
   "novelty": "known_parameters",
   "origin": "submission",
   "date": "2026-09-21",
-  "construction": "Check deletion from the board entry [[12,2,4]] (codes/12-2-4.json): row 1 of H_Z removed. Dropping one stabiliser generator frees one logical qubit and cannot raise the distance.",
+  "construction": "Check deletion from the board entry [[12,2,4]] (codes/12-2-4-b.json): row 1 of H_Z removed. Dropping one stabiliser generator frees one logical qubit and cannot raise the distance.",
   "notes": "Found by sweeping every single-row deletion of every small board entry and keeping those that land undominated. The parent's remaining checks are unchanged."
  },
  "family": "check-deletion",

@@ -1068,6 +1068,44 @@
     240,
     242
    ]
+  },
+  {
+   "first": "10-2-3",
+   "second": "10-2-3-b",
+   "first_blob": "4b2b48af4b98016cfeef37d855a6edaebc3bb2f1",
+   "second_blob": "2fc656aa59864bc22e508c7bfb093087953d50da",
+   "permutation": [
+    0,
+    6,
+    4,
+    2,
+    8,
+    5,
+    9,
+    3,
+    1,
+    7
+   ]
+  },
+  {
+   "first": "12-2-4",
+   "second": "12-2-4-b",
+   "first_blob": "9d186207dc87d66f7fbcc0c3bb478a9bd0ad48a5",
+   "second_blob": "9671a7b5b6872f7b0d7b3792eb703df07882cb38",
+   "permutation": [
+    0,
+    1,
+    4,
+    5,
+    8,
+    9,
+    3,
+    2,
+    7,
+    6,
+    11,
+    10
+   ]
   }
  ]
 }
