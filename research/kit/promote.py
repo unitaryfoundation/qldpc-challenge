@@ -232,6 +232,69 @@ def candidate_slug(doc):
     return f"{doc['n']}-{doc['k']}-{doc['distance']['d']}"
 
 
+def _code_axes(doc):
+    n = int(doc["n"]); k = int(doc["k"]); d = int(doc["distance"]["d"])
+    checks = doc.get("checks") or {}
+    if "S" in checks:
+        w = max(len(set(s.get("X", [])) | set(s.get("Z", []))) for s in checks["S"])
+    elif "X" in checks:
+        w = max({*(len(r) for r in checks["X"]), *(len(r) for r in checks["Z"])})
+    else:
+        w = None
+    return n, k, d, int(w) if w is not None else None
+
+
+def _same_code(new, old):
+    return (new.get("checks") == old.get("checks"))
+
+
+def _strictly_improves(new, old):
+    n_n, k_n, d_n, w_n = _code_axes(new)
+    n_o, k_o, d_o, w_o = _code_axes(old)
+    if w_n is None or w_o is None:
+        return False
+    return (n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o
+            and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o))
+
+
+def _compare_status(new, old):
+    if _strictly_improves(new, old):
+        return "strictly better"
+    if _strictly_improves(old, new):
+        return "strictly worse"
+    n_n, k_n, d_n, w_n = _code_axes(new)
+    n_o, k_o, d_o, w_o = _code_axes(old)
+    if (n_n, k_n, d_n, w_n) == (n_o, k_o, d_o, w_o):
+        return "lateral"
+    return "lateral"
+
+
+def _suggested_slug(slug, root):
+    codes_dir = os.path.join(root, "codes")
+    for letter in "bcdefghijklmnopqrstuvwxyz":
+        cand = f"{slug}-{letter}.json"
+        if not os.path.exists(os.path.join(codes_dir, cand)):
+            return f"{slug}-{letter}"
+    i = 2
+    while os.path.exists(os.path.join(codes_dir, f"{slug}-{i}.json")):
+        i += 1
+    return f"{slug}-{i}"
+
+
+def _revision_info(new, old, code_rel):
+    status = "strictly better" if _strictly_improves(new, old) else (
+        "strictly worse" if _strictly_improves(old, new) else "lateral")
+    n_n, k_n, d_n, w_n = _code_axes(new)
+    n_o, k_o, d_o, w_o = _code_axes(old)
+    same = _same_code(new, old)
+    if same and n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o and d_n != d_o:
+        status = "strictly better"
+    return {"is_revision": True, "existing": code_rel,
+            "same_code": same, "comparison": status,
+            "old_axes": [n_o, k_o, d_o, w_o],
+            "new_axes": [n_n, k_n, d_n, w_n]}
+
+
 def build_doc(candidate, evidence, facts, *, authors=None, date=None):
     """Return the document to submit: the validated candidate plus its provenance.
 
@@ -608,7 +671,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     report = {"schema": REPORT_SCHEMA, "ok": False, "slug": None, "title": None,
               "branch": None, "files": {}, "body_file": None, "gates": {},
               "blocked_by": [], "needs_human": [], "commands": [],
-              "ladder": None, "frontier": None}
+              "ladder": None, "frontier": None, "revision": None}
     blocked = report["blocked_by"]
 
     problems = check_evidence(evidence)
@@ -692,7 +755,38 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     written = [(code_path, code_rel), (note_path, note_rel)]
     if repro_rel:
         written.append((os.path.join(root, repro_rel), repro_rel))
-    if not force:
+    old_doc = None
+    if os.path.exists(code_path):
+        try:
+            with open(code_path, encoding="utf-8") as fh:
+                old_doc = json.load(fh)
+        except (OSError, ValueError):
+            old_doc = None
+    if old_doc is not None:
+        report["revision"] = _revision_info(doc, old_doc, code_rel)
+        same = _same_code(doc, old_doc)
+        allowed = False
+        if same:
+            n_n, k_n, d_n, w_n = _code_axes(doc)
+            n_o, k_o, d_o, w_o = _code_axes(old_doc)
+            if (n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o):
+                allowed = True
+        if not allowed:
+            status = _compare_status(doc, old_doc)
+            if not same:
+                suggested = _suggested_slug(slug, root)
+                blocked.append(
+                    f"{code_rel} overwrites existing entry "
+                    f"{os.path.basename(code_path)}; new version is "
+                    f"{status}; does not advance over the version it replaces; "
+                    f"distinct code collides with the existing entry; file it "
+                    f"as a suffixed slug ({suggested}) instead of overwriting")
+            else:
+                blocked.append(
+                    f"{code_rel} overwrites existing entry "
+                    f"{os.path.basename(code_path)}; new version is "
+                    f"{status}; does not advance over the version it replaces")
+    if not force and not blocked:
         for p, rel in written:
             if os.path.exists(p):
                 blocked.append(f"{rel} already exists; pass force=True to "

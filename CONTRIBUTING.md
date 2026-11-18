@@ -328,6 +328,18 @@ the corrected claim, as it does for every changed circuit claim.
 `research/audits/circuit_distance_bounds.py` produces such fault sets with a
 proved lower bound beside them.
 
+## Revisions and overwrites (issue #5732)
+
+A PR that modifies an existing `codes/<slug>.json` is a **revision**, not a new
+submission. It is only legitimate when the new version strictly improves on the
+prior one on at least one of `(n, k, d, w)` with no regression (a genuine
+distance tightening counts). A distinct code that collides with an existing entry
+on `n, k, d` (or on the stabilizer group) must be filed as a new, suffixed
+entry (`-b`, `-c`, …) via `coordination.unique_path` / `submit.make_submission`,
+never by overwriting the existing file. `./qldpc submit` and
+`research/kit/promote.py` refuse an overwrite that is not a strict improvement
+and name the suffixed slug to use instead.
+
 ## One code, one entry
 
 Two files whose check matrices generate the same stabilizer group up to a
