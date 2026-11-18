@@ -272,8 +272,8 @@ jobs:
           # A test can also pin an entry without naming it. The validation
           # gate (verify/validation_gate.py) keeps a golden verdict for each
           # of its published reproductions under $GATE_GOLDENS, named for the
-          # entry and recording the sha256 of codes/<slug>.json, and
-          # verify/test_validation_gate.py fails when those bytes move. The
+          # entry, and verify/test_validation_gate.py fails when
+          # codes/<slug>.json no longer reproduces it. The
           # slugs are in the gate module and in the fixture names, never in
           # the test's source, so the grep cannot see them: #5929 changed the
           # circuit tier of codes/160-36-6.json, passed here, and the gate
