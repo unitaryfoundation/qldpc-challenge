@@ -3,7 +3,252 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/109-35-6.html">[[109,35,6]] — 109-35-6</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[109,35,6]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/552-278-4.html">[[552,278,4]] — 552-278-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[552,278,4]] — Weight-8 rate-278/552 Armillary CSS code (M=8, q=3, p=23)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Solved the Armillary channel-pairing constraint (<code>tau_b^{xz} = tau_{b&#x27;}^{xz}</code> with <code>chi^{xz}(b) = chi^{xz}(b&#x27;)</code>) for <code>M=8, q=3</code>, retained X groups <code>(0, 4)</code>, and retained Z groups <code>(2, 6)</code> via hill-climbing over the <code>32</code> channel permutations <code>pi_{h,a} in S_3</code> (<code>100</code> restarts).</li>
+<li>Solved the exact linear angular-shift system <code>A * delta = 0</code> together with 4-cycle avoidance constraints (<code>|delta_{h,a,j}| &lt;= 5</code>) using MILP (<code>scipy.optimize.milp</code>), yielding a girth-6 routing family parameterized by station count <code>p</code>.</li>
+<li>Evaluated <code>p in {7, 11, 13, 17, 19, 23, 29, 31, 37, 41}</code> at <code>100</code> RIS trials (<code>surrogate.distance_rand</code>), followed by <code>2000</code> RIS trials during packaging and <code>8000</code> RIS trials at the validation gate.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: <code>M=8</code>, <code>q=3</code>, <code>p=23</code>, <code>n=24*23=552</code>, <code>k=278</code> (<code>R=0.5036</code>), max check weight <code>w=8</code>, X- and Z-Tanner graph girth <code>6</code>.</li>
+<li>Distance claim: <code>d &lt;= 4</code> (<code>confidence: &quot;upper_bound&quot;</code>), witnessed by explicit weight-4 logical operators and unrefuted in <code>8000</code> RIS trials (<code>verify/validate_candidate.py</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Scaling the paper&#x27;s published <code>M=12</code> tables (<code>T2</code>, <code>T3</code>, <code>T4</code>) directly to <code>p &lt;= 19</code> (<code>n &lt;= 684</code>) yielded <code>d &lt;= 4..6</code>, dominated by existing <code>w=12</code> entries (<code>[[612,310,8]]</code>, <code>[[648,328,8]]</code>, <code>[[684,346,8]]</code>).</li>
+<li>Retaining single-group checks (<code>|X|=1</code> or <code>|Z|=1</code>) at <code>M=6</code> gave column weight <code>1</code> and <code>d &lt;= 2</code>.</li>
+<li><code>M=8, q=2</code> (<code>|S_2|=2</code>) failed to produce 4-cycle-free shift assignments in our MILP screen.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Tooling: Python + <code>scipy.optimize.milp</code> (HiGHS) for shift/girth-6 solving, <code>research/kit/surrogate.py</code> + <code>verify/gf2_fast</code> for distance screening, and <code>./qldpc submit</code> / <code>verify/validate_candidate.py</code> for verification.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Armillary parameters (<code>M=8</code>, <code>q=3</code>, <code>p=23</code>, <code>X_groups=(0, 4)</code>, <code>Z_groups=(2, 6)</code>, zero-based indexing as in arXiv:2611.20410 Section &quot;Routing rules and indexing&quot;):</p>
+<p>Channel permutations <code>pi_{h,a}</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: 210 201 021 210
+  a=1: 201 021 210 120
+  a=2: 120 102 021 210
+  a=3: 102 201 012 201
+  a=4: 120 012 012 120
+  a=5: 210 021 102 012
+  a=6: 201 120 120 201
+  a=7: 120 201 210 210
+</pre>
+<p>Station shifts <code>(delta_{h,a,0}, delta_{h,a,1}, delta_{h,a,2})</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: (-3, -5, -5) (5, -3, 4) (5, -4, 5) (3, 3, 1)
+  a=1: (5, -5, 3) (-5, 3, 5) (3, 5, 5) (5, -5, 5)
+  a=2: (-5, 3, 5) (3, 5, 5) (-3, -4, -3) (-4, -1, 5)
+  a=3: (5, 5, -2) (-3, -4, -3) (5, 4, -4) (5, -5, 5)
+  a=4: (-1, -5, -4) (3, 5, -3) (4, -2, 4) (3, -2, 5)
+  a=5: (4, 0, -5) (-5, -2, 5) (4, -5, 5) (5, -5, -5)
+  a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
+  a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/552-278-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/696-350-4.html">[[696,350,4]] — 696-350-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[696,350,4]] — Weight-8 rate-350/696 Armillary CSS code (M=8, q=3, p=29)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Solved the Armillary channel-pairing constraint (<code>tau_b^{xz} = tau_{b&#x27;}^{xz}</code> with <code>chi^{xz}(b) = chi^{xz}(b&#x27;)</code>) for <code>M=8, q=3</code>, retained X groups <code>(0, 4)</code>, and retained Z groups <code>(2, 6)</code> via hill-climbing over the <code>32</code> channel permutations <code>pi_{h,a} in S_3</code> (<code>100</code> restarts).</li>
+<li>Solved the exact linear angular-shift system <code>A * delta = 0</code> together with 4-cycle avoidance constraints (<code>|delta_{h,a,j}| &lt;= 5</code>) using MILP (<code>scipy.optimize.milp</code>), yielding a girth-6 routing family parameterized by station count <code>p</code>.</li>
+<li>Evaluated <code>p in {7, 11, 13, 17, 19, 23, 29, 31, 37, 41}</code> at <code>100</code> RIS trials (<code>surrogate.distance_rand</code>), followed by <code>2000</code> RIS trials during packaging and <code>8000</code> RIS trials at the validation gate.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: <code>M=8</code>, <code>q=3</code>, <code>p=29</code>, <code>n=24*29=696</code>, <code>k=350</code> (<code>R=0.5029</code>), max check weight <code>w=8</code>, X- and Z-Tanner graph girth <code>6</code>.</li>
+<li>Distance claim: <code>d &lt;= 4</code> (<code>confidence: &quot;upper_bound&quot;</code>), witnessed by explicit weight-4 logical operators and unrefuted in <code>8000</code> RIS trials (<code>verify/validate_candidate.py</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Scaling the paper&#x27;s published <code>M=12</code> tables (<code>T2</code>, <code>T3</code>, <code>T4</code>) directly to <code>p &lt;= 19</code> (<code>n &lt;= 684</code>) yielded <code>d &lt;= 4..6</code>, dominated by existing <code>w=12</code> entries (<code>[[612,310,8]]</code>, <code>[[648,328,8]]</code>, <code>[[684,346,8]]</code>).</li>
+<li>Retaining single-group checks (<code>|X|=1</code> or <code>|Z|=1</code>) at <code>M=6</code> gave column weight <code>1</code> and <code>d &lt;= 2</code>.</li>
+<li><code>M=8, q=2</code> (<code>|S_2|=2</code>) failed to produce 4-cycle-free shift assignments in our MILP screen.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Tooling: Python + <code>scipy.optimize.milp</code> (HiGHS) for shift/girth-6 solving, <code>research/kit/surrogate.py</code> + <code>verify/gf2_fast</code> for distance screening, and <code>./qldpc submit</code> / <code>verify/validate_candidate.py</code> for verification.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Armillary parameters (<code>M=8</code>, <code>q=3</code>, <code>p=29</code>, <code>X_groups=(0, 4)</code>, <code>Z_groups=(2, 6)</code>, zero-based indexing as in arXiv:2611.20410 Section &quot;Routing rules and indexing&quot;):</p>
+<p>Channel permutations <code>pi_{h,a}</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: 210 201 021 210
+  a=1: 201 021 210 120
+  a=2: 120 102 021 210
+  a=3: 102 201 012 201
+  a=4: 120 012 012 120
+  a=5: 210 021 102 012
+  a=6: 201 120 120 201
+  a=7: 120 201 210 210
+</pre>
+<p>Station shifts <code>(delta_{h,a,0}, delta_{h,a,1}, delta_{h,a,2})</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: (-3, -5, -5) (5, -3, 4) (5, -4, 5) (3, 3, 1)
+  a=1: (5, -5, 3) (-5, 3, 5) (3, 5, 5) (5, -5, 5)
+  a=2: (-5, 3, 5) (3, 5, 5) (-3, -4, -3) (-4, -1, 5)
+  a=3: (5, 5, -2) (-3, -4, -3) (5, 4, -4) (5, -5, 5)
+  a=4: (-1, -5, -4) (3, 5, -3) (4, -2, 4) (3, -2, 5)
+  a=5: (4, 0, -5) (-5, -2, 5) (4, -5, 5) (5, -5, -5)
+  a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
+  a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/696-350-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/744-374-4.html">[[744,374,4]] — 744-374-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[744,374,4]] — Weight-8 rate-374/744 Armillary CSS code (M=8, q=3, p=31)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Solved the Armillary channel-pairing constraint (<code>tau_b^{xz} = tau_{b&#x27;}^{xz}</code> with <code>chi^{xz}(b) = chi^{xz}(b&#x27;)</code>) for <code>M=8, q=3</code>, retained X groups <code>(0, 4)</code>, and retained Z groups <code>(2, 6)</code> via hill-climbing over the <code>32</code> channel permutations <code>pi_{h,a} in S_3</code> (<code>100</code> restarts).</li>
+<li>Solved the exact linear angular-shift system <code>A * delta = 0</code> together with 4-cycle avoidance constraints (<code>|delta_{h,a,j}| &lt;= 5</code>) using MILP (<code>scipy.optimize.milp</code>), yielding a girth-6 routing family parameterized by station count <code>p</code>.</li>
+<li>Evaluated <code>p in {7, 11, 13, 17, 19, 23, 29, 31, 37, 41}</code> at <code>100</code> RIS trials (<code>surrogate.distance_rand</code>), followed by <code>2000</code> RIS trials during packaging and <code>8000</code> RIS trials at the validation gate.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: <code>M=8</code>, <code>q=3</code>, <code>p=31</code>, <code>n=24*31=744</code>, <code>k=374</code> (<code>R=0.5027</code>), max check weight <code>w=8</code>, X- and Z-Tanner graph girth <code>6</code>.</li>
+<li>Distance claim: <code>d &lt;= 4</code> (<code>confidence: &quot;upper_bound&quot;</code>), witnessed by explicit weight-4 logical operators and unrefuted in <code>8000</code> RIS trials (<code>verify/validate_candidate.py</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Scaling the paper&#x27;s published <code>M=12</code> tables (<code>T2</code>, <code>T3</code>, <code>T4</code>) directly to <code>p &lt;= 19</code> (<code>n &lt;= 684</code>) yielded <code>d &lt;= 4..6</code>, dominated by existing <code>w=12</code> entries (<code>[[612,310,8]]</code>, <code>[[648,328,8]]</code>, <code>[[684,346,8]]</code>).</li>
+<li>Retaining single-group checks (<code>|X|=1</code> or <code>|Z|=1</code>) at <code>M=6</code> gave column weight <code>1</code> and <code>d &lt;= 2</code>.</li>
+<li><code>M=8, q=2</code> (<code>|S_2|=2</code>) failed to produce 4-cycle-free shift assignments in our MILP screen.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Tooling: Python + <code>scipy.optimize.milp</code> (HiGHS) for shift/girth-6 solving, <code>research/kit/surrogate.py</code> + <code>verify/gf2_fast</code> for distance screening, and <code>./qldpc submit</code> / <code>verify/validate_candidate.py</code> for verification.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Armillary parameters (<code>M=8</code>, <code>q=3</code>, <code>p=31</code>, <code>X_groups=(0, 4)</code>, <code>Z_groups=(2, 6)</code>, zero-based indexing as in arXiv:2611.20410 Section &quot;Routing rules and indexing&quot;):</p>
+<p>Channel permutations <code>pi_{h,a}</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: 210 201 021 210
+  a=1: 201 021 210 120
+  a=2: 120 102 021 210
+  a=3: 102 201 012 201
+  a=4: 120 012 012 120
+  a=5: 210 021 102 012
+  a=6: 201 120 120 201
+  a=7: 120 201 210 210
+</pre>
+<p>Station shifts <code>(delta_{h,a,0}, delta_{h,a,1}, delta_{h,a,2})</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: (-3, -5, -5) (5, -3, 4) (5, -4, 5) (3, 3, 1)
+  a=1: (5, -5, 3) (-5, 3, 5) (3, 5, 5) (5, -5, 5)
+  a=2: (-5, 3, 5) (3, 5, 5) (-3, -4, -3) (-4, -1, 5)
+  a=3: (5, 5, -2) (-3, -4, -3) (5, 4, -4) (5, -5, 5)
+  a=4: (-1, -5, -4) (3, 5, -3) (4, -2, 4) (3, -2, 5)
+  a=5: (4, 0, -5) (-5, -2, 5) (4, -5, 5) (5, -5, -5)
+  a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
+  a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/744-374-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/888-446-4.html">[[888,446,4]] — 888-446-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[888,446,4]] — Weight-8 rate-446/888 Armillary CSS code (M=8, q=3, p=37)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Solved the Armillary channel-pairing constraint (<code>tau_b^{xz} = tau_{b&#x27;}^{xz}</code> with <code>chi^{xz}(b) = chi^{xz}(b&#x27;)</code>) for <code>M=8, q=3</code>, retained X groups <code>(0, 4)</code>, and retained Z groups <code>(2, 6)</code> via hill-climbing over the <code>32</code> channel permutations <code>pi_{h,a} in S_3</code> (<code>100</code> restarts).</li>
+<li>Solved the exact linear angular-shift system <code>A * delta = 0</code> together with 4-cycle avoidance constraints (<code>|delta_{h,a,j}| &lt;= 5</code>) using MILP (<code>scipy.optimize.milp</code>), yielding a girth-6 routing family parameterized by station count <code>p</code>.</li>
+<li>Evaluated <code>p in {7, 11, 13, 17, 19, 23, 29, 31, 37, 41}</code> at <code>100</code> RIS trials (<code>surrogate.distance_rand</code>), followed by <code>2000</code> RIS trials during packaging and <code>8000</code> RIS trials at the validation gate.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: <code>M=8</code>, <code>q=3</code>, <code>p=37</code>, <code>n=24*37=888</code>, <code>k=446</code> (<code>R=0.5023</code>), max check weight <code>w=8</code>, X- and Z-Tanner graph girth <code>6</code>.</li>
+<li>Distance claim: <code>d &lt;= 4</code> (<code>confidence: &quot;upper_bound&quot;</code>), witnessed by explicit weight-4 logical operators and unrefuted in <code>8000</code> RIS trials (<code>verify/validate_candidate.py</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Scaling the paper&#x27;s published <code>M=12</code> tables (<code>T2</code>, <code>T3</code>, <code>T4</code>) directly to <code>p &lt;= 19</code> (<code>n &lt;= 684</code>) yielded <code>d &lt;= 4..6</code>, dominated by existing <code>w=12</code> entries (<code>[[612,310,8]]</code>, <code>[[648,328,8]]</code>, <code>[[684,346,8]]</code>).</li>
+<li>Retaining single-group checks (<code>|X|=1</code> or <code>|Z|=1</code>) at <code>M=6</code> gave column weight <code>1</code> and <code>d &lt;= 2</code>.</li>
+<li><code>M=8, q=2</code> (<code>|S_2|=2</code>) failed to produce 4-cycle-free shift assignments in our MILP screen.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Tooling: Python + <code>scipy.optimize.milp</code> (HiGHS) for shift/girth-6 solving, <code>research/kit/surrogate.py</code> + <code>verify/gf2_fast</code> for distance screening, and <code>./qldpc submit</code> / <code>verify/validate_candidate.py</code> for verification.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Armillary parameters (<code>M=8</code>, <code>q=3</code>, <code>p=37</code>, <code>X_groups=(0, 4)</code>, <code>Z_groups=(2, 6)</code>, zero-based indexing as in arXiv:2611.20410 Section &quot;Routing rules and indexing&quot;):</p>
+<p>Channel permutations <code>pi_{h,a}</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: 210 201 021 210
+  a=1: 201 021 210 120
+  a=2: 120 102 021 210
+  a=3: 102 201 012 201
+  a=4: 120 012 012 120
+  a=5: 210 021 102 012
+  a=6: 201 120 120 201
+  a=7: 120 201 210 210
+</pre>
+<p>Station shifts <code>(delta_{h,a,0}, delta_{h,a,1}, delta_{h,a,2})</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: (-3, -5, -5) (5, -3, 4) (5, -4, 5) (3, 3, 1)
+  a=1: (5, -5, 3) (-5, 3, 5) (3, 5, 5) (5, -5, 5)
+  a=2: (-5, 3, 5) (3, 5, 5) (-3, -4, -3) (-4, -1, 5)
+  a=3: (5, 5, -2) (-3, -4, -3) (5, 4, -4) (5, -5, 5)
+  a=4: (-1, -5, -4) (3, 5, -3) (4, -2, 4) (3, -2, 5)
+  a=5: (4, 0, -5) (-5, -2, 5) (4, -5, 5) (5, -5, -5)
+  a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
+  a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/888-446-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/984-494-4.html">[[984,494,4]] — 984-494-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[984,494,4]] — Weight-8 rate-494/984 Armillary CSS code (M=8, q=3, p=41)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Solved the Armillary channel-pairing constraint (<code>tau_b^{xz} = tau_{b&#x27;}^{xz}</code> with <code>chi^{xz}(b) = chi^{xz}(b&#x27;)</code>) for <code>M=8, q=3</code>, retained X groups <code>(0, 4)</code>, and retained Z groups <code>(2, 6)</code> via hill-climbing over the <code>32</code> channel permutations <code>pi_{h,a} in S_3</code> (<code>100</code> restarts).</li>
+<li>Solved the exact linear angular-shift system <code>A * delta = 0</code> together with 4-cycle avoidance constraints (<code>|delta_{h,a,j}| &lt;= 5</code>) using MILP (<code>scipy.optimize.milp</code>), yielding a girth-6 routing family parameterized by station count <code>p</code>.</li>
+<li>Evaluated <code>p in {7, 11, 13, 17, 19, 23, 29, 31, 37, 41}</code> at <code>100</code> RIS trials (<code>surrogate.distance_rand</code>), followed by <code>2000</code> RIS trials during packaging and <code>8000</code> RIS trials at the validation gate.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Construction: <code>M=8</code>, <code>q=3</code>, <code>p=41</code>, <code>n=24*41=984</code>, <code>k=494</code> (<code>R=0.5020</code>), max check weight <code>w=8</code>, X- and Z-Tanner graph girth <code>6</code>.</li>
+<li>Distance claim: <code>d &lt;= 4</code> (<code>confidence: &quot;upper_bound&quot;</code>), witnessed by explicit weight-4 logical operators and unrefuted in <code>8000</code> RIS trials (<code>verify/validate_candidate.py</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Scaling the paper&#x27;s published <code>M=12</code> tables (<code>T2</code>, <code>T3</code>, <code>T4</code>) directly to <code>p &lt;= 19</code> (<code>n &lt;= 684</code>) yielded <code>d &lt;= 4..6</code>, dominated by existing <code>w=12</code> entries (<code>[[612,310,8]]</code>, <code>[[648,328,8]]</code>, <code>[[684,346,8]]</code>).</li>
+<li>Retaining single-group checks (<code>|X|=1</code> or <code>|Z|=1</code>) at <code>M=6</code> gave column weight <code>1</code> and <code>d &lt;= 2</code>.</li>
+<li><code>M=8, q=2</code> (<code>|S_2|=2</code>) failed to produce 4-cycle-free shift assignments in our MILP screen.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Tooling: Python + <code>scipy.optimize.milp</code> (HiGHS) for shift/girth-6 solving, <code>research/kit/surrogate.py</code> + <code>verify/gf2_fast</code> for distance screening, and <code>./qldpc submit</code> / <code>verify/validate_candidate.py</code> for verification.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Armillary parameters (<code>M=8</code>, <code>q=3</code>, <code>p=41</code>, <code>X_groups=(0, 4)</code>, <code>Z_groups=(2, 6)</code>, zero-based indexing as in arXiv:2611.20410 Section &quot;Routing rules and indexing&quot;):</p>
+<p>Channel permutations <code>pi_{h,a}</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: 210 201 021 210
+  a=1: 201 021 210 120
+  a=2: 120 102 021 210
+  a=3: 102 201 012 201
+  a=4: 120 012 012 120
+  a=5: 210 021 102 012
+  a=6: 201 120 120 201
+  a=7: 120 201 210 210
+</pre>
+<p>Station shifts <code>(delta_{h,a,0}, delta_{h,a,1}, delta_{h,a,2})</code> (columns <code>h=0,1,2,3</code>):</p>
+<pre>
+  a=0: (-3, -5, -5) (5, -3, 4) (5, -4, 5) (3, 3, 1)
+  a=1: (5, -5, 3) (-5, 3, 5) (3, 5, 5) (5, -5, 5)
+  a=2: (-5, 3, 5) (3, 5, 5) (-3, -4, -3) (-4, -1, 5)
+  a=3: (5, 5, -2) (-3, -4, -3) (5, 4, -4) (5, -5, 5)
+  a=4: (-1, -5, -4) (3, 5, -3) (4, -2, 4) (3, -2, 5)
+  a=5: (4, 0, -5) (-5, -2, 5) (4, -5, 5) (5, -5, -5)
+  a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
+  a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/984-494-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/109-35-6.html">[[109,35,6]] — 109-35-6</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[109,35,6]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -16,7 +261,7 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/109-35-6.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/115-23-1.html">[[115,23,1]] — 115-23-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[115,23,1]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/115-23-1.html">[[115,23,1]] — 115-23-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[115,23,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -29,7 +274,7 @@
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/115-23-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/129-25-1.html">[[129,25,1]] — 129-25-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details open><summary>note</summary><div class=notebody><h3>[[129,25,1]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/129-25-1.html">[[129,25,1]] — 129-25-1</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[129,25,1]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -21520,6 +21765,70 @@ mul, _ = cyclic_product(11,3)
 HX, HZ = build_2bga(mul, [0, 1, 7, 13, 26], [0, 14, 16, 23, 32])   # n = 66, k = 4
 </pre>
 <p>Then <code>make_submission(HX, HZ, ..., trials=8000, seed=11)</code> from <code>research/kit/submit.py</code> reproduces the witnesses; the deep ladder used three fresh seeds at the trial counts in the table above.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/66-4-12.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/684-6-72.html">[[684,6,72]] — 684-6-72</a></h3><div class=kv style="color:var(--mut)">2026-10-17 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details ><summary>note</summary><div class=notebody><h3>Distance revision for [[684,6,72]]</h3>
+<p>A weight-72 Z logical operator tightens the distance upper bound of the existing affine 2BGA code introduced by @MathysRennela in <a href="https://github.com/unitaryfoundation/qldpc-challenge/pull/3637">PR #3637</a>. The catalogue recorded <code>d_X ≤ 77</code> and <code>d_Z ≤ 80</code>. The new witness gives <code>d_Z ≤ 72</code> and therefore <code>d ≤ 72</code>. The matrices and the X-side witness are identical to those of the original entry. The exact distance remains open.</p>
+<p>Henryk Soboń (@henryksobon300-code) found the Z witness on 17 October 2026. A deterministic replay on the second 342-qubit block reduced the search to 38 orbits. The folded X checks had rank 32. Enumerating the 64 kernel vectors recovered the same weight-72 witness. The number in <code>found_at_samples</code> records this enumeration budget.</p>
+<p>The <a href="https://henryksobon300-code.github.io/my-work-henryk-sobon/research/qldpc-684-distance-bound/">QEC-10 certificate and standalone verifier</a> use the exact <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/15e58eea2bba862eb49a8a162fa801f81d027f5a/codes/684-6-77.json">original matrix JSON</a>. The verifier checks weight 72, zero X syndrome and an X logical partner with which the witness anticommutes. It also checks that adjoining the witness increases the Z check rank from 339 to 340.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[684,6,77]] — affine 2BGA code on Z_19 x| Z_18, check weight 8, a frontier extension</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Cell: CSS, <code>weight-8</code>, <code>unrestricted</code>. n = 684 is under the 700 cap, so the <code>w &lt;= 8</code> and <code>d &lt;= 40</code> conditions attached to the <code>n &lt;= 1000</code> extended tier do not apply (schema/SCHEMA.md), even though this entry&#x27;s check weight is 8.</p>
+<p>This cell is the crowded one: 398 entries, 369 at n &lt;= 700, and **176 of them on the frontier**, led on efficiency by [[682,32,42]] at kd^2/n = 82.77. This entry scores kd^2/n = 52.009 and beats no existing entry; it is a frontier extension, which the board counts because ranking is Pareto over (n, k, d, w) rather than by the efficiency leader. The hypothesis was that the sampler which produced [[684,4,104]] (check weight 12, <code>weight-9plus</code>, where it beat nothing) would land somewhere open at monomial weight 4.</p>
+<p>Rather than guess the bar, research/does_it_advance.py measured it: at n = 684 <b>every reachable k needs d &gt;= 57</b>, because [[672,14,56]] dominates anything at d &lt;= 56 regardless of k; at n = 544, k = 4..12 need d &gt;= 42 and k = 2 needs 48. The boundary is measured, not inferred — <code>[[684,4,57]]</code> reports advancing and <code>[[684,4,40]]</code> reports dominated on the same filter the gate uses. At 77 this entry clears that bar by 20.</p>
+<p>The k that reach those bars are common: over 300 draws, k=2 53, k=4 47, k=6 30 at n=684 (k=4 49, k=6 32 at n=544). The one route to a looser bar, k &gt;= 33, occurred 0 times — so it was never a plan.</p>
+<h4>What was searched</h4>
+<p><code>sample_kasai_affine(4000, q_range=(17,19), weight=4, seed=11)</code> with <code>--only-k 2,4,6</code>, screen at 50 RIS trials: 3977 survived k&gt;=2, d&gt;=4, of which 3198 kept. Top 20 by efficiency refined at 20000 trials; all 20 are committed with their monomial lists in research/kasai_sweep_refined.json.</p>
+<p>The <code>--only-k</code> filter is load-bearing. Efficiency ranks <b>high</b> k first while the distance needed to advance is roughly k-independent, so a refine budget ranked on <code>k*d^2/n</code> spends itself on the k that cannot reach the bar — which is how [[684,14,96]] was produced in the first place.</p>
+<h4>Evidence trail</h4>
+<p>Every number is a witness-backed <b>upper bound</b>, never a certificate:</p>
+<p>| stage | budget | tool | reading | |---|---|---|---| | screen | 50 trials, seed 11 | research/kit/surrogate.py | 121 | | refine | 20000 trials | same | 102 | | probes | 20000 / 100000 / 400000 trials | same (gf2_fast) | 103 / 91 / <b>91, looked converged</b> | | local gate | 8000 trials x 10 fresh seeds | verify/validate_candidate.py | 10/10, nothing lighter | | gate, <b>no accelerator</b> | 3 x 107080 Python trials | verify/gate_changed.py | passed — fast pass had silently not run | | 8M, seed 1777624973 | 8,000,000 | same | 92→90→<b>85</b>, refuted 91 | | 8M, seed 987654321 | 8,000,000 | same | 89→<b>83</b>, refuted 85 | | 8M, seeds 111111 / 222222 | 8,000,000 each | same | pass, nothing below 83 | | <b>8M, CI seed 340293076</b> | 8,000,000 | same | 87→<b>80 at 7.91M</b>, refuted 83 | | <b>16M, seed 555555</b> | 16,000,000 | <code>research/kit/surrogate.py</code> (<code>distance_rand_witness</code>, chunked) | 88→<b>82</b> | | <b>16M, seed 666666</b> | 16,000,000 | same | <b>87</b> | | <b>8M, CI seed 1612132052</b> | 8,000,000 | verify/gate_changed.py | 86→81→<b>77</b>, refuted 80 | | <b>filed</b> | — | — | <b>X 77, Z 80 -&gt; d = 77</b> |</p>
+<p><b>The coarse reading overstated by 44.</b> 121 became 77. Efficiency goes as d^2, so the error is squared, and only the refine pass plus deep re-measurement catch it.</p>
+<p><b>A local plateau is not a floor.</b> 91 held at both 100000 and 400000 trials, which is what convergence looks like — and it was wrong by 14.</p>
+<p><b>Local gate depth is not CI depth.</b> <code>verify/gate_changed.py</code> budgets <code>min(8_000_000, 150*trials)</code> for a frontier-advancing claim against <code>validate_candidate</code>&#x27;s 8000 — about 1000x. Ten independent local passes all reported &quot;no lighter logical&quot;, and every one was consistent with a claim 14 too high. [[684,4,104]] went the same way: filed at 111, a 12M-trial re-search took it to 105, and an 8M-trial CI refutation found a weight-104 Z logical.</p>
+<p>**77 is the lightest witness across roughly 80M trials, not a certified distance.** Eight searches returned 85, 83, 83, 87, 80, 82, 87, 77. The record low kept falling — 83, then 80, then 77 — and the minima arrive at the deadline rather than settling (CI&#x27;s 80 came at 7.91M of 8M). What the runs jointly establish is a bound.</p>
+<p><b>The instrument is not neutral.</b> The gate searches at <code>pair_depth=8</code> (verify/gate_changed.py), while board entries have been re-measured at 16, 24, 32, 48 and 64 — the repo&#x27;s own note on a sibling entry warns that reading a claim made at 24-80 &quot;at the default of 10 reads high for a reason that is the instrument, not the code&quot;. The true distance may be below 77 for that reason alone.</p>
+<h4>Dead ends</h4>
+<ul>
+<li><b>d was refuted four times: 91, 85, 83, 80.</b> Each refutation printed a</li>
+<p>witness (85 Z, 83 X, 80 Z, 77 X) and each is embedded here; the filed value is the lightest. <code>witness_provenance</code> records each side against the run that produced that witness, at 8000000 trials.</p>
+<li><b>The displacement claim was lost on the way down.</b> At d = 80 this entry</li>
+<p>dominated [[698,2,79]] by 1; at 77 it no longer does (that needs 79), so <code>advances_by</code> is empty and <code>beaten entries</code> is 0. It remains board-advancing as a frontier extension down to 57. Earlier revisions of this PR said &quot;displaces&quot;; that was true then and is not now.</p>
+<li><b>The accelerator can be missing without saying so.</b> A git worktree does</li>
+<p>not carry <code>verify/*.so</code>, so an early <code>gate_changed</code> run executed with <code>GF is None</code>, did only the Python seeds, and reported a pass at 3 x 107080 trials. The tell is the absent <code>+ fast x N</code> in its summary line; <code>make fast</code> in the worktree restored it.</p>
+<li><b>d = 102 was never close</b> — refuted 1 run in 10 by the *shallow* 8000-trial</li>
+<p>gate, which then passed 10/10 on 91.</p>
+<li><b>Eleven of the twenty refined finalists collapsed</b> from ~120 to 18 at</li>
+<p>20000 trials. The majority of the shortlist was inflation.</p>
+<li><b>[[684,14,96]] was refuted twice over:</b> a weight-40 logical under the</li>
+<p>claimed 96, and WL equivalence to the existing entry 684-14-54.json. research/does_it_advance.py had called it a 13-entry advance — a pre-filter, not a verdict; the gate is authoritative.</p>
+<li><b>Matching the staged candidate back to its spec by fingerprint failed.</b></li>
+<p>The fingerprint <code>screen</code> stamps and the one the verifier computes are different values; the spec was recovered by rebuilding each dumped record and comparing HX and HZ for equality.</p>
+<li><b><code>make_submission</code> searches on the pure-numpy path</b> and did not finish</li>
+<p>400000 trials in 90 minutes; witnesses were measured elsewhere and passed in, where it re-validates them against commutation and row-space membership. It stamps <code>tool = surrogate.lightest_logical</code> and one shared trial count on both sides, so <code>witness_provenance</code> is written per side instead.</p>
+</ul>
+<h4>Tools</h4>
+<p>MiMo-V2.6-Flash (via OpenCode), unattended, for @MathysRennela. Python/numpy; <code>research/kit/search.py</code> for the sampler and screen, research/kit/surrogate.py for RIS with the gf2_fast accelerator (verify/gf2_fast.cpp), research/does_it_advance.py for the frontier filter, and the gate unchanged.</p>
+<h4>Reproduction</h4>
+<pre>
+import sys, numpy as np
+sys.path[:0] = [&quot;research&quot;, &quot;research/kit&quot;, &quot;verify&quot;]
+from search import sample_kasai_affine, screen
+from kasai_affine_sweep import rebuild
+from css import compute_k
+from surrogate import distance_rand_witness
+
+recs = screen(sample_kasai_affine(4000, q_range=(17, 19), weight=4, seed=11),
+              min_k=2, min_d=4, trials=50, seed=11, backend=&quot;auto&quot;, workers=8)
+spec = next(r[&quot;spec&quot;] for r in recs
+            if r[&quot;n&quot;] == 684 and r[&quot;k&quot;] == 6 and r[&quot;spec&quot;][&quot;a&quot;] == [90, 252, 75, 64])
+HX, HZ = rebuild(spec)
+print(HX.shape, HZ.shape, int(HX.sum(1).max()))   # (342, 684) (342, 684) 8
+print(compute_k(HX, HZ))                          # 6
+w = distance_rand_witness(HX, HZ, trials=400000, seed=3, backend=&quot;auto&quot;)
+print(w.weight, w.side)                           # 91 Z  &lt;- local plateau only
+</pre>
+<p>That last line is the trap this note exists to record: it reads 91, and the claim is 77. The number that constrains the distance is the one the accelerated refutation returns at 8M trials, not the one a bounded probe settles on.</p>
+<p>The arrays are committed verbatim in codes/684-6-72.json under <code>checks.X</code> / <code>checks.Z</code>, so the code rebuilds without rerunning the search, and <code>qldpc reproduce 684-6-72</code> reads that file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-6-72.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/684-6-75.html">[[684,6,75]] — 684-6-75</a></h3><div class=kv style="color:var(--mut)">2026-10-17 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a></div><details ><summary>note</summary><div class=notebody><h3>[[684,6,75]] — affine 2BGA code on Z_19 x| Z_18, check weight 8, a frontier extension</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Cell: CSS, <code>weight-8</code>, <code>unrestricted</code>. n = 684 is under the 700 cap, so the <code>w &lt;= 8</code> and <code>d &lt;= 40</code> conditions attached to the <code>n &lt;= 1000</code> extended tier do not apply (schema/SCHEMA.md), even though this entry&#x27;s check weight is 8.</p>
