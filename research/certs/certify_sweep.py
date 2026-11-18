@@ -94,7 +94,8 @@ OUTCOMES = ("exact", "partial", "timeout", "refuted", "error")
 EXIT_REFUTED = 3
 SAT_CERTIFY = os.path.join(ROOT, "verify", "sat_certify.py")
 TROPIDIST_CERTIFY = os.path.join(HERE, "tropidist_certify.py")
-BACKENDS = ("sat", "tropidist", "tropidist+sat")
+QEDIST_CERTIFY = os.path.join(HERE, "routed_certify.py")
+BACKENDS = ("sat", "tropidist", "tropidist+sat", "qedist", "qedist+sat")
 WALL_FLOOR = 300
 
 
@@ -642,6 +643,47 @@ def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist, start
         return None, str(e), False
 
 
+def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, kmin=None, tropidist_root=None, script=None):
+    cmd = [sys.executable, script or QEDIST_CERTIFY, path, "--qedist", qedist_root,
+           "--tlim", str(float(tlim)), "--threads", str(int(threads)), "--json"]
+    if tropidist_root:
+        cmd += ["--tropidist", tropidist_root]
+    if kmin and int(kmin) > 1:
+        cmd += ["--kmin", str(int(kmin))]
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                            start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=wall)
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(proc.pid, 9)
+        except OSError:
+            proc.kill()
+        proc.communicate()
+        return None, None, True
+    if proc.returncode not in (0, 1) or not out.strip():
+        tail = (err or "").strip().splitlines()
+        return None, (tail[-1] if tail else f"qedist_certify exit {proc.returncode}"), False
+    try:
+        return json.loads(out), None, False
+    except ValueError:
+        return None, f"qedist_certify printed no record for {slug}", False
+
+
+def _qedist_attempt(path, slug, tlim, qedist_root, threads, certify_qedist, start=None, tropidist_root=None):
+    kmin = int(start) if start and int(start) > 1 else None
+    if certify_qedist is None:
+        return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, tropidist_wall(tlim), kmin=kmin,
+                                    tropidist_root=tropidist_root)
+    with open(path, encoding="utf-8") as f:
+        doc = json.load(f)
+    kw = {"kmin": {side: kmin for side in ("X", "Z", "P")}} if kmin else {}
+    try:
+        return certify_qedist(doc, root=qedist_root, tlim=tlim, threads=threads, **kw), None, False
+    except (ValueError, RuntimeError) as e:
+        return None, str(e), False
+
+
 def _is_proof_log(cert):
     return (cert is not None and classify(cert) == "exact"
             and (cert.get("verification") or {}).get("level") == "proof_log")
@@ -649,8 +691,9 @@ def _is_proof_log(cert):
 
 def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0, slugs=None,
               retry=False, certs_dir=CERTS, codes_dir=CODES, certify=None, tools=None,
-              backend="sat", tropidist=None, threads=1, certify_tropidist=None, ladder=None,
-              records_only=False, bands=None, max_gap=None, min_gap=None):
+              backend="sat", tropidist=None, qedist=None, threads=1, certify_tropidist=None,
+              certify_qedist=None, ladder=None, records_only=False, bands=None, max_gap=None,
+              min_gap=None):
     """Open entries in queue order until the budget is spent; stage what closes.
 
     Returns the run manifest, which is also written to <out_dir>/run.json.
@@ -679,9 +722,11 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
     """
     if backend not in BACKENDS:
         raise ValueError(f"backend must be one of {BACKENDS}")
-    use_tool = "tropidist" in backend
-    if use_tool and tropidist is None and certify_tropidist is None:
+    use_tool = ("tropidist" in backend) or ("qedist" in backend)
+    if "tropidist" in backend and tropidist is None and certify_tropidist is None:
         raise ValueError("the tropidist backend needs a checkout: --tropidist or TROPIDIST_ROOT")
+    if "qedist" in backend and qedist is None and certify_qedist is None:
+        raise ValueError("the qedist backend needs a checkout: --qedist or QEDIST_ROOT")
     if tools is None:
         import sat_certify
         tools = sat_certify.tool_versions
@@ -717,15 +762,21 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
         t0 = time.time()
         cert, error, killed, used, upgrade = None, None, False, "sat", None
         if use_tool:
-            used = "tropidist"
-            cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist,
-                                                     start=row.get("start"))
+            if "qedist" in backend:
+                used = "qedist"
+                cert, error, killed = _qedist_attempt(path, slug, tlim, qedist, threads, certify_qedist,
+                                                     start=row.get("start"), tropidist_root=tropidist)
+            else:
+                used = "tropidist"
+                cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist,
+                                                         start=row.get("start"))
         # The SAT path runs alone, after a tool error, on an entry the tool
         # closed (to carry it to proof_log), and, with a ladder, on an entry
         # the tool left open: the ladder's rungs can be proof-checked, which
         # the tool's bound cannot, and a bound at least as high replaces it.
         tool_open = cert is not None and classify(cert) in ("partial", "timeout")
-        if backend == "sat" or (backend == "tropidist+sat" and not stab
+        sat_after_tool = ("tropidist+sat" in backend or "qedist+sat" in backend)
+        if backend == "sat" or (sat_after_tool and not stab
                                 and (error is not None or (cert is not None and classify(cert) == "exact")
                                      or (bool(ladder) and tool_open))):
             sat_cert, sat_error, sat_killed = _sat_attempt(path, slug, tlim, wall, certify, ladder=ladder,
@@ -912,7 +963,7 @@ def pr_text(m, staged=None):
         title = f"certs: exact distances for {n} {noun} from the weekly certification sweep of {date}"
     levels = Counter(r["level"] for r in rows)
     sat_rows = [r for r in rows if r.get("backend", "sat") == "sat"]
-    tool_rows = [r for r in rows if r.get("backend") == "tropidist"]
+    tool_rows = [r for r in rows if r.get("backend") in ("tropidist", "qedist")]
     solver = [r for r in sat_rows if r["level"] == "solver"]
     tools = m.get("tools") or {}
     run = f" ([run]({m['run']}))" if m.get("run") else ""
@@ -1049,6 +1100,8 @@ def main(argv=None):
                         "on what it closed)")
     r.add_argument("--tropidist", default=os.environ.get("TROPIDIST_ROOT"),
                    help="the tropidist checkout (default: $TROPIDIST_ROOT)")
+    r.add_argument("--qedist", default=os.environ.get("QEDIST_ROOT"),
+                   help="the QEDist checkout (default: $QEDIST_ROOT)")
     r.add_argument("--threads", type=int, default=1, help="threads per tropidist run (default 1)")
     r.add_argument("--ladder", type=float, default=None, metavar="SECONDS",
                    help="ask W = 1, 2, ... up to d - 1 with this many seconds per side, and stage what it "
@@ -1088,7 +1141,7 @@ def main(argv=None):
         m = run_sweep(queue=q, out_dir=a.out_dir, attempts_path=a.attempts, tlim=a.tlim,
                       job_seconds=a.job_seconds, max_entries=a.max_entries, slugs=a.slugs, retry=a.retry,
                       ladder=a.ladder or None,
-                      backend=a.backend, tropidist=a.tropidist, threads=a.threads,
+                      backend=a.backend, tropidist=a.tropidist, qedist=a.qedist, threads=a.threads,
                       records_only=a.records_only, bands=a.band, max_gap=a.max_gap, min_gap=a.min_gap)
         o = m["outcomes"]
         print(f"opened {m['opened']} of {m['selected']}: exact {o.get('exact', 0)}, partial "
