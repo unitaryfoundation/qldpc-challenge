@@ -45,7 +45,7 @@
     "verify/fixtures/validation_gate/golden/144-12-12.json": "41d169837629084a2d507b42475a3b9ebe8dfa154b4fa317557d96dbf2e025a1",
     "verify/fixtures/validation_gate/golden/150-30-10.json": "f255bb31bb5bf63aa39fd19897973de4e09868161f009cf3c811a4c2f4e3e828",
     "verify/fixtures/validation_gate/golden/160-32-10.json": "5845edefc5accb4ce2ccc4bfd0a4288b39ddae3dc68519c143d30fbf11d0521f",
-    "verify/fixtures/validation_gate/golden/160-36-6.json": "106739f2770f22f3c768217604d34c0db128c921d977829e2dc3566ce7cbd7c4",
+    "verify/fixtures/validation_gate/golden/160-36-6.json": "40579f3d69ad2a03e716eb3a2e4e75ae85b23c6191e68fa44567acddb9e24a15",
     "verify/fixtures/validation_gate/golden/170-34-8.json": "9ad37555e4ea8512ae7a0236c056b05a1e375d695be81ee496e048f2412dc90c",
     "verify/fixtures/validation_gate/golden/180-36-8.json": "8dcd16e9c0663f55452b5b85aef596177a775fd9159fa66e1789abb0b1f0a1d4",
     "verify/fixtures/validation_gate/golden/190-38-8.json": "856d87e8349f1f921b1f567d4c02034bfc4c27c5d97a19790021ff7da261e633",
