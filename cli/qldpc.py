@@ -1454,6 +1454,123 @@ def _peer_audit_check(doc, report, args, res, slug):
     return 1
 
 
+def _code_axes_doc(doc):
+    n, k = doc["n"], doc["k"]
+    dist = doc.get("distance") or {}
+    d = dist.get("d")
+    if d is None and isinstance(dist.get("X"), dict):
+        d = dist["X"].get("value")
+    d = int(d)
+    checks = doc.get("checks") or {}
+    if "S" in checks:
+        w = max(len(set(s.get("X", [])) | set(s.get("Z", []))) for s in checks["S"])
+    elif "X" in checks:
+        w = max({*(len(r) for r in checks["X"]), *(len(r) for r in checks["Z"])})
+    else:
+        w = None
+    return n, k, d, int(w) if w is not None else None
+
+
+def _same_code_doc(new, old):
+    return (new.get("checks") == old.get("checks"))
+
+
+def _strictly_improves_doc(new, old):
+    n_n, k_n, d_n, w_n = _code_axes_doc(new)
+    n_o, k_o, d_o, w_o = _code_axes_doc(old)
+    if w_n is None or w_o is None:
+        return False
+    return (n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o
+            and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o))
+
+
+def _compare_status_doc(new, old):
+    if _strictly_improves_doc(new, old):
+        return "strictly better"
+    if _strictly_improves_doc(old, new):
+        return "strictly worse"
+    n_n, k_n, d_n, w_n = _code_axes_doc(new)
+    n_o, k_o, d_o, w_o = _code_axes_doc(old)
+    if (n_n, k_n, d_n, w_n) == (n_o, k_o, d_o, w_o):
+        return "lateral"
+    return "lateral"
+
+
+def _suggested_slug_doc(slug, out_dir):
+    for letter in "bcdefghijklmnopqrstuvwxyz":
+        cand = f"{slug}-{letter}.json"
+        if not os.path.exists(os.path.join(out_dir, cand)):
+            return f"{slug}-{letter}"
+    i = 2
+    while os.path.exists(os.path.join(out_dir, f"{slug}-{i}.json")):
+        i += 1
+    return f"{slug}-{i}"
+
+
+def _revision_check(doc, report, args, res):
+    n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
+    slug = f"{n}-{k}-{d}"
+    out_dir = args.out
+    code_path = os.path.join(out_dir, f"{slug}.json")
+    if not os.path.exists(code_path):
+        res["revision"] = {"is_revision": False, "is_overwrite": False}
+        res["is_revision"] = False
+        res["is_overwrite"] = False
+        return 0
+    try:
+        with open(code_path, encoding="utf-8") as fh:
+            old_doc = json.load(fh)
+    except (OSError, ValueError):
+        res["revision"] = {"is_revision": True, "is_overwrite": True,
+                           "unreadable": True}
+        return 0
+    old_slug = os.path.basename(code_path)
+    same = _same_code_doc(doc, old_doc)
+    allowed = False
+    if same:
+        n_n, k_n, d_n, w_n = _code_axes_doc(doc)
+        n_o, k_o, d_o, w_o = _code_axes_doc(old_doc)
+        if (n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o):
+            allowed = True
+    status = _compare_status_doc(doc, old_doc)
+    res["revision"] = {"is_revision": True, "is_overwrite": True,
+                       "existing": code_path, "same_code": same,
+                       "comparison": status if same else "distinct code",
+                       "strictly_better": allowed}
+    res["is_revision"] = True
+    res["is_overwrite"] = True
+    res["overwrites"] = code_path
+    res["overwritten_entry"] = code_path
+    res["revision_status"] = status if same else "distinct code collides"
+    res["comparison"] = status if same else "distinct code collides"
+    if allowed:
+        return 0
+    status = _compare_status_doc(doc, old_doc)
+    if not same:
+        suggested = _suggested_slug_doc(slug, out_dir)
+        problems = [f"{code_path} overwrites existing entry {old_slug}; "
+                    f"new version is {status}; does not advance over the "
+                    f"version it replaces; distinct code collides with the "
+                    f"existing entry; file it as a suffixed slug "
+                    f"({suggested}) instead of overwriting"]
+    else:
+        problems = [f"{code_path} overwrites existing entry {old_slug}; "
+                    f"new version is {status}; does not advance over the "
+                    f"version it replaces"]
+    if args.dry_run:
+        res.setdefault("would_refuse", []).extend(problems)
+        print("\n--dry-run: the real run would be refused as a revision/overwrite:")
+        for p in problems:
+            print(f"  {p}")
+        return 0
+    print("\nsubmission refused; nothing written to the board:")
+    for p in problems:
+        print(f"  {p}")
+    res["error"] = {"stage": "revision", "class": "revision",
+                    "message": "; ".join(problems)}
+    return 1
+
+
 def _frontier_check(doc, report, args, res):
     """Refuse a code an entry in its track cell dominates (AGENTS.md, The motto).
 
@@ -1556,6 +1673,9 @@ def cmd_submit(args):
     res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
                score=round(k * d * d / n, 3),
                earned_distance=report.get("earned_distance"))
+    rc = _revision_check(doc, report, args, res)
+    if rc:
+        return rc
     rc = _peer_audit_check(doc, report, args, res, slug)
     if rc:
         return rc
