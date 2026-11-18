@@ -63,14 +63,16 @@ def qedist_root(path=None):
     return find_qedist()
 
 
-def certify(doc, *, root=None, tlim=60.0, threads=1):
+def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None):
     if doc.get("code_type") != "CSS":
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
-    if d - 1 > MAX_CUTOFF:
-        raise QEDistCertifyError(f"entry d={d} exceeds QEDist's cutoff cap ({MAX_CUTOFF})")
-    if d - 1 < 1:
-        raise QEDistCertifyError("entry d must be at least 2")
+    if cutoff is None:
+        cutoff = d - 1
+    if cutoff > MAX_CUTOFF:
+        raise QEDistCertifyError(f"cutoff {cutoff} exceeds QEDist's cap ({MAX_CUTOFF})")
+    if cutoff < 1:
+        raise QEDistCertifyError("cutoff must be at least 1")
 
     prefix = qedist_root(root)
     if prefix is None:
@@ -88,7 +90,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1):
         cmd = prefix + [
             "certify", str(input_path),
             "--profile", "css",
-            "--cutoff", str(d - 1),
+            "--cutoff", str(cutoff),
             "--seconds-per-shard", str(float(tlim)),
             "--workers", str(int(threads)),
             "--out", str(out_dir),
@@ -192,12 +194,33 @@ def main(argv=None):
     ap.add_argument("--qedist", default=None)
     ap.add_argument("--tlim", type=float, default=60.0)
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--ladder", type=float, default=None, metavar="SECONDS")
+    ap.add_argument("--kmin", type=int, default=None)
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
     with open(args.path, encoding="utf-8") as f:
         doc = json.load(f)
-    cert = certify(doc, root=args.qedist, tlim=args.tlim, threads=args.threads)
+    d = int(doc["distance"]["d"])
+    if args.ladder is None:
+        cert = certify(doc, root=args.qedist, tlim=args.tlim, threads=args.threads)
+    else:
+        start = args.kmin if args.kmin and args.kmin > 1 else 1
+        last = None
+        for w in range(start, d):
+            try:
+                c = certify(doc, root=args.qedist, tlim=args.ladder, threads=args.threads, cutoff=w)
+                last = c
+                if c.get("d_exact"):
+                    break
+            except Exception as exc:  # noqa: BLE001
+                print(f"cutoff {w}: {exc}", file=sys.stderr)
+                break
+        if last is None:
+            cert = certify(doc, root=args.qedist, tlim=args.tlim, threads=args.threads, cutoff=start - 1 if start > 1 else 1)
+        else:
+            last.setdefault("ladder", {"budget_per_side": args.ladder})
+            cert = last
     print(json.dumps(cert, indent=2))
     return 0
 
