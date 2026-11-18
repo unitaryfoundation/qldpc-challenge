@@ -33,3 +33,38 @@ def test_row_sort_yields_sorted_rows():
     stats = row_sort_symmetry_selftest()
     assert stats["unsorted"] == 0
     assert stats["models"] > 0
+
+
+def test_cube_isometries_form_a_group_of_48_and_keep_the_orbit_key_invariant():
+    import numpy as np
+    from local_sat import _site_permutations, orbit_canonical_key
+    perms = _site_permutations(3, dimension=3)
+    assert len(perms) == len(set(perms)) == 48
+    members = set(perms)
+    for p in perms:
+        for q in perms:
+            assert tuple(p[q[i]] for i in range(27)) in members
+    rng = np.random.default_rng(1)
+    HX = rng.integers(0, 2, size=(3, 27)).astype(np.int8)
+    HZ = rng.integers(0, 2, size=(3, 27)).astype(np.int8)
+    ref = orbit_canonical_key(3, 3, HX, HZ, perms=perms)
+    for p in perms[::4]:
+        M = np.vstack([HX, HZ])[:, list(p)]
+        assert orbit_canonical_key(3, 3, M[:3], M[3:], perms=perms) == ref
+
+
+def test_a_cube_cell_yields_codes_whose_checks_respect_the_diameter():
+    import math
+
+    from local_sat import enumerate_local_sat_codes
+    out = list(enumerate_local_sat_codes(2, 2, 4, 1, math.sqrt(3), dimension=3,
+                                         max_diameter=math.sqrt(2), max_codes=3))
+    assert out
+    for spec, HX, HZ in out:
+        sites = spec["sites"]
+        assert spec["dimension"] == 3 and len(sites) == 8 and len(sites[0]) == 3
+        for H in (HX, HZ):
+            for row in H:
+                sup = [q for q in range(len(row)) if row[q]]
+                assert all(math.dist(sites[a], sites[b]) <= math.sqrt(2) + 1e-9
+                           for a in sup for b in sup)

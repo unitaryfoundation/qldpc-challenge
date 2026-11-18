@@ -56,14 +56,30 @@ except ImportError:  # pragma: no cover
     Cadical300 = None
 
 
-def _grid_sites(side):
-    return [(float(x), float(y)) for y in range(side) for x in range(side)]
+def _grid_sites(side, dimension=2):
+    """Return the unit-spaced grid sites, x fastest.
+
+    An n_side x n_side square for dimension 2, an n_side x n_side x n_side
+    cube for dimension 3 (issue #5840).
+    """
+    if dimension == 2:
+        return [(float(x), float(y)) for y in range(side) for x in range(side)]
+    if dimension == 3:
+        return [(float(x), float(y), float(z))
+                for z in range(side) for y in range(side) for x in range(side)]
+    raise ValueError(f"dimension must be 2 or 3, not {dimension!r}")
 
 
 def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
                     shared_t3=False, layers=1, nonempty_rows=False,
-                    row_sort=False):
+                    row_sort=False, dimension=2, max_diameter=None):
     """Build the locality-constrained CNF and return its variable maps.
+
+    ``dimension``: 2 for the n_side x n_side square, 3 for the cube (issue
+    #5840); the radius predicate is Euclidean in either. ``max_diameter``:
+    when given, no check acts on two qubits farther apart than this, so the
+    layout's interaction radius (the verifier's largest check diameter) is
+    bounded by construction; the anchor radius should be at least as large.
 
     Returns a dict with keys: ``sites``, ``n``, ``G``, ``xr``, ``zr``, ``ax``,
     ``az``, ``clauses``, ``incidence_vars``, ``iter_errors``,
@@ -83,7 +99,7 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
     fewer checks than G, which the enumerator rejects after a full solve;
     the clause costs nothing and is implied by t >= 1 detection anyway.
     """
-    sites = _grid_sites(n_side) * int(layers)
+    sites = _grid_sites(n_side, dimension) * int(layers)
     n = len(sites)
     G = n_generators
 
@@ -336,6 +352,16 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
         cls.append(lits)
         return cls
 
+    if max_diameter is not None:
+        # interaction-diameter predicate: two qubits farther apart than
+        # max_diameter never share a check
+        far = [(q1, q2) for q1 in range(n) for q2 in range(q1 + 1, n)
+               if math.dist(sites[q1], sites[q2]) > max_diameter + 1e-9]
+        for g in range(G):
+            for q1, q2 in far:
+                emit([-xr[(g, q1)], -xr[(g, q2)]])
+                emit([-zr[(g, q1)], -zr[(g, q2)]])
+
     if row_sort:
         _n_vars = add_row_sort_clauses({"n": n, "G": G, "xr": xr, "zr": zr,
                                         "n_vars": len(aux)}, emit)
@@ -350,6 +376,8 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
     incidence_vars = {v for (_, _), v in xr.items()} | {v for (_, _), v in zr.items()}
     return {
         "sites": sites,
+        "dimension": dimension,
+        "max_diameter": max_diameter,
         "n": n,
         "G": G,
         "xr": xr,
@@ -381,13 +409,42 @@ def _d4_maps(side):
     ]
 
 
-def _site_permutations(side):
-    """Qubit index permutations induced by the 8 grid isometries.
+def _cube_maps(side):
+    """Return the 48 isometries of the cube as maps (x, y, z) -> (x', y', z').
 
-    sites are ordered [(x, y) for y in range(side) for x in range(side)], so
-    index = y * side + x. perm[q] = index the qubit at q maps TO.
+    Each is a permutation of the axes followed by a reflection of any subset
+    of them.
+    """
+    S = side - 1
+    maps = []
+    for perm in itertools.permutations(range(3)):
+        for flips in itertools.product((False, True), repeat=3):
+            def f(x, y, z, perm=perm, flips=flips):
+                c = (x, y, z)
+                out = [c[perm[i]] for i in range(3)]
+                return tuple(S - out[i] if flips[i] else out[i] for i in range(3))
+            maps.append(f)
+    return maps
+
+
+def _site_permutations(side, dimension=2):
+    """Return the qubit index permutations induced by the grid isometries.
+
+    8 for the square, 48 for the cube. Sites are ordered x fastest, so index
+    = y * side + x in the square and z * side**2 + y * side + x in the cube.
+    perm[q] = index the qubit at q maps TO.
     """
     perms = []
+    if dimension == 3:
+        for f in _cube_maps(side):
+            p = [0] * (side ** 3)
+            for z in range(side):
+                for y in range(side):
+                    for x in range(side):
+                        x2, y2, z2 = f(x, y, z)
+                        p[(z * side + y) * side + x] = (z2 * side + y2) * side + x2
+            perms.append(tuple(p))
+        return perms
     for f in _d4_maps(side):
         p = [0] * (side * side)
         for y in range(side):
@@ -403,11 +460,14 @@ def _canon_key(M):
     return tuple(sorted(bytes(int(b) for b in row) for row in M))
 
 
-def orbit_canonical_key(side, G, HX, HZ, perms=None, xz_swap=True):
-    """Minimum canonical key over the D4 orbit and (optionally) the X<->Z
-    interchange of the stacked [HX; HZ] incidence matrix."""
+def orbit_canonical_key(side, G, HX, HZ, perms=None, xz_swap=True, dimension=2):
+    """Return the minimum canonical key over the grid-isometry orbit.
+
+    The orbit is under D4, or the cube group when ``dimension`` is 3, and
+    optionally the X<->Z interchange of the stacked [HX; HZ] incidence matrix.
+    """
     if perms is None:
-        perms = _site_permutations(side)
+        perms = _site_permutations(side, dimension)
     M = np.vstack([HX, HZ])
     best = None
     for p in perms:
@@ -439,10 +499,13 @@ def orbit_selftest(side=6, G=4, seed=0):
     return True
 
 
-def _full_symmetry_group(side):
-    """All 16 transforms (site perm, xz_swap) of D4 x C2, identity first."""
+def _full_symmetry_group(side, dimension=2):
+    """Return all transforms (site perm, xz_swap) of the isometry group times C2.
+
+    Identity first: 16 for the square, 96 for the cube.
+    """
     out = []
-    for p in _site_permutations(side):
+    for p in _site_permutations(side, dimension):
         for xz in (False, True):
             out.append((p, xz))
     return out
@@ -467,6 +530,7 @@ def add_static_symmetry_clauses(cnf, emit):
     Returns the number of auxiliary variables introduced.
     """
     side = int(round(max(s[0] for s in cnf["sites"]))) + 1
+    dimension = len(cnf["sites"][0])
     n = cnf["n"]
     G = cnf["G"]
     rowmaps = (cnf["xr"], cnf["zr"])
@@ -483,7 +547,7 @@ def add_static_symmetry_clauses(cnf, emit):
     ]
     var_of = {(s, g, q): rowmaps[s][(g, q)] for s, g, q in order}
 
-    for p, xz in _full_symmetry_group(side):
+    for p, xz in _full_symmetry_group(side, dimension):
         if p == tuple(range(n)) and not xz:
             continue  # identity
         # vector v in canonical order; w = sigma(v)
@@ -572,6 +636,8 @@ def enumerate_local_sat_codes(
     exact_on_reject=False,
     stats=None,
     budget_check=None,
+    dimension=2,
+    max_diameter=None,
 ):
     """Yield ``(spec, HX, HZ)`` for distinct
     CSS codes whose checks are all local under the returned layout.
@@ -581,7 +647,8 @@ def enumerate_local_sat_codes(
 
     Parameters
     ----------
-    n_side       : qubits live on an n_side x n_side grid (n = n_side**2)
+    n_side       : qubits live on an n_side x n_side grid (n = n_side**2), or
+                   on an n_side**3 cube when ``dimension`` is 3 (issue #5840)
     n_generators : rows sought in EACH of HX and HZ
     max_weight   : per-row weight bound (active qubits <= max_weight)
     t            : code must detect every Pauli error of weight <= t
@@ -673,7 +740,7 @@ def enumerate_local_sat_codes(
     if symmetry not in ("none", "orbit", "lex"):
         raise ValueError(f"unknown symmetry {symmetry!r}; choose none|orbit|lex")
 
-    perms = _site_permutations(n_side) if symmetry == "orbit" else None
+    perms = _site_permutations(n_side, dimension) if symmetry == "orbit" else None
 
     if stats is None:
         stats = {}
@@ -684,14 +751,15 @@ def enumerate_local_sat_codes(
         cnf = build_local_cnf(
             n_side, n_generators, max_weight, t, radius, sink=solver_obj,
             shared_t3=shared_t3, layers=layers, nonempty_rows=nonempty_rows,
-            row_sort=row_sort,
+            row_sort=row_sort, dimension=dimension, max_diameter=max_diameter,
         )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, solver_obj.add_clause)
     else:
         cnf = build_local_cnf(n_side, n_generators, max_weight, t, radius,
                               shared_t3=shared_t3, layers=layers,
-                              nonempty_rows=nonempty_rows, row_sort=row_sort)
+                              nonempty_rows=nonempty_rows, row_sort=row_sort,
+                              dimension=dimension, max_diameter=max_diameter)
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, cnf["clauses"].append)
         solver_obj = solver_map[solver](bootstrap_with=cnf["clauses"])
@@ -807,6 +875,8 @@ def enumerate_local_sat_codes(
                 "t": t,
                 "radius": radius,
                 "layers": layers,
+                "dimension": dimension,
+                "max_diameter": max_diameter,
                 "seed": seed,
                 "index": count,
                 "sites": list(sites),
