@@ -38,6 +38,14 @@ def _successful_checks(head_sha="abc123"):
             "conclusion": "success",
             "started_at": "2026-09-25T10:01:00Z",
         },
+        {
+            "id": 3,
+            "name": "codes-format",
+            "head_sha": head_sha,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T10:02:00Z",
+        },
     ]
 
 
@@ -338,6 +346,7 @@ def test_checks_require_success_on_the_current_head():
     assert failures == [
         "missing verify check on current head",
         "missing prose check on current head",
+        "missing codes-format check on current head",
     ]
 
 
@@ -515,6 +524,37 @@ def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypat
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(head, base))
     result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
     assert not result.eligible and result.metadata_errors
+
+
+def test_a_replacement_circuit_that_lowers_a_side_is_blocked(monkeypatch):
+    """#5911 and #5934 (2026-11-17): an author replaced their entry's circuit with a worse one."""
+    def doc(x, z):
+        d = _code_document()
+        d["circuit"] = {"d_circ": {"X": {"value": x}, "Z": {"value": z}}, "rounds": 7}
+        return d
+    files = [{"filename": "codes/64-21-7.json", "status": "modified"},
+             {"filename": "circuits/64-21-7/memory_x.stim", "status": "modified"}]
+    monkeypatch.setattr(merge_eligible_prs, "list_pr_files", lambda _repo, _number: files)
+    monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), doc(5, 6)))
+    result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
+    assert not result.eligible
+    assert result.reasons == ["codes/64-21-7.json: the replacement circuit lowers d_circ "
+                              "(X 5 -> 4, Z 6 -> 4); the committed circuit is better"]
+    # a replacement that raises a side and keeps the other is what the tier is for
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(5, 5), doc(5, 4)))
+    assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
+    # a lowered reading on the unchanged circuit is a refutation, not a replacement
+    monkeypatch.setattr(merge_eligible_prs, "list_pr_files",
+                        lambda _repo, _number: [{"filename": "codes/64-21-7.json", "status": "modified"}])
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), doc(5, 6)))
+    assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
+    # a new entry with a circuit has nothing to regress from
+    monkeypatch.setattr(merge_eligible_prs, "list_pr_files", lambda _repo, _number: [
+        {"filename": "codes/64-21-7.json", "status": "added"},
+        {"filename": "circuits/64-21-7/memory_x.stim", "status": "added"}])
+    monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), None))
+    assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
 
 
 def test_a_refutation_that_appends_its_credit_to_notes_still_inherits_the_gap(monkeypatch):
