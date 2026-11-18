@@ -25,7 +25,7 @@ from urllib.parse import quote, urlencode
 DEFAULT_REPO = "unitaryfoundation/qldpc-challenge"
 DEFAULT_BASE = "main"
 PAGE_SIZE = 100
-REQUIRED_CHECKS = ("verify", "prose")
+REQUIRED_CHECKS = ("verify", "prose", "codes-format")
 # One entry per PR. Everything the board files for an entry hangs off its slug
 # (`notes/<slug>.md`, `circuits/<slug>/`, `certs/<slug>.json`), so a PR touching
 # two records is a batch whose provenance has to be read one entry at a time.
@@ -169,7 +169,7 @@ def metadata_error(document: Any) -> str | None:
 
 
 def check_failures(runs: list[dict[str, Any]], head_sha: str) -> list[str]:
-    """Require latest verify/prose runs on this exact SHA to have succeeded."""
+    """Require the latest verify, prose, and codes-format runs on this exact SHA to have succeeded."""
     failures: list[str] = []
     for check_name in REQUIRED_CHECKS:
         matching = [run for run in runs if run.get("name") == check_name and run.get("head_sha") == head_sha]
@@ -250,6 +250,47 @@ def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, bas
     return new_notes.startswith(old_notes)
 
 
+def _circuit_sides(document: Any) -> dict[str, int]:
+    """Return {side: d_circ value} of a document's circuit block, empty when it has none."""
+    circuit = document.get("circuit") if isinstance(document, dict) else None
+    d_circ = circuit.get("d_circ") if isinstance(circuit, dict) else None
+    out: dict[str, int] = {}
+    for side in ("X", "Z"):
+        value = ((d_circ or {}).get(side) or {}).get("value")
+        if isinstance(value, int) and not isinstance(value, bool):
+            out[side] = value
+    return out
+
+
+def circuit_regression(repo: str, path: str, document: Any, files: list[dict[str, Any]], base: str) -> str | None:
+    """Name the side whose circuit fault distance this PR lowers while replacing the circuit.
+
+    verify/check_authorship.py lets an entry's listed author replace its
+    circuit with any other, and the gate only checks the new circuit's own
+    claim, so on 2026-11-17 two circuit-tier PRs (#5911, #5934) merged with
+    d_circ below the committed schedule's. A PR that changes a file under
+    circuits/<slug>/ has filed a new circuit; its reading may not fall on any
+    side. A lowered reading on the unchanged circuit is a refutation and is
+    left to the refutation binding.
+    """
+    slug = path[len("codes/"):-len(".json")] if path.startswith("codes/") and path.endswith(".json") else None
+    if slug is None:
+        return None
+    prefix = f"circuits/{slug}/"
+    if not any(isinstance(item.get("filename"), str) and item["filename"].startswith(prefix) for item in files):
+        return None
+    try:
+        base_doc = _cached_read_code_document(repo, path, base)
+    except GitHubCLIError:
+        return None                       # a new entry: nothing to regress from
+    before, after = _circuit_sides(base_doc), _circuit_sides(document)
+    fallen = [f"{side} {before[side]} -> {after[side]}" for side in ("X", "Z")
+              if side in before and side in after and after[side] < before[side]]
+    if not fallen:
+        return None
+    return f"{path}: the replacement circuit lowers d_circ ({', '.join(fallen)}); the committed circuit is better"
+
+
 @dataclass
 class Evaluation:
     number: int
@@ -326,6 +367,11 @@ def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
                 model = provenance["model"]
                 result.models.extend([model] if isinstance(model, str) else model)
                 result.authors.extend(provenance["authors"])
+            for path in code_paths:
+                head_doc = _cached_read_code_document(repo, path, head_sha)
+                regression = circuit_regression(repo, path, head_doc, files, base)
+                if regression:
+                    result.reasons.append(regression)
 
         runs = list_check_runs(repo, head_sha)
         result.reasons.extend(check_failures(runs, head_sha))
@@ -461,7 +507,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
             "Maintainer tool: report eligible code PRs. Report-only unless --merge is "
-            "given; only current-head verify and prose successes are accepted."
+            "given; only current-head verify, prose, and codes-format successes are accepted."
         )
     )
     parser.add_argument("--repo", default=DEFAULT_REPO, help="GitHub owner/repo")
