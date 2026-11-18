@@ -1,0 +1,132 @@
+{
+  "d": 7,
+  "d_exact": true,
+  "d_lower": 7,
+  "encoding": "selector",
+  "ladder": {
+    "budget_per_side": 1800.0,
+    "start": 1
+  },
+  "logical_classes": 18,
+  "name": "[[62,18,7]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "8789da00a13e49820f9c2533639681b27e919c5bef8a0999c9b3220c42c4bf04",
+          "proof": "verified",
+          "secs": 0.4,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "8b18ab3e7a2c04f1becfa79ddb3c0468bda701b9d3bf635596bff772f04a4d7e",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "d6a9159836b6a1f940b5386fbefbc62ba37230ee5e9255ce8ff5de5ffd6ea05e",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        },
+        {
+          "W": 4,
+          "cnf_sha256": "737b379ca2f0d865d5e4495942d6a31d572116d1cd10489b1f64d30c2bb9ceab",
+          "proof": "verified",
+          "secs": 0.4,
+          "status": "UNSAT"
+        },
+        {
+          "W": 5,
+          "cnf_sha256": "a9a22b820face6c81894fc86e4d11303f654242fd022ae0b6b99b23d9104482d",
+          "proof": "verified",
+          "secs": 1.0,
+          "status": "UNSAT"
+        },
+        {
+          "W": 6,
+          "cnf_sha256": "bf388e33f0053a0ab772e6e81173d020d965fc5235a9a87e847557fd53e92d28",
+          "proof": "verified",
+          "secs": 3.3,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 7 exists",
+      "proved_min": 7,
+      "secs": 5.3,
+      "status": "UNSAT",
+      "value": 7
+    },
+    "Z": {
+      "exact": true,
+      "ladder": [
+        {
+          "W": 1,
+          "cnf_sha256": "aebf619b8e742d23b33effd80acaec6bacec5a7fa68b9d372c8b4f41514b66dd",
+          "proof": "verified",
+          "secs": 0.1,
+          "status": "UNSAT"
+        },
+        {
+          "W": 2,
+          "cnf_sha256": "95318e5dd22df097ebea6190c69858d2c44ba8d63cd4c4a0a29a3e3d59353e72",
+          "proof": "verified",
+          "secs": 0.1,
+          "status": "UNSAT"
+        },
+        {
+          "W": 3,
+          "cnf_sha256": "dd9813d3656a298071a039c6c6c554c69ff73f7512183588a370a57ea13248d0",
+          "proof": "verified",
+          "secs": 0.2,
+          "status": "UNSAT"
+        },
+        {
+          "W": 4,
+          "cnf_sha256": "6e0036ae16ef47faa3f43ed2277a2224ec70fa97c464de5a4b2d05cacfe5cec0",
+          "proof": "verified",
+          "secs": 0.4,
+          "status": "UNSAT"
+        },
+        {
+          "W": 5,
+          "cnf_sha256": "7a2d6ee6acda8c46411c0d71234039fce8b9177069e3a4bae669a6fa244aab7c",
+          "proof": "verified",
+          "secs": 0.9,
+          "status": "UNSAT"
+        },
+        {
+          "W": 6,
+          "cnf_sha256": "fa7163e35dad6841ab0f00d0c42b3db7d87394c4b1e77709a1e7f40e20052041",
+          "proof": "verified",
+          "secs": 3.3,
+          "status": "UNSAT"
+        }
+      ],
+      "note": "no logical < 7 exists",
+      "proved_min": 7,
+      "secs": 5.0,
+      "status": "UNSAT",
+      "value": 7
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 3600,
+  "verification": {
+    "checker": "drat-trim sha256:d38f0c10da6718bf",
+    "cnf_sha256": "X=bf388e33f0053a0ab772e6e81173d020d965fc5235a9a87e847557fd53e92d28;Z=fa7163e35dad6841ab0f00d0c42b3db7d87394c4b1e77709a1e7f40e20052041",
+    "level": "proof_log",
+    "note": "pure-CNF re-encoding refuted by kissat 4.0.4 and checked by drat-trim; the XOR path agrees. Confirms the CNF is unsatisfiable, not that it asks the distance question",
+    "replay": {
+      "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+      "emit": "python verify/replay_proofs.py 62-18-7-b",
+      "emitter": "verify/sat_certify.py side_cnf, XOR chunk arity 5, no symmetry prefix"
+    }
+  }
+}
