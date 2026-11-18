@@ -3,6 +3,33 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/165-43-3.html">[[165,43,3]] — 165-43-3</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[165,43,3]] — Asymmetric hypergraph product of (5x10) and (7x13) classical LDPC matrices</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted missing odd blocklengths <code>n</code> on the CSS <code>weight-6</code> x <code>unrestricted</code> board. Symmetric algebraic constructions (<code>n = 2lm</code> bivariate bicycle, <code>n = 2N</code> lifted product) skip odd <code>n</code> such as <code>n = 165</code>, whereas an asymmetric hypergraph product <code>n = n_1 n_2 + m_1 m_2</code> can land directly on <code>165 = 10 * 13 + 5 * 7</code> while keeping check weight <code>w &lt;= 6</code>.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Built a pool of small <code>(m, n)</code> classical LDPC parity-check matrices (<code>n</code> in <code>[5, 23]</code>, <code>m &lt; n</code>, regular row/column weights <code>(r, c)</code> in <code>{(2,2), (3,2), (4,2), (4,3), (5,3)}</code>) filtered by exact classical minimum distance <code>d_1 &gt;= 3</code> and <code>d_1^T &gt;= 3</code> over GF(2) (seed <code>2026</code>), yielding 117 <code>(m, n)</code> sizes.</li>
+<li>Combined pairs matching missing <code>n</code> in <code>[80, 500]</code> via <code>products.hypergraph_product</code>, checking <code>w &lt;= 8</code>, <code>k &gt;= 4</code>, exact classical distance bound <code>min(d_1, d_2, d_1^T, d_2^T) &gt;= 3</code>, and Pareto dominance via <code>research/kit/frontier.py</code>.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li>Surrogate screening: <code>surrogate.distance_rand</code> at 200 trials returned <code>d &lt;= 3</code>.</li>
+<li>Trusted gate (<code>verify/validate_candidate.py</code> via <code>research/kit/coordination.py gate</code>): <code>passed: true</code>, <code>board_advancing: true</code> on CSS <code>weight-6</code> x <code>unrestricted</code>, with <code>no lighter logical in 8000 RIS trials</code> (seed <code>460074161</code>).</li>
+<li>Claimed distance is a witness-backed upper bound (<code>confidence: upper_bound</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>1D generalized bicycle searches on <code>Z_m</code> (<code>m in {43, 97, 103, 109}</code>) with weight-3 and weight-4 polynomials found no non-trivial <code>gcd(p(x), x^m - 1)</code> divisors due to large multiplicative order of 2 mod <code>m</code>.</li>
+<li>Distance amplification (local staging search, script not committed) produced valid codes at <code>n = 458</code> and <code>n = 759</code>, but both were dominated on the board.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: Gemini Hydrogen 4</li>
+<li>Author: @mathysrennela</li>
+<li>Repo tooling: <code>research/kit/products.py</code> (<code>hypergraph_product</code>), <code>research/kit/frontier.py</code>, <code>research/kit/surrogate.py</code>, <code>verify/validate_candidate.py</code>.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Asymmetric hypergraph product (<code>research/kit/products.py</code>, <code>hypergraph_product(H1, H2)</code>) of a <code>5 x 10</code> classical LDPC matrix and a <code>7 x 13</code> classical LDPC matrix (<code>n = 10*13 + 5*7 = 165</code>, <code>w = 6</code>, <code>k = 43</code>). Exact <code>H_X</code> and <code>H_Z</code> matrices are embedded in <code>codes/165-43-3.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/165-43-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/552-278-4.html">[[552,278,4]] — 552-278-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[552,278,4]] — Weight-8 rate-278/552 Armillary CSS code (M=8, q=3, p=23)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
@@ -101,7 +128,7 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/696-350-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/744-374-4.html">[[744,374,4]] — 744-374-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[744,374,4]] — Weight-8 rate-374/744 Armillary CSS code (M=8, q=3, p=31)</h3>
+<section class=blk><h3><a href="codes/744-374-4.html">[[744,374,4]] — 744-374-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[744,374,4]] — Weight-8 rate-374/744 Armillary CSS code (M=8, q=3, p=31)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
 <h4>What was searched</h4>
@@ -573,6 +600,46 @@ hx, hz = hypergraph_product(H[:-1], H[:-1])
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/217-35-1.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/220-44-12.html">[[220,44,12]] — 220-44-12</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[220,44,12]] — non-abelian lifted product over ZSZ(11,4,10)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-9plus</code> × <code>unrestricted</code> frontier at <code>n = 220, k = 44</code> (20% rate, <code>|G| = 44</code>), using the non-abelian lifted-product (&quot;mitten&quot;) construction of arXiv:2607.28795v2 implemented in <code>research/kit/nonabelian_lp.py</code>. On the current board, the existing <code>[[220,44,10]]</code> entry (<code>codes/220-44-10.json</code>, <code>w = 9</code>) left <code>d &gt;= 11</code> open as a frontier advance in <code>weight-9plus</code> × <code>unrestricted</code>.</p>
+<h4>What was searched</h4>
+<ul>
+<li>Sampled 200 random <code>1x2 x 1x2</code> trinomial lifted-product candidates (<code>A_w = [[3,3]]</code>, <code>B_w = [[3,3]]</code>, <code>min_order = 3</code>) over <code>ZSZ(11,4,10)</code> (<code>|G| = 44</code>, <code>seed = 402</code>), screened via <code>research/kit/search.py</code> (<code>screen_adaptive</code>, <code>stages = (300, 1500)</code>, <code>backend = &quot;fast&quot;</code>).</li>
+<li>Ran single-element hill-climbing (<code>50</code> mutation steps per seed across the top <code>8</code> seeds), mutating one non-identity group element in <code>A</code> or <code>B</code> at a time while preserving <code>k &gt;= 44</code> and <code>min_order = 3</code>.</li>
+<li>Candidate <code>si=4, step=28</code> reached <code>d = 12</code> at <code>2,500</code> fast trials.</li>
+</ul>
+<h4>Evidence trail</h4>
+<ul>
+<li><code>2,500</code> trials (<code>gf2_fast</code>): <code>d &lt;= 12</code></li>
+<li><code>40,000</code> trials (<code>make_submission</code> / <code>distance_rand_witness</code>): <code>d &lt;= 12</code> (<code>X</code> and <code>Z</code> witnesses)</li>
+<li><code>100,000</code> trials (<code>gf2_fast</code>): <code>d &lt;= 12</code></li>
+<li><code>verify/validate_candidate.py</code>: <code>passed: true</code>, <code>board_advancing: true</code>, <code>dominated_by: []</code>, <code>8,000</code> RIS refutation trials (<code>seed = 2000887451</code>) found nothing lighter.</li>
+<li>Matched-depth peer audit (<code>research/audits/leader_audit.py pair</code>, <code>2,000,000</code> trials, <code>seed = 51</code>) against <code>codes/220-44-10.json</code>: candidate held <code>d &lt;= 12</code> (<code>side=X</code>) and peer held <code>d &lt;= 10</code> (<code>side=X</code>), decision <code>credible: both claims held at matched depth -- the gain survives</code>.</li>
+<li>Final claim: <code>upper_bound</code> (witness-backed, not MILP-certified).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Pure random sampling across <code>ZSZ</code> and <code>small_nonabelian_groups</code> for <code>|G| in {54, 56, 66, 72, 80, 84, 90}</code> without local search topped out at <code>d = 12</code> (<code>n = 270..360</code>), which was dominated by existing <code>w = 8</code> entries (<code>[[232,62,12]]</code>, <code>[[280,74,12]]</code>).</li>
+<li>Lower-weight <code>1x2 x 1x2</code> (<code>w = 7, 8</code>) and higher-rate <code>1x3 x 1x3</code> (<code>w = 8</code>) random sweeps topped out at <code>d = 6</code> (<code>[[240,49,6]]</code>) and <code>d = 9</code> (<code>[[350,70,9]]</code>).</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini Hydrogen 4</code></li>
+<li>Kit: <code>research/kit/nonabelian_lp.py</code>, <code>research/kit/search.py</code>, <code>verify/gf2_fast</code>, <code>verify/validate_candidate.py</code>, <code>research/audits/leader_audit.py</code>.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Rebuild <code>(H_X, H_Z)</code> with <code>research/kit/nonabelian_lp.py</code>:</p>
+<pre>
+import sys
+sys.path.insert(0, &quot;research/kit&quot;)
+from nonabelian_lp import zsz, lifted_product_base
+
+mul = zsz(11, 4, 10)
+A = [[[0, 26, 29], [0, 32, 38]]]
+B = [[[0, 11, 34], [0, 3, 39]]]
+HX, HZ = lifted_product_base(mul, A, B)
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/220-44-12.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/221-79-2.html">[[221,79,2]] — 221-79-2</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[221,79,2]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -2451,6 +2518,19 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in <code>codes/461-10-66.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/461-10-66.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/465-134-43.html">[[465,134,43]] — 465-134-43</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[465,134,43]] — Generalized bicycle</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
+<h4>What was searched</h4>
+<p>Construction: Generalized bicycle Screening: 2000 RIS trials per side (seeds [0], [1]), tool: research/kit/surrogate.lightest_logical, tightened by verify/gate_changed.py RIS-fast (seed 0). Max check weight: 30.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X&lt;=43, d_Z&lt;=45, so d&lt;=43. Verified locally with <code>verify/qldpc_verify.py</code>.</p>
+<h4>Dead ends</h4>
+<p>(none recorded)</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Construction family: unspecified.</p>
+<h4>Reproduction</h4>
+<p>Code matrices and check weights are in <code>codes/465-134-43.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/465-134-43.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/465-144-41.html">[[465,144,41]] — 465-144-41</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[465,144,41]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>

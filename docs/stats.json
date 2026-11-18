@@ -1,6 +1,6 @@
 {
-  "verified_codes": 3654,
-  "css_codes": 3397,
+  "verified_codes": 3657,
+  "css_codes": 3400,
   "stabilizer_codes": 257,
   "certified_exact": 1646,
   "tracks": 12,
@@ -8,21 +8,21 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2402,
-    "not_derived": 87,
-    "parameters_only": 418,
     "literature": 490,
+    "parameters_only": 418,
+    "not_derived": 90,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2814,
+    "unknown": 2817,
     "known_parameters": 765,
     "new_parameters": 75
   },
   "novelty_audited": 840,
   "board_screen": {
-    "not_screened": 915,
     "distinct": 2445,
+    "not_screened": 918,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -30,25 +30,25 @@
   },
   "family_concentration": {
     "global": {
-      "records": 1750,
+      "records": 1752,
       "families": 15,
-      "untagged": 494,
-      "untagged_share": 0.282,
+      "untagged": 495,
+      "untagged_share": 0.283,
       "top": [
         {
           "family": "generalized-bicycle",
-          "records": 577,
-          "share": 0.33
+          "records": 576,
+          "share": 0.329
         },
         {
           "family": "bivariate-bicycle",
           "records": 183,
-          "share": 0.105
+          "share": 0.104
         }
       ],
-      "top1_share": 0.33,
-      "top2_share": 0.434,
-      "hhi": 0.131
+      "top1_share": 0.329,
+      "top2_share": 0.433,
+      "hhi": 0.13
     },
     "cells": {
       "local-2d-bilayer~weight-4": {
@@ -349,7 +349,7 @@
         "moved": false
       },
       "unrestricted~weight-6": {
-        "records": 654,
+        "records": 655,
         "families": 14,
         "untagged": 159,
         "untagged_share": 0.243,
@@ -366,9 +366,9 @@
           }
         ],
         "top1_share": 0.234,
-        "top2_share": 0.39,
-        "hhi": 0.106,
-        "members": 1254,
+        "top2_share": 0.389,
+        "hhi": 0.105,
+        "members": 1255,
         "leader": {
           "slug": "960-24-38",
           "family": "2bga-coset",
@@ -382,7 +382,7 @@
         "moved": false
       },
       "unrestricted~weight-8": {
-        "records": 1157,
+        "records": 1158,
         "families": 14,
         "untagged": 274,
         "untagged_share": 0.237,
@@ -401,7 +401,7 @@
         "top1_share": 0.29,
         "top2_share": 0.413,
         "hhi": 0.119,
-        "members": 2363,
+        "members": 2364,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -415,26 +415,26 @@
         "moved": false
       },
       "unrestricted~weight-any": {
-        "records": 1750,
+        "records": 1752,
         "families": 15,
-        "untagged": 494,
-        "untagged_share": 0.282,
+        "untagged": 495,
+        "untagged_share": 0.283,
         "top": [
           {
             "family": "generalized-bicycle",
-            "records": 577,
-            "share": 0.33
+            "records": 576,
+            "share": 0.329
           },
           {
             "family": "bivariate-bicycle",
             "records": 183,
-            "share": 0.105
+            "share": 0.104
           }
         ],
-        "top1_share": 0.33,
-        "top2_share": 0.434,
-        "hhi": 0.131,
-        "members": 3397,
+        "top1_share": 0.329,
+        "top2_share": 0.433,
+        "hhi": 0.13,
+        "members": 3400,
         "leader": {
           "slug": "682-140-82",
           "family": "generalized-bicycle",
