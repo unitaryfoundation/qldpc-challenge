@@ -227,3 +227,31 @@ def test_two_entries_with_the_same_bytes_share_one_memo_entry(tmp_path, memo,
     assert len(calls) == 1
     a, b = (e for e in out)
     assert a["slug"] != b["slug"] and a["report"] == b["report"]
+
+
+def test_a_pooled_pass_gives_the_serial_reports_and_fills_the_memo(tmp_path, monkeypatch):
+    """board_reports(jobs=N) verifies the misses in worker processes (issue #5578).
+
+    A worker verifies one file's bytes; the parent assembles the entries in
+    path order and writes the memo, so what a reader gets, and what the memo
+    holds, is what the serial pass produces.
+    """
+    import shutil
+    board = tmp_path / "codes"
+    board.mkdir()
+    for i in range(3):
+        doc = json.loads(open(FIXTURE, encoding="utf-8").read())
+        doc["name"] = f"copy {i}"
+        (board / f"72-6-6-{i}.json").write_text(json.dumps(doc))
+    memo_a, memo_b = tmp_path / "memo-a", tmp_path / "memo-b"
+    monkeypatch.setenv(Q.BOARD_CACHE_ENV, str(memo_a))
+    Q._BOARD_CACHE.clear()
+    serial = Q.board_reports(str(board))
+    monkeypatch.setenv(Q.BOARD_CACHE_ENV, str(memo_b))
+    Q._BOARD_CACHE.clear()
+    pooled = Q.board_reports(str(board), jobs=2)
+    assert [e["slug"] for e in pooled] == [e["slug"] for e in serial]
+    assert [e["report"] for e in pooled] == [e["report"] for e in serial]
+    written = sorted(p.name for p in memo_b.rglob("*.json"))
+    assert written == sorted(p.name for p in memo_a.rglob("*.json")) and len(written) == 3
+    shutil.rmtree(memo_b)
