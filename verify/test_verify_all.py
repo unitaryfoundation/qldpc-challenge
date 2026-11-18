@@ -1076,13 +1076,25 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     # the same `if:`, with no always() to outlive a sweep that failed.
     assert cond(_GATE) == cond(_CODE_SWEEP) and "always()" not in cond(_GATE)
     # Every mention in every workflow, not only in the named steps of this
-    # one: no job-level or workflow-level env sets it, and no other workflow.
+    # one: no job-level or workflow-level env sets it, and the one other
+    # workflow that names it, reproduce.yml, hands it to a single step on
+    # the same terms (issue #5578, change G): a step-level env, the
+    # directory emptied by the first line of that step's script, and no
+    # cache or artifact path naming it.
     workflows = _every_workflow()
     mentions = [(wf, ln.strip()) for wf, lines in workflows.items()
                 for ln in lines if "QLDPC_BOARD_CACHE" in ln]
-    assert mentions == [("verify.yml", _MEMO.strip()),
+    assert mentions == [("reproduce.yml", _MEMO.strip()),
+                        ("reproduce.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+                        ("verify.yml", _MEMO.strip()),
                         ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
                         ("verify.yml", _MEMO.strip())], mentions
+    reproduce = workflows["reproduce.yml"]
+    env_at = next(i for i, ln in enumerate(reproduce) if ln == _MEMO)
+    assert reproduce[env_at - 1] == "        env:" and reproduce[env_at + 1] == "        run: |"
+    assert reproduce[env_at + 3].strip() == 'rm -rf "$QLDPC_BOARD_CACHE"'
+    assert not any(("runner.temp" in ln or "board-memo" in ln) and ln != _MEMO
+                   for ln in reproduce), "reproduce.yml names the memo directory only in that env line"
     # Nothing saves or restores it, so no run reads what another wrote: in
     # this workflow the runner's temp directory is named by those two lines
     # and by no cache or artifact path.
