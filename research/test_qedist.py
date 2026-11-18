@@ -22,25 +22,66 @@ from qedist import (  # noqa: E402
 )
 
 
+def _css_doc():
+    # Synthetic [[7,1,3]] Steane code so tests do not depend on mutable board slugs.
+    checks = [[0, 1, 2, 3], [0, 1, 4, 5], [0, 2, 4, 6]]
+    return {
+        "schema": "qldpc-challenge/v1",
+        "code_type": "CSS",
+        "name": "steane-7-1-3",
+        "n": 7,
+        "k": 1,
+        "checks": {"X": checks, "Z": checks},
+        "distance": {
+            "d": 3,
+            "X": {"value": 3, "witness": [4, 5, 6]},
+            "Z": {"value": 3, "witness": [4, 5, 6]},
+        },
+    }
+
+
+def _stabilizer_doc():
+    # Synthetic [[5,1,3]] five-qubit stabilizer code.
+    return {
+        "schema": "qldpc-challenge/v1",
+        "code_type": "stabilizer",
+        "name": "five-qubit-5-1-3",
+        "n": 5,
+        "k": 1,
+        "checks": {
+            "S": [
+                {"X": [0, 3], "Z": [1, 2]},
+                {"X": [1, 4], "Z": [2, 3]},
+                {"X": [0, 2], "Z": [3, 4]},
+                {"X": [1, 3], "Z": [0, 4]},
+            ]
+        },
+        "distance": {
+            "d": 3,
+            "P": {"value": 3, "witness": {"X": [0, 1, 2], "Z": []}},
+        },
+    }
+
+
 class ConversionTests(unittest.TestCase):
     def test_css_conversion_includes_witnesses(self):
-        doc = json.loads((ROOT / "codes" / "10-2-3-b.json").read_text())
+        doc = _css_doc()
         out = challenge_to_qedist(doc)
         self.assertEqual(out["schema"], "cssdist.code.v1")
-        self.assertEqual(out["n"], 10)
-        self.assertEqual(len(out["hx"]), 4)
-        self.assertEqual(len(out["hz"]), 4)
+        self.assertEqual(out["n"], 7)
+        self.assertEqual(len(out["hx"]), 3)
+        self.assertEqual(len(out["hz"]), 3)
         self.assertIn("witnesses", out)
         self.assertEqual(out["witnesses"]["X"][0], doc["distance"]["X"]["witness"])
         self.assertEqual(out["witnesses"]["Z"][0], doc["distance"]["Z"]["witness"])
 
     def test_no_witnesses_option(self):
-        doc = json.loads((ROOT / "codes" / "10-2-3-b.json").read_text())
+        doc = _css_doc()
         out = challenge_to_qedist(doc, include_witnesses=False)
         self.assertNotIn("witnesses", out)
 
     def test_stabilizer_rejected(self):
-        doc = json.loads((ROOT / "codes" / "52-15-7.json").read_text())
+        doc = _stabilizer_doc()
         with self.assertRaises(ValueError):
             challenge_to_qedist(doc)
 
@@ -49,16 +90,15 @@ class ConversionTests(unittest.TestCase):
             challenge_to_qedist({"code_type": "CSS", "n": 4, "checks": {}})
 
     def test_stabilizer_conversion(self):
-        doc = json.loads((ROOT / "codes" / "20-4-5.json").read_text())
+        doc = _stabilizer_doc()
         out = challenge_stabilizer_to_qedist(doc)
         self.assertEqual(out["schema"], "qedist.stabilizer.v1")
-        self.assertEqual(out["n"], 20)
-        self.assertEqual(len(out["stabilizers"]), 20)
-        self.assertIn("witnesses", out)
-        self.assertEqual(len(out["witnesses"][0]), 20)
+        self.assertEqual(out["n"], 5)
+        self.assertEqual(out["stabilizers"], ["XZZXI", "IXZZX", "XIXZZ", "ZXIXZ"])
+        self.assertEqual(out["witnesses"], ["XXXII"])
 
     def test_stabilizer_wrong_type_rejected(self):
-        doc = json.loads((ROOT / "codes" / "10-2-3-b.json").read_text())
+        doc = _css_doc()
         with self.assertRaises(ValueError):
             challenge_stabilizer_to_qedist(doc)
 
@@ -72,8 +112,9 @@ class EndToEndTests(unittest.TestCase):
         import tempfile
         from qedist import certify_challenge
 
-        doc_path = ROOT / "codes" / "10-2-3-b.json"
         with tempfile.TemporaryDirectory() as td:
+            doc_path = Path(td) / "steane.json"
+            doc_path.write_text(json.dumps(_css_doc()))
             summary = certify_challenge(doc_path, Path(td) / "run", seconds=30)
         self.assertEqual(summary["status"], "EXACT_DISTANCE")
         self.assertEqual(summary["exact_distance"], 3)

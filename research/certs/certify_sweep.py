@@ -643,13 +643,13 @@ def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist, start
         return None, str(e), False
 
 
-def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, kmin=None, tropidist_root=None, script=None):
-    cmd = [sys.executable, script or QEDIST_CERTIFY, path, "--qedist", qedist_root,
+def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, tropidist_root=None, script=None):
+    cmd = [sys.executable, script or QEDIST_CERTIFY, path,
            "--tlim", str(float(tlim)), "--threads", str(int(threads)), "--json"]
+    if qedist_root:
+        cmd += ["--qedist", qedist_root]
     if tropidist_root:
         cmd += ["--tropidist", tropidist_root]
-    if kmin and int(kmin) > 1:
-        cmd += ["--kmin", str(int(kmin))]
     proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                             start_new_session=True)
     try:
@@ -671,15 +671,14 @@ def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, kmin=None
 
 
 def _qedist_attempt(path, slug, tlim, qedist_root, threads, certify_qedist, start=None, tropidist_root=None):
-    kmin = int(start) if start and int(start) > 1 else None
     if certify_qedist is None:
-        return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, tropidist_wall(tlim), kmin=kmin,
+        return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, tropidist_wall(tlim),
                                     tropidist_root=tropidist_root)
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
-    kw = {"kmin": {side: kmin for side in ("X", "Z", "P")}} if kmin else {}
     try:
-        return certify_qedist(doc, root=qedist_root, tlim=tlim, threads=threads, **kw), None, False
+        return certify_qedist(doc, qedist_root=qedist_root, tropidist_root=tropidist_root,
+                              tlim=tlim, threads=threads), None, False
     except (ValueError, RuntimeError) as e:
         return None, str(e), False
 

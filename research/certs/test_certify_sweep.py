@@ -744,3 +744,43 @@ def test_dry_run_returns_zero_and_leaves_out_dir_empty(tmp_path):
     assert rc == 0
     if out.exists():
         assert list(out.iterdir()) == []
+
+
+def test_qedist_backend_and_reopened_partial(tmp_path):
+    S = _script()
+    codes, certs, out = str(tmp_path / "codes"), str(tmp_path / "certs"), str(tmp_path / "out")
+    os.makedirs(certs)
+    _write(os.path.join(codes, "p.json"), _DOC)
+    _write(os.path.join(certs, "p.json"), {"d_exact": False, "d_lower": 2, "tlim_per_solve": 60})
+    queue = {"entries": [_row("p")]}
+    seen = []
+
+    def fake_routed_certify(doc, *, qedist_root=None, tropidist_root=None, tlim=60.0, threads=4):
+        seen.append((qedist_root, tropidist_root, tlim, threads))
+        return _record(level="solver")
+
+    m = S.run_sweep(queue=queue, out_dir=out, attempts_path=str(tmp_path / "a.jsonl"), tlim=120,
+                    job_seconds=1000, certs_dir=certs, codes_dir=codes, backend="qedist",
+                    qedist="/tmp/qedist", certify_qedist=fake_routed_certify, tools=lambda: {})
+    assert seen == [("/tmp/qedist", None, 120, 1)]
+    assert m["outcomes"] == {"exact": 1} and m["staged"] == ["p"]
+
+    # Subprocess path must not pass --kmin (which routed_certify.py rejects).
+    dummy = tmp_path / "dummy_routed.py"
+    dummy.write_text(
+        "import argparse, json\n"
+        "ap = argparse.ArgumentParser()\n"
+        "ap.add_argument('path')\n"
+        "ap.add_argument('--qedist', default=None)\n"
+        "ap.add_argument('--tropidist', default=None)\n"
+        "ap.add_argument('--tlim', type=float, default=60.0)\n"
+        "ap.add_argument('--threads', type=int, default=4)\n"
+        "ap.add_argument('--json', action='store_true')\n"
+        "ap.parse_args()\n"
+        "print(json.dumps({'d_exact': True, 'd': 4, 'sides': {}}))\n",
+        encoding="utf-8",
+    )
+    rec, err, killed = S.qedist_in_subprocess(
+        os.path.join(codes, "p.json"), "p", 120, "/tmp/qedist", 1, 30, script=str(dummy)
+    )
+    assert err is None and not killed and rec["d_exact"] is True
