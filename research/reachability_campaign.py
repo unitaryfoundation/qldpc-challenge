@@ -57,10 +57,14 @@ CH = os.environ.get('CH', REPO_ROOT)
 CALCULUS = os.environ.get('CALCULUS', os.path.join(os.path.dirname(REPO_ROOT), 'code-calculus-dev'))
 OUT_DIR = os.path.join(REPO_ROOT, 'research', 'out')
 os.makedirs(OUT_DIR, exist_ok=True)
-CKPT = os.environ.get('CKPT', os.path.join(OUT_DIR, 'reachability_ckpt.json'))
-OUT_REACH = os.environ.get('OUT_REACH', os.path.join(OUT_DIR, 'reachable_n.txt'))
-OUT_BA = os.environ.get('OUT_BA', os.path.join(OUT_DIR, 'board_advancing_n.txt'))
-OUT_PARETO = os.environ.get('OUT_PARETO', os.path.join(OUT_DIR, 'pareto_frontier.json'))
+TARGET = os.environ.get('TARGET', 'n').lower()
+if TARGET not in ('n', 'k'):
+    raise SystemExit('TARGET must be n or k, got %r' % TARGET)
+_suffix = '' if TARGET == 'n' else '_k'
+CKPT = os.environ.get('CKPT', os.path.join(OUT_DIR, 'reachability_ckpt%s.json' % _suffix))
+OUT_REACH = os.environ.get('OUT_REACH', os.path.join(OUT_DIR, 'reachable_n%s.txt' % _suffix))
+OUT_BA = os.environ.get('OUT_BA', os.path.join(OUT_DIR, 'board_advancing_n%s.txt' % _suffix))
+OUT_PARETO = os.environ.get('OUT_PARETO', os.path.join(OUT_DIR, 'pareto_frontier%s.json' % _suffix))
 N_MAX = int(os.environ.get('N_MAX', '1000'))
 WORKERS = int(os.environ.get('WORKERS', '4'))
 CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
@@ -95,7 +99,8 @@ def _worker_init():
 
 def process_parent(args):
     """Process one parent. Returns (idx, parent_n, children_list, error)."""
-    ppath, pdoc, missing_frozen, seen_frozen = args
+    ppath, pdoc, target_spec, seen_frozen = args
+    mode = target_spec[0]
     children = []
     error = None
     try:
@@ -107,13 +112,20 @@ def process_parent(args):
                              structural=True, include_disconnected=False, reduce_display=True)
     except Exception as e:
         return {'ppath': ppath, 'parent_n': pdoc['n'], 'children': [], 'error': str(e)}
-    missing = set(missing_frozen)
+    if mode == 'n':
+        missing = set(target_spec[1])
+    else:
+        maxk = target_spec[1]
     seen = set(tuple(x) for x in seen_frozen)
     for c in cands:
         cs = c['state']; cl = c['ledger']
         n = cs.n(); k = cs.k()
-        if n not in missing:
-            continue
+        if mode == 'n':
+            if n not in missing:
+                continue
+        else:
+            if n not in maxk or not (k > maxk[n]):
+                continue
         ux = cl.sector['X'].upper if hasattr(cl.sector['X'], 'upper') else None
         uz = cl.sector['Z'].upper if hasattr(cl.sector['Z'], 'upper') else None
         d_ub = min(x for x in (ux, uz) if x is not None) if any(x is not None for x in (ux, uz)) else pdoc['distance']['d']
@@ -305,10 +317,14 @@ def main():
             pass
     print('loaded', len(docs), 'docs', flush=True)
 
-    # missing set
-    ns = set(d['n'] for _, d in docs if d.get('code_type') == 'CSS')
-    missing = set(n for n in range(1, 1001) if n not in ns)
-    print('missing n:', len(missing), flush=True)
+    # missing set (n mode) / k-targetable set (k mode, filled in after board load)
+    if TARGET == 'n':
+        ns = set(d['n'] for _, d in docs if d.get('code_type') == 'CSS')
+        missing = set(n for n in range(1, 1001) if n not in ns)
+        print('missing n:', len(missing), flush=True)
+    else:
+        missing = set()
+        print('TARGET=k: k-gap mode (parents with n on board, k above current max)', flush=True)
 
     # css parents filtered by N_MAX
     css_parents = [(p, d) for p, d in docs if d.get('code_type') == 'CSS' and d['n'] <= N_MAX]
@@ -403,6 +419,14 @@ def main():
             lc = 'unrestricted'
             board_entries.append({'n': d['n'], 'k': d['k'], 'd': d['distance']['d'], 'w': w, 'lc': lc, 'wc': wc, 'code_type': 'CSS'})
 
+    # k-targetable set for missing-k mode: current max k per n on the board
+    maxk_by_n = {}
+    for e in board_entries:
+        if e['n'] not in maxk_by_n or e['k'] > maxk_by_n[e['n']]:
+            maxk_by_n[e['n']] = e['k']
+    if TARGET == 'k':
+        print('k-targetable n on board:', len(maxk_by_n), flush=True)
+
     # checklist tracking (optional, self-contained)
     checklist_path = os.path.join(OUT_DIR, 'pareto_checklist.json')
     def mark_found(n, k, d, found_by, found_file):
@@ -471,7 +495,11 @@ def main():
                     continue
             filtered_chunk.append((ppath, pdoc))
         # prepare args
-        args_list = [(ppath, pdoc, frozenset(missing), seen_snapshot) for ppath, pdoc in filtered_chunk]
+        if TARGET == 'n':
+            target_spec = ('n', frozenset(missing))
+        else:
+            target_spec = ('k', maxk_by_n)
+        args_list = [(ppath, pdoc, target_spec, seen_snapshot) for ppath, pdoc in filtered_chunk]
 
         # parallel process
         with mp.Pool(processes=WORKERS, initializer=_worker_init) as pool:
@@ -521,7 +549,11 @@ def main():
             path = sr['path']
             print('SAVED: %d-%d-%d (parent n=%d) -> %s' % (n, k, d_ub, child['parent_n'], path), flush=True)
             seen_targets.add(key)
-            missing.discard(n)
+            if TARGET == 'n':
+                missing.discard(n)
+            else:
+                if n not in maxk_by_n or k > maxk_by_n[n]:
+                    maxk_by_n[n] = k
             prev = best_variants.get(bkey)
             if prev is not None and prev[3] and os.path.exists(prev[3]) and prev[3] != path:
                 try: os.remove(prev[3])
