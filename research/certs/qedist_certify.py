@@ -34,6 +34,7 @@ sys.path.insert(0, os.path.join(ROOT, "research", "kit"))
 
 import gf2  # noqa: E402
 import heuristic_distance as HD  # noqa: E402
+from check_certs import checks_sha256  # noqa: E402
 from qedist import challenge_to_qedist, find_qedist  # noqa: E402
 
 QEDIST_REPO = "github.com/yeon-lee/QEDist"
@@ -63,7 +64,7 @@ def qedist_root(path=None):
     return find_qedist()
 
 
-def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None):
+def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None):
     if doc.get("code_type") != "CSS":
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
@@ -81,7 +82,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None):
         )
 
     import tempfile
-    tmp = Path(tempfile.mkdtemp(prefix="qedist-cert-"))
+    tmp = Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="qedist-cert-"))
     try:
         inp = challenge_to_qedist(doc, include_witnesses=True)
         input_path = tmp / "input.json"
@@ -95,6 +96,8 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None):
             "--workers", str(int(threads)),
             "--out", str(out_dir),
         ]
+        if out_dir.exists():
+            cmd.insert(-2, "--resume")
         t0 = time.time()
         proc = subprocess.run(cmd, capture_output=True, text=True)
         wall = round(time.time() - t0, 1)
@@ -163,20 +166,29 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None):
     if result.get("exact_distance") is not None and int(result["exact_distance"]) != d:
         overall = False
 
-    return {
+    verification = {
+        "level": LEVEL,
+        "note": "QEDist's lower bound is exhaustive search inside its kernel "
+                "(tree search with bounds and symmetries); the vector it returned "
+                "was re-verified by verify/heuristic_distance.py. Solver verdict only.",
+    }
+    rec = {
         "name": doc.get("name"),
         "d": d,
         "sides": cert_sides,
         "d_exact": overall,
         "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search",
         "tlim_per_solve": float(tlim),
-        "verification": {
-            "level": LEVEL,
-            "note": "QEDist's lower bound is exhaustive search inside its kernel "
-                    "(tree search with bounds and symmetries); the vector it returned "
-                    "was re-verified by verify/heuristic_distance.py. Solver verdict only.",
-        },
+        "verification": verification,
     }
+    if not overall:
+        side_lbs = [
+            int(b["lower_bound"]) if b.get("lower_bound") is not None else (d if b.get("exact") else 1)
+            for b in cert_sides.values()
+        ]
+        rec["d_lower"] = min(side_lbs) if side_lbs else 1
+        verification["checks_sha256"] = checks_sha256(doc)
+    return rec
 
 
 def _vector_from_support(support, n):
@@ -184,6 +196,58 @@ def _vector_from_support(support, n):
     for q in support:
         v[int(q)] ^= 1
     return v
+
+
+def _rung_completed(cert, w):
+    """Return True when every side in ``cert`` excluded all logicals up to weight ``w``."""
+    sides = (cert.get("sides") or {}).values()
+    if not sides:
+        return False
+    for b in sides:
+        if b.get("status") == "SAT":
+            return False
+        if b.get("exact"):
+            continue
+        lb = b.get("lower_bound")
+        if lb is None or int(lb) < w + 1:
+            return False
+    return True
+
+
+def run_ladder(doc, *, root=None, budget=60.0, threads=1, kmin=None):
+    """Run ascending cutoffs 1..d-1 (or kmin..d-1), resuming QEDist and keeping the last completed rung."""
+    import tempfile
+
+    d = int(doc["distance"]["d"])
+    start = int(kmin) if kmin and int(kmin) > 1 else 1
+    last = None
+    first = None
+    with tempfile.TemporaryDirectory(prefix="qedist-ladder-") as td:
+        for w in range(start, d):
+            try:
+                c = certify(doc, root=root, tlim=budget, threads=threads, cutoff=w, work_dir=td)
+            except Exception as exc:  # noqa: BLE001
+                print(f"cutoff {w}: {exc}", file=sys.stderr)
+                break
+            if first is None:
+                first = c
+            if any(b.get("status") == "SAT" for b in (c.get("sides") or {}).values()):
+                last = c
+                break
+            if not _rung_completed(c, w):
+                break
+            last = c
+            if c.get("d_exact"):
+                break
+    if last is None:
+        if first is not None:
+            cert = first
+        else:
+            raise QEDistCertifyError("ladder failed on the first rung")
+    else:
+        cert = last
+    cert.setdefault("ladder", {"budget_per_side": budget})
+    return cert
 
 
 def main(argv=None):
@@ -201,26 +265,10 @@ def main(argv=None):
 
     with open(args.path, encoding="utf-8") as f:
         doc = json.load(f)
-    d = int(doc["distance"]["d"])
     if args.ladder is None:
         cert = certify(doc, root=args.qedist, tlim=args.tlim, threads=args.threads)
     else:
-        start = args.kmin if args.kmin and args.kmin > 1 else 1
-        last = None
-        for w in range(start, d):
-            try:
-                c = certify(doc, root=args.qedist, tlim=args.ladder, threads=args.threads, cutoff=w)
-                last = c
-                if c.get("d_exact"):
-                    break
-            except Exception as exc:  # noqa: BLE001
-                print(f"cutoff {w}: {exc}", file=sys.stderr)
-                break
-        if last is None:
-            cert = certify(doc, root=args.qedist, tlim=args.tlim, threads=args.threads, cutoff=start - 1 if start > 1 else 1)
-        else:
-            last.setdefault("ladder", {"budget_per_side": args.ladder})
-            cert = last
+        cert = run_ladder(doc, root=args.qedist, budget=args.ladder, threads=args.threads, kmin=args.kmin)
     print(json.dumps(cert, indent=2))
     return 0
 
