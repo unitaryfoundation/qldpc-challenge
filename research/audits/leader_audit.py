@@ -279,18 +279,30 @@ def _best_payload(entry, n, k, claim, best, verdict=None):
 
 
 def _measure_qedist(entry, seconds, threads, qedist_root):
-    n, k_claim, HX, HZ, doc = load_entry(entry)
-    k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(entry))
-    if _reject_unusable(entry, k, k_claim, css_ok):
-        return None
-    claim = int(doc["distance"]["d"]) if "d" in (doc.get("distance") or {}) else int(doc["distance"]["P"]["value"])
+    with open(entry, encoding="utf-8") as fh:
+        doc = json.load(fh)
     code_type = doc.get("code_type", "CSS")
     if code_type == "stabilizer":
+        n = int(doc["n"])
+        k = int(doc["k"])
+        stabs = (doc.get("checks") or {}).get("S") or []
+        if not stabs:
+            print(f"ERROR: {entry}: stabilizer entry missing checks.S", file=sys.stderr, flush=True)
+            return None
+        w = max((len(set(s.get("X") or []) | set(s.get("Z") or [])) for s in stabs), default=0)
+        dist = doc.get("distance") or {}
+        claim = int(dist["d"]) if "d" in dist else int(dist["P"]["value"])
+        print(f"{os.path.basename(entry)}: n={n} k={k} w={w} stabilizer claim d<={claim}", flush=True)
         if qedist_stabilizer_certify is None:
             print("QEDist stabilizer certifier unavailable", file=sys.stderr)
             return None
         cert = qedist_stabilizer_certify.certify(doc, root=qedist_root, tlim=seconds, threads=threads)
     else:
+        n, k_claim, HX, HZ, doc = load_entry(entry)
+        k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(entry))
+        if _reject_unusable(entry, k, k_claim, css_ok):
+            return None
+        claim = int(doc["distance"]["d"])
         if qedist_certify is None:
             print("QEDist certifier unavailable", file=sys.stderr)
             return None
@@ -298,7 +310,10 @@ def _measure_qedist(entry, seconds, threads, qedist_root):
     d_exact = bool(cert.get("d_exact"))
     refuted = False
     weight = claim
+    lbs = []
     for side, blk in (cert.get("sides") or {}).items():
+        if blk.get("lower_bound") is not None:
+            lbs.append(int(blk["lower_bound"]))
         if blk.get("status") == "SAT":
             refuted = True
             if blk.get("upper_bound") is not None:
@@ -308,20 +323,24 @@ def _measure_qedist(entry, seconds, threads, qedist_root):
             weight = min(weight, int(blk["upper_bound"]))
     if refuted:
         verdict = VERDICT_REFUTED
+        lower_bound = min(lbs) if lbs else None
     elif d_exact:
         verdict = VERDICT_HOLDS
         weight = claim
+        lower_bound = claim
     else:
         verdict = VERDICT_INCONCLUSIVE
-        lbs = [b.get("lower_bound") for b in (cert.get("sides") or {}).values() if b.get("lower_bound") is not None]
-        if lbs:
-            weight = min(lbs)
-    print(f"  QEDist: d_exact={d_exact} refuted={refuted}", flush=True)
+        lower_bound = min(lbs) if lbs else None
+        if lower_bound is not None:
+            weight = lower_bound
+    print(f"  QEDist: d_exact={d_exact} lower_bound={lower_bound} refuted={refuted}", flush=True)
     return {
         "entry": entry,
         "stem": os.path.splitext(os.path.basename(entry))[0],
         "n": n, "k": k, "w": w, "claim": claim, "weight": weight,
-        "verdict": verdict, "side": None, "support": [], "seed": None, "trials": 0,
+        "verdict": verdict, "d_exact": d_exact, "lower_bound": lower_bound,
+        "tool": "qedist", "seconds": float(seconds),
+        "side": None, "support": [], "seed": None, "trials": 0,
     }
 def cmd_ladder(args):
     n, k_claim, HX, HZ, doc = load_entry(args.entry)
@@ -410,9 +429,13 @@ def _measure(entry, trials, seeds, threads, pair_depth, witness_dir=None):
 
 def cmd_screen(args):
     rows = []
-    print(f"  pair_depth={args.pair_depth} threads={args.threads}", flush=True)
+    backend = getattr(args, "backend", "ris")
+    if backend == "qedist":
+        print(f"  backend=qedist seconds={args.seconds} threads={args.threads}", flush=True)
+    else:
+        print(f"  pair_depth={args.pair_depth} threads={args.threads}", flush=True)
     for entry in args.entries:
-        if getattr(args, "backend", "ris") == "qedist":
+        if backend == "qedist":
             m = _measure_qedist(entry, args.seconds, args.threads, args.qedist)
         else:
             m = _measure(entry, args.trials, args.seeds, args.threads, args.pair_depth, args.witness_dir)
@@ -515,10 +538,14 @@ def cmd_pair(args):
             flush=True,
         )
         return EXIT_INVALID
-    print(
-        f"pair: trials={args.trials:,} seeds={args.seeds} pair_depth={args.pair_depth} threads={args.threads}",
-        flush=True,
-    )
+    backend = getattr(args, "backend", "ris")
+    if backend == "qedist":
+        print(f"pair: backend=qedist seconds={args.seconds} threads={args.threads}", flush=True)
+    else:
+        print(
+            f"pair: trials={args.trials:,} seeds={args.seeds} pair_depth={args.pair_depth} threads={args.threads}",
+            flush=True,
+        )
     print(f"  candidate: {_display(args.candidate)}", flush=True)
     for p in peers:
         print(f"  peer:      {_display(p)}", flush=True)
@@ -546,10 +573,16 @@ def cmd_pair(args):
         # issue #4236): the budget, the decision, and the peers measured, so a
         # d-only gain can be checked against the depth its claim rests on
         # rather than taken on the word of a note.
-        _write_witness(json_out, peer_audit.record(
-            args.candidate, peers, results, decision, trials=args.trials,
-            seeds=args.seeds, pair_depth=args.pair_depth, threads=args.threads,
-            exit_code=rc))
+        if backend == "qedist":
+            rec = peer_audit.record(
+                args.candidate, peers, results, decision, backend="qedist",
+                tool="qedist", seconds=args.seconds, threads=args.threads, exit_code=rc)
+        else:
+            rec = peer_audit.record(
+                args.candidate, peers, results, decision, trials=args.trials,
+                seeds=args.seeds, pair_depth=args.pair_depth, threads=args.threads,
+                exit_code=rc)
+        _write_witness(json_out, rec)
         print(f"wrote {json_out}", flush=True)
     return rc
 
@@ -603,6 +636,9 @@ def main(argv=None):
     scr.add_argument("--seeds", type=int, nargs="+", default=[51])
     scr.add_argument("--threads", type=int, default=8)
     scr.add_argument("--pair-depth", type=int, default=10)
+    scr.add_argument("--backend", choices=("ris", "qedist"), default="ris")
+    scr.add_argument("--qedist", default=None)
+    scr.add_argument("--seconds", type=float, default=60.0)
     scr.add_argument(
         "--witness-dir",
         default=None,
