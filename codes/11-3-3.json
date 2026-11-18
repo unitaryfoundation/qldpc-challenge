@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[11,3,3]] reduction of [[12,3,3]]",
  "code_type": "CSS",
  "n": 11,
@@ -218,6 +218,60 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3486,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.164245408,
+     "ci95": [
+      0.157520996,
+      0.17134021
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1361,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.050247049,
+     "ci95": [
+      0.047552008,
+      0.053091358
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3412,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.158861945,
+     "ci95": [
+      0.152376736,
+      0.165694486
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1218,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.044431335,
+     "ci95": [
+      0.041929419,
+      0.047079
+     ]
+    }
+   ]
   }
  }
 }

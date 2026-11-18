@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[14,2,3]]",
  "code_type": "CSS",
  "n": 14,
@@ -210,6 +210,84 @@
    ],
    "date": "2026-11-08",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 4773,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.321629941,
+     "ci95": [
+      0.299006769,
+      0.352242835
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 1227,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.044792994,
+     "ci95": [
+      0.042278911,
+      0.047453034
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 350,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.011949996,
+     "ci95": [
+      0.010753905,
+      0.01327757
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 4749,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.31555315,
+     "ci95": [
+      0.294179471,
+      0.343593202
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 1357,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.05008232,
+     "ci95": [
+      0.047392683,
+      0.05292112
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 363,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.012405234,
+     "ci95": [
+      0.011184525,
+      0.013757573
+     ]
+    }
+   ]
   }
  }
 }
