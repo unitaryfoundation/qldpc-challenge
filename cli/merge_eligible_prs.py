@@ -220,11 +220,17 @@ def _cached_read_code_document(repo: str, path: str, ref: str) -> Any:
     return result
 
 
-def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, base: str) -> bool:
+def _inherited_metadata_gap(
+    repo: str, path: str, document: Any, error: str, base: str, base_path: str | None = None
+) -> bool:
     """Report whether the PR inherited this provenance gap from the base entry rather than introducing it.
 
     True when the entry exists on ``base`` with the same missing field and the
-    PR left ``provenance`` as it was, apart from appending to ``notes``. A contribution to another author's
+    PR left ``provenance`` as it was, apart from appending to ``notes``. The base entry is
+    read under ``base_path`` when the PR renamed the record: a distance revision
+    files the entry under its new slug (CONTRIBUTING.md, "Correcting a distance
+    already on the board"), so under ``path`` the base has nothing and the
+    revision would pass for a new entry. A contribution to another author's
     entry (a circuit tier, a layout, a lowered circuit distance) passes
     verify/check_authorship.py only if it touches nothing in provenance but an
     appended note, so its author cannot add the field; requiring it would block
@@ -232,7 +238,7 @@ def _inherited_metadata_gap(repo: str, path: str, document: Any, error: str, bas
     the entry, or that changed provenance, is still held to the rule.
     """
     try:
-        base_doc = _cached_read_code_document(repo, path, base)
+        base_doc = _cached_read_code_document(repo, base_path or path, base)
     except GitHubCLIError:
         return False                      # no base entry: the PR adds it
     if not isinstance(base_doc, dict) or not isinstance(document, dict):
@@ -341,13 +347,22 @@ def evaluate_pr(repo: str, pr: dict[str, Any], base: str) -> Evaluation:
             if too_many:
                 result.reasons.append(too_many)
             added = {item.get("filename") for item in files if item.get("status") == "added"}
+            # a distance revision renames the record, so its base entry lives
+            # under the name the PR replaced
+            renamed_from = {
+                item.get("filename"): item.get("previous_filename")
+                for item in files
+                if item.get("status") == "renamed" and isinstance(item.get("previous_filename"), str)
+            }
             for path in code_paths:
                 document = _cached_read_code_document(repo, path, head_sha)
                 error = metadata_error(document)
                 if error:
                     # a record this PR adds declares its own provenance; only a
                     # record that existed on base can have inherited a gap
-                    inherited = path not in added and _inherited_metadata_gap(repo, path, document, error, base)
+                    inherited = path not in added and _inherited_metadata_gap(
+                        repo, path, document, error, base, base_path=renamed_from.get(path)
+                    )
                     if inherited:
                         # The field was already missing on the base entry and
                         # this PR left provenance alone: a contribution to an
