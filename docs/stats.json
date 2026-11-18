@@ -1,8 +1,8 @@
 {
-  "verified_codes": 3659,
+  "verified_codes": 3660,
   "css_codes": 3402,
-  "stabilizer_codes": 257,
-  "certified_exact": 1767,
+  "stabilizer_codes": 258,
+  "certified_exact": 2072,
   "tracks": 12,
   "best_kd2_over_n": 1380.29,
   "best_geometric_efficiency": 1.7555,
@@ -15,7 +15,7 @@
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2819,
+    "unknown": 2820,
     "known_parameters": 765,
     "new_parameters": 75
   },

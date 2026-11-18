@@ -1,0 +1,166 @@
+{
+ "schema_version": "0.4",
+ "name": "[[9,1,3]]",
+ "code_type": "stabilizer",
+ "n": 9,
+ "k": 1,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     1,
+     4
+    ],
+    "Z": [
+     0,
+     1,
+     3,
+     4
+    ]
+   },
+   {
+    "X": [
+     4,
+     5,
+     7,
+     8
+    ],
+    "Z": [
+     4
+    ]
+   },
+   {
+    "X": [
+     1,
+     2
+    ],
+    "Z": [
+     1
+    ]
+   },
+   {
+    "X": [
+     1
+    ],
+    "Z": [
+     2,
+     4,
+     5
+    ]
+   },
+   {
+    "X": [
+     3,
+     6,
+     7
+    ],
+    "Z": [
+     3,
+     4,
+     6,
+     7
+    ]
+   },
+   {
+    "X": [
+     7
+    ],
+    "Z": [
+     6
+    ]
+   },
+   {
+    "X": [
+     0,
+     3
+    ],
+    "Z": [
+     0,
+     3
+    ]
+   },
+   {
+    "X": [
+     4,
+     5,
+     7,
+     8
+    ],
+    "Z": [
+     4,
+     5,
+     8
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "P": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": {
+    "X": [
+     0,
+     1
+    ],
+    "Z": [
+     0,
+     2
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "Non-CSS stabilizer code found by randomized backtracking search over local Pauli generators on a 3x3 grid (radius sqrt2), filtered for no weight-1/2 logicals and non-CSS under single-qubit Clifford.",
+  "references": [],
+  "date": "2026-11-18",
+  "notes": "Found via random search; d>=3 by exhaustive enumeration of weight 1-2 Paulis."
+ },
+ "locality": {
+  "coordinates": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    1.0,
+    0.0
+   ],
+   [
+    2.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0
+   ],
+   [
+    1.0,
+    1.0
+   ],
+   [
+    2.0,
+    1.0
+   ],
+   [
+    0.0,
+    2.0
+   ],
+   [
+    1.0,
+    2.0
+   ],
+   [
+    2.0,
+    2.0
+   ]
+  ],
+  "layers": 1,
+  "interaction_radius": 1.4142135623730951
+ },
+ "family": "other"
+}

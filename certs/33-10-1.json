@@ -1,0 +1,30 @@
+{
+  "d": 1,
+  "d_exact": true,
+  "encoding": "selector",
+  "logical_classes": 10,
+  "name": "[[33,10,1]]",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 1 exists",
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 1
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 1 exists",
+      "secs": 0.0,
+      "status": "UNSAT",
+      "value": 1
+    }
+  },
+  "solver": "CryptoMiniSat 5.14 SAT",
+  "symmetry": false,
+  "tlim_per_solve": 60,
+  "verification": {
+    "level": "solver",
+    "note": "proof path did not complete: [Errno 2] No such file or directory: 'kissat'"
+  }
+}

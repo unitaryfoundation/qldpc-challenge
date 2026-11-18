@@ -65,6 +65,15 @@
 (3,7): 713</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 13.3417 &middot; Z 11.1803 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/200-8-9">circuits/200-8-9/</a> &middot; canonical noise recipe, 9 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 9 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[101040, 101041, 101052, 101054, 101073, 101076, 101079, 101087, 101090]</div></details>
+<div class=kv><b>d_circ^Z</b> 9 &middot; fault-set witness of 9 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 9)</summary><div class=wit>[100965, 100967, 100970, 100976, 101035, 101077, 101079, 101118, 101123]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; De-stacked from this entry&#x27;s own bilayer layout by the map (site (i,j), slot c) -&gt; (i+j, j-i+c), injective since a collision needs 2j = 2j&#x27;+1. Which qubit at a site takes slot 0 decides whether a check pair clears the radius cap, asymmetrically in the sign of the slot difference, so the choice is 2-SAT per site: implication graph and Tarjan SCC, clauses re-verified. &middot; 2026-09-12</div>
@@ -75,7 +84,7 @@
 <div class=kv><b>authors</b> Liang, Zijian and Eberhardt, Jens Niklas and Chen, Yu-An</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Liang-Eberhardt-Chen [[288,8,12]] family, (10,10) lattice.</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2504.08887">arXiv:2504.08887</a></div>
 <div class=kv><b>date</b> 2025-04-11</div>
 <div class=kv><b>notes</b> Reference baseline (Liang, Eberhardt, Chen).</div>

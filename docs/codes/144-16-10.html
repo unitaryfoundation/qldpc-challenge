@@ -47,6 +47,15 @@
 (3,10): 2592</div></details>
 <div class=kv title="Euclidean support diameter of the stored distance witnesses in the verified layout, in units of the qubit spacing: how far the exhibited logicals spread, which governs the cost of using them (lattice surgery, logical measurement). An upper bound on the spread of the exhibited logicals only: the witnesses bound the logical weight from above and are not claimed minimal, so a tighter logical may exist."><b>witness diameter</b> X 7.0711 &middot; Z 6.7082 <span class=claimed>(Euclidean support diameter of the stored distance witnesses in the layout; an upper bound on the exhibited logicals&rsquo; spread, not a minimum over all logicals)</span></div>
 </section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/144-16-10">circuits/144-16-10/</a> &middot; canonical noise recipe, 10 rounds, stim 1.16.0</div>
+<div class=kv><b>d_circ</b> &le; 10 <span class=claimed>(min over bases; penalty-only, clamped to &le; d)</span></div>
+<div class=kv><b>d_circ^X</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[116953, 116955, 116980, 116981, 116985, 116986, 117020, 117021, 117023, 117024]</div></details>
+<div class=kv><b>d_circ^Z</b> 10 &middot; fault-set witness of 10 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the committed .dem, 10)</summary><div class=wit>[116968, 116969, 117003, 117004, 117006, 117007, 117036, 117037, 117038, 117051]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
 <div class=kv style="color:var(--mut)">layout contributed by <a href="https://github.com/dorakingx">@dorakingx</a> &middot; Simulated annealing over site assignments on an integer grid with the repo&#x27;s own research/local2d/fold_layout.search_layout (max-diameter objective, several bounding boxes and seeds); single layer at radius 4 tried first, then two layers at 7. Radius and per-site occupancy re-measured with the verifier&#x27;s rule. &middot; 2026-10-03</div>
@@ -57,7 +66,7 @@
 <div class=kv><b>authors</b> Liangdong Lu and Ruipan Yang and Guanmin Guo</div>
 <div class=kv><b>provenance</b> literature baseline</div>
 <div class=kv><b>construction</b> Bivariate bicycle code QC(A,B) on Z_12 x Z_6 with weight-4 generators A = 1 + x<sup>11</sup> + y<sup>5</sup> + x<sup>9</sup> y<sup>5</sup>, B = x<sup>3</sup> y<sup>2</sup> + x<sup>8</sup> y<sup>2</sup> + x<sup>4</sup> y<sup>3</sup> + x<sup>9</sup> y<sup>3</sup> (weight-8 checks). Reproduction of Table 1 entry 1 of arXiv:2609.06572 (Lu, Yang, Guo).</div>
-<div class=kv><b>model</b> <span class=claimed>classical construction (no AI model)</span></div>
+<div class=kv><b>model</b> <span class=modelmark></span>human <span class=claimed>(claimed, not verified)</span></div>
 <div class=kv><b>reference</b> <a href="https://arxiv.org/abs/2609.06572">arXiv:2609.06572</a></div>
 <div class=kv><b>date</b> 2026-09-06</div>
 <div class=kv><b>notes</b> Seeded from the published census of arXiv:2609.06572, Table 1 entry 1, where d=10 is established exactly by exhaustive bit-mask verification cross-validated against Magma (their Remark 4.4). Check matrices rebuilt independently with this repo&#x27;s kit; the witnesses here were found fresh by this repo&#x27;s RIS surrogate (upper bound d&lt;=10). Reproduced by @MathysRennela.</div>

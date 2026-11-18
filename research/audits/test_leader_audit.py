@@ -494,3 +494,74 @@ def test_pair_writes_the_record_the_packaging_paths_consume(monkeypatch, entry, 
     assert (rec["trials"], rec["seeds"], rec["pair_depth"], rec["threads"]) == (2000, [1, 2], 10, 2)
     assert [r["verdict"] for r in rec["results"]] == [la.VERDICT_HOLDS, la.VERDICT_HOLDS]
     assert peer_audit.blockers(["[[4,2,2]] w=4 peer.json"], rec, required_trials=2000) == []
+
+
+def test_pair_qedist_records_tool_seconds_and_bound(monkeypatch, entry, tmp_path):
+    import types
+    import peer_audit
+
+    peer = _write(tmp_path, "peer.json", 2)
+    monkeypatch.setattr(
+        la, "qedist_certify",
+        types.SimpleNamespace(certify=lambda doc, **kw: {
+            "d_exact": True,
+            "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
+        }),
+    )
+    args = _pair_args(entry, [peer])
+    args.backend = "qedist"
+    args.qedist = None
+    args.seconds = 15.0
+    args.json_out = str(tmp_path / "out" / "qedist_audit.json")
+    rc = la.cmd_pair(args)
+    assert rc == la.EXIT_OK
+    rec = json.load(open(args.json_out))
+    assert rec["backend"] == "qedist"
+    assert rec["tool"] == "qedist"
+    assert rec["seconds"] == 15.0
+    assert "trials" not in rec and "seeds" not in rec
+    assert all(r["d_exact"] is True and r["lower_bound"] == 2 for r in rec["results"])
+    assert peer_audit.blockers(["[[4,2,2]] w=4 peer.json"], rec, required_trials=2_000_000) == []
+
+
+def test_measure_qedist_handles_stabilizer(monkeypatch, tmp_path):
+    import types
+
+    stab_doc = {
+        "n": 5, "k": 1, "code_type": "stabilizer", "name": "[[5,1,3]]",
+        "checks": {"S": [
+            {"X": [0, 3], "Z": [1, 2]},
+            {"X": [1, 4], "Z": [2, 3]},
+            {"X": [0, 2], "Z": [3, 4]},
+            {"X": [1, 3], "Z": [0, 4]},
+        ]},
+        "distance": {"d": 3, "P": {"value": 3}},
+    }
+    stab_path = tmp_path / "stab.json"
+    stab_path.write_text(json.dumps(stab_doc))
+    monkeypatch.setattr(
+        la, "qedist_stabilizer_certify",
+        types.SimpleNamespace(certify=lambda doc, **kw: {
+            "d_exact": True,
+            "sides": {"P": {"lower_bound": 3, "status": "UNSAT"}},
+        }),
+    )
+    m = la._measure_qedist(str(stab_path), 10.0, 1, None)
+    assert m is not None
+    assert m["verdict"] == la.VERDICT_HOLDS
+    assert m["lower_bound"] == 3
+    assert m["d_exact"] is True
+
+
+def test_screen_accepts_qedist_flags(monkeypatch, entry):
+    import types
+
+    monkeypatch.setattr(
+        la, "qedist_certify",
+        types.SimpleNamespace(certify=lambda doc, **kw: {
+            "d_exact": True,
+            "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
+        }),
+    )
+    rc = la.main(["screen", entry, "--backend", "qedist", "--seconds", "5"])
+    assert rc == la.EXIT_OK

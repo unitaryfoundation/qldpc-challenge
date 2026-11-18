@@ -18,7 +18,7 @@
   "tlim_per_solve": 120,
   "verification": {
     "checker": "drat-trim sha256:f58f63b0f76945d4",
-    "cnf_sha256": "X=bc6839af79096d09ea9c51de8b252be4335e95f2d47556c2d94f7c00555a4cbd;Z=dc64947de2b6e50021befc1e2e66a9cf12cdd7dff40adc05a6af4d8993e067de",
+    "cnf_sha256": "X=ec834555f39dede59e211cb81a7bf3ebd66d95d52da791537d039054ba9e03b5;Z=0d7fad38403b985146019c99eb157610ede411dc674c2d092b9bb483a6218849",
     "level": "proof_log",
     "note": "pure-CNF re-encoding refuted by kissat and checked by drat-trim; the XOR path agrees. The formula is regenerated from this entry and re-checked by CI rather than stored: a refutation nobody opens is not evidence, and the trimmed cores run to 95.8 MB as text. Confirms the formula is unsatisfiable, not that it asks the distance question",
     "replay": {

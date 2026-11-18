@@ -1,0 +1,27 @@
+{
+  "d": 5,
+  "d_exact": true,
+  "name": "[[34,8,5]] E-PEEL of 35-8-5",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 5 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 5
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 5 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 5
+    }
+  },
+  "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 5.0,
+  "verification": {
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only."
+  }
+}

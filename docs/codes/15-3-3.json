@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "priced-calculus-15-3-3",
  "code_type": "CSS",
  "n": 15,
@@ -239,6 +239,60 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2277,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.091684484,
+     "ci95": [
+      0.087668649,
+      0.095887591
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 664,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.023192482,
+     "ci95": [
+      0.021470312,
+      0.025050171
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2269,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.091285007,
+     "ci95": [
+      0.087282042,
+      0.095474737
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 663,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.02315583,
+     "ci95": [
+      0.021435179,
+      0.025011986
+     ]
+    }
+   ]
   }
  }
 }
