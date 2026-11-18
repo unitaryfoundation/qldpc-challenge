@@ -30,7 +30,55 @@
 </ul>
 <h4>Reproduction</h4>
 <p>Asymmetric hypergraph product (<code>research/kit/products.py</code>, <code>hypergraph_product(H1, H2)</code>) of a <code>5 x 10</code> classical LDPC matrix and a <code>7 x 13</code> classical LDPC matrix (<code>n = 10*13 + 5*7 = 165</code>, <code>w = 6</code>, <code>k = 43</code>). Exact <code>H_X</code> and <code>H_Z</code> matrices are embedded in <code>codes/165-43-3.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/165-43-3.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/552-278-4.html">[[552,278,4]] — 552-278-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[552,278,4]] — Weight-8 rate-278/552 Armillary CSS code (M=8, q=3, p=23)</h3>
+<section class=blk><h3><a href="codes/49-27-2.html">[[49,27,2]] — 49-27-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details open><summary>note</summary><div class=notebody><h3>[[49,27,2]] — code-calculus k-gap fill (single-step child of [[50,26,3]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[50,26,3]] (codes/50-26-3.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/50-26-3.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/49-27-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/52-36-2.html">[[52,36,2]] — 52-36-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details open><summary>note</summary><div class=notebody><h3>[[52,36,2]] — code-calculus k-gap fill (single-step child of [[53,36,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[53,36,2]] (codes/53-36-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/53-36-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-36-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/552-278-4.html">[[552,278,4]] — 552-278-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[552,278,4]] — Weight-8 rate-278/552 Armillary CSS code (M=8, q=3, p=23)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
 <h4>What was searched</h4>
@@ -79,7 +127,103 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/552-278-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/696-350-4.html">[[696,350,4]] — 696-350-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details open><summary>note</summary><div class=notebody><h3>[[696,350,4]] — Weight-8 rate-350/696 Armillary CSS code (M=8, q=3, p=29)</h3>
+<section class=blk><h3><a href="codes/61-30-3.html">[[61,30,3]] — 61-30-3</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[61,30,3]] — code-calculus k-gap fill (single-step child of [[62,21,6]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[62,21,6]] (codes/62-21-6.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 14500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 3, d_Z &lt;= 3, so d &lt;= 3</li>
+<p>(14500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/62-21-6.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/61-30-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/61-35-2.html">[[61,35,2]] — 61-35-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[61,35,2]] — code-calculus k-gap fill (single-step child of [[62,35,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[62,35,2]] (codes/62-35-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/62-35-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/61-35-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/61-49-2.html">[[61,49,2]] — 61-49-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[61,49,2]] — code-calculus k-gap fill (single-step child of [[62,48,3]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[62,48,3]] (codes/62-48-3.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/62-48-3.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/61-49-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/69-53-2.html">[[69,53,2]] — 69-53-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[69,53,2]] — code-calculus k-gap fill (single-step child of [[70,48,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[70,48,2]] (codes/70-48-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/70-48-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/69-53-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/696-350-4.html">[[696,350,4]] — 696-350-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[696,350,4]] — Weight-8 rate-350/696 Armillary CSS code (M=8, q=3, p=29)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
 <h4>What was searched</h4>
@@ -128,6 +272,30 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/696-350-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/70-56-2.html">[[70,56,2]] — 70-56-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[70,56,2]] — code-calculus k-gap fill (single-step child of [[71,55,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[71,55,2]] (codes/71-55-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/71-55-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/70-56-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/744-374-4.html">[[744,374,4]] — 744-374-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[744,374,4]] — Weight-8 rate-374/744 Armillary CSS code (M=8, q=3, p=31)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
@@ -177,6 +345,78 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/744-374-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/82-56-2.html">[[82,56,2]] — 82-56-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[82,56,2]] — code-calculus k-gap fill (single-step child of [[83,55,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[83,55,2]] (codes/83-55-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/83-55-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/82-56-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/88-47-2.html">[[88,47,2]] — 88-47-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[88,47,2]] — code-calculus k-gap fill (single-step child of [[88,46,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[88,46,2]] (codes/88-46-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/88-46-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/88-47-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/88-67-2.html">[[88,67,2]] — 88-67-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[88,67,2]] — code-calculus k-gap fill (single-step child of [[89,49,3]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[89,49,3]] (codes/89-49-3.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/89-49-3.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/88-67-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/888-446-4.html">[[888,446,4]] — 888-446-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[888,446,4]] — Weight-8 rate-446/888 Armillary CSS code (M=8, q=3, p=37)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
@@ -226,6 +466,30 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/888-446-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/89-50-3.html">[[89,50,3]] — 89-50-3</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[89,50,3]] — code-calculus k-gap fill (single-step child of [[89,49,3]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[89,49,3]] (codes/89-49-3.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 6500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 3, d_Z &lt;= 3, so d &lt;= 3</li>
+<p>(6500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/89-49-3.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/89-50-3.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/9-1-3-s.html">[[9,1,3]] — 9-1-3-s</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a></div><details ><summary>note</summary><div class=notebody><h3>[[9,1,3]] — non-CSS stabilizer code on a 3x3 grid (g = 1)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>The stabilizer board had no entry with geometric efficiency g &gt;= 1; the best stabilizer code carrying an honest 2D layout sat at about g ~ 0.36 (<code>[[8,2,3]]</code>). The <code>local-2d-single x weight-4</code> stabilizer cell has only a handful of frontier entries, so a genuinely non-CSS stabilizer family with a compact 2D layout would be board-advancing almost by default. The hypothesis was that a 3x3 grid (9 qubits) could host a 9-qubit non-CSS stabilizer code whose generators are 2x2-block Paulis, giving radius sqrt(2) and g = 1.</p>
@@ -261,6 +525,54 @@
 (128, 64), (9, 9), (432, 304)
 </pre>
 <p>Coordinates (row-major 3x3 grid): qubit i at (i mod 3, i // 3). Rebuild the submission document from <code>codes/9-1-3-s.json</code>; the verifier recomputes n, k, weight class, locality class, and interaction radius from it.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-1-3-s.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/96-51-2.html">[[96,51,2]] — 96-51-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[96,51,2]] — code-calculus k-gap fill (single-step child of [[96,50,2]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[96,50,2]] (codes/96-50-2.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/96-50-2.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/96-51-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/98-54-2.html">[[98,54,2]] — 98-54-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[98,54,2]] — code-calculus k-gap fill (single-step child of [[99,53,1]])</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>k-gap mode of the reachability campaign: for an n already on the CSS board, find single-step children that raise k above the current maximum for that n. The planner (unitaryfoundation/code-calculus-dev @ 74889f1, v0.3.0) derives deletion/peel/puncture children of board parents; this child comes from [[99,53,1]] (codes/99-53-1.json) by one planner.plan step. Hypothesis: removal moves raise k fast enough to land new Pareto points, trading distance down.</p>
+<h4>What was searched</h4>
+<p>The campaign processed 1093 CSS parents with n &lt;= 100, generated planner children, and staged only those whose k exceeds the current board maximum for that n (292 staged). Screening ran at 500 RIS trials per side with gf2_fast pre-filtering; this candidate&#x27;s witnesses were then confirmed at 4500 trials per side survived (research/kit/surrogate.lightest_logical, seeds [0]). Siblings that screened to a lighter logical were dropped before gating.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bounds: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2</li>
+<p>(4500 trials/side survived, tool research/kit/surrogate.lightest_logical).</p>
+<li>Trusted gate: passed: true; refute pass found no lighter logical</li>
+<p>(); board_advancing: true in cells None, advancing: pure frontier extension (no axis strictly improved).</p>
+<li>Claim: upper_bound on both sides, not certified exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The campaign&#x27;s dominant failure mode is distance collapse: 222 of the 292 staged children witnessed to d = 1, and 10 of the 23 deeper ones were dominated at the gate (e.g. a d = 5 sibling dominated by [[80,32,6]]). Staged filenames carrying the planner ledger&#x27;s optimistic bound routinely over-claim d relative to the witness; the witnessed value is the claim here.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash via the OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical for witness screening.</li>
+<li>verify/validate_candidate.py via research/kit/coordination.py gate.</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Parent checks: codes/99-53-1.json. One planner.plan single-step removal (deletion/peel/puncture, unitaryfoundation/code-calculus-dev @ 74889f1) reproduces the child; the parent slug, parent distance, and constructor name are pinned by the tool run that staged it, and the witness provenance above records the seeds and trial counts.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/98-54-2.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/984-494-4.html">[[984,494,4]] — 984-494-4</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini Hydrogen 4</div><details ><summary>note</summary><div class=notebody><h3>[[984,494,4]] — Weight-8 rate-494/984 Armillary CSS code (M=8, q=3, p=41)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> x <code>unrestricted</code> CSS frontier in the ultra-high-rate (<code>R &gt; 1/2</code>) regime, adapting the dynamic CXSWAP Armillary construction of arXiv:2611.20410 (<code>M=12</code>, <code>w=12</code>, <code>n &gt;= 3636</code>) down to <code>M=8</code> groups (<code>w=8</code>) and <code>q=3</code> channels so that <code>n = 24p &lt;= 1000</code> fits the repository blocklength cap (<code>EXT_MAX_N = 1000</code>, <code>EXT_MAX_CHECK_WEIGHT = 8</code>). On <code>weight-8</code> x <code>unrestricted</code>, existing <code>R &gt;= 0.45</code> CSS entries with <code>d &gt;= 6</code> start at <code>n = 640</code> (<code>[[640,322,6]]</code>), leaving the <code>n &lt; 640</code> and higher-<code>k</code> (<code>k &gt; 322</code>) <code>R &gt; 1/2</code> frontier open.</p>
@@ -310,6 +622,31 @@
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/984-494-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3>k-gap reachability campaign: 13 board-advancing fills and the ledger-optimism lesson</h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>A k-gap variant of the reachability campaign (the mode is added in PR #6495 to research/reachability_campaign.py, which until now staged only children whose n was missing from the board): <code>TARGET=k</code> stages children that raise k for an n already on the board instead. A stress run (n &lt;= 20) and a full run (n &lt;= 100) produced 292 staged k-raising children, of which 13 survived the trusted gate as board-advancing; each is filed as its own PR (#6716, #6717, #6722, #6735, #6740, #6749, #6755, #6763, #6772, #6778, #6779, #6780, #6781). The run&#x27;s most useful output was not the codes but a measurement of how badly the planner ledger&#x27;s optimistic distance bound over-claims, and how far the campaign&#x27;s snapshot domination check diverges from the gate.</p>
+<h4>What worked</h4>
+<h5>The TARGET=k mode and the 13 survivors</h5>
+<p>1093 CSS parents with n &lt;= 100 (WORKERS=2, CHUNK_SIZE=25, screening 500 RIS trials per side with gf2_fast pre-filtering) produced 292 children whose k exceeds the current board maximum for their n. Trusted gating (coordination.py gate, fresh-seed refute pass at 4.5k-5.3k RIS trials) of the 23 with witnessed d &gt;= 2 left 13 board-advancing entries: eleven strictly advance at least one axis, two are pure frontier extensions. The strongest is [[61,30,3]] (kd^2/n 4.43, advances k and n in weight-9plus/unrestricted, PR #6716); [[98,54,2]] is the only one that advances d itself (weight-8, PR #6781). All thirteen are d = 2-3 high-rate fills: the k-gap mode trades distance for rate by construction, since the removal moves that raise k also strip structure.</p>
+<h5>Witness-first reporting</h5>
+<p>After the first batch was found to be mis-described (see below), every reported number was re-read from the staged documents&#x27; witness fields rather than from staged slugs. The witnessed distance of a candidate is the only claim the gate reads; the slug is decoration.</p>
+<h4>What did not work (and why)</h4>
+<h5>The ledger&#x27;s optimistic bound over-claims the slug</h5>
+<p>The campaign stages children under &lt;n&gt;-&lt;k&gt;-&lt;d_ub&gt;.json with d_ub from the planner ledger. 264 of the 292 staged slugs over-claim relative to the witness the staging search itself found: 222 of the 292 children witnessed to d = 1 (deletion/peel raises k and strips structure in one move). The four frontier codes of the stress run were first reported to the operator as d = 3/2/2/2 from their slugs; all four are d = 1 by witness. Lesson: read distance.X.value / distance.Z.value before reporting anything, and treat the staged slug as a hypothesis the witness must confirm.</p>
+<h5>Campaign snapshot domination diverges from the gate</h5>
+<p>The campaign&#x27;s dominated() check compares against a board snapshot taken at load time. [[15,10,3]] passed it as non-dominated and the gate then named [[14,10,1]] as its dominator (both are d = 1; the snapshot predates nothing relevant, the campaign&#x27;s rule is just looser about the cell). Conversely the gate dominated [[93,30,5]] (kd^2/n 8.06, the run&#x27;s headline by the ledger bound) with the existing [[80,32,6]], and [[95,26,5]] with [[90,26,5]]. Ten of the 23 deeper candidates were dominated. Always re-gate; the campaign&#x27;s Pareto bookkeeping is a scheduling heuristic, not a verdict.</p>
+<h5>Process failures worth recording</h5>
+<p>The first submission batch failed twice before any PR opened: a stray untracked file in codes/ broke the board loader and left the PR body&#x27;s frontier section as an unfilled placeholder that the prose pre-flight refuses, and the drafted bodies cited a repro manifest the ./qldpc submit flow does not write. Both were fixed by removing the stray file and writing per-code research notes (notes/&lt;slug&gt;.md) that describe the recipe inline. A cleanup step also deleted committed files under notes/ with a wildcard; they were restored from HEAD within a minute. Wildcards on tracked directories are banned in this workspace from now on.</p>
+<h4>Reproduction</h4>
+<p>Campaign: `TARGET=k N_MAX=100 WORKERS=2 CHUNK_SIZE=25 TRIALS=500 GF2_TRIALS=500 uv run --extra research python -u research/reachability_campaign.py` (mode added in PR #6495; the file on main carries the n-targeting original). Gating per candidate: `uv run --extra research python research/kit/coordination.py gate &lt;path&gt;<code>. Submission per candidate: </code>./qldpc submit &lt;candidate&gt; --authors @mathysrennela --model &quot;GLM-5.3-Flash&quot; --harness &quot;OpenCode agent harness&quot; --family other --construction &quot;code-calculus v0.3rc k-gap fill&quot; --note-file &lt;note&gt; --no-circuit --open-pr --base-ref origin/main`.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: GLM-5.3-Flash; harness: OpenCode agent harness.</li>
+<li>unitaryfoundation/code-calculus-dev @ 74889f1 (planner.plan, v0.3.0).</li>
+<li>research/kit/surrogate.lightest_logical (witness screening),</li>
+<p>gf2_fast pre-filter (verify/gf2_fast.cpp), verify/validate_candidate.py via research/kit/coordination.py gate (verdicts).</p>
+<li>Compute: two workers, about 2 hours wall clock for the full run, plus</li>
+<p>23 gate runs at about 2 minutes each.</p>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-18-k-gap-reachability-campaign.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/109-35-6.html">[[109,35,6]] — 109-35-6</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[109,35,6]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -2134,7 +2471,17 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
   a=6: (4, 4, -2) (3, 4, 5) (-3, -3, -4) (-5, 5, 3)
   a=7: (5, 5, 5) (-2, -5, 2) (3, 3, 5) (-5, -5, 5)
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/408-206-4.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/409-2-57.html">[[409,2,57]] — 409-2-57</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[409,2,57]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/409-2-50.html">[[409,2,50]] — 409-2-50</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[409,2,50]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-18: [[409,2,57]] -&gt; [[409,2,50]]</h4>
+<p>[[409,2,50]] supersedes the board&#x27;s [[409,2,57]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 15.89 to 12.22. Before this revision the entry recorded the X bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot; and the Z bound as having survived 7,710,000 samples of &quot;verify/gate_changed.py RIS-fast refutation&quot;.</p>
+<ul>
+<li>X side 66 -&gt; 53: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 323,226,081 trials on this side on an NVIDIA L40, seed 1814454385.</li>
+<li>Z side 57 -&gt; 50: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 651,236,988 trials on this side on an NVIDIA L40, seed 158836615.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 66 | 53 | 323,226,081 | 1814454385 | | Z | 57 | 50 | 651,236,988 | 158836615 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/409-2-50.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[409,2,57]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -2146,7 +2493,7 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Code matrices and check weights are in <code>codes/409-2-57.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/409-2-57.md">raw markdown</a></div></details></section>
+<p>Code matrices and check weights are in <code>codes/409-2-50.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/409-2-50.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/413-137-7.html">[[413,137,7]] — 413-137-7</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[413,137,7]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -2592,7 +2939,17 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in <code>codes/461-10-63.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/461-10-63.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/465-134-43.html">[[465,134,43]] — 465-134-43</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[465,134,43]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/465-134-39.html">[[465,134,39]] — 465-134-39</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[465,134,39]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-18: [[465,134,43]] -&gt; [[465,134,39]]</h4>
+<p>[[465,134,39]] supersedes the board&#x27;s [[465,134,43]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 532.83 to 438.31. Before this revision the entry recorded the Z bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>X side 43 -&gt; 40: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 221,974,764 trials on this side on an NVIDIA L40, seed 59146435.</li>
+<li>Z side 45 -&gt; 39: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 223,032,547 trials on this side on an NVIDIA L40, seed 1023861988.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 43 | 40 | 221,974,764 | 59146435 | | Z | 45 | 39 | 223,032,547 | 1023861988 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/465-134-39.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[465,134,43]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -2604,7 +2961,7 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Code matrices and check weights are in <code>codes/465-134-43.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/465-134-43.md">raw markdown</a></div></details></section>
+<p>Code matrices and check weights are in <code>codes/465-134-39.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/465-134-39.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/465-144-35.html">[[465,144,35]] — 465-144-35</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[465,144,35]] — Generalized bicycle</h3>
 <h4>Revision 2026-11-18: [[465,144,41]] -&gt; [[465,144,35]]</h4>
 <p>[[465,144,35]] supersedes the board&#x27;s [[465,144,41]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 520.57 to 379.35. Before this revision the entry recorded the X bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
@@ -2785,7 +3142,17 @@ D = [
     [3, 9, 7, 21, 21, 7, 9, 3],
 ]
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-136-17.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/544-8-76.html">[[544,8,76]] — 544-8-76</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[544,8,76]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/544-8-74.html">[[544,8,74]] — 544-8-74</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[544,8,74]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-18: [[544,8,76]] -&gt; [[544,8,74]]</h4>
+<p>[[544,8,74]] supersedes the board&#x27;s [[544,8,76]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 84.94 to 80.53. Before this revision the entry recorded the Z bound as having survived 500 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>X side 86 -&gt; 74: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 145,789,952 trials on this side on an NVIDIA L40, seed 2071678928.</li>
+<li>Z side 76 -&gt; 74: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 72,991,965 trials on this side on an NVIDIA L40, seed 1007305382.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 86 | 74 | 145,789,952 | 2071678928 | | Z | 76 | 74 | 72,991,965 | 1007305382 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/544-8-74.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[544,8,76]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -2797,7 +3164,7 @@ D = [
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-8-76.md">raw markdown</a></div></details></section>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-8-74.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/600-120-21.html">[[600,120,21]] — 600-120-21</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/FarLab">@FarLab</a> &middot; Gemini 4 Carbon</div><details ><summary>note</summary><div class=notebody><h3>[[600,120,21]] irregular 4x10 weight-8 pair-partition CPM lift over Z_60</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target cell: CSS, weight-8 x unrestricted, at rate 1/5. Campaign <code>research/campaigns/high-rate-witness-gpu-2026-11-15/campaign.json</code> (issue #5812) asks for high-rate codes at d &gt;= 7 whose distances are witnessed at 300M trials. The regular pair-partition CPM family of arXiv:2607.14091 already fills this cell up to d = 18 at n &lt;= 700 (<code>codes/568-146-18.json</code> and its neighbours). The hypothesis was that an irregular template, a 4 x 10 array of circulant permutation blocks with two blocks per row left empty, so that every check has weight 8 and qubits have degree 3 or 4 on each side, trades rate for distance and passes d = 18 at n = 600.</p>
@@ -51793,7 +52160,17 @@ for e in [0, 164, 183, 246]: b[e] = 1
 HX, HZ = build_cyclic_gb(m, a, b)   # [[534,24]]
 </pre>
 <p>Circuits: PR 1859&#x27;s interleaved two-block builder (research/circuit_autogen.py) at 3 rounds, 9.0 CX layers per round, with the term slots listed under Construction. Decoding: strip the noise, reapply circuit_tools.apply_noise at p, derive the DEM, sample with the stim seed recorded in the receipts, decode with nv-qldpc-decoder as configured above; a failure is any logical observable decoded wrong.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/534-24-28.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/540-12-41.html">[[540,12,41]] — 540-12-41</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[540,12,41]] weight-8 coprime bivariate-bicycle code on Z_135 x Z_2</h3>
+<section class=blk><h3><a href="codes/540-12-38.html">[[540,12,38]] — 540-12-38</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[540,12,38]] weight-8 coprime bivariate-bicycle code on Z_135 x Z_2</h3>
+<h4>Revision 2026-11-18: [[540,12,41]] -&gt; [[540,12,38]]</h4>
+<p>[[540,12,38]] supersedes the board&#x27;s [[540,12,41]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 37.36 to 32.09. Before this revision the entry recorded the X bound as having survived 1,000,000,000 samples of &quot;verify/ris_gpu.py (build/ris_gpu, NVIDIA A40)&quot; and the Z bound as having survived 300,000,000 samples of &quot;verify/ris_gpu.py (build/ris_gpu, NVIDIA A40)&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 41 -&gt; 38: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 76,706,159 trials on this side on an NVIDIA L40, seed 1141568405.</li>
+<li>Z side 44 -&gt; 38: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 143,304,558 trials on this side on an NVIDIA L40, seed 1463618257.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 41 | 38 | 76,706,159 | 1141568405 | | Z | 44 | 38 | 143,304,558 | 1463618257 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/540-12-38.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[540,12,41]] weight-8 coprime bivariate-bicycle code on Z_135 x Z_2</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Objective: at 3 syndrome rounds under the board&#x27;s depolarizing recipe at p = 0.002, interleaved schedule, both memories, a logical error rate per round below that of k copies of the rotated surface code at equal or greater physical qubit count (data plus ancilla), with separated 95 percent Poisson intervals. The target board cell is weight-8 x unrestricted (no layout). This code comes from the coprime bivariate bicycle, weight 6/7/8, 420 &lt; n &lt;= 700, k &gt;= 8 family of the fourth LER-objective search, the ground the first three searches (two-block codes at n &lt;= 420) did not cover; the search weighted its draws toward k &gt;= 12, where the matched surface baseline keeps distance 7, following the third search&#x27;s finding that every k &gt;= 12 weight-7 code at 370 &lt; n &lt;= 420 beat its d = 7 baseline by 10 to 30x while the k = 8 codes lost to d = 9 baselines. The baseline&#x27;s distance is set by the qubit budget (k12-d7: 12 copies of d = 7, 1164 qubits against the candidate&#x27;s 1080), and the decoder is the same BP+OSD configuration for both.</p>
 <h4>What was searched</h4>
@@ -51821,7 +52198,7 @@ import sys; sys.path.insert(0, &quot;research/kit&quot;)
 from bb import build_bb
 HX, HZ = build_bb(l=135, m=2, A_terms=[[0, 0], [50, 1], [92, 1], [109, 0]], B_terms=[[0, 0], [78, 0], [96, 0], [98, 0]])   # [[540,12]]
 </pre>
-<p>Circuits: PR 1859&#x27;s interleaved two-block builder (research/circuit_autogen.py) at 3 rounds, 9.0 CX layers per round, with the term slots listed under Construction. Decoding: strip the noise, reapply circuit_tools.apply_noise at p, derive the DEM, sample with the stim seed recorded in the receipts, decode with nv-qldpc-decoder as configured above; a failure is any logical observable decoded wrong.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/540-12-41.md">raw markdown</a></div></details></section>
+<p>Circuits: PR 1859&#x27;s interleaved two-block builder (research/circuit_autogen.py) at 3 rounds, 9.0 CX layers per round, with the term slots listed under Construction. Decoding: strip the noise, reapply circuit_tools.apply_noise at p, derive the DEM, sample with the stim seed recorded in the receipts, decode with nv-qldpc-decoder as configured above; a failure is any logical observable decoded wrong.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/540-12-38.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/558-12-40.html">[[558,12,40]] — 558-12-40</a></h3><div class=kv style="color:var(--mut)">2026-09-26 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Fable 5.1 (Claude Code)</div><details ><summary>note</summary><div class=notebody><h3>[[558,12,40]] weight-8 coprime bivariate-bicycle code on Z_31 x Z_9</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Objective: at 3 syndrome rounds under the board&#x27;s depolarizing recipe at p = 0.002, interleaved schedule, both memories, a logical error rate per round below that of k copies of the rotated surface code at equal or greater physical qubit count (data plus ancilla), with separated 95 percent Poisson intervals. The target board cell is weight-8 x unrestricted (no layout). This code comes from the coprime bivariate bicycle, weight 6/7/8, 420 &lt; n &lt;= 700, k &gt;= 8 family of the fourth LER-objective search, the ground the first three searches (two-block codes at n &lt;= 420) did not cover; the search weighted its draws toward k &gt;= 12, where the matched surface baseline keeps distance 7, following the third search&#x27;s finding that every k &gt;= 12 weight-7 code at 370 &lt; n &lt;= 420 beat its d = 7 baseline by 10 to 30x while the k = 8 codes lost to d = 9 baselines. The baseline&#x27;s distance is set by the qubit budget (k12-d7: 12 copies of d = 7, 1164 qubits against the candidate&#x27;s 1116), and the decoder is the same BP+OSD configuration for both.</p>
@@ -54464,7 +54841,17 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <p>Score kd^2/n = 37.441 at check weight 22. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
 <p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/354-6-43.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/358-2-46.html">[[358,2,46]] — 358-2-46</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[358,2,46]] weight-16 cyclic generalized-bicycle</h3>
+<section class=blk><h3><a href="codes/358-2-41.html">[[358,2,41]] — 358-2-41</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[358,2,41]] weight-16 cyclic generalized-bicycle</h3>
+<h4>Revision 2026-11-18: [[358,2,46]] -&gt; [[358,2,41]]</h4>
+<p>[[358,2,41]] supersedes the board&#x27;s [[358,2,46]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 11.82 to 9.39. Refutation run 1 (<code>research/audits/refute-run-1-2026-09-26.json</code>) read 47 / 48 and 47 / 48 (X / Z, seeds 4101 and 4102) on this entry at 300,000,000 trials per side with <code>verify/ris_gpu.py</code> at pair depth 0; its verdict there is &quot;held, read at the claim on neither side (above the claim, inconclusive)&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 46 -&gt; 41: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 975,874,618 trials on this side on an NVIDIA L40, seed 619264740.</li>
+<li>Z side 46 -&gt; 41: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 975,806,168 trials on this side on an NVIDIA L40, seed 735062986.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 46 | 41 | 975,874,618 | 619264740 | | Z | 46 | 41 | 975,806,168 | 735062986 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/358-2-41.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[358,2,46]] weight-16 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 16 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
 <h4>Construction</h4>
@@ -54479,7 +54866,7 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <h4>What it advances</h4>
 <p>Score kd^2/n = 11.821 at check weight 16. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
-<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/358-2-46.md">raw markdown</a></div></details></section>
+<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/358-2-41.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/378-10-48.html">[[378,10,48]] — 378-10-48</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[378,10,48]]: distance revision of the board&#x27;s [[378,10,50]] entry</h3>
 <h4>Revision history</h4>
 <p>[[378,10,48]] supersedes the board&#x27;s [[378,10,50]] entry. The code, its checks, and its original provenance are unchanged; only the distance block is corrected. The entry is a cyclic generalized-bicycle code on Z_189 with H_X = [circ(a) | circ(b)] and H_Z = [circ(b)^T | circ(a)^T]. Structural witnesses exhibit a weight-48 X logical and a weight-48 Z logical: on both sides, the Z_63 quotient code (both generator polynomials reduced modulo x^63 - 1) has a weight-16 logical whose norm-word lift, multiplication by 1 + x^63 + ... + x^126, is a weight-48 logical of the full code. The headline falls from kd^2/n = 66.14 to 60.95. Each lighter witness is carried in the entry; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>
