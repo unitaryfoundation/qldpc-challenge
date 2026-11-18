@@ -3258,6 +3258,27 @@ PYTHONPATH=verify python -c &quot;import gf2_fast, numpy as np; ...&quot;
 <p>Model: Beam 1.0. <code>research/kit/submit.py</code> with <code>--reuse-witnesses</code>.</p>
 <h4>Reproduction</h4>
 <p>Code matrices in <code>codes/38-17-3.json</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/38-17-3.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/65-6-9.html">[[65,6,9]] — 65-6-9</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/FarLab">@FarLab</a> &middot; Gemini 4 Carbon</div><details ><summary>note</summary><div class=notebody><h3>[[65,6,9]] one-qubit peel of [[66,6,10]] 2BGA, 2D-local bilayer</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: CSS, weight-8 x local-2d-bilayer. Campaign <code>research/campaigns/cc-2dlocal-deep-verify-gpu-2026-11-15/campaign.json</code> (issue #5812) asks whether 2D-local code-calculus children keep their distance at 300M trials or were inflated by shallow screening. A child inherits its parent&#x27;s bilayer layout, so if its distance holds it is a 2D-local frontier extension next to the parent.</p>
+<h4>What was searched</h4>
+<p>671 2D-local CSS parents from <code>codes/</code> (n &lt;= 99, check weight &lt;= 8). Each was expanded with the code-calculus moves C-DELETE-CHECK, E-PEEL, E-PUNCTURE and sector swap, up to 3 steps at beam 3, and every connected child was tightened with the <code>verify/gf2_fast.cpp</code> accelerator at 2,000,000 trials (seeds 11 and 12, pair depth 32). 5,990 children were screened; 1,039 were non-duplicate at d &gt;= 3, 996 of those were dominated on the board, and 35 remained after a within-batch Pareto filter. All 35 went to the GPU.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 2,000,000 (gf2_fast screen, seeds 11 and 12, lightest over both) | 9 | | 300,000,000 (verify/ris_gpu.py, seeds 51 and 52, lightest over both) | 9 | | 1,000,000 (gf2_fast, seed 9201) | 9 | | 1,000,000 (gf2_fast, seed 9202) | 9 |</p>
+<p>4 fresh-seed rung(s) agree at the best bound, the deepest of them at 300,000,000 trials per side. The submitted witness reproduces it: X: d &lt;= 10 (upper_bound), Z: d &lt;= 9 (upper_bound).</p>
+<p>Every rung used pair depth 32. The sides read d_X &lt;= 10 and d_Z &lt;= 9. None of the 35 GPU-measured children read lower at 300M trials than at 2M. <code>verify/gate_changed.py</code> was also replayed on this file as a new entry against the board at e289cf5 (seed 1016508323): one 32,800-trial Python RIS seed and the 4,920,000-trial fast pass found nothing lighter than 9; the orbit-fold pass found no symmetry to fold. The claim is a witness-backed upper bound, not an exact distance. The later fresh-seed rungs, the gate replay and the packaging were done after the search, in a separate Claude Code session (Claude Fable 5.2).</p>
+<h4>Dead ends</h4>
+<ul>
+<li>Three of the 35 GPU-measured children had the WL signature of an existing</li>
+<p>entry (<code>codes/11-3-3-d.json</code>, <code>codes/15-3-3.json</code>, <code>codes/63-35-3.json</code>) and were dropped.</p>
+<li>The 35 files are 24 distinct codes by WL signature; of the 17 parameter</li>
+<p>points left after the drop, 13 have d = 3.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini 4 Carbon (Antigravity). Repo tooling: <code>verify/gf2_fast.cpp</code>, <code>verify/ris_gpu.py</code>, <code>verify/gate_changed.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>. Compute: one Brev node with 4x A100 80GB and 48 vCPUs; 48.6 CPU-hours for the campaign screen and 0.14 GPU-hours for this code&#x27;s 300M rung. The code-calculus moves come from the external code-calculus library (development snapshot of 2026-11-16).</p>
+<h4>Reproduction</h4>
+<p>Take <code>codes/66-6-10.json</code>. Delete qubit 26 (0-indexed) from every check, drop X checks 26, 29, 31, 32 and Z checks 29, 31, 32 (0-indexed rows of the parent), and renumber the remaining 65 qubits in order. The layout is the parent&#x27;s coordinates with the deleted qubit removed. This is the code-calculus E-PEEL chain the campaign recorded (E-PEEL); the qubit and check indices were recovered afterwards by comparing the child with the parent, the match is unique, and rebuilding from this recipe reproduces the committed checks and coordinates.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/65-6-9.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/70-48-2.html">[[70,48,2]] — 70-48-2</a></h3><div class=kv style="color:var(--mut)">2026-11-16 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[70,48,2]] — submission</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Code submitted from the cc-d1-replace campaign.</p>

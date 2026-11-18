@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[12,2,4]] three 422 blocks outer CSS composition",
  "code_type": "CSS",
  "n": 12,
@@ -198,6 +198,60 @@
    ],
    "date": "2026-11-08",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3634,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.138515085,
+     "ci95": [
+      0.132467664,
+      0.144955446
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1235,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.034232964,
+     "ci95": [
+      0.032295334,
+      0.036285676
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3563,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.133906772,
+     "ci95": [
+      0.128104152,
+      0.140073159
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1218,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.033708086,
+     "ci95": [
+      0.031788796,
+      0.035742056
+     ]
+    }
+   ]
   }
  }
 }

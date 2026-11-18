@@ -62,7 +62,14 @@
 <details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[1, 4, 43, 64]</div></details>
 <div class=kv><b>d_circ^Z</b> 4 &middot; fault-set witness of 4 mechanisms (claimed upper_bound)</div>
 <details><summary>witness fault set (mechanism indices in the committed .dem, 4)</summary><div class=wit>[2027, 2033, 2064, 2070]</div></details>
-<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+<svg class=lercurve viewBox="0 0 360 170" width=360 height=170 role=img aria-label="measured logical error rate against physical rate"><line x1=46 y1=142.0 x2=348 y2=142.0 class=grid/><text x=42 y=145.0 class=tick text-anchor=end>1e-2</text><line x1=46 y1=76.0 x2=348 y2=76.0 class=grid/><text x=42 y=79.0 class=tick text-anchor=end>1e-1</text><line x1=46 y1=10.0 x2=348 y2=10.0 class=grid/><text x=42 y=13.0 class=tick text-anchor=end>1e0</text><text x=46.0 y=156 class=tick text-anchor=middle>0.001</text><text x=348.0 y=156 class=tick text-anchor=middle>0.002</text><text x=197 y=168 class=tick text-anchor=middle>physical rate p</text><polyline class="lx" points="46.0,106.7 348.0,66.7"/><circle class="lx st-pending" cx=46.0 cy=106.7 r=4><title>X p=0.001: 0.0342/round, pending</title></circle><circle class="lx st-gate" cx=348.0 cy=66.7 r=4><title>X p=0.002: 0.139/round, gate</title></circle><polyline class="lz" points="46.0,107.2 348.0,67.6"/><circle class="lz st-pending" cx=46.0 cy=107.2 r=4><title>Z p=0.001: 0.0337/round, pending</title></circle><circle class="lz st-gate" cx=348.0 cy=67.6 r=4><title>Z p=0.002: 0.134/round, gate</title></circle></svg>
+<table class=lerpts><thead><tr><th>basis</th><th>p</th><th>ler/round</th><th>95% CI</th><th>failures/shots</th><th>status</th></tr></thead><tbody>
+<tr class="st-gate"><td>X</td><td>0.002</td><td class=num>0.139</td><td class=num>[0.132, 0.145]</td><td class=num>3634/10<sup>4</sup></td><td>verified at PR time</td></tr>
+<tr class="st-pending"><td>X</td><td>0.001</td><td class=num>0.0342</td><td class=num>[0.0323, 0.0363]</td><td class=num>1235/10<sup>4</sup></td><td>pending post-merge replication</td></tr>
+<tr class="st-gate"><td>Z</td><td>0.002</td><td class=num>0.134</td><td class=num>[0.128, 0.14]</td><td class=num>3563/10<sup>4</sup></td><td>verified at PR time</td></tr>
+<tr class="st-pending"><td>Z</td><td>0.001</td><td class=num>0.0337</td><td class=num>[0.0318, 0.0357]</td><td class=num>1218/10<sup>4</sup></td><td>pending post-merge replication</td></tr>
+</tbody></table>
+<div class=kv><span class=claimed>decoder bposd-cs-10; rates are compared across entries only at equal p; a point whose per-shot failure fraction would exceed 1/2 is not admitted</span></div>
 </section>
 <section class=blk><h3>Verified 2D layout</h3>
 <div class=kv style="color:var(--mut)">as measured by the verifier: every check drawn over the submitted coordinates; the interaction radius is the longest dashed pair</div>
