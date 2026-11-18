@@ -2011,6 +2011,47 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
 
 
 
+def identity_keys(doc):
+    """Return the keys the board's duplicate scan files an entry under, and nothing else.
+
+    ``{"fingerprint", "signature", "css_equivalent"}`` as verify() records
+    them: the stabilizer-group fingerprint, the Weisfeiler-Leman signature,
+    and the fingerprints and signatures of the entry's local-Clifford CSS
+    images (None when it has none). Computed by the same functions
+    _verify_semantic calls, in the same order, so the values are the ones a
+    full report would carry.
+
+    For verify_all.py --board-base (issue #5578, change C): a sweep that
+    leaves an unchanged entry's structural verdict to the base branch still
+    has to scan it for collisions with the entries that changed, and this is
+    what that scan reads. It raises on an entry it cannot read; the caller
+    then verifies that entry in full.
+    """
+    import hashlib
+    n = doc["n"]
+    sig = signature(doc)
+    if is_stabilizer(doc):
+        A, B = stabilizer_matrices(doc)
+        S = np.concatenate([A, B], axis=1)
+        fp = hashlib.sha256(gf2.rref(S)[0].tobytes()).hexdigest()[:16]
+        images = []
+        found = is_css_up_to_local_clifford(A, B)
+        if found is not None and found[1]:
+            images = clifford_css_images(doc, found[0])
+    else:
+        HX = _matrix(doc["checks"]["X"], n)
+        HZ = _matrix(doc["checks"]["Z"], n)
+        fp = css_fingerprint(HX, HZ)
+        images, _capped = css_local_hadamard_images(doc)
+    ceq = None
+    if images:
+        ceq = {"fingerprints": [css_fingerprint(_matrix(im["checks"]["X"], n),
+                                                _matrix(im["checks"]["Z"], n))
+                                for im in images],
+               "signatures": [signature(im)["hash"] for im in images]}
+    return {"fingerprint": fp, "signature": sig, "css_equivalent": ceq}
+
+
 def _board_entry(path, data):
     """Verify one board file from the bytes already read (None = oversize)."""
     entry = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
@@ -2192,8 +2233,16 @@ def _memo_write(cache_dir, data, entry):
 _BOARD_MEMO_VERSION = 1
 
 
-def board_reports(code_dir):
+def board_reports(code_dir, jobs=1):
     """Verify every <code_dir>/*.json structurally, memoized on the bytes read.
+
+    ``jobs``: processes for the entries the memos do not answer, 0 for one
+    per CPU, 1 (the default) for this process alone. The verdicts are the
+    serial ones: a worker runs _board_entry on one file's bytes, which reads
+    nothing a sibling worker writes, and this process assembles the results
+    in path order and writes the memo as it does serially. On a four-core
+    runner the structural pass over 3,400 entries is about a quarter of its
+    serial 5.5 minutes (issue #5578).
 
     One process pays for the pass once, whoever asks: the site builder, the
     candidate validator and several tests each used to rescan and re-verify
@@ -2247,18 +2296,48 @@ def board_reports(code_dir):
     if _BOARD_CACHE.get("dir") == code_dir and _BOARD_CACHE.get("key") == key:
         return _BOARD_CACHE["reports"]
     cache_dir = board_cache_dir()
+    workers = (os.cpu_count() or 1) if jobs == 0 else int(jobs)
     entries = []
-    for p, data in raw:
-        hit = None
-        if cache_dir and data is not None:
-            hit = _memo_read(cache_dir, p, data)
-        if hit is not None:
+    if workers <= 1:
+        for p, data in raw:
+            hit = None
+            if cache_dir and data is not None:
+                hit = _memo_read(cache_dir, p, data)
+            if hit is not None:
+                entries.append(hit)
+                continue
+            entry = _board_entry(p, data)
+            if cache_dir and data is not None and entry["size_error"] is None:
+                _memo_write(cache_dir, data, entry)
+            entries.append(entry)
+    else:
+        # The misses are verified in a pool, one per distinct byte string, so
+        # two entries with the same bytes cost one verification as they do
+        # serially (the second is a memo hit there); each path then gets its
+        # own entry around the shared doc and report, as _memo_read builds one.
+        import concurrent.futures
+        misses = {}
+        for p, data in raw:
+            hit = None
+            if cache_dir and data is not None:
+                hit = _memo_read(cache_dir, p, data)
             entries.append(hit)
-            continue
-        entry = _board_entry(p, data)
-        if cache_dir and data is not None and entry["size_error"] is None:
-            _memo_write(cache_dir, data, entry)
-        entries.append(entry)
+            if hit is None:
+                misses.setdefault(data, []).append(len(entries) - 1)
+        work = [(ps[0], data) for data, ps in misses.items()]
+        with concurrent.futures.ProcessPoolExecutor(
+                max_workers=max(1, min(workers, len(work)))) as pool:
+            computed = list(pool.map(_board_entry, [raw[i][0] for i, _ in work],
+                                     [data for _, data in work], chunksize=8))
+        for (first, data), entry in zip(work, computed):
+            if cache_dir and data is not None and entry["size_error"] is None:
+                _memo_write(cache_dir, data, entry)
+            for i in misses[data]:
+                p = raw[i][0]
+                copy = dict(entry, path=p, slug=os.path.splitext(os.path.basename(p))[0])
+                if copy["size_error"] is not None:
+                    copy["size_error"] = file_size_error(p) or None
+                entries[i] = copy
     reports = tuple(entries)
     _BOARD_CACHE.clear()
     _BOARD_CACHE.update(dir=code_dir, key=key, reports=reports)

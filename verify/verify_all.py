@@ -139,6 +139,7 @@ part of this file that needs the whole board, and they are the cheap part."""
 
 import argparse
 import concurrent.futures
+import glob
 import hashlib
 import importlib.metadata
 import json
@@ -148,7 +149,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from qldpc_verify import board_reports
+from qldpc_verify import _board_entry, board_reports, identity_keys, file_size_error
 from circuit_verify import verify_circuit
 from gate_changed import changed_codes as changed_code_paths
 from ler_verify import summary_rate, verify_ler
@@ -168,6 +169,94 @@ def _changed_slugs(base, code_root, fallback):
         print(f"note: could not diff vs {base}; {fallback}")
         return None
     return {os.path.splitext(os.path.basename(p))[0] for p in changed}
+
+
+def board_slugs_to_verify(base, code_root):
+    """Return the entries --board-base verifies in full, or None for all."""
+    return _changed_slugs(base, code_root, "verifying every entry")
+
+
+def _identity_entry(path):
+    """Identity keys of one unchanged entry, or None when it has to be verified in full.
+
+    None for an oversize, unparseable or otherwise unreadable file: the
+    failure mode costs a verification, never a collision scan.
+    """
+    try:
+        if file_size_error(path):
+            return None
+        with open(path, "rb") as f:
+            doc = json.loads(f.read())
+        return identity_keys(doc)
+    except Exception:                       # noqa: BLE001 -- fail closed: verify it
+        return None
+
+
+def board_entries_since(base, code_root, codes_dir, jobs):
+    """Return the sweep's entries for --board-base, or None when the flag is void.
+
+    Full structural verification for the entries whose codes/<slug>.json or
+    circuits/<slug>/ changed since ``base`` and for every entry whose bytes
+    name one of those slugs (a benchmark baseline, an architecture partner,
+    a declared relabeling parent: verify() reads such an entry's partner,
+    so its verdict can move when the partner does). Every other entry keeps
+    the base branch's verdict and contributes its identity keys, computed in
+    ``jobs`` processes, so the duplicate scan still reads every byte of the
+    tree. None when the diff cannot be computed, when the verifier stack
+    differs from ``base`` (circuit_stack_changed, the same rule
+    --circuit-base rests on: the skip is sound only while the verifier is
+    the one that produced the base branch's verdicts), or when an unchanged
+    entry's keys cannot be computed, in which case the caller runs the full
+    pass. Entries carry ``base_verdict``: True for one whose structural
+    verdict is the base branch's.
+    """
+    if circuit_stack_changed(base, code_root if os.path.isdir(os.path.join(code_root, "verify")) else ROOT):
+        print(f"note: the verifier stack differs from {base}, or could not be compared "
+              "with it; verifying every entry")
+        return None
+    changed = board_slugs_to_verify(base, code_root)
+    if changed is None:
+        return None
+    paths = sorted(glob.glob(os.path.join(codes_dir, "*.json")))
+    raw = {}
+    for path in paths:
+        if file_size_error(path):
+            raw[path] = None
+            continue
+        with open(path, "rb") as f:
+            raw[path] = f.read()
+    needles = [slug.encode() for slug in sorted(changed)]
+    full, light = [], []
+    for path in paths:
+        slug = os.path.splitext(os.path.basename(path))[0]
+        data = raw[path]
+        if slug in changed or data is None or any(nd in data for nd in needles):
+            full.append(path)
+        else:
+            light.append(path)
+    workers = (os.cpu_count() or 1) if jobs == 0 else max(1, int(jobs))
+    if workers > 1 and len(light) > 1:
+        with concurrent.futures.ProcessPoolExecutor(
+                max_workers=min(workers, len(light))) as pool:
+            keys = list(pool.map(_identity_entry, light, chunksize=16))
+    else:
+        keys = [_identity_entry(path) for path in light]
+    entries = {}
+    for path, key in zip(light, keys):
+        if key is None:
+            full.append(path)
+            continue
+        entries[path] = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
+                         "doc": None, "report": key, "size_error": None,
+                         "load_error": None, "base_verdict": True}
+    for path in full:
+        entry = dict(_board_entry(path, raw[path]))
+        entry["base_verdict"] = False
+        entries[path] = entry
+    print(f"structural pass: {len(full)} entries verified ({len(changed)} changed since "
+          f"{base}, the rest name one of them); {len(entries) - len(full)} unchanged entries "
+          f"keep the base branch's verdict and were scanned for duplicates", flush=True)
+    return [entries[path] for path in paths]
 
 
 def ler_slugs_to_measure(base, code_root):
@@ -431,6 +520,16 @@ def main(argv=None):
                          "says passed it on the same bytes under the same "
                          "verifier stack, and write the record back with this "
                          "run's passes. A trusted input: for runs on main only")
+    ap.add_argument("--board-base", default=None, metavar="REF",
+                    help="verify in full only the entries changed since REF and the "
+                         "entries that name them; the rest keep REF's structural "
+                         "verdict and contribute identity keys to the duplicate scan. "
+                         "Void when the verifier stack differs from REF or the diff "
+                         "fails (every entry is verified). For a sweep no gate follows: "
+                         "a gate reads the sweep's memo and would pay the pass itself")
+    ap.add_argument("--jobs", default=1, type=int, metavar="N",
+                    help="processes for the structural pass and the identity keys: "
+                         "1 (default) for this process alone, 0 for one per CPU")
     ap.add_argument("--circuit-jobs", default=1, type=int, metavar="N",
                     help="check the circuit tier in N processes, before any "
                          "entry is reported; 0 means one per CPU. The default "
@@ -438,6 +537,8 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if args.circuit_jobs < 0:
         ap.error("--circuit-jobs must be 0 (one per CPU) or a positive count")
+    if args.jobs < 0:
+        ap.error("--jobs must be 0 (one per CPU) or a positive count")
     if args.ler_sample is not None and args.ler_sample < 1:
         # Zero would be a way to ask for no re-measurement at all. Nothing
         # needs it: leaving the flag out is how a run says "only what
@@ -462,9 +563,20 @@ def main(argv=None):
     # One structural pass per tree, shared with every other consumer. The
     # reports are the memoized objects other callers in this process read, so
     # each is copied before the circuit tier writes a verdict into it.
-    entries = [(e, True) for e in board_reports(os.path.join(code_root, "codes"))]
-    entries += [(e, False) for e in
-                board_reports(os.path.join(ROOT, "verify", "fixtures"))]
+    codes_dir = os.path.join(code_root, "codes")
+
+    def shared_pass(directory):
+        # the keyword only when asked, so a caller's stand-in for the pass
+        # that takes the directory alone keeps working
+        return board_reports(directory) if args.jobs == 1 else board_reports(directory, jobs=args.jobs)
+
+    board = None
+    if args.board_base:
+        board = board_entries_since(args.board_base, code_root, codes_dir, args.jobs)
+    if board is None:
+        board = shared_pass(codes_dir)
+    entries = [(e, True) for e in board]
+    entries += [(e, False) for e in shared_pass(os.path.join(ROOT, "verify", "fixtures"))]
     if not entries:
         print("no submissions found")
         return 0
@@ -548,11 +660,38 @@ def main(argv=None):
     failed = []
     skipped_circuits = 0
     recorded_circuits = 0
+    base_verdicts = 0
     sigs = {}
     fps = {}
+
+    def file_identity(rel, rep):
+        """File one entry under its fingerprint and signature and those of its images."""
+        if "signature" in rep:
+            sigs.setdefault(rep["signature"]["hash"], []).append(rel)
+        if "fingerprint" in rep:
+            fps.setdefault(rep["fingerprint"], []).append(rel)
+        # a CSS entry is also filed under its local-Hadamard images
+        # (its X/Z swap, for a connected code), so a relabeled copy
+        # collides with it; a stabilizer entry that is CSS up to
+        # local Cliffords is rejected outright, so it never reaches
+        # this point
+        ceq = rep.get("css_equivalent") or {}
+        for fp in set(ceq.get("fingerprints") or []):
+            fps.setdefault(fp, []).append(rel + " (via local Hadamard)")
+        for h in set(ceq.get("signatures") or []):
+            sigs.setdefault(h, []).append(rel + " (via local Hadamard)")
+
     for e, is_code in entries:
         p = e["path"]
         rel = os.path.relpath(p, code_root if is_code else ROOT)
+        if e.get("base_verdict"):
+            # --board-base: unchanged since the base, so the structural
+            # verdict is the base branch's; only the duplicate scan reads it
+            print(f"BASE  {rel}  -> unchanged since {args.board_base}; structural "
+                  "verdict is the base branch's")
+            file_identity(rel, e["report"])
+            base_verdicts += 1
+            continue
         if e["size_error"]:
             failed.append(rel)
             print(f"FAIL  {rel}  -> file_size_within_limit: {e['size_error']}")
@@ -620,20 +759,7 @@ def main(argv=None):
             print(f"PASS  {rel}  -> d{ed.get('value','?')} "
                   f"({ed.get('tier','-')}){circ}")
             if is_code:
-                if "signature" in rep:
-                    sigs.setdefault(rep["signature"]["hash"], []).append(rel)
-                if "fingerprint" in rep:
-                    fps.setdefault(rep["fingerprint"], []).append(rel)
-                # a CSS entry is also filed under its local-Hadamard images
-                # (its X/Z swap, for a connected code), so a relabeled copy
-                # collides with it; a stabilizer entry that is CSS up to
-                # local Cliffords is rejected outright, so it never reaches
-                # this point
-                ceq = rep.get("css_equivalent") or {}
-                for fp in set(ceq.get("fingerprints") or []):
-                    fps.setdefault(fp, []).append(rel + " (via local Hadamard)")
-                for h in set(ceq.get("signatures") or []):
-                    sigs.setdefault(h, []).append(rel + " (via local Hadamard)")
+                file_identity(rel, rep)
         else:
             failed.append(rel)
             bad = [c["check"] for c in rep["checks"] if not c["ok"]]
@@ -671,7 +797,10 @@ def main(argv=None):
         save_circuit_record(args.circuit_record, stack, passed)
         print(f"\ncircuit tier not re-run for {recorded_circuits} entries recorded as "
               f"passing on these bytes; {len(passed)} passes now in {args.circuit_record}")
-    print(f"\n{len(entries)-len(failed)}/{len(entries)} passed")
+    verified = len(entries) - base_verdicts
+    print(f"\n{verified-len(failed)}/{verified} passed"
+          + (f"; {base_verdicts} unchanged since {args.board_base} keep the base "
+             "branch's verdict" if base_verdicts else ""))
     return 1 if (failed or identical) else 0
 
 

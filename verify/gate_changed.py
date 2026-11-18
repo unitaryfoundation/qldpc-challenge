@@ -400,17 +400,29 @@ def board_record_slugs(code_root=ROOT):
                          d.get("code_type", "CSS")))
         except Exception:
             continue
+    # A dominator shares the board and is no longer, so compare each row
+    # only with the rows of its own code type at n no larger than its own:
+    # the same relation as before, over the pairs that can satisfy it
+    # (issue #5578, "compare within a cell").
     rec = set()
-    for i, a in enumerate(rows):
-        dominated = any(
-            j != i
-            and b[7] == a[7]                           # same board (code type)
-            and b[5] <= a[5] and b[6] <= a[6]          # shares a's home cell
-            and b[1] <= a[1] and b[2] >= a[2] and b[3] >= a[3] and b[4] <= a[4]
-            and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])
-            for j, b in enumerate(rows))
-        if not dominated:
-            rec.add(a[0])
+    by_type = {}
+    for row in rows:
+        by_type.setdefault(row[7], []).append(row)
+    for group in by_type.values():
+        group.sort(key=lambda r: r[1])
+        for i, a in enumerate(group):
+            dominated = False
+            for j, b in enumerate(group):
+                if b[1] > a[1]:
+                    break                              # sorted by n
+                if (j != i
+                        and b[5] <= a[5] and b[6] <= a[6]  # shares a's home cell
+                        and b[2] >= a[2] and b[3] >= a[3] and b[4] <= a[4]
+                        and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])):
+                    dominated = True
+                    break
+            if not dominated:
+                rec.add(a[0])
     return rec
 
 

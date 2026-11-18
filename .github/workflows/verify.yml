@@ -502,6 +502,12 @@ jobs:
         # the argument in full. The value arrives through the environment,
         # as SLUG_TESTS does above.
         #
+        # --jobs 0: the structural pass runs one process per CPU. A worker
+        # verifies one file's bytes and the parent assembles the reports in
+        # path order and writes the memo, so the verdicts and the memo are
+        # the serial ones; on four cores the pass is about a quarter of its
+        # serial 5.5 minutes (issue #5578).
+        #
         # QLDPC_BOARD_CACHE: this step and the gate below are two processes
         # that each need a structural pass over the whole board, the sweep
         # to verify it and the gate to compare its candidate with every
@@ -535,7 +541,7 @@ jobs:
           QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo
         run: |
           rm -rf "$QLDPC_BOARD_CACHE"
-          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
+          uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --jobs 0 --circuit-jobs 0
       - name: verify all submissions (LER stack unchanged)
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: submitted
@@ -551,10 +557,20 @@ jobs:
         # exists for, and a PR that edits a test, the site or research/
         # does not repeat the base branch's run. It used to: the flag was
         # withheld from every PR that was not data-only.
+        #
+        # --board-base: no gate follows this sweep, so an entry the PR did
+        # not change keeps the base branch's structural verdict and only
+        # its identity keys are computed, for the duplicate scan; the
+        # entries the PR changed, and those that name one of them, are
+        # verified in full. verify_all voids the flag when its stack
+        # differs from the base, the rule --circuit-base already rests on
+        # (issue #5578, change C). The code-submission sweep above does not
+        # pass it: the gate reads that sweep's memo, and a memo without the
+        # unchanged entries' reports would make the gate pay the pass.
         env:
           BASE_REF: origin/${{ github.base_ref }}
         run: |
-          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --circuit-jobs 0
+          uv run --frozen --extra research python verify/verify_all.py --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --board-base "$BASE_REF" --jobs 0 --circuit-jobs 0
       # The circuit record: which entries have passed the circuit tier on
       # main, on which bytes, under which verifier. A run on main has no base
       # branch to lean on, and re-running the tier for every entry on every
@@ -596,7 +612,7 @@ jobs:
         # merge did not touch keeps the rate the PR that introduced it
         # measured; a base that cannot be diffed makes verify_all re-measure
         # everything (its own fail-open rule), so a skip is never silent.
-        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --circuit-jobs 0
+        run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --jobs 0 --circuit-jobs 0
       - name: verify all submissions (LER stack changed, or the weekly run)
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true') || (github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed == 'true' && steps.verdict.outputs.cache-hit != 'true')
         working-directory: submitted
@@ -644,7 +660,7 @@ jobs:
           record="--circuit-record ../circuit-record/record.json"
           case "$EVENT_NAME" in
             pull_request)
-              scope="--ler-base $BASE_REF --ler-sample $LER_SAMPLE --ler-seed $PR_NUMBER --circuit-base $BASE_REF" ;;
+              scope="--ler-base $BASE_REF --ler-sample $LER_SAMPLE --ler-seed $PR_NUMBER --circuit-base $BASE_REF --board-base $BASE_REF" ;;
             push)
               scope="$record"
               if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
@@ -653,7 +669,7 @@ jobs:
             *)
               scope="$record" ;;
           esac
-          uv run --frozen --extra research python verify/verify_all.py $scope --circuit-jobs 0
+          uv run --frozen --extra research python verify/verify_all.py $scope --jobs 0 --circuit-jobs 0
       # always(): a sweep that fails on one entry still earned its other
       # passes, and only passes are in the file. hashFiles: a sweep that
       # never ran wrote nothing to save.
@@ -708,8 +724,11 @@ jobs:
         with:
           path: search-cache
           key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
+      # On a push to main and on the schedule HEAD is main, so the diff
+      # below is empty and the step gated nothing (issue #5578); a manual
+      # dispatch on a branch is the one non-PR run with a diff to gate.
       - name: distance refutation gate (changed submissions only)
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         working-directory: submitted
         run: uv run --frozen --extra research python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
       - name: upload verification receipts

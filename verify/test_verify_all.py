@@ -795,8 +795,8 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
                                                       **_SAMPLE_ENV)
     for event in ("push", "schedule", "workflow_dispatch"):
         argv = _verify_all_argv(full, tmp_path, EVENT_NAME=event, BEFORE="abc123", **_SAMPLE_ENV)
-        assert argv[-4:] == ["--circuit-record", _RECORD, "--circuit-jobs", "0"], (event, argv)
-        assert "--circuit-base" not in argv, (event, argv)
+        assert argv[-6:] == ["--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], (event, argv)
+        assert "--circuit-base" not in argv and "--board-base" not in argv, (event, argv)
     push = _code(steps[_PUSH_SWEEP])
     assert any(ln.startswith("        if: github.event_name == 'push' && ") for ln in push)
     run = next(ln for ln in push if "verify/verify_all.py" in ln)
@@ -1002,10 +1002,11 @@ def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
     script = _script(lines)
     pr = _verify_all_argv(script, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
     assert pr == ["--ler-base", "origin/main", "--ler-sample", "3", "--ler-seed", "5578",
-                  "--circuit-base", "origin/main", "--circuit-jobs", "0"], pr
+                  "--circuit-base", "origin/main", "--board-base", "origin/main",
+                  "--jobs", "0", "--circuit-jobs", "0"], pr
     push = _verify_all_argv(script, tmp_path, EVENT_NAME="push", BEFORE="abc123", **_SAMPLE_ENV)
     assert push == ["--ler-base", "abc123", "--ler-sample", "3", "--ler-seed", "43263400509",
-                    "--circuit-record", _RECORD, "--circuit-jobs", "0"], push
+                    "--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], push
     # No LER flag at all means every claim: the weekly run, a manual dispatch,
     # and a push with no `before` to diff against. (A `before` that is set
     # but cannot be diffed gets the flags, and verify_all's own fallback:
@@ -1013,7 +1014,7 @@ def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
     for env in ({"EVENT_NAME": "schedule"}, {"EVENT_NAME": "workflow_dispatch"},
                 {"EVENT_NAME": "push"}, {"EVENT_NAME": "push", "BEFORE": "0" * 40}):
         argv = _verify_all_argv(script, tmp_path, **env, **_SAMPLE_ENV)
-        assert argv == ["--circuit-record", _RECORD, "--circuit-jobs", "0"], (env, argv)
+        assert argv == ["--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], (env, argv)
 
 
 def test_the_flags_the_workflow_passes_are_ones_verify_all_takes(tmp_path, monkeypatch):
@@ -1152,3 +1153,116 @@ def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
 def test_the_condition_reader_fails_closed(cond, expected):
     """The reader above is the check, so it has to refuse what it does not recognise."""
     assert _cannot_run_on_a_code_submission(cond) is expected
+
+
+# --board-base REF (issue #5578, change C): an entry the run did not change
+# keeps the base branch's structural verdict and only its identity keys are
+# computed; the entries it changed, and the entries that name them, are
+# verified in full; the flag is void when the verifier stack differs from
+# REF or the diff fails.
+def _run_board(monkeypatch, argv, identity=None, stack_changed=False):
+    verified = []                     # the repo's entries; the fixtures verify as well
+
+    def fake_verify(doc):
+        if doc["name"].endswith("-1-1"):
+            verified.append(doc["name"])
+        return json.loads(json.dumps(OK_REP))
+    monkeypatch.setattr(QV, "verify", fake_verify)
+    monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
+    monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
+    monkeypatch.setattr(VA, "circuit_stack_changed", lambda base, root=None: stack_changed)
+    monkeypatch.setattr(VA, "identity_keys", identity or (lambda doc: {
+        "fingerprint": "fp-" + doc["name"], "signature": {"hash": "sig-" + doc["name"]},
+        "css_equivalent": None}))
+    rc = VA.main(argv)
+    return rc, sorted(verified)
+
+
+def test_board_base_verifies_the_changed_entries_and_scans_the_rest(tmp_path, monkeypatch, capsys):
+    root = _repo(tmp_path)
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
+                                            "--ler-base", "main", "--circuit-base", "main"])
+    out = capsys.readouterr().out
+    assert rc == 0
+    assert verified == ["a-1-1", "b-1-1"]          # a's JSON and b's circuit changed
+    assert "BASE  codes/c-1-1.json  -> unchanged since main" in out
+    import re
+    assert re.search(r"\n\d+/\d+ passed; 1 unchanged since main keep the base branch's verdict", out)
+
+
+def test_board_base_verifies_an_entry_that_names_a_changed_one(tmp_path, monkeypatch):
+    root = _repo(tmp_path)
+    _git(root, "checkout", "-q", "main")
+    _write(root, "codes/d-1-1.json", json.dumps({"name": "d-1-1", "partner": "a-1-1"}))
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "a partner")
+    _git(root, "checkout", "-q", "pr")
+    _git(root, "merge", "-q", "main")
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"])
+    assert rc == 0 and verified == ["a-1-1", "b-1-1", "d-1-1"]
+
+
+def test_board_base_is_void_when_the_stack_or_the_diff_is_not_the_bases(tmp_path, monkeypatch, capsys):
+    root = _repo(tmp_path)
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "no-such-ref"])
+    assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"], stack_changed=True)
+    out = capsys.readouterr().out
+    assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
+    assert "verifier stack differs from main" in out
+
+
+def test_board_base_still_catches_a_duplicate_among_unchanged_entries(tmp_path, monkeypatch, capsys):
+    root = _repo(tmp_path)
+    _git(root, "checkout", "-q", "main")
+    _write(root, "codes/e-1-1.json", json.dumps({"name": "e-1-1", "circuit": {"ler": LER}}))
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "another unchanged entry")
+    _git(root, "checkout", "-q", "pr")
+    _git(root, "merge", "-q", "main")
+    same = lambda doc: {"fingerprint": "shared", "signature": {"hash": "shared"},  # noqa: E731
+                        "css_equivalent": None}
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"], identity=same)
+    out = capsys.readouterr().out
+    assert verified == ["a-1-1", "b-1-1"]
+    assert rc == 1 and "IDENTICAL CODES" in out and "codes/c-1-1.json, codes/e-1-1.json" in out
+
+
+def test_board_base_verifies_an_entry_whose_keys_cannot_be_computed(tmp_path, monkeypatch):
+    root = _repo(tmp_path)
+
+    def broken(doc):
+        if doc["name"] == "c-1-1":
+            raise KeyError("checks")
+        return {"fingerprint": doc["name"], "signature": {"hash": doc["name"]}, "css_equivalent": None}
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"], identity=broken)
+    assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
+
+
+def test_jobs_must_be_zero_or_positive():
+    with pytest.raises(SystemExit):
+        VA.main(["--jobs", "-1"])
+
+
+def test_identity_keys_are_the_ones_verify_records():
+    fixtures = os.path.join(os.path.dirname(__file__), "fixtures")
+    checked = 0
+    for name in sorted(os.listdir(fixtures)):
+        if not name.endswith(".json"):
+            continue
+        with open(os.path.join(fixtures, name), encoding="utf-8") as f:
+            doc = json.load(f)
+        rep = QV.verify(doc)
+        if not rep.get("ok") or "fingerprint" not in rep:
+            continue
+        keys = QV.identity_keys(doc)
+        assert keys["fingerprint"] == rep["fingerprint"], name
+        assert keys["signature"]["hash"] == rep["signature"]["hash"], name
+        ceq = rep.get("css_equivalent")
+        if ceq:
+            assert keys["css_equivalent"]["fingerprints"] == ceq["fingerprints"], name
+            assert keys["css_equivalent"]["signatures"] == ceq["signatures"], name
+        else:
+            assert keys["css_equivalent"] is None, name
+        checked += 1
+    assert checked >= 3
