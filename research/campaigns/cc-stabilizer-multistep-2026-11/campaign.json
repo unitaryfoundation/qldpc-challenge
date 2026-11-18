@@ -1,0 +1,69 @@
+{
+  "campaign": {
+    "budget": {
+      "candidates_screened": 5000,
+      "cpu_hours": 300
+    },
+    "constraints": {
+      "max_check_weight": 6,
+      "n": [
+        1,
+        60
+      ]
+    },
+    "direction": {
+      "abandon_criterion": {
+        "flat_fresh_rungs": 2,
+        "note": "drop if first 50 candidates are all d<=2 or dominated",
+        "trials_cap": 2000000
+      },
+      "bar": {
+        "axes": [
+          "d",
+          "kd2_over_n"
+        ],
+        "slug": "630-126-20"
+      },
+      "budget": {
+        "cpu_hours": 300,
+        "trials_per_candidate": 2000000
+      },
+      "cell": "unrestricted~weight-6",
+      "expected_value": "Either a stabilizer frontier advance at small n or a definitive closure of the single-parent calculus route.",
+      "family": "other",
+      "feasibility": "Prior single-step probe (cc-stabilizer-parents-2026-11-05) enumerated 1259 moves; distances stay small so 2M trials settle them.",
+      "hypothesis": "Depth-2/3 symplectic move sequences from stabilizer parents reach nondominated stabilizer points that single-step moves missed.",
+      "novelty": {
+        "against": "cc-stabilizer-parents-2026-11-05 negative result",
+        "claim": "multi-step symplectic children of stabilizer parents"
+      },
+      "what_a_negative_would_teach": "That stabilizer parents are not reachable by their own calculus at any shallow depth; fresh constructions are needed."
+    },
+    "id": "cc-stabilizer-multistep-2026-11",
+    "methods": {
+      "families": [
+        "other"
+      ],
+      "screening": {
+        "seeds": [
+          11,
+          12
+        ],
+        "trials_per_candidate": 2000000
+      }
+    },
+    "name": "Stabilizer-parent multi-step code-calculus (depth 2-3)",
+    "notes": "CPU-only. Extends cc-stabilizer-parents-2026-11-05.",
+    "objective": {
+      "direction": "maximize",
+      "metric": "kd2_over_n"
+    },
+    "schema_version": 1,
+    "status": "draft",
+    "stopping": [
+      {
+        "type": "budget_exhausted"
+      }
+    ]
+  }
+}
