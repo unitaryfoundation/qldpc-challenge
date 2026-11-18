@@ -22,7 +22,12 @@ Environment variables (all optional, sensible defaults):
   N_MAX         only process parents with n <= N_MAX (default: 1000)
   WORKERS       multiprocessing workers (default: 4)
   CHUNK_SIZE    parents per checkpoint (default: 25)
-  TRIALS        witness-search trials per side (default: 2000; screen depth)
+  TRIALS        base witness-search trials per side (default: 2000; screen depth)
+  TRIALS_PER_D  additional trials per unit of claimed d (default: 2000)
+  DEEP_RUNG_MIN_D  claimed d at which the mandatory deep rung applies (default: 20)
+  DEEP_RUNG_BASE   deep-rung base trials (default: 200000)
+  DEEP_RUNG_PER_D   deep-rung trials per unit d (default: 20000)
+  DEEP_RUNG_CAP    deep-rung budget cap (default: 2000000)
   GF2_TRIALS    gf2_fast pre-filter trials per child (default: 2000)
   SKIP_DOMINATED  skip parents dominated by the board (default: 1)
 
@@ -62,6 +67,22 @@ CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
 TRIALS = int(os.environ.get('TRIALS', '2000'))  # screening depth; deep-confirm survivors at 20000+
 GF2_TRIALS = int(os.environ.get('GF2_TRIALS', '2000'))  # gf2_fast pre-filter trials per child
 SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '1') == '1'
+
+# --- screening budget: depth-proportional, not flat -------------------------
+TRIALS_PER_D = int(os.environ.get('TRIALS_PER_D', '2000'))
+DEEP_RUNG_MIN_D = int(os.environ.get('DEEP_RUNG_MIN_D', '20'))
+DEEP_RUNG_BASE = int(os.environ.get('DEEP_RUNG_BASE', '200000'))
+DEEP_RUNG_PER_D = int(os.environ.get('DEEP_RUNG_PER_D', '20000'))
+DEEP_RUNG_CAP = int(os.environ.get('DEEP_RUNG_CAP', '2000000'))
+
+
+def screening_trials(d_claim):
+    d = max(int(d_claim) if d_claim else 0, 1)
+    t = TRIALS + TRIALS_PER_D * d
+    if d >= DEEP_RUNG_MIN_D:
+        t = max(t, DEEP_RUNG_BASE + DEEP_RUNG_PER_D * d)
+    return min(t, DEEP_RUNG_CAP)
+
 
 sys.path.insert(0, CALCULUS)
 sys.path.insert(0, CH + '/research/kit')
@@ -115,6 +136,10 @@ def process_parent(args):
             'checks': checks,
             'parent_n': pdoc['n'], 'parent_file': ppath,
             'parent_d': pdoc['distance']['d'],
+            'screen_trials': screening_trials(max(
+                ux if ux is not None else d_ub,
+                uz if uz is not None else d_ub,
+                d_ub)),
         })
         seen.add((n, k, d_ub, w, lc, wc))
     return {'ppath': ppath, 'parent_n': pdoc['n'], 'children': children, 'error': None}
@@ -477,7 +502,7 @@ def main():
             best_in_chunk[bkey] = child
 
         # save in parallel
-        save_args = [(bkey, child, stg, TRIALS) for bkey, child in best_in_chunk.items()]
+        save_args = [(bkey, child, stg, child.get('screen_trials', TRIALS)) for bkey, child in best_in_chunk.items()]
         if save_args:
             with mp.Pool(processes=WORKERS, initializer=_worker_init) as save_pool:
                 save_results = save_pool.map(_save_one, save_args)
