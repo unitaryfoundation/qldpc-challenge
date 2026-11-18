@@ -75,6 +75,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none       # the diff below needs trees, not blobs (issue #5578)
       - name: detect CUDA RIS changes
         if: github.event_name == 'pull_request'
         id: ris
@@ -133,24 +134,27 @@ jobs:
       # verify/test_validation_gate.py (`detect changed code submissions`).
       GATE_GOLDENS: verify/fixtures/validation_gate/golden
     steps:
+      # One clone per job (issue #5578, change F). The history is fetched
+      # without blobs: the gate's diffs against the base need commits and
+      # trees, the blobs of the checked-out tree come with the checkout, and
+      # a blob a later step reads from another commit (git show base:path)
+      # is fetched on demand through the same remote and credentials. The
+      # trusted tree is a worktree of this clone at the base branch, so the
+      # 800 MB history pack is downloaded once instead of twice.
       - name: check out submitted tree
         uses: actions/checkout@v4
         with:
           fetch-depth: 0          # full history so the gate can diff vs the base
+          filter: blob:none
           path: submitted
       - name: check out trusted verifier tree (base branch)
         if: github.event_name == 'pull_request'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.base_ref }}
-          fetch-depth: 0
-          path: trusted
+        working-directory: submitted
+        run: git worktree add --detach ../trusted "origin/${{ github.base_ref }}"
       - name: check out trusted verifier tree (current ref)
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: trusted
+        working-directory: submitted
+        run: git worktree add --detach ../trusted HEAD
       - uses: astral-sh/setup-uv@v5
       # The early exit (issue #2615). The gate and verify_all read the
       # submitted tree's codes/, circuits/, schema/ and decode/ and the trusted
