@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[15,7,3]] quantum Hamming code, single-layer 2D-local layout",
  "code_type": "CSS",
  "n": 15,
@@ -222,6 +222,36 @@
    ],
    "date": "2026-11-08",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 3247,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.147433827,
+     "ci95": [
+      0.141429959,
+      0.153743001
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 3304,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.15129732,
+     "ci95": [
+      0.145134506,
+      0.157778685
+     ]
+    }
+   ]
   }
  }
 }
