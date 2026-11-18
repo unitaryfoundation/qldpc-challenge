@@ -49,7 +49,7 @@ def test_stabilizer_entry_is_refused():
 
 def test_high_distance_entry_is_refused():
     M = _module()
-    with open(os.path.join(_ROOT, "codes", "544-18-76.json"), encoding="utf-8") as f:
+    with open(os.path.join(_ROOT, "codes", "544-18-70.json"), encoding="utf-8") as f:
         doc = json.load(f)
     with pytest.raises(M.QEDistCertifyError):
         M.certify(doc, tlim=10.0, threads=1)
