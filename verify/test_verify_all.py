@@ -1170,7 +1170,7 @@ def _run_board(monkeypatch, argv, identity=None, stack_changed=False):
     monkeypatch.setattr(QV, "verify", fake_verify)
     monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
     monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
-    monkeypatch.setattr(VA, "circuit_stack_changed", lambda base, root=None: stack_changed)
+    monkeypatch.setattr(VA, "circuit_stack_changed", lambda base: stack_changed)
     monkeypatch.setattr(VA, "identity_keys", identity or (lambda doc: {
         "fingerprint": "fp-" + doc["name"], "signature": {"hash": "sig-" + doc["name"]},
         "css_equivalent": None}))
@@ -1266,3 +1266,35 @@ def test_identity_keys_are_the_ones_verify_records():
             assert keys["css_equivalent"] is None, name
         checked += 1
     assert checked >= 3
+
+
+def test_board_base_entries_are_left_out_of_the_circuit_pool(tmp_path, monkeypatch, capsys):
+    """#6666's first run: the pool's selection read a verdict from an entry that carries none."""
+    root = _repo(tmp_path)
+    pooled = []
+    monkeypatch.setattr(VA, "circuit_workers", lambda jobs, n: 2)
+
+    def in_process(jobs, workers, done):
+        out = {}
+        for slug, doc, d in jobs:
+            pooled.append(slug)
+            out[slug] = VA.verify_circuit(doc, d)
+            done(slug, out[slug])
+        return out
+    monkeypatch.setattr(VA, "check_circuits_in_pool", in_process)
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
+                                            "--circuit-base", "main", "--circuit-jobs", "2"])
+    out = capsys.readouterr().out
+    assert rc == 0 and verified == ["a-1-1", "b-1-1"]
+    assert sorted(pooled) == ["a-1-1", "b-1-1"]          # c-1-1 kept the base's verdict
+    assert "BASE  codes/c-1-1.json" in out
+
+
+def test_a_sampled_run_does_not_apply_board_base(tmp_path, monkeypatch, capsys):
+    """The sample draws from every claim and re-measures what it draws, so every entry is verified."""
+    root = _repo(tmp_path)
+    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
+                                            "--ler-base", "main", "--ler-sample", "1", "--ler-seed", "7"])
+    out = capsys.readouterr().out
+    assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
+    assert "--board-base main is not applied" in out and "BASE  " not in out

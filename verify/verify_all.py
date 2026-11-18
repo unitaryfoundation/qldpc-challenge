@@ -149,7 +149,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from qldpc_verify import _board_entry, board_reports, identity_keys, file_size_error
+from qldpc_verify import _board_entry, board_reports, file_size_error, identity_keys
 from circuit_verify import verify_circuit
 from gate_changed import changed_codes as changed_code_paths
 from ler_verify import summary_rate, verify_ler
@@ -210,7 +210,7 @@ def board_entries_since(base, code_root, codes_dir, jobs):
     pass. Entries carry ``base_verdict``: True for one whose structural
     verdict is the base branch's.
     """
-    if circuit_stack_changed(base, code_root if os.path.isdir(os.path.join(code_root, "verify")) else ROOT):
+    if circuit_stack_changed(base):
         print(f"note: the verifier stack differs from {base}, or could not be compared "
               "with it; verifying every entry")
         return None
@@ -246,8 +246,16 @@ def board_entries_since(base, code_root, codes_dir, jobs):
         if key is None:
             full.append(path)
             continue
+        try:
+            doc = json.loads(raw[path])
+        except ValueError:
+            full.append(path)
+            continue
+        # report holds the identity keys and nothing else: no "ok", no
+        # verdict. Every reader of entries skips a base_verdict entry before
+        # it reads a verdict; the doc is kept for the readers that count claims.
         entries[path] = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
-                         "doc": None, "report": key, "size_error": None,
+                         "doc": doc, "report": key, "size_error": None,
                          "load_error": None, "base_verdict": True}
     for path in full:
         entry = dict(_board_entry(path, raw[path]))
@@ -564,6 +572,13 @@ def main(argv=None):
     # reports are the memoized objects other callers in this process read, so
     # each is copied before the circuit tier writes a verdict into it.
     codes_dir = os.path.join(code_root, "codes")
+    board_base = args.board_base
+    if board_base and args.ler_sample is not None:
+        # The sample draws from every claim on the board and re-measures
+        # what it draws, which an entry left at the base's verdict is not.
+        print(f"note: --ler-sample re-measures claims across the board, so --board-base "
+              f"{board_base} is not applied; verifying every entry")
+        board_base = None
 
     def shared_pass(directory):
         # the keyword only when asked, so a caller's stand-in for the pass
@@ -571,8 +586,8 @@ def main(argv=None):
         return board_reports(directory) if args.jobs == 1 else board_reports(directory, jobs=args.jobs)
 
     board = None
-    if args.board_base:
-        board = board_entries_since(args.board_base, code_root, codes_dir, args.jobs)
+    if board_base:
+        board = board_entries_since(board_base, code_root, codes_dir, args.jobs)
     if board is None:
         board = shared_pass(codes_dir)
     entries = [(e, True) for e in board]
@@ -633,7 +648,7 @@ def main(argv=None):
     if args.circuit_jobs != 1:
         jobs = []
         for e, is_code in entries:
-            if not is_code or e["size_error"] or e["load_error"]:
+            if not is_code or e["size_error"] or e["load_error"] or e.get("base_verdict"):
                 continue
             if not (e["report"]["ok"] and e["doc"].get("circuit")):
                 continue
@@ -687,7 +702,7 @@ def main(argv=None):
         if e.get("base_verdict"):
             # --board-base: unchanged since the base, so the structural
             # verdict is the base branch's; only the duplicate scan reads it
-            print(f"BASE  {rel}  -> unchanged since {args.board_base}; structural "
+            print(f"BASE  {rel}  -> unchanged since {board_base}; structural "
                   "verdict is the base branch's")
             file_identity(rel, e["report"])
             base_verdicts += 1
@@ -799,7 +814,7 @@ def main(argv=None):
               f"passing on these bytes; {len(passed)} passes now in {args.circuit_record}")
     verified = len(entries) - base_verdicts
     print(f"\n{verified-len(failed)}/{verified} passed"
-          + (f"; {base_verdicts} unchanged since {args.board_base} keep the base "
+          + (f"; {base_verdicts} unchanged since {board_base} keep the base "
              "branch's verdict" if base_verdicts else ""))
     return 1 if (failed or identical) else 0
 
