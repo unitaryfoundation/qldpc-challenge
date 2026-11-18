@@ -1,0 +1,27 @@
+{
+  "d": 3,
+  "d_exact": true,
+  "name": "[[11,3,3]] priced-calculus peel",
+  "sides": {
+    "X": {
+      "exact": true,
+      "note": "no logical < 3 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 3
+    },
+    "Z": {
+      "exact": true,
+      "note": "no logical < 3 exists",
+      "secs": 0.1,
+      "status": "UNSAT",
+      "value": 3
+    }
+  },
+  "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 60.0,
+  "verification": {
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only."
+  }
+}
