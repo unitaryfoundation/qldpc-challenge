@@ -5131,57 +5131,53 @@
    ]
   },
   "Z": {
-   "value": 47,
+   "value": 32,
    "confidence": "upper_bound",
    "witness": [
-    4,
-    13,
-    20,
-    23,
+    26,
+    35,
     64,
-    73,
-    80,
-    86,
-    87,
-    92,
-    109,
-    152,
-    190,
-    192,
-    201,
-    215,
-    220,
-    231,
-    243,
-    246,
-    254,
-    263,
-    267,
+    72,
+    101,
+    124,
+    125,
+    138,
+    167,
+    198,
+    200,
+    223,
+    224,
+    227,
     269,
-    281,
     301,
-    307,
-    311,
-    316,
-    328,
-    341,
-    349,
-    354,
-    363,
+    309,
+    310,
+    330,
+    331,
+    335,
+    352,
+    357,
     364,
-    388,
-    393,
-    414,
-    423,
-    440,
-    443,
-    449,
+    400,
+    421,
+    447,
     451,
-    470,
+    456,
     476,
-    497,
-    505
-   ]
+    485,
+    497
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-10-24",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
+    "seeds": [
+     1
+    ]
+   }
   }
  },
  "provenance": {
@@ -5197,7 +5193,8 @@
    "ris_trials_per_side": 20000000,
    "cpu_hours": 80.0,
    "tool": "residue-table divisor enumeration + research/kit/surrogate gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": " Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-24 (witnesses by @vprusso): Z side 47 -> 32 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1)."
  },
  "family": "generalized-bicycle"
 }

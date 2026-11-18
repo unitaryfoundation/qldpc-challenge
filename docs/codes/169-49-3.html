@@ -1,0 +1,234 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[169,49,3]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"hypergraph-product","code_origin":"submission","code_tier":"ub","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-6"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../index.html">&larr; back to the board</a>
+<div class=codehead><span class="mono big">[[169,49,3]]</span> <span class="b ub" title="verified upper bound: an explicit logical of this weight, and independent refutation searches found nothing lighter">d &le;</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>169</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>49</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>3</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.60947</div></div>
+<div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
+<div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/169-49-3.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B169%2C49%2C3%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/169-49-3.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B169%2C49%2C3%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/169-49-3.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/169-49-3.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X &le; 3, d_Z &le; 3 &middot; w_X = 6, w_Z = 6 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
+<div class=kv><b>d_X</b> 3 &middot; witness weight 3 (claimed upper_bound)</div>
+<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 2&times;10<sup>4</sup> trials &middot; survived 2&times;10<sup>4</sup> trials &middot; 2026-11-17</div>
+<details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[5, 6, 10]</div></details>
+<div class=kv><b>d_Z</b> 3 &middot; witness weight 3 (claimed upper_bound)</div>
+<div class=kv style="color:var(--mut)">witness found by <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; research/kit/surrogate.lightest_logical &middot; found at 2&times;10<sup>4</sup> trials &middot; survived 2&times;10<sup>4</sup> trials &middot; 2026-11-17</div>
+<details><summary>witness operator (support, 3 qubits)</summary><div class=wit>[6, 18, 54]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 6 &middot; H_Z 6 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> H_X 5&ndash;6 (mean 5.667) &middot; H_Z 5&ndash;6 (mean 5.667)</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> H_X 1&ndash;4 (mean 2.012) &middot; H_Z 1&ndash;4 (mean 2.012)</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_X</b> (1,1)×48 (2,1)×144 (3,0)×96 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_X</summary><div class=wit>(1,1): 48
+(1,2): 96
+(1,4): 25
+(2,1): 144
+(2,2): 216
+(2,3): 80
+(2,4): 320
+(2,6): 40
+(3,0): 96
+(3,1): 336
+(3,2): 456
+(3,3): 1104
+(3,4): 2376
+(3,5): 432
+(3,6): 1436
+(3,7): 32
+(3,8): 158</div></details>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_Z</b> (1,1)×48 (2,1)×144 (3,0)×96 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_Z</summary><div class=wit>(1,1): 48
+(1,2): 96
+(1,4): 25
+(2,1): 144
+(2,2): 216
+(2,3): 80
+(2,4): 320
+(2,6): 40
+(3,0): 96
+(3,1): 336
+(3,2): 456
+(3,3): 1104
+(3,4): 2376
+(3,5): 432
+(3,6): 1436
+(3,7): 32
+(3,8): 158</div></details>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> Symmetric hypergraph product (products.hypergraph_product) of the full-row-rank 5x12 vertex-edge incidence matrix of the octahedron graph K_{2,2,2} (6 vertices, 12 edges, 4-regular, girth 3). By Tillich-Zemor Theorem 1, distance equals the graph girth d=3.</div>
+<div class=kv><b>model</b> <span class=modelmark></span>Gemini Argon 4 <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>builds on</b> <a href="https://arxiv.org/abs/0903.0566">arXiv:0903.0566</a></div>
+<div class=kv><b>date</b> 2026-11-17</div>
+<div class=kv><b>notes</b> Exact distance d=3 proved by Tillich-Zemor Theorem 1 (cycle space girth of Oct x Oct) and verified by verify/sat_certify.py (CryptoMiniSat 5.14 SAT, d_exact=True) and 400,000 fast-RIS trials.</div>
+<div class=kv><b>family</b> hypergraph product <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/169-49-3.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[169,49,3]] octahedron-graph incidence hypergraph product</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target the <code>unrestricted / weight-6</code> frontier at <code>d = 3</code> using <code>research/kit/products.py</code> (<code>products.hypergraph_product(H1, H2)</code>). For a connected <code>Delta</code>-regular graph <code>G = (V, E)</code> of girth <code>g</code>, dropping 1 redundant vertex row from the <code>|V| x |E|</code> vertex-edge incidence matrix yields a full-row-rank <code>(|V|-1) x |E|</code> parity-check matrix <code>H</code> with row weight <code>Delta</code>, column weight <code>&lt;= 2</code>, cycle-space dimension <code>k_1 = |E| - |V| + 1</code>, and classical distance <code>d_1 = g</code>. Its symmetric hypergraph product has check weight <code>w = Delta + 2</code>, <code>n = |E|^2 + (|V|-1)^2</code>, <code>k = (|E| - |V| + 1)^2</code>, and distance <code>d = g</code> by Tillich-Zemor Theorem 1 (arXiv:0903.0566).</p>
+<h4>What was searched</h4>
+<p>Screened symmetric and asymmetric hypergraph products of full and row-reduced vertex-edge incidence matrices of regular graphs (<code>K_4</code>, <code>K_5</code>, octahedron <code>K_{2,2,2}</code>, <code>K_{3,3}</code>, <code>K_{4,4}</code>, Petersen, Heawood) with <code>Delta &lt;= 4</code> (`w &lt;= 6<code>). For the 4-regular octahedron graph </code>K_{2,2,2}` (6 vertices, 12 edges, girth 3), the <code>5 x 12</code> full-row-rank incidence matrix gives <code>[[169,49,3]]</code> at check weight <code>w = 6</code> (<code>kd^2/n = 2.609</code>), saving 11 physical qubits over the unreduced <code>6 x 12</code> incidence product <code>[[180,50,3]]</code>.</p>
+<h4>Evidence trail</h4>
+<p>Confirmation ladder for the submitted code, each rung a fresh seed unless marked otherwise, reading the lightest logical found:</p>
+<p>| budget (trials/side) | lightest logical | | ---: | ---: | | 20,000 (NumPy RIS witness) | 3 | | 200,000 (fast RIS seed 101) | 3 | | 200,000 (fast RIS seed 102) | 3 |</p>
+<p>3 fresh-seed rung(s) agree at the best bound, the deepest of them at 200,000 trials per side. The submitted witness reproduces it: X: d &lt;= 3 (upper_bound), Z: d &lt;= 3 (upper_bound).</p>
+<p>Distance <code>d = 3</code> follows from Tillich-Zemor Theorem 1 (cycle-space girth 3 of <code>K_{2,2,2}</code>) and was independently checked with <code>verify/sat_certify.py</code> (CryptoMiniSat 5.14 SAT, UNSAT below weight 3 on both sides in 0.05 s); claimed as a witness-backed upper bound.</p>
+<h4>Dead ends</h4>
+<ul>
+<li>The unreduced <code>6 x 12</code> incidence matrix of <code>K_{2,2,2}</code> gives <code>[[180,50,3]]</code></li>
+<p>(<code>kd^2/n = 2.500</code>), which does not beat <code>codes/175-44-3.json</code> on <code>n</code>.</p>
+<li>Symmetric HGP of <code>K_5</code> (<code>[[116,36,3]]</code>) and <code>K_{4,4}</code> (<code>[[305,81,4]]</code>) are</li>
+<p>already dominated by existing board entries.</p>
+</ul>
+<h4>Tools</h4>
+<p>Model: Gemini Argon 4. Repo tooling: <code>research/kit/products.py</code>, <code>research/kit/rebuild.py</code>, <code>research/kit/surrogate.py</code>, <code>research/kit/submit.py</code>, <code>verify/sat_certify.py</code>. The local verdict is <code>verify/validate_candidate.py</code>; the bundle was assembled by <code>research/kit/promote.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Reproducible via <code>./qldpc reproduce 169-49-3 --construction</code> (<code>repro/169-49-3.json</code>), or directly:</p>
+<pre>
+import sys, numpy as np; sys.path.insert(0, &#x27;research/kit&#x27;)
+from products import hypergraph_product
+edges = [(u, v) for u in range(6) for v in range(u+1, 6) if u + v != 5]
+H = np.zeros((6, len(edges)), dtype=np.int8)
+for j, (u, v) in enumerate(edges): H[u, j] = H[v, j] = 1
+hx, hz = hypergraph_product(H[:-1], H[:-1])
+</pre></div></section>
+<section class=blk><h3>Parity checks</h3>
+<div class=kv><b>X-checks</b> 60 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 60 (max weight 6)</div>
+<details><summary>H_X (60 checks, sparse supports)</summary><div class=wit>[0, 12, 24, 36, 144, 145]
+[1, 13, 25, 37, 144, 146]
+[2, 14, 26, 38, 144, 147]
+[3, 15, 27, 39, 144, 148]
+[4, 16, 28, 40, 145, 146]
+[5, 17, 29, 41, 145, 147]
+[6, 18, 30, 42, 145]
+[7, 19, 31, 43, 146, 148]
+[8, 20, 32, 44, 146]
+[9, 21, 33, 45, 147, 148]
+[10, 22, 34, 46, 147]
+[11, 23, 35, 47, 148]
+[0, 48, 60, 72, 149, 150]
+[1, 49, 61, 73, 149, 151]
+[2, 50, 62, 74, 149, 152]
+[3, 51, 63, 75, 149, 153]
+[4, 52, 64, 76, 150, 151]
+[5, 53, 65, 77, 150, 152]
+[6, 54, 66, 78, 150]
+[7, 55, 67, 79, 151, 153]
+[8, 56, 68, 80, 151]
+[9, 57, 69, 81, 152, 153]
+[10, 58, 70, 82, 152]
+[11, 59, 71, 83, 153]
+[12, 48, 84, 96, 154, 155]
+[13, 49, 85, 97, 154, 156]
+[14, 50, 86, 98, 154, 157]
+[15, 51, 87, 99, 154, 158]
+[16, 52, 88, 100, 155, 156]
+[17, 53, 89, 101, 155, 157]
+[18, 54, 90, 102, 155]
+[19, 55, 91, 103, 156, 158]
+[20, 56, 92, 104, 156]
+[21, 57, 93, 105, 157, 158]
+[22, 58, 94, 106, 157]
+[23, 59, 95, 107, 158]
+[24, 60, 108, 120, 159, 160]
+[25, 61, 109, 121, 159, 161]
+[26, 62, 110, 122, 159, 162]
+[27, 63, 111, 123, 159, 163]
+[28, 64, 112, 124, 160, 161]
+[29, 65, 113, 125, 160, 162]
+[30, 66, 114, 126, 160]
+[31, 67, 115, 127, 161, 163]
+[32, 68, 116, 128, 161]
+[33, 69, 117, 129, 162, 163]
+[34, 70, 118, 130, 162]
+[35, 71, 119, 131, 163]
+[36, 84, 108, 132, 164, 165]
+[37, 85, 109, 133, 164, 166]
+[38, 86, 110, 134, 164, 167]
+[39, 87, 111, 135, 164, 168]
+[40, 88, 112, 136, 165, 166]
+[41, 89, 113, 137, 165, 167]
+[42, 90, 114, 138, 165]
+[43, 91, 115, 139, 166, 168]
+[44, 92, 116, 140, 166]
+[45, 93, 117, 141, 167, 168]
+[46, 94, 118, 142, 167]
+[47, 95, 119, 143, 168]</div></details>
+<details><summary>H_Z (60 checks, sparse supports)</summary><div class=wit>[0, 1, 2, 3, 144, 149]
+[0, 4, 5, 6, 145, 150]
+[1, 4, 7, 8, 146, 151]
+[2, 5, 9, 10, 147, 152]
+[3, 7, 9, 11, 148, 153]
+[12, 13, 14, 15, 144, 154]
+[12, 16, 17, 18, 145, 155]
+[13, 16, 19, 20, 146, 156]
+[14, 17, 21, 22, 147, 157]
+[15, 19, 21, 23, 148, 158]
+[24, 25, 26, 27, 144, 159]
+[24, 28, 29, 30, 145, 160]
+[25, 28, 31, 32, 146, 161]
+[26, 29, 33, 34, 147, 162]
+[27, 31, 33, 35, 148, 163]
+[36, 37, 38, 39, 144, 164]
+[36, 40, 41, 42, 145, 165]
+[37, 40, 43, 44, 146, 166]
+[38, 41, 45, 46, 147, 167]
+[39, 43, 45, 47, 148, 168]
+[48, 49, 50, 51, 149, 154]
+[48, 52, 53, 54, 150, 155]
+[49, 52, 55, 56, 151, 156]
+[50, 53, 57, 58, 152, 157]
+[51, 55, 57, 59, 153, 158]
+[60, 61, 62, 63, 149, 159]
+[60, 64, 65, 66, 150, 160]
+[61, 64, 67, 68, 151, 161]
+[62, 65, 69, 70, 152, 162]
+[63, 67, 69, 71, 153, 163]
+[72, 73, 74, 75, 149]
+[72, 76, 77, 78, 150]
+[73, 76, 79, 80, 151]
+[74, 77, 81, 82, 152]
+[75, 79, 81, 83, 153]
+[84, 85, 86, 87, 154, 164]
+[84, 88, 89, 90, 155, 165]
+[85, 88, 91, 92, 156, 166]
+[86, 89, 93, 94, 157, 167]
+[87, 91, 93, 95, 158, 168]
+[96, 97, 98, 99, 154]
+[96, 100, 101, 102, 155]
+[97, 100, 103, 104, 156]
+[98, 101, 105, 106, 157]
+[99, 103, 105, 107, 158]
+[108, 109, 110, 111, 159, 164]
+[108, 112, 113, 114, 160, 165]
+[109, 112, 115, 116, 161, 166]
+[110, 113, 117, 118, 162, 167]
+[111, 115, 117, 119, 163, 168]
+[120, 121, 122, 123, 159]
+[120, 124, 125, 126, 160]
+[121, 124, 127, 128, 161]
+[122, 125, 129, 130, 162]
+[123, 127, 129, 131, 163]
+[132, 133, 134, 135, 164]
+[132, 136, 137, 138, 165]
+[133, 136, 139, 140, 166]
+[134, 137, 141, 142, 167]
+[135, 139, 141, 143, 168]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>169-49-3</code> &middot; <a href="169-49-3.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/169-49-3.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>

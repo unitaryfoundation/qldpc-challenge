@@ -1,0 +1,283 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[224,12,16]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"2bga-coset","code_origin":"submission","code_tier":"ub","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-6"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../index.html">&larr; back to the board</a>
+<div class=codehead><span class="mono big">[[224,12,16]]</span> <span class="b ub" title="verified upper bound: an explicit logical of this weight, and independent refutation searches found nothing lighter">d &le;</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>224</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>12</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>16</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>13.7143</div></div>
+<div class=cell title="max check weight"><div class=l>w</div><div class=v>6</div></div>
+<div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/224-12-16-b.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B224%2C12%2C16%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/224-12-16-b.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B224%2C12%2C16%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/224-12-16-b.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/224-12-16-b.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X &le; 16, d_Z &le; 16 &middot; w_X = 6, w_Z = 6 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
+<div class=kv><b>d_X</b> 16 &middot; witness weight 16 (claimed upper_bound)</div>
+<details><summary>witness operator (support, 16 qubits)</summary><div class=wit>[12, 45, 63, 92, 102, 107, 109, 110, 118, 132, 161, 172, 180, 198, 204, 214]</div></details>
+<div class=kv><b>d_Z</b> 16 &middot; witness weight 16 (claimed upper_bound)</div>
+<details><summary>witness operator (support, 16 qubits)</summary><div class=wit>[34, 47, 51, 66, 69, 70, 91, 98, 110, 126, 127, 139, 147, 163, 186, 218]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X 6 &middot; H_Z 6 <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> H_X 6 &middot; H_Z 6</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> H_X 3 &middot; H_Z 3</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_X</b> (1,3)×224 (2,4)×1680 (3,3)×168 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_X</summary><div class=wit>(1,3): 224
+(2,4): 1680
+(3,3): 168
+(3,5): 16296
+(3,7): 2240</div></details>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_Z</b> (1,3)×224 (2,4)×1680 (3,3)×168 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_Z</summary><div class=wit>(1,3): 224
+(2,4): 1680
+(3,3): 168
+(3,5): 16296
+(3,7): 2240</div></details>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> Coset code Q_G^H(a,b) of arXiv:2606.17268, G=SmallGroup(224,53), H the 1st non-normal subgroup, a=[1,81,186], b=[1,16,47]</div>
+<div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0 <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>date</b> 2026-11-17</div>
+<div class=kv><b>notes</b> Checked against the current board: codes/224-12-16.json is a different stabilizer group (construction fingerprint 606abaa8430563f5 vs db3f87cc43954a47), while the Weisfeiler-Leman signature matches (same n, k, d, w), so this entry is filed as the second code at the same parameters, construction family 2bga-coset on SmallGroup(224,53) versus the existing 2bga-nonabelian two-block group-algebra code.</div>
+<div class=kv><b>family</b> 2BGA coset <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>Parity checks</h3>
+<div class=kv><b>X-checks</b> 112 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 112 (max weight 6)</div>
+<details><summary>H_X (112 checks, sparse supports)</summary><div class=wit>[0, 52, 103, 112, 138, 200]
+[1, 92, 100, 113, 145, 207]
+[2, 40, 81, 114, 149, 210]
+[3, 68, 108, 115, 116, 153]
+[4, 69, 104, 116, 139, 201]
+[5, 70, 110, 117, 155, 213]
+[6, 103, 107, 118, 119, 161]
+[7, 68, 93, 119, 146, 208]
+[8, 85, 105, 120, 163, 218]
+[9, 56, 95, 121, 122, 165]
+[10, 57, 82, 122, 150, 211]
+[11, 58, 97, 123, 167, 219]
+[12, 30, 84, 124, 125, 169]
+[13, 85, 109, 117, 125, 154]
+[14, 86, 111, 126, 127, 171]
+[15, 87, 91, 124, 127, 184]
+[16, 73, 83, 128, 173, 220]
+[17, 24, 108, 129, 130, 177]
+[18, 84, 104, 120, 130, 162]
+[19, 98, 110, 131, 132, 179]
+[20, 76, 86, 129, 132, 192]
+[7, 21, 72, 133, 134, 181]
+[22, 73, 96, 123, 134, 166]
+[23, 74, 106, 135, 136, 183]
+[24, 64, 75, 133, 136, 196]
+[2, 25, 45, 137, 138, 185]
+[26, 31, 98, 126, 138, 170]
+[27, 47, 99, 139, 140, 187]
+[28, 100, 102, 112, 137, 140]
+[29, 88, 97, 141, 142, 189]
+[30, 48, 74, 142, 174, 221]
+[31, 65, 90, 143, 191, 223]
+[30, 32, 39, 144, 145, 193]
+[2, 33, 109, 131, 145, 178]
+[10, 34, 111, 146, 147, 195]
+[35, 91, 99, 113, 144, 147]
+[0, 18, 36, 148, 149, 197]
+[8, 37, 88, 135, 149, 182]
+[20, 38, 89, 150, 151, 199]
+[39, 80, 90, 114, 148, 151]
+[9, 40, 61, 152, 153, 200]
+[10, 41, 46, 139, 153, 186]
+[11, 42, 63, 154, 155, 202]
+[16, 43, 107, 115, 152, 155]
+[4, 44, 106, 156, 157, 204]
+[45, 64, 89, 143, 157, 190]
+[46, 81, 101, 158, 159, 206]
+[47, 56, 66, 156, 159, 214]
+[45, 48, 55, 160, 161, 207]
+[9, 31, 49, 146, 161, 194]
+[22, 47, 50, 162, 163, 209]
+[11, 51, 102, 118, 160, 163]
+[3, 33, 52, 164, 165, 210]
+[4, 19, 53, 150, 165, 198]
+[5, 35, 54, 166, 167, 212]
+[1, 55, 101, 121, 164, 167]
+[21, 56, 77, 116, 168, 169]
+[22, 57, 62, 154, 169, 201]
+[23, 58, 79, 170, 171, 213]
+[24, 29, 59, 124, 168, 171]
+[13, 20, 60, 172, 173, 215]
+[5, 61, 80, 158, 173, 205]
+[15, 62, 95, 174, 175, 217]
+[63, 72, 82, 128, 172, 175]
+[61, 64, 71, 119, 176, 177]
+[21, 46, 65, 162, 177, 208]
+[37, 63, 66, 178, 179, 218]
+[16, 23, 67, 129, 176, 179]
+[12, 49, 68, 122, 180, 181]
+[13, 34, 69, 166, 181, 211]
+[14, 51, 70, 182, 183, 219]
+[6, 15, 71, 133, 180, 183]
+[36, 72, 92, 125, 184, 185]
+[37, 73, 78, 117, 170, 185]
+[38, 74, 94, 127, 186, 187]
+[39, 44, 75, 137, 184, 187]
+[26, 35, 76, 188, 189, 220]
+[1, 14, 77, 174, 189, 216]
+[7, 28, 78, 190, 191, 222]
+[0, 79, 96, 141, 188, 191]
+[77, 80, 87, 130, 192, 193]
+[36, 62, 81, 120, 178, 193]
+[53, 79, 82, 132, 194, 195]
+[29, 38, 83, 144, 192, 195]
+[25, 65, 84, 134, 196, 197]
+[26, 50, 85, 123, 182, 197]
+[27, 67, 86, 136, 198, 199]
+[17, 28, 87, 148, 196, 199]
+[53, 88, 93, 126, 186, 200]
+[54, 89, 105, 140, 201, 202]
+[55, 60, 90, 112, 152, 202]
+[41, 51, 91, 142, 203, 204]
+[6, 27, 92, 190, 204, 221]
+[18, 43, 93, 205, 206, 223]
+[3, 8, 94, 156, 203, 206]
+[52, 78, 95, 131, 194, 207]
+[69, 94, 96, 147, 208, 209]
+[44, 54, 97, 113, 160, 209]
+[41, 66, 98, 135, 198, 210]
+[42, 83, 99, 151, 211, 212]
+[32, 43, 100, 114, 164, 212]
+[71, 76, 101, 115, 168, 213]
+[57, 67, 102, 157, 214, 215]
+[17, 42, 103, 143, 205, 215]
+[33, 59, 104, 159, 216, 217]
+[12, 19, 105, 172, 214, 217]
+[60, 70, 106, 118, 176, 218]
+[48, 59, 107, 121, 180, 219]
+[32, 58, 108, 158, 216, 220]
+[49, 75, 109, 175, 221, 222]
+[25, 34, 110, 128, 188, 222]
+[40, 50, 111, 141, 203, 223]</div></details>
+<details><summary>H_Z (112 checks, sparse supports)</summary><div class=wit>[0, 28, 90, 112, 148, 191]
+[1, 35, 97, 113, 167, 189]
+[2, 39, 100, 114, 137, 145]
+[3, 43, 101, 115, 164, 206]
+[3, 4, 56, 116, 156, 165]
+[5, 13, 73, 117, 166, 173]
+[6, 51, 106, 118, 183, 204]
+[6, 7, 64, 119, 133, 190]
+[8, 18, 81, 120, 149, 206]
+[9, 55, 107, 121, 152, 161]
+[9, 10, 68, 122, 146, 153]
+[11, 22, 85, 123, 154, 163]
+[12, 15, 59, 124, 180, 217]
+[12, 13, 72, 125, 172, 181]
+[14, 26, 88, 126, 182, 189]
+[14, 15, 74, 127, 174, 183]
+[16, 63, 110, 128, 155, 179]
+[17, 20, 67, 129, 199, 215]
+[17, 18, 80, 130, 148, 205]
+[19, 33, 95, 131, 165, 217]
+[19, 20, 82, 132, 150, 172]
+[21, 24, 71, 133, 168, 177]
+[21, 22, 84, 134, 162, 169]
+[23, 37, 98, 135, 170, 179]
+[23, 24, 86, 129, 136, 171]
+[25, 28, 75, 137, 196, 222]
+[0, 25, 26, 138, 188, 197]
+[4, 27, 41, 139, 198, 204]
+[27, 28, 89, 140, 190, 199]
+[29, 79, 111, 141, 171, 195]
+[29, 30, 91, 124, 142, 144]
+[31, 45, 103, 138, 143, 161]
+[32, 35, 83, 144, 212, 220]
+[1, 32, 33, 145, 164, 216]
+[7, 34, 49, 146, 181, 222]
+[34, 35, 96, 147, 166, 188]
+[36, 39, 87, 148, 184, 193]
+[2, 36, 37, 149, 178, 185]
+[10, 38, 53, 150, 186, 195]
+[38, 39, 99, 144, 151, 187]
+[40, 43, 90, 114, 152, 223]
+[3, 40, 41, 153, 203, 210]
+[13, 42, 57, 154, 211, 215]
+[5, 42, 43, 155, 205, 212]
+[44, 47, 94, 156, 187, 209]
+[44, 45, 102, 137, 157, 160]
+[46, 61, 108, 153, 158, 177]
+[46, 47, 104, 139, 159, 162]
+[48, 51, 97, 142, 160, 219]
+[6, 48, 49, 161, 180, 221]
+[18, 50, 65, 162, 197, 223]
+[8, 50, 51, 163, 182, 203]
+[52, 55, 100, 112, 164, 207]
+[9, 52, 53, 165, 194, 200]
+[22, 54, 69, 166, 201, 209]
+[11, 54, 55, 160, 167, 202]
+[56, 59, 101, 121, 159, 168]
+[12, 56, 57, 122, 169, 214]
+[26, 58, 73, 123, 170, 220]
+[14, 58, 59, 171, 216, 219]
+[60, 63, 105, 172, 202, 218]
+[16, 60, 61, 152, 173, 176]
+[30, 62, 77, 169, 174, 193]
+[62, 63, 109, 154, 175, 178]
+[64, 67, 106, 136, 157, 176]
+[17, 64, 65, 143, 177, 196]
+[33, 66, 81, 159, 178, 210]
+[19, 66, 67, 179, 198, 214]
+[68, 71, 107, 115, 119, 180]
+[21, 68, 69, 116, 181, 208]
+[37, 70, 85, 117, 182, 218]
+[23, 70, 71, 176, 183, 213]
+[15, 72, 75, 133, 175, 184]
+[25, 72, 73, 128, 134, 185]
+[41, 74, 88, 135, 142, 186]
+[27, 74, 75, 136, 187, 221]
+[76, 79, 110, 132, 188, 213]
+[29, 76, 77, 168, 189, 192]
+[45, 78, 92, 185, 190, 207]
+[31, 78, 79, 170, 191, 194]
+[20, 80, 83, 151, 173, 192]
+[32, 80, 81, 114, 158, 193]
+[49, 82, 95, 122, 175, 194]
+[34, 82, 83, 128, 195, 211]
+[24, 84, 87, 124, 130, 196]
+[36, 84, 85, 120, 125, 197]
+[53, 86, 98, 126, 132, 198]
+[38, 86, 87, 127, 192, 199]
+[0, 40, 88, 141, 149, 200]
+[4, 57, 89, 150, 157, 201]
+[42, 89, 90, 143, 151, 202]
+[91, 94, 111, 127, 147, 203]
+[44, 91, 92, 113, 184, 204]
+[61, 93, 103, 119, 200, 205]
+[46, 93, 94, 186, 206, 208]
+[1, 48, 95, 121, 174, 207]
+[7, 65, 96, 134, 191, 208]
+[50, 96, 97, 123, 141, 209]
+[2, 52, 98, 131, 138, 210]
+[10, 69, 99, 139, 147, 211]
+[54, 99, 100, 113, 140, 212]
+[5, 58, 101, 158, 167, 213]
+[47, 102, 105, 140, 163, 214]
+[60, 102, 103, 112, 118, 215]
+[77, 104, 108, 116, 130, 216]
+[62, 104, 105, 120, 201, 217]
+[8, 66, 106, 135, 156, 218]
+[11, 70, 107, 118, 155, 219]
+[16, 76, 108, 115, 129, 220]
+[30, 92, 109, 125, 145, 221]
+[78, 109, 110, 117, 131, 222]
+[31, 93, 111, 126, 146, 223]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>224-12-16-b</code> &middot; <a href="224-12-16-b.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/224-12-16-b.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>

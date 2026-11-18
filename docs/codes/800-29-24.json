@@ -6730,47 +6730,43 @@
    }
   },
   "Z": {
-   "value": 27,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": [
-    176,
-    194,
-    201,
-    204,
-    219,
-    222,
-    255,
-    278,
-    279,
-    322,
-    497,
-    553,
-    556,
-    590,
-    597,
-    600,
-    612,
-    634,
-    638,
-    640,
-    643,
-    646,
-    662,
-    665,
-    724,
-    740,
-    761
+    70,
+    83,
+    87,
+    89,
+    93,
+    106,
+    122,
+    130,
+    144,
+    162,
+    439,
+    466,
+    476,
+    483,
+    489,
+    508,
+    509,
+    539,
+    546,
+    554,
+    564,
+    576,
+    598,
+    620
    ],
    "witness_provenance": {
     "found_by": [
-     "@e-eight"
+     "@vprusso"
     ],
-    "date": "2026-10-28",
-    "found_at_samples": 100000,
-    "survived_samples": 100000,
-    "tool": "research/kit/surrogate.lightest_logical",
+    "date": "2026-10-31",
+    "found_at_samples": 300000000,
+    "tool": "ris_gpu 300M trials/side, pair depth 8, Perlmutter A100",
     "seeds": [
-     4243
+     1
     ]
    }
   }
@@ -6783,7 +6779,7 @@
   "origin": "submission",
   "date": "2026-10-28",
   "model": "Claude Opus 5.5",
-  "notes": "Equivalence checked: the gate's dedup step found no exact duplicate and no WL-equivalent board entry (checked, not equivalent). Distance is an RIS upper bound held flat over ~7.2M trials, pair depth 64, seeds 101/102/201.",
+  "notes": "Equivalence checked: the gate's dedup step found no exact duplicate and no WL-equivalent board entry (checked, not equivalent). Distance is an RIS upper bound held flat over ~7.2M trials, pair depth 64, seeds 101/102/201. Distance revision 2026-11-10 from the weekly Perlmutter re-verification sweep of 2026-10-31 (witnesses by @vprusso): Z side 27 -> 24 (GPU randomized information-set search (verify/ris_gpu.py, pair depth 8), 300,000,000 trials per side on an NVIDIA A100, seed 1).",
   "search_budget": {
    "candidates_screened": 23744,
    "ris_trials_per_side": 5000000,
