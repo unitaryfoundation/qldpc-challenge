@@ -126,6 +126,12 @@ jobs:
       # the full self-test suite and runs the two narrower steps described in
       # `detect changed code submissions` below.
       DATA_SURFACE: codes circuits notes fieldnotes repro certs
+      # Where the validation gate keeps its golden verdicts, one <slug>.json
+      # per published reproduction: validation_gate.py's GOLDEN_DIR, and
+      # verify/test_data_surface.py pins the two together. A data-only pull
+      # request that changes an entry with a file here runs
+      # verify/test_validation_gate.py (`detect changed code submissions`).
+      GATE_GOLDENS: verify/fixtures/validation_gate/golden
     steps:
       - name: check out submitted tree
         uses: actions/checkout@v4
@@ -262,6 +268,18 @@ jobs:
           # files, most of which name entries, and every one of them was
           # dropped here without a word. A path may now pass through
           # directories on the way to its test_*.py.
+          #
+          # A test can also pin an entry without naming it. The validation
+          # gate (verify/validation_gate.py) keeps a golden verdict for each
+          # of its published reproductions under $GATE_GOLDENS, named for the
+          # entry, and verify/test_validation_gate.py fails when
+          # codes/<slug>.json no longer reproduces it. The
+          # slugs are in the gate module and in the fixture names, never in
+          # the test's source, so the grep cannot see them: #5929 changed the
+          # circuit tier of codes/160-36-6.json, passed here, and the gate
+          # test then failed on every pull request that ran the suite until
+          # #6241 re-recorded the golden. A changed entry that has a golden
+          # therefore selects the gate's test file as well.
           slug_tests=""
           slugs=$(git diff --name-status --diff-filter=AMDRT "$base"...HEAD -- codes circuits certs repro \
                     | cut -f2- | tr '\t' '\n' \
@@ -277,6 +295,9 @@ jobs:
             slug_tests="$slug_tests $(grep -rlF --include='test_*.py' \
                           -e "$slug" -e "${slug//-/,}" \
                           research verify site cli || true)"
+            if [ -f "$GATE_GOLDENS/$slug.json" ]; then
+              slug_tests="$slug_tests verify/test_validation_gate.py"
+            fi
           done
           slug_tests=$(printf '%s\n' $slug_tests \
                          | grep -E '^(research|verify|site|cli)/([A-Za-z0-9_]+/)*test_[A-Za-z0-9_.]+\.py$' \
@@ -440,8 +461,10 @@ jobs:
         # tests whose source names a slug the PR changed, under codes/,
         # circuits/, certs/ or repro/, so editing an entry or its certificate
         # can no longer break a test that pins it and have CI shrug (#2901 ->
-        # #2940). A grep-list of this tree's own test files, not paths the PR
-        # invented; it arrives through the environment rather than ${{ }} in
+        # #2940), and the validation gate's test when a changed entry has a
+        # golden verdict (#5929 -> #6241). A list of this tree's own test
+        # files, not paths the PR invented; it arrives through the
+        # environment rather than ${{ }} in
         # the script, because an environment variable is never re-parsed as
         # shell.
         env:
