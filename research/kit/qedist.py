@@ -156,6 +156,133 @@ def certify_challenge(
     }
 
 
+QEDIST_STABILIZER_SCHEMA = "qedist.stabilizer.v1"
+
+
+def _supports_to_pauli(n: int, x, z) -> str:
+    xs = set(x or [])
+    zs = set(z or [])
+    chars = []
+    for q in range(n):
+        has_x = q in xs
+        has_z = q in zs
+        if has_x and has_z:
+            chars.append("Y")
+        elif has_x:
+            chars.append("X")
+        elif has_z:
+            chars.append("Z")
+        else:
+            chars.append("I")
+    return "".join(chars)
+
+
+def challenge_stabilizer_to_qedist(doc: dict, *, include_witnesses: bool = True) -> dict:
+    if doc.get("code_type", "stabilizer") != "stabilizer":
+        raise ValueError(
+            "QEDist stabilizer path handles stabilizer codes; got code_type=%r"
+            % doc.get("code_type")
+        )
+    n = int(doc["n"])
+    checks = doc.get("checks") or {}
+    stabs = checks.get("S")
+    if not isinstance(stabs, list) or not stabs:
+        raise ValueError("challenge stabilizer code is missing checks.S")
+    out = {
+        "schema": QEDIST_STABILIZER_SCHEMA,
+        "name": doc.get("name"),
+        "n": n,
+        "stabilizers": [_supports_to_pauli(n, s.get("X"), s.get("Z")) for s in stabs],
+    }
+    if include_witnesses:
+        dist = doc.get("distance") or {}
+        side = dist.get("P")
+        if isinstance(side, dict):
+            wit = side.get("witness")
+            if isinstance(wit, dict):
+                out["witnesses"] = [_supports_to_pauli(n, wit.get("X"), wit.get("Z"))]
+    return out
+
+
+def certify_stabilizer_challenge(
+    code_path,
+    out_dir,
+    *,
+    cutoff=None,
+    seconds: float = 60.0,
+    workers: int = 1,
+    include_witnesses: bool = True,
+    shards: int = 1,
+) -> dict:
+    code_path = Path(code_path)
+    out_dir = Path(out_dir)
+    out_dir.parent.mkdir(parents=True, exist_ok=True)
+    doc = json.loads(code_path.read_text())
+
+    if cutoff is None:
+        d = (doc.get("distance") or {}).get("d")
+        if d is None:
+            d = ((doc.get("distance") or {}).get("P") or {}).get("value")
+        cutoff = (int(d) - 1) if d is not None else 10
+    if cutoff < 1:
+        cutoff = 1
+
+    prefix = find_qedist()
+    if prefix is None:
+        raise RuntimeError(
+            "QEDist is not installed. Install it with:\\n"
+            "  git clone https://github.com/yeon-lee/QEDist.git\\n"
+            "  cd QEDist && python -m venv .venv && . .venv/bin/activate "
+            "&& python -m pip install .\\n"
+            "or set the QEDIST environment variable to the executable path."
+        )
+
+    inp = challenge_stabilizer_to_qedist(doc, include_witnesses=include_witnesses)
+    input_path = out_dir.parent / (out_dir.name + ".input.json")
+    input_path.write_text(json.dumps(inp, indent=2) + "\n")
+
+    def _invoke(witnesses: bool) -> None:
+        if not witnesses:
+            inp2 = challenge_stabilizer_to_qedist(doc, include_witnesses=False)
+            input_path.write_text(json.dumps(inp2, indent=2) + "\n")
+        cmd = prefix + [
+            "certify-stabilizer", str(input_path),
+            "--cutoff", str(cutoff),
+            "--seconds", str(seconds),
+            "--workers", str(workers),
+            "--shards", str(shards),
+            "--out", str(out_dir),
+        ]
+        if out_dir.exists():
+            cmd.append("--resume")
+        _run(cmd)
+        _run(prefix + ["audit-stabilizer", str(out_dir)])
+
+    try:
+        _invoke(include_witnesses)
+    except RuntimeError as exc:
+        if (include_witnesses and "Invalid" in str(exc)
+                and "witness" in str(exc).lower()):
+            _invoke(False)
+        else:
+            raise
+
+    result_path = out_dir / "result.json"
+    if not result_path.exists():
+        raise RuntimeError("QEDist did not write %s" % result_path)
+    result = json.loads(result_path.read_text())
+    return {
+        "code": str(code_path),
+        "status": result.get("status"),
+        "exact_distance": result.get("exact_distance"),
+        "distance_lower_bound": result.get("distance_lower_bound"),
+        "distance_upper_bound": result.get("distance_upper_bound"),
+        "nodes": result.get("nodes_in_recorded_attempts"),
+        "run_dir": str(out_dir),
+        "witness": result.get("witness"),
+    }
+
+
 def main(argv=None) -> int:
     import argparse
 
@@ -169,15 +296,27 @@ def main(argv=None) -> int:
     parser.add_argument("--no-witnesses", action="store_true")
     args = parser.parse_args(argv)
 
-    summary = certify_challenge(
-        args.code,
-        args.out,
-        profile=args.profile,
-        cutoff=args.cutoff,
-        seconds=args.seconds,
-        workers=args.workers,
-        include_witnesses=not args.no_witnesses,
-    )
+    import json as _json
+    _doc = _json.loads(Path(args.code).read_text())
+    if _doc.get("code_type") == "stabilizer":
+        summary = certify_stabilizer_challenge(
+            args.code,
+            args.out,
+            cutoff=args.cutoff,
+            seconds=args.seconds,
+            workers=args.workers,
+            include_witnesses=not args.no_witnesses,
+        )
+    else:
+        summary = certify_challenge(
+            args.code,
+            args.out,
+            profile=args.profile,
+            cutoff=args.cutoff,
+            seconds=args.seconds,
+            workers=args.workers,
+            include_witnesses=not args.no_witnesses,
+        )
     print(json.dumps(summary, indent=2))
     return 0
 
