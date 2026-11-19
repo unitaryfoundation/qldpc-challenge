@@ -27,6 +27,8 @@ from qldpc_verify import board_reports, generator_supports, is_stabilizer
 from check_certs import checks_sha256  # noqa: E402
 from ler_verify import gate_point, points_of  # noqa: E402
 import ler_receipts as lr  # noqa: E402
+import circuit_tools as ctools  # noqa: E402
+import stim  # noqa: E402
 
 DOCS = os.path.join(ROOT, "docs")
 CERTS = os.path.join(ROOT, "certs")
@@ -1998,6 +2000,9 @@ def load_entries():
                            (doc.get("circuit", {}).get("d_circ") or {}).values())
                        if doc.get("circuit") else None),
             "has_ler": bool((doc.get("circuit") or {}).get("ler")),
+            # schedule diagnostics (issue #5807): depth, width, and
+            # parallelism of the committed circuits, for the code page.
+            "sched": schedule_diagnostics(doc, slug),
             # measured logical error rate: the worse of the two
             # per-round side rates, the same worst-side convention as d =
             # min(d_X, d_Z). The schema pins p and the decoder, so the number
@@ -2129,6 +2134,145 @@ def ler_setting(doc):
         return None
     q = next(iter(g.values()))
     return (q["p"], q["decoder"])
+
+
+# ------------------------------------------- schedule diagnostics (issue #5807)
+# Depth, width, and parallelism of the committed syndrome-extraction circuits,
+# derived at build time from circuits/<slug>/memory_{x,z}.stim the way girth
+# and trapping sets are derived from the checks: displayed on the code page,
+# never ranked. The verifier already requires every TICK segment to be a
+# genuinely parallel layer (no qubit twice in a layer), so the layer count is
+# the circuit's gate depth and not a formatting choice.
+
+SCHED_TIP = ("schedule of the committed memory circuits, computed at build time "
+             "and never ranked: qubits is every qubit the circuit addresses "
+             "(data, ancilla, and flag), layers is the number of TICK-delimited "
+             "parallel gate layers in the whole memory experiment, layers per "
+             "round divides the layers between the data preparation and the "
+             "final readout by the rounds, 2q layers and 2q gates per round are "
+             "the two-qubit-gate layers and gates of one extraction round, 2q "
+             "gates per layer is their mean over the two-qubit layers (the "
+             "parallelism), and qubit-layers is qubits times layers, a "
+             "spacetime volume")
+
+
+def _gate_kind(name):
+    """'noise', 'meas', 'reset', 'two', or 'one' for a stim instruction name;
+    annotations are filtered before this is asked."""
+    if name in ctools.MEASURES:
+        return "meas"
+    if name in ctools.RESET_FLIP:
+        return "reset"
+    gd = stim.gate_data(name)
+    if gd.is_noisy_gate and not gd.produces_measurements:
+        return "noise"
+    return "two" if gd.is_two_qubit_gate else "one"
+
+
+def schedule_of_circuit(circuit, rounds):
+    """Schedule diagnostics of one memory circuit (issue #5807).
+
+    A layer is a TICK segment with at least one operation (noise channels and
+    annotations do not count). Returns qubits, layers, the two-qubit layer and
+    gate totals, the per-round figures (layers between the data preparation
+    layer and the final readout layer, two-qubit layers, and two-qubit gates,
+    each divided by `rounds`), the largest and the mean number of two-qubit
+    gates in a two-qubit layer, and qubits times layers."""
+    layers = []
+    cur, ops = 0, 0
+    kinds = {}
+    for inst in circuit.flattened():
+        name = inst.name
+        if name == "TICK":
+            if ops:
+                layers.append(cur)
+            cur, ops = 0, 0
+            continue
+        if name in ctools.ANNOTATIONS:
+            continue
+        kind = kinds.get(name)
+        if kind is None:
+            kind = kinds[name] = _gate_kind(name)
+        if kind == "noise":
+            continue
+        ops += 1
+        if kind == "two":
+            cur += len(inst.targets_copy()) // 2
+    if ops:
+        layers.append(cur)
+    two_layers = [c for c in layers if c]
+    two_gates = sum(two_layers)
+    n_layers = len(layers)
+
+    def per_round(total):
+        if not rounds:
+            return None
+        q, r = divmod(total, rounds)
+        return q if r == 0 else round(total / rounds, 1)
+
+    return {
+        "qubits": circuit.num_qubits,
+        "layers": n_layers,
+        "two_qubit_layers": len(two_layers),
+        "two_qubit_gates": two_gates,
+        "layers_per_round": per_round(max(n_layers - 2, 0)),
+        "two_qubit_layers_per_round": per_round(len(two_layers)),
+        "two_qubit_gates_per_round": per_round(two_gates),
+        "max_parallel": max(two_layers, default=0),
+        "mean_parallel": (round(two_gates / len(two_layers), 1)
+                          if two_layers else 0),
+        "qubit_layers": circuit.num_qubits * n_layers,
+    }
+
+
+def schedule_diagnostics(doc, slug):
+    """{side: schedule_of_circuit(...)} over the committed memory circuits of
+    an entry with a circuit block; a side whose file is missing or does not
+    parse is left out (the verifier, not the site, judges the files)."""
+    circ = doc.get("circuit") or {}
+    if not circ:
+        return {}
+    out = {}
+    for side in ("X", "Z"):
+        path = os.path.join(ROOT, "circuits", slug, f"memory_{side.lower()}.stim")
+        try:
+            circuit = stim.Circuit.from_file(path)
+        except (OSError, ValueError):
+            continue
+        out[side] = schedule_of_circuit(circuit, circ.get("rounds"))
+    return out
+
+
+def schedule_table(sched):
+    """The code page's schedule table: one row per basis, collapsed to one
+    row when both circuits have the same figures (the usual case: the same
+    skeleton prepared and read out in the other basis)."""
+    cols = (("qubits", "qubits"), ("layers", "layers"),
+            ("layers / round", "layers_per_round"),
+            ("2q layers / round", "two_qubit_layers_per_round"),
+            ("2q gates / round", "two_qubit_gates_per_round"),
+            ("2q gates / layer", "mean_parallel"),
+            ("qubit-layers", "qubit_layers"))
+    rows = []
+    sides = [s for s in ("X", "Z") if s in sched]
+    if len(sides) == 2 and sched["X"] == sched["Z"]:
+        rows.append(("X, Z", sched["X"]))
+    else:
+        rows.extend((s, sched[s]) for s in sides)
+
+    def cell(v):
+        return "&ndash;" if v is None else f"{v:,}" if isinstance(v, int) else str(v)
+
+    head = "".join(f"<th>{html.escape(label)}</th>" for label, _ in cols)
+    body = "".join(
+        f"<tr><td>{label}</td>"
+        + "".join(f'<td class=num>{cell(row.get(key))}</td>' for _, key in cols)
+        + "</tr>" for label, row in rows)
+    return (f'<div class=kv title="{html.escape(SCHED_TIP)}"><b>schedule</b> '
+            '<span class=claimed>(computed from the committed circuits; '
+            'displayed, never ranked)</span></div>'
+            f'<table class="lerpts sched"><thead><tr><th>basis</th>{head}</tr>'
+            f'</thead><tbody>{body}</tbody></table>')
 
 
 def ler_points(doc, slug):
@@ -3103,6 +3247,8 @@ def detail_page(e):
                  f'{e["slug"]}/</a> &middot; canonical noise recipe, '
                  f'{circ.get("rounds")} rounds, stim '
                  f'{html.escape(str(circ.get("stim_version", "?")))}</div>')
+        if e.get("sched"):
+            P.append(schedule_table(e["sched"]))
         dc = circ.get("d_circ") or {}
         vals = [dc[s]["value"] for s in ("X", "Z") if s in dc]
         if vals:
@@ -4183,6 +4329,19 @@ FAQ = [
      "cost of lattice surgery and logical measurement. The witnesses are upper "
      "bounds on the logical weight and are not claimed minimal, so the "
      "diameter bounds the spread of the exhibited logicals only."),
+    ("What is the schedule table on a code page?",
+     "Diagnostics of the committed syndrome-extraction circuits, computed "
+     "when the site is built and never used for ranking. Qubits counts every "
+     "qubit the circuit addresses (data, ancilla, and flag). Layers counts the "
+     "TICK-delimited parallel gate layers of the whole memory experiment; the "
+     "verifier requires each layer to touch no qubit twice, so this is the "
+     "gate depth. Layers per round divides the layers between the data "
+     "preparation and the final readout by the number of rounds, and the "
+     "two-qubit layers and gates per round describe one extraction round: "
+     "the two-qubit layers are the schedule depth hardware pays for, the "
+     "gates per layer are the mean parallelism. Qubit-layers is qubits times "
+     "layers, a spacetime volume. Two circuits with the same d_circ can "
+     "differ by a factor of several in all of these."),
     ("What do I get if I find a new code?",
      "Bragging rights, chiefly. Your code lands on the board under your GitHub "
      "handle with a permanent link you can wave around, and if it advances a "
