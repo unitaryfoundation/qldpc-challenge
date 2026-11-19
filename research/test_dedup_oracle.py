@@ -129,3 +129,44 @@ def test_index_from_paths_skips_garbage():
     with open(p, "w") as f:
         f.write("{not json")
     assert D.index_from_paths([p]) == []
+
+
+def test_open_pr_fetch_reads_file_contents_with_an_explicit_get(monkeypatch, tmp_path):
+    """The contents call must say --method GET.
+
+    gh api turns any call that carries a --field into a POST, which the
+    contents endpoint answers with a 404, and the fetch loop swallows that
+    and indexes nothing (found wiring issue #6814).
+    """
+    import base64
+    HX = np.array([[1, 0, 1, 0, 1, 0, 1],
+                   [0, 1, 1, 0, 0, 1, 1],
+                   [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+    doc = _doc_from_matrices(HX, HX.copy(), name="steane")
+    calls = []
+
+    def fake_gh_json(args):
+        calls.append(list(args))
+        if args[:2] == ["pr", "list"]:
+            return [{"number": 4242, "headRefName": "feature/x",
+                     "headRepository": {"name": "qldpc-challenge"},
+                     "headRepositoryOwner": {"login": "someone"},
+                     "files": [{"path": "codes/7-1-3-z.json"}, {"path": "notes/7-1-3-z.md"}]}]
+        assert args[0] == "api"
+        assert args[1:3] == ["--method", "GET"], args
+        assert "repos/someone/qldpc-challenge/contents/codes/7-1-3-z.json" in args
+        assert "ref=feature/x" in args
+        raw = json.dumps(doc).encode("utf-8")
+        return {"content": base64.b64encode(raw).decode("ascii"), "encoding": "base64"}
+    monkeypatch.setattr(D, "_gh_json", fake_gh_json)
+    cache = tmp_path / "pr_index.json"
+    entries = D.fetch_open_pr_index(refresh=True, cache_path=str(cache))
+    assert [e["pr"] for e in entries] == [4242]
+    assert entries[0]["source"] == "pr" and entries[0]["name"] == "7-1-3-z.json"
+    assert len(calls) == 2, "one listing call and one contents call, the note is skipped"
+    ident, _ = D.identity_doc(doc)
+    assert D.check(ident, entries)["exact"], "the fetched PR code is an exact match for itself"
+    # the cache round-trips the sets
+    again = D.fetch_open_pr_index(refresh=False, cache_path=str(cache))
+    assert again[0]["fingerprints"] == entries[0]["fingerprints"]
+    assert again[0]["pr"] == 4242

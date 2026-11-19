@@ -207,7 +207,11 @@ def fetch_open_pr_index(*, limit=200, refresh=False, cache_path=CACHE_PATH):
             if not path.startswith("codes/") or not path.endswith(".json"):
                 continue
             try:
-                res = _gh_json(["api", f"repos/{owner}/{repo}/contents/{path}",
+                # --method GET: with a --field and no method, gh api POSTs,
+                # and a POST to the contents endpoint is a 404 that the
+                # except below would swallow, leaving the open-PR index empty
+                res = _gh_json(["api", "--method", "GET",
+                                f"repos/{owner}/{repo}/contents/{path}",
                                 "--field", f"ref={branch}"])
                 raw = base64.b64decode(res.get("content", ""), validate=False)
                 doc = json.loads(raw.decode("utf-8"))
