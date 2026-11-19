@@ -1,6 +1,6 @@
 {
  "schema_version": "0.2",
- "name": "[[341,40,46]]",
+ "name": "[[341,40,33]]",
  "code_type": "CSS",
  "n": 341,
  "k": 40,
@@ -5470,7 +5470,7 @@
   ]
  },
  "distance": {
-  "d": 34,
+  "d": 33,
   "X": {
    "value": 34,
    "confidence": "upper_bound",
@@ -5524,63 +5524,52 @@
    }
   },
   "Z": {
-   "value": 43,
+   "value": 33,
    "confidence": "upper_bound",
    "witness": [
-    12,
-    14,
-    15,
-    18,
-    19,
-    21,
-    35,
-    55,
-    56,
-    77,
-    82,
-    83,
-    99,
-    109,
-    114,
-    117,
-    123,
-    129,
-    135,
-    164,
-    165,
+    1,
+    10,
+    37,
+    40,
+    47,
+    53,
+    58,
+    60,
+    61,
+    97,
+    102,
+    113,
+    120,
+    130,
+    151,
     166,
-    182,
-    186,
-    191,
+    183,
+    184,
+    190,
     195,
-    211,
-    222,
-    227,
-    230,
-    233,
-    234,
-    246,
-    253,
-    262,
-    272,
-    278,
-    284,
-    298,
-    301,
-    309,
-    326,
+    205,
+    221,
+    224,
+    237,
+    241,
+    254,
+    270,
+    275,
+    281,
+    285,
+    318,
+    334,
     336
    ],
    "witness_provenance": {
     "found_by": [
-     "@mathysrennela"
+     "@FarLab"
     ],
-    "date": "2026-11-16",
-    "found_at_samples": 2000,
-    "survived_samples": 2000,
-    "tool": "research/kit/surrogate.lightest_logical",
+    "date": "2026-11-19",
+    "found_at_samples": 202706100,
+    "tool": "verify/ris_gpu.py, pair depth 16, NVIDIA L40",
     "seeds": [
-     1
+     1905741702
     ]
    }
   }
@@ -5592,6 +5581,7 @@
   "construction": "Generalized bicycle",
   "origin": "submission",
   "date": "2026-11-17",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "Distance revision 2026-11-19 (witness by @FarLab): Z side 43 -> 33 (GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 16), 202,706,100 trials on this side on an NVIDIA L40, seed 1905741702)."
  }
 }
