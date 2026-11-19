@@ -353,14 +353,6 @@
       "code_type": "CSS"
     },
     {
-      "id": "10-2-3",
-      "n": 10,
-      "k": 2,
-      "d": 3,
-      "tier": "exact",
-      "code_type": "CSS"
-    },
-    {
       "id": "10-2-3-b",
       "n": 10,
       "k": 2,
@@ -661,14 +653,6 @@
       "n": 12,
       "k": 2,
       "d": 3,
-      "tier": "exact",
-      "code_type": "CSS"
-    },
-    {
-      "id": "12-2-4",
-      "n": 12,
-      "k": 2,
-      "d": 4,
       "tier": "exact",
       "code_type": "CSS"
     },
