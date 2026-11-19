@@ -6,7 +6,7 @@
     ".github/workflows/refute-weekly.yml": "ed51e3bc129339ea20a789460734d3df9301abb83d9cea368290c9e7189626bb",
     ".github/workflows/verify.yml": "98a4240b961f4bc749e418d255588e0e3047491a198ef71c87951c638cbd0d43",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
-    "pyproject.toml": "70f8d63de7dc61577561eb8f7b92e38907110cfc4ff6fc02473eceb5ad7f921f",
+    "pyproject.toml": "4ffed0efc3c64d893ef53a8b88205d563c38a23dc31680fad55f5bea2fbbf939",
     "uv.lock": "9a9e47507c05f376002b77bd4f6d43325e7df145521b6a5fcc7f12709045732d",
     "verify/setup_gf2_fast.py": "5d8e5c08a0745353b8a98ace8e87cbe6c0e04b75c6f78ad7f9430e3098a5dac0",
     "verify/gf2_fast.cpp": "434919c1c2877a416ab871765129177ddfc53f8fb7ead9a5092686ff870e3cd3",

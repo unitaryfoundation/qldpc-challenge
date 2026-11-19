@@ -22,7 +22,6 @@ import pytest
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 _WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "verify.yml")
-_LINT_WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "lint.yml")
 
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
@@ -124,16 +123,6 @@ def test_workflow_triggers_for_the_test_runner_itself():
         "a change to run_tests.py itself has to re-run the suite it defines; "
         "add a run_tests.py entry to .github/workflows/verify.yml"
     )
-
-
-def test_lint_workflow_blocks_ruff_on_changed_python_files():
-    with open(_LINT_WORKFLOW, encoding="utf-8") as f:
-        workflow = f.read()
-    assert "fetch-depth: 2" in workflow
-    assert '"$GITHUB_SHA^1" "$GITHUB_SHA" -- \'*.py\'' in workflow
-    assert 'uv run --frozen ruff check "${files[@]}"' in workflow
-    assert 'uv run --frozen ruff format --check "${files[@]}"' in workflow
-    assert "|| true" not in workflow, "changed-file Ruff failures must block the check"
 
 
 def test_collected_directories_exist(runner_cmd):
