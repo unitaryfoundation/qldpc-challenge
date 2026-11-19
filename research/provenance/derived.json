@@ -1,30 +1,13 @@
 {
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
-  "literature": 490,
-  "no_match": 2407,
-  "not_derived": 215,
-  "parameters_only": 460
+  "literature": 489,
+  "no_match": 2383,
+  "not_derived": 356,
+  "parameters_only": 459
  },
  "derivation_version": 1,
  "entries": {
-  "10-2-3": {
-   "bucket": "literature",
-   "matches": [
-    {
-     "id": "wangpryadko2022:GB_10_w6",
-     "ref": "arXiv:2203.17216",
-     "source": "wang_pryadko_gb",
-     "xz_swapped": false
-    },
-    {
-     "id": "2bga:SmallGroup(5,1):a[2]:b[2,3,4]",
-     "ref": "arXiv:2306.16400",
-     "source": "lin_pryadko_2bga_abelian",
-     "xz_swapped": false
-    }
-   ]
-  },
   "10-2-3-b": {
    "bucket": "parameters_only",
    "matches": [
@@ -703,6 +686,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "108-63-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "108-8-10": {
    "bucket": "literature",
    "matches": [
@@ -986,6 +973,10 @@
     }
    ]
   },
+  "112-29-1": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "112-4-13": {
    "bucket": "literature",
    "matches": [
@@ -1071,6 +1062,10 @@
     }
    ]
   },
+  "112-61-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "112-8-13": {
    "bucket": "literature",
    "matches": [
@@ -1083,6 +1078,10 @@
    ]
   },
   "113-1-17": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "113-24-2": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -1309,21 +1308,6 @@
   "12-2-3": {
    "bucket": "parameters_only",
    "matches": [
-    {
-     "id": "codetables:[[12,2]]",
-     "ref": "https://codetables.de -- bounds only, no construction to compare",
-     "source": "codetables"
-    }
-   ]
-  },
-  "12-2-4": {
-   "bucket": "parameters_only",
-   "matches": [
-    {
-     "id": "codetables:[[12,2]]",
-     "ref": "https://codetables.de -- bounds only, no construction to compare",
-     "source": "codetables"
-    },
     {
      "id": "codetables:[[12,2]]",
      "ref": "https://codetables.de -- bounds only, no construction to compare",
@@ -1805,6 +1789,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "120-65-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "120-8-12": {
    "bucket": "parameters_only",
@@ -4488,6 +4476,10 @@
     }
    ]
   },
+  "165-43-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "166-2-18": {
    "bucket": "literature",
    "matches": [
@@ -4800,6 +4792,10 @@
    "matches": []
   },
   "169-13-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "169-49-3": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -6837,12 +6833,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "209-10-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "209-24-19": {
    "bucket": "no_match",
    "matches": []
   },
   "209-28-15": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "209-39-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "209-42-20": {
+   "bucket": "not_derived",
    "matches": []
   },
   "209-43-15": {
@@ -7259,6 +7267,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "220-44-12": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "220-47-18": {
    "bucket": "not_derived",
@@ -8298,6 +8310,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "250-100-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "250-40-8": {
    "bucket": "no_match",
    "matches": []
@@ -8707,6 +8723,10 @@
     }
    ]
   },
+  "263-4-27": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "263-73-7": {
    "bucket": "no_match",
    "matches": []
@@ -8777,6 +8797,10 @@
   },
   "269-34-13": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "269-40-32": {
+   "bucket": "not_derived",
    "matches": []
   },
   "27-10-1": {
@@ -9007,6 +9031,14 @@
   },
   "278-44-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "279-12-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "279-4-32": {
+   "bucket": "not_derived",
    "matches": []
   },
   "279-74-11": {
@@ -9295,6 +9327,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "285-2-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "286-2-29": {
    "bucket": "no_match",
    "matches": []
@@ -9315,8 +9351,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "287-33-37": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "287-34-26": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "287-36-14": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "287-6-28": {
+   "bucket": "not_derived",
    "matches": []
   },
   "288-100-3": {
@@ -9697,6 +9745,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "299-10-28": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "3-2-1": {
    "bucket": "no_match",
@@ -10160,6 +10212,30 @@
    "bucket": "no_match",
    "matches": []
   },
+  "301-133-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "301-138-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "301-141-20": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "301-144-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "301-145-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "301-32-33": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "302-120-20": {
    "bucket": "no_match",
    "matches": []
@@ -10348,8 +10424,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "310-2-39": {
-   "bucket": "no_match",
+  "310-2-38": {
+   "bucket": "not_derived",
    "matches": []
   },
   "310-20-12": {
@@ -10454,6 +10530,10 @@
   },
   "318-6-38": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "319-12-29": {
+   "bucket": "not_derived",
    "matches": []
   },
   "319-65-2": {
@@ -10975,8 +11055,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "330-2-42": {
-   "bucket": "no_match",
+  "330-2-40": {
+   "bucket": "not_derived",
    "matches": []
   },
   "330-22-9": {
@@ -11248,6 +11328,18 @@
    "bucket": "no_match",
    "matches": []
   },
+  "341-40-46": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "341-56-43": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "341-61-40": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "342-118-3": {
    "bucket": "no_match",
    "matches": []
@@ -11274,6 +11366,10 @@
   },
   "342-76-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "343-6-39": {
+   "bucket": "not_derived",
    "matches": []
   },
   "343-8-6": {
@@ -11321,6 +11417,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "347-2-54": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "348-2-41": {
    "bucket": "no_match",
@@ -11665,8 +11765,8 @@
     }
    ]
   },
-  "358-2-46": {
-   "bucket": "no_match",
+  "358-2-41": {
+   "bucket": "not_derived",
    "matches": []
   },
   "359-153-3": {
@@ -12194,6 +12294,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "360-25-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "360-38-8": {
    "bucket": "no_match",
    "matches": []
@@ -12418,6 +12522,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "371-10-29": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "371-130-18": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "371-136-11": {
    "bucket": "no_match",
    "matches": []
@@ -12490,6 +12602,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "377-12-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "377-129-5": {
    "bucket": "no_match",
    "matches": []
@@ -12498,8 +12614,24 @@
    "bucket": "no_match",
    "matches": []
   },
+  "377-18-34": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "377-23-58": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "377-24-15": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "377-39-54": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "377-4-47": {
+   "bucket": "not_derived",
    "matches": []
   },
   "378-10-48": {
@@ -12658,6 +12790,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "38-4-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "382-36-10": {
    "bucket": "no_match",
    "matches": []
@@ -12698,6 +12834,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "384-96-15": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "384-96-4": {
    "bucket": "no_match",
    "matches": []
@@ -12708,6 +12848,38 @@
   },
   "388-20-5": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "389-106-32": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-110-31": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-27-60": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-67-50": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-69-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-70-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-72-48": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "389-73-46": {
+   "bucket": "not_derived",
    "matches": []
   },
   "39-13-1": {
@@ -12831,6 +13003,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "390-11-6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "390-14-35": {
    "bucket": "no_match",
    "matches": []
@@ -12847,8 +13023,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "390-50-41": {
-   "bucket": "no_match",
+  "390-50-40": {
+   "bucket": "not_derived",
    "matches": []
   },
   "390-54-37": {
@@ -12899,12 +13075,12 @@
    "bucket": "no_match",
    "matches": []
   },
-  "390-82-31": {
-   "bucket": "no_match",
+  "390-82-30-b": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "390-82-38": {
-   "bucket": "no_match",
+  "390-82-35": {
+   "bucket": "not_derived",
    "matches": []
   },
   "391-13-13": {
@@ -12961,6 +13137,10 @@
      "xz_swapped": false
     }
    ]
+  },
+  "395-10-59": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "395-202-5": {
    "bucket": "no_match",
@@ -13390,12 +13570,20 @@
    "bucket": "no_match",
    "matches": []
   },
+  "408-206-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "408-216-5": {
    "bucket": "no_match",
    "matches": []
   },
   "408-216-8": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "409-2-50": {
+   "bucket": "not_derived",
    "matches": []
   },
   "41-10-5": {
@@ -13486,6 +13674,10 @@
   },
   "414-92-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "415-104-17": {
+   "bucket": "not_derived",
    "matches": []
   },
   "415-111-9": {
@@ -13837,6 +14029,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "421-2-47": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "422-2-20": {
    "bucket": "literature",
    "matches": [
@@ -13875,8 +14071,16 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "424-110-12": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "426-6-42": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "427-23-67": {
+   "bucket": "not_derived",
    "matches": []
   },
   "428-4-54": {
@@ -13885,6 +14089,14 @@
   },
   "429-22-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "429-56-44": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "429-77-56": {
+   "bucket": "not_derived",
    "matches": []
   },
   "43-6-2": {
@@ -13919,6 +14131,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "431-4-23": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "432-112-14": {
    "bucket": "no_match",
    "matches": []
@@ -13941,6 +14157,14 @@
   },
   "432-96-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "433-2-59": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "433-30-52": {
+   "bucket": "not_derived",
    "matches": []
   },
   "433-58-2": {
@@ -13993,6 +14217,10 @@
   },
   "436-4-54": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "437-22-22": {
+   "bucket": "not_derived",
    "matches": []
   },
   "438-18-12": {
@@ -14145,6 +14373,30 @@
    "bucket": "no_match",
    "matches": []
   },
+  "445-85-59": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "445-89-58": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "445-92-54": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "445-93-53": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "445-95-57": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "445-96-57": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "446-13-13": {
    "bucket": "no_match",
    "matches": []
@@ -14251,6 +14503,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "453-2-35": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "454-2-21": {
    "bucket": "literature",
    "matches": [
@@ -14275,6 +14531,10 @@
   },
   "454-8-17": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "456-230-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "457-8-17": {
@@ -14324,6 +14584,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "461-10-63": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "462-10-11": {
    "bucket": "no_match",
    "matches": []
@@ -14360,6 +14624,22 @@
    "bucket": "no_match",
    "matches": []
   },
+  "465-134-39": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "465-144-35": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "465-146-39": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "465-76-64": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "466-118-42": {
    "bucket": "no_match",
    "matches": []
@@ -14368,8 +14648,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "466-58-50": {
-   "bucket": "no_match",
+  "466-58-46": {
+   "bucket": "not_derived",
    "matches": []
   },
   "466-58-50-b": {
@@ -15139,6 +15419,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "49-27-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "49-7-2": {
    "bucket": "parameters_only",
    "matches": [
@@ -15620,8 +15904,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "514-32-42": {
-   "bucket": "no_match",
+  "514-32-38": {
+   "bucket": "not_derived",
    "matches": []
   },
   "514-32-60": {
@@ -15648,8 +15932,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "514-66-58": {
-   "bucket": "no_match",
+  "514-66-57": {
+   "bucket": "not_derived",
    "matches": []
   },
   "514-66-59-b": {
@@ -15766,6 +16050,14 @@
    "bucket": "no_match",
    "matches": []
   },
+  "52-3-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "52-36-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "52-4-9": {
    "bucket": "literature",
    "matches": [
@@ -15801,8 +16093,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "526-2-77": {
-   "bucket": "no_match",
+  "526-2-74": {
+   "bucket": "not_derived",
    "matches": []
   },
   "528-4-34": {
@@ -16125,8 +16417,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "540-12-41": {
-   "bucket": "no_match",
+  "540-12-38": {
+   "bucket": "not_derived",
    "matches": []
   },
   "540-274-8": {
@@ -16153,20 +16445,24 @@
    "bucket": "no_match",
    "matches": []
   },
-  "544-10-78": {
-   "bucket": "no_match",
+  "544-10-48": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "544-18-76": {
-   "bucket": "no_match",
+  "544-136-17": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "544-20-80": {
-   "bucket": "no_match",
+  "544-18-48": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "544-8-76": {
-   "bucket": "no_match",
+  "544-20-76": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "544-8-74": {
+   "bucket": "not_derived",
    "matches": []
   },
   "545-73-3": {
@@ -16325,6 +16621,10 @@
   },
   "550-38-16": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "552-278-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "552-8-9": {
@@ -17380,6 +17680,10 @@
    "bucket": "not_derived",
    "matches": []
   },
+  "600-120-21": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "600-16-30": {
    "bucket": "no_match",
    "matches": []
@@ -17440,6 +17744,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "608-152-19": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "608-2-36": {
    "bucket": "no_match",
    "matches": []
@@ -17458,6 +17766,18 @@
   },
   "61-18-6": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "61-30-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "61-35-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "61-49-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "610-122-69": {
@@ -18136,6 +18456,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "639-91-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "64-10-4": {
    "bucket": "parameters_only",
    "matches": [
@@ -18458,6 +18782,10 @@
     }
    ]
   },
+  "640-128-3": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "640-132-7": {
    "bucket": "no_match",
    "matches": []
@@ -18502,8 +18830,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "646-2-100": {
-   "bucket": "no_match",
+  "646-2-97": {
+   "bucket": "not_derived",
    "matches": []
   },
   "646-350-8": {
@@ -18563,6 +18891,10 @@
    "matches": []
   },
   "65-5-8": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "65-6-9": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -18757,8 +19089,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "662-2-103": {
-   "bucket": "no_match",
+  "662-2-100": {
+   "bucket": "not_derived",
    "matches": []
   },
   "662-60-92": {
@@ -18769,11 +19101,11 @@
    "bucket": "no_match",
    "matches": []
   },
-  "662-62-89": {
-   "bucket": "no_match",
+  "662-62-88": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "662-62-92": {
+  "662-62-89": {
    "bucket": "no_match",
    "matches": []
   },
@@ -18837,8 +19169,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "672-14-56": {
-   "bucket": "no_match",
+  "672-14-44": {
+   "bucket": "not_derived",
    "matches": []
   },
   "672-16-48": {
@@ -18941,8 +19273,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "674-42-94": {
-   "bucket": "no_match",
+  "674-42-92": {
+   "bucket": "not_derived",
    "matches": []
   },
   "674-44-86": {
@@ -18969,6 +19301,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "674-86-88": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "674-86-89": {
    "bucket": "no_match",
    "matches": []
@@ -18978,10 +19314,6 @@
    "matches": []
   },
   "674-86-90": {
-   "bucket": "no_match",
-   "matches": []
-  },
-  "674-86-93": {
    "bucket": "no_match",
    "matches": []
   },
@@ -19253,12 +19585,16 @@
    "bucket": "no_match",
    "matches": []
   },
-  "684-6-75": {
-   "bucket": "no_match",
+  "684-6-72": {
+   "bucket": "not_derived",
    "matches": []
   },
   "684-8-106": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "684-8-36": {
+   "bucket": "not_derived",
    "matches": []
   },
   "684-8-54": {
@@ -19275,6 +19611,10 @@
   },
   "69-50-1": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "69-53-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "69-6-5": {
@@ -19315,6 +19655,10 @@
   },
   "696-236-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "696-350-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "696-352-10": {
@@ -19360,6 +19704,10 @@
   },
   "7-4-1": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "7-4-1-1c4baa76c41fa671": {
+   "bucket": "not_derived",
    "matches": []
   },
   "7-5-1": {
@@ -19422,6 +19770,10 @@
   },
   "70-48-2": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "70-56-2": {
+   "bucket": "not_derived",
    "matches": []
   },
   "70-6-11": {
@@ -20263,6 +20615,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "744-374-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "749-155-3": {
    "bucket": "no_match",
    "matches": []
@@ -20579,6 +20935,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "789-21-7": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "79-11-3": {
    "bucket": "parameters_only",
    "matches": [
@@ -20710,12 +21070,40 @@
    "bucket": "no_match",
    "matches": []
   },
+  "8-5-1-64b4b354f2379296": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-5-1-714718feeaa44e62": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-5-1-8bf0bb06bb2532c6": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-5-1-99826a95cc6cebda": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "8-5-1-b": {
    "bucket": "no_match",
    "matches": []
   },
+  "8-5-1-bc16cdc3f19fc228": {
+   "bucket": "not_derived",
+   "matches": []
+  },
+  "8-5-1-c": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "8-6-1": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "8-6-1-ca6696bffd91d382": {
+   "bucket": "not_derived",
    "matches": []
   },
   "8-6-2": {
@@ -20943,6 +21331,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "80-5-4": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "80-6-10": {
    "bucket": "literature",
    "matches": [
@@ -21101,6 +21493,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "82-56-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "820-44-5": {
    "bucket": "no_match",
@@ -21774,6 +22170,10 @@
     }
    ]
   },
+  "88-47-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "88-6-6": {
    "bucket": "parameters_only",
    "matches": [
@@ -21783,6 +22183,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "88-67-2": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "880-40-22": {
    "bucket": "no_match",
@@ -21810,6 +22214,10 @@
   },
   "888-226-18": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "888-446-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "89-1-15": {
@@ -21847,6 +22255,10 @@
   },
   "89-49-3": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "89-50-3": {
+   "bucket": "not_derived",
    "matches": []
   },
   "89-8-10": {
@@ -21922,6 +22334,10 @@
     }
    ]
   },
+  "9-1-3-s": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "9-2-2": {
    "bucket": "no_match",
    "matches": []
@@ -21958,8 +22374,16 @@
    "bucket": "no_match",
    "matches": []
   },
+  "9-6-1-47c2912b9067610a": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "9-6-1-b": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "9-6-1-c": {
+   "bucket": "not_derived",
    "matches": []
   },
   "9-6-2": {
@@ -22277,8 +22701,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "914-18-31": {
-   "bucket": "no_match",
+  "914-18-30": {
+   "bucket": "not_derived",
    "matches": []
   },
   "918-14-9": {
@@ -22349,8 +22773,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "921-18-31": {
-   "bucket": "no_match",
+  "921-18-30": {
+   "bucket": "not_derived",
    "matches": []
   },
   "922-18-30": {
@@ -22927,6 +23351,10 @@
     }
    ]
   },
+  "96-51-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "96-6-13": {
    "bucket": "no_match",
    "matches": []
@@ -23059,6 +23487,10 @@
    "bucket": "no_match",
    "matches": []
   },
+  "98-54-2": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "98-6-12": {
    "bucket": "literature",
    "matches": [
@@ -23122,6 +23554,10 @@
   },
   "980-399-4": {
    "bucket": "no_match",
+   "matches": []
+  },
+  "984-494-4": {
+   "bucket": "not_derived",
    "matches": []
   },
   "989-53-5": {

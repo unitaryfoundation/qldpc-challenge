@@ -244,6 +244,16 @@ plain text so a witness is auditable in a diff. The caps are raise-only, with
 a decision on the issue tracker. The fields are in `schema/SCHEMA.md` under
 `circuit`.
 
+The code page shows schedule diagnostics derived from the committed circuits
+when the site is built, the way girth and trapping sets are derived from the
+checks: the qubits the circuit addresses (data, ancilla, and flag), the
+TICK-delimited parallel gate layers of the whole memory experiment, the
+layers per extraction round, the two-qubit-gate layers and gates per round,
+the mean two-qubit gates per two-qubit layer, and qubits times layers. The
+verifier requires every layer to touch no qubit twice, so the layer count is
+the circuit's gate depth. Nothing is stored, nothing is ranked, and the
+frontier does not read them (issue #5807).
+
 ## Measured-rate tier
 
 On the same committed circuits an entry may also carry a measured logical
