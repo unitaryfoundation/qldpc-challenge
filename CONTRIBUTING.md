@@ -103,6 +103,10 @@ whether it sits on each cell's frontier, and which existing board entries it
 dominates (and on which axis). Review it before requesting review — it is a
 board-relative claim, not a statement against the wider literature.
 
+If `gh pr edit <n> --body-file <file>` fails with "Projects (classic) is
+being deprecated", update the body through the REST API instead:
+`gh api repos/unitaryfoundation/qldpc-challenge/pulls/<n> -X PATCH -f body="$(cat <file>)"`.
+
 ## General stabilizer codes
 
 A code whose generators mix `X` and `Z` on one qubit (the [[5,1,3]] code,

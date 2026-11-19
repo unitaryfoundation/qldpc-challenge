@@ -1049,8 +1049,7 @@ def pr_body(doc, report, args, out, note_out=None):
     if note_out:
         lines += [f"Research note: `{_repo_path(note_out)}`", ""]
     else:
-        lines += [f"(Add a research note at notes/{n}-{k}-{d}.md; see "
-                  f"notes/TEMPLATE.md.)", ""]
+        lines += ["(Optionally add a research note; see notes/TEMPLATE.md.)", ""]
     # No draft footer: 'edit before requesting review' is itself a scaffolding
     # marker the prose check rejects. The reminder lives in the CLI output.
     return "\n".join(ln for ln in lines if ln is not None)
