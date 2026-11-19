@@ -133,6 +133,50 @@
 <p>Model: Beam 1.0. Harness: OpenCode agent. Code-calculus v0.3.0.</p>
 <h4>Reproduction</h4>
 <p>Re-run the greedy single-step campaign over 2D-local parents with n &lt;= 16 using code-calculus v0.3.0.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/9-6-1-c.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Code-calculus rules: useful, valid, and board-advancing at 412/811</h3><div class=kv style="color:var(--mut)">2026-11-19 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>An audit of every board entry in <code>codes/</code> whose provenance attributes it to the code-calculus (construction text or per-code note mentioning &quot;code calculus&quot; / &quot;priced calculus&quot; / &quot;construction calculus&quot; / a named rule). Result: <b>811 verified codes, of which 412 (50.8%) are board-advancing</b> (on a per-cell Pareto frontier over <code>n, k, d, w</code>). The direct transformation rules (<code>C-DELETE-CHECK</code>, <code>C-ADD-CHECK</code>, <code>E-PEEL</code>, <code>E-PUNCTURE</code>, <code>E-GRAFT</code>) account for 515 of those codes and 225 of the board-advancing ones. The rules do produce valid codes — all 811 pass <code>verify/qldpc_verify.py</code> with an earned distance — but soundness remains unproved (Gates 2–7 unchecked) and every distance is a witness-backed upper bound.</p>
+<h4>Method</h4>
+<ul>
+<li>Universe: all <code>codes/*.json</code> (3,686 entries) plus their <code>notes/*.md</code>.</li>
+<li>Calculus-attributed: construction contains &quot;calculus&quot;/&quot;priced&quot;, or a rule</li>
+<p>token (<code>E-PUNCTURE</code>, <code>E-PEEL</code>, <code>E-GRAFT</code>, <code>C-DELETE-CHECK</code>, <code>C-ADD-CHECK</code>, <code>C-DIRECT-SUM</code>, <code>C-CSS</code>, <code>E-GLUE</code>, <code>E-EXTEND</code>, <code>E-LOCAL-HADAMARD</code>, <code>P-REBASE</code>), or the note mentions &quot;code calculus&quot; / &quot;priced calculus&quot; / &quot;construction calculus&quot; / &quot;code-calculus&quot;.</p>
+<li>Validity: membership in <code>load_entries()</code> (trusted gate, <code>ok: true</code>, earned</li>
+<p>distance present). Board-advancing: membership in <code>compute_records()</code> (per-cell Pareto frontier over <code>n, k, d, w</code>).</p>
+</ul>
+<h4>Counts</h4>
+<p>| Bucket | Codes | Board-advancing | |---|---:|---:| | All calculus-attributed | 811 | 412 (50.8%) | | Direct rule tokens (sum) | 515 | 225 | | Planner/greedy/search-derived (rest) | 296 | 187 | | All board entries | 3,686 | 2,179 |</p>
+<p>Per direct rule (construction field names the rule; mostly disjoint, 9 codes name two tokens):</p>
+<p>| Rule | Codes | Board-advancing | |---|---:|---:| | <code>E-PEEL</code> | 169 | 99 | | <code>C-DELETE-CHECK</code> | 165 | 53 | | <code>E-PUNCTURE</code> | 125 | 46 | | <code>C-ADD-CHECK</code> | 53 | 24 | | <code>E-GRAFT</code> | 3 | 3 |</p>
+<p>Rule-level lessons:</p>
+<ul>
+<li><b><code>E-PEEL</code> is the workhorse</b> — 169 codes, 99 board-advancing (58.6%).</li>
+<p>Peeling a check set reliably lands on a frontier cell.</p>
+<li><b><code>E-GRAFT</code> is small but perfect</b> — 3/3 board-advancing; the pinned</li>
+<p>replay&#x27;s graft child is one of them.</p>
+<li><b><code>E-PUNCTURE</code> and <code>C-DELETE-CHECK</code></b> carry volume (125 and 165 codes)</li>
+<p>but lower hit rates (36.8% and 32.1%): deletion-style moves strip structure and often produce dominated children.</p>
+<li><b><code>C-ADD-CHECK</code></b> (strict improvement) is rarer (53) but a third of its</li>
+<p>outputs (24) advance — consistent with Proposition 18.3 killing minimum-weight classes rather than blind addition.</p>
+<li><b><code>P-REBASE</code> (3 codes) produced 0 board-advancing</b> entries; the</li>
+<p>remaining rare rules (<code>C-CSS</code> 3/3, <code>C-DIRECT-SUM</code> 18/11, <code>E-GLUE</code> 94/37, <code>E-EXTEND</code> 8/1, <code>E-LOCAL-HADAMARD</code> 4/1) are too small to read a rate from.</p>
+</ul>
+<h4>Validity check</h4>
+<p>Every one of the 811 codes is in <code>load_entries()</code> with <code>ok: true</code> and an earned distance — zero failed the trusted gate. The pinned replay (<code>machine/experiments/issue21_challenge_replay.json</code>, commit <code>9d30c66a</code>) records a check addition, a row-space graft and a two-step deletion chain, each with <code>challenge_verifier: {ok: true, failed_checks: []}</code> and earned upper-bound distances. <code>machine/test_priced_calculus.py</code> (104 tests) and <code>machine/test_pinned_replay.py</code> pass on the dev side.</p>
+<h4>What did not work / limits</h4>
+<ul>
+<li><b>Soundness is not established.</b> Gates 2–7 are unchecked; hand derivations</li>
+<p>are evidence, not machine-checked proof. <code>unavailable</code> is withheld by design, and exact post-deletion distances are not claimed. The 412 board-advancing codes are witness-backed upper bounds, not proofs of optimality.</p>
+<li><b>Prices are inputs.</b> The consumer checks structural consistency and input</li>
+<p>shape, not the truth of supplied lower bounds or exhaustive minimum-weight-class enumerations. A &quot;board-advancing&quot; result is a Pareto-frontier claim under verified parameters.</p>
+<li><b>Board-advancing ≠ globally optimal.</b> Distances are <code>upper_bound</code> tier</li>
+<p>unless a maintainer runs <code>verify/certify.py</code>; certification beyond the envelope (d ≤ 13, k ≤ 12) is out of reach.</p>
+<li><b>Planner attribution is noisy.</b> 165 codes say only &quot;derived by the</li>
+<p>code-calculus planner from a CSS parent&quot; in their note while their construction is &quot;Generalized bicycle&quot; etc. They are counted as calculus-attributed but are search/planner products, not single-rule transforms; the 515 explicit-token count is the clean &quot;rule created this&quot; figure.</p>
+<li><b>Attribution overlap.</b> Some notes name several rules in a chain; the</li>
+<p>note-level counts in the table are not additive with the explicit-token table.</p>
+</ul>
+<h4>Implication for future searches</h4>
+<p>The rules are worth using as *generators* feeding the trusted gate, not as oracles: ~51% of calculus-attributed codes advance a frontier cell, and <code>E-PEEL</code> in particular is a high-yield move. But treat every staged distance as a hypothesis the witness must confirm (the ledger&#x27;s optimistic bound over-claims; see the k-gap fieldnote), and never report a slug&#x27;s distance without reading <code>distance.X.value</code> / <code>distance.Z.value</code>. Soundness and price truth remain separate, open obligations. EOF echo &quot;written&quot;; wc -c fieldnotes/2026-11-19-code-calculus-rules-evaluation.md</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-19-code-calculus-rules-evaluation.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/108-63-2.html">[[108,63,2]] — 108-63-2</a></h3><div class=kv style="color:var(--mut)">2026-11-18 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[108,63,2]] — depth-3 sector-targeted deletion-chain child of codes/108-60-2.json</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Produced by campaign cc-deletion-peel-scaled-2026-11-18: the scaled sector-targeted deletion/peel/puncture sweep of code-calculus v0.3.0 over the board&#x27;s own CSS parents (n &lt;= 120, check weight &lt;= 8; 889 parents). Cell aimed: weight-8 x unrestricted.  Hypothesis (the campaign card&#x27;s): removal moves extend the v0.1 rounds&#x27; yield to depth-3 chains at recorded cost, and each new (n, k, d, w) Pareto point in a populated cell is a frontier extension; this entry advanced its cell on k+n.</p>
