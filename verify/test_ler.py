@@ -132,13 +132,144 @@ def test_broken_arithmetic_rejected(artifact):
     assert "X_ler_arithmetic" in bad
 
 
-def test_unpinned_decoder_rejected(artifact):
+def test_unregistered_decoder_rejected(artifact):
     doc, cdir = artifact
     doc = copy.deepcopy(doc)
-    doc["circuit"]["ler"]["Z"][1]["decoder"] = "mwpm"
+    doc["circuit"]["ler"]["Z"][1]["decoder"] = "foo"
     rep = lv.verify_ler(doc, cdir)
     bad = [c["check"] for c in rep["checks"] if not c["ok"]]
     assert "Z_ler_arithmetic" in bad
+
+
+def _noisy(cdir, basis, p):
+    circuit = stim.Circuit.from_file(os.path.join(cdir, lv.SIDE_FILES[basis] + ".stim"))
+    return ct.apply_noise(ct.strip_noise(circuit), 7, p=p)
+
+
+@pytest.fixture(scope="module")
+def multi(artifact):
+    """The artifact plus a second curve per basis under the other registry
+    decoders, one point each at p = 0.005 (issue #5804)."""
+    doc, cdir = artifact
+    doc = copy.deepcopy(doc)
+    for basis in ("X", "Z"):
+        circuit = stim.Circuit.from_file(os.path.join(cdir, lv.SIDE_FILES[basis] + ".stim"))
+        for dec in ("bplsd-cs-10", "bp-ms-30", "mwpm"):
+            doc["circuit"]["ler"][basis].append(
+                lm.measure_point(circuit, doc["n"], ROUNDS, 0.005, 7, shots=SHOTS,
+                                 log=lambda s: None, decoder=dec))
+    return doc, cdir
+
+
+def test_registry_decoders_measure_and_verify(multi):
+    doc, cdir = multi
+    for basis in ("X", "Z"):
+        decs = [q["decoder"] for q in doc["circuit"]["ler"][basis]]
+        assert sorted(decs) == sorted(["bposd-cs-10", "bposd-cs-10", "bplsd-cs-10",
+                                       "bp-ms-30", "mwpm"])
+    rep = lv.verify_ler(doc, cdir)
+    assert rep["ok"], [c for c in rep["checks"] if not c["ok"]]
+    labels = {c["check"] for c in rep["checks"]}
+    assert {"Z_ler_replicated", "Z_ler_replicated_bplsd-cs-10",
+            "Z_ler_replicated_bp-ms-30", "Z_ler_replicated_mwpm"} <= labels
+    pts = rep["computed"]["Z"]["points"]
+    assert "0.005" in pts and "0.005@mwpm" in pts and "0.005@bp-ms-30" in pts
+    assert pts["0.005@mwpm"]["decoder"] == "mwpm"
+    # the headline reads the reference decoder only
+    assert lv.summary_rate(doc) == lv.summary_rate(_artifact_doc_only(doc))
+    assert lv.gate_point(doc["circuit"]["ler"]["Z"])["decoder"] == "bposd-cs-10"
+    assert lv.gate_point(doc["circuit"]["ler"]["Z"], "mwpm")["decoder"] == "mwpm"
+
+
+def _artifact_doc_only(doc):
+    """The same document with every non-reference point removed."""
+    d = copy.deepcopy(doc)
+    for basis in ("X", "Z"):
+        d["circuit"]["ler"][basis] = [q for q in d["circuit"]["ler"][basis]
+                                      if q["decoder"] == lt.DECODER_ID]
+    return d
+
+
+def test_each_decoder_gets_its_own_gate_budget(multi, monkeypatch):
+    doc, cdir = multi
+    calls = []
+    real = lv.replicate_point
+
+    def spy(dem, point, **kw):
+        calls.append((point["p"], point["decoder"]))
+        return real(dem, point, **kw)
+    monkeypatch.setattr(lv, "replicate_point", spy)
+    rep = lv.verify_ler(doc, cdir, budget=60)
+    assert rep["ok"]
+    # every decoder's top point was tried in the gate, each with its own budget
+    assert {(0.005, d) for d in ("bposd-cs-10", "bplsd-cs-10", "bp-ms-30", "mwpm")} <= set(calls)
+
+
+def test_same_rate_and_decoder_twice_rejected(multi):
+    doc, cdir = multi
+    doc = copy.deepcopy(doc)
+    doc["circuit"]["ler"]["X"].append(copy.deepcopy(doc["circuit"]["ler"]["X"][-1]))
+    rep = lv.verify_ler(doc, cdir)
+    bad = {c["check"]: c["detail"] for c in rep["checks"] if not c["ok"]}
+    assert "X_ler_arithmetic" in bad and "appears twice" in bad["X_ler_arithmetic"]
+
+
+def test_matching_is_refused_where_stim_cannot_decompose(multi, monkeypatch):
+    doc, cdir = multi
+    circuit = stim.Circuit("""
+        X_ERROR(0.1) 0
+        CX 0 1 0 2
+        M 0 1 2
+        DETECTOR rec[-1]
+        DETECTOR rec[-2]
+        DETECTOR rec[-3]
+        OBSERVABLE_INCLUDE(0) rec[-1]
+    """)
+    ok, why = lt.decoder_admits("mwpm", circuit)
+    assert not ok and "decompose" in why
+    assert lt.decoder_admits("bposd-cs-10", circuit) == (True, "")
+    # the canonical recipe re-noises a circuit before measuring, so stand in
+    # for a model stim cannot decompose from here on
+    monkeypatch.setattr(lt, "decomposed_dem",
+                        lambda c: (_ for _ in ()).throw(ValueError("Failed to decompose")))
+    fixture = stim.Circuit.from_file(os.path.join(cdir, "memory_z.stim"))
+    with pytest.raises(ValueError):
+        lm.measure_point(fixture, doc["n"], ROUNDS, 0.005, 1, shots=SHOTS,
+                         log=lambda s: None, decoder="mwpm")
+    # a claim under mwpm on a circuit the registry does not admit fails as a claim
+    rep = lv.verify_ler(doc, cdir)
+    bad = [c["check"] for c in rep["checks"] if not c["ok"]]
+    assert "Z_ler_decoder_mwpm" in bad and "Z_ler_arithmetic" not in bad
+    assert rep["computed"]["Z"]["points"]["0.005@mwpm"]["status"] == "inadmissible"
+
+
+def test_receipt_keys_points_by_decoder(multi, tmp_path):
+    doc, cdir = multi
+    rep = lv.verify_ler(doc, cdir, mode="all", budget=60, seeds=1)
+    digest = lr.claim_digest(doc, cdir)
+    receipt = lr.make_receipt("7-1-3", digest, rep, head_sha="deadbeef")
+    lr.write_receipt(str(tmp_path), receipt)
+    back = lr.load_receipt(str(tmp_path), "7-1-3")
+    assert "0.005@mwpm" in back["points"]["X"] and "0.005" in back["points"]["X"]
+    assert lr.point_status(back, digest, "X", 0.005, "mwpm") == "verified"
+    assert lr.point_status(back, digest, "X", 0.005) == "verified"
+    assert lr.point_status(back, digest, "X", 0.002, "mwpm") == "pending"
+
+
+def test_measure_cli_takes_a_registry_decoder(artifact, tmp_path):
+    doc, cdir = artifact
+    path = tmp_path / "7-1-3.json"
+    path.write_text(json.dumps(doc, indent=1) + "\n")
+    rc = lm.main([str(path), "--p", "0.005", "--shots", str(SHOTS), "--seed", "7",
+                  "--decoder", "bp-ms-30", "--circuits-dir", cdir])
+    assert rc == 0
+    out = json.loads(path.read_text())
+    for basis in ("X", "Z"):
+        decs = [q["decoder"] for q in out["circuit"]["ler"][basis]]
+        assert decs.count("bp-ms-30") == 1 and decs.count("bposd-cs-10") == 2
+    assert lv.verify_ler(out, cdir)["ok"]
+    with pytest.raises(SystemExit):
+        lm.main([str(path), "--p", "0.005", "--decoder", "nope", "--circuits-dir", cdir])
 
 
 def test_shots_floor_rejected(artifact):
@@ -182,7 +313,7 @@ def _starve_replica(monkeypatch):
     many-core box is small enough to be unverifiable while the same chunk
     on a four-core runner already verifies a high-rate point, so a test
     that sets a tiny LER_SECONDS asserts the core count of the machine."""
-    def starved(dem, shots, seed, max_seconds=None, workers=None):
+    def starved(dem, shots, seed, max_seconds=None, workers=None, **kw):
         return 1, 20
     monkeypatch.setattr(lv.lt, "measure_failures", starved)
 
@@ -237,12 +368,12 @@ def test_lower_points_are_deferred_when_the_budget_runs_out(artifact,
     doc, cdir = artifact
     real = lv.replicate_point
 
-    def fake(dem, point, *, budget, seeds=1):
+    def fake(dem, point, *, budget, seeds=1, **kw):
         if point["p"] < 0.005:                   # the second point, each basis
             return {"status": "unverifiable", "p": point["p"],
                     "replica_shots": 0, "replica_failures": 0, "runs": [],
                     "detectable_factor": None}
-        return real(dem, point, budget=budget, seeds=seeds)
+        return real(dem, point, budget=budget, seeds=seeds, **kw)
     monkeypatch.setattr(lv, "replicate_point", fake)
     rep = lv.verify_ler(doc, cdir)
     assert rep["ok"], [c for c in rep["checks"] if not c["ok"]]

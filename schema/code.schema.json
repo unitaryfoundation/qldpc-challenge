@@ -150,7 +150,7 @@
         },
         "ler": {
           "type": "object",
-          "description": "optional measured logical-error-rate tier: the same committed memory circuits, sampled under the canonical noise recipe at one or more physical rates and decoded with the pinned decoder. Distance is a floor; this is the measured rate a device-like simulation actually sees, prefactors included. Since 0.5 each basis is a list of points (a curve), compared across entries only at equal p.",
+          "description": "optional measured logical-error-rate tier: the same committed memory circuits, sampled under the canonical noise recipe at one or more physical rates and decoded with a decoder from the registry (verify/ler_tools.py DECODERS). Distance is a floor; this is the measured rate a device-like simulation actually sees, prefactors included. Since 0.5 each basis is a list of points (a curve), compared across entries only at equal p and equal decoder; the reference decoder bposd-cs-10 gives the board's headline rate and frontier, every other decoder is a separately labeled curve (issue #5804).",
           "required": [
             "X",
             "Z"
@@ -162,10 +162,10 @@
                 {
                   "type": "array",
                   "minItems": 1,
-                  "maxItems": 4,
+                  "maxItems": 16,
                   "items": {
                     "type": "object",
-                    "description": "one measured point: the committed memory circuit, its canonical noise recipe re-applied at physical rate p, sampled and decoded with the pinned decoder. Self-reported measurement; CI re-measures with an independent seed (verify/ler_verify.py): the highest-rate point at PR time, the rest weekly post-merge with receipts under receipts/ler/.",
+                    "description": "one measured point: the committed memory circuit, its canonical noise recipe re-applied at physical rate p, sampled and decoded with the named registry decoder. Self-reported measurement; CI re-measures with an independent seed (verify/ler_verify.py): per decoder, the highest-rate point at PR time, the rest weekly post-merge with receipts under receipts/ler/. (p, decoder) pairs are distinct within a basis, at most one point per rate and decoder.",
                     "required": [
                       "p",
                       "shots",
@@ -203,9 +203,12 @@
                       },
                       "decoder": {
                         "enum": [
-                          "bposd-cs-10"
+                          "bposd-cs-10",
+                          "bplsd-cs-10",
+                          "bp-ms-30",
+                          "mwpm"
                         ],
-                        "description": "the pinned decoder (BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior)"
+                        "description": "the registry decoder the point was measured with, one of verify/ler_tools.py DECODERS: bposd-cs-10 (the reference: BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior), bplsd-cs-10 (BP+LSD, same BP, lsd_cs order 10), bp-ms-30 (minimum-sum BP alone, 30 iterations), mwpm (pymatching on stim's decomposed model, admitted only when every mechanism decomposes). Rates under different decoders are never compared with each other"
                       },
                       "ler_per_round": {
                         "type": "number",
@@ -293,10 +296,10 @@
                 {
                   "type": "array",
                   "minItems": 1,
-                  "maxItems": 4,
+                  "maxItems": 16,
                   "items": {
                     "type": "object",
-                    "description": "one measured point: the committed memory circuit, its canonical noise recipe re-applied at physical rate p, sampled and decoded with the pinned decoder. Self-reported measurement; CI re-measures with an independent seed (verify/ler_verify.py): the highest-rate point at PR time, the rest weekly post-merge with receipts under receipts/ler/.",
+                    "description": "one measured point: the committed memory circuit, its canonical noise recipe re-applied at physical rate p, sampled and decoded with the named registry decoder. Self-reported measurement; CI re-measures with an independent seed (verify/ler_verify.py): per decoder, the highest-rate point at PR time, the rest weekly post-merge with receipts under receipts/ler/. (p, decoder) pairs are distinct within a basis, at most one point per rate and decoder.",
                     "required": [
                       "p",
                       "shots",
@@ -334,9 +337,12 @@
                       },
                       "decoder": {
                         "enum": [
-                          "bposd-cs-10"
+                          "bposd-cs-10",
+                          "bplsd-cs-10",
+                          "bp-ms-30",
+                          "mwpm"
                         ],
-                        "description": "the pinned decoder (BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior)"
+                        "description": "the registry decoder the point was measured with, one of verify/ler_tools.py DECODERS: bposd-cs-10 (the reference: BP+OSD, minimum-sum, scaling 0.625, osd_cs order 10, 30 iterations, DEM-prob channel prior), bplsd-cs-10 (BP+LSD, same BP, lsd_cs order 10), bp-ms-30 (minimum-sum BP alone, 30 iterations), mwpm (pymatching on stim's decomposed model, admitted only when every mechanism decomposes). Rates under different decoders are never compared with each other"
                       },
                       "ler_per_round": {
                         "type": "number",

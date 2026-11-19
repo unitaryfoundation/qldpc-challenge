@@ -14,6 +14,10 @@ import datetime
 import hashlib
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ler_tools as lt  # noqa: E402
 
 RECEIPT_VERSION = "1"
 RECEIPT_DIR = "receipts/ler"
@@ -75,12 +79,15 @@ def load_receipt(root, slug):
         return json.load(f)
 
 
-def point_status(receipt, digest, side, p):
-    """"verified", "failed", "unverifiable", or "pending" for one point, given
-    the current claim digest (a stale receipt is pending)."""
+def point_status(receipt, digest, side, p, decoder=lt.DECODER_ID):
+    """"verified", "failed", "unverifiable", "inadmissible", or "pending" for
+    one point under ``decoder``, given the current claim digest (a stale
+    receipt is pending). Receipts key a point by ler_tools.point_key, the rate
+    alone for the reference decoder, so receipts written before the registry
+    read unchanged."""
     if not receipt or receipt.get("claim_digest") != digest:
         return "pending"
-    rec = ((receipt.get("points") or {}).get(side) or {}).get(str(p))
+    rec = ((receipt.get("points") or {}).get(side) or {}).get(lt.point_key(p, decoder))
     if not rec:
         return "pending"
     return rec.get("status", "pending")

@@ -249,13 +249,18 @@ a decision on the issue tracker. The fields are in `schema/SCHEMA.md` under
 On the same committed circuits an entry may also carry a measured logical
 error rate, `circuit.ler`: per basis, a list of points, one per physical
 error rate on a fixed grid (`P_GRID` in `verify/ler_verify.py`), each
-recording the shots, the failures, the seed, the pinned decoder, the
-per-round rate, and its confidence interval. `d_circ` is a floor. This is
-the rate a simulation sees, prefactors included, and it is what separates two
-schedules with the same `d_circ`. The grid is fixed so that entries are
-compared only at equal p. The site never compares rates measured at
-different physical rates, and the measured-rate frontier (over n, k, and the
-rate, with d and w not entering) is computed per p over verified points only.
+recording the shots, the failures, the seed, the decoder, the per-round
+rate, and its confidence interval. `d_circ` is a floor. This is the rate a
+simulation sees, prefactors included, and it is what separates two schedules
+with the same `d_circ`. The grid is fixed so that entries are compared only
+at equal p. The decoder is one of a small registry (`DECODERS` in
+`verify/ler_tools.py`, issue #5804): the reference decoder `bposd-cs-10`
+gives the headline rate and the LER record, and an entry may carry further
+curves under the other registry decoders, each shown and ranked on its own.
+The site never compares rates measured at different physical rates or under
+different decoders, and the measured-rate frontier (over n, k, and the rate,
+with d and w not entering) is computed per p and per decoder over verified
+points only.
 
 A point whose per-shot failure fraction exceeds one half is saturated, since
 the per-round conversion reads it as one half whatever the circuit does, and
@@ -266,8 +271,8 @@ than the circuit earns, and that is what replication tests.
 
 Verification is by re-measurement with an independent seed, sized to
 discriminate rather than to a fixed shot count. At PR time the gate tries the
-points from the highest rate down inside a wall budget per basis and must
-verify at least one. A point the budget cannot check to the admissibility
+points from the highest rate down inside a wall budget per basis and per
+decoder and must verify at least one under each decoder the entry carries. A point the budget cannot check to the admissibility
 bound is deferred, with every lower point, to the weekly post-merge run
 (`verify/ler_replicate.py`), which re-measures every point with a long budget
 and several seeds and writes a receipt per entry under `receipts/ler/`. The
