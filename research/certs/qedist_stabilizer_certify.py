@@ -21,7 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
 sys.path.insert(0, os.path.join(ROOT, "research", "kit"))
 
-from qedist import challenge_stabilizer_to_qedist, find_qedist  # noqa: E402
+from qedist import challenge_stabilizer_to_qedist, find_qedist, solver_string  # noqa: E402
 
 QEDIST_REPO = "github.com/yeon-lee/QEDist"
 LEVEL = "solver"
@@ -129,7 +129,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
         "d": d,
         "sides": {"P": blk},
         "d_exact": overall,
-        "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search (stabilizer)",
+        "solver": solver_string(prefix, suffix=" (stabilizer)"),
         "tlim_per_solve": float(tlim),
         "verification": {
             "level": LEVEL,

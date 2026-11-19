@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.join(ROOT, "research", "kit"))
 import gf2  # noqa: E402
 import heuristic_distance as HD  # noqa: E402
 from check_certs import checks_sha256  # noqa: E402
-from qedist import challenge_to_qedist, find_qedist  # noqa: E402
+from qedist import challenge_to_qedist, find_qedist, solver_string  # noqa: E402
 
 QEDIST_REPO = "github.com/yeon-lee/QEDist"
 LEVEL = "solver"
@@ -64,7 +64,8 @@ def qedist_root(path=None):
     return find_qedist()
 
 
-def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None):
+def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
+            symmetries=True):
     if doc.get("code_type") != "CSS":
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
@@ -84,7 +85,11 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None)
     import tempfile
     tmp = Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="qedist-cert-"))
     try:
-        inp = challenge_to_qedist(doc, include_witnesses=True)
+        # Tanner-graph symmetries cut the search roots to one per orbit
+        # (issue #6867); the tool verifies them and refuses a wrong one, in
+        # which case the run is repeated without them.
+        inp = challenge_to_qedist(doc, include_witnesses=True, symmetries=symmetries)
+        n_sym = len(inp.get("symmetry_generators") or [])
         input_path = tmp / "input.json"
         input_path.write_text(json.dumps(inp, indent=2) + "\n")
         out_dir = tmp / "run"
@@ -100,6 +105,15 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None)
             cmd.insert(-2, "--resume")
         t0 = time.time()
         proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode != 0 and n_sym and "symmetr" in (proc.stderr + proc.stdout).lower():
+            inp.pop("symmetry_generators", None)
+            n_sym = 0
+            input_path.write_text(json.dumps(inp, indent=2) + "\n")
+            if out_dir.exists():
+                import shutil
+                shutil.rmtree(out_dir)
+            cmd = [a for a in cmd if a != "--resume"]
+            proc = subprocess.run(cmd, capture_output=True, text=True)
         wall = round(time.time() - t0, 1)
         if proc.returncode != 0:
             raise QEDistCertifyError(
@@ -170,14 +184,16 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None)
         "level": LEVEL,
         "note": "QEDist's lower bound is exhaustive search inside its kernel "
                 "(tree search with bounds and symmetries); the vector it returned "
-                "was re-verified by verify/heuristic_distance.py. Solver verdict only.",
+                "was re-verified by verify/heuristic_distance.py. Solver verdict only. "
+                + (f"{n_sym} Tanner-graph symmetry generators supplied and verified by the tool."
+                   if n_sym else "No symmetry generators supplied."),
     }
     rec = {
         "name": doc.get("name"),
         "d": d,
         "sides": cert_sides,
         "d_exact": overall,
-        "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search",
+        "solver": solver_string(prefix),
         "tlim_per_solve": float(tlim),
         "verification": verification,
     }
