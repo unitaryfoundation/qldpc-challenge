@@ -50,7 +50,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/330-34-14.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[330,34,14]] — GB divisor-trick code on Z_165, weight-8</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Generalized bicycle code on Z_165: H_X=[A|B], H_Z=[B^T|A^T], A,B circulants of a = 1+x^6+x^17+x^44, b = 1+x^29+x^51+x^77 over GF(2)[x]/(x^165-1). Divisor trick: a and b are weight-4 codewords of the classical cyclic code &lt;g&gt;, g = gcd(a,b,x^165-1) = x^17+x^16+x^15+x^14+x^11+x^6+x^5+x^4+x^3+1 (deg 17), so k = 2*deg g = 34 by the Panteleev-Kalachev closed form; check weight 8 (4+4). Weight-4 codewords enumerated exhaustively per irreducible factor of x^165-1 by GF(2^m) root tests + meet-in-the-middle; pair selected by distance screening over 40 sibling pairs.</p>
+<p>Origin: submission.</p>
+<p>Distance evidence: rising RIS ladder 20k/80k/320k/1.28M/2M trials flat at 14; refutation barrage 3x8M-trial fresh-seed runs all 14; weight-14 witnesses on both sides (Z via GB transpose symmetry, re-verified against ker/rowspace). Literature novelty unverified. n=330 outside exhaustive 2BGA enumeration (n&lt;=200).</p>
+<h4>What was searched</h4>
+<p>Distance evidence: rising RIS ladder 20k/80k/320k/1.28M/2M trials flat at 14; refutation barrage 3x8M-trial fresh-seed runs all 14; weight-14 witnesses on both sides (Z via GB transpose symmetry, re-verified against ker/rowspace). Literature novelty unverified. n=330 outside exhaustive 2BGA enumeration (n&lt;=200).</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 14 (upper_bound), d_Z &lt;= 14 (upper_bound), so d &lt;= 14. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @seunomonije. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Generalized bicycle code on Z_165: H_X=[A|B], H_Z=[B^T|A^T], A,B circulants of a = 1+x^6+x^17+x^44, b = 1+x^29+x^51+x^77 over GF(2)[x]/(x^165-1). Divisor trick: a and b are weight-4 codewords of the classical cyclic code &lt;g&gt;, g = gcd(a,b,x^165-1) = x^17+x^16+x^15+x^14+x^11+x^6+x^5+x^4+x^3+1 (deg 17), so k = 2*deg g = 34 by the Panteleev-Kalachev closed form; check weight 8 (4+4). Weight-4 codewords enumerated exhaustively per irreducible factor of x^165-1 by GF(2^m) root tests + meet-in-the-middle; pair selected by distance screening over 40 sibling pairs.</p>
+<p>Max check weight: 8. Matrices in codes/330-34-14.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 165 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 165 (max weight 8)</div>
 <details><summary>H_X (165 checks, sparse supports)</summary><div class=wit>[0, 6, 17, 44, 165, 194, 216, 242]

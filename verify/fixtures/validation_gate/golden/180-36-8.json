@@ -354,6 +354,27 @@
    "n": 180,
    "rank_HX": 72,
    "rank_HZ": 72,
+   "sector_distances": {
+    "X": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 8,
+     "witness_weight": 8
+    },
+    "Z": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 8,
+     "witness_weight": 8
+    },
+    "d": {
+     "exact": false,
+     "lower": null,
+     "upper": 8
+    }
+   },
    "weight_class": "weight-9plus"
   },
   "css_equivalent": {

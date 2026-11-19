@@ -55,7 +55,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/310-14-21.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[310,14,21]] — metacyclic 2BGA code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Regular 2BGA on C_31 semidirect C_5 with action r=16; supports a=[0, 19, 75, 101], b=[42, 67, 107, 124].</p>
+<p>References: arXiv:2306.16400.</p>
+<p>Autoresearch sample 413, confirmation seed 8152439. RIS distance upper-bound ladder: 29 (1k trials/side), 22 (2k), 22 (8k), 21 (60k), 21 (1M). Literature novelty unverified.</p>
+<h4>What was searched</h4>
+<p>Autoresearch sample 413, confirmation seed 8152439. RIS distance upper-bound ladder: 29 (1k trials/side), 22 (2k), 22 (8k), 21 (60k), 21 (1M). Literature novelty unverified.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 21 (upper_bound), d_Z &lt;= 21 (upper_bound), so d &lt;= 21. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: OpenAI 5.6 Sol. Authors: @shassinger. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Regular 2BGA on C_31 semidirect C_5 with action r=16; supports a=[0, 19, 75, 101], b=[42, 67, 107, 124].</p>
+<p>Max check weight: 8. Matrices in codes/310-14-21.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 155 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 155 (max weight 8)</div>
 <details><summary>H_X (155 checks, sparse supports)</summary><div class=wit>[0, 71, 80, 114, 203, 208, 251, 308]

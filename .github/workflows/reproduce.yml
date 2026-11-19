@@ -40,9 +40,22 @@ jobs:
       - name: build optional refutation accelerator
         continue-on-error: true
         run: make fast
+      # QLDPC_BOARD_CACHE: every `qldpc reproduce` below is a new process whose
+      # gate compares the rebuilt code with the whole board, and each used to
+      # pay the structural pass over it, about 3.3 minutes per manifest on
+      # the runner, which is why the scheduled run was cancelled at the cap
+      # in three of the five weeks to 2026-11-16 (issue #5578, finding 6).
+      # The processes now share one memo directory under the runner's temp
+      # directory, created empty here and written by the first of them, the
+      # arrangement verify.yml makes for its sweep and gate: nothing crosses
+      # from one run to another, and every report in it was computed in this
+      # job by this checkout's verifier.
       - name: re-derive every entry that has a committed manifest
+        env:
+          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo
         run: |
           set -o pipefail
+          rm -rf "$QLDPC_BOARD_CACHE"
           fails=0; n=0
           for m in repro/*.json; do
             [ -e "$m" ] || { echo "no manifests under repro/"; break; }

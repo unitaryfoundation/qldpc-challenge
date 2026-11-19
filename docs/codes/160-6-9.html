@@ -99,7 +99,22 @@
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/160-6-9.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[160,6,9]] — f = 1 + xy + x^-1 y^2, g = 1 + x^-1 y + x^-2 y^-1; annulus-type boundary engine,</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>f = 1 + xy + x^-1 y^2, g = 1 + x^-1 y + x^-2 y^-1; annulus-type boundary engine, (8,10) lattice.</p>
+<p>Origin: submission.</p>
+<p>References: arXiv:2504.08887.</p>
+<h4>What was searched</h4>
+<p>Construction parameters as given in the provenance above; no additional sweep recorded.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 9 (exact), d_Z &lt;= 10 (exact), so d &lt;= 9. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Opus 4.8. Authors: @FarLab, @vprusso. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>f = 1 + xy + x^-1 y^2, g = 1 + x^-1 y + x^-2 y^-1; annulus-type boundary engine, (8,10) lattice.</p>
+<p>Max check weight: 6. Matrices in codes/160-6-9.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 88 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 81 (max weight 6)</div>
 <details><summary>H_X (88 checks, sparse supports)</summary><div class=wit>[2, 10, 21, 80, 92, 101]

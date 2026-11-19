@@ -53,7 +53,23 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/510-16-24.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[510,16,24]] — weight-6 generalized bicycle on Z_255 (two-orbit Singer instance)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Generalized bicycle (two-block) code on Z_255: H_X=[A|B], H_Z=[B^T|A^T], a(x)=x^151+x^197+x^233, b(x)=x^37+x^196+x^202; g=gcd(a,b,x^255-1) irreducible of degree 8, k=16, row weight 6. Full circulant check sets kept (symmetry-visible).</p>
+<p>Origin: submission. Novelty status: known_parameters.</p>
+<p>References: arXiv:2203.17216, arXiv:2306.16400, arXiv:2502.19406.</p>
+<p>Member of the known [[2^(m+1)-2, 2m]] GB family (m=8); marked known_parameters accordingly — the contribution is the distance datum d&lt;=24 for this instance (no published distance found in the 2026-08-19 lit pass) plus the documented symmetry: TWO orbits of the 16 canonical logical classes under the full Tanner automorphism group (Singer packets, x primitive mod g). Evidence: GPU deep-RIS 15Mx2/side (CPU-verified witnesses) + sqetch 20Mx2/side; original 26-claim refuted down to 24 by the GPU engine itself.</p>
+<h4>What was searched</h4>
+<p>Member of the known [[2^(m+1)-2, 2m]] GB family (m=8); marked known_parameters accordingly — the contribution is the distance datum d&lt;=24 for this instance (no published distance found in the 2026-08-19 lit pass) plus the documented symmetry: TWO orbits of the 16 canonical logical classes under the full Tanner automorphism group (Singer packets, x primitive mod g). Evidence: GPU deep-RIS 15Mx2/side (CPU-verified witnesses) + sqetch 20Mx2/side; original 26-claim refuted down to 24 by the GPU engine itself.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 24 (upper_bound), d_Z &lt;= 24 (upper_bound), so d &lt;= 24. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @FarLab. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Generalized bicycle (two-block) code on Z_255: H_X=[A|B], H_Z=[B^T|A^T], a(x)=x^151+x^197+x^233, b(x)=x^37+x^196+x^202; g=gcd(a,b,x^255-1) irreducible of degree 8, k=16, row weight 6. Full circulant check sets kept (symmetry-visible).</p>
+<p>Max check weight: 6. Matrices in codes/510-16-24.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 255 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 255 (max weight 6)</div>
 <details><summary>H_X (255 checks, sparse supports)</summary><div class=wit>[151, 197, 233, 292, 451, 457]

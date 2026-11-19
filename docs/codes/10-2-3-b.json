@@ -87,7 +87,7 @@
   "origin": "submission",
   "date": "2026-09-27",
   "model": "Mimo-V2.6-Free",
-  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json`, a lighter-check companion to `codes/10-2-3.json` (same [[10,2,3]], max check weight 4 vs 6)."
+  "notes": "Equivalence assessed against the board: no exact stabilizer-group fingerprint match and no Weisfeiler-Leman signature match to any existing entry. Filed as `codes/10-2-3-b.json` (lighter-check variant of the [[10,2,3]] entry, max check weight 4 vs 6)."
  },
  "family": "topological",
  "locality": {

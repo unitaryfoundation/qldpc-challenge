@@ -8,20 +8,26 @@ same canonical noise recipe the circuit tier already pins (circuit_tools
 P_REF), so one circuit artifact serves both claims.
 
 The measurement: sample the circuit's detector error model with stim's seeded
-sampler, decode each shot with the pinned decoder, and count shots where the
-predicted observable flips disagree with the actual ones. The pinned decoder
-is BP+OSD exactly as decode/distance.py pins it (minimum-sum BP, scaling
-0.625, osd_cs at order 10, 30 iterations), with the DEM's own per-mechanism
-probabilities as the channel prior. MWPM is deliberately NOT the pin, for a
-sharper reason than decomposability in the abstract: pymatching accepts an
-undecomposed DEM without complaint and silently drops every mechanism that
-touches more than two detectors (on the d=5 seed it kept 572 of 1687), then
-returns confident numbers for a different, easier channel. Do not "check" a
-board ler value with pymatching; on these codes it is not decoding the same
-problem. Note also the systematic offset this pin implies: BP+OSD decodes
-hyperedges that decomposed MWPM splits, and measures ~1.5x better on the d=5
-seed, so board values read ~1.5x below the MWPM numbers familiar from the
-literature.
+sampler, decode each shot with a decoder from the registry below, and count
+shots where the predicted observable flips disagree with the actual ones. The
+reference decoder is BP+OSD exactly as decode/distance.py pins it (minimum-sum
+BP, scaling 0.625, osd_cs at order 10, 30 iterations), with the DEM's own
+per-mechanism probabilities as the channel prior; it is the decoder every
+headline rate on the board is read with. The registry (issue #5804) adds a
+BP+LSD variant, plain minimum-sum BP, and minimum-weight perfect matching, each
+pinned to one implementation and parameter set and named on every point, so
+an entry can carry one curve per decoder and the site shows them side by side
+without ever comparing a rate under one decoder with a rate under another.
+
+Matching needs a graphlike model. pymatching accepts an undecomposed DEM
+without complaint and silently drops every mechanism that touches more than
+two detectors (on the d=5 seed it kept 572 of 1687), then returns confident
+numbers for a different, easier channel, so the mwpm entry runs on stim's
+decomposed model (decompose_errors=True) and is admitted only when stim can
+decompose every mechanism; a circuit it cannot decompose has no mwpm rate.
+Note the systematic offset between the two models: BP+OSD decodes hyperedges
+that decomposed matching splits, and measures about 1.5x better on the d=5
+seed, which is one reason the curves are labeled and kept apart.
 
 Reproducibility has one honest boundary. The stim sampler is deterministic for
 a given seed and stim version, and the decoder is deterministic on one
@@ -45,7 +51,48 @@ try:
 except ImportError:          # surfaced by callers that actually need it
     stim = None
 
-DECODER_ID = "bposd-cs-10"   # the one pinned decoder; an enum in the schema
+DECODER_ID = "bposd-cs-10"   # the reference decoder: the board's headline
+                             # rate and the frontier star read this one, and
+                             # every other id in DECODERS is an additional,
+                             # labeled curve (issue #5804)
+# The decoder registry: the ids a circuit.ler point may name (the schema's
+# enum mirrors this dict), each pinned to one implementation and parameter
+# set, the implementation versions being the dependency pins in uv.lock.
+# Rates measured with different decoders are never compared with each other.
+# Adding or changing an entry is a verify/ change with its own review.
+# "model" says which detector error model the decoder runs on: the
+# undecomposed one the circuit tier commits (hook mechanisms fire more than
+# two detectors and survive), or stim's decomposed one, which a matching
+# decoder needs and which only exists when every mechanism splits into
+# components of at most two detectors.
+DECODERS = {
+    "bposd-cs-10": {
+        "implementation": "ldpc 2.4.1 BpOsdDecoder",
+        "parameters": ("minimum-sum BP, scaling 0.625, 30 iterations, OSD-CS order 10, "
+                       "channel prior the DEM's own mechanism probabilities"),
+        "model": "undecomposed",
+    },
+    "bplsd-cs-10": {
+        "implementation": "ldpc 2.4.1 BpLsdDecoder",
+        "parameters": ("minimum-sum BP, scaling 0.625, 30 iterations, LSD-CS order 10 "
+                       "(localized statistics decoding), channel prior the DEM's probabilities"),
+        "model": "undecomposed",
+    },
+    "bp-ms-30": {
+        "implementation": "ldpc 2.4.1 BpDecoder",
+        "parameters": ("minimum-sum BP alone, scaling 0.625, 30 iterations, channel prior the "
+                       "DEM's probabilities; a shot whose output disagrees with the observables "
+                       "fails, converged or not"),
+        "model": "undecomposed",
+    },
+    "mwpm": {
+        "implementation": "pymatching 2.4.0 Matching",
+        "parameters": ("minimum-weight perfect matching on stim's decomposed detector error "
+                       "model (decompose_errors=True), edge weights from the decomposed "
+                       "probabilities; admitted only when every mechanism decomposes"),
+        "model": "decomposed",
+    },
+}
 MIN_SHOTS = 10_000           # absolute floor on sample size
 MIN_FAILURES = 100           # the real floor: the tier exists to compare
                              # prefactors between schedules with equal d_circ,
@@ -81,61 +128,168 @@ def _osd_order(H, want):
 
 
 
-def make_decoder(H, probs):
-    """The pinned BP+OSD decoder over H_dem with the DEM's own channel prior.
+def make_decoder(H, probs, decoder=DECODER_ID):
+    """Build a registry decoder over H_dem with the given channel prior.
 
-    Mirrors decode/distance.py's pin exactly; only the prior differs, because
+    Returns an object with ``decode(syndrome) -> fault vector`` for the
+    decoders that run on the undecomposed model; the reference decoder
+    mirrors decode/distance.py's pin exactly, only the prior differs, because
     here the DEM supplies true per-mechanism probabilities where the
-    code-capacity search had to guess a uniform rate.
+    code-capacity search had to guess a uniform rate. ``mwpm`` is not built
+    here: matching runs on the decomposed model, see Predictor.
     """
-    from ldpc import BpOsdDecoder
+    spec = DECODERS.get(decoder)
+    if spec is None:
+        raise ValueError(f"unknown decoder {decoder!r}; the registry has "
+                         f"{', '.join(DECODERS)}")
+    if spec["model"] != "undecomposed":
+        raise ValueError(f"{decoder} runs on the decomposed model; build it "
+                         f"with Predictor(dem, decoder, circuit)")
     from scipy.sparse import csr_matrix
     Hm = np.asarray(H, dtype=np.uint8)
-    # ldpc 2.4.1 does not validate osd_order against the redundancy
-    # k = n - rank(H): osd_setup writes osd_candidate[i] = 1 for i < osd_order
-    # into an array of size k, so an order above k corrupts the heap. Clamping
-    # is a no-op wherever k >= 10 and leaves failure counts unchanged (#1616).
-    return BpOsdDecoder(csr_matrix(Hm),
-                        error_channel=list(map(float, probs)),
-                        max_iter=30, bp_method="minimum_sum",
-                        ms_scaling_factor=0.625, osd_method="osd_cs",
-                        osd_order=_osd_order(Hm, 10))
+    common = dict(error_channel=list(map(float, probs)), max_iter=30,
+                  bp_method="minimum_sum", ms_scaling_factor=0.625)
+    if decoder == "bposd-cs-10":
+        from ldpc import BpOsdDecoder
+        # ldpc 2.4.1 does not validate osd_order against the redundancy
+        # k = n - rank(H): osd_setup writes osd_candidate[i] = 1 for i < osd_order
+        # into an array of size k, so an order above k corrupts the heap. Clamping
+        # is a no-op wherever k >= 10 and leaves failure counts unchanged (#1616).
+        return BpOsdDecoder(csr_matrix(Hm), osd_method="osd_cs",
+                            osd_order=_osd_order(Hm, 10), **common)
+    if decoder == "bplsd-cs-10":
+        from ldpc import BpLsdDecoder
+        return BpLsdDecoder(csr_matrix(Hm), lsd_method="lsd_cs",
+                            lsd_order=_osd_order(Hm, 10), **common)
+    if decoder == "bp-ms-30":
+        from ldpc import BpDecoder
+        return BpDecoder(csr_matrix(Hm), **common)
+    raise ValueError(f"{decoder} is in the registry but has no builder")
+
+
+def decomposed_dem(circuit):
+    """Return stim's decomposed model of a circuit, the one matching runs on.
+
+    Raises when a mechanism has no decomposition into at most two detectors.
+    """
+    return circuit.detector_error_model(decompose_errors=True,
+                                        flatten_loops=True)
+
+
+def decoder_admits(decoder, circuit=None):
+    """Say whether ``decoder`` may run on ``circuit``, as (admitted, reason).
+
+    Every undecomposed-model decoder is admitted on every circuit. A
+    decomposed-model decoder needs the circuit and stim's decomposition of
+    every mechanism; a circuit stim cannot decompose carries no such rate.
+    """
+    spec = DECODERS.get(decoder)
+    if spec is None:
+        return False, f"unknown decoder {decoder!r}"
+    if spec["model"] == "undecomposed":
+        return True, ""
+    if circuit is None:
+        return False, f"{decoder} needs the committed circuit to derive the decomposed model"
+    try:
+        import pymatching  # noqa: F401
+    except ImportError:
+        return False, "pymatching is not installed (the `research` extra)"
+    try:
+        decomposed_dem(circuit)
+    except Exception as e:  # stim raises ValueError on an undecomposable mechanism
+        return False, (f"{decoder} is not admitted on this circuit: stim cannot "
+                       f"decompose every mechanism into at most two detectors "
+                       f"({str(e).splitlines()[0][:120]})")
+    return True, ""
+
+
+class Predictor:
+    """What the measurement needs from a decoder: predicted observable flips.
+
+    Built once per process (decoder construction is the fixed cost the
+    benchmark separates out). ``predict(dets)`` takes shots x detectors and
+    returns shots x observables, both uint8. For the undecomposed-model
+    decoders the prediction is (L @ e_hat) mod 2 of the returned fault vector,
+    exactly the arithmetic the reference decoder always used; for ``mwpm`` it
+    is pymatching's own observable prediction on the decomposed model of the
+    same circuit, whose detectors and observables are the same objects in the
+    same order, so the sampled syndromes carry over unchanged.
+    """
+
+    def __init__(self, dem, decoder=DECODER_ID, circuit=None):
+        spec = DECODERS.get(decoder)
+        if spec is None:
+            raise ValueError(f"unknown decoder {decoder!r}; the registry has "
+                             f"{', '.join(DECODERS)}")
+        self.decoder = decoder
+        self.observables = dem.num_observables
+        if spec["model"] == "decomposed":
+            ok, why = decoder_admits(decoder, circuit)
+            if not ok:
+                raise ValueError(why)
+            import pymatching
+            self._matching = pymatching.Matching.from_detector_error_model(
+                decomposed_dem(circuit))
+            self._dec, self._L = None, None
+        else:
+            from circuit_tools import dem_matrices
+            H, L = dem_matrices(dem)
+            self._matching = None
+            self._dec, self._L = make_decoder(H, dem_probs(dem), decoder), L
+
+    def predict(self, dets):
+        dets = np.asarray(dets, dtype=np.uint8)
+        if dets.ndim == 1:
+            dets = dets.reshape(1, -1)
+        if self._matching is not None:
+            if dets.shape[0] == 0:
+                return np.zeros((0, self.observables), dtype=np.uint8)
+            return np.asarray(self._matching.decode_batch(dets),
+                              dtype=np.uint8).reshape(dets.shape[0], -1)
+        out = np.empty((dets.shape[0], self._L.shape[0]), dtype=np.uint8)
+        for i in range(dets.shape[0]):
+            e_hat = self._dec.decode(dets[i])
+            out[i] = (self._L @ e_hat) % 2
+        return out
+
+
+def _failures(pred, obs):
+    """Count the shots whose predicted observable flips differ from the sampled ones."""
+    return int(np.count_nonzero(np.any(pred != obs, axis=1)))
 
 
 _WORKER = {}
 
 
-def _worker_init(H, probs, L):
-    """Build one decoder per worker process and keep it for every chunk.
-
-    Decoder construction is the fixed cost the benchmark separates out, so it
-    must not be paid per chunk; a pool initializer pays it once per worker.
-    """
-    _WORKER["dec"] = make_decoder(H, probs)
-    _WORKER["L"] = L
+def _worker_init(dem_text, decoder, circuit_text):
+    """Build one predictor per worker process and keep it for every chunk."""
+    import stim as _stim
+    dem = _stim.DetectorErrorModel(dem_text)
+    circuit = _stim.Circuit(circuit_text) if circuit_text is not None else None
+    _WORKER["pred"] = Predictor(dem, decoder, circuit)
 
 
 def _decode_chunk(args):
-    """Failures in one chunk of shots. Order-independent, so chunking cannot
-    change the total."""
+    """Count failures in one chunk of shots.
+
+    Order-independent, so chunking cannot change the total.
+    """
     dets, obs = args
-    dec, L = _WORKER["dec"], _WORKER["L"]
-    failures = 0
-    for i in range(dets.shape[0]):
-        e_hat = dec.decode(dets[i])
-        if np.any((L @ e_hat) % 2 != obs[i]):
-            failures += 1
-    return failures
+    return _failures(_WORKER["pred"].predict(dets), np.asarray(obs, dtype=np.uint8))
 
 
-def measure_failures(dem, shots, seed, max_seconds=None, workers=None):
-    """Sampled logical failures of a DEM under the pinned decoder.
+def measure_failures(dem, shots, seed, max_seconds=None, workers=None,
+                     decoder=DECODER_ID, circuit=None):
+    """Count the sampled logical failures of a DEM under a registry decoder.
 
-    A shot fails when the decoder's predicted observable flips (L @ e_hat over
-    GF(2)) disagree with the sampled ones on any observable. Returns
-    (failures, shots_done); shots/seed fully determine the sample for a given
-    stim version, and shots_done == shots whenever `max_seconds` does not
-    truncate.
+    A shot fails when the decoder's predicted observable flips disagree with
+    the sampled ones on any observable. Returns (failures, shots_done);
+    shots/seed fully determine the sample for a given stim version, and
+    shots_done == shots whenever `max_seconds` does not truncate. The sample
+    is drawn from ``dem`` (the committed, undecomposed model) whichever
+    decoder runs, so two decoders on one circuit see the same shots; a
+    decomposed-model decoder additionally needs ``circuit``, the circuit the
+    DEM was derived from, to build its own model.
 
     Shots are independent, so decoding distributes across processes. Sampling
     stays in the parent under the given seed and only the decode loop is
@@ -155,11 +309,21 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None):
     import os
     import time
 
-    from circuit_tools import dem_matrices
-    H, L = dem_matrices(dem)
     dets, obs, _ = dem.compile_sampler(seed=seed).sample(shots=shots)
     dets = dets.astype(np.uint8)
+    obs = obs.astype(np.uint8)
     deadline = (time.monotonic() + max_seconds) if max_seconds else None
+    circuit_text = str(circuit) if circuit is not None else None
+
+    def serial():
+        pred = Predictor(dem, decoder, circuit)
+        failures = 0
+        step = 1000
+        for i in range(0, shots, step):
+            failures += _failures(pred.predict(dets[i:i + step]), obs[i:i + step])
+            if deadline and time.monotonic() > deadline:
+                return failures, min(i + step, shots)
+        return failures, shots
 
     if workers is None:
         workers = max(1, (os.cpu_count() or 1))
@@ -169,20 +333,11 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None):
     target_chunks = max(1, workers * 4)
     chunk = max(1, -(-shots // target_chunks))
     if workers == 1 or shots <= chunk:
-        dec = make_decoder(H, dem_probs(dem))
-        failures = 0
-        for i in range(shots):
-            e_hat = dec.decode(dets[i])
-            if np.any((L @ e_hat) % 2 != obs[i]):
-                failures += 1
-            if deadline and i % 1000 == 999 and time.monotonic() > deadline:
-                return failures, i + 1
-        return failures, shots
+        return serial()
 
     import multiprocessing as mp
     pieces = [(dets[i:i + chunk], obs[i:i + chunk])
               for i in range(0, shots, chunk)]
-    probs = dem_probs(dem)
     # Threads are useless here: the decoder holds the GIL through decode
     # (measured at 1.03x on four threads), so parallelism has to be processes.
     # Prefer fork, which needs no __main__ guard in the caller; a library that
@@ -196,7 +351,7 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None):
     try:
         with ctx.Pool(processes=min(workers, len(pieces)),
                       initializer=_worker_init,
-                      initargs=(H, probs, L)) as pool:
+                      initargs=(str(dem), decoder, circuit_text)) as pool:
             failures, done = 0, 0
             for got, piece in zip(pool.imap(_decode_chunk, pieces), pieces):
                 failures += got
@@ -206,15 +361,17 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None):
                     break
             return failures, done
     except (OSError, RuntimeError, ValueError, ImportError):
-        dec = make_decoder(H, probs)
-        failures = 0
-        for i in range(shots):
-            e_hat = dec.decode(dets[i])
-            if np.any((L @ e_hat) % 2 != obs[i]):
-                failures += 1
-            if deadline and i % 1000 == 999 and time.monotonic() > deadline:
-                return failures, i + 1
-        return failures, shots
+        return serial()
+
+
+def point_key(p, decoder=DECODER_ID):
+    """Return the key a point's replication record is filed under.
+
+    In a verifier report and a receipt alike: the rate alone for the reference
+    decoder (the form every receipt on disk already uses) and rate@decoder
+    for the others.
+    """
+    return str(p) if decoder == DECODER_ID else f"{p}@{decoder}"
 
 
 def wilson_ci(failures, shots, z=Z95):
@@ -243,13 +400,14 @@ def per_round(p_shot, rounds):
     return 0.5 * (1.0 - (1.0 - 2.0 * p) ** (1.0 / rounds))
 
 
-def ler_block(dem, rounds, shots, seed, p_ref):
-    """A schema-shaped per-basis `ler` entry, measured from scratch.
+def ler_block(dem, rounds, shots, seed, p_ref, decoder=DECODER_ID, circuit=None):
+    """Measure a schema-shaped per-basis `ler` entry from scratch.
 
-    The submitter-side generator and the test fixture builder: runs the pinned
-    measurement and packages exactly the fields ler_verify.py re-checks.
+    The submitter-side generator and the test fixture builder: runs the
+    measurement under ``decoder`` and packages exactly the fields
+    ler_verify.py re-checks.
     """
-    failures, _ = measure_failures(dem, shots, seed)
+    failures, _ = measure_failures(dem, shots, seed, decoder=decoder, circuit=circuit)
     p_shot = failures / shots
     lo, hi = wilson_ci(failures, shots)
     return {
@@ -257,7 +415,7 @@ def ler_block(dem, rounds, shots, seed, p_ref):
         "shots": shots,
         "failures": failures,
         "seed": seed,
-        "decoder": DECODER_ID,
+        "decoder": decoder,
         "ler_per_round": round(per_round(p_shot, rounds), 9),
         "ci95": [round(per_round(lo, rounds), 9),
                  round(per_round(hi, rounds), 9)],

@@ -139,6 +139,20 @@ def replay(slug, cert, work, tlim):
     return rep
 
 
+def select_shard(items, spec):
+    """Return the items of shard ``spec`` ("I/K": every K-th of the sorted items from I).
+
+    Shard I of K takes positions I, I + K, I + 2K, ... of the sorted list, so
+    the K shards partition the set and each carries the same share of the
+    slow entries wherever they sort. Malformed or out-of-range specs raise.
+    """
+    i_str, _, k_str = spec.partition("/")
+    i, k = int(i_str), int(k_str)
+    if k < 1 or not 0 <= i < k:
+        raise ValueError(f"shard must be I/K with 0 <= I < K, not {spec!r}")
+    return sorted(items)[i::k]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("slugs", nargs="*", help="entries to replay")
@@ -155,6 +169,14 @@ def main(argv=None):
                     help="per-solve and per-check time limit (default 900)")
     ap.add_argument("--json", action="store_true",
                     help="print one JSON report per entry")
+    ap.add_argument("--shard", default=None, metavar="I/K",
+                    help="replay only shard I of K of the chosen entries (every K-th "
+                         "of them in slug order from the I-th), so a run can be split "
+                         "across jobs (issue #5578)")
+    ap.add_argument("--max-minutes", type=float, default=None, metavar="M",
+                    help="stop opening entries after M minutes; what was opened is "
+                         "replayed to the end and the count left is reported (a budget "
+                         "stop is not a failure)")
     a = ap.parse_args(argv)
 
     certs = replayable()
@@ -168,6 +190,12 @@ def main(argv=None):
                                                    min(a.sample, len(pool))))
     else:
         chosen = a.slugs
+    if a.shard is not None:
+        try:
+            chosen = select_shard(chosen, a.shard)
+        except ValueError as e:
+            print(e)
+            return 2
     missing = [s for s in chosen if s not in certs]
     if missing:
         print(f"not replayable (no proof_log certificate with a replay "
@@ -183,8 +211,12 @@ def main(argv=None):
 
     work = tempfile.mkdtemp(prefix="replay-")
     failed, t0 = [], time.time()
+    left = 0
     try:
-        for slug in chosen:
+        for i, slug in enumerate(chosen):
+            if a.max_minutes is not None and time.time() - t0 > a.max_minutes * 60:
+                left = len(chosen) - i
+                break
             rep = replay(slug, certs[slug], work, a.tlim)
             if a.json:
                 print(json.dumps(rep, sort_keys=True))
@@ -197,8 +229,9 @@ def main(argv=None):
                 failed.append(rep)
     finally:
         shutil.rmtree(work, ignore_errors=True)
-    print(f"{len(chosen)} replayed, {len(failed)} failed, "
-          f"{round(time.time() - t0)}s")
+    print(f"{len(chosen) - left} replayed, {len(failed)} failed, "
+          + (f"{left} left unopened at the {a.max_minutes:g} min budget, " if left else "")
+          + f"{round(time.time() - t0)}s")
     for rep in failed:
         print(json.dumps(rep, sort_keys=True))
     return 1 if failed else 0

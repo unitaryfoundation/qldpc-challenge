@@ -74,13 +74,21 @@
 <div class=kv><b>locality</b> 2D-local single <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-29-2.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[52,29,2]] — C-DELETE-CHECK reduction</h3>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-29-2.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[52,29,2]] — C-DELETE-CHECK a2 from 52-28-2.json</h3>
 <h4>Direction &amp; hypothesis</h4>
-<p>Deletion of a check from a board entry.</p>
+<p>C-DELETE-CHECK a2 from 52-28-2.json.</p>
+<p>Parent: <code>52-28-2.json</code>.</p>
+<h4>What was searched</h4>
+<p>Single-step C-DELETE-CHECK reduction; see provenance/construction. Witness search at standard RIS trial counts.</p>
 <h4>Evidence trail</h4>
-<p>Gate passes, board_advancing.</p>
+<p>Witness-backed upper bound: d_X &lt;= 2, d_Z &lt;= 2, so d &lt;= 2. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
 <h4>Tools</h4>
-<p>Model: Beam 1.0.</p></div></section>
+<p>Model: DeepSeek V4 Flash 0731. Authors: @MathysRennela. code-calculus-dev, research/kit coordination.</p>
+<h4>Reproduction</h4>
+<p>Start from <code>52-28-2.json</code>; delete the recorded check to obtain this entry.</p>
+<p>Max check weight: 8. Matrices in codes/52-29-2.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 11 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 12 (max weight 8)</div>
 <details><summary>H_X (11 checks, sparse supports)</summary><div class=wit>[0, 1, 24, 25, 26, 27, 50, 51]

@@ -72,8 +72,10 @@ Useful flags:
   separate, optional step after the circuits exist:
   `python verify/ler_measure.py codes/<slug>.json --p 0.005 0.001` samples
   each committed memory circuit at the requested physical rates (the grid is
-  0.01, 0.005, 0.002, 0.001) with the pinned decoder and writes the points
-  into `circuit.ler`. Claim the highest rate at which your code is not
+  0.01, 0.005, 0.002, 0.001) with the reference decoder and writes the points
+  into `circuit.ler`; `--decoder` measures a further curve under one of the
+  other registry decoders (`DECODERS` in `verify/ler_tools.py`), shown beside
+  the reference curve and never compared with it. Claim the highest rate at which your code is not
   saturated as well as any lower rates you can afford: CI replicates the
   highest-rate point at PR time and leaves the rest to a weekly post-merge
   run whose receipts the board shows per point (schema/SCHEMA.md);
@@ -510,6 +512,14 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    `upstream` first (git remote add upstream
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
+
+   If you work in a git worktree, make it sparse. A full checkout is about
+   8 GB, 7.6 GB of it circuits/, and a cone-mode sparse worktree holding
+   codes, notes, fieldnotes, repro, certs, research, verify, schema, cli,
+   site, receipts, and decode is about 225 MB; add circuits/<slug> only for
+   a circuit-tier PR. The recipe, and the cleanup rule (remove the worktree
+   once the branch is pushed), are in AGENTS.md under "Worktrees" (issue
+   #6515).
 
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.
