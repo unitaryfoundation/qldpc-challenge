@@ -30,6 +30,24 @@ Environment variables (all optional, sensible defaults):
   DEEP_RUNG_CAP    deep-rung budget cap (default: 2000000)
   GF2_TRIALS    gf2_fast pre-filter trials per child (default: 2000)
   SKIP_DOMINATED  skip parents dominated by the board (default: 1)
+  DEDUP_ORACLE  run research/kit/dedup_oracle.py before staging (default: 1)
+  DEDUP_OPEN_PRS  index the codes/ files of open PRs as well as the board (default: 1)
+  DEDUP_REFRESH  re-fetch the open-PR index at campaign start instead of
+                reading the on-disk cache, which never expires on its own (default: 1)
+  DEDUP_PR_LIMIT  how many open PRs to index (default: 200)
+  OUT_DEDUP     dedup log, one JSON line per skipped or flagged child
+                (default: research/out/dedup_oracle.jsonl)
+
+Dedup oracle (issue #6814). Before a child is staged, and before its witness
+search is paid for, its fingerprint and WL signature are checked against the
+anti-collision index of ``research/kit/dedup_oracle.py``: the board as the gate
+sees it (own identity plus local-Hadamard images) and, with DEDUP_OPEN_PRS, the
+``codes/`` files of every open PR. An exact match (shared fingerprint) is the
+same code, which the gate would refuse as a duplicate or which another PR is
+already filing, so the child is skipped and logged. A WL-only match is a probable
+permutation; the gate admits those with a label, so the child is staged with a
+note naming the match. The oracle is a filter, never a verdict: a child that
+clears it still has to pass ``coordination.gate``.
 
 Usage:
   uv run --extra research python -u research/reachability_campaign.py
@@ -71,6 +89,13 @@ CHUNK_SIZE = int(os.environ.get('CHUNK_SIZE', '25'))
 TRIALS = int(os.environ.get('TRIALS', '2000'))  # screening depth; deep-confirm survivors at 20000+
 GF2_TRIALS = int(os.environ.get('GF2_TRIALS', '2000'))  # gf2_fast pre-filter trials per child
 SKIP_DOMINATED = os.environ.get('SKIP_DOMINATED', '1') == '1'
+
+# --- dedup oracle (issue #6814) ---------------------------------------------
+DEDUP_ORACLE = os.environ.get('DEDUP_ORACLE', '1') == '1'
+DEDUP_OPEN_PRS = os.environ.get('DEDUP_OPEN_PRS', '1') == '1'
+DEDUP_REFRESH = os.environ.get('DEDUP_REFRESH', '1') == '1'
+DEDUP_PR_LIMIT = int(os.environ.get('DEDUP_PR_LIMIT', '200'))
+OUT_DEDUP = os.environ.get('OUT_DEDUP', os.path.join(OUT_DIR, 'dedup_oracle%s.jsonl' % _suffix))
 
 # --- screening budget: depth-proportional, not flat -------------------------
 TRIALS_PER_D = int(os.environ.get('TRIALS_PER_D', '2000'))
@@ -158,9 +183,90 @@ def process_parent(args):
 
 
 
+# --- dedup oracle (issue #6814) ---
+_DEDUP = {'index': None}   # set in the main process by build_dedup_index, in save workers by _save_init
+
+
+def build_dedup_index():
+    """Build the anti-collision index the save workers check children against.
+
+    Returns None when the oracle is disabled or cannot be imported, so the
+    campaign runs as before and says so. Otherwise returns
+    ``dedup_oracle.combined_index`` over the board and, with DEDUP_OPEN_PRS,
+    the open PRs; the open-PR fetch degrades to nothing when ``gh`` is
+    unavailable, so an empty open-PR part is reported rather than passed over.
+    """
+    if not DEDUP_ORACLE:
+        print('dedup oracle: off (DEDUP_ORACLE=0)', flush=True)
+        _DEDUP['index'] = None
+        return None
+    try:
+        import dedup_oracle
+    except Exception as e:
+        print('dedup oracle: unavailable (%s); staging without it' % e, flush=True)
+        _DEDUP['index'] = None
+        return None
+    index = dedup_oracle.combined_index(include_board=True,
+                                        include_open_prs=DEDUP_OPEN_PRS,
+                                        open_pr_limit=DEDUP_PR_LIMIT,
+                                        refresh=DEDUP_REFRESH)
+    n_board = sum(1 for e in index if e.get('source') == 'board')
+    n_pr = sum(1 for e in index if e.get('source') == 'pr')
+    print('dedup oracle: %d board entries, %d open-PR codes indexed' % (n_board, n_pr), flush=True)
+    if DEDUP_OPEN_PRS and n_pr == 0:
+        print('dedup oracle: WARNING the open-PR index is empty (gh unavailable, or no open PR '
+              'carries a codes/ file); cross-PR duplicates will not be caught this run', flush=True)
+    _DEDUP['index'] = index
+    return index
+
+
+def _save_init(index):
+    _worker_init()
+    _DEDUP['index'] = index
+
+
+def _dedup_matches(entries):
+    """Index entries as the log records them and as a line names them."""
+    records = [{'source': e.get('source'), 'pr': e.get('pr'), 'name': e.get('name'),
+                'n': e.get('n'), 'k': e.get('k'), 'd': e.get('d')} for e in entries]
+    names = ['pr#%s:%s' % (r['pr'], r['name']) if r['source'] == 'pr' else '%s:%s' % (r['source'], r['name'])
+             for r in records]
+    return records, names
+
+
+def _dedup_check(HX, HZ):
+    """Return the oracle's verdict for (HX, HZ) against the index in _DEDUP, or None when it is off.
+
+    ``{'kind': 'exact' | 'wl', 'matches': [...], 'names': [...]}``. The identity
+    is the fingerprint and WL signature of the code itself
+    (``dedup_oracle.identity_matrices``), compared against index entries that
+    carry their own identity and their local-Hadamard images; cheap enough to
+    run before the witness search.
+    """
+    index = _DEDUP['index']
+    if not index:
+        return None
+    import dedup_oracle
+    res = dedup_oracle.check(dedup_oracle.identity_matrices(HX, HZ), index)
+    for kind in ('exact', 'wl'):
+        if res[kind]:
+            records, names = _dedup_matches(res[kind])
+            return {'kind': kind, 'matches': records, 'names': names}
+    return None
+
+
+def log_dedup(record):
+    """Append one dedup event to OUT_DEDUP (JSON lines); never raises."""
+    try:
+        with open(OUT_DEDUP, 'a') as f:
+            f.write(json.dumps(record) + '\n')
+    except Exception:
+        pass
+
+
 # --- save worker (runs in subprocess) ---
 def _save_one(args):
-    """Save one child. Returns dict with ok, child, bkey, path, error."""
+    """Save one child. Returns dict with ok, child, bkey, path, error, and dedup when the oracle spoke."""
     bkey, child, stg, trials = args
     sys.path.insert(0, CALCULUS)
     sys.path.insert(0, CH + '/research/kit')
@@ -170,11 +276,20 @@ def _save_one(args):
         from submit import make_submission, save_submission
         from coordination import unique_path
         HX, HZ = checks_to_matrices(child['checks'], n)
+        dedup = _dedup_check(HX, HZ)
+        if dedup is not None and dedup['kind'] == 'exact':
+            return {'ok': False, 'child': child, 'bkey': bkey, 'path': None, 'dedup': dedup,
+                    'error': 'exact duplicate of ' + ', '.join(dedup['names'])}
+        notes = None
+        if dedup is not None:
+            notes = ('Dedup oracle (research/kit/dedup_oracle.py): shares the WL signature of %s, '
+                     'a probable permutation of that code; the gate admits it with a '
+                     'possibly-equivalent label.' % ', '.join(dedup['names']))
         doc = make_submission(HX, HZ,
                              name='[[%d,%d,%d]] unified' % (n, k, d_ub),
                              construction='Unified analyze+stage from parent n=%d.' % child['parent_n'],
                              authors=['mathysrennela'], family='code-calculus',
-                             confidence='upper_bound', trials=trials)
+                             confidence='upper_bound', trials=trials, notes=notes)
         path = unique_path('%s/%d-%d-%d.json' % (stg, n, k, d_ub), doc)
         save_submission(doc, path, preflight=False, spec={
             'constructor': 'planner.plan',
@@ -182,7 +297,10 @@ def _save_one(args):
                        'parent_file': child['parent_file'],
                        'parent_d': child['parent_d']},
         })
-        return {'ok': True, 'child': child, 'bkey': bkey, 'path': path, 'error': None}
+        out = {'ok': True, 'child': child, 'bkey': bkey, 'path': path, 'error': None}
+        if dedup is not None:
+            out['dedup'] = dedup
+        return out
     except Exception as e:
         return {'ok': False, 'child': child, 'bkey': bkey, 'path': None, 'error': str(e)}
 
@@ -465,6 +583,11 @@ def main():
     from submit import make_submission, save_submission
     import numpy as np
 
+    # anti-collision index: the board plus open PRs, built once per run (issue #6814)
+    dedup_index = build_dedup_index()
+    dedup_skipped = 0
+    dedup_flagged = 0
+
     total = len(css_parents_sorted)
     idx = start_idx
     t0 = time.time()
@@ -532,7 +655,7 @@ def main():
         # save in parallel
         save_args = [(bkey, child, stg, child.get('screen_trials', TRIALS)) for bkey, child in best_in_chunk.items()]
         if save_args:
-            with mp.Pool(processes=WORKERS, initializer=_worker_init) as save_pool:
+            with mp.Pool(processes=WORKERS, initializer=_save_init, initargs=(dedup_index,)) as save_pool:
                 save_results = save_pool.map(_save_one, save_args)
         else:
             save_results = []
@@ -544,10 +667,25 @@ def main():
             w = child['w']; lc = child['lc']; wc = child['wc']
             key = (n, k, d_ub, w, lc, wc)
             if not sr['ok']:
-                print('SAVE FAILED %d-%d-%d: %s' % (n, k, d_ub, sr['error']), flush=True)
+                if sr.get('dedup'):
+                    dedup_skipped += 1
+                    print('DEDUP SKIP %d-%d-%d (parent n=%d): %s' % (n, k, d_ub, child['parent_n'], sr['error']),
+                          flush=True)
+                    log_dedup({'event': 'skipped', 'kind': 'exact', 'n': n, 'k': k, 'd': d_ub, 'w': w,
+                               'parent_n': child['parent_n'], 'parent_file': child['parent_file'],
+                               'matches': sr['dedup']['matches']})
+                else:
+                    print('SAVE FAILED %d-%d-%d: %s' % (n, k, d_ub, sr['error']), flush=True)
                 continue
             path = sr['path']
             print('SAVED: %d-%d-%d (parent n=%d) -> %s' % (n, k, d_ub, child['parent_n'], path), flush=True)
+            if sr.get('dedup'):
+                dedup_flagged += 1
+                print('  WL-EQUIVALENT: shares the WL signature of %s (staged with a note)'
+                      % ', '.join(sr['dedup']['names']), flush=True)
+                log_dedup({'event': 'flagged', 'kind': 'wl', 'n': n, 'k': k, 'd': d_ub, 'w': w,
+                           'parent_n': child['parent_n'], 'parent_file': child['parent_file'],
+                           'path': path, 'matches': sr['dedup']['matches']})
             seen_targets.add(key)
             if TARGET == 'n':
                 missing.discard(n)
@@ -581,8 +719,10 @@ def main():
         elapsed = time.time() - t0
         rate = idx / elapsed if elapsed > 0 else 0
         eta = (total - idx) / rate if rate > 0 else 0
-        print('processed %d/%d parents | seen=%d | pareto=%d | reachable=%d n | %.1f parents/min | ETA %.0f min' %
-              (idx, total, len(seen_targets), len(pareto_frontier), len(reachable), rate*60, eta/60), flush=True)
+        print('processed %d/%d parents | seen=%d | pareto=%d | reachable=%d n | dedup skipped=%d flagged=%d | '
+              '%.1f parents/min | ETA %.0f min' %
+              (idx, total, len(seen_targets), len(pareto_frontier), len(reachable), dedup_skipped, dedup_flagged,
+               rate*60, eta/60), flush=True)
 
     # final
     save_ckpt(total, reachable, results, seen_targets, pareto_frontier, total, best_variants)
@@ -593,6 +733,8 @@ def main():
     print('reachable n:', len(reachable))
     print('results n:', len(results))
     print('pareto frontier:', len(pareto_frontier))
+    print('dedup oracle: skipped %d exact duplicates, flagged %d WL equivalents (%s)'
+          % (dedup_skipped, dedup_flagged, OUT_DEDUP))
 
 
 if __name__ == '__main__':
