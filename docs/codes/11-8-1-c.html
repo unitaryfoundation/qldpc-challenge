@@ -65,7 +65,7 @@
 <h4>Direction &amp; hypothesis</h4>
 <p>Weight-6 local-2d board cell; aim at a board-advancing point by deforming a small high-distance CSS parent with the priced construction calculus (CodeState, apply_operation, DistanceLedger, planner.plan/plan_chain). Hypothesis: a depth-2 chain of single-check deletion (C-DELETE-CHECK) and peel (E-PEEL) moves on a d&gt;=4 parent can land a d&gt;=1 survivor at n=11 that the depth-1 sweep (fieldnote 2026-10-24-priced-calculus-board-sweep.md) did not reach, because the second move exploits the changed support of the first.</p>
 <h4>What was searched</h4>
-<p>Parents: CSS entries with n&lt;=12, d&gt;=4 (12-2-4.json and 12-2-4-b.json). Moves: C-DELETE-CHECK and E-PEEL, chained to depth 2, via planner.plan with structural screening (bare-qubit screen, Tanner connectivity, domination pruning). Witness search up to weight 4 per side; gate validation with verify/validate_candidate.py (refute=True). Two distinct parents produced this survivor; permutation-equivalent duplicates were collapsed before submission.</p>
+<p>Parents: CSS entries with n&lt;=12, d&gt;=4 (12-2-4-b.json and 12-2-4-b.json). Moves: C-DELETE-CHECK and E-PEEL, chained to depth 2, via planner.plan with structural screening (bare-qubit screen, Tanner connectivity, domination pruning). Witness search up to weight 4 per side; gate validation with verify/validate_candidate.py (refute=True). Two distinct parents produced this survivor; permutation-equivalent duplicates were collapsed before submission.</p>
 <h4>Evidence trail</h4>
 <p>Witness-backed upper bound: d_X &lt;= 1, d_Z &lt;= 1 (witnesses in codes/11-8-1.json). Full distance d = 1 (upper bound). The calculus propagated the parent interval through C-DELETE-CHECK/E-PEEL and the child witnesses tightened the upper bound; the gate&#x27;s refutation search did not find a lighter logical. Confidence: upper_bound.</p>
 <h4>Dead ends</h4>
@@ -73,7 +73,7 @@
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Harness: research/kit (coordination, submit, prescreen), machine/priced_calculus.py and machine/planner.py from github.com/MathysRennela/code-calculus-dev @ 5084747d90dee5fd3927f66bca33bbe3198ba67d (<code>machine/priced_calculus.py</code>, <code>machine/planner.py</code>). Gate: verify/validate_candidate.py. Approx compute: a few minutes on CPU.</p>
 <h4>Reproduction</h4>
-<p>Parent: codes/12-2-4.json (or 12-2-4-b.json). Apply a depth-2 chain of C-DELETE-CHECK / E-PEEL per the priced calculus consumer; the survivor is the staged candidate validated by the gate. Full matrices in codes/11-8-1.json.</p></div></section>
+<p>Parent: codes/12-2-4-b.json (or 12-2-4-b.json). Apply a depth-2 chain of C-DELETE-CHECK / E-PEEL per the priced calculus consumer; the survivor is the staged candidate validated by the gate. Full matrices in codes/11-8-1.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 3 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 0 (max weight 0)</div>
 <details><summary>H_X (3 checks, sparse supports)</summary><div class=wit>[0, 2, 3, 4, 5, 7]

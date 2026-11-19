@@ -28,6 +28,7 @@ from check_certs import checks_sha256  # noqa: E402
 from ler_verify import gate_point, points_of  # noqa: E402
 import ler_receipts as lr  # noqa: E402
 import circuit_tools as ctools  # noqa: E402
+import ler_tools as lt  # noqa: E402
 import stim  # noqa: E402
 
 DOCS = os.path.join(ROOT, "docs")
@@ -768,6 +769,8 @@ border:1px solid #a7f3d0;vertical-align:2px;white-space:nowrap}}
 .lercurve circle.lx{{fill:#1f77b4}} .lercurve circle.lz{{fill:#d62728}}
 .lercurve circle.st-pending,.lercurve circle.st-unverifiable{{fill:#fff}}
 .lercurve circle.st-failed{{fill:#000}}
+.lercurve polyline.alt{{stroke-dasharray:4 3;opacity:.75}} .lercurve circle.alt{{opacity:.75}}
+h3.lerdec{{font-size:13px;margin:10px 0 2px}}
 table.lerpts{{border-collapse:collapse;font-size:12px;margin:4px 0 8px}}
 table.lerpts th,table.lerpts td{{padding:2px 8px;border-bottom:1px solid var(--line,#ddd);text-align:left}}
 table.lerpts td.num{{font-variant-numeric:tabular-nums}}
@@ -2015,6 +2018,7 @@ def load_entries():
             # by the weekly post-merge receipt under receipts/ler/
             "ler_points": ler_points(doc, slug),
             "ler_by_p": ler_by_p(doc, slug),
+            "ler_by_pd": ler_by_pd(doc, slug),
             # transversal gates (issue #1850): the verifier's per-gate results,
             # listed on the code page and never ranked.
             "gates": rep["computed"].get("transversal_gates") or [],
@@ -2287,40 +2291,52 @@ def ler_points(doc, slug):
     receipt = lr.load_receipt(ROOT, slug)
     digest = lr.claim_digest(doc, cdir) if receipt else None
     out = {}
+    order = {d: i for i, d in enumerate(lt.DECODERS)}
     for s in ("X", "Z"):
         pts = points_of(ler.get(s)) or []
-        g = gate_point(pts)
+        decoders = {q.get("decoder", lt.DECODER_ID) for q in pts}
+        gates = {d: gate_point(pts, d) for d in decoders}
         rows = []
-        for q in sorted(pts, key=lambda q: -q["p"]):
-            if q is g:
+        for q in sorted(pts, key=lambda q: (order.get(q.get("decoder"), 99), -q["p"])):
+            dec = q.get("decoder", lt.DECODER_ID)
+            if q is gates.get(dec):
                 status = "gate"
             else:
-                status = lr.point_status(receipt, digest, s, q["p"])
-            rec = ((receipt or {}).get("points") or {}).get(s, {}).get(str(q["p"])) \
+                status = lr.point_status(receipt, digest, s, q["p"], dec)
+            rec = ((receipt or {}).get("points") or {}).get(s, {}).get(lt.point_key(q["p"], dec)) \
                 if status not in ("gate", "pending") else None
-            rows.append(dict(q, status=status, receipt=rec,
+            rows.append(dict(q, decoder=dec, status=status, receipt=rec,
                              measured_at=(receipt or {}).get("measured_at")))
         out[s] = rows
     return out
 
 
-def ler_by_p(doc, slug):
-    """{p: worse-side per-round rate} over the rates at which BOTH bases have
-    a verified point (gate-verified or receipt-verified); the frontier is
-    computed per p from this."""
+def ler_by_pd(doc, slug):
+    """{decoder: {p: worse-side per-round rate}} over the rates at which BOTH
+    bases have a verified point (gate-verified or receipt-verified) under that
+    decoder; the per-decoder frontiers are computed from this, and a decoder's
+    curve is never set beside another's (issue #5804)."""
     pts = ler_points(doc, slug)
     if not pts:
         return {}
     out = {}
-    for p in sorted({q["p"] for rows in pts.values() for q in rows}, reverse=True):
+    pairs = sorted({(q["decoder"], q["p"]) for rows in pts.values() for q in rows},
+                   key=lambda t: (t[0], -t[1]))
+    for dec, p in pairs:
         vals = []
         for s in ("X", "Z"):
-            q = next((q for q in pts.get(s, []) if q["p"] == p), None)
+            q = next((q for q in pts.get(s, []) if q["p"] == p and q["decoder"] == dec), None)
             if q and q["status"] in ("gate", "verified"):
                 vals.append(q["ler_per_round"])
         if len(vals) == 2:
-            out[p] = max(vals)
+            out.setdefault(dec, {})[p] = max(vals)
     return out
+
+
+def ler_by_p(doc, slug):
+    """{p: worse-side per-round rate} under the reference decoder, the curve
+    the headline rate and the LER record read; see ler_by_pd for the rest."""
+    return dict(ler_by_pd(doc, slug).get(lt.DECODER_ID, {}))
 
 
 def ler_curve_svg(points):
@@ -2359,16 +2375,21 @@ def ler_curve_svg(points):
     out.append(f'<text x={(L + W - 12) / 2:.0f} y={H - 2} class=tick text-anchor=middle>'
                'physical rate p</text>')
     for s, cls in (("X", "lx"), ("Z", "lz")):
-        pts = sorted((q for q in points.get(s, []) if q["ler_per_round"] > 0),
-                     key=lambda q: q["p"])
-        if len(pts) > 1:
-            out.append(f'<polyline class="{cls}" points="' + " ".join(
-                f'{X(q["p"]):.1f},{Y(q["ler_per_round"]):.1f}' for q in pts) + '"/>')
-        for q in pts:
-            out.append(f'<circle class="{cls} st-{q["status"]}" cx={X(q["p"]):.1f} '
-                       f'cy={Y(q["ler_per_round"]):.1f} r=4>'
-                       f'<title>{s} p={q["p"]:g}: {q["ler_per_round"]:.3g}/round, '
-                       f'{q["status"]}</title></circle>')
+        decoders = sorted({q.get("decoder", lt.DECODER_ID) for q in points.get(s, [])},
+                          key=lambda d: (d != lt.DECODER_ID, d))
+        for dec in decoders:
+            alt = "" if dec == lt.DECODER_ID else " alt"
+            pts = sorted((q for q in points.get(s, [])
+                          if q["ler_per_round"] > 0 and q.get("decoder", lt.DECODER_ID) == dec),
+                         key=lambda q: q["p"])
+            if len(pts) > 1:
+                out.append(f'<polyline class="{cls}{alt}" points="' + " ".join(
+                    f'{X(q["p"]):.1f},{Y(q["ler_per_round"]):.1f}' for q in pts) + '"/>')
+            for q in pts:
+                out.append(f'<circle class="{cls}{alt} st-{q["status"]}" cx={X(q["p"]):.1f} '
+                           f'cy={Y(q["ler_per_round"]):.1f} r=4>'
+                           f'<title>{s} p={q["p"]:g} ({html.escape(dec)}): '
+                           f'{q["ler_per_round"]:.3g}/round, {q["status"]}</title></circle>')
     out.append("</svg>")
     return "".join(out)
 
@@ -2382,22 +2403,32 @@ def ler_frontier(entries):
     Computed per physical rate p over the entries with a verified point at
     that p (issue #1278): an entry is a record if it is Pareto-best at any p
     it has been verified at, and rates at different p are never compared."""
-    by_p = {}
-    for i, e in enumerate(entries):
-        for p in e.get("ler_by_p") or {}:
-            by_p.setdefault((p, e["ler_key"][1] if e["ler_key"] else None), []).append(i)
+    return ler_frontiers(entries).get(lt.DECODER_ID, set())
 
-    def beats(b, a, p):
-        rb, ra = b["ler_by_p"][p], a["ler_by_p"][p]
+
+def ler_frontiers(entries):
+    """{decoder: frontier indices}: the (n, k, LER) Pareto frontier computed
+    per (physical rate, decoder) over the entries with a verified point under
+    that decoder at that rate (issue #5804). Rates under different decoders
+    are never compared; the reference decoder's set is what ler_frontier
+    returns and the board marks."""
+    by_pd = {}
+    for i, e in enumerate(entries):
+        for dec, curve in (e.get("ler_by_pd") or {}).items():
+            for p in curve:
+                by_pd.setdefault((p, dec), []).append(i)
+
+    def beats(b, a, p, dec):
+        rb, ra = b["ler_by_pd"][dec][p], a["ler_by_pd"][dec][p]
         return (b["n"] <= a["n"] and b["k"] >= a["k"] and rb <= ra
                 and (b["n"] < a["n"] or b["k"] > a["k"] or rb < ra))
 
-    front = set()
-    for (p, _), idxs in by_p.items():
+    fronts = {}
+    for (p, dec), idxs in by_pd.items():
         for i in idxs:
-            if not any(j != i and beats(entries[j], entries[i], p) for j in idxs):
-                front.add(i)
-    return front
+            if not any(j != i and beats(entries[j], entries[i], p, dec) for j in idxs):
+                fronts.setdefault(dec, set()).add(i)
+    return fronts
 
 
 def badge(tier, lb=None):
@@ -3283,7 +3314,7 @@ def detail_page(e):
             }
             pts = e.get("ler_points") or {}
             P.append(ler_curve_svg(pts))
-            P.append('<table class=lerpts><thead><tr><th>basis</th><th>p</th>'
+            P.append('<table class=lerpts><thead><tr><th>basis</th><th>decoder</th><th>p</th>'
                      '<th>ler/round</th><th>95% CI</th><th>failures/shots</th>'
                      '<th>status</th></tr></thead><tbody>')
             for s in ("X", "Z"):
@@ -3297,17 +3328,24 @@ def detail_page(e):
                                  f'{sci_int(rec["replica_shots"])} replica shots, '
                                  f'{q.get("measured_at", "")[:10]})')
                     P.append(
-                        f'<tr class="st-{st}"><td>{s}</td><td>{q["p"]:g}</td>'
+                        f'<tr class="st-{st}"><td>{s}</td>'
+                        f'<td class=mono>{html.escape(q.get("decoder", lt.DECODER_ID))}</td>'
+                        f'<td>{q["p"]:g}</td>'
                         f'<td class=num>{q["ler_per_round"]:.3g}</td>'
                         f'<td class=num>[{lo:.3g}, {hi:.3g}]</td>'
                         f'<td class=num>{q["failures"]}/{sci_int(q["shots"])}</td>'
                         f'<td>{status_text.get(st, st)}{html.escape(extra)}</td></tr>')
             P.append('</tbody></table>')
-            dec = next((q["decoder"] for rows in pts.values() for q in rows), "")
-            P.append(f'<div class=kv><span class=claimed>decoder '
-                     f'{html.escape(dec)}; rates are compared across entries '
-                     f'only at equal p; a point whose per-shot failure fraction '
-                     f'would exceed 1/2 is not admitted</span></div>')
+            decs = sorted({q.get("decoder", lt.DECODER_ID) for rows in pts.values() for q in rows},
+                          key=lambda d: (d != lt.DECODER_ID, d))
+            P.append('<div class=kv><span class=claimed>'
+                     + "; ".join(f'{html.escape(d)}: {html.escape(lt.DECODERS[d]["implementation"])}'
+                                 for d in decs if d in lt.DECODERS)
+                     + f'. The headline rate and the LER record read the reference decoder '
+                     f'{html.escape(lt.DECODER_ID)}; other decoders are separate, dashed curves. '
+                     f'Rates are compared across entries only at equal p and equal decoder; a '
+                     f'point whose per-shot failure fraction would exceed 1/2 is not admitted'
+                     '</span></div>')
         else:
             P.append('<div class=kv style="color:var(--mut)">no measured '
                      'logical error rate yet; d_circ is a floor, and the '
@@ -5362,8 +5400,37 @@ def ler_frontier_panel(entries, lrec):
             f'<span class=lfam>{sides}{circ} &middot; w={e["w"]}</span>'
             f'<span class=lwho>{authors_compact(e["authors_list"])}</span></li>')
     where = "; ".join(f'p = {p:g}' for p, _ in settings)
-    decs = sorted({dec for _, dec in settings if dec})
-    where += " with decoder " + ", ".join(html.escape(d) for d in decs) if decs else ""
+    where += f" with the reference decoder {html.escape(lt.DECODER_ID)}"
+    # curves under the other registry decoders: their own frontiers, labeled,
+    # never merged with the reference decoder's (issue #5804)
+    others = []
+    fronts = ler_frontiers(entries)
+    for dec in [d for d in lt.DECODERS if d != lt.DECODER_ID]:
+        idxs = fronts.get(dec)
+        if not idxs:
+            continue
+        items = []
+        for e in sorted((entries[i] for i in idxs),
+                        key=lambda e: (min(e["ler_by_pd"][dec].values()), e["n"], -e["k"])):
+            curve = e["ler_by_pd"][dec]
+            top = max(curve)
+            items.append(
+                f'<li><a class="mono lnkd" href="codes/{e["slug"]}.html">'
+                f'[[{e["n"]},{e["k"]},{e["d"]}]]</a>'
+                f'<span class=lerv title="worse of the two per-round rates at the highest '
+                f'p verified under {html.escape(dec)}">{curve[top]:.3g}</span>'
+                f'<span class=lfam>at p={top:g}'
+                + (f' &middot; {len(curve)} rates verified' if len(curve) > 1 else "")
+                + f' &middot; w={e["w"]}</span>'
+                f'<span class=lwho>{authors_compact(e["authors_list"])}</span></li>')
+        spec = lt.DECODERS[dec]
+        others.append(
+            f'<h3 class=lerdec>decoder {html.escape(dec)} <span class=tcount>&middot; '
+            f'{len(items)} on this frontier</span></h3>'
+            f'<p class=ptsub>{html.escape(spec["implementation"])}: {html.escape(spec["parameters"])}. '
+            f'Compared only among entries measured with this decoder at the same p; '
+            f'not comparable with the list above.</p>'
+            f'<ul class=latestlist>{"".join(items)}</ul>')
     more = ""
     if len(rows) > LER_PHONE_ROWS:
         more = ('<button type=button class="showall lershow">'
@@ -5388,7 +5455,8 @@ def ler_frontier_panel(entries, lrec):
             'independent of the (n, k, d, w) frontier that awards the '
             'record star, and the rows below carry the <span class=lerchip>'
             'LER record</span> chip in the table.</p>'
-            f'<ol class=latestlist>{"".join(rows)}</ol>{more}</section>')
+            f'<ol class=latestlist>{"".join(rows)}</ol>{more}'
+            f'{"".join(others)}</section>')
 
 
 # Default upper bound of the Codes weight slider; see

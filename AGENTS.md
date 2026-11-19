@@ -231,6 +231,40 @@ Locally, reproduce it with
 `PR_AUTHOR=<your-login> verify/prepush_prose_check.sh <body.md>`. Modifying
 someone else's existing note is exempt.
 
+## Worktrees
+
+A full checkout of this repository is about 8 GB, and 7.6 GB of it is
+`circuits/`. Worktrees share the object store but not the checkout, so every
+`git worktree add` copies that tree, and a machine that makes one worktree per
+PR fills up (issue #6515). Make worktrees sparse, and remove them once the
+branch is pushed.
+
+Create one with cone-mode sparse checkout. It holds the top-level files and
+the directories a submission, a kit change, or a site change reads, about
+225 MB, and takes seconds:
+
+```
+git worktree add --no-checkout --detach <path> origin/main
+git -C <path> sparse-checkout set --cone codes notes fieldnotes repro certs research verify schema cli site receipts decode
+git -C <path> checkout -b <branch> origin/main
+git -C <path> sparse-checkout add circuits/<slug>    # only for a circuit-tier PR, about 2 MB per entry
+cp verify/gf2_fast.cpython-*.so <path>/verify/      # the built accelerator is ignored by git
+```
+
+The last line matters: without the accelerator the circuit gate and the RIS
+screen fall back to a handful of trials, which is how #5094 came to be
+refuted in CI. `docs/` is generated output and is never needed in a worktree;
+add `.github` only for a workflow change.
+
+Remove a worktree as soon as its branch is pushed, with `git worktree remove
+<path>`. It refuses a worktree with modified or untracked files, but it
+deletes ignored files without asking, and `research/candidates/` is ignored:
+move staged candidates or audit logs you still need out of the worktree
+first. A detached worktree whose commits are not pushed needs a branch before
+removal (`git branch keep/<name>`), or the commits become unreachable. Run
+`git worktree prune` at the start of a session and `git worktree list` to see
+what is still registered.
+
 ## Working on the repo itself
 
 This is a Tier 1 activity: see "Two tiers of change" above. An agent does not

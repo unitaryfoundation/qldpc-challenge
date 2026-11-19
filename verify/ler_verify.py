@@ -24,14 +24,16 @@ or earlier.
 Checks, per basis:
   arithmetic   every point: p is on the grid, ler_per_round and ci95 recompute
                exactly from (failures, shots, rounds) via the pinned
-               conversion and Wilson interval, the decoder is the pinned one,
+               conversion and Wilson interval, the decoder is one of the
+               registry (ler_tools.DECODERS; issue #5804) and admitted on
+               this circuit,
                the claim meets the shot and failure floors (MIN_FAILURES is
                what makes the number a comparison rather than an order of
                magnitude) and is not saturated (a per-shot failure fraction
                above 1/2 reads as a per-round rate of 1/2 whatever the
-               circuit does, so such a point says nothing); rates are
-               distinct across points
-  replication  an independent re-sample decoded with the pinned decoder must
+               circuit does, so such a point says nothing); (rate, decoder)
+               pairs are distinct across points
+  replication  an independent re-sample decoded with the point's own decoder must
                agree with the claimed per-shot rate to within sampling error
                (|p_rep - p_claim| <= Z_GATE sigma of the replica). The
                replica is SIZED TO DISCRIMINATE, not to a fixed shot count:
@@ -39,7 +41,9 @@ Checks, per basis:
                claimed rate, which puts the 4-sigma detection threshold near
                a factor 1.4 under-report independent of the rate. At PR time
                (mode "gate") the points are tried from the highest rate down
-               inside one wall budget per basis (LER_SECONDS); the first
+               inside one wall budget per basis and per decoder (LER_SECONDS;
+               an entry carrying curves under several decoders pays the gate
+               once per decoder, and each decoder must verify one point); the first
                point is the cheapest, since failures are most common there.
                A point the budget cannot check to the admissibility bound
                (a factor-2 under-report caught with power) is DEFERRED to the
@@ -113,18 +117,22 @@ def is_legacy_form(ler):
     return any(isinstance(ler.get(s), dict) for s in ("X", "Z"))
 
 
-def gate_point(points):
-    """The point the PR-time gate replicates first: the highest rate. If the
-    entry merged, this point verified at PR time (the gate tries rates from
-    the top down and stops at the first it cannot afford, so a merged entry's
-    top point is always a gate-verified one)."""
-    pts = [q for q in points if isinstance(q, dict)]
+def gate_point(points, decoder=lt.DECODER_ID):
+    """The point the PR-time gate replicates first under ``decoder``: the
+    highest rate measured with it. If the entry merged, this point verified at
+    PR time (the gate tries rates from the top down and stops at the first it
+    cannot afford, so a merged entry's top point is always a gate-verified
+    one). The default is the reference decoder, the one the board's headline
+    rate reads; pass None for the highest rate under any decoder."""
+    pts = [q for q in points if isinstance(q, dict)
+           and (decoder is None or q.get("decoder", lt.DECODER_ID) == decoder)]
     return max(pts, key=lambda q: q.get("p") or 0) if pts else None
 
 
 def summary_rate(doc):
     """One number for an entry: the worse side's per-round rate at its gate
-    point (the highest rate claimed), or None without a measured tier."""
+    point (the highest rate claimed under the reference decoder), or None
+    without a measured tier under that decoder."""
     ler = (doc.get("circuit") or {}).get("ler")
     if not ler:
         return None
@@ -173,9 +181,9 @@ def point_errors(point, rounds):
     p = point.get("p")
     if p not in P_GRID:
         errs.append(f"p={p} is not on the rate grid {list(P_GRID)}")
-    if point.get("decoder") != lt.DECODER_ID:
-        errs.append(f"decoder={point.get('decoder')!r} is not the pinned "
-                    f"{lt.DECODER_ID!r}")
+    if point.get("decoder") not in lt.DECODERS:
+        errs.append(f"decoder={point.get('decoder')!r} is not in the registry "
+                    f"({', '.join(lt.DECODERS)})")
     shots, failures = point.get("shots", 0), point.get("failures", -1)
     if shots < lt.MIN_SHOTS:
         errs.append(f"shots={shots} below the statistical floor "
@@ -210,16 +218,21 @@ def point_errors(point, rounds):
     return errs
 
 
-def _dem_at(circuit, n, p):
-    """The committed circuit's DEM at physical rate p: the canonical recipe
+def _circuit_at(circuit, n, p):
+    """The committed circuit at physical rate p: the canonical recipe
     re-applied to the noiseless skeleton (at P_REF this is the committed
     circuit itself, which circuit_verify already checked)."""
     if p == ct.P_REF:
-        return ct.derive_dem(circuit)
-    return ct.derive_dem(ct.apply_noise(ct.strip_noise(circuit), n, p=p))
+        return circuit
+    return ct.apply_noise(ct.strip_noise(circuit), n, p=p)
 
 
-def replicate_point(dem, point, *, budget, seeds=1):
+def _dem_at(circuit, n, p):
+    """The committed circuit's DEM at physical rate p (see _circuit_at)."""
+    return ct.derive_dem(_circuit_at(circuit, n, p))
+
+
+def replicate_point(dem, point, *, budget, seeds=1, circuit=None):
     """Re-measure one point. `budget` is wall seconds for the whole point,
     split evenly across `seeds` independent replicas whose counts are pooled
     (the per-seed values are returned too, so a reader can see the spread).
@@ -235,7 +248,9 @@ def replicate_point(dem, point, *, budget, seeds=1):
         seed = (point["seed"] ^ REPLICA_SEED_SALT ^ (i * 0x9E3779B1)) \
             & 0x7FFFFFFF
         fail, done = lt.measure_failures(dem, per_seed, seed,
-                                         max_seconds=budget / max(1, seeds))
+                                         max_seconds=budget / max(1, seeds),
+                                         decoder=point.get("decoder", lt.DECODER_ID),
+                                         circuit=circuit)
         runs.append({"seed": seed, "shots": done, "failures": fail})
     rep_done = sum(r["shots"] for r in runs)
     rep_fail = sum(r["failures"] for r in runs)
@@ -314,9 +329,10 @@ def verify_ler(doc, circuits_dir, *, mode="gate", budget=None, seeds=None):
         for point in points:
             perr = point_errors(point, rounds)
             errs += [f"p={point.get('p')}: {e}" for e in perr]
-            if point.get("p") in seen:
-                errs.append(f"p={point.get('p')} appears twice")
-            seen.append(point.get("p"))
+            pair = (point.get("p"), point.get("decoder"))
+            if pair in seen:
+                errs.append(f"p={pair[0]} under decoder {pair[1]!r} appears twice")
+            seen.append(pair)
         record(f"{side}_ler_arithmetic", not errs, "; ".join(errs) or
                f"{len(points)} point(s) recompute exactly at p = "
                f"{', '.join(str(q['p']) for q in sorted(points, key=lambda q: -q['p']))}")
@@ -335,65 +351,88 @@ def verify_ler(doc, circuits_dir, *, mode="gate", budget=None, seeds=None):
         results = {}
         verified, failed, deferred = [], [], []
         import time
-        deadline = time.monotonic() + budget if mode == "gate" else None
-        for point in sorted(points, key=lambda q: -q["p"]):
-            p = point["p"]
-            if mode == "gate":
-                left = deadline - time.monotonic()
-                if deferred or left <= 0:
-                    deferred.append(p)
-                    results[str(p)] = {"status": "deferred", "p": p}
-                    continue
-                res = replicate_point(_dem_at(circuit, n, p), point,
-                                      budget=left, seeds=1)
-                if res["status"] == "unverifiable":
-                    res["status"] = "deferred"
-                    deferred.append(p)
-            else:
-                res = replicate_point(_dem_at(circuit, n, p), point,
-                                      budget=budget, seeds=seeds)
-            results[str(p)] = res
-            if res["status"] == "verified":
-                verified.append(p)
-            elif res["status"] == "failed":
-                failed.append(p)
-        report["computed"][side] = {"points": results, "mode": mode}
+        decoders = [d for d in lt.DECODERS
+                    if any(q.get("decoder") == d for q in points)]
+        for decoder in decoders:
+            group = sorted((q for q in points if q.get("decoder") == decoder),
+                           key=lambda q: -q["p"])
+            label = "" if decoder == lt.DECODER_ID else f"_{decoder}"
+            admitted, why = lt.decoder_admits(decoder, circuit)
+            if not admitted:
+                for q in group:
+                    results[lt.point_key(q["p"], decoder)] = {
+                        "status": "inadmissible", "p": q["p"],
+                        "decoder": decoder, "detail": why}
+                record(f"{side}_ler_decoder{label}", False, why)
+                continue
+            deadline = time.monotonic() + budget if mode == "gate" else None
+            dec_deferred = []
+            for point in group:
+                p = point["p"]
+                key = lt.point_key(p, decoder)
+                if mode == "gate":
+                    left = deadline - time.monotonic()
+                    if dec_deferred or left <= 0:
+                        dec_deferred.append(p)
+                        results[key] = {"status": "deferred", "p": p,
+                                        "decoder": decoder}
+                        continue
+                    res = replicate_point(_dem_at(circuit, n, p), point,
+                                          budget=left, seeds=1,
+                                          circuit=_circuit_at(circuit, n, p))
+                    if res["status"] == "unverifiable":
+                        res["status"] = "deferred"
+                        dec_deferred.append(p)
+                else:
+                    res = replicate_point(_dem_at(circuit, n, p), point,
+                                          budget=budget, seeds=seeds,
+                                          circuit=_circuit_at(circuit, n, p))
+                res["decoder"] = decoder
+                results[key] = res
+                if res["status"] == "verified":
+                    verified.append((p, decoder))
+                elif res["status"] == "failed":
+                    failed.append((p, decoder))
+            deferred.extend((p, decoder) for p in dec_deferred)
 
-        def fmt(p):
-            r = results[str(p)]
-            return (f"p={p}: replica {r['replica_failures']}/"
-                    f"{r['replica_shots']} = {r['replica_p_shot']:.4g} vs "
-                    f"claimed {r['claimed_p_shot']:.4g}, detects >= "
-                    f"{r['detectable_factor']}x")
-        if failed:
-            record(f"{side}_ler_replicated", False,
-                   "replica disagrees with the claim beyond "
-                   f"{Z_GATE:g} sigma at " + "; ".join(fmt(p) for p in failed))
-            continue
-        if mode == "gate" and not verified:
-            record(f"{side}_ler_replicated", False,
-                   f"unverifiable within budget: no point could be checked "
-                   f"to the factor-{MAX_DETECTABLE_FACTOR:g} admissibility "
-                   f"bound in {budget:.0f} s (tried p = "
-                   f"{', '.join(str(p) for p in deferred)}). The claim may be "
-                   f"honest, but this gate cannot check it; add a point at a "
-                   f"higher rate, where failures are common")
-            continue
-        unverifiable = [p for p, r in ((q["p"], results[str(q["p"])])
-                                       for q in points)
-                        if r["status"] == "unverifiable"]
-        detail = "verified at " + "; ".join(fmt(p) for p in verified)
-        if deferred:
-            detail += (f" | deferred to the post-merge replication: p = "
-                       f"{', '.join(str(p) for p in deferred)}")
-        if unverifiable:
-            detail += (f" | unverifiable within {budget:.0f} s per point: "
-                       f"p = {', '.join(str(p) for p in unverifiable)}")
-        record(f"{side}_ler_replicated", True, detail)
-        for p in deferred:
-            record(f"{side}_ler_p{p}_deferred", True,
-                   "left to verify/ler_replicate.py (weekly, long budget); "
-                   "pending on the board until its receipt lands")
+            def fmt(p, decoder=decoder):
+                r = results[lt.point_key(p, decoder)]
+                return (f"p={p}: replica {r['replica_failures']}/"
+                        f"{r['replica_shots']} = {r['replica_p_shot']:.4g} vs "
+                        f"claimed {r['claimed_p_shot']:.4g}, detects >= "
+                        f"{r['detectable_factor']}x")
+            dec_failed = [p for p, d in failed if d == decoder]
+            dec_verified = [p for p, d in verified if d == decoder]
+            if dec_failed:
+                record(f"{side}_ler_replicated{label}", False,
+                       f"{decoder}: replica disagrees with the claim beyond "
+                       f"{Z_GATE:g} sigma at " + "; ".join(fmt(p) for p in dec_failed))
+                continue
+            if mode == "gate" and not dec_verified:
+                record(f"{side}_ler_replicated{label}", False,
+                       f"{decoder}: unverifiable within budget: no point could be "
+                       f"checked to the factor-{MAX_DETECTABLE_FACTOR:g} admissibility "
+                       f"bound in {budget:.0f} s (tried p = "
+                       f"{', '.join(str(p) for p in dec_deferred)}). The claim may be "
+                       f"honest, but this gate cannot check it; add a point at a "
+                       f"higher rate, where failures are common")
+                continue
+            unverifiable = [q["p"] for q in group
+                            if results[lt.point_key(q["p"], decoder)]["status"]
+                            == "unverifiable"]
+            detail = f"{decoder}: verified at " + "; ".join(fmt(p) for p in dec_verified)
+            if dec_deferred:
+                detail += (f" | deferred to the post-merge replication: p = "
+                           f"{', '.join(str(p) for p in dec_deferred)}")
+            if unverifiable:
+                detail += (f" | unverifiable within {budget:.0f} s per point: "
+                           f"p = {', '.join(str(p) for p in unverifiable)}")
+            record(f"{side}_ler_replicated{label}", True, detail)
+            for p in dec_deferred:
+                record(f"{side}_ler_p{p}{label}_deferred", True,
+                       "left to verify/ler_replicate.py (weekly, long budget); "
+                       "pending on the board until its receipt lands")
+        report["computed"][side] = {"points": results, "mode": mode}
     return report
 
 
