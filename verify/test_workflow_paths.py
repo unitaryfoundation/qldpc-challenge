@@ -130,30 +130,26 @@ def test_weekly_proof_replay_fails_on_incomplete_shards():
     with open(_PROOF_REPLAY_WORKFLOW, encoding="utf-8") as f:
         workflow = f.read()
     shards = re.search(r'^  SHARDS: "(\d+)"$', workflow, re.M)
-    matrix = re.search(r'^        shard: \[([0-9, ]+)\]$', workflow, re.M)
+    matrix = re.search(r"^        shard: \[([0-9, ]+)\]$", workflow, re.M)
     assert shards and matrix, "update the proof-replay shard count and matrix together"
     shard_ids = [int(value) for value in re.findall(r"\d+", matrix.group(1))]
-    assert shard_ids == list(range(int(shards.group(1)))), (
-        "proof-replay matrix must cover every shard named by SHARDS"
-    )
+    assert shard_ids == list(range(int(shards.group(1)))), "proof-replay matrix must cover every shard named by SHARDS"
 
     replay_job = workflow.split("  replay:\n", 1)[1]
     timeout = re.search(r"^    timeout-minutes: (\d+)$", replay_job, re.M)
     budget = re.search(r"--max-minutes (\d+)", replay_job)
-    assert timeout and budget and int(budget.group(1)) < int(timeout.group(1)), (
-        "the per-shard replay budget must leave room below the job timeout"
+    assert timeout and budget and int(budget.group(1)) + 30 <= int(timeout.group(1)), (
+        "the per-shard replay budget must leave 30 minutes below the job timeout"
     )
     budget_check = re.search(
         r'(?m)^          if grep -q "left unopened" replay\.txt; then\n'
-        r'(?P<body>(?:^            .*\n)+)          fi$',
+        r"(?P<body>(?:^            .*\n)+)          fi$",
         replay_job,
     )
     assert budget_check and "exit 1" in budget_check.group("body"), (
         "a scheduled proof replay with entries left unopened must fail"
     )
-    assert "verify/replay_proofs.py --sample 12" in workflow, (
-        "keep the bounded rotating pull-request proof sample"
-    )
+    assert "verify/replay_proofs.py --sample 12" in workflow, "keep the bounded rotating pull-request proof sample"
 
 
 def test_collected_directories_exist(runner_cmd):

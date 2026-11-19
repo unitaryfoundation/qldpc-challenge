@@ -12,12 +12,11 @@ permissions:
 #
 # A pull request that touches the certificates or the emitter replays a
 # rotating subset of the quick entries. The weekly run replays all of them,
-# split into SHARDS parallel jobs. Shard I takes every SHARDS-th certificate
-# in slug order from the I-th, so the shards partition the set. A shard that
-# reaches its budget finishes the entry in hand, then fails if entries remain
-# unopened: the scheduled run must not report green without full coverage.
-# Increase both SHARDS and the matrix when board growth or runtime drift makes
-# that check fail.
+# split into SHARDS parallel jobs, assigning the longest recorded replays to
+# the currently lightest shard. Each shard reserves a slowdown margin before
+# opening an entry, skips work that cannot fit its remaining budget, and fails
+# if anything is left unopened. The scheduled run must not report green without
+# full coverage; the time-balanced partition is less sensitive to slug order.
 on:
   pull_request:
     paths:
@@ -45,7 +44,7 @@ env:
   # deliberate edit here and not a drift in whatever apt ships.
   KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
   DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
-  SHARDS: "22"
+  SHARDS: "12"
 
 jobs:
   subset:
@@ -78,7 +77,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5

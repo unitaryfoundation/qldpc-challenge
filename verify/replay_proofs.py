@@ -39,6 +39,8 @@ from sat_certify import (  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CERTS = os.path.join(ROOT, "certs")
 BATCH_LOG = os.path.join(CERTS, "proof_log_batch.jsonl")
+UNKNOWN_REPLAY_SECS = 600.0
+REPLAY_ESTIMATE_SAFETY_FACTOR = 1.25
 
 
 def replayable():
@@ -139,18 +141,31 @@ def replay(slug, cert, work, tlim):
     return rep
 
 
-def select_shard(items, spec):
-    """Return the items of shard ``spec`` ("I/K": every K-th of the sorted items from I).
+def _estimated_secs(slug, secs):
+    """Estimate solve/check time, conservatively filling missing rows."""
+    return secs.get(slug, UNKNOWN_REPLAY_SECS)
 
-    Shard I of K takes positions I, I + K, I + 2K, ... of the sorted list, so
-    the K shards partition the set and each carries the same share of the
-    slow entries wherever they sort. Malformed or out-of-range specs raise.
+
+def select_shard(items, spec, secs=None):
+    """Partition entries by recorded runtime, longest first, into shard ``I/K``.
+
+    Every item goes to the currently lightest shard, which keeps the predicted
+    replay time balanced when slug order happens to cluster slow certificates.
+    The assignment is deterministic for a fixed set of recorded times.
     """
     i_str, _, k_str = spec.partition("/")
     i, k = int(i_str), int(k_str)
     if k < 1 or not 0 <= i < k:
         raise ValueError(f"shard must be I/K with 0 <= I < K, not {spec!r}")
-    return sorted(items)[i::k]
+    secs = recorded_secs() if secs is None else secs
+    shards = [[] for _ in range(k)]
+    loads = [0.0] * k
+    ordered = sorted(items, key=lambda slug: (-_estimated_secs(slug, secs), slug))
+    for slug in ordered:
+        target = min(range(k), key=lambda shard: (loads[shard], shard))
+        shards[target].append(slug)
+        loads[target] += _estimated_secs(slug, secs)
+    return shards[i]
 
 
 def main(argv=None):
@@ -180,10 +195,10 @@ def main(argv=None):
     a = ap.parse_args(argv)
 
     certs = replayable()
+    secs = recorded_secs()
     if a.all:
         chosen = sorted(certs)
     elif a.sample:
-        secs = recorded_secs()
         pool = sorted(s for s in certs if secs.get(s, 0) <= a.max_secs)
         seed = a.seed if a.seed is not None else int(time.time() // 86400)
         chosen = sorted(random.Random(seed).sample(pool,
@@ -192,7 +207,7 @@ def main(argv=None):
         chosen = a.slugs
     if a.shard is not None:
         try:
-            chosen = select_shard(chosen, a.shard)
+            chosen = select_shard(chosen, a.shard, secs)
         except ValueError as e:
             print(e)
             return 2
@@ -211,12 +226,18 @@ def main(argv=None):
 
     work = tempfile.mkdtemp(prefix="replay-")
     failed, t0 = [], time.time()
-    left = 0
+    left = []
     try:
         for i, slug in enumerate(chosen):
-            if a.max_minutes is not None and time.time() - t0 > a.max_minutes * 60:
-                left = len(chosen) - i
-                break
+            if a.max_minutes is not None:
+                remaining = a.max_minutes * 60 - (time.time() - t0)
+                if remaining <= 0:
+                    left.extend(chosen[i:])
+                    break
+                estimate = _estimated_secs(slug, secs) * REPLAY_ESTIMATE_SAFETY_FACTOR
+                if estimate > remaining:
+                    left.append(slug)
+                    continue
             rep = replay(slug, certs[slug], work, a.tlim)
             if a.json:
                 print(json.dumps(rep, sort_keys=True))
@@ -229,8 +250,8 @@ def main(argv=None):
                 failed.append(rep)
     finally:
         shutil.rmtree(work, ignore_errors=True)
-    print(f"{len(chosen) - left} replayed, {len(failed)} failed, "
-          + (f"{left} left unopened at the {a.max_minutes:g} min budget, " if left else "")
+    print(f"{len(chosen) - len(left)} replayed, {len(failed)} failed, "
+          + (f"{len(left)} left unopened at the {a.max_minutes:g} min budget, " if left else "")
           + f"{round(time.time() - t0)}s")
     for rep in failed:
         print(json.dumps(rep, sort_keys=True))
