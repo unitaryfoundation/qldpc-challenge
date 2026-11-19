@@ -2,8 +2,8 @@
  "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs",
  "counts": {
   "literature": 489,
-  "no_match": 2383,
-  "not_derived": 356,
+  "no_match": 2380,
+  "not_derived": 359,
   "parameters_only": 459
  },
  "derivation_version": 1,
@@ -11328,7 +11328,7 @@
    "bucket": "no_match",
    "matches": []
   },
-  "341-40-46": {
+  "341-40-33": {
    "bucket": "not_derived",
    "matches": []
   },
@@ -15725,8 +15725,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "506-2-73": {
-   "bucket": "no_match",
+  "506-2-71": {
+   "bucket": "not_derived",
    "matches": []
   },
   "506-26-5": {
@@ -17736,8 +17736,8 @@
    "bucket": "no_match",
    "matches": []
   },
-  "606-6-78": {
-   "bucket": "no_match",
+  "606-6-56": {
+   "bucket": "not_derived",
    "matches": []
   },
   "607-83-3": {
@@ -19581,11 +19581,11 @@
    "bucket": "no_match",
    "matches": []
   },
-  "684-4-73": {
-   "bucket": "no_match",
+  "684-4-63": {
+   "bucket": "not_derived",
    "matches": []
   },
-  "684-6-72": {
+  "684-6-69": {
    "bucket": "not_derived",
    "matches": []
   },
