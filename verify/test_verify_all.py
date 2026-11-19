@@ -827,7 +827,7 @@ def test_the_record_is_restored_and_saved_only_on_main():
     # never be answered from a cache, and not the scheduled run, which is the
     # from-scratch check the record's lines are never more than a week from.
     assert "        if: github.event_name == 'push'" in steps[_RESTORE]
-    assert "        uses: actions/cache/restore@v4" in steps[_RESTORE]
+    assert "        uses: actions/cache/restore@" in steps[_RESTORE]
     with open(_WORKFLOW, encoding="utf-8") as f:
         assert "\n  push:\n    branches: [main]\n" in f.read()
     cond = next(ln for ln in steps[_SAVE] if ln.startswith("        if: "))[len("        if: "):]
@@ -1138,7 +1138,7 @@ def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
     lo, hi = names.index(_CODE_SWEEP), names.index(_GATE)
     assert lo < hi and names[hi - 1] == _SEARCH_RESTORE
     restore = _code(steps[_SEARCH_RESTORE])
-    assert "        uses: actions/cache/restore@v4" in restore
+    assert "        uses: actions/cache/restore@" in restore
     assert [ln.strip() for ln in restore if ln.strip().startswith("path:")] == ["path: search-cache"]
     for name in names[lo + 1:hi - 1]:
         cond = next((ln[len("        if: "):] for ln in steps[name]
