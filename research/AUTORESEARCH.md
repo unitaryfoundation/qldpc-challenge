@@ -50,6 +50,14 @@ verdict on stdout and keeps nothing (issue #2781).
 or in-process (add `verify/` to the path first):
 `import sys; sys.path.insert(0, "verify"); from validate_candidate import validate_candidate`.
 The verdict's `gates` block is your evidence; `labels` are what you show the human.
+Its `candidate.sector_distances` block is the verifier's per-side distance interval (issue
+#6812): for each side (`X` and `Z`, or `P` for a stabilizer code) and for `d`, `upper` is the
+witness weight the verifier checked, lowered to the refuter's find when the found logical is of
+that side, and `lower` is `None` until a certificate fills it, since the trustless check proves
+nothing below the witness. For a board entry with a `certs/<slug>.json`, pair the two with
+`qldpc_verify.apply_certificate(block, doc, cert)` (or pass `cert=` to `verify`) and read the
+proven `lower`. A campaign that selects parents or judges a sector swap reads this block, not a
+ledger's carried bound.
 
 ## The loop
 

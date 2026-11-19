@@ -147,6 +147,9 @@ def validate_candidate(doc, *, seed=None, refute=True):
     wc, lc = comp.get("weight_class"), comp.get("locality_class")
     verdict["candidate"]["weight_class"] = wc
     verdict["candidate"]["locality_class"] = lc
+    # per-side distance intervals (issue #6812): what the witnesses and the
+    # refuter established, for parent selection and post-swap checks
+    verdict["candidate"]["sector_distances"] = comp.get("sector_distances")
     verdict["candidate"]["fingerprint"] = rep.get("fingerprint")
     verdict["candidate"]["signature"] = rep.get("signature", {}).get("hash")
 
