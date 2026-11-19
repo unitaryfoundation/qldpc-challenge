@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: top up the table and commit it (race-safe)
         # --check before and after goes to the step summary; the run fails
         # only if the table is BROKEN (an unknown bucket, literature with no

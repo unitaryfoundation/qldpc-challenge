@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           # The merge commit and its first parent are enough for an added-file list.
           fetch-depth: 2
@@ -28,7 +28,7 @@ jobs:
             pyproject.toml
             uv.lock
           sparse-checkout-cone-mode: false
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       - name: repo-wide Ruff baseline (advisory)
         shell: bash
         run: |
