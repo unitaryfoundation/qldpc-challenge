@@ -95,6 +95,7 @@ import os
 import re
 import subprocess
 import sys
+from fractions import Fraction
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from qldpc_verify import is_stabilizer, sides
@@ -412,9 +413,80 @@ def architecture_binding(author, base_doc, new_doc):
                             "an architecture block")
 
 
-def circuit_improvement_binding(author, base_doc, new_doc):
+def circuit_schedules(base, root, slug):
+    """Depth and width of the entry's memory circuits on ``base`` and in the tree.
+
+    ``{"base": {side: schedule_depth}, "new": {side: schedule_depth},
+    "errors": [...]}``: the base files are read from git, the new ones from
+    ``root``, each through ``circuit_tools.schedule_depth``. A file that is
+    missing or does not parse is an error entry, and the shallower-schedule
+    route refuses on any error, so an unreadable circuit cannot read as
+    shallower.
+    """
+    import circuit_tools
+    import stim
+    out = {"base": {}, "new": {}, "errors": []}
+    for side in ("X", "Z"):
+        rel = f"circuits/{slug}/memory_{side.lower()}.stim"
+        try:
+            text = subprocess.check_output(["git", "show", f"{base}:{rel}"],
+                                           cwd=root, text=True,
+                                           stderr=subprocess.DEVNULL)
+            out["base"][side] = circuit_tools.schedule_depth(stim.Circuit(text))
+        except Exception as e:  # noqa: BLE001 - reported, and the route refuses
+            out["errors"].append(f"{rel} on {base}: {type(e).__name__}")
+        try:
+            circuit = stim.Circuit.from_file(os.path.join(root, rel))
+            out["new"][side] = circuit_tools.schedule_depth(circuit)
+        except Exception as e:  # noqa: BLE001 - reported, and the route refuses
+            out["errors"].append(f"{rel}: {type(e).__name__}")
+    return out
+
+
+def _per_round(depth, rounds):
+    """Layers per round as an exact fraction: (layers - 2) / rounds."""
+    return Fraction(max(int(depth["layers"]) - 2, 0), max(int(rounds or 0), 1))
+
+
+def shallower_schedule(bc, nc, schedules):
+    """Decide whether the new schedule is strictly shallower than the committed one on both bases.
+
+    The second way a non-author may replace a circuit tier (issue #6834): at
+    equal ``d_circ`` the committed schedule can still be several times
+    deeper than another that reads the same fault distance, and every TICK
+    layer costs every idle data qubit a depolarizing fault, so the measured
+    rate is worse by about the depth ratio while ``d_circ`` cannot see it.
+    Strictly shallower means fewer layers per round, (layers - 2) / rounds,
+    on both bases, with no basis addressing more qubits than before. Returns
+    (ok, reason-if-not); ``schedules`` is :func:`circuit_schedules`'s result,
+    and None (a caller without the files) refuses.
+    """
+    lead = "no side's circuit fault distance rose"
+    if schedules is None:
+        return False, lead
+    if schedules.get("errors"):
+        return False, (f"{lead}, and the schedules could not be compared: "
+                       + "; ".join(schedules["errors"]))
+    for side in ("X", "Z"):
+        b, n_ = schedules["base"].get(side), schedules["new"].get(side)
+        if b is None or n_ is None:
+            return False, f"{lead}, and the {side} memory circuit is missing"
+        old, new = _per_round(b, bc.get("rounds")), _per_round(n_, nc.get("rounds"))
+        if not new < old:
+            return False, (f"{lead}, and the {side} memory circuit is not "
+                           f"shallower ({float(new):g} vs {float(old):g} "
+                           "layers per round)")
+        if n_["qubits"] > b["qubits"]:
+            return False, (f"{lead}, and the shallower {side} memory circuit "
+                           f"addresses more qubits ({n_['qubits']} vs "
+                           f"{b['qubits']})")
+    return True, ""
+
+
+def circuit_improvement_binding(author, base_doc, new_doc, schedules=None):
     """Does new_doc differ from base_doc by exactly a replacement of its
-    circuit tier that raises the claimed fault distance, credited to author?
+    circuit tier that raises the claimed fault distance, or reads the same
+    fault distance from a strictly shallower schedule, credited to author?
     Returns (ok, reason-if-not).
 
     Replacement is otherwise reserved to the listed authors because the tier
@@ -431,7 +503,14 @@ def circuit_improvement_binding(author, base_doc, new_doc):
     schedule being replaced. Outside the circuit block: append to
     provenance.notes, change `name` and `schema_version`, nothing else.
     Credit lives in the new block's contributed_by, as for a first addition,
-    so the binding never widens the contributor's rights over the code."""
+    so the binding never widens the contributor's rights over the code.
+
+    The second route (issue #6834): when no side rose, the replacement binds
+    if every side read the same value and :func:`shallower_schedule` holds
+    for ``schedules`` (the depths :func:`circuit_schedules` read from the
+    committed files on base and in the tree). The gate still re-derives the
+    detector error models and re-runs the circuit search, since the witnesses
+    index the new circuits."""
     bc, nc = base_doc.get("circuit"), new_doc.get("circuit")
     if not isinstance(bc, dict):
         return False, "the entry has no circuit tier to improve"
@@ -479,7 +558,9 @@ def circuit_improvement_binding(author, base_doc, new_doc):
                            "the listed authors)")
         raised += nv > bv
     if raised == 0:
-        return False, "no side's circuit fault distance rose"
+        ok, why = shallower_schedule(bc, nc, schedules)
+        if not ok:
+            return False, why
     if author not in contributed_by_handles(nc):
         return False, ("circuit.contributed_by.by does not list the PR "
                        f"author @{author}")
@@ -710,7 +791,8 @@ BINDINGS = (
     ("benchmark", benchmark_binding, "adding a first benchmark block to"),
     ("architecture", architecture_binding, "adding a first architecture block to"),
     ("circuit_improvement", circuit_improvement_binding,
-     "raising the circuit fault distance of"),
+     "replacing the circuit tier (a higher d_circ, or the same from a "
+     "shallower schedule) of"),
     ("circuit_refutation", circuit_refutation_binding,
      "refuting the circuit fault distance of"),
     ("family", family_binding, "correcting the family tag of"),
@@ -734,6 +816,13 @@ def evident_binding(base_doc, new_doc):
                and isinstance((bd.get(s) or {}).get("value"), int)
                and nd[s]["value"] < bd[s]["value"] for s in bd):
             return "circuit_refutation"
+        return "circuit_improvement"
+    if (isinstance(base_doc.get("circuit"), dict)
+            and isinstance(new_doc.get("circuit"), dict)
+            and base_doc["circuit"] != new_doc["circuit"]
+            and base_doc["circuit"].get("ler") == new_doc["circuit"].get("ler")
+            and base_doc.get("distance") == new_doc.get("distance")):
+        # the same d_circ from other circuits: a schedule replacement
         return "circuit_improvement"
     if (isinstance(base_doc.get("circuit"), dict)
             and isinstance(new_doc.get("circuit"), dict)
@@ -903,7 +992,12 @@ def main(argv):
                                      "refutation reads the committed "
                                      "artifacts as they are", True))
                     continue
-                ok, why = bind(author, base_doc, doc)
+                extra = {}
+                if label == "circuit_improvement":
+                    # the shallower-schedule route reads the committed
+                    # circuits on base and in the tree (issue #6834)
+                    extra["schedules"] = circuit_schedules(base, root, slug)
+                ok, why = bind(author, base_doc, doc, **extra)
                 if ok:
                     print(f"ok    {f}: @{author} binds by {phrase} {base_path}")
                     break
@@ -922,8 +1016,9 @@ def main(argv):
               "credited to them in witness_provenance.found_by (issue #611), "
               "or exactly a first-layout addition credited to them in "
               "locality.contributed_by.by, or exactly a first-circuit-tier "
-              "addition or a d_circ-raising circuit-tier replacement credited "
-              "to them in circuit.contributed_by.by, or exactly a d_circ "
+              "addition or a circuit-tier replacement that raises d_circ or "
+              "reads the same d_circ from a strictly shallower schedule, "
+              "credited to them in circuit.contributed_by.by, or exactly a d_circ "
               "refutation (values down with witnesses of the new weights, "
               "credited in appended provenance.notes).")
         for f, hs, extra in violations:

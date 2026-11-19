@@ -842,6 +842,23 @@ def _rate_cases():
              migrated(), True, author="alice", rename=False, base_doc=base)
 
 
+def _memory_text(per_round, rounds, qubits=4, flip=False):
+    """Return a memory circuit of `rounds` rounds at `per_round` single-gate layers each.
+
+    A preparation layer and a readout layer bracket the rounds, so
+    (layers - 2) / rounds is exactly `per_round`. `flip` swaps the gate so
+    two texts differ at the same depth.
+    """
+    gate = "X" if flip else "H"
+    qs = " ".join(str(q) for q in range(qubits))
+    lines = [f"R {qs}", "TICK"]
+    for _ in range(rounds):
+        for j in range(per_round):
+            lines += [f"{gate} {j % qubits}", "TICK"]
+    lines.append(f"M {qs}")
+    return "\n".join(lines) + "\n"
+
+
 def _circuit_improvement_cases():
     """A better schedule (PRs #3621, #3623): replacing an existing circuit
     tier binds for anyone when the claimed d_circ is no lower on either side
@@ -885,9 +902,9 @@ def _circuit_improvement_cases():
             return d
         return edit
 
-    def case(name, edit, ok, base_doc=base, **kw):
+    def case(name, edit, ok, base_doc=base, base_files=stim, files=better, **kw):
         run_case(name, edit, ok, rename=False, base_doc=base_doc,
-                 base_files=stim, files=better, **kw)
+                 base_files=base_files, files=files, **kw)
 
     case("non-author may replace the circuit tier when d_circ rises on one "
          "side", improved(), True)
@@ -955,6 +972,79 @@ def _circuit_improvement_cases():
          improved_measured, True, base_doc=measured, author="alice")
     case("the listed author may still replace the tier without a rise",
          improved(x=4, z=5), True, author="alice")
+
+    # the shallower-schedule route (issue #6834): the same d_circ on both
+    # sides binds when the new circuits have strictly fewer layers per round
+    # on both bases and no more qubits; memory files are real stim text so
+    # check_authorship.circuit_schedules can read their depth
+    def pair(x_text, z_text):
+        return [("circuits/60-8-6/memory_x.stim", x_text),
+                ("circuits/60-8-6/memory_z.stim", z_text)]
+    deep = pair(_memory_text(12, 6), _memory_text(12, 6))
+    shallow = pair(_memory_text(6, 6), _memory_text(6, 6))
+    half = pair(_memory_text(6, 6), _memory_text(12, 6))
+    same_depth = pair(_memory_text(12, 6, flip=True), _memory_text(12, 6, flip=True))
+    wide = pair(_memory_text(6, 6, qubits=6), _memory_text(6, 6, qubits=6))
+    case("the same d_circ from a schedule strictly shallower on both bases "
+         "binds", improved(x=4, z=5), True, base_files=deep, files=shallow)
+    case("a schedule shallower on one basis and as deep on the other is a "
+         "replacement", improved(x=4, z=5), False, base_files=deep, files=half)
+    case("other circuits at the same depth are a replacement, not an "
+         "improvement", improved(x=4, z=5), False, base_files=deep,
+         files=same_depth)
+    case("a shallower schedule that addresses more qubits is a replacement",
+         improved(x=4, z=5), False, base_files=deep, files=wide)
+    case("a shallower schedule read at fewer rounds is rejected",
+         improved(x=4, z=5, rounds=5), False, base_files=deep, files=shallow)
+    case("a shallower schedule that also raises a side binds",
+         improved(x=6, z=5), True, base_files=deep, files=shallow)
+
+    def uncredited_same():
+        d = improved(x=4, z=5)()
+        del d["circuit"]["contributed_by"]
+        return d
+    case("a shallower schedule without contributed_by credit is rejected",
+         uncredited_same, False, base_files=deep, files=shallow)
+
+    def shallower_measured():
+        d = improved(x=4, z=5)()
+        d["circuit"]["ler"] = copy.deepcopy(measured["circuit"]["ler"])
+        return d
+    case("a shallower schedule over a measured one is reserved to the listed "
+         "authors", shallower_measured, False, base_doc=measured,
+         base_files=deep, files=shallow)
+    case("a shallower schedule binds when the base circuits are unreadable "
+         "only for the listed author", improved(x=4, z=5), False,
+         base_files=pair("not a circuit\n", "not a circuit\n"), files=shallow)
+
+    check("the evident binding for the same d_circ from other circuits is "
+          "the improvement",
+          check_authorship.evident_binding(base, improved(x=4, z=5)())
+          == "circuit_improvement")
+    depth = lambda layers, qubits=4: {"layers": layers, "qubits": qubits}  # noqa: E731
+    bc, nc = {"rounds": 6}, {"rounds": 6}
+    ok, why = check_authorship.shallower_schedule(bc, nc, None)
+    check("no schedules means no rise and nothing else",
+          not ok and why == "no side's circuit fault distance rose")
+    ok, why = check_authorship.shallower_schedule(
+        bc, nc, {"base": {}, "new": {}, "errors": ["circuits/x: ValueError"]})
+    check("an unreadable circuit refuses with the file named",
+          not ok and "could not be compared" in why and "circuits/x" in why)
+    ok, why = check_authorship.shallower_schedule(
+        bc, nc, {"base": {"X": depth(74), "Z": depth(74)},
+                 "new": {"X": depth(38), "Z": depth(74)}, "errors": []})
+    check("a basis that is not shallower is named with both depths",
+          not ok and "Z memory circuit is not shallower (12 vs 12" in why)
+    ok, why = check_authorship.shallower_schedule(
+        bc, nc, {"base": {"X": depth(74), "Z": depth(74)},
+                 "new": {"X": depth(38), "Z": depth(38, qubits=5)}, "errors": []})
+    check("more qubits on a shallower basis is named",
+          not ok and "addresses more qubits (5 vs 4)" in why)
+    ok, why = check_authorship.shallower_schedule(
+        bc, {"rounds": 7}, {"base": {"X": depth(74), "Z": depth(74)},
+                            "new": {"X": depth(79), "Z": depth(79)}, "errors": []})
+    check("depth is compared per round, so more rounds at the same total "
+          "layers is shallower", ok and why == "")
 
     check("the evident binding for a d_circ change is the improvement",
           check_authorship.evident_binding(base, improved()())

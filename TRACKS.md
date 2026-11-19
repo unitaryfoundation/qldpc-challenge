@@ -231,7 +231,11 @@ earn a higher circuit distance by measuring fewer rounds than the code
 distance. Nothing else changes: the entry stays in the same cells and keeps
 its place on the (n, k, d, w) frontier, the site marks it with a gear chip
 carrying the lower of its two `d_circ` values, and the circuit tab lists the
-entries that have one.
+entries that have one. The schedule's depth is not ranked either, but it is
+what a measured rate pays for: anyone may replace an entry's circuits with a
+schedule that reads a higher `d_circ`, or the same `d_circ` from strictly
+fewer layers per round on both bases (`CONTRIBUTING.md`, "Raising a circuit
+fault distance already on the board", issue #6834).
 
 The tier has caps: n at most 200, a cap on the error mechanisms per memory
 detector error model at `rounds = d`, and a cap on the size of each committed

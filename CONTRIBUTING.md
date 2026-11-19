@@ -302,10 +302,21 @@ exactly that replacement when the claimed `d_circ` is no lower on either
 side and higher on at least one, at no fewer rounds, with every field the
 old block carried still present. It refuses the replacement when the old
 block carries measured-rate points (`circuit.ler`), since those measure the
-schedule being replaced, and it refuses a schedule that reads the same or
-lower anywhere; both stay with the listed authors. The gate re-derives the
+schedule being replaced, and it refuses a schedule that reads lower
+anywhere; both stay with the listed authors. The gate re-derives the
 committed detector error models and re-runs the circuit search on the new
 claim, as it does for a first donated tier.
+
+A schedule that reads the same `d_circ` on both sides also binds when it is
+strictly shallower (issue #6834): fewer layers per round on both bases,
+measured on the committed files as the TICK-delimited layers that carry an
+operation, less the preparation and readout layers, divided by `rounds`,
+and no more qubits addressed on either basis. Every layer exposes every idle
+data qubit to a depolarizing fault under the canonical noise recipe, so a
+schedule several times deeper at the same `d_circ` has a measured rate
+worse by about that factor, which `d_circ` cannot see. Equal depth, a basis
+that is not shallower, more qubits, fewer rounds, or a measured schedule
+under it is a replacement reserved to the listed authors.
 
 ## Lowering a circuit fault distance already on the board
 

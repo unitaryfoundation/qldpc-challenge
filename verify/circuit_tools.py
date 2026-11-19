@@ -131,6 +131,35 @@ def _segments(flat_circuit):
     return segs
 
 
+def schedule_depth(circuit):
+    """Depth and width of a memory circuit: {"layers", "qubits"} (issue #6834).
+
+    ``layers`` counts the TICK-delimited segments that carry at least one
+    operation; noise channels and annotations are not operations, so the
+    count is the same for a committed circuit and its noiseless skeleton.
+    ``layer_conflict_errors`` already requires every segment to touch no
+    qubit twice, so this is the gate depth of the experiment, not a
+    formatting choice. ``qubits`` is every qubit the circuit addresses (data,
+    ancilla, and flag). The per-round depth a caller compares two schedules by
+    is (layers - 2) / rounds: the data preparation layer and the final
+    readout layer are the two that do not repeat.
+    """
+    noise = {}
+    layers = 0
+    for seg in _segments(circuit.flattened()):
+        for inst in seg:
+            name = inst.name
+            if name in ANNOTATIONS:
+                continue
+            is_noise = noise.get(name)
+            if is_noise is None:
+                is_noise = noise[name] = _is_pure_noise(name)
+            if not is_noise:
+                layers += 1
+                break
+    return {"layers": layers, "qubits": circuit.num_qubits}
+
+
 def layer_conflict_errors(skeleton):
     """[] iff every TICK segment of the noiseless skeleton is a genuinely
     parallel layer: no qubit targeted by more than one operation atom
