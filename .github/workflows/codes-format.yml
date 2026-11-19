@@ -19,19 +19,21 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      # One clone, history without blobs, and the trusted tree as a worktree
+      # of it at the base branch (issue #5578, change F): the check needs
+      # the two trees and a diff against the base, not two copies of the
+      # history pack.
       - name: check out submitted tree
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
           path: submitted
       # The checker runs from the base branch: a PR must not be able to weaken
       # the check that judges it.
       - name: check out trusted tree (base branch)
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.base_ref }}
-          fetch-depth: 0
-          path: trusted
+        working-directory: submitted
+        run: git worktree add --detach ../trusted "origin/${{ github.base_ref }}"
       - name: codes format (board JSON is json.dumps(doc, indent=1) plus a newline)
         working-directory: trusted
         run: |

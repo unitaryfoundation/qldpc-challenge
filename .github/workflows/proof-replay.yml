@@ -11,7 +11,14 @@ permissions:
 # the formula again with kissat, and has drat-trim check the new proof.
 #
 # A pull request that touches the certificates or the emitter replays a
-# rotating subset of the quick entries. The weekly run replays all of them.
+# rotating subset of the quick entries. The weekly run replays all of them,
+# split into SHARDS parallel jobs, each stopping cleanly at its budget: one
+# job replaying every certificate was cancelled at the 300-minute cap in
+# each of the five weeks to 2026-11-16 (issue #5578, finding 6), so the
+# tier's backstop was not running at all. Shard I takes every SHARDS-th
+# certificate in slug order from the I-th, so the shards partition the set;
+# a shard that reports entries left unopened at its budget is the signal to
+# add a shard (the matrix list and SHARDS must agree).
 on:
   pull_request:
     paths:
@@ -33,19 +40,20 @@ concurrency:
   group: proof-replay-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  PYTHONUNBUFFERED: "1"
+  # Pinned to a commit each, so a changed solver or checker is a
+  # deliberate edit here and not a drift in whatever apt ships.
+  KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
+  DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+  SHARDS: "6"
+
 jobs:
-  replay:
+  subset:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
-    # The full set is about 2.1 core-hours of solving and checking, 40 min
-    # of it on one entry (certs/proof_log_batch.jsonl records the per-entry
-    # times); the per-PR subset is seconds. The cap is for a hang.
-    timeout-minutes: 300
-    env:
-      PYTHONUNBUFFERED: "1"
-      # Pinned to a commit each, so a changed solver or checker is a
-      # deliberate edit here and not a drift in whatever apt ships.
-      KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
-      DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
+    # The per-PR subset is seconds; the cap is for a hang.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -62,8 +70,37 @@ jobs:
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
       - name: replay a rotating subset
-        if: github.event_name == 'pull_request'
         run: uv run --frozen --extra certify python verify/replay_proofs.py --sample 12 --seed ${{ github.event.pull_request.number }}
-      - name: replay every proof_log certificate
-        if: github.event_name != 'pull_request'
-        run: uv run --frozen --extra certify python verify/replay_proofs.py --all --tlim 1800
+  replay:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    # Each shard stops opening entries at 270 minutes and finishes the one in
+    # hand (an entry has taken 40 min; certs/proof_log_batch.jsonl records
+    # the per-entry times), so it ends under the cap, which is for a hang.
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: build kissat and drat-trim
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/arminbiere/kissat.git /tmp/kissat
+          git -C /tmp/kissat checkout -q "$KISSAT_REF"
+          (cd /tmp/kissat && ./configure >/dev/null && make -s -j"$(nproc)")
+          git clone -q https://github.com/marijnheule/drat-trim.git /tmp/drat-trim
+          git -C /tmp/drat-trim checkout -q "$DRAT_TRIM_REF"
+          (cd /tmp/drat-trim && make -s drat-trim)
+          install -m 755 /tmp/kissat/build/kissat /usr/local/bin/kissat
+          install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
+          kissat --version
+      - name: replay this shard of the proof_log certificates (stops opening entries at 270 min)
+        run: |
+          set -o pipefail
+          uv run --frozen --extra certify python verify/replay_proofs.py --all --tlim 1800 --shard ${{ matrix.shard }}/$SHARDS --max-minutes 270 | tee replay.txt
+          if grep -q "left unopened" replay.txt; then
+            echo "::warning title=proof replay shard ${{ matrix.shard }} ran out of budget::$(tail -1 replay.txt). Add a shard to the matrix and SHARDS."
+          fi

@@ -75,3 +75,30 @@ def test_the_smallest_entry_replays_end_to_end(tmp_path):
     for blk in rep["sides"].values():
         assert blk["cnf_sha256_matches"] and blk["kissat"] == "UNSAT"
         assert blk["drat_trim"] == "VERIFIED"
+
+
+def test_shards_partition_the_set_in_slug_order():
+    items = [f"s{i:02d}" for i in range(13)]
+    shards = [R.select_shard(items, f"{i}/4") for i in range(4)]
+    assert sorted(sum(shards, [])) == items
+    assert shards[0] == ["s00", "s04", "s08", "s12"] and shards[3] == ["s03", "s07", "s11"]
+    for bad in ("4/4", "-1/4", "0/0", "x"):
+        with pytest.raises(ValueError):
+            R.select_shard(items, bad)
+
+
+def test_a_budget_stops_opening_entries_and_is_reported_not_failed(monkeypatch, capsys):
+    """--max-minutes ends the run cleanly; what was not opened is counted, not failed."""
+    certs = {f"e{i}": {"verification": {"level": "proof_log"}} for i in range(5)}
+    monkeypatch.setattr(R, "replayable", lambda: certs)
+    monkeypatch.setattr(R.shutil, "which", lambda tool: "/usr/bin/" + tool)
+    opened = []
+    monkeypatch.setattr(R, "replay", lambda slug, cert, work, tlim: (opened.append(slug),
+                                                                      {"ok": True, "sides": {}})[1])
+    rc = R.main(["--all", "--max-minutes", "0"])
+    out = capsys.readouterr().out
+    assert rc == 0 and opened == []
+    assert "0 replayed, 0 failed, 5 left unopened at the 0 min budget" in out
+    rc = R.main(["--all", "--shard", "1/2"])
+    assert rc == 0 and opened == ["e1", "e3"]
+    assert "2 replayed, 0 failed" in capsys.readouterr().out
