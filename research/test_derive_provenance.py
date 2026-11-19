@@ -208,7 +208,12 @@ def test_a_bucket_added_later_is_not_read_as_corruption(tmp_path, monkeypatch):
 def test_top_up_records_new_entries_without_the_index(tmp_path, monkeypatch):
     """Anyone merging a code PR can reconcile coverage; no index needed."""
     payload = _payload()
-    dropped = sorted(payload["entries"])[0]
+    # an entry that is on the board today: the committed table lags the board
+    # between weekly top-ups (the dedup of #6296 removed the entry that sorted
+    # first and this test failed on every PR), and a departed slug is dropped
+    # by design, so it cannot be the row this checks
+    on_board = set(dp.board_slugs())
+    dropped = next(s for s in sorted(payload["entries"]) if s in on_board)
     del payload["entries"][dropped]
     payload["entries"]["9999-0-0"] = {"bucket": "no_match", "matches": []}
     payload["counts"] = dp.counts(payload["entries"])
@@ -225,8 +230,9 @@ def test_top_up_records_new_entries_without_the_index(tmp_path, monkeypatch):
 def test_top_up_never_promotes_an_underived_entry(tmp_path, monkeypatch):
     """It records what is unknown; it must not launder it into a verdict."""
     payload = _payload()
-    slug = next(s for s, v in payload["entries"].items()
-                if v["bucket"] == "literature")
+    on_board = set(dp.board_slugs())
+    slug = next(s for s, v in sorted(payload["entries"].items())
+                if v["bucket"] == "literature" and s in on_board)
     before = dict(payload["entries"][slug])
     _write(payload, tmp_path, monkeypatch)
     dp.top_up()
