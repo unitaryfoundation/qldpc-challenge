@@ -390,6 +390,8 @@ border:1px solid #a7f3d0;vertical-align:2px;white-space:nowrap}
 .lercurve circle.lx{fill:#1f77b4} .lercurve circle.lz{fill:#d62728}
 .lercurve circle.st-pending,.lercurve circle.st-unverifiable{fill:#fff}
 .lercurve circle.st-failed{fill:#000}
+.lercurve polyline.alt{stroke-dasharray:4 3;opacity:.75} .lercurve circle.alt{opacity:.75}
+h3.lerdec{font-size:13px;margin:10px 0 2px}
 table.lerpts{border-collapse:collapse;font-size:12px;margin:4px 0 8px}
 table.lerpts th,table.lerpts td{padding:2px 8px;border-bottom:1px solid var(--line,#ddd);text-align:left}
 table.lerpts td.num{font-variant-numeric:tabular-nums}
