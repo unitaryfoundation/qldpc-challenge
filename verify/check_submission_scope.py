@@ -201,6 +201,17 @@ def main(argv):
         return 1
     codes = [f for f in files if is_code_submission(f)]
     new_codes = [f for f in added if is_code_submission(f)]
+    # A board entry is one file, codes/<slug>.json. A path nested under
+    # codes/ (e.g. codes/<slug>.json/<slug>.json) is a packaging mistake that
+    # slips past the surface check because it still ends in .json (issue #6849).
+    bad_code_paths = [f for f in codes
+                      if not re.match(r"^codes/[^/]+\.json$", f)]
+    if bad_code_paths:
+        print("Code submission paths must be a single file, codes/<slug>.json,")
+        print("not a directory or a nested path:")
+        for f in bad_code_paths:
+            print(f"  {f}")
+        return 1
     new_slugs = sorted({submission_slug(f) for f in new_codes})
     critical = [f for f in files if is_critical(f)]
     # One new code per PR: the deep refutation gate budgets ~10 min per code, so
