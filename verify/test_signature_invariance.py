@@ -11,6 +11,14 @@ The twin the issue reports, 390-82-31-b, left the board when #4143 removed
 the permutation-equivalent duplicates, which is the outcome this file
 protects, so the tests that need both documents read the removed one from
 verify/fixtures/equivalence/, as the board held it.
+
+The other two inputs, 390-82-31 and 390-82-38, are read from the same
+directory, copied from the board as it stood on 2026-11-19. Read from codes/,
+they made this file fail on any pull request that revised either entry's
+distance, because a revision renames the file (#6793 renamed 390-82-38 to
+390-82-35). Nothing here depends on a distance claim, so a frozen copy tests
+exactly what the board copy did. The board-wide scan below still reads
+codes/ as it is.
 """
 import copy
 import glob
@@ -28,11 +36,6 @@ from qldpc_verify import signature  # noqa: E402
 from two_block_equivalence import equivalent, scan  # noqa: E402
 
 
-def load(slug):
-    with open(os.path.join(_ROOT, "codes", f"{slug}.json"), encoding="utf-8") as f:
-        return json.load(f)
-
-
 FIXTURES = os.path.join(_HERE, "fixtures", "equivalence")
 
 
@@ -43,7 +46,7 @@ def fixture(slug):
 
 @pytest.fixture(scope="module")
 def code():
-    return load("390-82-31")
+    return fixture("390-82-31")
 
 
 def test_a_tightened_distance_does_not_change_the_signature(code):
@@ -75,24 +78,24 @@ def test_the_signature_still_separates_different_codes(code):
     cyclic two-block code at one blocklength collides, because WL refinement on
     a regular Tanner graph is close to trivial.
     """
-    other = load("390-82-38")
+    other = fixture("390-82-38")
     assert signature(code)["hash"] != signature(other)["hash"]
 
 
 def test_the_equivalence_test_decides_rather_than_flags():
     """A WL collision is necessary, not sufficient; this closes the question."""
-    a, b = load("390-82-31"), fixture("390-82-31-b")
+    a, b = fixture("390-82-31"), fixture("390-82-31-b")
     found = equivalent(a, b)
     assert found is not None, "a known equivalent pair was not decided"
     unit, _swapped = found
     assert unit > 1
-    assert equivalent(a, load("390-82-38")) is None
+    assert equivalent(a, fixture("390-82-38")) is None
 
 
 @pytest.mark.board
 def test_the_board_scan_names_the_pairs_it_finds():
     """The scan names the known pair, and the real board holds none since #4143."""
-    pair = [os.path.join(_ROOT, "codes", "390-82-31.json"), os.path.join(FIXTURES, "390-82-31-b.json")]
+    pair = [os.path.join(FIXTURES, "390-82-31.json"), os.path.join(FIXTURES, "390-82-31-b.json")]
     hits = scan(pair)
     assert {tuple(sorted((a, b))) for a, b, _ in hits} == {("390-82-31", "390-82-31-b")}
     for a, b, (unit, _sw) in hits:
@@ -114,7 +117,7 @@ def test_two_block_shape_without_the_circulant_structure_is_refused():
 
     from two_block_equivalence import equivalent, is_generalised_bicycle
 
-    a, b = load("390-82-31"), fixture("390-82-31-b")
+    a, b = fixture("390-82-31"), fixture("390-82-31-b")
     assert is_generalised_bicycle(a) and is_generalised_bicycle(b)
     assert equivalent(a, b) is not None            # the genuine pair still decides
 
