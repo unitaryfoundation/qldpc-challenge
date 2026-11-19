@@ -143,6 +143,14 @@ def test_one_sided_tightening_keeps_the_other_witness(tmp_path):
     path, row = _run(tmp_path, doc, side_trials=300)
     assert row["verdict"] == "tightened" and set(row["sides"]) == {"Z"}
     assert row["d_new"] == 3 and row["new_slug"] == "9-1-3-b", "d is unchanged, so the slug needs a suffix"
+    assert row["title"] == "Distance revision: [[9,1,3]], Z side 5 -> 3"
+    with open(row["revision"][:-5] + ".body.md", encoding="utf-8") as fh:
+        body = fh.read()
+    assert "d stays 3 (Z side 5 -> 3)" in body and "kd^2/n unchanged at 1.00" in body
+    with open(row["revision"][:-5] + ".revision.json", encoding="utf-8") as fh:
+        header = json.load(fh)["note_header"]
+    assert header.startswith("# [[9,1,3]]: distance revision, Z side 5 -> 3\n"
+                             "## Revision 2026-11-19: [[9,1,3]], Z side 5 -> 3")
     with open(row["revision"], encoding="utf-8") as fh:
         new = json.load(fh)
     assert new["distance"]["X"] == doc["distance"]["X"], "the side that held is untouched"

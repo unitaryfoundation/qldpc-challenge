@@ -349,7 +349,22 @@ def pr_text(old_slug, new_slug, old_doc, new_doc, best, *, backend, pair_depth, 
     """Return the PR title, body, and note header for a revision, in the shape of the merged corrections."""
     n, k = int(old_doc["n"]), int(old_doc["k"])
     d_old, d_new = int(old_doc["distance"]["d"]), int(new_doc["distance"]["d"])
-    title = f"Distance revision: [[{n},{k},{d_old}]] -> [[{n},{k},{d_new}]]"
+    sides_text = ", ".join(f"{s} side {int(old_doc['distance'][s]['value'])} -> {best[s]['weight']}"
+                           for s in ("X", "Z") if s in best)
+    if d_new < d_old:
+        change = f"[[{n},{k},{d_old}]] -> [[{n},{k},{d_new}]]"
+        title = f"Distance revision: {change}"
+        headline = f"{change}; kd^2/n {_eff(n, k, d_old):.2f} -> {_eff(n, k, d_new):.2f}."
+        supersedes = (f"[[{n},{k},{d_new}]] supersedes the board's [[{n},{k},{d_old}]] entry. The code, its checks, "
+                      f"and its original provenance are unchanged; only the distance claim is corrected. The headline "
+                      f"kd^2/n falls from {_eff(n, k, d_old):.2f} to {_eff(n, k, d_new):.2f}.")
+    else:
+        change = f"[[{n},{k},{d_old}]], {sides_text}"
+        title = f"Distance revision: {change}"
+        headline = (f"d stays {d_old} ({sides_text}); kd^2/n unchanged at {_eff(n, k, d_old):.2f}, the looser side's "
+                    "claim is corrected.")
+        supersedes = (f"The entry keeps d = {d_old}; {sides_text}. The code, its checks, and its original provenance "
+                      "are unchanged; only the looser side's claim is corrected.")
     lines = []
     for side in ("X", "Z"):
         if side in best:
@@ -368,7 +383,7 @@ def pr_text(old_slug, new_slug, old_doc, new_doc, best, *, backend, pair_depth, 
         "",
         *lines,
         "",
-        f"[[{n},{k},{d_old}]] -> [[{n},{k},{d_new}]]; kd^2/n {_eff(n, k, d_old):.2f} -> {_eff(n, k, d_new):.2f}.",
+        headline,
         "",
         "Each witness was validated against the entry's check matrices when it was found (zero syndrome "
         "against the opposite side's checks, outside the row space of its own side by rank over GF(2)). "
@@ -377,12 +392,10 @@ def pr_text(old_slug, new_slug, old_doc, new_doc, best, *, backend, pair_depth, 
         "",
     ])
     header = "\n".join([
-        f"# [[{n},{k},{d_new}]]: distance revision of [[{n},{k},{d_old}]]",
-        f"## Revision {new_doc['distance'][next(iter(best))]['witness_provenance']['date']}: "
-        f"[[{n},{k},{d_old}]] -> [[{n},{k},{d_new}]]",
-        f"[[{n},{k},{d_new}]] supersedes the board's [[{n},{k},{d_old}]] entry. The code, its checks, and its "
-        f"original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls "
-        f"from {_eff(n, k, d_old):.2f} to {_eff(n, k, d_new):.2f}.",
+        f"# [[{n},{k},{d_new}]]: distance revision"
+        + (f" of [[{n},{k},{d_old}]]" if d_new < d_old else f", {sides_text}"),
+        f"## Revision {new_doc['distance'][next(iter(best))]['witness_provenance']['date']}: {change}",
+        supersedes,
         *lines,
         "",
         "| side | claimed | lightest logical found | trials | seed |",
