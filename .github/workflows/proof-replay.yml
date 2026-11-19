@@ -12,13 +12,12 @@ permissions:
 #
 # A pull request that touches the certificates or the emitter replays a
 # rotating subset of the quick entries. The weekly run replays all of them,
-# split into SHARDS parallel jobs, each stopping cleanly at its budget: one
-# job replaying every certificate was cancelled at the 300-minute cap in
-# each of the five weeks to 2026-11-16 (issue #5578, finding 6), so the
-# tier's backstop was not running at all. Shard I takes every SHARDS-th
-# certificate in slug order from the I-th, so the shards partition the set;
-# a shard that reports entries left unopened at its budget is the signal to
-# add a shard (the matrix list and SHARDS must agree).
+# split into SHARDS parallel jobs. Shard I takes every SHARDS-th certificate
+# in slug order from the I-th, so the shards partition the set. A shard that
+# reaches its budget finishes the entry in hand, then fails if entries remain
+# unopened: the scheduled run must not report green without full coverage.
+# Increase both SHARDS and the matrix when board growth or runtime drift makes
+# that check fail.
 on:
   pull_request:
     paths:
@@ -46,7 +45,7 @@ env:
   # deliberate edit here and not a drift in whatever apt ships.
   KISSAT_REF: 8af8e56f174b778aef3aa45af9f739b2a5f492c2    # rel-4.0.4
   DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
-  SHARDS: "6"
+  SHARDS: "22"
 
 jobs:
   subset:
@@ -74,14 +73,12 @@ jobs:
   replay:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
-    # Each shard stops opening entries at 270 minutes and finishes the one in
-    # hand (an entry has taken 40 min; certs/proof_log_batch.jsonl records
-    # the per-entry times), so it ends under the cap, which is for a hang.
-    timeout-minutes: 300
+    # A 330-minute replay budget leaves a 30-minute margin under the runner cap.
+    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -97,10 +94,11 @@ jobs:
           install -m 755 /tmp/kissat/build/kissat /usr/local/bin/kissat
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
-      - name: replay this shard of the proof_log certificates (stops opening entries at 270 min)
+      - name: replay this shard of the proof_log certificates (fails on incomplete coverage)
         run: |
           set -o pipefail
-          uv run --frozen --extra certify python verify/replay_proofs.py --all --tlim 1800 --shard ${{ matrix.shard }}/$SHARDS --max-minutes 270 | tee replay.txt
+          uv run --frozen --extra certify python verify/replay_proofs.py --all --tlim 1800 --shard ${{ matrix.shard }}/$SHARDS --max-minutes 330 | tee replay.txt
           if grep -q "left unopened" replay.txt; then
-            echo "::warning title=proof replay shard ${{ matrix.shard }} ran out of budget::$(tail -1 replay.txt). Add a shard to the matrix and SHARDS."
+            echo "::error title=proof replay shard ${{ matrix.shard }} incomplete::$(tail -1 replay.txt). Increase shard capacity before treating the weekly replay as complete."
+            exit 1
           fi
