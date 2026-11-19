@@ -214,6 +214,25 @@ under `research/` or a directory of run output under `repro/` is reported here r
 by CI (issue #3810). It must exit 0 before the push. Treat this as part of pushing, not
 as an optional review step — the working-tree check proves nothing about what CI sees.
 
+**Agent self-check before staging or submitting.** These are the mistakes that have turned
+green local runs into red CI on submission PRs; verify each one before pushing:
+
+- **Family tag.** If `provenance.construction` names a family (pair-partition, bivariate
+  bicycle, generalized bicycle), `family` must carry that tag or a more specific one —
+  never `other`. `verify/test_family_tag_consistency.py` enforces this; the kit now infers
+  it in `submit.make_submission` and refuses a mismatch in `prescreen.preflight`.
+- **Code artifact shape.** A submission is one file, `codes/<slug>.json`. Never a directory
+  named `*.json`, never a nested path. `submit.save_submission` refuses a non-`.json` or
+  directory path.
+- **One concern per PR.** A code submission carries only `codes/`, `notes/`, and its own
+  `repro/<slug>.json` manifest. Kit modules, workflows, and verifier changes go in their
+  own PR first, so the citation resolves and the scope check stays green.
+- **Derived provenance after removals.** Deleting or renaming a code leaves
+  `research/provenance/derived.json` stale. Run
+  `uv run python research/derive_provenance.py --top-up` and commit the result in the same
+  PR. The weekly workflow repairs this on Monday, but until then every PR based on that
+  main inherits the red tests.
+
 In a fork, `origin` is the fork, and its `origin/main` is whatever the fork last synced,
 which is not what CI diffs against. The script uses `upstream/main` when an `upstream`
 remote exists and refuses to default to a fork's `origin/main` otherwise, so add the
