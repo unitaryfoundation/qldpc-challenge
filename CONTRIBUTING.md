@@ -511,6 +511,14 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
 
+   If you work in a git worktree, make it sparse. A full checkout is about
+   8 GB, 7.6 GB of it circuits/, and a cone-mode sparse worktree holding
+   codes, notes, fieldnotes, repro, certs, research, verify, schema, cli,
+   site, receipts, and decode is about 225 MB; add circuits/<slug> only for
+   a circuit-tier PR. The recipe, and the cleanup rule (remove the worktree
+   once the branch is pushed), are in AGENTS.md under "Worktrees" (issue
+   #6515).
+
 Report the [[n,k,d]], which track it advances, and that the distance held under
 deep re-verification.
 ```
