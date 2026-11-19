@@ -1,6 +1,6 @@
 {
- "schema_version": "0.1",
- "name": "[[390,82,31]] cyclic GB divisor code on Z_195",
+ "schema_version": "0.2",
+ "name": "[[390,82,30]] cyclic GB divisor code on Z_195",
  "code_type": "CSS",
  "n": 390,
  "k": 82,
@@ -7031,80 +7031,100 @@
   ]
  },
  "distance": {
-  "d": 31,
+  "d": 30,
   "X": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    9,
-    46,
-    61,
-    111,
-    118,
-    122,
-    136,
-    154,
-    163,
-    165,
-    168,
-    170,
-    188,
-    208,
-    210,
-    215,
-    224,
-    231,
-    236,
-    240,
-    252,
-    256,
-    263,
-    281,
-    311,
-    319,
+    0,
+    14,
+    18,
+    20,
+    27,
+    36,
+    37,
+    71,
+    72,
+    104,
+    105,
+    123,
+    151,
+    160,
+    172,
+    192,
+    213,
+    216,
+    220,
+    259,
+    262,
+    264,
+    293,
+    299,
     324,
-    329,
-    349,
-    355,
-    374
-   ]
+    332,
+    358,
+    363,
+    386,
+    387
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab"
+    ],
+    "date": "2026-11-19",
+    "found_at_samples": 226478045,
+    "tool": "verify/ris_gpu.py, pair depth 16, NVIDIA L40",
+    "seeds": [
+     1807323689
+    ]
+   }
   },
   "Z": {
-   "value": 31,
+   "value": 30,
    "confidence": "upper_bound",
    "witness": [
-    16,
-    35,
-    41,
-    61,
-    66,
-    71,
+    21,
+    23,
+    38,
+    40,
+    49,
+    78,
     79,
-    109,
-    127,
-    134,
-    138,
-    150,
-    154,
-    159,
-    166,
-    175,
-    180,
-    182,
+    92,
+    129,
+    130,
+    131,
+    133,
+    163,
+    170,
+    178,
+    185,
+    186,
     202,
-    220,
-    222,
-    225,
-    227,
+    213,
+    230,
     236,
+    242,
     254,
-    268,
     272,
-    279,
-    329,
-    344,
-    381
-   ]
+    281,
+    291,
+    294,
+    318,
+    350,
+    380
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab"
+    ],
+    "date": "2026-11-19",
+    "found_at_samples": 225458507,
+    "tool": "verify/ris_gpu.py, pair depth 16, NVIDIA L40",
+    "seeds": [
+     1085047635
+    ]
+   }
   }
  },
  "provenance": {
@@ -7118,7 +7138,7 @@
    "arXiv:2203.17216"
   ],
   "date": "2026-07-18",
-  "notes": "Search and verification by Claude Fable 5. Distance is an honest upper bound from ~30M randomized-information-set trials across 8 independent seeded passes and three pair depths; no logical below weight 31 was ever witnessed, but d could be lower. Literature novelty unverified. kd^2/n = 202.06; supersedes the [[390,82,30]] entry from the same divisor pool."
+  "notes": "Search and verification by Claude Fable 5. Distance is an honest upper bound from ~30M randomized-information-set trials across 8 independent seeded passes and three pair depths; no logical below weight 31 was ever witnessed, but d could be lower. Literature novelty unverified. kd^2/n = 202.06; supersedes the [[390,82,30]] entry from the same divisor pool. Distance revision 2026-11-19 (witnesses by @FarLab): X side 31 -> 30 (GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 16), 226,478,045 trials on this side on an NVIDIA L40, seed 1807323689); Z side 31 -> 30 (GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 16), 225,458,507 trials on this side on an NVIDIA L40, seed 1085047635)."
  },
  "family": "generalized-bicycle"
 }

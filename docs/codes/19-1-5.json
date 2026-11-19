@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[19,1,5]] triangular 6.6.6 colour code, single-layer 2D-local layout",
  "code_type": "CSS",
  "n": 19,
@@ -287,6 +287,60 @@
    ],
    "date": "2026-11-06",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2918,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.08036457,
+     "ci95": [
+      0.076864597,
+      0.084052112
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 833,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.017896035,
+     "ci95": [
+      0.016685615,
+      0.019193564
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2851,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.077697856,
+     "ci95": [
+      0.074308012,
+      0.081267256
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 777,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.016607153,
+     "ci95": [
+      0.015448335,
+      0.017852186
+     ]
+    }
+   ]
   }
  }
 }

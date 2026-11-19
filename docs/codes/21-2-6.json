@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[21,2,6]]",
  "code_type": "CSS",
  "n": 21,
@@ -341,6 +341,36 @@
    ],
    "date": "2026-11-17",
    "method": "First circuit tier via research/circuit_autogen.generate (pilot; Beam 1.0)"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 3502,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.090996549,
+     "ci95": [
+      0.086874133,
+      0.09539307
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 4070,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.122234614,
+     "ci95": [
+      0.116003938,
+      0.129078899
+     ]
+    }
+   ]
   }
  }
 }
