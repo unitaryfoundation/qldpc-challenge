@@ -55,6 +55,7 @@ the gate would refuse the candidate on any of them.
 import argparse
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -280,6 +281,39 @@ def kind_of(check, detail=""):
     return "packaging"
 
 
+_FAMILY_RULES = [
+    ("pair-partition-cpm",
+     re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
+    ("bivariate-bicycle",
+     re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
+    ("generalized-bicycle",
+     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
+]
+
+
+def _family_contradictions(doc):
+    import re
+    con = str((doc.get("provenance") or {}).get("construction") or "")
+    tag = doc.get("family")
+    if not con or not tag:
+        return []
+    out = []
+    opening = con[:90]
+    for family, pat in _FAMILY_RULES:
+        m = pat.search(opening)
+        if not m:
+            continue
+        if tag == family:
+            continue
+        if re.search(r"\\bquotient of\\b", opening[:m.start()], re.I):
+            continue
+        out.append({"check": "family_tag_consistency",
+                    "detail": (f"construction names {family!r} (matched "
+                               f"{m.group(0)!r}) but family={tag!r}"),
+                    "kind": "packaging"})
+    return out
+
+
 def preflight(doc):
     """Run the verifier's structural half on a packaged document.
 
@@ -304,6 +338,7 @@ def preflight(doc):
                "kind": kind_of(c["check"], c.get("detail", ""))}
               for c in rep["checks"]
               if not c["ok"] and c["check"] != "distance_not_refuted"]
+    failed = failed + _family_contradictions(doc)
     kinds = sorted({f["kind"] for f in failed})
     comp = rep.get("computed") or {}
     keep = ("code_type", "n", "k", "max_check_weight", "weight_class")
