@@ -125,6 +125,16 @@ def test_workflow_triggers_for_the_test_runner_itself():
     )
 
 
+def test_workflow_triggers_for_verifier_claim_surfaces():
+    patterns = pull_request_paths()
+    uncovered = [surface for surface in ("codes", "circuits", "certs")
+                 if not covers(patterns, surface)]
+    assert not uncovered, (
+        f"a PR changing only {uncovered} skips the trusted submission checks; "
+        "add each claim surface to .github/workflows/verify.yml"
+    )
+
+
 def test_collected_directories_exist(runner_cmd):
     for directory in pytest_directories(runner_cmd):
         assert os.path.isdir(os.path.join(_ROOT, directory)), (

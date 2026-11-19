@@ -13,6 +13,9 @@ on:
       # PR merges with only ruff and prose on its rollup (PR #2321).
       - "cli/**"
       - "codes/**"
+      # Circuit evidence is part of the code claim and needs the trusted
+      # circuit tier even when a PR changes only circuits/<slug>/ (PR #1012).
+      - "circuits/**"
       # check_certs.py runs inside this workflow, so a certificate-only PR
       # (a level change, a new replay recipe) has to trigger it: without this
       # entry such a PR got prose and proof-replay and never the certificate
