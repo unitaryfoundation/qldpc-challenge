@@ -88,8 +88,20 @@
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/41-30-1.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[41,30,1]] code-calculus v0.2rc greedy gated</h3>
-<p>Code-calculus v0.2rc greedy gated campaign (cc-distance-raise). Witness-backed upper bound on distance.</p></div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/41-30-1.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[41,30,1]] — code-calculus v0.2rc greedy gated</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Frontier gaps in the CSS track via greedy multi-step composition of C-DELETE-CHECK, E-PEEL, and E-PUNCTURE (code-calculus v0.2rc).</p>
+<h4>What was searched</h4>
+<p>CSS parents from codes/ with n &lt;= 10, up to 3 greedy steps, budget 16 RIS trials per candidate, sector swap enabled, domination pruning. See the greedy gated campaign (code-calculus v0.2rc).</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 1, d_Z &lt;= 6, so d &lt;= 1. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Sector-swap-only, strict C-ADD-CHECK addition, and E-GLUE produced no board-advancing codes in this campaign.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Authors: @mathysrennela. code-calculus-dev, research/kit coordination.</p>
+<h4>Reproduction</h4>
+<p>Run the greedy gated campaign (code-calculus v0.2rc) at n&lt;=10, 3 steps, budget 16.</p>
+<p>Max check weight: 22. Matrices in codes/41-30-1.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 7 (max weight 22) &middot; <b style="min-width:auto">Z-checks</b> 4 (max weight 22)</div>
 <details><summary>H_X (7 checks, sparse supports)</summary><div class=wit>[0, 1, 2, 3, 9, 10, 12, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 30, 33, 34, 36, 40]

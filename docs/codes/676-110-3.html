@@ -71,7 +71,22 @@
 <div class=kv><b>locality</b> 2D-local single <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 4 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/676-110-3.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[676,110,3]] — topological code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Holey rotated surface code on a 26x26 unit-grid vertex layout, retaining 566 local plaquette and boundary stabilizers.</p>
+<p>References: https://github.com/unitaryfoundation/qldpc-challenge/blob/6821fc34ca5074b54801ac38624531417f5ad61c/codes/700-85-3.json.</p>
+<p>All 676 qubits have distinct unit-grid coordinates. The layout has rho=1 and r=sqrt(2). Distance three is exact on both CSS sides.</p>
+<h4>What was searched</h4>
+<p>All 676 qubits have distinct unit-grid coordinates. The layout has rho=1 and r=sqrt(2). Distance three is exact on both CSS sides.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 3 (upper_bound), d_Z &lt;= 3 (upper_bound), so d &lt;= 3. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Magic State Labs (Custom) v0.1. Authors: @npdeep. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Holey rotated surface code on a 26x26 unit-grid vertex layout, retaining 566 local plaquette and boundary stabilizers.</p>
+<p>Max check weight: 4. Matrices in codes/676-110-3.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 282 (max weight 4) &middot; <b style="min-width:auto">Z-checks</b> 284 (max weight 4)</div>
 <details><summary>H_X (282 checks, sparse supports)</summary><div class=wit>[0, 1, 26, 27]

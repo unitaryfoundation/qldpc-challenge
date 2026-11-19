@@ -83,7 +83,23 @@
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/392-8-15.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[392,8,15]] — planar BB (local-2d-bilayer weight-6)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Open-boundary planar bivariate-bicycle (Liang-Eberhardt-Chen / Liang-Yang-Iosue-Chen, arXiv:2504.08887) on a 14x14 grid; f = x + x^2 + y^2, g = 1 + x^2 y + x^2 y^2; built with the directional anyon-condensation truncation, corner-resolved, bilayer layout.</p>
+<p>Origin: submission. Novelty status: known_parameters.</p>
+<p>References: arXiv:2504.08887, arXiv:2410.11942.</p>
+<p>LITERATURE NOVELTY: NOT NOVEL. This is the L=14 member of the flagship planar BB family f=x+x^2+y^2, g=1+x^2 y+x^2 y^2 from Liang, Eberhardt &amp; Chen, &#x27;Planar quantum LDPC codes with open boundaries&#x27; (arXiv:2504.08887), Eq. 9 / Table V. The paper already publishes this exact (f,g) family at L=6,8,10,12 ([[72,8,4]],[[128,8,6]],[[200,8,9]],[[288,8,12]]); [[392,8,15]] is a mechanical lattice-size extension, not a new construction. It is also the same family as the board&#x27;s own local-2d-bilayer weight-6 bar-holder [[288,8,12]] (L=12). Board status: passes the trusted gate (passed=true), advances the local-2d-bilayer weight-6 cell (kd^2/n=4.59 vs 4.00 bar), but is NOT a literature discovery. Distance is an upper_bound witness, not server-certified exact.</p>
+<h4>What was searched</h4>
+<p>LITERATURE NOVELTY: NOT NOVEL. This is the L=14 member of the flagship planar BB family f=x+x^2+y^2, g=1+x^2 y+x^2 y^2 from Liang, Eberhardt &amp; Chen, &#x27;Planar quantum LDPC codes with open boundaries&#x27; (arXiv:2504.08887), Eq. 9 / Table V. The paper already publishes this exact (f,g) family at L=6,8,10,12 ([[72,8,4]],[[128,8,6]],[[200,8,9]],[[288,8,12]]); [[392,8,15]] is a mechanical lattice-size extension, not a new construction. It is also the same family as the board&#x27;s own local-2d-bilayer weight-6 bar-holder [[288,8,12]] (L=12). Board status: passes the trusted gate (passed=true), advances the local-2d-bilayer weight-6 cell (kd^2/n=4.59 vs 4.00 bar), but is NOT a literature discovery. Distance is an upper_bound witness, not server-certified exact.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 15 (upper_bound), d_Z &lt;= 15 (upper_bound), so d &lt;= 15. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Tencent Hy3. Authors: @mathysrennela. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Open-boundary planar bivariate-bicycle (Liang-Eberhardt-Chen / Liang-Yang-Iosue-Chen, arXiv:2504.08887) on a 14x14 grid; f = x + x^2 + y^2, g = 1 + x^2 y + x^2 y^2; built with the directional anyon-condensation truncation, corner-resolved, bilayer layout.</p>
+<p>Max check weight: 6. Matrices in codes/392-8-15.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 192 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 192 (max weight 6)</div>
 <details><summary>H_X (192 checks, sparse supports)</summary><div class=wit>[0, 197, 198]

@@ -50,7 +50,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-82-27.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[390,82,27]] — cyclic GB divisor code, kd^2/n = 153.3</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Generalized bicycle (two-block) code on the cyclic group Z_195: H_X = [A|B], H_Z = [B^T|A^T] with A, B circulants; a(x) support {0,36,84,86,91,100,139,177}, b(x) support {24,30,82,102,133,169,175,185}. Both a and b are sparse multiples of a degree-37 divisor g of x^195-1 (product of the degree-1 factor x+1 and three degree-12 irreducible factors), giving k = 2*deg gcd(a,b,x^195-1) = 82 at n = 390 with weight-16 checks. Distance evidence: rising RIS ladder to 20M trials/side plus three independent 8M-trial refutation passes (seeds 777/888/999) all bottoming at d&lt;=27; BP+OSD decoder search found nothing lighter than 46.</p>
+<p>References: arXiv:1904.02703, arXiv:2203.17216.</p>
+<p>Search and verification by Claude Fable 5 (model: Claude Fable 5).</p>
+<h4>What was searched</h4>
+<p>Search and verification by Claude Fable 5 (model: Claude Fable 5).</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 27 (upper_bound), d_Z &lt;= 27 (upper_bound), so d &lt;= 27. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @seunomonije. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Generalized bicycle (two-block) code on the cyclic group Z_195: H_X = [A|B], H_Z = [B^T|A^T] with A, B circulants; a(x) support {0,36,84,86,91,100,139,177}, b(x) support {24,30,82,102,133,169,175,185}. Both a and b are sparse multiples of a degree-37 divisor g of x^195-1 (product of the degree-1 factor x+1 and three degree-12 irreducible factors), giving k = 2*deg gcd(a,b,x^195-1) = 82 at n = 390 with weight-16 checks. Distance evidence: rising RIS ladder to 20M trials/side plus three independent 8M-trial refutation passes (seeds 777/888/999) all bottoming at d&lt;=27; BP+OSD decoder search found nothing lighter than 46.</p>
+<p>Max check weight: 16. Matrices in codes/390-82-27.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 195 (max weight 16) &middot; <b style="min-width:auto">Z-checks</b> 195 (max weight 16)</div>
 <details><summary>H_X (195 checks, sparse supports)</summary><div class=wit>[0, 36, 84, 86, 91, 100, 139, 177, 219, 225, 277, 297, 328, 364, 370, 380]

@@ -103,7 +103,22 @@
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/120-24-8.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[120,24,8]] — non-abelian lifted-product (mitten) code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Mitten lifted product LP(A,B) (Bhardwaj et al arXiv:2607.28795, Def.4/8) on non-abelian group metacyclic(C3:C8,r=2) (order 24): a0=[5, 6, 15], a1=[0, 3, 4], b0=[1, 7, 13], b1=[0, 17, 22] over F2[G]. n=5|G|, k=|G|, weight-9.</p>
+<p>References: arXiv:2607.28795.</p>
+<p>Found with Jukebox</p>
+<h4>What was searched</h4>
+<p>Found with Jukebox</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 8 (upper_bound), d_Z &lt;= 8 (upper_bound), so d &lt;= 8. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Opus 4.8. Authors: @yhu1996. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Mitten lifted product LP(A,B) (Bhardwaj et al arXiv:2607.28795, Def.4/8) on non-abelian group metacyclic(C3:C8,r=2) (order 24): a0=[5, 6, 15], a1=[0, 3, 4], b0=[1, 7, 13], b1=[0, 17, 22] over F2[G]. n=5|G|, k=|G|, weight-9.</p>
+<p>Max check weight: 9. Matrices in codes/120-24-8.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 48 (max weight 9) &middot; <b style="min-width:auto">Z-checks</b> 48 (max weight 9)</div>
 <details><summary>H_X (48 checks, sparse supports)</summary><div class=wit>[2, 3, 9, 48, 52, 53, 97, 103, 109]

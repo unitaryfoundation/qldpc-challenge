@@ -64,7 +64,23 @@
 <div class=kv><b>locality</b> 2D-local bilayer <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/80-9-8.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[80,9,8]] — Two-block group algebra (2BGA) code over (C_10 x C_2) rtimes C_2: a={1, s r^5, r</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Two-block group algebra (2BGA) code over (C_10 x C_2) rtimes C_2: a={1, s r^5, r^5, s r^6}, b={1, s^2, r, s^2 r^3} (Lin &amp; Pryadko, arXiv:2306.16400, Table 1).</p>
+<p>Origin: baseline. Novelty status: known_parameters.</p>
+<p>References: arXiv:2306.16400.</p>
+<p>Literature baseline (arXiv:2306.16400, Lin &amp; Pryadko, 28 Jun 2023). Two-block group algebra code reconstructed from the published group presentation; distance d=9 taken from the paper&#x27;s Table 1 and certified by an explicit non-stabilizer witness on each side (regenerated via the research kit&#x27;s RIS search). Literature novelty confirmed by manual cross-check: arXiv:2306.16400 Table 1 explicitly reports the [[80,9,9]] parameters with W=6 (reconstructed checks have weight 8). The verifier&#x27;s &#x27;literature novelty UNVERIFIED&#x27; label is by-design (validate_candidate.py performs no literature lookup) and is intentionally not overridden. 2D-local layout added 2026-07-27: simulated annealing over qubit-to-site assignments on a unit-spaced triangular grid (2 layers, capacity 1 per site per layer); measured interaction radius 5.291503 (bilayer); same code, same check matrices.</p>
+<h4>What was searched</h4>
+<p>Baseline contribution: parameters taken from the cited source; no original search performed for this entry.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 9 (upper_bound), d_Z &lt;= 8 (upper_bound), so d &lt;= 8. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: unspecified. Authors: Lin, Hsiang-Ku, Pryadko, Leonid P.. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Two-block group algebra (2BGA) code over (C_10 x C_2) rtimes C_2: a={1, s r^5, r^5, s r^6}, b={1, s^2, r, s^2 r^3} (Lin &amp; Pryadko, arXiv:2306.16400, Table 1).</p>
+<p>Max check weight: 8. Matrices in codes/80-9-8.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 40 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 40 (max weight 8)</div>
 <details><summary>H_X (40 checks, sparse supports)</summary><div class=wit>[0, 20, 23, 27, 40, 42, 70, 76]

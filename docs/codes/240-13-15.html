@@ -57,7 +57,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/240-13-15.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[240,13,15]] — 2BGA code on S5 (odd k, weight-8)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>2BGA on the symmetric group S5 (order 120): H_X=[L(a)|R(b)], H_Z=[R(b)^T|L(a)^T] with supports a=[1,34,61,111], b=[30,66,69,71] (indices into the deterministic BFS element order of research/kit/group_algebra.sym(5); identity is index 0). Found by a random support sweep over exotic groups. Novelty status: new_parameters.</p>
+<p>References: arXiv:2306.16400 (2BGA family; exhaustive W&lt;=8 tables stop at n&lt;=200), arXiv:2606.17268 (coset-code searches to n=306: no n=240, all k even).</p>
+<p>Odd k=13 -- impossible for abelian two-block codes, so the BB/GB literature is excluded by parity. Claimed d is the lightest logical found by deep self-refutation: RIS flat at 15 across 1M/4M/16M trials/side x 2 seeds (gf2_fast, ~66M side-trials total), weight-15 X witness re-validated by the pinned python stack, BP+OSD (1M trials) found nothing lighter. Upper bound only. Novelty check 2026-07-08 against both references found no [[240,13,*]] and no odd-k code in any published 2BGA/coset enumeration.</p>
+<h4>What was searched</h4>
+<p>Odd k=13 -- impossible for abelian two-block codes, so the BB/GB literature is excluded by parity. Claimed d is the lightest logical found by deep self-refutation: RIS flat at 15 across 1M/4M/16M trials/side x 2 seeds (gf2_fast, ~66M side-trials total), weight-15 X witness re-validated by the pinned python stack, BP+OSD (1M trials) found nothing lighter. Upper bound only. Novelty check 2026-07-08 against both references found no [[240,13,*]] and no odd-k code in any published 2BGA/coset enumeration.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 15 (upper_bound), d_Z &lt;= 16 (upper_bound), so d &lt;= 15. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @FarLab. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>2BGA on the symmetric group S5 (order 120): H_X=[L(a)|R(b)], H_Z=[R(b)^T|L(a)^T] with supports a=[1,34,61,111], b=[30,66,69,71] (indices into the deterministic BFS element order of research/kit/group_algebra.sym(5); identity is index 0). Found by a random support sweep over exotic groups.</p>
+<p>Max check weight: 8. Matrices in codes/240-13-15.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 120 (max weight 8) &middot; <b style="min-width:auto">Z-checks</b> 120 (max weight 8)</div>
 <details><summary>H_X (120 checks, sparse supports)</summary><div class=wit>[1, 26, 79, 100, 123, 157, 158, 238]

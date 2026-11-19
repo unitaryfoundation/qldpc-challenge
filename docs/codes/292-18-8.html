@@ -50,7 +50,23 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/292-18-8.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[292,18,8]] — twisted-torus BB baseline (arXiv:2503.03827)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+y^2, g(x,y)=1+y+x^-4y on the abelian quotient group Z^2/L with twist basis a_1=[0, 73], a_2=[2, 32] (n=2|det[a_1,a_2]|=2*146). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].</p>
+<p>Origin: baseline. Novelty status: known_parameters.</p>
+<p>References: arXiv:2503.03827.</p>
+<p>Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d&gt;20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery.</p>
+<h4>What was searched</h4>
+<p>Baseline contribution: parameters taken from the cited source; no original search performed for this entry.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 8 (upper_bound), d_Z &lt;= 8 (upper_bound), so d &lt;= 8. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: unspecified. Authors: Zijian Liang, Ke Liu, Hao Song, Yu-An Chen. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Twisted-torus bivariate-bicycle code from Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025). Stabilizers f(x,y)=1+x+y^2, g(x,y)=1+y+x^-4y on the abelian quotient group Z^2/L with twist basis a_1=[0, 73], a_2=[2, 32] (n=2|det[a_1,a_2]|=2*146). Reconstructed from the published polynomials and twist; CSS form H_X=[f|g], H_Z=[gbar|fbar].</p>
+<p>Max check weight: 6. Matrices in codes/292-18-8.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 146 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 146 (max weight 6)</div>
 <details><summary>H_X (146 checks, sparse supports)</summary><div class=wit>[0, 1, 5, 146, 148, 260]

@@ -52,7 +52,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/674-168-48-b.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[674,168,48]] — to [[674,168,48]]: orbit-fold witness</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Frobenius-paired cyclic generalized-bicycle code over Z_337; a=[0, 2, 9, 19, 45, 68, 98, 163, 183, 206, 223, 234, 264, 280, 295]; b=[0, 8, 36, 45, 55, 58, 76, 109, 150, 169, 180, 218, 262, 272, 315]; b=a(x^4) up to a cyclic shift; a is invariant under exponent multiplier 128; H_X=[circ(a)|circ(b)], H_Z=[circ(b)^T|circ(a)^T].</p>
+<p>Origin: submission. Novelty status: unknown.</p>
+<p>Witness-backed upper bound d &lt;= 76, not an exact-distance claim. A matched-depth audit against the existing [[674,168,74]] peer found the submitted weight-76 X logical after 8,000,000 trials at pair depth 64 and seed 92978641; the Z witness is its independently validated generalized-bicycle involution mirror. The same matched run rediscovered the peer&#x27;s weight-74 logical. The construction advances that unrestricted frontier entry; literature novelty is unverified. Corrected to d &lt;= 48 on 2026-10-09 by @FarLab with the orbit-fold search of PR #2902 (X: 76 -&gt; 48; Z: 76 -&gt; 48; see issue #2949). The entry was identified in the follow-up audit on issue #2899 (2026-10-08).</p>
+<h4>What was searched</h4>
+<p>Witness-backed upper bound d &lt;= 76, not an exact-distance claim. A matched-depth audit against the existing [[674,168,74]] peer found the submitted weight-76 X logical after 8,000,000 trials at pair depth 64 and seed 92978641; the Z witness is its independently validated generalized-bicycle involution mirror. The same matched run rediscovered the peer&#x27;s weight-74 logical. The construction advances that unrestricted frontier entry; literature novelty is unverified. Corrected to d &lt;= 48 on 2026-10-09 by @FarLab with the orbit-fold search of PR #2902 (X: 76 -&gt; 48; Z: 76 -&gt; 48; see issue #2949). The entry was identified in the follow-up audit on issue #2899 (2026-10-08).</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 48 (upper_bound), d_Z &lt;= 48 (upper_bound), so d &lt;= 48. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: OpenAI GPT-5 (Codex). Authors: @DennisWayo. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Frobenius-paired cyclic generalized-bicycle code over Z_337; a=[0, 2, 9, 19, 45, 68, 98, 163, 183, 206, 223, 234, 264, 280, 295]; b=[0, 8, 36, 45, 55, 58, 76, 109, 150, 169, 180, 218, 262, 272, 315]; b=a(x^4) up to a cyclic shift; a is invariant under exponent multiplier 128; H_X=[circ(a)|circ(b)], H_Z=[circ(b)^T|circ(a)^T].</p>
+<p>Max check weight: 30. Matrices in codes/674-168-48-b.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 337 (max weight 30) &middot; <b style="min-width:auto">Z-checks</b> 337 (max weight 30)</div>
 <details><summary>H_X (337 checks, sparse supports)</summary><div class=wit>[0, 2, 9, 19, 45, 68, 98, 163, 183, 206, 223, 234, 264, 280, 295, 337, 345, 373, 382, 392, 395, 413, 446, 487, 506, 517, 555, 599, 609, 652]

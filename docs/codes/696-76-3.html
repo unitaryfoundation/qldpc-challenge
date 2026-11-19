@@ -70,7 +70,21 @@
 <div class=kv><b>locality</b> 2D-local single <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 4 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/696-76-3.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[696,76,3]] — irregular holey rotated surface code, g=0.9828</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Irregular holey rotated surface code on a 29x24 integer vertex grid, n = 696. Cell (i,j) carries an X check when i+j is even and a Z check otherwise; 75 cells are punched out as holes, giving k = 1 + holes = 76. Boundary parity combination (0, 1, 1, 1) chosen by scanning all 16 so that H_X H_Z^T = 0. Holes placed by greedy max-independent-set with hill climbing under the d=3 spacing rule (same-parity Chebyshev &gt;= 3, any-parity Manhattan &gt;= 3, margin 3), searched jointly over grid shape. r = sqrt(2) exactly, single layer.</p>
+<p>Same family as [[700,75,3]] and [[625,50,3]]. The gain is grid shape: those fix a single grid, but the cap is Lx*Ly &lt;= 700 and g = 9k/n rewards a smaller n at equal hole count. A 29x24 grid holds 75 holes in 696 qubits where 28x25 held 74 in 700. Constructor calibrated against the plain rotated surface code, reproducing [[25,1,5]], [[49,1,7]] and [[81,1,9]] before any holey run was believed.</p>
+<h4>What was searched</h4>
+<p>Same family as [[700,75,3]] and [[625,50,3]]. The gain is grid shape: those fix a single grid, but the cap is Lx*Ly &lt;= 700 and g = 9k/n rewards a smaller n at equal hole count. A 29x24 grid holds 75 holes in 696 qubits where 28x25 held 74 in 700. Constructor calibrated against the plain rotated surface code, reproducing [[25,1,5]], [[49,1,7]] and [[81,1,9]] before any holey run was believed.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 3 (upper_bound), d_Z &lt;= 3 (upper_bound), so d &lt;= 3. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Opus 5. Authors: @vprusso. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Irregular holey rotated surface code on a 29x24 integer vertex grid, n = 696. Cell (i,j) carries an X check when i+j is even and a Z check otherwise; 75 cells are punched out as holes, giving k = 1 + holes = 76. Boundary parity combination (0, 1, 1, 1) chosen by scanning all 16 so that H_X H_Z^T = 0. Holes placed by greedy max-independent-set with hill climbing under the d=3 spacing rule (same-parity Chebyshev &gt;= 3, any-parity Manhattan &gt;= 3, margin 3), searched jointly over grid shape. r = sqrt(2) exactly, single layer.</p>
+<p>Max check weight: 4. Matrices in codes/696-76-3.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 313 (max weight 4) &middot; <b style="min-width:auto">Z-checks</b> 307 (max weight 4)</div>
 <details><summary>H_X (313 checks, sparse supports)</summary><div class=wit>[0, 1, 24, 25]

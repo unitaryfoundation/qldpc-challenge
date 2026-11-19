@@ -55,7 +55,23 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/254-44-21.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[254,44,21]] — weight-12 cyclic GB code (weight-9plus cell)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Generalized bicycle (2BGA on Z_127), circulant size 127, a(x) = 1 + x^10 + x^12 + x^25 + x^88 + x^95, b(x) = 1 + x + x^29 + x^37 + x^96 + x^119. Weight-6 supports designed as multiples of a degree-22 divisor g of x^127 - 1 (g = (x-1) times three degree-7 irreducibles; k = 2 deg g = 44). Check weight 12 (weight-9plus cell).</p>
+<p>Origin: submission. Novelty status: unknown.</p>
+<p>References: arXiv:1904.02703, arXiv:2306.16400.</p>
+<p>Support-6 GB campaign 20260714 (divisor design over Z_127). Screen 250 RIS trials across all 816 degree-22 divisors of x^127 - 1; refine top candidates at 8000; ladder [60000, 1000000] -&gt; d [21, 21]; claimed d = lightest logical witnessed (gf2_fast RIS). Independent adversarial re-check: 4 fresh seeds (940001-940004) x 1.5M trials (gf2_fast), lightest logical 21 each time, nothing lighter. Independent BP+OSD syndrome-decoder cross-check (60000 trials) corroborated d=21, nothing lighter. Upper bound only. Lit-check 2026-07-14: no published [[254,44,21]] found; closest published n=254 GB neighbor [[254,28,14]] (arXiv:1904.02703); weight-12 supports are outside the published W&lt;=8 enumerations; novelty vs literature unverified.</p>
+<h4>What was searched</h4>
+<p>Support-6 GB campaign 20260714 (divisor design over Z_127). Screen 250 RIS trials across all 816 degree-22 divisors of x^127 - 1; refine top candidates at 8000; ladder [60000, 1000000] -&gt; d [21, 21]; claimed d = lightest logical witnessed (gf2_fast RIS). Independent adversarial re-check: 4 fresh seeds (940001-940004) x 1.5M trials (gf2_fast), lightest logical 21 each time, nothing lighter. Independent BP+OSD syndrome-decoder cross-check (60000 trials) corroborated d=21, nothing lighter. Upper bound only. Lit-check 2026-07-14: no published [[254,44,21]] found; closest published n=254 GB neighbor [[254,28,14]] (arXiv:1904.02703); weight-12 supports are outside the published W&lt;=8 enumerations; novelty vs literature unverified.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 21 (upper_bound), d_Z &lt;= 21 (upper_bound), so d &lt;= 21. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @vprusso. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Generalized bicycle (2BGA on Z_127), circulant size 127, a(x) = 1 + x^10 + x^12 + x^25 + x^88 + x^95, b(x) = 1 + x + x^29 + x^37 + x^96 + x^119. Weight-6 supports designed as multiples of a degree-22 divisor g of x^127 - 1 (g = (x-1) times three degree-7 irreducibles; k = 2 deg g = 44). Check weight 12 (weight-9plus cell).</p>
+<p>Max check weight: 12. Matrices in codes/254-44-21.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 127 (max weight 12) &middot; <b style="min-width:auto">Z-checks</b> 127 (max weight 12)</div>
 <details><summary>H_X (127 checks, sparse supports)</summary><div class=wit>[0, 10, 12, 25, 88, 95, 127, 128, 156, 164, 223, 246]

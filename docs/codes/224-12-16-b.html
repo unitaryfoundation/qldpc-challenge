@@ -50,7 +50,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight ≤ 6 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/224-12-16-b.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[224,12,16]] — coset code (b)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Coset code Q_G^H(a,b) of arXiv:2606.17268, G=SmallGroup(224,53), H the 1st non-normal subgroup, a=[1,81,186], b=[1,16,47]</p>
+<p>Origin: submission.</p>
+<p>Checked against the current board: codes/224-12-16.json is a different stabilizer group (construction fingerprint 606abaa8430563f5 vs db3f87cc43954a47), while the Weisfeiler-Leman signature matches (same n, k, d, w), so this entry is filed as the second code at the same parameters, construction family 2bga-coset on SmallGroup(224,53) versus the existing 2bga-nonabelian two-block group-algebra code.</p>
+<h4>What was searched</h4>
+<p>Checked against the current board: codes/224-12-16.json is a different stabilizer group (construction fingerprint 606abaa8430563f5 vs db3f87cc43954a47), while the Weisfeiler-Leman signature matches (same n, k, d, w), so this entry is filed as the second code at the same parameters, construction family 2bga-coset on SmallGroup(224,53) versus the existing 2bga-nonabelian two-block group-algebra code.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 16 (upper_bound), d_Z &lt;= 16 (upper_bound), so d &lt;= 16. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Authors: @mathysrennela. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Coset code Q_G^H(a,b) of arXiv:2606.17268, G=SmallGroup(224,53), H the 1st non-normal subgroup, a=[1,81,186], b=[1,16,47]</p>
+<p>Max check weight: 6. Matrices in codes/224-12-16-b.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 112 (max weight 6) &middot; <b style="min-width:auto">Z-checks</b> 112 (max weight 6)</div>
 <details><summary>H_X (112 checks, sparse supports)</summary><div class=wit>[0, 52, 103, 112, 138, 200]

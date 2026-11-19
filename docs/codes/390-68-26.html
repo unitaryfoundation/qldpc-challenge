@@ -75,7 +75,22 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-68-26.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[390,68,26]] — Generalized bicycle (two-block) code on the cyclic group Z_195: H_X = [A|B], H_Z</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Generalized bicycle (two-block) code on the cyclic group Z_195: H_X = [A|B], H_Z = [B^T|A^T] with A, B circulants; a(x) support {54,68,74,124,148,153} (weight 6), b(x) support {41,53,74,89,101,148,153} (weight 7), max check weight 13. Both a and b are sparse multiples of a common divisor of x^195-1 with k = 2*deg gcd(a,b,x^195-1) = 68 at n = 390. Found in the same divisor-trick sweep as the [[390,82,27]] entry, selected for minimal check weight at high kd^2/n. Distance evidence: rising RIS ladder 20k-2M trials, then 8M-trial refutation passes (seeds 777/999/424242) and pair-depth passes (depths 16/24, 3M trials) all bottoming at d&lt;=28; the 12M-trial witness search returned the embedded weight-28 Z logical, and the GB transpose symmetry (block swap + index reversal) maps it to the embedded weight-28 X logical, machine-verified against ker/rowspace.</p>
+<p>References: arXiv:1904.02703, arXiv:2203.17216.</p>
+<p>Search and verification by Claude Fable 5. Sibling of the [[390,82,27]] entry: lower check weight (13 vs 16) and higher distance at lower k; Pareto-incomparable, kd^2/n = 136.7. Distance corrected from d&lt;=28 to d&lt;=26 using the verified weight-26 X and Z witnesses reported in issue #942. The issue&#x27;s verification checks place both witnesses in the appropriate opposite-check kernels and outside the stabilizer row spaces; the search budget is not reported. @ethanfeld supplied the correction.</p>
+<h4>What was searched</h4>
+<p>Search and verification by Claude Fable 5. Sibling of the [[390,82,27]] entry: lower check weight (13 vs 16) and higher distance at lower k; Pareto-incomparable, kd^2/n = 136.7. Distance corrected from d&lt;=28 to d&lt;=26 using the verified weight-26 X and Z witnesses reported in issue #942. The issue&#x27;s verification checks place both witnesses in the appropriate opposite-check kernels and outside the stabilizer row spaces; the search budget is not reported. @ethanfeld supplied the correction.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 26 (upper_bound), d_Z &lt;= 26 (upper_bound), so d &lt;= 26. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Fable 5. Authors: @seunomonije. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Generalized bicycle (two-block) code on the cyclic group Z_195: H_X = [A|B], H_Z = [B^T|A^T] with A, B circulants; a(x) support {54,68,74,124,148,153} (weight 6), b(x) support {41,53,74,89,101,148,153} (weight 7), max check weight 13. Both a and b are sparse multiples of a common divisor of x^195-1 with k = 2*deg gcd(a,b,x^195-1) = 68 at n = 390. Found in the same divisor-trick sweep as the [[390,82,27]] entry, selected for minimal check weight at high kd^2/n. Distance evidence: rising RIS ladder 20k-2M trials, then 8M-trial refutation passes (seeds 777/999/424242) and pair-depth passes (depths 16/24, 3M trials) all bottoming at d&lt;=28; the 12M-trial witness search returned the embedded weight-28 Z logical, and the GB transpose symmetry (block swap + index reversal) maps it to the embedded weight-28 X logical, machine-verified against ker/rowspace.</p>
+<p>Max check weight: 13. Matrices in codes/390-68-26.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 195 (max weight 13) &middot; <b style="min-width:auto">Z-checks</b> 195 (max weight 13)</div>
 <details><summary>H_X (195 checks, sparse supports)</summary><div class=wit>[54, 68, 74, 124, 148, 153, 236, 248, 269, 284, 296, 343, 348]

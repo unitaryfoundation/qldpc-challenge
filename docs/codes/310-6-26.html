@@ -75,7 +75,21 @@
 <div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
 <div class=kv><b>weight class</b> weight &gt; 8 <span class=claimed>(computed)</span></div>
 </section>
-<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">no research note was staged with this submission &mdash; notes are requested for new submissions (<a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/README.md</a>)</div></section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/310-6-26.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[310,6,26]] — non-abelian 2BGA on the metacyclic group Z31 x| Z5 (order 155, y x y^-1 = x^16)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Two-block group algebra code over the metacyclic group Z31 x| Z5 (order 155, y x y^-1 = x^16): HX = [L[a] L[b]], HZ = [R[b] R[a]] with element-index supports a=[17, 40, 63, 112], b=[37, 41, 92, 143, 150] in the left/right regular representation; n = 2|G|, max check weight 9.</p>
+<p>Found by a MAP-Elites search over non-abelian 2BGA codes gated by an escalating distance ladder; the reported d is the minimum over multi-seed randomized information-set searches at 200k, 2M and 20M iterations (values agreed across all rungs), with the recorded per-side witnesses extracted at the 20M budget.</p>
+<h4>What was searched</h4>
+<p>Found by a MAP-Elites search over non-abelian 2BGA codes gated by an escalating distance ladder; the reported d is the minimum over multi-seed randomized information-set searches at 200k, 2M and 20M iterations (values agreed across all rungs), with the recorded per-side witnesses extracted at the 20M budget.</p>
+<h4>Evidence trail</h4>
+<p>Witness-backed upper bound: d_X &lt;= 26 (upper_bound), d_Z &lt;= 26 (upper_bound), so d &lt;= 26. Verified by verify/validate_candidate.py (passed: true).</p>
+<h4>Dead ends</h4>
+<p>Not recorded for this entry.</p>
+<h4>Tools</h4>
+<p>Model: Claude Opus 5. Authors: @vprusso. Verified with verify/validate_candidate.py via research/kit/coordination.py gate.</p>
+<h4>Reproduction</h4>
+<p>Two-block group algebra code over the metacyclic group Z31 x| Z5 (order 155, y x y^-1 = x^16): HX = [L[a] L[b]], HZ = [R[b] R[a]] with element-index supports a=[17, 40, 63, 112], b=[37, 41, 92, 143, 150] in the left/right regular representation; n = 2|G|, max check weight 9.</p>
+<p>Max check weight: 9. Matrices in codes/310-6-26.json.</p></div></section>
 <section class=blk><h3>Parity checks</h3>
 <div class=kv><b>X-checks</b> 155 (max weight 9) &middot; <b style="min-width:auto">Z-checks</b> 155 (max weight 9)</div>
 <details><summary>H_X (155 checks, sparse supports)</summary><div class=wit>[28, 98, 115, 142, 160, 173, 234, 263, 277]
