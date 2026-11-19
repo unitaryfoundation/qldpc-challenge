@@ -317,6 +317,12 @@ stamp and it goes deep instead, which is correct but slower.
 Worked examples in the history: `[[684,14,72]]` to `[[684,14,54]]`,
 `[[540,12,44]]` to `[[540,12,41]]`, `[[682,140,83]]` to 66.
 
+`research/revision_harvest.py` runs the search half of this over a list of
+entries at the reachability campaign's depth-proportional budget and writes
+each tightening as a candidate in exactly this shape (the revised entry, the
+PR body, the note header); `--apply <checkout>` performs steps 1 to 4 in a
+checkout, leaving the commit and the PR to you (issue #6813).
+
 ## Permutation equivalence between two entries
 
 `permutation_equivalence.py` decides whether two entries are one code: it
