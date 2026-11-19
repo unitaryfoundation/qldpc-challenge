@@ -95,7 +95,7 @@
   "authors": [
    "@MathysRennela"
   ],
-  "construction": "C-DELETE-CHECK+ E-GRAFT from 12-2-4.json",
+  "construction": "C-DELETE-CHECK+ E-GRAFT from 12-2-4-b.json",
   "origin": "submission",
   "date": "2026-10-30",
   "model": "Ox Alpha 1.0",
