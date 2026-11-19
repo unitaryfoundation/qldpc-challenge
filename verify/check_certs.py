@@ -48,7 +48,6 @@ entry's partial certificate has the single Pauli-weight side `P` instead of
 """
 import argparse
 import glob
-import hashlib
 import json
 import os
 import sys
@@ -87,31 +86,10 @@ def _inside_tree(art):
     return os.path.isfile(full)
 
 
-def checks_sha256(doc):
-    """Return the hash that binds a formal or partial certificate to one code.
-
-    sha256 over the compact JSON of {"X": rows, "Z": rows} with every row's
-    support sorted and the rows of each side sorted, so the hash names the
-    stabilizer presentation (the set of check rows on the labeled qubits)
-    and nothing about file formatting or row order. A formal proof is about
-    a matrix pair defined inside a proof development; this is what ties
-    that pair to codes/<slug>.json, and a certificate whose hash is not this
-    entry's is a proof about some other code. A stabilizer entry (checks.S,
-    one X and Z support per generator) hashes {"S": rows} with each
-    generator's two supports sorted and the generators sorted (issue #4718);
-    the CSS form is unchanged, so every committed hash still matches.
-    """
-    checks = doc["checks"]
-    if "S" in checks and "X" not in checks:
-        canon = {"S": sorted([sorted(int(q) for q in row.get("X", [])),
-                              sorted(int(q) for q in row.get("Z", []))]
-                             for row in checks["S"])}
-    else:
-        canon = {side: sorted(sorted(int(q) for q in row)
-                              for row in checks[side])
-                 for side in ("X", "Z")}
-    blob = json.dumps(canon, separators=(",", ":"), sort_keys=True)
-    return hashlib.sha256(blob.encode("ascii")).hexdigest()
+# checks_sha256 lives with the verifier (qldpc_verify), which binds a
+# certificate's lower bounds to an entry with it (issue #6812); re-exported
+# here for the site and the tests that import it from this module.
+from qldpc_verify import checks_sha256  # noqa: E402, F401
 
 
 def _code_doc(slug):

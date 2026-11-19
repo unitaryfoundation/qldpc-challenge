@@ -1,5 +1,5 @@
 {
- "doc_sha256": "853ac1cbaab052d5f1abcf47b7be0119c65e3aea2b8408a9e57df0e4144b6005",
+ "doc_sha256": "a2623a2a089aaaac94cc914a25a868db0e68a1326f939b618baa65dc93e6a8e0",
  "report": {
   "checks": [
    {
@@ -300,6 +300,27 @@
     "lattice_step": 1.0,
     "max_swaps_per_check": 0,
     "total_swaps": 0
+   },
+   "sector_distances": {
+    "X": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 3,
+     "witness_weight": 3
+    },
+    "Z": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 3,
+     "witness_weight": 3
+    },
+    "d": {
+     "exact": false,
+     "lower": null,
+     "upper": 3
+    }
    },
    "transversal_gates": [
     {

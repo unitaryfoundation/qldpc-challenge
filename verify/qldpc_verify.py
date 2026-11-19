@@ -65,10 +65,11 @@ What "verified" means per field:
 
 import collections
 import glob
+import hashlib
 import json
-import re
 import math
 import os
+import re
 import secrets
 import sys
 
@@ -1333,13 +1334,138 @@ def support_diameter(coords, support):
                default=0.0)
 
 
-def verify(doc, refute=False, seed=None):
+def checks_sha256(doc):
+    """Return the hash that binds a formal or partial certificate to one code.
+
+    sha256 over the compact JSON of {"X": rows, "Z": rows} with every row's
+    support sorted and the rows of each side sorted, so the hash names the
+    stabilizer presentation (the set of check rows on the labeled qubits)
+    and nothing about file formatting or row order. A formal proof is about
+    a matrix pair defined inside a proof development; this is what ties
+    that pair to codes/<slug>.json, and a certificate whose hash is not this
+    entry's is a proof about some other code. A stabilizer entry (checks.S,
+    one X and Z support per generator) hashes {"S": rows} with each
+    generator's two supports sorted and the generators sorted (issue #4718);
+    the CSS form is unchanged, so every committed hash still matches.
+    """
+    checks = doc["checks"]
+    if "S" in checks and "X" not in checks:
+        canon = {"S": sorted([sorted(int(q) for q in row.get("X", [])),
+                              sorted(int(q) for q in row.get("Z", []))]
+                             for row in checks["S"])}
+    else:
+        canon = {side: sorted(sorted(int(q) for q in row)
+                              for row in checks[side])
+                 for side in ("X", "Z")}
+    blob = json.dumps(canon, separators=(",", ":"), sort_keys=True)
+    return hashlib.sha256(blob.encode("ascii")).hexdigest()
+
+
+def sector_distances(doc, earned, refutation=None):
+    """Per-side distance intervals from what this check established (issue #6812).
+
+    ``earned`` is ``report["earned_distance"]``: the sides whose witness
+    verified, each with the witness weight. ``refutation`` is
+    ``{"side", "weight", "witness"}`` when the refuter found a logical lighter
+    than the claimed d (``side`` is None when the found operator is of neither
+    side, which only a bogus refuter can produce). Returns, for each side the
+    code has ("X" and "Z", or "P" for a stabilizer code) and for "d":
+    ``upper`` (the verified witness weight, lowered to the refuter's find on
+    that side), ``lower`` (None: a trustless check proves nothing below the
+    witness; apply_certificate() fills it), ``exact`` (lower == upper, proved),
+    and per side ``witness_weight`` and ``refuted_to``. A side without a valid
+    witness has ``upper`` None, and so does d.
+    """
+    sides = ("P",) if is_stabilizer(doc) else ("X", "Z")
+    out, uppers = {}, []
+    for side in sides:
+        e = earned.get(side) if earned else None
+        wt = int(e["value"]) if e else None
+        entry = {"upper": wt, "lower": None, "exact": False,
+                 "witness_weight": wt, "refuted_to": None}
+        if (refutation and refutation.get("side") == side and wt is not None
+                and refutation["weight"] < wt):
+            entry["upper"] = entry["refuted_to"] = int(refutation["weight"])
+        out[side] = entry
+        uppers.append(entry["upper"])
+    d_up = min(uppers) if uppers and all(u is not None for u in uppers) else None
+    if refutation and d_up is not None and refutation["weight"] < d_up:
+        d_up = int(refutation["weight"])     # a lighter logical bounds d whatever its side
+    out["d"] = {"upper": d_up, "lower": None, "exact": False}
+    return out
+
+
+def _cert_consistent(cert, doc):
+    """Return whether an exact certificate agrees with the entry's current distance.
+
+    Overall and per side: a stale certificate left behind by a distance edit
+    proves nothing about the edited claim.
+    """
+    dist = doc["distance"]
+    if cert.get("d") is not None and cert["d"] != dist["d"]:
+        return False
+    for side in ("X", "Z", "P"):
+        cv = ((cert.get("sides") or {}).get(side) or {}).get("value")
+        dv = (dist.get(side) or {}).get("value")
+        if cv is not None and dv is not None and cv != dv:
+            return False
+    return True
+
+
+def apply_certificate(sector, doc, cert):
+    """Return a copy of a sector_distances() block with the lower bounds a
+    certificate (certs/<slug>.json) proves for this entry (issue #6812).
+
+    An exact certificate consistent with the entry proves each side's upper
+    bound, so lower = upper and exact is set. A partial certificate (issue
+    #4230) proves ``d_lower`` overall and ``sides.<side>.proved_min`` per
+    side; it is honored by its binding hash (``verification.checks_sha256``
+    must be this entry's canonical checks), never above the verified witness
+    (that contradiction is check_certs.py's to report), and only when its
+    sides are the entry's. A bound of 1 is the trivial one and stays None.
+    Nothing is read from disk: the caller pairs the entry with its file.
+    """
+    out = {k: dict(v) for k, v in sector.items()}
+    if not cert:
+        return out
+    sides = [k for k in out if k != "d"]
+    if cert.get("d_exact"):
+        if not _cert_consistent(cert, doc):
+            return out
+        for key in sides + ["d"]:
+            up = out[key]["upper"]
+            val = (doc["distance"]["d"] if key == "d"
+                   else (doc["distance"].get(key) or {}).get("value"))
+            if up is not None and val is not None and up == val:
+                out[key].update(lower=int(val), exact=True)
+        return out
+    lb = cert.get("d_lower")
+    if not isinstance(lb, int) or lb < 2:
+        return out
+    if set(cert.get("sides") or {}) != set(sides):
+        return out
+    if (cert.get("verification") or {}).get("checks_sha256") != checks_sha256(doc):
+        return out
+    d_up = out["d"]["upper"]
+    if d_up is not None and lb <= d_up:
+        out["d"].update(lower=lb, exact=(lb == d_up))
+    for side in sides:
+        pm = ((cert.get("sides") or {}).get(side) or {}).get("proved_min")
+        up = out[side]["upper"]
+        if isinstance(pm, int) and pm >= 2 and up is not None and pm <= up:
+            out[side].update(lower=pm, exact=(pm == up))
+    return out
+
+
+def verify(doc, refute=False, seed=None, cert=None):
     """Verify a submission. If ``refute`` is set, run the distance refutation with
     ``seed`` -- when ``seed is None`` a fresh RANDOM seed is drawn, so the gate is
     non-deterministic by design (an over-claim cannot reliably evade one fixed
     search). The seed used is reported in the ``distance_not_refuted`` detail, so a
     failing run is reproducible (re-run with that seed). Pass an explicit ``seed``
-    to reproduce a run or for a deterministic test."""
+    to reproduce a run or for a deterministic test. ``cert`` is the entry's
+    certificate (certs/<slug>.json) when the caller has one; it fills the lower
+    bounds of ``computed.sector_distances`` and changes no check (issue #6812)."""
     report = {"name": doc.get("name") if isinstance(doc, dict) else None,
               "checks": [], "ok": True, "computed": {}, "earned_distance": {}}
 
@@ -1367,13 +1493,13 @@ def verify(doc, refute=False, seed=None):
         return report
     try:
         report["signature"] = signature(doc)
-        return _verify_semantic(doc, report, record, refute, seed)
+        return _verify_semantic(doc, report, record, refute, seed, cert)
     except Exception as e:  # never crash on a hostile submission
         record("verifier_ran", False, f"{type(e).__name__}: {e}")
         return report
 
 
-def _verify_semantic(doc, report, record, refute=False, seed=None):
+def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
 
     n = doc["n"]
     stab = is_stabilizer(doc)
@@ -1755,6 +1881,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
     #
     #    FAILS CLOSED: if the refuter cannot run, that is recorded as a FAILURE, not
     #    a silent pass -- a gate that fails open is no gate.
+    found = None
     if refute and "d" in report["earned_distance"]:
         run_seed = seed if seed is not None else secrets.randbelow(2**31)
         try:
@@ -1764,10 +1891,37 @@ def _verify_semantic(doc, report, record, refute=False, seed=None):
                    (f"found weight-{d_found} logical < claimed {dist['d']} "
                     f"(seed {run_seed}); witness={wit}" if refuted
                     else f"no lighter logical in {ntr} RIS trials (seed {run_seed})"))
+            if refuted:
+                found = (d_found, wit)
         except Exception as e:
             record("distance_not_refuted", False,
                    f"refutation could not run ({type(e).__name__}: {e}; seed "
                    f"{run_seed}); failing closed -- manual review required")
+
+    # 8a. sector distances (issue #6812): the per-side intervals, under
+    #     computed so a gate verdict and a memoized board report carry them. A
+    #     campaign that selects parents or judges a sector swap reads these
+    #     rather than a ledger's carried bound. The refuter reports the lighter
+    #     logical it found but not its side; the side is read off the operator
+    #     here, so the bound lands on the sector it belongs to.
+    refutation = None
+    if found is not None:
+        d_found, wit = found
+        side_found = None
+        if stab:
+            side_found = "P"
+        elif isinstance(wit, list):
+            v = _vec(wit, n)
+            if gf2.commutes(v, HZ) and not gf2.in_rowspace(v, HX):
+                side_found = "X"
+            elif gf2.commutes(v, HX) and not gf2.in_rowspace(v, HZ):
+                side_found = "Z"
+        refutation = {"side": side_found, "weight": int(d_found), "witness": wit}
+    report["computed"]["sector_distances"] = sector_distances(
+        doc, report["earned_distance"], refutation)
+    if cert:
+        report["computed"]["sector_distances"] = apply_certificate(
+            report["computed"]["sector_distances"], doc, cert)
 
     # 9. locality / geometric 2D embedding. The locality CLASS is computed from
     #    the layout, never trusted from a self-declared track. A class is earned
