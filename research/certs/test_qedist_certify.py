@@ -132,3 +132,61 @@ def test_partial_cert_satisfies_cert_schema(monkeypatch, tmp_path):
     with open(os.path.join(_ROOT, "schema", "cert.schema.json"), encoding="utf-8") as f:
         schema = json.load(f)
     jsonschema.validate(cert, schema)
+
+
+def _fake_tool(monkeypatch, M, returncode, sector_bounds, audit_code=None):
+    """Stand in for the qedist executable: write result.json and exit with the given code."""
+    import subprocess
+    monkeypatch.setattr(M, "qedist_root", lambda root=None: ["fake-qedist"])
+
+    def fake_run(cmd, **kw):
+        if cmd[1] == "certify":
+            out_dir = cmd[cmd.index("--out") + 1]
+            os.makedirs(out_dir, exist_ok=True)
+            with open(os.path.join(out_dir, "result.json"), "w", encoding="utf-8") as f:
+                json.dump({"sector_bounds": sector_bounds, "status": "INCOMPLETE" if returncode == 75 else "X"}, f)
+            return subprocess.CompletedProcess(cmd, returncode, "", "")
+        if cmd[1] == "audit":
+            return subprocess.CompletedProcess(cmd, audit_code if audit_code is not None else returncode, "", "")
+        return subprocess.CompletedProcess(cmd, 0, "QEDist 0.1\n", "")
+
+    monkeypatch.setattr(M.subprocess, "run", fake_run)
+
+
+def _steane_claiming(d):
+    checks = [[0, 1, 2, 3], [0, 1, 4, 5], [0, 2, 4, 6]]
+    return {"n": 7, "k": 1, "code_type": "CSS", "name": "steane",
+            "checks": {"X": checks, "Z": checks},
+            "distance": {"d": d, "X": {"value": d}, "Z": {"value": d}}}
+
+
+def test_an_incomplete_search_exit_75_is_a_timeout_record_not_an_error(monkeypatch):
+    """QEDist exits 75 when a required search did not finish in the budget; the
+    partial result is read, not discarded (issue #6867)."""
+    M = _module()
+    _fake_tool(monkeypatch, M, 75, {"X": {"lower": 1, "upper": 5}, "Z": {"lower": 3, "upper": 5}})
+    cert = M.certify(_steane_claiming(5), tlim=1)
+    assert not cert["d_exact"]
+    assert cert["sides"]["X"]["status"] == "TIMEOUT" and cert["sides"]["X"]["lower_bound"] is None
+    assert cert["sides"]["Z"]["status"] == "TIMEOUT" and cert["sides"]["Z"]["lower_bound"] == 3
+    assert cert["d_lower"] == 1
+    assert "(yeon-lee/QEDist)" in cert["solver"]
+
+
+def test_a_failed_run_exit_2_is_an_error(monkeypatch):
+    M = _module()
+    _fake_tool(monkeypatch, M, 2, {})
+    import pytest
+    with pytest.raises(M.QEDistCertifyError):
+        M.certify(_steane_claiming(5), tlim=1)
+
+
+def test_a_lighter_witness_exit_10_is_a_refutation(monkeypatch):
+    """Exit 10 is a witness lighter than the cutoff: the vector is re-checked and the side is marked SAT."""
+    M = _module()
+    _fake_tool(monkeypatch, M, 10, {"X": {"lower": 1, "upper": 3, "witness": [4, 5, 6]},
+                                    "Z": {"lower": 1, "upper": 3, "witness": [4, 5, 6]}})
+    cert = M.certify(_steane_claiming(5), tlim=1)
+    assert not cert["d_exact"]
+    assert all(b["status"] == "SAT" and b["witness"] == [4, 5, 6] for b in cert["sides"].values())
+
