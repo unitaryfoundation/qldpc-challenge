@@ -1957,7 +1957,17 @@ hx, hz, coords, _ = mb.build(4, rows=3, m=13, pitch=2, drop_empty=True)
 <p>Model: Beam 1.0. Construction family: code-calculus.</p>
 <h4>Reproduction</h4>
 <p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/369-53-1.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/371-10-41.html">[[371,10,30]] — 371-10-41</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[371,10,41]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/371-10-29.html">[[371,10,29]] — 371-10-29</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[371,10,29]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-18: [[371,10,30]] -&gt; [[371,10,29]]</h4>
+<p>[[371,10,29]] supersedes the board&#x27;s [[371,10,30]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 24.26 to 22.67. Before this revision the entry recorded the X bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;. The entry was filed under the slug <code>371-10-41</code>, with [[371,10,41]] in its name and note heading, while the distance recorded in the file was 30; this revision brings the slug, the name and the heading in line with the corrected distance.</p>
+<ul>
+<li>X side 30 -&gt; 29: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 31,711,726 trials on this side on an NVIDIA L40, seed 1993427198.</li>
+<li>Z side 41 -&gt; 30: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 98,230,806 trials on this side on an NVIDIA L40, seed 1993427199.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 30 | 29 | 31,711,726 | 1993427198 | | Z | 41 | 30 | 98,230,806 | 1993427199 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/371-10-29.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[371,10,41]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
 <h4>What was searched</h4>
@@ -1969,7 +1979,7 @@ hx, hz, coords, _ = mb.build(4, rows=3, m=13, pitch=2, drop_empty=True)
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/371-10-41.md">raw markdown</a></div></details></section>
+<p>Code matrices and check weights are in the submitted JSON file.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/371-10-29.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/371-130-18.html">[[371,130,15]] — 371-130-18</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[371,130,18]] — Generalized bicycle</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Child of the reachability campaign: derived by the code-calculus planner from a CSS parent. Staged as a full submission (matrices + parentage).</p>
@@ -54761,7 +54771,17 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <p>Model: Claude Fable 5.1 (Claude Code), matching <code>provenance.model</code>. Generators from research/kit (search.py samplers, group_algebra.py) and research/cyclic_gb.py; GPU RIS from verify/ris_gpu.cu built with nvcc for an NVIDIA A40, driven through verify/ris_gpu.py&#x27;s input format; gf2_fast from verify/ for exact k, kernels, and the CPU RIS; verify/validate_candidate.py and verify/gate_changed.py for the gate. Compute: about 3.5 GPU hours for the stream that produced this code plus about 1 GPU hour of finalist passes, and about 4 CPU hours of gate runs.</p>
 <h4>Reproduction</h4>
 <p>Rebuild (H_X, H_Z) from the construction string in the code file&#x27;s provenance: Cyclic (single-circulant-pair) generalized-bicycle code over Z_155 (research/cyclic_gb.py build_cyclic_gb): a(x) = 1 + x^11 + x^25 + x^40, b(x) = 1 + x^20 + x^81 + x^126; H_X = [circ(a) | circ(b)], H_Z = [circ(b)^T | circ(a)^T] with circ(v)[i, (i + j) mod 155] = v[j]. n = 2m = 310, k = 2 deg gcd(a, b, x^155 - 1) = 12, every check has weight 8. Taken as one connected component of the Z_465 code with a = 1 + x^33 + x^75 + x^120, b = 1 + x^60 + x^243 + x^378 (all offsets divisible by 3), which is the direct sum of three copies of this code.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/310-12-26.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/310-2-39.html">[[310,2,39]] — 310-2-39</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[310,2,39]] weight-20 cyclic generalized-bicycle</h3>
+<section class=blk><h3><a href="codes/310-2-38.html">[[310,2,38]] — 310-2-38</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[310,2,38]] weight-20 cyclic generalized-bicycle</h3>
+<h4>Revision 2026-11-18: [[310,2,39]] -&gt; [[310,2,38]]</h4>
+<p>[[310,2,38]] supersedes the board&#x27;s [[310,2,39]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 9.81 to 9.32. Refutation run 1 (<code>research/audits/refute-run-1-2026-09-26.json</code>) read 39 / 41 and 39 / 41 (X / Z, seeds 4101 and 4102) on this entry at 300,000,000 trials per side with <code>verify/ris_gpu.py</code> at pair depth 0; its verdict there is &quot;held, read at the claim on X only&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 39 -&gt; 38: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 32), 3,218,563 trials per side, seed 169990256.</li>
+<li>Z side 39 -&gt; 38: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 727,654,154 trials on this side on an NVIDIA L40, seed 26628830.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 39 | 38 | 3,218,563 | 169990256 | | Z | 39 | 38 | 727,654,154 | 26628830 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/310-2-38.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[310,2,39]] weight-20 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 20 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
 <h4>Construction</h4>
@@ -54776,7 +54796,7 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <h4>What it advances</h4>
 <p>Score kd^2/n = 9.813 at check weight 20. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
-<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/310-2-39.md">raw markdown</a></div></details></section>
+<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/310-2-38.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/316-2-37.html">[[316,2,37]] — 316-2-37</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[316,2,37]] weight-16 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 16 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
