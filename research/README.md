@@ -58,6 +58,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `arxiv_watch.py` | audit | arXiv triage for papers that may carry a board-relevant code; claims, never distances |
 | `circuit_autogen.py` | canonical | memory-circuit generation behind `qldpc submit` (issue #1848); flagged schedules (Johnson-coil and span flags) and the invariant two-block decomposition of the issue #4231 sweep |
 | `circuit_backfill.py` | canonical | the same circuit path over board entries that have no circuit tier (issue #1026) |
+| `ler_priority.py` | audit | the logical-error-rate backfill queue: circuit-bearing entries without `circuit.ler`, shallowest schedule first by TICK layers per round, with the `verify/ler_measure.py` command per entry (issue #6834) |
 | `circuit_seed.py` | rebuild | the circuit-tier seed artifact for a rotated-surface-code entry (RFC 0001 Phase A) |
 
 ## Easily confused
