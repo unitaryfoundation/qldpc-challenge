@@ -155,6 +155,14 @@ def test_code_page_shows_the_schedule_of_the_committed_circuits(tmp_path):
     assert f'<td class=num>{want["qubit_layers"]:,}</td>' in page
     assert "What is the schedule table on a code page?" in open(
         tmp_path / "docs" / "faq.html", encoding="utf-8").read()
+    # the depth travels with d_circ (issue #6834): on the code page's d_circ
+    # line and in the board row's gear chip
+    depth = want["layers_per_round"]
+    assert f"&middot; {depth} layers per round" in page
+    with open(tmp_path / "docs" / "index.html", encoding="utf-8") as f:
+        board = f.read()
+    assert f"&#9881;6 &middot; {depth}/rd</span>" in board
+    assert f"{depth} TICK layers per round" in board
 
     # the entry without circuits has no schedule section
     with open(tmp_path / "docs" / "codes" / "17-1-7.html", encoding="utf-8") as f:
@@ -167,3 +175,11 @@ def test_missing_circuit_files_give_no_diagnostics(tmp_path):
     doc = {"circuit": {"rounds": 3}}
     assert build.schedule_diagnostics(doc, "nothing-here") == {}
     assert build.schedule_diagnostics({}, "nothing-here") == {}
+
+
+def test_schedule_depth_label_is_the_deeper_basis():
+    build = load_site_build()
+    assert build.schedule_depth_label({"X": {"layers_per_round": 10}, "Z": {"layers_per_round": 12}}) == 12
+    assert build.schedule_depth_label({"X": {"layers_per_round": 7.5}}) == 7.5
+    assert build.schedule_depth_label({"X": {"layers_per_round": None}}) is None
+    assert build.schedule_depth_label({}) is None

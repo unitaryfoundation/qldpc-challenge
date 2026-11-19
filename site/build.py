@@ -2006,6 +2006,7 @@ def load_entries():
             # schedule diagnostics (issue #5807): depth, width, and
             # parallelism of the committed circuits, for the code page.
             "sched": schedule_diagnostics(doc, slug),
+            "sched_depth": schedule_depth_label(schedule_diagnostics(doc, slug)),
             # measured logical error rate: the worse of the two
             # per-round side rates, the same worst-side convention as d =
             # min(d_X, d_Z). The schema pins p and the decoder, so the number
@@ -2245,6 +2246,19 @@ def schedule_diagnostics(doc, slug):
             continue
         out[side] = schedule_of_circuit(circuit, circ.get("rounds"))
     return out
+
+
+def schedule_depth_label(sched):
+    """Return the layers-per-round figure shown beside d_circ (issue #6834).
+
+    The deeper of the two bases, or None when neither side has a figure. Two
+    schedules at the same d_circ can differ by a factor of several in depth,
+    and every TICK layer costs every idle data qubit a fault, so the figure
+    travels with the chip rather than staying on the code page.
+    """
+    vals = [row.get("layers_per_round") for row in (sched or {}).values()
+            if row.get("layers_per_round") is not None]
+    return max(vals) if vals else None
 
 
 def schedule_table(sched):
@@ -3284,9 +3298,14 @@ def detail_page(e):
         vals = [dc[s]["value"] for s in ("X", "Z") if s in dc]
         if vals:
             eff_c = min(vals)
+            depth = schedule_depth_label(e.get("sched"))
             P.append(f'<div class=kv><b>d_circ</b> &le; {eff_c} '
                      '<span class=claimed>(min over bases; penalty-only, '
-                     'clamped to &le; d)</span></div>')
+                     'clamped to &le; d)</span>'
+                     + (f' &middot; {depth} layers per round <span class=claimed>'
+                        '(the deeper basis; computed, never ranked)</span>'
+                        if depth is not None else "")
+                     + '</div>')
         for s in ("X", "Z"):
             claim = dc.get(s)
             if not claim:
@@ -5769,8 +5788,15 @@ def board_table(entries, records, lrec=frozenset()):
             + novelty
             + ((f'<span class=circchip title="circuit tier: verified '
                 f'syndrome-extraction circuits, d_circ&le;{e["d_circ"]}'
-                f'{" + measured logical error rate" if e["has_ler"] else ""}'
-                f'">&#9881;{e["d_circ"]}</span>')
+                + (f'; {e["sched_depth"]} TICK layers per round (deeper is '
+                   'worse at equal d_circ: every layer exposes every idle '
+                   'data qubit to a fault)'
+                   if e.get("sched_depth") is not None else "")
+                + f'{" + measured logical error rate" if e["has_ler"] else ""}'
+                f'">&#9881;{e["d_circ"]}'
+                + (f' &middot; {e["sched_depth"]}/rd'
+                   if e.get("sched_depth") is not None else "")
+                + '</span>')
                if e["d_circ"] is not None else "")
             + (f'<span class=lerchip title="LER record: Pareto-best on (n, k, '
                f'measured logical error rate) at some physical rate it was '
