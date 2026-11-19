@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[24,8,3]] 2BGA",
  "code_type": "CSS",
  "n": 24,
@@ -398,6 +398,60 @@
    ],
    "date": "2026-10-30",
    "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=3 per check, 8 data CX slots per round, X-check term slots [6, 1, 7, 2, 3, 5, 4], Z-check term slots [0, 6, 1, 3, 4, 2, 5] over terms A_0..A_2, B_0..B_3)"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2583,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.107591066,
+     "ci95": [
+      0.103051977,
+      0.112340572
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 806,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.028455361,
+     "ci95": [
+      0.026523527,
+      0.030524905
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 2553,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.1059742,
+     "ci95": [
+      0.101489426,
+      0.110666746
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 735,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.025809319,
+     "ci95": [
+      0.023980951,
+      0.027774269
+     ]
+    }
+   ]
   }
  }
 }

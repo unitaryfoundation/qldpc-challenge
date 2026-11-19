@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[24,4,5]] two-block code over D12",
  "code_type": "CSS",
  "n": 24,
@@ -457,6 +457,36 @@
    ],
    "date": "2026-10-31",
    "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 9 data CX slots per round, X-check term slots [5, 2, 3, 8, 4, 6, 1, 7], Z-check term slots [5, 6, 4, 0, 2, 3, 7, 1] over terms A_0..A_5, B_0..B_1)"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1530,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.035225922,
+     "ci95": [
+      0.033386194,
+      0.03716782
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 1492,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.034212403,
+     "ci95": [
+      0.032407818,
+      0.036118099
+     ]
+    }
+   ]
   }
  }
 }

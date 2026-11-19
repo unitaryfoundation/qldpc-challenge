@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "[[25,5,4]] SAT t3 w6 (a)",
  "code_type": "CSS",
  "n": 25,
@@ -331,6 +331,36 @@
    ],
    "date": "2026-11-18",
    "method": "circuit_autogen schedule search (two-block interleaved, then layout, then generic), verified by verify/circuit_verify.py before writing"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 3058,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.105279384,
+     "ci95": [
+      0.100805926,
+      0.10998887
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 2411,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.075858746,
+     "ci95": [
+      0.07250618,
+      0.079376222
+     ]
+    }
+   ]
   }
  }
 }
