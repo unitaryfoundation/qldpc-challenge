@@ -105,6 +105,26 @@ def _handles(names):
     return out
 
 
+_FAMILY_RULES = [
+    ("pair-partition-cpm",
+     re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
+    ("bivariate-bicycle",
+     re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
+    ("generalized-bicycle",
+     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
+]
+
+
+def infer_family(construction):
+    con = str(construction or "")
+    opening = con[:90]
+    for family, pat in _FAMILY_RULES:
+        m = pat.search(opening)
+        if m and not re.search(r"\\bquotient of\\b", opening[:m.start()], re.I):
+            return family
+    return None
+
+
 def make_submission(HX, HZ, *, name, construction, authors, family=None,
                     references=None, notes=None, date=None, tracks=(),
                     confidence="upper_bound", coordinates=None, layers=None,
@@ -234,6 +254,10 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     if handles:
         doc["distance"]["X"]["witness_provenance"] = _provenance(seed)
         doc["distance"]["Z"]["witness_provenance"] = _provenance(seed + 1)
+    if family is None or family == "other":
+        inferred = infer_family(construction)
+        if inferred is not None:
+            family = inferred
     if family is not None:
         doc["family"] = family            # Layer-2 tag (filterable, never ranked)
     if tracks:
