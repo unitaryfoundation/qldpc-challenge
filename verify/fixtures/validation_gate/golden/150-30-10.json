@@ -411,6 +411,27 @@
     "max_swaps_per_check": 13,
     "total_swaps": 1002
    },
+   "sector_distances": {
+    "X": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 10,
+     "witness_weight": 10
+    },
+    "Z": {
+     "exact": false,
+     "lower": null,
+     "refuted_to": null,
+     "upper": 10,
+     "witness_weight": 10
+    },
+    "d": {
+     "exact": false,
+     "lower": null,
+     "upper": 10
+    }
+   },
    "weight_class": "weight-9plus"
   },
   "css_equivalent": {
