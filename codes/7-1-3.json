@@ -116,28 +116,137 @@
  },
  "circuit": {
   "d_circ": {
-   "X": {
-    "value": 3,
-    "confidence": "upper_bound",
-    "witness": [
-     440,
-     442,
-     675
-    ]
-   },
    "Z": {
     "value": 3,
     "confidence": "upper_bound",
     "witness": [
-     449,
-     454,
-     470
+     214,
+     216,
+     267
+    ]
+   },
+   "X": {
+    "value": 3,
+    "confidence": "upper_bound",
+    "witness": [
+     365,
+     374,
+     386
     ]
    }
   },
   "rounds": 3,
   "stim_version": "1.16.0",
-  "notes": "Johnson-coil + 4 span flags sequential extraction (max_flags=2 per check, 4 X + 5 Z edge-colored data CX layers per round); verified against stim 1.16.0 and RIS DEM search (seed 0xC18C) at full gate budget",
+  "notes": "SAT-scheduled interleaved X+Z extraction with 1 Chao-Reichardt flag per check co-scheduled into idle ancilla slots (7 CX layers, 9 TICKs/round, 19 qubits total); witnesses from RIS on ker(H_dem) at twice the gate trial budget.",
+  "contributed_by": {
+   "by": [
+    "@FarLab"
+   ],
+   "date": "2026-11-19",
+   "method": "SAT interleaved X+Z + co-scheduled minimal-flag schedule search, verified by verify/circuit_verify.py"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.01,
+     "shots": 10000,
+     "failures": 1944,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.075675815,
+     "ci95": [
+      0.072169585,
+      0.079351471
+     ]
+    },
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 793,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.027968653,
+     "ci95": [
+      0.026055586,
+      0.030019219
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 274,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.009305441,
+     "ci95": [
+      0.00826155,
+      0.010479982
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 119,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.003998558,
+     "ci95": [
+      0.003340359,
+      0.004785856
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.01,
+     "shots": 10000,
+     "failures": 2005,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.078518084,
+     "ci95": [
+      0.074922033,
+      0.082286394
+     ]
+    },
+    {
+     "p": 0.005,
+     "shots": 10000,
+     "failures": 764,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.026886522,
+     "ci95": [
+      0.025015598,
+      0.028894482
+     ]
+    },
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 227,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.007684154,
+     "ci95": [
+      0.00674348,
+      0.008754987
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 20000,
+     "failures": 216,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.003626236,
+     "ci95": [
+      0.003172936,
+      0.004144038
+     ]
+    }
+   ]
+  },
   "logicals": {
    "X": [
     [
@@ -175,116 +284,6 @@
      ]
     }
    }
-  ],
-  "contributed_by": {
-   "by": [
-    "@MathysRennela",
-    "@FarLab"
-   ],
-   "date": "2026-10-29",
-   "method": "Johnson-coil + 4 span flags sequential extraction (max_flags=2 per check, 4 X + 5 Z edge-colored data CX layers per round)"
-  },
-  "ler": {
-   "X": [
-    {
-     "p": 0.01,
-     "shots": 10000,
-     "failures": 4677,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.299376943,
-     "ci95": [
-      0.280911003,
-      0.322128685
-     ]
-    },
-    {
-     "p": 0.005,
-     "shots": 10000,
-     "failures": 2986,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.130739241,
-     "ci95": [
-      0.125383544,
-      0.136352416
-     ]
-    },
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 1032,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.037082189,
-     "ci95": [
-      0.034833361,
-      0.03947279
-     ]
-    },
-    {
-     "p": 0.001,
-     "shots": 10000,
-     "failures": 484,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.016683843,
-     "ci95": [
-      0.015248425,
-      0.018252341
-     ]
-    }
-   ],
-   "Z": [
-    {
-     "p": 0.01,
-     "shots": 10000,
-     "failures": 4561,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.277770602,
-     "ci95": [
-      0.262415348,
-      0.295671385
-     ]
-    },
-    {
-     "p": 0.005,
-     "shots": 10000,
-     "failures": 2980,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.13037291,
-     "ci95": [
-      0.125030806,
-      0.135971593
-     ]
-    },
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 987,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.035338822,
-     "ci95": [
-      0.033152005,
-      0.03766654
-     ]
-    },
-    {
-     "p": 0.001,
-     "shots": 10000,
-     "failures": 390,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.013353455,
-     "ci95": [
-      0.012082709,
-      0.014756141
-     ]
-    }
-   ]
-  }
+  ]
  }
 }
