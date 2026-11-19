@@ -166,7 +166,7 @@ Two principles drive the format:
       `0.001` in any affordable sample, which is what the grid is for.
     - `shots`, `failures`, `seed`: the measurement. The stim sampler is
       seeded, so (shots, seed, stim version) determine the sample; a shot
-      fails when the pinned decoder's predicted observable flips disagree
+      fails when the point's decoder's predicted observable flips disagree
       with the sampled ones. `failures >= 100` is the floor that matters:
       the tier exists to compare prefactors between schedules with equal
       d_circ, which differ by 1.2-2x, and 100 failures puts ~10% error on
@@ -176,16 +176,29 @@ Two principles drive the format:
       10-30% time-boundary bias relative to the long-round limit; it is
       the same convention for every entry, so comparisons stand, but treat
       the absolute number accordingly.
-    - `decoder`: `"bposd-cs-10"`, the one pinned decoder (BP+OSD exactly as
-      `decode/distance.py` pins it, with the DEM's own probabilities as the
-      channel prior). MWPM is deliberately not offered: matching needs a
-      decomposable DEM, which the weight-6+ codes this board is about do
-      not produce -- and pymatching accepts an undecomposed DEM silently,
-      dropping every mechanism above two detectors before decoding, so an
-      MWPM number on these codes answers an easier problem. Expect board
-      values to read ~1.5x better than the decomposed-MWPM numbers familiar
-      from the surface-code literature; that offset is the pinned decoder
-      seeing hyperedges whole, not an error.
+    - `decoder`: which registry decoder measured the point, one of
+      `verify/ler_tools.py`'s `DECODERS` (issue #5804): `"bposd-cs-10"`,
+      the reference decoder (BP+OSD exactly as `decode/distance.py` pins
+      it, with the DEM's own probabilities as the channel prior), which is
+      the decoder the board's headline rate and the LER record read;
+      `"bplsd-cs-10"` (BP+LSD, the same BP with localized statistics
+      decoding at order 10); `"bp-ms-30"` (minimum-sum BP alone, 30
+      iterations); and `"mwpm"` (pymatching on stim's decomposed model,
+      admitted only on a circuit whose every mechanism decomposes into at
+      most two detectors, which the verifier checks before replicating).
+      A basis may carry one curve per decoder, at most one point per (rate,
+      decoder); curves under different decoders are shown side by side and
+      never compared with each other, on the entry page or in the frontier.
+      Each id pins one implementation and parameter set, the versions being
+      the dependency pins in `uv.lock`; adding or changing an id is a
+      `verify/` change with its own review. Matching is pinned to the
+      decomposed model for a reason: pymatching accepts an undecomposed DEM
+      silently, dropping every mechanism above two detectors before
+      decoding, so an MWPM number on the committed model answers an easier
+      problem. Expect the reference decoder's values to read ~1.5x better
+      than the decomposed-MWPM numbers familiar from the surface-code
+      literature; that offset is BP+OSD seeing hyperedges whole, not an
+      error, and it is why the two curves are kept apart.
     - `ler_per_round`, `ci95`: the per-round rate via the parity-aware
       conversion, and its Wilson 95% interval; both must recompute exactly
       from `failures`/`shots`/`rounds`.
@@ -195,7 +208,9 @@ Two principles drive the format:
       count): when it cannot catch a factor-2 under-report with power, the
       point is unverifiable at that budget. At PR time the gate tries the
       points from the highest rate down inside 120 s per basis; the first
-      point is the cheapest, since failures are most common there. A point
+      point is the cheapest, since failures are most common there; an entry
+      carrying curves under several decoders pays that budget once per
+      decoder, and each decoder must verify one point. A point
       the budget cannot check is deferred, with every lower point, to the
       weekly post-merge replication (`verify/ler_replicate.py`, 30 minutes
       per point across three seeds), whose verdict per point lands as a
@@ -211,7 +226,7 @@ Two principles drive the format:
       between it and the factor-2 admissibility bound sit in a gray zone
       where a lucky draw can survive (admissibility itself demands ~98%
       power at factor 2, so the zone is bounded); and the tier is
-      decode-bound, so what the budgets admit is set by the pinned
+      decode-bound, so what the budgets admit is set by the point's
       decoder's speed on the entry's DEM, measured per entry rather than
       read off d. Statistical rather than bit-exact because BP is float
       arithmetic and cross-platform exactness is not a promise the board
@@ -268,7 +283,10 @@ Two principles drive the format:
     patches of distance d, k d^2 data qubits in all, the baseline for a k
     with no single-code entry).
   - `decoder`: `name`, optional `implementation` (package and version, or
-    repository @ commit) and `parameters`.
+    repository @ commit) and `parameters`. Free-form: a benchmark names
+    whatever decoder its operational claim was made with; when that is one
+    of the `circuit.ler` registry decoders, give its registry id as `name`
+    so the two blocks can be read together, but nothing couples them.
   - `resources.candidate`, `resources.baseline`: `data_qubits`,
     `ancilla_qubits`, optional `total_qubits`, `rounds`,
     `spacetime_volume`, `decoder_latency_us`. The verifier requires
