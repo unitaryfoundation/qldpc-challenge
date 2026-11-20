@@ -439,6 +439,15 @@ jobs:
         working-directory: submitted
         continue-on-error: true
         run: make fast
+      - name: reconcile derived provenance table (top-up, issue #4023)
+        # research/provenance/derived.json lags the board between weekly
+        # top-ups, and a code PR is never asked to update it. Reconcile it
+        # in the CI working tree before the self-tests so they (and
+        # test_the_committed_table_matches_the_board) see a complete table.
+        # Top-up only adds not_derived rows and drops departed ones; it never
+        # touches a derived bucket, so a genuinely broken table still fails.
+        working-directory: submitted
+        run: python3 research/derive_provenance.py --top-up
       - name: self-tests (every test_*.py run_tests.py collects; skipped for data-only PRs)
         if: github.event_name != 'pull_request' || steps.changes.outputs.data_only != 'true'
         working-directory: submitted
