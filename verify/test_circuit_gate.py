@@ -96,6 +96,7 @@ def test_circuits_change_triggers_gate():
     paths = ["circuits/25-1-5/memory_z.stim", "codes/72-6-6.json",
              "circuits/25-1-5/memory_z.dem", "docs/index.html"]
     assert gc.map_changed(paths) == ["codes/25-1-5.json", "codes/72-6-6.json"]
+    assert gc.map_changed(["circuits/25-1-5/memory_z.dem", "docs/index.html"]) == []
 
 
 def test_orphaned_circuits_fail_closed(tmp_path, capsys):

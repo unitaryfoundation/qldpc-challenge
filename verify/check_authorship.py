@@ -148,7 +148,7 @@ def changed_codes(base, root=ROOT):
 
 
 def circuits_changed(base, root, slug):
-    """Report whether anything under circuits/<slug>/ changed vs base.
+    """Report whether memory_x.stim or memory_z.stim under circuits/<slug>/ changed vs base.
 
     Fails closed (True) when the diff cannot be computed, as gate_changed.py
     does.
@@ -156,16 +156,19 @@ def circuits_changed(base, root, slug):
     try:
         out = subprocess.check_output(
             ["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD",
-             "--", f"circuits/{slug}"], cwd=root, text=True)
+             "--", f"circuits/{slug}/memory_x.stim",
+             f"circuits/{slug}/memory_z.stim"], cwd=root, text=True)
         return bool(out.strip())
     except Exception:
         return True
 
 
 def code_for_circuit_path(path):
-    """codes/<slug>.json for a path under circuits/<slug>/, else None."""
-    if path.startswith("circuits/") and path.count("/") >= 2:
-        return f"codes/{path.split('/')[1]}.json"
+    """codes/<slug>.json for memory_{x,z}.stim under circuits/<slug>/, else None."""
+    parts = path.split("/")
+    if (len(parts) == 3 and parts[0] == "circuits"
+            and parts[2] in ("memory_x.stim", "memory_z.stim")):
+        return f"codes/{parts[1]}.json"
     return None
 
 

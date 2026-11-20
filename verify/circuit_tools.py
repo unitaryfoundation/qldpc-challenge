@@ -252,10 +252,11 @@ def noise_recipe_errors(circuit, n_data, p=P_REF):
 def derive_dem(circuit):
     """The pinned DEM derivation (RFC 0001 step 5): no decomposition (hook
     mechanisms fire >2 detectors and must survive), loops flattened so error
-    instructions are plain, absolutely-indexed lines. str() of the result is
-    the committed .dem artifact; witness indices count its error instructions
-    in file order. Verification compares a committed .dem against this with
-    dem_matches, not byte equality -- see there for why."""
+    instructions are plain, absolutely-indexed lines. Witness indices count
+    its error instructions in file order. The .dem is derived from the
+    committed .stim, not committed; a legacy committed .dem, when present,
+    is compared against this with dem_matches, not byte equality -- see
+    there for why."""
     return circuit.detector_error_model(decompose_errors=False,
                                         flatten_loops=True)
 

@@ -319,8 +319,8 @@ def bound_basis(root, slug, doc, basis, *, tlim, threads, work_dir):
                seconds=round(float(tool.get("seconds") or time.time() - t0), 1),
                mechanisms=tool.get("cols"), detectors=tool.get("rows"))
     if ub is not None and int(ub) < claim:
-        with open(base + ".dem", encoding="utf-8") as f:
-            dem = stim.DetectorErrorModel(f.read())
+        circuit = stim.Circuit(open(base + ".stim", encoding="utf-8").read())
+        dem = CT.derive_dem(circuit)
         mapped = map_witness(directory, tool.get("witness") or [], dem)
         errs = CT.witness_errors(dem, mapped, int(ub)) if mapped is not None else ["no mapping to the committed .dem"]
         rec.update(witness=mapped, witness_errors=errs,

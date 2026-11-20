@@ -63,7 +63,7 @@ def test_submit_writes_circuits_beside_the_code(npz, capsys, tmp_path):
     doc = json.load(open(os.path.join(out, "12-4-2.json")))
     circuits_dir = str(tmp_path / "circuits" / "12-4-2")
     assert sorted(os.listdir(circuits_dir)) == [
-        "memory_x.dem", "memory_x.stim", "memory_z.dem", "memory_z.stim"]
+        "memory_x.stim", "memory_z.stim"]
     assert doc["schema_version"] == "0.2"
     assert doc["circuit"]["rounds"] == 2
     # the written artifacts pass both verifiers, exactly as CI runs them

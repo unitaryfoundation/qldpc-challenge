@@ -159,6 +159,19 @@ def misplaced_repro(files, slugs, deleted=()):
     return bad
 
 
+def added_dems(files):
+    """Return the .dem files a PR adds under circuits/.
+
+    The DEM is derived from the committed .stim by the pinned verifier, so a
+    committed .dem is redundant -- ~90% of the circuit tier's bytes for no
+    additional check (the gate re-derives and compares regardless). Legacy
+    committed .dem files are still accepted by circuit_verify; new ones are
+    not.
+    """
+    return [f for f in files
+            if f.startswith("circuits/") and f.endswith(".dem")]
+
+
 def main(argv):
     root = ROOT
     if "--root" in argv:
@@ -223,6 +236,15 @@ def main(argv):
               "so each gets the full refutation budget.")
         print("\nNew code submissions:")
         for f in new_codes:
+            print(f"  {f}")
+        return 1
+    dems = added_dems(added)
+    if dems:
+        print("Submission PR adds committed .dem files; the DEM is derived "
+              "from the committed .stim by the pinned verifier, so a "
+              "committed .dem is redundant bulk.")
+        print("\nAdded .dem files:")
+        for f in dems:
             print(f"  {f}")
         return 1
     if not codes:
