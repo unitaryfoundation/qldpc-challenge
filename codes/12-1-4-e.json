@@ -1,0 +1,168 @@
+{
+ "schema_version": "0.4",
+ "name": "[[12,1,4]] C-DELETE-CHECK -> E-PEEL of 13-1-5",
+ "code_type": "stabilizer",
+ "n": 12,
+ "k": 1,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     1,
+     2,
+     4,
+     11
+    ],
+    "Z": [
+     1,
+     2
+    ]
+   },
+   {
+    "X": [
+     0,
+     1,
+     3,
+     10
+    ],
+    "Z": [
+     0,
+     1
+    ]
+   },
+   {
+    "X": [
+     0,
+     2,
+     9,
+     11
+    ],
+    "Z": [
+     0,
+     11
+    ]
+   },
+   {
+    "X": [
+     1,
+     8,
+     10,
+     11
+    ],
+    "Z": [
+     10,
+     11
+    ]
+   },
+   {
+    "X": [
+     0,
+     7,
+     9,
+     10
+    ],
+    "Z": [
+     9,
+     10
+    ]
+   },
+   {
+    "X": [
+     6,
+     8,
+     9,
+     11
+    ],
+    "Z": [
+     8,
+     9
+    ]
+   },
+   {
+    "X": [
+     5,
+     7,
+     8,
+     10
+    ],
+    "Z": [
+     7,
+     8
+    ]
+   },
+   {
+    "X": [
+     4,
+     5,
+     6,
+     8
+    ],
+    "Z": [
+     5,
+     6
+    ]
+   },
+   {
+    "X": [
+     3,
+     5,
+     7
+    ],
+    "Z": [
+     5
+    ]
+   },
+   {
+    "X": [
+     2,
+     4,
+     6
+    ],
+    "Z": [
+     4
+    ]
+   },
+   {
+    "X": [
+     1,
+     3,
+     4,
+     5
+    ],
+    "Z": [
+     3,
+     4
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "P": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": {
+    "X": [
+     2,
+     7,
+     8,
+     11
+    ],
+    "Z": [
+     11
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "origin": "submission",
+  "date": "2026-11-19",
+  "construction": "Symplectic multi-step move sequence on the stabilizer board entry codes/13-1-5.json ([[13,1,5]]): C-DELETE-CHECK -> E-PEEL; delete generator 0; peel qubit 5 with generator 7. Parent construction: twisted XZZX toric code (13 cyclic shifts of XIZZIXIIIIIII; reproduced from the Error Correction Zoo entry stab_13_1_5, https://errorcorrectionzoo.org/c/stab_13_1_5)",
+  "notes": "Pauli-weight witness from a 1000-trial RIS screen; distance is an upper bound.",
+  "model": "Beam 1.0"
+ },
+ "family": "other"
+}
