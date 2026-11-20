@@ -497,60 +497,6 @@
    ],
    "date": "2026-11-20",
    "method": "SAT interleaved X+Z + co-scheduled minimal-flag schedule search, verified by verify/circuit_verify.py"
-  },
-  "ler": {
-   "X": [
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 646,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.009784633,
-     "ci95": [
-      0.00903968,
-      0.01059074
-     ]
-    },
-    {
-     "p": 0.001,
-     "shots": 20000,
-     "failures": 139,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.000998823,
-     "ci95": [
-      0.000845642,
-      0.00117972
-     ]
-    }
-   ],
-   "Z": [
-    {
-     "p": 0.002,
-     "shots": 10000,
-     "failures": 635,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.009607897,
-     "ci95": [
-      0.008870711,
-      0.010406107
-     ]
-    },
-    {
-     "p": 0.001,
-     "shots": 20000,
-     "failures": 146,
-     "seed": 20261006,
-     "decoder": "bposd-cs-10",
-     "ler_per_round": 0.001049442,
-     "ci95": [
-      0.000892068,
-      0.001234547
-     ]
-    }
-   ]
   }
  }
 }
