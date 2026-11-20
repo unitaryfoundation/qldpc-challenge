@@ -23,6 +23,7 @@ once, the serial verdicts, and a worker that fails ending the run.
 """
 import json
 import os
+import re
 import subprocess
 
 import pytest
@@ -757,6 +758,32 @@ def _code(lines):
     return [ln for ln in lines if not ln.lstrip().startswith("#")]
 
 
+def _cache_ref_ok(ref):
+    return ref == "v4" or bool(re.fullmatch(r"[0-9a-f]{40}", ref))
+
+
+def _uses_cache(lines, suffix):
+    """True if any line uses actions/cache/<suffix>@ with a v4 tag or a 40-hex SHA."""
+    for ln in lines:
+        s = ln.strip()
+        prefix = "uses: actions/cache/" + suffix + "@"
+        if s.startswith(prefix):
+            ref = s[len(prefix):].split()[0]
+            if _cache_ref_ok(ref):
+                return True
+    return False
+
+
+def _uses_combined_cache(lines):
+    """True if any line uses the combined actions/cache action (not restore/save)."""
+    for ln in lines:
+        s = ln.strip()
+        m = re.match(r"uses: actions/cache@(\S+)", s)
+        if m and _cache_ref_ok(m.group(1).split()[0]):
+            return True
+    return False
+
+
 def _verify_all_argv(script, tmp_path, **env):
     """Run a sweep step's shell with a recording `uv` on PATH; return verify_all's argv."""
     bindir = tmp_path / "bin"
@@ -827,15 +854,15 @@ def test_the_record_is_restored_and_saved_only_on_main():
     # never be answered from a cache, and not the scheduled run, which is the
     # from-scratch check the record's lines are never more than a week from.
     assert "        if: github.event_name == 'push'" in steps[_RESTORE]
-    assert "        uses: actions/cache/restore@" in steps[_RESTORE]
+    assert _uses_cache(steps[_RESTORE], "restore")
     with open(_WORKFLOW, encoding="utf-8") as f:
         assert "\n  push:\n    branches: [main]\n" in f.read()
     cond = next(ln for ln in steps[_SAVE] if ln.startswith("        if: "))[len("        if: "):]
     for clause in ("always()", "github.event_name != 'pull_request'",
                    "github.ref == 'refs/heads/main'"):
         assert clause in cond.split(" && "), (clause, cond)
-    assert "        uses: actions/cache/save@v4" in steps[_SAVE]
-    assert "        uses: actions/cache@v4" not in "\n".join(steps[_RESTORE] + steps[_SAVE])
+    assert _uses_cache(steps[_SAVE], "save")
+    assert not _uses_combined_cache(steps[_RESTORE] + steps[_SAVE])
 
 
 # --ler-sample (issue #5578): a run that changed the stack that measures the
@@ -1138,7 +1165,7 @@ def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
     lo, hi = names.index(_CODE_SWEEP), names.index(_GATE)
     assert lo < hi and names[hi - 1] == _SEARCH_RESTORE
     restore = _code(steps[_SEARCH_RESTORE])
-    assert "        uses: actions/cache/restore@" in restore
+    assert _uses_cache(restore, "restore")
     assert [ln.strip() for ln in restore if ln.strip().startswith("path:")] == ["path: search-cache"]
     for name in names[lo + 1:hi - 1]:
         cond = next((ln[len("        if: "):] for ln in steps[name]
