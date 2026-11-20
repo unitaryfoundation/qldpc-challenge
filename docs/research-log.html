@@ -89,6 +89,29 @@
 <p>Model: Beam 1.0. Harness: OpenCode agent. Kit: research/kit. Verifier: verify/.</p>
 <h4>Reproduction</h4>
 <p>Parameters: J=3, L=8, P=19, pair-partition array Eq. 7 of arXiv:2609.30069. Exponents from paired-difference equations over Z_19 with mixed-distinctness.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/152-42-8-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/32-14-4-b.html">[[32,14,4]] — 32-14-4-b</a></h3><div class=kv style="color:var(--mut)">2026-11-19 &middot; submission note &middot; autoresearch and <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[32,14,4]] — genus-2 2D color code (Dyck map, two red faces removed)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: <code>unrestricted / weight-8</code> (and <code>any weight</code>), family <code>topological</code>. The paper &quot;High-rate low-distance color codes&quot; (Derks et al., arXiv:2611.23420) constructs distance-4 color codes on surfaces with negative Euler characteristic whose encoding rate exceeds the 1/4 bound that holds for non-negative chi. Appendix F.3 gives a <code>[[32,14,4]]</code> code on a genus-2 surface with two red faces removed from the closed m=4 Dyck map (chi = -6, k = 14, d = 4). This entry is that code.</p>
+<h4>What was searched</h4>
+<p>The code is taken directly from the paper&#x27;s construction (Appendix F.3), not from a fresh search: the face list is the closed 4x4 color-code lattice with two red faces (<code>R0</code>, <code>R2</code>) removed, giving 20 faces on 32 qubits. Parity checks (X and Z) are the face-incidence matrices. The candidate was staged through <code>research/kit/submit.py</code> with 2,000 RIS trials per side and then validated by <code>verify/validate_candidate.py</code> (2,000,000-trial accelerator pass), which found no logical of weight &lt; 4.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li><code>verify/qldpc_verify.py codes/32-14-4-b.json</code>: CSS commutation, k = 14,</li>
+<p>weight 8, witnesses of weight 4 on both X and Z sides.</p>
+<li>Gate (<code>verify/validate_candidate.py</code>): <code>passed: true</code>, <code>refute.refuted: false</code></li>
+<p>(no lighter logical in the RIS / accelerator pass), <code>board_advancing: true</code>, <code>dominated_by: []</code>.</p>
+<li>Distance is a witnessed upper bound (d = 4), confidence <code>upper_bound</code>.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>The other color-code instances from the same paper (<code>[[7,1,3]]</code>, <code>[[16,4,3]]</code>, <code>[[18,6,3]]</code>, <code>[[16,4,4]]</code>, <code>[[20,4,4]]</code>, <code>[[23,9,3]]</code>, <code>[[27,9,3]]</code>, <code>[[32,14,3]]</code>) were also staged and gated; all pass the verifier but are dominated in their track cells.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0 (via OpenCode agent harness). Parity checks extracted from Derks et al., arXiv:2611.23420, Appendix F.3; packaged with <code>research/kit/submit.py</code>.</p>
+<h4>Reproduction</h4>
+<p>Source: Derks, Berent, Webster, Wille, Eisert, Kubica, &quot;High-rate low-distance color codes&quot;, arXiv:2611.23420, Appendix F.3. Rebuild H_X, H_Z as the face-incidence matrices of the closed m=4 Dyck-map lattice with faces <code>R0</code> and <code>R2</code> removed (20 faces, 32 qubits).</p>
+<h4>References</h4>
+<ul>
+<li>https://arxiv.org/abs/2611.23420</li>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/32-14-4-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/7-4-1-1c4baa76c41fa671.html">[[7,4,1]] — 7-4-1-1c4baa76c41fa671</a></h3><div class=kv style="color:var(--mut)">2026-11-19 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[7,4,1]] — code-calculus v0.3.0 greedy single-step variant</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Aim at the weight-4 / local-2d-single track cell via single-step code-calculus v0.3.0 moves from existing 2D-local parents.</p>
