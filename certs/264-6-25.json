@@ -1,0 +1,34 @@
+{
+  "d": 25,
+  "d_exact": false,
+  "d_lower": 21,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "orchestrator bb-w4-mid it213 [[264,6,25]]",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 21",
+      "proved_min": 21,
+      "secs": 42.1,
+      "status": "TIMEOUT",
+      "value": 25
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 21",
+      "proved_min": 21,
+      "secs": 42.1,
+      "status": "TIMEOUT",
+      "value": 25
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "09625e877c24f23a1fc2955243bf2fda9416faa0a136c4103a37dc38e9669f51",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 2 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}
