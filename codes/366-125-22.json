@@ -4400,43 +4400,43 @@
   ]
  },
  "distance": {
-  "d": 24,
+  "d": 22,
   "P": {
-   "value": 24,
+   "value": 22,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     6,
-     48,
-     62,
-     81,
-     95,
-     137,
-     198,
-     213,
-     223,
-     286,
-     296,
-     311
+     30,
+     55,
+     89,
+     98,
+     130,
+     146,
+     225,
+     241,
+     273,
+     282,
+     316,
+     341
     ],
     "Z": [
-     39,
-     70,
-     71,
-     72,
-     73,
-     104,
-     187,
-     242,
-     245,
-     264,
-     267,
-     322
+     19,
+     30,
+     63,
+     83,
+     97,
+     123,
+     248,
+     274,
+     288,
+     308,
+     341,
+     352
     ]
    }
   }
  },
- "name": "[[366,125,24]] plain-fold CPM pair-partition, (J,L)=(4,12), P=61",
+ "name": "[[366,125,22]] plain-fold CPM pair-partition, (J,L)=(4,12), P=61",
  "provenance": {
   "authors": [
    "Lee, Jong Yeon",
@@ -4454,6 +4454,6 @@
   ],
   "date": "2026",
   "novelty": "known_parameters",
-  "notes": "Literature baseline: a reproduction of a code published with arXiv:2609.30069, rebuilt from the authors' data repository (https://github.com/ultra-high-rate-qec/design-principles-data/blob/306b31d/codes/plain_fold/j4l12/instances/plain_j4l12_p31top_p61_s000.json). Not a new construction. The authors report 16 <= d <= 24. Their lower-bound search output is not in the repository, so this entry carries an upper bound backed by their weight-24 Pauli logical, stored as the witness."
+  "notes": "Literature baseline: a reproduction of a code published with arXiv:2609.30069, rebuilt from the authors' data repository (https://github.com/ultra-high-rate-qec/design-principles-data/blob/306b31d/codes/plain_fold/j4l12/instances/plain_j4l12_p31top_p61_s000.json). Not a new construction. The authors report 16 <= d <= 24. The board's verify check found a weight-22 logical, so this entry carries the upper bound 22 with that Pauli logical stored as the witness."
  }
 }
