@@ -117,10 +117,10 @@ def baseline(doc, circuits_dir):
     for b in ("X", "Z"):
         p = os.path.join(circuits_dir, SIDE_FILES[b] + ".stim")
         try:
-            circuit = stim.Circuit(open(p, encoding="utf-8").read())
-            dem = ct.derive_dem(circuit)
-            out["mechanisms"][b] = dem.num_errors
-        except (OSError, ValueError, Exception):
+            with open(p, encoding="utf-8") as f:
+                circuit = stim.Circuit(f.read())
+            out["mechanisms"][b] = ct.derive_dem(circuit).num_errors
+        except Exception:
             out["mechanisms"][b] = None
     out["score"] = list(score_of(cb["d_circ"]))
     return out

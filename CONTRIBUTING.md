@@ -82,8 +82,8 @@ Useful flags:
   `layers` is required alongside the coordinates (the CLI defaults it to 1);
 - `--circuits DIR` your own `memory_x.stim` and `memory_z.stim` (canonical
   noise recipe, see `verify/circuit_tools.py`) in place of the generated ones;
-  the `.dem` files are derived with the pinned stim and the witnesses searched
-  for you. `--no-circuit` submits the code tier only. `d_circ` is penalty-only:
+  the DEM is derived with the pinned stim and the witnesses searched
+  for you; no `.dem` file is committed. `--no-circuit` submits the code tier only. `d_circ` is penalty-only:
   a circuit can discount an entry, never inflate it, and the value the CLI
   reports is what the board will show. A measured logical error rate is a
   separate, optional step after the circuits exist:
@@ -354,7 +354,7 @@ schedules that claimed `d_circ = d`). Correcting it is a refutation of the
 circuit tier, and it binds for anyone the way a distance refutation does.
 Lower the side (or sides) that came down to the weight of the fault set you
 found, store that fault set as the side's `witness` (indices into the
-committed `.dem`, exactly as many as the new value), keep `confidence` at
+DEM derived from the committed `.stim`, exactly as many as the new value), keep `confidence` at
 `upper_bound`, and append a sentence to `provenance.notes` that names your
 `@handle`, which is where the credit lives, since the circuit side has no
 `witness_provenance`. Leave everything else alone: `verify/check_authorship.py`
@@ -590,8 +590,8 @@ operator of the claimed Pauli weight for a stabilizer code, or the verifier
 rejects the claim), put the file in `codes/`, and verify locally before the PR:
 
 ```
-uv run python verify/qldpc_verify.py codes/my-128-6-8.json
-uv run python verify/check_codes_format.py --files codes/my-128-6-8.json
+uv run python verify/qldpc_verify.py codes/<your-entry>.json
+uv run python verify/check_codes_format.py --files codes/<your-entry>.json
 ```
 
 Exit 0 with an `earned_distance` block means it will pass CI. The second

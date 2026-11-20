@@ -174,8 +174,7 @@ def test_generate_two_block_verifies_at_full_distance(tmp_path):
     doc = _doc("12-4-2")
     block, files, family = ca.generate(doc, **QUICK)
     assert family.startswith("two-block interleaved")
-    assert set(files) == {"memory_x.stim", "memory_x.dem",
-                          "memory_z.stim", "memory_z.dem"}
+    assert set(files) == {"memory_x.stim", "memory_z.stim"}
     report = _verify(doc, block, files, tmp_path)
     assert report["ok"], report
     assert report["earned_d_circ"]["d_circ"]["value"] == doc["distance"]["d"]

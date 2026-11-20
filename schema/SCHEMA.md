@@ -67,10 +67,10 @@ Two principles drive the format:
     records its null result by raising it.
 - `circuit` (optional; requires `schema_version: "0.2"`; RFC 0001, issue #505):
   the circuit tier. The entry additionally ships syndrome-extraction memory
-  circuits under `circuits/<slug>/` — `memory_x.stim`, `memory_z.stim`, and
-  their derived `memory_x.dem`, `memory_z.dem` (committed so witnesses are
-  checkable without running stim) — and claims a witness-backed circuit-level
-  distance per basis. The tier is penalty-only: each basis's claim is
+  circuits under `circuits/<slug>/` — `memory_x.stim`, `memory_z.stim`; the
+  `.dem` files are derived from the `.stim` by the verifier and are no longer
+  committed — and claims a witness-backed circuit-level distance per basis.
+  The tier is penalty-only: each basis's claim is
   clamped to the distance of the logical that memory protects, `d_Z` for the
   X memory and `d_X` for the Z memory (issue #4715), so the effective
   `d_circ`, the minimum over the bases, is `<= d`.
@@ -81,17 +81,17 @@ Two principles drive the format:
     - `confidence`: `"upper_bound"` (the only tier so far; an exact tier via
       MILP over `H_dem` is deferred future work).
     - `witness`: sorted 0-based indices of `error(...)` instructions in that
-      basis's committed flattened `.dem`, counted in file order. The XOR of
+      basis's DEM derived from the committed `.stim`, counted in file order.
+      The XOR of
       their detector sets must vanish (the fault set is undetected) and the
       XOR of their observable sets must not (it flips a logical) — the
       circuit-tier analogue of the low-weight logical the code tier stores.
   - `rounds`: noisy extraction rounds per memory circuit; must be `>= d`.
-  - `stim_version`: the stim that derived the `.dem` files; must equal the
-    version pinned in `uv.lock` (the verifier re-derives the `.dem` and
-    requires an exact mechanism-for-mechanism match -- probabilities only to
-    float tolerance, since their last ulps are architecture-sensitive and the
-    distance tier never reads them -- so a version bump surfaces as a diff on
-    that artifact).
+  - `stim_version`: the stim that derived the memory circuits; must equal the
+    version pinned in `uv.lock` (the verifier re-derives the DEM from the
+    committed `.stim` and requires an exact mechanism-for-mechanism match --
+    probabilities only to float tolerance, since their last ulps are
+    architecture-sensitive and the distance tier never reads them).
   - `ancilla_coordinates` (optional): one `[x, y]` per non-data qubit in
     circuit index order; required only for the geometric circuit tier
     (Phase B, not yet checked).
@@ -466,7 +466,7 @@ A general stabilizer code (`code_type: "stabilizer"`, `schema_version:
 
 ## What the verifier reports
 
-`python verify/qldpc_verify.py codes/your-code.json` prints a JSON report:
+`python verify/qldpc_verify.py codes/<your-entry>.json` prints a JSON report:
 per-check pass/fail, the computed `n, k, ranks, max_check_weight,
 interaction_radius`, and an `earned_distance` block giving the tier each side
 actually earned (an `exact` claim shows as `upper_bound` here and is flagged

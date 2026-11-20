@@ -24,13 +24,16 @@ Checks, per basis (RFC 0001 numbering):
                     final transversal readout; closure detectors match the
                     declared check matrix rows; data qubits are 0..n-1; the
                     declared round count is what the circuit performs
-  5. witness        the committed .dem re-derives from the committed .stim
-                    under the pinned stim, mechanism-for-mechanism (exact
-                    structure and file order; probabilities to float
-                    tolerance -- their last ulps are architecture-sensitive
-                    and the distance tier never reads them), and the claimed
+  5. witness        the DEM is derived from the committed .stim under the
+                    pinned stim, mechanism-for-mechanism (exact structure and
+                    file order; probabilities to float tolerance -- their
+                    last ulps are architecture-sensitive and the distance
+                    tier never reads them). A legacy committed .dem, when
+                    present, must still match that re-derivation; the
+                    committed .dem is no longer required. The claimed
                     witness is an undetected logical fault set of the claimed
-                    weight in it, with value at most the distance of the
+                    weight in the derived DEM, with value at most the
+                    distance of the
                     logical that memory protects (penalty-only clamp, per
                     basis: d_Z for the X memory, d_X for the Z memory, so
                     the effective d_circ = min over bases stays <= d;

@@ -3316,7 +3316,7 @@ def detail_page(e):
                      f'&middot; fault-set witness of {len(wit)} mechanisms '
                      f'({"claimed " + claim.get("confidence", "?")})</div>')
             P.append(f'<details><summary>witness fault set (mechanism '
-                     f'indices in the committed .dem, {len(wit)})</summary>'
+                     f'indices in the DEM derived from the committed .stim, {len(wit)})</summary>'
                      f'<div class=wit>{wit}</div></details>')
         ler = circ.get("ler")
         if ler:

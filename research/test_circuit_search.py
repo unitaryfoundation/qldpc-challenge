@@ -40,7 +40,7 @@ def test_every_attempt_is_staged_gated_and_journaled(tmp_path):
     assert evaluated, "an interleaved two-block schedule evaluates at this size"
     for r in evaluated:
         adir = os.path.join(_ROOT, r["staged"])
-        for name in ("memory_x.stim", "memory_x.dem", "memory_z.stim", "memory_z.dem",
+        for name in ("memory_x.stim", "memory_z.stim",
                      "block.json", "candidate.json", "verdict.json", "notes.md"):
             assert os.path.exists(os.path.join(adir, name)), name
         verdict = json.load(open(os.path.join(adir, "verdict.json"), encoding="utf-8"))
