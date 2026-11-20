@@ -463,6 +463,58 @@ def check_revisions(base, root, problems):
     return True
 
 
+def check_note_rewrites(base, root, problems):
+    """Refuse an in-place rewrite of an existing note that drops its body.
+
+    A modified ``notes/<slug>.md`` (git status M, same slug) whose body
+    retention falls below ``RETENTION_MIN`` is a wholesale replacement of
+    one entry's note by another's, not a revision: the entry it belongs to
+    did not change, so the narrative should not either. A new code belongs
+    under a suffixed slug with its own note (issue #5732, PR #6849).
+    Returns False only if git could not produce the diff.
+    """
+    try:
+        out = subprocess.check_output(
+            ["git", "diff", "--name-status", f"{base}...HEAD", "--", "notes/"],
+            cwd=root, text=True)
+    except Exception as e:
+        print(f"could not diff vs {base}: {e}")
+        return False
+    modified = []
+    for row in out.splitlines():
+        parts = row.split("\t")
+        if len(parts) < 2:
+            continue
+        if parts[0][:1] != "M":
+            continue
+        rel = parts[-1]
+        if (rel.startswith("notes/") and rel.endswith(".md")
+                and os.path.basename(rel) not in ("README.md", "TEMPLATE.md")):
+            modified.append(rel)
+    for rel in sorted(modified):
+        try:
+            old_text = subprocess.check_output(
+                ["git", "show", f"{base}:{rel}"], cwd=root, text=True,
+                stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            continue
+        new_path = os.path.join(root, rel)
+        if not os.path.exists(new_path):
+            continue
+        with open(new_path, encoding="utf-8") as f:
+            new_text = f.read()
+        kept = retention(old_text, new_text)
+        if kept >= RETENTION_MIN:
+            continue
+        problems.append((rel, "note rewrite drops the previous note's body",
+                        f"{rel}: {kept:.0%} of its body lines survive "
+                        f"(minimum {RETENTION_MIN:.0%}); an existing entry's "
+                        f"note must not be replaced wholesale. File a new "
+                        f"code under a suffixed slug with its own note, or "
+                        f"carry the previous text under '{FOLD_IN_HEADING}'."))
+    return True
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=ROOT)
@@ -522,11 +574,17 @@ def main(argv):
     # --files the diff is still the source of truth for this check, but the
     # root may be a bare directory with no git history (the self-tests), so
     # only the CI shape, where the diff also chose the files, fails closed.
-    if not args.all and not check_revisions(args.base, root, problems):
-        if files is not args.files:
-            print("failing closed")
-            return 1
-        print("skipping the revision check")
+    if not args.all:
+        if not check_revisions(args.base, root, problems):
+            if files is not args.files:
+                print("failing closed")
+                return 1
+            print("skipping the revision check")
+        if not check_note_rewrites(args.base, root, problems):
+            if files is not args.files:
+                print("failing closed")
+                return 1
+            print("skipping the note-rewrite check")
 
     if args.report:
         write_report(problems, len(files), args.report)
@@ -550,6 +608,11 @@ def main(argv):
         print("slug. If the narrative belongs elsewhere, move it to a dated fieldnotes/")
         print("entry in the same PR instead (PR #3053 did this for [[502,102,50]]). See")
         print("research/audits/README.md, 'Filing a distance revision'.")
+    if any(why.startswith("note rewrite drops") for _, why, _ in problems):
+        print("\nAn existing entry's note must not be replaced wholesale: file a new")
+        print("code under a suffixed slug with its own note, or carry the previous")
+        print(f"text under '{FOLD_IN_HEADING}'. See CONTRIBUTING.md,")
+        print("'Revisions and overwrites (issue #5732)' and PR #6849.")
 
     print("\nFix by pointing at something that exists in this PR, or by naming the")
     print("external source and pinning it (e.g. 'github.com/org/repo @ abc1234,")

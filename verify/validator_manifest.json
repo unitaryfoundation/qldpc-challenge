@@ -19,7 +19,7 @@
     "verify/check_certs.py": "1bb922d07cededa32b24b6d7d18c0723fac8e8ce79737095c0fe4aa0005ea61e",
     "verify/check_codes_format.py": "50d274ad20f693233c8ae6aac28e8d538767d7b0471278e0cbfa0e5e10b34811",
     "verify/check_pr_duplicates.py": "7f2d287cb3de989b003bab777cde4ae22ed7c385097d2a03d9811dcd29acdd52",
-    "verify/check_prose.py": "57419651740d418c6755257630f143b45d832da89d1315c9d4f5323298a18e29",
+    "verify/check_prose.py": "24c747b47cd780899ec3c880e7dc026079a0ec725ce48ac5f932c5c65cde4677",
     "verify/check_submission_scope.py": "3979f77a47901269d795e2e68bc02adc5a9303d1e5dec6180d2bd7ac681c4219",
     "verify/check_tree_consistency.py": "1d477721d54adcf67d86a574137801a55d01ab0bf187031c58517d8cfcda1411",
     "verify/check_validator_integrity.py": "34cb1c32d29cd5c953200c2e586c77c01f8ff47a6e76d1b6c54819f8d5a5c680",
