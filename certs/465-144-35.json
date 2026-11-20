@@ -1,0 +1,34 @@
+{
+  "d": 35,
+  "d_exact": false,
+  "d_lower": 9,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[465,144,35]] Generalized bicycle",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 9",
+      "proved_min": 9,
+      "secs": 5.3,
+      "status": "TIMEOUT",
+      "value": 35
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 9",
+      "proved_min": 9,
+      "secs": 5.3,
+      "status": "TIMEOUT",
+      "value": 37
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "e2945c0cb208413a482bbd68ea1c55ab167b6c818635be247958dde34590629c",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. No symmetry generators supplied. Each side asked at its own claimed value."
+  }
+}
