@@ -1,26 +1,16 @@
-# Ruff lint + format check (issue #658). Advisory while the codebase is
-# brought to the configured standard: the config in pyproject.toml is the
-# target, and this job REPORTS the distance to it (job summary + log) without
-# failing, so a red X never reads as a broken PR while 500+ pre-existing
-# findings are being worked off. After the one-time mechanical
-# `ruff check --fix` + `ruff format` pass lands, delete the two `|| true`
-# suffixes and the summary block to make it a normal blocking check. The ruff
-# version comes from uv.lock, so lint verdicts cannot drift with upstream
-# releases.
+# Ruff lint + format check (issue #658). The repo-wide report tracks legacy
+# debt but remains advisory until the separate mechanical cleanup. Newly added
+# Python files must be clean; edits to existing files are not forced to reformat
+# unrelated legacy code.
 name: lint
 
-# The job only writes a step summary; least-privilege like verify.yml and
-# prose.yml.
 permissions:
   contents: read
 
 on:
+  # The merge-eligibility helper requires a `ruff` check on every PR head.
+  # Sparse checkout keeps this low-cost on data-only and documentation PRs.
   pull_request:
-    paths:
-      - "**.py"
-      - "pyproject.toml"
-      - "uv.lock"
-      - ".github/workflows/lint.yml"
 
 jobs:
   ruff:
@@ -28,19 +18,39 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The merge commit and its first parent are enough for an added-file list.
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout: |
+            *.py
+            **/*.py
+            pyproject.toml
+            uv.lock
+          sparse-checkout-cone-mode: false
       - uses: astral-sh/setup-uv@v5
-      - name: ruff check (advisory)
+      - name: repo-wide Ruff baseline (advisory)
+        shell: bash
         run: |
-          uv run --frozen ruff check --output-format github . > ruff-check.txt || true
-          count=$(grep -c "::error" ruff-check.txt || true)
-          echo "## ruff (advisory until the mechanical pass lands)" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- \`ruff check\`: **${count}** finding(s) repo-wide" >> "$GITHUB_STEP_SUMMARY"
+          uv run --frozen --only-group dev ruff check --output-format github . > ruff-check.txt || true
+          lint_count=$(grep -c "::error" ruff-check.txt || true)
+          format_count=$(uv run --frozen --only-group dev ruff format --check --quiet . 2>/dev/null | wc -l || true)
+          echo "## Ruff (repo-wide baseline; advisory)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Ruff check: **${lint_count}** finding(s)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Ruff format check: **${format_count}** file(s) would be reformatted" >> "$GITHUB_STEP_SUMMARY"
           cat ruff-check.txt
-      - name: ruff format check (advisory)
+          uv run --frozen --only-group dev ruff format --check . || true
+      - name: blocking Ruff check on added Python files
+        shell: bash
         run: |
-          unformatted=$(uv run --frozen ruff format --check --quiet . 2>/dev/null | wc -l || true)
-          echo "- \`ruff format --check\`: **${unformatted}** file(s) would be reformatted" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Run \`uv run ruff check .\` and \`uv run ruff format --check .\` locally; new code should arrive clean (CONTRIBUTING.md)." >> "$GITHUB_STEP_SUMMARY"
-          uv run --frozen ruff format --check . || true
+          git diff --name-only --no-renames --diff-filter=A -z \
+            "$GITHUB_SHA^1" "$GITHUB_SHA" -- '*.py' > "$RUNNER_TEMP/added-python-files"
+          mapfile -d '' -t files < "$RUNNER_TEMP/added-python-files"
+          if ((${#files[@]} == 0)); then
+            echo "No added Python files to lint."
+            exit 0
+          fi
+          printf 'Linting %s added Python file(s):\n' "${#files[@]}"
+          printf '  %s\n' "${files[@]}"
+          uv run --frozen --only-group dev ruff check "${files[@]}"
+          uv run --frozen --only-group dev ruff format --check "${files[@]}"

@@ -46,6 +46,14 @@ def _successful_checks(head_sha="abc123"):
             "conclusion": "success",
             "started_at": "2026-09-25T10:02:00Z",
         },
+        {
+            "id": 4,
+            "name": "ruff",
+            "head_sha": head_sha,
+            "status": "completed",
+            "conclusion": "success",
+            "started_at": "2026-09-25T10:03:00Z",
+        },
     ]
 
 
@@ -347,6 +355,7 @@ def test_checks_require_success_on_the_current_head():
         "missing verify check on current head",
         "missing prose check on current head",
         "missing codes-format check on current head",
+        "missing ruff check on current head",
     ]
 
 
@@ -362,6 +371,13 @@ def test_latest_check_run_must_be_successful():
         }
     )
     assert merge_eligible_prs.check_failures(runs, "abc123") == ["verify is in_progress/no conclusion"]
+
+
+def test_ruff_check_must_succeed_for_merge_eligibility():
+    runs = _successful_checks()
+    ruff = next(run for run in runs if run["name"] == "ruff")
+    ruff["conclusion"] = "failure"
+    assert merge_eligible_prs.check_failures(runs, "abc123") == ["ruff is completed/failure"]
 
 
 def test_pr_eligibility_requires_changed_code_metadata_and_required_checks(monkeypatch):

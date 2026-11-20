@@ -35,11 +35,11 @@ dev = [
 ]
 
 # Lint and format: ruff, with vprusso/toqito's configuration as the baseline
-# (issue #658). Adoption is sequenced: this config plus a non-blocking CI job
-# first, one mechanical `ruff check --fix` + `ruff format` pass as its own PR
-# once the open PR queue drains (reformatting verify/ re-pins the integrity
-# manifest, so it must not race a manifest change), then the job turns
-# blocking. Docstring-content rules (D1xx, D417) come last, as their own pass.
+# (issue #658). Until the one-time mechanical `ruff check --fix` + `ruff format`
+# pass lands as its own PR, CI reports whole-tree debt and blocks only new
+# Python files; edits to existing files stay advisory so a verifier change does
+# not carry an unrelated reformat and manifest re-pin. After that pass, CI can
+# make the whole tree blocking. Docstring-content rules (D1xx, D417) come last.
 [tool.ruff]
 line-length = 120
 target-version = "py312"    # site/build.py uses 3.12-only f-string
