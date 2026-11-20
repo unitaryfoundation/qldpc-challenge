@@ -34,6 +34,7 @@ whatever bounds were reached.
         [--tlim 300] [--trials 200000] [--brute-max 2e7] [--out research/certs/stabilizer_crosscheck-<date>.json]
     uv run --extra certify python research/certs/stabilizer_crosscheck.py --slugs 5-1-3 40-9-6
 """
+
 import argparse
 import datetime
 import itertools
@@ -60,12 +61,12 @@ DEFAULT_BRUTE_MAX = 2e7
 # ---------------------------------------------------------------------------- brute force
 def pauli_count(n, max_weight):
     """Count the Pauli operators of weight 1 to max_weight on n qubits."""
-    return sum(math.comb(n, w) * 3 ** w for w in range(1, max_weight + 1))
+    return sum(math.comb(n, w) * 3**w for w in range(1, max_weight + 1))
 
 
 def _patterns(w):
     """Return the 3^w single-qubit Pauli assignments of a weight-w support, as (x, z) bit arrays."""
-    codes = np.array(list(itertools.product((1, 2, 3), repeat=w)), dtype=np.int8)   # 1 = X, 2 = Z, 3 = Y
+    codes = np.array(list(itertools.product((1, 2, 3), repeat=w)), dtype=np.int8)  # 1 = X, 2 = Z, 3 = Y
     return (codes != 2).astype(np.int8), (codes != 1).astype(np.int8)
 
 
@@ -90,7 +91,7 @@ def brute_force(A, B, max_weight, *, limit=DEFAULT_BRUTE_MAX):
             Z = np.zeros_like(X)
             X[:, support] = px
             Z[:, support] = pz
-            syndrome = (X @ B.T + Z @ A.T) % 2          # symplectic product with every generator
+            syndrome = (X @ B.T + Z @ A.T) % 2  # symplectic product with every generator
             for i in np.flatnonzero(~syndrome.any(axis=1)):
                 v = np.concatenate([X[i], Z[i]])
                 if not gf2.in_rowspace(v, S):
@@ -110,6 +111,7 @@ def milp_check(doc, cap, tlim):
     """
     import certify as CE
     import tropidist_certify as TC
+
     (H, L), _ = TC.pauli_problem(doc)
     res = CE._exists_lighter(H, L, cap, tlim)
     return "confirmed" if res is False else "contradiction" if res else "timeout"
@@ -137,20 +139,30 @@ def crosscheck(slug, doc, d, *, tlim, trials, brute_max, skip_milp=False):
         out["brute_force"]["lighter_logicals"] = len(lighter)
         if lighter:
             v = lighter[0]
-            out["brute_force"]["example"] = {"X": [int(i) for i in np.flatnonzero(v[:n])],
-                                             "Z": [int(i) for i in np.flatnonzero(v[n:])],
-                                             "weight": int((v[:n] | v[n:]).sum()),
-                                             "valid": bool(HD.valid_pauli_logical(v, A, B))}
+            out["brute_force"]["example"] = {
+                "X": [int(i) for i in np.flatnonzero(v[:n])],
+                "Z": [int(i) for i in np.flatnonzero(v[n:])],
+                "weight": int((v[:n] | v[n:]).sum()),
+                "valid": bool(HD.valid_pauli_logical(v, A, B)),
+            }
     if skip_milp:
         out["milp"] = {"verdict": "skipped"}
     else:
         t0 = time.time()
-        out["milp"] = {"verdict": milp_check(doc, d - 1, tlim), "tlim_per_solve": tlim,
-                       "secs": round(time.time() - t0, 1)}
+        out["milp"] = {
+            "verdict": milp_check(doc, d - 1, tlim),
+            "tlim_per_solve": tlim,
+            "secs": round(time.time() - t0, 1),
+        }
     t0 = time.time()
     w, ok = ris_check(doc, trials)
-    out["ris"] = {"trials": trials, "lightest": w, "witness_valid": ok, "agrees": w is None or w >= d,
-                  "secs": round(time.time() - t0, 1)}
+    out["ris"] = {
+        "trials": trials,
+        "lightest": w,
+        "witness_valid": ok,
+        "agrees": w is None or w >= d,
+        "secs": round(time.time() - t0, 1),
+    }
     exact_ok = (checked and not lighter) or out["milp"]["verdict"] == "confirmed"
     refuted = (checked and bool(lighter)) or out["milp"]["verdict"] == "contradiction" or (w is not None and w < d)
     out["verdict"] = "contradiction" if refuted else "confirmed" if exact_ok and out["ris"]["agrees"] else "unconfirmed"
@@ -175,16 +187,25 @@ def certified_stabilizer_slugs():
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--slugs", nargs="*", default=None, help="entries to check (default with --all: every certified "
-                                                               "stabilizer entry)")
+    ap.add_argument(
+        "--slugs",
+        nargs="*",
+        default=None,
+        help="entries to check (default with --all: every certified stabilizer entry)",
+    )
     ap.add_argument("--all", action="store_true", help="check every stabilizer entry that has a certificate")
     ap.add_argument("--tlim", type=float, default=300.0, help="seconds per MILP solve (default 300)")
     ap.add_argument("--trials", type=int, default=200_000, help="RIS trials (default 200000)")
-    ap.add_argument("--brute-max", type=float, default=DEFAULT_BRUTE_MAX,
-                    help="enumerate only when the Pauli count is at most this (default 2e7)")
+    ap.add_argument(
+        "--brute-max",
+        type=float,
+        default=DEFAULT_BRUTE_MAX,
+        help="enumerate only when the Pauli count is at most this (default 2e7)",
+    )
     ap.add_argument("--skip-milp", action="store_true")
-    ap.add_argument("--out", default=None,
-                    help="record path (default research/certs/stabilizer_crosscheck-<date>.json)")
+    ap.add_argument(
+        "--out", default=None, help="record path (default research/certs/stabilizer_crosscheck-<date>.json)"
+    )
     a = ap.parse_args(argv)
     slugs = list(a.slugs or [])
     if a.all:
@@ -194,8 +215,7 @@ def main(argv=None):
         return 2
     today = datetime.date.today().isoformat()
     out_path = a.out or os.path.join(HERE, f"stabilizer_crosscheck-{today}.json")
-    record = {"date": today, "tlim_per_solve": a.tlim, "ris_trials": a.trials, "brute_max": a.brute_max,
-              "entries": []}
+    record = {"date": today, "tlim_per_solve": a.tlim, "ris_trials": a.trials, "brute_max": a.brute_max, "entries": []}
     rc = 0
     for slug in slugs:
         with open(os.path.join(CODES, slug + ".json"), encoding="utf-8") as f:
@@ -207,13 +227,17 @@ def main(argv=None):
                 d = json.load(f)["d"]
         rec = crosscheck(slug, doc, d, tlim=a.tlim, trials=a.trials, brute_max=a.brute_max, skip_milp=a.skip_milp)
         record["entries"].append(rec)
-        print(f"{slug}: {rec['verdict']} (brute force {'checked' if rec['brute_force']['checked'] else 'skipped'}, "
-              f"MILP {rec['milp']['verdict']}, RIS lightest {rec['ris']['lightest']} in {rec['ris']['secs']} s)",
-              flush=True)
+        print(
+            f"{slug}: {rec['verdict']} (brute force {'checked' if rec['brute_force']['checked'] else 'skipped'}, "
+            f"MILP {rec['milp']['verdict']}, RIS lightest {rec['ris']['lightest']} in {rec['ris']['secs']} s)",
+            flush=True,
+        )
         if rec["verdict"] == "contradiction":
             rc = 3
-        record["summary"] = {v: sum(1 for e in record["entries"] if e["verdict"] == v)
-                             for v in ("confirmed", "unconfirmed", "contradiction")}
+        record["summary"] = {
+            v: sum(1 for e in record["entries"] if e["verdict"] == v)
+            for v in ("confirmed", "unconfirmed", "contradiction")
+        }
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(record, f, indent=1, sort_keys=True)
             f.write("\n")

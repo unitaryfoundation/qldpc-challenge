@@ -35,6 +35,7 @@ SCOPE / LIMITS (measured, read before reusing):
 The distance functions need scipy (the ``research`` extra); construction and
 the coordinate helper stay numpy-only.
 """
+
 import os
 import sys
 
@@ -45,18 +46,16 @@ for _p in (_HERE, os.path.join(_HERE, "..", "kit")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from css import rref, verify_css, compute_k, logical_basis  # noqa: E402
+from css import compute_k, logical_basis, rref, verify_css  # noqa: E402
 
 # Default polynomials of the [[288,8,12]] code (Eq. 9). Supports are (di, dj).
-S_f    = [(1, 0), (2, 0), (0, 2)]
-S_g    = [(0, 0), (2, 1), (2, 2)]
+S_f = [(1, 0), (2, 0), (0, 2)]
+S_g = [(0, 0), (2, 1), (2, 2)]
 S_fbar = [(-1, 0), (-2, 0), (0, -2)]
 S_gbar = [(0, 0), (-2, -1), (-2, -2)]
 
 
-def build_open_directional(Lx, Ly,
-                           S_f=S_f, S_g=S_g, S_fbar=S_fbar, S_gbar=S_gbar,
-                           resolve_corners=True):
+def build_open_directional(Lx, Ly, S_f=S_f, S_g=S_g, S_fbar=S_fbar, S_gbar=S_gbar, resolve_corners=True):
     """Open-boundary CSS code on an Lx x Ly grid, n = 2*Lx*Ly.
 
     Qubit indexing: A-qubits (one Pauli family) idx = i*Ly + j;
@@ -77,24 +76,29 @@ def build_open_directional(Lx, Ly,
     inb = lambda i, j: row_in(i) and col_in(j)
 
     offs = S_f + S_g + S_fbar + S_gbar
-    di_hi = max(d[0] for d in offs); di_lo = min(d[0] for d in offs)
-    dj_hi = max(d[1] for d in offs); dj_lo = min(d[1] for d in offs)
+    di_hi = max(d[0] for d in offs)
+    di_lo = min(d[0] for d in offs)
+    dj_hi = max(d[1] for d in offs)
+    dj_lo = min(d[1] for d in offs)
 
     def make_row(ci, cj, suppA, suppB, keep_oob):
         """Build one truncated row; return None if a dropped (out-of-bounds)
-        qubit violates keep_oob, or if the row is empty."""
+        qubit violates keep_oob, or if the row is empty.
+        """
         row = np.zeros(n, dtype=np.int8)
         any_in = False
-        for (di, dj) in suppA:
+        for di, dj in suppA:
             i, j = ci + di, cj + dj
             if inb(i, j):
-                row[A(i, j)] ^= 1; any_in = True
+                row[A(i, j)] ^= 1
+                any_in = True
             elif not keep_oob(i, j):
                 return None
-        for (di, dj) in suppB:
+        for di, dj in suppB:
             i, j = ci + di, cj + dj
             if inb(i, j):
-                row[B(i, j)] ^= 1; any_in = True
+                row[B(i, j)] ^= 1
+                any_in = True
             elif not keep_oob(i, j):
                 return None
         if not any_in or row.sum() == 0:
@@ -109,9 +113,11 @@ def build_open_directional(Lx, Ly,
     for ci in range(-di_hi, Lx - di_lo):
         for cj in range(-dj_hi, Ly - dj_lo):
             rx = make_row(ci, cj, S_f, S_g, x_keep)
-            if rx is not None: xrows.append(rx)
+            if rx is not None:
+                xrows.append(rx)
             rz = make_row(ci, cj, S_gbar, S_fbar, z_keep)
-            if rz is not None: zrows.append(rz)
+            if rz is not None:
+                zrows.append(rz)
 
     HX = np.array(xrows, dtype=np.int8)
     HZ = np.array(zrows, dtype=np.int8)
@@ -131,7 +137,8 @@ def grid_coordinates(Lx, Ly, kept=None):
 
     A(i,j) and B(i,j) share the site (i, j) on two layers. ``kept`` (from
     ``boundary_engine.build_planar``'s cleanup info) restricts to the surviving
-    qubits of a qubit-removal layout, in their post-cleanup order."""
+    qubits of a qubit-removal layout, in their post-cleanup order.
+    """
     n2 = Lx * Ly
     coords = [[i, j] for i in range(Lx) for j in range(Ly)] * 2
     if kept is not None:
@@ -148,17 +155,16 @@ def _min_logical_weight(HX, HZ, tlim=None):
     Semantics under a time limit: if some per-logical subproblems time out,
     proved=False and the returned weight is only an UPPER bound on the true
     minimum (the min over the solved subproblems). If NO subproblem solved,
-    returns (inf, False) -- never a fake finite sentinel."""
+    returns (inf, False) -- never a fake finite sentinel.
+    """
     try:
-        from scipy.optimize import milp, Bounds, LinearConstraint
+        from scipy.optimize import Bounds, LinearConstraint, milp
     except ImportError as e:
-        raise ImportError(
-            "exact planar distance needs scipy: uv run --with scipy ..."
-        ) from e
+        raise ImportError("exact planar distance needs scipy: uv run --with scipy ...") from e
     n = HX.shape[1]
     LZ = logical_basis(HX, HZ)
     if LZ.shape[0] == 0:
-        return float('inf'), True
+        return float("inf"), True
 
     # Use a full-rank basis of HZ as parity constraints (fewer rows -> faster).
     Hc, _piv = rref(HZ)
@@ -166,16 +172,30 @@ def _min_logical_weight(HX, HZ, tlim=None):
     best, proved = n + 1, True
     for tL in LZ:
         nv = n + numC + 1
-        c = np.zeros(nv); c[:n] = 1.0
-        lb = np.zeros(nv); ub = np.zeros(nv)
-        ub[:n] = 1.0; ub[n:n + numC] = np.sum(Hc, axis=1) // 2; ub[-1] = int(tL.sum()) // 2
+        c = np.zeros(nv)
+        c[:n] = 1.0
+        lb = np.zeros(nv)
+        ub = np.zeros(nv)
+        ub[:n] = 1.0
+        ub[n : n + numC] = np.sum(Hc, axis=1) // 2
+        ub[-1] = int(tL.sum()) // 2
         Amat = np.zeros((numC + 1, nv))
-        Amat[:numC, :n] = Hc; Amat[:numC, n:n + numC] = -2 * np.eye(numC)
-        Amat[numC, :n] = tL; Amat[numC, -1] = -2
-        blb = np.zeros(numC + 1); bub = np.zeros(numC + 1); blb[-1] = 1; bub[-1] = 1
-        opts = {'time_limit': tlim} if tlim else {}
-        res = milp(c=c, constraints=LinearConstraint(Amat, blb, bub),
-                   integrality=np.ones(nv), bounds=Bounds(lb, ub), options=opts)
+        Amat[:numC, :n] = Hc
+        Amat[:numC, n : n + numC] = -2 * np.eye(numC)
+        Amat[numC, :n] = tL
+        Amat[numC, -1] = -2
+        blb = np.zeros(numC + 1)
+        bub = np.zeros(numC + 1)
+        blb[-1] = 1
+        bub[-1] = 1
+        opts = {"time_limit": tlim} if tlim else {}
+        res = milp(
+            c=c,
+            constraints=LinearConstraint(Amat, blb, bub),
+            integrality=np.ones(nv),
+            bounds=Bounds(lb, ub),
+            options=opts,
+        )
         if res.x is not None and res.fun is not None:
             best = min(best, int(round(res.fun)))
             if not res.success:
@@ -185,7 +205,7 @@ def _min_logical_weight(HX, HZ, tlim=None):
     if best > n:
         # No subproblem solved at all (e.g. tlim too small): there is no
         # incumbent, so do NOT return the n+1 sentinel as if it were a weight.
-        return float('inf'), False
+        return float("inf"), False
     return best, proved
 
 
@@ -208,11 +228,9 @@ def code_params(Lx, Ly, tlim=None):
 if __name__ == "__main__":
     HX, HZ = build_open_directional(6, 6)
     print("flagship family, 6x6 grid:")
-    print(f"  n = {HX.shape[1]}  CSS = {verify_css(HX, HZ)}  "
-          f"k = {compute_k(HX, HZ)}  (expect n=72, k=8)")
+    print(f"  n = {HX.shape[1]}  CSS = {verify_css(HX, HZ)}  k = {compute_k(HX, HZ)}  (expect n=72, k=8)")
     try:
         p = code_params(6, 6, tlim=60)
-        print(f"  MILP distance: dX={p['dX']} dZ={p['dZ']} d={p['d']} "
-              f"proved={p['proved']}  (expect d=4)")
+        print(f"  MILP distance: dX={p['dX']} dZ={p['dZ']} d={p['d']} proved={p['proved']}  (expect d=4)")
     except ImportError as e:
         print(f"  (skipping exact distance: {e})")

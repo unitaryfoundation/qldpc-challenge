@@ -1,4 +1,5 @@
 """A certificate row says what its verdict is worth; a stabilizer entry without one names the backend (issue #4939)."""
+
 import importlib.util
 import os
 
@@ -19,4 +20,4 @@ def test_every_level_has_a_label_and_solver_is_called_a_verdict():
     assert "solver verdict" in solver and "machine-checked" not in solver.split("no artifact")[0]
     assert "drat-trim" in build.cert_level_label("proof_log")
     assert "machine-checked proof" in build.cert_level_label("formal")
-    assert build.cert_level_label("mystery") == '<span class=claimed>level mystery</span>'
+    assert build.cert_level_label("mystery") == "<span class=claimed>level mystery</span>"

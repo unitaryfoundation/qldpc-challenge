@@ -10,6 +10,7 @@ pending. A receipt binds to the claim it checked through a digest of the ler
 block, the round count, and the committed circuits; a claim edited after its
 receipt reads as pending again until the next run.
 """
+
 import datetime
 import hashlib
 import json
@@ -45,15 +46,15 @@ def make_receipt(slug, digest, report, *, head_sha=None, when=None):
     """A receipt from a mode-"all" ler_verify report."""
     points = {}
     for side, comp in (report.get("computed") or {}).items():
-        points[side] = {p: {k: v for k, v in r.items() if k != "runs"}
-                        | {"runs": r.get("runs", [])}
-                        for p, r in (comp.get("points") or {}).items()}
+        points[side] = {
+            p: {k: v for k, v in r.items() if k != "runs"} | {"runs": r.get("runs", [])}
+            for p, r in (comp.get("points") or {}).items()
+        }
     return {
         "receipt_version": RECEIPT_VERSION,
         "slug": slug,
         "claim_digest": digest,
-        "measured_at": when or datetime.datetime.now(
-            datetime.timezone.utc).isoformat(timespec="seconds"),
+        "measured_at": when or datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         "head_sha": head_sha,
         "ok": bool(report.get("ok")),
         "points": points,
@@ -80,11 +81,12 @@ def load_receipt(root, slug):
 
 
 def point_status(receipt, digest, side, p, decoder=lt.DECODER_ID):
-    """"verified", "failed", "unverifiable", "inadmissible", or "pending" for
+    """ "verified", "failed", "unverifiable", "inadmissible", or "pending" for
     one point under ``decoder``, given the current claim digest (a stale
     receipt is pending). Receipts key a point by ler_tools.point_key, the rate
     alone for the reference decoder, so receipts written before the registry
-    read unchanged."""
+    read unchanged.
+    """
     if not receipt or receipt.get("claim_digest") != digest:
         return "pending"
     rec = ((receipt.get("points") or {}).get(side) or {}).get(lt.point_key(p, decoder))

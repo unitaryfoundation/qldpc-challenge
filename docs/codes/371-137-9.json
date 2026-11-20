@@ -3289,34 +3289,28 @@
  "distance": {
   "d": 9,
   "X": {
-   "value": 13,
+   "value": 11,
    "confidence": "upper_bound",
    "witness": [
-    2,
-    6,
-    35,
-    63,
-    67,
-    145,
-    148,
-    155,
-    201,
-    229,
-    232,
-    262,
-    265
+    9,
+    51,
+    65,
+    73,
+    92,
+    115,
+    130,
+    198,
+    278,
+    288,
+    352
    ],
    "witness_provenance": {
     "found_by": [
-     "@mathysrennela"
+     "@vprusso"
     ],
-    "date": "2026-11-16",
-    "found_at_samples": 2000,
-    "survived_samples": 2000,
-    "tool": "research/kit/surrogate.lightest_logical",
-    "seeds": [
-     0
-    ]
+    "date": "2026-11-20",
+    "found_at_samples": 602705,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
    }
   },
   "Z": {
@@ -3354,6 +3348,7 @@
   "construction": "Generalized bicycle",
   "origin": "submission",
   "date": "2026-11-17",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": "X-side value lowered from 13 to 11 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-11 X-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 9 is unchanged."
  }
 }

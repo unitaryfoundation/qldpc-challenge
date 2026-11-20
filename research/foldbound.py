@@ -30,7 +30,11 @@ each reported 80.
     python foldbound.py codes/<entry>.json
     python foldbound.py --gb <m> <a-exponents> <b-exponents> [claimed]
 """
-import json, os, sys
+
+import json
+import os
+import sys
+
 import numpy as np
 
 MAXFOLD = int(os.environ.get("FOLD_MAXFOLD", 160))
@@ -95,6 +99,7 @@ def bound(n, HX, HZ, repo=None):
     repo = repo or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.insert(0, os.path.join(repo, "verify"))
     import gf2_fast
+
     spanX, spanZ = rref_rows(HX), rref_rows(HZ)
     best = None
     for b, t in partitions(n):
@@ -104,8 +109,7 @@ def bound(n, HX, HZ, repo=None):
             continue
         for seed in SEEDS:
             try:
-                d, side, sup = gf2_fast.distance_rand_witness(
-                    FX, FZ, TRIALS, seed, 4, 1)
+                d, side, sup = gf2_fast.distance_rand_witness(FX, FZ, TRIALS, seed, 4, 1)
             except Exception:
                 continue
             if not d:
@@ -126,8 +130,7 @@ def bound(n, HX, HZ, repo=None):
                 stab = HX if side == "X" else HZ
                 if in_span(spanX if side == "X" else spanZ, u):
                     continue
-                best = (w, b, t, r, str(side),
-                        [int(c) for c in np.nonzero(u)[0]])
+                best = (w, b, t, r, str(side), [int(c) for c in np.nonzero(u)[0]])
     return best
 
 
@@ -156,11 +159,13 @@ if __name__ == "__main__":
     else:
         doc = json.load(open(sys.argv[1]))
         n, claimed, name = doc["n"], doc["distance"]["d"], doc["name"]
+
         def M(rows):
             A = np.zeros((len(rows), n), dtype=np.int8)
             for i, rr in enumerate(rows):
                 A[i, rr] = 1
             return A
+
         HX, HZ = M(doc["checks"]["X"]), M(doc["checks"]["Z"])
     r = bound(n, HX, HZ)
     if r is None:
@@ -168,7 +173,6 @@ if __name__ == "__main__":
         sys.exit(0)
     w, b, t, orb, side, sup = r
     verdict = "REFUTES" if claimed and w < claimed else "clears"
-    print(f"{name}: claims {claimed}, fold gives d<={w} ({b} blocks, t={t}, "
-          f"orbit {orb}, {side} side) -> {verdict}")
+    print(f"{name}: claims {claimed}, fold gives d<={w} ({b} blocks, t={t}, orbit {orb}, {side} side) -> {verdict}")
     print(f"  witness weight {len(sup)}: {sup[:14]}")
     sys.exit(1 if claimed and w < claimed else 0)

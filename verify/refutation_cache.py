@@ -39,6 +39,7 @@ Other conditions, each tested:
 * A reused record carries the seed and head of the run that searched, so the
   printed seed still reproduces the verdict it belongs to.
 """
+
 import hashlib
 import json
 import os
@@ -108,8 +109,7 @@ def load(cache_dir, doc_bytes, *, deep, accelerated, manifest_path=None):
     """
     if not cache_dir:
         return None
-    key = key_for(doc_bytes, deep=deep, accelerated=accelerated,
-                  manifest_path=manifest_path)
+    key = key_for(doc_bytes, deep=deep, accelerated=accelerated, manifest_path=manifest_path)
     try:
         with open(_path(cache_dir, key), encoding="utf-8") as f:
             rec = json.load(f)
@@ -129,8 +129,7 @@ def load(cache_dir, doc_bytes, *, deep, accelerated, manifest_path=None):
     return rec
 
 
-def store(cache_dir, doc_bytes, gate, hits, *, deep, accelerated,
-          head_sha=None, manifest_path=None):
+def store(cache_dir, doc_bytes, gate, hits, *, deep, accelerated, head_sha=None, manifest_path=None):
     """Store a completed refutation; return its path, or None if refused.
 
     A clean result is never stored. It would be unverifiable on the way back
@@ -148,8 +147,7 @@ def store(cache_dir, doc_bytes, gate, hits, *, deep, accelerated,
         "head_sha": head_sha,
         "stored_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    key = key_for(doc_bytes, deep=deep, accelerated=accelerated,
-                  manifest_path=manifest_path)
+    key = key_for(doc_bytes, deep=deep, accelerated=accelerated, manifest_path=manifest_path)
     path = _path(cache_dir, key)
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -170,9 +168,6 @@ def restored(rec):
     verdict from a fresh one without comparing seeds by hand.
     """
     gate = dict(rec["gate"])
-    gate["reused_from"] = {"head_sha": rec.get("head_sha"),
-                           "stored_at": rec.get("stored_at"),
-                           "seed": gate.get("seed")}
-    hits = {m: (dh, wit) for m, (dh, wit) in
-            ((m, (v[0], v[1])) for m, v in rec["hits"].items())}
+    gate["reused_from"] = {"head_sha": rec.get("head_sha"), "stored_at": rec.get("stored_at"), "seed": gate.get("seed")}
+    hits = {m: (dh, wit) for m, (dh, wit) in ((m, (v[0], v[1])) for m, v in rec["hits"].items())}
     return gate, hits

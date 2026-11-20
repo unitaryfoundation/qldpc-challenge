@@ -129,16 +129,14 @@ def novelty(board, n, k, d, w, code_type="CSS", lc="unrestricted"):
 
     board_advancing = not dominators
     advances_by = sorted({ax for _, gains in dominated for ax in gains})
-    d_only_peers = [b for b, gains in dominated
-                    if gains == ["d"] and b.get("d", 0) > 1]
+    d_only_peers = [b for b, gains in dominated if gains == ["d"] and b.get("d", 0) > 1]
     return {
         "cell": [wc, lc],
         "board": code_type,
         "board_advancing": board_advancing,
         "dominated_by": dominators,
         "advances_by": advances_by,
-        "d_only_gain": (bool(board_advancing) and advances_by == ["d"]
-                        and bool(d_only_peers)),
+        "d_only_gain": (bool(board_advancing) and advances_by == ["d"] and bool(d_only_peers)),
         "d_only_peers": d_only_peers,
         "beaten": dominated,
     }

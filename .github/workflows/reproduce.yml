@@ -35,8 +35,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       - name: build optional refutation accelerator
         continue-on-error: true
         run: make fast
@@ -81,7 +81,7 @@ jobs:
         # and site.yml regenerates the table on main after the merge. The
         # scheduled run is strict, so a table that stayed behind fails there.
         run: uv run --frozen --extra research python research/kit/multisize.py check ${{ github.event_name != 'pull_request' && '--strict' || '' }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: reproduction-receipts

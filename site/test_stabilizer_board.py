@@ -15,8 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_stabilizer", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_stabilizer", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -47,8 +46,7 @@ def _read(build, *parts):
 
 
 def test_stabilizer_entries_render_on_their_own_board(tmp_path):
-    build = _build_board(tmp_path, {"72-6-6": _fixture("72-6-6.json"),
-                                    "5-1-3": _fixture("5-1-3.json")})
+    build = _build_board(tmp_path, {"72-6-6": _fixture("72-6-6.json"), "5-1-3": _fixture("5-1-3.json")})
     index = _read(build, "index.html")
     stab = _read(build, "stabilizer.html")
 
@@ -65,7 +63,7 @@ def test_stabilizer_entries_render_on_their_own_board(tmp_path):
     assert "<th data-c=asym" in index
     assert "<th data-c=asym" not in stab
     assert 'data-asym="-1"' in stab
-    assert 'href="codes/5-1-3.html"' in stab   # the tracks grid lists it
+    assert 'href="codes/5-1-3.html"' in stab  # the tracks grid lists it
     assert 'href="index.html"' in stab
     assert "1 total, 1 records" in stab
 
@@ -109,13 +107,12 @@ def test_stabilizer_code_page_shows_pauli_weight_and_generators(tmp_path):
 def test_stabilizer_board_has_its_own_headline_cards_and_leaderboard(tmp_path):
     """The stabilizer page carries the stats bar and the contributor
     leaderboard the CSS board has, over its own entries: a handle that only
-    submitted a stabilizer code ranks there and nowhere on the CSS board."""
+    submitted a stabilizer code ranks there and nowhere on the CSS board.
+    """
     stab_doc = _fixture("5-1-3.json")
-    stab_doc["provenance"] = dict(stab_doc["provenance"], authors=["@stabber"],
-                                  origin="submission", date="2026-10-01")
+    stab_doc["provenance"] = dict(stab_doc["provenance"], authors=["@stabber"], origin="submission", date="2026-10-01")
     css_doc = _fixture("72-6-6.json")
-    css_doc["provenance"] = dict(css_doc["provenance"], authors=["@csser"],
-                                 origin="submission", date="2026-10-01")
+    css_doc["provenance"] = dict(css_doc["provenance"], authors=["@csser"], origin="submission", date="2026-10-01")
     build = _build_board(tmp_path, {"72-6-6": css_doc, "5-1-3": stab_doc})
     index = _read(build, "index.html")
     stab = _read(build, "stabilizer.html")
@@ -154,12 +151,11 @@ def test_stats_carry_the_novelty_split_and_the_census_shows_it(tmp_path):
     """
     css_doc = _fixture("72-6-6.json")
     css_doc["provenance"] = dict(css_doc["provenance"], novelty="known_parameters")
-    stab_doc = _fixture("5-1-3.json")          # no novelty field: unaudited
+    stab_doc = _fixture("5-1-3.json")  # no novelty field: unaudited
     build = _build_board(tmp_path, {"72-6-6": css_doc, "5-1-3": stab_doc})
 
     stats = json.loads(_read(build, "stats.json"))
-    assert stats["novelty"] == {"unknown": 1, "known_parameters": 1,
-                                "new_parameters": 0}
+    assert stats["novelty"] == {"unknown": 1, "known_parameters": 1, "new_parameters": 0}
     assert stats["novelty_audited"] == 1
 
     index = _read(build, "index.html")
@@ -172,18 +168,37 @@ def test_stats_carry_the_novelty_split_and_the_census_shows_it(tmp_path):
 def test_a_stabilizer_partial_certificate_shows_the_interval(tmp_path):
     """A tropidist lower bound on the Pauli side P renders like a CSS partial certificate (issue #4718)."""
     import sys
+
     sys.path.insert(0, os.path.join(ROOT, "verify"))
     import check_certs as C
+
     doc = _fixture("5-1-3.json")
     certs = tmp_path / "certs"
     certs.mkdir()
-    cert = {"name": doc["name"], "d": 3, "d_exact": False, "d_lower": 2,
-            "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search", "tlim_per_solve": 60,
-            "encoding": "pauli-mechanisms",
-            "sides": {"P": {"value": 3, "exact": False, "status": "TIMEOUT", "secs": 60.0, "proved_min": 2,
-                            "note": "lower bound 2 after 60 s"}},
-            "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel",
-                             "checks_sha256": C.checks_sha256(doc)}}
+    cert = {
+        "name": doc["name"],
+        "d": 3,
+        "d_exact": False,
+        "d_lower": 2,
+        "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search",
+        "tlim_per_solve": 60,
+        "encoding": "pauli-mechanisms",
+        "sides": {
+            "P": {
+                "value": 3,
+                "exact": False,
+                "status": "TIMEOUT",
+                "secs": 60.0,
+                "proved_min": 2,
+                "note": "lower bound 2 after 60 s",
+            }
+        },
+        "verification": {
+            "level": "solver",
+            "note": "exhaustion inside the tool's kernel",
+            "checks_sha256": C.checks_sha256(doc),
+        },
+    }
     with open(certs / "5-1-3.json", "w") as f:
         json.dump(cert, f)
     build = _build_board(tmp_path, {"5-1-3": doc})

@@ -48,13 +48,13 @@ import numpy as np
 
 try:
     import stim
-except ImportError:          # surfaced by callers that actually need it
+except ImportError:  # surfaced by callers that actually need it
     stim = None
 
-DECODER_ID = "bposd-cs-10"   # the reference decoder: the board's headline
-                             # rate and the frontier star read this one, and
-                             # every other id in DECODERS is an additional,
-                             # labeled curve (issue #5804)
+DECODER_ID = "bposd-cs-10"  # the reference decoder: the board's headline
+# rate and the frontier star read this one, and
+# every other id in DECODERS is an additional,
+# labeled curve (issue #5804)
 # The decoder registry: the ids a circuit.ler point may name (the schema's
 # enum mirrors this dict), each pinned to one implementation and parameter
 # set, the implementation versions being the dependency pins in uv.lock.
@@ -68,48 +68,55 @@ DECODER_ID = "bposd-cs-10"   # the reference decoder: the board's headline
 DECODERS = {
     "bposd-cs-10": {
         "implementation": "ldpc 2.4.1 BpOsdDecoder",
-        "parameters": ("minimum-sum BP, scaling 0.625, 30 iterations, OSD-CS order 10, "
-                       "channel prior the DEM's own mechanism probabilities"),
+        "parameters": (
+            "minimum-sum BP, scaling 0.625, 30 iterations, OSD-CS order 10, "
+            "channel prior the DEM's own mechanism probabilities"
+        ),
         "model": "undecomposed",
     },
     "bplsd-cs-10": {
         "implementation": "ldpc 2.4.1 BpLsdDecoder",
-        "parameters": ("minimum-sum BP, scaling 0.625, 30 iterations, LSD-CS order 10 "
-                       "(localized statistics decoding), channel prior the DEM's probabilities"),
+        "parameters": (
+            "minimum-sum BP, scaling 0.625, 30 iterations, LSD-CS order 10 "
+            "(localized statistics decoding), channel prior the DEM's probabilities"
+        ),
         "model": "undecomposed",
     },
     "bp-ms-30": {
         "implementation": "ldpc 2.4.1 BpDecoder",
-        "parameters": ("minimum-sum BP alone, scaling 0.625, 30 iterations, channel prior the "
-                       "DEM's probabilities; a shot whose output disagrees with the observables "
-                       "fails, converged or not"),
+        "parameters": (
+            "minimum-sum BP alone, scaling 0.625, 30 iterations, channel prior the "
+            "DEM's probabilities; a shot whose output disagrees with the observables "
+            "fails, converged or not"
+        ),
         "model": "undecomposed",
     },
     "mwpm": {
         "implementation": "pymatching 2.4.0 Matching",
-        "parameters": ("minimum-weight perfect matching on stim's decomposed detector error "
-                       "model (decompose_errors=True), edge weights from the decomposed "
-                       "probabilities; admitted only when every mechanism decomposes"),
+        "parameters": (
+            "minimum-weight perfect matching on stim's decomposed detector error "
+            "model (decompose_errors=True), edge weights from the decomposed "
+            "probabilities; admitted only when every mechanism decomposes"
+        ),
         "model": "decomposed",
     },
 }
-MIN_SHOTS = 10_000           # absolute floor on sample size
-MIN_FAILURES = 100           # the real floor: the tier exists to compare
-                             # prefactors between schedules with equal d_circ,
-                             # and those differ by 1.2-2x. 100 failures puts
-                             # ~10% sigma on the claim, so a factor-1.5
-                             # difference is resolvable; a shot floor alone
-                             # certifies an order of magnitude, not a
-                             # comparison. Good circuits pay more shots for
-                             # the same floor, which is the honest price of
-                             # claiming a smaller rate.
-Z95 = 1.959963984540054      # two-sided 95% normal quantile, for ci95
+MIN_SHOTS = 10_000  # absolute floor on sample size
+MIN_FAILURES = 100  # the real floor: the tier exists to compare
+# prefactors between schedules with equal d_circ,
+# and those differ by 1.2-2x. 100 failures puts
+# ~10% sigma on the claim, so a factor-1.5
+# difference is resolvable; a shot floor alone
+# certifies an order of magnitude, not a
+# comparison. Good circuits pay more shots for
+# the same floor, which is the honest price of
+# claiming a smaller rate.
+Z95 = 1.959963984540054  # two-sided 95% normal quantile, for ci95
 
 
 def dem_probs(dem):
     """Per-mechanism probabilities of a DEM, in file (column) order."""
-    return [inst.args_copy()[0] for inst in dem.flattened()
-            if inst.type == "error"]
+    return [inst.args_copy()[0] for inst in dem.flattened() if inst.type == "error"]
 
 
 def _osd_order(H, want):
@@ -127,7 +134,6 @@ def _osd_order(H, want):
     return max(0, min(want, A.shape[1] - rank))
 
 
-
 def make_decoder(H, probs, decoder=DECODER_ID):
     """Build a registry decoder over H_dem with the given channel prior.
 
@@ -140,29 +146,28 @@ def make_decoder(H, probs, decoder=DECODER_ID):
     """
     spec = DECODERS.get(decoder)
     if spec is None:
-        raise ValueError(f"unknown decoder {decoder!r}; the registry has "
-                         f"{', '.join(DECODERS)}")
+        raise ValueError(f"unknown decoder {decoder!r}; the registry has {', '.join(DECODERS)}")
     if spec["model"] != "undecomposed":
-        raise ValueError(f"{decoder} runs on the decomposed model; build it "
-                         f"with Predictor(dem, decoder, circuit)")
+        raise ValueError(f"{decoder} runs on the decomposed model; build it with Predictor(dem, decoder, circuit)")
     from scipy.sparse import csr_matrix
+
     Hm = np.asarray(H, dtype=np.uint8)
-    common = dict(error_channel=list(map(float, probs)), max_iter=30,
-                  bp_method="minimum_sum", ms_scaling_factor=0.625)
+    common = dict(error_channel=list(map(float, probs)), max_iter=30, bp_method="minimum_sum", ms_scaling_factor=0.625)
     if decoder == "bposd-cs-10":
         from ldpc import BpOsdDecoder
+
         # ldpc 2.4.1 does not validate osd_order against the redundancy
         # k = n - rank(H): osd_setup writes osd_candidate[i] = 1 for i < osd_order
         # into an array of size k, so an order above k corrupts the heap. Clamping
         # is a no-op wherever k >= 10 and leaves failure counts unchanged (#1616).
-        return BpOsdDecoder(csr_matrix(Hm), osd_method="osd_cs",
-                            osd_order=_osd_order(Hm, 10), **common)
+        return BpOsdDecoder(csr_matrix(Hm), osd_method="osd_cs", osd_order=_osd_order(Hm, 10), **common)
     if decoder == "bplsd-cs-10":
         from ldpc import BpLsdDecoder
-        return BpLsdDecoder(csr_matrix(Hm), lsd_method="lsd_cs",
-                            lsd_order=_osd_order(Hm, 10), **common)
+
+        return BpLsdDecoder(csr_matrix(Hm), lsd_method="lsd_cs", lsd_order=_osd_order(Hm, 10), **common)
     if decoder == "bp-ms-30":
         from ldpc import BpDecoder
+
         return BpDecoder(csr_matrix(Hm), **common)
     raise ValueError(f"{decoder} is in the registry but has no builder")
 
@@ -172,8 +177,7 @@ def decomposed_dem(circuit):
 
     Raises when a mechanism has no decomposition into at most two detectors.
     """
-    return circuit.detector_error_model(decompose_errors=True,
-                                        flatten_loops=True)
+    return circuit.detector_error_model(decompose_errors=True, flatten_loops=True)
 
 
 def decoder_admits(decoder, circuit=None):
@@ -197,9 +201,11 @@ def decoder_admits(decoder, circuit=None):
     try:
         decomposed_dem(circuit)
     except Exception as e:  # stim raises ValueError on an undecomposable mechanism
-        return False, (f"{decoder} is not admitted on this circuit: stim cannot "
-                       f"decompose every mechanism into at most two detectors "
-                       f"({str(e).splitlines()[0][:120]})")
+        return False, (
+            f"{decoder} is not admitted on this circuit: stim cannot "
+            f"decompose every mechanism into at most two detectors "
+            f"({str(e).splitlines()[0][:120]})"
+        )
     return True, ""
 
 
@@ -219,8 +225,7 @@ class Predictor:
     def __init__(self, dem, decoder=DECODER_ID, circuit=None):
         spec = DECODERS.get(decoder)
         if spec is None:
-            raise ValueError(f"unknown decoder {decoder!r}; the registry has "
-                             f"{', '.join(DECODERS)}")
+            raise ValueError(f"unknown decoder {decoder!r}; the registry has {', '.join(DECODERS)}")
         self.decoder = decoder
         self.observables = dem.num_observables
         if spec["model"] == "decomposed":
@@ -228,11 +233,12 @@ class Predictor:
             if not ok:
                 raise ValueError(why)
             import pymatching
-            self._matching = pymatching.Matching.from_detector_error_model(
-                decomposed_dem(circuit))
+
+            self._matching = pymatching.Matching.from_detector_error_model(decomposed_dem(circuit))
             self._dec, self._L = None, None
         else:
             from circuit_tools import dem_matrices
+
             H, L = dem_matrices(dem)
             self._matching = None
             self._dec, self._L = make_decoder(H, dem_probs(dem), decoder), L
@@ -244,8 +250,7 @@ class Predictor:
         if self._matching is not None:
             if dets.shape[0] == 0:
                 return np.zeros((0, self.observables), dtype=np.uint8)
-            return np.asarray(self._matching.decode_batch(dets),
-                              dtype=np.uint8).reshape(dets.shape[0], -1)
+            return np.asarray(self._matching.decode_batch(dets), dtype=np.uint8).reshape(dets.shape[0], -1)
         out = np.empty((dets.shape[0], self._L.shape[0]), dtype=np.uint8)
         for i in range(dets.shape[0]):
             e_hat = self._dec.decode(dets[i])
@@ -264,6 +269,7 @@ _WORKER = {}
 def _worker_init(dem_text, decoder, circuit_text):
     """Build one predictor per worker process and keep it for every chunk."""
     import stim as _stim
+
     dem = _stim.DetectorErrorModel(dem_text)
     circuit = _stim.Circuit(circuit_text) if circuit_text is not None else None
     _WORKER["pred"] = Predictor(dem, decoder, circuit)
@@ -278,8 +284,7 @@ def _decode_chunk(args):
     return _failures(_WORKER["pred"].predict(dets), np.asarray(obs, dtype=np.uint8))
 
 
-def measure_failures(dem, shots, seed, max_seconds=None, workers=None,
-                     decoder=DECODER_ID, circuit=None):
+def measure_failures(dem, shots, seed, max_seconds=None, workers=None, decoder=DECODER_ID, circuit=None):
     """Count the sampled logical failures of a DEM under a registry decoder.
 
     A shot fails when the decoder's predicted observable flips disagree with
@@ -320,7 +325,7 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None,
         failures = 0
         step = 1000
         for i in range(0, shots, step):
-            failures += _failures(pred.predict(dets[i:i + step]), obs[i:i + step])
+            failures += _failures(pred.predict(dets[i : i + step]), obs[i : i + step])
             if deadline and time.monotonic() > deadline:
                 return failures, min(i + step, shots)
         return failures, shots
@@ -336,8 +341,8 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None,
         return serial()
 
     import multiprocessing as mp
-    pieces = [(dets[i:i + chunk], obs[i:i + chunk])
-              for i in range(0, shots, chunk)]
+
+    pieces = [(dets[i : i + chunk], obs[i : i + chunk]) for i in range(0, shots, chunk)]
     # Threads are useless here: the decoder holds the GIL through decode
     # (measured at 1.03x on four threads), so parallelism has to be processes.
     # Prefer fork, which needs no __main__ guard in the caller; a library that
@@ -349,9 +354,9 @@ def measure_failures(dem, shots, seed, max_seconds=None, workers=None,
     except ValueError:
         ctx = mp.get_context("spawn")
     try:
-        with ctx.Pool(processes=min(workers, len(pieces)),
-                      initializer=_worker_init,
-                      initargs=(str(dem), decoder, circuit_text)) as pool:
+        with ctx.Pool(
+            processes=min(workers, len(pieces)), initializer=_worker_init, initargs=(str(dem), decoder, circuit_text)
+        ) as pool:
             failures, done = 0, 0
             for got, piece in zip(pool.imap(_decode_chunk, pieces), pieces):
                 failures += got
@@ -381,8 +386,7 @@ def wilson_ci(failures, shots, z=Z95):
     p = failures / shots
     denom = 1.0 + z * z / shots
     center = (p + z * z / (2 * shots)) / denom
-    half = (z / denom) * math.sqrt(p * (1 - p) / shots
-                                   + z * z / (4 * shots * shots))
+    half = (z / denom) * math.sqrt(p * (1 - p) / shots + z * z / (4 * shots * shots))
     return (max(0.0, center - half), min(1.0, center + half))
 
 
@@ -417,6 +421,5 @@ def ler_block(dem, rounds, shots, seed, p_ref, decoder=DECODER_ID, circuit=None)
         "seed": seed,
         "decoder": decoder,
         "ler_per_round": round(per_round(p_shot, rounds), 9),
-        "ci95": [round(per_round(lo, rounds), 9),
-                 round(per_round(hi, rounds), 9)],
+        "ci95": [round(per_round(lo, rounds), 9), round(per_round(hi, rounds), 9)],
     }

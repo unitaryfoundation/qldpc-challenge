@@ -6,6 +6,7 @@ appended note, and the schema bump, in the board's canonical format, and the
 verifier classes it. Selection is smallest n first and leaves alone what an
 earlier run settled at this budget (issue #4148).
 """
+
 import copy
 import json
 import os
@@ -63,31 +64,42 @@ def test_a_dishonest_or_long_range_layout_is_not_a_candidate(bare):
 def test_selection_is_smallest_first_and_skips_what_an_earlier_run_settled(tmp_path):
     codes = tmp_path / "codes"
     codes.mkdir()
-    for slug, n, extra in (("big", 100, {}), ("small", 20, {}), ("laid", 10, {"locality": {"coordinates": [[0, 0]],
-                                                                                      "layers": 1}}),
-                           ("stab", 8, {"code_type": "stabilizer"}), ("done", 30, {}), ("missed", 40, {}),
-                           ("cheap", 50, {}), ("stale", 35, {}), ("screened", 45, {})):
+    for slug, n, extra in (
+        ("big", 100, {}),
+        ("small", 20, {}),
+        ("laid", 10, {"locality": {"coordinates": [[0, 0]], "layers": 1}}),
+        ("stab", 8, {"code_type": "stabilizer"}),
+        ("done", 30, {}),
+        ("missed", 40, {}),
+        ("cheap", 50, {}),
+        ("stale", 35, {}),
+        ("screened", 45, {}),
+    ):
         doc = {"code_type": "CSS", "n": n, "k": 1, "checks": {"X": [[0]], "Z": [[1]]}, "distance": {"d": 1}}
         doc.update(extra)
         with open(codes / f"{slug}.json", "w", encoding="utf-8") as f:
             json.dump(doc, f)
     entries = LS.layoutless(str(codes))
     assert [s for s, _ in entries] == ["small", "done", "stale", "missed", "screened", "cheap", "big"]
-    last = {"done": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-10-20"},
-            "stale": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-09-01"},
-            "missed": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20"},
-            "screened": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20", "stages": ["screen"]},
-            "cheap": {"outcome": "miss", "entry_seconds": 60, "date": "2026-10-20"}}
+    last = {
+        "done": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-10-20"},
+        "stale": {"outcome": "accepted", "entry_seconds": 600, "date": "2026-09-01"},
+        "missed": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20"},
+        "screened": {"outcome": "miss", "entry_seconds": 600, "date": "2026-10-20", "stages": ["screen"]},
+        "cheap": {"outcome": "miss", "entry_seconds": 60, "date": "2026-10-20"},
+    }
     today = "2026-10-26"
     chosen, skipped = LS.select(entries, last=last, entry_seconds=600, today=today)
-    assert [s for s, _ in chosen] == ["small", "stale", "screened", "cheap", "big"], \
+    assert [s for s, _ in chosen] == ["small", "stale", "screened", "cheap", "big"], (
         "a shorter budget, fewer stages, or an accepted row older than AWAITING_DAYS: reopened"
+    )
     assert skipped == {"awaiting_pr": 1, "missed_at_budget": 1}
     chosen, skipped = LS.select(entries, last=last, entry_seconds=600, stages=("screen",), today=today)
     assert [s for s, _ in chosen] == ["small", "stale", "cheap", "big"] and skipped["missed_at_budget"] == 2
     chosen, _ = LS.select(entries, last=last, entry_seconds=600, retry=True, today=today)
-    assert [s for s, _ in chosen] == ["small", "stale", "missed", "screened", "cheap", "big"], \
+    assert [s for s, _ in chosen] == ["small", "stale", "missed", "screened", "cheap", "big"], (
         "retry reopens misses, not accepted ones"
+    )
     chosen, _ = LS.select(entries, last=last, entry_seconds=600, slugs=["missed", "done", "big"], today=today)
     assert [s for s, _ in chosen] == ["done", "missed", "big"], "named slugs lift both skips"
 
@@ -102,8 +114,15 @@ def test_a_run_stages_the_screen_hit_logs_the_attempt_and_stage_attaches_it(bare
     odd["n"] = 73
     with open(codes / "73-6-6.json", "w", encoding="utf-8", newline="\n") as f:
         f.write(LS.canonical(odd))
-    m = LS.run_sweep(out_dir=str(out), attempts_path=str(attempts), credit="@vprusso", job_seconds=600,
-                     entry_seconds=60, stages=("screen",), codes_dir=str(codes))
+    m = LS.run_sweep(
+        out_dir=str(out),
+        attempts_path=str(attempts),
+        credit="@vprusso",
+        job_seconds=600,
+        entry_seconds=60,
+        stages=("screen",),
+        codes_dir=str(codes),
+    )
     assert m["outcomes"] == {"accepted": 1, "miss": 1} and m["staged"] == ["72-6-6"]
     rows = LS.load_jsonl(str(attempts))
     assert [r["slug"] for r in rows] == ["72-6-6", "73-6-6"]
@@ -114,8 +133,15 @@ def test_a_run_stages_the_screen_hit_logs_the_attempt_and_stage_attaches_it(bare
         layout = json.load(f)
     assert layout["credit"] == "@vprusso" and layout["date"] == m["date"] and layout["layers"] == 2
     # a second run leaves both alone
-    m2 = LS.run_sweep(out_dir=str(tmp_path / "out2"), attempts_path=str(attempts), credit="@vprusso",
-                      job_seconds=600, entry_seconds=60, stages=("screen",), codes_dir=str(codes))
+    m2 = LS.run_sweep(
+        out_dir=str(tmp_path / "out2"),
+        attempts_path=str(attempts),
+        credit="@vprusso",
+        job_seconds=600,
+        entry_seconds=60,
+        stages=("screen",),
+        codes_dir=str(codes),
+    )
     assert m2["opened"] == 0 and m2["skipped"] == {"awaiting_pr": 1, "missed_at_budget": 1}
     # stage writes the current codes/ file with the layout, canonically, and refuses a second time
     staged, skipped = LS.stage(str(out), codes_dir=str(codes))
@@ -139,13 +165,29 @@ def test_the_layout_cap_stops_a_run_and_the_next_run_continues(bare, tmp_path):
     for name in ("72-6-6", "72-6-6-b"):
         with open(codes / f"{name}.json", "w", encoding="utf-8", newline="\n") as f:
             f.write(LS.canonical(bare))
-    m = LS.run_sweep(out_dir=str(tmp_path / "out"), attempts_path=str(attempts), credit="@vprusso",
-                     job_seconds=600, entry_seconds=60, stages=("screen",), codes_dir=str(codes), max_layouts=1)
+    m = LS.run_sweep(
+        out_dir=str(tmp_path / "out"),
+        attempts_path=str(attempts),
+        credit="@vprusso",
+        job_seconds=600,
+        entry_seconds=60,
+        stages=("screen",),
+        codes_dir=str(codes),
+        max_layouts=1,
+    )
     assert m["staged"] == ["72-6-6"] and m["opened"] == 1
     assert m["stopped_by_cap"] and not m["stopped_by_budget"] and m["left"] == 1
     assert "stopped at the layout cap with 1 left" in LS.summary_markdown(m)
-    m2 = LS.run_sweep(out_dir=str(tmp_path / "out2"), attempts_path=str(attempts), credit="@vprusso",
-                      job_seconds=600, entry_seconds=60, stages=("screen",), codes_dir=str(codes), max_layouts=1)
+    m2 = LS.run_sweep(
+        out_dir=str(tmp_path / "out2"),
+        attempts_path=str(attempts),
+        credit="@vprusso",
+        job_seconds=600,
+        entry_seconds=60,
+        stages=("screen",),
+        codes_dir=str(codes),
+        max_layouts=1,
+    )
     assert m2["staged"] == ["72-6-6-b"] and m2["skipped"] == {"awaiting_pr": 1} and not m2["stopped_by_cap"]
 
 
@@ -156,8 +198,18 @@ def test_the_annealers_run_inside_the_budget_on_a_small_code(bare, tmp_path):
     path = codes / "72-6-6.json"
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(LS.canonical(bare))
-    got = LS.attempt("72-6-6", bare, str(path), stages=("fold", "hinge", "tri"), entry_seconds=30,
-                     fold_iters=2000, hinge_iters=2000, hinge_seeds=1, tri_iters=20000, tri_rate=1e9)
+    got = LS.attempt(
+        "72-6-6",
+        bare,
+        str(path),
+        stages=("fold", "hinge", "tri"),
+        entry_seconds=30,
+        fold_iters=2000,
+        hinge_iters=2000,
+        hinge_seeds=1,
+        tri_iters=20000,
+        tri_rate=1e9,
+    )
     assert got["best_radius"] is not None and got["secs"] < 60
     if got["layout"] is not None:
         assert got["layout"]["stage"] in ("fold", "hinge") and got["layout"]["layers"] in (1, 2)

@@ -1,0 +1,34 @@
+{
+  "d": 36,
+  "d_exact": false,
+  "d_lower": 24,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[630,8,d<=36]] weight-6 BB on Z_35 x Z_9 code",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 24",
+      "proved_min": 24,
+      "secs": 8.8,
+      "status": "TIMEOUT",
+      "value": 36
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 24",
+      "proved_min": 24,
+      "secs": 8.8,
+      "status": "TIMEOUT",
+      "value": 36
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "7a0609b41ef684ba74d7a913b53101fb12ab771c2feca218e5b4c26270daef91",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 2 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}

@@ -89,30 +89,54 @@ LOG_SUFFIXES = (".log",)
 # Top-level directories that make a token repo-relative rather than incidental
 # prose. Anything starting with one of these must resolve in the tree.
 TOPDIRS = (
-    "codes/", "notes/", "verify/", "research/", "site/", "schema/", "certs/",
-    "docs/", "cli/", "decode/", "qldpc/", "talks/", "fieldnotes/", "tests/",
+    "codes/",
+    "notes/",
+    "verify/",
+    "research/",
+    "site/",
+    "schema/",
+    "certs/",
+    "docs/",
+    "cli/",
+    "decode/",
+    "qldpc/",
+    "talks/",
+    "fieldnotes/",
+    "tests/",
     ".github/",
 )
 
 FILE_EXT = (
-    ".py", ".json", ".md", ".npz", ".npy", ".txt", ".csv", ".tex", ".yml",
-    ".yaml", ".ipynb", ".sh", ".lean", ".log", ".pkl",
+    ".py",
+    ".json",
+    ".md",
+    ".npz",
+    ".npy",
+    ".txt",
+    ".csv",
+    ".tex",
+    ".yml",
+    ".yaml",
+    ".ipynb",
+    ".sh",
+    ".lean",
+    ".log",
+    ".pkl",
 )
 
-ABSOLUTE_LOCAL = re.compile(
-    r"(?:^|[\s(`\"'])((?:/Users/|/home/|/tmp/|/private/tmp/|/var/folders/|~/|C:\\)[\w./\\~-]+)")
+ABSOLUTE_LOCAL = re.compile(r"(?:^|[\s(`\"'])((?:/Users/|/home/|/tmp/|/private/tmp/|/var/folders/|~/|C:\\)[\w./\\~-]+)")
 
 # A file may cite an external artifact if it says where that artifact lives.
 EXTERNAL_MARKERS = re.compile(
     r"https?://|github\.com|gitlab\.com|zenodo|doi\.org|arxiv\.org/abs|"
     r"upstream repo|authors'? (?:own )?(?:published )?(?:repo|artifact)",
-    re.I)
+    re.I,
+)
 
 SESSION_URL = re.compile(r"claude\.ai/code/session[_/]|chatgpt\.com/c/", re.I)
 
 SCAFFOLDING = (
-    ("unedited `qldpc submit` draft footer",
-     re.compile(r"edit before requesting review", re.I)),
+    ("unedited `qldpc submit` draft footer", re.compile(r"edit before requesting review", re.I)),
     ("HTML comment left in the text", re.compile(r"<!--")),
     ("unticked checklist box", re.compile(r"^\s*[-*]\s*\[ \]", re.M)),
     ("TODO/FIXME placeholder", re.compile(r"\b(TODO|FIXME|TBD)\b")),
@@ -130,8 +154,7 @@ SLUG = re.compile(r"^(\d+)-(\d+)-(\d+)$")
 # Frontmatter of a fieldnote: the block between the opening and closing `---`.
 FRONTMATTER = re.compile(r"\A---\s*\n(.*?)\n---\s*\n", re.S)
 # `author: "@handle"` (quotes and @ optional). GitHub logins are case-insensitive.
-AUTHOR_LINE = re.compile(
-    r"^author:\s*[\"']?@?([A-Za-z0-9][A-Za-z0-9-]*)[\"']?\s*$", re.M)
+AUTHOR_LINE = re.compile(r"^author:\s*[\"']?@?([A-Za-z0-9][A-Za-z0-9-]*)[\"']?\s*$", re.M)
 
 # The note template is scaffolding by definition: it carries the placeholder
 # header and the instruction comment that every real note must not.
@@ -168,7 +191,7 @@ def is_repo_pathish(tok):
         return False
     if ARXIV_ID.match(tok):
         return False
-    if "<" in tok or ">" in tok or "*" in tok:      # placeholder or glob
+    if "<" in tok or ">" in tok or "*" in tok:  # placeholder or glob
         return False
     bare = strip_rel_prefix(tok)
     if bare.startswith(TOPDIRS):
@@ -189,14 +212,13 @@ def resolves(tok, root, near=None):
     """
     bare = strip_rel_prefix(tok).rstrip("/")
     candidates = [bare]
-    if "::" in bare:                                 # file.py::symbol
+    if "::" in bare:  # file.py::symbol
         candidates.append(bare.split("::", 1)[0])
-    if not bare.endswith(FILE_EXT):                  # research/kit/mod.function
+    if not bare.endswith(FILE_EXT):  # research/kit/mod.function
         head = bare.rsplit(".", 1)[0]
         candidates += [head, head + ".py", bare + ".py"]
     bases = [root] if near is None else [root, os.path.join(root, near)]
-    if any(os.path.exists(os.path.join(b, c))
-           for b in bases for c in candidates):
+    if any(os.path.exists(os.path.join(b, c)) for b in bases for c in candidates):
         return True
     # An extensionless reference to a source file that is not .py: `verify/gf2_fast`
     # is the C++ accelerator, shipped as gf2_fast.cpp and a built .so.
@@ -208,9 +230,9 @@ def resolves(tok, root, near=None):
     return False
 
 
-def check_text(text, label, root, problems, is_note_slug=None,
-               near=None):
+def check_text(text, label, root, problems, is_note_slug=None, near=None):
     external_ok = bool(EXTERNAL_MARKERS.search(text))
+
     # One line per distinct problem: a path repeated through a note should be
     # reported once, and never under two headings at the same time.
     def add(why, detail):
@@ -254,8 +276,11 @@ def check_text(text, label, root, problems, is_note_slug=None,
             if any(g in bare for g in GITIGNORED):
                 add("gitignored working output cited as evidence", tok)
             elif bare.endswith(LOG_SUFFIXES) and not resolves(tok, root, near):
-                add("raw run log cited as evidence (*.log is gitignored; promote "
-                    "the lines the claim rests on into a run manifest)", tok)
+                add(
+                    "raw run log cited as evidence (*.log is gitignored; promote "
+                    "the lines the claim rests on into a run manifest)",
+                    tok,
+                )
             elif not resolves(tok, root, near) and (claims_this_repo or not external_ok):
                 add("path does not exist in this tree", tok)
 
@@ -265,28 +290,26 @@ def check_text(text, label, root, problems, is_note_slug=None,
         if not found:
             add("note states no [[n,k,d]]", f"expected [[{n},{k},{d}]]")
         elif found[0] != (n, k, d):
-            add("note's first [[n,k,d]] disagrees with its filename",
-                f"[[{','.join(found[0])}]] vs [[{n},{k},{d}]]")
+            add("note's first [[n,k,d]] disagrees with its filename", f"[[{','.join(found[0])}]] vs [[{n},{k},{d}]]")
 
 
 def changed_prose(base, root):
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", "--diff-filter=AMR", f"{base}...HEAD"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-only", "--diff-filter=AMR", f"{base}...HEAD"], cwd=root, text=True
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}; failing closed")
         return None
-    return [f for f in out.splitlines()
-            if f.endswith(".md") and (f.startswith("notes/")
-                                      or f.startswith("fieldnotes/"))]
+    return [
+        f for f in out.splitlines() if f.endswith(".md") and (f.startswith("notes/") or f.startswith("fieldnotes/"))
+    ]
 
 
 def all_prose(root):
     """Every committed notes/*.md and fieldnotes/*.md, or None if git failed."""
     try:
-        out = subprocess.check_output(
-            ["git", "ls-files", "--", "notes", "fieldnotes"], cwd=root, text=True)
+        out = subprocess.check_output(["git", "ls-files", "--", "notes", "fieldnotes"], cwd=root, text=True)
     except Exception as e:
         print(f"could not list committed prose: {e}; failing closed")
         return None
@@ -299,8 +322,11 @@ def write_report(problems, nfiles, path):
     for label, why, detail in problems:
         groups.setdefault((why, detail), set()).add(label)
     nbad = len({label for label, _, _ in problems})
-    lines = [f"`verify/check_prose.py --all` over {nfiles} committed notes and fieldnotes: "
-             f"{len(problems)} problem(s) in {nbad} file(s).", ""]
+    lines = [
+        f"`verify/check_prose.py --all` over {nfiles} committed notes and fieldnotes: "
+        f"{len(problems)} problem(s) in {nbad} file(s).",
+        "",
+    ]
     for (why, detail), labels in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0])):
         names = ", ".join(f"`{label}`" for label in sorted(labels))
         lines.append(f"- {why}: `{detail}` in {len(labels)} file(s): {names}")
@@ -312,9 +338,10 @@ def added_fieldnotes(base, root):
     """Fieldnotes ADDED (not modified) by this PR, or None if git failed."""
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", "--diff-filter=A", f"{base}...HEAD",
-             "--", "fieldnotes/"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-only", "--diff-filter=A", f"{base}...HEAD", "--", "fieldnotes/"],
+            cwd=root,
+            text=True,
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}; failing closed")
         return None
@@ -325,17 +352,19 @@ def check_fieldnote_author(rel, text, pr_author, problems):
     """A newly added fieldnote must credit the PR author's own handle."""
     fm = FRONTMATTER.match(text)
     if not fm:
-        problems.append((rel, "fieldnote has no frontmatter",
-                         "cannot verify the author line"))
+        problems.append((rel, "fieldnote has no frontmatter", "cannot verify the author line"))
         return
     am = AUTHOR_LINE.search(fm.group(1))
     if not am:
-        problems.append((rel, "fieldnote frontmatter states no author",
-                         f'expected author: "@{pr_author}"'))
+        problems.append((rel, "fieldnote frontmatter states no author", f'expected author: "@{pr_author}"'))
     elif am.group(1).lower() != pr_author.lower():
-        problems.append((rel, "fieldnote author does not match the PR author",
-                         f"note credits @{am.group(1)} but the PR is by "
-                         f"@{pr_author}"))
+        problems.append(
+            (
+                rel,
+                "fieldnote author does not match the PR author",
+                f"note credits @{am.group(1)} but the PR is by @{pr_author}",
+            )
+        )
 
 
 def body_lines(text):
@@ -389,9 +418,10 @@ def slug_changes(base, root):
     """
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-status", "-M", f"{base}...HEAD",
-             "--", "codes/", "notes/", "fieldnotes/"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-status", "-M", f"{base}...HEAD", "--", "codes/", "notes/", "fieldnotes/"],
+            cwd=root,
+            text=True,
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}")
         return None
@@ -438,13 +468,13 @@ def check_revisions(base, root, problems):
     for old_slug, new_slug in sorted(events.items()):
         old_note, new_note = f"notes/{old_slug}.md", f"notes/{new_slug}.md"
         if os.path.exists(os.path.join(root, old_note)):
-            continue                                    # note not touched
+            continue  # note not touched
         try:
             old_text = subprocess.check_output(
-                ["git", "show", f"{base}:{old_note}"], cwd=root, text=True,
-                stderr=subprocess.DEVNULL)
+                ["git", "show", f"{base}:{old_note}"], cwd=root, text=True, stderr=subprocess.DEVNULL
+            )
         except subprocess.CalledProcessError:
-            continue                                    # no note to lose
+            continue  # no note to lose
         new_text = ""
         if os.path.exists(os.path.join(root, new_note)):
             with open(os.path.join(root, new_note), encoding="utf-8") as f:
@@ -452,14 +482,15 @@ def check_revisions(base, root, problems):
         kept = retention(old_text, new_text + "\n" + carried)
         if kept >= RETENTION_MIN:
             continue
-        how = ("git saw a rename" if old_note in renamed_notes
-               else "git saw a delete beside an add, not a rename")
+        how = "git saw a rename" if old_note in renamed_notes else "git saw a delete beside an add, not a rename"
         where = new_note if new_text else "no note under the new slug"
-        problems.append((
-            new_note if new_text else old_note,
-            "distance revision drops the previous note's body",
-            f"{old_note} -> {where}: {kept:.0%} of its body lines survive "
-            f"(minimum {RETENTION_MIN:.0%}); {how}"))
+        problems.append(
+            (
+                new_note if new_text else old_note,
+                "distance revision drops the previous note's body",
+                f"{old_note} -> {where}: {kept:.0%} of its body lines survive (minimum {RETENTION_MIN:.0%}); {how}",
+            )
+        )
     return True
 
 
@@ -467,16 +498,17 @@ def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=ROOT)
     ap.add_argument("--base", default="origin/main")
-    ap.add_argument("--body-file",
-                    help="file holding the PR body (never pass the body inline)")
-    ap.add_argument("--files", nargs="*",
-                    help="explicit files to check instead of the diff")
-    ap.add_argument("--pr-author",
-                    help="GitHub login of the PR author; every fieldnote added "
-                         "by the PR must credit this handle (CI passes it; "
-                         "local runs without it skip the attribution check)")
-    ap.add_argument("--all", action="store_true",
-                    help="check every committed notes/ and fieldnotes/ file instead of the diff")
+    ap.add_argument("--body-file", help="file holding the PR body (never pass the body inline)")
+    ap.add_argument("--files", nargs="*", help="explicit files to check instead of the diff")
+    ap.add_argument(
+        "--pr-author",
+        help="GitHub login of the PR author; every fieldnote added "
+        "by the PR must credit this handle (CI passes it; "
+        "local runs without it skip the attribution check)",
+    )
+    ap.add_argument(
+        "--all", action="store_true", help="check every committed notes/ and fieldnotes/ file instead of the diff"
+    )
     ap.add_argument("--report", help="write the problems as grouped markdown to this file")
     args = ap.parse_args(argv)
     root = os.path.abspath(args.root)
@@ -500,8 +532,7 @@ def main(argv):
         m = SLUG.match(os.path.basename(rel)[:-3])
         if m and rel.startswith("notes/"):
             slug = m.groups()
-        check_text(text, rel, root, problems, is_note_slug=slug,
-                   near=os.path.dirname(rel))
+        check_text(text, rel, root, problems, is_note_slug=slug, near=os.path.dirname(rel))
 
     if args.body_file and os.path.exists(args.body_file):
         with open(args.body_file, encoding="utf-8") as f:
@@ -539,9 +570,11 @@ def main(argv):
     for label, why, detail in problems:
         print(f"  {label}: {why}\n    {detail}")
     if any(label == BODY_LABEL for label, _, _ in problems):
-        print(f"\nAnything labelled '{BODY_LABEL}' above is in the PR description, "
-              "not in a\ncommitted file: fix it by editing the PR body. Nothing in "
-              "the tree has to\nchange for it.")
+        print(
+            f"\nAnything labelled '{BODY_LABEL}' above is in the PR description, "
+            "not in a\ncommitted file: fix it by editing the PR body. Nothing in "
+            "the tree has to\nchange for it."
+        )
 
     if any(why.startswith("distance revision") for _, why, _ in problems):
         print("\nA distance revision keeps the note it replaces: `git mv` it to the new")

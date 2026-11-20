@@ -17,19 +17,30 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_frontier", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_frontier", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-def _entry(slug, n, k, d, w, loc="unrestricted", wc="weight-any", ct="CSS",
-           tier="upper_bound", date="2026-01-01"):
-    return {"slug": slug, "n": n, "k": k, "d": d, "w": w,
-            "eff": round(k * d * d / n, 3), "geo": None, "model": None,
-            "origin": "submission", "family": "", "date": date, "tier": tier,
-            "locality_class": loc, "weight_class": wc, "code_type": ct}
+def _entry(slug, n, k, d, w, loc="unrestricted", wc="weight-any", ct="CSS", tier="upper_bound", date="2026-01-01"):
+    return {
+        "slug": slug,
+        "n": n,
+        "k": k,
+        "d": d,
+        "w": w,
+        "eff": round(k * d * d / n, 3),
+        "geo": None,
+        "model": None,
+        "origin": "submission",
+        "family": "",
+        "date": date,
+        "tier": tier,
+        "locality_class": loc,
+        "weight_class": wc,
+        "code_type": ct,
+    }
 
 
 # A small board with every way a code can be a record: outright (A), by a
@@ -37,7 +48,7 @@ def _entry(slug, n, k, d, w, loc="unrestricted", wc="weight-any", ct="CSS",
 # (E) -- and one code (B) that no cell lets through.
 BOARD = [
     _entry("72-6-6", 72, 6, 6, 6, wc="weight-6"),
-    _entry("72-6-5", 72, 6, 5, 6, wc="weight-6"),            # dominated by A
+    _entry("72-6-5", 72, 6, 5, 6, wc="weight-6"),  # dominated by A
     _entry("72-4-8", 72, 4, 8, 4, wc="weight-4"),
     _entry("72-6-4", 72, 6, 4, 4, loc="local-2d-bilayer", wc="weight-4"),
     _entry("5-1-3", 5, 1, 3, 4, wc="weight-4", ct="stabilizer"),
@@ -74,10 +85,20 @@ def _anchors(svg):
 def test_frontier_map_draws_exactly_the_cell_frontier_as_links():
     b = load_site_build()
     cells, default, member = b.frontier_cells(BOARD)
-    rows = [{"n": e["n"], "k": e["k"], "d": e["d"], "w": e["w"],
-             "eff": e["eff"], "t": e["date"], "x": e["tier"] == "exact",
-             "slug": e["slug"]}
-            for i, e in enumerate(BOARD) if default in member[i]]
+    rows = [
+        {
+            "n": e["n"],
+            "k": e["k"],
+            "d": e["d"],
+            "w": e["w"],
+            "eff": e["eff"],
+            "t": e["date"],
+            "x": e["tier"] == "exact",
+            "slug": e["slug"],
+        }
+        for i, e in enumerate(BOARD)
+        if default in member[i]
+    ]
     svg = b.frontier_map(rows)
     assert set(_anchors(svg)) == {"72-6-6", "72-4-8", "72-6-4"}
     assert len(_anchors(svg)) == 3, "one link per record"
@@ -94,15 +115,29 @@ def test_frontier_map_draws_exactly_the_cell_frontier_as_links():
 
 def test_d_bands_cover_every_distance():
     b = load_site_build()
-    assert [b.d_band(d) for d in (1, 3, 4, 5, 6, 8, 9, 12, 13, 20, 21, 40, 41, 999)] == \
-        [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]
-    assert [b.fr_radius(w) for w in (3, 4, 5, 6, 7, 8, 9, 40)] == \
-        [6.0, 6.0, 5.0, 5.0, 4.0, 4.0, 3.2, 3.2]
+    assert [b.d_band(d) for d in (1, 3, 4, 5, 6, 8, 9, 12, 13, 20, 21, 40, 41, 999)] == [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        6,
+    ]
+    assert [b.fr_radius(w) for w in (3, 4, 5, 6, 7, 8, 9, 40)] == [6.0, 6.0, 5.0, 5.0, 4.0, 4.0, 3.2, 3.2]
 
 
 def test_frontier_cells_default_follows_the_board():
     """A page charts one board; a stabilizer-only board defaults to ITS
-    global cell rather than to a CSS cell that is not there."""
+    global cell rather than to a CSS cell that is not there.
+    """
     b = load_site_build()
     cells, default, _ = b.frontier_cells([e for e in BOARD if e["code_type"] != "CSS"])
     assert cells[default][:3] == ("unrestricted", "weight-any", "stabilizer")
@@ -113,7 +148,8 @@ def test_front_page_frontier_section(tmp_path):
     """Built from the verifier fixtures (a CSS code and two stabilizer codes):
     the main page charts the CSS board only, so the section ships the map for
     the CSS global cell, the mode button, no board picker, and per-entry
-    membership equal to the star."""
+    membership equal to the star.
+    """
     build = load_site_build()
     codes = tmp_path / "codes"
     codes.mkdir()
@@ -133,18 +169,14 @@ def test_front_page_frontier_section(tmp_path):
     assert "data-m=frontier" in index
     assert "data-t=" not in index, "one board per page -> no board picker"
     assert "data-l=local-2d-bilayer" in index and "data-c=weight-4" in index
-    plot = re.search(r'<div class="plot frplot" id=frplot>(.*?)</div>', index,
-                     re.S).group(1)
+    plot = re.search(r'<div class="plot frplot" id=frplot>(.*?)</div>', index, re.S).group(1)
     want = build.cell_frontiers(entries)[("unrestricted", "weight-any")]
     assert set(_anchors(plot)) == {entries[i]["slug"] for i in want}
-    legend = re.search(r'<div class=chartlegend id=frlegend>(.*?)</div>', index,
-                       re.S).group(1)
+    legend = re.search(r"<div class=chartlegend id=frlegend>(.*?)</div>", index, re.S).group(1)
     assert legend.count("data-band=") == 7
 
-    cells = json.loads(re.search(
-        r'<script id="rccells" type="application/json">(.*?)</script>', index).group(1))
-    data = json.loads(re.search(
-        r'<script id="rcdata" type="application/json">(.*?)</script>', index).group(1))
+    cells = json.loads(re.search(r'<script id="rccells" type="application/json">(.*?)</script>', index).group(1))
+    data = json.loads(re.search(r'<script id="rcdata" type="application/json">(.*?)</script>', index).group(1))
     assert cells["def"] == ["unrestricted", "weight-any", "CSS"]
     assert cells["ramp"] == build.FR_RAMP
     by_slug = {r["slug"]: r for r in data}
@@ -154,8 +186,7 @@ def test_front_page_frontier_section(tmp_path):
     fronts = build.cell_frontiers(entries)
     for ci, (L, W, T, _lab) in enumerate(cells["cells"]):
         key = (L, W) if T == "CSS" else (L, W, T)
-        assert {s for s, r in by_slug.items() if ci in r["fr"]} == \
-            {entries[i]["slug"] for i in fronts[key]}
+        assert {s for s, r in by_slug.items() if ci in r["fr"]} == {entries[i]["slug"] for i in fronts[key]}
 
 
 def _fam(slug, n, k, d, w, family, date, origin="submission", **kw):
@@ -168,12 +199,11 @@ def _fam(slug, n, k, d, w, family, date, origin="submission", **kw):
 # BB code now leads; the frontier holds two GB and one BB record, and one
 # dominated GB entry is off it.
 FAMILIES = [
-    _fam("90-8-10", 90, 8, 10, 6, "generalized-bicycle", "2025-01-01",
-         origin="baseline"),                                               # the literature's best
-    _fam("72-12-8", 72, 12, 8, 6, "bivariate-bicycle", "2025-06-01"),     # leader by kd^2/n, on it
-    _fam("60-4-8", 60, 4, 8, 6, "generalized-bicycle", "2025-03-01"),     # on it (cheapest n)
-    _fam("90-8-9", 90, 8, 9, 6, "generalized-bicycle", "2025-02-01"),     # dominated by 90-8-10
-    _fam("40-2-6", 40, 2, 6, 8, "other", "2025-04-01"),                    # untagged, on the frontier
+    _fam("90-8-10", 90, 8, 10, 6, "generalized-bicycle", "2025-01-01", origin="baseline"),  # the literature's best
+    _fam("72-12-8", 72, 12, 8, 6, "bivariate-bicycle", "2025-06-01"),  # leader by kd^2/n, on it
+    _fam("60-4-8", 60, 4, 8, 6, "generalized-bicycle", "2025-03-01"),  # on it (cheapest n)
+    _fam("90-8-9", 90, 8, 9, 6, "generalized-bicycle", "2025-02-01"),  # dominated by 90-8-10
+    _fam("40-2-6", 40, 2, 6, 8, "other", "2025-04-01"),  # untagged, on the frontier
 ]
 
 
@@ -190,7 +220,7 @@ def test_family_concentration_reads_the_cell_frontier_and_the_move():
     assert cell["untagged"] == 1 and cell["untagged_share"] == 0.25
     assert cell["top"][0] == {"family": "generalized-bicycle", "records": 2, "share": 0.5}
     assert cell["top1_share"] == 0.5 and cell["top2_share"] == 0.75
-    assert cell["hhi"] == round(0.5 ** 2 + 0.25 ** 2, 3)
+    assert cell["hhi"] == round(0.5**2 + 0.25**2, 3)
     assert cell["leader"]["slug"] == "72-12-8" and cell["incumbent"]["slug"] == "90-8-10"
     assert cell["moved"] is True and fc["cells_moved"] == 1 == fc["cells_total"]
     assert fc["global"]["records"] == 4 and fc["global"]["top2_share"] == 0.75
@@ -209,5 +239,7 @@ def test_family_legend_item_carries_the_caveat_and_is_absent_without_data():
     assert 'title="' in item and "self-declared" in item
     assert build.family_legend_item(None) == "" and build.family_legend_item({"top": []}) == ""
     assert build.frontier_legend(3).endswith("3 records</span>")
-    assert build.frontier_legend(3, fc["cells"]["unrestricted~weight-any"]).count("<span class=ci") == \
-        build.frontier_legend(3).count("<span class=ci") + 1
+    assert (
+        build.frontier_legend(3, fc["cells"]["unrestricted~weight-any"]).count("<span class=ci")
+        == build.frontier_legend(3).count("<span class=ci") + 1
+    )

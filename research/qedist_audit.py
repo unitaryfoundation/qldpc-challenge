@@ -33,13 +33,12 @@ def _default_out(code_path: Path) -> Path:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("code", help="path to a challenge code JSON (CSS)")
-    parser.add_argument("--out", type=Path, default=None,
-                        help="output run directory (default: research/candidates/qedist/<slug>)")
+    parser.add_argument(
+        "--out", type=Path, default=None, help="output run directory (default: research/candidates/qedist/<slug>)"
+    )
     parser.add_argument("--profile", default="css", choices=("css", "lp"))
-    parser.add_argument("--cutoff", type=int, default=None,
-                        help="exclude logicals up to this weight (default: d-1)")
-    parser.add_argument("--seconds", type=float, default=60.0,
-                        help="seconds per shard")
+    parser.add_argument("--cutoff", type=int, default=None, help="exclude logicals up to this weight (default: d-1)")
+    parser.add_argument("--seconds", type=float, default=60.0, help="seconds per shard")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--no-witnesses", action="store_true")
     parser.add_argument("--json", action="store_true", help="print JSON summary")
@@ -53,9 +52,12 @@ def main(argv=None) -> int:
 
     if find_qedist() is None:
         print("QEDist is not installed or not on PATH.", file=sys.stderr)
-        print("Install: git clone https://github.com/yeon-lee/QEDist.git && "
-              "cd QEDist && python -m venv .venv && . .venv/bin/activate "
-              "&& python -m pip install .", file=sys.stderr)
+        print(
+            "Install: git clone https://github.com/yeon-lee/QEDist.git && "
+            "cd QEDist && python -m venv .venv && . .venv/bin/activate "
+            "&& python -m pip install .",
+            file=sys.stderr,
+        )
         print("Or set QEDIST=/path/to/qedist", file=sys.stderr)
         return 2
 

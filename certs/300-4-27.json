@@ -1,0 +1,34 @@
+{
+  "d": 27,
+  "d_exact": false,
+  "d_lower": 20,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[300,4,27]] non-abelian 2BGA on dih(75)",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 20",
+      "proved_min": 20,
+      "secs": 57.0,
+      "status": "TIMEOUT",
+      "value": 27
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 20",
+      "proved_min": 20,
+      "secs": 57.0,
+      "status": "TIMEOUT",
+      "value": 27
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "fa74d756c0fe437eeabfe786370c3c8f1ba86b7e07a8f4496383c49bee80effb",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 1 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}

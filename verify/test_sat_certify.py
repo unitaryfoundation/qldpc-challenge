@@ -4,6 +4,7 @@ The certifier can only be trusted if it agrees with the MILP certifier where
 both close, and if it refutes an overstated claim with a witness the trusted
 stack accepts.
 """
+
 import copy
 import json
 import os
@@ -36,8 +37,8 @@ def test_agrees_with_existing_milp_cert(slug):
         existing = json.load(f)
     res = sat_certify.certify(_doc(slug), tlim=300)
     assert res["d_exact"] == existing["d_exact"], (
-        f"{slug}: SAT says d_exact={res['d_exact']}, "
-        f"existing {existing['solver']} cert says {existing['d_exact']}")
+        f"{slug}: SAT says d_exact={res['d_exact']}, existing {existing['solver']} cert says {existing['d_exact']}"
+    )
     assert res["d"] == existing["d"]
 
 
@@ -49,7 +50,7 @@ def test_refutes_an_inflated_claim_with_a_valid_witness():
     """
     doc = copy.deepcopy(_doc("24-6-4"))
     true_d = int(doc["distance"]["d"])
-    doc["distance"]["d"] = true_d + 2          # claim more than the code has
+    doc["distance"]["d"] = true_d + 2  # claim more than the code has
     res = sat_certify.certify(doc, tlim=300)
     assert not res["d_exact"]
     sat_sides = [s for s, b in res["sides"].items() if b["status"] == "SAT"]
@@ -64,8 +65,7 @@ def test_refutes_an_inflated_claim_with_a_valid_witness():
     v[wit] = 1
     H_ker, H_row = (HZ, HX) if side == "X" else (HX, HZ)
     assert not ((H_ker @ v) % 2).any(), "witness is not in the kernel"
-    assert gf2.rank(np.vstack([H_row, v[None, :]])) > gf2.rank(H_row), \
-        "witness is a stabilizer, not a logical"
+    assert gf2.rank(np.vstack([H_row, v[None, :]])) > gf2.rank(H_row), "witness is a stabilizer, not a logical"
     assert 0 < int(v.sum()) <= true_d + 1
 
 
@@ -93,8 +93,7 @@ def test_symmetry_is_gated_on_a_verified_automorphism():
     HX = sat_certify._matrix(doc["checks"]["X"], n)
     HZ = sat_certify._matrix(doc["checks"]["Z"], n)
     p = sat_certify._shift_perm(n)
-    expected = (n % 2 == 0 and sat_certify._perm_fixes(HX, p)
-                and sat_certify._perm_fixes(HZ, p))
+    expected = n % 2 == 0 and sat_certify._perm_fixes(HX, p) and sat_certify._perm_fixes(HZ, p)
     assert res["symmetry"] == expected
 
     # A code the rotation does not fix must not be pruned by it.
@@ -187,8 +186,7 @@ def test_a_short_pairing_set_is_refused_rather_than_certified():
             sat_certify.certify(doc, tlim=300)
         # Same row count, no logical content: the guard has to measure the
         # span rather than the length, since a stabilizer is a row too.
-        sat_certify._logicals = lambda H_same, H_opp: np.zeros_like(
-            full(H_same, H_opp))
+        sat_certify._logicals = lambda H_same, H_opp: np.zeros_like(full(H_same, H_opp))
         with pytest.raises(ValueError, match="logical classes"):
             sat_certify.certify(doc, tlim=300)
     finally:
@@ -196,6 +194,7 @@ def test_a_short_pairing_set_is_refused_rather_than_certified():
 
 
 # --- the ascending ladder (issue #4230) --------------------------------------------------------
+
 
 def test_the_ladder_reaches_the_exact_verdict_and_records_every_rung():
     res = sat_certify.certify(_doc("24-6-4"), tlim=300, ladder=True)
@@ -228,6 +227,7 @@ def test_a_ladder_that_times_out_still_proves_a_lower_bound(monkeypatch):
         assert [(r["W"], r["status"]) for r in blk["ladder"]] == [(1, "UNSAT"), (2, "UNSAT"), (3, "TIMEOUT")]
         assert blk["note"] == "no logical < 3 exists; W = 3 TIMEOUT"
     import check_certs
+
     assert res["verification"]["checks_sha256"] == check_certs.checks_sha256(doc)
     assert res["verification"]["level"] == "solver"
     assert check_certs.bound_problems("72-12-6", res) == []

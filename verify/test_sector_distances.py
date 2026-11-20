@@ -14,10 +14,9 @@ import copy
 import json
 import os
 
-import pytest
-
 import check_certs
 import heuristic_distance
+import pytest
 import qldpc_verify as V
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,25 +47,26 @@ def toric_doc(claim):
     star, so they are logicals of the same class and the claim of 6 is an
     over-claim the refuter can catch.
     """
-    stars = [sorted({_h(i, j), _h(i, j - 1), _v(i, j), _v(i - 1, j)})
-             for i in range(L) for j in range(L)]
-    plaqs = [sorted({_h(i, j), _h(i + 1, j), _v(i, j), _v(i, j + 1)})
-             for i in range(L) for j in range(L)]
+    stars = [sorted({_h(i, j), _h(i, j - 1), _v(i, j), _v(i - 1, j)}) for i in range(L) for j in range(L)]
+    plaqs = [sorted({_h(i, j), _h(i + 1, j), _v(i, j), _v(i, j + 1)}) for i in range(L) for j in range(L)]
     z4 = sorted(_h(0, j) for j in range(L))
     x4 = sorted(_v(0, j) for j in range(L))
-    z6 = _sym(z4, plaqs[1])              # times plaquette (0, 1)
-    x6 = _sym(x4, stars[L + 1])          # times star (1, 1)
+    z6 = _sym(z4, plaqs[1])  # times plaquette (0, 1)
+    x6 = _sym(x4, stars[L + 1])  # times star (1, 1)
     wx, wz = (x4, z4) if claim == 4 else (x6, z6)
     assert len(wx) == claim and len(wz) == claim
     return {
         "schema_version": "0.1",
         "name": f"toric {L}x{L} claiming d={claim}",
         "code_type": "CSS",
-        "n": 2 * L * L, "k": 2,
+        "n": 2 * L * L,
+        "k": 2,
         "checks": {"X": stars, "Z": plaqs},
-        "distance": {"d": claim,
-                     "X": {"value": claim, "confidence": "upper_bound", "witness": wx},
-                     "Z": {"value": claim, "confidence": "upper_bound", "witness": wz}},
+        "distance": {
+            "d": claim,
+            "X": {"value": claim, "confidence": "upper_bound", "witness": wx},
+            "Z": {"value": claim, "confidence": "upper_bound", "witness": wz},
+        },
         "provenance": _provenance(),
     }, z4
 
@@ -84,17 +84,16 @@ def test_witnesses_give_the_upper_bounds_and_nothing_proves_a_lower_one():
     sd = rep["computed"]["sector_distances"]
     assert set(sd) == {"X", "Z", "d"}
     for side in ("X", "Z"):
-        assert sd[side] == {"upper": 4, "lower": None, "exact": False,
-                            "witness_weight": 4, "refuted_to": None}
+        assert sd[side] == {"upper": 4, "lower": None, "exact": False, "witness_weight": 4, "refuted_to": None}
     assert sd["d"] == {"upper": 4, "lower": None, "exact": False}
 
 
 def test_a_refuted_claim_lowers_the_side_the_found_logical_belongs_to(monkeypatch):
     doc, z4 = toric_doc(6)
-    assert V.verify(doc, refute=False)["ok"]     # the weight-6 witnesses are real logicals
+    assert V.verify(doc, refute=False)["ok"]  # the weight-6 witnesses are real logicals
 
     def fake_refute(doc, seed=0, **kw):
-        return True, 4, z4, 10                   # the refuter hands back a Z loop
+        return True, 4, z4, 10  # the refuter hands back a Z loop
 
     monkeypatch.setattr(heuristic_distance, "refute_check", fake_refute)
     rep = V.verify(doc, refute=True, seed=1)
@@ -108,8 +107,9 @@ def test_a_refuted_claim_lowers_the_side_the_found_logical_belongs_to(monkeypatc
 
 def test_a_find_of_no_side_still_bounds_d():
     doc, _ = toric_doc(6)
-    sd = V.sector_distances(doc, {"X": {"value": 6}, "Z": {"value": 6}},
-                            {"side": None, "weight": 5, "witness": [0, 1, 2]})
+    sd = V.sector_distances(
+        doc, {"X": {"value": 6}, "Z": {"value": 6}}, {"side": None, "weight": 5, "witness": [0, 1, 2]}
+    )
     assert sd["X"]["upper"] == 6 and sd["Z"]["upper"] == 6 and sd["d"]["upper"] == 5
 
 
@@ -122,8 +122,7 @@ def test_a_side_without_a_witness_has_no_bound():
 def test_an_exact_certificate_proves_every_side():
     doc, _ = toric_doc(4)
     rep = V.verify(doc, refute=False)
-    cert = {"d": 4, "d_exact": True,
-            "sides": {"X": {"value": 4, "exact": True}, "Z": {"value": 4, "exact": True}}}
+    cert = {"d": 4, "d_exact": True, "sides": {"X": {"value": 4, "exact": True}, "Z": {"value": 4, "exact": True}}}
     sd = V.apply_certificate(rep["computed"]["sector_distances"], doc, cert)
     for key in ("X", "Z", "d"):
         assert sd[key]["lower"] == 4 and sd[key]["exact"]
@@ -131,17 +130,20 @@ def test_an_exact_certificate_proves_every_side():
     assert V.verify(doc, refute=False, cert=cert)["computed"]["sector_distances"] == sd
     # a stale exact certificate (made against another distance) proves nothing
     stale = dict(cert, d=3)
-    assert V.apply_certificate(rep["computed"]["sector_distances"], doc, stale) == \
-        rep["computed"]["sector_distances"]
+    assert V.apply_certificate(rep["computed"]["sector_distances"], doc, stale) == rep["computed"]["sector_distances"]
 
 
 def test_a_partial_certificate_is_honored_by_its_binding_hash():
     doc, _ = toric_doc(4)
     rep = V.verify(doc, refute=False)
     base = rep["computed"]["sector_distances"]
-    cert = {"d": 4, "d_exact": False, "d_lower": 3,
-            "sides": {"X": {"proved_min": 3}, "Z": {"proved_min": 4}},
-            "verification": {"checks_sha256": check_certs.checks_sha256(doc)}}
+    cert = {
+        "d": 4,
+        "d_exact": False,
+        "d_lower": 3,
+        "sides": {"X": {"proved_min": 3}, "Z": {"proved_min": 4}},
+        "verification": {"checks_sha256": check_certs.checks_sha256(doc)},
+    }
     sd = V.apply_certificate(base, doc, cert)
     assert sd["X"] == dict(base["X"], lower=3)
     assert sd["Z"] == dict(base["Z"], lower=4, exact=True)
@@ -174,6 +176,7 @@ def test_a_stabilizer_code_has_the_single_side_p():
 def test_the_block_reaches_the_gate_verdict():
     """validate_candidate copies the block into candidate.sector_distances."""
     import validate_candidate as VC
+
     src = open(VC.__file__, encoding="utf-8").read()
     assert 'verdict["candidate"]["sector_distances"] = comp.get("sector_distances")' in src
 

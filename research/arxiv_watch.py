@@ -72,6 +72,7 @@ The query is in QUERY_GROUPS, the screening in SCREEN_TERMS and TIERS below,
 and triage records a fingerprint of both, so a rerun on a given day reproduces
 the same candidate set and scores from a changed fingerprint are not comparable.
 """
+
 import argparse
 import gzip
 import hashlib
@@ -266,16 +267,15 @@ USE_TERMS = {
     "circuit level noise": -2,
     "benchmark": -2,
 }
-TIERS = (("family", FAMILY_TERMS), ("structure", STRUCTURE_TERMS),
-         ("generic", GENERIC_TERMS), ("use", USE_TERMS))
+TIERS = (("family", FAMILY_TERMS), ("structure", STRUCTURE_TERMS), ("generic", GENERIC_TERMS), ("use", USE_TERMS))
 SCREEN_TERMS = {t: w for _tier, terms in TIERS for t, w in terms.items()}
 HARD_TERMS = frozenset(FAMILY_TERMS) | frozenset(STRUCTURE_TERMS)
 # The trap this closes: triage matches against a normalised haystack, so a key
 # carrying a capital or a hyphen ("quantum Tanner", "parity-check") can never
 # fire, and its weight is silently unreachable.
-assert all(t == _norm(t) for t in SCREEN_TERMS), \
-    "SCREEN_TERMS keys must be normalised: " + \
-    ", ".join(t for t in SCREEN_TERMS if t != _norm(t))
+assert all(t == _norm(t) for t in SCREEN_TERMS), "SCREEN_TERMS keys must be normalised: " + ", ".join(
+    t for t in SCREEN_TERMS if t != _norm(t)
+)
 
 # [[n,k,d]] (or [[n,k]]) in an abstract is the strongest signal available
 # without opening the paper, but only if the abstract is claiming it for this
@@ -283,10 +283,25 @@ assert all(t == _norm(t) for t in SCREEN_TERMS), \
 # else's parameters, so each match keeps its context and a comparison flag.
 PARAMS_RE = re.compile(r"\[\[\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*)?\]\]")
 COMPARISON_CUES = (
-    "improv", "compar", "prior work", "previous", "well known", "known",
-    "existing", "outperform", "better than", "versus", " vs ", "reported in",
-    "baseline", "state of the art", "whereas", "instead of", "rather than",
-    "relative to", "beat",
+    "improv",
+    "compar",
+    "prior work",
+    "previous",
+    "well known",
+    "known",
+    "existing",
+    "outperform",
+    "better than",
+    "versus",
+    " vs ",
+    "reported in",
+    "baseline",
+    "state of the art",
+    "whereas",
+    "instead of",
+    "rather than",
+    "relative to",
+    "beat",
 )
 CLAIM_LIMIT = 12
 PARAMS_BONUS = 4
@@ -294,12 +309,13 @@ ATOM = "{http://www.w3.org/2005/Atom}"
 ARXIV = "{http://arxiv.org/schemas/atom}"
 OPENSEARCH = "{http://a9.com/-/spec/opensearch/1.1/}"
 REVIEW_STATUSES = ("relevant", "not-relevant", "uncertain")
-UNREVIEWED = {"status": "unreviewed", "reason": "", "by": "", "date": "",
-              "version": None}
+UNREVIEWED = {"status": "unreviewed", "reason": "", "by": "", "date": "", "version": None}
 
-DISCLAIMER = ("triage only: screened_in orders a reading queue and asserts "
-              "nothing about novelty or distance; every parameter here is an "
-              "unverified claim read out of an abstract")
+DISCLAIMER = (
+    "triage only: screened_in orders a reading queue and asserts "
+    "nothing about novelty or distance; every parameter here is an "
+    "unverified claim read out of an abstract"
+)
 
 
 def build_query():
@@ -323,16 +339,17 @@ def criteria_fingerprint():
     Two rows whose fingerprints differ were screened under different criteria
     and their scores are not comparable.
     """
-    blob = json.dumps([build_query(), sorted(SCREEN_TERMS.items()),
-                       sorted(HARD_TERMS), PARAMS_BONUS], sort_keys=True)
+    blob = json.dumps([build_query(), sorted(SCREEN_TERMS.items()), sorted(HARD_TERMS), PARAMS_BONUS], sort_keys=True)
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:12]
 
 
 # export.arxiv.org answers 406 to urllib's default header set; sending Accept
 # and Accept-Encoding explicitly is what it wants.
-HEADERS = {"User-Agent": "qldpc-challenge-arxiv-watch/1.0",
-           "Accept": "application/atom+xml,application/xml,text/xml",
-           "Accept-Encoding": "gzip, deflate"}
+HEADERS = {
+    "User-Agent": "qldpc-challenge-arxiv-watch/1.0",
+    "Accept": "application/atom+xml,application/xml,text/xml",
+    "Accept-Encoding": "gzip, deflate",
+}
 THROTTLED = (406, 429)
 # see http_get(): on arXiv, urllib is refused where curl is served
 CURL = shutil.which("curl")
@@ -340,25 +357,27 @@ CURL = shutil.which("curl")
 
 def page_url(query, start, batch):
     """Build the feed URL for one page."""
-    return API + "?" + urllib.parse.urlencode({
-        "search_query": query, "start": start, "max_results": batch,
-        "sortBy": SORT_BY, "sortOrder": "descending"})
+    return (
+        API
+        + "?"
+        + urllib.parse.urlencode(
+            {"search_query": query, "start": start, "max_results": batch, "sortBy": SORT_BY, "sortOrder": "descending"}
+        )
+    )
 
 
 def _get_via_curl(url, timeout):
     """GET `url` with curl, returning (status, body_text)."""
     with tempfile.TemporaryDirectory() as tmp:
         body = os.path.join(tmp, "body")
-        cmd = [CURL, "-sS", "--compressed", "--max-time", str(int(timeout)),
-               "-o", body, "-w", "%{http_code}"]
+        cmd = [CURL, "-sS", "--compressed", "--max-time", str(int(timeout)), "-o", body, "-w", "%{http_code}"]
         for name, value in HEADERS.items():
             if name != "Accept-Encoding":  # --compressed sets its own
                 cmd += ["-H", f"{name}: {value}"]
         cmd.append(url)
         done = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if done.returncode != 0:
-            raise urllib.error.URLError(
-                f"curl exited {done.returncode}: {done.stderr.strip()[:200]}")
+            raise urllib.error.URLError(f"curl exited {done.returncode}: {done.stderr.strip()[:200]}")
         status = (done.stdout or "").strip()[-3:]
         with open(body, "rb") as f:
             return int(status), f.read().decode("utf-8", "replace")
@@ -395,8 +414,7 @@ def http_get(url, timeout=60):
     return _get_via_urllib(url, timeout)
 
 
-def fetch(query, start, batch, timeout=60, retries=RETRIES,
-          backoff=BACKOFF_SECONDS, sleep=time.sleep):
+def fetch(query, start, batch, timeout=60, retries=RETRIES, backoff=BACKOFF_SECONDS, sleep=time.sleep):
     """Return one page of the Atom feed as text, backing off on a throttle.
 
     The wait doubles per attempt up to BACKOFF_CEILING because a 406 is not a
@@ -410,11 +428,9 @@ def fetch(query, start, batch, timeout=60, retries=RETRIES,
         if status == 200:
             return body
         if status not in THROTTLED or attempt == retries:
-            raise urllib.error.HTTPError(url, status, "arXiv refused the feed "
-                                         "request", None, None)
-        wait = min(backoff * 2 ** attempt, BACKOFF_CEILING)
-        print(f"arXiv returned {status}; backing off {wait:.0f}s "
-              f"(attempt {attempt + 1} of {retries})", file=sys.stderr)
+            raise urllib.error.HTTPError(url, status, "arXiv refused the feed request", None, None)
+        wait = min(backoff * 2**attempt, BACKOFF_CEILING)
+        print(f"arXiv returned {status}; backing off {wait:.0f}s (attempt {attempt + 1} of {retries})", file=sys.stderr)
         sleep(wait)
     raise AssertionError("unreachable")
 
@@ -438,28 +454,28 @@ def parse_feed(xml_text):
     total = root.findtext(OPENSEARCH + "totalResults")
     out = []
     for e in root.findall(ATOM + "entry"):
-        raw_id = re.sub(r"^https?://arxiv\.org/abs/", "",
-                        (e.findtext(ATOM + "id") or "").strip())
+        raw_id = re.sub(r"^https?://arxiv\.org/abs/", "", (e.findtext(ATOM + "id") or "").strip())
         if not raw_id:
             continue
         bare, ver = split_arxiv_id(raw_id)
         pc = e.find(ARXIV + "primary_category")
-        out.append({
-            "id": bare,
-            "version": ver,
-            "title": " ".join((e.findtext(ATOM + "title") or "").split()),
-            "authors": [a.findtext(ATOM + "name") or ""
-                        for a in e.findall(ATOM + "author")],
-            "submitted": (e.findtext(ATOM + "published") or "")[:10],
-            "updated": (e.findtext(ATOM + "updated") or "")[:10],
-            "categories": [c.get("term") for c in e.findall(ATOM + "category")],
-            "primary": pc.get("term") if pc is not None else None,
-            "abstract": " ".join((e.findtext(ATOM + "summary") or "").split()),
-            "comment": " ".join((e.findtext(ARXIV + "comment") or "").split()),
-            "journal_ref": " ".join((e.findtext(ARXIV + "journal_ref") or "").split()),
-            "doi": (e.findtext(ARXIV + "doi") or "").strip(),
-            "link": f"https://arxiv.org/abs/{raw_id}",
-        })
+        out.append(
+            {
+                "id": bare,
+                "version": ver,
+                "title": " ".join((e.findtext(ATOM + "title") or "").split()),
+                "authors": [a.findtext(ATOM + "name") or "" for a in e.findall(ATOM + "author")],
+                "submitted": (e.findtext(ATOM + "published") or "")[:10],
+                "updated": (e.findtext(ATOM + "updated") or "")[:10],
+                "categories": [c.get("term") for c in e.findall(ATOM + "category")],
+                "primary": pc.get("term") if pc is not None else None,
+                "abstract": " ".join((e.findtext(ATOM + "summary") or "").split()),
+                "comment": " ".join((e.findtext(ARXIV + "comment") or "").split()),
+                "journal_ref": " ".join((e.findtext(ARXIV + "journal_ref") or "").split()),
+                "doi": (e.findtext(ARXIV + "doi") or "").strip(),
+                "link": f"https://arxiv.org/abs/{raw_id}",
+            }
+        )
     return out, int(total) if total and total.strip().isdigit() else None
 
 
@@ -479,14 +495,18 @@ def claimed_params(text):
     for m in PARAMS_RE.finditer(text):
         left = text.rfind(".", 0, m.start()) + 1
         right = text.find(".", m.end())
-        sentence = text[left:right if right != -1 else len(text)].strip()
-        prefix = _norm(text[left:m.start()])
+        sentence = text[left : right if right != -1 else len(text)].strip()
+        prefix = _norm(text[left : m.start()])
         n, k, d = m.group(1), m.group(2), m.group(3)
-        claims.append({
-            "n": int(n), "k": int(k), "d": int(d) if d else None,
-            "context": sentence[:240],
-            "comparison": any(cue in prefix for cue in COMPARISON_CUES),
-        })
+        claims.append(
+            {
+                "n": int(n),
+                "k": int(k),
+                "d": int(d) if d else None,
+                "context": sentence[:240],
+                "comparison": any(cue in prefix for cue in COMPARISON_CUES),
+            }
+        )
         if len(claims) >= CLAIM_LIMIT:
             break
     return claims
@@ -504,8 +524,7 @@ def triage(paper):
     """
     # joined with a full stop so a claim's context cannot run title into
     # abstract, and so the comment's "code at github..." is screened too
-    text = ". ".join(part for part in (paper["title"], paper["abstract"],
-                                       paper.get("comment") or "") if part)
+    text = ". ".join(part for part in (paper["title"], paper["abstract"], paper.get("comment") or "") if part)
     hay = _norm(text)
     matched = sorted(t for t in SCREEN_TERMS if t in hay)
     score = sum(SCREEN_TERMS[t] for t in matched)
@@ -521,22 +540,34 @@ def triage(paper):
         tier = "candidate"
     else:
         tier = "background"
-    return {"score": score, "matched": matched, "claimed_params": claims,
-            "tier": tier, "screened_in": hard,
-            "screen": criteria_fingerprint()}
+    return {
+        "score": score,
+        "matched": matched,
+        "claimed_params": claims,
+        "tier": tier,
+        "screened_in": hard,
+        "screen": criteria_fingerprint(),
+    }
 
 
 def _migrate_triage(t):
     """Bring a ledger row's triage dict up to the current field names."""
     if not isinstance(t, dict):
-        return {"score": 0, "matched": [], "claimed_params": [],
-                "tier": "background", "screened_in": False, "screen": ""}
+        return {
+            "score": 0,
+            "matched": [],
+            "claimed_params": [],
+            "tier": "background",
+            "screened_in": False,
+            "screen": "",
+        }
     if "claimed_params" not in t:
         old = t.pop("params", []) or []
         t["claimed_params"] = [
-            {"n": p[0], "k": p[1], "d": p[2] if len(p) > 2 else None,
-             "context": "", "comparison": False}
-            for p in old if len(p) >= 2]
+            {"n": p[0], "k": p[1], "d": p[2] if len(p) > 2 else None, "context": "", "comparison": False}
+            for p in old
+            if len(p) >= 2
+        ]
     if "screened_in" not in t:
         t["screened_in"] = bool(t.pop("flag", False))
     t.setdefault("tier", "candidate" if t["screened_in"] else "background")
@@ -558,8 +589,7 @@ def load_ledger(path=LEDGER):
                 r = json.loads(text)
                 key = r["id"]
             except (json.JSONDecodeError, KeyError, TypeError) as err:
-                print(f"{path}:{lineno}: skipping unreadable ledger line "
-                      f"({type(err).__name__})", file=sys.stderr)
+                print(f"{path}:{lineno}: skipping unreadable ledger line ({type(err).__name__})", file=sys.stderr)
                 continue
             r["triage"] = _migrate_triage(r.get("triage"))
             if r.get("tier"):
@@ -610,22 +640,22 @@ def slim_row(row):
     `version_history` means the row has only ever been seen at one version.
     Writing those out costs about 150 bytes a paper to say nothing.
     """
-    out = {"id": row["id"], "version": row.get("version", 1),
-           "updated": row.get("updated", ""),
-           "title": row.get("title", ""),
-           "tier": row.get("tier") or (row.get("triage") or {}).get(
-               "tier", "background"),
-           "first_seen": row.get("first_seen", ""),
-           "last_seen": row.get("last_seen", "")}
-    params = row.get("claimed_params") or (row.get("triage") or {}).get(
-        "claimed_params") or []
+    out = {
+        "id": row["id"],
+        "version": row.get("version", 1),
+        "updated": row.get("updated", ""),
+        "title": row.get("title", ""),
+        "tier": row.get("tier") or (row.get("triage") or {}).get("tier", "background"),
+        "first_seen": row.get("first_seen", ""),
+        "last_seen": row.get("last_seen", ""),
+    }
+    params = row.get("claimed_params") or (row.get("triage") or {}).get("claimed_params") or []
     if params:
         # the quoted sentence a parameter was read out of is what makes the
         # screen auditable DURING a poll; three parameters from one sentence
         # would store that sentence three times forever. The numbers persist,
         # the quote does not, and the link is how anyone checks it.
-        out["claimed_params"] = [
-            {k: v for k, v in p.items() if k != "context"} for p in params]
+        out["claimed_params"] = [{k: v for k, v in p.items() if k != "context"} for p in params]
     review = row.get("review") or {}
     if review.get("status") and review["status"] != "unreviewed":
         out["review"] = _slim_review(review)
@@ -659,10 +689,13 @@ def _slim_tried(record):
     mechanism = normalise_mechanism((record or {}).get("mechanism", ""))
     if not mechanism:
         return None
-    return {"mechanism": mechanism,
-            "where": str(record.get("where", ""))[:WHERE_MAX],
-            "outcome": str(record.get("outcome", ""))[:REASON_MAX],
-            "by": record.get("by", ""), "date": record.get("date", "")}
+    return {
+        "mechanism": mechanism,
+        "where": str(record.get("where", ""))[:WHERE_MAX],
+        "outcome": str(record.get("outcome", ""))[:REASON_MAX],
+        "by": record.get("by", ""),
+        "date": record.get("date", ""),
+    }
 
 
 def hydrate_row(row):
@@ -675,17 +708,21 @@ def hydrate_row(row):
     row.setdefault("claimed_params", [])
     row.setdefault("reviews", [])
     row.setdefault("link", arxiv_link(row))
-    row.setdefault("version_history",
-                   [{"version": row["version"], "updated": row["updated"],
-                     "seen": row.get("first_seen", "")}])
-    row.setdefault("review", {"status": "unreviewed", "reason": "",
-                              "by": "", "date": "", "version": None})
+    row.setdefault(
+        "version_history", [{"version": row["version"], "updated": row["updated"], "seen": row.get("first_seen", "")}]
+    )
+    row.setdefault("review", {"status": "unreviewed", "reason": "", "by": "", "date": "", "version": None})
     row["review"].setdefault("mechanisms", [])
     row.setdefault("tried", [])
-    row.setdefault("triage", {"tier": row["tier"],
-                              "claimed_params": row["claimed_params"],
-                              "matched": [], "screened_in":
-                              row["tier"] in ("strong", "candidate")})
+    row.setdefault(
+        "triage",
+        {
+            "tier": row["tier"],
+            "claimed_params": row["claimed_params"],
+            "matched": [],
+            "screened_in": row["tier"] in ("strong", "candidate"),
+        },
+    )
     return row
 
 
@@ -694,9 +731,7 @@ def save_ledger(rows, path=LEDGER):
     directory = os.path.dirname(path)
     if directory:
         os.makedirs(directory, exist_ok=True)
-    ordered = sorted(rows.values(),
-                     key=lambda r: (r.get("updated", ""), r["id"]),
-                     reverse=True)
+    ordered = sorted(rows.values(), key=lambda r: (r.get("updated", ""), r["id"]), reverse=True)
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         for r in ordered:
@@ -728,32 +763,31 @@ def window_days(ledger, requested=None, now=None):
     if requested is not None:
         why = f"--days {requested}"
         if gap is not None and requested < gap + LAG_SLACK_DAYS:
-            why += (f"; WARNING: {gap} days since the last poll ({last}), so "
-                    f"this window skips the days before it")
+            why += f"; WARNING: {gap} days since the last poll ({last}), so this window skips the days before it"
         return requested, why
     if gap is None:
         return DEFAULT_DAYS, f"no previous poll in the ledger, default {DEFAULT_DAYS} days"
     reach = gap + LAG_SLACK_DAYS
     if reach < DEFAULT_DAYS:
-        return DEFAULT_DAYS, (f"{gap} days since the last poll ({last}), "
-                              f"widened to the {DEFAULT_DAYS}-day floor")
-    return reach, (f"{gap} days since the last poll ({last}) plus "
-                   f"{LAG_SLACK_DAYS} days of slack")
+        return DEFAULT_DAYS, (f"{gap} days since the last poll ({last}), widened to the {DEFAULT_DAYS}-day floor")
+    return reach, (f"{gap} days since the last poll ({last}) plus {LAG_SLACK_DAYS} days of slack")
 
 
 def _version_history(prev, paper, today):
     """Carry a row's version history forward and append any bump."""
     if prev is None:
-        return [{"version": paper["version"], "updated": paper["updated"],
-                 "seen": today}]
+        return [{"version": paper["version"], "updated": paper["updated"], "seen": today}]
     history = [dict(h) for h in (prev.get("version_history") or [])]
     if not history:
-        history = [{"version": prev.get("version", paper["version"]),
-                    "updated": prev.get("updated", ""),
-                    "seen": prev.get("first_seen", today)}]
+        history = [
+            {
+                "version": prev.get("version", paper["version"]),
+                "updated": prev.get("updated", ""),
+                "seen": prev.get("first_seen", today),
+            }
+        ]
     if paper["version"] > history[-1].get("version", 0):
-        history.append({"version": paper["version"],
-                        "updated": paper["updated"], "seen": today})
+        history.append({"version": paper["version"], "updated": paper["updated"], "seen": today})
     return history
 
 
@@ -763,14 +797,22 @@ def _carry_review(prev, paper):
     for key, value in UNREVIEWED.items():
         review.setdefault(key, value)
     reviewed_at = review.get("version")
-    if review["status"] != "unreviewed" and reviewed_at is not None \
-            and paper["version"] > reviewed_at:
+    if review["status"] != "unreviewed" and reviewed_at is not None and paper["version"] > reviewed_at:
         review["stale"] = True
     return review
 
 
-def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
-         now=None, retry_pause=BACKOFF_SECONDS, sleep=None):
+def poll(
+    days,
+    ledger,
+    batch=100,
+    pages=10,
+    pause=PAUSE_SECONDS,
+    fetcher=None,
+    now=None,
+    retry_pause=BACKOFF_SECONDS,
+    sleep=None,
+):
     """Walk the feed back `days` and return (new, updated, ledger, scan).
 
     `new` are ids absent from the ledger; `updated` are ids whose arXiv version
@@ -787,17 +829,24 @@ def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
     today = now.strftime("%Y-%m-%d")
     query = build_query()
     new, updated = [], []
-    scan = {"polled": today, "cutoff": cutoff, "days": days,
-            "pages_fetched": 0, "entries_seen": 0, "total_results": None,
-            "oldest_updated": None, "complete": False, "stopped": ""}
+    scan = {
+        "polled": today,
+        "cutoff": cutoff,
+        "days": days,
+        "pages_fetched": 0,
+        "entries_seen": 0,
+        "total_results": None,
+        "oldest_updated": None,
+        "complete": False,
+        "stopped": "",
+    }
     for page in range(pages):
         start = page * batch
         entries, total = parse_feed(fetcher(query, start, batch))
         scan["pages_fetched"] += 1
         if total is not None:
             scan["total_results"] = total
-        exhausted = (scan["total_results"] is not None
-                     and start + len(entries) >= scan["total_results"])
+        exhausted = scan["total_results"] is not None and start + len(entries) >= scan["total_results"]
         if len(entries) < batch and not exhausted:
             # arXiv returns a short or empty page transiently even when more
             # results exist, so disbelieve it once before ending the scan.
@@ -818,8 +867,7 @@ def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
         for p in entries:
             scan["entries_seen"] += 1
             if not p["submitted"] and not p["updated"]:
-                print(f"arXiv:{p['id']}: no published or updated date; skipped",
-                      file=sys.stderr)
+                print(f"arXiv:{p['id']}: no published or updated date; skipped", file=sys.stderr)
                 continue
             if p["updated"] < cutoff:
                 reached_cutoff = True
@@ -827,19 +875,28 @@ def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
             if scan["oldest_updated"] is None or p["updated"] < scan["oldest_updated"]:
                 scan["oldest_updated"] = p["updated"]
             prev = ledger.get(p["id"])
-            row = {"id": p["id"], "version": p["version"], "title": p["title"],
-                   "authors": p["authors"], "submitted": p["submitted"],
-                   "updated": p["updated"], "categories": p["categories"],
-                   "primary": p["primary"], "link": p["link"],
-                   "abstract": p["abstract"], "comment": p["comment"],
-                   "journal_ref": p["journal_ref"], "doi": p["doi"],
-                   "triage": triage(p),
-                   "version_history": _version_history(prev, p, today),
-                   "first_seen": prev["first_seen"] if prev else today,
-                   "last_seen": today,
-                   "reviews": list((prev or {}).get("reviews") or []),
-                   "tried": list((prev or {}).get("tried") or []),
-                   "review": _carry_review(prev, p)}
+            row = {
+                "id": p["id"],
+                "version": p["version"],
+                "title": p["title"],
+                "authors": p["authors"],
+                "submitted": p["submitted"],
+                "updated": p["updated"],
+                "categories": p["categories"],
+                "primary": p["primary"],
+                "link": p["link"],
+                "abstract": p["abstract"],
+                "comment": p["comment"],
+                "journal_ref": p["journal_ref"],
+                "doi": p["doi"],
+                "triage": triage(p),
+                "version_history": _version_history(prev, p, today),
+                "first_seen": prev["first_seen"] if prev else today,
+                "last_seen": today,
+                "reviews": list((prev or {}).get("reviews") or []),
+                "tried": list((prev or {}).get("tried") or []),
+                "review": _carry_review(prev, p),
+            }
             if len(row["version_history"]) > 1:
                 row["prior_version"] = row["version_history"][-2]["version"]
             if prev is None:
@@ -857,14 +914,12 @@ def poll(days, ledger, batch=100, pages=10, pause=PAUSE_SECONDS, fetcher=None,
                 scan["complete"] = True
                 scan["stopped"] = f"end of results ({seen} entries)"
             else:
-                scan["stopped"] = (f"short page ({len(entries)} of {batch}) at "
-                                   f"start={start}, still inside the window")
+                scan["stopped"] = f"short page ({len(entries)} of {batch}) at start={start}, still inside the window"
             break
         if page + 1 < pages:
             sleep(pause)
     else:
-        scan["stopped"] = (f"page cap: {pages} pages of {batch} and still "
-                           f"inside the window")
+        scan["stopped"] = f"page cap: {pages} pages of {batch} and still inside the window"
     return new, updated, ledger, scan
 
 
@@ -891,8 +946,7 @@ def render(rows, kind, limit, show_abstract=False):
             v = f"v{r['prior_version']} -> v{r['version']}"
         mark = "READ" if t["screened_in"] else "    "
         score = f", score {t['score']}" if t.get("score") else ""
-        print(f"  {mark} {r['submitted']}  arXiv:{r['id']} {v}  "
-              f"{t['tier']}{score}")
+        print(f"  {mark} {r['submitted']}  arXiv:{r['id']} {v}  {t['tier']}{score}")
         print(f"       {r['title']}")
         # authors and categories are known during a poll and not kept in the
         # ledger, so a later offline read prints the link instead
@@ -912,8 +966,7 @@ def render(rows, kind, limit, show_abstract=False):
         line = rv.get("status", "unreviewed")
         if line != "unreviewed":
             at = rv.get("version")
-            line += f" (on v{at}, {rv.get('date', '')})" if at else \
-                f" ({rv.get('date', '')})"
+            line += f" (on v{at}, {rv.get('date', '')})" if at else f" ({rv.get('date', '')})"
             if rv.get("reason"):
                 line += f": {rv['reason']}"
             if rv.get("stale"):
@@ -927,8 +980,10 @@ def render(rows, kind, limit, show_abstract=False):
             if left and len(left) < len(mechanisms):
                 print(f"       not tried here: {'; '.join(left)}")
         for t in r.get("tried") or []:
-            print(f"       tried: {t.get('mechanism', '')} in {t.get('where', '')} "
-                  f"({t.get('date', '')}, {t.get('by', '')}): {t.get('outcome', '')}")
+            print(
+                f"       tried: {t.get('mechanism', '')} in {t.get('where', '')} "
+                f"({t.get('date', '')}, {t.get('by', '')}): {t.get('outcome', '')}"
+            )
         print(f"       {r['link']}")
         if show_abstract:
             print(f"       {r['abstract'][:400]}")
@@ -953,6 +1008,7 @@ def normalise_key(text):
 # was relevant. Tags are free text by design: a taxonomy fixed in advance would
 # not match the transfers that turn out to matter, so two spellings of one
 # mechanism are compared after the same normalization the screen uses.
+
 
 def normalise_mechanism(text):
     """Return one mechanism tag as the ledger keeps it: trimmed, single-spaced, capped."""
@@ -1005,8 +1061,7 @@ def _mechanism_matches(row, wanted):
 # nothing. The accepted shapes are an issue or PR reference, a campaign id, a
 # board slug, or a committed path.
 WORKING_OUTPUT = ("research/candidates", "research/out", "research/runs")
-ISSUE_REF = re.compile(
-    r"^(?:#|https?://github\.com/[\w.-]+/[\w.-]+/(?:pull|issues)/)(\d+)$")
+ISSUE_REF = re.compile(r"^(?:#|https?://github\.com/[\w.-]+/[\w.-]+/(?:pull|issues)/)(\d+)$")
 SLUG_RE = re.compile(r"^\d+-\d+-\d+(?:-[a-z0-9]+)?$")
 
 
@@ -1028,27 +1083,32 @@ def resolve_where(where, root=None):
         return True, f"issue or PR #{m.group(1)}"
     parts = text.replace("\\", "/").split("/")
     if os.path.isabs(text) or ".." in parts:
-        return False, (f"{text} is not a path inside the repository; name the committed "
-                       "file, the campaign, or the PR")
+        return False, (f"{text} is not a path inside the repository; name the committed file, the campaign, or the PR")
     if any(text == w or text.startswith(w + "/") for w in WORKING_OUTPUT):
-        return False, (f"{text} is gitignored working output and cannot be cited; name the "
-                       "campaign summary, the fieldnote, or the PR it became")
+        return False, (
+            f"{text} is gitignored working output and cannot be cited; name the "
+            "campaign summary, the fieldnote, or the PR it became"
+        )
     if "/" not in text and os.path.isdir(os.path.join(root, "research", "campaigns", text)):
         return True, f"campaign research/campaigns/{text}"
     if SLUG_RE.match(text) and os.path.exists(os.path.join(root, "codes", text + ".json")):
         return True, f"board entry codes/{text}.json"
     if os.path.exists(os.path.join(root, text)):
         return True, f"path {text}"
-    return False, (f"{text} is not an issue or PR reference (#N), a campaign id under "
-                   "research/campaigns/, a board slug, or a committed path")
+    return False, (
+        f"{text} is not an issue or PR reference (#N), a campaign id under "
+        "research/campaigns/, a board slug, or a committed path"
+    )
 
 
 def _missing(key, rows):
     """Explain an id the ledger does not hold, without reaching for the network."""
     near = sorted(k for k in rows if key in k or k in key)[:5]
     hint = f"; did you mean {', '.join(near)}?" if near else ""
-    print(f"arXiv:{key} not in the ledger ({len(rows)} rows); run a poll "
-          f"covering its submission date first{hint}", file=sys.stderr)
+    print(
+        f"arXiv:{key} not in the ledger ({len(rows)} rows); run a poll covering its submission date first{hint}",
+        file=sys.stderr,
+    )
 
 
 def cmd_review(args, path=LEDGER):
@@ -1073,16 +1133,17 @@ def cmd_review(args, path=LEDGER):
     status, reason = args.status, args.reason
     if status is None:
         if not had_verdict:
-            print(f"arXiv:{key} has no verdict to tag; give --status and --reason "
-                  "with --mechanism", file=sys.stderr)
+            print(f"arXiv:{key} has no verdict to tag; give --status and --reason with --mechanism", file=sys.stderr)
             return 1
         status, reason = prior["status"], prior.get("reason", "")
-    verdict = {"status": status, "reason": reason,
-               "by": args.by or os.environ.get("USER", ""),
-               "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-               "version": row.get("version")}
-    mechanisms = _dedupe_mechanisms(
-        list(prior.get("mechanisms") or []) + list(getattr(args, "mechanism", None) or []))
+    verdict = {
+        "status": status,
+        "reason": reason,
+        "by": args.by or os.environ.get("USER", ""),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "version": row.get("version"),
+    }
+    mechanisms = _dedupe_mechanisms(list(prior.get("mechanisms") or []) + list(getattr(args, "mechanism", None) or []))
     if mechanisms:
         verdict["mechanisms"] = mechanisms
     tagged = f"; mechanisms: {'; '.join(mechanisms)}" if mechanisms else ""
@@ -1116,28 +1177,30 @@ def cmd_tried(args, path=LEDGER):
     outcome = args.outcome.strip()[:REASON_MAX]
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     by = args.by or os.environ.get("USER", "")
-    records = [{"mechanism": m, "where": where, "outcome": outcome, "by": by, "date": today}
-               for m in _dedupe_mechanisms(args.mechanism)]
+    records = [
+        {"mechanism": m, "where": where, "outcome": outcome, "by": by, "date": today}
+        for m in _dedupe_mechanisms(args.mechanism)
+    ]
     tagged = {_mechanism_key(m) for m in (row.get("review") or {}).get("mechanisms") or []}
     untagged = [r["mechanism"] for r in records if _mechanism_key(r["mechanism"]) not in tagged]
     if getattr(args, "dry_run", False):
         for r in records:
-            print(f"dry run, not written -- arXiv:{key}: tried {r['mechanism']} in "
-                  f"{where} ({what}): {outcome}")
+            print(f"dry run, not written -- arXiv:{key}: tried {r['mechanism']} in {where} ({what}): {outcome}")
         return 0
     row["tried"] = list(row.get("tried") or []) + records
     save_ledger(rows, path)
     for r in records:
-        print(f"arXiv:{key} v{row.get('version')}: tried {r['mechanism']} in {where} "
-              f"({what}): {outcome}")
+        print(f"arXiv:{key} v{row.get('version')}: tried {r['mechanism']} in {where} ({what}): {outcome}")
     if untagged:
-        print(f"note: {'; '.join(untagged)} is not among the verdict's mechanisms for "
-              f"arXiv:{key}; this record now names it", file=sys.stderr)
+        print(
+            f"note: {'; '.join(untagged)} is not among the verdict's mechanisms for "
+            f"arXiv:{key}; this record now names it",
+            file=sys.stderr,
+        )
     return 0
 
 
-LIST_KINDS = ("all", "screened-in", "unreviewed", *REVIEW_STATUSES,
-              "mechanisms", "untried", "tried")
+LIST_KINDS = ("all", "screened-in", "unreviewed", *REVIEW_STATUSES, "mechanisms", "untried", "tried")
 
 
 def _select(rows, want):
@@ -1152,8 +1215,7 @@ def _select(rows, want):
         return [r for r in rows.values() if untried_mechanisms(r)]
     if want == "tried":
         return [r for r in rows.values() if r.get("tried")]
-    return [r for r in rows.values()
-            if (r.get("review") or UNREVIEWED).get("status") == want]
+    return [r for r in rows.values() if (r.get("review") or UNREVIEWED).get("status") == want]
 
 
 def _newest_first(rows):
@@ -1171,12 +1233,10 @@ def render_mechanisms(rows, limit):
         return
     ordered = sorted(groups.values(), key=lambda g: (-len(g[1]), _mechanism_key(g[0])))
     backlog = sum(1 for r in rows if untried_mechanisms(r))
-    print(f"\n{len(groups)} mechanisms on {len(rows)} papers, {backlog} papers with one "
-          "not tried here:")
+    print(f"\n{len(groups)} mechanisms on {len(rows)} papers, {backlog} papers with one not tried here:")
     for name, papers in ordered[:limit]:
         key = _mechanism_key(name)
-        waiting = [r for r in papers
-                   if key in {_mechanism_key(u) for u in untried_mechanisms(r)}]
+        waiting = [r for r in papers if key in {_mechanism_key(u) for u in untried_mechanisms(r)}]
         print(f"\n  {name}: {len(papers)} paper(s), {len(waiting)} not tried here")
         for r in _newest_first(papers):
             rv = r.get("review") or UNREVIEWED
@@ -1184,13 +1244,14 @@ def render_mechanisms(rows, limit):
             if rv.get("version"):
                 status += f" (on v{rv['version']}, {rv.get('date', '')})"
             print(f"    arXiv:{r['id']} v{r['version']}  {status}  {r['title']}")
-            hits = [t for t in r.get("tried") or []
-                    if _mechanism_key(t.get("mechanism", "")) == key]
+            hits = [t for t in r.get("tried") or [] if _mechanism_key(t.get("mechanism", "")) == key]
             if not hits:
                 print("        not tried here")
             for t in hits:
-                print(f"        tried in {t.get('where', '')} ({t.get('date', '')}, "
-                      f"{t.get('by', '')}): {t.get('outcome', '')}")
+                print(
+                    f"        tried in {t.get('where', '')} ({t.get('date', '')}, "
+                    f"{t.get('by', '')}): {t.get('outcome', '')}"
+                )
     if len(ordered) > limit:
         print(f"  ... {len(ordered) - limit} more mechanisms (--limit N, --full)")
 
@@ -1204,18 +1265,22 @@ def cmd_list(args, path=LEDGER):
     if wanted:
         keep = [r for r in keep if any(_mechanism_matches(r, m) for m in wanted)]
     if getattr(args, "json", False):
-        payload = {"disclaimer": DISCLAIMER, "ledger": path, "list": want,
-                   "mechanism": wanted,
-                   "rows": [dict(slim_row(r), link=arxiv_link(r),
-                                 mechanisms=mechanisms_of(r),
-                                 untried=untried_mechanisms(r))
-                            for r in _newest_first(keep)]}
+        payload = {
+            "disclaimer": DISCLAIMER,
+            "ledger": path,
+            "list": want,
+            "mechanism": wanted,
+            "rows": [
+                dict(slim_row(r), link=arxiv_link(r), mechanisms=mechanisms_of(r), untried=untried_mechanisms(r))
+                for r in _newest_first(keep)
+            ],
+        }
         print(json.dumps(payload, indent=2, sort_keys=True))
         print(DISCLAIMER, file=sys.stderr)
         return 0
     naming = f" naming {' or '.join(wanted)}" if wanted else ""
     print(f"ledger {path}: {len(rows)} papers, {len(keep)} matching {want}{naming}")
-    limit = 10 ** 6 if args.full else max(1, args.limit)
+    limit = 10**6 if args.full else max(1, args.limit)
     if want == "mechanisms":
         render_mechanisms(keep, limit)
     else:
@@ -1229,46 +1294,55 @@ def _has_mechanism(args):
 
 def main(argv=None):
     """Poll arXiv, list the ledger, record a verdict, or record what was tried."""
-    p = argparse.ArgumentParser(
-        prog="arxiv_watch",
-        description="poll arXiv for possibly board-relevant qLDPC papers")
-    p.add_argument("--days", type=int, default=None,
-                   help="how far back to look (default: since the previous "
-                        f"poll plus {LAG_SLACK_DAYS} days of slack)")
-    p.add_argument("--pages", type=int, default=10,
-                   help="page cap per poll (default 10)")
-    p.add_argument("--batch", type=int, default=100,
-                   help="entries per page (default 100)")
-    p.add_argument("--limit", type=int, default=10,
-                   help="rows per section (default 10)")
+    p = argparse.ArgumentParser(prog="arxiv_watch", description="poll arXiv for possibly board-relevant qLDPC papers")
+    p.add_argument(
+        "--days",
+        type=int,
+        default=None,
+        help=f"how far back to look (default: since the previous poll plus {LAG_SLACK_DAYS} days of slack)",
+    )
+    p.add_argument("--pages", type=int, default=10, help="page cap per poll (default 10)")
+    p.add_argument("--batch", type=int, default=100, help="entries per page (default 100)")
+    p.add_argument("--limit", type=int, default=10, help="rows per section (default 10)")
     p.add_argument("--full", action="store_true", help="print every row")
-    p.add_argument("--abstracts", action="store_true",
-                   help="include the first 400 characters of each abstract")
-    p.add_argument("--dry-run", action="store_true",
-                   help="poll, review, or record without writing the ledger")
-    p.add_argument("--json", action="store_true",
-                   help="emit the new and updated rows as JSON (with --list, the "
-                        "matching rows)")
+    p.add_argument("--abstracts", action="store_true", help="include the first 400 characters of each abstract")
+    p.add_argument("--dry-run", action="store_true", help="poll, review, or record without writing the ledger")
+    p.add_argument(
+        "--json", action="store_true", help="emit the new and updated rows as JSON (with --list, the matching rows)"
+    )
     p.add_argument("--ledger", default=LEDGER)
-    p.add_argument("--list", nargs="?", const="unreviewed", default=None,
-                   choices=list(LIST_KINDS),
-                   help="print ledger rows instead of polling")
-    p.add_argument("--review", default=None,
-                   help="record a verdict on this arXiv id instead of polling")
+    p.add_argument(
+        "--list",
+        nargs="?",
+        const="unreviewed",
+        default=None,
+        choices=list(LIST_KINDS),
+        help="print ledger rows instead of polling",
+    )
+    p.add_argument("--review", default=None, help="record a verdict on this arXiv id instead of polling")
     p.add_argument("--status", default=None, choices=list(REVIEW_STATUSES))
-    p.add_argument("--reason", default=None,
-                   help="a brief reason, required with --review")
+    p.add_argument("--reason", default=None, help="a brief reason, required with --review")
     p.add_argument("--by", default="", help="who reviewed it (default $USER)")
-    p.add_argument("--mechanism", action="append", default=None, metavar="TAG",
-                   help="with --review, a transferable idea the paper carries (repeatable); "
-                        "with --tried, the one applied; with --list, keep only papers "
-                        "naming a mechanism containing TAG")
-    p.add_argument("--tried", default=None, metavar="ID",
-                   help="record that a mechanism of this arXiv id was applied here; needs "
-                        "--mechanism, --where and --outcome")
-    p.add_argument("--where", default=None,
-                   help="where it was applied: an issue or PR (#N), a campaign id, a board "
-                        "slug, or a committed path")
+    p.add_argument(
+        "--mechanism",
+        action="append",
+        default=None,
+        metavar="TAG",
+        help="with --review, a transferable idea the paper carries (repeatable); "
+        "with --tried, the one applied; with --list, keep only papers "
+        "naming a mechanism containing TAG",
+    )
+    p.add_argument(
+        "--tried",
+        default=None,
+        metavar="ID",
+        help="record that a mechanism of this arXiv id was applied here; needs --mechanism, --where and --outcome",
+    )
+    p.add_argument(
+        "--where",
+        default=None,
+        help="where it was applied: an issue or PR (#N), a campaign id, a board slug, or a committed path",
+    )
     p.add_argument("--outcome", default=None, help="how it went, in a sentence")
     args = p.parse_args(argv)
 
@@ -1294,10 +1368,10 @@ def main(argv=None):
         if args.where is not None or args.outcome is not None:
             p.error("--where and --outcome only apply with --tried")
         tag_only = args.status is None and args.reason is None and _has_mechanism(args)
-        if not tag_only and (args.status is None or args.reason is None
-                             or not args.reason.strip()):
-            p.error("--review requires --status and a non-empty --reason, or --mechanism "
-                    "alone to tag the standing verdict")
+        if not tag_only and (args.status is None or args.reason is None or not args.reason.strip()):
+            p.error(
+                "--review requires --status and a non-empty --reason, or --mechanism alone to tag the standing verdict"
+            )
         return cmd_review(args, args.ledger)
     if args.status is not None or args.reason is not None:
         p.error("--status and --reason only apply with --review")
@@ -1307,33 +1381,49 @@ def main(argv=None):
     ledger = load_ledger(args.ledger)
     before = len(ledger)
     days, why = window_days(ledger, args.days)
-    new, updated, ledger, scan = poll(days, ledger, batch=max(1, args.batch),
-                                      pages=max(1, args.pages))
+    new, updated, ledger, scan = poll(days, ledger, batch=max(1, args.batch), pages=max(1, args.pages))
     if not scan["complete"]:
-        print(f"WARNING: window truncated -- {scan['stopped']}; oldest entry "
-              f"scanned was updated {scan['oldest_updated']}. Papers older "
-              f"than that in the window were not seen: rerun with a larger "
-              f"--pages or a narrower --days.", file=sys.stderr)
+        print(
+            f"WARNING: window truncated -- {scan['stopped']}; oldest entry "
+            f"scanned was updated {scan['oldest_updated']}. Papers older "
+            f"than that in the window were not seen: rerun with a larger "
+            f"--pages or a narrower --days.",
+            file=sys.stderr,
+        )
     if args.json:
-        print(json.dumps({"disclaimer": DISCLAIMER, "query": build_query(),
-                          "screen": criteria_fingerprint(),
-                          "screen_terms": SCREEN_TERMS, "window": why,
-                          "scan": scan, "new": new, "updated": updated},
-                         indent=2, sort_keys=True))
+        print(
+            json.dumps(
+                {
+                    "disclaimer": DISCLAIMER,
+                    "query": build_query(),
+                    "screen": criteria_fingerprint(),
+                    "screen_terms": SCREEN_TERMS,
+                    "window": why,
+                    "scan": scan,
+                    "new": new,
+                    "updated": updated,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
         print(DISCLAIMER, file=sys.stderr)
     else:
-        limit = 10 ** 6 if args.full else max(1, args.limit)
+        limit = 10**6 if args.full else max(1, args.limit)
         picked = sum(1 for r in new + updated if r["triage"]["screened_in"])
-        print(f"arXiv watch, last {days} days ({why}): {len(new)} new, "
-              f"{len(updated)} updated, {picked} screened in for review "
-              f"({before} papers in the ledger before this poll)")
+        print(
+            f"arXiv watch, last {days} days ({why}): {len(new)} new, "
+            f"{len(updated)} updated, {picked} screened in for review "
+            f"({before} papers in the ledger before this poll)"
+        )
         render(new, "new", limit, args.abstracts)
-        render(updated, "new versions of papers already seen", limit,
-               args.abstracts)
+        render(updated, "new versions of papers already seen", limit, args.abstracts)
         if new or updated:
             print(f"\n{DISCLAIMER}.")
-            print("record a verdict: python research/arxiv_watch.py --review "
-                  "<id> --status relevant|not-relevant|uncertain --reason '...'")
+            print(
+                "record a verdict: python research/arxiv_watch.py --review "
+                "<id> --status relevant|not-relevant|uncertain --reason '...'"
+            )
     if not args.dry_run:
         save_ledger(ledger, args.ledger)
     return 0

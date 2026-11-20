@@ -23,16 +23,15 @@ import os
 import subprocess
 import sys
 import time
-import json
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
 sys.path.insert(0, os.path.join(ROOT, "research", "kit"))
 
-import gf2  # noqa: E402
 import heuristic_distance as HD  # noqa: E402
 from check_certs import checks_sha256  # noqa: E402
 from qedist import challenge_to_qedist, find_qedist, solver_string  # noqa: E402
@@ -64,8 +63,7 @@ def qedist_root(path=None):
     return find_qedist()
 
 
-def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
-            symmetries=True):
+def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None, symmetries=True):
     if doc.get("code_type") != "CSS":
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
@@ -78,11 +76,10 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
 
     prefix = qedist_root(root)
     if prefix is None:
-        raise QEDistCertifyError(
-            "QEDist is not installed; set QEDIST or install from " + QEDIST_REPO
-        )
+        raise QEDistCertifyError("QEDist is not installed; set QEDIST or install from " + QEDIST_REPO)
 
     import tempfile
+
     tmp = Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="qedist-cert-"))
     try:
         # Tanner-graph symmetries cut the search roots to one per orbit
@@ -94,12 +91,18 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
         input_path.write_text(json.dumps(inp, indent=2) + "\n")
         out_dir = tmp / "run"
         cmd = prefix + [
-            "certify", str(input_path),
-            "--profile", "css",
-            "--cutoff", str(cutoff),
-            "--seconds-per-shard", str(float(tlim)),
-            "--workers", str(int(threads)),
-            "--out", str(out_dir),
+            "certify",
+            str(input_path),
+            "--profile",
+            "css",
+            "--cutoff",
+            str(cutoff),
+            "--seconds-per-shard",
+            str(float(tlim)),
+            "--workers",
+            str(int(threads)),
+            "--out",
+            str(out_dir),
         ]
         if out_dir.exists():
             cmd.insert(-2, "--resume")
@@ -116,14 +119,13 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
             input_path.write_text(json.dumps(inp, indent=2) + "\n")
             if out_dir.exists():
                 import shutil
+
                 shutil.rmtree(out_dir)
             cmd = [a for a in cmd if a != "--resume"]
             proc = subprocess.run(cmd, capture_output=True, text=True)
         wall = round(time.time() - t0, 1)
         if proc.returncode not in OK_EXITS:
-            raise QEDistCertifyError(
-                f"QEDist failed (exit {proc.returncode}): {(proc.stderr or proc.stdout)[-300:]}"
-            )
+            raise QEDistCertifyError(f"QEDist failed (exit {proc.returncode}): {(proc.stderr or proc.stdout)[-300:]}")
         # audit (its exit code mirrors the run's: 75 for an incomplete search is not a failure)
         aproc = subprocess.run(prefix + ["audit", str(out_dir)], capture_output=True, text=True)
         if aproc.returncode not in OK_EXITS:
@@ -163,8 +165,12 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
                     f"{side} side: the tool's weight-{ub} vector is not a nontrivial logical "
                     f"of weight {ub} (weight {weight}, valid {ok})"
                 )
-            blk.update(exact=False, status="SAT", witness=[int(x) for x in witness],
-                       note=f"REFUTED: logical of weight {ub} exists")
+            blk.update(
+                exact=False,
+                status="SAT",
+                witness=[int(x) for x in witness],
+                note=f"REFUTED: logical of weight {ub} exists",
+            )
             cert_sides[side] = blk
             continue
         if lb is not None and int(lb) > claim:
@@ -175,9 +181,13 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
             blk.update(exact=True, status="UNSAT", note=f"no logical < {claim} exists")
             cert_sides[side] = blk
             continue
-        proved = int(lb) if lb is not None and int(lb) > 1 else None   # a bound of 1 is the trivial one
-        blk.update(exact=False, status="TIMEOUT", lower_bound=proved,
-                   note=(f"lower bound {proved}" if proved is not None else "nothing proved"))
+        proved = int(lb) if lb is not None and int(lb) > 1 else None  # a bound of 1 is the trivial one
+        blk.update(
+            exact=False,
+            status="TIMEOUT",
+            lower_bound=proved,
+            note=(f"lower bound {proved}" if proved is not None else "nothing proved"),
+        )
         cert_sides[side] = blk
 
     overall = bool(cert_sides) and all(b.get("exact") for b in cert_sides.values())
@@ -188,10 +198,13 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
     verification = {
         "level": LEVEL,
         "note": "QEDist's lower bound is exhaustive search inside its kernel "
-                "(tree search with bounds and symmetries); the vector it returned "
-                "was re-verified by verify/heuristic_distance.py. Solver verdict only. "
-                + (f"{n_sym} Tanner-graph symmetry generators supplied and verified by the tool."
-                   if n_sym else "No symmetry generators supplied."),
+        "(tree search with bounds and symmetries); the vector it returned "
+        "was re-verified by verify/heuristic_distance.py. Solver verdict only. "
+        + (
+            f"{n_sym} Tanner-graph symmetry generators supplied and verified by the tool."
+            if n_sym
+            else "No symmetry generators supplied."
+        ),
     }
     rec = {
         "name": doc.get("name"),
@@ -272,7 +285,6 @@ def run_ladder(doc, *, root=None, budget=60.0, threads=1, kmin=None):
 
 
 def main(argv=None):
-    import argparse
 
     ap = argparse.ArgumentParser(description="Certify a board entry with QEDist")
     ap.add_argument("path")

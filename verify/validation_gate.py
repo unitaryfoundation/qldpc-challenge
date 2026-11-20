@@ -43,6 +43,7 @@ the two agree).
     uv run python verify/validation_gate.py                 # exit 0 iff every part passes
     uv run python verify/validation_gate.py --update-golden # record the current verdicts (reviewable diff)
 """
+
 import argparse
 import copy
 import hashlib
@@ -64,29 +65,56 @@ GOLDEN_DIR = os.path.join(_HERE, "fixtures", "validation_gate", "golden")
 CODES = os.path.join(_ROOT, "codes")
 # Seeded baselines and the mitten (Bhardwaj et al.) and ZSZ lifted-product
 # reconstructions: the entries whose verdicts a changed verifier must reproduce.
-REPRODUCTIONS = ("7-1-3", "72-12-6", "144-12-12", "100-20-8", "120-24-8", "150-30-10",
-                 "160-32-10", "160-36-6", "170-34-8", "180-36-8", "190-38-8")
+REPRODUCTIONS = (
+    "7-1-3",
+    "72-12-6",
+    "144-12-12",
+    "100-20-8",
+    "120-24-8",
+    "150-30-10",
+    "160-32-10",
+    "160-36-6",
+    "170-34-8",
+    "180-36-8",
+    "190-38-8",
+)
 # Mirror of research/kit/prescreen.py KINDS: which failed checks say the code
 # is inadmissible as opposed to the document being wrong.
 KINDS = {
-    "construction": ("tanner_connected", "stabilizer_group_connected",
-                     "css_commutation", "stabilizer_commutation",
-                     "k_at_least_1"),
+    "construction": (
+        "tanner_connected",
+        "stabilizer_group_connected",
+        "css_commutation",
+        "stabilizer_commutation",
+        "k_at_least_1",
+    ),
     "weight": ("check_weight_is_ldpc",),
-    "typing": ("stabilizer_code_is_not_css",
-               "stabilizer_code_is_not_locally_css"),
-    "layout": ("coordinates_cover_all_qubits", "coordinates_uniform_dimension",
-               "interaction_radius_within_claim", "site_occupancy_within_layers",
-               "site_spacing_at_least_one", "modules_cover_all_qubits"),
-    "benchmark": ("benchmark_candidate_data_qubits", "benchmark_qubit_totals",
-                  "benchmark_baseline_on_board", "benchmark_baseline_k",
-                  "benchmark_baseline_data_qubits"),
-    "architecture": ("architecture_gadget_fault_distance", "architecture_gadget_data_qubits",
-                     "architecture_qubit_totals", "architecture_partner_on_board",
-                     "architecture_magic_state_gain",
-                     "architecture_blocks_cover_logical_qubits",
-                     "architecture_physical_qubits_cover_blocks",
-                     "architecture_factory_footprint"),
+    "typing": ("stabilizer_code_is_not_css", "stabilizer_code_is_not_locally_css"),
+    "layout": (
+        "coordinates_cover_all_qubits",
+        "coordinates_uniform_dimension",
+        "interaction_radius_within_claim",
+        "site_occupancy_within_layers",
+        "site_spacing_at_least_one",
+        "modules_cover_all_qubits",
+    ),
+    "benchmark": (
+        "benchmark_candidate_data_qubits",
+        "benchmark_qubit_totals",
+        "benchmark_baseline_on_board",
+        "benchmark_baseline_k",
+        "benchmark_baseline_data_qubits",
+    ),
+    "architecture": (
+        "architecture_gadget_fault_distance",
+        "architecture_gadget_data_qubits",
+        "architecture_qubit_totals",
+        "architecture_partner_on_board",
+        "architecture_magic_state_gain",
+        "architecture_blocks_cover_logical_qubits",
+        "architecture_physical_qubits_cover_blocks",
+        "architecture_factory_footprint",
+    ),
     "other": ("verifier_ran",),
 }
 CODE_KINDS = frozenset({"construction", "weight"})
@@ -97,8 +125,9 @@ def kind_of(check, detail=""):
     for kind, names in KINDS.items():
         if check in names:
             return kind
-    if check == "schema_valid" and any(part.startswith("checks/") and "is too long" in part
-                                       for part in detail.split("; ")):
+    if check == "schema_valid" and any(
+        part.startswith("checks/") and "is too long" in part for part in detail.split("; ")
+    ):
         return "weight"
     if check.startswith(("distance_", "d_matches_")):
         return "witness"
@@ -106,6 +135,7 @@ def kind_of(check, detail=""):
 
 
 # -- solved cases ---------------------------------------------------------------
+
 
 def _lightest_logical(H_ker, H_row, n):
     """Brute force the lightest vector in ker(H_ker) outside row(H_row); tiny n only."""
@@ -132,15 +162,30 @@ def css_doc(name, HX, HZ, d, *, construction, family="other", confidence="exact"
     k = n - gf2.rank(HX) - gf2.rank(HZ)
     wx = _lightest_logical(HZ, HX, n)
     wz = _lightest_logical(HX, HZ, n)
-    return {"schema_version": "0.2", "name": name, "code_type": "CSS", "n": n, "k": int(k),
-            "checks": {"X": [list(map(int, np.flatnonzero(r))) for r in HX],
-                       "Z": [list(map(int, np.flatnonzero(r))) for r in HZ]},
-            "distance": {"d": d, "X": {"value": len(wx), "confidence": confidence, "witness": wx},
-                         "Z": {"value": len(wz), "confidence": confidence, "witness": wz}},
-            "provenance": {"authors": ["validation gate"], "origin": "baseline",
-                           "construction": construction, "date": "2026-10-23",
-                           "references": ["arXiv:2610.31352"]},
-            "family": family}
+    return {
+        "schema_version": "0.2",
+        "name": name,
+        "code_type": "CSS",
+        "n": n,
+        "k": int(k),
+        "checks": {
+            "X": [list(map(int, np.flatnonzero(r))) for r in HX],
+            "Z": [list(map(int, np.flatnonzero(r))) for r in HZ],
+        },
+        "distance": {
+            "d": d,
+            "X": {"value": len(wx), "confidence": confidence, "witness": wx},
+            "Z": {"value": len(wz), "confidence": confidence, "witness": wz},
+        },
+        "provenance": {
+            "authors": ["validation gate"],
+            "origin": "baseline",
+            "construction": construction,
+            "date": "2026-10-23",
+            "references": ["arXiv:2610.31352"],
+        },
+        "family": family,
+    }
 
 
 def steane():
@@ -148,9 +193,14 @@ def steane():
     M = np.zeros((3, 7), dtype=np.int8)
     for i, s in enumerate(H):
         M[i, s] = 1
-    return css_doc("[[7,1,3]] Steane code (validation gate)", M, M, 3,
-                   construction="Steane code: HX = HZ = the Hamming(7,4) parity-check matrix",
-                   family="topological")
+    return css_doc(
+        "[[7,1,3]] Steane code (validation gate)",
+        M,
+        M,
+        3,
+        construction="Steane code: HX = HZ = the Hamming(7,4) parity-check matrix",
+        family="topological",
+    )
 
 
 def shor():
@@ -160,14 +210,24 @@ def shor():
     HZ = np.zeros((6, 9), dtype=np.int8)
     for i, (a, b) in enumerate([(0, 1), (1, 2), (3, 4), (4, 5), (6, 7), (7, 8)]):
         HZ[i, [a, b]] = 1
-    return css_doc("[[9,1,3]] Shor code (validation gate)", HX, HZ, 3,
-                   construction="Shor code: three bit-flip repetition blocks under a phase-flip repetition code")
+    return css_doc(
+        "[[9,1,3]] Shor code (validation gate)",
+        HX,
+        HZ,
+        3,
+        construction="Shor code: three bit-flip repetition blocks under a phase-flip repetition code",
+    )
 
 
 def four_two_two():
     M = np.ones((1, 4), dtype=np.int8)
-    return css_doc("[[4,2,2]] code (validation gate)", M, M, 2,
-                   construction="the smallest error-detecting CSS code: one X check and one Z check on four qubits")
+    return css_doc(
+        "[[4,2,2]] code (validation gate)",
+        M,
+        M,
+        2,
+        construction="the smallest error-detecting CSS code: one X check and one Z check on four qubits",
+    )
 
 
 SOLVED = (("Steane [[7,1,3]]", steane, 1, 3), ("Shor [[9,1,3]]", shor, 1, 3), ("[[4,2,2]]", four_two_two, 2, 2))
@@ -197,16 +257,26 @@ def shor_with_hadamards(qubits=(0, 4)):
     wit = {"X": [], "Z": []}
     for q in a["distance"]["X"]["witness"]:
         wit["Z" if q in qubits else "X"].append(q)
-    return {"schema_version": "0.4", "name": "Shor code under a Hadamard on two qubits (validation gate)",
-            "code_type": "stabilizer", "n": a["n"], "k": a["k"], "checks": {"S": gens},
-            "distance": {"d": 3, "P": {"value": 3, "confidence": "upper_bound",
-                                       "witness": {k: sorted(v) for k, v in wit.items()}}},
-            "provenance": a["provenance"], "family": "other"}
+    return {
+        "schema_version": "0.4",
+        "name": "Shor code under a Hadamard on two qubits (validation gate)",
+        "code_type": "stabilizer",
+        "n": a["n"],
+        "k": a["k"],
+        "checks": {"S": gens},
+        "distance": {
+            "d": 3,
+            "P": {"value": 3, "confidence": "upper_bound", "witness": {k: sorted(v) for k, v in wit.items()}},
+        },
+        "provenance": a["provenance"],
+        "family": "other",
+    }
 
 
 def _failed(rep):
-    return [(c["check"], c.get("detail", "")) for c in rep["checks"]
-            if not c["ok"] and c["check"] != "distance_not_refuted"]
+    return [
+        (c["check"], c.get("detail", "")) for c in rep["checks"] if not c["ok"] and c["check"] != "distance_not_refuted"
+    ]
 
 
 def run_solved(tlim=60.0):
@@ -216,31 +286,59 @@ def run_solved(tlim=60.0):
         rep = V.verify(doc, refute=False)
         cert = certify.certify(doc, tlim=tlim)
         sides = {s: cert["sides"].get(s, {}).get("exact") for s in ("X", "Z")}
-        ok = (rep["ok"] and rep["computed"]["k"] == k and doc["k"] == k and doc["distance"]["X"]["value"] == d
-              and doc["distance"]["Z"]["value"] == d and cert["d_exact"] and all(sides.values()))
-        out.append({"case": label, "ok": bool(ok), "verifier_ok": rep["ok"], "k": rep["computed"].get("k"),
-                    "d_witnessed": min(doc["distance"]["X"]["value"], doc["distance"]["Z"]["value"]),
-                    "certified_exact": bool(cert["d_exact"]), "failed": _failed(rep)})
+        ok = (
+            rep["ok"]
+            and rep["computed"]["k"] == k
+            and doc["k"] == k
+            and doc["distance"]["X"]["value"] == d
+            and doc["distance"]["Z"]["value"] == d
+            and cert["d_exact"]
+            and all(sides.values())
+        )
+        out.append(
+            {
+                "case": label,
+                "ok": bool(ok),
+                "verifier_ok": rep["ok"],
+                "k": rep["computed"].get("k"),
+                "d_witnessed": min(doc["distance"]["X"]["value"], doc["distance"]["Z"]["value"]),
+                "certified_exact": bool(cert["d_exact"]),
+                "failed": _failed(rep),
+            }
+        )
     rep = V.verify(direct_sum_of_two_steane(), refute=False)
     failed = _failed(rep)
     names = {c for c, _ in failed}
-    out.append({"case": "direct sum of two Steane codes is refused as disconnected", "failed": failed,
-                "ok": (not rep["ok"]) and "tanner_connected" in names
-                and all(kind_of(c, dd) == "construction" for c, dd in failed)})
+    out.append(
+        {
+            "case": "direct sum of two Steane codes is refused as disconnected",
+            "failed": failed,
+            "ok": (not rep["ok"])
+            and "tanner_connected" in names
+            and all(kind_of(c, dd) == "construction" for c, dd in failed),
+        }
+    )
     image = shor_with_hadamards()
     rep = V.verify(image, refute=False)
     failed = _failed(rep)
     base = shor()
     fp = V.css_fingerprint(V._matrix(base["checks"]["X"], 9), V._matrix(base["checks"]["Z"], 9))
     eq = rep.get("css_equivalent") or {}
-    out.append({"case": "Shor code under a local Hadamard is sent back as its CSS image", "failed": failed,
-                "image_named": fp in (eq.get("fingerprints") or []),
-                "ok": (not rep["ok"]) and "stabilizer_code_is_not_locally_css" in {c for c, _ in failed}
-                and fp in (eq.get("fingerprints") or [])})
+    out.append(
+        {
+            "case": "Shor code under a local Hadamard is sent back as its CSS image",
+            "failed": failed,
+            "image_named": fp in (eq.get("fingerprints") or []),
+            "ok": (not rep["ok"])
+            and "stabilizer_code_is_not_locally_css" in {c for c, _ in failed}
+            and fp in (eq.get("fingerprints") or []),
+        }
+    )
     return out
 
 
 # -- broken artifacts ------------------------------------------------------------
+
 
 def _fixture_72():
     with open(os.path.join(_HERE, "fixtures", "72-6-6.json"), encoding="utf-8") as f:
@@ -249,39 +347,54 @@ def _fixture_72():
 
 def broken_construction():
     doc = steane()
-    doc["checks"]["Z"][0] = [3, 4, 5]            # drops a qubit: the checks no longer commute
+    doc["checks"]["Z"][0] = [3, 4, 5]  # drops a qubit: the checks no longer commute
     return doc
 
 
 def broken_weight():
     n = 40
-    HX = np.ones((1, n), dtype=np.int8)           # one check on all 40 qubits, over the cap of 32
+    HX = np.ones((1, n), dtype=np.int8)  # one check on all 40 qubits, over the cap of 32
     HZ = np.zeros((n // 2, n), dtype=np.int8)
     for i in range(n // 2):
         HZ[i, [2 * i, 2 * i + 1]] = 1
-    return css_doc("a check over the weight cap (validation gate)", HX, HZ, 2,
-                   construction="one weight-40 X check against 20 weight-2 Z checks", confidence="upper_bound")
+    return css_doc(
+        "a check over the weight cap (validation gate)",
+        HX,
+        HZ,
+        2,
+        construction="one weight-40 X check against 20 weight-2 Z checks",
+        confidence="upper_bound",
+    )
 
 
 def broken_packaging():
     doc = steane()
-    del doc["provenance"]                         # a required block is missing
+    del doc["provenance"]  # a required block is missing
     return doc
 
 
 def broken_typing():
     a = steane()
     gens = [{"X": s, "Z": []} for s in a["checks"]["X"]] + [{"X": [], "Z": s} for s in a["checks"]["Z"]]
-    return {"schema_version": "0.4", "name": a["name"], "code_type": "stabilizer", "n": 7, "k": 1,
-            "checks": {"S": gens},               # every generator pure: a CSS code typed stabilizer
-            "distance": {"d": 3, "P": {"value": 3, "confidence": "upper_bound",
-                                       "witness": {"X": a["distance"]["X"]["witness"], "Z": []}}},
-            "provenance": a["provenance"], "family": "other"}
+    return {
+        "schema_version": "0.4",
+        "name": a["name"],
+        "code_type": "stabilizer",
+        "n": 7,
+        "k": 1,
+        "checks": {"S": gens},  # every generator pure: a CSS code typed stabilizer
+        "distance": {
+            "d": 3,
+            "P": {"value": 3, "confidence": "upper_bound", "witness": {"X": a["distance"]["X"]["witness"], "Z": []}},
+        },
+        "provenance": a["provenance"],
+        "family": "other",
+    }
 
 
 def broken_witness():
     doc = steane()
-    doc["distance"]["X"]["witness"] = [0, 1]      # not in ker(H_Z): no logical at all
+    doc["distance"]["X"]["witness"] = [0, 1]  # not in ker(H_Z): no logical at all
     doc["distance"]["X"]["value"] = 2
     doc["distance"]["d"] = 2
     return doc
@@ -290,7 +403,7 @@ def broken_witness():
 def broken_layout():
     doc = _fixture_72()
     coords = doc["locality"]["coordinates"]
-    coords[1] = list(coords[0])                   # two qubits on one site, one layer declared
+    coords[1] = list(coords[0])  # two qubits on one site, one layer declared
     doc["locality"]["layers"] = 1
     return doc
 
@@ -298,13 +411,15 @@ def broken_layout():
 def broken_benchmark():
     doc = steane()
     doc["schema_version"] = "0.6"
-    doc["benchmark"] = {                          # a comparison whose candidate is not this code
+    doc["benchmark"] = {  # a comparison whose candidate is not this code
         "hardware_track": "2d-nearest-neighbor",
         "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
         "surface_baseline": {"patches": {"d": 3}},
         "decoder": {"name": "pymatching"},
-        "resources": {"candidate": {"data_qubits": 9, "ancilla_qubits": 8},   # 9 data qubits, n = 7
-                      "baseline": {"data_qubits": 9, "ancilla_qubits": 8}},
+        "resources": {
+            "candidate": {"data_qubits": 9, "ancilla_qubits": 8},  # 9 data qubits, n = 7
+            "baseline": {"data_qubits": 9, "ancilla_qubits": 8},
+        },
         "logical_error_rate": {"target": 0.01, "candidate": 0.005, "per": "round"},
         "status": "documented",
         "method": "validation gate: the candidate's data-qubit count is not n",
@@ -315,36 +430,45 @@ def broken_benchmark():
 def broken_architecture():
     doc = steane()
     doc["schema_version"] = "0.7"
-    doc["benchmark"] = {                          # a consistent Tier B block to build on
+    doc["benchmark"] = {  # a consistent Tier B block to build on
         "hardware_track": "2d-nearest-neighbor",
         "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
         "surface_baseline": {"patches": {"d": 3}},
         "decoder": {"name": "pymatching"},
-        "resources": {"candidate": {"data_qubits": 7, "ancilla_qubits": 6},
-                      "baseline": {"data_qubits": 9, "ancilla_qubits": 8}},
+        "resources": {
+            "candidate": {"data_qubits": 7, "ancilla_qubits": 6},
+            "baseline": {"data_qubits": 9, "ancilla_qubits": 8},
+        },
         "logical_error_rate": {"target": 0.01, "candidate": 0.005, "per": "round"},
         "status": "documented",
         "method": "validation gate: the comparison the architecture block builds on",
     }
-    doc["architecture"] = {                       # a gadget claiming more protection than the code has
-        "gadgets": [{"kind": "lattice-surgery",
-                     "operation": "joint Z Z measurement across two blocks",
-                     "blocks": 2, "fault_distance": 5,              # d = 3
-                     "resources": {"data_qubits": 14, "ancilla_qubits": 12, "rounds": 5}}],
+    doc["architecture"] = {  # a gadget claiming more protection than the code has
+        "gadgets": [
+            {
+                "kind": "lattice-surgery",
+                "operation": "joint Z Z measurement across two blocks",
+                "blocks": 2,
+                "fault_distance": 5,  # d = 3
+                "resources": {"data_qubits": 14, "ancilla_qubits": 12, "rounds": 5},
+            }
+        ],
         "status": "documented",
         "method": "validation gate: the gadget's fault distance exceeds d",
     }
     return doc
 
 
-BROKEN = (("construction", broken_construction, "css_commutation"),
-          ("weight", broken_weight, None),
-          ("packaging", broken_packaging, "schema_valid"),
-          ("typing", broken_typing, "stabilizer_code_is_not_css"),
-          ("witness", broken_witness, "distance_X_witness"),
-          ("layout", broken_layout, "site_occupancy_within_layers"),
-          ("benchmark", broken_benchmark, "benchmark_candidate_data_qubits"),
-          ("architecture", broken_architecture, "architecture_gadget_fault_distance"))
+BROKEN = (
+    ("construction", broken_construction, "css_commutation"),
+    ("weight", broken_weight, None),
+    ("packaging", broken_packaging, "schema_valid"),
+    ("typing", broken_typing, "stabilizer_code_is_not_css"),
+    ("witness", broken_witness, "distance_X_witness"),
+    ("layout", broken_layout, "site_occupancy_within_layers"),
+    ("benchmark", broken_benchmark, "benchmark_candidate_data_qubits"),
+    ("architecture", broken_architecture, "architecture_gadget_fault_distance"),
+)
 
 
 def run_broken():
@@ -354,14 +478,18 @@ def run_broken():
         failed = _failed(rep)
         kinds = {kind_of(c, d) for c, d in failed}
         names = {c for c, _ in failed}
-        ok = (not rep["ok"]) and kind in kinds and (check is None or check in names) \
+        ok = (
+            (not rep["ok"])
+            and kind in kinds
+            and (check is None or check in names)
             and ((kind in CODE_KINDS) == any(k in CODE_KINDS for k in kinds))
-        out.append({"kind": kind, "expected_check": check, "ok": bool(ok), "failed": failed,
-                    "kinds": sorted(kinds)})
+        )
+        out.append({"kind": kind, "expected_check": check, "ok": bool(ok), "failed": failed, "kinds": sorted(kinds)})
     return out
 
 
 # -- published reproductions -----------------------------------------------------
+
 
 def _doc_sha(path):
     with open(path, "rb") as f:
@@ -399,8 +527,7 @@ def run_reproductions(update=False):
             golden = json.load(f)
         same_bytes = golden.get("doc_sha256") == sha
         same_verdict = json.dumps(golden["report"], sort_keys=True, indent=1) == text
-        diff = [c["check"] for c in rep["checks"]
-                if c not in golden["report"].get("checks", [])]
+        diff = [c["check"] for c in rep["checks"] if c not in golden["report"].get("checks", [])]
         changed = f"; changed checks: {', '.join(diff[:6])}" if diff else ""
         if same_verdict and same_bytes:
             out.append({"slug": slug, "status": "match", "ok": True})
@@ -408,25 +535,47 @@ def run_reproductions(update=False):
             # The gate holds the verifier to its committed verdicts. A verdict
             # reproduced byte for byte, fingerprint included, is that claim
             # kept, whatever else in the entry file moved (#5929 -> #6241).
-            out.append({"slug": slug, "status": "match_entry_changed", "ok": True,
-                        "detail": "the entry's bytes differ from when the golden verdict was recorded "
-                                  "and the verdict on them is identical; the next --update-golden "
-                                  "refreshes the recorded hash"})
+            out.append(
+                {
+                    "slug": slug,
+                    "status": "match_entry_changed",
+                    "ok": True,
+                    "detail": "the entry's bytes differ from when the golden verdict was recorded "
+                    "and the verdict on them is identical; the next --update-golden "
+                    "refreshes the recorded hash",
+                }
+            )
         elif same_bytes:
-            out.append({"slug": slug, "status": "drift", "ok": False,
-                        "detail": "the verifier's verdict differs from the committed one" + changed})
+            out.append(
+                {
+                    "slug": slug,
+                    "status": "drift",
+                    "ok": False,
+                    "detail": "the verifier's verdict differs from the committed one" + changed,
+                }
+            )
         else:
-            out.append({"slug": slug, "status": "entry_changed", "ok": False,
-                        "detail": "the entry's bytes and the verdict on them both differ from the golden"
-                                  + changed + "; the entry's change or a verifier change moved the "
-                                  "verdict, so rule out the verifier before re-recording with "
-                                  "--update-golden"})
+            out.append(
+                {
+                    "slug": slug,
+                    "status": "entry_changed",
+                    "ok": False,
+                    "detail": "the entry's bytes and the verdict on them both differ from the golden"
+                    + changed
+                    + "; the entry's change or a verifier change moved the "
+                    "verdict, so rule out the verifier before re-recording with "
+                    "--update-golden",
+                }
+            )
     return out
 
 
 def run(update_golden=False, tlim=60.0):
-    return {"solved": run_solved(tlim), "broken": run_broken(),
-            "reproductions": run_reproductions(update=update_golden)}
+    return {
+        "solved": run_solved(tlim),
+        "broken": run_broken(),
+        "reproductions": run_reproductions(update=update_golden),
+    }
 
 
 def ok(results):
@@ -435,8 +584,11 @@ def ok(results):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--update-golden", action="store_true",
-                    help="record the current verdicts of the reproduction set as the golden files")
+    ap.add_argument(
+        "--update-golden",
+        action="store_true",
+        help="record the current verdicts of the reproduction set as the golden files",
+    )
     ap.add_argument("--tlim", type=float, default=60.0, help="MILP time limit for the solved cases")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet", action="store_true")
@@ -446,16 +598,26 @@ def main(argv=None):
         print(json.dumps(results, indent=1, sort_keys=True))
     elif not a.quiet or not ok(results):
         for r in results["solved"]:
-            print(f"solved      {'ok  ' if r['ok'] else 'FAIL'} {r['case']}"
-                  + (f" (k={r.get('k')}, d<={r.get('d_witnessed')}, exact={r.get('certified_exact')})"
-                     if "k" in r else "")
-                  + ("" if r["ok"] else f" failed checks: {r['failed']}"))
+            print(
+                f"solved      {'ok  ' if r['ok'] else 'FAIL'} {r['case']}"
+                + (
+                    f" (k={r.get('k')}, d<={r.get('d_witnessed')}, exact={r.get('certified_exact')})"
+                    if "k" in r
+                    else ""
+                )
+                + ("" if r["ok"] else f" failed checks: {r['failed']}")
+            )
         for r in results["broken"]:
-            print(f"broken      {'ok  ' if r['ok'] else 'FAIL'} {r['kind']}: "
-                  + ", ".join(c for c, _ in r["failed"]) + f" -> {r['kinds']}")
+            print(
+                f"broken      {'ok  ' if r['ok'] else 'FAIL'} {r['kind']}: "
+                + ", ".join(c for c, _ in r["failed"])
+                + f" -> {r['kinds']}"
+            )
         for r in results["reproductions"]:
-            print(f"reproduction {'ok  ' if r['ok'] else 'FAIL'} {r['slug']}: {r['status']}"
-                  + (f" ({r['detail']})" if r.get("detail") else ""))
+            print(
+                f"reproduction {'ok  ' if r['ok'] else 'FAIL'} {r['slug']}: {r['status']}"
+                + (f" ({r['detail']})" if r.get("detail") else "")
+            )
     good = ok(results)
     if not a.quiet or not good:
         print("validation gate: " + ("passed" if good else "FAILED"))

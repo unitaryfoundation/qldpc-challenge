@@ -7,6 +7,7 @@ nothing. A WL-only match is a probable permutation: the child is staged, the
 result and the staged note name the match, and the gate keeps the last word.
 With the oracle off or its index empty the save path is unchanged.
 """
+
 import glob
 import json
 import os
@@ -26,9 +27,18 @@ STEANE = [[0, 1, 3, 4], [1, 2, 4, 5], [3, 4, 5, 6]]
 
 
 def _child():
-    return {"n": 7, "k": 1, "d_ub": 3, "w": 4, "lc": "unrestricted", "wc": "weight-4",
-            "checks": {"X": STEANE, "Z": STEANE},
-            "parent_n": 9, "parent_file": "codes/9-1-3.json", "parent_d": 3}
+    return {
+        "n": 7,
+        "k": 1,
+        "d_ub": 3,
+        "w": 4,
+        "lc": "unrestricted",
+        "wc": "weight-4",
+        "checks": {"X": STEANE, "Z": STEANE},
+        "parent_n": 9,
+        "parent_file": "codes/9-1-3.json",
+        "parent_d": 3,
+    }
 
 
 def _ident():
@@ -47,13 +57,13 @@ def test_an_exact_match_is_skipped_before_the_witness_search(tmp_path, monkeypat
 
     def no_search(*a, **k):
         raise AssertionError("the witness search must not run for a known duplicate")
+
     monkeypatch.setattr(submit, "make_submission", no_search)
     res = _save(tmp_path, monkeypatch, index)
     assert res["ok"] is False
     assert res["dedup"]["kind"] == "exact"
     assert res["dedup"]["names"] == ["pr#4242:7-1-3.json"]
-    assert res["dedup"]["matches"][0] == {"source": "pr", "pr": 4242, "name": "7-1-3.json",
-                                          "n": 7, "k": 1, "d": 3}
+    assert res["dedup"]["matches"][0] == {"source": "pr", "pr": 4242, "name": "7-1-3.json", "n": 7, "k": 1, "d": 3}
     assert "exact duplicate of pr#4242:7-1-3.json" in res["error"]
     assert glob.glob(str(tmp_path / "*")) == [], "nothing is staged for a duplicate"
 
@@ -108,6 +118,7 @@ def test_build_dedup_index_reports_an_empty_open_pr_part(monkeypatch, capsys):
     def fake_combined_index(**kw):
         seen.update(kw)
         return board_only
+
     monkeypatch.setattr(D, "combined_index", fake_combined_index)
     monkeypatch.setattr(RC, "DEDUP_ORACLE", True)
     monkeypatch.setattr(RC, "DEDUP_OPEN_PRS", True)
@@ -124,8 +135,10 @@ def test_build_dedup_index_reports_an_empty_open_pr_part(monkeypatch, capsys):
 
 def test_build_dedup_index_is_quiet_when_open_prs_are_indexed(monkeypatch, capsys):
     ident = _ident()
-    index = [D._as_entry("board", None, "a.json", 7, 1, 3, ident["fingerprints"], ident["signatures"]),
-             D._as_entry("pr", 7, "b.json", 7, 1, 3, {"fp"}, {"sig"})]
+    index = [
+        D._as_entry("board", None, "a.json", 7, 1, 3, ident["fingerprints"], ident["signatures"]),
+        D._as_entry("pr", 7, "b.json", 7, 1, 3, {"fp"}, {"sig"}),
+    ]
     monkeypatch.setattr(D, "combined_index", lambda **kw: index)
     monkeypatch.setattr(RC, "DEDUP_ORACLE", True)
     monkeypatch.setattr(RC, "DEDUP_OPEN_PRS", True)
@@ -154,6 +167,7 @@ def test_a_save_pool_worker_sees_the_index(tmp_path):
     # the production wiring: the index travels to the save workers through the
     # pool initializer, so a duplicate is refused inside the subprocess too
     import multiprocessing as mp
+
     ident = _ident()
     index = [D._as_entry("pr", 11, "7-1-3.json", 7, 1, 3, ident["fingerprints"], ident["signatures"])]
     with mp.Pool(processes=1, initializer=RC._save_init, initargs=(index,)) as pool:
@@ -181,6 +195,7 @@ def test_identity_used_by_the_check_is_the_gates_own():
     # the oracle index carries the gate's fingerprint sets; the campaign checks the
     # child's own fingerprint against them, which is prescreen.identity's value
     import prescreen as P
+
     HX, HZ = RC.checks_to_matrices(_child()["checks"], 7)
     ident = D.identity_matrices(HX, HZ)
     own = P.identity(HX, HZ)

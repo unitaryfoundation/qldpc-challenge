@@ -18,6 +18,7 @@ against `codes/`. Board data moves, and a test that reads it tests the board
 rather than the rule (the lesson of #946 and #986). `refute=False` as well:
 nothing here is about the distance search.
 """
+
 import json
 import os
 import sys
@@ -54,12 +55,20 @@ def _board_row(doc, d):
     """One synthetic board entry: the same code, claiming `d`."""
     fp, sig = _identity(doc)
     rep = verify(doc, refute=False)
-    return {"name": "the-entry.json", "n": doc["n"], "k": doc["k"], "d": d,
-            "code_type": "CSS", "fingerprint": fp, "sig": sig,
-            "css_fingerprints": [], "css_sigs": [],
-            "weight_class": rep["computed"]["weight_class"],
-            "w": rep["computed"]["max_check_weight"],
-            "locality_class": rep["computed"]["locality_class"]}
+    return {
+        "name": "the-entry.json",
+        "n": doc["n"],
+        "k": doc["k"],
+        "d": d,
+        "code_type": "CSS",
+        "fingerprint": fp,
+        "sig": sig,
+        "css_fingerprints": [],
+        "css_sigs": [],
+        "weight_class": rep["computed"]["weight_class"],
+        "w": rep["computed"]["max_check_weight"],
+        "locality_class": rep["computed"]["locality_class"],
+    }
 
 
 def _against(board_d):

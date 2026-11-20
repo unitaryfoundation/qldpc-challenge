@@ -52,6 +52,7 @@ Usage:
 
 Requires ``python-sat`` (``uv run --with python-sat python ...``).
 """
+
 import itertools
 import os
 import sys
@@ -62,6 +63,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit
 
 try:
     from pysat.solvers import Minisat22
+
     _HAS_PYSAT = True
 except ImportError:
     _HAS_PYSAT = False
@@ -69,7 +71,8 @@ except ImportError:
 
 def _seq_counter(lits, bound, A, tag):
     """Sinz sequential counter: at most ``bound`` of ``lits`` may be true.
-    ``tag`` must be unique per call (aux-variable namespace)."""
+    ``tag`` must be unique per call (aux-variable namespace).
+    """
     n = len(lits)
     if bound >= n:
         return []
@@ -110,8 +113,7 @@ def _xor_chain(lits, A, tag):
     return cls, prev
 
 
-def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
-                        max_codes=None):
+def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0, max_codes=None):
     """Yield ``(spec, HX, HZ)`` for distinct CSS codes found by SAT.
 
     Parameters
@@ -161,7 +163,7 @@ def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
         for g2 in range(G):
             pair_lits = []
             for q in range(n):
-                p = A(("ov", g1, g2, q))          # p <-> xr[g1,q] & zr[g2,q]
+                p = A(("ov", g1, g2, q))  # p <-> xr[g1,q] & zr[g2,q]
                 clauses.append([-p, xr[(g1, q)]])
                 clauses.append([-p, zr[(g2, q)]])
                 clauses.append([p, -xr[(g1, q)], -zr[(g2, q)]])
@@ -169,7 +171,7 @@ def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
             ch, out = _xor_chain(pair_lits, A, ("par", g1, g2))
             clauses.extend(ch)
             if out is not None:
-                clauses.append([-out])             # final parity must be 0
+                clauses.append([-out])  # final parity must be 0
 
     # --- detection: for each error, SOME X-row has odd overlap with ze OR
     #     SOME Z-row has odd overlap with xe.
@@ -211,11 +213,10 @@ def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
             for q in range(n):
                 a = A(("act", side, g, q))
                 v = varmap[(g, q)]
-                clauses.append([-a, v])          # a -> v
-                clauses.append([-v, a])          # v -> a
+                clauses.append([-a, v])  # a -> v
+                clauses.append([-v, a])  # v -> a
                 act.append(a)
-            clauses.extend(_seq_counter(act, max_weight, A,
-                                        tag=("w", side, g)))
+            clauses.extend(_seq_counter(act, max_weight, A, tag=("w", side, g)))
 
     # --- symmetry breaking: first X-row starts with an X on qubit 0
     clauses.append([xr[(0, 0)]])
@@ -254,9 +255,15 @@ def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
                 solver.add_clause(block)
                 continue
 
-            spec = {"family": "sat-css", "n": n, "n_generators": G,
-                    "max_weight": max_weight, "t": t, "seed": seed,
-                    "index": count}
+            spec = {
+                "family": "sat-css",
+                "n": n,
+                "n_generators": G,
+                "max_weight": max_weight,
+                "t": t,
+                "seed": seed,
+                "index": count,
+            }
             yield (spec, HX, HZ)
             count += 1
             solver.add_clause(block)
@@ -264,17 +271,21 @@ def enumerate_sat_codes(n, n_generators, max_weight, t, *, seed=0,
         solver.delete()
 
 
-def search_sat_codes(n, n_generators, max_weight, t, *, count=100, seed=0,
-                     min_k=4, min_d=4, trials=400, keep=25, verbose=True):
+def search_sat_codes(
+    n, n_generators, max_weight, t, *, count=100, seed=0, min_k=4, min_d=4, trials=400, keep=25, verbose=True
+):
     """Generate up to ``count`` SAT-found codes and screen them with the kit's
-    standard funnel (``search.screen``). Returns ranked records."""
+    standard funnel (``search.screen``). Returns ranked records.
+    """
     from search import screen
-    gen = enumerate_sat_codes(n, n_generators, max_weight, t, seed=seed,
-                              max_codes=count)
+
+    gen = enumerate_sat_codes(n, n_generators, max_weight, t, seed=seed, max_codes=count)
     recs = screen(gen, min_k=min_k, min_d=min_d, trials=trials)
     if verbose:
-        print(f"SAT-CSS sweep n={n} gens={n_generators} w<={max_weight} t={t}: "
-              f"{len(recs)} survivors (k>={min_k}, d_ub>={min_d})")
+        print(
+            f"SAT-CSS sweep n={n} gens={n_generators} w<={max_weight} t={t}: "
+            f"{len(recs)} survivors (k>={min_k}, d_ub>={min_d})"
+        )
         for r in recs[:keep]:
             print(f"  [[{r['n']},{r['k']},{r['d']}]] eff={r['efficiency']} {r['spec']}")
     return recs[:keep]

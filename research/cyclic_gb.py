@@ -19,13 +19,19 @@ Provenance: this stack produced the generalized-bicycle wave merged in
 PRs #1206-#1261 (hackathon #1155) and earlier GB records; distances are
 upper bounds until the trusted gate (verify/validate_candidate.py) rules.
 """
-import sys, os, json, time, itertools
+
+import itertools
+import json
+import os
+import sys
+import time
+
 import numpy as np
 import sympy
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit"))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "verify"))
-from css import verify_css, compute_k, rank, rref
+from css import compute_k, rref, verify_css
 from surrogate import distance_rand, lightest_logical
 
 
@@ -43,7 +49,7 @@ def poly_mul(a, b):
 
 
 def poly_mod(a, m):
-    """a mod m over GF(2). m must be nonzero."""
+    """A mod m over GF(2). m must be nonzero."""
     dm = len(m) - 1
     while dm > 0 and m[dm] == 0:
         dm -= 1
@@ -75,7 +81,7 @@ def poly_to_int(a):
     v = 0
     for i, ai in enumerate(a):
         if ai:
-            v |= (1 << i)
+            v |= 1 << i
     return v
 
 
@@ -91,7 +97,8 @@ def int_to_poly(v, m=None):
 # ---------------------------------------------------------------------------
 def factor_xn_minus_1(m):
     """Return the irreducible factors of x^m - 1 over GF(2), each as
-    (poly_int, degree). poly_int is the integer encoding (little-endian)."""
+    (poly_int, degree). poly_int is the integer encoding (little-endian).
+    """
     x = sympy.symbols("x")
     poly = sympy.Poly(x**m + 1, x, modulus=2)  # x^m - 1 == x^m + 1 over GF(2)
     factors = []
@@ -124,7 +131,8 @@ def circ(v):
 
 def build_cyclic_gb(m, a, b):
     """Build HX, HZ for a cyclic generalized-bicycle code over Z_m.
-    a, b are length-m 0/1 lists (the first-row supports of the circulants)."""
+    a, b are length-m 0/1 lists (the first-row supports of the circulants).
+    """
     A = circ(np.array(a, dtype=np.int8))
     B = circ(np.array(b, dtype=np.int8))
     HX = np.concatenate([A, B], axis=1)
@@ -133,7 +141,7 @@ def build_cyclic_gb(m, a, b):
 
 
 def k_from_ab(m, a, b):
-    """k = 2 * deg(gcd(a(x), b(x), x^m - 1))."""
+    """K = 2 * deg(gcd(a(x), b(x), x^m - 1))."""
     xm1 = [1] + [0] * (m - 1) + [1]  # x^m + 1 = x^m - 1 over GF(2)
     g = poly_gcd(poly_gcd(a, b), xm1)
     return 2 * poly_deg(g)
@@ -144,7 +152,8 @@ def k_from_ab(m, a, b):
 # ---------------------------------------------------------------------------
 def parity_check_of_ideal(m, g_int):
     """Parity-check polynomial h = (x^m - 1)/g(x). Codewords of the cyclic
-    code with generator g(x) are ker(circ(h))."""
+    code with generator g(x) are ker(circ(h)).
+    """
     xm1 = [1] + [0] * (m - 1) + [1]
     g = int_to_poly(g_int, m)
     # trim trailing zeros of g down to its true degree
@@ -176,6 +185,7 @@ def prange_sparse_words(m, g_int, weight_band, n_trials, seed=0, max_words=1000)
     Returns a list of (support_tuple, weight) for distinct words found.
     """
     from css import kernel_basis
+
     h = parity_check_of_ideal(m, g_int)
     H = circ(np.array(h, dtype=np.int8))  # (m, m) parity check
     K = kernel_basis(H)  # rows span the codewords
@@ -202,10 +212,10 @@ def prange_sparse_words(m, g_int, weight_band, n_trials, seed=0, max_words=1000)
         # pairwise sums of the lightest rows (closes the gap to minima
         # realized only as short combinations)
         if red.shape[0] >= 2:
-            light = np.argsort(w)[:min(10, red.shape[0])]
+            light = np.argsort(w)[: min(10, red.shape[0])]
             sub = red[light]
             for i in range(len(light)):
-                pr = (sub[i] + sub[i + 1:]) % 2
+                pr = (sub[i] + sub[i + 1 :]) % 2
                 if pr.size == 0:
                     continue
                 pw = pr.sum(axis=1)
@@ -234,6 +244,7 @@ if __name__ == "__main__":
     print("k (via rank):", compute_k(HX, HZ))
     print("k (via gcd):", k_from_ab(m, a, b))
 
+
 def divisor_ideals(m, target_deg, max_ideals=100000, seed=0):
     """Enumerate divisor ideals of x^m - 1 of degree target_deg.
 
@@ -242,7 +253,6 @@ def divisor_ideals(m, target_deg, max_ideals=100000, seed=0):
     optionally the linear factor). We enumerate combinations of the right
     size directly.
     """
-    import itertools
     facts = factor_xn_minus_1(m)
     lin = [p for p, d in facts if d == 1]
     big = [(p, d) for p, d in facts if d > 1]
@@ -254,7 +264,7 @@ def divisor_ideals(m, target_deg, max_ideals=100000, seed=0):
     d = big[0][1] if big else 0
     all_same = all(bd == d for _, bd in big)
     if all_same:
-        for use_lin in ([0, 1] if lin else [0]):
+        for use_lin in [0, 1] if lin else [0]:
             rem = target_deg - use_lin
             if rem < 0 or rem % d != 0:
                 continue
@@ -301,16 +311,15 @@ def divisor_ideals(m, target_deg, max_ideals=100000, seed=0):
     return results
 
 
-def find_fertile_ideals(m, target_deg, weight_band, n_trials, n_ideals, seed=0,
-                        min_words=2, max_words_per_ideal=30):
+def find_fertile_ideals(m, target_deg, weight_band, n_trials, n_ideals, seed=0, min_words=2, max_words_per_ideal=30):
     """Find divisor ideals of degree target_deg that contain low-weight
     codewords. Returns list of (g_int, words) where words is a list of
-    (weight, support_tuple)."""
+    (weight, support_tuple).
+    """
     ideals = divisor_ideals(m, target_deg, max_ideals=n_ideals, seed=seed)
     fertile = []
     for i, (g_int, deg) in enumerate(ideals):
-        words = prange_sparse_words(m, g_int, weight_band, n_trials,
-                                    seed=seed + i, max_words=max_words_per_ideal)
+        words = prange_sparse_words(m, g_int, weight_band, n_trials, seed=seed + i, max_words=max_words_per_ideal)
         if len(words) >= min_words:
             fertile.append((g_int, words))
     return fertile
@@ -318,7 +327,8 @@ def find_fertile_ideals(m, target_deg, weight_band, n_trials, n_ideals, seed=0,
 
 def build_and_screen(m, g_int, words, trials, seed=0, min_d=1, backend="fast", threads=4):
     """Build codes from pairs of words in the ideal and screen by distance.
-    Returns list of (eff, n, k, d, a, b, w) sorted by eff desc."""
+    Returns list of (eff, n, k, d, a, b, w) sorted by eff desc.
+    """
     results = []
     # dedup words by support; prange returns (support_tuple, weight)
     seen = set()
@@ -332,22 +342,23 @@ def build_and_screen(m, g_int, words, trials, seed=0, min_d=1, backend="fast", t
         for j in range(i, len(uniq)):
             a, wta = uniq[i]
             b, wtb = uniq[j]
-            av = np.zeros(m, dtype=np.int8); av[list(a)] = 1
-            bv = np.zeros(m, dtype=np.int8); bv[list(b)] = 1
+            av = np.zeros(m, dtype=np.int8)
+            av[list(a)] = 1
+            bv = np.zeros(m, dtype=np.int8)
+            bv[list(b)] = 1
             HX, HZ = build_cyclic_gb(m, av.tolist(), bv.tolist())
             if not verify_css(HX, HZ):
                 continue
             k = compute_k(HX, HZ)
             n = 2 * m
             w = max(wta + wtb, 2 * max(wta, wtb))
-            d = distance_rand(HX, HZ, trials=trials, seed=seed + i * 100 + j,
-                              backend=backend, threads=threads)
+            d = distance_rand(HX, HZ, trials=trials, seed=seed + i * 100 + j, backend=backend, threads=threads)
             if d == float("inf") or d < min_d:
                 continue
             eff = k * d * d / n
-            results.append({"eff": eff, "n": n, "k": k, "d": int(d),
-                            "w": int(w), "a": list(a), "b": list(b),
-                            "g_int": g_int})
+            results.append(
+                {"eff": eff, "n": n, "k": k, "d": int(d), "w": int(w), "a": list(a), "b": list(b), "g_int": g_int}
+            )
     results.sort(key=lambda r: -r["eff"])
     return results
 
@@ -358,6 +369,7 @@ def load_board(weight_cap=None):
     weight_cap filters to entries with check weight <= cap; None keeps all.
     """
     import glob
+
     entries = []
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
     for f in glob.glob(os.path.join(root, "codes", "*.json")):
@@ -382,16 +394,18 @@ def load_board(weight_cap=None):
 
 def dominates(other, cand):
     """True if `other` dominates `cand` on (n down, k up, d up, w down)."""
-    return (other["n"] <= cand["n"] and other["k"] >= cand["k"]
-            and other["d"] >= cand["d"] and other["w"] <= cand["w"]
-            and (other["n"] < cand["n"] or other["k"] > cand["k"]
-                 or other["d"] > cand["d"] or other["w"] < cand["w"]))
+    return (
+        other["n"] <= cand["n"]
+        and other["k"] >= cand["k"]
+        and other["d"] >= cand["d"]
+        and other["w"] <= cand["w"]
+        and (other["n"] < cand["n"] or other["k"] > cand["k"] or other["d"] > cand["d"] or other["w"] < cand["w"])
+    )
 
 
 def is_advancing(board, n, k, d, w):
     """True if (n, k, d, w) is nondominated by every entry in `board`."""
-    return not any(dominates(o, {"n": n, "k": k, "d": d, "w": w})
-                   for o in board)
+    return not any(dominates(o, {"n": n, "k": k, "d": d, "w": w}) for o in board)
 
 
 def deep_confirm(m, a, b, trials=2000000, threads=4):
@@ -401,12 +415,13 @@ def deep_confirm(m, a, b, trials=2000000, threads=4):
     deep randomized search (default 2M trials/side) and the lightest
     logical on each side. Returns (d_upper, w_x, w_z).
     """
-    av = np.zeros(m, dtype=np.int8); av[list(a)] = 1
-    bv = np.zeros(m, dtype=np.int8); bv[list(b)] = 1
+    av = np.zeros(m, dtype=np.int8)
+    av[list(a)] = 1
+    bv = np.zeros(m, dtype=np.int8)
+    bv[list(b)] = 1
     HX, HZ = build_cyclic_gb(m, av.tolist(), bv.tolist())
     print("css:", verify_css(HX, HZ), "n:", HX.shape[1], "k:", compute_k(HX, HZ))
-    d = distance_rand(HX, HZ, trials=trials, seed=0, backend="fast",
-                      threads=threads)
+    d = distance_rand(HX, HZ, trials=trials, seed=0, backend="fast", threads=threads)
     print(f"deep distance search, {trials} trials per side: d <= {d}")
     wx, _ = lightest_logical(HX, HZ, trials=trials, seed=1)
     wz, _ = lightest_logical(HZ, HX, trials=trials, seed=2)
@@ -414,10 +429,21 @@ def deep_confirm(m, a, b, trials=2000000, threads=4):
     return int(d) if d != float("inf") else None, wx, wz
 
 
-def find_advancing(m, target_deg, weight_cap=None, band=(8, 16),
-                   prange_trials=60000, screen_trials=2000, deep_trials=50000,
-                   start_ideal=0, n_ideals=60, seed=7, threads=4, stop=True,
-                   out="research/candidates/advancing_find.json"):
+def find_advancing(
+    m,
+    target_deg,
+    weight_cap=None,
+    band=(8, 16),
+    prange_trials=60000,
+    screen_trials=2000,
+    deep_trials=50000,
+    start_ideal=0,
+    n_ideals=60,
+    seed=7,
+    threads=4,
+    stop=True,
+    out="research/candidates/advancing_find.json",
+):
     """Scan divisor ideals and stop at the first nondominated code.
 
     Generalized from the one-off driver: weight_cap selects the board cell
@@ -425,15 +451,13 @@ def find_advancing(m, target_deg, weight_cap=None, band=(8, 16),
     it is reported, since the 2k screen often inflates d.
     """
     board = load_board(weight_cap)
-    print(f"loaded {len(board)} board entries "
-          f"({'w>=%d' % weight_cap if weight_cap else 'unrestricted'})")
+    print(f"loaded {len(board)} board entries ({'w>=%d' % weight_cap if weight_cap else 'unrestricted'})")
     ideals = divisor_ideals(m, target_deg, max_ideals=100000, seed=seed)
-    print(f"{len(ideals)} degree-{target_deg} ideals available (n={2*m})")
+    print(f"{len(ideals)} degree-{target_deg} ideals available (n={2 * m})")
     t0 = time.time()
     for i in range(start_ideal, min(start_ideal + n_ideals, len(ideals))):
         g_int, deg = ideals[i]
-        words = prange_sparse_words(m, g_int, band, prange_trials,
-                                    seed=1000 + i, max_words=20)
+        words = prange_sparse_words(m, g_int, band, prange_trials, seed=1000 + i, max_words=20)
         if len(words) < 2 or min(w for _, w in words) > 20:
             continue
         words_sorted = sorted(words, key=lambda x: x[1])
@@ -443,49 +467,57 @@ def find_advancing(m, target_deg, weight_cap=None, band=(8, 16),
                 w = max(wta + wtb, 2 * max(wta, wtb))
                 if w > 32:
                     continue  # schema caps check weight at 32
-                av = np.zeros(m, dtype=np.int8); av[list(a)] = 1
-                bv = np.zeros(m, dtype=np.int8); bv[list(b)] = 1
+                av = np.zeros(m, dtype=np.int8)
+                av[list(a)] = 1
+                bv = np.zeros(m, dtype=np.int8)
+                bv[list(b)] = 1
                 HX, HZ = build_cyclic_gb(m, av.tolist(), bv.tolist())
                 if not verify_css(HX, HZ):
                     continue
                 k = compute_k(HX, HZ)
                 n = 2 * m
-                d = distance_rand(HX, HZ, trials=screen_trials, seed=0,
-                                  backend="fast", threads=threads)
+                d = distance_rand(HX, HZ, trials=screen_trials, seed=0, backend="fast", threads=threads)
                 if d == float("inf"):
                     continue
                 adv = is_advancing(board, n, k, int(d), w)
-                print(f"[{time.time()-t0:.0f}s] ideal {i} pair({pi},{pj}): "
-                      f"[[{n},{k},{int(d)}]] w={w} "
-                      f"eff={k*d*d/n:.1f} advancing={adv}", flush=True)
+                print(
+                    f"[{time.time() - t0:.0f}s] ideal {i} pair({pi},{pj}): "
+                    f"[[{n},{k},{int(d)}]] w={w} "
+                    f"eff={k * d * d / n:.1f} advancing={adv}",
+                    flush=True,
+                )
                 if not adv:
                     continue
-                d2 = distance_rand(HX, HZ, trials=deep_trials, seed=1,
-                                   backend="fast", threads=threads)
+                d2 = distance_rand(HX, HZ, trials=deep_trials, seed=1, backend="fast", threads=threads)
                 if d2 == float("inf"):
                     continue
                 adv2 = is_advancing(board, n, k, int(d2), w)
-                print(f"  deepened: d<={int(d2)} eff={k*d2*d2/n:.1f} "
-                      f"advancing={adv2}", flush=True)
+                print(f"  deepened: d<={int(d2)} eff={k * d2 * d2 / n:.1f} advancing={adv2}", flush=True)
                 if not adv2:
                     continue
-                result = {"n": int(n), "k": int(k), "d": int(d2), "w": int(w),
-                          "eff": round(float(k*d2*d2/n), 2),
-                          "a": [int(x) for x in a], "b": [int(x) for x in b],
-                          "g_int": int(g_int)}
+                result = {
+                    "n": int(n),
+                    "k": int(k),
+                    "d": int(d2),
+                    "w": int(w),
+                    "eff": round(float(k * d2 * d2 / n), 2),
+                    "a": [int(x) for x in a],
+                    "b": [int(x) for x in b],
+                    "g_int": int(g_int),
+                }
                 if out:
                     os.makedirs(os.path.dirname(out), exist_ok=True)
                     json.dump(result, open(out, "w"), indent=1)
                     print(f"saved to {out}")
                 if stop:
                     return result
-    print(f"no advancing code in ideals {start_ideal}..{start_ideal + n_ideals - 1} "
-          f"({time.time()-t0:.0f}s)")
+    print(f"no advancing code in ideals {start_ideal}..{start_ideal + n_ideals - 1} ({time.time() - t0:.0f}s)")
     return None
 
 
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--m", type=int, default=337)
     ap.add_argument("--deg", type=int, default=85)
@@ -497,19 +529,24 @@ if __name__ == "__main__":
     ap.add_argument("--out", type=str, default="research/candidates/cyclic_search.json")
     ap.add_argument("--backend", type=str, default="fast")
     ap.add_argument("--threads", type=int, default=4)
-    ap.add_argument("--mode", choices=("sweep", "find-advancing", "confirm"),
-                    default="sweep")
-    ap.add_argument("--weight-cap", type=int, default=None,
-                    help="board cell filter: keep entries with w > cap "
-                         "(find-advancing mode only)")
-    ap.add_argument("--confirm", type=str, default=None,
-                    help="candidate JSON with n, a, b (confirm mode only)")
+    ap.add_argument("--mode", choices=("sweep", "find-advancing", "confirm"), default="sweep")
+    ap.add_argument(
+        "--weight-cap",
+        type=int,
+        default=None,
+        help="board cell filter: keep entries with w > cap (find-advancing mode only)",
+    )
+    ap.add_argument("--confirm", type=str, default=None, help="candidate JSON with n, a, b (confirm mode only)")
     ap.add_argument("--confirm-trials", type=int, default=2000000)
-    ap.add_argument("--campaign", type=str, default=None,
-                    help="campaign.json whose run_contract supplies m, deg, "
-                         "band, ideals, trials, screen, seed and threads; an "
-                         "explicit flag still wins but is reported as a "
-                         "deviation from the contract")
+    ap.add_argument(
+        "--campaign",
+        type=str,
+        default=None,
+        help="campaign.json whose run_contract supplies m, deg, "
+        "band, ideals, trials, screen, seed and threads; an "
+        "explicit flag still wins but is reported as a "
+        "deviation from the contract",
+    )
     args = ap.parse_args()
 
     # A sweep whose depth lives only in argv leaves nothing that says what it
@@ -520,20 +557,21 @@ if __name__ == "__main__":
     if args.campaign:
         sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit"))
         from campaign import load_campaign  # noqa: PLC0415
+
         camp = load_campaign(args.campaign)
         if not camp.run_contract:
-            sys.exit(f"{args.campaign}: no run_contract to read parameters "
-                     "from; add one or drop --campaign")
-        given = {a.dest for a in ap._actions
-                 if any(f in sys.argv for f in a.option_strings)}
+            sys.exit(f"{args.campaign}: no run_contract to read parameters from; add one or drop --campaign")
+        given = {a.dest for a in ap._actions if any(f in sys.argv for f in a.option_strings)}
         params, deviations = camp.resolved_params(
-            **{k: getattr(args, k) for k in given
-               if k in (camp.run_contract["parameters"] or {})})
+            **{k: getattr(args, k) for k in given if k in (camp.run_contract["parameters"] or {})}
+        )
         for key, value in params.items():
             if hasattr(args, key):
                 setattr(args, key, value)
-        print(f"campaign {camp.id}, contract {camp.contract_hash}: "
-              + " ".join(f"{k}={v}" for k, v in sorted(params.items())))
+        print(
+            f"campaign {camp.id}, contract {camp.contract_hash}: "
+            + " ".join(f"{k}={v}" for k, v in sorted(params.items()))
+        )
         for key, d in sorted(deviations.items()):
             print(f"  deviation: {key} contract={d['contract']} used={d['used']}")
 
@@ -542,27 +580,32 @@ if __name__ == "__main__":
     if args.mode == "confirm":
         cand = json.load(open(args.confirm))
         m_c = cand["n"] // 2
-        deep_confirm(m_c, cand["a"], cand["b"], trials=args.confirm_trials,
-                     threads=args.threads)
+        deep_confirm(m_c, cand["a"], cand["b"], trials=args.confirm_trials, threads=args.threads)
         sys.exit(0)
 
     if args.mode == "find-advancing":
-        find_advancing(args.m, args.deg, weight_cap=args.weight_cap,
-                       band=(lo, hi), screen_trials=args.screen,
-                       seed=args.seed, threads=args.threads)
+        find_advancing(
+            args.m,
+            args.deg,
+            weight_cap=args.weight_cap,
+            band=(lo, hi),
+            screen_trials=args.screen,
+            seed=args.seed,
+            threads=args.threads,
+        )
         sys.exit(0)
 
     t0 = time.time()
-    fertile = find_fertile_ideals(args.m, args.deg, (lo, hi), args.trials,
-                                  args.ideals, seed=args.seed)
-    print(f"[{time.time()-t0:.0f}s] {len(fertile)} fertile ideals of degree {args.deg}")
+    fertile = find_fertile_ideals(args.m, args.deg, (lo, hi), args.trials, args.ideals, seed=args.seed)
+    print(f"[{time.time() - t0:.0f}s] {len(fertile)} fertile ideals of degree {args.deg}")
     all_results = []
     for gi, words in fertile:
-        res = build_and_screen(args.m, gi, words, args.screen, seed=args.seed,
-                               backend=args.backend, threads=args.threads)
+        res = build_and_screen(
+            args.m, gi, words, args.screen, seed=args.seed, backend=args.backend, threads=args.threads
+        )
         all_results.extend(res)
     all_results.sort(key=lambda r: -r["eff"])
-    print(f"[{time.time()-t0:.0f}s] {len(all_results)} codes screened")
+    print(f"[{time.time() - t0:.0f}s] {len(all_results)} codes screened")
     for r in all_results[:20]:
         print(f"  eff={r['eff']:8.1f} [[{r['n']},{r['k']},{r['d']}]] w={r['w']}")
     json.dump(all_results, open(args.out, "w"), indent=1)

@@ -60,7 +60,11 @@ import numpy as np
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO = os.path.abspath(os.path.join(_HERE, "..", ".."))
 _CODES = os.path.join(_REPO, "codes")
-for _p in (os.path.join(_REPO, "research", "kit"), os.path.join(_REPO, "verify"), os.path.join(_REPO, "research", "certs")):
+for _p in (
+    os.path.join(_REPO, "research", "kit"),
+    os.path.join(_REPO, "verify"),
+    os.path.join(_REPO, "research", "certs"),
+):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
@@ -75,6 +79,7 @@ EXIT_REFUTED = 2
 EXIT_INVALID = 3
 
 import peer_audit  # noqa: E402
+
 try:
     import qedist_certify  # noqa: E402
     import qedist_stabilizer_certify  # noqa: E402
@@ -136,8 +141,8 @@ def ris(HX, HZ, trials, seed, threads=8, pair_depth=10, prepared=None):
     """
     t0 = time.time()
     found = surrogate.distance_rand_witness(
-        HX, HZ, trials, seed, backend="auto", threads=threads,
-        pair_depth=pair_depth, prepared=prepared)
+        HX, HZ, trials, seed, backend="auto", threads=threads, pair_depth=pair_depth, prepared=prepared
+    )
     if not found:
         return float("inf"), "", [], time.time() - t0
     return found.weight, found.side, found.support, time.time() - t0
@@ -276,8 +281,6 @@ def _best_payload(entry, n, k, claim, best, verdict=None):
     return payload
 
 
-
-
 def _measure_qedist(entry, seconds, threads, qedist_root):
     with open(entry, encoding="utf-8") as fh:
         doc = json.load(fh)
@@ -337,11 +340,23 @@ def _measure_qedist(entry, seconds, threads, qedist_root):
     return {
         "entry": entry,
         "stem": os.path.splitext(os.path.basename(entry))[0],
-        "n": n, "k": k, "w": w, "claim": claim, "weight": weight,
-        "verdict": verdict, "d_exact": d_exact, "lower_bound": lower_bound,
-        "tool": "qedist", "seconds": float(seconds),
-        "side": None, "support": [], "seed": None, "trials": 0,
+        "n": n,
+        "k": k,
+        "w": w,
+        "claim": claim,
+        "weight": weight,
+        "verdict": verdict,
+        "d_exact": d_exact,
+        "lower_bound": lower_bound,
+        "tool": "qedist",
+        "seconds": float(seconds),
+        "side": None,
+        "support": [],
+        "seed": None,
+        "trials": 0,
     }
+
+
 def cmd_ladder(args):
     n, k_claim, HX, HZ, doc = load_entry(args.entry)
     k, w, css_ok = describe(n, k_claim, HX, HZ, doc, os.path.basename(args.entry))
@@ -575,13 +590,28 @@ def cmd_pair(args):
         # rather than taken on the word of a note.
         if backend == "qedist":
             rec = peer_audit.record(
-                args.candidate, peers, results, decision, backend="qedist",
-                tool="qedist", seconds=args.seconds, threads=args.threads, exit_code=rc)
+                args.candidate,
+                peers,
+                results,
+                decision,
+                backend="qedist",
+                tool="qedist",
+                seconds=args.seconds,
+                threads=args.threads,
+                exit_code=rc,
+            )
         else:
             rec = peer_audit.record(
-                args.candidate, peers, results, decision, trials=args.trials,
-                seeds=args.seeds, pair_depth=args.pair_depth, threads=args.threads,
-                exit_code=rc)
+                args.candidate,
+                peers,
+                results,
+                decision,
+                trials=args.trials,
+                seeds=args.seeds,
+                pair_depth=args.pair_depth,
+                threads=args.threads,
+                exit_code=rc,
+            )
         _write_witness(json_out, rec)
         print(f"wrote {json_out}", flush=True)
     return rc

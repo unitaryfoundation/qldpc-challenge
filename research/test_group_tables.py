@@ -2,6 +2,7 @@
 
 Run: uv run --extra research pytest research/test_group_tables.py
 """
+
 import glob
 import json
 import os
@@ -55,8 +56,7 @@ def test_the_notes_supports_rebuild_the_board_entry(slug):
 
 def test_the_recipe_form_runs_through_rebuild():
     order, gap_id, a, b = ENTRIES["128-20-14"]
-    HX, HZ = rebuild.rebuild("group_algebra.build_2bga_small_group",
-                             {"order": order, "gap_id": gap_id, "a": a, "b": b})
+    HX, HZ = rebuild.rebuild("group_algebra.build_2bga_small_group", {"order": order, "gap_id": gap_id, "a": a, "b": b})
     assert HX.shape == (64, 128) and HZ.shape == (64, 128)
 
 

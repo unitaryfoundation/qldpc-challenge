@@ -16,8 +16,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "research" / "kit"))
 
 from qedist import (  # noqa: E402
-    challenge_to_qedist,
     challenge_stabilizer_to_qedist,
+    challenge_to_qedist,
     find_qedist,
     qedist_commit,
     solver_string,
@@ -113,6 +113,7 @@ class ConversionTests(unittest.TestCase):
 class EndToEndTests(unittest.TestCase):
     def test_certify_small_code(self):
         import tempfile
+
         from qedist import certify_challenge
 
         with tempfile.TemporaryDirectory() as td:
@@ -151,42 +152,46 @@ class SymmetryAndStampTests(unittest.TestCase):
         out = challenge_to_qedist(doc, symmetries=True)
         self.assertTrue(out["symmetry_generators"])
         # a rigid code: a path of weight-2 X checks pinned at one end by a Z check
-        rigid = {"code_type": "CSS", "n": 4, "k": 1,
-                 "checks": {"X": [[0, 1], [1, 2], [2, 3]], "Z": [[0]]},
-                 "distance": {"d": 1}}
+        rigid = {
+            "code_type": "CSS",
+            "n": 4,
+            "k": 1,
+            "checks": {"X": [[0, 1], [1, 2], [2, 3]], "Z": [[0]]},
+            "distance": {"d": 1},
+        }
         self.assertEqual(tanner_symmetry_generators(4, rigid["checks"]["X"], rigid["checks"]["Z"]), [])
         self.assertNotIn("symmetry_generators", challenge_to_qedist(rigid, symmetries=True))
 
     def test_commit_is_read_from_the_checkout_behind_the_executable(self):
         import subprocess
         import tempfile
+
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp) / "QEDist"
             (repo / ".venv" / "bin").mkdir(parents=True)
             exe = repo / ".venv" / "bin" / "qedist"
             exe.write_text("#!/bin/sh\necho QEDist 9.9\n")
             exe.chmod(0o755)
-            git = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t",
-                   "-c", "commit.gpgsign=false"]
+            git = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false"]
             subprocess.run(["git", "init", "-q", str(repo)], check=True)
             (repo / "README").write_text("x\n")
             subprocess.run(git + ["add", "README"], check=True)
             subprocess.run(git + ["commit", "-q", "-m", "x"], check=True)
             sha = subprocess.check_output(git + ["rev-parse", "--short=12", "HEAD"], text=True).strip()
             self.assertEqual(qedist_commit([str(exe)]), sha)
-            self.assertEqual(solver_string([str(exe)]),
-                             f"QEDist 9.9 {sha} (yeon-lee/QEDist) exhaustive search")
+            self.assertEqual(solver_string([str(exe)]), f"QEDist 9.9 {sha} (yeon-lee/QEDist) exhaustive search")
             self.assertTrue(solver_string([str(exe)], suffix=" (stabilizer)").endswith(" (stabilizer)"))
         self.assertIsNone(qedist_commit(["/bin/sh"]))
         self.assertIsNone(qedist_commit(["no-such-qedist-command"]), "a bare name is looked up on PATH, not the cwd")
 
-    @unittest.skipUnless(find_qedist() and os.environ.get("QEDIST_RUN_TESTS") == "1",
-                         "needs an installed QEDist and QEDIST_RUN_TESTS=1")
+    @unittest.skipUnless(
+        find_qedist() and os.environ.get("QEDIST_RUN_TESTS") == "1", "needs an installed QEDist and QEDIST_RUN_TESTS=1"
+    )
     def test_end_to_end_steane_with_symmetries(self):
         sys.path.insert(0, str(ROOT / "research" / "certs"))
         import qedist_certify as QC
+
         cert = QC.certify(_css_doc(), tlim=30, threads=1)
         self.assertTrue(cert["d_exact"])
         self.assertIn("symmetry generators supplied", cert["verification"]["note"])
         self.assertIn("(yeon-lee/QEDist)", cert["solver"])
-

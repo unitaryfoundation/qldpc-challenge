@@ -1,0 +1,34 @@
+{
+  "d": 33,
+  "d_exact": false,
+  "d_lower": 12,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[330,14,33]]",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 12",
+      "proved_min": 12,
+      "secs": 14.6,
+      "status": "TIMEOUT",
+      "value": 33
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 12",
+      "proved_min": 12,
+      "secs": 14.6,
+      "status": "TIMEOUT",
+      "value": 33
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "aaf1564d8d82bf9b1928cd18144205ff79eb7ed05eb9c276942f9d2286e12040",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 1 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}

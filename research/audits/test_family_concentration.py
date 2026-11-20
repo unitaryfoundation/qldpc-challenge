@@ -5,6 +5,7 @@ share and the HHI sits between an even split and a single family; the moved
 count is the sum of the per-cell flags; and the caveat that `family` is the
 self-declared label travels inside the record (issue #4025).
 """
+
 import glob
 import importlib.util
 import json
@@ -22,7 +23,8 @@ def _latest():
 
 def _script():
     spec = importlib.util.spec_from_file_location(
-        "family_concentration_script", os.path.join(_HERE, "family_concentration.py"))
+        "family_concentration_script", os.path.join(_HERE, "family_concentration.py")
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -42,8 +44,7 @@ def test_the_record_is_internally_consistent():
     for c in r["cells"].values():
         assert c["records"] <= c["members"]
         assert c["untagged"] + sum(t["records"] for t in c["top"]) <= c["records"]
-        assert c["moved"] == (c["incumbent"] is not None
-                              and c["leader"]["family"] != c["incumbent"]["family"])
+        assert c["moved"] == (c["incumbent"] is not None and c["leader"]["family"] != c["incumbent"]["family"])
     assert r["cells_moved"] == sum(c["moved"] for c in r["cells"].values())
     assert r["cells_total"] == len(r["cells"]) >= r["cells_moved"]
     assert "self-declared" in r["caveat"]

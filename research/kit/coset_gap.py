@@ -32,6 +32,7 @@ Requires GAP (the ``smallgrp`` package) on ``PATH``.  The result is a CSS
 code, so it is directly usable by ``research/kit/submit.py`` and by
 ``research/kit/rebuild.py`` as ``coset_gap.build``.
 """
+
 import os
 import subprocess
 import tempfile
@@ -40,7 +41,7 @@ import numpy as np
 
 GAP_DIR = os.environ.get("QLDPC_GAP_DIR") or tempfile.mkdtemp(prefix="qldpc-coset-gap-")
 
-_TEMPLATE = r'''
+_TEMPLATE = r"""
 LoadPackage("smallgrp");
 SizeScreen([1000000, 1000000]);
 G := SmallGroup(%(ell)d, %(m)d);
@@ -106,7 +107,7 @@ for i in [1..mm] do
   Print("\n");
 od;
 QUIT;
-'''
+"""
 
 
 def _parse(stdout):
@@ -126,8 +127,7 @@ def _parse(stdout):
         elif line.startswith("@@ROW"):
             vals = [int(x) for x in line.split()[1:]]
             if len(vals) != mat.shape[1]:
-                raise RuntimeError(
-                    f"row has {len(vals)} entries, expected {mat.shape[1]}")
+                raise RuntimeError(f"row has {len(vals)} entries, expected {mat.shape[1]}")
             mat[filled] = vals
             filled += 1
     if HX is None or HZ is None:
@@ -146,14 +146,18 @@ def build(ell, m, s, ahat, bhat, timeout=900):
     os.makedirs(GAP_DIR, exist_ok=True)
     script = os.path.join(GAP_DIR, f"_gap_coset_{os.getpid()}.g")
     with open(script, "w") as f:
-        f.write(_TEMPLATE % {
-            "ell": ell, "m": m, "s": s,
-            "ahat": "[" + ",".join(str(x) for x in ahat) + "]",
-            "bhat": "[" + ",".join(str(x) for x in bhat) + "]",
-        })
+        f.write(
+            _TEMPLATE
+            % {
+                "ell": ell,
+                "m": m,
+                "s": s,
+                "ahat": "[" + ",".join(str(x) for x in ahat) + "]",
+                "bhat": "[" + ",".join(str(x) for x in bhat) + "]",
+            }
+        )
     try:
-        r = subprocess.run(["gap", "-b", script], capture_output=True,
-                           text=True, timeout=timeout)
+        r = subprocess.run(["gap", "-b", script], capture_output=True, text=True, timeout=timeout)
     finally:
         try:
             os.remove(script)
@@ -199,9 +203,9 @@ PAPER_INSTANCES = [
 
 if __name__ == "__main__":
     from css import compute_k, verify_css
-    for (n_c, k_c, d_c, ell, m, s, ahat, bhat) in PAPER_INSTANCES:
+
+    for n_c, k_c, d_c, ell, m, s, ahat, bhat in PAPER_INSTANCES:
         HX, HZ = build(ell, m, s, ahat, bhat)
         k = compute_k(HX, HZ)
         w = int(max(HX.sum(axis=1).max(), HZ.sum(axis=1).max()))
-        print(f"[[{HX.shape[1]},{k},{d_c}]] (paper [[{n_c},{k_c},{d_c}]]) "
-              f"w={w} css={verify_css(HX, HZ)}")
+        print(f"[[{HX.shape[1]},{k},{d_c}]] (paper [[{n_c},{k_c},{d_c}]]) w={w} css={verify_css(HX, HZ)}")

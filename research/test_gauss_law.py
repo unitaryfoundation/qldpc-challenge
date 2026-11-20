@@ -31,15 +31,14 @@ sys.path.insert(0, os.path.join(_HERE, "..", "verify"))
 
 import numpy as np
 from css import compute_k, verify_css
-from gauss_law import (classical_gauss_law_1d, optimal_1d_multiplicities,
-                        quantum_gauss_law_1d)
+from gauss_law import classical_gauss_law_1d, optimal_1d_multiplicities, quantum_gauss_law_1d
 from gf2 import commutes, in_rowspace
 from surrogate import distance_rand
 
 
 def test_optimal_multiplicities_satisfy_theorem_iii_5():
     """Theorem III.5's construction: [[N d(d+1)/2, N, d]]."""
-    for (N, d) in [(6, 3), (8, 4), (10, 5), (12, 6), (16, 8)]:
+    for N, d in [(6, 3), (8, 4), (10, 5), (12, 6), (16, 8)]:
         p, q = optimal_1d_multiplicities(N, d)
         assert len(p) == N and len(q) == N
         HX, HZ = quantum_gauss_law_1d(N, d, p, q)
@@ -50,7 +49,8 @@ def test_optimal_multiplicities_satisfy_theorem_iii_5():
 
 def test_check_weights():
     """Inner generators are X-type of weight 2; outer checks are Z-type of
-    weight 3d (the Gauss's law check spans a site and two links)."""
+    weight 3d (the Gauss's law check spans a site and two links).
+    """
     N, d = 8, 4
     HX, HZ = quantum_gauss_law_1d(N, d)
     assert int(HX.sum(axis=1).max()) == 2
@@ -59,7 +59,8 @@ def test_check_weights():
 
 def test_classical_code_rank_and_shape():
     """The classical code has N independent Gauss's law constraints plus the
-    copy-equality constraints; its dimension is N."""
+    copy-equality constraints; its dimension is N.
+    """
     N, d = 8, 4
     p, q = optimal_1d_multiplicities(N, d)
     H, _, _ = classical_gauss_law_1d(N, p, q)
@@ -99,6 +100,6 @@ def test_distance_is_the_claimed_d():
 
 def test_distance_upper_bound_at_least_d():
     """A witness search must not find anything lighter than d."""
-    for (N, d) in [(6, 3), (8, 4)]:
+    for N, d in [(6, 3), (8, 4)]:
         HX, HZ = quantum_gauss_law_1d(N, d)
         assert distance_rand(HX, HZ, trials=300) >= d

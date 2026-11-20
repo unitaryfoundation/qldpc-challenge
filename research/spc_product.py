@@ -16,6 +16,7 @@ hence k = 512 - 169 - 169 = 174.
 This module builds it. Nothing here decides a distance or a track;
 `verify/validate_candidate.py` does.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -32,26 +33,34 @@ def build_spc_512():
     """Return (HX, HZ) for the [[512,174,8]] SPC 3-fold product code."""
     h = np.array([[1, 1]], dtype=np.int64)
     I = np.eye(2, dtype=np.int64)
-    HX = np.vstack([
-        _kron_all(h, h, h, I, I, I, I, I, I),
-        _kron_all(I, I, I, h, h, h, I, I, I),
-        _kron_all(I, I, I, I, I, I, h, h, h),
-    ])
-    HZ = np.vstack([
-        _kron_all(h, I, I, h, I, I, h, I, I),
-        _kron_all(I, h, I, I, h, I, I, h, I),
-        _kron_all(I, I, h, I, I, h, I, I, h),
-    ])
+    HX = np.vstack(
+        [
+            _kron_all(h, h, h, I, I, I, I, I, I),
+            _kron_all(I, I, I, h, h, h, I, I, I),
+            _kron_all(I, I, I, I, I, I, h, h, h),
+        ]
+    )
+    HZ = np.vstack(
+        [
+            _kron_all(h, I, I, h, I, I, h, I, I),
+            _kron_all(I, h, I, I, h, I, I, h, I),
+            _kron_all(I, I, h, I, I, h, I, I, h),
+        ]
+    )
     return HX, HZ
 
 
 if __name__ == "__main__":
-    import sys, os
+    import os
+    import sys
+
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit"))
-    from css import compute_k, verify_css, rank
+    from css import compute_k, rank, verify_css
 
     HX, HZ = build_spc_512()
-    print(f"n = {HX.shape[1]}  k = {compute_k(HX, HZ)}  "
-          f"max weight = {int(HX.sum(1).max())}  "
-          f"rank X = {rank(HX)}  rank Z = {rank(HZ)}  "
-          f"commutes = {verify_css(HX, HZ)}")
+    print(
+        f"n = {HX.shape[1]}  k = {compute_k(HX, HZ)}  "
+        f"max weight = {int(HX.sum(1).max())}  "
+        f"rank X = {rank(HX)}  rank Z = {rank(HZ)}  "
+        f"commutes = {verify_css(HX, HZ)}"
+    )

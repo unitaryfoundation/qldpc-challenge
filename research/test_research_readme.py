@@ -1,4 +1,5 @@
 """research/README.md is the map of the top-level scripts (issue #3383): a new one must be listed."""
+
 import os
 import re
 
@@ -9,8 +10,7 @@ with open(os.path.join(HERE, "README.md"), encoding="utf-8") as f:
 
 
 def test_every_top_level_script_is_in_the_manifest():
-    scripts = sorted(f for f in os.listdir(HERE)
-                     if f.endswith(".py") and not f.startswith(("test_", "_")))
+    scripts = sorted(f for f in os.listdir(HERE) if f.endswith(".py") and not f.startswith(("test_", "_")))
     missing = [s for s in scripts if f"`{s}`" not in README]
     assert not missing, f"add to research/README.md: {missing}"
 

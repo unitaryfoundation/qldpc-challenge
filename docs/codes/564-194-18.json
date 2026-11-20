@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[564,194,18]]",
  "code_type": "CSS",
  "n": 564,
@@ -5301,30 +5301,36 @@
    ]
   },
   "Z": {
-   "value": 20,
+   "value": 18,
    "confidence": "upper_bound",
    "witness": [
-    3,
-    22,
-    61,
-    73,
-    93,
-    138,
-    169,
-    220,
-    244,
-    275,
-    279,
-    307,
-    317,
-    403,
-    453,
-    455,
-    494,
-    529,
-    553,
-    563
-   ]
+    0,
+    108,
+    116,
+    126,
+    127,
+    156,
+    196,
+    219,
+    231,
+    329,
+    359,
+    395,
+    436,
+    437,
+    476,
+    496,
+    508,
+    540
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-20",
+    "found_at_samples": 19484469,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
+   }
   }
  },
  "provenance": {
@@ -5334,7 +5340,7 @@
   "construction": "Pair-partition CPM CSS code (J=4, L=12, P=47; arXiv:2607.14091)",
   "origin": "submission",
   "date": "2026-08-12",
-  "notes": "Witness-backed upper bound; no exact-distance claim."
+  "notes": "Witness-backed upper bound; no exact-distance claim. Z-side value lowered from 20 to 18 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-18 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 18 is unchanged."
  },
  "family": "pair-partition-cpm"
 }

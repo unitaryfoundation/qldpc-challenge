@@ -16,6 +16,7 @@ advance demanded 3 -- and since every recorded run took the two-rung
 authorized was a boundary at which it was not, and the gate could only ever
 say hold.
 """
+
 import importlib.util
 import os
 import sys
@@ -43,7 +44,7 @@ def _facts(rungs, bar, **kw):
 # The 20k-then-200k shape every recorded run took: two rungs, and a bound
 # that has not moved between them.
 _TWO_RUNG_SETTLED = [(20_000, 20), (200_000, 20)]
-_BAR = 106.11          # below 20^2 * 230 / 904 at that bound: the 2026-09-20 bar
+_BAR = 106.11  # below 20^2 * 230 / 904 at that bound: the 2026-09-20 bar
 
 
 def test_a_settled_ladder_at_the_threshold_advances_its_depth():
@@ -55,8 +56,7 @@ def test_a_settled_ladder_at_the_threshold_advances_its_depth():
     """
     facts = _facts(_TWO_RUNG_SETTLED, 6.0, n=108, k=8)
     assert facts["flat_fresh_rungs_at_best"] == E.MIN_FLAT_RUNGS
-    action, why = _harness().harness_override("hold-deepen", facts,
-                                              level=0, n_levels=4)
+    action, why = _harness().harness_override("hold-deepen", facts, level=0, n_levels=4)
     assert action == "promote-next-rung"
     assert why and "own authority" in why
 
@@ -68,8 +68,7 @@ def test_a_settled_ladder_below_the_bar_is_abandoned_at_the_same_threshold():
     """
     facts = _facts(_TWO_RUNG_SETTLED, _BAR)
     assert not facts["best_at_or_above_bar"]
-    action, why = _harness().harness_override("hold-deepen", facts,
-                                              level=0, n_levels=4)
+    action, why = _harness().harness_override("hold-deepen", facts, level=0, n_levels=4)
     assert action == "abandon-ladder"
     assert E._abandon_is_proven_safe(facts)
     assert why and "can only fall" in why
@@ -94,12 +93,9 @@ def test_both_branches_turn_on_one_threshold():
                 return f["flat_fresh_rungs_at_best"]
         return None
 
-    assert first_flat(lambda f: mod.harness_override(
-        "hold-deepen", f, level=0, n_levels=4)[0]) == E.MIN_FLAT_RUNGS
-    assert mod.harness_override("hold-deepen", below_bar, level=0,
-                                n_levels=4)[0] == "abandon-ladder"
-    assert mod.harness_override("hold-deepen", at_bar, level=0,
-                                n_levels=4)[0] == "promote-next-rung"
+    assert first_flat(lambda f: mod.harness_override("hold-deepen", f, level=0, n_levels=4)[0]) == E.MIN_FLAT_RUNGS
+    assert mod.harness_override("hold-deepen", below_bar, level=0, n_levels=4)[0] == "abandon-ladder"
+    assert mod.harness_override("hold-deepen", at_bar, level=0, n_levels=4)[0] == "promote-next-rung"
 
 
 def test_a_descending_ladder_is_left_alone():
@@ -111,9 +107,7 @@ def test_a_descending_ladder_is_left_alone():
     facts = _facts([(20_000, 22), (200_000, 20)], _BAR)
     assert facts["ladder_still_descending"]
     assert facts["flat_fresh_rungs_at_best"] < E.MIN_FLAT_RUNGS
-    assert _harness().harness_override("hold-deepen", facts,
-                                       level=0, n_levels=4) == ("hold-deepen",
-                                                                None)
+    assert _harness().harness_override("hold-deepen", facts, level=0, n_levels=4) == ("hold-deepen", None)
 
 
 def test_the_harness_never_widens_a_fence():
@@ -124,14 +118,12 @@ def test_the_harness_never_widens_a_fence():
     mod = _harness()
     for bar in (1.0, 6.0, 106.11, 10_000.0):
         facts = _facts(_TWO_RUNG_SETTLED, bar, n=108, k=8)
-        action, _ = mod.harness_override("hold-deepen", facts, level=0,
-                                         n_levels=4)
+        action, _ = mod.harness_override("hold-deepen", facts, level=0, n_levels=4)
         if action == "abandon-ladder":
             assert E._abandon_is_proven_safe(facts)
     # last level: no deeper rung exists to advance to
     facts = _facts(_TWO_RUNG_SETTLED, 6.0, n=108, k=8)
-    assert mod.harness_override("hold-deepen", facts, level=3,
-                                n_levels=4) == ("hold-deepen", None)
+    assert mod.harness_override("hold-deepen", facts, level=3, n_levels=4) == ("hold-deepen", None)
 
 
 def test_the_harness_never_reverses_an_abandon_the_verdict_already_earned():
@@ -140,8 +132,7 @@ def test_the_harness_never_reverses_an_abandon_the_verdict_already_earned():
     The harness must leave that decision alone rather than reopening it.
     """
     facts = _facts(_TWO_RUNG_SETTLED, _BAR)
-    assert _harness().harness_override("abandon-ladder", facts,
-                                       level=0, n_levels=4)[0] == "abandon-ladder"
+    assert _harness().harness_override("abandon-ladder", facts, level=0, n_levels=4)[0] == "abandon-ladder"
 
 
 def test_no_verdict_still_holds_an_unsettled_ladder():
@@ -151,6 +142,4 @@ def test_no_verdict_still_holds_an_unsettled_ladder():
     """
     facts = _facts([(20_000, 22)], _BAR)
     assert facts["flat_fresh_rungs_at_best"] == 1 < E.MIN_FLAT_RUNGS
-    assert _harness().harness_override("hold-deepen", facts,
-                                       level=0, n_levels=4) == ("hold-deepen",
-                                                                None)
+    assert _harness().harness_override("hold-deepen", facts, level=0, n_levels=4) == ("hold-deepen", None)
