@@ -12,6 +12,7 @@ the next divergence fails here instead of merging.
   uv run --frozen python run_tests.py           # what CI runs
 """
 
+import glob
 import os
 import re
 import sys
@@ -22,6 +23,7 @@ import pytest
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 _WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "verify.yml")
+_WORKFLOWS_DIR = os.path.join(_ROOT, ".github", "workflows")
 _PROOF_REPLAY_WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "proof-replay.yml")
 
 if _ROOT not in sys.path:
@@ -126,6 +128,22 @@ def test_workflow_triggers_for_the_test_runner_itself():
     )
 
 
+def test_external_workflow_actions_are_pinned_to_full_commit_shas():
+    unpinned = []
+    workflows = sorted(
+        glob.glob(os.path.join(_WORKFLOWS_DIR, "*.yml")) + glob.glob(os.path.join(_WORKFLOWS_DIR, "*.yaml"))
+    )
+    for path in workflows:
+        with open(path, encoding="utf-8") as f:
+            refs = re.findall(r"^\s*uses:\s*([^\s#]+)", f.read(), re.M)
+        for ref in refs:
+            if ref.startswith(("./", "docker://")):
+                continue
+            if not re.fullmatch(r"[^@]+@[0-9a-f]{40}", ref):
+                unpinned.append(f"{os.path.relpath(path, _ROOT)}: {ref}")
+    assert not unpinned, "workflow actions must use immutable full SHAs:\n" + "\n".join(unpinned)
+
+
 def test_workflow_triggers_for_verifier_claim_surfaces():
     patterns = pull_request_paths()
     uncovered = [surface for surface in ("codes", "circuits", "certs")
@@ -160,6 +178,7 @@ def test_weekly_proof_replay_fails_on_incomplete_shards():
         "a scheduled proof replay with entries left unopened must fail"
     )
     assert "verify/replay_proofs.py --sample 12" in workflow, "keep the bounded rotating pull-request proof sample"
+
 
 
 def test_collected_directories_exist(runner_cmd):
