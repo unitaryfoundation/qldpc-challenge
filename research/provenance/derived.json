@@ -3,7 +3,7 @@
  "counts": {
   "literature": 489,
   "no_match": 2380,
-  "not_derived": 359,
+  "not_derived": 361,
   "parameters_only": 459
  },
  "derivation_version": 1,
@@ -2792,6 +2792,10 @@
     }
    ]
   },
+  "136-38-8-b": {
+   "bucket": "not_derived",
+   "matches": []
+  },
   "136-4-18": {
    "bucket": "literature",
    "matches": [
@@ -3769,6 +3773,10 @@
      "source": "codetables"
     }
    ]
+  },
+  "152-42-8-b": {
+   "bucket": "not_derived",
+   "matches": []
   },
   "152-58-2": {
    "bucket": "literature",
