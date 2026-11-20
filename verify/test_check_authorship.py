@@ -493,6 +493,16 @@ def main():
         rc = check_authorship.main(
             ["--author", "bob", "--root", td, "--base", "main"])
         check("deleting a code and all its circuits together passes", rc == 0)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        dems = [("circuits/60-8-6/memory_x.dem", "# dem\n"),
+                ("circuits/60-8-6/memory_z.dem", "# dem\n")]
+        make_repo(td, base_doc=HAS_CIRCUIT, extra=STIM + dems)
+        git(td, "rm", "-q", *[path for path, _ in dems])
+        git(td, "commit", "-q", "-m", "drop legacy .dem files")
+        rc = check_authorship.main(
+            ["--author", "bob", "--root", td, "--base", "main"])
+        check("deleting legacy .dem files by a non-author passes",
+              rc == 0 and not check_authorship.circuits_changed("main", td, "60-8-6"))
 
     OTHER = copy.deepcopy(BASE_DOC)
     OTHER["n"], OTHER["k"] = 70, 4

@@ -415,11 +415,10 @@ def test_record_reruns_an_entry_when_anything_it_read_changed(tmp_path, monkeypa
     _write(root, "circuits/b-1-1/memory_x.stim", "# rescheduled again\n")
     rc, checked = _run_circuit(monkeypatch, argv)
     assert rc == 0 and checked == ["a-1-1", "b-1-1"]
-    _write(root, "circuits/c-1-1/memory_z.dem", "# a new file beside the old one\n")
+    _write(root, "circuits/c-1-1/memory_z.dem", "# legacy dem ignored by record\n")
     rc, checked = _run_circuit(monkeypatch, argv)
-    assert rc == 0 and checked == ["c-1-1"]
-    os.rename(os.path.join(root, "circuits/c-1-1/memory_z.dem"),
-              os.path.join(root, "circuits/c-1-1/memory_y.dem"))       # same bytes, new name
+    assert rc == 0 and checked == []
+    _write(root, "circuits/c-1-1/memory_z.stim", "# rescheduled\n")
     rc, checked = _run_circuit(monkeypatch, argv)
     assert rc == 0 and checked == ["c-1-1"]
     rc, checked = _run_circuit(monkeypatch, argv)

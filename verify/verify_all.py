@@ -394,22 +394,20 @@ def circuit_stack_digest(root=ROOT):
 def circuit_entry_key(stack, entry_path, circuits_dir):
     """Digest what one circuit verdict was about, or None if it cannot be read.
 
-    The stack digest, the entry file's bytes, and the path and bytes of every
-    file under circuits_dir. None means the entry is checked and never
-    recorded.
+    The stack digest, the entry file's bytes, and the path and bytes of
+    memory_x.stim and memory_z.stim under circuits_dir. None means the entry
+    is checked and never recorded.
     """
     h = hashlib.sha256()
     h.update(stack.encode() + b"\0")
     try:
         h.update(_file_digest(entry_path))
-        files = []
-        for dirpath, dirnames, filenames in os.walk(circuits_dir):
-            dirnames.sort()
-            files += [os.path.join(dirpath, name) for name in filenames]
-        for path in sorted(files):
-            rel = os.path.relpath(path, circuits_dir).replace(os.sep, "/")
+        for rel in ("memory_x.stim", "memory_z.stim"):
             h.update(rel.encode() + b"\0")
-            h.update(_file_digest(path))
+            try:
+                h.update(_file_digest(os.path.join(circuits_dir, rel)))
+            except FileNotFoundError:
+                h.update(b"absent")
     except OSError:
         return None
     return h.hexdigest()

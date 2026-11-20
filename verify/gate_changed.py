@@ -143,14 +143,17 @@ FOLD_SECONDS_STD = 60.0
 
 
 def map_changed(paths):
-    """Changed paths -> the code JSONs the gate must run on. A change under
-    circuits/<slug>/ is a change to that entry's circuit-tier claim surface
-    (the DEM the witnesses live in), so it maps back to codes/<slug>.json --
-    a schedule swap cannot dodge the gate by leaving the JSON untouched."""
+    """Changed paths -> the code JSONs the gate must run on. A change to
+    memory_x.stim or memory_z.stim under circuits/<slug>/ is a change to that
+    entry's circuit-tier claim surface (the DEM is derived from them), so it
+    maps back to codes/<slug>.json -- a schedule swap cannot dodge the gate by
+    leaving the JSON untouched. Deleting legacy .dem files is ignored."""
     files = []
     for p in paths:
-        if p.startswith("circuits/") and p.count("/") >= 2:
-            p = f"codes/{p.split('/')[1]}.json"
+        parts = p.split("/")
+        if (len(parts) == 3 and parts[0] == "circuits"
+                and parts[2] in ("memory_x.stim", "memory_z.stim")):
+            p = f"codes/{parts[1]}.json"
         if p.endswith(".json") and p not in files:
             files.append(p)
     return files
@@ -509,12 +512,13 @@ def circuit_gate_needed(base_doc, doc, circuits_diffed):
 
 
 def _circuits_diffed(base, code_root, slug):
-    """Did anything under circuits/<slug>/ change vs base? Fails closed (True)
-    when the diff cannot be computed."""
+    """Did memory_x.stim or memory_z.stim under circuits/<slug>/ change vs base?
+    Fails closed (True) when the diff cannot be computed."""
     try:
         out = subprocess.check_output(
             ["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD", "--",
-             f"circuits/{slug}"], cwd=code_root, text=True)
+             f"circuits/{slug}/memory_x.stim", f"circuits/{slug}/memory_z.stim"],
+            cwd=code_root, text=True)
         return bool(out.strip())
     except Exception:
         return True
