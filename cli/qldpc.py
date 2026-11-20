@@ -1506,9 +1506,10 @@ def _suggested_slug_doc(slug, out_dir):
     return f"{slug}-{i}"
 
 
-def _revision_check(doc, report, args, res):
+def _revision_check(doc, report, args, res, slug=None):
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
-    slug = f"{n}-{k}-{d}"
+    if slug is None:
+        slug = getattr(args, "slug", "") or f"{n}-{k}-{d}"
     out_dir = args.out
     code_path = os.path.join(out_dir, f"{slug}.json")
     if not os.path.exists(code_path):
@@ -1551,11 +1552,14 @@ def _revision_check(doc, report, args, res):
                     f"new version is {status}; does not advance over the "
                     f"version it replaces; distinct code collides with the "
                     f"existing entry; file it as a suffixed slug "
-                    f"({suggested}) instead of overwriting"]
+                    f"({suggested}) instead of overwriting (re-run with "
+                    f"--slug {suggested})"]
     else:
         problems = [f"{code_path} overwrites existing entry {old_slug}; "
                     f"new version is {status}; does not advance over the "
-                    f"version it replaces"]
+                    f"version it replaces (re-run with --slug "
+                    f"{_suggested_slug_doc(slug, out_dir)} to file it as a "
+                    f"new entry)"]
     if args.dry_run:
         res.setdefault("would_refuse", []).extend(problems)
         print("\n--dry-run: the real run would be refused as a revision/overwrite:")
@@ -1668,11 +1672,11 @@ def cmd_submit(args):
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
     print(f"  OK  verified. score kd^2/n = {round(k * d * d / n, 3)}")
 
-    slug = f"{n}-{k}-{d}"
+    slug = getattr(args, "slug", "") or f"{n}-{k}-{d}"
     res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
                score=round(k * d * d / n, 3),
                earned_distance=report.get("earned_distance"))
-    rc = _revision_check(doc, report, args, res)
+    rc = _revision_check(doc, report, args, res, slug=slug)
     if rc:
         return rc
     rc = _peer_audit_check(doc, report, args, res, slug)
@@ -3391,6 +3395,13 @@ def main(argv=None):
                         "lower it to file a thinner claim knowingly")
     s.add_argument("--seed", type=int, default=0)
     s.add_argument("--out", default=os.path.join(_ROOT, "codes"))
+    s.add_argument("--slug", default="",
+                   help="override the board slug (default <n>-<k>-<d>) used for "
+                        "codes/<slug>.json, notes/<slug>.md, circuits/<slug>/, "
+                        "the PR branch, and the PR body. Use a suffixed slug "
+                        "(e.g. 32-14-4-b) when a distinct code collides with "
+                        "an existing entry on (n, k, d), instead of "
+                        "overwriting it (issue #5732).")
     s.add_argument("--force", action="store_true",
                    help="overwrite an existing codes/<slug>.json")
     s.add_argument("--dry-run", action="store_true",

@@ -559,6 +559,7 @@
     "verify_structural_s": 0.68
    },
    "k": 132,
+   "measured_slug": "682-132-64",
    "n": 682,
    "role": "w=24",
    "rungs": {
@@ -579,7 +580,7 @@
     "submit_search_extrapolated": true,
     "submit_search_s": 3404.31
    },
-   "slug": "682-132-64",
+   "slug": "682-132-56",
    "w": 24
   },
   {

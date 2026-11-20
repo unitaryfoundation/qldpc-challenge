@@ -3,6 +3,23 @@
 You bring `H_X` and `H_Z`; one command turns them into a verified, PR-ready
 submission.
 
+## Clone options
+
+The working tree is large (mostly `circuits/`, ~8 GB). Use a partial clone to
+avoid downloading everything:
+
+```bash
+# Partial clone: blobs fetched on demand (recommended)
+git clone --filter=blob:none --sparse https://github.com/unitaryfoundation/qldpc-challenge.git
+cd qldpc-challenge
+git sparse-checkout set codes circuits notes fieldnotes repro certs
+
+# Codes and notes only (no circuits)
+git sparse-checkout set codes notes fieldnotes repro certs
+```
+
+Or run `./scripts/clone-sparse.sh [--no-circuits]`.
+
 ## One command
 
 ```
@@ -361,7 +378,12 @@ on `n, k, d` (or on the stabilizer group) must be filed as a new, suffixed
 entry (`-b`, `-c`, …) via `coordination.unique_path` / `submit.make_submission`,
 never by overwriting the existing file. `./qldpc submit` and
 `research/kit/promote.py` refuse an overwrite that is not a strict improvement
-and name the suffixed slug to use instead.
+and name the suffixed slug to use instead; pass it back with `--slug <suggested>`
+(to `./qldpc submit`) or `slug=<suggested>` (to `promote()`), so that
+`codes/<slug>.json`, `notes/<slug>.md`, `circuits/<slug>/`, the PR branch and
+the PR body all carry the same suffixed slug. Hand-renaming only some of those
+paths is what produced the nested-directory and note-overwrite incidents
+(issue #5732, PR #6849).
 
 ## One code, one entry
 
