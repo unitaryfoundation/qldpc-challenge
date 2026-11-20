@@ -23,8 +23,17 @@ from typing import Any, Optional
 QEDIST_SCHEMA = "cssdist.code.v1"
 
 
-def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True) -> dict:
-    """Convert a challenge code document (CSS) into a QEDist code document."""
+def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True,
+                        symmetries: bool = False) -> dict:
+    """Convert a challenge code document (CSS) into a QEDist code document.
+
+    With ``symmetries`` the document also carries ``symmetry_generators``,
+    the qubit permutations under which both check sets are invariant
+    (tanner_symmetry_generators), so the tool searches one root per orbit
+    instead of one per qubit (issue #6867). QEDist verifies each generator
+    against the stabilizer spaces before using it, so a wrong one is
+    rejected, never trusted.
+    """
     if doc.get("code_type", "CSS") != "CSS":
         raise ValueError(
             "QEDist only handles CSS codes; got code_type=%r" % doc.get("code_type")
@@ -49,7 +58,104 @@ def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True) -> dict:
                 witnesses[sector] = [list(sec["witness"])]
         if witnesses:
             out["witnesses"] = witnesses
+    if symmetries:
+        gens = tanner_symmetry_generators(n, checks["X"], checks["Z"])
+        if gens:
+            out["symmetry_generators"] = gens
     return out
+
+
+def tanner_symmetry_generators(n: int, hx, hz) -> list[list[int]]:
+    """Generators of the qubit permutations preserving both check sets.
+
+    The automorphism group of the Tanner graph with three vertex colors
+    (qubits, X checks, Z checks) maps checks to checks of the same type, so
+    its restriction to the qubits permutes the rows of H_X among themselves
+    and the rows of H_Z among themselves, which is what QEDist's
+    ``symmetry_generators`` asks for. Each generator is the image list of the
+    qubits (the tool's convention). The identity is dropped; the list is
+    empty when the group is trivial or pynauty is not installed. nauty
+    returns a generating set, not the group, so the list stays short however
+    large the group is.
+    """
+    try:
+        import pynauty
+    except ImportError:
+        return []
+    hx = [sorted(int(q) for q in row) for row in hx]
+    hz = [sorted(int(q) for q in row) for row in hz]
+    mx, mz = len(hx), len(hz)
+    adjacency = {q: [] for q in range(n)}
+    for i, row in enumerate(hx):
+        adjacency[n + i] = row
+    for j, row in enumerate(hz):
+        adjacency[n + mx + j] = row
+    coloring = [c for c in (set(range(n)), set(range(n, n + mx)),
+                            set(range(n + mx, n + mx + mz))) if c]
+    graph = pynauty.Graph(n + mx + mz, directed=False, adjacency_dict=adjacency,
+                          vertex_coloring=coloring)
+    generators, *_ = pynauty.autgrp(graph)
+    identity = list(range(n))
+    out = []
+    for perm in generators:
+        image = [int(perm[q]) for q in range(n)]
+        if image != identity:
+            out.append(image)
+    return out
+
+
+def qedist_commit(prefix: Optional[list[str]] = None) -> Optional[str]:
+    """Short commit of the git checkout the QEDist executable lives in, or None.
+
+    The install recipe is a venv inside the clone, so the console script sits
+    under ``<checkout>/.venv/bin``; walking up from the resolved executable to
+    the first ``.git`` finds the checkout. A wheel install has no checkout and
+    gives None, and the certificate then records the version alone.
+    """
+    prefix = prefix or find_qedist()
+    if not prefix or len(prefix) != 1:
+        return None
+    exe = prefix[0]
+    if os.sep not in exe:
+        exe = shutil.which(exe) or ""      # a bare command name resolves on PATH, never against the cwd
+    if not exe or not os.path.isfile(exe):
+        return None
+    cur = os.path.dirname(os.path.realpath(exe))
+    while cur and cur != os.path.dirname(cur):
+        if os.path.isdir(os.path.join(cur, ".git")):
+            try:
+                return subprocess.check_output(
+                    ["git", "-C", cur, "rev-parse", "--short=12", "HEAD"],
+                    text=True, stderr=subprocess.DEVNULL).strip() or None
+            except (OSError, subprocess.CalledProcessError):
+                return None
+        cur = os.path.dirname(cur)
+    return None
+
+
+def qedist_version(prefix: Optional[list[str]] = None) -> str:
+    """The tool's own version line (``QEDist 0.1``), or ``QEDist`` when it cannot be asked."""
+    prefix = prefix or find_qedist()
+    if not prefix:
+        return "QEDist"
+    try:
+        out = (subprocess.run(prefix + ["--version"], capture_output=True, text=True)  # noqa: PLW1510
+               .stdout or "").strip()
+    except (OSError, subprocess.SubprocessError):
+        return "QEDist"
+    return out.splitlines()[0].strip() if out else "QEDist"
+
+
+def solver_string(prefix: Optional[list[str]] = None, suffix: str = "") -> str:
+    """The certificate's ``solver`` field: version, commit when known, repository, and method.
+
+    Stamped from what is installed rather than hardcoded (#2349), so a record
+    names the tool that made it: ``QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist)
+    exhaustive search``.
+    """
+    commit = qedist_commit(prefix)
+    head = qedist_version(prefix) + (f" {commit}" if commit else "")
+    return f"{head} (yeon-lee/QEDist) exhaustive search{suffix}"
 
 
 def find_qedist() -> Optional[list[str]]:
