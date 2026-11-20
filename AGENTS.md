@@ -127,6 +127,11 @@ whole file.
 
 The two rules, here so they are never missed:
 
+**Dedup before submitting.** Before opening PRs for a batch of candidates, run
+`uv run python research/kit/dedup_submissions.py <candidate files...>` and collapse each
+`(n,k,d,w)` / canonical-form group to one representative. Do not open multiple PRs for
+the same `(n,k,d,w)`.
+
 **No code is a "find" until `verify/validate_candidate.py` returns `passed: true` for it.**
 Run it as `uv run --extra research python research/kit/coordination.py gate <path>`, which
 calls the gate unchanged and writes its verdict to `<path>.verdict.json` beside the candidate;

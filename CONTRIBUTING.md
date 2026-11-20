@@ -92,6 +92,12 @@ Useful flags:
   not be bound to a GitHub account);
 - `--dry-run` build and verify without writing.
 
+When submitting several codes, deduplicate them first by `(n,k,d,w)` (and by
+canonical form for stabilizer codes) so you open one PR per distinct code, not
+one per candidate file. Run
+`uv run python research/kit/dedup_submissions.py <candidate files...>` before
+opening PRs.
+
 Either way — `--open-pr`, or the commands it prints for you to run — the PR
 body is drafted for you from
 [`.github/pull_request_template.md`](.github/pull_request_template.md) and the
