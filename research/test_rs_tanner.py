@@ -1,8 +1,9 @@
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "kit"))
 import numpy as np
-from rs_tanner import (make_tanner_code, to_binary, tanner_css_from_hp,
-                      gf_mul, gf_inv, rs_parity_check)
+from rs_tanner import gf_inv, gf_mul, make_tanner_code, rs_parity_check, tanner_css_from_hp, to_binary
 
 
 def test_gf_inverse():
