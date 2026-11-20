@@ -5,7 +5,7 @@
     ".github/workflows/prose.yml": "96fee3fcf426104e4a656aa8a6afb1d691bac91a3b90e96d150b620937f2b010",
     ".github/workflows/proof-replay.yml": "bebc5eec7ebfcbfb7337620eaf43787dfa804638f62986bc653cc163030c43eb",
     ".github/workflows/refute-weekly.yml": "ed51e3bc129339ea20a789460734d3df9301abb83d9cea368290c9e7189626bb",
-    ".github/workflows/verify.yml": "f84343ce2db88812b336862205821d02a13ab063fb80e26f8fb71beb9ab58524",
+    ".github/workflows/verify.yml": "86d7516b728ff282d120c167d882ad453faa0ca25e0bdb7d8eb297baf603cdf7",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
     "pyproject.toml": "4ffed0efc3c64d893ef53a8b88205d563c38a23dc31680fad55f5bea2fbbf939",
     "uv.lock": "9a9e47507c05f376002b77bd4f6d43325e7df145521b6a5fcc7f12709045732d",
