@@ -58,6 +58,27 @@ already screened, at what depth, and what the gate said about it, and
 `./qldpc negatives` lists what earlier campaigns closed, what each closure
 assumed, and what change would make it worth retrying.
 
+## Clone options
+
+The working tree is large (mostly `circuits/`, ~8 GB). Pick the clone that
+matches what you need:
+
+```bash
+# Partial clone, no blob download until needed (recommended; ~1.1 GB pack)
+git clone --filter=blob:none --sparse https://github.com/unitaryfoundation/qldpc-challenge.git
+cd qldpc-challenge
+git sparse-checkout set codes circuits notes fieldnotes repro certs
+
+# Codes and notes only (skip circuits entirely; ~0.4 GB)
+git sparse-checkout set codes notes fieldnotes repro certs
+
+# One-shot shallow snapshot (no history; breaks `qldpc recent`/blame)
+git clone --depth 1 https://github.com/unitaryfoundation/qldpc-challenge.git
+```
+
+Or run `./scripts/clone-sparse.sh [--no-circuits]`. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
+
 ## Installation
 
 This repo uses [uv](https://docs.astral.sh/uv/) to manage the Python environment. Install it from the [uv docs](https://docs.astral.sh/uv/getting-started/installation/); after that `uv run` sets up the environment on first use, so there is no separate install step here.
