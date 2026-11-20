@@ -77,14 +77,17 @@ def test_the_smallest_entry_replays_end_to_end(tmp_path):
         assert blk["drat_trim"] == "VERIFIED"
 
 
-def test_shards_partition_the_set_in_slug_order():
-    items = [f"s{i:02d}" for i in range(13)]
-    shards = [R.select_shard(items, f"{i}/4") for i in range(4)]
+def test_shards_partition_and_balance_by_recorded_runtime():
+    items = ["a", "b", "c", "d", "e", "f"]
+    secs = {"a": 12, "b": 11, "c": 10, "d": 9, "e": 2, "f": 1}
+    shards = [R.select_shard(items, f"{i}/3", secs) for i in range(3)]
     assert sorted(sum(shards, [])) == items
-    assert shards[0] == ["s00", "s04", "s08", "s12"] and shards[3] == ["s03", "s07", "s11"]
-    for bad in ("4/4", "-1/4", "0/0", "x"):
+    assert shards == [["a", "f"], ["b", "e"], ["c", "d"]]
+    loads = [sum(secs[s] for s in shard) for shard in shards]
+    assert loads == [13, 13, 19]
+    for bad in ("3/3", "-1/3", "0/0", "x"):
         with pytest.raises(ValueError):
-            R.select_shard(items, bad)
+            R.select_shard(items, bad, secs)
 
 
 def test_a_budget_stops_opening_entries_and_is_reported_not_failed(monkeypatch, capsys):
@@ -102,3 +105,20 @@ def test_a_budget_stops_opening_entries_and_is_reported_not_failed(monkeypatch, 
     rc = R.main(["--all", "--shard", "1/2"])
     assert rc == 0 and opened == ["e1", "e3"]
     assert "2 replayed, 0 failed" in capsys.readouterr().out
+
+
+def test_budget_skips_an_entry_that_wont_fit_and_runs_smaller_entries(monkeypatch, capsys):
+    certs = {slug: {"verification": {"level": "proof_log"}} for slug in ("a-long", "b-short")}
+    secs = {"a-long": 8, "b-short": 2}
+    monkeypatch.setattr(R, "replayable", lambda: certs)
+    monkeypatch.setattr(R, "recorded_secs", lambda: secs)
+    monkeypatch.setattr(R.shutil, "which", lambda tool: "/usr/bin/" + tool)
+    opened = []
+    monkeypatch.setattr(
+        R, "replay", lambda slug, cert, work, tlim: (opened.append(slug), {"ok": True, "sides": {}})[1]
+    )
+
+    rc = R.main(["--all", "--max-minutes", "0.1"])
+
+    assert rc == 0 and opened == ["b-short"]
+    assert "1 replayed, 0 failed, 1 left unopened at the 0.1 min budget" in capsys.readouterr().out

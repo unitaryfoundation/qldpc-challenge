@@ -643,13 +643,18 @@ def _tropidist_attempt(path, slug, tlim, root, threads, certify_tropidist, start
         return None, str(e), False
 
 
-def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, tropidist_root=None, script=None):
+def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, tropidist_root=None, script=None,
+                         ladder=None, start=None):
     cmd = [sys.executable, script or QEDIST_CERTIFY, path,
            "--tlim", str(float(tlim)), "--threads", str(int(threads)), "--json"]
     if qedist_root:
         cmd += ["--qedist", qedist_root]
     if tropidist_root:
         cmd += ["--tropidist", tropidist_root]
+    if ladder:
+        cmd += ["--ladder", str(float(ladder))]
+        if start and int(start) > 1:
+            cmd += ["--kmin", str(int(start))]
     proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
                             start_new_session=True)
     try:
@@ -670,10 +675,12 @@ def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, tropidist
         return None, f"qedist_certify printed no record for {slug}", False
 
 
-def _qedist_attempt(path, slug, tlim, qedist_root, threads, certify_qedist, start=None, tropidist_root=None):
+def _qedist_attempt(path, slug, tlim, qedist_root, threads, certify_qedist, start=None, tropidist_root=None,
+                    ladder=None):
     if certify_qedist is None:
-        return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, tropidist_wall(tlim),
-                                    tropidist_root=tropidist_root)
+        wall = tropidist_wall(tlim) if not ladder else max(tropidist_wall(tlim), WALL_FLOOR + 2 * float(ladder) * 64)
+        return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall,
+                                    tropidist_root=tropidist_root, ladder=ladder, start=start)
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
     try:
@@ -764,7 +771,8 @@ def run_sweep(*, queue, out_dir, attempts_path, tlim, job_seconds, max_entries=0
             if "qedist" in backend:
                 used = "qedist"
                 cert, error, killed = _qedist_attempt(path, slug, tlim, qedist, threads, certify_qedist,
-                                                     start=row.get("start"), tropidist_root=tropidist)
+                                                     start=row.get("start"), tropidist_root=tropidist,
+                                                     ladder=ladder)
             else:
                 used = "tropidist"
                 cert, error, killed = _tropidist_attempt(path, slug, tlim, tropidist, threads, certify_tropidist,

@@ -1,0 +1,275 @@
+{
+ "schema_version": "0.2",
+ "name": "[[32,14,4]] color code from Derks et al. (arXiv:2611.23420)",
+ "code_type": "CSS",
+ "n": 32,
+ "k": 14,
+ "checks": {
+  "X": [
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+   ],
+   [
+    0,
+    1,
+    8,
+    9,
+    16,
+    17,
+    24,
+    25
+   ],
+   [
+    2,
+    3,
+    10,
+    11,
+    18,
+    19,
+    26,
+    27
+   ],
+   [
+    4,
+    5,
+    12,
+    13,
+    20,
+    21,
+    28,
+    29
+   ],
+   [
+    6,
+    7,
+    14,
+    15,
+    22,
+    23,
+    30,
+    31
+   ],
+   [
+    0,
+    7,
+    13,
+    14,
+    19,
+    20,
+    25,
+    26
+   ],
+   [
+    1,
+    2,
+    8,
+    15,
+    21,
+    22,
+    27,
+    28
+   ],
+   [
+    3,
+    4,
+    9,
+    10,
+    16,
+    23,
+    29,
+    30
+   ],
+   [
+    5,
+    6,
+    11,
+    12,
+    17,
+    18,
+    24,
+    31
+   ]
+  ],
+  "Z": [
+   [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+   ],
+   [
+    0,
+    1,
+    8,
+    9,
+    16,
+    17,
+    24,
+    25
+   ],
+   [
+    2,
+    3,
+    10,
+    11,
+    18,
+    19,
+    26,
+    27
+   ],
+   [
+    4,
+    5,
+    12,
+    13,
+    20,
+    21,
+    28,
+    29
+   ],
+   [
+    6,
+    7,
+    14,
+    15,
+    22,
+    23,
+    30,
+    31
+   ],
+   [
+    0,
+    7,
+    13,
+    14,
+    19,
+    20,
+    25,
+    26
+   ],
+   [
+    1,
+    2,
+    8,
+    15,
+    21,
+    22,
+    27,
+    28
+   ],
+   [
+    3,
+    4,
+    9,
+    10,
+    16,
+    23,
+    29,
+    30
+   ],
+   [
+    5,
+    6,
+    11,
+    12,
+    17,
+    18,
+    24,
+    31
+   ]
+  ]
+ },
+ "distance": {
+  "d": 4,
+  "X": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    16,
+    24,
+    29
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@autoresearch"
+    ],
+    "date": "2026-11-19",
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     3
+    ]
+   }
+  },
+  "Z": {
+   "value": 4,
+   "confidence": "upper_bound",
+   "witness": [
+    3,
+    22,
+    27,
+    30
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@autoresearch"
+    ],
+    "date": "2026-11-19",
+    "found_at_samples": 2000,
+    "survived_samples": 2000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     4
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "autoresearch",
+   "@mathysrennela"
+  ],
+  "construction": "2D color code on a genus-2 surface (Dyck map) from Derks et al., 'High-rate low-distance color codes', arXiv:2611.23420 (Appendix F.3): two red faces removed from the closed m=4 lattice.",
+  "references": [
+   "https://arxiv.org/abs/2611.23420"
+  ],
+  "date": "2026-11-19",
+  "notes": "",
+  "model": "Beam 1.0",
+  "harness": "OpenCode agent harness"
+ },
+ "family": "topological"
+}

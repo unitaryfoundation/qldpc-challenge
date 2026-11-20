@@ -355,59 +355,59 @@
  },
  "circuit": {
   "d_circ": {
-   "X": {
-    "value": 3,
-    "confidence": "upper_bound",
-    "witness": [
-     1943,
-     1945,
-     2835
-    ]
-   },
    "Z": {
     "value": 3,
     "confidence": "upper_bound",
     "witness": [
-     1259,
-     1267,
-     2990
+     2368,
+     2379,
+     2415
+    ]
+   },
+   "X": {
+    "value": 3,
+    "confidence": "upper_bound",
+    "witness": [
+     3246,
+     3271,
+     3378
     ]
    }
   },
   "rounds": 3,
   "stim_version": "1.16.0",
-  "notes": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [8, 9, 2, 1, 7, 3, 4, 5, 6], Z-check term slots [1, 2, 8, 7, 0, 3, 6, 5, 4] over terms A_0..A_4, B_0..B_3); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "notes": "SAT-scheduled interleaved X+Z extraction with 1-flag co-scheduled into idle ancilla slots (11 CX layers, 13 TICKs/round, 54 qubits total; replaces 22.3-TICK/round schedule); witnesses from RIS on ker(H_dem) at twice the gate trial budget.",
   "contributed_by": {
    "by": [
     "@FarLab"
    ],
-   "date": "2026-10-30",
-   "method": "Johnson-coil flagged interleaved two-block extraction (max_flags=4 per check, 10 data CX slots per round, X-check term slots [8, 9, 2, 1, 7, 3, 4, 5, 6], Z-check term slots [1, 2, 8, 7, 0, 3, 6, 5, 4] over terms A_0..A_4, B_0..B_3)"
+   "date": "2026-11-19",
+   "method": "SAT interleaved X+Z + co-scheduled minimal-flag schedule search, verified by verify/circuit_verify.py"
   },
   "ler": {
    "X": [
     {
      "p": 0.002,
      "shots": 10000,
-     "failures": 3892,
+     "failures": 1631,
      "seed": 20261006,
      "decoder": "bposd-cs-10",
-     "ler_per_round": 0.197429495,
+     "ler_per_round": 0.061657406,
      "ci95": [
-      0.189007787,
-      0.206430347
+      0.058594535,
+      0.064877542
      ]
     },
     {
      "p": 0.001,
      "shots": 10000,
-     "failures": 1372,
+     "failures": 540,
      "seed": 20261006,
      "decoder": "bposd-cs-10",
-     "ler_per_round": 0.050700679,
+     "ler_per_round": 0.018689921,
      "ci95": [
-      0.047990775,
-      0.05356014
+      0.017161973,
+      0.020351671
      ]
     }
    ],
@@ -415,25 +415,25 @@
     {
      "p": 0.002,
      "shots": 10000,
-     "failures": 3945,
+     "failures": 1714,
      "seed": 20261006,
      "decoder": "bposd-cs-10",
-     "ler_per_round": 0.202332909,
+     "ler_per_round": 0.065287105,
      "ci95": [
-      0.193620935,
-      0.211668264
+      0.062109025,
+      0.068625332
      ]
     },
     {
      "p": 0.001,
      "shots": 10000,
-     "failures": 1401,
+     "failures": 559,
      "seed": 20261006,
      "decoder": "bposd-cs-10",
-     "ler_per_round": 0.051901024,
+     "ler_per_round": 0.019374369,
      "ci95": [
-      0.049151908,
-      0.054800473
+      0.017815789,
+      0.021067002
      ]
     }
    ]
