@@ -1,4 +1,5 @@
 """Reed-Solomon Tanner codes over GF(2^m) and binary conversion."""
+
 import numpy as np
 
 _IRRED = {2: 0b111, 3: 0b1011, 4: 0b10011, 5: 0b100101, 6: 0b1000011}
@@ -21,7 +22,7 @@ def gf_mul(a, b, m):
         hi = a >> (m - 1)
         a = (a << 1) & mask
         if hi:
-            a ^= (poly & mask)
+            a ^= poly & mask
     return res
 
 
@@ -94,7 +95,6 @@ def _rs_generator_matrix(S, k, m):
 
 
 def rs_parity_check(S, k, m):
-    n = len(S)
     G = _rs_generator_matrix(S, k, m)
     H = _null_space_gf(G.tolist(), m)
     return H
@@ -163,16 +163,17 @@ def to_binary(H, m):
 
 
 def tanner_css_from_hp(Hbin):
-    import os, sys
+    import os
+    import sys
+
     sys.path.insert(0, os.path.dirname(__file__))
     from products import hypergraph_product
+
     HX, HZ = hypergraph_product(Hbin, Hbin)
     return HX, HZ
 
 
 def sample_tanner(num, *, seed=0):
-    import numpy as np
-    rng = np.random.default_rng(seed)
     yielded = 0
     edges_k33 = [(u, v) for u in range(3) for v in range(3)]
     for _ in range(num * 5):
@@ -183,7 +184,6 @@ def sample_tanner(num, *, seed=0):
         HX, HZ = tanner_css_from_hp(Hbin)
         if HX.shape[1] > 1000:
             continue
-        spec = {"family": "other", "construction": "rs-tanner-hp",
-                "graph": "K3,3", "field": "F4", "local": "RS(3,2)"}
+        spec = {"family": "other", "construction": "rs-tanner-hp", "graph": "K3,3", "field": "F4", "local": "RS(3,2)"}
         yield (spec, HX, HZ)
         yielded += 1
