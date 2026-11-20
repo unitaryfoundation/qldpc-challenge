@@ -1,6 +1,6 @@
 {
  "schema_version": "0.3",
- "name": "[[924,29,27]] weight-8 open-boundary planar tile code (21x22, S_f=[(0, 0), (1, 3), (2, 1), (4, 4)], S_g=[(0, 2), (1, 4), (3, 1), (4, 0)])",
+ "name": "[[924,29,26]] weight-8 open-boundary planar tile code (21x22, S_f=[(0, 0), (1, 3), (2, 1), (4, 4)], S_g=[(0, 2), (1, 4), (3, 1), (4, 0)])",
  "code_type": "CSS",
  "n": 924,
  "k": 29,
@@ -7830,14 +7830,12 @@
   ]
  },
  "distance": {
-  "d": 27,
+  "d": 26,
   "X": {
-   "value": 27,
+   "value": 26,
    "confidence": "upper_bound",
    "witness": [
-    10,
-    31,
-    65,
+    17,
     103,
     127,
     168,
@@ -7848,10 +7846,12 @@
     341,
     381,
     408,
-    475,
+    446,
+    476,
     487,
-    502,
+    489,
     514,
+    523,
     534,
     581,
     738,
@@ -7860,19 +7860,17 @@
     824,
     825,
     872,
-    891,
-    910
+    891
    ],
    "witness_provenance": {
     "found_by": [
-     "@l6-w8-2dlocal-n700-1000"
+     "@Ming-yuan-Liang"
     ],
-    "date": "2026-11-09",
-    "found_at_samples": 200000,
-    "survived_samples": 200000,
-    "tool": "research/kit/surrogate.distance_rand_witness (gf2_fast backend, threads=2)",
+    "date": "2026-11-20",
+    "found_at_samples": 1910000,
+    "tool": "verify/gate_changed.py RIS-fast (CI verify job 136455297210)",
     "seeds": [
-     401
+     1638707898
     ]
    }
   },
@@ -7933,7 +7931,7 @@
   "construction": "Open-boundary planar BB code (Liang-Yang-Iosue-Chen boundary construction, Liang-Eberhardt-Chen planar tile family): research/local2d/boundary_engine.build_planar(21, 22, S_f=[(0, 0), (1, 3), (2, 1), (4, 4)], S_g=[(0, 2), (1, 4), (3, 1), (4, 0)]) followed by reduce_weights; bilayer layout planar.grid_coordinates (A and B qubits of cell (i,j) at site (i,j) on two layers). Supports found by this lane's mutation search over 4+4 monomials in the B=5 box around the board's B5-29/B5-32 pairs.",
   "references": [],
   "date": "2026-11-09",
-  "notes": "Lane w8-2dlocal-n700-1000 (L6). Ladder: screen 3x20000 (pd22) + 3x100000 (pd20); deep fast-backend 200k x3 (pd16) and 1M-class x4+ (pd12) fresh seeds, plus numpy per-side cross-checks; claimed d is the lightest reading found on either side across all rungs (upper_bound). X witness: fast trials=200000 seed=401; Z witness: numpy trials=5000 seed=602.",
+  "notes": "Lane w8-2dlocal-n700-1000 (L6). Ladder: screen 3x20000 (pd22) + 3x100000 (pd20); deep fast-backend 200k x3 (pd16) and 1M-class x4+ (pd12) fresh seeds, plus numpy per-side cross-checks; claimed d is the lightest reading found on either side across all rungs (upper_bound). X witness: fast trials=200000 seed=401; Z witness: numpy trials=5000 seed=602. Correction 2026-11-20: CI refutation (PR #6936, RIS-fast seed 1638707898, witness found at 1,910,000 cumulative trials) found a weight-26 X-logical; repackaged at the honest reading 26.",
   "model": "GLM-5.3-Flash",
   "harness": "ZCode",
   "origin": "submission",
