@@ -49,6 +49,7 @@ What it deliberately does NOT check, and why:
   `check_prose.py` and `check_certs.py`'s jobs; this checker only answers
   "does the entry it names exist", which is the question neither of them asks.
 """
+
 import argparse
 import glob
 import os
@@ -85,7 +86,7 @@ KINDS = {
         "suffix": ".md",
         "exclude": NOTE_DOCS,
         "label": "note with no codes/<slug>.json -- site/build.py resolves "
-                 "notes through existing entries, so this one renders nowhere",
+        "notes through existing entries, so this one renders nowhere",
     },
     "certs": {
         "glob": "certs/*.json",
@@ -93,7 +94,7 @@ KINDS = {
         "suffix": ".json",
         "exclude": frozenset(),
         "label": "certificate with no codes/<slug>.json -- it still validates, "
-                 "but it attests to a file that is not here",
+        "but it attests to a file that is not here",
     },
     "heuristic": {
         "glob": "certs/heuristic/*.json",
@@ -101,8 +102,8 @@ KINDS = {
         "suffix": ".json",
         "exclude": frozenset(),
         "label": "heuristic certificate with no codes/<slug>.json -- "
-                 "check_certs.py cannot validate it, but this question "
-                 "needs no schema",
+        "check_certs.py cannot validate it, but this question "
+        "needs no schema",
     },
     "receipts": {
         "glob": "receipts/ler/*.json",
@@ -110,7 +111,7 @@ KINDS = {
         "suffix": ".json",
         "exclude": frozenset(),
         "label": "LER receipt with no codes/<slug>.json -- site/ reads "
-                 "receipts through existing entries, so this one shows nowhere",
+        "receipts through existing entries, so this one shows nowhere",
     },
     "circuits": {
         "glob": "circuits/*",
@@ -124,8 +125,7 @@ KINDS = {
 
 # A tree without these is not the tree this sweep describes; reading one
 # anyway would report a board that looks clean while skipping a location.
-REQUIRED = ("codes", "notes", "certs", "certs/heuristic", "receipts/ler",
-            "circuits")
+REQUIRED = ("codes", "notes", "certs", "certs/heuristic", "receipts/ler", "circuits")
 
 
 def code_slugs(root):
@@ -136,8 +136,7 @@ def code_slugs(root):
     site/build.py): a `codes/*.json` glob is what counts as an entry, so a
     future change to that definition stays greppable in one shape.
     """
-    return {os.path.splitext(os.path.basename(p))[0]
-            for p in glob.glob(os.path.join(root, "codes", "*.json"))}
+    return {os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(root, "codes", "*.json"))}
 
 
 def orphan_slugs(root, kind, codes):
@@ -159,16 +158,13 @@ def scan(root=ROOT):
     orphan per artifact behind it, counted once per kind.
     """
     codes = code_slugs(root)
-    return {name: orphan_slugs(root, kind, codes)
-            for name, kind in KINDS.items()}
+    return {name: orphan_slugs(root, kind, codes) for name, kind in KINDS.items()}
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--root", default=ROOT,
-                    help="tree to sweep (default: this repository)")
-    ap.add_argument("--quiet", action="store_true",
-                    help="print counts only, without listing the files")
+    ap.add_argument("--root", default=ROOT, help="tree to sweep (default: this repository)")
+    ap.add_argument("--quiet", action="store_true", help="print counts only, without listing the files")
     args = ap.parse_args(argv)
 
     root = os.path.abspath(args.root)

@@ -19,14 +19,14 @@ that nothing lighter exists.
     from annihilator import attack
     report = attack(doc, trials=40_000, seed=11)
 """
+
 import os
 import sys
 import time
 
 import numpy as np
 
-for _p in (os.path.join(os.path.dirname(os.path.dirname(
-        os.path.dirname(os.path.abspath(__file__)))), "verify"),):
+for _p in (os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "verify"),):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
@@ -47,8 +47,7 @@ def matrix(support_list, n):
 def block_columns(n, block):
     """Column indices of one of the two equal blocks."""
     half = n // 2
-    return (np.arange(half) if block == "left"
-            else np.arange(half, n))
+    return np.arange(half) if block == "left" else np.arange(half, n)
 
 
 def subspace(H_opp, cols):
@@ -79,11 +78,11 @@ def _light_vectors(K, trials, rng):
             return
         weights = R.sum(axis=1)
         order = np.argsort(weights)
-        for i in order[:min(len(order), 8)]:
+        for i in order[: min(len(order), 8)]:
             yield passes, R[i]
         # Pairs from the lightest few rows: the cheapest depth that reaches
         # a cancellation a single row cannot.
-        head = order[:min(len(order), 12)]
+        head = order[: min(len(order), 12)]
         for a_i in range(len(head)):
             for b_i in range(a_i + 1, len(head)):
                 yield passes, R[head[a_i]] ^ R[head[b_i]]
@@ -106,8 +105,7 @@ def attack_side(HX, HZ, side, block, *, trials=40_000, seed=0):
     rank_same = gf2.rank(H_same)
     rng = np.random.default_rng(seed)
     best, best_v, best_at = None, None, None
-    for at, short in _light_vectors(np.asarray(K, dtype=np.uint8), trials,
-                                    rng):
+    for at, short in _light_vectors(np.asarray(K, dtype=np.uint8), trials, rng):
         w = int(short.sum())
         if w == 0 or (best is not None and w >= best):
             continue
@@ -153,18 +151,17 @@ def attack(doc, *, trials=40_000, seed=0):
         # CSS blocks, so there is no A | B to split. Out of scope rather
         # than a failure, and recorded as such so the next sweep does not
         # retry it.
-        return {"n": n, "verdict": "skipped",
-                "detail": f"not CSS: checks are "
-                          f"{sorted(checks) or 'absent'}, so there is no "
-                          f"two-block split to attack"}
+        return {
+            "n": n,
+            "verdict": "skipped",
+            "detail": f"not CSS: checks are {sorted(checks) or 'absent'}, so there is no two-block split to attack",
+        }
     if n % 2:
-        return {"n": n, "verdict": "skipped",
-                "detail": "odd blocklength has no two equal blocks"}
+        return {"n": n, "verdict": "skipped", "detail": "odd blocklength has no two equal blocks"}
     HX = matrix(doc["checks"]["X"], n)
     HZ = matrix(doc["checks"]["Z"], n)
     d = int(doc["distance"]["d"])
-    claimed = {s: int((doc["distance"].get(s) or {}).get("value") or d)
-               for s in SIDES}
+    claimed = {s: int((doc["distance"].get(s) or {}).get("value") or d) for s in SIDES}
     t0 = time.time()
     findings, dims = [], {}
     for side in SIDES:
@@ -178,7 +175,8 @@ def attack(doc, *, trials=40_000, seed=0):
                 raise ValueError(
                     f"{side}/{block}: the search returned a vector that is "
                     f"not a logical of that type; this is a bug in the "
-                    f"attack, not a result")
+                    f"attack, not a result"
+                )
             got["claimed_side"] = claimed[side]
             if w < claimed[side]:
                 findings.append(got)
@@ -186,7 +184,15 @@ def attack(doc, *, trials=40_000, seed=0):
     verdict = "clean"
     if best is not None:
         verdict = "refuted" if best < d else "tightened"
-    return {"n": n, "claimed_d": d, "claimed_sides": claimed,
-            "subspace_dims": dims, "trials": trials, "seed": seed,
-            "secs": round(time.time() - t0, 1),
-            "verdict": verdict, "lightest": best, "findings": findings}
+    return {
+        "n": n,
+        "claimed_d": d,
+        "claimed_sides": claimed,
+        "subspace_dims": dims,
+        "trials": trials,
+        "seed": seed,
+        "secs": round(time.time() - t0, 1),
+        "verdict": verdict,
+        "lightest": best,
+        "findings": findings,
+    }

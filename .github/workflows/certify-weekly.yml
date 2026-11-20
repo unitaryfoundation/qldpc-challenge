@@ -7,12 +7,14 @@ name: certify-weekly
 # tropidist backend (research/certs/tropidist_certify.py, issue #4716) on
 # each, then verify/sat_certify.py with the proof path on a CSS entry the
 # tool closed, one time limit per solve, until the job budget is spent.
-# That is tropidist+sat, the default since issue #4939 accepted the tool's
-# verdicts at the solver level: the run fetches the tool at its pinned
-# commit, files the proof_log record where SAT finishes and the tool's
-# solver-level record otherwise, and admits stabilizer entries, which only
-# the tool certifies. A workflow_dispatch run with backend set to sat stays
-# on the SAT path and skips the fetch; tropidist runs the tool alone. The
+# The default is qedist+sat (issue #6867): research/certs/routed_certify.py
+# sends CSS and stabilizer entries with d <= 65 to QEDist (arXiv:2611.21709,
+# with the entry's Tanner-graph symmetries) and the rest to tropidist, both
+# fetched at pinned commits; SAT then files the proof_log record where it
+# finishes and the tool's solver-level record otherwise. tropidist+sat is the
+# previous default (issue #4939 accepted the tool's verdicts at the solver
+# level); a workflow_dispatch run with backend set to sat stays on the SAT
+# path and fetches no tool; tropidist or qedist runs that tool alone. The
 # SAT path also runs as an ascending ladder (W = 1, 2,
 # ... up to d - 1, the ladder input's seconds per side; issue #4230) on what
 # it leaves open, so an entry that does not close still files a partial
@@ -69,9 +71,9 @@ on:
         type: boolean
         default: false
       backend:
-        description: "tropidist+sat (default), tropidist, or sat (issues #4716 and #4939)"
+        description: "qedist+sat (default), qedist, tropidist+sat, tropidist, or sat (issues #4716, #4939, #6867)"
         required: false
-        default: "tropidist+sat"
+        default: "qedist+sat"
       ladder:
         description: "seconds per side for the ascending SAT ladder that files partial certificates (0: ask d - 1 only)"
         required: false
@@ -96,13 +98,18 @@ jobs:
       DRAT_TRIM_REF: 2e3b2dc0ecf938addbd779d42877b6ed69d9a985
       TROPIDIST_REF: b03ec2d4077f287f89f97b5c2c16ce5ce17c2c58
       TROPIDIST_ROOT: /tmp/tropidist
-      BACKEND: ${{ github.event.inputs.backend || 'tropidist+sat' }}
+      # QEDist (arXiv:2611.21709, yeon-lee/QEDist) at a pinned commit (issue
+      # #6867): the routed backend sends CSS and stabilizer entries with
+      # d <= 65 to it and the rest to tropidist, so both tools are fetched.
+      QEDIST_REF: aeb7006147b7
+      QEDIST_ROOT: /tmp/qedist
+      BACKEND: ${{ github.event.inputs.backend || 'qedist+sat' }}
       OUT_DIR: /tmp/certify-sweep
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       - name: build kissat and drat-trim
         run: |
           set -euo pipefail
@@ -116,7 +123,7 @@ jobs:
           install -m 755 /tmp/drat-trim/drat-trim /usr/local/bin/drat-trim
           kissat --version
       - name: fetch tropidist at its pinned commit (skipped by backend sat)
-        if: contains(env.BACKEND, 'tropidist')
+        if: contains(env.BACKEND, 'tropidist') || contains(env.BACKEND, 'qedist')
         run: |
           set -euo pipefail
           git clone -q https://github.com/Fanerst/tropidist.git "$TROPIDIST_ROOT"
@@ -124,6 +131,19 @@ jobs:
           # the C kernels build on first use with cc; a code problem needs only numpy, which uv provides
           uv run --frozen --extra research python research/certs/tropidist_certify.py codes/5-1-3.json \
             --tropidist "$TROPIDIST_ROOT" --tlim 60
+      - name: install QEDist at its pinned commit (skipped unless the backend names it)
+        if: contains(env.BACKEND, 'qedist')
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/yeon-lee/QEDist.git "$QEDIST_ROOT"
+          git -C "$QEDIST_ROOT" checkout -q "$QEDIST_REF"
+          python3 -m venv "$QEDIST_ROOT/.venv"
+          "$QEDIST_ROOT/.venv/bin/python" -m pip install -q "$QEDIST_ROOT"
+          # the native engine compiles on first use; a code problem needs only the standard library
+          QEDIST="$QEDIST_ROOT/.venv/bin/qedist" uv run --frozen --extra research python \
+            research/certs/qedist_certify.py codes/5-1-3.json --tlim 60 >/dev/null 2>&1 || \
+            QEDIST="$QEDIST_ROOT/.venv/bin/qedist" uv run --frozen --extra research python \
+            research/certs/qedist_certify.py codes/7-1-3.json --tlim 60
       - name: work the head of the queue
         id: sweep
         env:
@@ -143,9 +163,12 @@ jobs:
             done
           fi
           set +e
-          case "$BACKEND" in sat|tropidist|tropidist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
+          case "$BACKEND" in sat|tropidist|tropidist+sat|qedist|qedist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
           tool=""
-          case "$BACKEND" in *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";; esac
+          case "$BACKEND" in
+            *qedist*) tool="--qedist $QEDIST_ROOT --tropidist $TROPIDIST_ROOT --threads 4";;
+            *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";;
+          esac
           uv run --frozen --extra research python research/certs/certify_sweep.py run \
             --out-dir "$OUT_DIR" --tlim "$TLIM" --job-seconds $(( JOB_MINUTES * 60 )) \
             --backend "$BACKEND" $tool \
@@ -160,7 +183,7 @@ jobs:
           [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ]
       - name: keep the run's output whatever happens next
         if: always() && steps.sweep.outcome != 'skipped'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: certify-sweep-${{ github.run_number }}
           path: ${{ env.OUT_DIR }}

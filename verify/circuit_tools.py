@@ -55,18 +55,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gf2
 
 try:
-    import gf2_fast as _GF        # optional C++ accelerator (make fast); the
-except ImportError:               # search degrades to the python path without it
+    import gf2_fast as _GF  # optional C++ accelerator (make fast); the
+except ImportError:  # search degrades to the python path without it
     _GF = None
 
 P_REF = 0.001
 RESET_FLIP = {"R": "X_ERROR", "RX": "Z_ERROR"}
 MEASURES = ("M", "MX")
-ANNOTATIONS = ("TICK", "DETECTOR", "OBSERVABLE_INCLUDE", "QUBIT_COORDS",
-               "SHIFT_COORDS")
+ANNOTATIONS = ("TICK", "DETECTOR", "OBSERVABLE_INCLUDE", "QUBIT_COORDS", "SHIFT_COORDS")
 
 
 # ---------------------------------------------------------------- noise recipe
+
 
 def _is_pure_noise(name):
     gd = stim.gate_data(name)
@@ -76,7 +76,8 @@ def _is_pure_noise(name):
 def strip_noise(circuit):
     """The noiseless skeleton: noise channels removed, measurement flip
     arguments dropped. Measurement record indices are unchanged, so detector
-    and observable references stay valid."""
+    and observable references stay valid.
+    """
     out = stim.Circuit()
     for inst in circuit.flattened():
         if _is_pure_noise(inst.name):
@@ -97,10 +98,11 @@ def skeleton_errors(skeleton):
     instruction, so every one is read until that name has been reported: a
     classically controlled gate after a plain one of the same name is as far
     outside the set as one that comes first. Each failure is named once per
-    gate name."""
+    gate name.
+    """
     errs = []
-    unitary = {}                  # gate name -> is it a unitary gate
-    reported = set()              # unitary names already reported
+    unitary = {}  # gate name -> is it a unitary gate
+    reported = set()  # unitary names already reported
     for inst in skeleton.flattened():
         name = inst.name
         if name in ANNOTATIONS or name in MEASURES or name in RESET_FLIP:
@@ -108,14 +110,14 @@ def skeleton_errors(skeleton):
         if name not in unitary:
             unitary[name] = stim.gate_data(name).is_unitary
             if not unitary[name]:
-                errs.append(f"instruction {name} is outside the circuit-tier "
-                            f"gate set (unitary gates, R, RX, M, MX, and "
-                            f"annotations)")
-        if unitary[name] and name not in reported and any(
-                not t.is_qubit_target for t in inst.targets_copy()):
+                errs.append(
+                    f"instruction {name} is outside the circuit-tier "
+                    f"gate set (unitary gates, R, RX, M, MX, and "
+                    f"annotations)"
+                )
+        if unitary[name] and name not in reported and any(not t.is_qubit_target for t in inst.targets_copy()):
             reported.add(name)
-            errs.append(f"{name} with a non-qubit target (classical "
-                        f"control) is outside the circuit-tier gate set")
+            errs.append(f"{name} with a non-qubit target (classical control) is outside the circuit-tier gate set")
     return errs
 
 
@@ -165,7 +167,8 @@ def layer_conflict_errors(skeleton):
     parallel layer: no qubit targeted by more than one operation atom
     (annotations do not count). See the module docstring for why this is
     load-bearing: layer count controls idle-data noise, so a layer structure
-    that could not run on hardware would shed fault mechanisms for free."""
+    that could not run on hardware would shed fault mechanisms for free.
+    """
     errs = []
     for si, seg in enumerate(_segments(skeleton.flattened())):
         used = set()
@@ -180,7 +183,8 @@ def layer_conflict_errors(skeleton):
                     errs.append(
                         f"TICK layer {si} operates on qubit {q} more than "
                         f"once; a layer must be executable in parallel "
-                        f"(sequential operations need a TICK between them)")
+                        f"(sequential operations need a TICK between them)"
+                    )
                     break
                 used.add(q)
             if errs:
@@ -193,7 +197,8 @@ def layer_conflict_errors(skeleton):
 def apply_noise(skeleton, n_data, p=P_REF):
     """The canonical noisy circuit for a noiseless skeleton (see module
     docstring). This function IS the recipe: a submission conforms iff it
-    equals apply_noise(strip_noise(submission), n, P_REF)."""
+    equals apply_noise(strip_noise(submission), n, P_REF).
+    """
     out = stim.Circuit()
     segs = _segments(skeleton.flattened())
     for si, seg in enumerate(segs):
@@ -206,8 +211,7 @@ def apply_noise(skeleton, n_data, p=P_REF):
                 out.append(inst)
                 continue
             targets = inst.targets_copy()
-            qubits = [t.qubit_value for t in targets
-                      if t.qubit_value is not None]
+            qubits = [t.qubit_value for t in targets if t.qubit_value is not None]
             touched.update(qubits)
             active = True
             if name in MEASURES:
@@ -229,7 +233,8 @@ def apply_noise(skeleton, n_data, p=P_REF):
 def noise_recipe_errors(circuit, n_data, p=P_REF):
     """[] iff the circuit is exactly the canonical noisy form of its own
     skeleton. Any deviation -- a missing or extra channel, a wrong rate, a
-    disallowed instruction -- is reported with the first differing line."""
+    disallowed instruction -- is reported with the first differing line.
+    """
     skel = strip_noise(circuit)
     errs = skeleton_errors(skel) + layer_conflict_errors(skel)
     if errs:
@@ -241,13 +246,18 @@ def noise_recipe_errors(circuit, n_data, p=P_REF):
     wl, hl = want.splitlines(), have.splitlines()
     for i, (a, b) in enumerate(zip(wl, hl)):
         if a != b:
-            return [f"noise placement deviates from the canonical recipe at "
-                    f"instruction {i + 1}: expected '{a}', found '{b}'"]
-    return [f"noise placement deviates from the canonical recipe: circuit has "
-            f"{len(hl)} instructions, the canonical form has {len(wl)}"]
+            return [
+                f"noise placement deviates from the canonical recipe at "
+                f"instruction {i + 1}: expected '{a}', found '{b}'"
+            ]
+    return [
+        f"noise placement deviates from the canonical recipe: circuit has "
+        f"{len(hl)} instructions, the canonical form has {len(wl)}"
+    ]
 
 
 # --------------------------------------------------------------- DEM handling
+
 
 def derive_dem(circuit):
     """The pinned DEM derivation (RFC 0001 step 5): no decomposition (hook
@@ -256,9 +266,9 @@ def derive_dem(circuit):
     its error instructions in file order. The .dem is derived from the
     committed .stim, not committed; a legacy committed .dem, when present,
     is compared against this with dem_matches, not byte equality -- see
-    there for why."""
-    return circuit.detector_error_model(decompose_errors=False,
-                                        flatten_loops=True)
+    there for why.
+    """
+    return circuit.detector_error_model(decompose_errors=False, flatten_loops=True)
 
 
 def dem_matches(derived, committed, rtol=1e-9, atol=1e-12):
@@ -277,7 +287,8 @@ def dem_matches(derived, committed, rtol=1e-9, atol=1e-12):
     differ somewhere are taken apart, which is the minority (those whose
     probability lost its last digits in the committed file's text), and they
     are compared target by target with stim's own equality rather than through
-    one string per target (issue #5409)."""
+    one string per target (issue #5409).
+    """
     da = list(derived.flattened())
     ca = list(committed.flattened())
     if len(da) != len(ca):
@@ -290,16 +301,15 @@ def dem_matches(derived, committed, rtol=1e-9, atol=1e-12):
         if x.targets_copy() != y.targets_copy():
             return False
         ax, ay = x.args_copy(), y.args_copy()
-        if len(ax) != len(ay) or any(
-                abs(a - b) > rtol * max(abs(a), abs(b)) + atol
-                for a, b in zip(ax, ay)):
+        if len(ax) != len(ay) or any(abs(a - b) > rtol * max(abs(a), abs(b)) + atol for a, b in zip(ax, ay)):
             return False
     return True
 
 
 def _columns_from_instructions(flat):
     """dem_columns of a flattened DEM, one stim object per target. This is the
-    definition; _columns_from_text is a faster way to the same answer."""
+    definition; _columns_from_text is a faster way to the same answer.
+    """
     cols = []
     for inst in flat:
         if inst.type != "error":
@@ -323,7 +333,8 @@ def _columns_from_text(flat):
     `L<int>` or the separator `^`. Anything else on an error line returns
     None rather than a guess: a tag (which may contain any text; stim escapes
     line breaks inside one, so a tag cannot start a line of its own), a token
-    of another shape, a line with no closing parenthesis."""
+    of another shape, a line with no closing parenthesis.
+    """
     cols = []
     try:
         for line in str(flat).split("\n"):
@@ -332,7 +343,7 @@ def _columns_from_text(flat):
             if not line.startswith("error("):
                 return None
             ds, ls = [], []
-            for tok in line[line.index(")") + 1:].split():
+            for tok in line[line.index(")") + 1 :].split():
                 kind = tok[0]
                 if kind == "D":
                     ds.append(int(tok[1:]))
@@ -358,7 +369,8 @@ def dem_columns(dem):
     several per target. The object walk is kept as the definition and as the
     fallback: it runs whenever the text is not in the plain form
     _columns_from_text reads, or the text yields a different number of
-    columns than stim counts errors."""
+    columns than stim counts errors.
+    """
     flat = dem.flattened()
     cols = _columns_from_text(flat)
     if cols is None or len(cols) != flat.num_errors:
@@ -395,32 +407,33 @@ def dem_lint(dem, cols=None):
     errs = []
     if cols is None:
         cols = dem_columns(dem)
-    probs = [inst.args_copy()[0] for inst in dem.flattened()
-             if inst.type == "error"]
+    probs = [inst.args_copy()[0] for inst in dem.flattened() if inst.type == "error"]
     bad_det = [j for j, (ds, ls) in enumerate(cols) if not ds and ls]
     if bad_det:
-        errs.append(f"detectability: mechanism(s) {bad_det[:8]} flip an "
-                    f"observable with no detector (weight-1 undetected "
-                    f"logicals: the circuit has d_circ = 1)")
+        errs.append(
+            f"detectability: mechanism(s) {bad_det[:8]} flip an "
+            f"observable with no detector (weight-1 undetected "
+            f"logicals: the circuit has d_circ = 1)"
+        )
     covered = set()
     for _, ls in cols:
         covered.update(ls)
     missing = sorted(set(range(dem.num_observables)) - covered)
     if missing:
-        errs.append(f"observable_coverage: observable(s) {missing} are "
-                    f"flipped by no mechanism (miswired OBSERVABLE_INCLUDE)")
-    bad_p = [j for j, p in enumerate(probs)
-             if not (p == p and 0.0 < p < 1.0)]
+        errs.append(
+            f"observable_coverage: observable(s) {missing} are flipped by no mechanism (miswired OBSERVABLE_INCLUDE)"
+        )
+    bad_p = [j for j, p in enumerate(probs) if not (p == p and 0.0 < p < 1.0)]
     if bad_p:
-        errs.append(f"probability_bounds: mechanism(s) {bad_p[:8]} carry "
-                    f"probabilities outside (0, 1) or NaN")
+        errs.append(f"probability_bounds: mechanism(s) {bad_p[:8]} carry probabilities outside (0, 1) or NaN")
     return errs
 
 
 def dem_matrices(dem):
     """Dense (H_dem, L): detectors x mechanisms and observables x mechanisms.
     The search substrate; the witness CHECK never needs it (witness_errors is
-    sparse), so verification stays cheap even where these would be large."""
+    sparse), so verification stays cheap even where these would be large.
+    """
     cols = dem_columns(dem)
     H = np.zeros((dem.num_detectors, len(cols)), dtype=np.int8)
     L = np.zeros((dem.num_observables, len(cols)), dtype=np.int8)
@@ -439,15 +452,15 @@ def witness_errors(dem, witness, value, cols=None):
     logical), with |witness| = value. The check itself is sparse and
     O(|witness| * degree); reading the columns is O(mechanisms), so a caller
     that already holds dem_columns(dem) passes it as `cols`, and nothing else
-    may be passed there."""
+    may be passed there.
+    """
     if cols is None:
         cols = dem_columns(dem)
     idx = [int(i) for i in witness]
     if idx != sorted(set(idx)):
         return ["witness indices must be strictly increasing and distinct"]
     if idx and idx[-1] >= len(cols):
-        return [f"witness index {idx[-1]} out of range: the DEM has "
-                f"{len(cols)} error mechanisms"]
+        return [f"witness index {idx[-1]} out of range: the DEM has {len(cols)} error mechanisms"]
     if len(idx) != value:
         return [f"witness has {len(idx)} mechanisms but claims value {value}"]
     det, obs = set(), set()
@@ -463,6 +476,7 @@ def witness_errors(dem, witness, value, cols=None):
 
 
 # --------------------------------------------------------------------- search
+
 
 def _kernel_basis(H):
     return _GF.kernel_basis(H) if _GF else gf2.kernel_basis(H)
@@ -496,15 +510,17 @@ def ris_dem(H, L, trials, seed=0, pair_top=24, max_seconds=None, threads=4):
     (8, 64, 64, ...) sequence, so results stay deterministic given (seed,
     trials, threads) whenever the cap does not truncate. Finds are PROPOSALS
     either way -- callers validate with witness_errors. The numpy loop below
-    is the fallback and the audited reference implementation."""
+    is the fallback and the audited reference implementation.
+    """
     import time
+
     H = np.ascontiguousarray(np.asarray(H, dtype=np.int8))
     L = np.ascontiguousarray(np.asarray(L, dtype=np.int8))
     if _GF is not None and hasattr(_GF, "dem_rand_witness"):
         deadline = (time.monotonic() + max_seconds) if max_seconds else None
         best, wit = None, None
         done, chunk_i = 0, 0
-        per_trial = None            # measured; conservative running max
+        per_trial = None  # measured; conservative running max
         while done < trials:
             t = min(8 if chunk_i == 0 else 64, trials - done)
             if deadline is not None and per_trial is not None:
@@ -513,12 +529,10 @@ def ris_dem(H, L, trials, seed=0, pair_top=24, max_seconds=None, threads=4):
                     break
                 t = min(t, afford)
             t0 = time.monotonic()
-            w, sup = _GF.dem_rand_witness(H, L, trials=t,
-                                          seed=seed + 7919 * chunk_i,
-                                          pair_depth=pair_top,
-                                          threads=threads)
-            per_trial = max(per_trial or 0.0,
-                            (time.monotonic() - t0) / t, 1e-9)
+            w, sup = _GF.dem_rand_witness(
+                H, L, trials=t, seed=seed + 7919 * chunk_i, pair_depth=pair_top, threads=threads
+            )
+            per_trial = max(per_trial or 0.0, (time.monotonic() - t0) / t, 1e-9)
             if w is not None and (best is None or w < best):
                 best, wit = int(w), [int(i) for i in sup]
             done += t
@@ -553,7 +567,7 @@ def ris_dem(H, L, trials, seed=0, pair_top=24, max_seconds=None, threads=4):
         free = np.flatnonzero(free_mask)
         if not free.size:
             continue
-        A = np.asarray(R, dtype=np.uint8)[:, free]        # rank x |F|
+        A = np.asarray(R, dtype=np.uint8)[:, free]  # rank x |F|
         Lp = L8[:, perm].astype(np.int64)
         sig = (Lp[:, free] + Lp[:, piv] @ A.astype(np.int64)) % 2
         live = sig.any(axis=0)
@@ -586,12 +600,13 @@ def ris_dem(H, L, trials, seed=0, pair_top=24, max_seconds=None, threads=4):
 
 # -------------------------------------------------------------------- builder
 
+
 def edge_coloring(H, rng=None):
     """Greedy proper coloring of check-qubit edges -> list of parallel CX
     layers. A rng shuffles the edge insertion order, yielding a different
-    valid schedule per seed (the schedule-search knob)."""
-    edges = [(c, int(q)) for c in range(H.shape[0])
-             for q in np.flatnonzero(H[c])]
+    valid schedule per seed (the schedule-search knob).
+    """
+    edges = [(c, int(q)) for c in range(H.shape[0]) for q in np.flatnonzero(H[c])]
     if rng is not None:
         rng.shuffle(edges)
     layers, used_q, used_c = [], {}, {}
@@ -607,8 +622,7 @@ def edge_coloring(H, rng=None):
     return layers
 
 
-def build_css_memory(HX, HZ, rounds, basis="Z", sched_seed=None,
-                     layers_x=None, layers_z=None):
+def build_css_memory(HX, HZ, rounds, basis="Z", sched_seed=None, layers_x=None, layers_z=None):
     """Reference noiseless memory-experiment skeleton for a CSS code: the
     implementation submitters copy, and the generator of the seed artifacts.
 
@@ -635,15 +649,12 @@ def build_css_memory(HX, HZ, rounds, basis="Z", sched_seed=None,
     az = list(range(n + rX, n + rX + rZ))
     data = list(range(n))
     rng = None if sched_seed is None else np.random.default_rng(sched_seed)
-    lay_x = [l for l in (layers_x if layers_x is not None
-                         else edge_coloring(HX, rng)) if l]
-    lay_z = [l for l in (layers_z if layers_z is not None
-                         else edge_coloring(HZ, rng)) if l]
+    lay_x = [l for l in (layers_x if layers_x is not None else edge_coloring(HX, rng)) if l]
+    lay_z = [l for l in (layers_z if layers_z is not None else edge_coloring(HZ, rng)) if l]
     prep, readout = ("R", "M") if basis == "Z" else ("RX", "MX")
     side = basis.lower()
     H_anchor = HZ if basis == "Z" else HX
-    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" \
-        else gf2.logical_basis(HZ, HX)
+    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" else gf2.logical_basis(HZ, HX)
 
     c = stim.Circuit()
     pos = {}
@@ -678,17 +689,16 @@ def build_css_memory(HX, HZ, rounds, basis="Z", sched_seed=None,
         return stim.target_rec(pos[key] - total)
 
     n_anchor = H_anchor.shape[0]
-    for i in range(n_anchor):                       # deterministic at prep
+    for i in range(n_anchor):  # deterministic at prep
         c.append("DETECTOR", [rec((side, i, 0))])
     for r in range(1, rounds):
         for i in range(rX):
             c.append("DETECTOR", [rec(("x", i, r)), rec(("x", i, r - 1))])
         for i in range(rZ):
             c.append("DETECTOR", [rec(("z", i, r)), rec(("z", i, r - 1))])
-    for i in range(n_anchor):                       # closure on data readout
+    for i in range(n_anchor):  # closure on data readout
         targs = [rec(("data", int(q))) for q in np.flatnonzero(H_anchor[i])]
         c.append("DETECTOR", targs + [rec((side, i, rounds - 1))])
     for j, row in enumerate(L_obs):
-        c.append("OBSERVABLE_INCLUDE",
-                 [rec(("data", int(q))) for q in np.flatnonzero(row)], j)
+        c.append("OBSERVABLE_INCLUDE", [rec(("data", int(q))) for q in np.flatnonzero(row)], j)
     return c

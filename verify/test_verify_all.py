@@ -21,6 +21,7 @@ stored, and that verify.yml hands the record to no pull request.
 that covers it with a stand-in the workers can import: every entry checked
 once, the serial verdicts, and a worker that fails ending the run.
 """
+
 import json
 import os
 import re
@@ -31,15 +32,15 @@ import qldpc_verify as QV
 import test_ler_stack as LS
 import verify_all as VA
 
-OK_REP = {"ok": True, "earned_distance": {"d": {"value": 1, "tier": "t"}},
-          "computed": {}, "checks": []}
+OK_REP = {"ok": True, "earned_distance": {"d": {"value": 1, "tier": "t"}}, "computed": {}, "checks": []}
 OK_CIRC = {"ok": True, "earned_d_circ": {"d_circ": {"value": 1}}, "checks": []}
 LER = {b: {"ler_per_round": 1e-3} for b in ("X", "Z")}
 
 
 def _git(cwd, *args):
-    subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
-                   cwd=cwd, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=cwd, check=True, capture_output=True, text=True
+    )
 
 
 def _write(root, rel, text):
@@ -59,8 +60,7 @@ def _repo(tmp_path):
     _git(root, "add", "-A")
     _git(root, "commit", "-q", "-m", "base")
     _git(root, "checkout", "-q", "-b", "pr")
-    _write(root, "codes/a-1-1.json",
-           json.dumps({"name": "a-1-1", "circuit": {"ler": LER}, "note": "edited"}))
+    _write(root, "codes/a-1-1.json", json.dumps({"name": "a-1-1", "circuit": {"ler": LER}, "note": "edited"}))
     _write(root, "circuits/b-1-1/memory_x.stim", "# rescheduled\n")
     _git(root, "add", "-A")
     _git(root, "commit", "-q", "-m", "pr")
@@ -71,8 +71,7 @@ def _run(monkeypatch, argv):
     measured = []
     monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(OK_REP)))
     monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
-    monkeypatch.setattr(VA, "verify_ler",
-                        lambda doc, d: (measured.append(doc["name"]), {"ok": True})[1])
+    monkeypatch.setattr(VA, "verify_ler", lambda doc, d: (measured.append(doc["name"]), {"ok": True})[1])
     rc = VA.main(argv)
     return rc, sorted(measured)
 
@@ -81,7 +80,7 @@ def test_pr_run_measures_only_changed_entries(tmp_path, monkeypatch, capsys):
     root = _repo(tmp_path)
     rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "main"])
     assert rc == 0
-    assert measured == ["a-1-1", "b-1-1"]          # JSON edit and circuit edit; not c
+    assert measured == ["a-1-1", "b-1-1"]  # JSON edit and circuit edit; not c
     c_line = next(ln for ln in capsys.readouterr().out.splitlines() if "c-1-1.json" in ln)
     assert c_line.startswith("PASS") and "ler unchanged since base" in c_line
 
@@ -107,8 +106,9 @@ def test_skipped_claim_cannot_hide_a_failing_entry(tmp_path, monkeypatch):
     root = _repo(tmp_path)
     bad = dict(OK_CIRC, ok=False, checks=[{"check": "dem_matches", "ok": False}])
     monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(OK_REP)))
-    monkeypatch.setattr(VA, "verify_circuit",
-                        lambda doc, d: json.loads(json.dumps(bad if doc["name"] == "c-1-1" else OK_CIRC)))
+    monkeypatch.setattr(
+        VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(bad if doc["name"] == "c-1-1" else OK_CIRC))
+    )
     monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
     assert VA.main(["--root", root, "--ler-base", "main"]) == 1
 
@@ -125,18 +125,24 @@ def test_structural_reports_come_from_the_shared_pass(tmp_path, monkeypatch):
     asked = []
 
     def fake_reports(code_dir):
-        asked.append(os.path.relpath(code_dir, root) if code_dir.startswith(root)
-                     else os.path.basename(code_dir))
+        asked.append(os.path.relpath(code_dir, root) if code_dir.startswith(root) else os.path.basename(code_dir))
         if not code_dir.startswith(root):
-            return ()                            # no fixtures in this fake tree
+            return ()  # no fixtures in this fake tree
         out = []
         for name in sorted(os.listdir(code_dir)):
             path = os.path.join(code_dir, name)
             with open(path) as f:
                 doc = json.load(f)
-            out.append({"path": path, "slug": name[:-5], "doc": doc,
-                        "report": json.loads(json.dumps(OK_REP)),
-                        "size_error": None, "load_error": None})
+            out.append(
+                {
+                    "path": path,
+                    "slug": name[:-5],
+                    "doc": doc,
+                    "report": json.loads(json.dumps(OK_REP)),
+                    "size_error": None,
+                    "load_error": None,
+                }
+            )
         return tuple(out)
 
     def no_bare_verify(doc):
@@ -171,8 +177,9 @@ def test_circuit_verdict_does_not_leak_into_the_shared_report(tmp_path, monkeypa
             with open(path) as f:
                 doc = json.load(f)
             rep = shared.setdefault(name, json.loads(json.dumps(OK_REP)))
-            out.append({"path": path, "slug": name[:-5], "doc": doc, "report": rep,
-                        "size_error": None, "load_error": None})
+            out.append(
+                {"path": path, "slug": name[:-5], "doc": doc, "report": rep, "size_error": None, "load_error": None}
+            )
         return tuple(out)
 
     bad = dict(OK_CIRC, ok=False, checks=[{"check": "dem_matches", "ok": False}])
@@ -195,12 +202,12 @@ def test_unparseable_entry_fails_instead_of_crashing(tmp_path, monkeypatch, caps
     monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
     assert VA.main(["--root", root]) == 1
     out = capsys.readouterr().out
-    assert any(ln.startswith("FAIL") and "zz-1-1.json" in ln and "JSONDecodeError" in ln
-               for ln in out.splitlines())
+    assert any(ln.startswith("FAIL") and "zz-1-1.json" in ln and "JSONDecodeError" in ln for ln in out.splitlines())
 
 
 # --circuit-base: which entries pay the circuit tier (the same routing question
 # as --ler-base above, for the deterministic half of the tier).
+
 
 def _run_circuit(monkeypatch, argv, circ=None, structural=None, stack_changed=False):
     """Run main with faked verifiers; return (rc, entries whose circuit tier ran).
@@ -215,8 +222,7 @@ def _run_circuit(monkeypatch, argv, circ=None, structural=None, stack_changed=Fa
         checked.append(doc["name"])
         return json.loads(json.dumps((circ or {}).get(doc["name"], OK_CIRC)))
 
-    monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(
-        (structural or {}).get(doc["name"], OK_REP))))
+    monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps((structural or {}).get(doc["name"], OK_REP))))
     monkeypatch.setattr(VA, "verify_circuit", fake_circuit)
     monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
     return VA.main(argv), sorted(checked)
@@ -226,7 +232,7 @@ def test_circuit_base_checks_only_changed_entries(tmp_path, monkeypatch, capsys)
     root = _repo(tmp_path)
     rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"])
     assert rc == 0
-    assert checked == ["a-1-1", "b-1-1"]           # JSON edit and circuit edit; not c
+    assert checked == ["a-1-1", "b-1-1"]  # JSON edit and circuit edit; not c
     out = capsys.readouterr().out
     c_line = next(ln for ln in out.splitlines() if "c-1-1.json" in ln)
     # The skipped entry passes on the base branch's evidence, and its line must
@@ -260,8 +266,9 @@ def test_unusable_circuit_base_falls_back_to_everything(tmp_path, monkeypatch, c
 def test_circuit_base_still_fails_a_changed_entry(tmp_path, monkeypatch):
     root = _repo(tmp_path)
     bad = dict(OK_CIRC, ok=False, checks=[{"check": "dem_matches", "ok": False}])
-    rc, _ = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"],
-                         circ={"b-1-1": bad})    # b changed only under circuits/
+    rc, _ = _run_circuit(
+        monkeypatch, ["--root", root, "--circuit-base", "main"], circ={"b-1-1": bad}
+    )  # b changed only under circuits/
     assert rc == 1
 
 
@@ -269,20 +276,18 @@ def test_circuit_base_never_skips_the_structural_pass(tmp_path, monkeypatch, cap
     """Only the circuit tier is skipped: an unchanged entry that fails structurally fails."""
     root = _repo(tmp_path)
     bad = dict(OK_REP, ok=False, checks=[{"check": "css_commutation", "ok": False}])
-    rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"],
-                               structural={"c-1-1": bad})
+    rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"], structural={"c-1-1": bad})
     assert rc == 1 and checked == ["a-1-1", "b-1-1"]
-    assert any(ln.startswith("FAIL") and "c-1-1.json" in ln
-               for ln in capsys.readouterr().out.splitlines())
+    assert any(ln.startswith("FAIL") and "c-1-1.json" in ln for ln in capsys.readouterr().out.splitlines())
 
 
 # The flag is only sound while the verifier is the one the base branch was
 # checked with. verify_all decides that itself, from a diff of CIRCUIT_STACK.
 
+
 def test_circuit_base_is_void_when_the_verifier_stack_changed(tmp_path, monkeypatch, capsys):
     root = _repo(tmp_path)
-    rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"],
-                               stack_changed=True)
+    rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-base", "main"], stack_changed=True)
     assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]
     out = capsys.readouterr().out
     assert "the verifier stack differs from main" in out
@@ -360,8 +365,7 @@ def test_circuit_stack_is_the_import_closure_of_verify_all():
             todo.extend(LS.imported_names(path))
         elif name in LS._BUILT:
             files.update(LS._BUILT[name])
-    fixed = {"schema/code.schema.json", "pyproject.toml", "uv.lock", "Makefile",
-             ".github/workflows/verify.yml"}
+    fixed = {"schema/code.schema.json", "pyproject.toml", "uv.lock", "Makefile", ".github/workflows/verify.yml"}
     listed = set(VA.CIRCUIT_STACK)
     assert listed == files | fixed, (
         f"CIRCUIT_STACK in verify/verify_all.py lists {sorted(listed - files - fixed)} that "
@@ -375,6 +379,7 @@ def test_circuit_stack_is_the_import_closure_of_verify_all():
 
 # --circuit-record: the same skip for runs on main, from a record of passes
 # keyed by content rather than from a diff.
+
 
 def _record_repo(tmp_path):
     """Return (root, record path): the three-entry repo and a record path outside it."""
@@ -391,7 +396,7 @@ def test_record_skips_what_has_passed_on_these_bytes(tmp_path, monkeypatch, caps
     root, record = _record_repo(tmp_path)
     argv = ["--root", root, "--circuit-record", record]
     rc, checked = _run_circuit(monkeypatch, argv)
-    assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]     # no record yet
+    assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]  # no record yet
     assert "no circuit record at" in capsys.readouterr().out
     assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]
 
@@ -401,8 +406,7 @@ def test_record_skips_what_has_passed_on_these_bytes(tmp_path, monkeypatch, caps
     lines = [ln for ln in out.splitlines() if ln.startswith("PASS") and "-1-1.json" in ln]
     assert len(lines) == 3
     # A recorded pass is not this run's evidence, so no d_circ is printed for it.
-    assert all("circuit recorded as passing on these bytes" in ln and "d_circ<=" not in ln
-               for ln in lines)
+    assert all("circuit recorded as passing on these bytes" in ln and "d_circ<=" not in ln for ln in lines)
     assert "circuit tier not re-run for 3 entries recorded as passing" in out
 
 
@@ -447,7 +451,7 @@ def test_stack_digest_moves_with_every_stack_file(tmp_path):
     assert VA.circuit_stack_digest(root) == base
     os.remove(os.path.join(root, VA.CIRCUIT_STACK[-1]))
     assert VA.circuit_stack_digest(root) != base
-    _write(root, "site/build.py", "edited\n")                   # outside the stack
+    _write(root, "site/build.py", "edited\n")  # outside the stack
 
 
 def test_record_never_stores_a_failure(tmp_path, monkeypatch):
@@ -458,32 +462,38 @@ def test_record_never_stores_a_failure(tmp_path, monkeypatch):
     assert rc == 1 and checked == ["a-1-1", "b-1-1", "c-1-1"]
     assert sorted(_passes(record)) == ["a-1-1", "b-1-1"]
     rc, checked = _run_circuit(monkeypatch, argv, circ={"c-1-1": bad})
-    assert rc == 1 and checked == ["c-1-1"]                      # re-run every time
+    assert rc == 1 and checked == ["c-1-1"]  # re-run every time
     rc, checked = _run_circuit(monkeypatch, argv)
     assert rc == 0 and checked == ["c-1-1"]
     assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]
 
 
-@pytest.mark.parametrize("text", [
-    "{not json",
-    "[]",
-    json.dumps({"version": 1, "stack": "x"}),
-    json.dumps({"version": 99, "stack": "x", "passed": {}}),
-])
+@pytest.mark.parametrize(
+    "text",
+    [
+        "{not json",
+        "[]",
+        json.dumps({"version": 1, "stack": "x"}),
+        json.dumps({"version": 99, "stack": "x", "passed": {}}),
+    ],
+)
 def test_malformed_record_is_an_empty_record(tmp_path, monkeypatch, capsys, text):
     root, record = _record_repo(tmp_path)
     _write(os.path.dirname(record), "record.json", text)
     rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-record", record])
     assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]
     assert "checking every circuit tier" in capsys.readouterr().out
-    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]   # and it is repaired
+    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]  # and it is repaired
 
 
 def test_record_line_for_other_bytes_is_not_believed(tmp_path, monkeypatch):
     """A line under the right stack and slug vouches for nothing but its own digest."""
     root, record = _record_repo(tmp_path)
-    planted = {"version": VA.RECORD_VERSION, "stack": VA.circuit_stack_digest(),
-               "passed": {s: "0" * 64 for s in ("a-1-1", "b-1-1", "c-1-1")}}
+    planted = {
+        "version": VA.RECORD_VERSION,
+        "stack": VA.circuit_stack_digest(),
+        "passed": {s: "0" * 64 for s in ("a-1-1", "b-1-1", "c-1-1")},
+    }
     _write(os.path.dirname(record), "record.json", json.dumps(planted))
     rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-record", record])
     assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]
@@ -507,8 +517,7 @@ def test_record_never_skips_the_structural_pass(tmp_path, monkeypatch, capsys):
     bad = dict(OK_REP, ok=False, checks=[{"check": "css_commutation", "ok": False}])
     rc, checked = _run_circuit(monkeypatch, argv, structural={"c-1-1": bad})
     assert rc == 1 and checked == []
-    assert any(ln.startswith("FAIL") and "c-1-1.json" in ln
-               for ln in capsys.readouterr().out.splitlines())
+    assert any(ln.startswith("FAIL") and "c-1-1.json" in ln for ln in capsys.readouterr().out.splitlines())
     assert sorted(_passes(record)) == ["a-1-1", "b-1-1"]
 
 
@@ -542,18 +551,17 @@ def test_record_is_written_as_the_run_goes(tmp_path, monkeypatch):
     with pytest.raises(KeyboardInterrupt):
         VA.main(argv)
     left = _passes(record)
-    assert left["a-1-1"] != old["a-1-1"]                         # earned before the stop
+    assert left["a-1-1"] != old["a-1-1"]  # earned before the stop
     assert left["b-1-1"] == old["b-1-1"] and left["c-1-1"] == old["c-1-1"]
     rc, checked = _run_circuit(monkeypatch, argv)
-    assert rc == 0 and checked == ["b-1-1"]     # b's old line is for other bytes; c's holds
+    assert rc == 0 and checked == ["b-1-1"]  # b's old line is for other bytes; c's holds
 
 
 def test_unwritable_record_is_reported_and_does_not_change_the_verdict(tmp_path, monkeypatch, capsys):
     root, _ = _record_repo(tmp_path)
     blocker = tmp_path / "a-file"
     blocker.write_text("")
-    rc, checked = _run_circuit(
-        monkeypatch, ["--root", root, "--circuit-record", str(blocker / "record.json")])
+    rc, checked = _run_circuit(monkeypatch, ["--root", root, "--circuit-record", str(blocker / "record.json")])
     assert rc == 0 and checked == ["a-1-1", "b-1-1", "c-1-1"]
     assert "WARNING: could not write the circuit record" in capsys.readouterr().out
 
@@ -583,8 +591,7 @@ def _pool_repo(tmp_path, monkeypatch, **how):
     root = _repo(tmp_path / "repo")
     for name, value in how.items():
         slug = name.replace("_", "-")
-        _commit(root, f"codes/{slug}.json",
-                json.dumps({"name": slug, "circuit": {"ler": LER}, "pool": value}))
+        _commit(root, f"codes/{slug}.json", json.dumps({"name": slug, "circuit": {"ler": LER}, "pool": value}))
     marks = tmp_path / "marks"
     marks.mkdir()
     monkeypatch.setenv("VERIFY_ALL_TEST_MARKS", str(marks))
@@ -620,9 +627,9 @@ def test_pool_checks_every_circuit_once_and_prints_the_serial_verdicts(tmp_path,
     assert VA.main(["--root", root, "--circuit-jobs", "2"]) == 0
     out = capsys.readouterr().out
     names, pids = _marks(marks)
-    assert names == ["a-1-1", "b-1-1", "c-1-1"]                  # once each, none in the loop
+    assert names == ["a-1-1", "b-1-1", "c-1-1"]  # once each, none in the loop
     assert os.getpid() not in pids and 1 <= len(pids) <= 2
-    assert _pass_lines(out) == serial and len(serial) == 3       # same lines, same order
+    assert _pass_lines(out) == serial and len(serial) == 3  # same lines, same order
     assert "circuit tier: checking 3 entries in 2 processes" in out
 
 
@@ -649,15 +656,15 @@ def test_pool_checks_only_what_the_flags_leave(tmp_path, monkeypatch, capsys):
     root, marks = _pool_repo(tmp_path, monkeypatch)
     record = str(tmp_path / "circuit-record" / "record.json")
     assert VA.main(["--root", root, "--circuit-base", "main", "--circuit-jobs", "2"]) == 0
-    assert _marks(marks)[0] == ["a-1-1", "b-1-1"]                # c is unchanged since main
+    assert _marks(marks)[0] == ["a-1-1", "b-1-1"]  # c is unchanged since main
     argv = ["--root", root, "--circuit-record", record, "--circuit-jobs", "2"]
     assert VA.main(argv) == 0
     assert _marks(marks)[0] == ["a-1-1", "b-1-1", "c-1-1"]
-    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]   # the pool's passes are recorded
+    assert sorted(_passes(record)) == ["a-1-1", "b-1-1", "c-1-1"]  # the pool's passes are recorded
     capsys.readouterr()
     assert VA.main(argv) == 0
     assert _marks(marks)[0] == []
-    assert "circuit tier: checking" not in capsys.readouterr().out   # nothing to check, no pool
+    assert "circuit tier: checking" not in capsys.readouterr().out  # nothing to check, no pool
 
 
 def test_pool_records_passes_as_they_arrive(tmp_path, monkeypatch):
@@ -691,7 +698,7 @@ def test_no_pool_unless_asked_and_worth_it(tmp_path, monkeypatch):
         raise AssertionError("a pool was started")
 
     monkeypatch.setattr(VA, "check_circuits_in_pool", no_pool)
-    assert VA.main(["--root", root]) == 0                        # the default is this process
+    assert VA.main(["--root", root]) == 0  # the default is this process
     assert VA.main(["--root", root, "--circuit-jobs", "1"]) == 0
     # One circuit to check is not worth a pool, whatever was asked for.
     for slug in ("b-1-1", "c-1-1"):
@@ -703,10 +710,10 @@ def test_no_pool_unless_asked_and_worth_it(tmp_path, monkeypatch):
 def test_circuit_workers():
     assert VA.circuit_workers(1, 100) == 1
     assert VA.circuit_workers(4, 100) == 4
-    assert VA.circuit_workers(4, 3) == 3                          # never more than the jobs
+    assert VA.circuit_workers(4, 3) == 3  # never more than the jobs
     assert VA.circuit_workers(4, 0) == 1 and VA.circuit_workers(0, 0) == 1
     cpus = getattr(os, "process_cpu_count", os.cpu_count)() or 1
-    assert VA.circuit_workers(0, 10_000) == cpus                  # 0 is one per CPU
+    assert VA.circuit_workers(0, 10_000) == cpus  # 0 is one per CPU
 
 
 def test_negative_circuit_jobs_is_refused(tmp_path, monkeypatch):
@@ -718,10 +725,13 @@ def test_negative_circuit_jobs_is_refused(tmp_path, monkeypatch):
 # Which run gets which flag is a few lines of shell and a few `if:` lines
 # inside verify.yml, so run the shell and read the conditions back.
 
-_WORKFLOW = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                         ".github", "workflows", "verify.yml")
-_PR_SWEEPS = ("verify all submissions (trusted verifier for code changes)",
-              "verify all submissions (LER stack unchanged)")
+_WORKFLOW = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".github", "workflows", "verify.yml"
+)
+_PR_SWEEPS = (
+    "verify all submissions (trusted verifier for code changes)",
+    "verify all submissions (LER stack unchanged)",
+)
 _PUSH_SWEEP = "verify all submissions (push to main, LER scoped to the merge)"
 _FULL_SWEEP = "verify all submissions (LER stack changed, or the weekly run)"
 _RESTORE = "restore the circuit record (push to main)"
@@ -737,7 +747,7 @@ def _workflow_steps():
     with open(_WORKFLOW, encoding="utf-8") as f:
         for line in f.read().splitlines():
             if line.startswith("      - name: "):
-                name = line[len("      - name: "):]
+                name = line[len("      - name: ") :]
                 steps[name] = []
             elif line.startswith("      - ") or (line.strip() and not line.startswith(" " * 7)):
                 name = None
@@ -749,7 +759,7 @@ def _workflow_steps():
 def _script(lines):
     """Return the `run: |` script of a step, dedented."""
     run = lines.index("        run: |")
-    return "\n".join(ln[10:] for ln in lines[run + 1:]) + "\n"
+    return "\n".join(ln[10:] for ln in lines[run + 1 :]) + "\n"
 
 
 def _code(lines):
@@ -767,7 +777,7 @@ def _uses_cache(lines, suffix):
         s = ln.strip()
         prefix = "uses: actions/cache/" + suffix + "@"
         if s.startswith(prefix):
-            ref = s[len(prefix):].split()[0]
+            ref = s[len(prefix) :].split()[0]
             if _cache_ref_ok(ref):
                 return True
     return False
@@ -794,7 +804,7 @@ def _verify_all_argv(script, tmp_path, **env):
     env = {"PATH": f"{bindir}{os.pathsep}{os.environ['PATH']}", "BASE_REF": "origin/main", **env}
     subprocess.run(["bash", "-e", "-c", script], env=env, check=True, cwd=tmp_path)
     argv = log.read_text().split("\n")
-    return argv[argv.index("verify/verify_all.py") + 1:-1]
+    return argv[argv.index("verify/verify_all.py") + 1 : -1]
 
 
 def test_every_pull_request_sweep_passes_circuit_base(tmp_path):
@@ -804,8 +814,7 @@ def test_every_pull_request_sweep_passes_circuit_base(tmp_path):
         argv = _verify_all_argv(_script(steps[name]), tmp_path)
         assert argv[argv.index("--circuit-base") + 1] == "origin/main", (name, argv)
         assert argv[argv.index("--ler-base") + 1] == "origin/main", (name, argv)
-    argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request",
-                            **_SAMPLE_ENV)
+    argv = _verify_all_argv(_script(steps[_FULL_SWEEP]), tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
     assert argv[argv.index("--circuit-base") + 1] == "origin/main", argv
     assert argv[-2:] == ["--circuit-jobs", "0"], argv
 
@@ -817,8 +826,7 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
         assert not any("--circuit-record" in ln for ln in _code(steps[name])), name
         assert "--circuit-record" not in _verify_all_argv(_script(steps[name]), tmp_path), name
     full = _script(steps[_FULL_SWEEP])
-    assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request",
-                                                      **_SAMPLE_ENV)
+    assert "--circuit-record" not in _verify_all_argv(full, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
     for event in ("push", "schedule", "workflow_dispatch"):
         argv = _verify_all_argv(full, tmp_path, EVENT_NAME=event, BEFORE="abc123", **_SAMPLE_ENV)
         assert argv[-6:] == ["--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], (event, argv)
@@ -832,8 +840,7 @@ def test_no_pull_request_sweep_is_handed_the_record(tmp_path):
 def test_every_sweep_is_scoped_one_way_or_the_other():
     """Four sweeps, and each names how its circuit tier is scoped: none is left to a default."""
     steps = _workflow_steps()
-    sweeps = {name for name, lines in steps.items()
-              if any("verify/verify_all.py" in ln for ln in _code(lines))}
+    sweeps = {name for name, lines in steps.items() if any("verify/verify_all.py" in ln for ln in _code(lines))}
     assert sweeps == {*_PR_SWEEPS, _PUSH_SWEEP, _FULL_SWEEP}, sorted(sweeps)
     for name in sweeps:
         text = "\n".join(_code(steps[name]))
@@ -846,8 +853,7 @@ def test_every_sweep_is_scoped_one_way_or_the_other():
 def test_the_record_is_restored_and_saved_only_on_main():
     """The cache is main's at both ends, and the weekly run starts from nothing."""
     steps = _workflow_steps()
-    users = {name for name, lines in steps.items()
-             if any("circuit-record" in ln for ln in _code(lines))}
+    users = {name for name, lines in steps.items() if any("circuit-record" in ln for ln in _code(lines))}
     assert users == {_RESTORE, _SAVE, _PUSH_SWEEP, _FULL_SWEEP}, sorted(users)
     # Restored on a push and on nothing else: not a pull request, which must
     # never be answered from a cache, and not the scheduled run, which is the
@@ -856,9 +862,8 @@ def test_the_record_is_restored_and_saved_only_on_main():
     assert _uses_cache(steps[_RESTORE], "restore")
     with open(_WORKFLOW, encoding="utf-8") as f:
         assert "\n  push:\n    branches: [main]\n" in f.read()
-    cond = next(ln for ln in steps[_SAVE] if ln.startswith("        if: "))[len("        if: "):]
-    for clause in ("always()", "github.event_name != 'pull_request'",
-                   "github.ref == 'refs/heads/main'"):
+    cond = next(ln for ln in steps[_SAVE] if ln.startswith("        if: "))[len("        if: ") :]
+    for clause in ("always()", "github.event_name != 'pull_request'", "github.ref == 'refs/heads/main'"):
         assert clause in cond.split(" && "), (clause, cond)
     assert _uses_cache(steps[_SAVE], "save")
     assert not _uses_combined_cache(steps[_RESTORE] + steps[_SAVE])
@@ -867,6 +872,7 @@ def test_the_record_is_restored_and_saved_only_on_main():
 # --ler-sample (issue #5578): a run that changed the stack that measures the
 # claims used to re-measure every one of them before the merge, and no longer
 # fit the job. It now re-measures a few, and the weekly runs re-measure all.
+
 
 def _claims_repo(tmp_path, n=12):
     """Build a board of `n` entries that carry an ler claim and one that does not."""
@@ -922,7 +928,7 @@ def test_ler_sample_depends_on_nothing_but_its_arguments():
 
 def test_sample_adds_to_what_the_base_selects(tmp_path, monkeypatch, capsys):
     """Entries the run changed are re-measured whether or not they are drawn."""
-    root = _repo(tmp_path)                            # a and b changed since main; c did not
+    root = _repo(tmp_path)  # a and b changed since main; c did not
     base = ["--root", root, "--ler-base", "main"]
     assert _run(monkeypatch, base)[1] == ["a-1-1", "b-1-1"]
     for seed in range(8):
@@ -935,8 +941,7 @@ def test_sample_adds_to_what_the_base_selects(tmp_path, monkeypatch, capsys):
 def test_sample_never_narrows_a_base_that_cannot_be_diffed(tmp_path, monkeypatch, capsys):
     """The fallback is everything, and a sample of it would be a silent skip."""
     root = _repo(tmp_path)
-    rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "no-such-ref",
-                                      "--ler-sample", "1"])
+    rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "no-such-ref", "--ler-sample", "1"])
     assert rc == 0 and measured == ["a-1-1", "b-1-1", "c-1-1"]
     out = capsys.readouterr().out
     assert "re-measuring every ler claim" in out and "a sample of" not in out
@@ -952,9 +957,15 @@ def test_a_sampled_claim_that_fails_fails_the_run(tmp_path, monkeypatch):
     def run(seed):
         monkeypatch.setattr(QV, "verify", lambda doc: json.loads(json.dumps(OK_REP)))
         monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
-        monkeypatch.setattr(VA, "verify_ler", lambda doc, d: (
-            {"ok": True} if doc["name"] != bad else
-            {"ok": False, "checks": [{"check": "ler_replicates", "ok": False}]}))
+        monkeypatch.setattr(
+            VA,
+            "verify_ler",
+            lambda doc, d: (
+                {"ok": True}
+                if doc["name"] != bad
+                else {"ok": False, "checks": [{"check": "ler_replicates", "ok": False}]}
+            ),
+        )
         return VA.main(["--root", root, "--ler-sample", "3", "--ler-seed", str(seed)])
 
     assert run(drawn) == 1
@@ -974,8 +985,7 @@ def test_an_entry_that_is_not_an_object_fails_cleanly_under_a_sample(tmp_path, m
     root, _ = _claims_repo(tmp_path)
     _write(root, "codes/list-1-1.json", "[]")
     _write(root, "codes/odd-1-1.json", json.dumps({"name": "odd-1-1", "circuit": "not an object"}))
-    bad = {"ok": False, "checks": [{"check": "schema_valid", "ok": False}],
-           "computed": {}, "earned_distance": {}}
+    bad = {"ok": False, "checks": [{"check": "schema_valid", "ok": False}], "computed": {}, "earned_distance": {}}
 
     def verify(doc):
         well_formed = isinstance(doc, dict) and isinstance(doc.get("circuit", {}), dict)
@@ -995,7 +1005,7 @@ def test_each_kind_of_run_reaches_the_sweep_meant_for_it():
     steps = _workflow_steps()
 
     def cond(name):
-        return next(ln for ln in steps[name] if ln.startswith("        if: "))[len("        if: "):]
+        return next(ln for ln in steps[name] if ln.startswith("        if: "))[len("        if: ") :]
 
     assert set(cond(_FULL_SWEEP).split(" || ")) == {
         "github.event_name == 'schedule'",
@@ -1006,39 +1016,73 @@ def test_each_kind_of_run_reaches_the_sweep_meant_for_it():
         " && steps.verdict.outputs.cache-hit != 'true')",
     }
     # The complements: a push or a pull request that left the stack alone.
-    assert cond(_PUSH_SWEEP) == ("github.event_name == 'push'"
-                                 " && steps.merge.outputs.ler_stack_changed != 'true'")
-    assert cond(_PR_SWEEPS[1]) == ("github.event_name == 'pull_request'"
-                                   " && steps.changes.outputs.codes_changed != 'true'"
-                                   " && steps.changes.outputs.ler_stack_changed != 'true'"
-                                   " && steps.verdict.outputs.cache-hit != 'true'")
-    assert cond(_PR_SWEEPS[0]) == ("github.event_name == 'pull_request'"
-                                   " && steps.changes.outputs.codes_changed == 'true'"
-                                   " && steps.verdict.outputs.cache-hit != 'true'")
+    assert cond(_PUSH_SWEEP) == ("github.event_name == 'push' && steps.merge.outputs.ler_stack_changed != 'true'")
+    assert cond(_PR_SWEEPS[1]) == (
+        "github.event_name == 'pull_request'"
+        " && steps.changes.outputs.codes_changed != 'true'"
+        " && steps.changes.outputs.ler_stack_changed != 'true'"
+        " && steps.verdict.outputs.cache-hit != 'true'"
+    )
+    assert cond(_PR_SWEEPS[0]) == (
+        "github.event_name == 'pull_request'"
+        " && steps.changes.outputs.codes_changed == 'true'"
+        " && steps.verdict.outputs.cache-hit != 'true'"
+    )
 
 
 def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
     """Run the stack sweep's shell for each kind of run and read the LER flags back."""
     lines = _workflow_steps()[_FULL_SWEEP]
-    for line in ('          LER_SAMPLE: "3"',
-                 "          BEFORE: ${{ github.event.before }}",
-                 "          PR_NUMBER: ${{ github.event.pull_request.number }}",
-                 "          RUN_ID: ${{ github.run_id }}"):
+    for line in (
+        '          LER_SAMPLE: "3"',
+        "          BEFORE: ${{ github.event.before }}",
+        "          PR_NUMBER: ${{ github.event.pull_request.number }}",
+        "          RUN_ID: ${{ github.run_id }}",
+    ):
         assert line in lines, line
     script = _script(lines)
     pr = _verify_all_argv(script, tmp_path, EVENT_NAME="pull_request", **_SAMPLE_ENV)
-    assert pr == ["--ler-base", "origin/main", "--ler-sample", "3", "--ler-seed", "5578",
-                  "--circuit-base", "origin/main", "--board-base", "origin/main",
-                  "--jobs", "0", "--circuit-jobs", "0"], pr
+    assert pr == [
+        "--ler-base",
+        "origin/main",
+        "--ler-sample",
+        "3",
+        "--ler-seed",
+        "5578",
+        "--circuit-base",
+        "origin/main",
+        "--board-base",
+        "origin/main",
+        "--jobs",
+        "0",
+        "--circuit-jobs",
+        "0",
+    ], pr
     push = _verify_all_argv(script, tmp_path, EVENT_NAME="push", BEFORE="abc123", **_SAMPLE_ENV)
-    assert push == ["--ler-base", "abc123", "--ler-sample", "3", "--ler-seed", "43263400509",
-                    "--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], push
+    assert push == [
+        "--ler-base",
+        "abc123",
+        "--ler-sample",
+        "3",
+        "--ler-seed",
+        "43263400509",
+        "--circuit-record",
+        _RECORD,
+        "--jobs",
+        "0",
+        "--circuit-jobs",
+        "0",
+    ], push
     # No LER flag at all means every claim: the weekly run, a manual dispatch,
     # and a push with no `before` to diff against. (A `before` that is set
     # but cannot be diffed gets the flags, and verify_all's own fallback:
     # test_sample_never_narrows_a_base_that_cannot_be_diffed.)
-    for env in ({"EVENT_NAME": "schedule"}, {"EVENT_NAME": "workflow_dispatch"},
-                {"EVENT_NAME": "push"}, {"EVENT_NAME": "push", "BEFORE": "0" * 40}):
+    for env in (
+        {"EVENT_NAME": "schedule"},
+        {"EVENT_NAME": "workflow_dispatch"},
+        {"EVENT_NAME": "push"},
+        {"EVENT_NAME": "push", "BEFORE": "0" * 40},
+    ):
         argv = _verify_all_argv(script, tmp_path, **env, **_SAMPLE_ENV)
         assert argv == ["--circuit-record", _RECORD, "--jobs", "0", "--circuit-jobs", "0"], (env, argv)
 
@@ -1046,16 +1090,16 @@ def test_a_stack_change_is_sampled_and_the_weekly_run_is_not(tmp_path):
 def test_the_flags_the_workflow_passes_are_ones_verify_all_takes(tmp_path, monkeypatch):
     """A seed is a pull request number or a run id, which is a large integer."""
     root = _repo(tmp_path)
-    rc, measured = _run(monkeypatch, ["--root", root, "--ler-base", "main", "--ler-sample", "3",
-                                      "--ler-seed", "43263400509"])
+    rc, measured = _run(
+        monkeypatch, ["--root", root, "--ler-base", "main", "--ler-sample", "3", "--ler-seed", "43263400509"]
+    )
     assert rc == 0 and measured == ["a-1-1", "b-1-1", "c-1-1"]
 
 
 def test_only_the_stack_sweep_samples():
     """Every other sweep either diffs against a base it can trust or re-measures everything."""
     steps = _workflow_steps()
-    users = {name for name, lines in steps.items()
-             if any("--ler-sample" in ln for ln in _code(lines))}
+    users = {name for name, lines in steps.items() if any("--ler-sample" in ln for ln in _code(lines))}
     assert users == {_FULL_SWEEP}, sorted(users)
 
 
@@ -1087,8 +1131,7 @@ def _every_workflow():
 def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     """Filled by the trusted sweep, read by the trusted gate, named nowhere else."""
     steps = _workflow_steps()
-    users = [name for name, lines in steps.items()
-             if any("QLDPC_BOARD_CACHE" in ln for ln in _code(lines))]
+    users = [name for name, lines in steps.items() if any("QLDPC_BOARD_CACHE" in ln for ln in _code(lines))]
     assert users == [_CODE_SWEEP, _GATE], users
     for name in users:
         assert _MEMO in steps[name], name
@@ -1108,24 +1151,29 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     # directory emptied by the first line of that step's script, and no
     # cache or artifact path naming it.
     workflows = _every_workflow()
-    mentions = [(wf, ln.strip()) for wf, lines in workflows.items()
-                for ln in lines if "QLDPC_BOARD_CACHE" in ln]
-    assert mentions == [("reproduce.yml", _MEMO.strip()),
-                        ("reproduce.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
-                        ("verify.yml", _MEMO.strip()),
-                        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
-                        ("verify.yml", _MEMO.strip())], mentions
+    mentions = [(wf, ln.strip()) for wf, lines in workflows.items() for ln in lines if "QLDPC_BOARD_CACHE" in ln]
+    assert mentions == [
+        ("reproduce.yml", _MEMO.strip()),
+        ("reproduce.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+        ("verify.yml", _MEMO.strip()),
+        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+        ("verify.yml", _MEMO.strip()),
+    ], mentions
     reproduce = workflows["reproduce.yml"]
     env_at = next(i for i, ln in enumerate(reproduce) if ln == _MEMO)
     assert reproduce[env_at - 1] == "        env:" and reproduce[env_at + 1] == "        run: |"
     assert reproduce[env_at + 3].strip() == 'rm -rf "$QLDPC_BOARD_CACHE"'
-    assert not any(("runner.temp" in ln or "board-memo" in ln) and ln != _MEMO
-                   for ln in reproduce), "reproduce.yml names the memo directory only in that env line"
+    assert not any(("runner.temp" in ln or "board-memo" in ln) and ln != _MEMO for ln in reproduce), (
+        "reproduce.yml names the memo directory only in that env line"
+    )
     # Nothing saves or restores it, so no run reads what another wrote: in
     # this workflow the runner's temp directory is named by those two lines
     # and by no cache or artifact path.
-    temp = [ln for ln in workflows["verify.yml"]
-            if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln or "board-memo" in ln]
+    temp = [
+        ln
+        for ln in workflows["verify.yml"]
+        if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln or "board-memo" in ln
+    ]
     assert temp == [_MEMO, _MEMO], temp
 
 
@@ -1142,10 +1190,13 @@ def test_the_sweep_empties_the_board_memo_before_filling_it(tmp_path):
 
 def _cannot_run_on_a_code_submission(cond):
     """Say whether an `if:` rules out a pull request that changes codes/ or circuits/."""
-    rules_out = {"github.event_name == 'push'", "github.event_name == 'schedule'",
-                 "github.event_name == 'workflow_dispatch'",
-                 "github.event_name != 'pull_request'",
-                 "steps.changes.outputs.codes_changed != 'true'"}
+    rules_out = {
+        "github.event_name == 'push'",
+        "github.event_name == 'schedule'",
+        "github.event_name == 'workflow_dispatch'",
+        "github.event_name != 'pull_request'",
+        "steps.changes.outputs.codes_changed != 'true'",
+    }
     alternatives = [alt.strip().strip("()") for alt in cond.split(" || ")]
     return bool(cond) and all(rules_out & set(alt.split(" && ")) for alt in alternatives)
 
@@ -1166,28 +1217,30 @@ def test_only_the_search_cache_restore_runs_between_the_sweep_and_its_gate():
     restore = _code(steps[_SEARCH_RESTORE])
     assert _uses_cache(restore, "restore")
     assert [ln.strip() for ln in restore if ln.strip().startswith("path:")] == ["path: search-cache"]
-    for name in names[lo + 1:hi - 1]:
-        cond = next((ln[len("        if: "):] for ln in steps[name]
-                     if ln.startswith("        if: ")), "")
+    for name in names[lo + 1 : hi - 1]:
+        cond = next((ln[len("        if: ") :] for ln in steps[name] if ln.startswith("        if: ")), "")
         assert _cannot_run_on_a_code_submission(cond), (name, cond)
     # _workflow_steps only sees named steps: make sure there is no other kind here.
     with open(_WORKFLOW, encoding="utf-8") as f:
         lines = f.read().splitlines()
-    span = lines[lines.index(f"      - name: {_CODE_SWEEP}"):lines.index(f"      - name: {_GATE}")]
+    span = lines[lines.index(f"      - name: {_CODE_SWEEP}") : lines.index(f"      - name: {_GATE}")]
     assert all(ln.startswith("      - name: ") for ln in span if ln.startswith("      - "))
 
 
-@pytest.mark.parametrize("cond, expected", [
-    ("github.event_name == 'push'", True),
-    ("always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'", True),
-    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'", True),
-    ("github.event_name == 'schedule' || (github.event_name == 'push' && steps.merge.outputs.x == 'true')", True),
-    ("", False),
-    ("always()", False),
-    ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'", False),
-    ("github.event_name == 'push' || github.event_name == 'pull_request'", False),
-    ("github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true'", False),
-])
+@pytest.mark.parametrize(
+    "cond, expected",
+    [
+        ("github.event_name == 'push'", True),
+        ("always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'", True),
+        ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true'", True),
+        ("github.event_name == 'schedule' || (github.event_name == 'push' && steps.merge.outputs.x == 'true')", True),
+        ("", False),
+        ("always()", False),
+        ("github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'", False),
+        ("github.event_name == 'push' || github.event_name == 'pull_request'", False),
+        ("github.event_name == 'pull_request' && steps.changes.outputs.data_only == 'true'", False),
+    ],
+)
 def test_the_condition_reader_fails_closed(cond, expected):
     """The reader above is the check, so it has to refuse what it does not recognise."""
     assert _cannot_run_on_a_code_submission(cond) is expected
@@ -1199,32 +1252,44 @@ def test_the_condition_reader_fails_closed(cond, expected):
 # verified in full; the flag is void when the verifier stack differs from
 # REF or the diff fails.
 def _run_board(monkeypatch, argv, identity=None, stack_changed=False):
-    verified = []                     # the repo's entries; the fixtures verify as well
+    verified = []  # the repo's entries; the fixtures verify as well
 
     def fake_verify(doc):
         if doc["name"].endswith("-1-1"):
             verified.append(doc["name"])
         return json.loads(json.dumps(OK_REP))
+
     monkeypatch.setattr(QV, "verify", fake_verify)
     monkeypatch.setattr(VA, "verify_circuit", lambda doc, d: json.loads(json.dumps(OK_CIRC)))
     monkeypatch.setattr(VA, "verify_ler", lambda doc, d: {"ok": True})
     monkeypatch.setattr(VA, "circuit_stack_changed", lambda base: stack_changed)
-    monkeypatch.setattr(VA, "identity_keys", identity or (lambda doc: {
-        "fingerprint": "fp-" + doc["name"], "signature": {"hash": "sig-" + doc["name"]},
-        "css_equivalent": None}))
+    monkeypatch.setattr(
+        VA,
+        "identity_keys",
+        identity
+        or (
+            lambda doc: {
+                "fingerprint": "fp-" + doc["name"],
+                "signature": {"hash": "sig-" + doc["name"]},
+                "css_equivalent": None,
+            }
+        ),
+    )
     rc = VA.main(argv)
     return rc, sorted(verified)
 
 
 def test_board_base_verifies_the_changed_entries_and_scans_the_rest(tmp_path, monkeypatch, capsys):
     root = _repo(tmp_path)
-    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
-                                            "--ler-base", "main", "--circuit-base", "main"])
+    rc, verified = _run_board(
+        monkeypatch, ["--root", root, "--board-base", "main", "--ler-base", "main", "--circuit-base", "main"]
+    )
     out = capsys.readouterr().out
     assert rc == 0
-    assert verified == ["a-1-1", "b-1-1"]          # a's JSON and b's circuit changed
+    assert verified == ["a-1-1", "b-1-1"]  # a's JSON and b's circuit changed
     assert "BASE  codes/c-1-1.json  -> unchanged since main" in out
     import re
+
     assert re.search(r"\n\d+/\d+ passed; 1 unchanged since main keep the base branch's verdict", out)
 
 
@@ -1258,8 +1323,11 @@ def test_board_base_still_catches_a_duplicate_among_unchanged_entries(tmp_path, 
     _git(root, "commit", "-q", "-m", "another unchanged entry")
     _git(root, "checkout", "-q", "pr")
     _git(root, "merge", "-q", "main")
-    same = lambda doc: {"fingerprint": "shared", "signature": {"hash": "shared"},  # noqa: E731
-                        "css_equivalent": None}
+    same = lambda doc: {
+        "fingerprint": "shared",
+        "signature": {"hash": "shared"},  # noqa: E731
+        "css_equivalent": None,
+    }
     rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"], identity=same)
     out = capsys.readouterr().out
     assert verified == ["a-1-1", "b-1-1"]
@@ -1273,6 +1341,7 @@ def test_board_base_verifies_an_entry_whose_keys_cannot_be_computed(tmp_path, mo
         if doc["name"] == "c-1-1":
             raise KeyError("checks")
         return {"fingerprint": doc["name"], "signature": {"hash": doc["name"]}, "css_equivalent": None}
+
     rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main"], identity=broken)
     assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
 
@@ -1319,20 +1388,24 @@ def test_board_base_entries_are_left_out_of_the_circuit_pool(tmp_path, monkeypat
             out[slug] = VA.verify_circuit(doc, d)
             done(slug, out[slug])
         return out
+
     monkeypatch.setattr(VA, "check_circuits_in_pool", in_process)
-    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
-                                            "--circuit-base", "main", "--circuit-jobs", "2"])
+    rc, verified = _run_board(
+        monkeypatch, ["--root", root, "--board-base", "main", "--circuit-base", "main", "--circuit-jobs", "2"]
+    )
     out = capsys.readouterr().out
     assert rc == 0 and verified == ["a-1-1", "b-1-1"]
-    assert sorted(pooled) == ["a-1-1", "b-1-1"]          # c-1-1 kept the base's verdict
+    assert sorted(pooled) == ["a-1-1", "b-1-1"]  # c-1-1 kept the base's verdict
     assert "BASE  codes/c-1-1.json" in out
 
 
 def test_a_sampled_run_does_not_apply_board_base(tmp_path, monkeypatch, capsys):
     """The sample draws from every claim and re-measures what it draws, so every entry is verified."""
     root = _repo(tmp_path)
-    rc, verified = _run_board(monkeypatch, ["--root", root, "--board-base", "main",
-                                            "--ler-base", "main", "--ler-sample", "1", "--ler-seed", "7"])
+    rc, verified = _run_board(
+        monkeypatch,
+        ["--root", root, "--board-base", "main", "--ler-base", "main", "--ler-sample", "1", "--ler-seed", "7"],
+    )
     out = capsys.readouterr().out
     assert rc == 0 and verified == ["a-1-1", "b-1-1", "c-1-1"]
     assert "--board-base main is not applied" in out and "BASE  " not in out

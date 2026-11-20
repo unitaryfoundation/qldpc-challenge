@@ -10,6 +10,7 @@ board are left alone. `--fix` rewrites files in place.
     python verify/check_codes_format.py --files codes/<slug>.json
     python verify/check_codes_format.py --fix --files codes/<slug>.json
 """
+
 import argparse
 import json
 import os
@@ -29,8 +30,8 @@ def changed_codes(base, root):
     """codes/*.json added, modified, or renamed since ``base``; None if git failed."""
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", "--diff-filter=AMR", f"{base}...HEAD", "--", "codes"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-only", "--diff-filter=AMR", f"{base}...HEAD", "--", "codes"], cwd=root, text=True
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}; failing closed")
         return None
@@ -108,8 +109,9 @@ def main(argv):
     print("Codes format check failed: a board file is json.dumps(doc, indent=1), one key per line.\n")
     for rel, why in bad:
         print(f"  {rel}: {why}")
-    print("\nFix in place with\n\n  python3 verify/check_codes_format.py --fix --files "
-          + " ".join(rel for rel, _ in bad))
+    print(
+        "\nFix in place with\n\n  python3 verify/check_codes_format.py --fix --files " + " ".join(rel for rel, _ in bad)
+    )
     return 1
 
 

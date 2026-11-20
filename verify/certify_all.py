@@ -1,7 +1,8 @@
 """Run exact certification over codes/ and write a cert per code that closes.
 A cert file certs/<slug>.json (d_exact=true) is what upgrades a code's
 displayed tier to d=. Codes that do not close in budget simply get no cert
-and stay at the self-certified upper bound. 2 workers, modest per-solve cap."""
+and stay at the self-certified upper bound. 2 workers, modest per-solve cap.
+"""
 
 import glob
 import json

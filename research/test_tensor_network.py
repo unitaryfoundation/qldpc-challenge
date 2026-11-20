@@ -26,10 +26,8 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 sys.path.insert(0, os.path.join(_HERE, "kit"))
 
-import numpy as np
 import tensor_network as tn
-from tensor_network import (eleven_qubit_code, is_abelian, is_css,
-                             seven_qubit_state_code, swo08_code)
+from tensor_network import eleven_qubit_code, is_abelian, is_css, seven_qubit_state_code, swo08_code
 
 
 def _commutes(u, v):
@@ -55,7 +53,8 @@ def test_swo08_block_is_not_css():
 def test_seven_qubit_state_is_not_abelian_as_printed():
     """The paper's seven operators for the 7-qubit state do not commute: the
     two logicals anticommute on the extra qubit 0.  The module reports this
-    rather than pretending the family is a stabilizer code."""
+    rather than pretending the family is a stabilizer code.
+    """
     assert not is_abelian(seven_qubit_state_code())
 
 

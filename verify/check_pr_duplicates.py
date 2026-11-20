@@ -47,7 +47,7 @@ import subprocess
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, _HERE)                       # trusted verify/ only
+sys.path.insert(0, _HERE)  # trusted verify/ only
 import qldpc_verify  # noqa: E402
 from validate_candidate import _identity_sets as identity_sets  # noqa: E402
 
@@ -71,8 +71,7 @@ def changed_entries(root, base):
     Three-dot, so only the PR's own side of the diff counts; a deletion carries
     no code to compare.
     """
-    out = _run(["git", "diff", "--name-only", "--diff-filter=AM", f"{base}...HEAD", "--", "codes"],
-               cwd=root)
+    out = _run(["git", "diff", "--name-only", "--diff-filter=AM", f"{base}...HEAD", "--", "codes"], cwd=root)
     return [f for f in out.splitlines() if is_entry(f)]
 
 
@@ -90,8 +89,16 @@ def identities(doc):
 
 def open_prs(repo, exclude):
     """Return the other open PRs of `repo` as {number: {"author", "title"}}."""
-    out = _run(["gh", "api", "--paginate", f"repos/{repo}/pulls?state=open&per_page=100",
-                "--jq", ".[] | {number: .number, author: .user.login, title: .title}"])
+    out = _run(
+        [
+            "gh",
+            "api",
+            "--paginate",
+            f"repos/{repo}/pulls?state=open&per_page=100",
+            "--jq",
+            ".[] | {number: .number, author: .user.login, title: .title}",
+        ]
+    )
     prs = {}
     for line in out.splitlines():
         if not line.strip():
@@ -104,8 +111,16 @@ def open_prs(repo, exclude):
 
 def pr_entries(repo, number):
     """Return the codes/<slug>.json paths PR `number` adds or modifies."""
-    out = _run(["gh", "api", "--paginate", f"repos/{repo}/pulls/{number}/files?per_page=100",
-                "--jq", '.[] | select(.status != "removed") | .filename'])
+    out = _run(
+        [
+            "gh",
+            "api",
+            "--paginate",
+            f"repos/{repo}/pulls/{number}/files?per_page=100",
+            "--jq",
+            '.[] | select(.status != "removed") | .filename',
+        ]
+    )
     return [f for f in out.splitlines() if is_entry(f)]
 
 
@@ -119,8 +134,7 @@ def fetch_heads(root, numbers):
 def drop_heads(root, numbers):
     """Remove the refs fetch_heads created; never fails."""
     for n in numbers:
-        subprocess.run(["git", "update-ref", "-d", f"{_REF_PREFIX}{n}"], cwd=root,
-                       capture_output=True, check=False)
+        subprocess.run(["git", "update-ref", "-d", f"{_REF_PREFIX}{n}"], cwd=root, capture_output=True, check=False)
 
 
 def pr_doc(root, number, path):
@@ -166,30 +180,38 @@ def verdict(found, pr_number, prs):
         who = prs.get(c["number"], {}).get("author", "?")
         where = f"open PR #{c['number']} by {who} as {c['other_path']}"
         if c["kind"] == "identical":
-            what = (f"{c['path']} and {where} are one code (the same stabilizer group, directly "
-                    f"or up to a local Hadamard relabeling)")
+            what = (
+                f"{c['path']} and {where} are one code (the same stabilizer group, directly "
+                f"or up to a local Hadamard relabeling)"
+            )
             if c["number"] < pr_number:
                 code = 1
-                lines.append(f"::error::{what}: one code, one entry (CONTRIBUTING.md); this PR is "
-                             f"the later filing, so it waits until #{c['number']} has merged or "
-                             f"been withdrawn, then re-run this check")
+                lines.append(
+                    f"::error::{what}: one code, one entry (CONTRIBUTING.md); this PR is "
+                    f"the later filing, so it waits until #{c['number']} has merged or "
+                    f"been withdrawn, then re-run this check"
+                )
             else:
-                lines.append(f"::warning::{what}; this PR is the earlier filing and may merge, "
-                             f"#{c['number']} is held by this check")
+                lines.append(
+                    f"::warning::{what}; this PR is the earlier filing and may merge, "
+                    f"#{c['number']} is held by this check"
+                )
         else:
-            lines.append(f"::warning::{c['path']} shares a Weisfeiler-Leman signature with {where}: "
-                         f"possibly the same code up to a qubit permutation, review before "
-                         f"merging both")
+            lines.append(
+                f"::warning::{c['path']} shares a Weisfeiler-Leman signature with {where}: "
+                f"possibly the same code up to a qubit permutation, review before "
+                f"merging both"
+            )
     return code, lines
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--root", default=os.path.dirname(_HERE),
-                    help="the submitted checkout (default: this repository)")
+    ap.add_argument("--root", default=os.path.dirname(_HERE), help="the submitted checkout (default: this repository)")
     ap.add_argument("--base", default="origin/main")
-    ap.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY"),
-                    help="OWNER/NAME (default: $GITHUB_REPOSITORY)")
+    ap.add_argument(
+        "--repo", default=os.environ.get("GITHUB_REPOSITORY"), help="OWNER/NAME (default: $GITHUB_REPOSITORY)"
+    )
     ap.add_argument("--pr-number", type=int, required=True)
     args = ap.parse_args(argv)
     if not args.repo:
@@ -209,7 +231,7 @@ def main(argv=None):
         try:
             with open(os.path.join(args.root, path), encoding="utf-8") as f:
                 mine[path] = identities(json.load(f))
-        except Exception as e:                  # verify_all reports the entry's own defects
+        except Exception as e:  # verify_all reports the entry's own defects
             print(f"note: {path} has no identity to compare ({type(e).__name__}: {e})")
     if not any(fps or sigs for fps, sigs in mine.values()):
         print("no entry of this PR carries an identity; nothing to compare")
@@ -219,8 +241,10 @@ def main(argv=None):
         prs = open_prs(args.repo, args.pr_number)
     except (subprocess.CalledProcessError, OSError, ValueError) as e:
         detail = getattr(e, "stderr", None) or str(e)
-        print(f"::warning::could not list the open pull requests of {args.repo} "
-              f"({str(detail).strip()}); duplicate check against open PRs skipped")
+        print(
+            f"::warning::could not list the open pull requests of {args.repo} "
+            f"({str(detail).strip()}); duplicate check against open PRs skipped"
+        )
         return 0
     files = {}
     for number in sorted(prs):
@@ -237,8 +261,10 @@ def main(argv=None):
     try:
         fetch_heads(args.root, sorted(files))
     except subprocess.CalledProcessError as e:
-        print(f"::warning::could not fetch the heads of the open PRs ({e.stderr.strip()}); "
-              f"duplicate check against open PRs skipped")
+        print(
+            f"::warning::could not fetch the heads of the open PRs ({e.stderr.strip()}); "
+            f"duplicate check against open PRs skipped"
+        )
         return 0
     others = []
     try:
@@ -247,8 +273,7 @@ def main(argv=None):
                 try:
                     others.append((number, path, identities(pr_doc(args.root, number, path))))
                 except Exception as e:
-                    print(f"note: #{number} {path} has no identity to compare "
-                          f"({type(e).__name__}: {e})")
+                    print(f"note: #{number} {path} has no identity to compare ({type(e).__name__}: {e})")
     finally:
         drop_heads(args.root, sorted(files))
 
@@ -256,8 +281,7 @@ def main(argv=None):
     for line in lines:
         print(line)
     if not lines:
-        print(f"no entry of this PR matches an entry of the {len(files)} open PR(s) that change "
-              f"board entries")
+        print(f"no entry of this PR matches an entry of the {len(files)} open PR(s) that change board entries")
     return code
 
 

@@ -6,6 +6,7 @@ it; a failed build restores the full Python search battery. Build locally with:
 
     make fast
 """
+
 import os
 
 from pybind11.setup_helpers import Pybind11Extension, build_ext
@@ -17,9 +18,8 @@ setup(
     name="gf2_fast",
     version="0.1",
     description="Bit-packed GF(2) linear algebra for quantum code search",
-    packages=[],           # extension only; keep setuptools away from the
-    py_modules=[],         # repo's flat directory layout
-
+    packages=[],  # extension only; keep setuptools away from the
+    py_modules=[],  # repo's flat directory layout
     ext_modules=[
         Pybind11Extension(
             "gf2_fast",

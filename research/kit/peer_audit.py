@@ -28,6 +28,7 @@ on, covering every d-only peer the gate named, discharges the audit. A prose
 ``evidence.peer_audit`` is still accepted by ``promote.py`` for notes written
 before the record existed; it is reported as unchecked rather than refused.
 """
+
 import datetime
 import json
 import os
@@ -53,10 +54,9 @@ DEFAULT_PAIR_DEPTH = 10
 _MEANING = {
     "drop": "the candidate's own claim came down at that budget; do not package it",
     "redirect": "the board peer's claim came down; the submission to make is that "
-                "entry's distance revision (research/audits/README.md, Filing a "
-                "distance revision), not this candidate",
-    "inconclusive": "neither claim was reached at that budget, which is no "
-                    "information; audit deeper or not at all",
+    "entry's distance revision (research/audits/README.md, Filing a "
+    "distance revision), not this candidate",
+    "inconclusive": "neither claim was reached at that budget, which is no information; audit deeper or not at all",
 }
 
 
@@ -100,8 +100,7 @@ def d_only_peers(candidate, board):
     for b in board:
         if b.get("code_type", "CSS") != code_type or b.get("w") is None or w is None:
             continue
-        if _WEIGHT_ORDER.get(b.get("weight_class"), 9) > wc \
-                or _LOCAL_ORDER.get(b.get("locality_class"), 9) > lc:
+        if _WEIGHT_ORDER.get(b.get("weight_class"), 9) > wc or _LOCAL_ORDER.get(b.get("locality_class"), 9) > lc:
             continue
         # a d = 1 entry is a placeholder, not a real distance claim: beating it
         # on d alone is not the suspect (inflated-bound) pattern.
@@ -110,24 +109,47 @@ def d_only_peers(candidate, board):
     return out
 
 
-def pair_command(candidate_path, *, trials=DEFAULT_TRIALS, seeds=DEFAULT_SEEDS,
-                 pair_depth=DEFAULT_PAIR_DEPTH, out="peer-audit.json"):
+def pair_command(
+    candidate_path, *, trials=DEFAULT_TRIALS, seeds=DEFAULT_SEEDS, pair_depth=DEFAULT_PAIR_DEPTH, out="peer-audit.json"
+):
     """Return the exact ``leader_audit.py pair`` invocation that produces the record."""
     seed_text = " ".join(str(s) for s in seeds)
-    return (f"uv run --frozen python research/audits/leader_audit.py pair "
-            f"{candidate_path} --trials {trials} --seeds {seed_text} "
-            f"--pair-depth {pair_depth} --witness-dir <dir-for-witnesses> "
-            f"--json-out {out}")
+    return (
+        f"uv run --frozen python research/audits/leader_audit.py pair "
+        f"{candidate_path} --trials {trials} --seeds {seed_text} "
+        f"--pair-depth {pair_depth} --witness-dir <dir-for-witnesses> "
+        f"--json-out {out}"
+    )
 
 
-def record(candidate, peers, results, decision, *, trials=None, seeds=None, pair_depth=None,
-           threads=1, exit_code=0, today=None, backend="ris", seconds=None, tool=None):
+def record(
+    candidate,
+    peers,
+    results,
+    decision,
+    *,
+    trials=None,
+    seeds=None,
+    pair_depth=None,
+    threads=1,
+    exit_code=0,
+    today=None,
+    backend="ris",
+    seconds=None,
+    tool=None,
+):
     """Return the audit record ``leader_audit.py pair --json-out`` writes."""
-    rec = {"schema": AUDIT_SCHEMA, "candidate": str(candidate),
-           "peers": [str(p) for p in peers], "backend": str(backend),
-           "threads": int(threads), "decision": str(decision),
-           "exit_code": int(exit_code), "results": list(results),
-           "recorded": today or datetime.date.today().isoformat()}
+    rec = {
+        "schema": AUDIT_SCHEMA,
+        "candidate": str(candidate),
+        "peers": [str(p) for p in peers],
+        "backend": str(backend),
+        "threads": int(threads),
+        "decision": str(decision),
+        "exit_code": int(exit_code),
+        "results": list(results),
+        "recorded": today or datetime.date.today().isoformat(),
+    }
     if backend == "qedist":
         rec["tool"] = str(tool or "qedist")
         if seconds is not None:
@@ -152,7 +174,8 @@ def load_audit(path):
         raise PeerAuditError(
             f"--peer-audit {path}: schema is {obj.get('schema')!r}, expected "
             f"{AUDIT_SCHEMA!r}; write the record with research/audits/leader_audit.py "
-            f"pair --json-out")
+            f"pair --json-out"
+        )
     return obj
 
 
@@ -165,8 +188,9 @@ def _positive_int(value):
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
-def blockers(peers, audit, *, required_trials=None, required_pair_depth=None,
-             candidate_path="<candidate>.json", attach=""):
+def blockers(
+    peers, audit, *, required_trials=None, required_pair_depth=None, candidate_path="<candidate>.json", attach=""
+):
     """Return why ``audit`` does not discharge the d-only gain over ``peers``.
 
     An empty list means it does. No peers means there is nothing to discharge.
@@ -181,12 +205,17 @@ def blockers(peers, audit, *, required_trials=None, required_pair_depth=None,
         return []
     names = ", ".join(peers)
     if not audit:
-        cmd = pair_command(candidate_path, trials=required_trials or DEFAULT_TRIALS,
-                           pair_depth=required_pair_depth or DEFAULT_PAIR_DEPTH)
+        cmd = pair_command(
+            candidate_path,
+            trials=required_trials or DEFAULT_TRIALS,
+            pair_depth=required_pair_depth or DEFAULT_PAIR_DEPTH,
+        )
         tail = f", then {attach}" if attach else ""
-        return [f"the gate reports a d-only gain over {names}; {RULE} requires a "
-                f"matched-depth peer audit before packaging, and none is recorded. "
-                f"Run {cmd}{tail}"]
+        return [
+            f"the gate reports a d-only gain over {names}; {RULE} requires a "
+            f"matched-depth peer audit before packaging, and none is recorded. "
+            f"Run {cmd}{tail}"
+        ]
     if not is_checkable(audit):
         return []
     problems = []
@@ -194,44 +223,49 @@ def blockers(peers, audit, *, required_trials=None, required_pair_depth=None,
     head = decision.split(":", 1)[0].strip().lower()
     if head != CREDIBLE:
         meaning = _MEANING.get(head, "only a `credible` decision discharges the audit")
-        problems.append(f"the recorded peer audit's decision is "
-                        f"{decision or 'missing'!r}: {meaning}")
+        problems.append(f"the recorded peer audit's decision is {decision or 'missing'!r}: {meaning}")
     if audit.get("backend") == "qedist":
         secs = audit.get("seconds")
         if not isinstance(secs, (int, float)) or isinstance(secs, bool) or secs <= 0:
-            problems.append("the recorded qedist peer audit carries no seconds, so its "
-                            "budget cannot be checked")
+            problems.append("the recorded qedist peer audit carries no seconds, so its budget cannot be checked")
         if not audit.get("tool"):
             problems.append("the recorded qedist peer audit carries no tool name")
         for res in audit.get("results") or []:
             if not res.get("d_exact") and res.get("lower_bound") is None:
-                problems.append("the recorded qedist peer audit carries no proved bound "
-                                f"for {res.get('stem') or res.get('entry') or 'an entry'}")
+                problems.append(
+                    "the recorded qedist peer audit carries no proved bound "
+                    f"for {res.get('stem') or res.get('entry') or 'an entry'}"
+                )
                 break
     else:
         trials = audit.get("trials")
         if not _positive_int(trials):
-            problems.append("the recorded peer audit carries no trials, so its depth "
-                            "cannot be checked")
+            problems.append("the recorded peer audit carries no trials, so its depth cannot be checked")
         elif required_trials and trials < required_trials:
-            problems.append(f"the recorded peer audit was read at {trials:,} trials, "
-                            f"shallower than the {required_trials:,} the claim rests on: "
-                            f"an instrument artifact, not a distance difference ({RULE})")
+            problems.append(
+                f"the recorded peer audit was read at {trials:,} trials, "
+                f"shallower than the {required_trials:,} the claim rests on: "
+                f"an instrument artifact, not a distance difference ({RULE})"
+            )
         depth = audit.get("pair_depth")
         if not _positive_int(depth):
             problems.append("the recorded peer audit carries no pair_depth")
         elif required_pair_depth and depth < required_pair_depth:
-            problems.append(f"the recorded peer audit used pair depth {depth}, shallower "
-                            f"than the {required_pair_depth} the claim's own search used")
+            problems.append(
+                f"the recorded peer audit used pair depth {depth}, shallower "
+                f"than the {required_pair_depth} the claim's own search used"
+            )
         seeds = audit.get("seeds")
         if not isinstance(seeds, list) or not seeds:
             problems.append("the recorded peer audit carries no seeds")
     audited = {peer_slug(p) for p in (audit.get("peers") or [])} - {""}
     missing = [p for p in peers if peer_slug(p) not in audited]
     if missing:
-        problems.append(f"the recorded peer audit does not cover "
-                        f"{', '.join(missing)}; it audited "
-                        f"{', '.join(sorted(audited)) or 'no peer'}")
+        problems.append(
+            f"the recorded peer audit does not cover "
+            f"{', '.join(missing)}; it audited "
+            f"{', '.join(sorted(audited)) or 'no peer'}"
+        )
     return problems
 
 
@@ -242,10 +276,14 @@ def summary(audit):
     if audit.get("backend") == "qedist":
         secs = audit.get("seconds")
         budget = f"{secs:g}s" if isinstance(secs, (int, float)) and not isinstance(secs, bool) else "unrecorded"
-        return (f"{audit.get('decision', '')}; {audit.get('tool', 'qedist')} {budget}, "
-                f"threads {audit.get('threads', 'unrecorded')}")
+        return (
+            f"{audit.get('decision', '')}; {audit.get('tool', 'qedist')} {budget}, "
+            f"threads {audit.get('threads', 'unrecorded')}"
+        )
     seeds = ", ".join(str(s) for s in (audit.get("seeds") or [])) or "unrecorded"
     trials = audit.get("trials")
     depth = f"{trials:,}" if _positive_int(trials) else "unrecorded"
-    return (f"{audit.get('decision', '')}; {depth} trials per seed, seeds {seeds}, "
-            f"pair depth {audit.get('pair_depth', 'unrecorded')}")
+    return (
+        f"{audit.get('decision', '')}; {depth} trials per seed, seeds {seeds}, "
+        f"pair depth {audit.get('pair_depth', 'unrecorded')}"
+    )

@@ -37,7 +37,7 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit"))
 
 try:
-    from pysat.solvers import Minisat22, Cadical153, CryptoMinisat, Kissat404, Minicard
+    from pysat.solvers import Cadical153, CryptoMinisat, Kissat404, Minicard, Minisat22
 
     _HAS_PYSAT = True
 except ImportError:
@@ -65,14 +65,24 @@ def _grid_sites(side, dimension=2):
     if dimension == 2:
         return [(float(x), float(y)) for y in range(side) for x in range(side)]
     if dimension == 3:
-        return [(float(x), float(y), float(z))
-                for z in range(side) for y in range(side) for x in range(side)]
+        return [(float(x), float(y), float(z)) for z in range(side) for y in range(side) for x in range(side)]
     raise ValueError(f"dimension must be 2 or 3, not {dimension!r}")
 
 
-def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
-                    shared_t3=False, layers=1, nonempty_rows=False,
-                    row_sort=False, dimension=2, max_diameter=None):
+def build_local_cnf(
+    n_side,
+    n_generators,
+    max_weight,
+    t,
+    radius,
+    sink=None,
+    shared_t3=False,
+    layers=1,
+    nonempty_rows=False,
+    row_sort=False,
+    dimension=2,
+    max_diameter=None,
+):
     """Build the locality-constrained CNF and return its variable maps.
 
     ``dimension``: 2 for the n_side x n_side square, 3 for the cube (issue
@@ -152,9 +162,7 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
     # xr[g,q], and require p -> close(i,q).
     for g in range(G):
         for q in range(n):
-            close = [
-                i for i in range(n) if math.dist(sites[i], sites[q]) <= radius + 1e-9
-            ]
+            close = [i for i in range(n) if math.dist(sites[i], sites[q]) <= radius + 1e-9]
             if not close:
                 emit([-xr[(g, q)]])
                 emit([-zr[(g, q)]])
@@ -345,8 +353,7 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
                     if prev is None:
                         cls += [[-cur, lit], [cur, -lit]]
                     else:
-                        cls += [[-cur, prev, lit], [-cur, -prev, -lit],
-                                [cur, -prev, lit], [cur, prev, -lit]]
+                        cls += [[-cur, prev, lit], [-cur, -prev, -lit], [cur, -prev, lit], [cur, prev, -lit]]
                     prev = cur
                 lits.append(prev)
         cls.append(lits)
@@ -355,16 +362,19 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
     if max_diameter is not None:
         # interaction-diameter predicate: two qubits farther apart than
         # max_diameter never share a check
-        far = [(q1, q2) for q1 in range(n) for q2 in range(q1 + 1, n)
-               if math.dist(sites[q1], sites[q2]) > max_diameter + 1e-9]
+        far = [
+            (q1, q2)
+            for q1 in range(n)
+            for q2 in range(q1 + 1, n)
+            if math.dist(sites[q1], sites[q2]) > max_diameter + 1e-9
+        ]
         for g in range(G):
             for q1, q2 in far:
                 emit([-xr[(g, q1)], -xr[(g, q2)]])
                 emit([-zr[(g, q1)], -zr[(g, q2)]])
 
     if row_sort:
-        _n_vars = add_row_sort_clauses({"n": n, "G": G, "xr": xr, "zr": zr,
-                                        "n_vars": len(aux)}, emit)
+        _n_vars = add_row_sort_clauses({"n": n, "G": G, "xr": xr, "zr": zr, "n_vars": len(aux)}, emit)
     else:
         _n_vars = len(aux)
 
@@ -394,6 +404,7 @@ def build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=None,
 
 # --- D4 orbit machinery for symmetry-aware enumeration ----------------------
 
+
 def _d4_maps(side):
     """The 8 grid isometries of the square, each (x, y) -> (x', y')."""
     S = side - 1
@@ -419,10 +430,12 @@ def _cube_maps(side):
     maps = []
     for perm in itertools.permutations(range(3)):
         for flips in itertools.product((False, True), repeat=3):
+
             def f(x, y, z, perm=perm, flips=flips):
                 c = (x, y, z)
                 out = [c[perm[i]] for i in range(3)]
                 return tuple(S - out[i] if flips[i] else out[i] for i in range(3))
+
             maps.append(f)
     return maps
 
@@ -437,7 +450,7 @@ def _site_permutations(side, dimension=2):
     perms = []
     if dimension == 3:
         for f in _cube_maps(side):
-            p = [0] * (side ** 3)
+            p = [0] * (side**3)
             for z in range(side):
                 for y in range(side):
                     for x in range(side):
@@ -472,7 +485,7 @@ def orbit_canonical_key(side, G, HX, HZ, perms=None, xz_swap=True, dimension=2):
     best = None
     for p in perms:
         Mp = M[:, list(p)]
-        for swapped in ((False, True) if xz_swap else (False,)):
+        for swapped in (False, True) if xz_swap else (False,):
             A = np.vstack([Mp[G:], Mp[:G]]) if swapped else Mp
             k = _canon_key(A)
             if best is None or k < best:
@@ -482,7 +495,8 @@ def orbit_canonical_key(side, G, HX, HZ, perms=None, xz_swap=True, dimension=2):
 
 def orbit_selftest(side=6, G=4, seed=0):
     """Invariance sanity check: the canonical key is constant over the whole
-    transform group applied to random matrices. Raises on failure."""
+    transform group applied to random matrices. Raises on failure.
+    """
     rng = np.random.default_rng(seed)
     n = side * side
     perms = _site_permutations(side)
@@ -538,13 +552,9 @@ def add_static_symmetry_clauses(cnf, emit):
     # aux vars must number ABOVE everything build_local_cnf allocated
     # (colliding with incidence vars silently corrupts the CNF — found by
     # the 2x2 brute-force test, 2026-09-08)
-    aux_count = cnf.get("n_vars") or max(
-        max(m.values()) for m in (cnf["xr"], cnf["zr"], cnf["ax"], cnf["az"])
-    )
+    aux_count = cnf.get("n_vars") or max(max(m.values()) for m in (cnf["xr"], cnf["zr"], cnf["ax"], cnf["az"]))
     # canonical variable order and the per-transform image list
-    order = [
-        (s, g, q) for s in range(2) for g in range(G) for q in range(n)
-    ]
+    order = [(s, g, q) for s in range(2) for g in range(G) for q in range(n)]
     var_of = {(s, g, q): rowmaps[s][(g, q)] for s, g, q in order}
 
     for p, xz in _full_symmetry_group(side, dimension):
@@ -587,7 +597,8 @@ def add_static_symmetry_clauses(cnf, emit):
 
 
 def add_row_sort_clauses(cnf, emit):
-    n = cnf["n"]; G = cnf["G"]
+    n = cnf["n"]
+    G = cnf["G"]
     rowmaps = (cnf["xr"], cnf["zr"])
     aux_count = cnf.get("n_vars") or max(max(m.values()) for m in (cnf["xr"], cnf["zr"], cnf["ax"], cnf["az"]))
     for side in range(2):
@@ -595,12 +606,15 @@ def add_row_sort_clauses(cnf, emit):
         for g in range(G - 1):
             a = [rowmap[(g, q)] for q in range(n)]
             b = [rowmap[(g + 1, q)] for q in range(n)]
-            eq_prev = aux_count + 1; aux_count += 1
+            eq_prev = aux_count + 1
+            aux_count += 1
             emit([eq_prev])
             for i in range(n):
-                ai = a[i]; bi = b[i]
+                ai = a[i]
+                bi = b[i]
                 emit([-eq_prev, -ai, bi])
-                eq_i = aux_count + 1; aux_count += 1
+                eq_i = aux_count + 1
+                aux_count += 1
                 emit([-eq_i, eq_prev])
                 emit([-eq_i, -ai, bi])
                 emit([-eq_i, ai, -bi])
@@ -608,7 +622,6 @@ def add_row_sort_clauses(cnf, emit):
                 emit([-eq_prev, ai, bi, eq_i])
                 eq_prev = eq_i
     return aux_count
-
 
     return aux_count
 
@@ -735,8 +748,9 @@ def enumerate_local_sat_codes(
         # error, not an exception) if add_clause is called after a solve,
         # which the enumeration's blocking clauses always do. Verified
         # overnight 2026-09-05: first SAT model kills the run.
-        raise ValueError("kissat cannot enumerate: no incremental add_clause "
-                         "(process aborts, not raises); use cadical/cryptominisat")
+        raise ValueError(
+            "kissat cannot enumerate: no incremental add_clause (process aborts, not raises); use cadical/cryptominisat"
+        )
     if symmetry not in ("none", "orbit", "lex"):
         raise ValueError(f"unknown symmetry {symmetry!r}; choose none|orbit|lex")
 
@@ -744,22 +758,39 @@ def enumerate_local_sat_codes(
 
     if stats is None:
         stats = {}
-    stats.update(rounds=0, yielded=0, final=None, solver=solver,
-                 rejected={"zero_row": 0, "undetected": 0, "orbit": 0})
+    stats.update(rounds=0, yielded=0, final=None, solver=solver, rejected={"zero_row": 0, "undetected": 0, "orbit": 0})
     if stream:
         solver_obj = solver_map[solver](bootstrap_with=[])
         cnf = build_local_cnf(
-            n_side, n_generators, max_weight, t, radius, sink=solver_obj,
-            shared_t3=shared_t3, layers=layers, nonempty_rows=nonempty_rows,
-            row_sort=row_sort, dimension=dimension, max_diameter=max_diameter,
+            n_side,
+            n_generators,
+            max_weight,
+            t,
+            radius,
+            sink=solver_obj,
+            shared_t3=shared_t3,
+            layers=layers,
+            nonempty_rows=nonempty_rows,
+            row_sort=row_sort,
+            dimension=dimension,
+            max_diameter=max_diameter,
         )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, solver_obj.add_clause)
     else:
-        cnf = build_local_cnf(n_side, n_generators, max_weight, t, radius,
-                              shared_t3=shared_t3, layers=layers,
-                              nonempty_rows=nonempty_rows, row_sort=row_sort,
-                              dimension=dimension, max_diameter=max_diameter)
+        cnf = build_local_cnf(
+            n_side,
+            n_generators,
+            max_weight,
+            t,
+            radius,
+            shared_t3=shared_t3,
+            layers=layers,
+            nonempty_rows=nonempty_rows,
+            row_sort=row_sort,
+            dimension=dimension,
+            max_diameter=max_diameter,
+        )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, cnf["clauses"].append)
         solver_obj = solver_map[solver](bootstrap_with=cnf["clauses"])
@@ -826,12 +857,8 @@ def enumerate_local_sat_codes(
                 for q in range(n):
                     HX[g, q] = 1 if xr[(g, q)] in model else 0
                     HZ[g, q] = 1 if zr[(g, q)] in model else 0
-            anchors_x = [
-                next(i for i in range(n) if ax[(g, i)] in model) for g in range(G)
-            ]
-            anchors_z = [
-                next(i for i in range(n) if az[(g, i)] in model) for g in range(G)
-            ]
+            anchors_x = [next(i for i in range(n) if ax[(g, i)] in model) for g in range(G)]
+            anchors_z = [next(i for i in range(n) if az[(g, i)] in model) for g in range(G)]
             if row_sort:
                 block = [(-v if v in model else v) for v in incidence_vars]
             else:
@@ -839,9 +866,7 @@ def enumerate_local_sat_codes(
 
             if symmetry == "orbit":
                 # yield only the canonical representative of each orbit
-                if _canon_key(np.vstack([HX, HZ])) != orbit_canonical_key(
-                    n_side, G, HX, HZ, perms=perms
-                ):
+                if _canon_key(np.vstack([HX, HZ])) != orbit_canonical_key(n_side, G, HX, HZ, perms=perms):
                     stats["rejected"]["orbit"] += 1
                     solver_obj.add_clause(block)
                     continue
@@ -894,18 +919,19 @@ def enumerate_local_sat_codes(
 
 
 def geometric_efficiency(n, k, d, interaction_radius, layers):
-    """g = 4 k d^2 / (n rho^2 r^4); surface code (r=sqrt2, rho=1) scores 1."""
+    """G = 4 k d^2 / (n rho^2 r^4); surface code (r=sqrt2, rho=1) scores 1."""
     if n == 0 or interaction_radius <= 0:
         return 0.0
     return 4.0 * k * d * d / (n * (layers**2) * (interaction_radius**4))
 
 
-def calibrate_local_cnf(n_side, n_generators, max_weight, t, radius,
-                        shared_t3=True):
+def calibrate_local_cnf(n_side, n_generators, max_weight, t, radius, shared_t3=True):
     """Build the CNF (streamed, no solver) and report its budget: aux vars,
     clause count, and build time. Reject configs whose CNF would blow up
-    memory before spending solver time."""
+    memory before spending solver time.
+    """
     import time as _time
+
     t0 = _time.time()
     counter = {"clauses": 0}
 
@@ -913,12 +939,13 @@ def calibrate_local_cnf(n_side, n_generators, max_weight, t, radius,
         def add_clause(self, c):
             counter["clauses"] += 1
 
-    cnf = build_local_cnf(n_side, n_generators, max_weight, t, radius,
-                          sink=_Sink(), shared_t3=shared_t3)
+    cnf = build_local_cnf(n_side, n_generators, max_weight, t, radius, sink=_Sink(), shared_t3=shared_t3)
     dt = _time.time() - t0
-    print(f"calibrate n_side={n_side} (n={cnf['n']}) G={n_generators} "
-          f"w={max_weight} t={t}: {cnf['n_vars']:,} aux, "
-          f"{counter['clauses']:,} clauses, {dt:.1f}s build")
+    print(
+        f"calibrate n_side={n_side} (n={cnf['n']}) G={n_generators} "
+        f"w={max_weight} t={t}: {cnf['n_vars']:,} aux, "
+        f"{counter['clauses']:,} clauses, {dt:.1f}s build"
+    )
     return cnf["n_vars"], counter["clauses"]
 
 
@@ -939,7 +966,8 @@ def search_local_sat(
     layers=1,
 ):
     """Generate up to ``count`` locality-constrained SAT codes, screen them
-    with the kit's funnel, and rank by geometric efficiency g."""
+    with the kit's funnel, and rank by geometric efficiency g.
+    """
     from search import screen
 
     gen = enumerate_local_sat_codes(
@@ -994,9 +1022,18 @@ def lex_symmetry_selftest(side=4, G=5, t=1, radius=1.5, weight=4, cap=60):
     count = 0
     canons = set()
     for spec, HX, HZ, *_ in enumerate_local_sat_codes(
-        side, G, weight, t, radius, max_codes=cap, solver="cadical",
-        symmetry="lex", shared_t3=True, conf_budget=100_000,
-        time_budget=20.0, max_rounds=1200,
+        side,
+        G,
+        weight,
+        t,
+        radius,
+        max_codes=cap,
+        solver="cadical",
+        symmetry="lex",
+        shared_t3=True,
+        conf_budget=100_000,
+        time_budget=20.0,
+        max_rounds=1200,
     ):
         canons.add(group_canon(HX, HZ))
         count += 1
@@ -1007,16 +1044,15 @@ def lex_symmetry_selftest(side=4, G=5, t=1, radius=1.5, weight=4, cap=60):
 
 if __name__ == "__main__":
     print("selftest:", lex_symmetry_selftest())
-    search_local_sat(
-        n_side=4, n_generators=4, max_weight=3, t=1, radius=1.5, count=20, seed=11
-    )
+    search_local_sat(n_side=4, n_generators=4, max_weight=3, t=1, radius=1.5, count=20, seed=11)
 
 
 def row_sort_symmetry_selftest(side=4, G=5, t=1, radius=1.5, weight=4, cap=60):
-    models = 0; bad = 0
+    models = 0
+    bad = 0
     for spec, HX, HZ in enumerate_local_sat_codes(
-            side, G, weight, t, radius,
-            symmetry="lex", row_sort=True, max_codes=cap, conf_budget=200000):
+        side, G, weight, t, radius, symmetry="lex", row_sort=True, max_codes=cap, conf_budget=200000
+    ):
         models += 1
         for side_rows in (HX, HZ):
             for g in range(len(side_rows) - 1):

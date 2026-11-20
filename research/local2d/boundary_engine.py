@@ -64,6 +64,7 @@ and block rollback (a fixed screening seed has a deterministic blind spot --
 see the docstrings; this discipline is the difference between a real
 qubit-removal and a silently distance-losing one).
 """
+
 import os
 import sys
 
@@ -74,9 +75,8 @@ for _p in (_HERE, os.path.join(_HERE, "..", "kit")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from css import rref, rank, kernel_basis  # noqa: E402
+from css import kernel_basis, rank, rref  # noqa: E402
 from surrogate import distance_rand  # noqa: E402
-
 
 # =====================================================================
 #  Recorded (S_f, S_g) pairs for the board's open-boundary planar family
@@ -162,9 +162,7 @@ S_G_W8 = ((0, 0), (0, 1), (-1, -1), (-1, 3))
 #: with another: mixing two of these pairs builds a code that is on no board.
 #: S_G_TILE4_PUBLISHED is deliberately NOT here -- it is the published code, not
 #: a pair this repo has filed, so it has no board entry to be verified against.
-RECORDED_PAIRS = ((S_F_TILE4, S_G_TILE4_MAIN),
-                  (S_F_08887, S_G_08887),
-                  (S_F_W8, S_G_W8))
+RECORDED_PAIRS = ((S_F_TILE4, S_G_TILE4_MAIN), (S_F_08887, S_G_08887), (S_F_W8, S_G_W8))
 
 # CALIBRATE ON THE CHECK MATRICES, NOT ON (n, k). At a 21x22 lattice the
 # triple (n, k, w) comes out (924, 18, 8) for S_G_TILE4_MAIN and for a wrong
@@ -186,6 +184,7 @@ RECORDED_PAIRS = ((S_F_TILE4, S_G_TILE4_MAIN),
 # =====================================================================
 #  F2[t] polynomial arithmetic (coefficients as Python int bitmasks)
 # =====================================================================
+
 
 def pmul(a: int, b: int) -> int:
     """Carry-less (GF(2)[t]) product."""
@@ -255,13 +254,14 @@ def poly_kernel(M):
 #  Half-infinite boundary gauge generators
 # =====================================================================
 
+
 def _vec_span(vec):
     """j-extent of a strip vector (max bit_length over components)."""
     return max((p.bit_length() for p in vec), default=0)
 
 
 def _vec_weight(vec):
-    return sum(bin(p).count('1') for p in vec)
+    return sum(bin(p).count("1") for p in vec)
 
 
 def _normalize(vec):
@@ -279,7 +279,8 @@ def _compactify(basis):
     the natural compact generators; on a finite lattice, corner-adjacent
     translates of the compact generators are then not expressible by
     in-lattice translates of wide basis vectors (measured: rank deficit 4 on
-    the [[288,8,12]] reference). Pairwise reduction restores compactness."""
+    the [[288,8,12]] reference). Pairwise reduction restores compactness.
+    """
     basis = [_normalize(list(v)) for v in basis if any(v)]
     improved = True
     while improved:
@@ -304,22 +305,23 @@ def _compactify(basis):
 def _truncation_vectors(candA, candB, nA, w):
     """Strip vectors of all boundary-truncated bulk stabilizers of the
     CANDIDATE type (own supports candA on A, candB on B): center row c with
-    c + p < 0 for some support row p; keep only in-half-plane Paulis."""
+    c + p < 0 for some support row p; keep only in-half-plane Paulis.
+    """
     ps = [p for p, _ in candA + candB]
     pminc, pmaxc = min(ps), max(ps)
     out = []
-    for c in range(-pmaxc, -pminc):          # properly truncated centers
+    for c in range(-pmaxc, -pminc):  # properly truncated centers
         vec = [0] * (2 * nA)
         ok = True
         for blk, supp in ((0, candA), (1, candB)):
-            for (p, q) in supp:
+            for p, q in supp:
                 u = c + p
                 if u < 0:
-                    continue                  # truncated away
+                    continue  # truncated away
                 if u >= nA:
                     ok = False
                     break
-                vec[blk * nA + u] ^= 1 << (q + 64)   # offset to keep nonneg
+                vec[blk * nA + u] ^= 1 << (q + 64)  # offset to keep nonneg
             if not ok:
                 break
         if ok and any(vec):
@@ -368,11 +370,11 @@ def half_plane_generators(conA, conB, candA=None, candB=None, w=None):
         for u in range(nA):
             v = u - c
             ga = 0
-            for (p, q) in conA:
+            for p, q in conA:
                 if p == v:
                     ga ^= 1 << (qmax - q)
             gb = 0
-            for (p, q) in conB:
+            for p, q in conB:
                 if p == v:
                     gb ^= 1 << (qmax - q)
             row[u] = ga
@@ -383,10 +385,8 @@ def half_plane_generators(conA, conB, candA=None, candB=None, w=None):
     seen = set()
 
     def emit(vec):
-        suppA = [(u, j) for u in range(nA)
-                 for j in range(vec[u].bit_length()) if (vec[u] >> j) & 1]
-        suppB = [(u, j) for u in range(nA)
-                 for j in range(vec[nA + u].bit_length()) if (vec[nA + u] >> j) & 1]
+        suppA = [(u, j) for u in range(nA) for j in range(vec[u].bit_length()) if (vec[u] >> j) & 1]
+        suppB = [(u, j) for u in range(nA) for j in range(vec[nA + u].bit_length()) if (vec[nA + u] >> j) & 1]
         if not suppA and not suppB:
             return
         gA = tuple(sorted(suppA))
@@ -437,15 +437,12 @@ def boundary_generators(S_f, S_g, w=None):
     return {
         # X-type candidates (own supports f on A, g on B), constrained by
         # Z-bulk (gbar on A, fbar on B)
-        'top':    half_plane_generators(S_gbar, S_fbar, S_f, S_g, w),
-        'bottom': half_plane_generators(refl(S_gbar), refl(S_fbar),
-                                        refl(S_f), refl(S_g), w),
+        "top": half_plane_generators(S_gbar, S_fbar, S_f, S_g, w),
+        "bottom": half_plane_generators(refl(S_gbar), refl(S_fbar), refl(S_f), refl(S_g), w),
         # Z-type candidates (own supports gbar on A, fbar on B), constrained
         # by X-bulk (f on A, g on B), in the transposed frame
-        'left':   half_plane_generators(trans(S_f), trans(S_g),
-                                        trans(S_gbar), trans(S_fbar), w),
-        'right':  half_plane_generators(refl(trans(S_f)), refl(trans(S_g)),
-                                        refl(trans(S_gbar)), refl(trans(S_fbar)), w),
+        "left": half_plane_generators(trans(S_f), trans(S_g), trans(S_gbar), trans(S_fbar), w),
+        "right": half_plane_generators(refl(trans(S_f)), refl(trans(S_g)), refl(trans(S_gbar)), refl(trans(S_fbar)), w),
     }
 
 
@@ -453,19 +450,21 @@ def boundary_generators(S_f, S_g, w=None):
 #  Finite-lattice assembly
 # =====================================================================
 
+
 def _place(gen, side, s, Lx, Ly):
     """Map a canonical-frame generator support to lattice (i, j) qubit
     coordinates for translate s along the boundary. Returns (qA, qB) lists
-    of (i,j), or None if any coordinate falls outside the lattice."""
+    of (i,j), or None if any coordinate falls outside the lattice.
+    """
     suppA, suppB = gen
     out = ([], [])
     for k, supp in enumerate((suppA, suppB)):
-        for (u, j) in supp:
-            if side == 'top':
+        for u, j in supp:
+            if side == "top":
                 i, c = u, j + s
-            elif side == 'bottom':
+            elif side == "bottom":
                 i, c = Lx - 1 - u, j + s
-            elif side == 'left':
+            elif side == "left":
                 i, c = j + s, u
             else:  # right
                 i, c = j + s, Ly - 1 - u
@@ -475,8 +474,7 @@ def _place(gen, side, s, Lx, Ly):
     return out
 
 
-def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
-                 max_promotions=200, verbose=False):
+def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True, max_promotions=200, verbose=False):
     """Full boundary-engine construction of the open-boundary planar code.
 
     ``S_f`` and ``S_g`` are the family: they fix the code, and a different pair
@@ -499,7 +497,8 @@ def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
     way, X and Z check matrices both. Returns (HX, HZ, info). After cleanup,
     n = HX.shape[1] may be smaller than 2*Lx*Ly (qubit-removal layouts); info
     records counts and the kept qubit indices (into the original 2*Lx*Ly
-    numbering)."""
+    numbering).
+    """
     # Accept any sequence of pairs, so this module's named constants -- which
     # are tuples, and so cannot be mutated by a caller -- can be passed in
     # directly instead of being copied into a list at every call site.
@@ -512,13 +511,13 @@ def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
     A = lambda i, j: i * Ly + j
     B = lambda i, j: n2 + i * Ly + j
 
-    xset, zset = {}, {}   # bytes -> row (dedup)
+    xset, zset = {}, {}  # bytes -> row (dedup)
 
     def add(table, qA, qB):
         row = np.zeros(n, dtype=np.int8)
-        for (i, j) in qA:
+        for i, j in qA:
             row[A(i, j)] ^= 1
-        for (i, j) in qB:
+        for i, j in qB:
             row[B(i, j)] ^= 1
         if row.any():
             table[row.tobytes()] = row
@@ -529,23 +528,22 @@ def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
         pjs = [q for _, q in SA + SB]
         for ci in range(-min(pis), Lx - max(pis)):
             for cj in range(-min(pjs), Ly - max(pjs)):
-                add(table,
-                    [(ci + p, cj + q) for (p, q) in SA],
-                    [(ci + p, cj + q) for (p, q) in SB])
+                add(table, [(ci + p, cj + q) for (p, q) in SA], [(ci + p, cj + q) for (p, q) in SB])
+
     bulk(xset, S_f, S_g)
     bulk(zset, S_gbar, S_fbar)
     n_bulk_x, n_bulk_z = len(xset), len(zset)
 
     # ---- boundary gauge translates ----
     gens = boundary_generators(S_f, S_g, w)
-    for side in ('top', 'bottom'):
+    for side in ("top", "bottom"):
         for gen in gens[side]:
             jmax = max(j for _, j in gen[0] + gen[1])
             for s in range(0, Ly - jmax):
                 placed = _place(gen, side, s, Lx, Ly)
                 if placed:
                     add(xset, *placed)
-    for side in ('left', 'right'):
+    for side in ("left", "right"):
         for gen in gens[side]:
             jmax = max(j for _, j in gen[0] + gen[1])
             for s in range(0, Lx - jmax):
@@ -566,10 +564,8 @@ def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
     HX, HZ = HX[~xbad], HZ[~zbad]
 
     # ---- corner topological-order completion ----
-    extent_i = (max(p for p, _ in S_f + S_g + S_fbar + S_gbar)
-                - min(p for p, _ in S_f + S_g + S_fbar + S_gbar))
-    extent_j = (max(q for _, q in S_f + S_g + S_fbar + S_gbar)
-                - min(q for _, q in S_f + S_g + S_fbar + S_gbar))
+    extent_i = max(p for p, _ in S_f + S_g + S_fbar + S_gbar) - min(p for p, _ in S_f + S_g + S_fbar + S_gbar)
+    extent_j = max(q for _, q in S_f + S_g + S_fbar + S_gbar) - min(q for _, q in S_f + S_g + S_fbar + S_gbar)
     # one-sided extents (supports are shift-normalized nonneg)
     e1_i = max(p for p, _ in S_f + S_g)
     e1_j = max(q for _, q in S_f + S_g)
@@ -585,48 +581,55 @@ def build_planar(Lx, Ly, S_f, S_g, w=None, corner_pad=2, cleanup=True,
     rj = min(extent_j + corner_pad + 1, Ly - e1_j - 2)
     n_promoted = 0
     for _ in range(max_promotions):
-        cand = _best_corner_logical(HX, HZ, Lx, Ly, ri, rj, A, B,
-                                     e1_i, e1_j)
+        cand = _best_corner_logical(HX, HZ, Lx, Ly, ri, rj, A, B, e1_i, e1_j)
         if cand is None:
             break
         vec, ptype = cand
-        if ptype == 'X':
+        if ptype == "X":
             HX = np.vstack([HX, vec.reshape(1, -1)])
         else:
             HZ = np.vstack([HZ, vec.reshape(1, -1)])
         n_promoted += 1
 
-    info = dict(n_bulk_x=n_bulk_x, n_bulk_z=n_bulk_z,
-                n_x_rows=HX.shape[0], n_z_rows=HZ.shape[0],
-                n_corner_dropped=n_dropped, n_promoted=n_promoted,
-                gens={s: len(gens[s]) for s in gens})
+    info = dict(
+        n_bulk_x=n_bulk_x,
+        n_bulk_z=n_bulk_z,
+        n_x_rows=HX.shape[0],
+        n_z_rows=HZ.shape[0],
+        n_corner_dropped=n_dropped,
+        n_promoted=n_promoted,
+        gens={s: len(gens[s]) for s in gens},
+    )
 
     # ---- cleanup: weight-1 stabilizers + decoupled qubits ----
     if cleanup:
         HX, HZ, kept = _cleanup(HX, HZ)
-        info['kept_qubits'] = kept
-        info['n_removed_qubits'] = n - len(kept)
+        info["kept_qubits"] = kept
+        info["n_removed_qubits"] = n - len(kept)
     if verbose:
         print(info)
     return HX, HZ, info
 
 
 def _corner_regions(Lx, Ly, ri, rj):
-    return [(range(0, ri), range(0, rj)),
-            (range(0, ri), range(Ly - rj, Ly)),
-            (range(Lx - ri, Lx), range(0, rj)),
-            (range(Lx - ri, Lx), range(Ly - rj, Ly))]
+    return [
+        (range(0, ri), range(0, rj)),
+        (range(0, ri), range(Ly - rj, Ly)),
+        (range(Lx - ri, Lx), range(0, rj)),
+        (range(Lx - ri, Lx), range(Ly - rj, Ly)),
+    ]
 
 
 def _local_logicals(Hsame, Hother, mask):
     """Nontrivial logicals of one Pauli type supported inside `mask`:
     reps of ker(Hother|_mask) / (rowspace(Hsame) restricted to mask).
     Exact: P in rowspace(Hsame) with supp(P) in mask  <=>  P = a.Hsame with
-    a in the left-kernel of Hsame[:, ~mask]."""
+    a in the left-kernel of Hsame[:, ~mask].
+    """
     R = np.where(mask)[0]
     if R.size == 0 or Hother.shape[0] == 0:
         return []
-    K = kernel_basis(Hother[:, R])            # rows: length |R|
+    K = kernel_basis(Hother[:, R])  # rows: length |R|
     if K.size == 0:
         return []
     if Hsame.shape[0] > 0:
@@ -670,7 +673,8 @@ def _best_corner_logical(HX, HZ, Lx, Ly, ri, rj, A, B, extent_i=0, extent_j=0):
     of an anticommuting (X,Z) candidate pair supported in the same corner
     region (the parent paper's corner completion). A lone candidate pairing
     only with extended operators is a genuine logical and is never promoted
-    (a lone-candidate rule drives k to 0 on tight lattices)."""
+    (a lone-candidate rule drives k to 0 on tight lattices).
+    """
     n = HX.shape[1]
     best = None
 
@@ -685,28 +689,28 @@ def _best_corner_logical(HX, HZ, Lx, Ly, ri, rj, A, B, extent_i=0, extent_j=0):
     h_j = min(extent_j + 2, Ly - extent_j - 2)
     bands = []
     if h_i >= 1:
-        bands.append((range(0, h_i), range(0, Ly), 'X'))
-        bands.append((range(Lx - h_i, Lx), range(0, Ly), 'X'))
+        bands.append((range(0, h_i), range(0, Ly), "X"))
+        bands.append((range(Lx - h_i, Lx), range(0, Ly), "X"))
     if h_j >= 1:
-        bands.append((range(0, Lx), range(0, h_j), 'Z'))
-        bands.append((range(0, Lx), range(Ly - h_j, Ly), 'Z'))
-    for (ris_, rjs_, ptype) in bands:
+        bands.append((range(0, Lx), range(0, h_j), "Z"))
+        bands.append((range(0, Lx), range(Ly - h_j, Ly), "Z"))
+    for ris_, rjs_, ptype in bands:
         mask = np.zeros(n, dtype=bool)
         for i in ris_:
             for j in rjs_:
                 mask[A(i, j)] = True
                 mask[B(i, j)] = True
-        if ptype == 'X':
+        if ptype == "X":
             for vec in _local_logicals(HX, HZ, mask):
-                consider(vec, 'X')
+                consider(vec, "X")
         else:
             for vec in _local_logicals(HZ, HX, mask):
-                consider(vec, 'Z')
+                consider(vec, "Z")
     if best is not None:
         return (best[0], best[1])
 
     # ---- pass 2: corner pairs ----
-    for (ris_, rjs_) in _corner_regions(Lx, Ly, ri, rj):
+    for ris_, rjs_ in _corner_regions(Lx, Ly, ri, rj):
         mask = np.zeros(n, dtype=bool)
         for i in ris_:
             for j in rjs_:
@@ -724,15 +728,16 @@ def _best_corner_logical(HX, HZ, Lx, Ly, ri, rj, A, B, extent_i=0, extent_j=0):
         for i in range(P.shape[0]):
             for j in range(P.shape[1]):
                 if P[i, j]:
-                    consider(XC[i], 'X')
-                    consider(ZC[j], 'Z')
+                    consider(XC[i], "X")
+                    consider(ZC[j], "Z")
     return (best[0], best[1]) if best else None
 
 
 def _cleanup(HX, HZ):
     """Sec. III D step 4: iteratively eliminate weight-1 stabilizers
     (multiply them into other same-type rows, then drop the fixed qubit)
-    and decoupled qubits (zero columns). Returns (HX, HZ, kept_indices)."""
+    and decoupled qubits (zero columns). Returns (HX, HZ, kept_indices).
+    """
     n = HX.shape[1]
     kept = np.ones(n, dtype=bool)
     HX, HZ = HX.copy(), HZ.copy()
@@ -740,8 +745,8 @@ def _cleanup(HX, HZ):
         changed = False
         HX = HX[HX.sum(axis=1) > 0] if HX.size else HX
         HZ = HZ[HZ.sum(axis=1) > 0] if HZ.size else HZ
-        for name in ('X', 'Z'):
-            H = HX if name == 'X' else HZ
+        for name in ("X", "Z"):
+            H = HX if name == "X" else HZ
             if not H.size:
                 continue
             wts = H.sum(axis=1)
@@ -755,12 +760,11 @@ def _cleanup(HX, HZ):
                     if rr != r:
                         H[rr] ^= H[r]
                 # opposite-type rows cannot touch q in a commuting group
-                Hopp = HZ if name == 'X' else HX
-                assert not (Hopp.size and Hopp[:, q].any()), \
-                    "weight-1 stabilizer conflicts with opposite type"
+                Hopp = HZ if name == "X" else HX
+                assert not (Hopp.size and Hopp[:, q].any()), "weight-1 stabilizer conflicts with opposite type"
                 H = np.delete(H, r, axis=0)
                 # remove the column entirely (qubit disentangled)
-                if name == 'X':
+                if name == "X":
                     HX = np.delete(H, q, axis=1)
                     HZ = np.delete(HZ, q, axis=1) if HZ.size else HZ
                 else:
@@ -787,8 +791,9 @@ def _cleanup(HX, HZ):
 
 
 def compute_k(HX, HZ):
-    """k = n - rank(HX) - rank(HZ), tolerant of empty check matrices (which
-    the cleanup and grafting loops can produce)."""
+    """K = n - rank(HX) - rank(HZ), tolerant of empty check matrices (which
+    the cleanup and grafting loops can produce).
+    """
     nq = HX.shape[1] if HX.ndim == 2 else HZ.shape[1]
     rx = rank(HX) if HX.size else 0
     rz = rank(HZ) if HZ.size else 0
@@ -799,8 +804,8 @@ def compute_k(HX, HZ):
 #  Lattice grafting (qubit removal) and weight reduction
 # =====================================================================
 
-def graft_r1(HX, HZ, max_removals=10**9, trials=200, seed=0, d_floor=None,
-             verbose=False):
+
+def graft_r1(HX, HZ, max_removals=10**9, trials=200, seed=0, d_floor=None, verbose=False):
     """Restricted (r=1) lattice grafting, arXiv:2504.08887 Sec. III E.
 
     Repeatedly remove a qubit q that participates in EXACTLY ONE stabilizer
@@ -813,7 +818,8 @@ def graft_r1(HX, HZ, max_removals=10**9, trials=200, seed=0, d_floor=None,
     reverted. Candidate order is randomized (`seed`); run several seeds and
     keep the best, as in the paper.
 
-    Returns (HX, HZ, n_removed)."""
+    Returns (HX, HZ, n_removed).
+    """
     rng = np.random.default_rng(seed)
     k0 = compute_k(HX, HZ)
     # d_floor: explicit acceptance floor for the distance. Without it the
@@ -822,23 +828,21 @@ def graft_r1(HX, HZ, max_removals=10**9, trials=200, seed=0, d_floor=None,
     # silently licenses distance-losing removals (measured: a [[292,12,14]]
     # graft dropped to d=13 with a trials=120 baseline). When the target d
     # is known, pass it.
-    d0 = d_floor if d_floor is not None else distance_rand(HX, HZ,
-                                                           trials=trials, seed=1)
+    d0 = d_floor if d_floor is not None else distance_rand(HX, HZ, trials=trials, seed=1)
     removed = 0
     while removed < max_removals:
         wx = HX.sum(axis=0) if HX.size else np.zeros(HX.shape[1])
         wz = HZ.sum(axis=0) if HZ.size else np.zeros(HZ.shape[1])
-        cands = ([('X', int(q)) for q in np.where(wx == 1)[0]] +
-                 [('Z', int(q)) for q in np.where(wz == 1)[0]])
+        cands = [("X", int(q)) for q in np.where(wx == 1)[0]] + [("Z", int(q)) for q in np.where(wz == 1)[0]]
         if not cands:
             break
         rng.shuffle(cands)
         accepted = False
-        for (t, q) in cands:
-            H = HX if t == 'X' else HZ
+        for t, q in cands:
+            H = HX if t == "X" else HZ
             r = int(np.where(H[:, q] == 1)[0][0])
-            HX2 = np.delete(HX, r, axis=0) if t == 'X' else HX
-            HZ2 = np.delete(HZ, r, axis=0) if t == 'Z' else HZ
+            HX2 = np.delete(HX, r, axis=0) if t == "X" else HX
+            HZ2 = np.delete(HZ, r, axis=0) if t == "Z" else HZ
             HX2 = np.delete(HX2, q, axis=1)
             HZ2 = np.delete(HZ2, q, axis=1)
             if compute_k(HX2, HZ2) != k0:
@@ -849,16 +853,16 @@ def graft_r1(HX, HZ, max_removals=10**9, trials=200, seed=0, d_floor=None,
                 removed += 1
                 accepted = True
                 if verbose:
-                    print(f"  graft: removed qubit (type {t}), n={HX.shape[1]}, "
-                          f"d_rand={d2}", flush=True)
+                    print(f"  graft: removed qubit (type {t}), n={HX.shape[1]}, d_rand={d2}", flush=True)
                 break
         if not accepted:
             break
     return HX, HZ, removed
 
 
-def graft_r1_safe(HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500,
-                  seed=0, d_floor=None, verbose=False, block=3):
+def graft_r1_safe(
+    HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500, seed=0, d_floor=None, verbose=False, block=3
+):
     """Self-correcting restricted (r=1) grafting.
 
     Same move set as graft_r1, but each removal that passes the cheap
@@ -873,30 +877,32 @@ def graft_r1_safe(HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500,
     trials caught 6/6, wasting every chain. Confirm-per-step converts
     end-of-chain rejection into per-step backtracking.
 
-    Returns (HX, HZ, n_removed)."""
+    Returns (HX, HZ, n_removed).
+    """
     rng = np.random.default_rng(seed)
     k0 = compute_k(HX, HZ)
     assert d_floor is not None, "graft_r1_safe requires an explicit d_floor"
-    orig = list(range(HX.shape[1]))      # stable qubit identities
+    orig = list(range(HX.shape[1]))  # stable qubit identities
     blacklist = set()
     confirm_seed = 5
     removed = 0
-    since_block = []                     # orig-ids removed since last good snapshot
+    since_block = []  # orig-ids removed since last good snapshot
     snap_HX, snap_HZ, snap_orig = HX.copy(), HZ.copy(), list(orig)
     while removed < max_removals:
         wx = HX.sum(axis=0) if HX.size else np.zeros(HX.shape[1])
         wz = HZ.sum(axis=0) if HZ.size else np.zeros(HZ.shape[1])
-        cands = [(t, int(q)) for t, w in (('X', wx), ('Z', wz))
-                 for q in np.where(w == 1)[0] if orig[int(q)] not in blacklist]
+        cands = [
+            (t, int(q)) for t, w in (("X", wx), ("Z", wz)) for q in np.where(w == 1)[0] if orig[int(q)] not in blacklist
+        ]
         if not cands:
             break
         rng.shuffle(cands)
         accepted = False
-        for (t, q) in cands:
-            H = HX if t == 'X' else HZ
+        for t, q in cands:
+            H = HX if t == "X" else HZ
             r = int(np.where(H[:, q] == 1)[0][0])
-            HX2 = np.delete(HX, r, axis=0) if t == 'X' else HX
-            HZ2 = np.delete(HZ, r, axis=0) if t == 'Z' else HZ
+            HX2 = np.delete(HX, r, axis=0) if t == "X" else HX
+            HZ2 = np.delete(HZ, r, axis=0) if t == "Z" else HZ
             HX2 = np.delete(HX2, q, axis=1)
             HZ2 = np.delete(HZ2, q, axis=1)
             if compute_k(HX2, HZ2) != k0:
@@ -908,19 +914,20 @@ def graft_r1_safe(HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500,
             # single-seed confirms at 2500 trials pass distance-losing
             # removals ~40% of the time; two seeds cut the per-step
             # slip-through to ~15%, with a 3-seed block gate behind it.)
-            dC = distance_rand(HX2, HZ2, trials=confirm_trials,
-                               seed=confirm_seed)
+            dC = distance_rand(HX2, HZ2, trials=confirm_trials, seed=confirm_seed)
             if dC >= d_floor:
-                dC = min(dC, distance_rand(HX2, HZ2, trials=confirm_trials,
-                                           seed=confirm_seed + 1))
+                dC = min(dC, distance_rand(HX2, HZ2, trials=confirm_trials, seed=confirm_seed + 1))
             confirm_seed += 4
             orig_removed_last = orig[q]
             if dC < d_floor:
                 blacklist.add(orig[q])
                 if verbose:
-                    print(f"  graft-safe: UNDO qubit (type {t}) -- confirm "
-                          f"d_rand({confirm_trials})={dC} < {d_floor}; "
-                          f"blacklisted", flush=True)
+                    print(
+                        f"  graft-safe: UNDO qubit (type {t}) -- confirm "
+                        f"d_rand({confirm_trials})={dC} < {d_floor}; "
+                        f"blacklisted",
+                        flush=True,
+                    )
                 continue
             del orig[q]
             HX, HZ = HX2, HZ2
@@ -928,8 +935,7 @@ def graft_r1_safe(HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500,
             since_block.append(orig_removed_last)
             accepted = True
             if verbose:
-                print(f"  graft-safe: removed qubit (type {t}), "
-                      f"n={HX.shape[1]}, confirmed d_rand={dC}", flush=True)
+                print(f"  graft-safe: removed qubit (type {t}), n={HX.shape[1]}, confirmed d_rand={dC}", flush=True)
             # block verification: every `block` accepted removals, run the
             # full multi-seed gate; on failure roll back to the last good
             # snapshot and blacklist the block's qubits. Rationale
@@ -939,21 +945,22 @@ def graft_r1_safe(HX, HZ, max_removals=10**9, trials=1200, confirm_trials=2500,
             # chains die at end-verification. Early block gates bound the
             # damage to `block` steps instead of the whole chain.
             if len(since_block) >= block:
-                dB = min(distance_rand(HX, HZ, trials=confirm_trials,
-                                       seed=s2) for s2 in (701, 809, 911))
+                dB = min(distance_rand(HX, HZ, trials=confirm_trials, seed=s2) for s2 in (701, 809, 911))
                 if dB < d_floor:
                     HX, HZ, orig = snap_HX.copy(), snap_HZ.copy(), list(snap_orig)
                     removed -= len(since_block)
                     blacklist.update(since_block)
                     if verbose:
-                        print(f"  graft-safe: BLOCK ROLLBACK ({len(since_block)} "
-                              f"removals; gate d_rand={dB} < {d_floor}); "
-                              f"qubits blacklisted", flush=True)
+                        print(
+                            f"  graft-safe: BLOCK ROLLBACK ({len(since_block)} "
+                            f"removals; gate d_rand={dB} < {d_floor}); "
+                            f"qubits blacklisted",
+                            flush=True,
+                        )
                 else:
                     snap_HX, snap_HZ, snap_orig = HX.copy(), HZ.copy(), list(orig)
                     if verbose:
-                        print(f"  graft-safe: block gate PASSED at n={HX.shape[1]} "
-                              f"(d_rand={dB})", flush=True)
+                        print(f"  graft-safe: block gate PASSED at n={HX.shape[1]} (d_rand={dB})", flush=True)
                 since_block = []
             break
         if not accepted:
@@ -971,7 +978,8 @@ def reduce_weights(H, passes=10):
     the [[288,8,12]] family builds with a weight-7 Z-generator that reduces
     to 6, matching the paper). A code's weight class is a property of the
     best generating set, so this pass is part of construction, not
-    cosmetics."""
+    cosmetics.
+    """
     H = H.copy() % 2
     for _ in range(passes):
         changed = False
@@ -1002,10 +1010,9 @@ if __name__ == "__main__":
     Sg = [(0, 0), (2, 1), (2, 2)]
     HX, HZ, info = build_planar(6, 6, Sf, Sg)
     from css import verify_css
+
     k = compute_k(HX, HZ)
-    wmax = max(reduce_weights(HX).sum(axis=1).max(),
-               reduce_weights(HZ).sum(axis=1).max())
+    wmax = max(reduce_weights(HX).sum(axis=1).max(), reduce_weights(HZ).sum(axis=1).max())
     d = distance_rand(HX, HZ, trials=400, seed=0)
-    print(f"build_planar 6x6 flagship: n={HX.shape[1]} k={k} "
-          f"CSS={verify_css(HX, HZ)} max_weight={wmax} d_rand<= {d}")
-    print(f"  (expect n=72, k=8, CSS=True, max_weight=6, d<=4)")
+    print(f"build_planar 6x6 flagship: n={HX.shape[1]} k={k} CSS={verify_css(HX, HZ)} max_weight={wmax} d_rand<= {d}")
+    print("  (expect n=72, k=8, CSS=True, max_weight=6, d<=4)")

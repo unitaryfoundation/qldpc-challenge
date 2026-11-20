@@ -8,9 +8,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_downloads", os.path.join(ROOT, "site", "build.py")
-    )
+    spec = importlib.util.spec_from_file_location("site_build_downloads", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -59,8 +57,7 @@ def test_index_manifest_lists_every_id(tmp_path):
     with open(os.path.join(build.DOCS, "codes", build.INDEX_MANIFEST)) as f:
         index = json.load(f)
     assert index["codes"] == [
-        {"id": "72-6-6", "n": 72, "k": 6, "d": 6, "tier": index["codes"][0]["tier"],
-         "code_type": "CSS"}
+        {"id": "72-6-6", "n": 72, "k": 6, "d": 6, "tier": index["codes"][0]["tier"], "code_type": "CSS"}
     ]
     # tiers are the board's short labels: "ub" (upper bound) or "exact"
     assert index["codes"][0]["tier"] in ("ub", "exact")

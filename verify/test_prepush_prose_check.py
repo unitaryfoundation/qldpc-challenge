@@ -6,6 +6,7 @@ upstream would report a branch with broken citations as clean. These tests
 build a small upstream, a fork of it with a stale main, and a branch on the
 fork, and check which base the script resolves and what it says.
 """
+
 import os
 import re
 import subprocess
@@ -19,9 +20,13 @@ SCRIPT = os.path.join(_HERE, "prepush_prose_check.sh")
 
 
 def _git(cwd, *args, check=True):
-    return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t",
-                           "-c", "commit.gpgsign=false", *args],
-                          cwd=cwd, check=check, capture_output=True, text=True)
+    return subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", *args],
+        cwd=cwd,
+        check=check,
+        capture_output=True,
+        text=True,
+    )
 
 
 def _commit_note(repo, name, body):
@@ -41,8 +46,7 @@ def fork(tmp_path):
     # The script's own tree is what check_prose.py runs from, so give the
     # repositories the verifier they will be asked to run.
     os.makedirs(up / "verify")
-    for name in ("check_prose.py", "check_submission_scope.py",
-                 "prepush_prose_check.sh"):
+    for name in ("check_prose.py", "check_submission_scope.py", "prepush_prose_check.sh"):
         with open(os.path.join(_HERE, name), encoding="utf-8") as f:
             (up / "verify" / name).write_text(f.read(), encoding="utf-8")
     _git(up, "add", "verify")
@@ -66,9 +70,14 @@ def _run(repo, env=None, body="/dev/null"):
     e = dict(os.environ, QLDPC_PYTHON=sys.executable)
     e.pop("BASE", None)
     e.update(env or {})
-    return subprocess.run(["sh", os.path.join(repo, "verify",
-                                              "prepush_prose_check.sh"), body],
-                          cwd=repo, env=e, capture_output=True, text=True, check=False)
+    return subprocess.run(
+        ["sh", os.path.join(repo, "verify", "prepush_prose_check.sh"), body],
+        cwd=repo,
+        env=e,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
 
 
 def test_without_an_upstream_remote_a_fork_origin_is_refused(fork):
@@ -127,7 +136,7 @@ def test_the_contributor_prompt_checks_the_note_and_names_the_gate():
     with open(os.path.join(_ROOT, "CONTRIBUTING.md"), encoding="utf-8") as f:
         text = f.read()
     start = text.index("You are contributing to the QEC Challenge")
-    block = text[start:start + text[start:].index("```")]
+    block = text[start : start + text[start:].index("```")]
     files = re.findall(r"--files\s+(\S+)", block)
     assert files and all(f.endswith(".md") for f in files), files
     assert "verify/prepush_prose_check.sh <body.md>" in block

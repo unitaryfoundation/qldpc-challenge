@@ -55,7 +55,7 @@ def step_script(name):
     start = lines.index(header) + 1
     run = next(i for i in range(start, len(lines)) if lines[i] == "        run: |")
     body = []
-    for line in lines[run + 1:]:
+    for line in lines[run + 1 :]:
         if line.strip() and not line.startswith(" " * 10):
             break
         body.append(line[10:])
@@ -126,8 +126,7 @@ def repo(tmp_path, change):
     root.mkdir(parents=True)
 
     def git(*a):
-        return subprocess.run(["git", *a], cwd=root, check=True,
-                              capture_output=True, text=True)
+        return subprocess.run(["git", *a], cwd=root, check=True, capture_output=True, text=True)
 
     git("init", "-q", "-b", "work")
     git("config", "user.email", "t@example.com")
@@ -160,14 +159,24 @@ def run_step(root):
     script = script.replace("${{ github.base_ref }}", "main")
     out = root.parent / "github_output"
     out.write_text("")
-    env = dict(os.environ, GITHUB_OUTPUT=str(out), GITHUB_STEP_SUMMARY=os.devnull,
-               DATA_SURFACE=" ".join(workflow_env("DATA_SURFACE")),
-               GATE_GOLDENS=" ".join(workflow_env("GATE_GOLDENS")),
-               LER_STACK=" ".join(workflow_env("LER_STACK")))
+    env = dict(
+        os.environ,
+        GITHUB_OUTPUT=str(out),
+        GITHUB_STEP_SUMMARY=os.devnull,
+        DATA_SURFACE=" ".join(workflow_env("DATA_SURFACE")),
+        GATE_GOLDENS=" ".join(workflow_env("GATE_GOLDENS")),
+        LER_STACK=" ".join(workflow_env("LER_STACK")),
+    )
     # `bash -e`, without pipefail, is what GitHub gives a `run:` step that
     # names no shell, and no step in verify.yml names one.
-    done = subprocess.run(["bash", "--noprofile", "--norc", "-e", "-c", script],
-                          cwd=root, env=env, capture_output=True, text=True, check=False)
+    done = subprocess.run(
+        ["bash", "--noprofile", "--norc", "-e", "-c", script],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert done.returncode == 0, done.stderr
     return dict(line.split("=", 1) for line in out.read_text().splitlines())
 
@@ -177,10 +186,16 @@ def detect(tmp_path, change):
 
 
 def test_an_entry_with_its_certificate_and_manifest_is_data_only(tmp_path):
-    got = detect(tmp_path, {
-        "codes/c-3-3.json": '{"n": 3}', "notes/c-3-3.md": "# [[c,3,3]]\n",
-        "circuits/c-3-3/memory_x.stim": "TICK\n", "certs/c-3-3.json": '{"level": "solver"}',
-        "repro/c-3-3.json": "{}"})
+    got = detect(
+        tmp_path,
+        {
+            "codes/c-3-3.json": '{"n": 3}',
+            "notes/c-3-3.md": "# [[c,3,3]]\n",
+            "circuits/c-3-3/memory_x.stim": "TICK\n",
+            "certs/c-3-3.json": '{"level": "solver"}',
+            "repro/c-3-3.json": "{}",
+        },
+    )
     assert got["codes_changed"] == "true" and got["data_only"] == "true"
 
 
@@ -191,8 +206,15 @@ def test_a_certificate_alone_is_data_only_and_is_not_a_code_change(tmp_path):
 
 
 def test_anything_outside_the_surface_runs_the_suite(tmp_path):
-    for i, extra in enumerate(["verify/qldpc_verify.py", "research/build.py", "docs/index.html",
-                               "conftest.py", ".github/workflows/verify.yml"]):
+    for i, extra in enumerate(
+        [
+            "verify/qldpc_verify.py",
+            "research/build.py",
+            "docs/index.html",
+            "conftest.py",
+            ".github/workflows/verify.yml",
+        ]
+    ):
         got = detect(tmp_path / str(i), {"certs/a-1-1.json": '{"level": "formal"}', extra: "y = 2\n"})
         assert got["data_only"] == "false", extra
 
@@ -207,15 +229,25 @@ def test_a_diff_that_cannot_be_computed_runs_the_suite(tmp_path):
     root = repo(tmp_path, {"certs/a-1-1.json": '{"level": "formal"}'})
     assert run_step(root)["data_only"] == "true"
     subprocess.run(["git", "update-ref", "-d", "refs/remotes/origin/main"], cwd=root, check=True)
-    assert run_step(root) == {"codes_changed": "true", "data_only": "false", "slug_tests": "",
-                              "ler_stack_changed": "true"}
+    assert run_step(root) == {
+        "codes_changed": "true",
+        "data_only": "false",
+        "slug_tests": "",
+        "ler_stack_changed": "true",
+    }
 
 
 def test_the_tests_naming_a_changed_entry_are_found_by_either_spelling(tmp_path):
     """By slug or by [[n,k,d]], and from any part of the surface named for the entry."""
-    for i, path in enumerate(["codes/a-1-1.json", "circuits/a-1-1/memory_x.stim",
-                              "certs/a-1-1.json", "certs/heuristic/a-1-1.json",
-                              "repro/a-1-1.json"]):
+    for i, path in enumerate(
+        [
+            "codes/a-1-1.json",
+            "circuits/a-1-1/memory_x.stim",
+            "certs/a-1-1.json",
+            "certs/heuristic/a-1-1.json",
+            "repro/a-1-1.json",
+        ]
+    ):
         got = detect(tmp_path / str(i), {path: '{"n": 11}'})
         assert got["slug_tests"] == "verify/test_pins.py", path
 
