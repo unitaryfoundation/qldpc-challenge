@@ -224,9 +224,9 @@ green local runs into red CI on submission PRs; verify each one before pushing:
 - **Code artifact shape.** A submission is one file, `codes/<slug>.json`. Never a directory
   named `*.json`, never a nested path. `submit.save_submission` refuses a non-`.json` or
   directory path.
-- **One concern per PR.** A code submission carries only `codes/`, `notes/`, and its own
-  `repro/<slug>.json` manifest. Kit modules, workflows, and verifier changes go in their
-  own PR first, so the citation resolves and the scope check stays green.
+- **One concern per PR.** A code submission carries only `codes/` and `notes/`, plus
+  optionally its own `repro/<slug>.json` manifest. Kit modules, workflows, and verifier
+  changes go in their own PR first, so the citation resolves and the scope check stays green.
 - **Derived provenance after removals.** Deleting or renaming a code leaves
   `research/provenance/derived.json` stale. Run
   `uv run python research/derive_provenance.py --top-up` and commit the result in the same
