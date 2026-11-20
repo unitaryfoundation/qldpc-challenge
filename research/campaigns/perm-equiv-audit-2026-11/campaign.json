@@ -48,13 +48,13 @@
       ]
     },
     "name": "Permutation / WL equivalence audit",
-    "notes": "CPU-only. Pure combinatorial audit.",
+    "notes": "CPU-only. Pure combinatorial audit. Run 2026-11-20 over the board at 067168503: research/audits/permutation_audit-2026-11-20.json (115 WL-collision pairs: 10 equivalent, 94 inequivalent, 8 gb_family_no, 3 undecided; 44 literature matches, 38 equivalent) in 313 s of CPU. The packaging paths now call the same decision on a flagged candidate (research/kit/equivalence.py, issue #6186).",
     "objective": {
       "direction": "maximize",
       "metric": "kd2_over_n"
     },
     "schema_version": 1,
-    "status": "draft",
+    "status": "completed",
     "stopping": [
       {
         "type": "budget_exhausted"

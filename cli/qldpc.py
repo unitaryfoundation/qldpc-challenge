@@ -69,6 +69,7 @@ import heuristic_distance as hd  # noqa: E402
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import equivalence  # noqa: E402
 import frontier  # noqa: E402
 import frontier_history  # noqa: E402
 import peer_audit  # noqa: E402
@@ -926,19 +927,56 @@ def board_dedup(report, *, exclude=None):
     return {"checked": True, "match": None, "kind": None}
 
 
+def audit_wl_match(doc, dedup, *, root=None):
+    """Decide a WL-signature match with the permutation audit (issue #6186).
+
+    A dedup whose kind is a shared WL signature is handed to
+    ``equivalence.decide_pair`` against the entry it names; the record is
+    attached as ``dedup["audit"]`` and written under
+    ``research/candidates/equivalence/<slug>.equivalence.json`` (gitignored
+    working output, never part of the PR). Any other dedup is returned as is.
+    """
+    if not (dedup and dedup.get("match") and dedup.get("kind") == "WL signature"):
+        return dedup
+    root = root or _ROOT
+    try:
+        record = equivalence.decide_pair(doc, dedup["match"], root=root)
+    except Exception as e:  # noqa: BLE001 - the box falls back to the human rule
+        print(f"  note: permutation audit against {dedup['match']} skipped ({e})")
+        return dedup
+    dedup = dict(dedup, audit=record)
+    try:
+        out_dir = os.path.join(root, "research", "candidates", "equivalence")
+        os.makedirs(out_dir, exist_ok=True)
+        slug = os.path.splitext(os.path.basename(str(dedup["match"])))[0]
+        path = equivalence.save_record(
+            record, os.path.join(out_dir, f"candidate-vs-{slug}{equivalence.RECORD_SUFFIX}"))
+        print(f"  permutation audit against {dedup['match']}: {record.get('verdict')} "
+              f"({record.get('reason') or record.get('found_by')}); record -> {path}")
+    except OSError as e:
+        print(f"  note: equivalence record not written ({e})")
+    return dedup
+
+
 def _equivalence_box(dedup):
     """Return the equivalence checklist line, ticked only on evidence.
 
     No match on a checked board: ticked, and it says what was checked, so an
-    unedited draft passes the prose gate and --open-pr can succeed. A match,
-    or no board to check against: unticked, naming the entry, so the gate
-    holds the PR until a human has said in `provenance.notes` why this is a
-    different code.
+    unedited draft passes the prose gate and --open-pr can succeed. A WL match
+    the permutation audit decided (issue #6186): ticked with the separating
+    invariant, or unticked naming the exhibited permutation, which is a
+    duplicate to withdraw. A match the audit did not decide, or no board to
+    check against: unticked, naming the entry, so the gate holds the PR until
+    a human has said in `provenance.notes` why this is a different code.
     """
     if dedup and dedup.get("checked") and not dedup.get("match"):
         return _box(True, "Checked against the current board by exact "
                          "fingerprint and WL signature, local-Hadamard images "
                          "included: no equivalent entry")
+    if dedup and dedup.get("audit"):
+        decided, text = equivalence.finding(dedup["audit"])
+        if decided is not None:
+            return _box(decided, text[0].upper() + text[1:])
     if dedup and dedup.get("match"):
         return _box(False, f"Possibly equivalent to `{dedup['match']}` "
                           f"({dedup['kind']}): say in `provenance.notes` why "
@@ -1756,8 +1794,8 @@ def cmd_submit(args):
     # run is writing into the board's own directory the dedup is told to skip it:
     # the question the equivalence box asks is whether some OTHER entry already
     # carries this code, and the file this run just added is not an answer to it.
-    args._dedup = board_dedup(
-        report, exclude=_self_entry_name(args.out, out))
+    args._dedup = audit_wl_match(doc, board_dedup(
+        report, exclude=_self_entry_name(args.out, out)))
     title = pr_title(n, k, d, _descriptor(args))
     body_file = write_pr_body(slug, pr_body(doc, report, args, out, note_out))
     branch = f"submit-{slug}"

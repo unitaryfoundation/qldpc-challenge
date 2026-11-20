@@ -79,6 +79,7 @@ for _rel in ("verify", "site", "cli", os.path.join("research", "kit")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+import equivalence  # noqa: E402
 import escalation  # noqa: E402
 import frontier  # noqa: E402
 import peer_audit  # noqa: E402
@@ -491,7 +492,7 @@ def bundle_title(doc, evidence):
     return cli.pr_title(doc["n"], doc["k"], doc["distance"]["d"], head)
 
 
-def equivalence_finding(verdict, doc):
+def equivalence_finding(verdict, doc, *, audit=None, root=_ROOT):
     """Return ``(ticked, text_or_reason)`` for the equivalence checklist box.
 
     ``cli/qldpc.py`` always emits this box unticked, and
@@ -500,9 +501,12 @@ def equivalence_finding(verdict, doc):
     The finding is not a matter of taste: the gate's dedup already compared the
     candidate against every board entry by fingerprint and by WL signature. When
     it found nothing, that IS the answer and the box is ticked with the gate as
-    its reason. When it found a WL-equivalent peer, judging the equivalence is a
-    human's, and the box is only ticked once ``provenance.notes`` records the
-    comparison.
+    its reason. When it found a WL-equivalent peer, the permutation audit
+    decides it where it can (issue #6186): an exhibited permutation refuses the
+    candidate as that entry, a separating invariant ticks the box with the
+    reason, and only an undecided pair is left to ``provenance.notes``.
+    ``audit`` is a record :func:`equivalence.decide_pair` already produced for
+    this candidate; without one the pair is decided here against ``root``.
     """
     dedup = (verdict.get("gates") or {}).get("dedup") or {}
     exact, wl = dedup.get("exact_duplicate_of"), dedup.get("wl_equivalent_of")
@@ -511,6 +515,11 @@ def equivalence_finding(verdict, doc):
                        f"{exact}")
     notes = ((doc.get("provenance") or {}).get("notes") or "").strip()
     if wl:
+        if audit is None:
+            audit = equivalence.decide_pair(doc, wl, root=root)
+        decided, text = equivalence.finding(audit)
+        if decided is not None:
+            return decided, text
         if notes:
             return True, (f"`verify/validate_candidate.py` flags the same "
                           f"Weisfeiler-Leman signature as board entry {wl}; "
@@ -524,7 +533,8 @@ def equivalence_finding(verdict, doc):
 
 
 def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
-            repro_rel=None, reproducible=False, frontier_record=None):
+            repro_rel=None, reproducible=False, frontier_record=None,
+            equivalence_record=None):
     """Render the PR body from the verified document and the gate's own verdict.
 
     Same sections as ``.github/pull_request_template.md`` and the same frontier
@@ -557,7 +567,7 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
     if doc.get("family"):
         lines += [f"Family tag: {doc['family']} (a self-declared filter, never "
                   f"used for ranking).", ""]
-    ticked, reason = equivalence_finding(verdict, doc)
+    ticked, reason = equivalence_finding(verdict, doc, audit=equivalence_record)
     construction = ((doc.get("provenance") or {}).get("construction") or "").strip()
     lines += ["### Checklist",
               "- [x] One JSON file under `codes/`, conforming to "
@@ -739,7 +749,11 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         dominated_by, advancing, allowed=allow_non_frontier,
         attach=f"pass allow_non_frontier=True ({frontier.FLAG}) to file it as a "
                f"non-frontier record, which the PR body then says"))
-    ticked, reason = equivalence_finding(verdict, doc)
+    wl_peer = ((verdict.get("gates") or {}).get("dedup") or {}).get("wl_equivalent_of")
+    audit = equivalence.decide_pair(doc, wl_peer, root=root) if wl_peer else None
+    if audit is not None:
+        report["equivalence"] = audit
+    ticked, reason = equivalence_finding(verdict, doc, audit=audit, root=root)
     if not ticked:
         blocked.append(reason)
     if blocked:
@@ -804,7 +818,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     body = pr_body(doc, report_verify, verdict, evidence, facts,
                    code_rel=code_rel, note_rel=note_rel, repro_rel=repro_rel,
                    reproducible=recipe_from_spec(recipe) is not None,
-                   frontier_record=report["frontier"])
+                   frontier_record=report["frontier"], equivalence_record=audit)
     report["title"] = bundle_title(doc, evidence)
     report["files"] = {"code": code_rel, "note": note_rel}
     if repro_rel:
@@ -844,7 +858,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
 
     report["needs_human"] = needs_human(doc, verdict, body_file if write else None,
                                         evidence=evidence,
-                                        frontier_record=report["frontier"])
+                                        frontier_record=report["frontier"],
+                                        equivalence_record=audit)
     report["commands"] = _git_commands(slug, report["title"], code_rel, note_rel,
                                        body_file, base=base,
                                        extra=[repro_rel] if repro_rel else ())
@@ -852,7 +867,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     return report
 
 
-def needs_human(doc, verdict, body_file, evidence=None, frontier_record=None):
+def needs_human(doc, verdict, body_file, evidence=None, frontier_record=None, equivalence_record=None):
     """List what this bundle still needs a person for, and why."""
     items = [{"item": "literature novelty",
               "why": "the gate deduplicates against this board only and labels "
@@ -867,11 +882,13 @@ def needs_human(doc, verdict, body_file, evidence=None, frontier_record=None):
                      "AGENTS.md; this module writes files and never runs git "
                      "or gh"}]
     wl = ((verdict.get("gates") or {}).get("dedup") or {}).get("wl_equivalent_of")
-    if wl:
+    audit = equivalence_record
+    if wl and (audit is None or equivalence.finding(audit)[0] is None):
         items.append({"item": f"the equivalence comparison against {wl}",
                       "why": "the gate found the same Weisfeiler-Leman "
-                             "signature; provenance.notes records a judgment "
-                             "that only a person can make"})
+                             "signature and the permutation audit did not "
+                             "decide the pair; provenance.notes records a "
+                             "judgment that only a person can make"})
     if (frontier_record or {}).get("filed_as_non_frontier"):
         doms = ", ".join(frontier_record.get("dominated_by") or []) or "a cell entry"
         items.append({"item": "the non-frontier filing",
