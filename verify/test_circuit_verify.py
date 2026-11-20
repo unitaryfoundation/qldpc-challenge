@@ -165,6 +165,18 @@ def test_stale_dem_rejected(seed, tmp_path):
     assert not _status(report, "Z_dem_reproduces")
 
 
+def test_absent_dem_accepted(seed, tmp_path):
+    doc, sd = seed
+    d = tmp_path / "circuits"
+    shutil.copytree(sd, d)
+    for name in ("memory_x.dem", "memory_z.dem"):
+        (d / name).unlink(missing_ok=True)
+    report = cv.verify_circuit(doc, d)
+    assert report["ok"], report
+    assert _status(report, "X_dem_reproduces")
+    assert _status(report, "Z_dem_reproduces")
+
+
 def test_missing_noise_channel_rejected(seed, tmp_path):
     def drop_first_dep2(t):
         lines = t.splitlines()

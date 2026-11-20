@@ -145,6 +145,26 @@ def test_scratch_riding_on_a_submission_is_refused(tmp_path, capsys):
     assert "notes/x-1-1.md" not in listed and "codes/x-1-1.json" not in listed
 
 
+def test_a_committed_dem_is_refused(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
+        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n",
+         "circuits/x-1-1/memory_x.stim": "# x\n",
+         "circuits/x-1-1/memory_x.dem": "# x\n"})
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "adds committed .dem files" in out
+    assert "circuits/x-1-1/memory_x.dem" in out
+
+
+def test_deleting_a_dem_is_not_refused(tmp_path):
+    root, base = _repo(
+        tmp_path, {"codes/x-1-1.json": '{"n": 1}',
+                   "circuits/x-1-1/memory_x.dem": "# x\n"},
+        {"circuits/x-1-1/memory_x.dem": None})
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
 def test_an_entry_with_its_own_artifacts_passes(tmp_path):
     root, base = _repo(
         tmp_path, {"codes/y-2-2.json": '{"n": 2}'},

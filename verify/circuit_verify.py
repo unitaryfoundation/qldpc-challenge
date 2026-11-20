@@ -24,13 +24,16 @@ Checks, per basis (RFC 0001 numbering):
                     final transversal readout; closure detectors match the
                     declared check matrix rows; data qubits are 0..n-1; the
                     declared round count is what the circuit performs
-  5. witness        the committed .dem re-derives from the committed .stim
-                    under the pinned stim, mechanism-for-mechanism (exact
-                    structure and file order; probabilities to float
-                    tolerance -- their last ulps are architecture-sensitive
-                    and the distance tier never reads them), and the claimed
+  5. witness        the DEM is derived from the committed .stim under the
+                    pinned stim, mechanism-for-mechanism (exact structure and
+                    file order; probabilities to float tolerance -- their
+                    last ulps are architecture-sensitive and the distance
+                    tier never reads them). A legacy committed .dem, when
+                    present, must still match that re-derivation; the
+                    committed .dem is no longer required. The claimed
                     witness is an undetected logical fault set of the claimed
-                    weight in it, with value at most the distance of the
+                    weight in the derived DEM, with value at most the
+                    distance of the
                     logical that memory protects (penalty-only clamp, per
                     basis: d_Z for the X memory, d_X for the Z memory, so
                     the effective d_circ = min over bases stays <= d;
@@ -269,18 +272,26 @@ def verify_circuit(doc, circuits_dir):
         claim = cb["d_circ"][side]
         base = os.path.join(circuits_dir, SIDE_FILES[side])
         try:
-            for ext in (".stim", ".dem"):
-                if os.path.getsize(base + ext) > MAX_CIRCUIT_FILE_BYTES:
-                    raise ValueError(f"{base + ext} exceeds "
-                                     f"{MAX_CIRCUIT_FILE_BYTES} bytes")
+            if os.path.getsize(base + ".stim") > MAX_CIRCUIT_FILE_BYTES:
+                raise ValueError(f"{base + '.stim'} exceeds "
+                                 f"{MAX_CIRCUIT_FILE_BYTES} bytes")
             circuit = stim.Circuit(open(base + ".stim").read())
-            committed = stim.DetectorErrorModel(open(base + ".dem").read())
+            # The .dem is derived from the .stim (strategy: stop committing
+            # derived DEMs). If a legacy .dem is present, still verify it
+            # matches the re-derivation; otherwise derive and proceed.
+            committed = None
+            dem_path = base + ".dem"
+            if os.path.exists(dem_path):
+                if os.path.getsize(dem_path) > MAX_CIRCUIT_FILE_BYTES:
+                    raise ValueError(f"{dem_path} exceeds "
+                                     f"{MAX_CIRCUIT_FILE_BYTES} bytes")
+                committed = stim.DetectorErrorModel(open(dem_path).read())
         except Exception as e:
             record(f"{side}_circuit_files", False, f"{type(e).__name__}: {e}")
             continue
         record(f"{side}_circuit_files", True,
                f"{os.path.relpath(base, os.path.dirname(circuits_dir))}"
-               f".stim/.dem")
+               f".stim" + (".dem" if committed is not None else ""))
 
         skel = ct.strip_noise(circuit)
         try:                                    # step 1: validity
@@ -310,15 +321,19 @@ def verify_circuit(doc, circuits_dir):
                f"to search this DEM)")
         if derived.num_errors > MAX_DEM_MECHANISMS:
             continue
-        dem_match = ct.dem_matches(derived, committed)
-        record(f"{side}_dem_reproduces", dem_match,
-               "committed .dem re-derives mechanism-for-mechanism (exact "
-               "structure and order; probabilities to float tolerance)"
-               if dem_match else
-               "committed .dem differs from the pinned re-derivation -- "
-               "regenerate it with the pinned stim version")
-        if not dem_match:
-            continue
+        if committed is not None:
+            dem_match = ct.dem_matches(derived, committed)
+            record(f"{side}_dem_reproduces", dem_match,
+                   "committed .dem re-derives mechanism-for-mechanism (exact "
+                   "structure and order; probabilities to float tolerance)"
+                   if dem_match else
+                   "committed .dem differs from the pinned re-derivation -- "
+                   "regenerate it with the pinned stim version")
+            if not dem_match:
+                continue
+        else:
+            record(f"{side}_dem_reproduces", True,
+                   "no committed .dem; DEM derived from .stim")
         # step 5.5 (issue #690): structural integrity of the derived DEM,
         # the substrate every downstream consumer (witness check, refutation
         # gate, measured-rate decoder prior) takes on faith. Deterministic

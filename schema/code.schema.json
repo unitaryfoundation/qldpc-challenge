@@ -92,7 +92,7 @@
     },
     "circuit": {
       "type": "object",
-      "description": "optional circuit tier (RFC 0001, issue #505): the entry ships syndrome-extraction memory circuits under circuits/<slug>/ (memory_x.stim, memory_z.stim, plus their derived .dem files), and claims a witness-backed circuit-level distance per basis. Penalty-only: the recorded d_circ is clamped to <= d and can only discount a score, never inflate it. Forbidden on stabilizer entries: the memory experiments are per basis, and a general stabilizer code needs a schedule the tier does not yet build.",
+      "description": "optional circuit tier (RFC 0001, issue #505): the entry ships syndrome-extraction memory circuits under circuits/<slug>/ (memory_x.stim, memory_z.stim; the .dem files are derived from the .stim and no longer committed), and claims a witness-backed circuit-level distance per basis. Penalty-only: the recorded d_circ is clamped to <= d and can only discount a score, never inflate it. Forbidden on stabilizer entries: the memory experiments are per basis, and a general stabilizer code needs a schedule the tier does not yet build.",
       "required": [
         "d_circ",
         "rounds",
@@ -125,7 +125,7 @@
         "stim_version": {
           "type": "string",
           "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-          "description": "stim version that derived the committed .dem files; the verifier requires it to equal the version pinned in uv.lock and re-derives the .dem mechanism-for-mechanism (probabilities only to float tolerance: their last ulps are architecture-sensitive and the distance tier never reads them)"
+          "description": "stim version that derived the memory circuits; the verifier requires it to equal the version pinned in uv.lock and re-derives the DEM from the committed .stim mechanism-for-mechanism (probabilities only to float tolerance: their last ulps are architecture-sensitive and the distance tier never reads them)"
         },
         "ancilla_coordinates": {
           "type": "array",
@@ -1295,7 +1295,7 @@
             "minimum": 0
           },
           "minItems": 1,
-          "description": "sorted 0-based indices of error(...) instructions in this basis's committed flattened .dem, counted in file order. The XOR of their detector sets must vanish (undetected) and the XOR of their observable sets must not (flips a logical): the circuit-tier analogue of the low-weight logical the code tier stores."
+          "description": "sorted 0-based indices of error(...) instructions in this basis's DEM derived from the committed .stim, counted in file order. The XOR of their detector sets must vanish (undetected) and the XOR of their observable sets must not (flips a logical): the circuit-tier analogue of the low-weight logical the code tier stores."
         }
       }
     },

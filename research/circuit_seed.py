@@ -1,7 +1,7 @@
 """
 Generate the circuit-tier seed artifact for a rotated-surface-code board entry
 (RFC 0001 Phase A, issue #505): full-distance memory circuits for both bases,
-their DEMs, and the circuit JSON block with RIS-found witnesses.
+and the circuit JSON block with RIS-found witnesses.
 
 The schedule is the standard geometric one: every plaquette couples its data
 qubits in a fixed zigzag order read off the layout coordinates. Each check's
@@ -13,7 +13,6 @@ bound realizes the full code distance in both bases, deep-checks the first,
 and writes:
 
     circuits/<slug>/memory_{x,z}.stim   canonical-noise circuits
-    circuits/<slug>/memory_{x,z}.dem    committed DEMs (pinned stim)
     codes/<slug>.json                   + circuit block (schema 0.2)
 
 Usage: python research/circuit_seed.py codes/25-1-5.json [--rounds R]
@@ -171,7 +170,7 @@ def main():
                      f"pattern pair is not full-distance after all")
         stem = os.path.join(outdir, f"memory_{basis.lower()}")
         open(stem + ".stim", "w").write(str(noisy) + "\n")
-        open(stem + ".dem", "w").write(str(dem) + "\n")
+        # .dem is derived from the .stim; no longer committed (PR: drop derived DEMs)
         block["d_circ"][basis] = {"value": best, "confidence": "upper_bound",
                                   "witness": wit}
 
