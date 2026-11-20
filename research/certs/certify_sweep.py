@@ -684,7 +684,9 @@ def qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall, tropidist
 def _qedist_attempt(path, slug, tlim, qedist_root, threads, certify_qedist, start=None, tropidist_root=None,
                     ladder=None):
     if certify_qedist is None:
-        wall = tropidist_wall(tlim) if not ladder else max(tropidist_wall(tlim), WALL_FLOOR + 2 * float(ladder) * 64)
+        # the same hard per-entry limit the SAT path has: a ladder that keeps
+        # completing rungs is killed at wall_clock(tlim, ladder), as it is there
+        wall = wall_clock(tlim, ladder) if ladder else tropidist_wall(tlim)
         return qedist_in_subprocess(path, slug, tlim, qedist_root, threads, wall,
                                     tropidist_root=tropidist_root, ladder=ladder, start=start)
     with open(path, encoding="utf-8") as f:
