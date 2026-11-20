@@ -9,6 +9,7 @@ whatever the count of survivors.
 
     uv run --extra research python research/campaigns/bb-w6-n-le-100-trinomials/run.py
 """
+
 import json
 import os
 import sys
@@ -43,8 +44,7 @@ def main(out=None, refute=True):
     # counted and reported, not charged to the budget, so the 120 candidates
     # the budget buys are 120 codes with k >= 1. sample_bb counts its own
     # rejected draws toward num, so it is asked for more than enough.
-    sampled = sample_bb(10 ** 9, l_range=(3, 10), m_range=(3, 10), weight=3, seed=0,
-                        n_range=(40, 100), max_weight=6)
+    sampled = sample_bb(10**9, l_range=(3, 10), m_range=(3, 10), weight=3, seed=0, n_range=(40, 100), max_weight=6)
     trivial = 0
     screened = 0
     for i, (spec, HX, HZ) in enumerate(sampled):
@@ -69,10 +69,15 @@ def main(out=None, refute=True):
             led.end_experiment()
             continue
         doc = make_submission(
-            HX, HZ, name=f"[[{n},{k},{d}]] trinomial bivariate bicycle",
+            HX,
+            HZ,
+            name=f"[[{n},{k},{d}]] trinomial bivariate bicycle",
             construction=f"Bivariate bicycle on Z_{spec['l']} x Z_{spec['m']}, A = {spec['A']}, "
-                         f"B = {spec['B']}; sampled by the bb-w6-n-le-100-trinomials campaign.",
-            authors=["@vprusso"], family="bivariate-bicycle", confidence="upper_bound")
+            f"B = {spec['B']}; sampled by the bb-w6-n-le-100-trinomials campaign.",
+            authors=["@vprusso"],
+            family="bivariate-bicycle",
+            confidence="upper_bound",
+        )
         verdict = validate_candidate(doc, seed=11, refute=refute)
         if verdict["passed"]:
             led.record_verdict("passed")
@@ -90,14 +95,17 @@ def main(out=None, refute=True):
         f"{screened} trinomial pairs with k >= 1 at n in [40, 100], {trials} numpy RIS trials each "
         f"({trivial} further draws had k = 0 and were not charged): the best screened kd^2/n was "
         f"{eff} at [[{n},{k},{d}]] (l={params['l']}, m={params['m']}) against the bar {bar} "
-        f"({card['bar']['slug']}); " + card["what_a_negative_would_teach"])
+        f"({card['bar']['slug']}); " + card["what_a_negative_would_teach"],
+    )
     fired = led.stop_reason()
     print(f"  stopped by: {fired[0]} ({fired[1]})" if fired else "  no stopping condition fired")
     summary = led.summary(report="research/campaigns/bb-w6-n-le-100-trinomials/REPORT.md")
     out = out or os.path.join(_HERE, "summary.json")
     write_summary(summary, out)
-    print(f"  best screened kd^2/n {eff} at [[{n},{k},{d}]]; {trivial} draws had k = 0; "
-          f"survivors {len(summary['survivors'])}")
+    print(
+        f"  best screened kd^2/n {eff} at [[{n},{k},{d}]]; {trivial} draws had k = 0; "
+        f"survivors {len(summary['survivors'])}"
+    )
     print(f"  summary -> {os.path.relpath(out, _ROOT)}")
     return summary
 

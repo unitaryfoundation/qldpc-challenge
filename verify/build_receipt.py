@@ -4,6 +4,7 @@ Receipts summarize facts already computed by the trusted verifier and the distan
 refutation gate. They are CI artifacts, not board data: generating one never changes
 whether a submission passes, and self-reported provenance is labelled as such.
 """
+
 import hashlib
 import json
 import os
@@ -25,8 +26,7 @@ def _sha256(path):
     return h.hexdigest()
 
 
-def make_receipt(doc, path, verdict, *, gate, repo_root, pr_number=None,
-                 pr_author=None, base_sha=None, head_sha=None):
+def make_receipt(doc, path, verdict, *, gate, repo_root, pr_number=None, pr_author=None, base_sha=None, head_sha=None):
     """Return a JSON-serializable receipt for one already-gated submission."""
     prov = doc.get("provenance") or {}
     candidate = verdict.get("candidate", {})
@@ -45,11 +45,9 @@ def make_receipt(doc, path, verdict, *, gate, repo_root, pr_number=None,
         },
         "trusted_validation": {
             "verifier_commit": base_sha or _git(repo_root, "rev-parse", "HEAD"),
-            "validator_source_sha256": verdict.get("validator", {}).get(
-                "source_sha256"),
+            "validator_source_sha256": verdict.get("validator", {}).get("source_sha256"),
             "validator_seed": verdict.get("validator", {}).get("seed"),
-            "structural_result": "passed" if gates.get("verify", {}).get("ok")
-                                 else "failed",
+            "structural_result": "passed" if gates.get("verify", {}).get("ok") else "failed",
             "distance_gate": gate,
         },
         "computed": {

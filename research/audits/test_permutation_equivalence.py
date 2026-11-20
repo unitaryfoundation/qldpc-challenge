@@ -2,6 +2,7 @@
 
 The checker must also refuse a wrong permutation, or the ledger proves nothing.
 """
+
 import json
 import os
 import sys

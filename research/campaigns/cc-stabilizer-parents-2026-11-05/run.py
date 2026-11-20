@@ -229,8 +229,7 @@ def main(argv=None):
             "slug": bar["name"][:-5],
             "axes": ["k", "d"],
             "note": "the stabilizer entry with the best kd^2/n at n <= %d; the stabilizer board ranks apart "
-            "from the CSS board"
-            % N_CAP,
+            "from the CSS board" % N_CAP,
         },
         "budget": {"walltime_hours": 2, "candidates_screened": 20000, "trials_per_candidate": TRIALS},
         "feasibility": (
@@ -410,8 +409,11 @@ def main(argv=None):
                     )
                     print(
                         f"  PASSED [[{n2},{k2},{dP}]] w={w2} {move} of {slug}: advancing={nov.get('board_advancing')} "
-                        + ("dominated by " + ", ".join(nov.get("dominated_by") or [])
-                           if nov.get("dominated_by") else ""),
+                        + (
+                            "dominated by " + ", ".join(nov.get("dominated_by") or [])
+                            if nov.get("dominated_by")
+                            else ""
+                        ),
                         flush=True,
                     )
                 else:

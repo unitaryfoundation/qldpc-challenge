@@ -12,6 +12,7 @@ as, and cites only paths that already exist on the base branch, because
 
     uv run --frozen python research/geometric_grafts/make_notes.py <outdir>
 """
+
 import os
 import sys
 
@@ -27,8 +28,16 @@ from multiband_surface import params  # noqa: E402
 # (d, rows, m, pitch), all measured at 300k RIS trials/side with d = 5 on both
 # sides, all Pareto-undominated in the 2D-local single / weight-4 cell.
 CONFIGS = [
-    (5, 7, 8, 6), (5, 20, 3, 6), (5, 9, 6, 6), (5, 2, 25, 4), (5, 14, 4, 6),
-    (5, 8, 6, 6), (5, 12, 4, 6), (5, 9, 5, 6), (5, 16, 3, 6), (5, 16, 2, 6),
+    (5, 7, 8, 6),
+    (5, 20, 3, 6),
+    (5, 9, 6, 6),
+    (5, 2, 25, 4),
+    (5, 14, 4, 6),
+    (5, 8, 6, 6),
+    (5, 12, 4, 6),
+    (5, 9, 5, 6),
+    (5, 16, 3, 6),
+    (5, 16, 2, 6),
 ]
 
 TEMPLATE = """# [[{n},{k},{d}]] — multi-band dense-packed surface code at rows={rows}, m={m}, pitch={pitch}
@@ -167,13 +176,13 @@ it, the screen's competitor set matches the site's exactly (223 of 223).
 
 def main(outdir):
     os.makedirs(outdir, exist_ok=True)
-    for (d, rows, m, pitch) in CONFIGS:
+    for d, rows, m, pitch in CONFIGS:
         p = params(d, rows, m, pitch)
         n, k, w = p["n"], p["k"], p["w"]
         assert p["css"] and p["connected"] and not p["empty_rows"], p
-        body = TEMPLATE.format(n=n, k=k, d=5, rows=rows, m=m, m_minus_1=m - 1,
-                               pitch=pitch, w=w,
-                               eff=round(k * 25 / n, 3))
+        body = TEMPLATE.format(
+            n=n, k=k, d=5, rows=rows, m=m, m_minus_1=m - 1, pitch=pitch, w=w, eff=round(k * 25 / n, 3)
+        )
         path = os.path.join(outdir, f"{n}-{k}-5.md")
         open(path, "w").write(body)
         assert len(body.encode()) < 10240, (path, len(body.encode()))

@@ -30,6 +30,7 @@ def test_lex_yields_at_most_one_per_d4xz_orbit():
 
 def test_row_sort_yields_sorted_rows():
     from local_sat import row_sort_symmetry_selftest
+
     stats = row_sort_symmetry_selftest()
     assert stats["unsorted"] == 0
     assert stats["models"] > 0
@@ -38,6 +39,7 @@ def test_row_sort_yields_sorted_rows():
 def test_cube_isometries_form_a_group_of_48_and_keep_the_orbit_key_invariant():
     import numpy as np
     from local_sat import _site_permutations, orbit_canonical_key
+
     perms = _site_permutations(3, dimension=3)
     assert len(perms) == len(set(perms)) == 48
     members = set(perms)
@@ -57,8 +59,8 @@ def test_a_cube_cell_yields_codes_whose_checks_respect_the_diameter():
     import math
 
     from local_sat import enumerate_local_sat_codes
-    out = list(enumerate_local_sat_codes(2, 2, 4, 1, math.sqrt(3), dimension=3,
-                                         max_diameter=math.sqrt(2), max_codes=3))
+
+    out = list(enumerate_local_sat_codes(2, 2, 4, 1, math.sqrt(3), dimension=3, max_diameter=math.sqrt(2), max_codes=3))
     assert out
     for spec, HX, HZ in out:
         sites = spec["sites"]
@@ -66,5 +68,4 @@ def test_a_cube_cell_yields_codes_whose_checks_respect_the_diameter():
         for H in (HX, HZ):
             for row in H:
                 sup = [q for q in range(len(row)) if row[q]]
-                assert all(math.dist(sites[a], sites[b]) <= math.sqrt(2) + 1e-9
-                           for a in sup for b in sup)
+                assert all(math.dist(sites[a], sites[b]) <= math.sqrt(2) + 1e-9 for a in sup for b in sup)

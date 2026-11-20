@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """E-GLUE pair gluing using code-calculus v0.2 glue transformer."""
-import argparse, datetime, json, os, sys, itertools
+
+import argparse
+import datetime
+import itertools
+import json
+import os
+import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
@@ -12,7 +18,7 @@ if CC not in sys.path:
     sys.path.insert(0, CC)
 os.environ.setdefault("QLDPC_RUN_ID", "cc-glue-css")
 import coordination
-from machine.priced_calculus import CodeState, DistanceLedger, apply_operation, export_challenge_entry
+from machine.priced_calculus import CodeState, DistanceLedger
 
 TODAY = datetime.date.today().isoformat()
 CERT = {"move_words": ["U", "U"], "evidence": "experiment: glue probe"}
@@ -26,6 +32,7 @@ def main():
     staging = coordination.staging_dir()
     os.makedirs(staging, exist_ok=True)
     import glob
+
     docs = []
     for p in sorted(glob.glob(os.path.join(ROOT, "codes", "*.json"))):
         d = json.load(open(p))
@@ -33,7 +40,9 @@ def main():
             docs.append((os.path.splitext(os.path.basename(p))[0], d))
     print(f"{len(docs)} CSS parents with n <= {args.n_cap}", flush=True)
     # try gluing pairs with disjoint qubit namespaces via relabeling not possible; use small parents only
-    tried = 0; gated = 0; finds = 0
+    tried = 0
+    gated = 0
+    finds = 0
     for (s1, d1), (s2, d2) in itertools.combinations(docs, 2):
         if tried >= args.pairs:
             break
@@ -48,13 +57,14 @@ def main():
             newQ = tuple(q + shift for q in st2.Q)
             # rebuild rows
             from machine.priced_calculus import Row
+
             new_rows = []
             for r in st2.rows:
                 new_rows.append(Row(r.id + "_2", r.sector, tuple(q + shift for q in r.support)))
             st2 = CodeState(newQ, tuple(new_rows), frozenset(r.id + "_2" for r in st2.rows))
         try:
             glued = st1.glue(st2, seam_certificate=CERT)
-        except Exception as e:
+        except Exception:
             continue
         # export requires ledger witnesses; build a ledger from parent? Use a dummy interval ledger
         try:

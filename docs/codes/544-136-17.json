@@ -4944,52 +4944,34 @@
    }
   },
   "Z": {
-   "value": 31,
+   "value": 17,
    "confidence": "upper_bound",
    "witness": [
-    7,
-    46,
-    47,
-    63,
-    89,
-    103,
-    104,
-    114,
-    116,
-    131,
-    205,
-    210,
-    211,
-    252,
-    259,
-    272,
-    307,
-    308,
-    311,
-    344,
-    346,
-    360,
-    361,
-    378,
-    387,
-    395,
-    412,
-    447,
-    522,
-    524,
-    539
+    0,
+    91,
+    117,
+    153,
+    163,
+    179,
+    201,
+    204,
+    230,
+    294,
+    321,
+    420,
+    424,
+    450,
+    489,
+    499,
+    541
    ],
    "witness_provenance": {
     "found_by": [
-     "@MathysRennela"
+     "@vprusso"
     ],
-    "date": "2026-11-17",
-    "found_at_samples": 50000,
-    "survived_samples": 50000,
-    "tool": "research/kit/surrogate.lightest_logical",
-    "seeds": [
-     10111
-    ]
+    "date": "2026-11-20",
+    "found_at_samples": 54346258,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
    }
   }
  },
@@ -5004,6 +4986,7 @@
   "references": [
    "arXiv:2610.06820"
   ],
-  "novelty": "known_parameters"
+  "novelty": "known_parameters",
+  "notes": "Z-side value lowered from 31 to 17 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-17 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 17 is unchanged."
  }
 }

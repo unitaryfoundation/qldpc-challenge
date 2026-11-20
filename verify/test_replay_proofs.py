@@ -5,6 +5,7 @@ formula hash is not what the emitter now produces, since a refutation of
 some other formula says nothing about this entry, and that a genuine entry
 replays end to end when the solver and checker are present.
 """
+
 import copy
 import json
 import os
@@ -27,8 +28,7 @@ def _one_small():
     """Return the smallest replayable certificate on the board."""
     certs = R.replayable()
     assert certs, "no proof_log certificate carries a replay recipe"
-    slug = min(certs, key=lambda s: json.load(
-        open(os.path.join(_ROOT, "codes", s + ".json")))["n"])
+    slug = min(certs, key=lambda s: json.load(open(os.path.join(_ROOT, "codes", s + ".json")))["n"])
     return slug, certs[slug]
 
 
@@ -48,6 +48,7 @@ def test_the_sample_is_deterministic_in_the_seed():
     secs = R.recorded_secs()
     pool = sorted(s for s in R.replayable() if secs.get(s, 0) <= 20)
     import random
+
     a = random.Random(7).sample(pool, 5)
     b = random.Random(7).sample(pool, 5)
     assert a == b and len(set(a)) == 5
@@ -58,8 +59,8 @@ def test_a_tampered_hash_fails_before_any_solving(tmp_path):
     slug, cert = _one_small()
     bad = copy.deepcopy(cert)
     bad["verification"]["cnf_sha256"] = ";".join(
-        f"{p.split('=')[0]}={'0' * 64}"
-        for p in cert["verification"]["cnf_sha256"].split(";"))
+        f"{p.split('=')[0]}={'0' * 64}" for p in cert["verification"]["cnf_sha256"].split(";")
+    )
     rep = R.replay(slug, bad, str(tmp_path), tlim=60)
     assert not rep["ok"]
     for blk in rep["sides"].values():
@@ -96,8 +97,7 @@ def test_a_budget_stops_opening_entries_and_is_reported_not_failed(monkeypatch, 
     monkeypatch.setattr(R, "replayable", lambda: certs)
     monkeypatch.setattr(R.shutil, "which", lambda tool: "/usr/bin/" + tool)
     opened = []
-    monkeypatch.setattr(R, "replay", lambda slug, cert, work, tlim: (opened.append(slug),
-                                                                      {"ok": True, "sides": {}})[1])
+    monkeypatch.setattr(R, "replay", lambda slug, cert, work, tlim: (opened.append(slug), {"ok": True, "sides": {}})[1])
     rc = R.main(["--all", "--max-minutes", "0"])
     out = capsys.readouterr().out
     assert rc == 0 and opened == []
@@ -114,9 +114,7 @@ def test_budget_skips_an_entry_that_wont_fit_and_runs_smaller_entries(monkeypatc
     monkeypatch.setattr(R, "recorded_secs", lambda: secs)
     monkeypatch.setattr(R.shutil, "which", lambda tool: "/usr/bin/" + tool)
     opened = []
-    monkeypatch.setattr(
-        R, "replay", lambda slug, cert, work, tlim: (opened.append(slug), {"ok": True, "sides": {}})[1]
-    )
+    monkeypatch.setattr(R, "replay", lambda slug, cert, work, tlim: (opened.append(slug), {"ok": True, "sides": {}})[1])
 
     rc = R.main(["--all", "--max-minutes", "0.1"])
 

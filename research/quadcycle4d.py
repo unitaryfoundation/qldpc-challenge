@@ -76,6 +76,7 @@ This module is a constructor for research use only: it makes no claim about
 distance. Distance is an upper bound read off a witness, and no code is a find
 until ``verify/validate_candidate.py`` says so.
 """
+
 import os
 
 import numpy as np
@@ -162,8 +163,7 @@ def _regular(dims, terms, invert=False):
     dims = tuple(int(r) for r in dims)
     elements = _elements(dims)
     index = {e: i for i, e in enumerate(elements)}
-    support = {(_inverse(t, dims) if invert else tuple(int(x) % r
-                 for x, r in zip(t, dims))) for t in terms}
+    support = {(_inverse(t, dims) if invert else tuple(int(x) % r for x, r in zip(t, dims))) for t in terms}
     M = np.zeros((len(elements),) * 2, dtype=np.int8)
     for i, e in enumerate(elements):
         for t in support:
@@ -183,7 +183,7 @@ def _assemble(dims, blocks, factors):
             if entry is None:
                 continue
             letter, invert = entry
-            acc[:, col * nG:(col + 1) * nG] ^= factors[letter][invert]
+            acc[:, col * nG : (col + 1) * nG] ^= factors[letter][invert]
         rows.extend(acc)
     return np.array(rows, dtype=np.int8)
 
@@ -214,16 +214,25 @@ def build_quadcycle(dims, a, b, c, d):
     """
     factors = {}
     for letter, terms in (("a", a), ("b", b), ("c", c), ("d", d)):
-        factors[letter] = (_regular(dims, terms, invert=False),
-                           _regular(dims, terms, invert=True))
+        factors[letter] = (_regular(dims, terms, invert=False), _regular(dims, terms, invert=True))
     HX = _assemble(dims, _HX_BLOCKS, factors)
     HZ = _assemble(dims, _HZ_BLOCKS, factors)
     return HX, HZ
 
 
-def sample_quadcycle(num, *, dim_range=(2, 9), rank=2, max_site=200,
-                     weights=(1, 1, 1, 2), seed=0, n_range=None,
-                     max_weight=None, min_k=1, audit=None):
+def sample_quadcycle(
+    num,
+    *,
+    dim_range=(2, 9),
+    rank=2,
+    max_site=200,
+    weights=(1, 1, 1, 2),
+    seed=0,
+    n_range=None,
+    max_weight=None,
+    min_k=1,
+    audit=None,
+):
     """Yield ``num`` random quadcycle candidates ``(spec, HX, HZ)``.
 
     ``dims`` is a ``rank``-dimensional torus with product <= ``max_site`` (so
@@ -271,17 +280,34 @@ def sample_quadcycle(num, *, dim_range=(2, 9), rank=2, max_site=200,
             continue
         tally["built"] += 1
         HX, HZ = build_quadcycle(dims, *terms)
-        yield ({"family": "quadcycle", "dims": list(dims),
+        yield (
+            {
+                "family": "quadcycle",
+                "dims": list(dims),
                 "a": [list(t) for t in terms[0]],
                 "b": [list(t) for t in terms[1]],
                 "c": [list(t) for t in terms[2]],
-                "d": [list(t) for t in terms[3]]}, HX, HZ)
+                "d": [list(t) for t in terms[3]],
+            },
+            HX,
+            HZ,
+        )
 
 
-def sample_quadcycle_shared(num, *, dim_range=(2, 16), rank=2, max_site=166,
-                            shared_weight=2, factor_weights=(1, 1, 2, 2),
-                            seed=0, n_range=None, max_weight=8, min_k=1,
-                            audit=None):
+def sample_quadcycle_shared(
+    num,
+    *,
+    dim_range=(2, 16),
+    rank=2,
+    max_site=166,
+    shared_weight=2,
+    factor_weights=(1, 1, 2, 2),
+    seed=0,
+    n_range=None,
+    max_weight=8,
+    min_k=1,
+    audit=None,
+):
     """Yield ``num`` quadcycle candidates whose four factors share a divisor.
 
     The paper's closed form for the logical count (its Eq. 7) is
@@ -346,21 +372,30 @@ def sample_quadcycle_shared(num, *, dim_range=(2, 16), rank=2, max_site=166,
         HX, HZ = build_quadcycle(dims, *terms)
         if min_k > 1:
             import sys as _sys
+
             _kit = os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit")
             if _kit not in _sys.path:
                 _sys.path.insert(0, _kit)
             from css import compute_k
+
             if compute_k(HX, HZ) < min_k:
                 tally["rejected_k"] += 1
                 continue
         tally.setdefault("built", 0)
         tally["built"] += 1
-        yield ({"family": "quadcycle", "dims": list(dims),
+        yield (
+            {
+                "family": "quadcycle",
+                "dims": list(dims),
                 "shared": [list(t) for t in shared],
                 "a": [list(t) for t in terms[0]],
                 "b": [list(t) for t in terms[1]],
                 "c": [list(t) for t in terms[2]],
-                "d": [list(t) for t in terms[3]]}, HX, HZ)
+                "d": [list(t) for t in terms[3]],
+            },
+            HX,
+            HZ,
+        )
 
 
 def _decode(dims, flats):
@@ -378,17 +413,18 @@ def _decode(dims, flats):
 TABLE2 = [
     # Table 2 of arXiv:2610.10731, as (dims, a, b, c, d, (n, k)).
     # Exponents are read mod their modulus: x on Z_3 is (1, 0), y is (0, 1).
-    ((3, 3), [(1, 0), (0, 0)], [(0, 1), (0, 0)], [(1, 0), (0, 1)],
-     [(0, 0), (1, 1)], (54, 6)),
-    ((3, 4), [(0, 0), (1, 1)], [(0, 1), (0, 0)], [(1, 0), (0, 1)],
-     [(0, 0), (1, 0), (2, 0), (0, 1)], (72, 6)),
-    ((3, 9), [(0, 1), (0, 0)], [(1, 0), (0, 2)], [(2, 0), (0, 2)],
-     [(0, 0), (1, 0), (0, 3), (0, 6)], (162, 6)),
-    ((2, 19), [(1, 0), (0, 2)], [(1, 0), (0, 3)], [(1, 0), (0, 5)],
-     [(0, 0), (1, 1), (0, 2), (0, 9)], (228, 6)),
-    ((2, 5, 7), [(0, 0, 0), (0, 1, 1)], [(1, 0, 0), (2, 0, 1)],
-     [(1, 1, 0), (0, 0, 3)], [(0, 0, 0), (1, 1, 0), (1, 2, 0), (0, 3, 1)],
-     (420, 6)),
+    ((3, 3), [(1, 0), (0, 0)], [(0, 1), (0, 0)], [(1, 0), (0, 1)], [(0, 0), (1, 1)], (54, 6)),
+    ((3, 4), [(0, 0), (1, 1)], [(0, 1), (0, 0)], [(1, 0), (0, 1)], [(0, 0), (1, 0), (2, 0), (0, 1)], (72, 6)),
+    ((3, 9), [(0, 1), (0, 0)], [(1, 0), (0, 2)], [(2, 0), (0, 2)], [(0, 0), (1, 0), (0, 3), (0, 6)], (162, 6)),
+    ((2, 19), [(1, 0), (0, 2)], [(1, 0), (0, 3)], [(1, 0), (0, 5)], [(0, 0), (1, 1), (0, 2), (0, 9)], (228, 6)),
+    (
+        (2, 5, 7),
+        [(0, 0, 0), (0, 1, 1)],
+        [(1, 0, 0), (2, 0, 1)],
+        [(1, 1, 0), (0, 0, 3)],
+        [(0, 0, 0), (1, 1, 0), (1, 2, 0), (0, 3, 1)],
+        (420, 6),
+    ),
 ]
 
 
@@ -401,8 +437,8 @@ def check_table2():
     """
     import os
     import sys
-    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                    "kit"))
+
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "kit"))
     from css import compute_k, verify_css
 
     out = []

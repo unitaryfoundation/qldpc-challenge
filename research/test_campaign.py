@@ -7,6 +7,7 @@ survivor is only a survivor once the gate has said so. Everything else here is
 the schema doing its job, which is worth pinning because a campaign that
 validates loosely is a task two executors can read differently.
 """
+
 import copy
 import glob
 import json
@@ -41,8 +42,7 @@ GOOD = {
         "name": "A campaign for the tests",
         "objective": {"metric": "kd2_over_n", "direction": "maximize"},
         "direction": None,
-        "constraints": {"max_check_weight": 8, "n": [100, 400],
-                        "locality": "local-2d-bilayer"},
+        "constraints": {"max_check_weight": 8, "n": [100, 400], "locality": "local-2d-bilayer"},
         "methods": {"families": ["bivariate-bicycle"]},
         "budget": {"cpu_hours": 10},
         "stopping": [{"type": "budget_exhausted"}],
@@ -57,8 +57,10 @@ CARD = {
     "bar": {"slug": "682-20-22", "axes": ["kd2_over_n"]},
     "budget": {"cpu_hours": 2, "trials_per_candidate": 400},
     "feasibility": "n = 682 is under BASE_MAX_N and group_algebra.py builds the family.",
-    "novelty": {"claim": "a weight-6 GB code above the cell's bar at n = 682",
-                "against": "the cyclic GB tables of arXiv:2306.16400"},
+    "novelty": {
+        "claim": "a weight-6 GB code above the cell's bar at n = 682",
+        "against": "the cyclic GB tables of arXiv:2306.16400",
+    },
     "expected_value": "A weight-6 code above the bar at n = 682 would lead the cell at that size.",
     "abandon_criterion": {"flat_fresh_rungs": 2, "trials_cap": 20000},
     "what_a_negative_would_teach": "That weight-6 GB over Z_341 is exhausted at this depth.",
@@ -79,14 +81,20 @@ def passed_verdict(n=200, k=8, d=12, wc="weight-6", advancing=True):
     """
     return {
         "passed": True,
-        "candidate": {"n": n, "k": k, "d": d, "family": "bivariate-bicycle",
-                      "weight_class": wc, "locality_class": "unrestricted",
-                      "fingerprint": "abc123", "signature": "def456"},
-        "gates": {"verify": {"ok": True, "failed_checks": [],
-                             "weight_class": wc,
-                             "locality_class": "unrestricted"},
-                  "novelty": {"board_advancing": advancing,
-                              "cell": ["weight-6", "unrestricted"]}},
+        "candidate": {
+            "n": n,
+            "k": k,
+            "d": d,
+            "family": "bivariate-bicycle",
+            "weight_class": wc,
+            "locality_class": "unrestricted",
+            "fingerprint": "abc123",
+            "signature": "def456",
+        },
+        "gates": {
+            "verify": {"ok": True, "failed_checks": [], "weight_class": wc, "locality_class": "unrestricted"},
+            "novelty": {"board_advancing": advancing, "cell": ["weight-6", "unrestricted"]},
+        },
         "labels": ["advances the weight-6 x unrestricted board"],
     }
 
@@ -96,6 +104,7 @@ def doc(n=200, k=8, d=12):
 
 
 # -- the schema -----------------------------------------------------------
+
 
 def test_a_valid_campaign_loads():
     c = Campaign(validate_campaign(camp()))
@@ -119,8 +128,7 @@ def test_an_unknown_stopping_type_is_rejected():
         validate_campaign(camp(stopping=[{"type": "when_i_feel_like_it"}]))
 
 
-@pytest.mark.parametrize("budget", [{}, {"cpu_hours": 0}, {"cpu_hours": -5},
-                                    {"cpu_hours": 1, "wall_hours": 2}])
+@pytest.mark.parametrize("budget", [{}, {"cpu_hours": 0}, {"cpu_hours": -5}, {"cpu_hours": 1, "wall_hours": 2}])
 def test_a_malformed_budget_is_rejected(budget):
     """No budget, a zero budget and a negative one are all unbounded."""
     with pytest.raises(CampaignError):
@@ -147,10 +155,12 @@ def test_target_reached_without_a_target_is_rejected():
 def test_target_reached_on_a_metric_the_ledger_cannot_score_is_rejected():
     """A stopping condition that can never fire is worse than none at all."""
     with pytest.raises(CampaignError, match="could never fire"):
-        validate_campaign(camp(
-            objective={"metric": "frontier_entries", "direction": "maximize",
-                       "target": 3},
-            stopping=[{"type": "target_reached"}]))
+        validate_campaign(
+            camp(
+                objective={"metric": "frontier_entries", "direction": "maximize", "target": 3},
+                stopping=[{"type": "target_reached"}],
+            )
+        )
 
 
 def test_an_id_that_is_not_its_directory_is_rejected(tmp_path):
@@ -170,6 +180,7 @@ def test_a_bad_schema_version_is_rejected():
 
 # -- the search space -----------------------------------------------------
 
+
 def test_constraints_filter_the_search_and_nothing_else():
     """in_scope answers 'is this worth another rung', never 'which cell'.
 
@@ -184,7 +195,7 @@ def test_constraints_filter_the_search_and_nothing_else():
     assert c.in_scope(locality="local-2d-single")
     assert not c.in_scope(locality="unrestricted")
     # an unconstrained axis never excludes anything
-    assert c.in_scope(k=10 ** 6)
+    assert c.in_scope(k=10**6)
     # a locality string outside the schema's classes says so
     with pytest.raises(CampaignError, match="unknown locality class"):
         c.in_scope(locality="2D local")
@@ -196,6 +207,7 @@ def test_the_objective_metric_is_computed_from_the_candidate():
 
 
 # -- the ledger -----------------------------------------------------------
+
 
 def test_a_candidate_the_gate_did_not_pass_is_refused():
     """The single most important refusal in this module."""
@@ -248,8 +260,7 @@ def test_budget_exhaustion_fires_and_names_the_field():
 
 
 def test_a_frontier_advance_fires_when_asked_for():
-    c = Campaign(validate_campaign(camp(
-        stopping=[{"type": "frontier_advance"}, {"type": "budget_exhausted"}])))
+    c = Campaign(validate_campaign(camp(stopping=[{"type": "frontier_advance"}, {"type": "budget_exhausted"}])))
     led = Ledger(c)
     led.start_experiment("bivariate-bicycle")
     led.record_candidate(doc(), passed_verdict(advancing=True))
@@ -258,8 +269,7 @@ def test_a_frontier_advance_fires_when_asked_for():
 
 
 def test_a_dry_spell_fires_no_progress():
-    c = Campaign(validate_campaign(camp(
-        stopping=[{"type": "no_progress", "experiments": 2}])))
+    c = Campaign(validate_campaign(camp(stopping=[{"type": "no_progress", "experiments": 2}])))
     led = Ledger(c)
     for _ in range(2):
         led.start_experiment("bivariate-bicycle")
@@ -270,14 +280,13 @@ def test_a_dry_spell_fires_no_progress():
 
 
 def test_a_survivor_resets_the_dry_spell():
-    c = Campaign(validate_campaign(camp(
-        stopping=[{"type": "no_progress", "experiments": 2}])))
+    c = Campaign(validate_campaign(camp(stopping=[{"type": "no_progress", "experiments": 2}])))
     led = Ledger(c)
     led.start_experiment("bivariate-bicycle")
-    led.end_experiment(empty_ok=True)                      # dry
+    led.end_experiment(empty_ok=True)  # dry
     led.start_experiment("bivariate-bicycle")
     led.record_candidate(doc(), passed_verdict(advancing=False))
-    led.end_experiment()                      # not dry
+    led.end_experiment()  # not dry
     assert led.stop_reason() is None
 
 
@@ -290,17 +299,25 @@ def _with_survivor(c, **candidate):
 
 
 def test_the_target_is_read_in_the_objective_direction():
-    up = Campaign(validate_campaign(camp(
-        objective={"metric": "kd2_over_n", "direction": "maximize",
-                   "target": 100},
-        stopping=[{"type": "target_reached"}])))
+    up = Campaign(
+        validate_campaign(
+            camp(
+                objective={"metric": "kd2_over_n", "direction": "maximize", "target": 100},
+                stopping=[{"type": "target_reached"}],
+            )
+        )
+    )
     assert _with_survivor(up, n=200, k=8, d=12).stop_reason() is None
-    assert _with_survivor(up, n=100, k=10, d=32).stop_reason()[0] \
-        == "target_reached"
+    assert _with_survivor(up, n=100, k=10, d=32).stop_reason()[0] == "target_reached"
     # no current metric is naturally minimized; the comparison still honours it
-    down = Campaign(validate_campaign(camp(
-        objective={"metric": "distance", "direction": "minimize", "target": 4},
-        stopping=[{"type": "target_reached"}])))
+    down = Campaign(
+        validate_campaign(
+            camp(
+                objective={"metric": "distance", "direction": "minimize", "target": 4},
+                stopping=[{"type": "target_reached"}],
+            )
+        )
+    )
     assert _with_survivor(down, d=5).stop_reason() is None
     assert _with_survivor(down, d=4).stop_reason()[0] == "target_reached"
 
@@ -311,15 +328,21 @@ def test_the_target_cannot_be_reached_by_a_candidate_the_gate_refused():
     A screening score for a code the gate went on to reject must not end a
     campaign, and must not appear in its summary as an objective met.
     """
-    c = Campaign(validate_campaign(camp(
-        objective={"metric": "kd2_over_n", "direction": "maximize",
-                   "target": 6},
-        stopping=[{"type": "target_reached"}, {"type": "budget_exhausted"}])))
+    c = Campaign(
+        validate_campaign(
+            camp(
+                objective={"metric": "kd2_over_n", "direction": "maximize", "target": 6},
+                stopping=[{"type": "target_reached"}, {"type": "budget_exhausted"}],
+            )
+        )
+    )
     led = Ledger(c)
     led.start_experiment("bivariate-bicycle")
     with pytest.raises(CampaignError):
-        led.record_candidate(doc(n=72, k=12, d=6),          # kd^2/n = 6
-                             {"passed": False, "labels": ["duplicate"]})
+        led.record_candidate(
+            doc(n=72, k=12, d=6),  # kd^2/n = 6
+            {"passed": False, "labels": ["duplicate"]},
+        )
     led.record_negative("gate rejected", "duplicate of a board entry")
     led.record_verdict("duplicate")
     led.end_experiment()
@@ -344,6 +367,7 @@ def test_wall_time_is_measured_rather_than_reported():
 
 # -- the summary ----------------------------------------------------------
 
+
 def test_the_summary_records_what_was_spent_and_what_stopped_it():
     led = Ledger(Campaign(validate_campaign(camp())))
     led.start_experiment("bivariate-bicycle", seed=3)
@@ -365,8 +389,7 @@ def test_a_campaign_with_no_submission_still_reports():
     """Zero survivors is a complete outcome, not a failure to report."""
     led = Ledger(Campaign(validate_campaign(camp())))
     led.start_experiment("bivariate-bicycle")
-    led.record_negative("closed family",
-                        "every draw collapsed under the quotient lift")
+    led.record_negative("closed family", "every draw collapsed under the quotient lift")
     led.spend(cpu_hours=10)
     led.end_experiment()
     s = led.summary()
@@ -386,18 +409,17 @@ def test_an_interrupted_run_does_not_file_itself_as_completed():
 
 def test_the_summary_round_trips_through_disk(tmp_path):
     led = Ledger(Campaign(validate_campaign(camp())))
-    out = write_summary(led.summary(status="abandoned"),
-                        str(tmp_path / "sub" / "summary.json"))
+    out = write_summary(led.summary(status="abandoned"), str(tmp_path / "sub" / "summary.json"))
     assert json.load(open(out))["status"] == "abandoned"
 
 
 # -- the shipped definitions ---------------------------------------------
 
+
 @pytest.mark.parametrize("cid", ["w8-2dlocal-n700-1000", "smoke-bb-72"])
 def test_the_committed_campaigns_validate(cid):
     """A shipped example that does not load is worse than no example."""
-    c = load_campaign(os.path.join(_ROOT, "research", "campaigns", cid,
-                                   "campaign.json"))
+    c = load_campaign(os.path.join(_ROOT, "research", "campaigns", cid, "campaign.json"))
     assert c.id == cid and c.required_outputs
 
 
@@ -410,14 +432,14 @@ def test_a_definition_that_is_not_json_says_so(tmp_path):
 
 # -- the journal and the merge (issue #2314) ------------------------------
 
+
 def survivor_verdict(fingerprint, **over):
     v = passed_verdict(**over)
     v["candidate"]["fingerprint"] = fingerprint
     return v
 
 
-def run_one(journal, family="bivariate-bicycle", *, seed, cpu_hours=1,
-            fingerprints=(), negatives=()):
+def run_one(journal, family="bivariate-bicycle", *, seed, cpu_hours=1, fingerprints=(), negatives=()):
     """Run one experiment of the shared campaign and journal it."""
     led = Ledger(Campaign(validate_campaign(camp())), journal=str(journal))
     led.start_experiment(family, seed=seed)
@@ -436,7 +458,7 @@ def test_each_closed_experiment_is_journaled_as_it_closes(tmp_path):
     led = Ledger(Campaign(validate_campaign(camp())), journal=str(j))
     led.start_experiment("bivariate-bicycle", seed=1)
     led.spend(cpu_hours=2)
-    assert not j.exists()                        # nothing is written mid-run
+    assert not j.exists()  # nothing is written mid-run
     led.end_experiment()
     led.start_experiment("bivariate-bicycle", seed=2)
     led.record_candidate(doc(), passed_verdict())
@@ -446,14 +468,12 @@ def test_each_closed_experiment_is_journaled_as_it_closes(tmp_path):
     first = json.loads(lines[0])
     assert first["campaign_id"] == "test-campaign"
     assert first["experiment"]["seed"] == 1 and first["survivors"] == []
-    assert json.loads(lines[1])["survivors"][0]["cell"] == \
-        ["weight-6", "unrestricted"]
+    assert json.loads(lines[1])["survivors"][0]["cell"] == ["weight-6", "unrestricted"]
 
 
 def test_a_journal_replays_into_the_ledger_it_came_from(tmp_path):
     j = tmp_path / "ledger.jsonl"
-    run_one(j, seed=1, cpu_hours=4, fingerprints=("fp-a",),
-            negatives=[("closed family", "every draw collapsed")])
+    run_one(j, seed=1, cpu_hours=4, fingerprints=("fp-a",), negatives=[("closed family", "every draw collapsed")])
     back = Ledger.from_journal(Campaign(validate_campaign(camp())), str(j))
     assert back.consumed()["cpu_hours"] == 4
     assert [s["fingerprint"] for s in back.survivors] == ["fp-a"]
@@ -489,11 +509,14 @@ def test_a_journal_for_another_campaign_is_refused(tmp_path):
 
 
 def test_two_executors_of_the_same_campaign_merge(tmp_path):
-    a = run_one(tmp_path / "a.jsonl", seed=1, cpu_hours=3,
-                fingerprints=("fp-a",))
-    b = run_one(tmp_path / "b.jsonl", seed=2, cpu_hours=5,
-                fingerprints=("fp-b",),
-                negatives=[("wall", "nothing under weight 8")])
+    a = run_one(tmp_path / "a.jsonl", seed=1, cpu_hours=3, fingerprints=("fp-a",))
+    b = run_one(
+        tmp_path / "b.jsonl",
+        seed=2,
+        cpu_hours=5,
+        fingerprints=("fp-b",),
+        negatives=[("wall", "nothing under weight 8")],
+    )
     both = a.merge(b)
     assert len(both.experiments) == 2
     assert both.consumed()["cpu_hours"] == 8
@@ -505,10 +528,8 @@ def test_two_executors_of_the_same_campaign_merge(tmp_path):
 
 def test_the_same_seed_is_the_same_work_and_is_charged_once(tmp_path):
     """Replicated execution is the point; paying twice for it is not."""
-    a = run_one(tmp_path / "a.jsonl", seed=7, cpu_hours=3,
-                fingerprints=("fp-a",))
-    b = run_one(tmp_path / "b.jsonl", seed=7, cpu_hours=3,
-                fingerprints=("fp-a",))
+    a = run_one(tmp_path / "a.jsonl", seed=7, cpu_hours=3, fingerprints=("fp-a",))
+    b = run_one(tmp_path / "b.jsonl", seed=7, cpu_hours=3, fingerprints=("fp-a",))
     both = a.merge(b)
     assert len(both.experiments) == 1
     assert both.consumed()["cpu_hours"] == 3
@@ -540,10 +561,8 @@ def test_a_merged_ledger_stops_on_the_shared_budget(tmp_path):
 
 
 def test_a_merged_ledger_summarizes_like_any_other(tmp_path):
-    a = run_one(tmp_path / "a.jsonl", seed=1, cpu_hours=5,
-                fingerprints=("fp-a",))
-    b = run_one(tmp_path / "b.jsonl", seed=2, cpu_hours=5,
-                fingerprints=("fp-b",))
+    a = run_one(tmp_path / "a.jsonl", seed=1, cpu_hours=5, fingerprints=("fp-a",))
+    b = run_one(tmp_path / "b.jsonl", seed=2, cpu_hours=5, fingerprints=("fp-b",))
     s = a.merge(b).summary()
     assert s["budget"]["consumed"]["cpu_hours"] == 10
     assert len(s["survivors"]) == 2 and s["frontier_advances"] == 2
@@ -553,9 +572,9 @@ def test_a_merged_ledger_summarizes_like_any_other(tmp_path):
 def test_several_journals_load_as_one_ledger(tmp_path):
     run_one(tmp_path / "a.jsonl", seed=1, cpu_hours=2, fingerprints=("fp-a",))
     run_one(tmp_path / "b.jsonl", seed=2, cpu_hours=2, fingerprints=("fp-b",))
-    both = Ledger.from_journal(Campaign(validate_campaign(camp())),
-                               [str(tmp_path / "a.jsonl"),
-                                str(tmp_path / "b.jsonl")])
+    both = Ledger.from_journal(
+        Campaign(validate_campaign(camp())), [str(tmp_path / "a.jsonl"), str(tmp_path / "b.jsonl")]
+    )
     assert len(both.experiments) == 2 and both.consumed()["cpu_hours"] == 4
     assert len(both.survivors) == 2
 
@@ -569,8 +588,7 @@ def test_a_ledger_with_no_journal_writes_nothing(tmp_path):
 
 # -- run contracts (issue #2342) ------------------------------------------
 CONTRACT = {
-    "template": "python research/cyclic_gb.py --m {m} --trials {trials} "
-                "--seed {seed}",
+    "template": "python research/cyclic_gb.py --m {m} --trials {trials} --seed {seed}",
     "parameters": {"m": 337, "trials": 2000000, "seed": [51, 52]},
 }
 
@@ -643,8 +661,7 @@ def test_an_override_is_applied_and_reported_as_a_deviation():
     led.start_experiment("bivariate-bicycle", seed=51, trials=300)
     exp = led.end_experiment(empty_ok=True)
     assert exp["params"]["trials"] == 300
-    assert exp["contract_deviations"] == {
-        "trials": {"contract": 2000000, "used": 300}}
+    assert exp["contract_deviations"] == {"trials": {"contract": 2000000, "used": 300}}
 
 
 def test_an_override_equal_to_the_contract_is_not_a_deviation():
@@ -677,8 +694,7 @@ def test_the_contract_cannot_weaken_the_gate():
     led = Ledger(c)
     led.start_experiment("bivariate-bicycle", seed=51)
     with pytest.raises(CampaignError, match="passed"):
-        led.record_candidate({"n": 200, "k": 8, "distance": {"d": 12}},
-                             {"passed": False})
+        led.record_candidate({"n": 200, "k": 8, "distance": {"d": 12}}, {"passed": False})
 
 
 # -- run manifests (issue #2341) ------------------------------------------
@@ -710,8 +726,7 @@ def test_snapshot_outside_a_checkout_still_produces_a_manifest(tmp_path):
 def test_manifest_records_params_seeds_and_spend(tmp_path):
     """The manifest carries what a shell history used to."""
     c = Campaign(validate_campaign(camp()))
-    led = Ledger(c, params={"trials": 2_000_000, "workers": 8,
-                                        "ladder": [[2000, 12], [20000, 11]]})
+    led = Ledger(c, params={"trials": 2_000_000, "workers": 8, "ladder": [[2000, 12], [20000, 11]]})
     led.start_experiment(c.families[0], seed=51)
     led.spend(cpu_hours=0.25, candidates_screened=10)
     led.end_experiment()
@@ -826,20 +841,23 @@ def test_dead_ends_survive_a_write_and_reload(tmp_path):
 
 # -- writing a definition (issue #2780) --------------------------------------
 
+
 def test_a_scaffold_is_a_valid_campaign_with_the_defaults_filled():
     from campaign import scaffold_campaign
+
     spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     c = spec["campaign"]
     assert c["schema_version"] == 1 and c["id"] == "gb-probe"
     assert c["objective"] == {"metric": "kd2_over_n", "direction": "maximize"}
     assert c["stopping"] == [{"type": "budget_exhausted"}]
     assert c["status"] == "draft"
-    Campaign(spec)                                # constructible in memory
+    Campaign(spec)  # constructible in memory
 
 
 def test_a_scaffold_has_no_default_budget():
     """An unbounded campaign is the thing the object exists to prevent."""
     from campaign import scaffold_campaign
+
     with pytest.raises(TypeError):
         scaffold_campaign("gb-probe", "GB probe")
     with pytest.raises(CampaignError, match="budget"):
@@ -848,20 +866,27 @@ def test_a_scaffold_has_no_default_budget():
 
 def test_scaffold_fields_pass_through_and_are_validated():
     from campaign import scaffold_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"candidates_screened": 50},
+
+    spec = scaffold_campaign(
+        "gb-probe",
+        "GB probe",
+        card=CARD,
+        budget={"candidates_screened": 50},
         families=["generalized-bicycle"],
         objective={"target": 20},
         stopping=[{"type": "target_reached"}, {"type": "budget_exhausted"}],
-        constraints={"n": [600, 700]}, notes="one night")
+        constraints={"n": [600, 700]},
+        notes="one night",
+    )
     c = spec["campaign"]
     assert c["methods"] == {"families": ["generalized-bicycle"]}
     assert c["objective"]["target"] == 20 and c["constraints"] == {"n": [600, 700]}
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
-                          families=["not-a-family"])
+        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1}, families=["not-a-family"])
     with pytest.raises(CampaignError):
-        scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1},
-                          stopping=[{"type": "target_reached"}])   # no target
+        scaffold_campaign(
+            "gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 1}, stopping=[{"type": "target_reached"}]
+        )  # no target
 
 
 def test_a_bare_campaign_dict_is_told_about_the_wrapper():
@@ -871,8 +896,10 @@ def test_a_bare_campaign_dict_is_told_about_the_wrapper():
 
 def test_write_campaign_round_trips_through_load_campaign(tmp_path):
     from campaign import scaffold_campaign, write_campaign
-    spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2},
-                             families=["generalized-bicycle"])
+
+    spec = scaffold_campaign(
+        "gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2}, families=["generalized-bicycle"]
+    )
     path = tmp_path / "campaigns" / "gb-probe" / "campaign.json"
     assert write_campaign(spec, str(path)) == str(path)
     back = load_campaign(str(path))
@@ -885,6 +912,7 @@ def test_write_campaign_round_trips_through_load_campaign(tmp_path):
 
 def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
     from campaign import scaffold_campaign, write_campaign
+
     spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     path = str(tmp_path / "campaign.json")
     write_campaign(spec, path)
@@ -897,6 +925,7 @@ def test_write_campaign_refuses_to_overwrite_unless_told(tmp_path):
 
 def test_write_campaign_holds_the_directory_to_the_id(tmp_path):
     from campaign import scaffold_campaign, write_campaign
+
     spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
     wrong = tmp_path / "campaigns" / "other-name" / "campaign.json"
     with pytest.raises(CampaignError, match="directory name"):
@@ -906,9 +935,14 @@ def test_write_campaign_holds_the_directory_to_the_id(tmp_path):
 def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     """The documented route for a run that does not want a directory yet."""
     from campaign import scaffold_campaign
-    led = Ledger(Campaign(scaffold_campaign(
-        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
-        families=["bivariate-bicycle"])))
+
+    led = Ledger(
+        Campaign(
+            scaffold_campaign(
+                "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10}, families=["bivariate-bicycle"]
+            )
+        )
+    )
     led.start_experiment("bivariate-bicycle", seed=1, params={"l": 6})
     led.record_screen(trials=1000, d=6, backend="numpy")
     led.record_verdict("not_run")
@@ -917,14 +951,15 @@ def test_an_in_memory_campaign_drives_a_ledger_to_a_summary(tmp_path):
     with open(out, encoding="utf-8") as f:
         summ = json.load(f)
     assert summ["campaign_id"] == "adhoc"
-    assert summ["experiments"][0]["screened"] == {"trials": 1000, "d": 6,
-                                                  "backend": "numpy"}
+    assert summ["experiments"][0]["screened"] == {"trials": 1000, "d": 6, "backend": "numpy"}
 
 
 # -- the direction card (issue #4028) -----------------------------------------
 
+
 def test_a_new_campaign_must_state_its_direction_card():
     from campaign import scaffold_campaign
+
     with pytest.raises(CampaignError, match="direction card"):
         scaffold_campaign("gb-probe", "GB probe", budget={"cpu_hours": 2})
     spec = scaffold_campaign("gb-probe", "GB probe", card=CARD, budget={"cpu_hours": 2})
@@ -932,20 +967,24 @@ def test_a_new_campaign_must_state_its_direction_card():
     assert Campaign(spec).direction == CARD
 
 
-@pytest.mark.parametrize("damage", [
-    lambda c: c.pop("expected_value"),
-    lambda c: c.update(cell="weight-6"),
-    lambda c: c.update(family="not-a-family"),
-    lambda c: c["bar"].pop("axes"),
-    lambda c: c["abandon_criterion"].update(flat_fresh_rungs=1),
-    lambda c: c.update(expected_value=7),
-    lambda c: c.update(non_monotonic={"why_worth_starting": "a wall"}),
-    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, regresses_on=["score"])),
-    lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, stop="never")),
-    lambda c: c.update(non_monotonic="entered worse on purpose"),
-])
+@pytest.mark.parametrize(
+    "damage",
+    [
+        lambda c: c.pop("expected_value"),
+        lambda c: c.update(cell="weight-6"),
+        lambda c: c.update(family="not-a-family"),
+        lambda c: c["bar"].pop("axes"),
+        lambda c: c["abandon_criterion"].update(flat_fresh_rungs=1),
+        lambda c: c.update(expected_value=7),
+        lambda c: c.update(non_monotonic={"why_worth_starting": "a wall"}),
+        lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, regresses_on=["score"])),
+        lambda c: c.update(non_monotonic=dict(NON_MONOTONIC, stop="never")),
+        lambda c: c.update(non_monotonic="entered worse on purpose"),
+    ],
+)
 def test_a_malformed_card_is_rejected(damage):
     from campaign import scaffold_campaign
+
     card = copy.deepcopy(CARD)
     damage(card)
     with pytest.raises(CampaignError):
@@ -958,7 +997,7 @@ def test_a_definition_before_the_card_carries_null_and_still_loads():
     assert Campaign(validate_campaign(obj)).direction is None
     obj["campaign"].pop("direction")
     with pytest.raises(CampaignError):
-        validate_campaign(obj)                    # the key is required, null or not
+        validate_campaign(obj)  # the key is required, null or not
 
 
 NON_MONOTONIC = {
@@ -972,18 +1011,23 @@ NON_MONOTONIC = {
 def test_a_route_entered_worse_on_purpose_says_so_on_the_card(tmp_path):
     """The optional field (issue #4237) validates in the definition and in the summary."""
     from campaign import scaffold_campaign
+
     card = dict(CARD, non_monotonic=NON_MONOTONIC)
-    spec = scaffold_campaign("gb-probe", "GB probe", card=card, budget={"cpu_hours": 2},
-                             families=["generalized-bicycle"])
+    spec = scaffold_campaign(
+        "gb-probe", "GB probe", card=card, budget={"cpu_hours": 2}, families=["generalized-bicycle"]
+    )
     assert spec["campaign"]["direction"]["non_monotonic"] == NON_MONOTONIC
     assert spec["campaign"]["direction"]["abandon_criterion"] == CARD["abandon_criterion"]
     minimal = dict(NON_MONOTONIC)
-    minimal.pop("base")                            # base is the one optional part
-    scaffold_campaign("gb-probe", "GB probe", card=dict(CARD, non_monotonic=minimal),
-                      budget={"cpu_hours": 2})
+    minimal.pop("base")  # base is the one optional part
+    scaffold_campaign("gb-probe", "GB probe", card=dict(CARD, non_monotonic=minimal), budget={"cpu_hours": 2})
     led = Ledger(Campaign(spec))
-    led.start_experiment("generalized-bicycle", seed=1, params={"m": 341},
-                         note="first rung expected below the bar; the lattice is a wall")
+    led.start_experiment(
+        "generalized-bicycle",
+        seed=1,
+        params={"m": 341},
+        note="first rung expected below the bar; the lattice is a wall",
+    )
     led.record_screen(trials=400, d=20, backend="numpy")
     led.record_verdict("dominated")
     led.end_experiment()
@@ -1006,9 +1050,14 @@ def test_the_summary_schema_carries_the_same_card_as_the_definition():
 
 def test_the_summary_carries_the_card(tmp_path):
     from campaign import scaffold_campaign
-    led = Ledger(Campaign(scaffold_campaign(
-        "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10},
-        families=["generalized-bicycle"])))
+
+    led = Ledger(
+        Campaign(
+            scaffold_campaign(
+                "adhoc", "ad hoc", card=CARD, budget={"candidates_screened": 10}, families=["generalized-bicycle"]
+            )
+        )
+    )
     led.start_experiment("generalized-bicycle", seed=1, params={"m": 341})
     led.record_screen(trials=400, d=6, backend="numpy")
     led.record_verdict("not_run")
@@ -1025,8 +1074,10 @@ def test_the_committed_campaigns_either_state_a_card_or_say_null():
         assert "direction" in c.c, f
         if c.direction is not None:
             assert c.direction["bar"]["slug"] and c.direction["what_a_negative_would_teach"]
-    cards = [load_campaign(f).direction for f in
-             glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))]
+    cards = [
+        load_campaign(f).direction
+        for f in glob.glob(os.path.join(_ROOT, "research", "campaigns", "*", "campaign.json"))
+    ]
     assert any(cards), "one committed campaign ships with the card filled in"
 
 
@@ -1038,18 +1089,21 @@ def test_the_committed_campaigns_either_state_a_card_or_say_null():
 # and the summary schema types the item while a bare {what, detail} still
 # validates.
 
+
 def test_a_negative_records_its_assumptions_and_revisit_condition(tmp_path):
     """The typed negative survives the journal and validates in the summary."""
     import campaign as C
+
     j = tmp_path / "ledger.jsonl"
     led = Ledger(Campaign(validate_campaign(camp())), journal=str(j))
     led.start_experiment("bivariate-bicycle", seed=3, params={"l": 6, "m": 6})
     led.spend(cpu_hours=1)
-    led.record_negative("weight-6 at n=72 is closed",
-                        "two flat rungs at d <= 6, below the bar",
-                        assumptions=["weight-6 BB on Z_6 x Z_6",
-                                     "numpy RIS at 2000 trials per candidate"],
-                        revisit_if="a backend that reaches 1e6 trials per candidate")
+    led.record_negative(
+        "weight-6 at n=72 is closed",
+        "two flat rungs at d <= 6, below the bar",
+        assumptions=["weight-6 BB on Z_6 x Z_6", "numpy RIS at 2000 trials per candidate"],
+        revisit_if="a backend that reaches 1e6 trials per candidate",
+    )
     led.end_experiment()
     neg = led.negative_results[0]
     assert neg["family"] == "bivariate-bicycle"
@@ -1064,12 +1118,11 @@ def test_a_negative_records_its_assumptions_and_revisit_condition(tmp_path):
 
 def test_a_negative_outside_an_experiment_takes_what_it_is_given():
     import campaign as C
+
     led = Ledger(Campaign(validate_campaign(camp())))
     led.record_negative("closed family", "every draw collapsed")
-    assert led.negative_results[0] == {"what": "closed family",
-                                       "detail": "every draw collapsed"}
-    led.record_negative("S4 lift is closed", "no survivor below the bar",
-                        family="lifted-product", params={"G": "S4"})
+    assert led.negative_results[0] == {"what": "closed family", "detail": "every draw collapsed"}
+    led.record_negative("S4 lift is closed", "no survivor below the bar", family="lifted-product", params={"G": "S4"})
     assert led.negative_results[1]["family"] == "lifted-product"
     assert led.negative_results[1]["params"] == {"G": "S4"}
     C.validate_summary(led.summary())
@@ -1078,12 +1131,15 @@ def test_a_negative_outside_an_experiment_takes_what_it_is_given():
 def test_a_malformed_negative_is_refused_where_it_is_recorded():
     import campaign as C
     import pytest
+
     led = Ledger(Campaign(validate_campaign(camp())))
-    for bad in ({"assumptions": "one string, not a list"},
-                {"assumptions": []},
-                {"assumptions": ["ok", ""]},
-                {"revisit_if": "   "},
-                {"revisit_if": 3}):
+    for bad in (
+        {"assumptions": "one string, not a list"},
+        {"assumptions": []},
+        {"assumptions": ["ok", ""]},
+        {"revisit_if": "   "},
+        {"revisit_if": 3},
+    ):
         with pytest.raises(C.CampaignError):
             led.record_negative("w", "d", **bad)
     assert led.negative_results == []
@@ -1098,6 +1154,7 @@ def test_a_malformed_negative_is_refused_where_it_is_recorded():
 
 # -- valid is not frontier (issue #5700) ------------------------------------
 
+
 def test_survivors_split_into_frontier_and_non_frontier_rows():
     import campaign as C
 
@@ -1109,7 +1166,7 @@ def test_survivors_split_into_frontier_and_non_frontier_rows():
     led.record_candidate(doc(n=144, k=12, d=12), passed_verdict(advancing=True))
     led.end_experiment()
     assert [r["n"] for r in led.frontier_survivors()] == [144]
-    row, = led.non_frontier_survivors()
+    (row,) = led.non_frontier_survivors()
     assert row["n"] == 200 and row["dominated_by"] == ["[[72,12,6]] w=6 72-12-6.json"]
     assert led.frontier_survivors()[0]["dominated_by"] == []
     s = led.summary()

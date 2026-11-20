@@ -6,6 +6,7 @@ linear algebra. Everything here operates on CSS parity-check matrices given as
 ``int`` arrays of shape ``(num_checks, n)``; ``-1`` and ``1`` are identified
 (arithmetic is mod 2 throughout).
 """
+
 import os
 import sys
 
@@ -13,9 +14,7 @@ import numpy as np
 
 # Reuse the verifier's GF(2) routines rather than re-implementing them: the
 # construction side and the checking side then agree by construction.
-sys.path.insert(
-    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "verify")
-)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "verify"))
 import gf2  # noqa: E402
 
 # Re-export the primitives the construction/screening tools build on.

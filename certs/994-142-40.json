@@ -1,0 +1,34 @@
+{
+  "d": 40,
+  "d_exact": false,
+  "d_lower": 24,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[994,142,40]] weight-8 pair-partition CPM code, 6x14 template",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 24",
+      "proved_min": 24,
+      "secs": 36.1,
+      "status": "TIMEOUT",
+      "value": 40
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 24",
+      "proved_min": 24,
+      "secs": 36.1,
+      "status": "TIMEOUT",
+      "value": 40
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "c9f808af4d0c8dc6478c63875501209debda8415a91025a149c216264e6145eb",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 1 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}

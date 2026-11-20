@@ -46,13 +46,11 @@ def run(HX, HZ, coords, originals, k0, seed, degree_max=1, verbose=False):
     while True:
         wx = HX.sum(axis=0) if HX.size else np.zeros(HX.shape[1])
         wz = HZ.sum(axis=0) if HZ.size else np.zeros(HZ.shape[1])
-        cands = [(t, int(q)) for t, w in (("X", wx), ("Z", wz))
-                 for q in np.where((w >= 1) & (w <= degree_max))[0]]
+        cands = [(t, int(q)) for t, w in (("X", wx), ("Z", wz)) for q in np.where((w >= 1) & (w <= degree_max))[0]]
         if not cands:
             break
         rng.shuffle(cands)
-        cands.sort(key=lambda tc: -C._edge_distance(coords, int(tc[1]),
-                                                    xmin, xmax, ymin, ymax))
+        cands.sort(key=lambda tc: -C._edge_distance(coords, int(tc[1]), xmin, xmax, ymin, ymax))
         accepted = False
         for t, q in cands:
             A = HX if t == "X" else HZ
@@ -83,8 +81,7 @@ def run(HX, HZ, coords, originals, k0, seed, degree_max=1, verbose=False):
 
 
 def main():
-    bases = [(34, 29, 3, 1, 3, 173), (34, 29, 3, 1, 0, 172),
-             (31, 31, 3, 1, 3, 169), (32, 31, 1, 4, 3, 173)]
+    bases = [(34, 29, 3, 1, 3, 173), (34, 29, 3, 1, 0, 172), (31, 31, 3, 1, 3, 169), (32, 31, 1, 4, 3, 173)]
     out = HERE / "out"
     out.mkdir(exist_ok=True)
     best = None
@@ -107,25 +104,27 @@ def main():
             continue
         n0 = HX.shape[1]
         for seed in (0, 1, 2, 3, 4, 5):
-            a, b, c2, o2, rm = run(HX.copy(), HZ.copy(), coords.copy(),
-                                   list(orig), k0, seed)
+            a, b, c2, o2, rm = run(HX.copy(), HZ.copy(), coords.copy(), list(orig), k0, seed)
             n1 = a.shape[1]
             ok = C.one_connected(a, b)[0]
-            print(f"{W}x{H} p=({px},{pz}) o={order} seed={seed}: "
-                  f"n {n0}->{n1} (-{rm}) k={k0} g={9*k0/n1:.4f} "
-                  f"connected={ok} {time.time()-t0:.0f}s", flush=True)
+            print(
+                f"{W}x{H} p=({px},{pz}) o={order} seed={seed}: "
+                f"n {n0}->{n1} (-{rm}) k={k0} g={9 * k0 / n1:.4f} "
+                f"connected={ok} {time.time() - t0:.0f}s",
+                flush=True,
+            )
             if ok and (best is None or n1 < best[0]):
-                best = (n1, a, b, c2, o2,
-                        (W, H, px, pz, order, seed, n0, n1, k0))
-                np.savez(out / f"constrained-{n1}-{k0}-3.npz",
-                         hx=a, hz=b, coords=c2)
+                best = (n1, a, b, c2, o2, (W, H, px, pz, order, seed, n0, n1, k0))
+                np.savez(out / f"constrained-{n1}-{k0}-3.npz", hx=a, hz=b, coords=c2)
                 print(f"  -> saved constrained-{n1}-{k0}-3.npz", flush=True)
     if best:
         n1, _, _, _, _, meta = best
-        print(f"BEST n={n1} k={meta[8]} "
-              f"(base {meta[0]}x{meta[1]} p=({meta[2]},{meta[3]}) "
-              f"o={meta[4]} seed={meta[5]}, n {meta[6]}->{meta[7]})",
-              flush=True)
+        print(
+            f"BEST n={n1} k={meta[8]} "
+            f"(base {meta[0]}x{meta[1]} p=({meta[2]},{meta[3]}) "
+            f"o={meta[4]} seed={meta[5]}, n {meta[6]}->{meta[7]})",
+            flush=True,
+        )
 
 
 if __name__ == "__main__":

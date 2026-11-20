@@ -1,22 +1,33 @@
 """Real Git diffs distinguish orphan edits from complete circuit cleanup."""
-import subprocess
 
-import pytest
+import subprocess
 
 import check_authorship as authorship
 import gate_changed as gate
+import pytest
 
 
 def git(root, *args):
-    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.com",
-                    *args], cwd=root, check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-c", "user.name=Test", "-c", "user.email=test@example.com", *args],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
 
 
-@pytest.mark.parametrize("case,expected", [
-    ("edit_orphan", 1), ("add_orphan", 1), ("remove_orphan", 0),
-    ("partial_cleanup", 1), ("remove_both", 0), ("remove_json_only", 1),
-    ("rename_both", 0),
-])
+@pytest.mark.parametrize(
+    "case,expected",
+    [
+        ("edit_orphan", 1),
+        ("add_orphan", 1),
+        ("remove_orphan", 0),
+        ("partial_cleanup", 1),
+        ("remove_both", 0),
+        ("remove_json_only", 1),
+        ("rename_both", 0),
+    ],
+)
 def test_orphan_cleanup(tmp_path, capsys, case, expected):
     git(tmp_path, "init", "-q", "-b", "main")
     code = tmp_path / "codes" / "old.json"
@@ -47,16 +58,14 @@ def test_orphan_cleanup(tmp_path, capsys, case, expected):
         git(tmp_path, "mv", "circuits/old", "circuits/new")
     git(tmp_path, "add", "-A")
     git(tmp_path, "commit", "-qm", "change")
-    assert authorship.main(["--root", str(tmp_path), "--base", "main",
-                            "--author", "alice"]) == expected
+    assert authorship.main(["--root", str(tmp_path), "--base", "main", "--author", "alice"]) == expected
     output = capsys.readouterr().out
     if expected:
         assert "remaining circuits/ artifacts" in output
         assert "authors []" not in output
     if case == "rename_both":
         # Both sides of an exact rename stay visible regardless of similarity.
-        assert set(gate.changed_codes("main", str(tmp_path))) == {
-            "codes/old.json", "codes/new.json"}
+        assert set(gate.changed_codes("main", str(tmp_path))) == {"codes/old.json", "codes/new.json"}
         args = ["codes/old.json"]  # the removed side has no claim to refute
     else:
         args = []

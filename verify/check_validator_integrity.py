@@ -15,6 +15,7 @@ the manifest is the durable review signal for deliberate changes to that checkou
   python verify/check_validator_integrity.py --update     # re-pin a reviewed change
   python verify/check_validator_integrity.py --root PATH  # check another tree
 """
+
 import argparse
 import glob
 import hashlib
@@ -100,6 +101,7 @@ def run_validation_gate():
     """Run verify/validation_gate.py on this tree; 0 iff every part passes."""
     sys.path.insert(0, _HERE)
     import validation_gate
+
     return validation_gate.main(["--quiet"])
 
 
@@ -113,8 +115,7 @@ def _sha256(root, filename):
 
 
 def current_hashes(root=_ROOT):
-    return {fn: _sha256(root, fn) for fn in trusted_files(root)
-            if os.path.isfile(os.path.join(root, fn))}
+    return {fn: _sha256(root, fn) for fn in trusted_files(root) if os.path.isfile(os.path.join(root, fn))}
 
 
 def update(root=_ROOT, gate=run_validation_gate):
@@ -124,9 +125,11 @@ def update(root=_ROOT, gate=run_validation_gate):
     # runs against this checkout, so it is skipped for another --root.
     if root == _ROOT and gate is not None:
         if gate() != 0:
-            print("FAIL: the validation gate did not pass; not re-pinning. Fix the verifier, or, "
-                  "if a verdict changed by design, re-record it with "
-                  "`python verify/validation_gate.py --update-golden` and review that diff.")
+            print(
+                "FAIL: the validation gate did not pass; not re-pinning. Fix the verifier, or, "
+                "if a verdict changed by design, re-record it with "
+                "`python verify/validation_gate.py --update-golden` and review that diff."
+            )
             return 1
     expected = trusted_files(root)
     hashes = current_hashes(root)
@@ -137,20 +140,21 @@ def update(root=_ROOT, gate=run_validation_gate):
             print(f"  - {fn}: missing from tree")
         return 1
     manifest = {
-        "_comment": ("Pinned SHA-256 of the repo-local production validation and "
-                     "policy-gate execution closure. "
-                     "CI (check_validator_integrity.py) fails if any of these files "
-                     "drifts from this pin. Re-pin deliberately with "
-                     "`python verify/check_validator_integrity.py --update` and get "
-                     "the diff reviewed."),
+        "_comment": (
+            "Pinned SHA-256 of the repo-local production validation and "
+            "policy-gate execution closure. "
+            "CI (check_validator_integrity.py) fails if any of these files "
+            "drifts from this pin. Re-pin deliberately with "
+            "`python verify/check_validator_integrity.py --update` and get "
+            "the diff reviewed."
+        ),
         "files": hashes,
     }
     manifest_path = _manifest_path(root)
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
         f.write("\n")
-    print(f"re-pinned {len(expected)} files -> "
-          f"{os.path.relpath(manifest_path, root)}")
+    print(f"re-pinned {len(expected)} files -> {os.path.relpath(manifest_path, root)}")
     return 0
 
 
@@ -185,9 +189,11 @@ def check(root=_ROOT):
         print("FAIL: the trusted validation stack drifted from its pin:")
         for d in drift:
             print(f"  - {d}")
-        print("\nIf this change is intended, re-pin with "
-              "`python verify/check_validator_integrity.py --update` and have the "
-              "manifest diff reviewed (these files gate what the board accepts).")
+        print(
+            "\nIf this change is intended, re-pin with "
+            "`python verify/check_validator_integrity.py --update` and have the "
+            "manifest diff reviewed (these files gate what the board accepts)."
+        )
         return 1
     print(f"ok: trusted validation stack matches the pin ({len(expected)} files)")
     return 0
@@ -195,10 +201,8 @@ def check(root=_ROOT):
 
 def main(argv):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", default=_ROOT,
-                    help="repository tree to check (default: this checkout)")
-    ap.add_argument("--update", action="store_true",
-                    help="replace the manifest with hashes from the selected tree")
+    ap.add_argument("--root", default=_ROOT, help="repository tree to check (default: this checkout)")
+    ap.add_argument("--update", action="store_true", help="replace the manifest with hashes from the selected tree")
     args = ap.parse_args(argv)
     root = os.path.abspath(args.root)
     return update(root) if args.update else check(root)

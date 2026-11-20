@@ -19,9 +19,9 @@ H = {e}  =>  cosets = G, N_G(H) = G  =>  reduces to the regular 2BGA.
 Reuses the group builders from ``group_algebra`` (perm_group, cyclic_product,
 sym, alt, dihedral, metacyclic).
 """
-import numpy as np
 
-from group_algebra import perm_group, cyclic_product, sym, alt, dihedral  # noqa: F401
+import numpy as np
+from group_algebra import alt, cyclic_product, dihedral, perm_group, sym  # noqa: F401
 
 
 def inverse(mul, g):
@@ -32,7 +32,8 @@ def inverse(mul, g):
 
 def subgroup_closure(mul, gens):
     """Smallest subgroup (set of element indices) containing ``gens`` and the
-    identity."""
+    identity.
+    """
     H = {0}
     frontier = list(set(gens) | {0})
     H.update(frontier)
@@ -42,7 +43,8 @@ def subgroup_closure(mul, gens):
             for b in frontier:
                 for prod in (mul[a, b], mul[b, a]):
                     if prod not in H:
-                        H.add(int(prod)); nxt.append(int(prod))
+                        H.add(int(prod))
+                        nxt.append(int(prod))
         frontier = nxt
     return sorted(H)
 
@@ -50,14 +52,16 @@ def subgroup_closure(mul, gens):
 def left_cosets(mul, H):
     """Partition G into left cosets xH. Returns ``(reps, coset_of)`` where
     ``coset_of[x]`` is the coset index (0..m-1) of element x and ``reps[c]`` is
-    a representative of coset c."""
+    a representative of coset c.
+    """
     N = mul.shape[0]
     coset_of = [-1] * N
     reps = []
     for x in range(N):
         if coset_of[x] != -1:
             continue
-        c = len(reps); reps.append(x)
+        c = len(reps)
+        reps.append(x)
         for h in H:
             coset_of[int(mul[x, h])] = c
     return reps, coset_of
@@ -102,7 +106,8 @@ def _block(m, perms):
 def build_coset(mul, H, a, b, check_normalizer=True):
     """Coset two-block code. ``H`` a subgroup (element-index list), ``a`` a
     subset of G, ``b`` a subset of N_G(H). Returns ``(HX, HZ)`` int8 of shape
-    (m, 2m), CSS guaranteed."""
+    (m, 2m), CSS guaranteed.
+    """
     reps, coset_of = left_cosets(mul, H)
     m = len(reps)
     if check_normalizer:
@@ -118,9 +123,9 @@ def build_coset(mul, H, a, b, check_normalizer=True):
 
 
 if __name__ == "__main__":
-    from css import verify_css, compute_k
-    from surrogate import distance_rand
+    from css import compute_k, verify_css
     from group_algebra import build_2bga
+    from surrogate import distance_rand
 
     # (1) H = {e}: coset construction must reduce to the regular 2BGA.
     mul, tup = cyclic_product(6, 6)
@@ -129,9 +134,11 @@ if __name__ == "__main__":
     b = [idx[(0, 3)], idx[(1, 0)], idx[(2, 0)]]
     HXc, HZc = build_coset(mul, [0], a, b)
     HXr, HZr = build_2bga(mul, a, b)
-    print("(1) H={e} reduces to 2BGA:",
-          np.array_equal(HXc, HXr) and np.array_equal(HZc, HZr),
-          f" n={HXc.shape[1]} k={compute_k(HXc, HZc)} d<={distance_rand(HXc, HZc, trials=400)}")
+    print(
+        "(1) H={e} reduces to 2BGA:",
+        np.array_equal(HXc, HXr) and np.array_equal(HZc, HZr),
+        f" n={HXc.shape[1]} k={compute_k(HXc, HZc)} d<={distance_rand(HXc, HZc, trials=400)}",
+    )
 
     # (2) A genuine NON-NORMAL H in a non-abelian group: S4, H = <(0 1)>.
     #     m = [G:H] = 12, n = 24. CSS is automatic (right action by N_G(H)).
@@ -139,12 +146,15 @@ if __name__ == "__main__":
     t = el4.index((1, 0, 2, 3))
     H = subgroup_closure(mul4, [t])
     Nrm = normalizer(mul4, H)
-    print(f"(2) S4: |G|={len(el4)} |H|={len(H)} [G:H]={index_in(mul4, H)} "
-          f"|N_G(H)|={len(Nrm)} (H normal? {len(Nrm) == len(el4)})")
-    a = [0, el4.index((1, 2, 0, 3)), el4.index((0, 1, 3, 2))]   # weight-3 in G
-    b = list(Nrm[:3])                                            # weight-3 in N_G(H)
+    print(
+        f"(2) S4: |G|={len(el4)} |H|={len(H)} [G:H]={index_in(mul4, H)} "
+        f"|N_G(H)|={len(Nrm)} (H normal? {len(Nrm) == len(el4)})"
+    )
+    a = [0, el4.index((1, 2, 0, 3)), el4.index((0, 1, 3, 2))]  # weight-3 in G
+    b = list(Nrm[:3])  # weight-3 in N_G(H)
     HX, HZ = build_coset(mul4, H, a, b)
-    print(f"    construction runs; css={verify_css(HX, HZ)} (automatic), "
-          f"n={HX.shape[1]} k={compute_k(HX, HZ)}")
-    print("    (arbitrary low-weight a,b usually give k=0; finding (a,b) for "
-          "good (k,d) is the\n     search problem -- a planned Phase 2 follow-on.)")
+    print(f"    construction runs; css={verify_css(HX, HZ)} (automatic), n={HX.shape[1]} k={compute_k(HX, HZ)}")
+    print(
+        "    (arbitrary low-weight a,b usually give k=0; finding (a,b) for "
+        "good (k,d) is the\n     search problem -- a planned Phase 2 follow-on.)"
+    )

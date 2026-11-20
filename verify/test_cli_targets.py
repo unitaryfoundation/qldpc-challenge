@@ -6,6 +6,7 @@ pareto() the site uses to award record stars; if it ever disagrees with them,
 it is worse than not existing, because it would send people at cells that are
 not actually open.
 """
+
 import io
 import os
 import sys
@@ -29,6 +30,7 @@ def _cached_board():
     logic under test is cmd_targets, not the loader.
     """
     from build import load_entries
+
     entries = load_entries()
     original = qldpc._load_board_entries
     qldpc._load_board_entries = lambda: entries
@@ -45,6 +47,7 @@ def _run(*argv):
 
 def test_runs_with_no_arguments_and_covers_every_populated_cell():
     from build import cells
+
     out = _run()
     populated = {c for e in qldpc._load_board_entries() for c in cells(e)}
     assert f"across {len(populated)} populated cells" in out
@@ -54,6 +57,7 @@ def test_runs_with_no_arguments_and_covers_every_populated_cell():
 def test_counts_match_the_site_exactly():
     """Every cell's count must equal what the site computes, not approximate it."""
     from build import LOCALITY_LABEL, WEIGHT_LABEL, cells
+
     entries = qldpc._load_board_entries()
     by = {}
     for e in entries:
@@ -64,8 +68,7 @@ def test_counts_match_the_site_exactly():
         header = f"{LOCALITY_LABEL.get(loc, loc)} / {WEIGHT_LABEL.get(wt, wt)}"
         assert header in out, f"missing cell {header}"
         line = out.split(header, 1)[1].splitlines()[1]
-        assert f"{len(peers)} codes" in line, (
-            f"{header}: printed {line.strip()!r}, board has {len(peers)}")
+        assert f"{len(peers)} codes" in line, f"{header}: printed {line.strip()!r}, board has {len(peers)}"
 
 
 def test_cell_filter_narrows_and_rejects_nonsense():

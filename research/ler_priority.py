@@ -26,6 +26,7 @@ invocation per entry in the chosen order.
 Nothing here reads ``verify/`` beyond the committed files, and nothing is
 written to an entry.
 """
+
 import argparse
 import glob
 import json
@@ -72,8 +73,11 @@ def ler_points(circuit):
 
 def worst_rate(points, p=0.001):
     """Return the worse basis's ``ler_per_round`` at physical rate ``p``, or None."""
-    vals = [pt.get("ler_per_round") for _, pt in points
-            if pt.get("p") == p and isinstance(pt.get("ler_per_round"), (int, float))]
+    vals = [
+        pt.get("ler_per_round")
+        for _, pt in points
+        if pt.get("p") == p and isinstance(pt.get("ler_per_round"), (int, float))
+    ]
     return max(vals) if vals else None
 
 
@@ -91,19 +95,26 @@ def entries(codes_dir, circuits_dir, basis="z"):
             continue
         slug = os.path.splitext(os.path.basename(path))[0]
         dc = circ.get("d_circ") or {}
-        vals = [int(dc[s]["value"]) for s in ("X", "Z")
-                if isinstance(dc.get(s), dict) and isinstance(dc[s].get("value"), int)]
+        vals = [
+            int(dc[s]["value"])
+            for s in ("X", "Z")
+            if isinstance(dc.get(s), dict) and isinstance(dc[s].get("value"), int)
+        ]
         stim_path = os.path.join(circuits_dir, slug, f"memory_{basis}.stim")
         points = ler_points(circ)
-        rows.append({
-            "slug": slug, "n": doc.get("n"), "k": doc.get("k"),
-            "d": (doc.get("distance") or {}).get("d"),
-            "d_circ": min(vals) if vals else None,
-            "rounds": circ.get("rounds"),
-            "ticks_per_round": ticks_per_round(stim_path, circ.get("rounds")),
-            "points": len(points),
-            "worst_ler_per_round_at_0.001": worst_rate(points),
-        })
+        rows.append(
+            {
+                "slug": slug,
+                "n": doc.get("n"),
+                "k": doc.get("k"),
+                "d": (doc.get("distance") or {}).get("d"),
+                "d_circ": min(vals) if vals else None,
+                "rounds": circ.get("rounds"),
+                "ticks_per_round": ticks_per_round(stim_path, circ.get("rounds")),
+                "points": len(points),
+                "worst_ler_per_round_at_0.001": worst_rate(points),
+            }
+        )
     return rows
 
 
@@ -116,8 +127,15 @@ def queue(rows, *, max_depth=None, min_d_circ=1, limit=None):
     todo = [r for r in rows if r["points"] == 0 and (r["d_circ"] or 0) >= min_d_circ]
     if max_depth is not None:
         todo = [r for r in todo if r["ticks_per_round"] is not None and r["ticks_per_round"] <= max_depth]
-    todo.sort(key=lambda r: (r["ticks_per_round"] is None, r["ticks_per_round"] or 0,
-                             -(r["d_circ"] or 0), r["n"] or 0, r["slug"]))
+    todo.sort(
+        key=lambda r: (
+            r["ticks_per_round"] is None,
+            r["ticks_per_round"] or 0,
+            -(r["d_circ"] or 0),
+            r["n"] or 0,
+            r["slug"],
+        )
+    )
     return todo[:limit] if limit else todo
 
 
@@ -136,43 +154,53 @@ def main(argv=None):
     ap.add_argument("--codes-dir", default=os.path.join(_ROOT, "codes"))
     ap.add_argument("--circuits-dir", default=os.path.join(_ROOT, "circuits"))
     ap.add_argument("--basis", choices=("x", "z"), default="z", help="which memory circuit to measure the depth on")
-    ap.add_argument("--max-depth", type=float, default=None,
-                    help="keep entries at most this many TICK layers per round")
+    ap.add_argument(
+        "--max-depth", type=float, default=None, help="keep entries at most this many TICK layers per round"
+    )
     ap.add_argument("--min-d-circ", type=int, default=1, help="keep entries with at least this d_circ")
     ap.add_argument("--limit", type=int, default=None)
-    ap.add_argument("--measured", action="store_true",
-                    help="list the entries that already carry points, deepest first, with the worst rate at p = 0.001")
+    ap.add_argument(
+        "--measured",
+        action="store_true",
+        help="list the entries that already carry points, deepest first, with the worst rate at p = 0.001",
+    )
     ap.add_argument("--commands", action="store_true", help="print one ler_measure command per queued entry")
     ap.add_argument("--json", default=None, help="write the rows to this file")
     args = ap.parse_args(argv)
 
     rows = entries(args.codes_dir, args.circuits_dir, args.basis)
     if args.measured:
-        shown = sorted((r for r in rows if r["points"]),
-                       key=lambda r: (-(r["ticks_per_round"] or 0), r["slug"]))
+        shown = sorted((r for r in rows if r["points"]), key=lambda r: (-(r["ticks_per_round"] or 0), r["slug"]))
         if args.limit:
-            shown = shown[:args.limit]
+            shown = shown[: args.limit]
         print(f"{len(shown)} measured entries, deepest first")
         print("slug             [[n,k,d]]       d_circ  ticks/round  points  worst ler/round at p=0.001")
         for r in shown:
-            print(f"{r['slug']:16s} [[{r['n']},{r['k']},{r['d']}]]".ljust(33)
-                  + f"{_fmt(r['d_circ']):>6}  {_fmt(r['ticks_per_round']):>11}  {r['points']:>6}  "
-                  f"{_fmt(r['worst_ler_per_round_at_0.001'])}")
+            print(
+                f"{r['slug']:16s} [[{r['n']},{r['k']},{r['d']}]]".ljust(33)
+                + f"{_fmt(r['d_circ']):>6}  {_fmt(r['ticks_per_round']):>11}  {r['points']:>6}  "
+                f"{_fmt(r['worst_ler_per_round_at_0.001'])}"
+            )
     else:
         shown = queue(rows, max_depth=args.max_depth, min_d_circ=args.min_d_circ, limit=args.limit)
         n_circ = len(rows)
         n_todo = sum(1 for r in rows if r["points"] == 0)
-        print(f"{n_circ} entries with circuits, {n_todo} without a measured rate; "
-              f"{len(shown)} queued" + (f" at depth <= {args.max_depth:g}" if args.max_depth is not None else "")
-              + ", shallowest first")
+        print(
+            f"{n_circ} entries with circuits, {n_todo} without a measured rate; "
+            f"{len(shown)} queued"
+            + (f" at depth <= {args.max_depth:g}" if args.max_depth is not None else "")
+            + ", shallowest first"
+        )
         if args.commands:
             for r in shown:
                 print(command(r))
         else:
             print("slug             [[n,k,d]]       d_circ  ticks/round  rounds")
             for r in shown:
-                print(f"{r['slug']:16s} [[{r['n']},{r['k']},{r['d']}]]".ljust(33)
-                      + f"{_fmt(r['d_circ']):>6}  {_fmt(r['ticks_per_round']):>11}  {_fmt(r['rounds']):>6}")
+                print(
+                    f"{r['slug']:16s} [[{r['n']},{r['k']},{r['d']}]]".ljust(33)
+                    + f"{_fmt(r['d_circ']):>6}  {_fmt(r['ticks_per_round']):>11}  {_fmt(r['rounds']):>6}"
+                )
     if args.json:
         with open(args.json, "w", encoding="utf-8") as fh:
             json.dump({"basis": args.basis, "rows": shown}, fh, indent=1)

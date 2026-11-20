@@ -1,0 +1,29 @@
+{
+  "d": 6,
+  "d_exact": true,
+  "name": "QBTC [[44,10,6]]",
+  "sides": {
+    "P": {
+      "exact": true,
+      "lower_bound": 6,
+      "secs": 0.2,
+      "status": "UNSAT",
+      "upper_bound": 6,
+      "value": 6,
+      "witness": [
+        16,
+        18,
+        24,
+        26,
+        28,
+        30
+      ]
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search (stabilizer)",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "level": "solver",
+    "note": "QEDist Pauli-weight exhaustive search; witness re-checked by audit."
+  }
+}

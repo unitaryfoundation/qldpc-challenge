@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Greedy multi-step campaigns via code-calculus v0.2 run_campaign, gated."""
-import argparse, datetime, json, os, sys, glob
+
+import argparse
+import datetime
+import glob
+import json
+import os
+import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
@@ -12,9 +18,8 @@ if CC not in sys.path:
     sys.path.insert(0, CC)
 os.environ.setdefault("QLDPC_RUN_ID", "cc-greedy-gated")
 import coordination
-from machine.priced_calculus import (CodeState, DistanceLedger, apply_operation,
-    export_challenge_entry)
-from machine.planner import plan, infer_target_sector
+from machine.planner import infer_target_sector, plan
+from machine.priced_calculus import CodeState, DistanceLedger, apply_operation, export_challenge_entry
 
 TODAY = datetime.date.today().isoformat()
 
@@ -44,7 +49,8 @@ def main():
     os.makedirs(staging, exist_ok=True)
     ps = parents(args.n_cap)
     print(f"{len(ps)} CSS parents with n <= {args.n_cap}", flush=True)
-    gated = 0; finds = 0
+    gated = 0
+    finds = 0
     for slug, doc in ps:
         st = CodeState.from_challenge(doc)
         ld = DistanceLedger.from_challenge(st, doc)
@@ -53,12 +59,20 @@ def main():
         ts = infer_target_sector(cur_ld, doc["distance"]["d"])
         for step in range(args.steps):
             try:
-                cands = plan(cur_state, cur_ld, target=doc["distance"]["d"],
-                             structural=True, reduce_display=True, reduce_by_domination=True,
-                             sector_targeted=True, target_sector=ts,
-                             support_search={"budget": args.budget, "max_weight": 3},
-                             sector_swap=True, ranking="pareto",
-                             deep_verify=True)
+                cands = plan(
+                    cur_state,
+                    cur_ld,
+                    target=doc["distance"]["d"],
+                    structural=True,
+                    reduce_display=True,
+                    reduce_by_domination=True,
+                    sector_targeted=True,
+                    target_sector=ts,
+                    support_search={"budget": args.budget, "max_weight": 3},
+                    sector_swap=True,
+                    ranking="pareto",
+                    deep_verify=True,
+                )
             except Exception as e:
                 print(f"  {slug} step{step}: plan error {e}", flush=True)
                 break
@@ -68,19 +82,28 @@ def main():
             chosen = survivors[0]
             # export + gate
             try:
-                entry = export_challenge_entry(cur_doc, chosen["state"], chosen["ledger"],
+                entry = export_challenge_entry(
+                    cur_doc,
+                    chosen["state"],
+                    chosen["ledger"],
                     f"[[{chosen['state'].n()},{chosen['state'].k()},{chosen['ledger'].full.upper or doc['distance']['d']}]] greedy {slug} step{step}",
                     f"greedy multi-step (target {ts}) step {step} from codes/{slug}.json",
-                    TODAY)
+                    TODAY,
+                )
             except Exception as e:
                 print(f"  {slug} step{step}: export error {e}", flush=True)
                 break
-            path = coordination.unique_path(os.path.join(staging, f"{chosen['state'].n()}-{chosen['state'].k()}-{chosen['ledger'].full.upper or 0}.json"), entry)
+            path = coordination.unique_path(
+                os.path.join(
+                    staging, f"{chosen['state'].n()}-{chosen['state'].k()}-{chosen['ledger'].full.upper or 0}.json"
+                ),
+                entry,
+            )
             with open(path, "w") as f:
                 json.dump(entry, f, indent=2)
             try:
                 verdict, _ = coordination.gate_and_record(path)
-            except coordination.PreflightFailure as e:
+            except coordination.PreflightFailure:
                 print(f"  {slug} step{step}: preflight refused", flush=True)
                 break
             gated += 1
@@ -91,17 +114,35 @@ def main():
             cand_d = chosen["ledger"].full.upper or doc["distance"]["d"]
             if cand_d >= 2:
                 import subprocess as _sp
+
                 downgraded = False
                 for trials in (2000, 20000, 200000, 2000000):
                     for seed in (1, 2, 3):
-                        dr = _sp.run(["./qldpc", "submit", path,
-                                      "--authors", "@mathysrennela", "--model", "Beam 1.0",
-                                      "--family", "other",
-                                      "--construction", "code-calculus v0.2rc greedy gated",
-                                      "--reuse-witnesses", "--no-circuit",
-                                      "--fast-trials", str(trials), "--seed", str(seed),
-                                      "--dry-run"],
-                                     cwd=ROOT, capture_output=True, text=True)
+                        dr = _sp.run(
+                            [
+                                "./qldpc",
+                                "submit",
+                                path,
+                                "--authors",
+                                "@mathysrennela",
+                                "--model",
+                                "Beam 1.0",
+                                "--family",
+                                "other",
+                                "--construction",
+                                "code-calculus v0.2rc greedy gated",
+                                "--reuse-witnesses",
+                                "--no-circuit",
+                                "--fast-trials",
+                                str(trials),
+                                "--seed",
+                                str(seed),
+                                "--dry-run",
+                            ],
+                            cwd=ROOT,
+                            capture_output=True,
+                            text=True,
+                        )
                         out = (dr.stdout or "") + (dr.stderr or "")
                         m = None
                         for line in out.splitlines():
@@ -117,11 +158,17 @@ def main():
                                 except ValueError:
                                     deep_d = None
                         if deep_d is not None and deep_d != cand_d:
-                            print(f"  DOWNGRADED {os.path.basename(path)} at {trials} trials seed {seed}: {cand_d} -> {deep_d}, skipping", flush=True)
+                            print(
+                                f"  DOWNGRADED {os.path.basename(path)} at {trials} trials seed {seed}: {cand_d} -> {deep_d}, skipping",
+                                flush=True,
+                            )
                             downgraded = True
                             break
                         if deep_d is None:
-                            print(f"  REFUSED/COLLISION {os.path.basename(path)} at {trials} trials seed {seed}, skipping", flush=True)
+                            print(
+                                f"  REFUSED/COLLISION {os.path.basename(path)} at {trials} trials seed {seed}, skipping",
+                                flush=True,
+                            )
                             downgraded = True
                             break
                     if downgraded:

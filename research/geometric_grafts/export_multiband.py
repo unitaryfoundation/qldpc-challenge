@@ -8,6 +8,7 @@ rebuilt from ``research/multiband_surface.py``; nothing is hand-transcribed.
 
     uv run --frozen python research/geometric_grafts/export_multiband.py 5 7 7 6 /tmp/out
 """
+
 import os
 import sys
 
@@ -19,7 +20,6 @@ for _p in ("research", "research/kit", "verify"):
         sys.path.insert(0, _q)
 
 import numpy as np  # noqa: E402
-
 from multiband_surface import build, params  # noqa: E402
 
 
@@ -33,8 +33,7 @@ def export(d, rows, m, pitch, outdir):
     np.savez_compressed(npz, hx=hx.astype(np.uint8), hz=hz.astype(np.uint8))
     cnpz = os.path.join(outdir, tag + "-coords.npz")
     np.savez_compressed(cnpz, coords=np.asarray(coords, dtype=float))
-    print(f"{tag}: n={p['n']} k={p['k']} w={p['w']} css={p['css']} "
-          f"conn={p['connected']}")
+    print(f"{tag}: n={p['n']} k={p['k']} w={p['w']} css={p['css']} conn={p['connected']}")
     print(f"  {npz}")
     print(f"  {cnpz}")
     return npz, cnpz, tag

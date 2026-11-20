@@ -18,11 +18,14 @@ for any inner code of distance >= 3, so the family cannot enter the
 w <= 8 hackathon box; the modules remain the public implementation of the
 family for further study.
 """
+
 import numpy as np
+
 
 def rref(M):
     """Reduced row echelon form over GF(2); returns a matrix whose nonzero
-    rows span the same space as the rows of ``M``."""
+    rows span the same space as the rows of ``M``.
+    """
     M = np.asarray(M, dtype=np.int8) % 2
     rows, cols = M.shape
     A = M.copy()
@@ -55,11 +58,10 @@ def simplex_and_hamming_basis(k):
     # [1, N].  The simplex basis word s_a has s_a[x] = popcount(a & x) % 2.
     S = np.zeros((N, N), dtype=np.int8)
     for a in range(1, N + 1):
-        s = np.array([bin(a & x).count("1") % 2 for x in range(1, N + 1)],
-                     dtype=np.int8)
+        s = np.array([bin(a & x).count("1") % 2 for x in range(1, N + 1)], dtype=np.int8)
         S[a - 1] = s
     S = rref(S)
-    S = S[S.any(axis=1)]          # k independent rows -> simplex generator
+    S = S[S.any(axis=1)]  # k independent rows -> simplex generator
 
     # Weight-three basis of H_k = S_k^perp (Prop 4.1).
     # For each non-unit x pick i(x) with bit set, then
@@ -71,9 +73,9 @@ def simplex_and_hamming_basis(k):
     rows = []
     for x in range(1, N + 1):
         if x in unit:
-            continue              # skip the unit vectors
-        e = 1 << ((x & -x).bit_length() - 1)   # one set bit of x
-        xp = x ^ e               # x + e_i
+            continue  # skip the unit vectors
+        e = 1 << ((x & -x).bit_length() - 1)  # one set bit of x
+        xp = x ^ e  # x + e_i
         b = np.zeros(N, dtype=np.int8)
         for co in (x, xp, e):
             if 1 <= co <= N:
@@ -89,7 +91,8 @@ def simplex_and_hamming_basis(k):
 def choose_injections(B, R, seeds=None):
     """For each coordinate x, map each basis row ``j`` containing ``x`` to a
     copy index ``c(x, j)`` so that ``x -> (j -> c(x,j))`` is injective and
-    lands in ``[0, R)``.  Returns a dict ``{(x, j) -> copy_index}``."""
+    lands in ``[0, R)``.  Returns a dict ``{(x, j) -> copy_index}``.
+    """
     # copy[x] = sorted list of rows j whose support contains x; the t-th
     # element maps to copy index t -- an injection into [R].
     members = {}
@@ -153,8 +156,13 @@ def build_phantom_outer(k, copy_table=None):
     HX = np.zeros((0, M), dtype=np.int8)
 
     info = dict(
-        n=int(M), N=int(N), R=int(R), k=int(k),
-        rankZ=int(HZ.shape[0]), dX=R * 2 ** (k - 1), dZ=1,
+        n=int(M),
+        N=int(N),
+        R=int(R),
+        k=int(k),
+        rankZ=int(HZ.shape[0]),
+        dX=R * 2 ** (k - 1),
+        dZ=1,
     )
     return HX, HZ, info
 
@@ -167,9 +175,12 @@ def outer_max_weight(HZ):
 if __name__ == "__main__":
     for k in (2, 3):
         HX, HZ, info = build_phantom_outer(k)
-        print(f"k={k}: n={info['n']} N={info['N']} R={info['R']} "
-              f"rankZ={info['rankZ']} k_out={info['n'] - 0 - info['rankZ']} "
-              f"dX={info['dX']} dZ={info['dZ']} maxZhWt={outer_max_weight(HZ)}")
+        print(
+            f"k={k}: n={info['n']} N={info['N']} R={info['R']} "
+            f"rankZ={info['rankZ']} k_out={info['n'] - 0 - info['rankZ']} "
+            f"dX={info['dX']} dZ={info['dZ']} maxZhWt={outer_max_weight(HZ)}"
+        )
+
 
 def _kernel(M):
     """Basis of the kernel of ``M`` over GF(2)."""
@@ -227,15 +238,15 @@ def _in_rowspace(v, M):
 def steane():
     """The [[7,1,3]] Steane CSS code: ``(UX, UZ, x, z, info)`` where
     ``UX = UZ`` is the [7,3,4] simplex code and ``x = z`` is a weight-three
-    logical representative.  ``info`` holds ``m``, ``deltaX``, ``deltaZ``."""
+    logical representative.  ``info`` holds ``m``, ``deltaX``, ``deltaZ``.
+    """
     N = 7
     S = np.zeros((N, N), dtype=np.int8)
     for a in range(1, N + 1):
-        s = np.array([bin(a & x).count("1") % 2 for x in range(1, N + 1)],
-                     dtype=np.int8)
+        s = np.array([bin(a & x).count("1") % 2 for x in range(1, N + 1)], dtype=np.int8)
         S[a - 1] = s
     S = rref(S)
-    S = S[S.any(axis=1)]            # [7,3,4] simplex generator (3 x 7)
+    S = S[S.any(axis=1)]  # [7,3,4] simplex generator (3 x 7)
     UX = S
     UZ = S
     # logical reps: weight-three words in U^perp \\ U.  For the simplex,
@@ -272,11 +283,12 @@ def concat_phantom(outer, inner):
 
     def lift(blocks, rep):
         """Lift a length-``n0`` outer word to a length-``n`` word by putting
-        ``rep`` in each block where the outer word is 1."""
+        ``rep`` in each block where the outer word is 1.
+        """
         out = np.zeros(n, dtype=np.int8)
         for a_i in range(n0):
             if blocks[a_i]:
-                out[a_i * m:(a_i + 1) * m] = rep
+                out[a_i * m : (a_i + 1) * m] = rep
         return out
 
     # Internal checks: U_X and U_Z in every block (n0 copies each).
@@ -285,11 +297,11 @@ def concat_phantom(outer, inner):
     for b in range(n0):
         for row in UX:
             r = np.zeros(n, dtype=np.int8)
-            r[b * m:(b + 1) * m] = row
+            r[b * m : (b + 1) * m] = row
             X_internal.append(r)
         for row in UZ:
             r = np.zeros(n, dtype=np.int8)
-            r[b * m:(b + 1) * m] = row
+            r[b * m : (b + 1) * m] = row
             Z_internal.append(r)
 
     # Lifted outer checks: L_X(HX) and L_Z(HZ).
@@ -308,9 +320,15 @@ def concat_phantom(outer, inner):
     dZ = deltaZ * info_out["dZ"]
     k = info_out["k"]
     info = dict(
-        n=int(n), k=int(k), dX=int(dX), dZ=int(dZ),
-        d=int(min(dX, dZ)), maxW=int(max(HXc.sum(axis=1).max(), HZc.sum(axis=1).max())),
-        m=int(m), deltaX=int(deltaX), deltaZ=int(deltaZ),
+        n=int(n),
+        k=int(k),
+        dX=int(dX),
+        dZ=int(dZ),
+        d=int(min(dX, dZ)),
+        maxW=int(max(HXc.sum(axis=1).max(), HZc.sum(axis=1).max())),
+        m=int(m),
+        deltaX=int(deltaX),
+        deltaZ=int(deltaZ),
         n0=int(n0),
     )
     return HXc, HZc, info
@@ -322,9 +340,12 @@ if __name__ == "__main__":
     for k in (2, 3):
         outer = build_phantom_outer(k)
         HXc, HZc, info = concat_phantom(outer, inner)
-        print(f"k={k}: [[{info['n']},{info['k']},{info['d']}]] "
-              f"dX={info['dX']} dZ={info['dZ']} maxW={info['maxW']} "
-              f"n0={info['n0']} m={info['m']} deltaX/Z={info['deltaX']}/{info['deltaZ']}")
+        print(
+            f"k={k}: [[{info['n']},{info['k']},{info['d']}]] "
+            f"dX={info['dX']} dZ={info['dZ']} maxW={info['maxW']} "
+            f"n0={info['n0']} m={info['m']} deltaX/Z={info['deltaX']}/{info['deltaZ']}"
+        )
+
 
 def min_weight_outside(perp_basis, space_basis):
     r"""Min weight of a vector in rowspace(perp_basis) \ rowspace(space_basis)."""
@@ -360,7 +381,7 @@ def search_inner(m, D, dimX, dimZ, trials=20000, seed=0):
         UZ = UZ[UZ.any(axis=1)]
         if UZ.shape[0] != dimZ:
             continue
-        UZperp = _kernel(UZ)          # dim m - dimZ
+        UZperp = _kernel(UZ)  # dim m - dimZ
         # random U_X subseteq UZperp, dim dimX
         if dimX > UZperp.shape[0]:
             continue
