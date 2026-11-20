@@ -1,10 +1,10 @@
 {
   "_comment": "Pinned SHA-256 of the repo-local production validation and policy-gate execution closure. CI (check_validator_integrity.py) fails if any of these files drifts from this pin. Re-pin deliberately with `python verify/check_validator_integrity.py --update` and get the diff reviewed.",
   "files": {
-    ".github/workflows/codes-format.yml": "2406414cf900e705a30576ac497a451412418ff240b2aaa2f828ca8706d54817",
-    ".github/workflows/prose.yml": "96fee3fcf426104e4a656aa8a6afb1d691bac91a3b90e96d150b620937f2b010",
-    ".github/workflows/refute-weekly.yml": "ed51e3bc129339ea20a789460734d3df9301abb83d9cea368290c9e7189626bb",
-    ".github/workflows/verify.yml": "f84343ce2db88812b336862205821d02a13ab063fb80e26f8fb71beb9ab58524",
+    ".github/workflows/codes-format.yml": "1eb1a925a2835f77a3bc22abc3557e9b65166afa0f5e847d9a35829fb980b116",
+    ".github/workflows/prose.yml": "4a0645755d2fbeb78534117f8dd48293b97be67efd0aa290b1e62a510a417bb7",
+    ".github/workflows/refute-weekly.yml": "1a29d0d35f53a30d4e1f2c4ba639eda13d341bf106ceaaa615af4f044d295f0e",
+    ".github/workflows/verify.yml": "99d590a35275017b3fb583bc594eb466e78ea4c4d62e25df645ec64b20fd232c",
     "Makefile": "30f2d73d7fc62cb05171a603d899bc27cd4f1b4bbdc3bf59bfdf98b8d8b4bc56",
     "pyproject.toml": "4ffed0efc3c64d893ef53a8b88205d563c38a23dc31680fad55f5bea2fbbf939",
     "uv.lock": "9a9e47507c05f376002b77bd4f6d43325e7df145521b6a5fcc7f12709045732d",
