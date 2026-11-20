@@ -65,9 +65,12 @@ seeds) are screened at two extraction rounds, where fewer rounds can only
 overestimate d_circ, and the first that shows nothing below d is kept; the
 final circuits at rounds = d are then searched with twice the trial budget of
 the CI gate. The recorded value is whatever the search finds; when it finds
-nothing at or below d the code's own distance witness, applied as final
-readout flips, is the weight-d fallback that keeps the claim within the
-penalty-only clamp.
+nothing at or below the memory's cap the code's own distance witness of the
+other type, applied as final readout flips, is the fallback that keeps the
+claim within the penalty-only clamp. The cap is per basis
+(circuit_verify.basis_cap, issue #4715): the X memory is bounded by d_Z and
+the Z memory by d_X, so an asymmetric code's longer logical no longer leaves
+its memory unclaimable.
 """
 
 import os
@@ -81,7 +84,7 @@ sys.path.insert(0, os.path.join(ROOT, "verify"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import circuit_tools as ct  # noqa: E402
 import gf2  # noqa: E402
-from circuit_verify import MAX_CIRCUIT_FILE_BYTES, MAX_CIRCUIT_N, MAX_DEM_MECHANISMS  # noqa: E402
+from circuit_verify import MAX_CIRCUIT_FILE_BYTES, MAX_CIRCUIT_N, MAX_DEM_MECHANISMS, basis_cap  # noqa: E402
 from gate_changed import _circuit_budget  # noqa: E402
 
 SCREEN_ROUNDS = 2
@@ -921,8 +924,9 @@ def readout_witness(dem, HX, HZ, rounds, basis, support, flags=None):
 def search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed, seconds,
                  fallback_support=None, log=lambda s: None, flags=None):
     """Deep RIS on one memory circuit's DEM at twice the gate's trial budget;
-    returns (value, witness). Falls back to the readout-flip witness of
-    `fallback_support` when the search finds nothing at or below d."""
+    returns (value, witness). `d` is this memory's cap (circuit_verify.basis_cap:
+    the distance of the logical it protects). Falls back to the readout-flip
+    witness of `fallback_support` when the search finds nothing at or below it."""
     m = dem.num_errors
     if m > MAX_DEM_MECHANISMS:
         raise CircuitUnavailable(
@@ -950,15 +954,18 @@ def search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed, seconds,
     if w is None or w > d:
         raise CircuitUnavailable(
             f"{basis} memory: the search found no undetected logical fault "
-            f"set of weight <= d = {d} (lightest {w}), so no claim within "
-            f"the penalty-only clamp can be recorded")
+            f"set of weight <= {d}, the distance of the logical this memory "
+            f"protects (lightest {w}), so no claim within the penalty-only "
+            f"clamp can be recorded")
     return int(w), [int(i) for i in wit]
 
 
 def finish(notes, layers, HX, HZ, d, rounds, doc_witnesses, seed, seconds,
-           log=lambda s: None):
+           log=lambda s: None, caps=None):
     """Build both memory circuits at full rounds, search them, and return
-    (circuit block, {filename: text})."""
+    (circuit block, {filename: text}). `caps` maps each basis to its clamp
+    (circuit_verify.basis_cap); without it both memories are capped at d."""
+    caps = caps or {"X": d, "Z": d}
     block = {"d_circ": {}, "rounds": rounds, "stim_version": stim.__version__,
              "notes": notes}
     files = {}
@@ -968,9 +975,9 @@ def finish(notes, layers, HX, HZ, d, rounds, doc_witnesses, seed, seconds,
             raise CircuitUnavailable(f"{basis} memory at rounds={rounds} has "
                                      f"non-deterministic detectors")
         opp = "X" if basis == "Z" else "Z"
-        value, wit = search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed,
-                                  seconds, doc_witnesses.get(opp), log,
-                                  getattr(layers, "flags", None))
+        value, wit = search_basis(noisy, dem, HX, HZ, caps[basis], rounds,
+                                  basis, seed, seconds, doc_witnesses.get(opp),
+                                  log, getattr(layers, "flags", None))
         block["d_circ"][basis] = {"value": value, "confidence": "upper_bound",
                                   "witness": wit}
         stem = SIDE_FILES[basis]
@@ -1032,7 +1039,8 @@ def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6,
             if s in doc["distance"]}
     log(f"deep search at rounds={rounds}")
     block, files = finish(notes, layers, HX, HZ, d, rounds, wits, seed,
-                          seconds, log)
+                          seconds, log,
+                          caps={b: basis_cap(doc, b) for b in ("X", "Z")})
     for name, text in files.items():
         if len(text.encode("utf-8")) > MAX_CIRCUIT_FILE_BYTES:
             raise CircuitUnavailable(
@@ -1083,10 +1091,12 @@ def from_files(doc, directory, rounds=None, seed=0, seconds=180.0,
         log(f"{basis} memory: {m} mechanisms, RIS budget {2 * trials} trials "
             f"or {seconds:g} s -> " +
             (f"d_circ <= {w}" if w is not None else "no witness found"))
-        if w is None or w > d or ct.witness_errors(dem, wit, w):
+        cap = basis_cap(doc, basis)
+        if w is None or w > cap or ct.witness_errors(dem, wit, w):
             raise CircuitUnavailable(
-                f"{path}: no undetected logical fault set of weight <= d = "
-                f"{d} found (lightest {w}); no claim within the clamp")
+                f"{path}: no undetected logical fault set of weight <= "
+                f"{cap}, the distance of the logical the {basis} memory "
+                f"protects, found (lightest {w}); no claim within the clamp")
         block["d_circ"][basis] = {"value": int(w), "confidence": "upper_bound",
                                   "witness": [int(i) for i in wit]}
         files[stem + ".stim"] = text if text.endswith("\n") else text + "\n"

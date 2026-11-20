@@ -144,6 +144,16 @@ def test_external_workflow_actions_are_pinned_to_full_commit_shas():
     assert not unpinned, "workflow actions must use immutable full SHAs:\n" + "\n".join(unpinned)
 
 
+def test_workflow_triggers_for_verifier_claim_surfaces():
+    patterns = pull_request_paths()
+    uncovered = [surface for surface in ("codes", "circuits", "certs")
+                 if not covers(patterns, surface)]
+    assert not uncovered, (
+        f"a PR changing only {uncovered} skips the trusted submission checks; "
+        "add each claim surface to .github/workflows/verify.yml"
+    )
+
+
 def test_weekly_proof_replay_fails_on_incomplete_shards():
     with open(_PROOF_REPLAY_WORKFLOW, encoding="utf-8") as f:
         workflow = f.read()

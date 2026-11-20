@@ -3301,7 +3301,8 @@ def detail_page(e):
             depth = schedule_depth_label(e.get("sched"))
             P.append(f'<div class=kv><b>d_circ</b> &le; {eff_c} '
                      '<span class=claimed>(min over bases; penalty-only, '
-                     'clamped to &le; d)</span>'
+                     'each basis clamped to the distance of the logical it '
+                     'protects, so the min is &le; d)</span>'
                      + (f' &middot; {depth} layers per round <span class=claimed>'
                         '(the deeper basis; computed, never ranked)</span>'
                         if depth is not None else "")
