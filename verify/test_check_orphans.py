@@ -1,9 +1,11 @@
 import json
+
 import check_orphans
 
 
-def make_tree(tmp_path, *, with_code=True, with_circuits=True, circuit_block=False,
-              stray_repro_dir=False, stray_repro_file=False):
+def make_tree(
+    tmp_path, *, with_code=True, with_circuits=True, circuit_block=False, stray_repro_dir=False, stray_repro_file=False
+):
     root = tmp_path
     (root / "codes").mkdir(exist_ok=True)
     (root / "circuits").mkdir(exist_ok=True)
