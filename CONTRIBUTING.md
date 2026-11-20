@@ -534,6 +534,12 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
 
+   Enable the repository's local git hooks so the codes-format, prose, and
+   validator-integrity checks run before each commit:
+       git config core.hooksPath .githooks
+   The hooks live in .githooks/ and are version-controlled; without this
+   setting they never run.
+
    If you work in a git worktree, make it sparse. A full checkout is about
    8 GB, 7.6 GB of it circuits/, and a cone-mode sparse worktree holding
    codes, notes, fieldnotes, repro, certs, research, verify, schema, cli,
