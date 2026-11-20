@@ -17,6 +17,7 @@ Checks:
 
 Exit status is 0 on a clean tree, 1 otherwise.
 """
+
 import argparse
 import os
 import sys
@@ -59,8 +60,7 @@ def audit(root, quiet=False):
                     continue
                 if sz > MAX_CIRCUIT_FILE_BYTES:
                     rel = os.path.relpath(full, root)
-                    problems.append(f"oversized circuit file: {rel} "
-                                    f"({sz} > {MAX_CIRCUIT_FILE_BYTES})")
+                    problems.append(f"oversized circuit file: {rel} ({sz} > {MAX_CIRCUIT_FILE_BYTES})")
                 if fn.endswith(".dem") and os.environ.get("CHECK_SIZE_NO_DEM") == "1":
                     rel = os.path.relpath(full, root)
                     problems.append(f"committed .dem under circuits/: {rel}")
@@ -68,14 +68,12 @@ def audit(root, quiet=False):
     # 2. circuits budget
     csz = dir_size(circuits_dir)
     if csz > CIRCUITS_BUDGET_BYTES:
-        problems.append(f"circuits/ exceeds budget: {csz} > "
-                        f"{CIRCUITS_BUDGET_BYTES} bytes")
+        problems.append(f"circuits/ exceeds budget: {csz} > {CIRCUITS_BUDGET_BYTES} bytes")
 
     # 3. docs budget
     dsz = dir_size(docs_dir)
     if dsz > DOCS_BUDGET_BYTES:
-        problems.append(f"docs/ exceeds budget: {dsz} > "
-                        f"{DOCS_BUDGET_BYTES} bytes")
+        problems.append(f"docs/ exceeds budget: {dsz} > {DOCS_BUDGET_BYTES} bytes")
 
     if quiet:
         print(f"size problems: {len(problems)}")

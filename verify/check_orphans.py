@@ -20,6 +20,7 @@ Checks:
 
 Exit status is 0 on a clean tree, 1 otherwise.
 """
+
 import argparse
 import json
 import os
@@ -61,8 +62,7 @@ def audit(root, quiet=False):
             if not os.path.isdir(full):
                 continue
             if name not in code_slugs:
-                problems.append(f"orphaned circuits dir: circuits/{name}/ "
-                                f"(no codes/{name}.json)")
+                problems.append(f"orphaned circuits dir: circuits/{name}/ (no codes/{name}.json)")
 
     # 2. missing circuit evidence
     for slug in sorted(code_slugs):
@@ -70,8 +70,9 @@ def audit(root, quiet=False):
             continue
         cdir = os.path.join(circuits_dir, slug)
         if not os.path.isdir(cdir):
-            problems.append(f"missing circuits dir for circuit-tier entry: "
-                            f"circuits/{slug}/ (codes/{slug}.json declares circuit)")
+            problems.append(
+                f"missing circuits dir for circuit-tier entry: circuits/{slug}/ (codes/{slug}.json declares circuit)"
+            )
             continue
         for side in ("memory_x.stim", "memory_z.stim"):
             if not os.path.exists(os.path.join(cdir, side)):
@@ -81,8 +82,12 @@ def audit(root, quiet=False):
     # (issue #3810: "Directories already tracked stay tracked"); only NEW
     # stray directories / non-manifest files are refused.
     legacy_repro_dirs = {
-        "cpm-568-146-18", "cyclic-23-1-7", "cyclic-25-5-3",
-        "cyclic-25-5-5", "cyclic-27-3-5", "cyclic-29-1-9",
+        "cpm-568-146-18",
+        "cyclic-23-1-7",
+        "cyclic-25-5-3",
+        "cyclic-25-5-5",
+        "cyclic-27-3-5",
+        "cyclic-29-1-9",
     }
     repro_dir = os.path.join(root, "repro")
     if os.path.isdir(repro_dir):
@@ -91,8 +96,9 @@ def audit(root, quiet=False):
             if os.path.isdir(full):
                 if name in legacy_repro_dirs:
                     continue
-                problems.append(f"stray directory under repro/: repro/{name}/ "
-                                f"(only repro/<slug>.json manifests allowed)")
+                problems.append(
+                    f"stray directory under repro/: repro/{name}/ (only repro/<slug>.json manifests allowed)"
+                )
             elif not (name.endswith(".json")):
                 problems.append(f"stray file under repro/: repro/{name}")
 
@@ -102,8 +108,7 @@ def audit(root, quiet=False):
             for fn in files:
                 if fn.endswith(".dem"):
                     rel = os.path.relpath(os.path.join(dirpath, fn), root)
-                    problems.append(f"committed .dem under circuits/: {rel} "
-                                    f"(DEM is derived from .stim)")
+                    problems.append(f"committed .dem under circuits/: {rel} (DEM is derived from .stim)")
 
     if quiet:
         print(f"orphans/strays: {len(problems)}")
