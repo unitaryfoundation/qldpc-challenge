@@ -50,6 +50,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `foldbound.py` | audit | distance upper bound by folding a code onto a symmetric subspace; a refuter, not a layout tool |
 | `qedist_audit.py` | audit | certify a challenge CSS code's exact distance with the optional external QEDist tool (research/kit/qedist.py); evidence only, not board certification || `annihilator_sweep.py` | audit | the annihilator attack over the board's uncertified block-shaped entries (issue #2706) |
 | `board_bar.py` | audit | the smallest undominated d for a candidate (n, k, w), read off the board before any distance search |
+| `kit/equivalence.py` | canonical | decides a Weisfeiler-Leman equivalence flag at packaging time with `audits/permutation_audit.py`'s procedure, so `promote.py` and `qldpc submit` refuse an exhibited permutation and tick the box on a separating invariant (issue #6186) |
 | `does_it_advance.py` | audit | mirror of the gate's novelty block: would this candidate beat the board, and on which axes, before paying for the gate |
 | `derive_provenance.py` | audit | literature-versus-discovered provenance for every entry from the isomorphism check (issue #1279) |
 | `reachability_campaign.py` | canonical | unified reachability campaign driver: enumerates parents, runs the distance ladder, asks `kit/dedup_oracle.py` whether the board or an open PR already holds each child (issue #6814), and stages the rest (issue #5822) |
