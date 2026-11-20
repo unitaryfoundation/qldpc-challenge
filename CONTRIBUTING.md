@@ -3,6 +3,23 @@
 You bring `H_X` and `H_Z`; one command turns them into a verified, PR-ready
 submission.
 
+## Clone options
+
+The working tree is large (mostly `circuits/`, ~8 GB). Use a partial clone to
+avoid downloading everything:
+
+```bash
+# Partial clone: blobs fetched on demand (recommended)
+git clone --filter=blob:none --sparse https://github.com/unitaryfoundation/qldpc-challenge.git
+cd qldpc-challenge
+git sparse-checkout set codes circuits notes fieldnotes repro certs
+
+# Codes and notes only (no circuits)
+git sparse-checkout set codes notes fieldnotes repro certs
+```
+
+Or run `./scripts/clone-sparse.sh [--no-circuits]`.
+
 ## One command
 
 ```
@@ -92,6 +109,12 @@ Useful flags:
   not be bound to a GitHub account);
 - `--dry-run` build and verify without writing.
 
+When submitting several codes, deduplicate them first by `(n,k,d,w)` (and by
+canonical form for stabilizer codes) so you open one PR per distinct code, not
+one per candidate file. Run
+`uv run python research/kit/dedup_submissions.py <candidate files...>` before
+opening PRs.
+
 Either way — `--open-pr`, or the commands it prints for you to run — the PR
 body is drafted for you from
 [`.github/pull_request_template.md`](.github/pull_request_template.md) and the
@@ -102,6 +125,10 @@ site's own cell + Pareto logic to list the track cells the code lands in,
 whether it sits on each cell's frontier, and which existing board entries it
 dominates (and on which axis). Review it before requesting review — it is a
 board-relative claim, not a statement against the wider literature.
+
+If `gh pr edit <n> --body-file <file>` fails with "Projects (classic) is
+being deprecated", update the body through the REST API instead:
+`gh api repos/unitaryfoundation/qldpc-challenge/pulls/<n> -X PATCH -f body="$(cat <file>)"`.
 
 ## General stabilizer codes
 
@@ -351,7 +378,12 @@ on `n, k, d` (or on the stabilizer group) must be filed as a new, suffixed
 entry (`-b`, `-c`, …) via `coordination.unique_path` / `submit.make_submission`,
 never by overwriting the existing file. `./qldpc submit` and
 `research/kit/promote.py` refuse an overwrite that is not a strict improvement
-and name the suffixed slug to use instead.
+and name the suffixed slug to use instead; pass it back with `--slug <suggested>`
+(to `./qldpc submit`) or `slug=<suggested>` (to `promote()`), so that
+`codes/<slug>.json`, `notes/<slug>.md`, `circuits/<slug>/`, the PR branch and
+the PR body all carry the same suffixed slug. Hand-renaming only some of those
+paths is what produced the nested-directory and note-overwrite incidents
+(issue #5732, PR #6849).
 
 ## One code, one entry
 
@@ -523,6 +555,12 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    `upstream` first (git remote add upstream
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
+
+   Enable the repository's local git hooks so the codes-format, prose, and
+   validator-integrity checks run before each commit:
+       git config core.hooksPath .githooks
+   The hooks live in .githooks/ and are version-controlled; without this
+   setting they never run.
 
    If you work in a git worktree, make it sparse. A full checkout is about
    8 GB, 7.6 GB of it circuits/, and a cone-mode sparse worktree holding

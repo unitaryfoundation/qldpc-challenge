@@ -34,6 +34,7 @@ TRUSTED = (
     # CI orchestration: selects the trusted checkout, commands, and arguments.
     ".github/workflows/codes-format.yml",
     ".github/workflows/prose.yml",
+    ".github/workflows/proof-replay.yml",
     ".github/workflows/refute-weekly.yml",
     ".github/workflows/verify.yml",
     # Environment definition and the optional C++ accelerator build inputs.
@@ -66,6 +67,7 @@ TRUSTED = (
     "verify/ler_verify.py",
     "verify/qldpc_verify.py",
     "verify/recapture.py",
+    "verify/replay_proofs.py",
     "verify/refutation_cache.py",
     "verify/refute_board.py",
     "verify/transversal_gates.py",

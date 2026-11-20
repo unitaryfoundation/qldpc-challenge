@@ -57,6 +57,15 @@ if ! git rev-parse --verify --quiet "$BASE" >/dev/null; then
     exit 2
 fi
 
+# Staleness hint (non-fatal): how many commits the base is ahead of HEAD.
+# A branch behind the base is still diffed against its merge base, exactly as
+# CI does, so this never fails the gate; it only tells the contributor the
+# branch may want a rebase.
+_BEHIND=$(git rev-list --count HEAD.."$BASE" 2>/dev/null || echo 0)
+if [ "$_BEHIND" != "0" ]; then
+    echo "note: HEAD is $_BEHIND commit(s) behind $BASE; consider rebasing." >&2
+fi
+
 # A base the caller forced that disagrees with upstream/main is the stale
 # case the default now avoids; it is reported rather than silently diffed.
 if [ "$BASE" != "upstream/main" ] \

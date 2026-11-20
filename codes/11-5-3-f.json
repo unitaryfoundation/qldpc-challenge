@@ -1,0 +1,123 @@
+{
+ "schema_version": "0.4",
+ "name": "[[11,5,3]] E-PUNCTURE of 12-4-4",
+ "code_type": "stabilizer",
+ "n": 11,
+ "k": 5,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "Z": []
+   },
+   {
+    "X": [],
+    "Z": [
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ]
+   },
+   {
+    "X": [
+     0,
+     2,
+     3,
+     6,
+     10
+    ],
+    "Z": [
+     3,
+     4,
+     7,
+     9
+    ]
+   },
+   {
+    "X": [
+     3,
+     4,
+     7,
+     9
+    ],
+    "Z": [
+     0,
+     2,
+     4,
+     6,
+     7,
+     9,
+     10
+    ]
+   },
+   {
+    "X": [
+     1,
+     2,
+     4,
+     6,
+     9
+    ],
+    "Z": [
+     3,
+     4,
+     8,
+     10
+    ]
+   },
+   {
+    "X": [
+     3,
+     4,
+     8,
+     10
+    ],
+    "Z": [
+     1,
+     2,
+     3,
+     6,
+     8,
+     9,
+     10
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "P": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": {
+    "X": [],
+    "Z": [
+     0,
+     8,
+     10
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "origin": "submission",
+  "date": "2026-11-19",
+  "construction": "Symplectic multi-step move sequence on the stabilizer board entry codes/12-4-4.json ([[12,4,4]]): E-PUNCTURE; puncture qubit 2. Parent construction: Grassl additive-table quantum code; quantum code over GF(2^2) as tabulated at codetables.de: stored stabilizer matrix for cell [[12,4]] (table bounds 4-4, https://codetables.de/QECC.php?q=4&n=12&k=4) read as binary symplectic rows [x | z]; rank(A|B) < rank(A) + rank(B), so the group has no pure-X/pure-Z basis and the entry is typed stabilizer; generators reduced here to the lightest independent su",
+  "notes": "Pauli-weight witness from a 1000-trial RIS screen; distance is an upper bound.",
+  "model": "Beam 1.0"
+ },
+ "family": "other"
+}

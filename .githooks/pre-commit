@@ -10,6 +10,10 @@ if [ -n "$changed_codes" ]; then
     python3 verify/check_codes_format.py --files $changed_codes
 fi
 
+# Validator integrity (trusted stack pin). Fast (<1s): fails if a critical file
+# changed without re-pinning verify/validator_manifest.json.
+python3 verify/check_validator_integrity.py
+
 # Prose (file-level paths; PR-body citations are checked by prepush_prose_check.sh)
 changed_md=$(git diff --cached --name-only --diff-filter=AMR -- 'notes/*.md' 'fieldnotes/*.md' || true)
 if [ -n "$changed_md" ]; then

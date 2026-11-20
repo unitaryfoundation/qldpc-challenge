@@ -1,0 +1,177 @@
+{
+ "schema_version": "0.4",
+ "name": "[[15,4,3]] E-PEEL of 16-4-4-s",
+ "code_type": "stabilizer",
+ "n": 15,
+ "k": 4,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     0,
+     4
+    ],
+    "Z": [
+     1,
+     3,
+     4,
+     10
+    ]
+   },
+   {
+    "X": [
+     2,
+     5
+    ],
+    "Z": [
+     1,
+     3,
+     5,
+     8
+    ]
+   },
+   {
+    "X": [
+     3,
+     6
+    ],
+    "Z": [
+     0,
+     2,
+     6,
+     9
+    ]
+   },
+   {
+    "X": [
+     6,
+     9,
+     11,
+     12
+    ],
+    "Z": [
+     9,
+     11,
+     13
+    ]
+   },
+   {
+    "X": [
+     4,
+     10,
+     12,
+     13
+    ],
+    "Z": [
+     10,
+     12,
+     14
+    ]
+   },
+   {
+    "X": [
+     7,
+     13,
+     14
+    ],
+    "Z": [
+     7,
+     11,
+     13
+    ]
+   },
+   {
+    "X": [
+     5,
+     8,
+     11,
+     14
+    ],
+    "Z": [
+     8,
+     12,
+     14
+    ]
+   },
+   {
+    "X": [
+     2,
+     6,
+     7,
+     8,
+     11
+    ],
+    "Z": [
+     2,
+     11
+    ]
+   },
+   {
+    "X": [
+     3,
+     4,
+     8,
+     9,
+     12
+    ],
+    "Z": [
+     3,
+     12
+    ]
+   },
+   {
+    "X": [
+     0,
+     9,
+     10,
+     13
+    ],
+    "Z": [
+     0,
+     13
+    ]
+   },
+   {
+    "X": [
+     1,
+     5,
+     7,
+     10,
+     14
+    ],
+    "Z": [
+     1,
+     14
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 3,
+  "P": {
+   "value": 3,
+   "confidence": "upper_bound",
+   "witness": {
+    "X": [
+     1,
+     4,
+     5
+    ],
+    "Z": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "origin": "submission",
+  "date": "2026-11-19",
+  "construction": "Symplectic multi-step move sequence on the stabilizer board entry codes/16-4-4-s.json ([[16,4,4]]): E-PEEL; peel qubit 5 with generator 1. Parent construction: Z4-invariant (quasi-cyclic) non-CSS stabilizer code: 16 qubits in 4 orbits of Z4 (qubit 4*b+g, b = orbit, g in Z4), 12 generators in 3 orbits of Z4 (each orbit = the 4 translates g -> g+t of one representative Pauli), every generator of weight <= 5. Found by a lazy SAT search over such codes (commutation encoded exactly; every nontrivial logical of weight < 4 found along the way is excluded togeth",
+  "notes": "Pauli-weight witness from a 1000-trial RIS screen; distance is an upper bound.",
+  "model": "Beam 1.0"
+ },
+ "family": "other"
+}

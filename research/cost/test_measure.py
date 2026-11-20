@@ -33,11 +33,22 @@ def test_every_grid_entry_is_on_the_board():
     M = _script()
     slugs = [s for s, _ in M.GRID]
     assert len(slugs) == len(set(slugs))
+    # A distance revision renames the entry. The grid moves to the new slug and the
+    # record keeps the old one as measured_slug, so the grid can be updated before
+    # the revision lands: the entry is on the board under either name.
+    measured = {e["slug"]: e.get("measured_slug") for e in _table()["entries"]}
+
+    def on_board(slug):
+        for s in (slug, measured.get(slug)):
+            path = os.path.join(_ROOT, "codes", f"{s}.json")
+            if s and os.path.exists(path):
+                return path
+        return None
+
     for slug in slugs:
-        assert os.path.exists(os.path.join(_ROOT, "codes", slug + ".json")), slug
+        assert on_board(slug), slug
     # the cap corners the issue names are in the grid
-    docs = {s: json.load(open(os.path.join(_ROOT, "codes", s + ".json"), encoding="utf-8"))
-            for s in slugs}
+    docs = {s: json.load(open(on_board(s), encoding="utf-8")) for s in slugs}
     assert any(d["n"] == 700 for d in docs.values())
     assert any(d["n"] == 1000 for d in docs.values())
     # Distance coverage is descriptive: board bounds can be revised (#2941).

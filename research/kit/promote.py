@@ -648,7 +648,7 @@ def _run_check_prose(root, body_file, files, pr_author=None):
 def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             min_deep_trials=DEFAULT_MIN_DEEP_TRIALS, pr_author=None,
             body_dir=None, write=True, force=False, seed=None, base="main",
-            recipe=None, allow_non_frontier=False):
+            recipe=None, allow_non_frontier=False, slug=None):
     """Build one submission bundle and return its report.
 
     The order is fixed and is the point: evidence, then the trusted gate on the
@@ -745,7 +745,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     if blocked:
         return report
 
-    slug = candidate_slug(doc)
+    slug = slug or candidate_slug(doc)
     report["slug"] = slug
     report["branch"] = f"submit-{slug}"
     code_rel = os.path.join("codes", f"{slug}.json")
