@@ -20,13 +20,13 @@ If one is missing, the call raises a clear ImportError telling you how to get it
 (``uv run --extra research python ...``). Both take raw ``(HX, HZ)`` and build
 the throwaway submission doc the certifiers consume via ``submit.make_submission``.
 """
+
 import functools
 import importlib.util
 import os
 import sys
 
 import numpy as np
-
 from submit import make_submission
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -37,7 +37,8 @@ _DECODE = os.path.join(_HERE, "..", "..", "decode")
 def _load_module(path, name):
     """Import a module by explicit file path (avoids the name clash between this
     file and decode/distance.py, and lets the target's own sys.path inserts for
-    gf2 take effect)."""
+    gf2 take effect).
+    """
     spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -46,13 +47,20 @@ def _load_module(path, name):
 
 def _throwaway_doc(HX, HZ, trials, seed):
     """A minimal, schema-shaped doc (with witnesses and per-side distance values)
-    for a code under construction -- enough for the certifiers, no provenance."""
+    for a code under construction -- enough for the certifiers, no provenance.
+    """
     HX = np.asarray(HX, dtype=np.int8) % 2
     HZ = np.asarray(HZ, dtype=np.int8) % 2
     if trials and int(trials) > 0:
         return make_submission(
-            HX, HZ, name="(in-progress)", construction="(in-progress)",
-            authors=["?"], tracks=[], trials=int(trials), seed=seed,
+            HX,
+            HZ,
+            name="(in-progress)",
+            construction="(in-progress)",
+            authors=["?"],
+            tracks=[],
+            trials=int(trials),
+            seed=seed,
         )
     n = int(HX.shape[1])
     gf2 = _load_module(os.path.join(_VERIFY, "gf2.py"), "_qldpc_gf2_min")
@@ -62,13 +70,15 @@ def _throwaway_doc(HX, HZ, trials, seed):
         "code_type": "CSS",
         "n": n,
         "k": k,
-        "checks": {"X": [sorted(int(j) for j in np.nonzero(row % 2)[0])
-                         for row in HX],
-                   "Z": [sorted(int(j) for j in np.nonzero(row % 2)[0])
-                         for row in HZ]},
-        "distance": {"d": 1,
-                     "X": {"value": 1, "confidence": "upper_bound"},
-                     "Z": {"value": 1, "confidence": "upper_bound"}},
+        "checks": {
+            "X": [sorted(int(j) for j in np.nonzero(row % 2)[0]) for row in HX],
+            "Z": [sorted(int(j) for j in np.nonzero(row % 2)[0]) for row in HZ],
+        },
+        "distance": {
+            "d": 1,
+            "X": {"value": 1, "confidence": "upper_bound"},
+            "Z": {"value": 1, "confidence": "upper_bound"},
+        },
     }
 
 
@@ -91,14 +101,14 @@ def exact_distance(HX, HZ, tlim=600, trials=4000, seed=0, d_upper=None):
         raise ImportError(
             "exact_distance needs scipy (verify/certify.py), part of the `research` "
             "extra: `uv run --extra research python your_script.py`. "
-            f"Underlying error: {e}")
+            f"Underlying error: {e}"
+        )
     doc = _throwaway_doc(HX, HZ, trials, seed)
     if d_upper:
         for side, val in d_upper.items():
             if side in doc["distance"]:
                 doc["distance"][side]["value"] = int(val)
-        doc["distance"]["d"] = int(min(doc["distance"][s]["value"]
-                                       for s in ("X", "Z") if s in doc["distance"]))
+        doc["distance"]["d"] = int(min(doc["distance"][s]["value"] for s in ("X", "Z") if s in doc["distance"]))
     return certify.certify(doc, tlim=tlim)
 
 
@@ -118,26 +128,24 @@ def sat_exact_distance(HX, HZ, tlim=600, trials=4000, seed=0, d_upper=None):
     pycryptosat and python-sat.
     """
     try:
-        sat_certify = _load_module(os.path.join(_VERIFY, "sat_certify.py"),
-                                   "_qldpc_sat_certify")
+        sat_certify = _load_module(os.path.join(_VERIFY, "sat_certify.py"), "_qldpc_sat_certify")
     except ImportError as e:
         raise ImportError(
             "sat_exact_distance needs pycryptosat and python-sat "
             "(verify/sat_certify.py), part of the `research` extra: "
             "`uv run --extra research python your_script.py`. "
-            f"Underlying error: {e}")
+            f"Underlying error: {e}"
+        )
     doc = _throwaway_doc(HX, HZ, trials, seed)
     if d_upper:
         for side, val in d_upper.items():
             if side in doc["distance"]:
                 doc["distance"][side]["value"] = int(val)
-        doc["distance"]["d"] = int(min(doc["distance"][s]["value"]
-                                       for s in ("X", "Z") if s in doc["distance"]))
+        doc["distance"]["d"] = int(min(doc["distance"][s]["value"] for s in ("X", "Z") if s in doc["distance"]))
     return sat_certify.certify(doc, tlim=tlim)
 
 
-def decoder_distance(HX, HZ, trials=200000, seed=0, max_seconds=None,
-                     witness_trials=2000):
+def decoder_distance(HX, HZ, trials=200000, seed=0, max_seconds=None, witness_trials=2000):
     """Independent decoder-based distance evidence via ``decode/distance.py``
     (BP+OSD residual witnesses).
 
@@ -153,7 +161,8 @@ def decoder_distance(HX, HZ, trials=200000, seed=0, max_seconds=None,
         raise ImportError(
             "decoder_distance needs ldpc (decode/distance.py), part of the `research` "
             "extra: `uv run --extra research python your_script.py`. "
-            f"Underlying error: {e}")
+            f"Underlying error: {e}"
+        )
     doc = _throwaway_doc(HX, HZ, witness_trials, seed)
     return decdist.estimate(doc, trials=trials, seed=seed, max_seconds=max_seconds)
 
@@ -199,7 +208,8 @@ def _qsf_import():
             "sparse codes CPU connected-cluster beats GPU Brouwer-Zimmerman by "
             "orders of magnitude). For an in-tree build, set "
             "QUBITSERF_PYTHON=/path/to/Qubitserf/python. "
-            f"Underlying error: {e}")
+            f"Underlying error: {e}"
+        )
     return _df
 
 
@@ -235,19 +245,20 @@ def _qsf_subprocess(HX, HZ, method, which, threads, tlim):
         env.setdefault("OMP_NUM_THREADS", str(max(1, int(threads))))
         try:
             r = subprocess.run(
-                [sys.executable, "-c", _QSF_SUBPROCESS_SRC, fx, fz,
-                 method, which, str(threads)],
-                capture_output=True, text=True, timeout=tlim, env=env,
-                check=False)  # rc surfaces via the no-RESULT RuntimeError below
+                [sys.executable, "-c", _QSF_SUBPROCESS_SRC, fx, fz, method, which, str(threads)],
+                capture_output=True,
+                text=True,
+                timeout=tlim,
+                env=env,
+                check=False,
+            )  # rc surfaces via the no-RESULT RuntimeError below
         except subprocess.TimeoutExpired:
             return None
         for line in r.stdout.splitlines():
             if line.startswith("RESULT "):
                 out = int(line.split()[1])
                 return None if out == -1 else out
-        raise RuntimeError(
-            f"qubitserf subprocess produced no result "
-            f"(rc={r.returncode}): {r.stderr.strip()[-300:]}")
+        raise RuntimeError(f"qubitserf subprocess produced no result (rc={r.returncode}): {r.stderr.strip()[-300:]}")
 
 
 def qubitserf_distance(HX, HZ, method="cc", which="min", threads=0, tlim=600):
@@ -270,8 +281,7 @@ def qubitserf_distance(HX, HZ, method="cc", which="min", threads=0, tlim=600):
 
     def _run(q):
         try:
-            q.put(_df.css_distance(HX, HZ, method=method, which=which,
-                                   threads=threads))
+            q.put(_df.css_distance(HX, HZ, method=method, which=which, threads=threads))
         except Exception as e:  # noqa: BLE001 -- surfaced to the parent
             q.put(f"error:{type(e).__name__}: {e}")
 
@@ -300,8 +310,7 @@ def qubitserf_distance(HX, HZ, method="cc", which="min", threads=0, tlim=600):
     return None if out == -1 else int(out)
 
 
-def qubitserf_screen(HX, HZ, trials=None, seed=0, backend=None, threads=1,
-                     method="cc", tlim=120, **_):
+def qubitserf_screen(HX, HZ, trials=None, seed=0, backend=None, threads=1, method="cc", tlim=120, **_):
     """Screen a code with Qubitserf's connected-cluster exact distance.
 
     Signature-compatible with ``surrogate.distance_rand`` so it drops into
@@ -346,6 +355,7 @@ def resolve_screen(name="qubitserf", *, fallback=True, **overrides):
     """
     if name == "rand":
         from surrogate import distance_rand
+
         return distance_rand
     if name == "qubitserf":
         try:
@@ -354,14 +364,14 @@ def resolve_screen(name="qubitserf", *, fallback=True, **overrides):
             if not fallback:
                 raise
             from surrogate import distance_rand
+
             return distance_rand
         overrides.setdefault("tlim", 30)
         return functools.partial(qubitserf_screen, **overrides)
     raise ValueError(f"unknown screen backend {name!r}; expected one of {SCREENS}")
 
 
-def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
-                   seed=0, which="both"):
+def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000, seed=0, which="both"):
     """Two-stage verification: connected cluster proposes, the repo decides.
 
     This is the same division of labor ``escalation.exact_first`` already makes
@@ -408,23 +418,18 @@ def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
         cc_d = min(sides)
         # The bound stage 2 tests: per-side, so each solve aims at the value
         # that side actually achieved rather than the weaker minimum.
-        d_up = {"X": cc_x if cc_x is not None else cc_d,
-                "Z": cc_z if cc_z is not None else cc_d}
-        sat = sat_exact_distance(HX, HZ, tlim=tlim_sat, trials=trials,
-                                 seed=seed, d_upper=d_up)
+        d_up = {"X": cc_x if cc_x is not None else cc_d, "Z": cc_z if cc_z is not None else cc_d}
+        sat = sat_exact_distance(HX, HZ, tlim=tlim_sat, trials=trials, seed=seed, d_upper=d_up)
         if sat.get("d_exact"):
             outcome = "exact"
-        elif any("REFUTED" in ((v or {}).get("note") or "")
-                 for v in (sat.get("sides") or {}).values()):
+        elif any("REFUTED" in ((v or {}).get("note") or "") for v in (sat.get("sides") or {}).values()):
             outcome = "refuted"
         else:
             outcome = "timeout"
-        return {"outcome": outcome, "cc_d": cc_d, "cc_X": cc_x, "cc_Z": cc_z,
-                "sat": sat}
+        return {"outcome": outcome, "cc_d": cc_d, "cc_X": cc_x, "cc_Z": cc_z, "sat": sat}
     # No tight bound from stage 1: fall through to the ladder rather than
     # guessing. Reporting None keeps that decision the caller's.
-    return {"outcome": "unverified", "cc_d": None, "cc_X": None,
-            "cc_Z": None, "sat": None}
+    return {"outcome": "unverified", "cc_d": None, "cc_X": None, "cc_Z": None, "sat": None}
 
 
 # ---------------------------------------------------------------------------
@@ -436,6 +441,7 @@ def verify_with_cc(HX, HZ, *, tlim_qsf=300, tlim_sat=600, trials=4000,
 # it proves only d >= min_d, cheaply enough to use as a screen. This is a
 # lower bound, not an exact distance and not a certificate: anything promoted
 # still goes through verify/ and the gate.
+
 
 def _gf2_mod():
     return _load_module(os.path.join(_VERIFY, "gf2.py"), "_qldpc_gf2")
@@ -478,8 +484,7 @@ def weight_one_logical_exists(HX, HZ):
     return _first_weight_one_logical(HX, HZ) is not None
 
 
-def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
-                    trials=None, **_):
+def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0, trials=None, **_):
     """Use the SAT certifier as a *lower*-bound screen.
 
     Claims ``d = min_d`` (so ``W = min_d - 1``) and runs
@@ -508,6 +513,7 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
     ``sides``, ``secs`` and, when refuted, ``witness``.
     """
     import time
+
     t0 = time.monotonic()
     HXa = np.asarray(HX, dtype=np.int8) % 2
     HZa = np.asarray(HZ, dtype=np.int8) % 2
@@ -520,30 +526,31 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
         secs = round(time.monotonic() - t0, 2)
         if found is not None:
             side, q = found
-            return {"min_d": min_d, "outcome": "refuted",
-                    "both_sides_unsat": False,
-                    "sides": {}, "secs": secs,
-                    "witness": {"side": side, "support": [q]}}
-        return {"min_d": min_d, "outcome": "proved",
-                "both_sides_unsat": True,
-                "sides": {}, "secs": secs}
+            return {
+                "min_d": min_d,
+                "outcome": "refuted",
+                "both_sides_unsat": False,
+                "sides": {},
+                "secs": secs,
+                "witness": {"side": side, "support": [q]},
+            }
+        return {"min_d": min_d, "outcome": "proved", "both_sides_unsat": True, "sides": {}, "secs": secs}
 
     try:
-        res = sat_exact_distance(HX, HZ, tlim=tlim, trials=0, seed=seed,
-                                 d_upper={"X": min_d, "Z": min_d})
+        res = sat_exact_distance(HX, HZ, tlim=tlim, trials=0, seed=seed, d_upper={"X": min_d, "Z": min_d})
     except Exception as e:  # noqa: BLE001 -- reported, not raised
-        return {"min_d": min_d, "outcome": "error",
-                "detail": f"{type(e).__name__}: {e}",
-                "secs": round(time.monotonic() - t0, 2)}
+        return {
+            "min_d": min_d,
+            "outcome": "error",
+            "detail": f"{type(e).__name__}: {e}",
+            "secs": round(time.monotonic() - t0, 2),
+        }
     sides = res.get("sides") or {}
     secs = round(time.monotonic() - t0, 2)
     witness = None
-    timed_out = [s for s, b in sides.items()
-                 if (b or {}).get("status") == "TIMEOUT"]
-    refuted = [s for s, b in sides.items()
-               if (b or {}).get("status") == "SAT"]
-    unknown = [s for s, b in sides.items()
-               if (b or {}).get("status") not in ("SAT", "UNSAT", "TIMEOUT")]
+    timed_out = [s for s, b in sides.items() if (b or {}).get("status") == "TIMEOUT"]
+    refuted = [s for s, b in sides.items() if (b or {}).get("status") == "SAT"]
+    unknown = [s for s, b in sides.items() if (b or {}).get("status") not in ("SAT", "UNSAT", "TIMEOUT")]
     for s in refuted:
         w = (sides[s] or {}).get("witness")
         if w is not None:
@@ -559,10 +566,8 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
         outcome = "proved"
     else:
         outcome = "unknown"
-    both = (outcome == "proved")
-    out = {"min_d": min_d, "outcome": outcome,
-           "both_sides_unsat": both,
-           "sides": sides, "secs": secs}
+    both = outcome == "proved"
+    out = {"min_d": min_d, "outcome": outcome, "both_sides_unsat": both, "sides": sides, "secs": secs}
     if witness is not None:
         out["witness"] = witness
     if timed_out:
@@ -572,8 +577,7 @@ def sat_lower_bound(HX, HZ, min_d=2, tlim=60.0, seed=0,
     return out
 
 
-def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, seed=0,
-               backend=None, threads=1, **_):
+def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, seed=0, backend=None, threads=1, **_):
     """Standalone pre-filter built on :func:`sat_lower_bound`.
 
     Returns ``True`` when the code is *shown* to have distance ``< min_d``
@@ -599,15 +603,19 @@ def sat_screen(HX, HZ, *, min_d=2, tlim=60.0, seed=0,
 
 if __name__ == "__main__":
     # Confirm a small known code both ways (each is a no-op if its dep is absent).
-    from bb import build_bb, KNOWN
+    from bb import KNOWN, build_bb
+
     p = KNOWN["[[72,12,6]]"]
     HX, HZ = build_bb(p["l"], p["m"], p["A"], p["B"])
     print("code [[72,12,6]] -- confirming distance two ways:")
     try:
         res = exact_distance(HX, HZ, tlim=120, trials=2000)
-        print("  exact (scipy MILP):", {k: v.get("exact") if isinstance(v, dict) else v
-                                        for k, v in res.get("sides", {}).items()},
-              "d_exact=", res.get("d_exact"))
+        print(
+            "  exact (scipy MILP):",
+            {k: v.get("exact") if isinstance(v, dict) else v for k, v in res.get("sides", {}).items()},
+            "d_exact=",
+            res.get("d_exact"),
+        )
     except ImportError as e:
         print("  exact: skipped --", str(e).splitlines()[0])
     try:
@@ -615,4 +623,3 @@ if __name__ == "__main__":
         print("  decoder (BP+OSD):", res.get("d_heuristic"), res.get("verdict"))
     except ImportError as e:
         print("  decoder: skipped --", str(e).splitlines()[0])
-

@@ -122,11 +122,15 @@ def test_side_tiers_follow_the_certificate():
 def test_certificate_notes_render_for_formal_certificates_too():
     """A formal certificate has no per-side note; the page builds one from the side's value."""
     build = load_site_build()
-    solver = {"d": 6, "d_exact": True,
-              "sides": {"X": {"value": 6, "exact": True, "note": "no logical < 6 exists"},
-                        "Z": {"value": 6, "exact": True, "note": "no logical < 6 exists"}}}
+    solver = {
+        "d": 6,
+        "d_exact": True,
+        "sides": {
+            "X": {"value": 6, "exact": True, "note": "no logical < 6 exists"},
+            "Z": {"value": 6, "exact": True, "note": "no logical < 6 exists"},
+        },
+    }
     assert build.cert_side_notes(solver) == "X: no logical < 6 exists; Z: no logical < 6 exists"
-    formal = {"d": 6, "d_exact": True,
-              "sides": {"X": {"value": 6, "exact": True}, "Z": {"value": 6, "exact": True}}}
+    formal = {"d": 6, "d_exact": True, "sides": {"X": {"value": 6, "exact": True}, "Z": {"value": 6, "exact": True}}}
     assert build.cert_side_notes(formal) == "X: no logical < 6 exists; Z: no logical < 6 exists"
     assert build.cert_side_notes({"d": 6, "d_exact": True, "sides": {}}) == ""

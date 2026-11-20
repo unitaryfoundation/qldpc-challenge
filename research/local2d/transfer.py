@@ -30,6 +30,7 @@ Sierpinski triangles only in a pre-asymptotic regime (L <~ 16); asymptotically
 d ~ 3L/2 - 6, realized by a period-4 weight-6 "drifting soliton" -- the slope
 3/2 this module reproduces in its self-test.
 """
+
 import os
 import sys
 
@@ -42,7 +43,7 @@ from boundary_engine import pmul  # noqa: E402
 
 
 def pc(x):
-    return bin(int(x)).count('1')
+    return bin(int(x)).count("1")
 
 
 # ---------------------------------------------------------------------------
@@ -50,7 +51,8 @@ def pc(x):
 # ---------------------------------------------------------------------------
 def _poly_from_support(S, row_axis):
     """S = list of (i, j) monomials (x^i y^j). row_axis picks which of the two
-    exponents is the row variable x; the other is the column variable y."""
+    exponents is the row variable x; the other is the column variable y.
+    """
     if row_axis == 0:
         pts = [(i, j) for (i, j) in S]
     else:
@@ -60,7 +62,8 @@ def _poly_from_support(S, row_axis):
 
 def family_coeffs(Sf, Sg, row_axis):
     """Build {x_power: ymask} for f and g with a COMMON nonneg shift in both x
-    (row) and y (column). Returns (fc, gc, D)."""
+    (row) and y (column). Returns (fc, gc, D).
+    """
     pf = _poly_from_support(Sf, row_axis)
     pg = _poly_from_support(Sg, row_axis)
     allpts = pf + pg
@@ -81,7 +84,8 @@ def family_coeffs(Sf, Sg, row_axis):
 
 def choose_row_axis(Sf, Sg):
     """Pick the row axis (0 or 1) that minimizes the max x-degree D -> smallest
-    transfer-graph state. Tie-break: smaller column span."""
+    transfer-graph state. Tie-break: smaller column span.
+    """
     best = None
     for ax in (0, 1):
         fc, gc, D = family_coeffs(Sf, Sg, ax)
@@ -99,7 +103,7 @@ def choose_row_axis(Sf, Sg):
 # Transfer graph
 # ---------------------------------------------------------------------------
 def _ymul_inrange(coeff, val, W):
-    """coeff * val in F2[y]; return product or None if it leaves [0, W)."""
+    """Coeff * val in F2[y]; return product or None if it leaves [0, W)."""
     p = pmul(coeff, val)
     if p >> W:
         return None
@@ -112,7 +116,8 @@ def build_transfer_graph(Sf, Sg, W, CMAX, row_axis=None, exclude_zero=True):
     (keeps it finite). The all-zero window (the trivial logical) is EXCLUDED so
     its zero-cost self-loop cannot win the min-mean-cycle. States are enumerated
     exhaustively (not BFS) so every periodic operator is present.
-    Returns (states, edges) with edges[i] = list of (j, cost)."""
+    Returns (states, edges) with edges[i] = list of (j, cost).
+    """
     if row_axis is None:
         row_axis, _ = choose_row_axis(Sf, Sg)
     fc, gc, D = family_coeffs(Sf, Sg, row_axis)
@@ -138,6 +143,7 @@ def build_transfer_graph(Sf, Sg, W, CMAX, row_axis=None, exclude_zero=True):
             if cum + pc(m) > CMAX:
                 continue
             rec(slot + 1, cum + pc(m), acc + [m])
+
     rec(0, 0, [])
     states = list(states)
     idx = {s: i for i, s in enumerate(states)}
@@ -147,22 +153,26 @@ def build_transfer_graph(Sf, Sg, W, CMAX, row_axis=None, exclude_zero=True):
     # Window = rows i-D .. i-1 (a's then b's, oldest first); append (a_i, b_i).
     E = [[] for _ in range(len(states))]
     for s in states:
-        a_hist = s[:D]; b_hist = s[D:]
+        a_hist = s[:D]
+        b_hist = s[D:]
         for a_new in masks:
             for b_new in masks:
-                a_seq = a_hist + (a_new,)   # a_{i-D} .. a_i
+                a_seq = a_hist + (a_new,)  # a_{i-D} .. a_i
                 b_seq = b_hist + (b_new,)
-                acc = 0; ok = True
+                acc = 0
+                ok = True
                 for k, coeff in gc.items():
                     pr = _ymul_inrange(coeff, a_seq[D - k], W)
                     if pr is None:
-                        ok = False; break
+                        ok = False
+                        break
                     acc ^= pr
                 if ok:
                     for k, coeff in fc.items():
                         pr = _ymul_inrange(coeff, b_seq[D - k], W)
                         if pr is None:
-                            ok = False; break
+                            ok = False
+                            break
                         acc ^= pr
                 if not ok or acc != 0:
                     continue
@@ -185,14 +195,15 @@ def min_mean_cycle(V, E):
     policy-improvement rounds.
     """
     from collections import deque
-    INF = float('inf')
+
+    INF = float("inf")
     EPS = 1e-9
 
     # --- 1. Peel away nodes that cannot lie on any cycle (no live out-edge). ---
     outdeg = [len(E[u]) for u in range(V)]
     rev = [[] for _ in range(V)]
     for u in range(V):
-        for (v, _c) in E[u]:
+        for v, _c in E[u]:
             rev[v].append(u)
     alive = [d > 0 for d in outdeg]
     dead = deque(u for u in range(V) if not alive[u])
@@ -221,19 +232,19 @@ def min_mean_cycle(V, E):
         return INF
 
     # --- 2. Initial policy: cheapest out-edge from each alive node. ---
-    pi = [None] * V            # pi[u] = (successor, cost)
+    pi = [None] * V  # pi[u] = (successor, cost)
     for u in nodes:
         best = None
-        for (v, c) in adj[u]:
+        for v, c in adj[u]:
             if best is None or c < best[1]:
                 best = (v, c)
         pi[u] = best
 
     gain = [0.0] * V
     bias = [0.0] * V
-    state = [0] * V            # scratch for functional-graph cycle detection
+    state = [0] * V  # scratch for functional-graph cycle detection
 
-    for _ in range(len(nodes) + 5):   # generous cap; Howard converges quickly
+    for _ in range(len(nodes) + 5):  # generous cap; Howard converges quickly
         # --- 3. Value determination: every node follows pi to a unique cycle.
         for u in nodes:
             state[u] = 0
@@ -246,7 +257,7 @@ def min_mean_cycle(V, E):
                 state[u] = 1
                 path.append(u)
                 u = pi[u][0]
-            if state[u] == 1:                  # discovered a fresh cycle
+            if state[u] == 1:  # discovered a fresh cycle
                 ci = path.index(u)
                 cyc = path[ci:]
                 L = len(cyc)
@@ -259,9 +270,9 @@ def min_mean_cycle(V, E):
                     nx = cyc[(i + 1) % L]
                     bias[w] = pi[w][1] - g + bias[nx]
                 tail = path[:ci]
-            else:                              # path feeds an already-valued node
+            else:  # path feeds an already-valued node
                 tail = path
-            for w in reversed(tail):           # successor valued first
+            for w in reversed(tail):  # successor valued first
                 sv = pi[w][0]
                 gain[w] = gain[sv]
                 bias[w] = pi[w][1] - gain[sv] + bias[sv]
@@ -272,21 +283,21 @@ def min_mean_cycle(V, E):
         improved = False
         for u in nodes:
             mg = min(gain[v] for (v, _c) in adj[u])
-            if mg < gain[u] - EPS:             # an edge reaches a cheaper cycle
+            if mg < gain[u] - EPS:  # an edge reaches a cheaper cycle
                 bestval = None
                 pick = None
-                for (v, c) in adj[u]:
+                for v, c in adj[u]:
                     if gain[v] <= mg + EPS:
                         val = c - mg + bias[v]
                         if bestval is None or val < bestval:
                             bestval, pick = val, (v, c)
                 pi[u] = pick
                 improved = True
-            else:                              # same gain: try to reduce bias
+            else:  # same gain: try to reduce bias
                 g = gain[u]
                 bestval = bias[u]
                 pick = None
-                for (v, c) in adj[u]:
+                for v, c in adj[u]:
                     if abs(gain[v] - g) <= EPS:
                         val = c - g + bias[v]
                         if val < bestval - EPS:
@@ -314,7 +325,8 @@ def distance_slope(Sf, Sg, W, CMAX, Dcap=3):
     cheaper one. Some families have equal slopes on both axes, masking the
     distinction; others expose it (e.g. axis0=2/3 vs axis1=2, with exact d_X
     following 2/3). Returns (min_slope, {axis: (slope, |states|)}).
-    Axes whose max x-degree D exceeds Dcap are skipped (graph too large)."""
+    Axes whose max x-degree D exceeds Dcap are skipped (graph too large).
+    """
     per = {}
     for ax in (0, 1):
         _, _, D = family_coeffs(Sf, Sg, ax)
@@ -323,7 +335,7 @@ def distance_slope(Sf, Sg, W, CMAX, Dcap=3):
         s, V = slope(Sf, Sg, W, CMAX, ax)
         per[ax] = (s, V)
     if not per:
-        return float('inf'), per
+        return float("inf"), per
     return min(v[0] for v in per.values()), per
 
 
@@ -331,7 +343,8 @@ def distance_slope(Sf, Sg, W, CMAX, Dcap=3):
 # Self-test: must reproduce the flagship slope 3/2
 # ---------------------------------------------------------------------------
 def _shift_nonneg(S):
-    mi = min(p for p, _ in S); mj = min(q for _, q in S)
+    mi = min(p for p, _ in S)
+    mj = min(q for _, q in S)
     return [(p - mi, q - mj) for (p, q) in S]
 
 
@@ -353,5 +366,4 @@ if __name__ == "__main__":
     print(f"flagship Sf={Sf} Sg={Sg}  row_axis={ax} D={D}")
     for W, C in [(5, 4), (6, 4)]:
         s, V = slope(Sf, Sg, W, C)
-        print(f"  W={W} Cmax={C}: |states|={V:6d}  slope={s:.4f} /row"
-              f"   (expect ~1.5)", flush=True)
+        print(f"  W={W} Cmax={C}: |states|={V:6d}  slope={s:.4f} /row   (expect ~1.5)", flush=True)

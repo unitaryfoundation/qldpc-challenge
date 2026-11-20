@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[560,224,10]]",
  "code_type": "CSS",
  "n": 560,
@@ -4733,26 +4733,28 @@
    ]
   },
   "Z": {
-   "value": 16,
+   "value": 10,
    "confidence": "upper_bound",
    "witness": [
-    284,
-    323,
-    448,
-    453,
-    462,
-    463,
-    466,
-    468,
-    472,
-    478,
-    480,
-    490,
-    492,
-    494,
-    497,
-    503
-   ]
+    0,
+    5,
+    44,
+    53,
+    170,
+    187,
+    210,
+    212,
+    355,
+    367
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-20",
+    "found_at_samples": 2100,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
+   }
   }
  },
  "provenance": {
@@ -4763,7 +4765,7 @@
   "origin": "submission",
   "date": "2026-11-13",
   "model": "Beam 1.0",
-  "notes": "SCE code",
+  "notes": "SCE code Z-side value lowered from 16 to 10 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-10 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 10 is unchanged.",
   "references": [
    "arXiv:2606.24808v2"
   ],

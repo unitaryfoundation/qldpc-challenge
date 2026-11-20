@@ -6,6 +6,7 @@ can re-verify in seconds, and the lower bound shipped a solver's verdict.
 `verification.level` records what that verdict is worth, and the only way it
 stays meaningful is if claiming a level requires the artifact.
 """
+
 import copy
 import json
 import os
@@ -19,9 +20,13 @@ sys.path.insert(0, _HERE)
 
 import check_certs as C  # noqa: E402
 
-BASE = {"d": 12, "d_exact": True, "solver": "CryptoMiniSat 5.14.7 SAT",
-        "sides": {"X": {"value": 12, "exact": True}},
-        "verification": {"level": "solver"}}
+BASE = {
+    "d": 12,
+    "d_exact": True,
+    "solver": "CryptoMiniSat 5.14.7 SAT",
+    "sides": {"X": {"value": 12, "exact": True}},
+    "verification": {"level": "solver"},
+}
 
 
 @pytest.mark.board
@@ -41,14 +46,14 @@ def test_the_board_claims_no_level_it_cannot_evidence():
     replay recipe #2511 specifies for it.
     """
     import glob
+
     levels = {}
     for p in glob.glob(os.path.join(_ROOT, "certs", "*.json")):
         with open(p, encoding="utf-8") as f:
             cert = json.load(f)
         v = cert.get("verification") or {}
         levels.setdefault(v.get("level"), []).append((p, v))
-    assert set(levels) <= {"solver", "proof_log", "formal"}, \
-        f"unknown level: {sorted(set(levels))}"
+    assert set(levels) <= {"solver", "proof_log", "formal"}, f"unknown level: {sorted(set(levels))}"
     for level, rows in levels.items():
         if level == "solver":
             continue
@@ -62,21 +67,19 @@ def test_the_board_claims_no_level_it_cannot_evidence():
             # it on a schedule.
             if v.get("artifact"):
                 art = os.path.join(_ROOT, v["artifact"])
-                assert os.path.isfile(art), \
-                    f"{slug}: level {level} names an artifact not in the tree"
+                assert os.path.isfile(art), f"{slug}: level {level} names an artifact not in the tree"
                 assert os.path.getsize(art) > 0, f"{slug}: empty artifact"
             else:
-                assert v.get("replay"), \
-                    f"{slug}: level {level} with neither artifact nor replay"
+                assert v.get("replay"), f"{slug}: level {level} with neither artifact nor replay"
                 if level == "proof_log":
-                    assert v.get("cnf_sha256"), \
-                        f"{slug}: replayed proof_log without cnf_sha256"
+                    assert v.get("cnf_sha256"), f"{slug}: replayed proof_log without cnf_sha256"
             assert v.get("checker"), f"{slug}: level {level} with no checker"
     for path, v in levels.get("formal", []):
         assert v.get("replay") and v.get("checks_sha256"), (
             f"{os.path.basename(path)}: a formal certificate needs the "
             "replay recipe and the hash binding it to this code, since the "
-            "proof is a theorem rather than a file")
+            "proof is a theorem rather than a file"
+        )
 
 
 @pytest.mark.parametrize("level", ["proof_log", "formal"])
@@ -87,8 +90,9 @@ def test_a_stronger_level_needs_an_artifact_that_exists(level):
 
     c["verification"]["artifact"] = "certs/proofs/does-not-exist.drat"
     probs = C.evidence_problems("x", c)
-    assert probs and "not a file committed in this tree" in probs[0], \
+    assert probs and "not a file committed in this tree" in probs[0], (
         "an artifact that is not committed must be refused"
+    )
 
 
 @pytest.mark.parametrize("level", ["proof_log", "formal"])
@@ -96,15 +100,13 @@ def test_a_stronger_level_needs_a_named_checker(level):
     c = copy.deepcopy(BASE)
     c["verification"] = {"level": level, "artifact": "schema/cert.schema.json"}
     probs = C.evidence_problems("x", c)
-    assert any("checker" in p for p in probs), \
-        "an unchecked artifact is not a check"
+    assert any("checker" in p for p in probs), "an unchecked artifact is not a check"
 
 
 def test_solver_level_does_not_smuggle_an_artifact():
     """If something checkable exists, the certificate should claim its level."""
     c = copy.deepcopy(BASE)
-    c["verification"] = {"level": "solver",
-                         "artifact": "schema/cert.schema.json"}
+    c["verification"] = {"level": "solver", "artifact": "schema/cert.schema.json"}
     assert C.evidence_problems("x", c)
 
 
@@ -121,25 +123,29 @@ def test_a_well_formed_stronger_certificate_passes():
     entry by its hash and is exercised below with a real one.
     """
     c = copy.deepcopy(BASE)
-    c["verification"] = {"level": "proof_log",
-                         "artifact": "schema/cert.schema.json",
-                         "checker": "drat-trim 2024-05",
-                         "reference": "arXiv:2605.16523"}
+    c["verification"] = {
+        "level": "proof_log",
+        "artifact": "schema/cert.schema.json",
+        "checker": "drat-trim 2024-05",
+        "reference": "arXiv:2605.16523",
+    }
     assert C.evidence_problems("x", c) == []
 
 
-@pytest.mark.parametrize("art", [
-    "/etc/hosts",                      # absolute: os.path.join drops ROOT
-    "certs/../verify/check_certs.py",  # resolves in-tree, still not a path to
-                                       # store, since a reader has to normalise
-                                       # it before it names anything
-    "certs",                           # a directory is not an artifact
-    "certs/heuristic",
-])
+@pytest.mark.parametrize(
+    "art",
+    [
+        "/etc/hosts",  # absolute: os.path.join drops ROOT
+        "certs/../verify/check_certs.py",  # resolves in-tree, still not a path to
+        # store, since a reader has to normalise
+        # it before it names anything
+        "certs",  # a directory is not an artifact
+        "certs/heuristic",
+    ],
+)
 def test_an_artifact_outside_the_tree_is_refused(art):
     c = copy.deepcopy(BASE)
-    c["verification"] = {"level": "proof_log", "artifact": art,
-                         "checker": "drat-trim 2024-05"}
+    c["verification"] = {"level": "proof_log", "artifact": art, "checker": "drat-trim 2024-05"}
     assert C.evidence_problems("x", c), f"{art} must not be accepted"
 
 
@@ -154,8 +160,7 @@ def test_solver_level_claims_no_check_it_did_not_run(field):
     assert C.evidence_problems("x", c)
 
 
-def test_the_cert_writer_stamps_a_level_the_checker_accepts(tmp_path,
-                                                           monkeypatch):
+def test_the_cert_writer_stamps_a_level_the_checker_accepts(tmp_path, monkeypatch):
     """The gate is only worth having if the next regeneration satisfies it.
 
     certify_all.py writes certs/<slug>.json, so a cert written today has to
@@ -164,8 +169,9 @@ def test_the_cert_writer_stamps_a_level_the_checker_accepts(tmp_path,
     """
     import certify_all
 
-    monkeypatch.setattr(certify_all, "certify", lambda doc, tlim: {
-        "d": 7, "d_exact": True, "sides": {"X": {"value": 7, "exact": True}}})
+    monkeypatch.setattr(
+        certify_all, "certify", lambda doc, tlim: {"d": 7, "d_exact": True, "sides": {"X": {"value": 7, "exact": True}}}
+    )
     monkeypatch.setattr(certify_all, "CERTS", str(tmp_path / "certs"))
 
     src = tmp_path / "98-6-7.json"
@@ -180,18 +186,26 @@ def test_the_cert_writer_stamps_a_level_the_checker_accepts(tmp_path,
 
 # -- the formal tier's binding (issue #2511) ---------------------------------
 
-FORMAL_REPLAY = {"repo": "github.com/VerifiedQC/Lean-QEC", "commit": "e0b90148694c",
-                 "theorem": "BB72_dist_6", "build": "lake exe cache get && lake build",
-                 "toolchain": "leanprover/lean4:v4.30.0-rc2", "mathlib": "5450b53e5ddc"}
+FORMAL_REPLAY = {
+    "repo": "github.com/VerifiedQC/Lean-QEC",
+    "commit": "e0b90148694c",
+    "theorem": "BB72_dist_6",
+    "build": "lake exe cache get && lake build",
+    "toolchain": "leanprover/lean4:v4.30.0-rc2",
+    "mathlib": "5450b53e5ddc",
+}
 
 
 def _formal(slug="72-12-6", **over):
     c = copy.deepcopy(BASE)
     with open(os.path.join(_ROOT, "codes", f"{slug}.json"), encoding="utf-8") as f:
         doc = json.load(f)
-    c["verification"] = {"level": "formal", "checker": "Lean 4 v4.30.0-rc2",
-                         "replay": dict(FORMAL_REPLAY),
-                         "checks_sha256": C.checks_sha256(doc)}
+    c["verification"] = {
+        "level": "formal",
+        "checker": "Lean 4 v4.30.0-rc2",
+        "replay": dict(FORMAL_REPLAY),
+        "checks_sha256": C.checks_sha256(doc),
+    }
     c["verification"].update(over)
     return c
 
@@ -224,6 +238,7 @@ def test_a_formal_certificate_for_an_absent_entry_is_refused():
 
 # --- partial certificates: a proven lower bound below the claim (issue #4230) ----------------
 
+
 def _entry(slug):
     with open(os.path.join(_ROOT, "codes", f"{slug}.json"), encoding="utf-8") as f:
         return json.load(f)
@@ -232,15 +247,31 @@ def _entry(slug):
 def _partial(slug="72-12-6", d_lower=3, **over):
     doc = _entry(slug)
     d = doc["distance"]["d"]
-    ladder = [{"W": w, "status": "UNSAT", "secs": 0.1} for w in range(1, d_lower)] \
-        + [{"W": d_lower, "status": "TIMEOUT", "secs": 1.0}]
-    c = {"name": doc["name"], "d": d, "d_exact": False, "d_lower": d_lower,
-         "solver": "CryptoMiniSat 5.14 SAT", "tlim_per_solve": 1, "encoding": "selector",
-         "sides": {s: {"value": d, "exact": False, "status": "TIMEOUT", "secs": 1.0, "proved_min": d_lower,
-                       "ladder": copy.deepcopy(ladder), "note": f"no logical < {d_lower} exists; W = {d_lower} TIMEOUT"}
-                   for s in "XZ"},
-         "verification": {"level": "solver", "note": "no proof path was run",
-                          "checks_sha256": C.checks_sha256(doc)}}
+    ladder = [{"W": w, "status": "UNSAT", "secs": 0.1} for w in range(1, d_lower)] + [
+        {"W": d_lower, "status": "TIMEOUT", "secs": 1.0}
+    ]
+    c = {
+        "name": doc["name"],
+        "d": d,
+        "d_exact": False,
+        "d_lower": d_lower,
+        "solver": "CryptoMiniSat 5.14 SAT",
+        "tlim_per_solve": 1,
+        "encoding": "selector",
+        "sides": {
+            s: {
+                "value": d,
+                "exact": False,
+                "status": "TIMEOUT",
+                "secs": 1.0,
+                "proved_min": d_lower,
+                "ladder": copy.deepcopy(ladder),
+                "note": f"no logical < {d_lower} exists; W = {d_lower} TIMEOUT",
+            }
+            for s in "XZ"
+        },
+        "verification": {"level": "solver", "note": "no proof path was run", "checks_sha256": C.checks_sha256(doc)},
+    }
     c.update(over)
     return c
 
@@ -325,16 +356,34 @@ def test_an_exact_certificate_may_carry_only_its_own_distance_as_d_lower():
 
 # --- stabilizer partial certificates: the single Pauli side P (issue #4718) -------------------
 
+
 def _stab_partial(slug="90-21-10", d_lower=7, **over):
     doc = _entry(slug)
     d = doc["distance"]["d"]
-    c = {"name": doc["name"], "d": d, "d_exact": False, "d_lower": d_lower,
-         "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search", "tlim_per_solve": 600,
-         "encoding": "pauli-mechanisms",
-         "sides": {"P": {"value": d, "exact": False, "status": "TIMEOUT", "secs": 600.0, "proved_min": d_lower,
-                         "note": f"lower bound {d_lower} after 600 s"}},
-         "verification": {"level": "solver", "note": "exhaustion inside the tool's kernel",
-                          "checks_sha256": C.checks_sha256(doc)}}
+    c = {
+        "name": doc["name"],
+        "d": d,
+        "d_exact": False,
+        "d_lower": d_lower,
+        "solver": "tropidist 0123456789ab (arXiv:2611.08247) exhaustive search",
+        "tlim_per_solve": 600,
+        "encoding": "pauli-mechanisms",
+        "sides": {
+            "P": {
+                "value": d,
+                "exact": False,
+                "status": "TIMEOUT",
+                "secs": 600.0,
+                "proved_min": d_lower,
+                "note": f"lower bound {d_lower} after 600 s",
+            }
+        },
+        "verification": {
+            "level": "solver",
+            "note": "exhaustion inside the tool's kernel",
+            "checks_sha256": C.checks_sha256(doc),
+        },
+    }
     c.update(over)
     return c
 
@@ -361,8 +410,9 @@ def test_the_sides_of_a_partial_certificate_match_the_entry_kind():
 def test_the_stabilizer_binding_hash_names_the_generator_set_not_the_file():
     doc = _entry("90-21-10")
     same = copy.deepcopy(doc)
-    same["checks"]["S"] = [{"X": list(reversed(g["X"])), "Z": list(reversed(g["Z"]))}
-                           for g in reversed(doc["checks"]["S"])]
+    same["checks"]["S"] = [
+        {"X": list(reversed(g["X"])), "Z": list(reversed(g["Z"]))} for g in reversed(doc["checks"]["S"])
+    ]
     assert C.checks_sha256(doc) == C.checks_sha256(same)
     assert len(C.checks_sha256(doc)) == 64
     assert C.checks_sha256(doc) != C.checks_sha256(_entry("5-1-3"))

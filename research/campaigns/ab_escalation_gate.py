@@ -22,6 +22,7 @@ Nothing here judges a code: the bar is a synthetic campaign target shared by
 both arms, NOT a board bar. All readings are upper bounds witnessed by found
 logicals, and every rung is persisted before anything is decided.
 """
+
 import json
 import os
 import sys
@@ -32,12 +33,11 @@ sys.path.insert(0, os.path.join(ROOT, "kit"))
 
 import escalation as E
 from bb import build_bb
-from search import sample_bb, screen, efficiency
+from search import efficiency, sample_bb, screen
 from surrogate import distance_rand, prepare_distance_search
 
 STATE_DIR = os.path.join(ROOT, "candidates", "ab_gate")
-POOL_SPEC = dict(num=200, l_range=(3, 7), m_range=(3, 7), weight=3, seed=11,
-                 n_range=(30, 130))
+POOL_SPEC = dict(num=200, l_range=(3, 7), m_range=(3, 7), weight=3, seed=11, n_range=(30, 130))
 SCREEN_TRIALS = 800
 LADDER = (2_000, 20_000, 100_000, 400_000)
 CAP = sum(LADDER)
@@ -68,7 +68,7 @@ def init_pool():
     # Survivors spread across the ranking, so both arms see doomed, live, and
     # borderline ladders rather than only winners.
     picks, seen = [], set()
-    for r in recs[:2] + recs[len(recs) // 2 - 1: len(recs) // 2 + 1] + recs[-2:]:
+    for r in recs[:2] + recs[len(recs) // 2 - 1 : len(recs) // 2 + 1] + recs[-2:]:
         if r["fingerprint"] not in seen:
             seen.add(r["fingerprint"])
             picks.append(r)
@@ -77,25 +77,34 @@ def init_pool():
         raise SystemExit(
             f"only {len(picks)} survivors from {len(recs)} screened records -- "
             "pool too tight for a spread campaign; widen POOL_SPEC, do not "
-            "proceed with a vacuous A/B")
+            "proceed with a vacuous A/B"
+        )
     bar = round((effs[len(effs) // 2 - 1] + effs[len(effs) // 2]) / 2, 1)
 
     def snap():
-        return [{"spec": r["spec"], "n": r["n"], "k": r["k"],
-                 "fingerprint": r["fingerprint"],
-                 "screen_eff": r["efficiency"], "screen_d": r["d"],
-                 "ladder": [], "spent": 0, "disposition": "pending",
-                 "level": 0, "repeats": 0, "brief_id": None}
-                for r in picks]
+        return [
+            {
+                "spec": r["spec"],
+                "n": r["n"],
+                "k": r["k"],
+                "fingerprint": r["fingerprint"],
+                "screen_eff": r["efficiency"],
+                "screen_d": r["d"],
+                "ladder": [],
+                "spent": 0,
+                "disposition": "pending",
+                "level": 0,
+                "repeats": 0,
+                "brief_id": None,
+            }
+            for r in picks
+        ]
 
-    state = {"bar": bar, "ladder": list(LADDER), "cap": CAP,
-             "pool_size": len(recs),
-             "base": snap(), "gate": snap()}
+    state = {"bar": bar, "ladder": list(LADDER), "cap": CAP, "pool_size": len(recs), "base": snap(), "gate": snap()}
     _save(state)
     print(f"pool screened: {len(recs)} unique; campaign bar={bar}")
     for c in state["base"]:
-        print(f"  [[{c['n']},{c['k']},<={c['screen_d']}]] "
-              f"screen_eff={c['screen_eff']} fp={c['fingerprint']}")
+        print(f"  [[{c['n']},{c['k']},<={c['screen_d']}]] screen_eff={c['screen_eff']} fp={c['fingerprint']}")
 
 
 def _run_rung(c, trials):
@@ -103,12 +112,17 @@ def _run_rung(c, trials):
     spec = c["spec"]
     HX, HZ = build_bb(spec["l"], spec["m"], spec["A"], spec["B"])
     prep = prepare_distance_search(HX, HZ)
-    d = int(distance_rand(HX, HZ, trials=trials,
-                          seed=SEED + 1000 * c["repeats"] + len(c["ladder"]) * 7919
-                          + int(c["fingerprint"], 16),
-                          backend="numpy", prepared=prep))
-    c["ladder"].append({"trials": trials, "d": d, "fresh": True,
-                        "label": f"rung{len(c['ladder'])}+{c['repeats']}r"})
+    d = int(
+        distance_rand(
+            HX,
+            HZ,
+            trials=trials,
+            seed=SEED + 1000 * c["repeats"] + len(c["ladder"]) * 7919 + int(c["fingerprint"], 16),
+            backend="numpy",
+            prepared=prep,
+        )
+    )
+    c["ladder"].append({"trials": trials, "d": d, "fresh": True, "label": f"rung{len(c['ladder'])}+{c['repeats']}r"})
     c["spent"] += trials
     return d
 
@@ -116,11 +130,15 @@ def _run_rung(c, trials):
 def _brief_for(state, c):
     rungs = [(r["trials"], r["d"], r["fresh"]) for r in c["ladder"]]
     return E.rung_brief(
-        c["n"], c["k"], rungs, bar=state["bar"], family="bb",
-        spec={"l": c["spec"]["l"], "m": c["spec"]["m"],
-              "A": c["spec"]["A"], "B": c["spec"]["B"]},
+        c["n"],
+        c["k"],
+        rungs,
+        bar=state["bar"],
+        family="bb",
+        spec={"l": c["spec"]["l"], "m": c["spec"]["m"], "A": c["spec"]["A"], "B": c["spec"]["B"]},
         next_rung_trials=state["ladder"][min(c["level"], len(state["ladder"]) - 1)],
-        budget_remaining=state["cap"] - c["spent"])
+        budget_remaining=state["cap"] - c["spent"],
+    )
 
 
 def arm_base():
@@ -136,9 +154,12 @@ def arm_base():
         best = min(r["d"] for r in c["ladder"])
         above = best * best * c["k"] / c["n"] >= state["bar"]
         c["disposition"] = "above-bar" if above else "below-bar"
-        print(f"base [[{c['n']},{c['k']}]] best<={best} "
-              f"eff={_eff(c['n'], c['k'], best)} spent={c['spent']} "
-              f"-> {c['disposition']}", flush=True)
+        print(
+            f"base [[{c['n']},{c['k']}]] best<={best} "
+            f"eff={_eff(c['n'], c['k'], best)} spent={c['spent']} "
+            f"-> {c['disposition']}",
+            flush=True,
+        )
         _save(state)
     _save(state)
 
@@ -160,13 +181,14 @@ def gate_next():
         _run_rung(c, trials)
         brief = _brief_for(state, c)
         c["brief_id"] = brief["id"]
-        with open(os.path.join(bdir, f"{brief['id']}.json"), "w",
-                  encoding="utf-8") as f:
+        with open(os.path.join(bdir, f"{brief['id']}.json"), "w", encoding="utf-8") as f:
             json.dump(brief, f, indent=1, sort_keys=True)
         best = min(r["d"] for r in c["ladder"])
-        print(f"gate [[{c['n']},{c['k']}]] rung({trials}T) best<={best} "
-              f"eff={_eff(c['n'], c['k'], best)} spent={c['spent']} "
-              f"brief={brief['id']}")
+        print(
+            f"gate [[{c['n']},{c['k']}]] rung({trials}T) best<={best} "
+            f"eff={_eff(c['n'], c['k'], best)} spent={c['spent']} "
+            f"brief={brief['id']}"
+        )
         n_briefs += 1
     _save(state)
     print(f"\n{n_briefs} brief(s) await jev_decide in {bdir}")
@@ -198,15 +220,15 @@ def harness_override(action, facts, *, level, n_levels):
         # The bound can only fall and it already scores below the bar, so
         # deeper trials cannot rescue this ladder: abandoning destroys
         # nothing, and continuing to spend on it does.
-        return "abandon-ladder", ("harness: ladder proven below bar (bound "
-                                  "can only fall), abandoning on its own "
-                                  "authority")
+        return "abandon-ladder", (
+            "harness: ladder proven below bar (bound can only fall), abandoning on its own authority"
+        )
     if action == "hold-deepen" and level < n_levels - 1:
         # Replaying a depth the bound has already settled buys nothing, so
         # the harness advances the depth rather than the trial count.
         return "promote-next-rung", (
-            f"harness: bound settled over {E.MIN_FLAT_RUNGS} fresh rungs, "
-            "advancing depth on its own authority")
+            f"harness: bound settled over {E.MIN_FLAT_RUNGS} fresh rungs, advancing depth on its own authority"
+        )
     return action, None
 
 
@@ -226,11 +248,8 @@ def gate_apply():
                 verdict = json.load(f)
         brief = _brief_for(state, c)
         assert brief["id"] == c["brief_id"], "state drifted from brief"
-        d = E.apply_verdict(brief, verdict,
-                            budget_remaining=state["cap"] - c["spent"])
-        action, why = harness_override(d["action"], brief["facts"],
-                                       level=c["level"],
-                                       n_levels=len(state["ladder"]))
+        d = E.apply_verdict(brief, verdict, budget_remaining=state["cap"] - c["spent"])
+        action, why = harness_override(d["action"], brief["facts"], level=c["level"], n_levels=len(state["ladder"]))
         if why:
             d = dict(d, action=action, reason=d["reason"] + "; " + why)
         if action == "abandon-ladder":
@@ -259,19 +278,20 @@ def report():
     print(f"campaign bar (synthetic, shared): {bar}\n")
     for arm in ("base", "gate"):
         total = sum(c["spent"] for c in state[arm])
-        print(f"== {arm}: {total} trials spent "
-              f"(envelope {state['cap'] * len(state[arm])})")
+        print(f"== {arm}: {total} trials spent (envelope {state['cap'] * len(state[arm])})")
         for c in state[arm]:
             if not c["ladder"]:
                 print(f"  [[{c['n']},{c['k']}]] no rungs")
                 continue
             best = min(r["d"] for r in c["ladder"])
             above = best * best * c["k"] / c["n"] >= bar
-            print(f"  [[{c['n']},{c['k']}]] best<={best} "
-                  f"eff={_eff(c['n'], c['k'], best)} "
-                  f"{'ABOVE' if above else 'below'}-bar | {c['disposition']} "
-                  f"spent={c['spent']} settled_at_rung={settle_rung(c)} "
-                  f"ladder={[r['d'] for r in c['ladder']]}")
+            print(
+                f"  [[{c['n']},{c['k']}]] best<={best} "
+                f"eff={_eff(c['n'], c['k'], best)} "
+                f"{'ABOVE' if above else 'below'}-bar | {c['disposition']} "
+                f"spent={c['spent']} settled_at_rung={settle_rung(c)} "
+                f"ladder={[r['d'] for r in c['ladder']]}"
+            )
         print()
 
 

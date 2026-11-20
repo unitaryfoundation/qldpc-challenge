@@ -20,6 +20,7 @@ toolchain and the commit date of its mathlib revision, from the GitHub API
 
 Needs git with git-lfs and elan on PATH.
 """
+
 import argparse
 import datetime
 import glob
@@ -97,8 +98,9 @@ def _gh_json(path):
 
     GITHUB_TOKEN or GH_TOKEN is sent when set, so CI stays inside its rate limit.
     """
-    req = urllib.request.Request(GITHUB_API + path, headers={
-        "Accept": "application/vnd.github+json", "User-Agent": "qldpc-replay-formal"})
+    req = urllib.request.Request(
+        GITHUB_API + path, headers={"Accept": "application/vnd.github+json", "User-Agent": "qldpc-replay-formal"}
+    )
     tok = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     if tok:
         req.add_header("Authorization", f"Bearer {tok}")
@@ -133,8 +135,14 @@ def toolchain_dates(toolchain, mathlib, now=None, fetch=_gh_json):
     here can fail a replay.
     """
     now = now or datetime.datetime.now(datetime.timezone.utc)
-    out = {"toolchain_date": None, "toolchain_age_days": None, "latest_toolchain": None,
-           "latest_toolchain_date": None, "mathlib_date": None, "mathlib_age_days": None}
+    out = {
+        "toolchain_date": None,
+        "toolchain_age_days": None,
+        "latest_toolchain": None,
+        "latest_toolchain_date": None,
+        "mathlib_date": None,
+        "mathlib_age_days": None,
+    }
     tc = toolchain_tag(toolchain)
     if tc:
         origin, tag = tc
@@ -191,9 +199,9 @@ def _run(cmd, cwd, timeout, log, env=None):
     log.flush()
     t = time.monotonic()
     try:
-        p = subprocess.run(cmd, shell=shell, cwd=cwd, stdout=log,
-                           stderr=subprocess.STDOUT, timeout=timeout,
-                           env=env, check=False)
+        p = subprocess.run(
+            cmd, shell=shell, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, timeout=timeout, env=env, check=False
+        )
         return p.returncode, time.monotonic() - t
     except subprocess.TimeoutExpired:
         return "timeout", time.monotonic() - t
@@ -211,8 +219,13 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
     v = cert["verification"]
     probs = recipe_problems(v)
     if probs:
-        return {"slug": slug, "status": "unreplayable", "detail": "; ".join(probs),
-                "seconds": 0.0, "mode": "head" if head else "pinned"}
+        return {
+            "slug": slug,
+            "status": "unreplayable",
+            "detail": "; ".join(probs),
+            "seconds": 0.0,
+            "mode": "head" if head else "pinned",
+        }
     r = v["replay"]
     repo = r["repo"]
     url = _replay_url(repo)
@@ -225,37 +238,44 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
         shutil.rmtree(src)
     logpath = os.path.join(base, "replay.log")
     t0 = time.monotonic()
-    result = {"slug": slug, "theorem": r.get("theorem"), "commit": r["commit"], "repo": repo,
-              "toolchain": r.get("toolchain"), "mathlib": r.get("mathlib"),
-              "mode": "head" if head else "pinned", "log": logpath}
+    result = {
+        "slug": slug,
+        "theorem": r.get("theorem"),
+        "commit": r["commit"],
+        "repo": repo,
+        "toolchain": r.get("toolchain"),
+        "mathlib": r.get("mathlib"),
+        "mode": "head" if head else "pinned",
+        "log": logpath,
+    }
     if head:
         result["pinned_commit"] = r["commit"]
     with open(logpath, "w", encoding="utf-8") as log:
         deadline = lambda: max(1, int(timeout - (time.monotonic() - t0)))  # noqa: E731
-        rc, _ = _run(["git", "clone", "--quiet", "--no-checkout", "--end-of-options",
-                      url, "src"], base, deadline(), log)
+        rc, _ = _run(
+            ["git", "clone", "--quiet", "--no-checkout", "--end-of-options", url, "src"], base, deadline(), log
+        )
         if rc != 0:
             result.update(status="clone_failed" if rc != "timeout" else "timeout")
         else:
             if head:
-                rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options",
-                            "origin/HEAD"], src, deadline(), log)
+                rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options", "origin/HEAD"], src, deadline(), log)
                 detail = f"the default branch of {repo} could not be checked out"
             else:
-                rc, _ = _run(["git", "fetch", "--quiet", "--end-of-options",
-                            "origin", r["commit"]], src, deadline(), log)
+                rc, _ = _run(
+                    ["git", "fetch", "--quiet", "--end-of-options", "origin", r["commit"]], src, deadline(), log
+                )
                 if rc == 0:
-                    rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options",
-                                r["commit"]], src, deadline(), log)
+                    rc, _ = _run(["git", "checkout", "--quiet", "--end-of-options", r["commit"]], src, deadline(), log)
                 detail = f"commit {r['commit']} is not reachable from {repo}"
             if rc != 0:
-                result.update(status="checkout_failed" if rc != "timeout" else "timeout",
-                              detail=detail)
+                result.update(status="checkout_failed" if rc != "timeout" else "timeout", detail=detail)
             else:
                 if head:
                     try:
                         result["commit"] = subprocess.check_output(
-                            ["git", "rev-parse", "HEAD"], cwd=src, text=True).strip()
+                            ["git", "rev-parse", "HEAD"], cwd=src, text=True
+                        ).strip()
                     except subprocess.CalledProcessError:
                         pass
                 # without LFS filters `git lfs pull` leaves pointer files
@@ -264,8 +284,10 @@ def replay(slug, cert, *, timeout, keep=False, workdir=None, head=False):
                 if head:
                     # the branch's own pins are the point of this mode
                     result["toolchain"], result["mathlib"] = _read_pins(src)
-                    log.write(f"head {result['commit']}: lean-toolchain {result['toolchain']!r}, "
-                              f"mathlib {result['mathlib']!r}\n")
+                    log.write(
+                        f"head {result['commit']}: lean-toolchain {result['toolchain']!r}, "
+                        f"mathlib {result['mathlib']!r}\n"
+                    )
                 elif tc:
                     have, _ = _read_pins(src)
                     if have != tc:
@@ -297,13 +319,14 @@ def main(argv=None):
     ap.add_argument("slugs", nargs="*", help="certificates to replay (default: --all)")
     ap.add_argument("--all", action="store_true", help="every formal certificate")
     ap.add_argument("--list", action="store_true", help="print what would run and exit")
-    ap.add_argument("--head", action="store_true",
-                    help="advisory: build at the repository's current default branch with "
-                         "its own toolchain instead of the recorded commit")
-    ap.add_argument("--offline", action="store_true",
-                    help="skip the GitHub lookups for toolchain and mathlib dates")
-    ap.add_argument("--timeout", type=int, default=3600,
-                    help="wall-clock cap per certificate, seconds (default 3600)")
+    ap.add_argument(
+        "--head",
+        action="store_true",
+        help="advisory: build at the repository's current default branch with "
+        "its own toolchain instead of the recorded commit",
+    )
+    ap.add_argument("--offline", action="store_true", help="skip the GitHub lookups for toolchain and mathlib dates")
+    ap.add_argument("--timeout", type=int, default=3600, help="wall-clock cap per certificate, seconds (default 3600)")
     ap.add_argument("--keep", action="store_true", help="keep the checkout and log of every run")
     ap.add_argument("--workdir", default=None, help="parent directory for checkouts (default: temp)")
     ap.add_argument("--json", default=None, help="write the per-certificate results here")
@@ -320,8 +343,10 @@ def main(argv=None):
     if args.list:
         for slug, cert in wanted.items():
             r = cert["verification"].get("replay") or {}
-            print(f"{slug}: {r.get('repo')} @ {str(r.get('commit'))[:12]} toolchain {r.get('toolchain')} "
-                  f"mathlib {r.get('mathlib')} theorem {r.get('theorem')} :: {r.get('build')}")
+            print(
+                f"{slug}: {r.get('repo')} @ {str(r.get('commit'))[:12]} toolchain {r.get('toolchain')} "
+                f"mathlib {r.get('mathlib')} theorem {r.get('theorem')} :: {r.get('build')}"
+            )
         return 0
     results = []
     for slug, cert in wanted.items():
@@ -333,19 +358,24 @@ def main(argv=None):
             res.update(toolchain_dates(res.get("toolchain"), res.get("mathlib")))
         results.append(res)
         mark = "ok  " if res["status"] == "ok" else "FAIL"
-        print(f"{mark} {slug}: {res['status']} in {res['seconds']}s"
-              + (f" ({res['detail']})" if res.get("detail") else "")
-              + (f" at head {str(res.get('commit'))[:12]}" if args.head else "")
-              + f"; toolchain {_dated(res.get('toolchain'), res.get('toolchain_date'), res.get('toolchain_age_days'))}"
-              + (f", current release {res['latest_toolchain']}" if res.get("latest_toolchain") else "")
-              + f"; mathlib {_dated(res.get('mathlib'), res.get('mathlib_date'), res.get('mathlib_age_days'))}"
-              + (f"; log {res['log']}" if res.get("log") else ""), flush=True)
+        print(
+            f"{mark} {slug}: {res['status']} in {res['seconds']}s"
+            + (f" ({res['detail']})" if res.get("detail") else "")
+            + (f" at head {str(res.get('commit'))[:12]}" if args.head else "")
+            + f"; toolchain {_dated(res.get('toolchain'), res.get('toolchain_date'), res.get('toolchain_age_days'))}"
+            + (f", current release {res['latest_toolchain']}" if res.get("latest_toolchain") else "")
+            + f"; mathlib {_dated(res.get('mathlib'), res.get('mathlib_date'), res.get('mathlib_age_days'))}"
+            + (f"; log {res['log']}" if res.get("log") else ""),
+            flush=True,
+        )
     if args.json:
         with open(args.json, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=1)
     bad = [r for r in results if r["status"] != "ok"]
-    print(f"{len(results) - len(bad)} replayed, {len(bad)} failed"
-          + (" (advisory head replay; nothing gates on it)" if args.head else ""))
+    print(
+        f"{len(results) - len(bad)} replayed, {len(bad)} failed"
+        + (" (advisory head replay; nothing gates on it)" if args.head else "")
+    )
     return 1 if bad else 0
 
 

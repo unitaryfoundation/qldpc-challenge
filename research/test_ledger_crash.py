@@ -10,6 +10,7 @@ without saying which kind of zero it is, that a crash lands under errors and
 not negatives, and that a crash can neither reset nor advance the
 no-progress streak.
 """
+
 import json
 import os
 import sys
@@ -29,14 +30,17 @@ from campaign import (  # noqa: E402
 
 
 def _campaign(**over):
-    obj = {"campaign": {
-        "schema_version": 1, "id": "crash-test", "name": "crash test",
-        "objective": {"metric": "kd2_over_n", "direction": "maximize"},
-        "methods": {"families": ["bivariate-bicycle"]},
-        "budget": {"candidates_screened": 100},
-        "stopping": [{"type": "no_progress", "experiments": 2},
-                     {"type": "budget_exhausted"}],
-    }}
+    obj = {
+        "campaign": {
+            "schema_version": 1,
+            "id": "crash-test",
+            "name": "crash test",
+            "objective": {"metric": "kd2_over_n", "direction": "maximize"},
+            "methods": {"families": ["bivariate-bicycle"]},
+            "budget": {"candidates_screened": 100},
+            "stopping": [{"type": "no_progress", "experiments": 2}, {"type": "budget_exhausted"}],
+        }
+    }
     obj["campaign"].update(over)
     return Campaign(obj)
 
@@ -45,8 +49,7 @@ def test_a_zero_filed_as_a_negative_is_refused():
     """The driver pattern that hid both crashes no longer closes."""
     led = Ledger(_campaign())
     led.start_experiment("bivariate-bicycle", seed=1)
-    led.record_negative("sweep failed",
-                        "ValueError: invalid literal for int() with base 10")
+    led.record_negative("sweep failed", "ValueError: invalid literal for int() with base 10")
     with pytest.raises(CampaignError, match="screened zero"):
         led.end_experiment()
 
@@ -62,22 +65,19 @@ def test_a_silent_zero_is_refused():
 def test_a_crash_closes_as_aborted_and_lands_under_errors():
     led = Ledger(_campaign())
     led.start_experiment("bivariate-bicycle", seed=1)
-    led.record_error("sweep failed", "NameError: name 'dominators' is not "
-                                     "defined")
+    led.record_error("sweep failed", "NameError: name 'dominators' is not defined")
     exp = led.end_experiment()
     assert exp["aborted"] is True
-    assert led.errors == [{"what": "sweep failed",
-                           "detail": "NameError: name 'dominators' is not "
-                                     "defined",
-                           "experiment": 0}]
+    assert led.errors == [
+        {"what": "sweep failed", "detail": "NameError: name 'dominators' is not defined", "experiment": 0}
+    ]
     assert led.negative_results == []
 
 
 def test_a_legitimate_zero_closes_when_it_says_so():
     led = Ledger(_campaign())
     led.start_experiment("bivariate-bicycle", seed=1)
-    led.record_negative("empty at these parameters",
-                        "the sampler yields nothing for l=3, m=3")
+    led.record_negative("empty at these parameters", "the sampler yields nothing for l=3, m=3")
     exp = led.end_experiment(empty_ok=True)
     assert "aborted" not in exp
     assert led.errors == []
@@ -165,16 +165,27 @@ def test_a_version_one_journal_still_replays():
     led = Ledger(_campaign())
     path = None
     import tempfile
-    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False,
-                                     encoding="utf-8") as f:
+
+    with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False, encoding="utf-8") as f:
         path = f.name
-        f.write(json.dumps({
-            "record_version": 1, "campaign_id": "crash-test",
-            "recorded_at": "2026-10-01T00:00:00+00:00",
-            "experiment": {"family": "bivariate-bicycle", "seed": 1,
-                           "spent": {"candidates_screened": 10},
-                           "survivors": 0},
-            "survivors": [], "negative_results": []}) + "\n")
+        f.write(
+            json.dumps(
+                {
+                    "record_version": 1,
+                    "campaign_id": "crash-test",
+                    "recorded_at": "2026-10-01T00:00:00+00:00",
+                    "experiment": {
+                        "family": "bivariate-bicycle",
+                        "seed": 1,
+                        "spent": {"candidates_screened": 10},
+                        "survivors": 0,
+                    },
+                    "survivors": [],
+                    "negative_results": [],
+                }
+            )
+            + "\n"
+        )
     back = Ledger.from_journal(_campaign(), path)
     os.unlink(path)
     assert back.errors == []

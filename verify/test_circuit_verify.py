@@ -22,11 +22,10 @@ import json
 import os
 import shutil
 
-import pytest
-import stim
-
 import circuit_tools as ct
 import circuit_verify as cv
+import pytest
+import stim
 from qldpc_verify import _matrix
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,14 +37,19 @@ N = BASE_DOC["n"]
 def seed(tmp_path_factory):
     """(doc, circuits_dir): a complete valid artifact -- both memory circuits
     with canonical noise, committed DEMs, and a circuit block whose witnesses
-    the toolkit search found."""
+    the toolkit search found.
+    """
     d = tmp_path_factory.mktemp("circuits")
     HX = _matrix(BASE_DOC["checks"]["X"], N)
     HZ = _matrix(BASE_DOC["checks"]["Z"], N)
     doc = copy.deepcopy(BASE_DOC)
     doc["schema_version"] = "0.2"
-    block = {"d_circ": {}, "rounds": 5, "stim_version": stim.__version__,
-             "notes": "test artifact, default greedy schedule"}
+    block = {
+        "d_circ": {},
+        "rounds": 5,
+        "stim_version": stim.__version__,
+        "notes": "test artifact, default greedy schedule",
+    }
     for basis in ("Z", "X"):
         skel = ct.build_css_memory(HX, HZ, rounds=5, basis=basis)
         noisy = ct.apply_noise(skel, N)
@@ -55,8 +59,7 @@ def seed(tmp_path_factory):
         stem = os.path.join(d, f"memory_{basis.lower()}")
         open(stem + ".stim", "w").write(str(noisy) + "\n")
         open(stem + ".dem", "w").write(str(dem) + "\n")
-        block["d_circ"][basis] = {"value": w, "confidence": "upper_bound",
-                                  "witness": wit}
+        block["d_circ"][basis] = {"value": w, "confidence": "upper_bound", "witness": wit}
     doc["circuit"] = block
     return doc, str(d)
 
@@ -78,8 +81,7 @@ def test_generated_artifact_passes(seed):
     report = cv.verify_circuit(doc, d)
     assert report["ok"], report
     want = min(doc["circuit"]["d_circ"][s]["value"] for s in ("X", "Z"))
-    assert report["earned_d_circ"]["d_circ"] == {"value": want,
-                                                 "tier": "upper_bound"}
+    assert report["earned_d_circ"]["d_circ"] == {"value": want, "tier": "upper_bound"}
 
 
 def test_missing_files_rejected(seed, tmp_path):
@@ -92,8 +94,7 @@ def test_missing_files_rejected(seed, tmp_path):
 def test_tampered_witness_rejected(seed):
     doc, d = seed
     doc = copy.deepcopy(doc)
-    doc["circuit"]["d_circ"]["Z"]["witness"] = \
-        doc["circuit"]["d_circ"]["Z"]["witness"][:-1]      # weight != value
+    doc["circuit"]["d_circ"]["Z"]["witness"] = doc["circuit"]["d_circ"]["Z"]["witness"][:-1]  # weight != value
     report = cv.verify_circuit(doc, d)
     assert not _status(report, "Z_witness_valid")
 
@@ -109,27 +110,78 @@ def test_claim_above_code_distance_rejected(seed):
     side = doc["circuit"]["d_circ"]["Z"]
     side["witness"] = side["witness"] + [side["witness"][-1] + 1]
     side["value"] = len(side["witness"])
-    while side["value"] <= doc["distance"]["d"]:   # inflate past the clamp
+    while side["value"] <= doc["distance"]["d"]:  # inflate past the clamp
         side["witness"].append(side["witness"][-1] + 1)
         side["value"] += 1
     report = cv.verify_circuit(doc, d)
     assert not _status(report, "Z_witness_valid")
 
 
+def test_basis_cap_is_the_distance_of_the_logical_the_memory_protects():
+    """Each memory is capped by the distance of the logical it protects.
+
+    Issue #4715: the X memory reads out X-type logicals, which only a Z-type
+    logical flips undetected, so its cap is d_Z; mirror for Z; d when a side
+    is missing.
+    """
+    doc = {"distance": {"d": 5, "X": {"value": 5}, "Z": {"value": 7}}}
+    assert cv.basis_cap(doc, "X") == 7
+    assert cv.basis_cap(doc, "Z") == 5
+    assert cv.basis_cap({"distance": {"d": 4}}, "X") == 4
+    assert cv.basis_cap({"distance": {"d": 4, "Z": {"value": None}}}, "X") == 4
+
+
+def test_claim_between_d_and_the_protected_logicals_distance_is_admitted(seed, monkeypatch):
+    """The Z memory may claim up to d_X when d_X > d.
+
+    With the witness check stubbed out the clamp alone decides, and it is the
+    per-basis cap, not d.
+    """
+    doc, d = seed
+    doc = copy.deepcopy(doc)
+    monkeypatch.setattr(ct, "witness_errors", lambda *a, **k: [])
+    dd = doc["distance"]["d"]
+    doc["distance"]["X"]["value"] = dd + 2  # the X-type logical is longer
+    doc["distance"]["Z"]["value"] = dd
+    doc["circuit"]["d_circ"]["Z"]["value"] = dd + 2
+    report = cv.verify_circuit(doc, d)
+    assert _status(report, "Z_witness_valid"), "d_X bounds the Z memory"
+    doc["circuit"]["d_circ"]["Z"]["value"] = dd + 3
+    report = cv.verify_circuit(doc, d)
+    assert not _status(report, "Z_witness_valid")
+    why = next(c["detail"] for c in report["checks"] if c["check"] == "Z_witness_valid")
+    assert f"exceeds d_X={dd + 2}" in why and "Z memory protects" in why
+    # the X memory is bounded by d_Z = d, so the same value is refused there
+    doc["circuit"]["d_circ"]["X"]["value"] = dd + 1
+    report = cv.verify_circuit(doc, d)
+    assert not _status(report, "X_witness_valid")
+
+
 def test_stale_dem_rejected(seed, tmp_path):
     doc, sd = seed
-    d = _tampered_dir(sd, tmp_path, "memory_z.dem",
-                      lambda t: t.replace("error(0.00", "error(0.01", 1))
+    d = _tampered_dir(sd, tmp_path, "memory_z.dem", lambda t: t.replace("error(0.00", "error(0.01", 1))
     report = cv.verify_circuit(doc, d)
     assert not _status(report, "Z_dem_reproduces")
+
+
+def test_absent_dem_accepted(seed, tmp_path):
+    doc, sd = seed
+    d = tmp_path / "circuits"
+    shutil.copytree(sd, d)
+    for name in ("memory_x.dem", "memory_z.dem"):
+        (d / name).unlink(missing_ok=True)
+    report = cv.verify_circuit(doc, d)
+    assert report["ok"], report
+    assert _status(report, "X_dem_reproduces")
+    assert _status(report, "Z_dem_reproduces")
 
 
 def test_missing_noise_channel_rejected(seed, tmp_path):
     def drop_first_dep2(t):
         lines = t.splitlines()
-        i = next(j for j, l in enumerate(lines)
-                 if l.startswith("DEPOLARIZE2"))
-        return "\n".join(lines[:i] + lines[i + 1:]) + "\n"
+        i = next(j for j, l in enumerate(lines) if l.startswith("DEPOLARIZE2"))
+        return "\n".join(lines[:i] + lines[i + 1 :]) + "\n"
+
     doc, sd = seed
     d = _tampered_dir(sd, tmp_path, "memory_z.stim", drop_first_dep2)
     report = cv.verify_circuit(doc, d)
@@ -138,9 +190,7 @@ def test_missing_noise_channel_rejected(seed, tmp_path):
 
 def test_wrong_noise_rate_rejected(seed, tmp_path):
     doc, sd = seed
-    d = _tampered_dir(sd, tmp_path, "memory_z.stim",
-                      lambda t: t.replace("DEPOLARIZE2(0.001)",
-                                          "DEPOLARIZE2(0.002)", 1))
+    d = _tampered_dir(sd, tmp_path, "memory_z.stim", lambda t: t.replace("DEPOLARIZE2(0.001)", "DEPOLARIZE2(0.002)", 1))
     report = cv.verify_circuit(doc, d)
     assert not _status(report, "Z_noise_recipe_canonical")
 
@@ -149,7 +199,8 @@ def test_nondeterministic_detector_rejected(seed, tmp_path):
     def break_detector(t):
         i = t.index("DETECTOR rec[")
         j = t.index("\n", i)
-        return t[:i] + "DETECTOR rec[-1]" + t[j:]   # lone data M: random
+        return t[:i] + "DETECTOR rec[-1]" + t[j:]  # lone data M: random
+
     doc, sd = seed
     d = _tampered_dir(sd, tmp_path, "memory_z.stim", break_detector)
     report = cv.verify_circuit(doc, d)
@@ -159,7 +210,7 @@ def test_nondeterministic_detector_rejected(seed, tmp_path):
 def test_inflated_round_count_rejected(seed):
     doc, d = seed
     doc = copy.deepcopy(doc)
-    doc["circuit"]["rounds"] = 6            # circuit only performs 5
+    doc["circuit"]["rounds"] = 6  # circuit only performs 5
     report = cv.verify_circuit(doc, d)
     assert not _status(report, "Z_code_binding")
 
@@ -174,14 +225,13 @@ def test_unpinned_stim_version_rejected(seed):
 
 def test_stabilizer_observable_rejected(seed, tmp_path):
     """An observable that is a product of declared stabilizers protects
-    nothing; binding must reject it even though it is deterministic."""
+    nothing; binding must reject it even though it is deterministic.
+    """
     doc, sd = seed
     text = open(os.path.join(sd, "memory_z.stim")).read()
-    lines = [l for l in text.splitlines()
-             if not l.startswith("OBSERVABLE_INCLUDE")]
-    row = BASE_DOC["checks"]["Z"][0]        # final data M of qubit q: rec[q-n]
-    lines.append("OBSERVABLE_INCLUDE(0) " +
-                 " ".join(f"rec[{q - N}]" for q in row))
+    lines = [l for l in text.splitlines() if not l.startswith("OBSERVABLE_INCLUDE")]
+    row = BASE_DOC["checks"]["Z"][0]  # final data M of qubit q: rec[q-n]
+    lines.append("OBSERVABLE_INCLUDE(0) " + " ".join(f"rec[{q - N}]" for q in row))
     d = tmp_path / "circuits"
     shutil.copytree(sd, d)
     noisy = stim.Circuit("\n".join(lines))
@@ -192,12 +242,13 @@ def test_stabilizer_observable_rejected(seed, tmp_path):
 
 
 def test_tick_coarsening_rejected():
-    """vprusso's #646 review: idle-data mechanisms scale with TICK layer
+    """Vprusso's #646 review: idle-data mechanisms scale with TICK layer
     count, so deleting TICKs -- pure annotations -- shed fault mechanisms and
     inflated d_circ while staying recipe-conformant. Coarsening that claims
     impossible simultaneity (a qubit operated on twice in one layer) must now
     be rejected; merging genuinely disjoint layers -- real pipelining --
-    stays legal."""
+    stays legal.
+    """
     HX = _matrix(BASE_DOC["checks"]["X"], N)
     HZ = _matrix(BASE_DOC["checks"]["Z"], N)
     skel = ct.build_css_memory(HX, HZ, rounds=2, basis="Z")
@@ -208,32 +259,27 @@ def test_tick_coarsening_rejected():
     noisy = ct.apply_noise(coarse, N)
     errs = ct.noise_recipe_errors(noisy, N)
     assert errs and "parallel" in errs[0]
-    assert ct.derive_dem(noisy).num_errors < \
-        ct.derive_dem(ct.apply_noise(skel, N)).num_errors      # the lever
+    assert ct.derive_dem(noisy).num_errors < ct.derive_dem(ct.apply_noise(skel, N)).num_errors  # the lever
 
     # merging two DISJOINT layers (MX on X-ancillas, then R on Z-ancillas)
     # is honest pipelining and must stay conformant
     i = next(j for j, l in enumerate(lines) if l.startswith("MX "))
     assert lines[i + 1] == "TICK" and lines[i + 2].startswith("R ")
-    merged = stim.Circuit("\n".join(lines[:i + 1] + lines[i + 2:]))
+    merged = stim.Circuit("\n".join(lines[: i + 1] + lines[i + 2 :]))
     assert ct.noise_recipe_errors(ct.apply_noise(merged, N), N) == []
 
 
 def test_dem_matches_unit():
     """Probabilities compare to float tolerance (last ulps are architecture-
     sensitive: an honest artifact from another machine must pass), but any
-    structural difference -- and any real probability tamper -- must not."""
+    structural difference -- and any real probability tamper -- must not.
+    """
     a = stim.DetectorErrorModel("error(0.0044999999999999) D0 D1 L0")
-    assert ct.dem_matches(a, stim.DetectorErrorModel(
-        "error(0.0045000000000001) D0 D1 L0"))          # ulp drift: honest
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        "error(0.0046) D0 D1 L0"))                      # real tamper
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        "error(0.0045) D0 D2 L0"))                      # structure
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        "error(0.0045) D0 D1"))                         # observable dropped
-    assert not ct.dem_matches(a, a + stim.DetectorErrorModel(
-        "error(0.0045) D1"))                            # extra mechanism
+    assert ct.dem_matches(a, stim.DetectorErrorModel("error(0.0045000000000001) D0 D1 L0"))  # ulp drift: honest
+    assert not ct.dem_matches(a, stim.DetectorErrorModel("error(0.0046) D0 D1 L0"))  # real tamper
+    assert not ct.dem_matches(a, stim.DetectorErrorModel("error(0.0045) D0 D2 L0"))  # structure
+    assert not ct.dem_matches(a, stim.DetectorErrorModel("error(0.0045) D0 D1"))  # observable dropped
+    assert not ct.dem_matches(a, a + stim.DetectorErrorModel("error(0.0045) D1"))  # extra mechanism
 
 
 def test_witness_errors_unit():
@@ -243,16 +289,17 @@ def test_witness_errors_unit():
         error(0.1) D1
     """)
     assert ct.witness_errors(dem, [0, 1], 2) == []
-    assert ct.witness_errors(dem, [0], 1)            # detected
-    assert ct.witness_errors(dem, [1, 2], 2)         # flips nothing
-    assert ct.witness_errors(dem, [0, 1], 3)         # weight mismatch
-    assert ct.witness_errors(dem, [1, 0], 2)         # not sorted
-    assert ct.witness_errors(dem, [0, 9], 2)         # out of range
+    assert ct.witness_errors(dem, [0], 1)  # detected
+    assert ct.witness_errors(dem, [1, 2], 2)  # flips nothing
+    assert ct.witness_errors(dem, [0, 1], 3)  # weight mismatch
+    assert ct.witness_errors(dem, [1, 0], 2)  # not sorted
+    assert ct.witness_errors(dem, [0, 9], 2)  # out of range
 
 
 def test_search_matches_witness_check():
     """The toolkit loop an agent runs: build, search, self-check -- the same
-    arithmetic CI applies."""
+    arithmetic CI applies.
+    """
     HX = _matrix(BASE_DOC["checks"]["X"], N)
     HZ = _matrix(BASE_DOC["checks"]["Z"], N)
     skel = ct.build_css_memory(HX, HZ, rounds=2, basis="Z")
@@ -261,17 +308,17 @@ def test_search_matches_witness_check():
     dem = ct.derive_dem(noisy)
     H, L = ct.dem_matrices(dem)
     w, wit = ct.ris_dem(H, L, trials=8, seed=3)
-    assert w is not None and w <= 5      # rounds-truncated: can only be <= d
+    assert w is not None and w <= 5  # rounds-truncated: can only be <= d
     assert ct.witness_errors(dem, wit, w) == []
 
 
 def test_dem_lint_clean_on_reference():
     """The reference builder's DEM must pass all three structural checks
-    (issue #690); a false positive here would block every honest entry."""
+    (issue #690); a false positive here would block every honest entry.
+    """
     HX = _matrix(BASE_DOC["checks"]["X"], N)
     HZ = _matrix(BASE_DOC["checks"]["Z"], N)
-    dem = ct.derive_dem(ct.apply_noise(
-        ct.build_css_memory(HX, HZ, rounds=2, basis="Z"), N))
+    dem = ct.derive_dem(ct.apply_noise(ct.build_css_memory(HX, HZ, rounds=2, basis="Z"), N))
     assert ct.dem_lint(dem) == []
 
 
@@ -294,8 +341,7 @@ def test_dem_lint_observable_coverage():
         logical_observable L1
     """)
     errs = ct.dem_lint(dem)
-    assert any(e.startswith("observable_coverage") and "[1]" in e
-               for e in errs), errs
+    assert any(e.startswith("observable_coverage") and "[1]" in e for e in errs), errs
 
 
 def test_dem_lint_probability_bounds():
@@ -307,24 +353,21 @@ def test_dem_lint_probability_bounds():
         error(0.001) D0 L0
     """)
     errs = ct.dem_lint(dem)
-    assert any(e.startswith("probability_bounds") and "[0, 1]" in e
-               for e in errs), errs
+    assert any(e.startswith("probability_bounds") and "[0, 1]" in e for e in errs), errs
 
 
 def test_dem_lint_gates_the_verifier(seed, monkeypatch):
     """A structurally broken derived DEM must fail circuit_verify at the new
-    step 5.5 and stop before the witness check."""
+    step 5.5 and stop before the witness check.
+    """
     doc, cdir = seed
-    monkeypatch.setattr(ct, "dem_lint",
-                        lambda dem, cols=None: [
-                            "detectability: injected failure"])
+    monkeypatch.setattr(ct, "dem_lint", lambda dem, cols=None: ["detectability: injected failure"])
     rep = cv.verify_circuit(doc, cdir)
     assert not rep["ok"]
     bad = {c["check"]: c["detail"] for c in rep["checks"] if not c["ok"]}
     assert any(k.endswith("_dem_structure") for k in bad), bad
     checked = [c["check"] for c in rep["checks"]]
-    assert not any(k.endswith("_witness_valid") for k in checked), (
-        "witness check ran on a malformed DEM")
+    assert not any(k.endswith("_witness_valid") for k in checked), "witness check ran on a malformed DEM"
 
 
 # ------------------------------------------------- issue #5409: same verdicts
@@ -335,17 +378,19 @@ def test_dem_lint_gates_the_verifier(seed, monkeypatch):
 # built here rather than on board entries, so they keep meaning the same
 # thing whatever is merged.
 
+
 def _dem_items(rng, tags=False):
     """A small DEM as [name, tag, args, targets] rows, using every form a
     derived model can: several targets, repeated targets, separators, an
     error with no target, detector and observable declarations with and
     without coordinates, and (with `tags`) tags holding text that looks
-    like DEM."""
+    like DEM.
+    """
+
     def tag():
         if not tags or rng.random() < 0.5:
             return ""
-        return rng.choice(["t", "a b", "error(0.5) L0", "p(q) r", "D3 L1 ^",
-                           "x\\nerror(0.5) D1 L0", "\\C \\B"])
+        return rng.choice(["t", "a b", "error(0.5) L0", "p(q) r", "D3 L1 ^", "x\\nerror(0.5) D1 L0", "\\C \\B"])
 
     def error():
         toks = []
@@ -364,24 +409,25 @@ def _dem_items(rng, tags=False):
         if r < 0.75:
             items.append(error())
         elif r < 0.85:
-            items.append(["detector", tag(),
-                          [float(rng.randrange(9)), rng.uniform(0, 3)],
-                          [f"D{rng.randrange(30)}"]])
+            items.append(["detector", tag(), [float(rng.randrange(9)), rng.uniform(0, 3)], [f"D{rng.randrange(30)}"]])
         elif r < 0.92:
             items.append(["detector", tag(), [], [f"D{rng.randrange(30)}"]])
         else:
-            items.append(["logical_observable", tag(), [],
-                          [f"L{rng.randrange(3)}"]])
+            items.append(["logical_observable", tag(), [], [f"L{rng.randrange(3)}"]])
     return items
 
 
 def _dem(items):
     """The stim model of _dem_items rows."""
-    return stim.DetectorErrorModel("\n".join(
-        name + (f"[{tag}]" if tag else "")
-        + (f"({', '.join(repr(a) for a in args)})" if args else "")
-        + "".join(" " + t for t in toks)
-        for name, tag, args, toks in items))
+    return stim.DetectorErrorModel(
+        "\n".join(
+            name
+            + (f"[{tag}]" if tag else "")
+            + (f"({', '.join(repr(a) for a in args)})" if args else "")
+            + "".join(" " + t for t in toks)
+            for name, tag, args, toks in items
+        )
+    )
 
 
 def _dem_matches_before_5409(derived, committed, rtol=1e-9, atol=1e-12):
@@ -393,24 +439,21 @@ def _dem_matches_before_5409(derived, committed, rtol=1e-9, atol=1e-12):
     for x, y in zip(da, ca):
         if x.type != y.type:
             return False
-        if [str(t) for t in x.targets_copy()] != \
-           [str(t) for t in y.targets_copy()]:
+        if [str(t) for t in x.targets_copy()] != [str(t) for t in y.targets_copy()]:
             return False
         ax, ay = x.args_copy(), y.args_copy()
-        if len(ax) != len(ay) or any(
-                abs(a - b) > rtol * max(abs(a), abs(b)) + atol
-                for a, b in zip(ax, ay)):
+        if len(ax) != len(ay) or any(abs(a - b) > rtol * max(abs(a), abs(b)) + atol for a, b in zip(ax, ay)):
             return False
     return True
 
 
 def _perturbed(rng, items):
     """`items` with one thing changed, and the name of the change."""
-    out = [[name, tag, list(args), list(toks)]
-           for name, tag, args, toks in items]
+    out = [[name, tag, list(args), list(toks)] for name, tag, args, toks in items]
     errors = [row for row in out if row[0] == "error"]
-    kind = rng.choice(["none", "ulp", "rate", "target", "reorder", "drop",
-                       "swap_lines", "tag", "type", "extra", "separator"])
+    kind = rng.choice(
+        ["none", "ulp", "rate", "target", "reorder", "drop", "swap_lines", "tag", "type", "extra", "separator"]
+    )
     row = rng.choice(errors) if errors else None
     toks = row[3] if row else []
     if row is None:
@@ -441,17 +484,18 @@ def _perturbed(rng, items):
             other[0], other[3] = "detector", ["D1"]
     elif kind == "extra":
         out.append(["error", "", [0.125], ["D2"]])
-    if out == [[name, tag, list(args), list(toks)]
-               for name, tag, args, toks in items]:
-        kind = "none"                # the row drawn had nothing to change
+    if out == [[name, tag, list(args), list(toks)] for name, tag, args, toks in items]:
+        kind = "none"  # the row drawn had nothing to change
     return out, kind
 
 
 def test_dem_matches_decides_as_the_slow_comparison_did():
     """The fast path may only skip work: on every pair, including pairs that
     differ in one target, one rate, one line's position or one tag, the
-    verdict is the one the target-by-target string comparison reached."""
+    verdict is the one the target-by-target string comparison reached.
+    """
     import random
+
     rng = random.Random(5409)
     verdicts = {}
     for case in range(600):
@@ -467,14 +511,15 @@ def test_dem_matches_decides_as_the_slow_comparison_did():
     assert verdicts["tag"] == {True}, verdicts
     for kind in ("rate", "target", "extra", "drop", "separator", "type"):
         assert verdicts[kind] == {False}, (kind, verdicts)
-    for kind in ("reorder", "swap_lines"):     # equal neighbours may swap
+    for kind in ("reorder", "swap_lines"):  # equal neighbours may swap
         assert False in verdicts[kind], (kind, verdicts)
 
 
 def test_dem_matches_looks_past_the_instructions_that_are_equal():
     """A difference after a run of exactly equal instructions is still found,
     and a difference stim's equality sees but the comparison never read (a
-    tag) still is not one."""
+    tag) still is not one.
+    """
     a = stim.DetectorErrorModel("""
         error(0.001) D0 D1
         error(0.0044999999999999) D1 D2 L0
@@ -482,38 +527,40 @@ def test_dem_matches_looks_past_the_instructions_that_are_equal():
         detector(1, 2) D3
     """)
     same = "error(0.001) D0 D1\nerror(0.0045000000000001) D1 D2 L0\n"
-    assert ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D3\ndetector(1, 2) D3"))
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D4\ndetector(1, 2) D3"))      # last error
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D3\ndetector(1, 2) D4"))      # last line
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D3 D2\ndetector(1, 2) D3"))      # target order
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 L3\ndetector(1, 2) D3"))      # D3 is not L3
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 ^ D3\ndetector(1, 2) D3"))    # a separator
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.002) D2 D3\ndetector(1, 2) D3"))      # the rate
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D3\ndetector(1, 3) D3"))      # a coordinate
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D3\ndetector(1) D3"))         # one fewer
-    assert not ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error(0.001) D2 D3\nlogical_observable L3"))  # the type
-    assert ct.dem_matches(a, stim.DetectorErrorModel(
-        same + "error[tag](0.001) D2 D3\ndetector(1, 2) D3"))
+    assert ct.dem_matches(a, stim.DetectorErrorModel(same + "error(0.001) D2 D3\ndetector(1, 2) D3"))
+    assert not ct.dem_matches(a, stim.DetectorErrorModel(same + "error(0.001) D2 D4\ndetector(1, 2) D3"))  # last error
+    assert not ct.dem_matches(a, stim.DetectorErrorModel(same + "error(0.001) D2 D3\ndetector(1, 2) D4"))  # last line
+    assert not ct.dem_matches(
+        a, stim.DetectorErrorModel(same + "error(0.001) D3 D2\ndetector(1, 2) D3")
+    )  # target order
+    assert not ct.dem_matches(
+        a, stim.DetectorErrorModel(same + "error(0.001) D2 L3\ndetector(1, 2) D3")
+    )  # D3 is not L3
+    assert not ct.dem_matches(
+        a, stim.DetectorErrorModel(same + "error(0.001) D2 ^ D3\ndetector(1, 2) D3")
+    )  # a separator
+    assert not ct.dem_matches(a, stim.DetectorErrorModel(same + "error(0.002) D2 D3\ndetector(1, 2) D3"))  # the rate
+    assert not ct.dem_matches(
+        a, stim.DetectorErrorModel(same + "error(0.001) D2 D3\ndetector(1, 3) D3")
+    )  # a coordinate
+    assert not ct.dem_matches(a, stim.DetectorErrorModel(same + "error(0.001) D2 D3\ndetector(1) D3"))  # one fewer
+    assert not ct.dem_matches(
+        a, stim.DetectorErrorModel(same + "error(0.001) D2 D3\nlogical_observable L3")
+    )  # the type
+    assert ct.dem_matches(a, stim.DetectorErrorModel(same + "error[tag](0.001) D2 D3\ndetector(1, 2) D3"))
     # same targets and the same argument under another instruction type
     assert not ct.dem_matches(
         stim.DetectorErrorModel("error(0.001) D0\nerror(0.5) D3"),
-        stim.DetectorErrorModel("error(0.001) D0\ndetector(0.5) D3"))
+        stim.DetectorErrorModel("error(0.001) D0\ndetector(0.5) D3"),
+    )
 
 
 def test_given_columns_change_no_verdict():
     """dem_lint and witness_errors take the columns the caller already read;
-    with them or without, the answer is the same list."""
+    with them or without, the answer is the same list.
+    """
     import random
+
     rng = random.Random(54090)
     seen = set()
     for _ in range(200):
@@ -531,7 +578,7 @@ def test_given_columns_change_no_verdict():
             plain = ct.witness_errors(dem, wit, value)
             assert ct.witness_errors(dem, wit, value, cols) == plain
             seen.add(tuple(e.split()[1] for e in plain))
-    assert seen >= {True, False, ()}, seen     # clean and failing, both ways
+    assert seen >= {True, False, ()}, seen  # clean and failing, both ways
     dem = stim.DetectorErrorModel("error(0.1) D0 L0\nerror(0.1) D0")
     assert ct.witness_errors(dem, [0, 1], 2, ct.dem_columns(dem)) == []
 
@@ -539,12 +586,12 @@ def test_given_columns_change_no_verdict():
 def test_the_mechanisms_are_walked_once_per_basis(seed, monkeypatch):
     """verify_circuit reads the columns of each derived DEM once and hands
     them to the lint and to the witness check (issue #5409: each used to
-    read them again)."""
+    read them again).
+    """
     doc, cdir = seed
     walks = []
     real = ct.dem_columns
-    monkeypatch.setattr(ct, "dem_columns",
-                        lambda dem: walks.append(dem.num_errors) or real(dem))
+    monkeypatch.setattr(ct, "dem_columns", lambda dem: walks.append(dem.num_errors) or real(dem))
     rep = cv.verify_circuit(doc, cdir)
     assert rep["ok"], [c for c in rep["checks"] if not c["ok"]]
     assert len(walks) == 2, walks
@@ -554,16 +601,17 @@ def test_columns_read_from_text_are_the_columns():
     """dem_columns reads the text stim prints for the flattened model. The
     walk over stim's objects is the definition, and the two agree on every
     form a model can take, repeat blocks and detector shifts included; a
-    tagged error is left to the walk."""
+    tagged error is left to the walk.
+    """
     import random
+
     rng = random.Random(54091)
     read = declined = 0
     for case in range(400):
         items = _dem_items(rng, tags=case % 4 == 0)
         dem = _dem(items)
         if case % 5 == 0:
-            dem = stim.DetectorErrorModel(
-                f"repeat 3 {{\n{dem}\nshift_detectors 7\n}}\n{dem}")
+            dem = stim.DetectorErrorModel(f"repeat 3 {{\n{dem}\nshift_detectors 7\n}}\n{dem}")
         flat = dem.flattened()
         want = ct._columns_from_instructions(flat)
         assert len(want) == flat.num_errors
@@ -589,30 +637,30 @@ class _Printed:
 
 
 def test_text_reader_declines_a_line_it_cannot_read():
-    assert ct._columns_from_text(_Printed(
-        "error(0.1) D0 ^ L1 D2\ndetector(1, 2) D5\nerror(0.5)\n"
-        "logical_observable L0\nerror(0.25) L2 L2")) == [
-            ([0, 2], [1]), ([], []), ([], [2, 2])]
-    for text in ("error[t](0.1) D0",          # a tag
-                 "error D0",                  # no argument
-                 "error(0.1 D0",              # no closing parenthesis
-                 "error(0.1) D0 X3",          # another kind of target
-                 "error(0.1) D0 rec[-1]",
-                 "error(0.1) D0 ^^",
-                 "error(0.1) D0 Dx",          # not an index
-                 "error(0.1) D0 D",
-                 "error(0.1) L1.5"):
+    assert ct._columns_from_text(
+        _Printed("error(0.1) D0 ^ L1 D2\ndetector(1, 2) D5\nerror(0.5)\nlogical_observable L0\nerror(0.25) L2 L2")
+    ) == [([0, 2], [1]), ([], []), ([], [2, 2])]
+    for text in (
+        "error[t](0.1) D0",  # a tag
+        "error D0",  # no argument
+        "error(0.1 D0",  # no closing parenthesis
+        "error(0.1) D0 X3",  # another kind of target
+        "error(0.1) D0 rec[-1]",
+        "error(0.1) D0 ^^",
+        "error(0.1) D0 Dx",  # not an index
+        "error(0.1) D0 D",
+        "error(0.1) L1.5",
+    ):
         assert ct._columns_from_text(_Printed(text)) is None, text
-        assert ct._columns_from_text(_Printed(
-            "error(0.1) D0\n" + text + "\nerror(0.1) D1")) is None, text
+        assert ct._columns_from_text(_Printed("error(0.1) D0\n" + text + "\nerror(0.1) D1")) is None, text
 
 
 def test_dem_columns_falls_back_to_the_walk(monkeypatch):
     """Whatever the text reader returns, dem_columns answers with the
     columns: a refusal, or a column count stim does not confirm, sends it to
-    the walk over stim's objects."""
-    dem = stim.DetectorErrorModel(
-        "error(0.1) D0 L0\nerror(0.2) D1 ^ D2\ndetector D3")
+    the walk over stim's objects.
+    """
+    dem = stim.DetectorErrorModel("error(0.1) D0 L0\nerror(0.2) D1 ^ D2\ndetector D3")
     want = [([0], [0]), ([1, 2], [])]
     assert ct.dem_columns(dem) == want
     for wrong in (None, [], want[:1], want + [([9], [])]):
@@ -620,12 +668,10 @@ def test_dem_columns_falls_back_to_the_walk(monkeypatch):
             m.setattr(ct, "_columns_from_text", lambda flat, w=wrong: w)
             assert ct.dem_columns(dem) == want, wrong
     # text that looks like DEM inside a tag adds no column and hides none
-    tagged = stim.DetectorErrorModel(
-        "error[x\\nerror(0.5) L1](0.1) D0 L0\nerror(0.2) D1")
+    tagged = stim.DetectorErrorModel("error[x\\nerror(0.5) L1](0.1) D0 L0\nerror(0.2) D1")
     assert ct._columns_from_text(tagged.flattened()) is None
     assert ct.dem_columns(tagged) == [([0], [0]), ([1], [])]
-    quiet = stim.DetectorErrorModel(
-        "detector[x\\nerror(0.5) L1] D0\nerror(0.2) D1")
+    quiet = stim.DetectorErrorModel("detector[x\\nerror(0.5) L1] D0\nerror(0.2) D1")
     assert ct._columns_from_text(quiet.flattened()) == [([1], [])]
     assert ct.dem_columns(quiet) == [([1], [])]
 
@@ -633,53 +679,58 @@ def test_dem_columns_falls_back_to_the_walk(monkeypatch):
 def test_dem_columns_reads_plain_models_from_text(monkeypatch):
     """The point of the text reader is that the walk does not run: on a model
     without tags, which every derived DEM of a canonical circuit is, the walk
-    is never reached."""
+    is never reached.
+    """
+
     def walk(flat):
         raise AssertionError("the object walk ran on a plain model")
+
     monkeypatch.setattr(ct, "_columns_from_instructions", walk)
     HX = _matrix(BASE_DOC["checks"]["X"], N)
     HZ = _matrix(BASE_DOC["checks"]["Z"], N)
-    dem = ct.derive_dem(ct.apply_noise(
-        ct.build_css_memory(HX, HZ, rounds=2, basis="Z"), N))
+    dem = ct.derive_dem(ct.apply_noise(ct.build_css_memory(HX, HZ, rounds=2, basis="Z"), N))
     cols = ct.dem_columns(dem)
     assert len(cols) == dem.num_errors > 100
     H, L = ct.dem_matrices(dem)
     assert H.shape == (dem.num_detectors, len(cols))
-    assert all(sorted(H[:, j].nonzero()[0]) == sorted(set(ds))
-               for j, (ds, _) in enumerate(cols))
+    assert all(sorted(H[:, j].nonzero()[0]) == sorted(set(ds)) for j, (ds, _) in enumerate(cols))
 
 
 # ---------------------------------------- gate set: every instruction is read
+
 
 def test_classical_control_is_refused_wherever_it_appears():
     """The gate-set check reads every instruction. It used to read the first
     instruction of each gate name, so a classically controlled gate after a
     plain one of the same name passed it, and the noise recipe step then
-    raised on the DEPOLARIZE2 it tried to place."""
+    raised on the DEPOLARIZE2 it tried to place.
+    """
     plain = "R 0 1\nTICK\nCX 0 1\nTICK\nM 0\nTICK\n"
     assert ct.skeleton_errors(stim.Circuit(plain + "CX 1 0\nTICK\nM 1")) == []
-    for late in ("CX rec[-1] 1", "CZ rec[-1] 1", "CX sweep[0] 1",
-                 "CX 0 1 rec[-1] 1"):
+    for late in ("CX rec[-1] 1", "CZ rec[-1] 1", "CX sweep[0] 1", "CX 0 1 rec[-1] 1"):
         circuit = stim.Circuit(plain + late + "\nTICK\nM 1")
         errs = ct.skeleton_errors(circuit)
         name = late.split()[0]
-        assert errs == [f"{name} with a non-qubit target (classical control) "
-                        f"is outside the circuit-tier gate set"], (late, errs)
+        assert errs == [f"{name} with a non-qubit target (classical control) is outside the circuit-tier gate set"], (
+            late,
+            errs,
+        )
         # the recipe check reports it and does not raise (the mixed
         # instruction also reuses a qubit within its layer, a second error)
         assert ct.noise_recipe_errors(circuit, 2)[:1] == errs, late
     # still refused where it always was: on the first instruction of a name
-    assert ct.skeleton_errors(stim.Circuit(
-        "R 0 1\nTICK\nCX rec[-1] 1\nTICK\nM 0 1")) != []
+    assert ct.skeleton_errors(stim.Circuit("R 0 1\nTICK\nCX rec[-1] 1\nTICK\nM 0 1")) != []
 
 
 def test_gate_set_errors_are_named_once_per_gate():
     """One line per offending gate name, however often it recurs: the report
-    of a long circuit stays readable."""
+    of a long circuit stays readable.
+    """
     circuit = stim.Circuit(
         "R 0 1\nTICK\nCX 0 1\nTICK\nM 0\nTICK\nCX rec[-1] 1\nTICK\n"
         "CX rec[-1] 0\nTICK\nMR 0\nTICK\nCZ sweep[1] 0\nTICK\nMR 1\nTICK\n"
-        "CX 0 1\nTICK\nM 0 1")
+        "CX 0 1\nTICK\nM 0 1"
+    )
     errs = ct.skeleton_errors(circuit)
     assert len(errs) == 3, errs
     assert sum("CX with a non-qubit target" in e for e in errs) == 1
@@ -691,15 +742,14 @@ def test_late_classical_control_fails_the_entry_cleanly(seed, tmp_path):
     """End to end: a feedback gate appended after the final measurements
     leaves every detector deterministic, so the verifier reaches the noise
     recipe step. That step must fail the entry, not raise out of
-    verify_circuit, where it would end the whole sweep on a traceback."""
+    verify_circuit, where it would end the whole sweep on a traceback.
+    """
     doc, sd = seed
-    d = _tampered_dir(sd, tmp_path, "memory_z.stim",
-                      lambda text: text.rstrip("\n") + "\nTICK\nCX rec[-1] 0\n")
+    d = _tampered_dir(sd, tmp_path, "memory_z.stim", lambda text: text.rstrip("\n") + "\nTICK\nCX rec[-1] 0\n")
     report = cv.verify_circuit(doc, d)
     assert not report["ok"]
     assert _status(report, "Z_detectors_deterministic")
     assert not _status(report, "Z_noise_recipe_canonical")
-    detail = next(c["detail"] for c in report["checks"]
-                  if c["check"] == "Z_noise_recipe_canonical")
+    detail = next(c["detail"] for c in report["checks"] if c["check"] == "Z_noise_recipe_canonical")
     assert "CX with a non-qubit target" in detail, detail
-    assert _status(report, "X_noise_recipe_canonical")     # X is untouched
+    assert _status(report, "X_noise_recipe_canonical")  # X is untouched

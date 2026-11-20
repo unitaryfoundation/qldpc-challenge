@@ -45,6 +45,7 @@ Usage:
                                 [--report PATH] [--recapture PATH]
   python verify/refute_board.py --summarize REPORT... [--expect K]
 """
+
 import argparse
 import glob
 import hashlib
@@ -106,6 +107,7 @@ def scope_paths(paths, scope, root=ROOT, records=None):
         raise ValueError(f"bad scope {scope!r}: want records or all")
     if records is None:
         import gate_changed as G
+
         records = G.board_record_slugs
     keep = set(records(root))
     return [p for p in paths if os.path.splitext(os.path.basename(p))[0] in keep]
@@ -121,8 +123,9 @@ def file_seed(seed, rel):
     return (seed + rel_hash) % (2**31)
 
 
-def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check, clock=time.time, out=print,
-                 recapture=None):
+def refute_paths(
+    paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check, clock=time.time, out=print, recapture=None
+):
     """Run the refuter over ``paths`` and return the report.
 
     No new entry is opened once ``max_seconds`` of wall clock have passed; the
@@ -136,9 +139,20 @@ def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check
     stand-in refuter must accept it.
     """
     t0 = clock()
-    rep = {"seed": seed, "total": len(paths), "checked": 0, "skipped": [], "refuted": [], "errored": [],
-           "unreached": [], "stopped_by": None, "complete": False, "seconds": 0.0,
-           "recapture": recapture, "recorded": 0}
+    rep = {
+        "seed": seed,
+        "total": len(paths),
+        "checked": 0,
+        "skipped": [],
+        "refuted": [],
+        "errored": [],
+        "unreached": [],
+        "stopped_by": None,
+        "complete": False,
+        "seconds": 0.0,
+        "recapture": recapture,
+        "recorded": 0,
+    }
     idx = 0
     try:
         for idx, p in enumerate(paths):
@@ -165,22 +179,35 @@ def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check
                     is_refuted, d_found, wit, trials = refute(doc, seed=fs, capture=cap)
             except _Stopped:
                 raise
-            except Exception as e:                 # FAIL CLOSED
+            except Exception as e:  # FAIL CLOSED
                 rep["errored"].append([rel, f"{type(e).__name__}: {e}"])
                 out(f"ERROR    {rel}: refuter failed ({type(e).__name__}: {e}) -- fails closed, manual review")
                 continue
             rep["checked"] += 1
             if cap is not None:
                 slug = os.path.splitext(os.path.basename(p))[0]
-                RC.append_record(recapture, RC.entry_record(
-                    doc, slug, run_seed=seed, file_seed=fs, capture=cap,
-                    seconds=time.monotonic() - t_entry, refuted=is_refuted, d_found=d_found,
-                    trials=trials, battery=RC.battery_of(cap)))
+                RC.append_record(
+                    recapture,
+                    RC.entry_record(
+                        doc,
+                        slug,
+                        run_seed=seed,
+                        file_seed=fs,
+                        capture=cap,
+                        seconds=time.monotonic() - t_entry,
+                        refuted=is_refuted,
+                        d_found=d_found,
+                        trials=trials,
+                        battery=RC.battery_of(cap),
+                    ),
+                )
                 rep["recorded"] += 1
             if is_refuted:
                 rep["refuted"].append([rel, d_found, doc["distance"]["d"], wit])
-                out(f"REFUTED  {rel}: found weight-{d_found} logical < claimed {doc['distance']['d']}\n"
-                    f"         witness = {wit}")
+                out(
+                    f"REFUTED  {rel}: found weight-{d_found} logical < claimed {doc['distance']['d']}\n"
+                    f"         witness = {wit}"
+                )
             else:
                 out(f"ok       {rel}: no logical lighter than {doc['distance']['d']} ({trials} RIS trials)")
         else:
@@ -196,8 +223,10 @@ def refute_paths(paths, seed, max_seconds=None, root=ROOT, refute=H.refute_check
 def summary_line(rep):
     """One line of counts, printed whether or not the run completed."""
     tag = f" (shard {rep['shard']})" if rep.get("shard") else ""
-    return (f"{rep['checked']}/{rep['total']} codes checked{tag}; {len(rep['refuted'])} refuted, "
-            f"{len(rep['errored'])} errored, {len(rep['unreached'])} unreached.")
+    return (
+        f"{rep['checked']}/{rep['total']} codes checked{tag}; {len(rep['refuted'])} refuted, "
+        f"{len(rep['errored'])} errored, {len(rep['unreached'])} unreached."
+    )
 
 
 def verdict(rep):
@@ -205,8 +234,10 @@ def verdict(rep):
     if rep["refuted"] or rep["errored"]:
         return 1, "FAIL: distance claims need review (see REFUTED/ERROR above)."
     if rep["unreached"]:
-        return 1, (f"FAIL: incomplete coverage (stopped by {rep['stopped_by']}): {len(rep['unreached'])} entries "
-                   f"not reached; raise the shard count or the budget.")
+        return 1, (
+            f"FAIL: incomplete coverage (stopped by {rep['stopped_by']}): {len(rep['unreached'])} entries "
+            f"not reached; raise the shard count or the budget."
+        )
     return 0, "PASS: no over-claim found this run."
 
 
@@ -217,22 +248,28 @@ def summarize(report_globs, expect=None, out=print):
     lines = []
     if reps:
         lines.append("scope: " + ", ".join(sorted({str(r.get("scope", "all")) for r in reps})) + "\n")
-    lines += ["| shard | seed | checked | refuted | errored | unreached | minutes | status |",
-              "|---|---|---|---|---|---|---|---|"]
+    lines += [
+        "| shard | seed | checked | refuted | errored | unreached | minutes | status |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
     tot = {"total": 0, "checked": 0, "refuted": 0, "errored": 0, "unreached": 0}
     for rep in sorted(reps, key=lambda r: str(r.get("shard"))):
         status = "complete" if rep["complete"] else f"stopped by {rep['stopped_by']}"
         if rep["refuted"] or rep["errored"]:
             status += ", needs review"
-        lines.append(f"| {rep.get('shard') or 'all'} | {rep['seed']} | {rep['checked']}/{rep['total']} | "
-                     f"{len(rep['refuted'])} | {len(rep['errored'])} | {len(rep['unreached'])} | "
-                     f"{rep['seconds'] / 60:.0f} | {status} |")
+        lines.append(
+            f"| {rep.get('shard') or 'all'} | {rep['seed']} | {rep['checked']}/{rep['total']} | "
+            f"{len(rep['refuted'])} | {len(rep['errored'])} | {len(rep['unreached'])} | "
+            f"{rep['seconds'] / 60:.0f} | {status} |"
+        )
         tot["total"] += rep["total"]
         tot["checked"] += rep["checked"]
         for key in ("refuted", "errored", "unreached"):
             tot[key] += len(rep[key])
-    lines.append(f"| all | | {tot['checked']}/{tot['total']} | {tot['refuted']} | {tot['errored']} | "
-                 f"{tot['unreached']} | | {len(reps)} report(s) |")
+    lines.append(
+        f"| all | | {tot['checked']}/{tot['total']} | {tot['refuted']} | {tot['errored']} | "
+        f"{tot['unreached']} | | {len(reps)} report(s) |"
+    )
     for rep in reps:
         for rel, d_found, d_claim, _wit in rep["refuted"]:
             lines.append(f"- REFUTED {rel}: weight-{d_found} logical < claimed {d_claim} (shard {rep.get('shard')})")
@@ -259,6 +296,7 @@ def summarize(report_globs, expect=None, out=print):
 def _install_stop_handlers():
     def _raise(signum, _frame):
         raise _Stopped(signal.Signals(signum).name)
+
     for sig in (signal.SIGTERM, signal.SIGINT):
         signal.signal(sig, _raise)
 
@@ -266,50 +304,70 @@ def _install_stop_handlers():
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--seed", type=int, help="run seed; only to reproduce a run (random otherwise)")
-    ap.add_argument("--scope", choices=("records", "all"), default="records",
-                    help="records: the board's cell records (default); all: every entry")
+    ap.add_argument(
+        "--scope",
+        choices=("records", "all"),
+        default="records",
+        help="records: the board's cell records (default); all: every entry",
+    )
     ap.add_argument("--shard", help="I/K: take every K-th entry of the board (largest n first) starting at I")
-    ap.add_argument("--max-minutes", type=float, help="open no new entry after this much wall clock; "
-                    "the rest are reported unreached and the run fails")
+    ap.add_argument(
+        "--max-minutes",
+        type=float,
+        help="open no new entry after this much wall clock; the rest are reported unreached and the run fails",
+    )
     ap.add_argument("--report", help="write the JSON report here")
-    ap.add_argument("--recapture", metavar="PATH",
-                    help="append one JSON line per checked entry here as the run goes: seeds, trials, "
-                         "and every logical found at weight <= the claimed distance (issue #2897)")
+    ap.add_argument(
+        "--recapture",
+        metavar="PATH",
+        help="append one JSON line per checked entry here as the run goes: seeds, trials, "
+        "and every logical found at weight <= the claimed distance (issue #2897)",
+    )
     ap.add_argument("--root", default=ROOT, help=argparse.SUPPRESS)
-    ap.add_argument("--deep", action="store_true",
-                    help="completion pass: longer per-entry budgets (50k trials, 300s, 50k fold trials) with nauty/SAT fold when available")
+    ap.add_argument(
+        "--deep",
+        action="store_true",
+        help="completion pass: longer per-entry budgets (50k trials, 300s, 50k fold trials) with nauty/SAT fold when available",
+    )
     ap.add_argument("--summarize", nargs="+", metavar="REPORT", help="combine shard reports instead of searching")
     ap.add_argument("--expect", type=int, help="with --summarize: the number of shard reports there must be")
     args = ap.parse_args(argv)
     if args.summarize:
         return summarize(args.summarize, expect=args.expect)
 
-    seed = args.seed if args.seed is not None else secrets.randbelow(2**31)   # fresh each run
+    seed = args.seed if args.seed is not None else secrets.randbelow(2**31)  # fresh each run
     shard_flag = f" --shard {args.shard}" if args.shard else ""
     print(f"weekly board refutation -- random seed = {seed}")
     print(f"(reproduce this run with: python verify/refute_board.py --seed {seed} --scope {args.scope}{shard_flag})\n")
     board = board_paths(args.root)
     scoped = scope_paths(board, args.scope, args.root)
     paths = shard_paths(scoped, args.shard)
-    print(f"scope {args.scope}: {len(scoped)} of {len(board)} entries"
-          + (f"; shard {args.shard}: {len(paths)} entries" if args.shard else "") + ", largest n first\n")
+    print(
+        f"scope {args.scope}: {len(scoped)} of {len(board)} entries"
+        + (f"; shard {args.shard}: {len(paths)} entries" if args.shard else "")
+        + ", largest n first\n"
+    )
     if args.deep:
+
         def refute(doc, seed=0, capture=None):
             # Deep completion pass: bounded + SAT fold first (sound refutation),
             # then a long RIS pass.  The fold runs at the deep budget with nauty
             # and the SAT fold enabled; RIS covers what the fold cannot see.
-            sref, sd, swit, _sp = H.orbit_fold_refute(
-                doc, seed=seed + 97, trials=50000, max_seconds=300.0)
+            sref, sd, swit, _sp = H.orbit_fold_refute(doc, seed=seed + 97, trials=50000, max_seconds=300.0)
             if sref:
                 return True, sd, swit, 50000
-            return H.refute_check(doc, seed=seed, trials=50000,
-                                 max_seconds=300.0, fold_trials=0,
-                                 capture=capture)
+            return H.refute_check(doc, seed=seed, trials=50000, max_seconds=300.0, fold_trials=0, capture=capture)
     else:
         refute = H.refute_check
     _install_stop_handlers()
-    rep = refute_paths(paths, seed, max_seconds=None if args.max_minutes is None else 60 * args.max_minutes,
-                       root=args.root, refute=refute, recapture=args.recapture)
+    rep = refute_paths(
+        paths,
+        seed,
+        max_seconds=None if args.max_minutes is None else 60 * args.max_minutes,
+        root=args.root,
+        refute=refute,
+        recapture=args.recapture,
+    )
     rep["shard"] = args.shard
     rep["scope"] = args.scope
     if args.report:

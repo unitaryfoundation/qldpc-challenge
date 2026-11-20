@@ -65,9 +65,12 @@ seeds) are screened at two extraction rounds, where fewer rounds can only
 overestimate d_circ, and the first that shows nothing below d is kept; the
 final circuits at rounds = d are then searched with twice the trial budget of
 the CI gate. The recorded value is whatever the search finds; when it finds
-nothing at or below d the code's own distance witness, applied as final
-readout flips, is the weight-d fallback that keeps the claim within the
-penalty-only clamp.
+nothing at or below the memory's cap the code's own distance witness of the
+other type, applied as final readout flips, is the fallback that keeps the
+claim within the penalty-only clamp. The cap is per basis
+(circuit_verify.basis_cap, issue #4715): the X memory is bounded by d_Z and
+the Z memory by d_X, so an asymmetric code's longer logical no longer leaves
+its memory unclaimable.
 """
 
 import os
@@ -81,7 +84,7 @@ sys.path.insert(0, os.path.join(ROOT, "verify"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import circuit_tools as ct  # noqa: E402
 import gf2  # noqa: E402
-from circuit_verify import MAX_CIRCUIT_FILE_BYTES, MAX_CIRCUIT_N, MAX_DEM_MECHANISMS  # noqa: E402
+from circuit_verify import MAX_CIRCUIT_FILE_BYTES, MAX_CIRCUIT_N, MAX_DEM_MECHANISMS, basis_cap  # noqa: E402
 from gate_changed import _circuit_budget  # noqa: E402
 
 SCREEN_ROUNDS = 2
@@ -95,16 +98,19 @@ SIDE_FILES = {"X": "memory_x", "Z": "memory_z"}
 
 class CircuitUnavailable(Exception):
     """The generator cannot produce a verifiable circuit tier for this code;
-    the message says why. The code-tier submission is unaffected."""
+    the message says why. The code-tier submission is unaffected.
+    """
 
 
 # ------------------------------------------------------------------ builder
+
 
 class Schedule(list):
     """One round's CX layers (a list of layers, as everywhere in this module)
     with flag intervals attached: `.flags` maps (kind, check) to the
     [(on, off), ...] of flag_intervals(), {} when unflagged. A plain list is
-    an unflagged schedule."""
+    an unflagged schedule.
+    """
 
     def __init__(self, layers, flags=None):
         super().__init__(layers)
@@ -119,7 +125,8 @@ def flag_intervals(w, max_flags=None, span_flags=0):
     intervals (f, w - m + f); `span_flags` adds up to four outer intervals
     (0, w-1), (1, w-2), (0, w-2), (1, w-1), which break the three-hook
     cancellation of a pure coil (module docstring). [] for w < 2 or
-    max_flags == 0."""
+    max_flags == 0.
+    """
     if w < 2 or max_flags == 0:
         return []
     m = w // 2 if max_flags is None else min(w // 2, max_flags)
@@ -132,20 +139,20 @@ def flag_intervals(w, max_flags=None, span_flags=0):
 
 def flag_syndrome(ivs, hook_steps):
     """Which flags of `ivs` flip when the ancilla takes a hook fault right
-    after each step in `hook_steps`: a tuple of 0/1 per interval."""
-    return tuple(sum(1 for k in hook_steps if on <= k < off) % 2
-                 for on, off in ivs)
+    after each step in `hook_steps`: a tuple of 0/1 per interval.
+    """
+    return tuple(sum(1 for k in hook_steps if on <= k < off) % 2 for on, off in ivs)
 
 
 def flagged(layers, max_flags=None, span_flags=0):
     """`layers` as a Schedule with flag_intervals() on every check, each sized
-    by the number of data CX steps that check performs in the round."""
+    by the number of data CX steps that check performs in the round.
+    """
     steps = {}
     for layer in layers:
         for kind, chk, _ in layer:
             steps[(kind, chk)] = steps.get((kind, chk), 0) + 1
-    return Schedule(layers, {key: flag_intervals(w, max_flags, span_flags)
-                             for key, w in steps.items()})
+    return Schedule(layers, {key: flag_intervals(w, max_flags, span_flags) for key, w in steps.items()})
 
 
 def build_memory(HX, HZ, rounds, basis, layers):
@@ -189,8 +196,7 @@ def build_memory(HX, HZ, rounds, basis, layers):
     prep, readout = ("R", "M") if basis == "Z" else ("RX", "MX")
     side = basis.lower()
     H_anchor = HZ if basis == "Z" else HX
-    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" \
-        else gf2.logical_basis(HZ, HX)
+    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" else gf2.logical_basis(HZ, HX)
 
     def anc(key):
         return n + key[1] if key[0] == "X" else n + rX + key[1]
@@ -201,8 +207,7 @@ def build_memory(HX, HZ, rounds, basis, layers):
             targets = []
             for key, fl in buckets.items():
                 if b < len(fl):
-                    targets += [anc(key), fl[b]] if key[0] == "X" \
-                        else [fl[b], anc(key)]
+                    targets += [anc(key), fl[b]] if key[0] == "X" else [fl[b], anc(key)]
             c.append("TICK")
             c.append("CX", targets)
 
@@ -272,18 +277,17 @@ def build_memory(HX, HZ, rounds, basis, layers):
         targs = [rec(("data", int(q))) for q in np.flatnonzero(H_anchor[i])]
         c.append("DETECTOR", targs + [rec((side, i, rounds - 1))])
     for j, row in enumerate(L_obs):
-        c.append("OBSERVABLE_INCLUDE",
-                 [rec(("data", int(q))) for q in np.flatnonzero(row)], j)
+        c.append("OBSERVABLE_INCLUDE", [rec(("data", int(q))) for q in np.flatnonzero(row)], j)
     return c
 
 
 def closure_detector_base(HX, HZ, rounds, basis, flags=None):
     """Index of the first closure detector in a build_memory circuit built
-    with these `flags` (a Schedule's .flags; none by default)."""
+    with these `flags` (a Schedule's .flags; none by default).
+    """
     n_anchor = (HZ if basis == "Z" else HX).shape[0]
     n_flags = sum(len(v) for v in (flags or {}).values())
-    return n_anchor + (rounds - 1) * (HX.shape[0] + HZ.shape[0]) \
-        + rounds * n_flags
+    return n_anchor + (rounds - 1) * (HX.shape[0] + HZ.shape[0]) + rounds * n_flags
 
 
 def layers_parallel(layers):
@@ -299,7 +303,7 @@ def layers_parallel(layers):
 
 
 def deterministic(skeleton):
-    """stim's own validity verdict (RFC 0001 step 1)."""
+    """Stim's own validity verdict (RFC 0001 step 1)."""
     try:
         skeleton.detector_error_model()
     except Exception:
@@ -309,11 +313,13 @@ def deterministic(skeleton):
 
 # --------------------------------------------------- two-block decomposition
 
+
 def two_block_split(HX, HZ):
     """(A, B, zrow) when H_X = [A | B] and the rows of H_Z are exactly the rows
     of [B^T | A^T] in some order, with zrow[i] the H_Z row holding row i of
     [B^T | A^T]; None otherwise. Only the natural qubit order (left half,
-    right half) is recognized."""
+    right half) is recognized.
+    """
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
     n = HX.shape[1]
@@ -351,25 +357,26 @@ def commuting_decomposition(A, B, abelian=True, max_nodes=DECOMPOSITION_NODES):
     A = np.asarray(A, dtype=np.int8)
     B = np.asarray(B, dtype=np.int8)
     m = A.shape[0]
-    nbr = {"A": [tuple(int(x) for x in np.flatnonzero(A[v])) for v in range(m)],
-           "B": [tuple(int(x) for x in np.flatnonzero(B[v])) for v in range(m)]}
+    nbr = {
+        "A": [tuple(int(x) for x in np.flatnonzero(A[v])) for v in range(m)],
+        "B": [tuple(int(x) for x in np.flatnonzero(B[v])) for v in range(m)],
+    }
     wA, wB = len(nbr["A"][0]), len(nbr["B"][0])
     if wA == 0 or wB == 0:
         return None
     for color, M, w in (("A", A, wA), ("B", B, wB)):
-        if any(len(r) != w for r in nbr[color]) or \
-                not (M.sum(axis=0) == w).all():
+        if any(len(r) != w for r in nbr[color]) or not (M.sum(axis=0) == w).all():
             return None
     labels = [("A", a) for a in range(wA)] + [("B", b) for b in range(wB)]
-    partners = {L: [L2 for L2 in labels if L2 != L
-                    and (abelian or L2[0] != L[0])] for L in labels}
-    same_color = {L: [L2 for L2 in labels if L2 != L and L2[0] == L[0]]
-                  for L in labels}
+    partners = {L: [L2 for L2 in labels if L2 != L and (abelian or L2[0] != L[0])] for L in labels}
+    same_color = {L: [L2 for L2 in labels if L2 != L and L2[0] == L[0]] for L in labels}
 
     def fresh():
-        return ({L: [-1] * m for L in labels},
-                {L: [-1] * m for L in labels},
-                {(L, v): set(nbr[L[0]][v]) for L in labels for v in range(m)})
+        return (
+            {L: [-1] * m for L in labels},
+            {L: [-1] * m for L in labels},
+            {(L, v): set(nbr[L[0]][v]) for L in labels for v in range(m)},
+        )
 
     def propagate(state, queue):
         P, inv, dom = state
@@ -421,9 +428,7 @@ def commuting_decomposition(A, B, abelian=True, max_nodes=DECOMPOSITION_NODES):
 
     def copy(state):
         P, inv, dom = state
-        return ({L: p[:] for L, p in P.items()},
-                {L: p[:] for L, p in inv.items()},
-                {k: set(s) for k, s in dom.items()})
+        return ({L: p[:] for L, p in P.items()}, {L: p[:] for L, p in inv.items()}, {k: set(s) for k, s in dom.items()})
 
     nodes = [0]
 
@@ -448,8 +453,7 @@ def commuting_decomposition(A, B, abelian=True, max_nodes=DECOMPOSITION_NODES):
         L, v = best
         for x in sorted(dom[(L, v)]):
             child = copy(state)
-            if propagate(child, [(L, v, x)]) and (
-                    sol := search(child)) is not None:
+            if propagate(child, [(L, v, x)]) and (sol := search(child)) is not None:
                 return sol
         return None
 
@@ -476,8 +480,7 @@ def commuting_decomposition(A, B, abelian=True, max_nodes=DECOMPOSITION_NODES):
     return PA, PB
 
 
-def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
-                            partition_nodes=8000):
+def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48, partition_nodes=8000):
     """Permutation terms of A and B the way the issue #4231 sweep found them,
     as (PA, PB) in the format of commuting_decomposition(), or None.
 
@@ -496,15 +499,13 @@ def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
     B = np.asarray(B, dtype=np.int64)
     m = A.shape[0]
     for M in (A, B):
-        if len(set(M.sum(1).tolist())) != 1 or \
-                len(set(M.sum(0).tolist())) != 1:
+        if len(set(M.sum(1).tolist())) != 1 or len(set(M.sum(0).tolist())) != 1:
             return None
     rows = np.arange(m)
 
     def commuting_perms(M, N, use_self):
         adj = [np.flatnonzero(M[r]).tolist() for r in range(m)]
-        tests = [(N, N, True), (N @ N.T, N @ N.T, False),
-                 (N.T @ N, N.T @ N, False), (N @ N, N @ N, True)]
+        tests = [(N, N, True), (N @ N.T, N @ N.T, False), (N.T @ N, N.T @ N, False), (N @ N, N @ N, True)]
         if use_self:
             tests += [(M @ M.T, M.T @ M, False), (M @ M, M @ M, True)]
         found = []
@@ -534,8 +535,7 @@ def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
                 nodes[0] += 1
                 best_r, best = None, None
                 for r in open_rows:
-                    choices = [c for c in adj[r]
-                               if not used[c] and consistent(r, c)]
+                    choices = [c for c in adj[r] if not used[c] and consistent(r, c)]
                     if not choices:
                         return
                     if best is None or len(choices) < len(best):
@@ -553,7 +553,8 @@ def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
 
     def tile(M, perms, accept):
         """accept(chosen) for the first tiling of M by len(M[0]) of `perms`
-        that accept() does not reject, else None."""
+        that accept() does not reject, else None.
+        """
         w = int(M[0].sum())
         nodes = [0]
 
@@ -586,8 +587,7 @@ def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
             continue
 
         def with_b(PA):
-            ok_b = [pb for pb in cand_b
-                    if all((pb[pa] == pa[pb]).all() for pa in PA)]
+            ok_b = [pb for pb in cand_b if all((pb[pa] == pa[pb]).all() for pa in PA)]
             PB = tile(B, ok_b, lambda chosen: chosen)
             return None if PB is None else (PA, PB)
 
@@ -600,10 +600,13 @@ def invariant_decomposition(A, B, max_nodes=2500, max_per_start=48,
 def decompose_two_block(A, B):
     """Commuting permutation terms of a two-block code's A and B: the
     invariant search first, then commuting_decomposition() with and without
-    the Abelian assumption; None when all three give up."""
-    return invariant_decomposition(A, B) \
-        or commuting_decomposition(A, B, abelian=True) \
+    the Abelian assumption; None when all three give up.
+    """
+    return (
+        invariant_decomposition(A, B)
+        or commuting_decomposition(A, B, abelian=True)
         or commuting_decomposition(A, B, abelian=False)
+    )
 
 
 def interleaved_slots(wA, wB, rng, attempts=SLOT_ATTEMPTS):
@@ -612,7 +615,8 @@ def interleaved_slots(wA, wB, rng, attempts=SLOT_ATTEMPTS):
     slots 1..w and Z terms slots 0..w-1 (w = wA + wB), the X and Z terms of a
     shared slot have the same letter (so they act on opposite data halves),
     and for every (A_a, B_b) the X-before-Z order agrees on the two shared
-    qubits: (sx[A_a] < sz[B_b]) == (sx[B_b] < sz[A_a])."""
+    qubits: (sx[A_a] < sz[B_b]) == (sx[B_b] < sz[A_a]).
+    """
     terms = [("A", a) for a in range(wA)] + [("B", b) for b in range(wB)]
     w = len(terms)
     seen = set()
@@ -628,8 +632,7 @@ def interleaved_slots(wA, wB, rng, attempts=SLOT_ATTEMPTS):
             ts = [t for t in terms if t[0] == letter]
             for k, j in enumerate(rng.permutation(len(ts))):
                 sz[ts[int(j)]] = slots[k]
-        ok = all((sx[a] < sz[b]) == (sx[b] < sz[a])
-                 for a in terms[:wA] for b in terms[wA:])
+        ok = all((sx[a] < sz[b]) == (sx[b] < sz[a]) for a in terms[:wA] for b in terms[wA:])
         key = (tuple(sx[t] for t in terms), tuple(sz[t] for t in terms))
         if ok and key not in seen:
             seen.add(key)
@@ -640,7 +643,8 @@ def interleaved_layers(PA, PB, zrow, sx, sz):
     """CX layers of a two-block interleaved round: X check i couples to left
     qubit PA[a][i] (term A_a) or right qubit m + PB[b][i] (term B_b) at
     slot sx; Z check zrow[i] couples to right qubit m + PA[a]^{-1}[i] or left
-    qubit PB[b]^{-1}[i] at slot sz."""
+    qubit PB[b]^{-1}[i] at slot sz.
+    """
     m = len(PA[0])
     w = len(PA) + len(PB)
     layers = [[] for _ in range(w + 1)]
@@ -659,29 +663,37 @@ def interleaved_layers(PA, PB, zrow, sx, sz):
 
 def slot_text(sx, sz, wA, wB):
     terms = [("A", a) for a in range(wA)] + [("B", b) for b in range(wB)]
-    return (f"X-check term slots {[sx[t] for t in terms]}, Z-check term slots "
-            f"{[sz[t] for t in terms]} over terms A_0..A_{wA - 1}, "
-            f"B_0..B_{wB - 1}")
+    return (
+        f"X-check term slots {[sx[t] for t in terms]}, Z-check term slots "
+        f"{[sz[t] for t in terms]} over terms A_0..A_{wA - 1}, "
+        f"B_0..B_{wB - 1}"
+    )
 
 
 # ------------------------------------------------------------- candidates
+
 
 def fits(HX, HZ, rounds, schedule):
     """True when the Z memory of `schedule` at `rounds` is deterministic and
     inside the verifier's caps: MAX_DEM_MECHANISMS mechanisms and
     MAX_CIRCUIT_FILE_BYTES for each of the .stim and .dem texts. (The X
-    memory differs only in its anchors.)"""
+    memory differs only in its anchors.)
+    """
     noisy, dem = _dem_of(HX, HZ, rounds, "Z", schedule)
-    return dem is not None and dem.num_errors <= MAX_DEM_MECHANISMS and \
-        len(str(dem)) + 1 <= MAX_CIRCUIT_FILE_BYTES and \
-        len(str(noisy)) + 1 <= MAX_CIRCUIT_FILE_BYTES
+    return (
+        dem is not None
+        and dem.num_errors <= MAX_DEM_MECHANISMS
+        and len(str(dem)) + 1 <= MAX_CIRCUIT_FILE_BYTES
+        and len(str(noisy)) + 1 <= MAX_CIRCUIT_FILE_BYTES
+    )
 
 
 def fit_flags(HX, HZ, rounds, layers, spans=(0,)):
     """(schedule, max_flags, span_flags) for the most Johnson-coil flags per
     check (from w // 2 down to 1, w the most data CX steps any check
     performs) and, at that count, the first of `spans` span-flag counts
-    whose Z memory fits(); None when not even one flag per check fits."""
+    whose Z memory fits(); None when not even one flag per check fits.
+    """
     steps = {}
     for layer in layers:
         for kind, chk, _ in layer:
@@ -699,7 +711,8 @@ def two_block_candidates(HX, HZ, rng, rounds=None):
     """(family, iterator of (notes, layers)) for a two-block code, or None.
     With `rounds` each slot assignment comes flagged first (the coil, then
     the coil plus span flags when that fits too) and bare only when no flag
-    count fits; without it, bare only."""
+    count fits; without it, bare only.
+    """
     split = two_block_split(HX, HZ)
     if split is None:
         return None
@@ -717,21 +730,33 @@ def two_block_candidates(HX, HZ, rng, rounds=None):
             got = None if rounds is None else fit_flags(HX, HZ, rounds, layers)
             if got is not None:
                 sch, mf, _ = got
-                yield (f"Johnson-coil flagged interleaved two-block "
-                       f"extraction (max_flags={mf} per check, {w + 1} data "
-                       f"CX slots per round, {slot_text(sx, sz, wA, wB)})"), sch
+                yield (
+                    (
+                        f"Johnson-coil flagged interleaved two-block "
+                        f"extraction (max_flags={mf} per check, {w + 1} data "
+                        f"CX slots per round, {slot_text(sx, sz, wA, wB)})"
+                    ),
+                    sch,
+                )
                 span = flagged(layers, mf, SPAN_FLAGS)
                 if fits(HX, HZ, rounds, span):
-                    yield (f"Johnson-coil + {SPAN_FLAGS} span flags "
-                           f"interleaved two-block extraction (max_flags={mf} "
-                           f"per check, {w + 1} data CX slots per round, "
-                           f"{slot_text(sx, sz, wA, wB)})"), span
+                    yield (
+                        (
+                            f"Johnson-coil + {SPAN_FLAGS} span flags "
+                            f"interleaved two-block extraction (max_flags={mf} "
+                            f"per check, {w + 1} data CX slots per round, "
+                            f"{slot_text(sx, sz, wA, wB)})"
+                        ),
+                        span,
+                    )
                 continue
-            notes = (f"Interleaved two-block extraction (Bravyi et al. "
-                     f"arXiv:2308.07915 Table 5 style): joint reset and "
-                     f"measurement layers, {w + 1} CX layers per round; "
-                     f"{slot_text(sx, sz, wA, wB)}; terms recovered from H "
-                     f"alone by a commuting permutation decomposition")
+            notes = (
+                f"Interleaved two-block extraction (Bravyi et al. "
+                f"arXiv:2308.07915 Table 5 style): joint reset and "
+                f"measurement layers, {w + 1} CX layers per round; "
+                f"{slot_text(sx, sz, wA, wB)}; terms recovered from H "
+                f"alone by a commuting permutation decomposition"
+            )
             yield notes, Schedule(layers)
 
     return f"two-block interleaved (A: {wA} terms, B: {wB} terms)", cands()
@@ -740,10 +765,12 @@ def two_block_candidates(HX, HZ, rng, rounds=None):
 def layout_candidates(HX, HZ, coords):
     """(family, iterator) for a rotated-surface style layout (all checks of
     weight 2..4 on a 2D grid whose plaquette centers separate by parity), or
-    None. Reuses research/circuit_seed.py's pattern machinery."""
+    None. Reuses research/circuit_seed.py's pattern machinery.
+    """
     if coords is None:
         return None
     import circuit_seed as cs
+
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
     checks_x = [list(map(int, np.flatnonzero(r))) for r in HX]
@@ -770,21 +797,29 @@ def layout_candidates(HX, HZ, coords):
         return None
 
     def cands():
-        for px, pz, lx, lz in pairs:                # interleaved first
-            merged = [[("X", c, q) for c, q in a] + [("Z", c, q) for c, q in b]
-                      for a, b in zip(lx, lz)]
+        for px, pz, lx, lz in pairs:  # interleaved first
+            merged = [[("X", c, q) for c, q in a] + [("Z", c, q) for c, q in b] for a, b in zip(lx, lz)]
             if layers_parallel(merged):
-                yield (f"geometric zigzag schedule (X pattern '{px}', Z "
-                       f"pattern '{pz}') read off the 2D layout, X and Z "
-                       f"plaquettes coupled in the same 4 layers with joint "
-                       f"reset and measurement layers"), merged
+                yield (
+                    (
+                        f"geometric zigzag schedule (X pattern '{px}', Z "
+                        f"pattern '{pz}') read off the 2D layout, X and Z "
+                        f"plaquettes coupled in the same 4 layers with joint "
+                        f"reset and measurement layers"
+                    ),
+                    merged,
+                )
         for px, pz, lx, lz in pairs:
-            layers = [[("X", c, q) for c, q in a] for a in lx] + \
-                     [[("Z", c, q) for c, q in b] for b in lz]
-            yield (f"geometric zigzag schedule (X pattern '{px}', Z pattern "
-                   f"'{pz}') read off the 2D layout, X plaquettes then Z "
-                   f"plaquettes each round with joint reset and measurement "
-                   f"layers"), layers
+            layers = [[("X", c, q) for c, q in a] for a in lx] + [[("Z", c, q) for c, q in b] for b in lz]
+            yield (
+                (
+                    f"geometric zigzag schedule (X pattern '{px}', Z pattern "
+                    f"'{pz}') read off the 2D layout, X plaquettes then Z "
+                    f"plaquettes each round with joint reset and measurement "
+                    f"layers"
+                ),
+                layers,
+            )
 
     return "layout zigzag", cands()
 
@@ -794,7 +829,8 @@ def generic_candidates(HX, HZ, rng, rounds=None):
     candidate per coloring seed. Always applicable. With `rounds` each
     coloring comes flagged first: the most coil flags that fit, preferring
     at that count SPAN_FLAGS, then 2, then no span flags; bare when none
-    fits (or without `rounds`)."""
+    fits (or without `rounds`).
+    """
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
 
@@ -804,24 +840,32 @@ def generic_candidates(HX, HZ, rng, rounds=None):
             r = np.random.default_rng(int(rng.integers(1 << 31)))
             lx = [l for l in ct.edge_coloring(HX, r) if l]
             lz = [l for l in ct.edge_coloring(HZ, r) if l]
-            layers = [[("X", c, q) for c, q in a] for a in lx] + \
-                     [[("Z", c, q) for c, q in b] for b in lz]
-            got = None if rounds is None else \
-                fit_flags(HX, HZ, rounds, layers, spans=(SPAN_FLAGS, 2, 0))
+            layers = [[("X", c, q) for c, q in a] for a in lx] + [[("Z", c, q) for c, q in b] for b in lz]
+            got = None if rounds is None else fit_flags(HX, HZ, rounds, layers, spans=(SPAN_FLAGS, 2, 0))
             if got is not None:
                 sch, mf, sp = got
                 span = f" + {sp} span flags" if sp else ""
-                yield (f"Johnson-coil{span} sequential extraction "
-                       f"(max_flags={mf} per check, {len(lx)} X + {len(lz)} "
-                       f"Z edge-colored data CX layers per round, coloring "
-                       f"candidate {seed})"), sch
+                yield (
+                    (
+                        f"Johnson-coil{span} sequential extraction "
+                        f"(max_flags={mf} per check, {len(lx)} X + {len(lz)} "
+                        f"Z edge-colored data CX layers per round, coloring "
+                        f"candidate {seed})"
+                    ),
+                    sch,
+                )
             else:
-                yield (f"Generic sequential two-block extraction: one "
-                       f"ancilla per check, X checks then Z checks each "
-                       f"round with joint reset and measurement layers; CX "
-                       f"layers are a proper edge coloring of each Tanner "
-                       f"graph ({len(lx)} X + {len(lz)} Z CX layers per "
-                       f"round, coloring candidate {seed})"), Schedule(layers)
+                yield (
+                    (
+                        f"Generic sequential two-block extraction: one "
+                        f"ancilla per check, X checks then Z checks each "
+                        f"round with joint reset and measurement layers; CX "
+                        f"layers are a proper edge coloring of each Tanner "
+                        f"graph ({len(lx)} X + {len(lz)} Z CX layers per "
+                        f"round, coloring candidate {seed})"
+                    ),
+                    Schedule(layers),
+                )
             seed += 1
 
     return "generic sequential", cands()
@@ -829,10 +873,10 @@ def generic_candidates(HX, HZ, rng, rounds=None):
 
 def candidate_schedules(HX, HZ, coords, seed, rounds=None):
     """The first applicable family's (label, candidate iterator); `rounds`
-    (the final circuits' round count) turns the flagged variants on."""
+    (the final circuits' round count) turns the flagged variants on.
+    """
     rng = np.random.default_rng(seed)
-    for maker in (lambda: two_block_candidates(HX, HZ, rng, rounds),
-                  lambda: layout_candidates(HX, HZ, coords)):
+    for maker in (lambda: two_block_candidates(HX, HZ, rng, rounds), lambda: layout_candidates(HX, HZ, coords)):
         got = maker()
         if got is not None:
             return got
@@ -840,6 +884,7 @@ def candidate_schedules(HX, HZ, coords, seed, rounds=None):
 
 
 # ------------------------------------------------------------------ search
+
 
 def _dem_of(HX, HZ, rounds, basis, layers):
     skel = build_memory(HX, HZ, rounds, basis, layers)
@@ -849,13 +894,24 @@ def _dem_of(HX, HZ, rounds, basis, layers):
     return noisy, ct.derive_dem(noisy)
 
 
-def screen(cands, HX, HZ, d, max_candidates, seed, log=lambda s: None,
-           rounds=SCREEN_ROUNDS, trials=SCREEN_TRIALS, seconds=SCREEN_SECONDS):
+def screen(
+    cands,
+    HX,
+    HZ,
+    d,
+    max_candidates,
+    seed,
+    log=lambda s: None,
+    rounds=SCREEN_ROUNDS,
+    trials=SCREEN_TRIALS,
+    seconds=SCREEN_SECONDS,
+):
     """Try up to `max_candidates` schedules at `rounds` extraction rounds
     (fewer rounds can only overestimate d_circ) and return
     (notes, layers, per-basis bounds) for the first whose quick RIS finds
     nothing below d in either basis, else the best seen. Non-deterministic
-    schedules are skipped; None if none was deterministic."""
+    schedules are skipped; None if none was deterministic.
+    """
     best = None
     tried = 0
     for notes, layers in cands:
@@ -869,8 +925,7 @@ def screen(cands, HX, HZ, d, max_candidates, seed, log=lambda s: None,
                 bounds = None
                 break
             H, L = ct.dem_matrices(dem)
-            w, _ = ct.ris_dem(H, L, trials=trials, seed=seed,
-                              max_seconds=seconds)
+            w, _ = ct.ris_dem(H, L, trials=trials, seed=seed, max_seconds=seconds)
             bounds[basis] = w if w is not None else d
             if bounds[basis] < d:
                 break
@@ -878,9 +933,11 @@ def screen(cands, HX, HZ, d, max_candidates, seed, log=lambda s: None,
             log(f"candidate {tried}: detectors not deterministic, skipped")
             continue
         score = min(bounds.values())
-        log(f"candidate {tried}: " + ", ".join(
-            f"{b} <= {v}" for b, v in bounds.items()) +
-            (" (nothing below d found)" if score >= d else ""))
+        log(
+            f"candidate {tried}: "
+            + ", ".join(f"{b} <= {v}" for b, v in bounds.items())
+            + (" (nothing below d found)" if score >= d else "")
+        )
         if best is None or score > best[2]:
             best = (notes, layers, score, bounds)
         if score >= d:
@@ -895,15 +952,14 @@ def readout_witness(dem, HX, HZ, rounds, basis, support, flags=None):
     logical of the opposite type (an X logical for the Z memory): undetected
     by construction and of weight |support|. None if any flip's mechanism is
     missing from the DEM or two flips share one. `flags` are the schedule's
-    (they shift the closure detectors)."""
+    (they shift the closure detectors).
+    """
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
     H_anchor = HZ if basis == "Z" else HX
-    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" \
-        else gf2.logical_basis(HZ, HX)
+    L_obs = gf2.logical_basis(HX, HZ) if basis == "Z" else gf2.logical_basis(HZ, HX)
     base = closure_detector_base(HX, HZ, rounds, basis, flags)
-    index = {(tuple(ds), tuple(ls)): j
-             for j, (ds, ls) in enumerate(ct.dem_columns(dem))}
+    index = {(tuple(ds), tuple(ls)): j for j, (ds, ls) in enumerate(ct.dem_columns(dem))}
     wit = []
     for q in support:
         dets = tuple(base + int(i) for i in np.flatnonzero(H_anchor[:, q]))
@@ -918,17 +974,21 @@ def readout_witness(dem, HX, HZ, rounds, basis, support, flags=None):
     return wit
 
 
-def search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed, seconds,
-                 fallback_support=None, log=lambda s: None, flags=None):
+def search_basis(
+    noisy, dem, HX, HZ, d, rounds, basis, seed, seconds, fallback_support=None, log=lambda s: None, flags=None
+):
     """Deep RIS on one memory circuit's DEM at twice the gate's trial budget;
-    returns (value, witness). Falls back to the readout-flip witness of
-    `fallback_support` when the search finds nothing at or below d."""
+    returns (value, witness). `d` is this memory's cap (circuit_verify.basis_cap:
+    the distance of the logical it protects). Falls back to the readout-flip
+    witness of `fallback_support` when the search finds nothing at or below it.
+    """
     m = dem.num_errors
     if m > MAX_DEM_MECHANISMS:
         raise CircuitUnavailable(
             f"{basis} memory has {m} error mechanisms at rounds={rounds}, "
             f"over the circuit-tier cap of {MAX_DEM_MECHANISMS}; pass "
-            f"--circuits with a leaner schedule or --no-circuit")
+            f"--circuits with a leaner schedule or --no-circuit"
+        )
     fast = ct._GF is not None and hasattr(ct._GF, "dem_rand_witness")
     trials, _ = _circuit_budget(m, fast)
     trials = 2 * trials
@@ -936,61 +996,74 @@ def search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed, seconds,
     w, wit = ct.ris_dem(H, L, trials=trials, seed=seed, max_seconds=seconds)
     if w is not None and ct.witness_errors(dem, wit, w):
         w, wit = None, None
-    log(f"{basis} memory: {dem.num_detectors} detectors, {m} mechanisms, "
-        f"RIS budget {trials} trials or {seconds:g} s -> " +
-        (f"d_circ <= {w}" if w is not None else "no witness found"))
-    if (w is None or w > d) and fallback_support is not None \
-            and len(fallback_support) == d:
-        alt = readout_witness(dem, HX, HZ, rounds, basis, fallback_support,
-                              flags)
+    log(
+        f"{basis} memory: {dem.num_detectors} detectors, {m} mechanisms, "
+        f"RIS budget {trials} trials or {seconds:g} s -> " + (f"d_circ <= {w}" if w is not None else "no witness found")
+    )
+    if (w is None or w > d) and fallback_support is not None and len(fallback_support) == d:
+        alt = readout_witness(dem, HX, HZ, rounds, basis, fallback_support, flags)
         if alt is not None and not ct.witness_errors(dem, alt, d):
-            log(f"{basis} memory: readout flips along the code's weight-{d} "
-                f"logical witness the clamp value d_circ <= {d}")
+            log(
+                f"{basis} memory: readout flips along the code's weight-{d} "
+                f"logical witness the clamp value d_circ <= {d}"
+            )
             w, wit = d, alt
     if w is None or w > d:
         raise CircuitUnavailable(
             f"{basis} memory: the search found no undetected logical fault "
-            f"set of weight <= d = {d} (lightest {w}), so no claim within "
-            f"the penalty-only clamp can be recorded")
+            f"set of weight <= {d}, the distance of the logical this memory "
+            f"protects (lightest {w}), so no claim within the penalty-only "
+            f"clamp can be recorded"
+        )
     return int(w), [int(i) for i in wit]
 
 
-def finish(notes, layers, HX, HZ, d, rounds, doc_witnesses, seed, seconds,
-           log=lambda s: None):
+def finish(notes, layers, HX, HZ, d, rounds, doc_witnesses, seed, seconds, log=lambda s: None, caps=None):
     """Build both memory circuits at full rounds, search them, and return
-    (circuit block, {filename: text})."""
-    block = {"d_circ": {}, "rounds": rounds, "stim_version": stim.__version__,
-             "notes": notes}
+    (circuit block, {filename: text}). `caps` maps each basis to its clamp
+    (circuit_verify.basis_cap); without it both memories are capped at d.
+    """
+    caps = caps or {"X": d, "Z": d}
+    block = {"d_circ": {}, "rounds": rounds, "stim_version": stim.__version__, "notes": notes}
     files = {}
     for basis in ("Z", "X"):
         noisy, dem = _dem_of(HX, HZ, rounds, basis, layers)
         if dem is None:
-            raise CircuitUnavailable(f"{basis} memory at rounds={rounds} has "
-                                     f"non-deterministic detectors")
+            raise CircuitUnavailable(f"{basis} memory at rounds={rounds} has non-deterministic detectors")
         opp = "X" if basis == "Z" else "Z"
-        value, wit = search_basis(noisy, dem, HX, HZ, d, rounds, basis, seed,
-                                  seconds, doc_witnesses.get(opp), log,
-                                  getattr(layers, "flags", None))
-        block["d_circ"][basis] = {"value": value, "confidence": "upper_bound",
-                                  "witness": wit}
+        value, wit = search_basis(
+            noisy,
+            dem,
+            HX,
+            HZ,
+            caps[basis],
+            rounds,
+            basis,
+            seed,
+            seconds,
+            doc_witnesses.get(opp),
+            log,
+            getattr(layers, "flags", None),
+        )
+        block["d_circ"][basis] = {"value": value, "confidence": "upper_bound", "witness": wit}
         stem = SIDE_FILES[basis]
         files[stem + ".stim"] = str(noisy) + "\n"
-        files[stem + ".dem"] = str(dem) + "\n"
     return block, files
 
 
-def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6,
-             seconds=180.0, log=lambda s: None):
+def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6, seconds=180.0, log=lambda s: None):
     """The circuit tier for a verified submission document: (block, files,
     family label). `doc` carries checks, distance, and n; `coords` the layout
     if any. Raises CircuitUnavailable with the reason when no verifiable tier
-    can be produced (DEM over the cap, no claim within the clamp)."""
+    can be produced (DEM over the cap, no claim within the clamp).
+    """
     n, d = doc["n"], doc["distance"]["d"]
     if n > MAX_CIRCUIT_N:
         raise CircuitUnavailable(
             f"n={n} is above the circuit tier's reach of n <= "
             f"{MAX_CIRCUIT_N} (decided on #2797 and #2811: the tier stays on "
-            f"instances that can be built now); submit the code tier only")
+            f"instances that can be built now); submit the code tier only"
+        )
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
     rounds = max(int(rounds or d), d)
@@ -1009,50 +1082,56 @@ def generate(doc, coords=None, rounds=None, seed=0, max_candidates=6,
         raise CircuitUnavailable(
             f"the Z memory at rounds={rounds} has {dem.num_errors} error "
             f"mechanisms, over the circuit-tier cap of {MAX_DEM_MECHANISMS}; "
-            f"pass --circuits with a leaner schedule or --no-circuit")
+            f"pass --circuits with a leaner schedule or --no-circuit"
+        )
 
     def chained():
         yield first_notes, first_layers
         yield from cands
 
-    log(f"screening up to {max_candidates} candidates at "
-        f"{min(SCREEN_ROUNDS, rounds)} rounds")
-    picked = screen(chained(), HX, HZ, d, max_candidates, seed, log,
-                    rounds=min(SCREEN_ROUNDS, rounds))
+    log(f"screening up to {max_candidates} candidates at {min(SCREEN_ROUNDS, rounds)} rounds")
+    picked = screen(chained(), HX, HZ, d, max_candidates, seed, log, rounds=min(SCREEN_ROUNDS, rounds))
     if picked is None:
-        raise CircuitUnavailable("no candidate schedule had deterministic "
-                                 "detectors")
+        raise CircuitUnavailable("no candidate schedule had deterministic detectors")
     notes, layers, _ = picked
-    notes += (f"; generated by qldpc submit (research/circuit_autogen.py, "
-              f"seed {seed}), the first of up to {max_candidates} candidates "
-              f"whose RIS screen at {min(SCREEN_ROUNDS, rounds)} rounds found "
-              f"nothing below d; witnesses from RIS on ker(H_dem) at twice "
-              f"the gate's trial budget, validated in GF(2)")
-    wits = {s: doc["distance"][s]["witness"] for s in ("X", "Z")
-            if s in doc["distance"]}
+    notes += (
+        f"; generated by qldpc submit (research/circuit_autogen.py, "
+        f"seed {seed}), the first of up to {max_candidates} candidates "
+        f"whose RIS screen at {min(SCREEN_ROUNDS, rounds)} rounds found "
+        f"nothing below d; witnesses from RIS on ker(H_dem) at twice "
+        f"the gate's trial budget, validated in GF(2)"
+    )
+    wits = {s: doc["distance"][s]["witness"] for s in ("X", "Z") if s in doc["distance"]}
     log(f"deep search at rounds={rounds}")
-    block, files = finish(notes, layers, HX, HZ, d, rounds, wits, seed,
-                          seconds, log)
+    block, files = finish(
+        notes, layers, HX, HZ, d, rounds, wits, seed, seconds, log, caps={b: basis_cap(doc, b) for b in ("X", "Z")}
+    )
     for name, text in files.items():
         if len(text.encode("utf-8")) > MAX_CIRCUIT_FILE_BYTES:
             raise CircuitUnavailable(
                 f"{name} is {len(text.encode('utf-8'))} bytes, over the "
                 f"circuit-tier file cap of {MAX_CIRCUIT_FILE_BYTES}; pass "
-                f"--circuits with a leaner schedule or --no-circuit")
+                f"--circuits with a leaner schedule or --no-circuit"
+            )
     return block, files, family
 
 
-def from_files(doc, directory, rounds=None, seed=0, seconds=180.0,
-               log=lambda s: None):
+def from_files(doc, directory, rounds=None, seed=0, seconds=180.0, log=lambda s: None):
     """A submitter's own memory circuits: read memory_x.stim and
     memory_z.stim from `directory`, derive the DEMs with the pinned stim,
     search for witnesses, and return (block, files, label). The circuits are
     taken as they are (the verifier judges them); rounds is the declared
-    value or, by default, the number of times an ancilla is measured."""
+    value or, by default, the number of times an ancilla is measured.
+    """
     from circuit_verify import _binding_errors
+
     d = doc["distance"]["d"]
-    block = {"d_circ": {}, "rounds": None, "stim_version": stim.__version__,
-             "notes": "submitter-provided circuits (qldpc submit --circuits)"}
+    block = {
+        "d_circ": {},
+        "rounds": None,
+        "stim_version": stim.__version__,
+        "notes": "submitter-provided circuits (qldpc submit --circuits)",
+    }
     files = {}
     for basis in ("Z", "X"):
         stem = SIDE_FILES[basis]
@@ -1063,34 +1142,32 @@ def from_files(doc, directory, rounds=None, seed=0, seconds=180.0,
         noisy = stim.Circuit(text)
         skel = ct.strip_noise(noisy)
         if not deterministic(skel):
-            raise CircuitUnavailable(f"{path}: detectors are not "
-                                     f"deterministic")
+            raise CircuitUnavailable(f"{path}: detectors are not deterministic")
         _, meta = _binding_errors(skel, basis, doc)
         measured = meta.get("rounds_measured")
         if block["rounds"] is None:
             block["rounds"] = int(rounds or measured or d)
         dem = ct.derive_dem(noisy)
         if dem.num_errors > MAX_DEM_MECHANISMS:
-            raise CircuitUnavailable(
-                f"{path}: {dem.num_errors} mechanisms, over the tier cap "
-                f"{MAX_DEM_MECHANISMS}")
+            raise CircuitUnavailable(f"{path}: {dem.num_errors} mechanisms, over the tier cap {MAX_DEM_MECHANISMS}")
         m = dem.num_errors
         fast = ct._GF is not None and hasattr(ct._GF, "dem_rand_witness")
         trials, _ = _circuit_budget(m, fast)
         H, L = ct.dem_matrices(dem)
-        w, wit = ct.ris_dem(H, L, trials=2 * trials, seed=seed,
-                            max_seconds=seconds)
-        log(f"{basis} memory: {m} mechanisms, RIS budget {2 * trials} trials "
-            f"or {seconds:g} s -> " +
-            (f"d_circ <= {w}" if w is not None else "no witness found"))
-        if w is None or w > d or ct.witness_errors(dem, wit, w):
+        w, wit = ct.ris_dem(H, L, trials=2 * trials, seed=seed, max_seconds=seconds)
+        log(
+            f"{basis} memory: {m} mechanisms, RIS budget {2 * trials} trials "
+            f"or {seconds:g} s -> " + (f"d_circ <= {w}" if w is not None else "no witness found")
+        )
+        cap = basis_cap(doc, basis)
+        if w is None or w > cap or ct.witness_errors(dem, wit, w):
             raise CircuitUnavailable(
-                f"{path}: no undetected logical fault set of weight <= d = "
-                f"{d} found (lightest {w}); no claim within the clamp")
-        block["d_circ"][basis] = {"value": int(w), "confidence": "upper_bound",
-                                  "witness": [int(i) for i in wit]}
+                f"{path}: no undetected logical fault set of weight <= "
+                f"{cap}, the distance of the logical the {basis} memory "
+                f"protects, found (lightest {w}); no claim within the clamp"
+            )
+        block["d_circ"][basis] = {"value": int(w), "confidence": "upper_bound", "witness": [int(i) for i in wit]}
         files[stem + ".stim"] = text if text.endswith("\n") else text + "\n"
-        files[stem + ".dem"] = str(dem) + "\n"
     return block, files, "submitter-provided"
 
 

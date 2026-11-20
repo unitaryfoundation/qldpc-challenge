@@ -1,4 +1,5 @@
 """Proximity profile on a hand-built detector error model (issue #6242, campaign 3)."""
+
 import os
 import sys
 
@@ -34,10 +35,10 @@ def test_proximity_finds_the_shortcut_inside_the_neighborhood():
     by_det = px.fault_adjacency(cols)
     Q = px.neighborhood(cols, by_det, 0, (0, 1, 2, 3), size=8)
     assert set(Q) == {0, 1, 2, 3, 4}
-    assert px.proximity(cols, 0, Q, cap=3) == (2, 1)          # {0, 4, 3}, the only one
-    assert px.proximity(cols, 1, Q, cap=3) == (3, 1)          # 1 needs 0, 2, 3
-    assert px.proximity(cols, 0, [0, 1, 2, 3], cap=3) == (3, 1)   # without the shortcut
-    assert px.proximity(cols, 0, [0, 1, 2], cap=3) == (None, 0)   # no completion at all
+    assert px.proximity(cols, 0, Q, cap=3) == (2, 1)  # {0, 4, 3}, the only one
+    assert px.proximity(cols, 1, Q, cap=3) == (3, 1)  # 1 needs 0, 2, 3
+    assert px.proximity(cols, 0, [0, 1, 2, 3], cap=3) == (3, 1)  # without the shortcut
+    assert px.proximity(cols, 0, [0, 1, 2], cap=3) == (None, 0)  # no completion at all
 
 
 def test_profile_reads_the_minimum_over_the_witness_seeds():
@@ -72,4 +73,4 @@ def test_hook_profile_on_the_chain():
     # the shortcut fires two detectors; with min_detectors 2 it is the one hook seed
     assert px.hook_seeds(cols, Q, (0, 1, 2, 3), min_detectors=2) == [4]
     prof = px.profile_hooks(cols, (0, 1, 2, 3), size=10, min_detectors=2)
-    assert prof["seeds"] == 1 and prof["p_min"] == 2 and prof["cap"] == 3   # {4} + {0, 3}
+    assert prof["seeds"] == 1 and prof["p_min"] == 2 and prof["cap"] == 3  # {4} + {0, 3}

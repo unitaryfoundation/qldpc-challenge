@@ -13,6 +13,9 @@ on:
       # PR merges with only ruff and prose on its rollup (PR #2321).
       - "cli/**"
       - "codes/**"
+      # Circuit evidence is part of the code claim and needs the trusted
+      # circuit tier even when a PR changes only circuits/<slug>/ (PR #1012).
+      - "circuits/**"
       # check_certs.py runs inside this workflow, so a certificate-only PR
       # (a level change, a new replay recipe) has to trigger it: without this
       # entry such a PR got prose and proof-replay and never the certificate
@@ -72,7 +75,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           filter: blob:none       # the diff below needs trees, not blobs (issue #5578)
@@ -91,7 +94,7 @@ jobs:
         if: github.event_name != 'pull_request' || steps.ris.outputs.changed == 'true'
         id: cuda
         continue-on-error: true
-        uses: Jimver/cuda-toolkit@v0.2.19
+        uses: Jimver/cuda-toolkit@4bd727d5619dc6fa323b1e76c3aa5dca94f5ec6d # v0.2.19
         with:
           method: network
           sub-packages: '["nvcc"]'
@@ -142,7 +145,7 @@ jobs:
       # trusted tree is a worktree of this clone at the base branch, so the
       # 800 MB history pack is downloaded once instead of twice.
       - name: check out submitted tree
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0          # full history so the gate can diff vs the base
           filter: blob:none
@@ -155,7 +158,7 @@ jobs:
         if: github.event_name != 'pull_request'
         working-directory: submitted
         run: git worktree add --detach ../trusted HEAD
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       # The early exit (issue #2615). The gate and verify_all read the
       # submitted tree's codes/, circuits/, schema/ and decode/ and the trusted
       # tree's verifier stack; a digest over exactly those tree objects names
@@ -187,7 +190,7 @@ jobs:
       - name: look for a passing verdict on these bytes
         if: github.event_name == 'pull_request'
         id: verdict
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: passed-verdict
           key: verify-passed-${{ github.event.pull_request.number }}-${{ steps.digest.outputs.digest }}
@@ -612,7 +615,7 @@ jobs:
       # the prefix is what lets a later run find the newest record.
       - name: restore the circuit record (push to main)
         if: github.event_name == 'push'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: circuit-record
           key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
@@ -688,7 +691,7 @@ jobs:
       # never ran wrote nothing to save.
       - name: save the circuit record (runs on main)
         if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && hashFiles('circuit-record/record.json') != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: circuit-record
           key: circuit-record-${{ github.run_id }}-${{ github.run_attempt }}
@@ -711,7 +714,7 @@ jobs:
       # prefix cannot reach another PR's entries.
       - name: restore completed searches
         if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: search-cache
           key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -733,7 +736,7 @@ jobs:
       # keyed per run and attempt because cache entries are immutable.
       - name: save completed searches
         if: always() && github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true' && steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: search-cache
           key: gate-search-${{ github.event.pull_request.number }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -746,7 +749,7 @@ jobs:
         run: uv run --frozen --extra research python verify/gate_changed.py origin/${{ github.base_ref || 'main' }}
       - name: upload verification receipts
         if: always() && github.event_name == 'pull_request' && steps.changes.outputs.codes_changed == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: verification-receipts-${{ github.event.pull_request.number }}
           path: receipts/
@@ -763,7 +766,7 @@ jobs:
             "${{ github.event.pull_request.head.sha }}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > passed-verdict/marker.json
       - name: save the passing verdict
         if: success() && github.event_name == 'pull_request' && steps.verdict.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: passed-verdict
           key: verify-passed-${{ github.event.pull_request.number }}-${{ steps.digest.outputs.digest }}

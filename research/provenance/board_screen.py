@@ -44,6 +44,7 @@ anything.
     uv run python research/provenance/board_screen.py run
     uv run python research/provenance/board_screen.py check
 """
+
 import argparse
 import collections
 import datetime
@@ -65,13 +66,13 @@ CODES = os.path.join(ROOT, "codes")
 VERDICTS = ("exact_match", "review", "distinct")
 RULE = {
     "exact_match": "the fingerprint (rref of H_X and H_Z) equals a reference "
-                   "entry's: the same stabilizer group on the same qubit labels",
+    "entry's: the same stabilizer group on the same qubit labels",
     "review": "the Weisfeiler-Leman signature equals a reference entry's and the "
-              "fingerprint does not: possibly permutation-equivalent; a review "
-              "item, carrying the permutation audit's verdict where it has one",
+    "fingerprint does not: possibly permutation-equivalent; a review "
+    "item, carrying the permutation audit's verdict where it has one",
     "distinct": "the Weisfeiler-Leman signature matches no reference entry: not "
-                "permutation-equivalent to any seeded or literature entry on "
-                "the board; says nothing about codes the board does not carry",
+    "permutation-equivalent to any seeded or literature entry on "
+    "the board; says nothing about codes the board does not carry",
 }
 
 
@@ -112,8 +113,7 @@ def board():
 
 def reference_set(docs):
     """(baseline slugs, literature-bucket slugs), both restricted to screened entries."""
-    baseline = {s for s, (doc, _, _) in docs.items()
-                if (doc.get("provenance") or {}).get("origin") == "baseline"}
+    baseline = {s for s, (doc, _, _) in docs.items() if (doc.get("provenance") or {}).get("origin") == "baseline"}
     literature = set()
     try:
         with open(DERIVED, encoding="utf-8") as f:
@@ -131,8 +131,7 @@ def audit_verdicts():
         return {}, None
     with open(paths[-1], encoding="utf-8") as f:
         rec = json.load(f)
-    out = {frozenset((p["first"], p["second"])): p["verdict"]
-           for p in rec.get("board_pairs", [])}
+    out = {frozenset((p["first"], p["second"])): p["verdict"] for p in rec.get("board_pairs", [])}
     return out, os.path.relpath(paths[-1], ROOT)
 
 
@@ -154,8 +153,11 @@ def screen(docs, reference, audit):
             if verdict:
                 m["audit"] = verdict
             matches.append(m)
-        entries[s] = {"verdict": "exact_match" if same_fp else "review" if same_wl else "distinct",
-                      "in_reference": s in reference, "matches": matches}
+        entries[s] = {
+            "verdict": "exact_match" if same_fp else "review" if same_wl else "distinct",
+            "in_reference": s in reference,
+            "matches": matches,
+        }
     return entries
 
 
@@ -165,15 +167,15 @@ def counts(entries):
     out["screened"] = len(entries)
     wl = [m for v in entries.values() for m in v["matches"] if m["by"] == "wl"]
     out["wl_matches"] = len(wl)
-    out["wl_matches_by_audit"] = dict(sorted(
-        collections.Counter(m.get("audit", "not_audited") for m in wl).items()))
+    out["wl_matches_by_audit"] = dict(sorted(collections.Counter(m.get("audit", "not_audited") for m in wl).items()))
     return out
 
 
 def _head():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
-                                       text=True, stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -189,21 +191,29 @@ def run(out_path=SCREEN):
         "issue": 4024,
         "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
         "head": _head(),
-        "method": ("each CSS entry against the reference set by exact fingerprint "
-                   "(verify/qldpc_verify.py css_fingerprint: rref of H_X and H_Z) and "
-                   "Weisfeiler-Leman signature of the typed Tanner graph (signature); "
-                   "WL pairs the permutation audit decided carry its verdict"),
-        "reference": {"baseline": len(baseline), "literature": len(literature),
-                      "total": len(reference),
-                      "definition": "provenance.origin baseline, or bucket literature in derived.json"},
+        "method": (
+            "each CSS entry against the reference set by exact fingerprint "
+            "(verify/qldpc_verify.py css_fingerprint: rref of H_X and H_Z) and "
+            "Weisfeiler-Leman signature of the typed Tanner graph (signature); "
+            "WL pairs the permutation audit decided carry its verdict"
+        ),
+        "reference": {
+            "baseline": len(baseline),
+            "literature": len(literature),
+            "total": len(reference),
+            "definition": "provenance.origin baseline, or bucket literature in derived.json",
+        },
         "audit": audit_path,
         "rule": RULE,
-        "caveat": ("distinct means not permutation-equivalent to any seeded or literature "
-                   "entry on this board, not that the code is unpublished; review is a flag, "
-                   "not a verdict; nothing here is a novelty claim"),
-        "not_screened": {"stabilizer_entries": len(glob.glob(os.path.join(CODES, "*.json")))
-                         - len(docs) - len(skipped),
-                         "css_without_report": skipped},
+        "caveat": (
+            "distinct means not permutation-equivalent to any seeded or literature "
+            "entry on this board, not that the code is unpublished; review is a flag, "
+            "not a verdict; nothing here is a novelty claim"
+        ),
+        "not_screened": {
+            "stabilizer_entries": len(glob.glob(os.path.join(CODES, "*.json"))) - len(docs) - len(skipped),
+            "css_without_report": skipped,
+        },
         "counts": counts(entries),
         "entries": entries,
     }
@@ -211,12 +221,13 @@ def run(out_path=SCREEN):
         json.dump(payload, f, indent=1, sort_keys=True)
         f.write("\n")
     c = payload["counts"]
-    print(f"wrote {os.path.relpath(out_path, ROOT)}: {c['screened']} CSS entries against "
-          f"{len(reference)} reference entries ({len(baseline)} baseline, {len(literature)} "
-          f"literature): {c['exact_match']} exact_match, {c['review']} review "
-          f"({c['wl_matches']} WL matches, {c['wl_matches_by_audit']}), {c['distinct']} distinct"
-          + (f"; {len(skipped)} CSS entries without a report: {' '.join(skipped[:8])}"
-             if skipped else ""))
+    print(
+        f"wrote {os.path.relpath(out_path, ROOT)}: {c['screened']} CSS entries against "
+        f"{len(reference)} reference entries ({len(baseline)} baseline, {len(literature)} "
+        f"literature): {c['exact_match']} exact_match, {c['review']} review "
+        f"({c['wl_matches']} WL matches, {c['wl_matches_by_audit']}), {c['distinct']} distinct"
+        + (f"; {len(skipped)} CSS entries without a report: {' '.join(skipped[:8])}" if skipped else "")
+    )
     return 0
 
 
@@ -228,10 +239,14 @@ def check(path=SCREEN):
     with open(path, encoding="utf-8") as f:
         payload = json.load(f)
     entries = payload["entries"]
-    broken = [f"  {s}: unknown verdict {v['verdict']!r}" for s, v in sorted(entries.items())
-              if v["verdict"] not in VERDICTS]
-    broken += [f"  {s}: {v['verdict']} with no match listed" for s, v in sorted(entries.items())
-               if v["verdict"] != "distinct" and not v["matches"]]
+    broken = [
+        f"  {s}: unknown verdict {v['verdict']!r}" for s, v in sorted(entries.items()) if v["verdict"] not in VERDICTS
+    ]
+    broken += [
+        f"  {s}: {v['verdict']} with no match listed"
+        for s, v in sorted(entries.items())
+        if v["verdict"] != "distinct" and not v["matches"]
+    ]
     stored = {k: payload.get("counts", {}).get(k) for k in VERDICTS}
     fresh = {k: counts(entries)[k] for k in VERDICTS}
     if stored != fresh:
@@ -243,8 +258,10 @@ def check(path=SCREEN):
     have, want = set(entries), css_slugs()
     missing, departed = sorted(want - have), sorted(have - want)
     if missing or departed:
-        print(f"board screen is STALE: {len(missing)} CSS entries not screened, "
-              f"{len(departed)} screened entries no longer on the board.")
+        print(
+            f"board screen is STALE: {len(missing)} CSS entries not screened, "
+            f"{len(departed)} screened entries no longer on the board."
+        )
         if missing:
             print("  not screened: " + " ".join(missing[:12]) + (" ..." if len(missing) > 12 else ""))
         if departed:
@@ -252,9 +269,11 @@ def check(path=SCREEN):
         print("  run `python research/provenance/board_screen.py run` to rescreen the board.")
         return 0
     c = payload["counts"]
-    print(f"ok: board screen covers {len(entries)} CSS entries ({c['exact_match']} exact_match, "
-          f"{c['review']} review, {c['distinct']} distinct) against "
-          f"{payload['reference']['total']} reference entries")
+    print(
+        f"ok: board screen covers {len(entries)} CSS entries ({c['exact_match']} exact_match, "
+        f"{c['review']} review, {c['distinct']} distinct) against "
+        f"{payload['reference']['total']} reference entries"
+    )
     return 0
 
 

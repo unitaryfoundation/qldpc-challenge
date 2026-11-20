@@ -1,8 +1,7 @@
 """Regression tests for submit-time author validation (issue #636)."""
 
-import pytest
-
 import check_authorship
+import pytest
 import qldpc
 
 
@@ -29,28 +28,36 @@ def test_submit_checks_every_author_value(monkeypatch):
     monkeypatch.setattr(qldpc, "load_checks", _fail_if_code_is_loaded)
 
     with pytest.raises(SystemExit, match=r"Invalid author.*@bad!"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "@vprusso", "@bad!",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "@vprusso",
+                "@bad!",
+            ]
+        )
 
 
 def test_submit_rejects_whitespace_only_author_before_loading_code(monkeypatch):
     monkeypatch.setattr(qldpc, "load_checks", _fail_if_code_is_loaded)
 
     with pytest.raises(SystemExit, match=r"empty or whitespace-only"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "@vprusso", "   ",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "@vprusso",
+                "   ",
+            ]
+        )
 
 
 def test_submit_persists_normalized_author_values(monkeypatch):
     captured = []
 
-    monkeypatch.setattr(
-        qldpc, "load_checks", lambda _path: (None, None, None, None)
-    )
+    monkeypatch.setattr(qldpc, "load_checks", lambda _path: (None, None, None, None))
 
     def capture_build(_hx, _hz, args):
         captured.extend(args.authors)
@@ -59,10 +66,15 @@ def test_submit_persists_normalized_author_values(monkeypatch):
     monkeypatch.setattr(qldpc, "build_submission", capture_build)
 
     with pytest.raises(RuntimeError, match="build reached"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "  @vprusso  ", "  Jane Roe  ",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "  @vprusso  ",
+                "  Jane Roe  ",
+            ]
+        )
 
     assert captured == ["@vprusso", "Jane Roe"]
 
@@ -77,10 +89,15 @@ def test_valid_handle_and_plain_name_reach_code_loading(monkeypatch):
     monkeypatch.setattr(qldpc, "load_checks", record_load)
 
     with pytest.raises(RuntimeError, match="load reached"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "@vprusso", "Jane Roe",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "@vprusso",
+                "Jane Roe",
+            ]
+        )
 
     assert reached == ["must-not-be-loaded.npz"]
 
@@ -95,10 +112,15 @@ def test_anonymous_opt_in_warns_and_reaches_code_loading(monkeypatch, capsys):
     monkeypatch.setattr(qldpc, "load_checks", record_load)
 
     with pytest.raises(RuntimeError, match="load reached"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "Jane Roe", "--anonymous",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "Jane Roe",
+                "--anonymous",
+            ]
+        )
 
     assert reached == ["must-not-be-loaded.npz"]
     warning = capsys.readouterr().out
@@ -110,10 +132,15 @@ def test_anonymous_flag_rejects_conflicting_handle(monkeypatch):
     monkeypatch.setattr(qldpc, "load_checks", _fail_if_code_is_loaded)
 
     with pytest.raises(SystemExit, match=r"--anonymous cannot be combined"):
-        qldpc.main([
-            "submit", "must-not-be-loaded.npz",
-            "--authors", "@vprusso", "--anonymous",
-        ])
+        qldpc.main(
+            [
+                "submit",
+                "must-not-be-loaded.npz",
+                "--authors",
+                "@vprusso",
+                "--anonymous",
+            ]
+        )
 
 
 def test_cli_reuses_authorship_handle_pattern():

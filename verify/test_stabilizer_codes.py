@@ -13,6 +13,7 @@ counts), and an inflated distance claim (refuted by the heuristic gate). The
 last group checks that the two boards stay separate: a CSS entry never
 dominates a stabilizer one.
 """
+
 import copy
 import json
 import os
@@ -28,7 +29,7 @@ import validate_candidate as V
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FIXTURES = os.path.join(ROOT, "verify", "fixtures")
-STABILIZER_FIXTURES = ("5-1-3", "17-1-7")       # non-CSS under every local Clifford
+STABILIZER_FIXTURES = ("5-1-3", "17-1-7")  # non-CSS under every local Clifford
 
 
 def load_fixture(slug):
@@ -50,11 +51,16 @@ def stabilizer_doc(n, gens, d, witness, name="synthetic", k=None):
     B = Q._matrix([g["Z"] for g in gens], n)
     if k is None:
         k = n - gf2.rank(np.concatenate([A, B], axis=1))
-    return {"schema_version": "0.4", "name": name, "code_type": "stabilizer",
-            "n": n, "k": int(k), "checks": {"S": gens},
-            "distance": {"d": d, "P": {"value": d, "confidence": "upper_bound",
-                                       "witness": witness}},
-            "provenance": {"authors": ["@test"], "construction": "synthetic"}}
+    return {
+        "schema_version": "0.4",
+        "name": name,
+        "code_type": "stabilizer",
+        "n": n,
+        "k": int(k),
+        "checks": {"S": gens},
+        "distance": {"d": d, "P": {"value": d, "confidence": "upper_bound", "witness": witness}},
+        "provenance": {"authors": ["@test"], "construction": "synthetic"},
+    }
 
 
 def hadamard_copy(css_doc, qubits, witness_side="X"):
@@ -63,18 +69,21 @@ def hadamard_copy(css_doc, qubits, witness_side="X"):
     Its witness is the CSS side's witness conjugated the same way.
     """
     hq = set(qubits)
-    gens = [{"X": sorted(set(s) - hq), "Z": sorted(set(s) & hq)}
-            for s in css_doc["checks"]["X"]]
-    gens += [{"X": sorted(set(s) & hq), "Z": sorted(set(s) - hq)}
-             for s in css_doc["checks"]["Z"]]
+    gens = [{"X": sorted(set(s) - hq), "Z": sorted(set(s) & hq)} for s in css_doc["checks"]["X"]]
+    gens += [{"X": sorted(set(s) & hq), "Z": sorted(set(s) - hq)} for s in css_doc["checks"]["Z"]]
     wit = set(css_doc["distance"][witness_side]["witness"])
     if witness_side == "X":
         witness = {"X": sorted(wit - hq), "Z": sorted(wit & hq)}
     else:
         witness = {"X": sorted(wit & hq), "Z": sorted(wit - hq)}
-    return stabilizer_doc(css_doc["n"], gens, css_doc["distance"]["d"], witness,
-                          name=css_doc["name"] + " with local Hadamards",
-                          k=css_doc["k"])
+    return stabilizer_doc(
+        css_doc["n"],
+        gens,
+        css_doc["distance"]["d"],
+        witness,
+        name=css_doc["name"] + " with local Hadamards",
+        k=css_doc["k"],
+    )
 
 
 def phase_copy(css_doc, qubits):
@@ -89,15 +98,19 @@ def phase_copy(css_doc, qubits):
     gens = [{"X": sorted(s), "Z": sorted(set(s) & sq)} for s in css_doc["checks"]["X"]]
     gens += [{"X": [], "Z": sorted(s)} for s in css_doc["checks"]["Z"]]
     witness = {"X": [], "Z": sorted(css_doc["distance"]["Z"]["witness"])}
-    return stabilizer_doc(css_doc["n"], gens, css_doc["distance"]["d"], witness,
-                          name=css_doc["name"] + " with local S gates",
-                          k=css_doc["k"])
+    return stabilizer_doc(
+        css_doc["n"],
+        gens,
+        css_doc["distance"]["d"],
+        witness,
+        name=css_doc["name"] + " with local S gates",
+        k=css_doc["k"],
+    )
 
 
 def css_fp(doc):
     n = doc["n"]
-    return Q.css_fingerprint(Q._matrix(doc["checks"]["X"], n),
-                             Q._matrix(doc["checks"]["Z"], n))
+    return Q.css_fingerprint(Q._matrix(doc["checks"]["X"], n), Q._matrix(doc["checks"]["Z"], n))
 
 
 def toric_css(L):
@@ -108,32 +121,39 @@ def toric_css(L):
     column of horizontal edges (an X logical) and the column of vertical
     edges (a Z logical), both of weight L.
     """
+
     def h(i, j):
         return (i % L) * L + (j % L)
 
     def v(i, j):
         return L * L + (i % L) * L + (j % L)
-    X = [sorted({h(i, j), h(i, j - 1), v(i, j), v(i - 1, j)})
-         for i in range(L) for j in range(L)]
-    Z = [sorted({h(i, j), h(i + 1, j), v(i, j), v(i, j + 1)})
-         for i in range(L) for j in range(L)]
-    return {"name": f"toric L={L}", "n": 2 * L * L, "k": 2,
-            "distance": {"d": L,
-                         "X": {"value": L, "confidence": "upper_bound",
-                               "witness": [h(i, 0) for i in range(L)]},
-                         "Z": {"value": L, "confidence": "upper_bound",
-                               "witness": [v(i, 0) for i in range(L)]}},
-            "code_type": "CSS", "checks": {"X": X, "Z": Z}}
+
+    X = [sorted({h(i, j), h(i, j - 1), v(i, j), v(i - 1, j)}) for i in range(L) for j in range(L)]
+    Z = [sorted({h(i, j), h(i + 1, j), v(i, j), v(i, j + 1)}) for i in range(L) for j in range(L)]
+    return {
+        "name": f"toric L={L}",
+        "n": 2 * L * L,
+        "k": 2,
+        "distance": {
+            "d": L,
+            "X": {"value": L, "confidence": "upper_bound", "witness": [h(i, 0) for i in range(L)]},
+            "Z": {"value": L, "confidence": "upper_bound", "witness": [v(i, 0) for i in range(L)]},
+        },
+        "code_type": "CSS",
+        "checks": {"X": X, "Z": Z},
+    }
 
 
 def xzzx(L):
     """The XZZX toric code: the toric code with a Hadamard on every vertical
     edge, typed stabilizer. Rejected as CSS up to a local Clifford; here it
-    is the solver's and the rejection's test input."""
+    is the solver's and the rejection's test input.
+    """
     return hadamard_copy(toric_css(L), list(range(L * L, 2 * L * L)))
 
 
 # --- the fixtures verify ----------------------------------------------------
+
 
 @pytest.mark.parametrize("slug", STABILIZER_FIXTURES)
 def test_fixture_verifies_with_refutation(slug):
@@ -168,12 +188,13 @@ def test_five_qubit_parameters():
 
 # --- Pauli weight, not Hamming weight ----------------------------------------
 
+
 def test_y_witness_counts_pauli_weight():
     doc = load_fixture("5-1-3")
     wit = doc["distance"]["P"]["witness"]
     hamming = len(wit["X"]) + len(wit["Z"])
     pauli = len(set(wit["X"]) | set(wit["Z"]))
-    assert hamming == 4 and pauli == 3          # X Y X: one Y
+    assert hamming == 4 and pauli == 3  # X Y X: one Y
     assert Q.verify(doc)["ok"]
     inflated = copy.deepcopy(doc)
     inflated["distance"]["P"]["value"] = hamming
@@ -195,12 +216,12 @@ def test_ris_scores_by_pauli_weight():
 
 # --- rejections ---------------------------------------------------------------
 
+
 def test_css_code_typed_stabilizer_is_rejected_with_the_fix():
     steane = load_code("7-1-3")
     gens = [{"X": s, "Z": []} for s in steane["checks"]["X"]]
     gens += [{"X": [], "Z": s} for s in steane["checks"]["Z"]]
-    doc = stabilizer_doc(7, gens, 3, {"X": steane["distance"]["X"]["witness"],
-                                      "Z": []}, k=1)
+    doc = stabilizer_doc(7, gens, 3, {"X": steane["distance"]["X"]["witness"], "Z": []}, k=1)
     rep = Q.verify(doc)
     assert not rep["ok"]
     msg = failed(rep)["stabilizer_code_is_not_css"]
@@ -259,6 +280,7 @@ def test_exact_claim_accepted_as_upper_bound():
 
 # --- CSS up to a local Clifford ---------------------------------------------
 
+
 def test_hadamard_solver_finds_the_subset_and_the_css_image():
     for L in (3, 4):
         doc = xzzx(L)
@@ -274,8 +296,7 @@ def test_hadamard_solver_finds_the_subset_and_the_css_image():
         types, ops = Q.is_css_up_to_local_clifford(A, B)
         assert sorted(ops) in (h, sorted(set(range(doc["n"])) - set(h)))
         assert set(ops.values()) == {"ZYX"}
-        assert {css_fp(im) for im in Q.clifford_css_images(doc, types)} == \
-            {css_fp(im) for im in images}
+        assert {css_fp(im) for im in Q.clifford_css_images(doc, types)} == {css_fp(im) for im in images}
         rep = Q.verify(doc)
         assert fp_toric in rep["css_equivalent"]["fingerprints"]
         assert Q.signature(toric)["hash"] in rep["css_equivalent"]["signatures"]
@@ -290,14 +311,15 @@ def test_hadamard_solver_finds_the_subset_and_the_css_image():
 def test_xzzx_toric_is_rejected_as_the_toric_code_behind_hadamards(L, monkeypatch):
     """The rejection does not depend on the parent being on the board (the
     dedup gate could only see a parent that was). With an empty board the
-    entry is still refused, with the fix."""
+    entry is still refused, with the fix.
+    """
     doc = xzzx(L)
     rep = Q.verify(doc)
     assert not rep["ok"]
     msg = failed(rep)["stabilizer_code_is_not_locally_css"]
     assert "a Hadamard on" in msg and 'set code_type to "CSS"' in msg
     assert "checks.X" in msg and "checks.Z" in msg
-    assert "stabilizer_code_is_not_css" not in failed(rep)   # the rows do mix
+    assert "stabilizer_code_is_not_css" not in failed(rep)  # the rows do mix
     monkeypatch.setattr(V, "_board_entries", lambda: [])
     verdict = V.validate_candidate(doc, refute=False)
     assert verdict["passed"] is False
@@ -324,12 +346,11 @@ def test_hadamard_copy_of_a_css_code_is_rejected_not_deduped():
     # a qubit permutation does not help: the solver sees through it
     perm = [3, 6, 0, 5, 1, 4, 2]
     permuted = copy.deepcopy(doc)
-    permuted["checks"]["S"] = [{"X": sorted(perm[q] for q in g["X"]),
-                                "Z": sorted(perm[q] for q in g["Z"])}
-                               for g in doc["checks"]["S"]]
+    permuted["checks"]["S"] = [
+        {"X": sorted(perm[q] for q in g["X"]), "Z": sorted(perm[q] for q in g["Z"])} for g in doc["checks"]["S"]
+    ]
     w = doc["distance"]["P"]["witness"]
-    permuted["distance"]["P"]["witness"] = {"X": sorted(perm[q] for q in w["X"]),
-                                            "Z": sorted(perm[q] for q in w["Z"])}
+    permuted["distance"]["P"]["witness"] = {"X": sorted(perm[q] for q in w["X"]), "Z": sorted(perm[q] for q in w["Z"])}
     rep = Q.verify(permuted)
     assert "stabilizer_code_is_not_locally_css" in failed(rep)
     assert rep["css_equivalent"]["hadamard_qubits"] == sorted(perm[q] for q in [0, 1, 2])
@@ -337,7 +358,8 @@ def test_hadamard_copy_of_a_css_code_is_rejected_not_deduped():
 
 def test_s_rotated_css_code_is_rejected_beyond_hadamards():
     """An S on some qubits (X -> Y) leaves no pure-making Hadamard subset,
-    yet the code is still a CSS code in disguise."""
+    yet the code is still a CSS code in disguise.
+    """
     steane = load_code("7-1-3")
     doc = phase_copy(steane, [0, 1, 2])
     A, B = Q.stabilizer_matrices(doc)
@@ -395,7 +417,7 @@ def test_labeled_signature_separates_letter_patterns():
     xzzx = load_fixture("5-1-3")
     yzzy = copy.deepcopy(xzzx)
     for g in yzzy["checks"]["S"]:
-        g["Z"] = sorted(set(g["Z"]) | set(g["X"]))      # X -> Y
+        g["Z"] = sorted(set(g["Z"]) | set(g["X"]))  # X -> Y
     A, B = Q.stabilizer_matrices(yzzy)
     assert not ((A @ B.T + B @ A.T) % 2).any()
     w, wit = H.ris_min_pauli_logical(A, B, trials=200, seed=0)
@@ -406,6 +428,7 @@ def test_labeled_signature_separates_letter_patterns():
 
 
 # --- refutation ---------------------------------------------------------------
+
 
 def heavy_pauli_witness(doc, target):
     """Return a genuine nontrivial logical of Pauli weight `target`.
@@ -432,8 +455,7 @@ def test_inflated_distance_is_refuted():
     v = heavy_pauli_witness(doc, 9)
     bad = copy.deepcopy(doc)
     bad["distance"]["d"] = 9
-    bad["distance"]["P"] = {"value": 9, "confidence": "upper_bound",
-                            "witness": H.pauli_witness(v, doc["n"])}
+    bad["distance"]["P"] = {"value": 9, "confidence": "upper_bound", "witness": H.pauli_witness(v, doc["n"])}
     assert Q.verify(bad)["ok"], "the heavy witness is a genuine logical"
     rep = Q.verify(bad, refute=True, seed=0)
     assert not rep["ok"]
@@ -462,15 +484,18 @@ def test_estimate_reports_one_side():
 
 # --- gate plumbing: sides(), classify_diff, authorship binding -----------------
 
+
 def test_classify_diff_and_binding_on_a_pauli_side():
     doc = load_fixture("17-1-7")
     base = copy.deepcopy(doc)
     base["distance"]["d"] = 9
-    base["distance"]["P"] = {"value": 9, "confidence": "upper_bound",
-                             "witness": H.pauli_witness(heavy_pauli_witness(doc, 9), 17)}
+    base["distance"]["P"] = {
+        "value": 9,
+        "confidence": "upper_bound",
+        "witness": H.pauli_witness(heavy_pauli_witness(doc, 9), 17),
+    }
     new = copy.deepcopy(doc)
-    new["distance"]["P"]["witness_provenance"] = {
-        "found_by": ["@bob"], "date": "2026-09-25", "found_at_samples": 1000}
+    new["distance"]["P"]["witness_provenance"] = {"found_by": ["@bob"], "date": "2026-09-25", "found_at_samples": 1000}
     cls, why = G.classify_diff(base, new)
     assert cls == "tightening", why
     ok, why = check_authorship.refutation_binding("bob", base, new)
@@ -478,8 +503,7 @@ def test_classify_diff_and_binding_on_a_pauli_side():
     wrong_d = copy.deepcopy(new)
     wrong_d["distance"]["d"] = 8
     assert G.classify_diff(base, wrong_d)[1] == "distance.d is not P.value"
-    assert check_authorship.refutation_binding("bob", base, wrong_d)[1] == \
-        "distance.d is not P.value"
+    assert check_authorship.refutation_binding("bob", base, wrong_d)[1] == "distance.d is not P.value"
     assert G._witness_weight(new["distance"]["P"]) == 7
     assert G._locality_rank(doc) == 2
 
@@ -492,12 +516,23 @@ def test_structural_and_syndrome_passes_skip_stabilizer_codes():
 
 # --- separate leaderboards ----------------------------------------------------
 
+
 def test_stabilizer_candidate_is_not_dominated_by_css_entries(monkeypatch):
     doc = load_fixture("5-1-3")
-    fake_css = {"name": "4-1-3.json", "n": 4, "k": 1, "d": 3, "code_type": "CSS",
-                "fingerprint": "x", "sig": "y", "css_fingerprints": [],
-                "css_sigs": [], "weight_class": "weight-4", "w": 2,
-                "locality_class": "unrestricted"}
+    fake_css = {
+        "name": "4-1-3.json",
+        "n": 4,
+        "k": 1,
+        "d": 3,
+        "code_type": "CSS",
+        "fingerprint": "x",
+        "sig": "y",
+        "css_fingerprints": [],
+        "css_sigs": [],
+        "weight_class": "weight-4",
+        "w": 2,
+        "locality_class": "unrestricted",
+    }
     monkeypatch.setattr(V, "_board_entries", lambda: [fake_css])
     verdict = V.validate_candidate(doc, refute=False)
     assert verdict["gates"]["novelty"]["board"] == "stabilizer"
@@ -515,8 +550,7 @@ def test_record_cells_keep_the_boards_apart(tmp_path):
     with open(os.path.join(root, "codes", "5-1-3.json"), "w") as f:
         json.dump(load_fixture("5-1-3"), f)
     # a CSS code that beats it on every axis
-    css = {"n": 4, "k": 2, "distance": {"d": 3}, "code_type": "CSS",
-           "checks": {"X": [[0, 1]], "Z": [[2, 3]]}}
+    css = {"n": 4, "k": 2, "distance": {"d": 3}, "code_type": "CSS", "checks": {"X": [[0, 1]], "Z": [[2, 3]]}}
     with open(os.path.join(root, "codes", "4-2-3.json"), "w") as f:
         json.dump(css, f)
     assert G.board_record_slugs(root) == {"5-1-3", "4-2-3"}
@@ -524,12 +558,20 @@ def test_record_cells_keep_the_boards_apart(tmp_path):
 
 def test_site_records_are_per_board():
     import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "site_build", os.path.join(ROOT, "site", "build.py"))
+
+    spec = importlib.util.spec_from_file_location("site_build", os.path.join(ROOT, "site", "build.py"))
     build = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(build)
-    css = {"n": 4, "k": 2, "d": 3, "w": 2, "eff": 4.5, "code_type": "CSS",
-           "locality_class": "unrestricted", "weight_class": "weight-4"}
+    css = {
+        "n": 4,
+        "k": 2,
+        "d": 3,
+        "w": 2,
+        "eff": 4.5,
+        "code_type": "CSS",
+        "locality_class": "unrestricted",
+        "weight_class": "weight-4",
+    }
     stab = dict(css, n=5, k=1, code_type="stabilizer", eff=1.8)
     assert build.compute_records([css, stab]) == {0, 1}
     keys = set(build.cells_by_key([css, stab]))
@@ -539,8 +581,10 @@ def test_site_records_are_per_board():
 
 # --- CLI input ----------------------------------------------------------------
 
+
 def test_cli_loads_a_symplectic_npz_and_refuses_pure_rows(tmp_path):
     import qldpc as cli
+
     doc = load_fixture("17-1-7")
     A, B = Q.stabilizer_matrices(doc)
     p = os.path.join(str(tmp_path), "cyc.npz")
@@ -561,9 +605,9 @@ def test_cli_loads_a_symplectic_npz_and_refuses_pure_rows(tmp_path):
 
     class Args:
         trials, seed, fast_trials = 100, 0, 0
-        authors, construction, date, model, notes, name, family = (
-            ["@t"], "", "", "", "", "", None)
+        authors, construction, date, model, notes, name, family = (["@t"], "", "", "", "", "", None)
         _coords, layers, budget_json = None, 1, ""
+
     args = Args()
     for key in cli.BUDGET_KEYS:
         setattr(args, f"budget_{key}", None)

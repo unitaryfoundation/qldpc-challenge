@@ -1,0 +1,34 @@
+{
+  "d": 24,
+  "d_exact": false,
+  "d_lower": 16,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[722,18,24]]",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 16",
+      "proved_min": 16,
+      "secs": 26.1,
+      "status": "TIMEOUT",
+      "value": 25
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 16",
+      "proved_min": 16,
+      "secs": 26.1,
+      "status": "TIMEOUT",
+      "value": 24
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "195d94297a06ad3fdf02e455fc40e0235e49fff4da7ef5fd8ebb7d328086b77b",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. No symmetry generators supplied. Each side asked at its own claimed value."
+  }
+}

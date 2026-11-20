@@ -13,13 +13,14 @@ Run it and it writes `codes`-shaped arrays to an .npz:
 weight-8 placement (8 logical qubits at d = 12 in 96 qubits, where the board
 held `[[104,8,12]]`). No search is involved, so the script has no seeds.
 """
+
 import sys
 
 import numpy as np
 
 sys.path[:0] = ["research/kit", "verify"]
 
-from group_algebra import build_2bga, cyclic_product, direct_product, dihedral
+from group_algebra import build_2bga, cyclic_product, dihedral, direct_product
 
 
 def build():
@@ -28,22 +29,22 @@ def build():
     # Z_m = <y>. dihedral(4) is exactly that convention, with s_0 = s.
     mul_d4, el_d4 = dihedral(4)
     mul_z6, _ = cyclic_product(6)
-    mul, _ = direct_product(mul_d4, mul_z6)          # G = D_4 x Z_6, |G| = 48
+    mul, _ = direct_product(mul_d4, mul_z6)  # G = D_4 x Z_6, |G| = 48
 
     idx = {tuple(g): i for i, g in enumerate(el_d4)}
-    e = idx[(0, 1, 2, 3)]                            # identity
-    r1 = idx[(1, 2, 3, 0)]                           # r
-    r2 = idx[(2, 3, 0, 1)]                           # r^2
-    r3 = idx[(3, 0, 1, 2)]                           # r^3
-    s0 = idx[(0, 3, 2, 1)]                           # s_0 : i -> -i
+    e = idx[(0, 1, 2, 3)]  # identity
+    r1 = idx[(1, 2, 3, 0)]  # r
+    r2 = idx[(2, 3, 0, 1)]  # r^2
+    r3 = idx[(3, 0, 1, 2)]  # r^3
+    s0 = idx[(0, 3, 2, 1)]  # s_0 : i -> -i
 
-    def g(d, j):                                     # direct_product index
+    def g(d, j):  # direct_product index
         return d * 6 + j % 6
 
     # Appendix J, [[96,8,12]] row. |supp a| = |supp b| = 4, so every check has
     # weight 8 and the code has n = 2|G| = 96 qubits.
-    a = [g(e, 0), g(e, 1), g(r1, 0), g(r3, 0)]      # {(e,e), (e,y), (r,e), (r^3,e)}
-    b = [g(e, 0), g(r1, 2), g(s0, 0), g(r2, 4)]      # {(e,e), (r,y^2), (s_0,e), (r^2,y^4)}
+    a = [g(e, 0), g(e, 1), g(r1, 0), g(r3, 0)]  # {(e,e), (e,y), (r,e), (r^3,e)}
+    b = [g(e, 0), g(r1, 2), g(s0, 0), g(r2, 4)]  # {(e,e), (r,y^2), (s_0,e), (r^2,y^4)}
 
     HX, HZ = build_2bga(mul, a, b)
     return HX, HZ, (a, b, mul)

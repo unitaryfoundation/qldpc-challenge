@@ -1,5 +1,5 @@
 {
- "schema_version": "0.1",
+ "schema_version": "0.2",
  "name": "[[424,110,12]]",
  "code_type": "CSS",
  "n": 424,
@@ -3193,24 +3193,30 @@
  "distance": {
   "d": 12,
   "X": {
-   "value": 14,
+   "value": 12,
    "confidence": "upper_bound",
    "witness": [
-    19,
-    86,
-    138,
-    152,
-    156,
-    160,
-    210,
-    227,
-    231,
-    286,
-    316,
-    369,
-    380,
-    410
-   ]
+    0,
+    5,
+    22,
+    27,
+    44,
+    112,
+    139,
+    253,
+    263,
+    270,
+    306,
+    385
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@vprusso"
+    ],
+    "date": "2026-11-20",
+    "found_at_samples": 1705,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
+   }
   },
   "Z": {
    "value": 12,
@@ -3237,6 +3243,7 @@
   ],
   "construction": "CPM pair-partition (Okada-Kasai arXiv:2607.14091), instance qc_424_110_12, J=3 L=8 P=53",
   "origin": "submission",
-  "date": "2026-11-19"
+  "date": "2026-11-19",
+  "notes": "X-side value lowered from 14 to 12 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-12 X-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 12 is unchanged."
  }
 }

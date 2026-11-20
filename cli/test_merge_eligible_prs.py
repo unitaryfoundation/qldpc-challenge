@@ -471,12 +471,14 @@ def test_merge_command_is_squash_and_pinned_to_inspected_head(monkeypatch):
 
 def _reader(head_doc, base_doc, head_sha="abc123", base="main"):
     """Build a _read_code_document stand-in that serves the PR head and the base branch."""
+
     def read(_repo, _path, ref):
         if ref == head_sha:
             return head_doc
         if ref == base and base_doc is not None:
             return base_doc
         raise merge_eligible_prs.GitHubCLIError(f"no {_path} at {ref}")
+
     return read
 
 
@@ -487,8 +489,10 @@ def test_a_contribution_inherits_a_missing_model_from_the_base_entry(monkeypatch
     so the gap is the entry author's and does not block the PR.
     """
     base_doc = _code_document(model=None)
-    head_doc = {"provenance": dict(base_doc["provenance"]),
-                "circuit": {"contributed_by": {"by": ["@submitter"], "date": "2026-11-06"}}}
+    head_doc = {
+        "provenance": dict(base_doc["provenance"]),
+        "circuit": {"contributed_by": {"by": ["@submitter"], "date": "2026-11-06"}},
+    }
     monkeypatch.setattr(
         merge_eligible_prs,
         "list_pr_files",
@@ -522,8 +526,11 @@ def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypat
     assert not result.eligible
     assert result.metadata_errors == [("codes/10-2-3.json", "missing or empty provenance.model")]
     # a base entry with a model that the PR blanked: the PR introduced the gap
-    monkeypatch.setattr(merge_eligible_prs, "_read_code_document",
-                        _reader(_code_document(model=""), _code_document(model="Claude Opus 5")))
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "_read_code_document",
+        _reader(_code_document(model=""), _code_document(model="Claude Opus 5")),
+    )
     result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
     assert not result.eligible and result.metadata_errors
     # a base entry without a model whose provenance the PR also edited beyond notes: not inherited
@@ -544,31 +551,45 @@ def test_a_new_entry_or_a_changed_provenance_is_still_held_to_the_rule(monkeypat
 
 def test_a_replacement_circuit_that_lowers_a_side_is_blocked(monkeypatch):
     """#5911 and #5934 (2026-11-17): an author replaced their entry's circuit with a worse one."""
+
     def doc(x, z):
         d = _code_document()
         d["circuit"] = {"d_circ": {"X": {"value": x}, "Z": {"value": z}}, "rounds": 7}
         return d
-    files = [{"filename": "codes/64-21-7.json", "status": "modified"},
-             {"filename": "circuits/64-21-7/memory_x.stim", "status": "modified"}]
+
+    files = [
+        {"filename": "codes/64-21-7.json", "status": "modified"},
+        {"filename": "circuits/64-21-7/memory_x.stim", "status": "modified"},
+    ]
     monkeypatch.setattr(merge_eligible_prs, "list_pr_files", lambda _repo, _number: files)
     monkeypatch.setattr(merge_eligible_prs, "list_check_runs", lambda _repo, _sha: _successful_checks())
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), doc(5, 6)))
     result = merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main")
     assert not result.eligible
-    assert result.reasons == ["codes/64-21-7.json: the replacement circuit lowers d_circ "
-                              "(X 5 -> 4, Z 6 -> 4); the committed circuit is better"]
+    assert result.reasons == [
+        "codes/64-21-7.json: the replacement circuit lowers d_circ "
+        "(X 5 -> 4, Z 6 -> 4); the committed circuit is better"
+    ]
     # a replacement that raises a side and keeps the other is what the tier is for
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(5, 5), doc(5, 4)))
     assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
     # a lowered reading on the unchanged circuit is a refutation, not a replacement
-    monkeypatch.setattr(merge_eligible_prs, "list_pr_files",
-                        lambda _repo, _number: [{"filename": "codes/64-21-7.json", "status": "modified"}])
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [{"filename": "codes/64-21-7.json", "status": "modified"}],
+    )
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), doc(5, 6)))
     assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
     # a new entry with a circuit has nothing to regress from
-    monkeypatch.setattr(merge_eligible_prs, "list_pr_files", lambda _repo, _number: [
-        {"filename": "codes/64-21-7.json", "status": "added"},
-        {"filename": "circuits/64-21-7/memory_x.stim", "status": "added"}])
+    monkeypatch.setattr(
+        merge_eligible_prs,
+        "list_pr_files",
+        lambda _repo, _number: [
+            {"filename": "codes/64-21-7.json", "status": "added"},
+            {"filename": "circuits/64-21-7/memory_x.stim", "status": "added"},
+        ],
+    )
     monkeypatch.setattr(merge_eligible_prs, "_read_code_document", _reader(doc(4, 4), None))
     assert merge_eligible_prs.evaluate_pr("example/repo", _pr(), "main").eligible
 
@@ -576,7 +597,8 @@ def test_a_replacement_circuit_that_lowers_a_side_is_blocked(monkeypatch):
 def test_a_distance_revision_that_renames_the_entry_inherits_the_gap(monkeypatch):
     """A distance revision files the record under its new slug (CONTRIBUTING.md,
     "Correcting a distance already on the board"), so the base entry is read
-    under the name the PR replaced rather than taken for a new entry."""
+    under the name the PR replaced rather than taken for a new entry.
+    """
     base = _code_document(model=None)
     head = _code_document(model=None)
     head["provenance"]["notes"] = " Distance revision 2026-11-10: Z side 80 -> 75 (witness by @reviser)."

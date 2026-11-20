@@ -24,6 +24,7 @@ This is a *screen*, not a claim. It reads ``codes/*.json`` the way the site
 does and it can be wrong about anything the verifier recomputes; the gate in
 ``verify/validate_candidate.py`` is what decides whether a candidate advances.
 """
+
 import glob
 import json
 import os
@@ -44,14 +45,13 @@ def load_board(root=None):
         dist = doc.get("distance")
         if isinstance(dist, dict):
             dist = dist.get("d") or min(
-                (v.get("value") for v in dist.values()
-                 if isinstance(v, dict) and v.get("value")), default=None)
+                (v.get("value") for v in dist.values() if isinstance(v, dict) and v.get("value")), default=None
+            )
         checks = doc.get("checks") or {}
         w = max((len(s) for arr in checks.values() for s in arr), default=0)
         if n is None or k is None or dist is None:
             continue
-        out.append((int(n), int(k), int(dist), int(w),
-                    doc.get("code_type", "CSS"), doc.get("name", "")))
+        out.append((int(n), int(k), int(dist), int(w), doc.get("code_type", "CSS"), doc.get("name", "")))
     return out
 
 
@@ -68,7 +68,7 @@ def bar(board, n, k, w, code_type="CSS", d_floor=1):
     that case visible instead of flattering.
     """
     best, who = 0, []
-    for (bn, bk, bd, bw, bt, name) in board:
+    for bn, bk, bd, bw, bt, name in board:
         if bt != code_type or bw > w or bk < k or bn > n:
             continue
         if bd > best:
@@ -87,8 +87,7 @@ def summary(board, code_type="CSS", max_w=8, k_list=(2, 6, 12, 24)):
             t, _ = bar(board, n, k, max_w, code_type)
             row.append((n, t - 1))
             n += 6 * 10  # every quadcycle blocklength
-        print(f"k={k} w<={max_w}: " + "  ".join(f"n={n}:d>{d - 1}"
-                                               for n, d in row[:14]))
+        print(f"k={k} w<={max_w}: " + "  ".join(f"n={n}:d>{d - 1}" for n, d in row[:14]))
 
 
 if __name__ == "__main__":

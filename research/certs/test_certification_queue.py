@@ -5,6 +5,7 @@ thresholds, the order is the rule in the file's header, and the next ten are
 its head (issue #4027). How far the committed file lags today's board is
 reported and never fatal: the weekly workflow regenerates it.
 """
+
 import glob
 import importlib.util
 import json
@@ -18,7 +19,8 @@ _ROOT = os.path.dirname(os.path.dirname(_HERE))
 
 def _script():
     spec = importlib.util.spec_from_file_location(
-        "certification_queue_script", os.path.join(_HERE, "certification_queue.py"))
+        "certification_queue_script", os.path.join(_HERE, "certification_queue.py")
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -33,8 +35,8 @@ def test_bands_follow_the_documented_thresholds():
     Q = _script()
     assert Q.band_for("stabilizer", 10, 3, None, 0) == "P"
     assert Q.band_for("CSS", 100, 8, 12.0, 3) == "A"
-    assert Q.band_for("CSS", 100, 8, 12.0, 2) == "B"       # too few peers for A, but under an hour
-    assert Q.band_for("CSS", 390, 16, None, 0) == "B"      # the Perlmutter-closed region
+    assert Q.band_for("CSS", 100, 8, 12.0, 2) == "B"  # too few peers for A, but under an hour
+    assert Q.band_for("CSS", 390, 16, None, 0) == "B"  # the Perlmutter-closed region
     assert Q.band_for("CSS", 390, 17, None, 0) == "C"
     assert Q.band_for("CSS", 700, 24, None, 0) == "C"
     assert Q.band_for("CSS", 701, 10, None, 0) == "D"
@@ -70,9 +72,16 @@ def test_the_committed_queue_is_the_upper_bound_set_in_order():
                 assert side["lp_constraints"] >= 2
         else:
             assert r["band"] == "P" and "P" in r["sides"]
-    keys = [(0 if r["record"] else 1, Q.BAND_ORDER[r["band"]],
-             r["peers"]["median_side_secs"] if r["peers"]["median_side_secs"] is not None
-             else float("inf"), r["n"], r["slug"]) for r in q["entries"]]
+    keys = [
+        (
+            0 if r["record"] else 1,
+            Q.BAND_ORDER[r["band"]],
+            r["peers"]["median_side_secs"] if r["peers"]["median_side_secs"] is not None else float("inf"),
+            r["n"],
+            r["slug"],
+        )
+        for r in q["entries"]
+    ]
     assert keys == sorted(keys), "the file is in the order its rule states"
     assert [r["position"] for r in q["entries"]] == list(range(1, len(listed) + 1))
     assert q["next_ten"] == listed[:10]

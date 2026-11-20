@@ -14,6 +14,7 @@ writes lists them so the next one can do the same.
     python research/annihilator_sweep.py --out research/audits/<name>.json
     python research/annihilator_sweep.py --limit 20 --workers 6
 """
+
 import argparse
 import glob
 import json
@@ -81,7 +82,7 @@ def one(job):
         doc = json.load(f)
     try:
         rec = attack(doc, trials=trials, seed=seed)
-    except Exception as e:                       # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
         return {"slug": slug, "n": n, "verdict": "error", "detail": str(e)[:300]}
     rec["slug"] = slug
     return rec
@@ -89,39 +90,40 @@ def one(job):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--trials", type=int, default=40_000,
-                    help="information sets inside each subspace (default "
-                         "40000, the budget the filed revisions were "
-                         "re-measured at)")
+    ap.add_argument(
+        "--trials",
+        type=int,
+        default=40_000,
+        help="information sets inside each subspace (default "
+        "40000, the budget the filed revisions were "
+        "re-measured at)",
+    )
     ap.add_argument("--seed", type=int, default=11)
     ap.add_argument("--workers", type=int, default=6)
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--all", action="store_true",
-                    help="re-run entries a committed audit already covers")
-    ap.add_argument("--out", default=os.path.join(
-        AUDITS, "annihilator-sweep-remainder.json"))
+    ap.add_argument("--all", action="store_true", help="re-run entries a committed audit already covers")
+    ap.add_argument("--out", default=os.path.join(AUDITS, "annihilator-sweep-remainder.json"))
     a = ap.parse_args(argv)
 
     # Never read the file this run is about to write: a re-run would see
     # its own previous output as coverage, skip every target, and then
     # overwrite the record with an empty one.
-    prior = [p for p in glob.glob(os.path.join(AUDITS, "annihilator-*.json"))
-             if os.path.abspath(p) != os.path.abspath(a.out)]
+    prior = [
+        p for p in glob.glob(os.path.join(AUDITS, "annihilator-*.json")) if os.path.abspath(p) != os.path.abspath(a.out)
+    ]
     skip = already_run(prior)
     todo = targets(skip, include_all=a.all)
     if a.limit:
-        todo = todo[:a.limit]
+        todo = todo[: a.limit]
     jobs = [(n, slug, p, a.trials, a.seed) for n, slug, p in todo]
-    print(f"{len(jobs)} targets ({len(skip)} already covered by a committed "
-          f"audit)")
+    print(f"{len(jobs)} targets ({len(skip)} already covered by a committed audit)")
 
     results, t0 = [], time.time()
     with ProcessPoolExecutor(max_workers=a.workers) as pool:
         for i, rec in enumerate(pool.map(one, jobs), 1):
             results.append(rec)
             if rec["verdict"] in ("refuted", "tightened", "error"):
-                print(f"  {rec['slug']}: {rec['verdict']} "
-                      f"{rec.get('lightest') or rec.get('detail') or ''}")
+                print(f"  {rec['slug']}: {rec['verdict']} {rec.get('lightest') or rec.get('detail') or ''}")
             if i % 25 == 0 or i == len(jobs):
                 print(f"  {i}/{len(jobs)}  {round(time.time() - t0)}s")
 
@@ -132,17 +134,22 @@ def main(argv=None):
         "issue": 2706,
         "parent_issue": 1851,
         "dates": time.strftime("%Y-%m-%d"),
-        "attack": ("single-block annihilator: kernel of one block of "
-                   "H = [A | B], information-set decoding inside the "
-                   "subspace; a vector in the subspace is a logical of the "
-                   "opposite type unless it lies in the row space of its "
-                   "own side"),
+        "attack": (
+            "single-block annihilator: kernel of one block of "
+            "H = [A | B], information-set decoding inside the "
+            "subspace; a vector in the subspace is a logical of the "
+            "opposite type unless it lies in the row space of its "
+            "own side"
+        ),
         "tool": "research/kit/annihilator.py",
-        "selection": ("every uncertified entry of even blocklength not "
-                      "already covered by a committed annihilator audit"),
-        "budget": {"trials_per_subspace": a.trials, "seed": a.seed,
-                   "core_hours": round(
-                       sum(r.get("secs") or 0 for r in results) / 3600, 2)},
+        "selection": (
+            "every uncertified entry of even blocklength not already covered by a committed annihilator audit"
+        ),
+        "budget": {
+            "trials_per_subspace": a.trials,
+            "seed": a.seed,
+            "core_hours": round(sum(r.get("secs") or 0 for r in results) / 3600, 2),
+        },
         "targets_run": len(results),
         "counts": counts,
         "results": results,

@@ -21,7 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, os.path.join(ROOT, "verify"))
 sys.path.insert(0, os.path.join(ROOT, "research", "kit"))
 
-from qedist import challenge_stabilizer_to_qedist, find_qedist  # noqa: E402
+from qedist import challenge_stabilizer_to_qedist, find_qedist, solver_string  # noqa: E402
 
 QEDIST_REPO = "github.com/yeon-lee/QEDist"
 LEVEL = "solver"
@@ -60,23 +60,28 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
 
     prefix = qedist_root(root)
     if prefix is None:
-        raise QEDistStabilizerCertifyError(
-            "QEDist is not installed; set QEDIST or install from " + QEDIST_REPO
-        )
+        raise QEDistStabilizerCertifyError("QEDist is not installed; set QEDIST or install from " + QEDIST_REPO)
 
     import tempfile
+
     tmp = Path(tempfile.mkdtemp(prefix="qedist-stab-cert-"))
     inp = challenge_stabilizer_to_qedist(doc, include_witnesses=True)
     input_path = tmp / "input.json"
     input_path.write_text(json.dumps(inp, indent=2) + "\n")
     out_dir = tmp / "run"
     cmd = prefix + [
-        "certify-stabilizer", str(input_path),
-        "--cutoff", str(d - 1),
-        "--seconds", str(float(tlim)),
-        "--workers", str(int(threads)),
-        "--shards", str(int(shards)),
-        "--out", str(out_dir),
+        "certify-stabilizer",
+        str(input_path),
+        "--cutoff",
+        str(d - 1),
+        "--seconds",
+        str(float(tlim)),
+        "--workers",
+        str(int(threads)),
+        "--shards",
+        str(int(shards)),
+        "--out",
+        str(out_dir),
     ]
     t0 = time.time()
     proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -103,9 +108,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
         exact = True
         status = "UNSAT"
     elif lb is not None and int(lb) > claim:
-        raise QEDistStabilizerCertifyError(
-            f"tool proved d >= {lb} against a verified witness of weight {claim}"
-        )
+        raise QEDistStabilizerCertifyError(f"tool proved d >= {lb} against a verified witness of weight {claim}")
 
     blk = {
         "value": claim,
@@ -129,7 +132,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
         "d": d,
         "sides": {"P": blk},
         "d_exact": overall,
-        "solver": "QEDist 0.1 (yeon-lee/QEDist) exhaustive search (stabilizer)",
+        "solver": solver_string(prefix, suffix=" (stabilizer)"),
         "tlim_per_solve": float(tlim),
         "verification": {
             "level": LEVEL,
@@ -157,4 +160,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

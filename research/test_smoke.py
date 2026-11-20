@@ -10,16 +10,15 @@ numpy-only (no scipy/ldpc), so it runs in the frozen CI env.
 
 Run: uv run python research/test_smoke.py   (exit 0 = pass)
 """
-import os
+
 import sys
 
-
-from bb import build_bb, KNOWN
-from css import compute_k, verify_css
-from surrogate import distance_rand, lightest_logical
-from search import screen, pareto_frontier, sample_bb
-from submit import make_submission, validate
 import qldpc_verify
+from bb import KNOWN, build_bb
+from css import compute_k, verify_css
+from search import pareto_frontier, sample_bb, screen
+from submit import make_submission, validate
+from surrogate import distance_rand, lightest_logical
 
 _fail = []
 
@@ -48,14 +47,20 @@ def main():
     check("X witness has weight 6", wx == 6 and len(xwit) == 6)
 
     # 3. Package and run through the REAL verifier (the drift gate).
-    doc = make_submission(HX, HZ, name="[[72,12,6]] smoke", construction="bb torus",
-                          authors=["ci"], family="bivariate-bicycle",
-                          confidence="upper_bound", trials=1000)
+    doc = make_submission(
+        HX,
+        HZ,
+        name="[[72,12,6]] smoke",
+        construction="bb torus",
+        authors=["ci"],
+        family="bivariate-bicycle",
+        confidence="upper_bound",
+        trials=1000,
+    )
     check("packaged submission is schema-valid", not validate(doc))
     rep = qldpc_verify.verify(doc, refute=False)
     check("verifier accepts the packaged code", rep["ok"])
-    check("earned_distance d == 6",
-          rep.get("earned_distance", {}).get("d", {}).get("value") == 6)
+    check("earned_distance d == 6", rep.get("earned_distance", {}).get("d", {}).get("value") == 6)
 
     # 4. The search funnel runs and yields a (subset) frontier.
     recs = screen(sample_bb(40, seed=1), min_k=2, min_d=2, trials=120)
@@ -67,7 +72,7 @@ def main():
 
 
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 

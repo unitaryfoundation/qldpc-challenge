@@ -1,0 +1,34 @@
+{
+  "d": 51,
+  "d_exact": false,
+  "d_lower": 12,
+  "ladder": {
+    "budget_per_side": 120.0
+  },
+  "name": "[[674,170,d<=76]] Frobenius-paired generalized-bicycle code",
+  "sides": {
+    "X": {
+      "exact": false,
+      "note": "lower bound 12",
+      "proved_min": 12,
+      "secs": 6.5,
+      "status": "TIMEOUT",
+      "value": 51
+    },
+    "Z": {
+      "exact": false,
+      "note": "lower bound 12",
+      "proved_min": 12,
+      "secs": 6.5,
+      "status": "TIMEOUT",
+      "value": 51
+    }
+  },
+  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
+  "tlim_per_solve": 120.0,
+  "verification": {
+    "checks_sha256": "1f6851e8ce550e293ae153925b647d717abd31471b55c35bf21f8d2ab248c0b9",
+    "level": "solver",
+    "note": "QEDist's lower bound is exhaustive search inside its kernel (tree search with bounds and symmetries); the vector it returned was re-verified by verify/heuristic_distance.py. Solver verdict only. 2 Tanner-graph symmetry generators supplied and verified by the tool."
+  }
+}

@@ -27,7 +27,6 @@ github.com/Stavan-Jain/qec-lab @ c3f23c6ff27081d43944fb0b145819807e89c783,
   gross base Z6xZ6  -> cover Z12xZ6  [[144,12,12]], k preserved 12
   pair72 base Z3xZ6 -> cover Z6xZ6   [[72,4,8]],   k preserved
 """
-import numpy as np
 
 from bb import build_bb
 from css import compute_k, verify_css
@@ -63,8 +62,7 @@ def k_preserved(l, m, A_terms, B_terms):
     return kc == kb
 
 
-def doubling_screen(l, m, A_terms, B_terms, base_trials=200, cover_trials=300,
-                    min_k=4, seed=0):
+def doubling_screen(l, m, A_terms, B_terms, base_trials=200, cover_trials=300, min_k=4, seed=0):
     """Full cheap screen of one base -> cover pair. Returns None if the base
     or cover fails a stage, else a dict of facts (all distances upper bounds).
 
@@ -87,11 +85,16 @@ def doubling_screen(l, m, A_terms, B_terms, base_trials=200, cover_trials=300,
     dc = distance_rand(HXc, HZc, trials=cover_trials, seed=seed + 1)
     n_base, n_cover = HXb.shape[1], HXc.shape[1]
     return {
-        "l": l, "m": m,
+        "l": l,
+        "m": m,
         "A_terms": [list(t) for t in A_terms],
         "B_terms": [list(t) for t in B_terms],
-        "n_base": n_base, "k_base": int(kb), "d_base_ub": int(db),
-        "n_cover": n_cover, "k_cover": int(kc), "d_cover_ub": int(dc),
+        "n_base": n_base,
+        "k_base": int(kb),
+        "d_base_ub": int(db),
+        "n_cover": n_cover,
+        "k_cover": int(kc),
+        "d_cover_ub": int(dc),
         "eff_base": round(kb * db**2 / n_base, 2),
         "eff_cover": round(kc * dc**2 / n_cover, 2),
         "d_ratio": round(dc / db, 2) if db else None,
@@ -99,8 +102,7 @@ def doubling_screen(l, m, A_terms, B_terms, base_trials=200, cover_trials=300,
     }
 
 
-def sample_doubling_bases(n_samples, l_choices=None, m_choices=None,
-                          weight=3, seed=0, max_cover_n=700):
+def sample_doubling_bases(n_samples, l_choices=None, m_choices=None, weight=3, seed=0, max_cover_n=700):
     """Yield (spec, HX, HZ) cover triples for random weight-`weight` base
     polynomial pairs, same shape as the kit's other samplers for search.screen.
 
@@ -129,7 +131,8 @@ def sample_doubling_bases(n_samples, l_choices=None, m_choices=None,
         HX, HZ = build_bb_cover(l, m, A_terms, B_terms)
         spec = {
             "family": "bb-double-cover",
-            "l": l, "m": m,
+            "l": l,
+            "m": m,
             "A_terms": [list(t) for t in A_terms],
             "B_terms": [list(t) for t in B_terms],
         }
@@ -140,10 +143,8 @@ def sample_doubling_bases(n_samples, l_choices=None, m_choices=None,
 if __name__ == "__main__":
     print("== validation anchors (known qec-lab instances) ==")
     anchors = [
-        ("gross  Z6xZ6 -> Z12xZ6 [[144,12,12]]", 6, 6,
-         [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)], 12),
-        ("pair72 Z3xZ6 -> Z6xZ6  [[72,4,8]]",    3, 6,
-         [(2, 0), (0, 1), (0, 3)], [(0, 0), (1, 0), (0, 2)], 4),
+        ("gross  Z6xZ6 -> Z12xZ6 [[144,12,12]]", 6, 6, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)], 12),
+        ("pair72 Z3xZ6 -> Z6xZ6  [[72,4,8]]", 3, 6, [(2, 0), (0, 1), (0, 3)], [(0, 0), (1, 0), (0, 2)], 4),
     ]
     ok_all = True
     for name, l, m, A, B, k_expect in anchors:
@@ -154,11 +155,12 @@ if __name__ == "__main__":
         nb, nc = HXb.shape[1], HXc.shape[1]
         ok = css and kb == kc == k_expect and nc == 2 * nb
         ok_all &= ok
-        print(f"{name}: base n={nb} k={kb}, cover n={nc} k={kc} "
-              f"css={css} k_preserved={kb == kc}  {'OK' if ok else 'FAIL'}")
+        print(
+            f"{name}: base n={nb} k={kb}, cover n={nc} k={kc} "
+            f"css={css} k_preserved={kb == kc}  {'OK' if ok else 'FAIL'}"
+        )
     print("== sampler smoke (3 covers) ==")
     for spec, HX, HZ in sample_doubling_bases(3, seed=7):
         n, k = HX.shape[1], compute_k(HX, HZ)
-        print(f"Z_{spec['l']}xZ_{spec['m']} -> cover n={n} k={k} "
-              f"A={spec['A_terms']} B={spec['B_terms']}")
+        print(f"Z_{spec['l']}xZ_{spec['m']} -> cover n={n} k={k} A={spec['A_terms']} B={spec['B_terms']}")
     print("ALL OK" if ok_all else "ANCHOR FAILURE")

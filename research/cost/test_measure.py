@@ -6,6 +6,7 @@ environment that produced it, every certification side carries one of the
 statuses the script knows (a time-limited run is a status, not a missing
 number), and the rendered table names every entry (issue #4026).
 """
+
 import importlib.util
 import json
 import os
@@ -33,11 +34,22 @@ def test_every_grid_entry_is_on_the_board():
     M = _script()
     slugs = [s for s, _ in M.GRID]
     assert len(slugs) == len(set(slugs))
+    # A distance revision renames the entry. The grid moves to the new slug and the
+    # record keeps the old one as measured_slug, so the grid can be updated before
+    # the revision lands: the entry is on the board under either name.
+    measured = {e["slug"]: e.get("measured_slug") for e in _table()["entries"]}
+
+    def on_board(slug):
+        for s in (slug, measured.get(slug)):
+            path = os.path.join(_ROOT, "codes", f"{s}.json")
+            if s and os.path.exists(path):
+                return path
+        return None
+
     for slug in slugs:
-        assert os.path.exists(os.path.join(_ROOT, "codes", slug + ".json")), slug
+        assert on_board(slug), slug
     # the cap corners the issue names are in the grid
-    docs = {s: json.load(open(os.path.join(_ROOT, "codes", s + ".json"), encoding="utf-8"))
-            for s in slugs}
+    docs = {s: json.load(open(on_board(s), encoding="utf-8")) for s in slugs}
     assert any(d["n"] == 700 for d in docs.values())
     assert any(d["n"] == 1000 for d in docs.values())
     # Distance coverage is descriptive: board bounds can be revised (#2941).
@@ -74,17 +86,48 @@ def test_the_committed_table_covers_the_grid_and_labels_its_limits():
 
 def test_render_names_a_time_limited_side_as_such():
     M = _script()
-    tbl = {"parameters": {"ris_trials": 20000, "fast_trials": [200000, 2000000],
-                          "certify_tlim_s": 60, "certify_wall_s": 120},
-           "environment": {"date": "2026-10-23", "cpu": "x", "cores": 1, "python": "3",
-                           "numpy": "2", "scipy": "1", "accelerator": True, "head": "abc"},
-           "board_pass_cold_s": 1.0,
-           "entries": [{"slug": "s-1-1", "measured_slug": "s-1-2", "code_type": "CSS", "n": 1, "k": 1, "d": 1, "w": 1,
-                        "gate": {"gate_total_s": 1.0, "refute_s": 0.5},
-                        "rungs": {"ris_20000_X_s": 1.0, "ris_20000_Z_s": 2.0, "fast_200000_s": 0.1,
-                                  "fast_2000000_s": 1.0, "submit_search_s": 4.0},
-                        "certify": {"X": {"status": "wall_cap", "secs": 120.0},
-                                    "Z": {"status": "milp_tlim", "secs": 61.0, "generators": 7}}}]}
+    tbl = {
+        "parameters": {
+            "ris_trials": 20000,
+            "fast_trials": [200000, 2000000],
+            "certify_tlim_s": 60,
+            "certify_wall_s": 120,
+        },
+        "environment": {
+            "date": "2026-10-23",
+            "cpu": "x",
+            "cores": 1,
+            "python": "3",
+            "numpy": "2",
+            "scipy": "1",
+            "accelerator": True,
+            "head": "abc",
+        },
+        "board_pass_cold_s": 1.0,
+        "entries": [
+            {
+                "slug": "s-1-1",
+                "measured_slug": "s-1-2",
+                "code_type": "CSS",
+                "n": 1,
+                "k": 1,
+                "d": 1,
+                "w": 1,
+                "gate": {"gate_total_s": 1.0, "refute_s": 0.5},
+                "rungs": {
+                    "ris_20000_X_s": 1.0,
+                    "ris_20000_Z_s": 2.0,
+                    "fast_200000_s": 0.1,
+                    "fast_2000000_s": 1.0,
+                    "submit_search_s": 4.0,
+                },
+                "certify": {
+                    "X": {"status": "wall_cap", "secs": 120.0},
+                    "Z": {"status": "milp_tlim", "secs": 61.0, "generators": 7},
+                },
+            }
+        ],
+    }
     md = M.render(tbl)
     assert "| s-1-1 |" in md and "wall cap, 120 s" in md and "MILP limit, 61.0 s (7 generators)" in md
     assert "s-1-2 -> s-1-1" in md and "original measured input" in md

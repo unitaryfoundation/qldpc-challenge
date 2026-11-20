@@ -24,6 +24,7 @@ Rows are shaped like ``site/build.load_entries`` and ``cli/qldpc._entry_for``:
 ``n``, ``k``, ``d``, ``w``, ``code_type``, ``weight_class``, ``locality_class``,
 and ``slug``. Nothing here touches ``verify/`` or changes a verdict.
 """
+
 import os
 import sys
 
@@ -48,8 +49,7 @@ def describe(entry):
     """
     slug = entry.get("slug")
     if not slug:
-        name = os.path.basename(str(entry.get("name") or "").split()[-1]) \
-            if entry.get("name") else ""
+        name = os.path.basename(str(entry.get("name") or "").split()[-1]) if entry.get("name") else ""
         slug = name[:-5] if name.endswith(".json") else name
     if not slug:
         slug = f"{entry['n']}-{entry['k']}-{entry['d']}"
@@ -68,8 +68,9 @@ def in_cell(candidate, entry):
         return False
     wc = _WEIGHT_ORDER.get(candidate.get("weight_class"), 9)
     lc = _LOCAL_ORDER.get(candidate.get("locality_class"), 9)
-    return (_WEIGHT_ORDER.get(entry.get("weight_class"), 9) <= wc
-            and _LOCAL_ORDER.get(entry.get("locality_class"), 9) <= lc)
+    return (
+        _WEIGHT_ORDER.get(entry.get("weight_class"), 9) <= wc and _LOCAL_ORDER.get(entry.get("locality_class"), 9) <= lc
+    )
 
 
 def dominators(candidate, board):
@@ -89,8 +90,13 @@ def dominators(candidate, board):
         if not in_cell(candidate, b) or b.get("w") is None:
             continue
         bw = b["w"]
-        if (b["n"] <= n and b["k"] >= k and b["d"] >= d and bw <= w
-                and (b["n"] < n or b["k"] > k or b["d"] > d or bw < w)):
+        if (
+            b["n"] <= n
+            and b["k"] >= k
+            and b["d"] >= d
+            and bw <= w
+            and (b["n"] < n or b["k"] > k or b["d"] > d or bw < w)
+        ):
             out.append(describe(b))
     return out
 
@@ -110,18 +116,21 @@ def blockers(dominated_by, board_advancing, *, allowed=False, attach=""):
     doms = list(dominated_by or [])
     tail = f"; {attach}" if attach else ""
     if board_advancing is None and not doms:
-        return ["the verdict carries no gates.novelty.board_advancing, so whether "
-                "this code advances its cell was never decided; re-run "
-                "verify/validate_candidate.py against the current board"]
+        return [
+            "the verdict carries no gates.novelty.board_advancing, so whether "
+            "this code advances its cell was never decided; re-run "
+            "verify/validate_candidate.py against the current board"
+        ]
     if board_advancing is True and not doms:
         return []
     if allowed:
         return []
-    named = (f"dominated in its track cell by {', '.join(doms)}" if doms
-             else "the gate reports board_advancing: false")
-    return [f"not board-advancing: {named}. {RULE}: a dominated code passes the "
-            f"gate and is a non-frontier result, recorded and not submitted as a "
-            f"frontier code{tail}"]
+    named = f"dominated in its track cell by {', '.join(doms)}" if doms else "the gate reports board_advancing: false"
+    return [
+        f"not board-advancing: {named}. {RULE}: a dominated code passes the "
+        f"gate and is a non-frontier result, recorded and not submitted as a "
+        f"frontier code{tail}"
+    ]
 
 
 def body_line(dominated_by):
@@ -131,9 +140,11 @@ def body_line(dominated_by):
     and that it is a record of a valid code rather than a frontier claim.
     """
     names = ", ".join(dominated_by) or "an entry in its track cell"
-    return (f"- Non-frontier result: dominated in its track cell by {names}. "
-            f"Filed with {FLAG} as a record of a valid code, not as a frontier "
-            f"claim ({RULE}).")
+    return (
+        f"- Non-frontier result: dominated in its track cell by {names}. "
+        f"Filed with {FLAG} as a record of a valid code, not as a frontier "
+        f"claim ({RULE})."
+    )
 
 
 def within_batch(rows):

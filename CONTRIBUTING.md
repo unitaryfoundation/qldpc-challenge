@@ -3,6 +3,23 @@
 You bring `H_X` and `H_Z`; one command turns them into a verified, PR-ready
 submission.
 
+## Clone options
+
+The working tree is large (mostly `circuits/`, ~8 GB). Use a partial clone to
+avoid downloading everything:
+
+```bash
+# Partial clone: blobs fetched on demand (recommended)
+git clone --filter=blob:none --sparse https://github.com/unitaryfoundation/qldpc-challenge.git
+cd qldpc-challenge
+git sparse-checkout set codes circuits notes fieldnotes repro certs
+
+# Codes and notes only (no circuits)
+git sparse-checkout set codes notes fieldnotes repro certs
+```
+
+Or run `./scripts/clone-sparse.sh [--no-circuits]`.
+
 ## One command
 
 ```
@@ -65,8 +82,8 @@ Useful flags:
   `layers` is required alongside the coordinates (the CLI defaults it to 1);
 - `--circuits DIR` your own `memory_x.stim` and `memory_z.stim` (canonical
   noise recipe, see `verify/circuit_tools.py`) in place of the generated ones;
-  the `.dem` files are derived with the pinned stim and the witnesses searched
-  for you. `--no-circuit` submits the code tier only. `d_circ` is penalty-only:
+  the DEM is derived with the pinned stim and the witnesses searched
+  for you; no `.dem` file is committed. `--no-circuit` submits the code tier only. `d_circ` is penalty-only:
   a circuit can discount an entry, never inflate it, and the value the CLI
   reports is what the board will show. A measured logical error rate is a
   separate, optional step after the circuits exist:
@@ -337,7 +354,7 @@ schedules that claimed `d_circ = d`). Correcting it is a refutation of the
 circuit tier, and it binds for anyone the way a distance refutation does.
 Lower the side (or sides) that came down to the weight of the fault set you
 found, store that fault set as the side's `witness` (indices into the
-committed `.dem`, exactly as many as the new value), keep `confidence` at
+DEM derived from the committed `.stim`, exactly as many as the new value), keep `confidence` at
 `upper_bound`, and append a sentence to `provenance.notes` that names your
 `@handle`, which is where the credit lives, since the circuit side has no
 `witness_provenance`. Leave everything else alone: `verify/check_authorship.py`
@@ -361,7 +378,12 @@ on `n, k, d` (or on the stabilizer group) must be filed as a new, suffixed
 entry (`-b`, `-c`, …) via `coordination.unique_path` / `submit.make_submission`,
 never by overwriting the existing file. `./qldpc submit` and
 `research/kit/promote.py` refuse an overwrite that is not a strict improvement
-and name the suffixed slug to use instead.
+and name the suffixed slug to use instead; pass it back with `--slug <suggested>`
+(to `./qldpc submit`) or `slug=<suggested>` (to `promote()`), so that
+`codes/<slug>.json`, `notes/<slug>.md`, `circuits/<slug>/`, the PR branch and
+the PR body all carry the same suffixed slug. Hand-renaming only some of those
+paths is what produced the nested-directory and note-overwrite incidents
+(issue #5732, PR #6849).
 
 ## One code, one entry
 
@@ -568,8 +590,8 @@ operator of the claimed Pauli weight for a stabilizer code, or the verifier
 rejects the claim), put the file in `codes/`, and verify locally before the PR:
 
 ```
-uv run python verify/qldpc_verify.py codes/my-128-6-8.json
-uv run python verify/check_codes_format.py --files codes/my-128-6-8.json
+uv run python verify/qldpc_verify.py codes/<your-entry>.json
+uv run python verify/check_codes_format.py --files codes/<your-entry>.json
 ```
 
 Exit 0 with an `earned_distance` block means it will pass CI. The second
