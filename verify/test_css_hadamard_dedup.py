@@ -6,6 +6,7 @@ caught when typed `stabilizer`, because the verifier filed it under its CSS
 image, and missed when typed `CSS`, because the fingerprint keys on the RREF
 and the relabelling changes it. These tests pin the symmetry.
 """
+
 import json
 import os
 import sys
@@ -40,10 +41,8 @@ def test_a_connected_css_code_admits_exactly_the_swap():
     """Admit exactly the swap: purity forces h to be a union of components."""
     doc = load("144-12-12")
     image = swap_of(doc)
-    assert sorted(map(sorted, image["checks"]["X"])) == \
-        sorted(map(sorted, doc["checks"]["Z"]))
-    assert sorted(map(sorted, image["checks"]["Z"])) == \
-        sorted(map(sorted, doc["checks"]["X"]))
+    assert sorted(map(sorted, image["checks"]["X"])) == sorted(map(sorted, doc["checks"]["Z"]))
+    assert sorted(map(sorted, image["checks"]["Z"])) == sorted(map(sorted, doc["checks"]["X"]))
 
 
 def test_the_swap_is_filed_with_the_entry_so_a_relabelling_collides():
@@ -56,15 +55,12 @@ def test_the_swap_is_filed_with_the_entry_so_a_relabelling_collides():
     n = doc["n"]
     twin = dict(doc, name="twin", checks=swap_of(doc)["checks"])
 
-    fp_parent = css_fingerprint(_matrix(doc["checks"]["X"], n),
-                                _matrix(doc["checks"]["Z"], n))
-    fp_twin = css_fingerprint(_matrix(twin["checks"]["X"], n),
-                              _matrix(twin["checks"]["Z"], n))
+    fp_parent = css_fingerprint(_matrix(doc["checks"]["X"], n), _matrix(doc["checks"]["Z"], n))
+    fp_twin = css_fingerprint(_matrix(twin["checks"]["X"], n), _matrix(twin["checks"]["Z"], n))
     assert fp_parent != fp_twin, "if these matched there would be nothing to fix"
 
     images, _ = css_local_hadamard_images(twin)
-    fps = {css_fingerprint(_matrix(i["checks"]["X"], n),
-                           _matrix(i["checks"]["Z"], n)) for i in images}
+    fps = {css_fingerprint(_matrix(i["checks"]["X"], n), _matrix(i["checks"]["Z"], n)) for i in images}
     sigs = {signature(i)["hash"] for i in images}
     assert fp_parent in fps
     assert signature(doc)["hash"] in sigs
@@ -83,8 +79,7 @@ def test_verify_reports_the_images_for_a_css_entry():
     assert ceq.get("enumeration_capped") is False
     assert len(ceq.get("fingerprints") or []) == 1
     assert len(ceq.get("signatures") or []) == 1
-    assert any(c["check"] == "local_hadamard_css_images" and c["ok"]
-               for c in rep["checks"])
+    assert any(c["check"] == "local_hadamard_css_images" and c["ok"] for c in rep["checks"])
 
 
 def test_a_disconnected_code_admits_one_image_per_nonempty_component_set():
@@ -94,14 +89,13 @@ def test_a_disconnected_code_admits_one_image_per_nonempty_component_set():
     alone and of both. This is the case a connectivity shortcut gets wrong, so
     the components are enumerated rather than assumed away.
     """
-    doc = {"n": 4, "k": 2, "code_type": "CSS",
-           "distance": {"d": 1},
-           "checks": {"X": [[0, 1]], "Z": [[2, 3]]}}
+    doc = {"n": 4, "k": 2, "code_type": "CSS", "distance": {"d": 1}, "checks": {"X": [[0, 1]], "Z": [[2, 3]]}}
     images, capped = css_local_hadamard_images(doc)
     assert not capped
     assert len(images) == 3
-    shapes = {(tuple(sorted(map(tuple, i["checks"]["X"]))),
-               tuple(sorted(map(tuple, i["checks"]["Z"])))) for i in images}
+    shapes = {
+        (tuple(sorted(map(tuple, i["checks"]["X"]))), tuple(sorted(map(tuple, i["checks"]["Z"])))) for i in images
+    }
     assert len(shapes) == 3, "the three images are distinct"
 
 
@@ -113,9 +107,7 @@ def test_the_identity_is_not_returned_as_an_image():
     """
     doc = load("144-12-12")
     n = doc["n"]
-    fp = css_fingerprint(_matrix(doc["checks"]["X"], n),
-                         _matrix(doc["checks"]["Z"], n))
+    fp = css_fingerprint(_matrix(doc["checks"]["X"], n), _matrix(doc["checks"]["Z"], n))
     images, _ = css_local_hadamard_images(doc)
-    fps = {css_fingerprint(_matrix(i["checks"]["X"], n),
-                           _matrix(i["checks"]["Z"], n)) for i in images}
+    fps = {css_fingerprint(_matrix(i["checks"]["X"], n), _matrix(i["checks"]["Z"], n)) for i in images}
     assert fp not in fps

@@ -17,6 +17,7 @@ Polynomials are Python ints with bit i the coefficient of x^i, which makes
 multiplication a shift-and-xor loop and keeps m = 341 well under a
 millisecond per product.
 """
+
 import numpy as np
 from css import kernel_basis, rref
 
@@ -80,7 +81,7 @@ def factor_squarefree(f, rng):
     x = 2
     xp = x
     while deg(g) >= 2 * d:
-        xp = mod(mul(xp, xp), g)              # x^(2^d) mod g
+        xp = mod(mul(xp, xp), g)  # x^(2^d) mod g
         h = gcd(g, xp ^ x)
         if deg(h) > 0:
             out += _equal_degree_split(h, d, rng)
@@ -99,13 +100,12 @@ def _equal_degree_split(h, d, rng):
     while True:
         r = rng.getrandbits(deg(h)) | 1
         t, s = 0, mod(r, h)
-        for _ in range(d):                     # Tr(r) = r + r^2 + ... + r^(2^(d-1))
+        for _ in range(d):  # Tr(r) = r + r^2 + ... + r^(2^(d-1))
             t ^= s
             s = mod(mul(s, s), h)
         g = gcd(h, t)
         if 0 < deg(g) < deg(h):
-            return (_equal_degree_split(g, d, rng)
-                    + _equal_degree_split(div(h, g), d, rng))
+            return _equal_degree_split(g, d, rng) + _equal_degree_split(div(h, g), d, rng)
 
 
 def designed_divisor(factors, deg_band, rng, tries=500):
@@ -193,8 +193,7 @@ def cyclic_gb(m, a, b):
     """
     A = circulant(to_vector(from_support(a, m), m))
     B = circulant(to_vector(from_support(b, m), m))
-    return (np.concatenate([A, B], axis=1),
-            np.concatenate([B.T, A.T], axis=1))
+    return (np.concatenate([A, B], axis=1), np.concatenate([B.T, A.T], axis=1))
 
 
 def designed_k(m, a, b):

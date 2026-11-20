@@ -29,8 +29,8 @@ Group conventions (element index -> group element):
 Run ``uv run python research/kit/lp_protograph.py`` for the self-test, which
 reproduces the paper's stated (n, k) at the paper's own group parameters.
 """
-import numpy as np
 
+import numpy as np
 from group_algebra import L_rep, R_rep, cyclic_product, metacyclic
 
 
@@ -69,7 +69,7 @@ def build_group(family, t):
     elif family == "dic":
         mul = dicyclic(t)
     elif family == "dih":
-        mul, _ = metacyclic(t, 2, t - 1)      # D_t: r order t, s^2 = e
+        mul, _ = metacyclic(t, 2, t - 1)  # D_t: r order t, s^2 = e
     elif family == "ztz2":
         mul, _ = cyclic_product(t, 2)
     else:
@@ -103,7 +103,8 @@ def entry_index(family, t, entry):
 def _lift_block(mul, P, side, inv):
     """Expand a protograph of element-index lists into a block matrix of
     regular reps. ``side='L'`` uses L(g); ``side='R'`` uses R(g^-1) (the
-    paper's rho(g) e_h = e_{h g^-1})."""
+    paper's rho(g) e_h = e_{h g^-1}).
+    """
     rows, cols = len(P), len(P[0])
     N = mul.shape[0]
     M = np.zeros((rows * N, cols * N), dtype=np.int8)
@@ -113,7 +114,7 @@ def _lift_block(mul, P, side, inv):
             for g in P[i][j]:
                 rep = L_rep(mul, g) if side == "L" else R_rep(mul, inv[g])
                 blk = (blk + rep) % 2
-            M[i * N:(i + 1) * N, j * N:(j + 1) * N] = blk
+            M[i * N : (i + 1) * N, j * N : (j + 1) * N] = blk
     return M
 
 
@@ -149,35 +150,35 @@ def lifted_product_protograph(mul, A, B):
 
     mA, nA = len(A), len(A[0])
     mB, nB = len(B), len(B[0])
-    Aexp = _lift_block(mul, A, "L", inv)   # (mA*N, nA*N)
-    Bexp = _lift_block(mul, B, "R", inv)   # (mB*N, nB*N)
-    AexpT = np.ascontiguousarray(Aexp.T)   # (nA*N, mA*N), blocks transposed
-    BexpT = np.ascontiguousarray(Bexp.T)   # (nB*N, mB*N)
+    Aexp = _lift_block(mul, A, "L", inv)  # (mA*N, nA*N)
+    Bexp = _lift_block(mul, B, "R", inv)  # (mB*N, nB*N)
+    AexpT = np.ascontiguousarray(Aexp.T)  # (nA*N, mA*N), blocks transposed
+    BexpT = np.ascontiguousarray(Bexp.T)  # (nB*N, mB*N)
 
-    n1 = nA * nB * N                       # sector-1 qubits
+    n1 = nA * nB * N  # sector-1 qubits
     n = n1 + mA * mB * N
 
     HX = np.zeros((mA * nB * N, n), dtype=np.int8)
     for i in range(mA):
         for b in range(nB):
             r = (i * nB + b) * N
-            for j in range(nA):            # d == b
+            for j in range(nA):  # d == b
                 c = (j * nB + b) * N
-                HX[r:r + N, c:c + N] = Aexp[i * N:(i + 1) * N, j * N:(j + 1) * N]
-            for e in range(mB):            # u == i
+                HX[r : r + N, c : c + N] = Aexp[i * N : (i + 1) * N, j * N : (j + 1) * N]
+            for e in range(mB):  # u == i
                 c = n1 + (i * mB + e) * N
-                HX[r:r + N, c:c + N] = Bexp[e * N:(e + 1) * N, b * N:(b + 1) * N]
+                HX[r : r + N, c : c + N] = Bexp[e * N : (e + 1) * N, b * N : (b + 1) * N]
 
     HZ = np.zeros((nA * mB * N, n), dtype=np.int8)
     for a in range(nA):
         for f in range(mB):
             r = (a * mB + f) * N
-            for d in range(nB):            # j == a
+            for d in range(nB):  # j == a
                 c = (a * nB + d) * N
-                HZ[r:r + N, c:c + N] = BexpT[d * N:(d + 1) * N, f * N:(f + 1) * N]
-            for u in range(mA):            # e == f
+                HZ[r : r + N, c : c + N] = BexpT[d * N : (d + 1) * N, f * N : (f + 1) * N]
+            for u in range(mA):  # e == f
                 c = n1 + (u * mB + f) * N
-                HZ[r:r + N, c:c + N] = AexpT[a * N:(a + 1) * N, u * N:(u + 1) * N]
+                HZ[r : r + N, c : c + N] = AexpT[a * N : (a + 1) * N, u * N : (u + 1) * N]
     return HX, HZ
 
 
@@ -189,96 +190,136 @@ PAPER_CODES = {
     # abelian Z_3 x Z_t, n = 102 t  (paper: t=14, [[1428,186,<=18]])
     "R1Elite01": {
         "family": "z3zt",
-        "A": [[(2, 8), (1, 10), (2, 6), (0, 0), (2, 10)],
-              [(1, 4), (2, 8), (1, 7), (2, 7), (1, 9)],
-              [(0, 13), (2, 4), (1, 13), (0, 4), (0, 5)]],
-        "B": [[(0, 10), (0, 6), (1, 0), (0, 5), (2, 6)],
-              [(0, 6), (1, 1), (0, 9), (0, 5), (1, 12)],
-              [(0, 3), (0, 3), (0, 1), (2, 2), (0, 7)]],
+        "A": [
+            [(2, 8), (1, 10), (2, 6), (0, 0), (2, 10)],
+            [(1, 4), (2, 8), (1, 7), (2, 7), (1, 9)],
+            [(0, 13), (2, 4), (1, 13), (0, 4), (0, 5)],
+        ],
+        "B": [
+            [(0, 10), (0, 6), (1, 0), (0, 5), (2, 6)],
+            [(0, 6), (1, 1), (0, 9), (0, 5), (1, 12)],
+            [(0, 3), (0, 3), (0, 1), (2, 2), (0, 7)],
+        ],
     },
     # abelian Z_2 x Z_2 x Z_t, n = 136 t  (paper: t=11, [[1496,198,<=16]])
     "R1Elite02": {
         "family": "z22zt",
-        "A": [[(0, 0, 5), (1, 0, 7), (0, 0, 2), (0, 0, 6), (1, 1, 2)],
-              [(1, 1, 2), (0, 1, 3), (0, 1, 4), (0, 1, 10), (1, 0, 6)],
-              [(0, 0, 1), (1, 0, 10), (0, 0, 3), (0, 1, 1), (0, 0, 9)]],
-        "B": [[(1, 1, 4), (1, 1, 3), (0, 0, 0), (0, 1, 0), (0, 1, 0)],
-              [(1, 0, 3), (1, 1, 2), (0, 1, 8), (1, 1, 4), (0, 0, 7)],
-              [(0, 1, 4), (1, 0, 1), (1, 0, 2), (1, 0, 7), (0, 1, 5)]],
+        "A": [
+            [(0, 0, 5), (1, 0, 7), (0, 0, 2), (0, 0, 6), (1, 1, 2)],
+            [(1, 1, 2), (0, 1, 3), (0, 1, 4), (0, 1, 10), (1, 0, 6)],
+            [(0, 0, 1), (1, 0, 10), (0, 0, 3), (0, 1, 1), (0, 0, 9)],
+        ],
+        "B": [
+            [(1, 1, 4), (1, 1, 3), (0, 0, 0), (0, 1, 0), (0, 1, 0)],
+            [(1, 0, 3), (1, 1, 2), (0, 1, 8), (1, 1, 4), (0, 0, 7)],
+            [(0, 1, 4), (1, 0, 1), (1, 0, 2), (1, 0, 7), (0, 1, 5)],
+        ],
     },
     # non-abelian Dic_m, 5x3 protographs, n = 136 m (paper: m=11, [[1496,194,<=20]])
     "R2Elite01": {
         "family": "dic",
-        "A": [[(8, 0), (1, 0), (15, 0)],
-              [(7, 1), (2, 0), (18, 1)],
-              [(4, 0), (1, 0), (0, 0)],
-              [(3, 1), (3, 0), (2, 1)],
-              [(1, 0), (3, 0), (5, 0)]],
-        "B": [[(11, 0), (0, 1), (9, 0)],
-              [(12, 0), (0, 0), (11, 0)],
-              [(10, 0), (3, 1), (16, 0)],
-              [(10, 0), (3, 0), (18, 0)],
-              [(9, 0), (6, 1), (1, 1)]],
+        "A": [
+            [(8, 0), (1, 0), (15, 0)],
+            [(7, 1), (2, 0), (18, 1)],
+            [(4, 0), (1, 0), (0, 0)],
+            [(3, 1), (3, 0), (2, 1)],
+            [(1, 0), (3, 0), (5, 0)],
+        ],
+        "B": [
+            [(11, 0), (0, 1), (9, 0)],
+            [(12, 0), (0, 0), (11, 0)],
+            [(10, 0), (3, 1), (16, 0)],
+            [(10, 0), (3, 0), (18, 0)],
+            [(9, 0), (6, 1), (1, 1)],
+        ],
     },
     # non-abelian D_m (rotation order m), 5x3, n = 68 m (paper: m=22, [[1496,198,<=16]])
     "R2Elite02": {
         "family": "dih",
-        "A": [[(12, 0), (3, 1), (17, 0)],
-              [(8, 0), (0, 1), (15, 0)],
-              [(4, 1), (20, 1), (13, 1)],
-              [(0, 0), (17, 1), (11, 0)],
-              [(19, 0), (14, 0), (9, 0)]],
-        "B": [[(21, 0), (1, 0), (10, 0)],
-              [(12, 0), (0, 0), (3, 0)],
-              [(3, 0), (14, 0), (3, 0)],
-              [(1, 1), (6, 1), (19, 0)],
-              [(14, 0), (5, 0), (11, 0)]],
+        "A": [
+            [(12, 0), (3, 1), (17, 0)],
+            [(8, 0), (0, 1), (15, 0)],
+            [(4, 1), (20, 1), (13, 1)],
+            [(0, 0), (17, 1), (11, 0)],
+            [(19, 0), (14, 0), (9, 0)],
+        ],
+        "B": [
+            [(21, 0), (1, 0), (10, 0)],
+            [(12, 0), (0, 0), (3, 0)],
+            [(3, 0), (14, 0), (3, 0)],
+            [(1, 1), (6, 1), (19, 0)],
+            [(14, 0), (5, 0), (11, 0)],
+        ],
     },
     # non-abelian Dic_m, 3x5, n = 136 m (paper: m=11, [[1496,192,<=16]])
     "R3Elite01": {
         "family": "dic",
-        "A": [[(14, 1), (1, 1), (10, 1), (19, 0), (6, 0)],
-              [(5, 1), (21, 1), (15, 0), (9, 0), (3, 1)],
-              [(18, 1), (19, 0), (20, 1), (21, 1), (0, 0)]],
-        "B": [[(19, 1), (18, 1), (9, 0), (19, 0), (8, 1)],
-              [(2, 1), (21, 0), (3, 1), (11, 0), (1, 1)],
-              [(12, 1), (17, 0), (18, 0), (15, 1), (12, 1)]],
+        "A": [
+            [(14, 1), (1, 1), (10, 1), (19, 0), (6, 0)],
+            [(5, 1), (21, 1), (15, 0), (9, 0), (3, 1)],
+            [(18, 1), (19, 0), (20, 1), (21, 1), (0, 0)],
+        ],
+        "B": [
+            [(19, 1), (18, 1), (9, 0), (19, 0), (8, 1)],
+            [(2, 1), (21, 0), (3, 1), (11, 0), (1, 1)],
+            [(12, 1), (17, 0), (18, 0), (15, 1), (12, 1)],
+        ],
     },
     # non-abelian Dic_m, 3x5, n = 136 m (paper: m=11, [[1496,198,<=14]])
     "R3Elite02": {
         "family": "dic",
-        "A": [[(16, 0), (17, 1), (18, 0), (0, 1), (2, 0)],
-              [(17, 1), (1, 1), (2, 1), (4, 1), (6, 1)],
-              [(18, 0), (2, 1), (5, 0), (8, 1), (11, 0)]],
-        "B": [[(15, 0), (9, 1), (1, 0), (10, 1), (3, 0)],
-              [(11, 0), (5, 0), (15, 0), (9, 0), (3, 0)],
-              [(7, 0), (2, 1), (13, 0), (8, 1), (3, 0)]],
+        "A": [
+            [(16, 0), (17, 1), (18, 0), (0, 1), (2, 0)],
+            [(17, 1), (1, 1), (2, 1), (4, 1), (6, 1)],
+            [(18, 0), (2, 1), (5, 0), (8, 1), (11, 0)],
+        ],
+        "B": [
+            [(15, 0), (9, 1), (1, 0), (10, 1), (3, 0)],
+            [(11, 0), (5, 0), (15, 0), (9, 0), (3, 0)],
+            [(7, 0), (2, 1), (13, 0), (8, 1), (3, 0)],
+        ],
     },
     # abelian Z_t x Z_2, 3x4, n = 50 t (paper: t=30, [[1500,81,<=18]])
     "R3EliteP01": {
         "family": "ztz2",
-        "A": [[(22, 0), (17, 0), (19, 0), (21, 0)],
-              [(23, 1), (11, 1), (22, 1), (10, 1)],
-              [(1, 0), (28, 0), (2, 0), (29, 0)]],
-        "B": [[(28, 1), (11, 1), (7, 1), (17, 1)],
-              [(26, 0), (18, 1), (29, 0), (21, 1)],
-              [(5, 1), (28, 1), (21, 1), (25, 1)]],
+        "A": [
+            [(22, 0), (17, 0), (19, 0), (21, 0)],
+            [(23, 1), (11, 1), (22, 1), (10, 1)],
+            [(1, 0), (28, 0), (2, 0), (29, 0)],
+        ],
+        "B": [
+            [(28, 1), (11, 1), (7, 1), (17, 1)],
+            [(26, 0), (18, 1), (29, 0), (21, 1)],
+            [(5, 1), (28, 1), (21, 1), (25, 1)],
+        ],
     },
     # abelian Z_t x Z_2, 3x4, n = 50 t (paper: t=30, [[1500,76,<=20]])
     "R3EliteP02": {
         "family": "ztz2",
-        "A": [[(6, 1), (6, 0), (6, 1), (6, 0)],
-              [(0, 0), (1, 0), (2, 0), (26, 0)],
-              [(24, 1), (26, 0), (21, 1), (23, 0)]],
-        "B": [[(29, 1), (13, 0), (8, 1), (3, 0)],
-              [(10, 0), (6, 0), (2, 0), (28, 0)],
-              [(2, 1), (29, 0), (26, 1), (12, 0)]],
+        "A": [
+            [(6, 1), (6, 0), (6, 1), (6, 0)],
+            [(0, 0), (1, 0), (2, 0), (26, 0)],
+            [(24, 1), (26, 0), (21, 1), (23, 0)],
+        ],
+        "B": [
+            [(29, 1), (13, 0), (8, 1), (3, 0)],
+            [(10, 0), (6, 0), (2, 0), (28, 0)],
+            [(2, 1), (29, 0), (26, 1), (12, 0)],
+        ],
     },
 }
 
 # Column factor f = nA*nB + mA*mB per protograph shape (constant per code).
-_F = {"R1Elite01": 34, "R1Elite02": 34, "R2Elite01": 34, "R2Elite02": 34,
-      "R3Elite01": 34, "R3Elite02": 34, "R3EliteP01": 25, "R3EliteP02": 25}
+_F = {
+    "R1Elite01": 34,
+    "R1Elite02": 34,
+    "R2Elite01": 34,
+    "R2Elite02": 34,
+    "R3Elite01": 34,
+    "R3Elite02": 34,
+    "R3EliteP01": 25,
+    "R3EliteP02": 25,
+}
 
 
 def instantiate(name, t):
@@ -286,7 +327,7 @@ def instantiate(name, t):
     code = PAPER_CODES[name]
     family = code["family"]
     mul = build_group(family, t)
-    conv = lambda P: [[ [entry_index(family, t, e) ] for e in row ] for row in P]
+    conv = lambda P: [[[entry_index(family, t, e)] for e in row] for row in P]
     A = conv(code["A"])
     B = conv(code["B"])
     HX, HZ = lifted_product_protograph(mul, A, B)
@@ -304,8 +345,9 @@ def instantiate(name, t):
 
 
 def max_check_weight(HX, HZ):
-    return max(int(HX[i].sum()) for i in range(HX.shape[0])) if HX.size else 0, \
-           max(int(HZ[i].sum()) for i in range(HZ.shape[0])) if HZ.size else 0
+    return max(int(HX[i].sum()) for i in range(HX.shape[0])) if HX.size else 0, max(
+        int(HZ[i].sum()) for i in range(HZ.shape[0])
+    ) if HZ.size else 0
 
 
 # ----------------------------------------------------------------------
@@ -339,7 +381,9 @@ if __name__ == "__main__":
         w_expect = len(code["A"][0]) + len(code["B"])
         ok = (n == n_paper) and css and (k == k_paper) and wx == wz == w_expect
         ok_all &= ok
-        print(f"  {name:11s} G-param={t:2d}: n={n:5d} (want {n_paper})  "
-              f"k={k:3d} (want {k_paper})  css={css}  w=({wx},{wz}) want {w_expect}  "
-              f"{'OK' if ok else 'MISMATCH'}")
+        print(
+            f"  {name:11s} G-param={t:2d}: n={n:5d} (want {n_paper})  "
+            f"k={k:3d} (want {k_paper})  css={css}  w=({wx},{wz}) want {w_expect}  "
+            f"{'OK' if ok else 'MISMATCH'}"
+        )
     print("ALL OK" if ok_all else "SOME MISMATCHES -- fix before sweeping")

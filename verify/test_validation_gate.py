@@ -4,6 +4,7 @@ A verifier change that breaks a solved case, rejects a broken artifact for
 the wrong reason, or changes a committed verdict fails here, and the re-pin
 command refuses to run until it passes (issue #4030).
 """
+
 import json
 import os
 import sys

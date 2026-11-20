@@ -23,22 +23,18 @@ it at your own generator. Ready-made samplers ship for the BB family
 groups (``sample_dihedral``, ``sample_metacyclic``, ``sample_kasai_affine``);
 a new one for any other family is the same shape.
 """
+
 import hashlib
 import json
 import os
 
+import gf2poly
 import numpy as np
-
-from css import compute_k, verify_css, rref
+from bb import build_bb
+from css import compute_k, rref, verify_css
+from group_algebra import alt, build_2bga, build_bbga, cyclic_product, dihedral, metacyclic, sym
 from prescreen import block_structure, board_index, identity, lookup
 from surrogate import distance_rand, prepare_distance_search
-from bb import build_bb
-from group_algebra import (alt, build_2bga, build_bbga, cyclic_product, dihedral,
-                           metacyclic, sym)
-import gf2poly
-from products import (hypergraph_product, lifted_product, balanced_product,
-                      sample_hypergraph_product, sample_lifted_product,
-                      sample_balanced_product)
 
 
 def efficiency(n, k, d):
@@ -49,17 +45,24 @@ def efficiency(n, k, d):
 def fingerprint(HX, HZ):
     """Exact-duplicate key: the reduced row echelon forms pin the stabilizer
     group. Equal fingerprint => identical code (same convention as the
-    verifier's duplicate check). Used to dedup a sweep."""
+    verifier's duplicate check). Used to dedup a sweep.
+    """
     HX = np.asarray(HX, dtype=np.int8) % 2
     HZ = np.asarray(HZ, dtype=np.int8) % 2
     b = rref(HX)[0].tobytes() + b"|" + rref(HZ)[0].tobytes()
     return hashlib.sha256(b).hexdigest()[:16]
 
 
-PREPASS_COUNTS = ("candidates", "rejected_not_css", "rejected_k",
-                  "rejected_repeat", "rejected_disconnected",
-                  "rejected_board_exact", "rejected_board_wl",
-                  "flagged_board_wl")
+PREPASS_COUNTS = (
+    "candidates",
+    "rejected_not_css",
+    "rejected_k",
+    "rejected_repeat",
+    "rejected_disconnected",
+    "rejected_board_exact",
+    "rejected_board_wl",
+    "flagged_board_wl",
+)
 
 
 def _board_setup(board, index, audit):
@@ -134,23 +137,18 @@ def _screen_one(job):
     the code's own fingerprint, so a candidate gets
     the same trials wherever it runs and whatever order it arrives in.
     """
-    (spec, HX, HZ, k, fp, wl, min_d, trials, seed, backend, threads,
-     distance, dkw) = job
+    (spec, HX, HZ, k, fp, wl, min_d, trials, seed, backend, threads, distance, dkw) = job
     if distance is None:
-        d = distance_rand(HX, HZ, trials=trials, seed=seed + int(fp, 16),
-                          backend=backend, threads=threads)
+        d = distance_rand(HX, HZ, trials=trials, seed=seed + int(fp, 16), backend=backend, threads=threads)
     else:
         # An exact-distance backend has no restarts to seed, so seed/threads
         # are forwarded rather than re-derived; the callable owns that.
-        d = distance(HX, HZ, trials=trials, seed=seed + int(fp, 16),
-                     backend=backend, threads=threads, **(dkw or {}))
+        d = distance(HX, HZ, trials=trials, seed=seed + int(fp, 16), backend=backend, threads=threads, **(dkw or {}))
     if d == float("inf") or d < min_d:
         return None
     n = int(HX.shape[1])
-    w = int(max(max((int(r.sum()) for r in HX), default=0),
-                max((int(r.sum()) for r in HZ), default=0)))
-    rec = {"spec": spec, "n": n, "k": int(k), "d": int(d), "w": w,
-           "fingerprint": fp}
+    w = int(max(max((int(r.sum()) for r in HX), default=0), max((int(r.sum()) for r in HZ), default=0)))
+    rec = {"spec": spec, "n": n, "k": int(k), "d": int(d), "w": w, "fingerprint": fp}
     if wl is not None:
         rec["board_wl"] = wl
     return rec
@@ -172,11 +170,27 @@ def _batches(it, size):
         yield batch
 
 
-def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
-           metric=efficiency, keep=None, verbose=False, backend="numpy",
-           threads=1, workers=1, threads_per_candidate=None, batch=64,
-           distance=None, distance_kwargs=None, board="flag", index=None,
-           audit=None):
+def screen(
+    candidates,
+    *,
+    min_k=1,
+    min_d=1,
+    trials=400,
+    seed=0,
+    metric=efficiency,
+    keep=None,
+    verbose=False,
+    backend="numpy",
+    threads=1,
+    workers=1,
+    threads_per_candidate=None,
+    batch=64,
+    distance=None,
+    distance_kwargs=None,
+    board="flag",
+    index=None,
+    audit=None,
+):
     """Screen an iterable of ``(spec, HX, HZ)`` candidates.
 
     ``spec`` is any JSON-serializable description of how the code was built (a
@@ -233,7 +247,8 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
         raise ValueError(
             "workers and threads_per_candidate both > 1 oversubscribes the "
             "machine; parallelize across candidates for a sweep, or across "
-            "threads for a few finalists, not both")
+            "threads for a few finalists, not both"
+        )
 
     tally, index = _board_setup(board, index, audit)
 
@@ -241,15 +256,14 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
         rec["efficiency"] = round(float(metric(rec["n"], rec["k"], rec["d"])), 4)
         if verbose:
             flag = f"  ~ {rec['board_wl']}" if "board_wl" in rec else ""
-            print(f"  [[{rec['n']},{rec['k']},{rec['d']}]] "
-                  f"eff={rec['efficiency']:.3f}  {rec['spec']}{flag}")
+            print(f"  [[{rec['n']},{rec['k']},{rec['d']}]] eff={rec['efficiency']:.3f}  {rec['spec']}{flag}")
         return rec
 
     seen = {}
-    jobs = ((spec, HX, HZ, k, fp, wl, min_d, trials, seed, backend,
-             threads_per_candidate, distance, distance_kwargs)
-            for spec, HX, HZ, k, fp, wl in _prepass(
-                candidates, min_k=min_k, board=board, index=index, tally=tally))
+    jobs = (
+        (spec, HX, HZ, k, fp, wl, min_d, trials, seed, backend, threads_per_candidate, distance, distance_kwargs)
+        for spec, HX, HZ, k, fp, wl in _prepass(candidates, min_k=min_k, board=board, index=index, tally=tally)
+    )
 
     if workers == 1:
         for job in jobs:
@@ -258,6 +272,7 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
                 seen[rec["fingerprint"]] = _record(rec)
     else:
         import multiprocessing as mp
+
         try:
             ctx = mp.get_context("fork")
         except ValueError:
@@ -279,15 +294,27 @@ def screen(candidates, *, min_k=1, min_d=1, trials=400, seed=0,
 
     # Fingerprint breaks ties so the order does not depend on arrival order,
     # which it otherwise would once candidates are scored out of sequence.
-    out = sorted(seen.values(),
-                 key=lambda r: (-r["efficiency"], r["fingerprint"]))
+    out = sorted(seen.values(), key=lambda r: (-r["efficiency"], r["fingerprint"]))
     return out[:keep] if keep else out
 
 
-def screen_adaptive(candidates, *, stages=(400, 20_000, 200_000), target=None,
-                    min_k=1, min_d=1, metric=efficiency, keep=None,
-                    seed=0, backend="numpy", threads=1, audit=None,
-                    verbose=False, board="flag", index=None):
+def screen_adaptive(
+    candidates,
+    *,
+    stages=(400, 20_000, 200_000),
+    target=None,
+    min_k=1,
+    min_d=1,
+    metric=efficiency,
+    keep=None,
+    seed=0,
+    backend="numpy",
+    threads=1,
+    audit=None,
+    verbose=False,
+    board="flag",
+    index=None,
+):
     """Screen in widening stages, dropping what cannot reach ``target``.
 
     ``screen`` spends its whole trial budget on every candidate, including the
@@ -320,12 +347,20 @@ def screen_adaptive(candidates, *, stages=(400, 20_000, 200_000), target=None,
     tally.setdefault("trials_spent", 0)
 
     live = []
-    for spec, HX, HZ, k, fp, wl in _prepass(candidates, min_k=min_k,
-                                           board=board, index=index,
-                                           tally=tally):
-        live.append({"spec": spec, "HX": HX, "HZ": HZ, "k": k,
-                     "n": int(HX.shape[1]), "fp": fp, "wl": wl, "d": None,
-                     "prep": None})
+    for spec, HX, HZ, k, fp, wl in _prepass(candidates, min_k=min_k, board=board, index=index, tally=tally):
+        live.append(
+            {
+                "spec": spec,
+                "HX": HX,
+                "HZ": HZ,
+                "k": k,
+                "n": int(HX.shape[1]),
+                "fp": fp,
+                "wl": wl,
+                "d": None,
+                "prep": None,
+            }
+        )
     seen = {c["fp"] for c in live}
 
     for si, trials in enumerate(stages):
@@ -334,10 +369,17 @@ def screen_adaptive(candidates, *, stages=(400, 20_000, 200_000), target=None,
         for c in live:
             if c["prep"] is None and backend == "numpy":
                 c["prep"] = prepare_distance_search(c["HX"], c["HZ"])
-            got = int(distance_rand(
-                c["HX"], c["HZ"], trials=trials,
-                seed=seed + si * 7919 + int(c["fp"], 16),
-                backend=backend, threads=threads, prepared=c["prep"]))
+            got = int(
+                distance_rand(
+                    c["HX"],
+                    c["HZ"],
+                    trials=trials,
+                    seed=seed + si * 7919 + int(c["fp"], 16),
+                    backend=backend,
+                    threads=threads,
+                    prepared=c["prep"],
+                )
+            )
             # Every stage returns a valid upper bound, and the stages draw
             # independently, so a later one can come back worse. Keep the best
             # bound seen rather than the latest, or a deeper stage could report
@@ -346,13 +388,11 @@ def screen_adaptive(candidates, *, stages=(400, 20_000, 200_000), target=None,
             tally["trials_spent"] += trials
         live = [c for c in live if c["d"] != float("inf") and c["d"] >= min_d]
         if target is not None and si < len(stages) - 1:
-            scored = [{"n": c["n"], "k": c["k"], "d": c["d"], "_c": c}
-                      for c in live]
+            scored = [{"n": c["n"], "k": c["k"], "d": c["d"], "_c": c} for c in live]
             front_fps = {r["_c"]["fp"] for r in pareto_frontier(scored)}
             keepers, dropped = [], 0
             for c in live:
-                if (metric(c["n"], c["k"], c["d"]) >= target
-                        or c["fp"] in front_fps):
+                if metric(c["n"], c["k"], c["d"]) >= target or c["fp"] in front_fps:
                     keepers.append(c)
                 else:
                     dropped += 1
@@ -360,17 +400,21 @@ def screen_adaptive(candidates, *, stages=(400, 20_000, 200_000), target=None,
             tally["rejected"].append(dropped)
             live = keepers
             if verbose:
-                print(f"  stage {si} ({trials} trials): {len(keepers)} kept, "
-                      f"{dropped} rejected")
+                print(f"  stage {si} ({trials} trials): {len(keepers)} kept, {dropped} rejected")
 
     tally["trials_flat"] = len(seen) * (stages[-1] if stages else 0)
     out = []
     for c in live:
-        w = int(max(*(int(r.sum()) for r in c["HX"]),
-                    *(int(r.sum()) for r in c["HZ"])))
-        rec = {"spec": c["spec"], "n": c["n"], "k": c["k"], "d": c["d"],
-               "w": w, "fingerprint": c["fp"],
-               "efficiency": round(float(metric(c["n"], c["k"], c["d"])), 4)}
+        w = int(max(*(int(r.sum()) for r in c["HX"]), *(int(r.sum()) for r in c["HZ"])))
+        rec = {
+            "spec": c["spec"],
+            "n": c["n"],
+            "k": c["k"],
+            "d": c["d"],
+            "w": w,
+            "fingerprint": c["fp"],
+            "efficiency": round(float(metric(c["n"], c["k"], c["d"])), 4),
+        }
         if c["wl"] is not None:
             rec["board_wl"] = c["wl"]
         out.append(rec)
@@ -382,12 +426,15 @@ def pareto_frontier(records):
     """The Pareto-optimal records over (n smaller, k larger, d larger): those
     not dominated by any other (no other has n' <= n, k' >= k, d' >= d with at
     least one strict). This is the board's frontier view -- there can be many
-    co-leaders, none collapsed to a single rank."""
+    co-leaders, none collapsed to a single rank.
+    """
     front = []
     for r in records:
         dominated = any(
             s is not r
-            and s["n"] <= r["n"] and s["k"] >= r["k"] and s["d"] >= r["d"]
+            and s["n"] <= r["n"]
+            and s["k"] >= r["k"]
+            and s["d"] >= r["d"]
             and (s["n"] < r["n"] or s["k"] > r["k"] or s["d"] > r["d"])
             for s in records
         )
@@ -410,7 +457,8 @@ def load_leaderboard(path):
 def update_leaderboard(path, records):
     """Merge ``records`` into the leaderboard at ``path`` (keyed by fingerprint,
     so re-screening the same code just refreshes it), write it back sorted by
-    efficiency, and return the merged list. Lets a long search pause and resume."""
+    efficiency, and return the merged list. Lets a long search pause and resume.
+    """
     board = {r["fingerprint"]: r for r in load_leaderboard(path)}
     for r in records:
         board[r["fingerprint"]] = r
@@ -434,8 +482,7 @@ def bb_shape(l, m, A, B):  # noqa: E741
     return 2 * l * m, len(A) + len(B)
 
 
-def sample_bb(num, *, l_range=(4, 12), m_range=(3, 10), weight=3, seed=0,
-              n_range=None, max_weight=None, audit=None):
+def sample_bb(num, *, l_range=(4, 12), m_range=(3, 10), weight=3, seed=0, n_range=None, max_weight=None, audit=None):
     """Yield ``num`` random bivariate-bicycle candidates ``(spec, HX, HZ)``.
 
     Each picks a random torus Z_l x Z_m and two sets of ``weight`` distinct
@@ -494,9 +541,9 @@ def sample_bb(num, *, l_range=(4, 12), m_range=(3, 10), weight=3, seed=0,
         yield ({"family": "bb", "l": l, "m": m, "A": A, "B": B}, HX, HZ)
 
 
-def sample_cyclic_gb(num, *, m_range=(300, 345), weight=(12, 16),
-                     k_band=(120, 200), seed=0, trials_per_ideal=200,
-                     audit=None):
+def sample_cyclic_gb(
+    num, *, m_range=(300, 345), weight=(12, 16), k_band=(120, 200), seed=0, trials_per_ideal=200, audit=None
+):
     """Yield ``num`` cyclic generalized-bicycle candidates with k designed.
 
     H_X = [circ(a) | circ(b)] over Z_m, the family every one of the board's 25
@@ -525,6 +572,7 @@ def sample_cyclic_gb(num, *, m_range=(300, 345), weight=(12, 16),
     ``research/literature/README.md`` is where the rest of the story is.
     """
     import random
+
     rng = np.random.default_rng(seed)
     prng = random.Random(seed)
     tally = audit if audit is not None else {}
@@ -536,15 +584,12 @@ def sample_cyclic_gb(num, *, m_range=(300, 345), weight=(12, 16),
         tally["sampled"] += 1
         m = int(rng.choice(odd))
         if m not in factors:
-            factors[m] = gf2poly.factor_squarefree(gf2poly.x_pow_m_minus_1(m),
-                                                   prng)
-        g = gf2poly.designed_divisor(
-            factors[m], (k_band[0] // 2, k_band[1] // 2), prng)
+            factors[m] = gf2poly.factor_squarefree(gf2poly.x_pow_m_minus_1(m), prng)
+        g = gf2poly.designed_divisor(factors[m], (k_band[0] // 2, k_band[1] // 2), prng)
         if g is None:
             tally["no_divisor"] += 1
             continue
-        words = gf2poly.sparse_multiples(m, g, weight, rng,
-                                         trials=trials_per_ideal)
+        words = gf2poly.sparse_multiples(m, g, weight, rng, trials=trials_per_ideal)
         if len(words) < 2:
             tally["no_words"] += 1
             continue
@@ -557,8 +602,7 @@ def sample_cyclic_gb(num, *, m_range=(300, 345), weight=(12, 16),
         HX, HZ = gf2poly.cyclic_gb(m, a, b)
         tally["built"] += 1
         built += 1
-        yield ({"family": "cyclic-gb", "m": m, "g": hex(g), "a": a, "b": b,
-                "k": k}, HX, HZ)
+        yield ({"family": "cyclic-gb", "m": m, "g": hex(g), "a": a, "b": b, "k": k}, HX, HZ)
 
 
 def sample_dihedral(num, *, m_range=(30, 80), weight=4, seed=0):
@@ -596,13 +640,28 @@ def bbga_groups(max_order=24):
     """Return the default seed-group menu for ``sample_bbga``: ``(label, mul)`` pairs of order <= ``max_order``."""
     menu = [(f"C{m}", cyclic_product(m)[0]) for m in range(2, 13)]
     menu += [(f"D{m}", dihedral(m)[0]) for m in range(3, 7)]
-    menu += [("A4", alt(4)[0]), ("S4", sym(4)[0]),
-             ("C7x|C3", metacyclic(7, 3, 2)[0]), ("C5x|C4", metacyclic(5, 4, 2)[0])]
+    menu += [
+        ("A4", alt(4)[0]),
+        ("S4", sym(4)[0]),
+        ("C7x|C3", metacyclic(7, 3, 2)[0]),
+        ("C5x|C4", metacyclic(5, 4, 2)[0]),
+    ]
     return [(lab, mul) for lab, mul in menu if mul.shape[0] <= max_order]
 
 
-def sample_bbga(num, *, groups=None, p_range=(1, 4), q_range=(1, 4), seed_terms=2,
-                terms=(2, 4), max_weight=8, max_n=320, seed=0, audit=None):
+def sample_bbga(
+    num,
+    *,
+    groups=None,
+    p_range=(1, 4),
+    q_range=(1, 4),
+    seed_terms=2,
+    terms=(2, 4),
+    max_weight=8,
+    max_n=320,
+    seed=0,
+    audit=None,
+):
     """Yield ``num`` random weighted-shift BBGA candidates (arXiv:2609.36213).
 
     Rebuild a winner with ``group_algebra.build_bbga`` from the ``spec``:
@@ -674,12 +733,14 @@ def sample_metacyclic(num, *, order_range=(60, 160), weight=4, seed=0):
     check weight at 8. See ``sample_bb`` on why the weight cap is the binding one.
     """
     rng = np.random.default_rng(seed)
-    valid_params = [(n, k, r)
-                    for n in range(5, 60)
-                    for k in range(2, 20)
-                    if order_range[0] <= n * k <= order_range[1]
-                    for r in range(2, n)
-                    if pow(r, k, n) == 1]
+    valid_params = [
+        (n, k, r)
+        for n in range(5, 60)
+        for k in range(2, 20)
+        if order_range[0] <= n * k <= order_range[1]
+        for r in range(2, n)
+        if pow(r, k, n) == 1
+    ]
     for _ in range(num):
         if not valid_params:
             break
@@ -689,8 +750,7 @@ def sample_metacyclic(num, *, order_range=(60, 160), weight=4, seed=0):
         a = [int(x) for x in rng.choice(order, size=weight, replace=False)]
         b = [int(x) for x in rng.choice(order, size=weight, replace=False)]
         HX, HZ = build_2bga(mul, a, b)
-        yield ({"family": "2bga-metacyclic", "n": int(n), "k_m": int(k),
-                "r": int(r), "a": a, "b": b}, HX, HZ)
+        yield ({"family": "2bga-metacyclic", "n": int(n), "k_m": int(k), "r": int(r), "a": a, "b": b}, HX, HZ)
 
 
 def _primitive_root(q):
@@ -715,7 +775,7 @@ def sample_kasai_affine(num, *, q_range=(7, 19), weight=4, seed=0):
     rng = np.random.default_rng(seed)
     affine_groups = []
     for q in range(q_range[0], q_range[1] + 1):
-        if all(q % i for i in range(2, int(q ** 0.5) + 1)) and q > 1:
+        if all(q % i for i in range(2, int(q**0.5) + 1)) and q > 1:
             r = _primitive_root(q)
             if r is not None:
                 affine_groups.append((q, q - 1, r))
@@ -739,6 +799,8 @@ if __name__ == "__main__":
     for r in recs[:5]:
         print(f"  [[{r['n']},{r['k']},{r['d']}]]  eff={r['efficiency']:.3f}")
     front = pareto_frontier(recs)
-    params = sorted({(r["n"], r["k"], r["d"]) for r in front})   # dedup for display
-    print(f"Pareto frontier ({len(front)} codes, {len(params)} distinct params): "
-          + ", ".join(f"[[{n},{k},{d}]]" for n, k, d in params[:8]))
+    params = sorted({(r["n"], r["k"], r["d"]) for r in front})  # dedup for display
+    print(
+        f"Pareto frontier ({len(front)} codes, {len(params)} distinct params): "
+        + ", ".join(f"[[{n},{k},{d}]]" for n, k, d in params[:8])
+    )

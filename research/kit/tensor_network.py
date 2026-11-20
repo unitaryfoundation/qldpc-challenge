@@ -37,7 +37,6 @@ Two caveats, both checked by this module rather than assumed:
   ``n = 11``, stabilizer rank 10, ``k = 1``), but the glued code is not a
   stabilizer code in the strict sense and is not submitted anywhere.
 """
-import itertools
 
 import numpy as np
 
@@ -197,10 +196,10 @@ def glue(code_a, code_b, leg_a, leg_b):
             for vb in vb_list:
                 v = np.zeros(2 * n_new, dtype=np.int8)
                 na, nb = len(keep_a), len(keep_b)
-                v[:na] = va[:n_a][keep_a]                       # x part, A
-                v[na:na + nb] = vb[:n_b][keep_b]                 # x part, B
-                v[n_new:n_new + na] = va[n_a:2 * n_a][keep_a]   # z part, A
-                v[n_new + na:] = vb[n_b:2 * n_b][keep_b]        # z part, B
+                v[:na] = va[:n_a][keep_a]  # x part, A
+                v[na : na + nb] = vb[:n_b][keep_b]  # x part, B
+                v[n_new : n_new + na] = va[n_a : 2 * n_a][keep_a]  # z part, A
+                v[n_new + na :] = vb[n_b : 2 * n_b][keep_b]  # z part, B
                 rows.append(v)
     if rows:
         uniq = np.unique(np.array(rows, dtype=np.int8), axis=0)
@@ -223,7 +222,7 @@ def glue(code_a, code_b, leg_a, leg_b):
     # Extend a basis of the stabilizer group to a basis of the centralizer.
     S_basis = _rref(basis, 2 * n_new) if basis.shape[0] else np.zeros((0, 2 * n_new), dtype=np.int8)
     C_basis = _rref(np.vstack([S_basis, cent]) if cent.size else S_basis, 2 * n_new)
-    logicals = [xz_to_sym(row) for row in C_basis[S_basis.shape[0]:]]
+    logicals = [xz_to_sym(row) for row in C_basis[S_basis.shape[0] :]]
     return {"n": n_new, "stabilizers": stabs, "logicals": logicals}
 
 
@@ -234,15 +233,15 @@ def glue(code_a, code_b, leg_a, leg_b):
 # O'Sullivan (arXiv:0804.4656), on qubits 1..6.  (The table's column 0 is
 # the action on the codespace; it is used for the 7-qubit state below.)
 _SWO08_GENERATORS = [
-    [Z, I, Z, I, I, I],      # S1
-    [X, Z, Y, Y, X, I],      # S2
-    [X, X, X, X, Z, I],      # S3
-    [I, Z, Z, X, I, X],      # S4
-    [X, Y, X, Y, I, Z],      # S5
+    [Z, I, Z, I, I, I],  # S1
+    [X, Z, Y, Y, X, I],  # S2
+    [X, X, X, X, Z, I],  # S3
+    [I, Z, Z, X, I, X],  # S4
+    [X, Y, X, Y, I, Z],  # S5
 ]
 _SWO08_LOGICALS = [
-    [X, Z, X, Z, I, I],      # X_1
-    [Z, X, Y, Y, X, I],      # Z_1
+    [X, Z, X, Z, I, I],  # X_1
+    [Z, X, Y, Y, X, I],  # Z_1
 ]
 # Column 0 of Table 1: the codespace action of each operator.
 _SWO08_CODESPACE = [I, I, I, I, I, X, Z]
@@ -297,8 +296,7 @@ def swo08_code():
     printed ``Z_1`` row anticommutes with the printed ``S_1``, so the table
     cannot be transcribed as it stands.  The derived pair is the same code.
     """
-    code = {"n": 6, "stabilizers": [list(g) for g in _SWO08_GENERATORS],
-            "logicals": []}
+    code = {"n": 6, "stabilizers": [list(g) for g in _SWO08_GENERATORS], "logicals": []}
     code["logicals"] = derive_logicals(code)
     return code
 
@@ -336,7 +334,8 @@ def is_abelian(code):
 
 def eleven_qubit_code():
     """The [[11,1,3]] code of Figure 1(b): leg 6 of the 6-qubit code
-    contracted with leg 1 of the 7-qubit state."""
+    contracted with leg 1 of the 7-qubit state.
+    """
     a = swo08_code()
     b = seven_qubit_state_code()
     return glue(a, b, leg_a=5, leg_b=0)
@@ -351,12 +350,10 @@ def is_css(code):
 
 
 if __name__ == "__main__":
-    for name, code in [("6-qubit", swo08_code()),
-                       ("11-qubit", eleven_qubit_code())]:
+    for name, code in [("6-qubit", swo08_code()), ("11-qubit", eleven_qubit_code())]:
         gens = code["stabilizers"]
         n = code["n"]
         # rank of the stabilizer generators
         basis = _rref([sym_to_xz(g) for g in gens], 2 * n)
         r = basis.shape[0]
-        print(f"{name}: n={n} r={r} k={n - r} logicals={len(code['logicals'])} "
-              f"css={is_css(code)}")
+        print(f"{name}: n={n} r={r} k={n - r} logicals={len(code['logicals'])} css={is_css(code)}")

@@ -52,6 +52,7 @@ the blob hashes it cites, as `permutation_equivalence.py` does for its ledger.
     uv run --extra research python research/audits/permutation_audit.py recheck \
         research/audits/permutation_audit-<date>.json
 """
+
 import argparse
 import datetime
 import json
@@ -83,16 +84,17 @@ ISSUE_1204_MATCHES = (
     "214-2-25 394-2-30 422-2-31 454-2-33 "
     "60-4-8 64-18-8 70-8-10 72-8-10 72-10-9 84-2-9 96-4-10 48-4-8 56-6-7 72-8-7 80-9-9 196-12-17 "
     "15-7-3 34-2-7 40-2-8 40-6-4 40-10-4 40-12-4 42-6-6 42-10-4 42-12-4 45-9-3 45-16-4 50-2-9 50-10-4 "
-    "50-18-4 51-16-5 54-2-9 54-6-7 54-8-6 54-20-4 57-18-4 58-16-3 73-37-6 85-37-5 96-18-4 96-34-4").split()
+    "50-18-4 51-16-5 54-2-9 54-6-7 54-8-6 54-20-4 57-18-4 58-16-3 73-37-6 85-37-5 96-18-4 96-34-4"
+).split()
 # 2**rank row-space vectors are enumerated exactly below this; above it the
 # low-weight enumerator and the hypergraph encoding are skipped.
-ENUM_LIMIT = 2 ** 20
+ENUM_LIMIT = 2**20
 # A partial information set is used when its kernel has at most this many rows
 # (every kernel combination is enumerated with it).
 KERNEL_BITS = 8
 # Row sums the light-vector enumeration may plan per row space before the pair
 # is left undecided (`run --enum-budget`); 10**9 is about a minute of numpy.
-DEFAULT_BUDGET = 10 ** 9
+DEFAULT_BUDGET = 10**9
 # Column orders tried for the information sets (the natural order and seeded
 # shuffles); the cheapest complete plan is enumerated.
 ORDER_TRIES = 6
@@ -101,9 +103,15 @@ QECDB_API = "https://qecdb.org/api/codes/{}"
 
 # -- codes -------------------------------------------------------------------
 
+
 def code_from_doc(slug, doc):
-    return I.Code(slug, int(doc["n"]), doc["checks"]["X"], doc["checks"]["Z"],
-                  {"k": doc.get("k"), "d": (doc.get("distance") or {}).get("d")})
+    return I.Code(
+        slug,
+        int(doc["n"]),
+        doc["checks"]["X"],
+        doc["checks"]["Z"],
+        {"k": doc.get("k"), "d": (doc.get("distance") or {}).get("d")},
+    )
 
 
 def code_from_matrices(name, HX, HZ):
@@ -120,6 +128,7 @@ def blob_sha(path):
 
 
 # -- GF(2) on bit-packed ints -----------------------------------------------------
+
 
 def echelon_basis(vecs):
     """Return an independent spanning set of ``vecs`` (one vector per pivot bit)."""
@@ -191,6 +200,7 @@ def weight_enumerator(basis, limit=ENUM_LIMIT):
 
 # -- invariants ----------------------------------------------------------------
 
+
 def invariants(code):
     """Return the basis-independent invariants of ``code``, oriented (X, Z).
 
@@ -207,17 +217,34 @@ def invariants(code):
     wmax = code.max_weight()
     lowx = I.low_weight_enumerator(X, wmax, limit=ENUM_LIMIT)
     lowz = I.low_weight_enumerator(Z, wmax, limit=ENUM_LIMIT)
-    return {"n": code.n, "rank_X": rx, "rank_Z": rz, "intersection": len(inter),
-            "hull_X": len(hx), "hull_Z": len(hz),
-            "intersection_weights": weight_enumerator(inter),
-            "hull_X_weights": weight_enumerator(hx), "hull_Z_weights": weight_enumerator(hz),
-            "wmax": wmax, "low_X": lowx, "low_Z": lowz}
+    return {
+        "n": code.n,
+        "rank_X": rx,
+        "rank_Z": rz,
+        "intersection": len(inter),
+        "hull_X": len(hx),
+        "hull_Z": len(hz),
+        "intersection_weights": weight_enumerator(inter),
+        "hull_X_weights": weight_enumerator(hx),
+        "hull_Z_weights": weight_enumerator(hz),
+        "wmax": wmax,
+        "low_X": lowx,
+        "low_Z": lowz,
+    }
 
 
 def _oriented(inv, swap):
     a, b = ("Z", "X") if swap else ("X", "Z")
-    return (inv["rank_" + a], inv["rank_" + b], inv["low_" + a], inv["low_" + b],
-            inv["hull_" + a], inv["hull_" + b], inv["hull_" + a + "_weights"], inv["hull_" + b + "_weights"])
+    return (
+        inv["rank_" + a],
+        inv["rank_" + b],
+        inv["low_" + a],
+        inv["low_" + b],
+        inv["hull_" + a],
+        inv["hull_" + b],
+        inv["hull_" + a + "_weights"],
+        inv["hull_" + b + "_weights"],
+    )
 
 
 def invariants_separate(ia, ib):
@@ -242,10 +269,10 @@ def invariants_separate(ia, ib):
         wmax = min(ia["wmax"], ib["wmax"])
         la, lb = a[2], b[2]
         lza, lzb = a[3], b[3]
-        if la is not None and lb is not None and la[:wmax + 1] != lb[:wmax + 1]:
+        if la is not None and lb is not None and la[: wmax + 1] != lb[: wmax + 1]:
             reasons.append("low-weight enumerator of the X row space")
             continue
-        if lza is not None and lzb is not None and lza[:wmax + 1] != lzb[:wmax + 1]:
+        if lza is not None and lzb is not None and lza[: wmax + 1] != lzb[: wmax + 1]:
             reasons.append("low-weight enumerator of the Z row space")
             continue
         if a[6] is not None and b[6] is not None and a[6] != b[6]:
@@ -254,11 +281,12 @@ def invariants_separate(ia, ib):
         if a[7] is not None and b[7] is not None and a[7] != b[7]:
             reasons.append("weight enumerator of the hull of the Z row space")
             continue
-        return None                                   # this orientation is not refuted
+        return None  # this orientation is not refuted
     return reasons[0] if reasons[0] == reasons[1] else " / ".join(reasons)
 
 
 # -- the light vectors of a row space (Brouwer-Zimmermann) ---------------------
+
 
 def _permute_bits(v, perm):
     out, i = 0, 0
@@ -292,7 +320,7 @@ def information_sets(basis, n, kernel_bits=KERNEL_BITS, order=None):
     while True:
         avail = ((1 << n) - 1) & ~used
         rows = list(basis)
-        pivots = {}                                   # pivot column -> row index
+        pivots = {}  # pivot column -> row index
         taken = 0
         while True:
             cand = None
@@ -334,12 +362,13 @@ def _thresholds(sets, wmax):
     def marginal(i, t):
         r, kap = len(sets[i][0]), len(sets[i][1])
         return comb(r, t) << kap
+
     ts = [0] * len(sets)
     cost = sum(marginal(i, 0) for i in range(len(sets)))
     while sum(t + 1 for t in ts) <= wmax:
         open_sets = [i for i in range(len(sets)) if ts[i] < len(sets[i][0])]
         if not open_sets:
-            break                                     # every set enumerates its whole row space
+            break  # every set enumerates its whole row space
         i = min(open_sets, key=lambda i: marginal(i, ts[i] + 1))
         ts[i] += 1
         cost += marginal(i, ts[i])
@@ -363,6 +392,7 @@ def _unpack(rows):
 def _enumerate_set(systematic, kernel, t, n, wmax, found):
     """Add to ``found`` every sum of at most ``t`` systematic rows and a kernel combination with weight <= wmax."""
     from itertools import combinations
+
     R = _pack(systematic, n)
     span = [0]
     for v in kernel:
@@ -377,13 +407,14 @@ def _enumerate_set(systematic, kernel, t, n, wmax, found):
             hit = np.flatnonzero(wt <= wmax)
             if hit.size:
                 found.update(v for v in _unpack(block[hit]) if v)
-    keep(np.zeros((1, R.shape[1]), dtype=np.uint64))            # s = 0
+
+    keep(np.zeros((1, R.shape[1]), dtype=np.uint64))  # s = 0
     if t >= 1 and r:
-        keep(R)                                                    # s = 1
+        keep(R)  # s = 1
     if t >= 2 and r >= 2:
         pairs = [(i, j) for i in range(r) for j in range(i + 1, r)]
         P = np.array([R[i] ^ R[j] for i, j in pairs], dtype=np.uint64)
-        start = [0] * (r + 1)                                      # first pair with i >= q
+        start = [0] * (r + 1)  # first pair with i >= q
         pos = 0
         for q in range(r + 1):
             while pos < len(pairs) and pairs[pos][0] < q:
@@ -416,11 +447,12 @@ def light_vectors(vecs, n, wmax, budget=DEFAULT_BUDGET, tries=ORDER_TRIES):
     number of row sums, and the order's seed.
     """
     import random
+
     basis = echelon_basis(vecs)
     if not basis:
         return [], {"sets": [], "row_sums": 0}
     best = None
-    for seed in range(tries):                          # the natural column order, then seeded shuffles
+    for seed in range(tries):  # the natural column order, then seeded shuffles
         order = None
         if seed:
             order = list(range(n))
@@ -430,8 +462,11 @@ def light_vectors(vecs, n, wmax, budget=DEFAULT_BUDGET, tries=ORDER_TRIES):
         if best is None or cost < best[2]:
             best = (sets, ts, cost, seed)
     sets, ts, cost, seed = best
-    plan = {"sets": [{"rank": len(s), "kernel": len(kk), "t": t} for (s, kk), t in zip(sets, ts)],
-            "row_sums": cost, "column_order_seed": seed}
+    plan = {
+        "sets": [{"rank": len(s), "kernel": len(kk), "t": t} for (s, kk), t in zip(sets, ts)],
+        "row_sums": cost,
+        "column_order_seed": seed,
+    }
     if cost > budget:
         return None, plan
     found = set()
@@ -474,15 +509,18 @@ def light_vector_stage(a, b, budget=DEFAULT_BUDGET):
         out[key]["checks_only"] = {"X": lx == X, "Z": lz == Z}
         lists[key] = (lx, lz)
     ca, cb = out["first"]["counts"], out["second"]["counts"]
-    agree = [swap for swap in (False, True)
-             if (ca["X"], ca["Z"]) == ((cb["Z"], cb["X"]) if swap else (cb["X"], cb["Z"]))]
+    agree = [
+        swap for swap in (False, True) if (ca["X"], ca["Z"]) == ((cb["Z"], cb["X"]) if swap else (cb["X"], cb["Z"]))
+    ]
     if not agree:
-        w = next(w for w in range(wmax + 1)
-                 if ca["X"][w] != cb["X"][w] or ca["Z"][w] != cb["Z"][w])
+        w = next(w for w in range(wmax + 1) if ca["X"][w] != cb["X"][w] or ca["Z"][w] != cb["Z"][w])
         out["outcome"] = "counts differ"
         out["seconds"] = round(time.monotonic() - t0, 2)
-        return ("inequivalent", f"count of row-space vectors of weight {w} differs in both orientations "
-                                f"(enumeration complete to weight {wmax})"), out
+        return (
+            "inequivalent",
+            f"count of row-space vectors of weight {w} differs in both orientations "
+            f"(enumeration complete to weight {wmax})",
+        ), out
     ha = I.Code(a.id + "@light", a.n, I.ints_to_rows(lists["first"][0]), I.ints_to_rows(lists["first"][1]))
     hb = I.Code(b.id + "@light", b.n, I.ints_to_rows(lists["second"][0]), I.ints_to_rows(lists["second"][1]))
     for swap in agree:
@@ -495,12 +533,15 @@ def light_vector_stage(a, b, budget=DEFAULT_BUDGET):
     out["outcome"] = "hypergraphs not isomorphic"
     out["seconds"] = round(time.monotonic() - t0, 2)
     tail = "; they are exactly the check rows, so this is the Tanner comparison made decisive)" if tanner else ")"
-    return ("inequivalent",
-            f"the hypergraphs of all row-space vectors of weight at most {wmax} are not isomorphic in any "
-            "orientation (the lists are complete and span the row spaces, so no permutation exists" + tail), out
+    return (
+        "inequivalent",
+        f"the hypergraphs of all row-space vectors of weight at most {wmax} are not isomorphic in any "
+        "orientation (the lists are complete and span the row spaces, so no permutation exists" + tail,
+    ), out
 
 
 # -- the decision --------------------------------------------------------------
+
 
 def find_permutation(a, b):
     """(perm, swap) from nauty on the typed Tanner graphs, else (None, None)."""
@@ -517,15 +558,26 @@ def _equivalent(out, a, b, doc_a, doc_b, perm, swap, how):
         out.update(verdict="undecided", reason=f"{how} isomorphism did not verify on the row spaces", detail=detail)
         return
     ctrl = PE.negative_control(doc_a, doc_b, perm) if not swap else None
-    out.update(verdict="equivalent", permutation=perm, swap=swap, found_by=how, row_spaces=detail,
-               negative_control={True: "a perturbed permutation fails",
-                                 False: "skipped: the perturbation is an automorphism",
-                                 None: "not run for a swapped pair"}[ctrl])
+    out.update(
+        verdict="equivalent",
+        permutation=perm,
+        swap=swap,
+        found_by=how,
+        row_spaces=detail,
+        negative_control={
+            True: "a perturbed permutation fails",
+            False: "skipped: the perturbation is an automorphism",
+            None: "not run for a swapped pair",
+        }[ctrl],
+    )
     da, db = a.meta.get("d"), b.meta.get("d")
     if da is not None and db is not None and da != db:
-        out["distance_conflict"] = {"first_d": da, "second_d": db,
-                                    "note": f"one code under two claims; the weight-{min(da, db)} witness "
-                                            f"transports, so the claim of {max(da, db)} is over-stated"}
+        out["distance_conflict"] = {
+            "first_d": da,
+            "second_d": db,
+            "note": f"one code under two claims; the weight-{min(da, db)} witness "
+            f"transports, so the claim of {max(da, db)} is over-stated",
+        }
 
 
 def decide(a, b, doc_a, doc_b, budget=DEFAULT_BUDGET):
@@ -557,23 +609,30 @@ def decide(a, b, doc_a, doc_b, budget=DEFAULT_BUDGET):
     if TB.is_generalised_bicycle(doc_a) and TB.is_generalised_bicycle(doc_b):
         gb = TB.equivalent(doc_a, doc_b)
         if gb is None:
-            out.update(verdict="gb_family_no",
-                       reason="both are cyclic two-block codes and no unit map, shift, or block swap "
-                              "carries one onto the other (verify/two_block_equivalence.py)")
+            out.update(
+                verdict="gb_family_no",
+                reason="both are cyclic two-block codes and no unit map, shift, or block swap "
+                "carries one onto the other (verify/two_block_equivalence.py)",
+            )
         else:
-            out.update(verdict="undecided",
-                       reason=f"the two-block decider reports unit {gb[0]} (swap {gb[1]}) but no Tanner "
-                              "isomorphism was found; left for a human")
+            out.update(
+                verdict="undecided",
+                reason=f"the two-block decider reports unit {gb[0]} (swap {gb[1]}) but no Tanner "
+                "isomorphism was found; left for a human",
+            )
         out["seconds"] = round(time.monotonic() - t0, 2)
         return out
-    out.update(verdict="undecided",
-               reason=f"invariants agree, Tanner graphs are not isomorphic, and the light-vector enumeration is "
-                      f"{light['outcome']}")
+    out.update(
+        verdict="undecided",
+        reason=f"invariants agree, Tanner graphs are not isomorphic, and the light-vector enumeration is "
+        f"{light['outcome']}",
+    )
     out["seconds"] = round(time.monotonic() - t0, 2)
     return out
 
 
 # -- the board's WL clusters ------------------------------------------------
+
 
 def wl_clusters():
     """Entries sharing a WL signature with different fingerprints, from the verifier's own reports."""
@@ -615,24 +674,34 @@ _TWO_BGA = re.compile(r"2bga:SmallGroup\((\d+),(\d+)\):a\[([\d, ]*)\]:b\[([\d, ]
 def rebuild_2bga(match_id):
     """(HX, HZ) of an archive row from its committed GAP table; identity implicit unless listed."""
     from group_algebra import build_2bga_small_group
+
     m = _TWO_BGA.match(match_id)
     order, gid = int(m.group(1)), int(m.group(2))
 
     def zero_based(text):
         idx = [int(x) - 1 for x in text.split(",") if x.strip()]
         return idx if 0 in idx else [0] + idx
+
     return build_2bga_small_group(order, gid, zero_based(m.group(3)), zero_based(m.group(4)))
 
 
 def fetch_qecdb(record_id, fetch=None):
     """Fetch the record's H rows (Pauli strings) and parameters from the public API."""
     if fetch is None:
+
         def fetch(url):
             with urllib.request.urlopen(url, timeout=60) as r:
                 return json.loads(r.read().decode("utf-8"))
+
     rec = fetch(QECDB_API.format(record_id))
-    return {"id": record_id, "name": rec.get("name"), "n": rec.get("n"), "k": rec.get("k"),
-            "css": rec.get("css"), "rows": rec["H"].split()}
+    return {
+        "id": record_id,
+        "name": rec.get("name"),
+        "n": rec.get("n"),
+        "k": rec.get("k"),
+        "css": rec.get("css"),
+        "rows": rec["H"].split(),
+    }
 
 
 def qecdb_matrices(rows):
@@ -667,8 +736,13 @@ def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES, budget=DEFAULT_BUDGET
             doc = json.load(f)
         board = code_from_doc(slug, doc)
         for m in ent.get("matches", []):
-            rec = {"slug": slug, "blob": blob_sha(path), "source": m.get("source"), "id": m.get("id"),
-                   "ref": m.get("ref")}
+            rec = {
+                "slug": slug,
+                "blob": blob_sha(path),
+                "source": m.get("source"),
+                "id": m.get("id"),
+                "ref": m.get("ref"),
+            }
             try:
                 if m.get("source", "").startswith("lin_pryadko_2bga"):
                     HX, HZ = rebuild_2bga(m["id"])
@@ -699,23 +773,33 @@ def audit_literature(fetch=None, slugs=ISSUE_1204_MATCHES, budget=DEFAULT_BUDGET
                     verdict, light = light_vector_stage(lit, board, budget)
                     rec["light_vectors"] = light
                     if verdict is None:
-                        rec.update(verdict="undecided", reason="no Tanner isomorphism, the invariants agree, and "
-                                   f"the light-vector enumeration is {light['outcome']}")
+                        rec.update(
+                            verdict="undecided",
+                            reason="no Tanner isomorphism, the invariants agree, and "
+                            f"the light-vector enumeration is {light['outcome']}",
+                        )
                     elif verdict[0] == "inequivalent":
                         rec.update(verdict="inequivalent", reason=verdict[1])
                     else:
                         perm, swap, how = verdict[1], verdict[2], "hypergraph"
             if perm is not None:
                 ok, detail = PE.check_pair(lit_doc, doc, perm, swap=swap)
-                rec.update(verdict="equivalent" if ok else "undecided", permutation=perm, swap=swap,
-                           found_by=how, row_spaces=detail,
-                           literature_n=lit.n, literature_k=lit.k())
+                rec.update(
+                    verdict="equivalent" if ok else "undecided",
+                    permutation=perm,
+                    swap=swap,
+                    found_by=how,
+                    row_spaces=detail,
+                    literature_n=lit.n,
+                    literature_k=lit.k(),
+                )
             out.append(rec)
             print(f"{rec['verdict']:13s} {slug} <- {m['id']}", flush=True)
     return out
 
 
 # -- the record and its re-check --------------------------------------------------
+
 
 def run(out_path, fetch=None, all_literature=False, budget=DEFAULT_BUDGET):
     t0 = time.monotonic()
@@ -727,19 +811,24 @@ def run(out_path, fetch=None, all_literature=False, budget=DEFAULT_BUDGET):
         "issue": 3427,
         "date": datetime.date.today().isoformat(),
         "head": head,
-        "literature_scope": ("every literature row of derived.json" if all_literature
-                             else "the 41 matches of issue #1204"),
+        "literature_scope": (
+            "every literature row of derived.json" if all_literature else "the 41 matches of issue #1204"
+        ),
         "semantics": "permutation[i] = j means qubit i of the first code is qubit j of the second; equivalence "
-                     "means the permuted X and Z row spaces of the first equal those of the second, after an "
-                     "X/Z swap when swap is true",
+        "means the permuted X and Z row spaces of the first equal those of the second, after an "
+        "X/Z swap when swap is true",
         "enum_budget": budget,
         "counts": {
             "board_pairs": len(board),
-            "board": {v: sum(1 for p in board if p["verdict"] == v)
-                      for v in ("equivalent", "inequivalent", "gb_family_no", "undecided")},
+            "board": {
+                v: sum(1 for p in board if p["verdict"] == v)
+                for v in ("equivalent", "inequivalent", "gb_family_no", "undecided")
+            },
             "literature_matches": len(lit),
-            "literature": {v: sum(1 for p in lit if p["verdict"] == v)
-                           for v in ("equivalent", "inequivalent", "undecided", "not_re_derived")},
+            "literature": {
+                v: sum(1 for p in lit if p["verdict"] == v)
+                for v in ("equivalent", "inequivalent", "undecided", "not_re_derived")
+            },
         },
         "board_pairs": board,
         "literature": lit,
@@ -763,8 +852,10 @@ def recheck(path):
         a, b = PE.load_blob(p["first_blob"]), PE.load_blob(p["second_blob"])
         ok, detail = PE.check_pair(a, b, p["permutation"], swap=p.get("swap", False))
         failures += 0 if ok else 1
-        print(f"{'EQUIVALENT' if ok else 'NOT EQUIVALENT'}  {p['first']} -> {p['second']}  "
-              f"X {detail.get('X')}  Z {detail.get('Z')}")
+        print(
+            f"{'EQUIVALENT' if ok else 'NOT EQUIVALENT'}  {p['first']} -> {p['second']}  "
+            f"X {detail.get('X')}  Z {detail.get('Z')}"
+        )
     for p in rec["literature"]:
         if p["verdict"] != "equivalent":
             continue
@@ -774,11 +865,14 @@ def recheck(path):
         else:
             HX, HZ = rebuild_2bga(p["id"])
         lit = code_from_matrices(p["id"], HX, HZ)
-        ok, detail = PE.check_pair({"n": lit.n, "checks": {"X": lit.X, "Z": lit.Z}}, board,
-                                   p["permutation"], swap=p.get("swap", False))
+        ok, detail = PE.check_pair(
+            {"n": lit.n, "checks": {"X": lit.X, "Z": lit.Z}}, board, p["permutation"], swap=p.get("swap", False)
+        )
         failures += 0 if ok else 1
-        print(f"{'EQUIVALENT' if ok else 'NOT EQUIVALENT'}  {p['id']} -> {p['slug']}  "
-              f"X {detail.get('X')}  Z {detail.get('Z')}")
+        print(
+            f"{'EQUIVALENT' if ok else 'NOT EQUIVALENT'}  {p['id']} -> {p['slug']}  "
+            f"X {detail.get('X')}  Z {detail.get('Z')}"
+        )
     print(f"{failures} failure(s)")
     return failures
 
@@ -788,10 +882,17 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="audit the board's WL clusters and the literature matches")
     r.add_argument("--out", default=os.path.join(HERE, f"permutation_audit-{datetime.date.today().isoformat()}.json"))
-    r.add_argument("--all-literature", action="store_true",
-                   help="re-derive every literature row of derived.json, not only the 41 of issue #1204")
-    r.add_argument("--enum-budget", type=float, default=DEFAULT_BUDGET,
-                   help="row sums the light-vector enumeration may plan per row space (default %(default)s)")
+    r.add_argument(
+        "--all-literature",
+        action="store_true",
+        help="re-derive every literature row of derived.json, not only the 41 of issue #1204",
+    )
+    r.add_argument(
+        "--enum-budget",
+        type=float,
+        default=DEFAULT_BUDGET,
+        help="row sums the light-vector enumeration may plan per row space (default %(default)s)",
+    )
     c = sub.add_parser("recheck", help="re-verify the permutations a record carries")
     c.add_argument("record")
     args = ap.parse_args(argv)

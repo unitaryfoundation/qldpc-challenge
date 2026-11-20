@@ -12,6 +12,7 @@ and intersection enumerators read right on the Steane code, the swapped
 orientation compares one side swapped, and three of the pairs the 2026-10-17
 record left undecided are decided by the stage the new record names.
 """
+
 import glob
 import json
 import os
@@ -68,16 +69,17 @@ def test_an_invariant_difference_refutes_without_a_search():
     # the [[4,2,2]] code against a [[4,1,?]] code with one more Z check: ranks differ
     a = _code("a", [[0, 1, 2, 3]], [[0, 1, 2, 3]], 4, 2)
     b = _code("b", [[0, 1, 2, 3]], [[0, 1, 2, 3], [0, 1]], 4, 2)
-    rec = PA.decide(a, b, _doc([[0, 1, 2, 3]], [[0, 1, 2, 3]], 4, 2),
-                    _doc([[0, 1, 2, 3]], [[0, 1, 2, 3], [0, 1]], 4, 2))
+    rec = PA.decide(
+        a, b, _doc([[0, 1, 2, 3]], [[0, 1, 2, 3]], 4, 2), _doc([[0, 1, 2, 3]], [[0, 1, 2, 3], [0, 1]], 4, 2)
+    )
     assert rec["verdict"] == "inequivalent" and "ranks" in rec["reason"]
 
 
 def test_the_low_weight_enumerator_separates_what_ranks_do_not():
     # two [[6,2,?]] codes with equal ranks whose X row spaces have different weight-2 counts
     Z = [[0, 1, 2, 3, 4, 5]]
-    X1 = [[0, 1], [2, 3]]                 # row space holds two weight-2 vectors
-    X2 = [[0, 1, 2, 3], [0, 1, 4, 5]]     # row space holds none
+    X1 = [[0, 1], [2, 3]]  # row space holds two weight-2 vectors
+    X2 = [[0, 1, 2, 3], [0, 1, 4, 5]]  # row space holds none
     rec = PA.decide(_code("a", X1, Z, 6, 2), _code("b", X2, Z, 6, 2), _doc(X1, Z, 6, 2), _doc(X2, Z, 6, 2))
     assert rec["verdict"] == "inequivalent" and "low-weight enumerator" in rec["reason"]
 
@@ -122,6 +124,7 @@ def test_literature_rows_in_the_record_are_kept_for_the_trail():
 
 # -- the light-vector stage and the hull invariants (issue #4057) --------------
 
+
 def _gray_enumeration(vecs, wmax):
     basis, out, cur = PA.echelon_basis(vecs), set(), 0
     for g in range(1, 2 ** len(basis)):
@@ -134,6 +137,7 @@ def _gray_enumeration(vecs, wmax):
 def test_the_light_vector_enumeration_is_complete():
     """Brouwer-Zimmermann over the sets agrees with the whole row space, partial sets included."""
     import random
+
     rng = random.Random(4057)
     for _ in range(40):
         n, k = rng.randint(4, 28), rng.randint(1, 13)
@@ -146,8 +150,9 @@ def test_the_light_vector_enumeration_is_complete():
 
 def test_a_partial_information_set_carries_its_kernel():
     import random
+
     rng = random.Random(1)
-    vecs = [rng.getrandbits(20) for _ in range(12)]          # 12 of 20 columns: the second set is partial
+    vecs = [rng.getrandbits(20) for _ in range(12)]  # 12 of 20 columns: the second set is partial
     sets = PA.information_sets(PA.echelon_basis(vecs), 20)
     assert len(sets) == 2 and len(sets[1][0]) + len(sets[1][1]) == len(sets[0][0])
     got, _ = PA.light_vectors(vecs, 20, 20)
@@ -156,6 +161,7 @@ def test_a_partial_information_set_carries_its_kernel():
 
 def test_the_budget_leaves_a_pair_undecided_instead_of_guessing():
     import random
+
     rng = random.Random(2)
     vecs = [rng.getrandbits(60) for _ in range(30)]
     got, plan = PA.light_vectors(vecs, 60, 30, budget=10)

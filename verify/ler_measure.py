@@ -18,6 +18,7 @@ steps until every basis carries at least MIN_FAILURES failures at the rate,
 and a point whose failure fraction exceeds the saturation bound is reported
 and not written. Entries written here declare schema 0.5.
 """
+
 import argparse
 import json
 import os
@@ -32,12 +33,12 @@ import ler_verify as lv
 SHOT_STEPS = (10_000, 20_000, 40_000, 80_000, 160_000, 320_000)
 
 
-def measure_point(circuit, n, rounds, p, seed, shots=None, log=print,
-                  decoder=lt.DECODER_ID):
+def measure_point(circuit, n, rounds, p, seed, shots=None, log=print, decoder=lt.DECODER_ID):
     """One basis's point at rate p under ``decoder``, or None if saturated.
     Raises shots along SHOT_STEPS until the failure floor is met (or shots is
     given). Raises ValueError when the decoder is not in the registry or not
-    admitted on this circuit."""
+    admitted on this circuit.
+    """
     skel = ct.strip_noise(circuit)
     noisy = ct.apply_noise(skel, n, p=p)
     admitted, why = lt.decoder_admits(decoder, noisy)
@@ -54,11 +55,15 @@ def measure_point(circuit, n, rounds, p, seed, shots=None, log=print,
             break
     p_shot = failures / s
     lo, hi = lt.wilson_ci(failures, s)
-    return {"p": p, "shots": s, "failures": failures, "seed": seed,
-            "decoder": decoder,
-            "ler_per_round": round(lt.per_round(p_shot, rounds), 9),
-            "ci95": [round(lt.per_round(lo, rounds), 9),
-                     round(lt.per_round(hi, rounds), 9)]}
+    return {
+        "p": p,
+        "shots": s,
+        "failures": failures,
+        "seed": seed,
+        "decoder": decoder,
+        "ler_per_round": round(lt.per_round(p_shot, rounds), 9),
+        "ci95": [round(lt.per_round(lo, rounds), 9), round(lt.per_round(hi, rounds), 9)],
+    }
 
 
 def main(argv=None):
@@ -67,13 +72,18 @@ def main(argv=None):
     ap.add_argument("--p", type=float, nargs="+", required=True)
     ap.add_argument("--shots", type=int, default=None)
     ap.add_argument("--seed", type=int, default=20261006)
-    ap.add_argument("--decoder", choices=list(lt.DECODERS), default=lt.DECODER_ID,
-                    help="registry decoder to measure with (default: the reference decoder)")
+    ap.add_argument(
+        "--decoder",
+        choices=list(lt.DECODERS),
+        default=lt.DECODER_ID,
+        help="registry decoder to measure with (default: the reference decoder)",
+    )
     ap.add_argument("--replace", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--circuits-dir", default=None)
     a = ap.parse_args(argv)
     import stim
+
     with open(a.code, encoding="utf-8") as f:
         raw = f.read()
     doc = json.loads(raw)
@@ -81,8 +91,7 @@ def main(argv=None):
     m = re.match(r"\{\n( +)\"", raw)
     indent = len(m.group(1)) if m else 1
     slug = os.path.splitext(os.path.basename(a.code))[0]
-    cdir = a.circuits_dir or os.path.join(
-        os.path.dirname(os.path.abspath(a.code)), "..", "circuits", slug)
+    cdir = a.circuits_dir or os.path.join(os.path.dirname(os.path.abspath(a.code)), "..", "circuits", slug)
     circ = doc.get("circuit")
     if not circ:
         print("no circuit tier; measure needs committed memory circuits")
@@ -95,15 +104,12 @@ def main(argv=None):
     out = {}
     for side, fname in lv.SIDE_FILES.items():
         existing = [] if a.replace else list(lv.points_of(ler.get(side)) or [])
-        existing = [q for q in existing
-                    if not (q.get("p") in a.p
-                            and q.get("decoder", lt.DECODER_ID) == a.decoder)]
+        existing = [q for q in existing if not (q.get("p") in a.p and q.get("decoder", lt.DECODER_ID) == a.decoder)]
         circuit = stim.Circuit.from_file(os.path.join(cdir, fname + ".stim"))
         print(f"  {side} ({a.decoder}):")
         for p in a.p:
             try:
-                point = measure_point(circuit, doc["n"], circ["rounds"], p,
-                                      a.seed, a.shots, decoder=a.decoder)
+                point = measure_point(circuit, doc["n"], circ["rounds"], p, a.seed, a.shots, decoder=a.decoder)
             except ValueError as e:
                 print(f"    {e}")
                 return 2

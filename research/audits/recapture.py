@@ -63,6 +63,7 @@ Usage:
 RECORDS are ``.jsonl`` or ``.jsonl.gz`` files; T defaults to
 ``research/audits/recapture/incidence.json``.
 """
+
 import argparse
 import datetime
 import gzip
@@ -89,6 +90,7 @@ MAX_IDS = 5000
 
 
 # -- records -------------------------------------------------------------------
+
 
 def read_records(paths):
     """Yield the records in ``paths`` (``.jsonl`` or ``.jsonl.gz``), ``None`` per unreadable line.
@@ -124,6 +126,7 @@ def load_records(paths):
 
 # -- the incidence table -----------------------------------------------------------
 
+
 def new_table():
     return {"table_version": TABLE_VERSION, "updated": None, "folded_records": 0, "entries": {}}
 
@@ -156,9 +159,11 @@ def _run_key(rec):
 
 def _stratum(table, slug, side, key, rec):
     entries = table["entries"]
-    st = entries.setdefault(slug, {}).setdefault(side, {}).setdefault(key, {
-        "runs": [], "trials": 0, "claimed_d": rec.get("claimed_d"), "refuted_runs": 0,
-        "classes": {}})
+    st = (
+        entries.setdefault(slug, {})
+        .setdefault(side, {})
+        .setdefault(key, {"runs": [], "trials": 0, "claimed_d": rec.get("claimed_d"), "refuted_runs": 0, "classes": {}})
+    )
     return st
 
 
@@ -193,8 +198,7 @@ def fold(table, records):
                     if i < len(ids) and ids[i] is not None:
                         per_w[w][unit].add(ids[i])
             for w, found in per_w.items():
-                cls = st["classes"].setdefault(str(w), {
-                    "runs_with": 0, "censored": False, "op": {}, "cls": {}})
+                cls = st["classes"].setdefault(str(w), {"runs_with": 0, "censored": False, "op": {}, "cls": {}})
                 cls["runs_with"] += 1
                 if block.get("overflow"):
                     cls["censored"] = True
@@ -216,6 +220,7 @@ def fold(table, records):
 
 # -- the estimate ---------------------------------------------------------------------
 
+
 def chao(s_obs, f1, f2, runs):
     """Bias-corrected incidence Chao estimate with its 95% interval.
 
@@ -231,13 +236,14 @@ def chao(s_obs, f1, f2, runs):
     a = (runs - 1) / runs
     if f2 > 0:
         est = s_obs + a * f1 * (f1 - 1) / (2 * (f2 + 1))
-        var = (a * f1 * (f1 - 1) / (2 * (f2 + 1))
-               + a * a * f1 * (2 * f1 - 1) ** 2 / (4 * (f2 + 1) ** 2)
-               + a * a * f1 * f1 * f2 * (f1 - 1) ** 2 / (4 * (f2 + 1) ** 4))
+        var = (
+            a * f1 * (f1 - 1) / (2 * (f2 + 1))
+            + a * a * f1 * (2 * f1 - 1) ** 2 / (4 * (f2 + 1) ** 2)
+            + a * a * f1 * f1 * f2 * (f1 - 1) ** 2 / (4 * (f2 + 1) ** 4)
+        )
     else:
         est = s_obs + a * f1 * (f1 - 1) / 2
-        var = (a * f1 * (f1 - 1) / 2 + a * a * f1 * (2 * f1 - 1) ** 2 / 4
-               - a * a * f1 ** 4 / (4 * est))
+        var = a * f1 * (f1 - 1) / 2 + a * a * f1 * (2 * f1 - 1) ** 2 / 4 - a * a * f1**4 / (4 * est)
     var = max(var, 0.0)
     t = est - s_obs
     if t <= 0 or var <= 0:
@@ -271,13 +277,19 @@ def census_from_table(table, *, unit="op", min_runs=2, slugs=None):
             out[slug][side] = {}
             for key, st in sorted(batteries.items()):
                 m = len(st["runs"])
-                stratum = {"runs": m, "trials": st["trials"],
-                           "seeds": sorted({int(r.split(":")[0]) for r in st["runs"]}),
-                           "claimed_d": st.get("claimed_d"), "refuted_runs": st["refuted_runs"],
-                           "classes": {}, "note": None}
+                stratum = {
+                    "runs": m,
+                    "trials": st["trials"],
+                    "seeds": sorted({int(r.split(":")[0]) for r in st["runs"]}),
+                    "claimed_d": st.get("claimed_d"),
+                    "refuted_runs": st["refuted_runs"],
+                    "classes": {},
+                    "note": None,
+                }
                 if not st["classes"]:
-                    stratum["note"] = (f"no logical found at weight <= {st.get('claimed_d')} in "
-                                       f"{m} run(s), {st['trials']} trials")
+                    stratum["note"] = (
+                        f"no logical found at weight <= {st.get('claimed_d')} in {m} run(s), {st['trials']} trials"
+                    )
                 elif m < min_runs:
                     stratum["note"] = f"{m} run(s): no recapture to estimate from yet"
                 else:
@@ -291,15 +303,27 @@ def census_from_table(table, *, unit="op", min_runs=2, slugs=None):
                         f2 = sum(1 for c in counts if c == 2)
                         incidences = sum(counts)
                         mean_inc = incidences / s_obs
-                        row = {"S_obs": s_obs, "f1": f1, "f2": f2,
-                               "incidences": incidences, "mean_incidence": round(mean_inc, 2),
-                               "runs_with_captures": cls["runs_with"], "censored": bool(cls["censored"]),
-                               "calibrated": False, "estimate": None, "ci95": None, "coverage": None}
+                        row = {
+                            "S_obs": s_obs,
+                            "f1": f1,
+                            "f2": f2,
+                            "incidences": incidences,
+                            "mean_incidence": round(mean_inc, 2),
+                            "runs_with_captures": cls["runs_with"],
+                            "censored": bool(cls["censored"]),
+                            "calibrated": False,
+                            "estimate": None,
+                            "ci95": None,
+                            "coverage": None,
+                        }
                         if not cls["censored"]:
                             est, lo, hi, _ = chao(s_obs, f1, f2, m)
-                            row.update(estimate=round(est, 2), ci95=[round(lo, 2), round(hi, 2)],
-                                       coverage=round(s_obs / est, 3) if est > 0 else None,
-                                       calibrated=mean_inc >= MIN_MEAN_INCIDENCE)
+                            row.update(
+                                estimate=round(est, 2),
+                                ci95=[round(lo, 2), round(hi, 2)],
+                                coverage=round(s_obs / est, 3) if est > 0 else None,
+                                calibrated=mean_inc >= MIN_MEAN_INCIDENCE,
+                            )
                         stratum["classes"][int(w_key)] = row
                 out[slug][side][key] = stratum
     return out
@@ -314,12 +338,15 @@ def census(records, *, unit="op", min_runs=2):
 
 # -- the report ------------------------------------------------------------------------
 
+
 def render(result, unit="op"):
     """Markdown: one table of estimates, then the strata with nothing to estimate."""
     what = "operators" if unit == "op" else "classes"
-    lines = [f"| entry | side | battery | runs | w | {what} seen | f1 | f2 | mean recaptures | "
-             "estimate | 95% CI | coverage |",
-             "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    lines = [
+        f"| entry | side | battery | runs | w | {what} seen | f1 | f2 | mean recaptures | "
+        "estimate | 95% CI | coverage |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
     quiet = []
     sparse = censored = False
     for slug, sides in result.items():
@@ -331,26 +358,36 @@ def render(result, unit="op"):
                 for w, c in st["classes"].items():
                     if c["censored"]:
                         censored = True
-                        lines.append(f"| `{slug}` | {side} | {key} | {st['runs']} | {w} | >= {c['S_obs']} "
-                                     f"(censored) | {c['f1']} | {c['f2']} | {c['mean_incidence']} | "
-                                     "withheld | | |")
+                        lines.append(
+                            f"| `{slug}` | {side} | {key} | {st['runs']} | {w} | >= {c['S_obs']} "
+                            f"(censored) | {c['f1']} | {c['f2']} | {c['mean_incidence']} | "
+                            "withheld | | |"
+                        )
                         continue
                     ci = f"[{c['ci95'][0]}, {c['ci95'][1]}]"
                     if not c["calibrated"]:
                         ci += " (sparse)"
                         sparse = True
-                    lines.append(f"| `{slug}` | {side} | {key} | {st['runs']} | {w} | {c['S_obs']} | "
-                                 f"{c['f1']} | {c['f2']} | {c['mean_incidence']} | {c['estimate']} | "
-                                 f"{ci} | {c['coverage']} |")
+                    lines.append(
+                        f"| `{slug}` | {side} | {key} | {st['runs']} | {w} | {c['S_obs']} | "
+                        f"{c['f1']} | {c['f2']} | {c['mean_incidence']} | {c['estimate']} | "
+                        f"{ci} | {c['coverage']} |"
+                    )
     if len(lines) == 2:
         lines = ["No weight class has captures in two or more runs yet."]
     if sparse:
-        lines += ["", f"(sparse): each observed logical was found in fewer than {MIN_MEAN_INCIDENCE:g} runs "
-                  "on average, the regime where the interval failed calibration in both directions; "
-                  "read the count, not the interval."]
+        lines += [
+            "",
+            f"(sparse): each observed logical was found in fewer than {MIN_MEAN_INCIDENCE:g} runs "
+            "on average, the regime where the interval failed calibration in both directions; "
+            "read the count, not the interval.",
+        ]
     if censored:
-        lines += ["", f"(censored): a run hit the sweep's per-side cap or the table's {MAX_IDS} ids for "
-                  "this weight class, so the count is a floor and no estimate is made."]
+        lines += [
+            "",
+            f"(censored): a run hit the sweep's per-side cap or the table's {MAX_IDS} ids for "
+            "this weight class, so the count is a floor and no estimate is made.",
+        ]
     if quiet:
         lines += ["", "Budget only (no captures, or one run):"] + quiet
     return "\n".join(lines)
@@ -363,8 +400,9 @@ def main(argv=None):
     rep.add_argument("records", nargs="*", help="raw record files (.jsonl or .jsonl.gz); default: the table")
     rep.add_argument("--table", default=DEFAULT_TABLE, help="the incidence table (default: %(default)s)")
     rep.add_argument("--slug", action="append", default=None, help="only these entries (repeatable)")
-    rep.add_argument("--unit", choices=UNITS, default="op",
-                     help="count distinct operators (op, default) or logical classes (cls)")
+    rep.add_argument(
+        "--unit", choices=UNITS, default="op", help="count distinct operators (op, default) or logical classes (cls)"
+    )
     rep.add_argument("--min-runs", type=int, default=2, help="runs a stratum needs before an estimate (default 2)")
     rep.add_argument("--json", metavar="OUT", help="write the census as JSON here as well")
     fo = sub.add_parser("fold", help="add raw record files to the table")
@@ -377,9 +415,11 @@ def main(argv=None):
         records, skipped = load_records(args.records)
         added = fold(table, records)
         save_table(table, args.table)
-        print(f"folded {added} new run record(s) of {len(records)} read"
-              + (f", {skipped} unreadable line(s) skipped" if skipped else "")
-              + f" into {args.table} ({table['folded_records']} in all)")
+        print(
+            f"folded {added} new run record(s) of {len(records)} read"
+            + (f", {skipped} unreadable line(s) skipped" if skipped else "")
+            + f" into {args.table} ({table['folded_records']} in all)"
+        )
         return 0
 
     if args.records:
@@ -387,16 +427,21 @@ def main(argv=None):
         table = new_table()
         fold(table, records)
         source = f"{len(records)} record(s) from {len(args.records)} file(s)" + (
-            f", {skipped} unreadable line(s) skipped" if skipped else "")
+            f", {skipped} unreadable line(s) skipped" if skipped else ""
+        )
     else:
         if not os.path.exists(args.table):
-            print(f"no table at {args.table} and no record files given; run "
-                  "verify/refute_board.py --recapture PATH and fold it first", file=sys.stderr)
+            print(
+                f"no table at {args.table} and no record files given; run "
+                "verify/refute_board.py --recapture PATH and fold it first",
+                file=sys.stderr,
+            )
             return 2
         table = load_table(args.table)
         source = f"table {args.table}: {table['folded_records']} run record(s), updated {table['updated']}"
-    result = census_from_table(table, unit=args.unit, min_runs=args.min_runs,
-                               slugs=set(args.slug) if args.slug else None)
+    result = census_from_table(
+        table, unit=args.unit, min_runs=args.min_runs, slugs=set(args.slug) if args.slug else None
+    )
     print(source + "\n")
     print(render(result, unit=args.unit))
     if args.json:

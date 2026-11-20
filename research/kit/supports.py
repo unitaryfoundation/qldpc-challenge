@@ -40,6 +40,7 @@ so in the report.
 CLI: ``uv run python research/kit/supports.py codes/<slug>.json [--wmax W]``
 prints the report as JSON.
 """
+
 import json
 import os
 import sys
@@ -62,7 +63,7 @@ def _pack_cols(H):
     nw = (m + 63) // 64
     out = np.zeros((n, nw), dtype=np.uint64)
     for w in range(nw):
-        rows = H[w * 64:(w + 1) * 64]
+        rows = H[w * 64 : (w + 1) * 64]
         bits = rows.astype(np.uint64) << np.arange(rows.shape[0], dtype=np.uint64)[:, None]
         out[:, w] = bits.sum(axis=0, dtype=np.uint64)
     return out
@@ -104,7 +105,7 @@ def low_weight_kernel(H, wmax, *, chunk=2_000_000):
         syn = np.zeros((K, nw), dtype=np.uint64)
         if s > 0:
             for a in range(0, K, chunk):
-                syn[a:a + chunk] = np.bitwise_xor.reduce(cb[C[a:a + chunk].astype(np.int64)], axis=1)
+                syn[a : a + chunk] = np.bitwise_xor.reduce(cb[C[a : a + chunk].astype(np.int64)], axis=1)
         pad = np.full((K, h), -1, dtype=np.int16)
         pad[:, :s] = C
         sup_parts.append(pad)
@@ -122,14 +123,14 @@ def low_weight_kernel(H, wmax, *, chunk=2_000_000):
     for a, b in zip(starts[:-1], starts[1:]):
         if b - a < 2:
             continue
-        sets = [frozenset(int(x) for x in sup[i][:size[i]]) for i in range(a, b)]
+        sets = [frozenset(int(x) for x in sup[i][: size[i]]) for i in range(a, b)]
         for i, Si in enumerate(sets):
-            for Sj in sets[i + 1:]:
+            for Sj in sets[i + 1 :]:
                 pairs += 1
                 v = Si ^ Sj
                 if 0 < len(v) <= wmax:
                     found.add(v)
-    for v in found:                      # belt and braces: re-check against H
+    for v in found:  # belt and braces: re-check against H
         x = np.zeros(n, dtype=np.int8)
         x[list(v)] = 1
         assert not ((H @ x) % 2).any()
@@ -169,10 +170,14 @@ def automorphisms(n, supports, *, aut_cap=200_000):
         adj = {q: [] for q in range(n)}
         for i, S in enumerate(supports):
             adj[n + i] = sorted(S)
-        g = pynauty.Graph(n + len(supports), directed=False, adjacency_dict=adj,
-                          vertex_coloring=[set(range(n)), set(range(n, n + len(supports)))])
+        g = pynauty.Graph(
+            n + len(supports),
+            directed=False,
+            adjacency_dict=adj,
+            vertex_coloring=[set(range(n)), set(range(n, n + len(supports)))],
+        )
         _gens, size1, size2, orbit_ids, _norb = pynauty.autgrp(g)
-        order = int(round(size1 * 10 ** size2))
+        order = int(round(size1 * 10**size2))
         counts = {}
         for q in range(n):
             counts[orbit_ids[q]] = counts.get(orbit_ids[q], 0) + 1
@@ -180,6 +185,7 @@ def automorphisms(n, supports, *, aut_cap=200_000):
 
     import networkx as nx
     from networkx.algorithms.isomorphism import vf2pp_all_isomorphisms
+
     G = nx.Graph()
     for q in range(n):
         G.add_node(("q", q), kind="q")
@@ -221,36 +227,46 @@ def abelian_2bga_obstruction(HX, HZ, *, wmax=None, aut_cap=200_000):
     if wmax is None:
         wmax = int(min(HX.sum(1).min(), HZ.sum(1).min()))
     t0 = time.time()
-    kerZ, infoZ = low_weight_kernel(HZ, wmax)            # X-type operators
-    kerX, infoX = low_weight_kernel(HX, wmax)            # Z-type operators
+    kerZ, infoZ = low_weight_kernel(HZ, wmax)  # X-type operators
+    kerX, infoX = low_weight_kernel(HX, wmax)  # Z-type operators
     xs, xl = split_stabilizers(kerZ, HX, n)
     zs, zl = split_stabilizers(kerX, HZ, n)
     wmin = min(len(v) for v in xs | zs)
     xmin = {v for v in xs if len(v) == wmin}
     zmin = {v for v in zs if len(v) == wmin}
     minsup = xmin | zmin
-    rows = [frozenset(np.nonzero(r)[0].tolist()) for r in HX] + \
-           [frozenset(np.nonzero(r)[0].tolist()) for r in HZ]
+    rows = [frozenset(np.nonzero(r)[0].tolist()) for r in HX] + [frozenset(np.nonzero(r)[0].tolist()) for r in HZ]
     t1 = time.time()
     order, orbits, backend, capped = automorphisms(n, minsup, aut_cap=aut_cap)
     half = n // 2
     divides = order % half == 0
     orbits_ok = len(orbits) <= 2 and all(s % half == 0 for s in orbits)
     return {
-        "n": n, "wmax": wmax, "min_stabilizer_weight": wmin,
-        "x_stabilizers_le_wmax": len(xs), "z_stabilizers_le_wmax": len(zs),
+        "n": n,
+        "wmax": wmax,
+        "min_stabilizer_weight": wmin,
+        "x_stabilizers_le_wmax": len(xs),
+        "z_stabilizers_le_wmax": len(zs),
         "lightest_x_logical_le_wmax": min((len(v) for v in xl), default=None),
         "lightest_z_logical_le_wmax": min((len(v) for v in zl), default=None),
-        "min_supports": len(minsup), "x_min_supports": len(xmin), "z_min_supports": len(zmin),
+        "min_supports": len(minsup),
+        "x_min_supports": len(xmin),
+        "z_min_supports": len(zmin),
         "xz_shared_min_supports": len(xmin & zmin),
         "rows_are_exactly_the_min_supports": set(rows) == minsup,
-        "aut_order": order, "aut_backend": backend, "aut_capped": capped,
+        "aut_order": order,
+        "aut_backend": backend,
+        "aut_capped": capped,
         "qubit_orbit_sizes": orbits,
-        "half_n_divides_aut": divides, "orbits_compatible_with_2bga": orbits_ok,
+        "half_n_divides_aut": divides,
+        "orbits_compatible_with_2bga": orbits_ok,
         "abelian_2bga_realization_possible": divides and orbits_ok,
-        "work": {"ker_HZ": infoZ, "ker_HX": infoX,
-                 "seconds_enumeration": round(t1 - t0, 1),
-                 "seconds_automorphisms": round(time.time() - t1, 1)},
+        "work": {
+            "ker_HZ": infoZ,
+            "ker_HX": infoX,
+            "seconds_enumeration": round(t1 - t0, 1),
+            "seconds_automorphisms": round(time.time() - t1, 1),
+        },
     }
 
 
@@ -269,6 +285,7 @@ def _from_doc(path):
 
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("doc", help="submission JSON (codes/<slug>.json or a staged candidate)")
     ap.add_argument("--wmax", type=int, default=None, help="weight bound (default: lightest check)")

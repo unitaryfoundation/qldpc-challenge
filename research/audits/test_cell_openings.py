@@ -1,4 +1,5 @@
 """The openings record names the earliest member of each cell and family, as history and not a flag."""
+
 import glob
 import importlib.util
 import json
@@ -15,20 +16,32 @@ def _script():
 
 
 def _entry(slug, date, family, origin="submission", modular=False, geo_dim=None):
-    return {"slug": slug, "date": date, "family": family, "origin": origin, "n": 10, "k": 1, "d": 2,
-            "modular": modular, "geo_dim": geo_dim}
+    return {
+        "slug": slug,
+        "date": date,
+        "family": family,
+        "origin": origin,
+        "n": 10,
+        "k": 1,
+        "d": 2,
+        "modular": modular,
+        "geo_dim": geo_dim,
+    }
 
 
 def test_the_first_member_is_by_date_then_slug_and_per_family():
     mod = _script()
-    entries = [_entry("b-1-1", "2026-02-01", "tile"), _entry("a-1-1", "2026-02-01", "tile"),
-               _entry("c-1-1", "2026-01-01", "topological", origin="baseline", geo_dim=3),
-               _entry("d-1-1", "2026-03-01", "lifted-product", modular=True)]
+    entries = [
+        _entry("b-1-1", "2026-02-01", "tile"),
+        _entry("a-1-1", "2026-02-01", "tile"),
+        _entry("c-1-1", "2026-01-01", "topological", origin="baseline", geo_dim=3),
+        _entry("d-1-1", "2026-03-01", "lifted-product", modular=True),
+    ]
     cells = {("unrestricted", "weight-any"): [0, 1, 2, 3], ("unrestricted", "weight-4"): [0, 1]}
     out = mod.openings(entries, cells)
     big = out["unrestricted~weight-any"]
     assert big["first"]["slug"] == "c-1-1" and big["members"] == 4
-    assert big["first_by_declared_family"]["tile"]["slug"] == "a-1-1"      # same date: slug breaks the tie
+    assert big["first_by_declared_family"]["tile"]["slug"] == "a-1-1"  # same date: slug breaks the tie
     assert big["first_modular"]["slug"] == "d-1-1" and big["first_3d_layout"]["slug"] == "c-1-1"
     small = out["unrestricted~weight-4"]
     assert small["first"]["slug"] == "a-1-1" and small["first_modular"] is None

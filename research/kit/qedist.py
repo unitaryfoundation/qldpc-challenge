@@ -19,12 +19,10 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-
 QEDIST_SCHEMA = "cssdist.code.v1"
 
 
-def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True,
-                        symmetries: bool = False) -> dict:
+def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True, symmetries: bool = False) -> dict:
     """Convert a challenge code document (CSS) into a QEDist code document.
 
     With ``symmetries`` the document also carries ``symmetry_generators``,
@@ -35,9 +33,7 @@ def challenge_to_qedist(doc: dict, *, include_witnesses: bool = True,
     rejected, never trusted.
     """
     if doc.get("code_type", "CSS") != "CSS":
-        raise ValueError(
-            "QEDist only handles CSS codes; got code_type=%r" % doc.get("code_type")
-        )
+        raise ValueError("QEDist only handles CSS codes; got code_type=%r" % doc.get("code_type"))
     checks = doc.get("checks") or {}
     if "X" not in checks or "Z" not in checks:
         raise ValueError("challenge code is missing checks.X / checks.Z")
@@ -90,10 +86,8 @@ def tanner_symmetry_generators(n: int, hx, hz) -> list[list[int]]:
         adjacency[n + i] = row
     for j, row in enumerate(hz):
         adjacency[n + mx + j] = row
-    coloring = [c for c in (set(range(n)), set(range(n, n + mx)),
-                            set(range(n + mx, n + mx + mz))) if c]
-    graph = pynauty.Graph(n + mx + mz, directed=False, adjacency_dict=adjacency,
-                          vertex_coloring=coloring)
+    coloring = [c for c in (set(range(n)), set(range(n, n + mx)), set(range(n + mx, n + mx + mz))) if c]
+    graph = pynauty.Graph(n + mx + mz, directed=False, adjacency_dict=adjacency, vertex_coloring=coloring)
     generators, *_ = pynauty.autgrp(graph)
     identity = list(range(n))
     out = []
@@ -117,16 +111,19 @@ def qedist_commit(prefix: Optional[list[str]] = None) -> Optional[str]:
         return None
     exe = prefix[0]
     if os.sep not in exe:
-        exe = shutil.which(exe) or ""      # a bare command name resolves on PATH, never against the cwd
+        exe = shutil.which(exe) or ""  # a bare command name resolves on PATH, never against the cwd
     if not exe or not os.path.isfile(exe):
         return None
     cur = os.path.dirname(os.path.realpath(exe))
     while cur and cur != os.path.dirname(cur):
         if os.path.isdir(os.path.join(cur, ".git")):
             try:
-                return subprocess.check_output(
-                    ["git", "-C", cur, "rev-parse", "--short=12", "HEAD"],
-                    text=True, stderr=subprocess.DEVNULL).strip() or None
+                return (
+                    subprocess.check_output(
+                        ["git", "-C", cur, "rev-parse", "--short=12", "HEAD"], text=True, stderr=subprocess.DEVNULL
+                    ).strip()
+                    or None
+                )
             except (OSError, subprocess.CalledProcessError):
                 return None
         cur = os.path.dirname(cur)
@@ -139,8 +136,10 @@ def qedist_version(prefix: Optional[list[str]] = None) -> str:
     if not prefix:
         return "QEDist"
     try:
-        out = (subprocess.run(prefix + ["--version"], capture_output=True, text=True)  # noqa: PLW1510
-               .stdout or "").strip()
+        out = (
+            subprocess.run(prefix + ["--version"], capture_output=True, text=True).stdout  # noqa: PLW1510
+            or ""
+        ).strip()
     except (OSError, subprocess.SubprocessError):
         return "QEDist"
     return out.splitlines()[0].strip() if out else "QEDist"
@@ -175,8 +174,7 @@ def find_qedist() -> Optional[list[str]]:
 
 
 def _run(cmd: list[str], *, cwd: Optional[Path] = None) -> None:
-    proc = subprocess.run(cmd, cwd=str(cwd) if cwd else None,
-                          capture_output=True, text=True)
+    proc = subprocess.run(cmd, cwd=str(cwd) if cwd else None, capture_output=True, text=True)
     if proc.returncode != 0:
         raise RuntimeError(
             "QEDist command failed (exit %d): %s\n--- stdout ---\n%s\n--- stderr ---\n%s"
@@ -203,8 +201,7 @@ def certify_challenge(
     if cutoff is None:
         d = (doc.get("distance") or {}).get("d")
         cutoff = (int(d) - 1) if d is not None else 10
-    if cutoff < 1:
-        cutoff = 1
+    cutoff = max(cutoff, 1)
 
     prefix = find_qedist()
     if prefix is None:
@@ -225,12 +222,18 @@ def certify_challenge(
             inp2 = challenge_to_qedist(doc, include_witnesses=False)
             input_path.write_text(json.dumps(inp2, indent=2) + "\n")
         cmd = prefix + [
-            "certify", str(input_path),
-            "--profile", profile,
-            "--cutoff", str(cutoff),
-            "--seconds-per-shard", str(seconds),
-            "--workers", str(workers),
-            "--out", str(out_dir),
+            "certify",
+            str(input_path),
+            "--profile",
+            profile,
+            "--cutoff",
+            str(cutoff),
+            "--seconds-per-shard",
+            str(seconds),
+            "--workers",
+            str(workers),
+            "--out",
+            str(out_dir),
         ]
         if out_dir.exists():
             cmd.insert(-2, "--resume")
@@ -240,8 +243,7 @@ def certify_challenge(
     try:
         _invoke(include_witnesses)
     except RuntimeError as exc:
-        if (include_witnesses and "Invalid" in str(exc)
-                and "witness" in str(exc).lower()):
+        if include_witnesses and "Invalid" in str(exc) and "witness" in str(exc).lower():
             _invoke(False)
         else:
             raise
@@ -285,10 +287,7 @@ def _supports_to_pauli(n: int, x, z) -> str:
 
 def challenge_stabilizer_to_qedist(doc: dict, *, include_witnesses: bool = True) -> dict:
     if doc.get("code_type", "stabilizer") != "stabilizer":
-        raise ValueError(
-            "QEDist stabilizer path handles stabilizer codes; got code_type=%r"
-            % doc.get("code_type")
-        )
+        raise ValueError("QEDist stabilizer path handles stabilizer codes; got code_type=%r" % doc.get("code_type"))
     n = int(doc["n"])
     checks = doc.get("checks") or {}
     stabs = checks.get("S")
@@ -330,8 +329,7 @@ def certify_stabilizer_challenge(
         if d is None:
             d = ((doc.get("distance") or {}).get("P") or {}).get("value")
         cutoff = (int(d) - 1) if d is not None else 10
-    if cutoff < 1:
-        cutoff = 1
+    cutoff = max(cutoff, 1)
 
     prefix = find_qedist()
     if prefix is None:
@@ -352,12 +350,18 @@ def certify_stabilizer_challenge(
             inp2 = challenge_stabilizer_to_qedist(doc, include_witnesses=False)
             input_path.write_text(json.dumps(inp2, indent=2) + "\n")
         cmd = prefix + [
-            "certify-stabilizer", str(input_path),
-            "--cutoff", str(cutoff),
-            "--seconds", str(seconds),
-            "--workers", str(workers),
-            "--shards", str(shards),
-            "--out", str(out_dir),
+            "certify-stabilizer",
+            str(input_path),
+            "--cutoff",
+            str(cutoff),
+            "--seconds",
+            str(seconds),
+            "--workers",
+            str(workers),
+            "--shards",
+            str(shards),
+            "--out",
+            str(out_dir),
         ]
         if out_dir.exists():
             cmd.append("--resume")
@@ -367,8 +371,7 @@ def certify_stabilizer_challenge(
     try:
         _invoke(include_witnesses)
     except RuntimeError as exc:
-        if (include_witnesses and "Invalid" in str(exc)
-                and "witness" in str(exc).lower()):
+        if include_witnesses and "Invalid" in str(exc) and "witness" in str(exc).lower():
             _invoke(False)
         else:
             raise
@@ -403,6 +406,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     import json as _json
+
     _doc = _json.loads(Path(args.code).read_text())
     if _doc.get("code_type") == "stabilizer":
         summary = certify_stabilizer_challenge(

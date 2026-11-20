@@ -64,6 +64,7 @@ Usage:
     BASE     git ref to diff against (default origin/main); ignored if files given
     files    explicit code JSONs to gate (otherwise computed from the diff)
 """
+
 import glob
 import json
 import os
@@ -79,14 +80,14 @@ import circuit_tools as CT
 import gf2
 import heuristic_distance as H
 import refutation_cache as RC
+from build_receipt import make_receipt, write_receipt
 from circuit_verify import MAX_DEM_MECHANISMS, SIDE_FILES
 from qldpc_verify import file_size_error, generator_supports, is_stabilizer, sides
 from validate_candidate import validate_candidate
-from build_receipt import make_receipt, write_receipt
 
 try:
-    import gf2_fast as GF          # optional C++ accelerator (make fast); the
-except ImportError:                # gate degrades to the python passes without it
+    import gf2_fast as GF  # optional C++ accelerator (make fast); the
+except ImportError:  # gate degrades to the python passes without it
     GF = None
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -116,6 +117,7 @@ def fast_slices(trials):
         out.append(min(size, trials - sum(out)))
         size = min(size * 2, FAST_SLICE_MAX)
     return out
+
 
 # Structural (circulant generalized-bicycle) pass, issue #942. Trials are cheap
 # here because the search space is one circulant block rather than the whole
@@ -147,12 +149,12 @@ def map_changed(paths):
     memory_x.stim or memory_z.stim under circuits/<slug>/ is a change to that
     entry's circuit-tier claim surface (the DEM is derived from them), so it
     maps back to codes/<slug>.json -- a schedule swap cannot dodge the gate by
-    leaving the JSON untouched. Deleting legacy .dem files is ignored."""
+    leaving the JSON untouched. Deleting legacy .dem files is ignored.
+    """
     files = []
     for p in paths:
         parts = p.split("/")
-        if (len(parts) == 3 and parts[0] == "circuits"
-                and parts[2] in ("memory_x.stim", "memory_z.stim")):
+        if len(parts) == 3 and parts[0] == "circuits" and parts[2] in ("memory_x.stim", "memory_z.stim"):
             p = f"codes/{parts[1]}.json"
         if p.endswith(".json") and p not in files:
             files.append(p)
@@ -162,9 +164,20 @@ def map_changed(paths):
 def changed_codes(base, code_root=ROOT):
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD", "--",
-             "codes", "verify/fixtures", "circuits"],
-            cwd=code_root, text=True)
+            [
+                "git",
+                "diff",
+                "--name-only",
+                "--no-renames",
+                f"{base}...HEAD",
+                "--",
+                "codes",
+                "verify/fixtures",
+                "circuits",
+            ],
+            cwd=code_root,
+            text=True,
+        )
     except Exception as e:
         print(f"could not compute diff vs {base}: {e}; failing closed")
         return None
@@ -173,12 +186,12 @@ def changed_codes(base, code_root=ROOT):
 
 def changed_codes_status(base: str, code_root: str = ROOT) -> dict | None:
     """{path: status} for codes changed vs base (A/M/D), rename-split like
-    check_authorship.changed_codes so a refutation's rename stays visible."""
+    check_authorship.changed_codes so a refutation's rename stays visible.
+    """
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-status", "--no-renames", f"{base}...HEAD",
-             "--", "codes"],
-            cwd=code_root, text=True)
+            ["git", "diff", "--name-status", "--no-renames", f"{base}...HEAD", "--", "codes"], cwd=code_root, text=True
+        )
     except (subprocess.CalledProcessError, OSError):
         return None
     changes = {}
@@ -200,9 +213,9 @@ def changed_codes_status(base: str, code_root: str = ROOT) -> dict | None:
 def load_base_doc(base: str, path: str, code_root: str) -> dict | None:
     """Base-revision content of path, or None if unavailable."""
     try:
-        out = subprocess.check_output(["git", "show", f"{base}:{path}"],
-                                      cwd=code_root, text=True,
-                                      stderr=subprocess.DEVNULL)
+        out = subprocess.check_output(
+            ["git", "show", f"{base}:{path}"], cwd=code_root, text=True, stderr=subprocess.DEVNULL
+        )
         return json.loads(out)
     except (subprocess.CalledProcessError, OSError, json.JSONDecodeError):
         return None
@@ -211,14 +224,14 @@ def load_base_doc(base: str, path: str, code_root: str) -> dict | None:
 def base_doc_for(f: str, doc: dict, base: str, code_root: str) -> dict | None:
     """The base doc this file revises: itself when modified, or the deleted
     codes/<n>-<k>-*.json a refutation renamed away. None for new codes or on
-    any ambiguity (which downstream fails closed to the full gate)."""
+    any ambiguity (which downstream fails closed to the full gate).
+    """
     changes = changed_codes_status(base, code_root)
     if changes is None:
         return None
     if changes.get(f) == "M":
         return load_base_doc(base, f, code_root)
-    prefix = os.path.join(os.path.dirname(f),
-                          f"{doc.get('n')}-{doc.get('k')}-")
+    prefix = os.path.join(os.path.dirname(f), f"{doc.get('n')}-{doc.get('k')}-")
     dels = [p for p, s in changes.items() if s == "D" and p.startswith(prefix)]
     if len(dels) == 1:
         return load_base_doc(base, dels[0], code_root)
@@ -232,7 +245,8 @@ def structural_ok(verdict: dict) -> bool:
     file already on the board -- dedup flags the code as an exact duplicate
     of itself, and novelty judges board advancement. What the gate must not
     say ok about is a file the VERIFIER rejects, so only gates.verify.ok is
-    authoritative here."""
+    authoritative here.
+    """
     return bool(((verdict.get("gates") or {}).get("verify") or {}).get("ok"))
 
 
@@ -241,10 +255,12 @@ def layout_entered_tighter_class(base_doc: dict | None, new_doc: dict) -> bool:
     class than it had at base. For a layout-only diff this is the only way
     the code can become a NEW record of a 2d-local cell (its n, k, d, w are
     unchanged, so record status in cells it already occupied cannot change);
-    such a claim has never faced the deep battery and must not skip it."""
+    such a claim has never faced the deep battery and must not skip it.
+    """
     return _locality_rank(new_doc) < _locality_rank(
-        base_doc or {"n": new_doc.get("n"), "checks": new_doc.get("checks"),
-                     "code_type": new_doc.get("code_type", "CSS")})
+        base_doc
+        or {"n": new_doc.get("n"), "checks": new_doc.get("checks"), "code_type": new_doc.get("code_type", "CSS")}
+    )
 
 
 def _witness_weight(side_block: dict) -> int:
@@ -264,8 +280,8 @@ def _survival_raised(base_doc: dict | None, new_doc: dict | None) -> bool:
     bd = (base_doc or {}).get("distance") or {}
     nd = (new_doc or {}).get("distance") or {}
     for side in sides(new_doc or {}):
-        bs = ((bd.get(side) or {}).get("witness_provenance") or {})
-        ns = ((nd.get(side) or {}).get("witness_provenance") or {})
+        bs = (bd.get(side) or {}).get("witness_provenance") or {}
+        ns = (nd.get(side) or {}).get("witness_provenance") or {}
         nv = ns.get("survived_samples")
         if nv is None:
             continue
@@ -280,13 +296,15 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
     (cls, reason) with cls in {'new', 'stamp', 'layout-only', 'tightening',
     'full'}. Structural facts only -- witness validity is the verifier's job
     (verify_all runs before this gate in CI); anything unclassifiable is
-    'full' (fail closed)."""
+    'full' (fail closed).
+    """
     try:
         if base_doc is None:
             return "new", "no base counterpart"
         if _survival_raised(base_doc, new_doc):
-            return "stamp", ("witness_provenance.survived_samples added or "
-                             "raised: the survival claim is what needs vetting")
+            return "stamp", (
+                "witness_provenance.survived_samples added or raised: the survival claim is what needs vetting"
+            )
         frozen = ("checks", "n", "k", "code_type")
         for key in frozen:
             if base_doc.get(key) != new_doc.get(key):
@@ -294,8 +312,7 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
         if base_doc.get("distance") == new_doc.get("distance"):
             if base_doc.get("locality") != new_doc.get("locality"):
                 return "layout-only", "checks and distance unchanged from base"
-            return "layout-only", ("checks and distance unchanged from base "
-                                   "(metadata-only diff)")
+            return "layout-only", ("checks and distance unchanged from base (metadata-only diff)")
         if base_doc.get("locality") != new_doc.get("locality"):
             return "full", "distance and locality both changed (mixed diff)"
         bd, nd = base_doc.get("distance") or {}, new_doc.get("distance") or {}
@@ -310,23 +327,18 @@ def classify_diff(base_doc: dict | None, new_doc: dict) -> tuple[str, str]:
                 continue
             bv, nv = bs.get("value"), ns.get("value")
             if not (isinstance(bv, int) and isinstance(nv, int) and nv < bv):
-                return "full", (f"distance.{side}.value did not strictly "
-                                "decrease")
+                return "full", (f"distance.{side}.value did not strictly decrease")
             if _witness_weight(ns) != nv:
-                return "full", (f"distance.{side} witness weight does not "
-                                "equal the new value")
+                return "full", (f"distance.{side} witness weight does not equal the new value")
             if ns.get("confidence") != "upper_bound":
-                return "full", (f"distance.{side}.confidence is not "
-                                "upper_bound at the corrected value")
+                return "full", (f"distance.{side}.confidence is not upper_bound at the corrected value")
             tightened += 1
         if tightened == 0:
             return "full", "distance changed without a side strictly decreasing"
         # d = min(dX, dZ) for a CSS code, d = P.value for a stabilizer code
         if nd.get("d") != min(nd[s].get("value") for s in sides(new_doc)):
-            return "full", ("distance.d is not P.value" if is_stabilizer(new_doc)
-                            else "distance.d is not min(dX, dZ)")
-        return "tightening", (f"{tightened} side(s) strictly decreased with "
-                              "matching witnesses")
+            return "full", ("distance.d is not P.value" if is_stabilizer(new_doc) else "distance.d is not min(dX, dZ)")
+        return "tightening", (f"{tightened} side(s) strictly decreased with matching witnesses")
     except (KeyError, TypeError, AttributeError, ValueError) as e:
         # every malformed-document shape fails closed; a genuine bug in this
         # function should raise and surface in CI, not silently price full
@@ -348,26 +360,28 @@ def _locality_rank(doc):
     about who is a record. verify/test_frontier_consistency.py pins this
     mirror to the verifier across all of codes/. Used only to pick the
     refutation BUDGET; the authoritative classification stays in
-    qldpc_verify."""
+    qldpc_verify.
+    """
     import math
     from collections import Counter
+
     loc = doc.get("locality")
     n = doc["n"]
     if not loc or len(loc.get("coordinates", [])) != n:
         return 2
     coords = loc["coordinates"]
-    if {len(c) for c in coords} != {2}:     # the verifier's local classes are planar
+    if {len(c) for c in coords} != {2}:  # the verifier's local classes are planar
         return 2
     layers = loc.get("layers", 1)
 
     def diam(sup):
         pts = [coords[q] for q in sup]
         return max((math.dist(a, b) for a in pts for b in pts), default=0.0)
+
     radius = max((diam(s) for s in generator_supports(doc)), default=0.0)
     mult = Counter(tuple(c) for c in coords)
     sites = sorted(mult)
-    min_sp = min((math.dist(a, b) for i, a in enumerate(sites)
-                  for b in sites[i + 1:]), default=float("inf"))
+    min_sp = min((math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1 :]), default=float("inf"))
     if max(mult.values()) > layers or min_sp < 1.0 - 1e-9:
         return 2
     for rank, (lay, cap) in enumerate(((1, 4.0), (2, 7.0))):
@@ -378,7 +392,8 @@ def _locality_rank(doc):
 
 def _weight_rank(w):
     """Check-weight class as a tightness rank: weight-4 < weight-6 < weight-8
-    < any weight."""
+    < any weight.
+    """
     return 0 if w <= 4 else 1 if w <= 6 else 2 if w <= 8 else 3
 
 
@@ -391,16 +406,25 @@ def board_record_slugs(code_root=ROOT):
     Cell-aware on purpose: a 2D-local record is a record even when a nonlocal
     code beats it globally, and it deserves the deep battery too. The code
     type is a cell dimension: CSS and stabilizer codes sit on
-    separate boards, so neither can dominate the other."""
+    separate boards, so neither can dominate the other.
+    """
     rows = []
     for p in sorted(glob.glob(os.path.join(code_root, "codes", "*.json"))):
         try:
             d = json.load(open(p))
             w = max((len(s) for s in generator_supports(d)), default=0)
-            rows.append((os.path.splitext(os.path.basename(p))[0],
-                         d["n"], d["k"], d["distance"]["d"], w,
-                         _weight_rank(w), _locality_rank(d),
-                         d.get("code_type", "CSS")))
+            rows.append(
+                (
+                    os.path.splitext(os.path.basename(p))[0],
+                    d["n"],
+                    d["k"],
+                    d["distance"]["d"],
+                    w,
+                    _weight_rank(w),
+                    _locality_rank(d),
+                    d.get("code_type", "CSS"),
+                )
+            )
         except Exception:
             continue
     # A dominator shares the board and is no longer, so compare each row
@@ -417,11 +441,16 @@ def board_record_slugs(code_root=ROOT):
             dominated = False
             for j, b in enumerate(group):
                 if b[1] > a[1]:
-                    break                              # sorted by n
-                if (j != i
-                        and b[5] <= a[5] and b[6] <= a[6]  # shares a's home cell
-                        and b[2] >= a[2] and b[3] >= a[3] and b[4] <= a[4]
-                        and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])):
+                    break  # sorted by n
+                if (
+                    j != i
+                    and b[5] <= a[5]
+                    and b[6] <= a[6]  # shares a's home cell
+                    and b[2] >= a[2]
+                    and b[3] >= a[3]
+                    and b[4] <= a[4]
+                    and (b[1] < a[1] or b[2] > a[2] or b[3] > a[3] or b[4] < a[4])
+                ):
                     dominated = True
                     break
             if not dominated:
@@ -453,8 +482,9 @@ def _budget(n, deep, fast=False):
     accelerator battery of 3 seeds runs unchanged, so a missing or broken
     extension can never leave the gate shallower than it was. Worst case per
     record claim is ~4 min of python RIS + the fast pass (or 3 x 240 s python-
-    only); dominated rows stay cheap."""
-    per_trial = 0.0005 + 2.5e-6 * n              # seconds/trial, measured (both sides)
+    only); dominated rows stay cheap.
+    """
+    per_trial = 0.0005 + 2.5e-6 * n  # seconds/trial, measured (both sides)
     if deep:
         trials = 25000 + 120 * n
         seconds = min(240.0, max(120.0, trials * per_trial * 3))
@@ -477,24 +507,23 @@ def _budget(n, deep, fast=False):
 # 4.9 ms on the first of those), hence the fallback factor. At the cap with
 # r = m / 30 the 120 s target buys about 200 trials per basis; the old cap
 # bought 38.
-CIRCUIT_TRIAL_COST = 8.0e-13          # seconds per trial per (detectors^2 * mechanisms)
-CIRCUIT_PY_FACTOR = 200               # numpy-loop fallback slowdown, measured
-CIRCUIT_SECONDS = 120.0               # wall-clock target per basis
-CIRCUIT_MAX_TRIALS = 200_000          # raised 10x with the r^2 m search: on
-                                      # a small DEM (m ~ 2,000) the 120 s now
-                                      # buy ~60,000 trials where 20,000 took
-                                      # 15 s before (FarLab on #2811)
+CIRCUIT_TRIAL_COST = 8.0e-13  # seconds per trial per (detectors^2 * mechanisms)
+CIRCUIT_PY_FACTOR = 200  # numpy-loop fallback slowdown, measured
+CIRCUIT_SECONDS = 120.0  # wall-clock target per basis
+CIRCUIT_MAX_TRIALS = 200_000  # raised 10x with the r^2 m search: on
+# a small DEM (m ~ 2,000) the 120 s now
+# buy ~60,000 trials where 20,000 took
+# 15 s before (FarLab on #2811)
 CIRCUIT_MIN_TRIALS = 12
-CIRCUIT_DETECTORS_PER_MECHANISM = 1 / 30   # the densest ratio seen; used when
-                                           # the caller has no detector count
+CIRCUIT_DETECTORS_PER_MECHANISM = 1 / 30  # the densest ratio seen; used when
+# the caller has no detector count
 
 
 def _circuit_budget(m, fast, detectors=None):
     r = detectors if detectors else max(1, int(m * CIRCUIT_DETECTORS_PER_MECHANISM))
     per = CIRCUIT_TRIAL_COST * r * r * m * (1 if fast else CIRCUIT_PY_FACTOR)
     per = max(per, 0.002)
-    trials = int(max(CIRCUIT_MIN_TRIALS if fast else 3,
-                     min(CIRCUIT_MAX_TRIALS, CIRCUIT_SECONDS / per)))
+    trials = int(max(CIRCUIT_MIN_TRIALS if fast else 3, min(CIRCUIT_MAX_TRIALS, CIRCUIT_SECONDS / per)))
     return trials, CIRCUIT_SECONDS * 1.5
 
 
@@ -503,7 +532,8 @@ def circuit_gate_needed(base_doc, doc, circuits_diffed):
     surface changed -- the JSON's circuit block or the artifacts under
     circuits/<slug>/ -- or when there is no base to have gated it. An
     untouched claim already survived its own gate and the code-tier skip
-    logic must never be the thing that skips a CHANGED circuit claim."""
+    logic must never be the thing that skips a CHANGED circuit claim.
+    """
     if "circuit" not in doc:
         return False
     if base_doc is None:
@@ -513,12 +543,23 @@ def circuit_gate_needed(base_doc, doc, circuits_diffed):
 
 def _circuits_diffed(base, code_root, slug):
     """Did memory_x.stim or memory_z.stim under circuits/<slug>/ change vs base?
-    Fails closed (True) when the diff cannot be computed."""
+    Fails closed (True) when the diff cannot be computed.
+    """
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", "--no-renames", f"{base}...HEAD", "--",
-             f"circuits/{slug}/memory_x.stim", f"circuits/{slug}/memory_z.stim"],
-            cwd=code_root, text=True)
+            [
+                "git",
+                "diff",
+                "--name-only",
+                "--no-renames",
+                f"{base}...HEAD",
+                "--",
+                f"circuits/{slug}/memory_x.stim",
+                f"circuits/{slug}/memory_z.stim",
+            ],
+            cwd=code_root,
+            text=True,
+        )
         return bool(out.strip())
     except Exception:
         return True
@@ -532,8 +573,10 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
     a find only counts after the pinned witness check confirms it, exactly
     the layering the code-distance gate uses. Returns (hits, notes): hits
     maps basis -> (found_weight, witness, claimed); notes are per-basis "ok"
-    summaries. Raises on unreadable artifacts (caller fails closed)."""
+    summaries. Raises on unreadable artifacts (caller fails closed).
+    """
     import stim
+
     hits, notes = {}, []
     for side in ("X", "Z"):
         claim = int(doc["circuit"]["d_circ"][side]["value"])
@@ -542,23 +585,20 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
         dem = CT.derive_dem(circuit)
         m = dem.num_errors
         if m > MAX_DEM_MECHANISMS:
-            raise ValueError(f"{side}: {m} mechanisms exceeds the tier cap "
-                             f"{MAX_DEM_MECHANISMS}")
+            raise ValueError(f"{side}: {m} mechanisms exceeds the tier cap {MAX_DEM_MECHANISMS}")
         Hd, L = CT.dem_matrices(dem)
         # `fast` keys on the DEM entry point specifically: a stale extension
         # without it drops ris_dem to the numpy loop and must be budgeted so.
         trials, cap = _circuit_budget(
-            m, CT._GF is not None and hasattr(CT._GF, "dem_rand_witness"),
-            detectors=dem.num_detectors)
+            m, CT._GF is not None and hasattr(CT._GF, "dem_rand_witness"), detectors=dem.num_detectors
+        )
         if trials_override:
             trials = trials_override
         w, wit = CT.ris_dem(Hd, L, trials, seed=seed, max_seconds=cap)
-        if w is not None and w < claim and \
-                not CT.witness_errors(dem, wit, w):
+        if w is not None and w < claim and not CT.witness_errors(dem, wit, w):
             hits[side] = (w, wit, claim)
         else:
-            notes.append(f"{side} ok (m={m}, {trials} trials, "
-                         f"lightest {w} vs claimed {claim})")
+            notes.append(f"{side} ok (m={m}, {trials} trials, lightest {w} vs claimed {claim})")
     return hits, notes
 
 
@@ -572,9 +612,7 @@ def _validated_logical(HX, HZ, n, w, side, support):
     v[list(support)] = 1
     Hcheck = HZ if side == "X" else HX
     L = gf2.logical_basis(HX, HZ) if side == "X" else gf2.logical_basis(HZ, HX)
-    return (int(v.sum()) == w
-            and not ((Hcheck @ v) % 2).any()
-            and bool(((L @ v) % 2).any()))
+    return int(v.sum()) == w and not ((Hcheck @ v) % 2).any() and bool(((L @ v) % 2).any())
 
 
 def _revalidated_hits(doc, hits):
@@ -601,8 +639,7 @@ def _revalidated_hits(doc, hits):
             continue
         if w >= claimed or not support or max(support) >= n or min(support) < 0:
             continue
-        if any(_validated_logical(HX, HZ, n, w, side, support)
-               for side in ("X", "Z")):
+        if any(_validated_logical(HX, HZ, n, w, side, support) for side in ("X", "Z")):
             out[m] = (w, support)
     return out
 
@@ -631,7 +668,8 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
     over 2n bits is an upper bound on the Pauli weight, so each proposal is
     mapped back to a Pauli operator, validated, and RE-SCORED by Pauli weight
     before it is compared with the claim; the witness is then the Pauli
-    {"X", "Z"} dict the verifier reads."""
+    {"X", "Z"} dict the verifier reads.
+    """
     n = doc["n"]
     stab = is_stabilizer(doc)
     if stab:
@@ -643,12 +681,12 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
     claimed = int(doc["distance"]["d"])
     t0 = time.monotonic()
     deadline = (t0 + max_seconds) if max_seconds else None
-    done, proposals = 0, []                     # proposals: (w, side, support)
+    done, proposals = 0, []  # proposals: (w, side, support)
     last_report = t0
     for i, t in enumerate(fast_slices(trials)):
         w, side, support = GF.distance_rand_witness(
-            HX, HZ, trials=t, seed=seed + i * 1_000_003, pair_depth=8,
-            threads=FAST_THREADS)
+            HX, HZ, trials=t, seed=seed + i * 1_000_003, pair_depth=8, threads=FAST_THREADS
+        )
         done += t
         if side and stab:
             v = np.zeros(2 * n, dtype=np.int8)
@@ -664,14 +702,19 @@ def _fast_refute(doc, seed, trials, max_seconds=None):
             break
         if now - last_report >= FAST_PROGRESS_SECONDS:
             best = min(proposals, default=None)
-            print(f"  RIS-fast: {done:,}/{trials:,} trials, {now - t0:.0f}s, "
-                  f"best w={best[0] if best else None}", flush=True)
+            print(
+                f"  RIS-fast: {done:,}/{trials:,} trials, {now - t0:.0f}s, best w={best[0] if best else None}",
+                flush=True,
+            )
             last_report = now
     if done < trials:
         best = min(proposals, default=None)
-        print(f"  RIS-fast: wall-clock cap reached after {done:,}/{trials:,} "
-              f"trials ({time.monotonic() - t0:.0f}s); best proposal "
-              f"w={best[0] if best else None}", flush=True)
+        print(
+            f"  RIS-fast: wall-clock cap reached after {done:,}/{trials:,} "
+            f"trials ({time.monotonic() - t0:.0f}s); best proposal "
+            f"w={best[0] if best else None}",
+            flush=True,
+        )
     # Lightest first; the first proposal the python stack validates wins.
     for w, side, support in sorted(set(p for p in proposals if p[0] < claimed)):
         if stab:
@@ -706,16 +749,18 @@ def _structural_refute(doc, seed, trials):
     the refute_check tuple shape: (refuted, d, witness, trials).
 
     CSS only: the circulant-block structure is a property of (H_X, H_Z), so a
-    stabilizer code reports nothing searched and goes to the general battery."""
+    stabilizer code reports nothing searched and goes to the general battery.
+    """
     if is_stabilizer(doc):
         return False, None, None, 0
     n = doc["n"]
     HX = H._matrix(doc["checks"]["X"], n)
     HZ = H._matrix(doc["checks"]["Z"], n)
     w, side, support, block = GF.circulant_gb_witness(
-        HX, HZ, trials=trials, seed=seed, pair_depth=8, threads=FAST_THREADS)
+        HX, HZ, trials=trials, seed=seed, pair_depth=8, threads=FAST_THREADS
+    )
     if not block:
-        return False, None, None, 0          # not a circulant GB: nothing searched
+        return False, None, None, 0  # not a circulant GB: nothing searched
     claimed = int(doc["distance"]["d"])
     if not side or w >= claimed:
         return False, (w if side else None), None, trials
@@ -723,9 +768,7 @@ def _structural_refute(doc, seed, trials):
     v[list(support)] = 1
     Hcheck = HZ if side == "X" else HX
     L = gf2.logical_basis(HX, HZ) if side == "X" else gf2.logical_basis(HZ, HX)
-    valid = (int(v.sum()) == w
-             and not ((Hcheck @ v) % 2).any()
-             and bool(((L @ v) % 2).any()))
+    valid = int(v.sum()) == w and not ((Hcheck @ v) % 2).any() and bool(((L @ v) % 2).any())
     if not valid:
         return False, None, None, trials
     return True, w, sorted(int(q) for q in support), trials
@@ -744,49 +787,47 @@ def main(argv):
     if "--receipt-dir" in rest:
         i = rest.index("--receipt-dir")
         receipt_dir = os.path.abspath(rest[i + 1])
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     # A completed search, reusable by a later run on byte-identical code
     # (issue #2633). Absent, every run searches, which is today's behavior.
     if "--search-cache" in rest:
         i = rest.index("--search-cache")
         search_cache = os.path.abspath(rest[i + 1]) if rest[i + 1] else None
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--pr-number" in rest:
         i = rest.index("--pr-number")
         pr_number = int(rest[i + 1])
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--pr-author" in rest:
         i = rest.index("--pr-author")
         pr_author = rest[i + 1]
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--base-sha" in rest:
         i = rest.index("--base-sha")
         base_sha = rest[i + 1]
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--head-sha" in rest:
         i = rest.index("--head-sha")
         head_sha = rest[i + 1]
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--code-root" in rest:
         i = rest.index("--code-root")
         code_root = os.path.abspath(rest[i + 1])
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     if "--seed" in rest:
         i = rest.index("--seed")
         seed = int(rest[i + 1])
-        rest = rest[:i] + rest[i + 2:]
+        rest = rest[:i] + rest[i + 2 :]
     files = [a for a in argv if a.endswith(".json")]
     base = next((a for a in rest), "origin/main")
     if base_sha is None:
         try:
-            base_sha = subprocess.check_output(
-                ["git", "rev-parse", base], cwd=code_root, text=True).strip()
+            base_sha = subprocess.check_output(["git", "rev-parse", base], cwd=code_root, text=True).strip()
         except Exception:
             pass
     if head_sha is None:
         try:
-            head_sha = subprocess.check_output(
-                ["git", "rev-parse", "HEAD"], cwd=code_root, text=True).strip()
+            head_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=code_root, text=True).strip()
         except Exception:
             pass
     if not files:
@@ -802,10 +843,12 @@ def main(argv):
     # verdict (a merge can fail later) -- the seed is printed so any run reproduces.
     if seed is None:
         seed = secrets.randbelow(2**31)
-    print(f"refutation seed = {seed}  "
-          f"(reproduce: python verify/gate_changed.py --seed {seed} <files>; "
-          f"the fast pass is also wall-clock capped, see fast_trials in the "
-          f"receipt)\n")
+    print(
+        f"refutation seed = {seed}  "
+        f"(reproduce: python verify/gate_changed.py --seed {seed} <files>; "
+        f"the fast pass is also wall-clock capped, see fast_trials in the "
+        f"receipt)\n"
+    )
 
     refuted = 0
     failed = 0
@@ -820,8 +863,7 @@ def main(argv):
             circuit_dir = os.path.join(code_root, "circuits", slug)
             if any(files for _, _, files in os.walk(circuit_dir)):
                 failed += 1
-                print(f"FAIL     {f}: remaining circuits/ artifacts have no "
-                      "corresponding code entry")
+                print(f"FAIL     {f}: remaining circuits/ artifacts have no corresponding code entry")
             continue
         ferr = file_size_error(p)
         if ferr:
@@ -850,14 +892,12 @@ def main(argv):
                 # one. A None status (git failure) stays None: fail closed.
                 base_doc = load_base_doc(base, f, code_root)
         cls, why = classify_diff(base_doc, doc)
-        run_circuit = circuit_gate_needed(
-            base_doc, doc, _circuits_diffed(base, code_root, slug))
+        run_circuit = circuit_gate_needed(base_doc, doc, _circuits_diffed(base, code_root, slug))
 
         def run_circuit_gate():
             """The circuit-tier search (RFC 0001 step 6); (hits, notes, err)."""
             if not run_circuit:
-                return {}, (["circuit claim unchanged from base; already "
-                             "gated"] if "circuit" in doc else []), None
+                return {}, (["circuit claim unchanged from base; already gated"] if "circuit" in doc else []), None
             cdir = os.path.join(os.path.dirname(p), "..", "circuits", slug)
             try:
                 h, nts = _circuit_refute(doc, cdir, seed + 11)
@@ -873,18 +913,20 @@ def main(argv):
             verdict = validate_candidate(doc, seed=seed, refute=False)
             if not structural_ok(verdict):
                 failed += 1
-                print(f"FAIL     {f}: structural checks failed "
-                      f"(layout-only diff; see verify_all for details)")
+                print(f"FAIL     {f}: structural checks failed (layout-only diff; see verify_all for details)")
             elif slug in records and layout_entered_tighter_class(base_doc, doc):
                 # The layout moves the code into a tighter locality class
                 # where it claims a cell record it has never defended: the
                 # one layout-only shape that must not skip the deep battery.
-                cls, why = "layout-record", (
-                    "layout enters a tighter locality class and claims a "
-                    "cell record; deep battery required before it stands")
+                cls, why = (
+                    "layout-record",
+                    (
+                        "layout enters a tighter locality class and claims a "
+                        "cell record; deep battery required before it stands"
+                    ),
+                )
             else:
-                print(f"ok       {f} (layout-only diff: {why}; refutation "
-                      f"deferred to the weekly board sweep)")
+                print(f"ok       {f} (layout-only diff: {why}; refutation deferred to the weekly board sweep)")
             if cls == "layout-only":
                 # The CODE claim is unchanged and skips, but a changed
                 # circuit claim in the same diff must still be searched: a
@@ -895,55 +937,72 @@ def main(argv):
                     circ_hits, circ_notes, circ_failed = run_circuit_gate()
                 if circ_failed:
                     failed += 1
-                    print(f"FAIL     {f} [circuit]: gate could not search the "
-                          f"DEM ({circ_failed}); failing closed -- manual "
-                          f"review required")
+                    print(
+                        f"FAIL     {f} [circuit]: gate could not search the "
+                        f"DEM ({circ_failed}); failing closed -- manual "
+                        f"review required"
+                    )
                 elif circ_hits:
                     refuted += 1
                     for s, (w, wit, c) in circ_hits.items():
-                        print(f"REFUTED  {f} [circuit-{s}]: weight-{w} "
-                              f"undetected logical fault set < claimed "
-                              f"d_circ {c}\n         witness (dem error "
-                              f"indices) = {wit}")
+                        print(
+                            f"REFUTED  {f} [circuit-{s}]: weight-{w} "
+                            f"undetected logical fault set < claimed "
+                            f"d_circ {c}\n         witness (dem error "
+                            f"indices) = {wit}"
+                        )
                 elif ok_struct and run_circuit:
                     print(f"ok       {f} [circuit]: {'; '.join(circ_notes)}")
                 if receipt_dir:
                     # The receipt's headline verdict must reflect structural
                     # soundness of the edit, not the new-candidate gates
                     # (dedup self-matches by construction on an in-place edit).
-                    verdict["passed"] = bool(ok_struct and not circ_hits
-                                             and not circ_failed)
+                    verdict["passed"] = bool(ok_struct and not circ_hits and not circ_failed)
                     verdict["gates"]["refute"] = {
-                        "refuted": bool(circ_hits), "seed": seed,
+                        "refuted": bool(circ_hits),
+                        "seed": seed,
                         "detail": f"skipped: {why}; distance claim identical "
-                                  f"to base and covered by the weekly refute "
-                                  f"sweep; dedup self-match is expected for "
-                                  f"an in-place edit",
+                        f"to base and covered by the weekly refute "
+                        f"sweep; dedup self-match is expected for "
+                        f"an in-place edit",
                     }
-                    gate = {"refuted": bool(circ_hits), "seed": seed,
-                            "seeds": [], "trials": 0, "budget_seconds": 0.0,
-                            "deep": False, "fast_trials": 0, "methods": [],
-                            "diff_class": cls, "diff_reason": why}
+                    gate = {
+                        "refuted": bool(circ_hits),
+                        "seed": seed,
+                        "seeds": [],
+                        "trials": 0,
+                        "budget_seconds": 0.0,
+                        "deep": False,
+                        "fast_trials": 0,
+                        "methods": [],
+                        "diff_class": cls,
+                        "diff_reason": why,
+                    }
                     if "circuit" in doc:
                         gate["circuit"] = {
                             "searched": run_circuit,
                             "refuted": bool(circ_hits),
                             "failed": circ_failed,
-                            "hits": {s: {"found": w, "claimed": c}
-                                     for s, (w, _, c) in circ_hits.items()},
+                            "hits": {s: {"found": w, "claimed": c} for s, (w, _, c) in circ_hits.items()},
                             "notes": circ_notes,
                         }
                     receipt = make_receipt(
-                        doc, p, verdict, gate=gate,
-                        repo_root=code_root, pr_number=pr_number,
-                        pr_author=pr_author, base_sha=base_sha,
-                        head_sha=head_sha)
+                        doc,
+                        p,
+                        verdict,
+                        gate=gate,
+                        repo_root=code_root,
+                        pr_number=pr_number,
+                        pr_author=pr_author,
+                        base_sha=base_sha,
+                        head_sha=head_sha,
+                    )
                     write_receipt(receipt, receipt_dir, slug)
                 continue
         if cls in ("stamp", "layout-record"):
-            deep = True       # the new claim itself is what is being vetted
+            deep = True  # the new claim itself is what is being vetted
         elif cls == "tightening":
-            deep = False      # strictly-less-wrong claim; weekly sweep has depth
+            deep = False  # strictly-less-wrong claim; weekly sweep has depth
         else:
             deep = slug in records
         trials, budget, nseeds = _budget(int(doc["n"]), deep, fast=GF is not None)
@@ -959,19 +1018,19 @@ def main(argv):
         # Load AND confirm before the stages below decide whether to run:
         # a record that does not re-validate has to leave the search in
         # front of us, not behind us.
-        cached = RC.load(search_cache, doc_bytes, deep=deep,
-                         accelerated=GF is not None)
+        cached = RC.load(search_cache, doc_bytes, deep=deep, accelerated=GF is not None)
         if cached is not None:
             _rgate, _rhits = RC.restored(cached)
             _rhits = _revalidated_hits(doc, _rhits)
             if _rhits:
                 cached = (_rgate, _rhits)
-                print(f"reuse    {f}: refutation from "
-                      f"{(_rgate['reused_from'].get('head_sha') or '?')[:8]} "
-                      f"(seed {_rgate.get('seed')}), witness re-checked")
+                print(
+                    f"reuse    {f}: refutation from "
+                    f"{(_rgate['reused_from'].get('head_sha') or '?')[:8]} "
+                    f"(seed {_rgate.get('seed')}), witness re-checked"
+                )
             else:
-                print(f"note     {f}: a cached record did not re-validate; "
-                      f"searching")
+                print(f"note     {f}: a cached record did not re-validate; searching")
                 cached = None
 
         # STAGE 1 -- structure-aware pre-pass (issue #942). Cheapest mechanism
@@ -1020,10 +1079,10 @@ def main(argv):
         fold_trials = 0
         fold_refuted = False
         if not struct_refuted and cached is None:
-            fold_trials, fold_seconds = ((FOLD_TRIALS_DEEP, FOLD_SECONDS_DEEP) if deep
-                                         else (FOLD_TRIALS_STD, FOLD_SECONDS_STD))
-            fres = H.orbit_fold_refute(doc, seed=seed + 13, trials=fold_trials,
-                                       max_seconds=fold_seconds)
+            fold_trials, fold_seconds = (
+                (FOLD_TRIALS_DEEP, FOLD_SECONDS_DEEP) if deep else (FOLD_TRIALS_STD, FOLD_SECONDS_STD)
+            )
+            fres = H.orbit_fold_refute(doc, seed=seed + 13, trials=fold_trials, max_seconds=fold_seconds)
             fold_searched = fres[3]
             if fold_searched:
                 results["orbit-fold"] = fres
@@ -1036,10 +1095,7 @@ def main(argv):
             # two independent mechanisms; a hit from EITHER (any seed) refutes.
             # fold_trials=0: stage 1b already ran the fold at a larger budget.
             for si, s in enumerate(seeds):
-                results[f"RIS#{si}"] = H.refute_check(doc, seed=s,
-                                                      max_seconds=budget,
-                                                      trials=trials,
-                                                      fold_trials=0)
+                results[f"RIS#{si}"] = H.refute_check(doc, seed=s, max_seconds=budget, trials=trials, fold_trials=0)
             # Frontier claims additionally face the accelerated deep search when
             # the extension is built (CI builds it; see Makefile `fast`): ~150x
             # the python trial target in the wall-clock freed by dropping 2 of
@@ -1051,9 +1107,8 @@ def main(argv):
             # fast pass missed.
             if GF is not None and deep:
                 ftarget = min(8_000_000, 150 * trials)
-                results["RIS-fast"] = _fast_refute(doc, seed + 7, ftarget,
-                                                   max_seconds=FAST_SECONDS)
-                ftrials = results["RIS-fast"][3]     # trials actually searched
+                results["RIS-fast"] = _fast_refute(doc, seed + 7, ftarget, max_seconds=FAST_SECONDS)
+                ftrials = results["RIS-fast"][3]  # trials actually searched
         hits = {m: (dh, wit) for m, (ref, dh, wit, _) in results.items() if ref}
         # Circuit tier (RFC 0001 step 6): entries shipping syndrome circuits
         # additionally face a bounded RIS search on each memory DEM when the
@@ -1063,13 +1118,17 @@ def main(argv):
         # are a gate failure, never a silent pass.
         circ_hits, circ_notes, circ_failed = run_circuit_gate()
         if struct_refuted:
-            tag = (f"circulant-GB x {struct_trials} (refuted at stage 1; the "
-                   f"general battery cannot change a validated refutation and "
-                   f"was skipped)")
+            tag = (
+                f"circulant-GB x {struct_trials} (refuted at stage 1; the "
+                f"general battery cannot change a validated refutation and "
+                f"was skipped)"
+            )
         elif fold_refuted:
-            tag = (f"orbit-fold x {fold_searched} partitions @ {fold_trials} "
-                   f"(refuted at stage 1b; the general battery cannot change a "
-                   f"validated refutation and was skipped)")
+            tag = (
+                f"orbit-fold x {fold_searched} partitions @ {fold_trials} "
+                f"(refuted at stage 1b; the general battery cannot change a "
+                f"validated refutation and was skipped)"
+            )
             if struct_trials:
                 tag = f"circulant-GB x {struct_trials} + " + tag
         else:
@@ -1077,11 +1136,12 @@ def main(argv):
             if ftrials:
                 fast_tag = f" + fast x {ftrials}"
                 if ftrials < ftarget:
-                    fast_tag += (f" of {ftarget} (wall-clock cap "
-                                 f"{FAST_SECONDS / 60:g} min reached)")
-            tag = (f"deep, {len(seeds)} RIS seeds x {trials} trials "
-                   f"(<={budget:.0f}s each){fast_tag}" if deep else
-                   f"standard, {trials} trials (<={budget:.0f}s)")
+                    fast_tag += f" of {ftarget} (wall-clock cap {FAST_SECONDS / 60:g} min reached)"
+            tag = (
+                f"deep, {len(seeds)} RIS seeds x {trials} trials (<={budget:.0f}s each){fast_tag}"
+                if deep
+                else f"standard, {trials} trials (<={budget:.0f}s)"
+            )
             # The structural pass is priced on BOTH paths (it is cheap and does
             # not depend on record status), so its tag is appended outside the
             # deep/standard branch -- a standard-path run must still show it ran.
@@ -1109,8 +1169,7 @@ def main(argv):
             "fold_trials": fold_trials,
             # Names the mechanism that ended the run early, so a receipt with a
             # short method list is self-explaining rather than looking truncated.
-            "short_circuited_by": ("circulant-GB" if struct_refuted
-                                   else "orbit-fold" if fold_refuted else None),
+            "short_circuited_by": ("circulant-GB" if struct_refuted else "orbit-fold" if fold_refuted else None),
             "methods": list(results),
             "diff_class": cls,
             "diff_reason": why,
@@ -1121,20 +1180,20 @@ def main(argv):
             # still reproduces the verdict it belongs to.
             gate, hits = cached
             gate["revalidated"] = sorted(hits)
-            tag = ("reused refutation from "
-                   f"{(gate['reused_from'].get('head_sha') or '?')[:8]}"
-                   f" (seed {gate.get('seed')}, witness re-checked); "
-                   f"diff: {cls}")
+            tag = (
+                "reused refutation from "
+                f"{(gate['reused_from'].get('head_sha') or '?')[:8]}"
+                f" (seed {gate.get('seed')}, witness re-checked); "
+                f"diff: {cls}"
+            )
         elif search_cache:
-            RC.store(search_cache, doc_bytes, gate, hits, deep=deep,
-                     accelerated=GF is not None, head_sha=head_sha)
+            RC.store(search_cache, doc_bytes, gate, hits, deep=deep, accelerated=GF is not None, head_sha=head_sha)
         if "circuit" in doc:
             gate["circuit"] = {
                 "searched": run_circuit,
                 "refuted": bool(circ_hits),
                 "failed": circ_failed,
-                "hits": {s: {"found": w, "claimed": c}
-                         for s, (w, _, c) in circ_hits.items()},
+                "hits": {s: {"found": w, "claimed": c} for s, (w, _, c) in circ_hits.items()},
                 "notes": circ_notes,
             }
         if receipt_dir:
@@ -1149,39 +1208,51 @@ def main(argv):
                 "seed": gate.get("seed", seed),
                 "detail": "distance gate recorded by gate_changed.py",
             }
-            verdict["passed"] = bool(
-                verdict.get("passed") and not hits
-                and not circ_hits and not circ_failed)
+            verdict["passed"] = bool(verdict.get("passed") and not hits and not circ_hits and not circ_failed)
             slug = os.path.splitext(os.path.basename(f))[0]
             receipt = make_receipt(
-                doc, p, verdict, gate=gate, repo_root=code_root,
-                pr_number=pr_number, pr_author=pr_author,
-                base_sha=base_sha, head_sha=head_sha)
+                doc,
+                p,
+                verdict,
+                gate=gate,
+                repo_root=code_root,
+                pr_number=pr_number,
+                pr_author=pr_author,
+                base_sha=base_sha,
+                head_sha=head_sha,
+            )
             write_receipt(receipt, receipt_dir, slug)
         if hits:
             refuted += 1
             for m, (dh, wit) in hits.items():
-                print(f"REFUTED  {f} [{m}]: weight-{dh} logical < claimed distance "
-                      f"{doc['distance']['d']}\n         witness = {wit}")
+                print(
+                    f"REFUTED  {f} [{m}]: weight-{dh} logical < claimed distance "
+                    f"{doc['distance']['d']}\n         witness = {wit}"
+                )
         else:
-            print(f"ok       {f} ({tag}): no logical lighter than "
-                  f"{doc['distance']['d']}")
+            print(f"ok       {f} ({tag}): no logical lighter than {doc['distance']['d']}")
         if circ_failed:
             failed += 1
-            print(f"FAIL     {f} [circuit]: gate could not search the DEM "
-                  f"({circ_failed}); failing closed -- manual review required")
+            print(
+                f"FAIL     {f} [circuit]: gate could not search the DEM "
+                f"({circ_failed}); failing closed -- manual review required"
+            )
         elif circ_hits:
             if not hits:
                 refuted += 1
             for s, (w, wit, c) in circ_hits.items():
-                print(f"REFUTED  {f} [circuit-{s}]: weight-{w} undetected "
-                      f"logical fault set < claimed d_circ {c}\n"
-                      f"         witness (dem error indices) = {wit}")
+                print(
+                    f"REFUTED  {f} [circuit-{s}]: weight-{w} undetected "
+                    f"logical fault set < claimed d_circ {c}\n"
+                    f"         witness (dem error indices) = {wit}"
+                )
         elif circ_notes:
             print(f"ok       {f} [circuit]: {'; '.join(circ_notes)}")
     if refuted:
-        print(f"\n{refuted} submission(s) refuted: claimed distance is not supported "
-              f"by an independent search. See witnesses above.")
+        print(
+            f"\n{refuted} submission(s) refuted: claimed distance is not supported "
+            f"by an independent search. See witnesses above."
+        )
     if failed:
         print(f"\n{failed} submission(s) failed preflight checks.")
     return 1 if (refuted or failed) else 0

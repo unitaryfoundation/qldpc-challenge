@@ -10,6 +10,7 @@ time: a hit is byte-identical to a fresh pass, a key covers the validator and
 not just the board, one changed entry re-verifies one entry rather than the
 board, and CI reads no memo except one the job itself named.
 """
+
 import json
 import os
 import shutil
@@ -51,9 +52,7 @@ def count_passes(monkeypatch):
     """Count structural verifications, so a hit is observable and not inferred."""
     calls = []
     real = Q.verify
-    monkeypatch.setattr(
-        Q, "verify",
-        lambda doc, *a, **k: (calls.append(1), real(doc, *a, **k))[1])
+    monkeypatch.setattr(Q, "verify", lambda doc, *a, **k: (calls.append(1), real(doc, *a, **k))[1])
     return calls
 
 
@@ -67,10 +66,9 @@ def shape(reports):
     return [(e["slug"], e["report"], e["load_error"]) for e in reports]
 
 
-def test_a_hit_is_what_a_fresh_pass_would_have_computed(board, tmp_path,
-                                                        monkeypatch):
+def test_a_hit_is_what_a_fresh_pass_would_have_computed(board, tmp_path, monkeypatch):
     """The whole argument for caching this is that it is deterministic."""
-    monkeypatch.setenv("QLDPC_BOARD_CACHE", "")      # no memo at all
+    monkeypatch.setenv("QLDPC_BOARD_CACHE", "")  # no memo at all
     want = shape(fresh(board))
 
     monkeypatch.delenv("CI", raising=False)
@@ -85,7 +83,7 @@ def test_a_hit_is_what_a_fresh_pass_would_have_computed(board, tmp_path,
 def test_the_memo_outlives_the_process_memo(board, memo, monkeypatch):
     fresh(board)
     calls = count_passes(monkeypatch)
-    Q._CLOSURE_DIGEST.clear()                  # as a new process would start
+    Q._CLOSURE_DIGEST.clear()  # as a new process would start
     fresh(board)
     assert calls == [], "a warm memo should verify nothing"
 
@@ -109,8 +107,7 @@ def test_one_changed_entry_reverifies_one_entry(board, memo, monkeypatch):
     assert changed["doc"]["k"] == 5 and not changed["report"]["ok"]
 
 
-def test_a_changed_validator_closure_retires_every_entry(board, memo, monkeypatch,
-                                                         tmp_path):
+def test_a_changed_validator_closure_retires_every_entry(board, memo, monkeypatch, tmp_path):
     """codes/ can be byte-identical while the verifier is not.
 
     A branch switch, a re-pin or an unmerged local edit all leave the board
@@ -121,8 +118,7 @@ def test_a_changed_validator_closure_retires_every_entry(board, memo, monkeypatc
     fresh(board)
     calls = count_passes(monkeypatch)
     Q._CLOSURE_DIGEST.clear()
-    monkeypatch.setattr(Q, "validator_closure_digest",
-                        lambda *a, **k: "a-different-closure")
+    monkeypatch.setattr(Q, "validator_closure_digest", lambda *a, **k: "a-different-closure")
     fresh(board)
     assert len(calls) == 2, "a different closure must not reuse its reports"
 
@@ -168,7 +164,7 @@ def test_a_job_can_point_its_processes_at_one_memo(board, memo, monkeypatch):
     calls = count_passes(monkeypatch)
     want = shape(fresh(board))
     assert len(calls) == 2, "the job's first pass verifies both entries"
-    Q._CLOSURE_DIGEST.clear()                  # as the job's next process would start
+    Q._CLOSURE_DIGEST.clear()  # as the job's next process would start
     assert shape(fresh(board)) == want
     assert len(calls) == 2, "and its second pass verifies nothing"
 
@@ -207,8 +203,7 @@ def test_a_broken_board_file_is_cached_as_the_error_it_is(board, memo, monkeypat
     assert shape(again) == shape(out)
 
 
-def test_two_entries_with_the_same_bytes_share_one_memo_entry(tmp_path, memo,
-                                                              monkeypatch):
+def test_two_entries_with_the_same_bytes_share_one_memo_entry(tmp_path, memo, monkeypatch):
     """The key is the content, so a byte-identical copy is already answered.
 
     Worth pinning rather than discovering: the report does not depend on the
@@ -237,6 +232,7 @@ def test_a_pooled_pass_gives_the_serial_reports_and_fills_the_memo(tmp_path, mon
     holds, is what the serial pass produces.
     """
     import shutil
+
     board = tmp_path / "codes"
     board.mkdir()
     for i in range(3):

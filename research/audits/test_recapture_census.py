@@ -12,6 +12,7 @@ of the real search are the sampling units and the truth is known on both
 units. The arithmetic is pinned separately on hand-computed cases, and the
 record-reading path on records written by verify/recapture.py itself.
 """
+
 import importlib.util
 import itertools
 import json
@@ -52,6 +53,7 @@ def _toric(L=5):
 
     def iv(r, c):
         return L * L + (r % L) * L + (c % L)
+
     n = 2 * L * L
     HX = np.zeros((L * L, n), np.int8)
     HZ = np.zeros((L * L, n), np.int8)
@@ -92,10 +94,16 @@ def test_the_ground_truth_is_what_the_lattice_says():
 
 
 def _doc():
-    return {"n": N, "k": 2, "code_type": "CSS",
-            "checks": {"X": [[int(q) for q in np.nonzero(r)[0]] for r in HX],
-                       "Z": [[int(q) for q in np.nonzero(r)[0]] for r in HZ]},
-            "distance": {"d": 5}}
+    return {
+        "n": N,
+        "k": 2,
+        "code_type": "CSS",
+        "checks": {
+            "X": [[int(q) for q in np.nonzero(r)[0]] for r in HX],
+            "Z": [[int(q) for q in np.nonzero(r)[0]] for r in HZ],
+        },
+        "distance": {"d": 5},
+    }
 
 
 def _runs(trials, seeds):
@@ -105,23 +113,36 @@ def _runs(trials, seeds):
         cap = RC.Capture(threshold=5)
         H.ris_min_logical(HX, HZ, trials=trials, seed=s, capture=cap.side("X"))
         cap.result = {"method": "ris", "trials": trials}
-        recs.append(RC.entry_record(_doc(), "50-2-5", run_seed=s, file_seed=s, capture=cap, seconds=0.1,
-                                    refuted=False, d_found=5, trials=trials, battery=RC.battery_of(cap)))
+        recs.append(
+            RC.entry_record(
+                _doc(),
+                "50-2-5",
+                run_seed=s,
+                file_seed=s,
+                capture=cap,
+                seconds=0.1,
+                refuted=False,
+                d_found=5,
+                trials=trials,
+                battery=RC.battery_of(cap),
+            )
+        )
     return recs
 
 
 # -- the arithmetic ------------------------------------------------------------
 
+
 def test_chao_on_hand_computed_cases():
     # bias-corrected incidence form: S + ((m-1)/m) f1 (f1-1) / (2 (f2+1))
     e, lo, hi, var = est.chao(10, 4, 2, runs=1000)
     assert abs(e - (10 + 0.999 * 4 * 3 / 6)) < 1e-9 and 10 <= lo <= e <= hi
-    e0, lo0, hi0, _ = est.chao(10, 0, 3, runs=20)        # everything seen twice or more
+    e0, lo0, hi0, _ = est.chao(10, 0, 3, runs=20)  # everything seen twice or more
     assert e0 == 10 and (lo0, hi0) == (10, 10)
-    e2, lo2, hi2, var2 = est.chao(6, 5, 0, runs=10)       # f2 = 0 branch
+    e2, lo2, hi2, var2 = est.chao(6, 5, 0, runs=10)  # f2 = 0 branch
     assert e2 == pytest.approx(6 + 0.9 * 5 * 4 / 2) and var2 > 0 and lo2 >= 6 and hi2 > e2
     assert est.chao(0, 0, 0, runs=5) == (0.0, 0.0, 0.0, 0.0)
-    assert est.chao(4, 4, 0, runs=1)[0] == 4.0           # one run: no estimate
+    assert est.chao(4, 4, 0, runs=1)[0] == 4.0  # one run: no estimate
 
 
 def test_the_interval_cannot_fall_below_what_was_seen():
@@ -131,6 +152,7 @@ def test_the_interval_cannot_fall_below_what_was_seen():
 
 
 # -- calibration on the toric code ------------------------------------------------
+
 
 def _censuses(trials, runs, batches=20):
     """Independent censuses of the real search: (op class at w = 5, cls class at w = 5)."""
@@ -185,8 +207,7 @@ def test_the_sparse_regime_is_marked_and_fails_in_both_directions(trials, runs):
         elif c["ci95"][1] < 10:
             below += 1
             assert c["S_obs"] < 10 and c["estimate"] == c["S_obs"], c
-    print(f"\n  trials={trials} runs={runs}: {above} censuses missed from above, {below} from below, "
-          f"all marked sparse")
+    print(f"\n  trials={trials} runs={runs}: {above} censuses missed from above, {below} from below, all marked sparse")
     text = est.render(est.census(_runs(trials, range(runs))))
     assert "(sparse)" in text
 
@@ -199,9 +220,10 @@ def test_enough_runs_saturate_and_say_so():
 
 # -- reading records and reporting ---------------------------------------------
 
+
 def test_strata_without_captures_report_budget_only():
     recs = _runs(1, range(3))
-    for r in recs:                                     # nothing found at weight <= 5
+    for r in recs:  # nothing found at weight <= 5
         r["sides"]["X"].update(captured=0, w=[], op=[], cls=[])
     st = est.census(recs)["50-2-5"]["X"]["ris/py/10s"]
     assert st["classes"] == {} and "3 run(s), 3 trials" in st["note"]
@@ -213,7 +235,7 @@ def test_strata_without_captures_report_budget_only():
 
 def test_runs_are_deduplicated_and_batteries_stratified():
     recs = _runs(2, range(6))
-    doubled = recs + [json.loads(json.dumps(recs[0]))]              # the same run twice
+    doubled = recs + [json.loads(json.dumps(recs[0]))]  # the same run twice
     assert est.census(doubled)["50-2-5"]["X"]["ris/py/10s"]["runs"] == 6
     deep = json.loads(json.dumps(recs[1]))
     deep["battery"]["key"] = "ris/py/60s"
@@ -236,8 +258,9 @@ def test_files_round_trip_including_gzip_and_a_torn_line(tmp_path):
     for r in recs[:2]:
         RC.append_record(str(plain), r)
     with open(plain, "a", encoding="utf-8") as f:
-        f.write('{"slug": "50-2-5", "sides": {"X": {"w": [5')          # killed mid-write
+        f.write('{"slug": "50-2-5", "sides": {"X": {"w": [5')  # killed mid-write
     import gzip
+
     with gzip.open(tmp_path / "b.jsonl.gz", "wt", encoding="utf-8") as f:
         for r in recs[2:]:
             f.write(json.dumps(r) + "\n")
@@ -256,12 +279,13 @@ def test_no_table_and_no_records_is_a_usage_error_not_a_report(tmp_path):
 
 # -- the incidence table ---------------------------------------------------------
 
+
 def test_folding_accumulates_across_sweeps_and_counts_a_run_once(tmp_path):
     table_path = str(tmp_path / "incidence.json")
     week1, week2 = _runs(2, range(10)), _runs(2, range(10, 20))
-    table = est.load_table(table_path)                 # none yet: a fresh table
+    table = est.load_table(table_path)  # none yet: a fresh table
     assert est.fold(table, week1) == 10
-    assert est.fold(table, week1) == 0                 # the same runs again: nothing new
+    assert est.fold(table, week1) == 0  # the same runs again: nothing new
     assert est.fold(table, week2) == 10
     est.save_table(table, table_path)
     again = est.load_table(table_path)
@@ -287,7 +311,7 @@ def test_the_fold_command_writes_the_table(tmp_path):
         RC.append_record(str(path), r)
     table_path = str(tmp_path / "t" / "incidence.json")
     assert est.main(["fold", "--table", table_path, str(path)]) == 0
-    assert est.main(["fold", "--table", table_path, str(path)]) == 0     # idempotent
+    assert est.main(["fold", "--table", table_path, str(path)]) == 0  # idempotent
     assert est.load_table(table_path)["folded_records"] == 5
 
 

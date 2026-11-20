@@ -146,8 +146,7 @@ def test_external_workflow_actions_are_pinned_to_full_commit_shas():
 
 def test_workflow_triggers_for_verifier_claim_surfaces():
     patterns = pull_request_paths()
-    uncovered = [surface for surface in ("codes", "circuits", "certs")
-                 if not covers(patterns, surface)]
+    uncovered = [surface for surface in ("codes", "circuits", "certs") if not covers(patterns, surface)]
     assert not uncovered, (
         f"a PR changing only {uncovered} skips the trusted submission checks; "
         "add each claim surface to .github/workflows/verify.yml"

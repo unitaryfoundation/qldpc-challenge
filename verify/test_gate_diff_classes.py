@@ -1,7 +1,8 @@
 """Tests for gate_changed.classify_diff (issue #654): the refutation gate
 prices the DIFF, so each diff class must be recognized from structural facts
 alone, and anything else must fail closed to the full gate. Pure unit tests
-on document dicts -- no git, no search."""
+on document dicts -- no git, no search.
+"""
 
 import copy
 import os
@@ -12,28 +13,27 @@ BASE = {
     "schema_version": "0.1",
     "name": "[[60,8,6]] synthetic test code",
     "code_type": "CSS",
-    "n": 60, "k": 8,
+    "n": 60,
+    "k": 8,
     "checks": {"X": [[0, 1, 2]], "Z": [[3, 4, 5]]},
     "distance": {
         "d": 6,
-        "X": {"value": 6, "confidence": "upper_bound",
-              "witness": [0, 1, 2, 3, 4, 5]},
-        "Z": {"value": 7, "confidence": "upper_bound",
-              "witness": [0, 1, 2, 3, 4, 5, 6]},
+        "X": {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]},
+        "Z": {"value": 7, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5, 6]},
     },
-    "provenance": {"authors": ["@alice"], "construction": "synthetic",
-                   "notes": "original."},
+    "provenance": {"authors": ["@alice"], "construction": "synthetic", "notes": "original."},
 }
 
 
 def _tightened(value=5):
     doc = copy.deepcopy(BASE)
     doc["name"] = f"[[60,8,{value}]] synthetic test code"
-    doc["distance"]["X"] = {"value": value, "confidence": "upper_bound",
-                            "witness": list(range(value)),
-                            "witness_provenance": {
-                                "found_by": ["@bob"], "date": "2026-08-20",
-                                "found_at_samples": 10 ** 6}}
+    doc["distance"]["X"] = {
+        "value": value,
+        "confidence": "upper_bound",
+        "witness": list(range(value)),
+        "witness_provenance": {"found_by": ["@bob"], "date": "2026-08-20", "found_at_samples": 10**6},
+    }
     doc["distance"]["d"] = min(value, doc["distance"]["Z"]["value"])
     doc["provenance"]["notes"] += " Refuted."
     return doc
@@ -42,10 +42,11 @@ def _tightened(value=5):
 def _with_layout(doc=None):
     doc = copy.deepcopy(doc or BASE)
     doc["schema_version"] = "0.2"
-    doc["locality"] = {"coordinates": [[float(i), 0.0] for i in range(60)],
-                       "layers": 2,
-                       "contributed_by": {"by": ["@bob"],
-                                          "date": "2026-08-20"}}
+    doc["locality"] = {
+        "coordinates": [[float(i), 0.0] for i in range(60)],
+        "layers": 2,
+        "contributed_by": {"by": ["@bob"], "date": "2026-08-20"},
+    }
     doc["provenance"]["notes"] += " Layout added."
     return doc
 
@@ -74,8 +75,7 @@ def test_tightening():
 
 def test_tightening_both_sides():
     doc = _tightened()
-    doc["distance"]["Z"] = {"value": 6, "confidence": "upper_bound",
-                            "witness": list(range(6))}
+    doc["distance"]["Z"] = {"value": 6, "confidence": "upper_bound", "witness": list(range(6))}
     doc["distance"]["d"] = 5
     cls, _ = G.classify_diff(BASE, doc)
     assert cls == "tightening"
@@ -84,8 +84,11 @@ def test_tightening_both_sides():
 def test_survival_stamp_added_goes_deep():
     doc = copy.deepcopy(BASE)
     doc["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@bob"], "date": "2026-08-20",
-        "found_at_samples": 10 ** 6, "survived_samples": 10 ** 8}
+        "found_by": ["@bob"],
+        "date": "2026-08-20",
+        "found_at_samples": 10**6,
+        "survived_samples": 10**8,
+    }
     cls, _ = G.classify_diff(BASE, doc)
     assert cls == "stamp"
 
@@ -93,17 +96,20 @@ def test_survival_stamp_added_goes_deep():
 def test_survival_stamp_raised_goes_deep():
     base = copy.deepcopy(BASE)
     base["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@carol"], "date": "2026-08-01",
-        "found_at_samples": 10 ** 6, "survived_samples": 10 ** 7}
+        "found_by": ["@carol"],
+        "date": "2026-08-01",
+        "found_at_samples": 10**6,
+        "survived_samples": 10**7,
+    }
     doc = copy.deepcopy(base)
-    doc["distance"]["X"]["witness_provenance"]["survived_samples"] = 10 ** 9
+    doc["distance"]["X"]["witness_provenance"]["survived_samples"] = 10**9
     cls, _ = G.classify_diff(base, doc)
     assert cls == "stamp"
 
 
 def test_stamp_riding_on_tightening_goes_deep():
     doc = _tightened()
-    doc["distance"]["X"]["witness_provenance"]["survived_samples"] = 10 ** 8
+    doc["distance"]["X"]["witness_provenance"]["survived_samples"] = 10**8
     cls, _ = G.classify_diff(BASE, doc)
     assert cls == "stamp"
 
@@ -111,8 +117,11 @@ def test_stamp_riding_on_tightening_goes_deep():
 def test_unchanged_survival_stamp_is_not_a_stamp_diff():
     base = copy.deepcopy(BASE)
     base["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@carol"], "date": "2026-08-01",
-        "found_at_samples": 10 ** 6, "survived_samples": 10 ** 7}
+        "found_by": ["@carol"],
+        "date": "2026-08-01",
+        "found_at_samples": 10**6,
+        "survived_samples": 10**7,
+    }
     doc = _with_layout(base)
     cls, _ = G.classify_diff(base, doc)
     assert cls == "layout-only"
@@ -141,7 +150,7 @@ def test_mixed_layout_and_tightening_is_full():
 
 def test_witness_weight_mismatch_is_full():
     doc = _tightened()
-    doc["distance"]["X"]["witness"] = list(range(4))   # weight 4, value 5
+    doc["distance"]["X"]["witness"] = list(range(4))  # weight 4, value 5
     cls, _ = G.classify_diff(BASE, doc)
     assert cls == "full"
 
@@ -174,14 +183,17 @@ def test_garbage_fails_closed():
 
 def test_base_doc_pairing(tmp_path):
     """base_doc_for must find the base doc for an in-place edit AND across a
-    refutation rename; a genuinely new file must yield None (-> 'new')."""
+    refutation rename; a genuinely new file must yield None (-> 'new').
+    """
     import json
     import subprocess
+
     td = str(tmp_path)
 
     def git(*args):
-        subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
-                        *args], cwd=td, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@t", "-c", "user.name=t", *args], cwd=td, check=True, capture_output=True
+        )
 
     os.makedirs(os.path.join(td, "codes"))
 
@@ -223,20 +235,18 @@ def test_base_doc_pairing(tmp_path):
 
 
 def _grid_layout(n=60, layers=2, spacing=1.0):
-    return {"coordinates": [[spacing * (i % 10), spacing * (i // 10)]
-                            for i in range(n)],
-            "layers": layers}
+    return {"coordinates": [[spacing * (i % 10), spacing * (i // 10)] for i in range(n)], "layers": layers}
 
 
 def test_tighter_class_guard_fires_on_honest_layout():
     doc = copy.deepcopy(BASE)
-    doc["locality"] = _grid_layout()          # honest bilayer grid, small radius
+    doc["locality"] = _grid_layout()  # honest bilayer grid, small radius
     assert G.layout_entered_tighter_class(BASE, doc)
 
 
 def test_tighter_class_guard_ignores_dishonest_layout():
     doc = copy.deepcopy(BASE)
-    doc["locality"] = _grid_layout(spacing=0.1)   # violates unit spacing
+    doc["locality"] = _grid_layout(spacing=0.1)  # violates unit spacing
     assert not G.layout_entered_tighter_class(BASE, doc)
 
 
@@ -250,14 +260,17 @@ def test_tighter_class_guard_ignores_unchanged_class():
 
 def test_structural_ok_ignores_candidate_pipeline_gates():
     """An in-place board edit self-matches dedup and advances nothing; only
-    the verifier gate decides structural soundness (#674 regression)."""
-    self_dup = {"passed": False,
-                "gates": {"verify": {"ok": True, "failed_checks": []},
-                          "dedup": {"exact_duplicate_of": "40-10-4.json"},
-                          "novelty": {"board_advancing": False}}}
+    the verifier gate decides structural soundness (#674 regression).
+    """
+    self_dup = {
+        "passed": False,
+        "gates": {
+            "verify": {"ok": True, "failed_checks": []},
+            "dedup": {"exact_duplicate_of": "40-10-4.json"},
+            "novelty": {"board_advancing": False},
+        },
+    }
     assert G.structural_ok(self_dup)
-    rejected = {"passed": False,
-                "gates": {"verify": {"ok": False,
-                                     "failed_checks": ["coordinates_cover_all_qubits"]}}}
+    rejected = {"passed": False, "gates": {"verify": {"ok": False, "failed_checks": ["coordinates_cover_all_qubits"]}}}
     assert not G.structural_ok(rejected)
     assert not G.structural_ok({})

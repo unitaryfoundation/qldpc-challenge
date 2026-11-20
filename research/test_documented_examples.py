@@ -25,6 +25,7 @@ Costs about twice `research/test_smoke.py`: two Monte Carlo witness searches
 (~14 s each, `make_submission`'s own `trials`, one per run of the snippet) plus
 a board load and a `refute=False` gate pass.
 """
+
 import io
 import os
 import re
@@ -58,8 +59,10 @@ def _claimed_gate_outcome():
     passed even after the claim it was meant to police had been deleted.
     """
     m = re.search(r"^\s*#\s*gate:\s*(\w+)", _documented_snippet(), re.M)
-    assert m, ("QUICKSTART.md's example carries no `# gate: <outcome>` marker, so "
-               "there is nothing for this test to hold the page to")
+    assert m, (
+        "QUICKSTART.md's example carries no `# gate: <outcome>` marker, so "
+        "there is nothing for this test to hold the page to"
+    )
     return m.group(1)
 
 
@@ -72,7 +75,7 @@ def _prose_after_snippet():
     text = _quickstart_text()
     m = re.search(r"```python\n(.*?)```", text, re.S)
     assert m, "QUICKSTART.md no longer has a python example to check"
-    return text[m.end():].split("\n## ", 1)[0]
+    return text[m.end() :].split("\n## ", 1)[0]
 
 
 @pytest.fixture(scope="module")
@@ -92,6 +95,7 @@ def board(session_board_memo):
         if p not in sys.path:
             sys.path.insert(0, os.path.join(ROOT, p))
     from build import load_entries
+
     was = os.environ.get("QLDPC_BOARD_CACHE")
     os.environ["QLDPC_BOARD_CACHE"] = session_board_memo
     try:
@@ -108,7 +112,8 @@ def board(session_board_memo):
 @pytest.fixture(scope="module")
 def staging(tmp_path_factory):
     """A throwaway staging root, so the documented call writes for real without
-    touching the repository's `research/candidates/`."""
+    touching the repository's `research/candidates/`.
+    """
     return str(tmp_path_factory.mktemp("staging"))
 
 
@@ -140,7 +145,7 @@ def _run_documented_snippet(staging_root, *, build=None):
         bb.build_bb = build
 
     cwd = os.getcwd()
-    os.chdir(ROOT)                      # the snippet uses relative sys.path entries
+    os.chdir(ROOT)  # the snippet uses relative sys.path entries
     ns = {"__name__": "documented_example"}
     try:
         with redirect_stdout(io.StringIO()):
@@ -154,9 +159,11 @@ def _run_documented_snippet(staging_root, *, build=None):
             os.environ[coordination.RUN_ID_ENV] = real_rid
     assert "doc" in ns, "the documented snippet no longer builds a submission doc"
     assert "path" in ns and os.path.isfile(ns["path"]), (
-        "the documented snippet no longer stages the submission it builds")
+        "the documented snippet no longer stages the submission it builds"
+    )
     assert os.path.commonpath([ns["path"], staging_root]) == staging_root, (
-        f"the documented snippet staged outside its run directory: {ns['path']}")
+        f"the documented snippet staged outside its run directory: {ns['path']}"
+    )
     return ns
 
 
@@ -180,6 +187,7 @@ def doc(documented):
 def test_documented_snippet_builds_a_schema_valid_submission(doc):
     """The page's example must still run and still be well-formed."""
     from submit import validate
+
     errs = validate(doc)
     assert not errs, f"QUICKSTART.md's example is no longer schema-valid: {errs}"
 
@@ -190,8 +198,8 @@ def test_documented_parameters_match_the_page(doc):
     assert named, "QUICKSTART.md no longer names a [[n,k,d]] for its example"
     n, k, _d = (int(x) for x in named[0])
     assert (doc["n"], doc["k"]) == (n, k), (
-        f"QUICKSTART.md names [[{n},{k},...]] but the snippet builds "
-        f"[[{doc['n']},{doc['k']},{doc['distance']['d']}]]")
+        f"QUICKSTART.md names [[{n},{k},...]] but the snippet builds [[{doc['n']},{doc['k']},{doc['distance']['d']}]]"
+    )
 
 
 @pytest.mark.usefixtures("board_memo")
@@ -219,16 +227,19 @@ def test_page_claim_agrees_with_the_gate(doc, board):
             "QUICKSTART.md's example is marked `# gate: duplicate` and the prose "
             f"says it is already on the board, but the gate reports no duplicate "
             f"(passed={verdict.get('passed')}). Either the entry left the board or "
-            "the page is stale; fix whichever is wrong.")
+            "the page is stale; fix whichever is wrong."
+        )
         assert verdict.get("passed") is False
         assert "duplicate" in _prose_after_snippet().lower(), (
             "the example is marked `# gate: duplicate` but the paragraph after it "
-            "never tells the reader so; a reader who skips the comment is misled")
+            "never tells the reader so; a reader who skips the comment is misled"
+        )
     else:
         assert verdict.get("passed") is True, (
             f"QUICKSTART.md's example is marked `# gate: "
             f"{_claimed_gate_outcome()}` but the gate returns passed="
-            f"{verdict.get('passed')}. Update the marker or the example.")
+            f"{verdict.get('passed')}. Update the marker or the example."
+        )
 
 
 def test_documented_staging_keeps_both_candidates(documented, staging):
@@ -256,14 +267,15 @@ def test_documented_staging_keeps_both_candidates(documented, staging):
     second = _run_documented_snippet(staging, build=permuted)
     first_doc, second_doc = documented["doc"], second["doc"]
     assert (first_doc["n"], first_doc["k"]) == (second_doc["n"], second_doc["k"])
-    assert first_doc["checks"] != second_doc["checks"], \
+    assert first_doc["checks"] != second_doc["checks"], (
         "the second run rebuilt the first candidate, so nothing was tested"
+    )
 
     first_path, second_path = documented["path"], second["path"]
-    assert os.path.dirname(first_path) == os.path.dirname(second_path), \
-        "the two runs did not share a staging directory"
+    assert os.path.dirname(first_path) == os.path.dirname(second_path), "the two runs did not share a staging directory"
     assert first_path != second_path, "the second candidate took the first one's path"
     assert os.path.isfile(first_path) and os.path.isfile(second_path)
     stem = os.path.splitext(os.path.basename(first_path))[0]
     assert os.path.basename(second_path).startswith(stem), (
-        f"the second candidate was staged under an unrelated name: {second_path}")
+        f"the second candidate was staged under an unrelated name: {second_path}"
+    )

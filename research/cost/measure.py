@@ -32,6 +32,7 @@ Nothing under verify/ is changed or read beyond calling it.
     uv run --extra certify python research/cost/measure.py run --only 96-16-6 --resume
     uv run python research/cost/measure.py render                          # the table only
 """
+
 import argparse
 import datetime
 import hashlib
@@ -93,10 +94,13 @@ def _doc(slug):
 def _check_weight(doc, hd):
     if doc.get("code_type") == "stabilizer":
         import numpy as np
+
         A, B = hd.stabilizer_matrices(doc)
         return int(max(((np.asarray(A) != 0) | (np.asarray(B) != 0)).sum(axis=1)))
-    return max(max((len(set(r)) for r in doc["checks"]["X"]), default=0),
-               max((len(set(r)) for r in doc["checks"]["Z"]), default=0))
+    return max(
+        max((len(set(r)) for r in doc["checks"]["X"]), default=0),
+        max((len(set(r)) for r in doc["checks"]["Z"]), default=0),
+    )
 
 
 def _timed(fn, *a, **kw):
@@ -107,28 +111,36 @@ def _timed(fn, *a, **kw):
 
 def environment(hd):
     import numpy
+
     try:
         import scipy
+
         scipy_v = scipy.__version__
     except ImportError:
         scipy_v = None
     cpu = platform.processor() or None
     if sys.platform == "darwin":
         try:
-            cpu = subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"],
-                                          text=True).strip()
+            cpu = subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"], text=True).strip()
         except (OSError, subprocess.CalledProcessError):
             pass
     try:
-        head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         head = None
-    return {"date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
-            "head": head, "platform": platform.platform(), "cpu": cpu,
-            "cores": os.cpu_count(), "python": platform.python_version(),
-            "numpy": numpy.__version__, "scipy": scipy_v,
-            "accelerator": hd._fast is not None}
+    return {
+        "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
+        "head": head,
+        "platform": platform.platform(),
+        "cpu": cpu,
+        "cores": os.cpu_count(),
+        "python": platform.python_version(),
+        "numpy": numpy.__version__,
+        "scipy": scipy_v,
+        "accelerator": hd._fast is not None,
+    }
 
 
 def certify_side(slug, side, tlim):
@@ -136,6 +148,7 @@ def certify_side(slug, side, tlim):
     import certify
     import gf2
     import qldpc_verify as V
+
     doc = _doc(slug)
     n = doc["n"]
     HX = V._matrix(doc["checks"]["X"], n)
@@ -145,15 +158,17 @@ def certify_side(slug, side, tlim):
     t0 = time.perf_counter()
     lighter = certify._exists_lighter(H, LZ, val - 1, tlim)
     status = {True: "refuted", False: "exact", None: "milp_tlim"}[lighter]
-    print(json.dumps({"status": status, "secs": round(time.perf_counter() - t0, 2),
-                      "generators": int(LZ.shape[0]), "value": val}))
+    print(
+        json.dumps(
+            {"status": status, "secs": round(time.perf_counter() - t0, 2), "generators": int(LZ.shape[0]), "value": val}
+        )
+    )
 
 
 def measure_certify(slug, doc, tlim, wall):
     """Both sides, each in its own process under the wall cap."""
     if doc.get("code_type") == "stabilizer":
-        return {"status": "not_available",
-                "note": "verify/certify.py has no Pauli-weight formulation yet"}
+        return {"status": "not_available", "note": "verify/certify.py has no Pauli-weight formulation yet"}
     out = {"milp_tlim_s": tlim, "wall_cap_s": wall}
     for side in ("X", "Z"):
         if side not in doc["distance"]:
@@ -161,42 +176,58 @@ def measure_certify(slug, doc, tlim, wall):
             continue
         t0 = time.perf_counter()
         try:
-            r = subprocess.run([sys.executable, os.path.abspath(__file__), "certify-side",
-                                slug, side, str(tlim)], capture_output=True, text=True,
-                               timeout=wall, check=False)
+            r = subprocess.run(
+                [sys.executable, os.path.abspath(__file__), "certify-side", slug, side, str(tlim)],
+                capture_output=True,
+                text=True,
+                timeout=wall,
+                check=False,
+            )
             secs = round(time.perf_counter() - t0, 2)
             if r.returncode != 0:
-                out[side] = {"status": "error", "secs": secs,
-                             "detail": (r.stderr or "").strip()[-300:]}
+                out[side] = {"status": "error", "secs": secs, "detail": (r.stderr or "").strip()[-300:]}
             else:
                 rec = json.loads(r.stdout.strip().splitlines()[-1])
                 rec["secs"] = secs
                 out[side] = rec
         except subprocess.TimeoutExpired:
-            out[side] = {"status": "wall_cap", "secs": round(time.perf_counter() - t0, 2),
-                         "detail": f"killed at the {wall} s wall cap"}
+            out[side] = {
+                "status": "wall_cap",
+                "secs": round(time.perf_counter() - t0, 2),
+                "detail": f"killed at the {wall} s wall cap",
+            }
     return out
 
 
-def measure(slug, role, *, seed, ris_trials, fast_trials, tlim, wall, log=print,
-            ris_trials_large=2000, ris_large_n=300):
+def measure(
+    slug, role, *, seed, ris_trials, fast_trials, tlim, wall, log=print, ris_trials_large=2000, ris_large_n=300
+):
     import heuristic_distance as hd
     import qldpc_verify as V
     import validate_candidate as VC
+
     doc = _doc(slug)
     n = doc["n"]
     stab = doc.get("code_type") == "stabilizer"
-    rec = {"slug": slug, "role": role, "code_type": "stabilizer" if stab else "CSS",
-           "n": n, "k": doc["k"], "d": doc["distance"]["d"], "w": _check_weight(doc, hd),
-           "blob": _blob(os.path.join(CODES, slug + ".json")), "gate": {}, "rungs": {}}
+    rec = {
+        "slug": slug,
+        "role": role,
+        "code_type": "stabilizer" if stab else "CSS",
+        "n": n,
+        "k": doc["k"],
+        "d": doc["distance"]["d"],
+        "w": _check_weight(doc, hd),
+        "blob": _blob(os.path.join(CODES, slug + ".json")),
+        "gate": {},
+        "rungs": {},
+    }
     g = rec["gate"]
     g["verify_structural_s"], _ = _timed(V.verify, doc, refute=False)
     t, (refuted, _, _, trials) = _timed(hd.refute_check, doc, seed=seed)
     g["refute_s"], g["refute_trials"], g["refute_cap_s"] = t, int(trials), 10.0
     g["refute_found_lighter"] = bool(refuted)
     g["gate_total_s"], _ = _timed(VC.validate_candidate, doc, seed=seed)
-    g["dedup_novelty_s_derived"] = round(
-        max(0.0, g["gate_total_s"] - g["verify_structural_s"] - g["refute_s"]), 2)
+    g["dedup_novelty_s_derived"] = round(max(0.0, g["gate_total_s"] - g["verify_structural_s"] - g["refute_s"]), 2)
     log(f"  gate {g['gate_total_s']} s (structural {g['verify_structural_s']}, refute {g['refute_s']})")
 
     r = rec["rungs"]
@@ -236,8 +267,14 @@ def measure(slug, role, *, seed, ris_trials, fast_trials, tlim, wall, log=print,
     r["submit_search_s"] = round(sum(ris_default) + r.get(f"fast_{max(fast_trials)}_s", 0), 2)
     r["submit_search_extrapolated"] = trials != ris_trials
     rec["certify"] = measure_certify(slug, doc, tlim, wall)
-    log("  certify: " + ", ".join(f"{s}={rec['certify'][s]['status']} {rec['certify'][s].get('secs')} s"
-                                  for s in ("X", "Z") if s in rec["certify"]))
+    log(
+        "  certify: "
+        + ", ".join(
+            f"{s}={rec['certify'][s]['status']} {rec['certify'][s].get('secs')} s"
+            for s in ("X", "Z")
+            if s in rec["certify"]
+        )
+    )
     return rec
 
 
@@ -265,50 +302,68 @@ def render(table):
     p = table["parameters"]
     ris, fast = p["ris_trials"], p["fast_trials"]
     env = table["environment"]
-    lines = [f"Measured {env['date']} on {env['cpu']} ({env['cores']} cores), Python "
-             f"{env['python']}, numpy {env['numpy']}, scipy {env['scipy']}, accelerator "
-             f"{'built' if env['accelerator'] else 'absent'}; board at {str(env['head'])[:9]}. "
-             f"Cold board pass before the first gate call: {_fmt_s(table.get('board_pass_cold_s'))}. "
-             f"Certification: MILP time limit {p['certify_tlim_s']} s per generator, wall cap "
-             f"{p['certify_wall_s']} s per side. Times are this machine's, not a guarantee.",
-             "",
-             f"| entry | type | n | k | d at measurement | w | gate | of which refute | RIS {ris:,}/side (measured, or "
-             f"implied from a smaller count) | fast {fast[0]:,} | fast {fast[-1]:,} | submit search | "
-             "certify X | certify Z |",
-             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    lines = [
+        f"Measured {env['date']} on {env['cpu']} ({env['cores']} cores), Python "
+        f"{env['python']}, numpy {env['numpy']}, scipy {env['scipy']}, accelerator "
+        f"{'built' if env['accelerator'] else 'absent'}; board at {str(env['head'])[:9]}. "
+        f"Cold board pass before the first gate call: {_fmt_s(table.get('board_pass_cold_s'))}. "
+        f"Certification: MILP time limit {p['certify_tlim_s']} s per generator, wall cap "
+        f"{p['certify_wall_s']} s per side. Times are this machine's, not a guarantee.",
+        "",
+        f"| entry | type | n | k | d at measurement | w | gate | of which refute | RIS {ris:,}/side (measured, or "
+        f"implied from a smaller count) | fast {fast[0]:,} | fast {fast[-1]:,} | submit search | "
+        "certify X | certify Z |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
     renamed = [e for e in table["entries"] if e.get("measured_slug")]
     if renamed:
         mapping = "; ".join(f"{e['measured_slug']} -> {e['slug']}" for e in renamed)
-        lines[2:2] = ["Current entry slugs are shown below. The d column is the claimed bound "
-                      "at measurement. For renamed entries, d and all "
-                      "timings still describe the original measured input; measured_slug "
-                      f"and blob in the JSON preserve its identity: {mapping}.", ""]
+        lines[2:2] = [
+            "Current entry slugs are shown below. The d column is the claimed bound "
+            "at measurement. For renamed entries, d and all "
+            "timings still describe the original measured input; measured_slug "
+            f"and blob in the JSON preserve its identity: {mapping}.",
+            "",
+        ]
     for e in table["entries"]:
         g, r, c = e["gate"], e["rungs"], e["certify"]
         sides = ("P",) if e["code_type"] == "stabilizer" else ("X", "Z")
         tr = r.get("ris_trials", ris)
-        ris_s = " / ".join(_fmt_s(r.get(f"ris_{ris}_{s}_s")) if tr == ris else
-                           f"~{_fmt_s(r.get(f'ris_{ris}_{s}_implied_s'))} (from {tr:,} trials in "
-                           f"{_fmt_s(r.get(f'ris_{tr}_{s}_s'))})" for s in sides)
-        lines.append(f"| {e['slug']} | {e['code_type']} | {e['n']} | {e['k']} | {e['d']} | {e['w']} | "
-                     f"{_fmt_s(g['gate_total_s'])} | {_fmt_s(g['refute_s'])} | {ris_s} | "
-                     f"{_fmt_s(r.get(f'fast_{fast[0]}_s'))} | {_fmt_s(r.get(f'fast_{fast[-1]}_s'))} | "
-                     f"{'~' if r.get('submit_search_extrapolated') else ''}{_fmt_s(r['submit_search_s'])} | "
-                     f"{_fmt_cert(c, 'X')} | {_fmt_cert(c, 'Z')} |")
+        ris_s = " / ".join(
+            _fmt_s(r.get(f"ris_{ris}_{s}_s"))
+            if tr == ris
+            else f"~{_fmt_s(r.get(f'ris_{ris}_{s}_implied_s'))} (from {tr:,} trials in "
+            f"{_fmt_s(r.get(f'ris_{tr}_{s}_s'))})"
+            for s in sides
+        )
+        lines.append(
+            f"| {e['slug']} | {e['code_type']} | {e['n']} | {e['k']} | {e['d']} | {e['w']} | "
+            f"{_fmt_s(g['gate_total_s'])} | {_fmt_s(g['refute_s'])} | {ris_s} | "
+            f"{_fmt_s(r.get(f'fast_{fast[0]}_s'))} | {_fmt_s(r.get(f'fast_{fast[-1]}_s'))} | "
+            f"{'~' if r.get('submit_search_extrapolated') else ''}{_fmt_s(r['submit_search_s'])} | "
+            f"{_fmt_cert(c, 'X')} | {_fmt_cert(c, 'Z')} |"
+        )
     return "\n".join(lines) + "\n"
 
 
 def run(a):
     import heuristic_distance as hd
     import qldpc_verify as V
+
     table = {"cost_version": 1, "issue": 4026, "entries": []}
     if a.resume and os.path.exists(a.out):
         with open(a.out, encoding="utf-8") as f:
             table = json.load(f)
     done = {e["slug"] for e in table["entries"]}
-    table["parameters"] = {"seed": a.seed, "ris_trials": a.ris_trials, "fast_trials": a.fast_trials,
-                           "ris_trials_large": a.ris_trials_large, "ris_large_n": a.ris_large_n,
-                           "certify_tlim_s": a.certify_tlim, "certify_wall_s": a.certify_wall}
+    table["parameters"] = {
+        "seed": a.seed,
+        "ris_trials": a.ris_trials,
+        "fast_trials": a.fast_trials,
+        "ris_trials_large": a.ris_trials_large,
+        "ris_large_n": a.ris_large_n,
+        "certify_tlim_s": a.certify_tlim,
+        "certify_wall_s": a.certify_wall,
+    }
     table["environment"] = environment(hd)
     if "board_pass_cold_s" not in table:
         print("board pass (dedup needs every entry's report; cold the first time) ...", flush=True)
@@ -322,9 +377,18 @@ def run(a):
             print(f"{slug}: not on the board; skipped", flush=True)
             continue
         print(f"{slug} ({role})", flush=True)
-        rec = measure(slug, role, seed=a.seed, ris_trials=a.ris_trials, fast_trials=a.fast_trials,
-                      tlim=a.certify_tlim, wall=a.certify_wall, log=lambda m: print(m, flush=True),
-                      ris_trials_large=a.ris_trials_large, ris_large_n=a.ris_large_n)
+        rec = measure(
+            slug,
+            role,
+            seed=a.seed,
+            ris_trials=a.ris_trials,
+            fast_trials=a.fast_trials,
+            tlim=a.certify_tlim,
+            wall=a.certify_wall,
+            log=lambda m: print(m, flush=True),
+            ris_trials_large=a.ris_trials_large,
+            ris_large_n=a.ris_large_n,
+        )
         table["entries"] = [e for e in table["entries"] if e["slug"] != slug] + [rec]
         order = {s: i for i, (s, _) in enumerate(GRID)}
         table["entries"].sort(key=lambda e: order.get(e["slug"], 999))
@@ -346,8 +410,12 @@ def main(argv=None):
     r.add_argument("--resume", action="store_true", help="keep entries already in --out")
     r.add_argument("--seed", type=int, default=0)
     r.add_argument("--ris-trials", type=int, default=20000)
-    r.add_argument("--ris-trials-large", type=int, default=2000,
-                   help="RIS trials per side above --ris-large-n (the default count is implied from the rate)")
+    r.add_argument(
+        "--ris-trials-large",
+        type=int,
+        default=2000,
+        help="RIS trials per side above --ris-large-n (the default count is implied from the rate)",
+    )
     r.add_argument("--ris-large-n", type=int, default=300)
     r.add_argument("--fast-trials", type=int, nargs="+", default=[200_000, 2_000_000])
     r.add_argument("--certify-tlim", type=float, default=60.0, help="MILP time limit per generator")

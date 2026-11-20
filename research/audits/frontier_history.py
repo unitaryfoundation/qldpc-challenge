@@ -76,8 +76,7 @@ _FLOORS = (4, 6, 8, 12, 16, 24)
 
 
 def git(args, cwd):
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True,
-                          check=False)
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, check=False)
 
 
 def parse_log(text):
@@ -124,8 +123,7 @@ def fetch_params(requests, cwd):
     out = {}
     if not requests:
         return out
-    proc = subprocess.Popen(["git", "cat-file", "--batch"], cwd=cwd,
-                            stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(["git", "cat-file", "--batch"], cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     for sha, path in requests:
         proc.stdin.write(f"{sha}:{path}\n".encode())
         proc.stdin.flush()
@@ -154,8 +152,7 @@ def params(raw):
         if isinstance(dist, dict):
             d = dist.get("d")
             if d is None:
-                sides = [dist[s]["value"] for s in ("X", "Z")
-                         if isinstance(dist.get(s), dict) and "value" in dist[s]]
+                sides = [dist[s]["value"] for s in ("X", "Z") if isinstance(dist.get(s), dict) and "value" in dist[s]]
                 d = min(sides) if sides else None
         else:
             d = dist
@@ -201,8 +198,9 @@ def hypervolume(front, n_ref):
     the union area of the origin-anchored rectangles of every box that spans
     it.
     """
-    boxes = sorted(((math.log2(n_ref / n), 1 + math.log2(k), 1 + math.log2(d))
-                    for n, k, d in front if n < n_ref), reverse=True)
+    boxes = sorted(
+        ((math.log2(n_ref / n), 1 + math.log2(k), 1 + math.log2(d)) for n, k, d in front if n < n_ref), reverse=True
+    )
     total, i = 0.0, 0
     while i < len(boxes):
         a = boxes[i][0]
@@ -295,8 +293,9 @@ def replay(repo, n_ref=1000):
         front = set(flat)
         on_front = sum(1 for nkd in state.values() if nkd in front)
         note = describe_loss(prev_front - front, flat)
-        rows.append((utc_day(date), sha[:9], len(state), len(front), on_front,
-                     tuple(flat), hypervolume(flat, n_ref), note))
+        rows.append(
+            (utc_day(date), sha[:9], len(state), len(front), on_front, tuple(flat), hypervolume(flat, n_ref), note)
+        )
         prev_front = front
     return rows, state
 
@@ -312,8 +311,7 @@ def walk(repo):
     ``(n, k, d, code_type)`` or None. Shared by :func:`replay` and
     :func:`cell_moves`, so the two read history one way.
     """
-    log = git(["log", "--first-parent", "--reverse", "--name-status",
-               "--format=C %H %cI", "--", "codes/"], repo)
+    log = git(["log", "--first-parent", "--reverse", "--name-status", "--format=C %H %cI", "--", "codes/"], repo)
     if log.returncode != 0:
         sys.exit(f"git log failed: {log.stderr.decode().strip()}")
     commits = parse_log(log.stdout.decode())
@@ -421,9 +419,9 @@ class _CellFront:
         """Return ``(kd^2/n, path)`` of the live member with the highest efficiency, or None."""
         if not self.index:
             return None
-        arr = self.rows[:self.size].astype(float)
+        arr = self.rows[: self.size].astype(float)
         eff = arr[:, 1] * arr[:, 2] * arr[:, 2] / arr[:, 0]
-        eff[~self.alive[:self.size]] = -1.0
+        eff[~self.alive[: self.size]] = -1.0
         row = int(eff.argmax())
         path = next(p for p, r in self.index.items() if r == row)
         return float(eff[row]), path
@@ -435,8 +433,8 @@ class _CellFront:
         better, k and d higher, with at least one axis strict.
         """
         n, k, d, w = point
-        arr = self.rows[:self.size]
-        live = self.alive[:self.size]
+        arr = self.rows[: self.size]
+        live = self.alive[: self.size]
         weak = (arr[:, 0] <= n) & (arr[:, 1] >= k) & (arr[:, 2] >= d) & (arr[:, 3] <= w)
         strict = (arr[:, 0] < n) | (arr[:, 1] > k) | (arr[:, 2] > d) | (arr[:, 3] < w)
         return bool(self.np.any(live & weak & strict))
@@ -489,9 +487,9 @@ def cell_moves(repo, classes, *, cell_of=None):
             if status == "R" and dest in classes and path not in classes:
                 classes[path] = classes[dest]
 
-    members = {}            # cell -> _CellFront
+    members = {}  # cell -> _CellFront
     last = {}
-    best = {}               # cell -> (kd^2/n, path) before the landing
+    best = {}  # cell -> (kd^2/n, path) before the landing
     count = 0
     for date, sha, applied in landings(commits, blobs):
         count += 1
@@ -541,9 +539,12 @@ def cell_moves(repo, classes, *, cell_of=None):
                 shown = new or old
                 slug = os.path.basename(path)[:-5]
                 entry["frontier"] = {
-                    "date": date, "commit": sha[:9], "landing": count,
+                    "date": date,
+                    "commit": sha[:9],
+                    "landing": count,
                     "what": f"[[{shown[0]},{shown[1]},{shown[2]}]] w={w} {slug}",
-                    "kind": kind}
+                    "kind": kind,
+                }
             now = here.best()
             before = best.get(cell)
             if now is not None and (before is None or abs(now[0] - before[0]) > 1e-9):
@@ -551,10 +552,13 @@ def cell_moves(repo, classes, *, cell_of=None):
                 point = here.get(path)
                 slug = os.path.basename(path)[:-5]
                 entry["record"] = {
-                    "date": date, "commit": sha[:9], "landing": count,
+                    "date": date,
+                    "commit": sha[:9],
+                    "landing": count,
                     "what": f"[[{point[0]},{point[1]},{point[2]}]] w={point[3]} {slug}",
                     "kind": ("raised" if before is None or eff > before[0] else "lowered"),
-                    "kd2_over_n": round(eff, 3)}
+                    "kd2_over_n": round(eff, 3),
+                }
             best[cell] = now
     return last, count
 
@@ -570,10 +574,9 @@ def ramp(t):
     pos = min(max(float(t), 0.0), 1.0) * (len(_RAMP) - 1)
     i = min(int(pos), len(_RAMP) - 2)
     f = pos - i
-    lo = [_RAMP[i][j:j + 2] for j in (1, 3, 5)]
-    hi = [_RAMP[i + 1][j:j + 2] for j in (1, 3, 5)]
-    mix = [round(int(a, 16) + (int(b, 16) - int(a, 16)) * f)
-           for a, b in zip(lo, hi)]
+    lo = [_RAMP[i][j : j + 2] for j in (1, 3, 5)]
+    hi = [_RAMP[i + 1][j : j + 2] for j in (1, 3, 5)]
+    mix = [round(int(a, 16) + (int(b, 16) - int(a, 16)) * f) for a, b in zip(lo, hi)]
     return "#%02x%02x%02x" % tuple(mix)
 
 
@@ -675,15 +678,13 @@ def place_labels(points, panel):
     placed, out = [], []
     for x, y, text in points:
         w, h = 4.9 * len(text), 9.0
-        for dx, dy, anchor in ((4, -4, "start"), (4, 11, "start"),
-                               (-4, -4, "end")):
+        for dx, dy, anchor in ((4, -4, "start"), (4, 11, "start"), (-4, -4, "end")):
             lx, ly = x + dx, y + dy
             bx0 = lx if anchor == "start" else lx - w
             box = (bx0, ly - h, bx0 + w, ly)
             if box[0] < x0 or box[2] > x1 or box[1] < y0 or box[3] > y1:
                 continue
-            if any(not (box[2] < p[0] or box[0] > p[2] or box[3] < p[1]
-                        or box[1] > p[3]) for p in placed):
+            if any(not (box[2] < p[0] or box[0] > p[2] or box[3] < p[1] or box[1] > p[3]) for p in placed):
                 continue
             placed.append(box)
             out.append((lx, ly, anchor, text))
@@ -691,13 +692,14 @@ def place_labels(points, panel):
     return out
 
 
-_SUBTITLE = ('CSS board replayed from git history; each panel keeps the codes '
-             'with d at or above its floor; lower n and higher k are better; '
-             'check weight and locality ignored; log axes')
+_SUBTITLE = (
+    "CSS board replayed from git history; each panel keeps the codes "
+    "with d at or above its floor; lower n and higher k are better; "
+    "check weight and locality ignored; log axes"
+)
 
 
-def render_panels(snaps, floors, title, subtitle, colors, labels, extent,
-                  timeline=None):
+def render_panels(snaps, floors, title, subtitle, colors, labels, extent, timeline=None):
     """Return the SVG text of the panel chart for the given snapshots.
 
     One panel per distance floor, one staircase per snapshot in ``snaps``
@@ -716,8 +718,7 @@ def render_panels(snaps, floors, title, subtitle, colors, labels, extent,
     that places the frame in the board's history.
     """
     stairs = [[floor_staircase(s[5], f) for s in snaps] for f in floors]
-    ext_pts = [p for s in extent for f in floors
-               for p in floor_staircase(s[5], f)]
+    ext_pts = [p for s in extent for f in floors for p in floor_staircase(s[5], f)]
     if not ext_pts:
         sys.exit("no frontier code clears the lowest floor")
 
@@ -738,10 +739,8 @@ def render_panels(snaps, floors, title, subtitle, colors, labels, extent,
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
         f'viewBox="0 0 {w} {h}" font-family="system-ui,sans-serif">',
         f'<rect width="{w}" height="{h}" fill="#ffffff"/>',
-        f'<text x="{left}" y="28" font-size="15" font-weight="600">{title}'
-        '</text>',
-        f'<text x="{left}" y="46" font-size="11.5" fill="#666">{subtitle}'
-        '</text>',
+        f'<text x="{left}" y="28" font-size="15" font-weight="600">{title}</text>',
+        f'<text x="{left}" y="46" font-size="11.5" fill="#666">{subtitle}</text>',
         '<defs><pattern id="loss" patternUnits="userSpaceOnUse" width="6" '
         'height="6" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" '
         f'y2="6" stroke="{_LOSS}" stroke-width="2.2"/></pattern></defs>',
@@ -754,42 +753,39 @@ def render_panels(snaps, floors, title, subtitle, colors, labels, extent,
         x1, y1 = x0 + pw, y0 + ph
 
         def sx(n, x0=x0, x1=x1):
-            return x0 + (math.log(n) - math.log(n_min)) / \
-                (math.log(n_max) - math.log(n_min)) * (x1 - x0)
+            return x0 + (math.log(n) - math.log(n_min)) / (math.log(n_max) - math.log(n_min)) * (x1 - x0)
 
         def sy(k, y0=y0, y1=y1):
-            return y1 - (math.log(max(k, k_min)) - math.log(k_min)) / \
-                (math.log(k_max) - math.log(k_min)) * (y1 - y0)
+            return y1 - (math.log(max(k, k_min)) - math.log(k_min)) / (math.log(k_max) - math.log(k_min)) * (y1 - y0)
 
-        parts.append(f'<clipPath id="p{idx}"><rect x="{x0:.1f}" y="{y0:.1f}" '
-                     f'width="{pw:.1f}" height="{ph:.1f}"/></clipPath>')
+        parts.append(
+            f'<clipPath id="p{idx}"><rect x="{x0:.1f}" y="{y0:.1f}" width="{pw:.1f}" height="{ph:.1f}"/></clipPath>'
+        )
         for v in log_ticks(k_min, k_max):
             yy = sy(v)
-            parts.append(f'<line x1="{x0:.1f}" y1="{yy:.1f}" x2="{x1:.1f}" '
-                         f'y2="{yy:.1f}" stroke="#eee"/>')
-            parts.append(f'<text x="{x0 - 6:.1f}" y="{yy + 3.5:.1f}" '
-                         f'font-size="9.5" fill="#888" text-anchor="end">{v:g}'
-                         '</text>')
+            parts.append(f'<line x1="{x0:.1f}" y1="{yy:.1f}" x2="{x1:.1f}" y2="{yy:.1f}" stroke="#eee"/>')
+            parts.append(
+                f'<text x="{x0 - 6:.1f}" y="{yy + 3.5:.1f}" font-size="9.5" fill="#888" text-anchor="end">{v:g}</text>'
+            )
         for v in log_ticks(n_min, n_max):
             xx = sx(v)
-            parts.append(f'<line x1="{xx:.1f}" y1="{y0:.1f}" x2="{xx:.1f}" '
-                         f'y2="{y1:.1f}" stroke="#f2f2f2"/>')
-            parts.append(f'<text x="{xx:.1f}" y="{y1 + 13:.1f}" font-size="9.5" '
-                         f'fill="#888" text-anchor="middle">{v:g}</text>')
+            parts.append(f'<line x1="{xx:.1f}" y1="{y0:.1f}" x2="{xx:.1f}" y2="{y1:.1f}" stroke="#f2f2f2"/>')
+            parts.append(
+                f'<text x="{xx:.1f}" y="{y1 + 13:.1f}" font-size="9.5" fill="#888" text-anchor="middle">{v:g}</text>'
+            )
 
         parts.append(f'<g clip-path="url(#p{idx})">')
         for i in range(1, len(per_floor)):
-            for kind, a, b, klo, khi in region_rects(per_floor[i - 1],
-                                                     per_floor[i], n_max):
+            for kind, a, b, klo, khi in region_rects(per_floor[i - 1], per_floor[i], n_max):
                 # A gain is tinted with the snapshot that made it, so the
                 # shading itself says when; a loss is a red hatch, which no
                 # tint in the ramp can be mistaken for.
-                fill = (f'fill="{colors[i]}" fill-opacity="0.16"'
-                        if kind == "gain" else 'fill="url(#loss)"')
+                fill = f'fill="{colors[i]}" fill-opacity="0.16"' if kind == "gain" else 'fill="url(#loss)"'
                 parts.append(
                     f'<rect x="{sx(a):.1f}" y="{sy(khi):.1f}" '
                     f'width="{sx(b) - sx(a):.1f}" '
-                    f'height="{sy(klo) - sy(khi):.1f}" {fill}/>')
+                    f'height="{sy(klo) - sy(khi):.1f}" {fill}/>'
+                )
         for i, stair in enumerate(per_floor):
             if not stair:
                 continue
@@ -802,96 +798,107 @@ def render_panels(snaps, floors, title, subtitle, colors, labels, extent,
                 pts.append(f"L{sx(n):.1f},{sy(stair[j - 1][1]):.1f}")
                 pts.append(f"L{sx(n):.1f},{sy(k):.1f}")
             width = 2.2 if last else 1.4
-            parts.append(f'<path d="{" ".join(pts)}" fill="none" '
-                         f'stroke="{colors[i]}" stroke-width="{width}" '
-                         'stroke-linejoin="round"/>')
+            parts.append(
+                f'<path d="{" ".join(pts)}" fill="none" '
+                f'stroke="{colors[i]}" stroke-width="{width}" '
+                'stroke-linejoin="round"/>'
+            )
             ex, ey = sx(stair[-1][0]), sy(stair[-1][1])
-            parts.append(f'<line x1="{ex:.1f}" y1="{ey:.1f}" x2="{x1:.1f}" '
-                         f'y2="{ey:.1f}" stroke="{colors[i]}" '
-                         f'stroke-width="{width * 0.6:.1f}" '
-                         'stroke-dasharray="3 3"/>')
+            parts.append(
+                f'<line x1="{ex:.1f}" y1="{ey:.1f}" x2="{x1:.1f}" '
+                f'y2="{ey:.1f}" stroke="{colors[i]}" '
+                f'stroke-width="{width * 0.6:.1f}" '
+                'stroke-dasharray="3 3"/>'
+            )
         parts.append("</g>")
 
         today = per_floor[-1]
         dots = [(sx(n), sy(k), f"{n},{k},{d}") for n, k, d in today]
         for x, y, _ in dots:
-            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.6" '
-                         f'fill="{colors[-1]}" stroke="#fff" stroke-width="1"/>')
+            parts.append(
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.6" fill="{colors[-1]}" stroke="#fff" stroke-width="1"/>'
+            )
         for lx, ly, anchor, text in place_labels(dots, (x0, y0, x1, y1)):
             # A white halo keeps a label legible where it crosses a line.
-            parts.append(f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="8.5" '
-                         f'fill="#333" text-anchor="{anchor}" stroke="#fff" '
-                         'stroke-width="2.5" stroke-linejoin="round" '
-                         f'paint-order="stroke">{text}</text>')
+            parts.append(
+                f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="8.5" '
+                f'fill="#333" text-anchor="{anchor}" stroke="#fff" '
+                'stroke-width="2.5" stroke-linejoin="round" '
+                f'paint-order="stroke">{text}</text>'
+            )
 
-        parts.append(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{pw:.1f}" '
-                     f'height="{ph:.1f}" fill="none" stroke="#bbb"/>')
-        parts.append(f'<text x="{x0 + 6:.1f}" y="{y0 - 6:.1f}" font-size="12" '
-                     f'font-weight="600" fill="#333">d ≥ {floor}'
-                     f'<tspan dx="10" font-weight="400" fill="#777">'
-                     f'{len(today)} codes on the staircase</tspan></text>')
+        parts.append(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{pw:.1f}" height="{ph:.1f}" fill="none" stroke="#bbb"/>')
+        parts.append(
+            f'<text x="{x0 + 6:.1f}" y="{y0 - 6:.1f}" font-size="12" '
+            f'font-weight="600" fill="#333">d ≥ {floor}'
+            f'<tspan dx="10" font-weight="400" fill="#777">'
+            f"{len(today)} codes on the staircase</tspan></text>"
+        )
         if r == rws - 1:
-            parts.append(f'<text x="{(x0 + x1) / 2:.1f}" y="{y1 + 28:.1f}" '
-                         'font-size="10.5" fill="#666" text-anchor="middle">'
-                         'block length n</text>')
+            parts.append(
+                f'<text x="{(x0 + x1) / 2:.1f}" y="{y1 + 28:.1f}" '
+                'font-size="10.5" fill="#666" text-anchor="middle">'
+                "block length n</text>"
+            )
         if c == 0:
-            parts.append(f'<text transform="translate({x0 - 34:.1f},'
-                         f'{(y0 + y1) / 2:.1f}) rotate(-90)" font-size="10.5" '
-                         'fill="#666" text-anchor="middle">logical qubits k'
-                         '</text>')
+            parts.append(
+                f'<text transform="translate({x0 - 34:.1f},'
+                f'{(y0 + y1) / 2:.1f}) rotate(-90)" font-size="10.5" '
+                'fill="#666" text-anchor="middle">logical qubits k'
+                "</text>"
+            )
 
     # Legend: each snapshot as its line over its tint (the tint is the region
     # that snapshot gained), then the loss hatch and the dot.
     ly = h - 22
     lx = left
     for i, (label, color) in enumerate(zip(labels, colors)):
-        parts.append(f'<rect x="{lx}" y="{ly - 11}" width="22" height="10" '
-                     f'fill="{color}" fill-opacity="0.16"/>')
-        parts.append(f'<line x1="{lx}" y1="{ly - 11}" x2="{lx + 22}" '
-                     f'y2="{ly - 11}" stroke="{color}" '
-                     f'stroke-width="{2.4 if i == len(labels) - 1 else 1.6}"/>')
-        parts.append(f'<text x="{lx + 27}" y="{ly}" font-size="10.5" '
-                     f'fill="#444">{label}</text>')
+        parts.append(f'<rect x="{lx}" y="{ly - 11}" width="22" height="10" fill="{color}" fill-opacity="0.16"/>')
+        parts.append(
+            f'<line x1="{lx}" y1="{ly - 11}" x2="{lx + 22}" '
+            f'y2="{ly - 11}" stroke="{color}" '
+            f'stroke-width="{2.4 if i == len(labels) - 1 else 1.6}"/>'
+        )
+        parts.append(f'<text x="{lx + 27}" y="{ly}" font-size="10.5" fill="#444">{label}</text>')
         lx += 27 + 5.4 * len(label) + 16
-    parts.append(f'<text x="{lx}" y="{ly}" font-size="10.5" fill="#777">'
-                 '(tint: region that snapshot gained)</text>')
+    parts.append(f'<text x="{lx}" y="{ly}" font-size="10.5" fill="#777">(tint: region that snapshot gained)</text>')
     lx += 5.4 * 35 + 16
-    parts.append(f'<rect x="{lx}" y="{ly - 11}" width="22" height="10" '
-                 'fill="url(#loss)"/>')
-    parts.append(f'<text x="{lx + 27}" y="{ly}" font-size="10.5" fill="#444">'
-                 'lost (correction or removal)</text>')
+    parts.append(f'<rect x="{lx}" y="{ly - 11}" width="22" height="10" fill="url(#loss)"/>')
+    parts.append(f'<text x="{lx + 27}" y="{ly}" font-size="10.5" fill="#444">lost (correction or removal)</text>')
     lx += 27 + 5.4 * 28 + 16
-    parts.append(f'<circle cx="{lx + 5}" cy="{ly - 5}" r="2.6" '
-                 f'fill="{colors[-1]}"/>')
-    parts.append(f'<text x="{lx + 14}" y="{ly}" font-size="10.5" fill="#444">'
-                 'code on the last staircase (n,k,d)</text>')
+    parts.append(f'<circle cx="{lx + 5}" cy="{ly - 5}" r="2.6" fill="{colors[-1]}"/>')
+    parts.append(f'<text x="{lx + 14}" y="{ly}" font-size="10.5" fill="#444">code on the last staircase (n,k,d)</text>')
 
     if timeline:
         # A strip from the board's first landing to its last, month ticks,
         # and a marker at this frame's date.
-        first, last, cur = (datetime.date.fromisoformat(t).toordinal()
-                            for t in timeline)
+        first, last, cur = (datetime.date.fromisoformat(t).toordinal() for t in timeline)
         ty, tx0, tx1 = h - 52, left, w - right
 
         def tx(day):
             return tx0 + (day - first) / max(last - first, 1) * (tx1 - tx0)
 
-        parts.append(f'<line x1="{tx0}" y1="{ty}" x2="{tx1}" y2="{ty}" '
-                     'stroke="#ccc" stroke-width="2"/>')
-        parts.append(f'<line x1="{tx0}" y1="{ty}" x2="{tx(cur):.1f}" '
-                     f'y2="{ty}" stroke="{colors[-1]}" stroke-width="2"/>')
+        parts.append(f'<line x1="{tx0}" y1="{ty}" x2="{tx1}" y2="{ty}" stroke="#ccc" stroke-width="2"/>')
+        parts.append(
+            f'<line x1="{tx0}" y1="{ty}" x2="{tx(cur):.1f}" y2="{ty}" stroke="{colors[-1]}" stroke-width="2"/>'
+        )
         day = datetime.date.fromordinal(first).replace(day=1)
         while day.toordinal() <= last:
             if day.toordinal() >= first:
-                parts.append(f'<line x1="{tx(day.toordinal()):.1f}" '
-                             f'y1="{ty - 4}" x2="{tx(day.toordinal()):.1f}" '
-                             f'y2="{ty + 4}" stroke="#aaa"/>')
-                parts.append(f'<text x="{tx(day.toordinal()):.1f}" '
-                             f'y="{ty + 15}" font-size="9" fill="#888" '
-                             f'text-anchor="middle">{day.strftime("%b")}</text>')
+                parts.append(
+                    f'<line x1="{tx(day.toordinal()):.1f}" '
+                    f'y1="{ty - 4}" x2="{tx(day.toordinal()):.1f}" '
+                    f'y2="{ty + 4}" stroke="#aaa"/>'
+                )
+                parts.append(
+                    f'<text x="{tx(day.toordinal()):.1f}" '
+                    f'y="{ty + 15}" font-size="9" fill="#888" '
+                    f'text-anchor="middle">{day.strftime("%b")}</text>'
+                )
             day = (day.replace(day=28) + datetime.timedelta(days=4)).replace(day=1)
-        parts.append(f'<circle cx="{tx(cur):.1f}" cy="{ty}" r="4.5" '
-                     f'fill="{colors[-1]}" stroke="#fff" stroke-width="1.5"/>')
+        parts.append(
+            f'<circle cx="{tx(cur):.1f}" cy="{ty}" r="4.5" fill="{colors[-1]}" stroke="#fff" stroke-width="1.5"/>'
+        )
     parts.append("</svg>")
     return "\n".join(parts) + "\n"
 
@@ -901,12 +908,16 @@ def svg_frontier(rows, path, bucket="month", floors=_FLOORS):
     snaps = snapshots(rows, bucket)
     if not snaps:
         sys.exit("no frontier snapshots found to plot")
-    colors = ([ramp(1.0)] if len(snaps) == 1 else
-              [ramp(i / (len(snaps) - 1)) for i in range(len(snaps))])
+    colors = [ramp(1.0)] if len(snaps) == 1 else [ramp(i / (len(snaps) - 1)) for i in range(len(snaps))]
     text = render_panels(
-        snaps, floors,
+        snaps,
+        floors,
         f"Board (n, k) frontier by distance floor, as of {snaps[-1][0]}",
-        _SUBTITLE, colors, [f"as of {s[0]}" for s in snaps], snaps)
+        _SUBTITLE,
+        colors,
+        [f"as of {s[0]}" for s in snaps],
+        snaps,
+    )
     with open(path, "w", encoding="utf-8") as f:
         f.write(text)
     return snaps
@@ -941,16 +952,26 @@ def frame_svgs(rows, bucket="day", floors=_FLOORS):
         shown = ([runs[i - 1][1]] if i else []) + [first]
         colors = ([_PREV] if i else []) + [_CUR]
         labels = (["previous frame"] if i else []) + [f"as of {first[0]}"]
-        when = first[0] if first is last else \
-            f"{first[0]} (unchanged through {last[0]})"
-        subtitle = (f"{last[2]} CSS codes, {last[3]} (n, k, d) points on the "
-                    f"frontier, hypervolume {100 * last[6] / final_hv:.0f}% "
-                    "of the final frame's; lower n and higher k are better; "
-                    "log axes")
-        yield first[0], render_panels(
-            shown, floors, f"Board (n, k) frontier by distance floor, {when}",
-            subtitle, colors, labels, snaps,
-            timeline=(snaps[0][0], snaps[-1][0], last[0]))
+        when = first[0] if first is last else f"{first[0]} (unchanged through {last[0]})"
+        subtitle = (
+            f"{last[2]} CSS codes, {last[3]} (n, k, d) points on the "
+            f"frontier, hypervolume {100 * last[6] / final_hv:.0f}% "
+            "of the final frame's; lower n and higher k are better; "
+            "log axes"
+        )
+        yield (
+            first[0],
+            render_panels(
+                shown,
+                floors,
+                f"Board (n, k) frontier by distance floor, {when}",
+                subtitle,
+                colors,
+                labels,
+                snaps,
+                timeline=(snaps[0][0], snaps[-1][0], last[0]),
+            ),
+        )
 
 
 def write_frames(rows, directory, bucket="day", floors=_FLOORS):
@@ -965,8 +986,7 @@ def write_frames(rows, directory, bucket="day", floors=_FLOORS):
     return paths
 
 
-def write_gif(rows, path, bucket="day", floors=_FLOORS, frame_ms=300,
-              hold_ms=2500, width=1180):
+def write_gif(rows, path, bucket="day", floors=_FLOORS, frame_ms=300, hold_ms=2500, width=1180):
     """Assemble the frames into an animated GIF; return the frame count.
 
     The frames are drawn here; rasterizing them takes ``rsvg-convert``
@@ -976,11 +996,9 @@ def write_gif(rows, path, bucket="day", floors=_FLOORS, frame_ms=300,
     try:
         from PIL import Image
     except ImportError:
-        sys.exit("--gif needs Pillow: run under `uv run --frozen --extra "
-                 "research`")
+        sys.exit("--gif needs Pillow: run under `uv run --frozen --extra research`")
     if shutil.which("rsvg-convert") is None:
-        sys.exit("--gif needs rsvg-convert (librsvg) on PATH to rasterize "
-                 "the frames")
+        sys.exit("--gif needs rsvg-convert (librsvg) on PATH to rasterize the frames")
     images = []
     with tempfile.TemporaryDirectory() as tmp:
         for i, (date, text) in enumerate(frame_svgs(rows, bucket, floors)):
@@ -988,16 +1006,14 @@ def write_gif(rows, path, bucket="day", floors=_FLOORS, frame_ms=300,
             png = os.path.join(tmp, f"{i:04d}.png")
             with open(svg, "w", encoding="utf-8") as f:
                 f.write(text)
-            subprocess.run(["rsvg-convert", "-w", str(width), svg, "-o", png],
-                           check=True)
+            subprocess.run(["rsvg-convert", "-w", str(width), svg, "-o", png], check=True)
             with Image.open(png) as im:
                 images.append(im.convert("RGB").quantize(colors=128))
     if not images:
         sys.exit("no frontier snapshots found to animate")
     durations = [frame_ms] * len(images)
     durations[-1] = hold_ms
-    images[0].save(path, save_all=True, append_images=images[1:],
-                   duration=durations, loop=0)
+    images[0].save(path, save_all=True, append_images=images[1:], duration=durations, loop=0)
     return len(images)
 
 
@@ -1032,33 +1048,31 @@ def svg_history(rows, path):
     pts.append(f"L{x(days[-1]):.1f},{y(prev):.1f}")
 
     # Steps down, each with its size relative to the value it stepped from.
-    drops = [((vals[i - 1] - vals[i]) / vals[i - 1], i)
-             for i in range(1, len(vals)) if vals[i] < vals[i - 1]]
+    drops = [((vals[i - 1] - vals[i]) / vals[i - 1], i) for i in range(1, len(vals)) if vals[i] < vals[i - 1]]
     # The largest get a numeral at the dot and a line in the list above the
     # curve's low early stretch, where there is room; labels at the dots
     # collide.
-    named = {i: rank + 1 for rank, (_, i)
-             in enumerate(sorted(drops, reverse=True)[:8])}
+    named = {i: rank + 1 for rank, (_, i) in enumerate(sorted(drops, reverse=True)[:8])}
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
         f'viewBox="0 0 {w} {h}" font-family="system-ui,sans-serif">',
         f'<rect width="{w}" height="{h}" fill="#ffffff"/>',
         f'<text x="{left}" y="24" font-size="15" font-weight="600">'
-        'Board (n, k, d) frontier hypervolume over time</text>',
+        "Board (n, k, d) frontier hypervolume over time</text>",
         f'<text x="{left}" y="40" font-size="11.5" fill="#666">'
-        f'CSS board replayed from git history; share of today\'s '
-        f'({rows[-1][0]}) value; log2 coordinates; every step down marked, '
-        'the largest named</text>',
+        f"CSS board replayed from git history; share of today's "
+        f"({rows[-1][0]}) value; log2 coordinates; every step down marked, "
+        "the largest named</text>",
     ]
     for v in (0.0, 0.25, 0.5, 0.75, 1.0):
         if v > ymax:
             break
         yy = y(v)
-        parts.append(f'<line x1="{left}" y1="{yy:.1f}" x2="{w - right}" '
-                     f'y2="{yy:.1f}" stroke="#eee"/>')
-        parts.append(f'<text x="{left - 8}" y="{yy + 4:.1f}" font-size="11" '
-                     f'fill="#888" text-anchor="end">{v:.2f}</text>')
+        parts.append(f'<line x1="{left}" y1="{yy:.1f}" x2="{w - right}" y2="{yy:.1f}" stroke="#eee"/>')
+        parts.append(
+            f'<text x="{left - 8}" y="{yy + 4:.1f}" font-size="11" fill="#888" text-anchor="end">{v:.2f}</text>'
+        )
     # Six date ticks, spaced by DATE not by index (commits cluster toward the
     # end, so evenly spaced indices give unevenly spaced dates).
     for i in range(6):
@@ -1066,37 +1080,38 @@ def svg_history(rows, path):
         xx = x(day)
         anchor = "start" if i == 0 else "end" if i == 5 else "middle"
         label = datetime.date.fromordinal(day).strftime("%m-%d")
-        parts.append(f'<line x1="{xx:.1f}" y1="{top}" x2="{xx:.1f}" '
-                     f'y2="{h - bot}" stroke="#f4f4f4"/>')
-        parts.append(f'<text x="{xx:.1f}" y="{h - bot + 16}" font-size="11" '
-                     f'fill="#888" text-anchor="{anchor}">{label}</text>')
-    parts.append(f'<path d="{" ".join(pts)}" fill="none" stroke="#1d3557" '
-                 'stroke-width="2"/>')
+        parts.append(f'<line x1="{xx:.1f}" y1="{top}" x2="{xx:.1f}" y2="{h - bot}" stroke="#f4f4f4"/>')
+        parts.append(
+            f'<text x="{xx:.1f}" y="{h - bot + 16}" font-size="11" fill="#888" text-anchor="{anchor}">{label}</text>'
+        )
+    parts.append(f'<path d="{" ".join(pts)}" fill="none" stroke="#1d3557" stroke-width="2"/>')
     for _, i in drops:
         xx, yy = x(days[i]), y(vals[i])
-        parts.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="3.2" '
-                     f'fill="{_LOSS}"/>')
+        parts.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="3.2" fill="{_LOSS}"/>')
         if i in named:
-            parts.append(f'<text x="{xx:.1f}" y="{yy + 15:.1f}" font-size="9" '
-                         f'fill="{_LOSS}" text-anchor="middle" stroke="#fff" '
-                         'stroke-width="2" paint-order="stroke">'
-                         f'{named[i]}</text>')
+            parts.append(
+                f'<text x="{xx:.1f}" y="{yy + 15:.1f}" font-size="9" '
+                f'fill="{_LOSS}" text-anchor="middle" stroke="#fff" '
+                'stroke-width="2" paint-order="stroke">'
+                f"{named[i]}</text>"
+            )
     lx, ly = left + 12, top + 12
-    parts.append(f'<text x="{lx}" y="{ly}" font-size="10" fill="#666">'
-                 f'{len(drops)} steps down; the largest:</text>')
+    parts.append(f'<text x="{lx}" y="{ly}" font-size="10" fill="#666">{len(drops)} steps down; the largest:</text>')
     rel = dict((i, r) for r, i in drops)
     for i, rank in sorted(named.items(), key=lambda t: t[1]):
         ly += 13
-        parts.append(f'<text x="{lx}" y="{ly}" font-size="10" fill="{_LOSS}">'
-                     f'{rank}</text>')
-        parts.append(f'<text x="{lx + 14}" y="{ly}" font-size="10" '
-                     f'fill="#444">{rows[i][0]}  {rows[i][7]}  '
-                     f'−{100 * rel[i]:.2f}%</text>')
-    parts.append(f'<text transform="translate(16,{(top + h - bot) / 2:.1f}) '
-                 'rotate(-90)" font-size="11" fill="#666" text-anchor="middle">'
-                 'share of today\'s hypervolume</text>')
-    parts.append(f'<line x1="{left}" y1="{h - bot}" x2="{w - right}" '
-                 f'y2="{h - bot}" stroke="#bbb"/>')
+        parts.append(f'<text x="{lx}" y="{ly}" font-size="10" fill="{_LOSS}">{rank}</text>')
+        parts.append(
+            f'<text x="{lx + 14}" y="{ly}" font-size="10" '
+            f'fill="#444">{rows[i][0]}  {rows[i][7]}  '
+            f"−{100 * rel[i]:.2f}%</text>"
+        )
+    parts.append(
+        f'<text transform="translate(16,{(top + h - bot) / 2:.1f}) '
+        'rotate(-90)" font-size="11" fill="#666" text-anchor="middle">'
+        "share of today's hypervolume</text>"
+    )
+    parts.append(f'<line x1="{left}" y1="{h - bot}" x2="{w - right}" y2="{h - bot}" stroke="#bbb"/>')
     parts.append("</svg>")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(parts) + "\n")
@@ -1104,31 +1119,28 @@ def svg_history(rows, path):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--repo", default=_REPO,
-                    help="repository to replay (default: this checkout)")
-    ap.add_argument("--out", default=None,
-                    help="write the series as CSV here (default: print a summary)")
-    ap.add_argument("--plot", default=None,
-                    help="write the per-distance-floor staircase panels as an SVG here")
-    ap.add_argument("--bucket", default=None,
-                    choices=("day", "week", "month"),
-                    help="snapshot spacing (default: month for --plot, day "
-                         "for --frames and --gif)")
-    ap.add_argument("--floors", default=",".join(map(str, _FLOORS)),
-                    help="comma-separated distance floors, one panel each")
-    ap.add_argument("--plot-history", default=None,
-                    help="write the hypervolume-over-time chart as an SVG here")
-    ap.add_argument("--frames", default=None,
-                    help="write one panel-chart SVG per snapshot into this directory")
-    ap.add_argument("--gif", default=None,
-                    help="write the panel chart as an animated GIF here, one "
-                         "frame per snapshot (needs rsvg-convert and Pillow)")
-    ap.add_argument("--frame-ms", type=int, default=300,
-                    help="GIF frame duration in ms (default: 300)")
-    ap.add_argument("--n-ref", type=int, default=1000,
-                    help="hypervolume reference block length (default: 1000)")
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--repo", default=_REPO, help="repository to replay (default: this checkout)")
+    ap.add_argument("--out", default=None, help="write the series as CSV here (default: print a summary)")
+    ap.add_argument("--plot", default=None, help="write the per-distance-floor staircase panels as an SVG here")
+    ap.add_argument(
+        "--bucket",
+        default=None,
+        choices=("day", "week", "month"),
+        help="snapshot spacing (default: month for --plot, day for --frames and --gif)",
+    )
+    ap.add_argument(
+        "--floors", default=",".join(map(str, _FLOORS)), help="comma-separated distance floors, one panel each"
+    )
+    ap.add_argument("--plot-history", default=None, help="write the hypervolume-over-time chart as an SVG here")
+    ap.add_argument("--frames", default=None, help="write one panel-chart SVG per snapshot into this directory")
+    ap.add_argument(
+        "--gif",
+        default=None,
+        help="write the panel chart as an animated GIF here, one frame per snapshot (needs rsvg-convert and Pillow)",
+    )
+    ap.add_argument("--frame-ms", type=int, default=300, help="GIF frame duration in ms (default: 300)")
+    ap.add_argument("--n-ref", type=int, default=1000, help="hypervolume reference block length (default: 1000)")
     args = ap.parse_args()
 
     rows, state = replay(args.repo, args.n_ref)
@@ -1138,45 +1150,41 @@ def main():
 
     if args.plot:
         snaps = svg_frontier(rows, args.plot, args.bucket or "month", floors)
-        print(f"wrote {len(floors)} panels x {len(snaps)} snapshots "
-              f"({snaps[0][0]} .. {snaps[-1][0]}) to {args.plot}")
+        print(f"wrote {len(floors)} panels x {len(snaps)} snapshots ({snaps[0][0]} .. {snaps[-1][0]}) to {args.plot}")
 
     if args.frames:
         paths = write_frames(rows, args.frames, args.bucket or "day", floors)
         print(f"wrote {len(paths)} frames to {args.frames}")
 
     if args.gif:
-        count = write_gif(rows, args.gif, args.bucket or "day", floors,
-                          args.frame_ms)
+        count = write_gif(rows, args.gif, args.bucket or "day", floors, args.frame_ms)
         print(f"wrote {count} frames to {args.gif}")
 
     if args.plot_history:
         drops = svg_history(rows, args.plot_history)
-        print(f"wrote hypervolume history with {len(drops)} steps down to "
-              f"{args.plot_history}")
+        print(f"wrote hypervolume history with {len(drops)} steps down to {args.plot_history}")
 
     if args.out:
         with open(args.out, "w", encoding="utf-8") as f:
-            f.write("date,commit,codes,frontier_points,frontier_codes,"
-                    "hypervolume,note\n")
+            f.write("date,commit,codes,frontier_points,frontier_codes,hypervolume,note\n")
             for date, sha, n, fp, fc, _front, hv, note in rows:
                 f.write(f"{date},{sha},{n},{fp},{fc},{hv:.3f},{note}\n")
         print(f"wrote {len(rows)} rows to {args.out}")
 
     date, sha, n, fp, fc, _front, hv, _note = rows[-1]
-    print(f"{len(rows)} board-moving commits, {rows[0][0]} .. {rows[-1][0]}"
-          + (f"; {replay.unparsed} blobs did not parse and were skipped"
-             if replay.unparsed else ""))
-    print(f"current: {n} CSS codes, {fp} (n,k,d) points on the frontier, "
-          f"{fc} codes standing on it, hypervolume {hv:.1f}")
+    print(
+        f"{len(rows)} board-moving commits, {rows[0][0]} .. {rows[-1][0]}"
+        + (f"; {replay.unparsed} blobs did not parse and were skipped" if replay.unparsed else "")
+    )
+    print(
+        f"current: {n} CSS codes, {fp} (n,k,d) points on the frontier, {fc} codes standing on it, hypervolume {hv:.1f}"
+    )
 
     if not args.out:
         step = max(1, len(rows) // 10)
         for row in rows[::step] + [rows[-1]]:
-            print(f"  {row[0]}  codes={row[2]:<5} frontier_points={row[3]:<4} "
-                  f"hypervolume={row[6]:.1f}")
-        downs = [(rows[i - 1][6], rows[i]) for i in range(1, len(rows))
-                 if rows[i][6] < rows[i - 1][6]]
+            print(f"  {row[0]}  codes={row[2]:<5} frontier_points={row[3]:<4} hypervolume={row[6]:.1f}")
+        downs = [(rows[i - 1][6], rows[i]) for i in range(1, len(rows)) if rows[i][6] < rows[i - 1][6]]
         print(f"{len(downs)} steps down:")
         for before, row in downs:
             pct = 100 * (before - row[6]) / before

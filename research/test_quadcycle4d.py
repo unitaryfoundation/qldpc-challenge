@@ -42,7 +42,7 @@ def test_regular_representation_is_an_algebra_homomorphism():
 
 
 def test_reproduces_table2_parameters():
-    for (dims, a, b, c, d, claim) in TABLE2:
+    for dims, a, b, c, d, claim in TABLE2:
         HX, HZ = build_quadcycle(dims, a, b, c, d)
         assert verify_css(HX, HZ), f"{dims}: not CSS"
         assert HX.shape[1] == claim[0], f"{dims}: n {HX.shape[1]} != {claim[0]}"
@@ -50,12 +50,11 @@ def test_reproduces_table2_parameters():
 
 
 def test_check_table2_helper_agrees():
-    assert check_table2() == [(54, 6, 6), (72, 6, 8), (162, 6, 8),
-                              (228, 6, 8), (420, 6, 8)]
+    assert check_table2() == [(54, 6, 6), (72, 6, 8), (162, 6, 8), (228, 6, 8), (420, 6, 8)]
 
 
 def test_shape_matches_built_weight():
-    for (dims, a, b, c, d, _claim) in TABLE2:
+    for dims, a, b, c, d, _claim in TABLE2:
         _, w = quadcycle_shape(dims, a, b, c, d)
         HX, _ = build_quadcycle(dims, a, b, c, d)
         assert w == max(int(r.sum()) for r in HX)
@@ -70,16 +69,14 @@ def test_unit_factor_forces_k_zero(weights):
     0. Checked here on the pattern space rather than assumed from the formula.
     """
     seen = 0
-    for spec, HX, HZ in sample_quadcycle(12, dim_range=(2, 6), max_site=36,
-                                         weights=weights, seed=5):
+    for spec, HX, HZ in sample_quadcycle(12, dim_range=(2, 6), max_site=36, weights=weights, seed=5):
         assert compute_k(HX, HZ) == 0, f"{spec} encoded"
         seen += 1
     assert seen, "sampler produced nothing to check"
 
 
 def test_sampler_shapes_are_css_and_match_spec():
-    for spec, HX, HZ in sample_quadcycle(6, dim_range=(2, 6), max_site=36,
-                                         weights=(2, 2, 2, 2), seed=1):
+    for spec, HX, HZ in sample_quadcycle(6, dim_range=(2, 6), max_site=36, weights=(2, 2, 2, 2), seed=1):
         dims = tuple(spec["dims"])
         terms = [spec[k] for k in "abcd"]
         n, w = quadcycle_shape(dims, *terms)

@@ -1,9 +1,8 @@
 """Regression tests for additive verification receipts."""
+
 import json
 import os
 import tempfile
-
-import sys
 
 from build_receipt import make_receipt, write_receipt
 from validate_candidate import validate_candidate
@@ -21,10 +20,16 @@ def main():
         with open(source, "w") as f:
             json.dump(doc, f)
         receipt = make_receipt(
-            doc, source, verdict,
+            doc,
+            source,
+            verdict,
             gate={"refuted": False, "seed": 123, "methods": ["RIS"]},
-            repo_root=td, pr_number=7, pr_author="alice",
-            base_sha="base", head_sha="head")
+            repo_root=td,
+            pr_number=7,
+            pr_author="alice",
+            base_sha="base",
+            head_sha="head",
+        )
         path = write_receipt(receipt, os.path.join(td, "receipts"), "code")
         loaded = json.load(open(path))
         assert loaded["receipt_version"] == "1"
@@ -38,8 +43,9 @@ def main():
 
 
 def test_main():
-    """pytest entry point. main() returns None and signals failure by raising,
-    so a clean return is the pass condition."""
+    """Pytest entry point. main() returns None and signals failure by raising,
+    so a clean return is the pass condition.
+    """
     main()
 
 

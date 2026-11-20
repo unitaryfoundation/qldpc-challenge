@@ -13,6 +13,7 @@ SUMMARY The cross-shard summary passes only when the expected number of reports
 
 Run: uv run python verify/test_refute_board.py  (or pytest)
 """
+
 import json
 import os
 import sys
@@ -57,8 +58,10 @@ def test_order_and_shards():
     with tempfile.TemporaryDirectory() as tmp:
         paths = _board(tmp, ["10-2-3", "672-20-32", "144-12-12", "672-18-30", "9-1-3"])
         names = [os.path.basename(p) for p in paths]
-        check("largest n first, ties by name",
-              names == ["672-18-30.json", "672-20-32.json", "144-12-12.json", "10-2-3.json", "9-1-3.json"])
+        check(
+            "largest n first, ties by name",
+            names == ["672-18-30.json", "672-20-32.json", "144-12-12.json", "10-2-3.json", "9-1-3.json"],
+        )
         for k in range(1, 8):
             shards = [RB.shard_paths(paths, f"{i}/{k}") for i in range(k)]
             flat = sorted(p for s in shards for p in s)
@@ -84,17 +87,23 @@ def test_scope_records_or_all():
             return {"672-20-32", "10-2-3"}
 
         kept = RB.scope_paths(paths, "records", tmp, records=records)
-        check("records scope keeps the named slugs in board order",
-              [os.path.basename(p) for p in kept] == ["672-20-32.json", "10-2-3.json"] and seen == [tmp])
-        check("all scope keeps everything and asks nothing", RB.scope_paths(paths, "all", tmp, records=records) == paths
-              and seen == [tmp])
+        check(
+            "records scope keeps the named slugs in board order",
+            [os.path.basename(p) for p in kept] == ["672-20-32.json", "10-2-3.json"] and seen == [tmp],
+        )
+        check(
+            "all scope keeps everything and asks nothing",
+            RB.scope_paths(paths, "all", tmp, records=records) == paths and seen == [tmp],
+        )
         try:
             RB.scope_paths(paths, "frontier", tmp, records=records)
             check("rejects an unknown scope", False)
         except ValueError:
             check("rejects an unknown scope", True)
-        check("the default record function runs on the given root (these stubs have no checks, so no records)",
-              RB.scope_paths(paths, "records", tmp) == [])
+        check(
+            "the default record function runs on the given root (these stubs have no checks, so no records)",
+            RB.scope_paths(paths, "records", tmp) == [],
+        )
 
 
 def test_file_seed_is_path_and_run_seed_only():
@@ -119,8 +128,10 @@ def test_budget_stops_and_fails_loudly():
         rep = RB.refute_paths(paths, 5, max_seconds=15, root=tmp, refute=stub, clock=_Clock(10.0), out=lambda s: None)
         check("stopped at the budget", rep["stopped_by"] == "budget" and not rep["complete"])
         check("largest entries were checked first", calls == [30] and rep["checked"] == 1)
-        check("unreached lists the rest in order",
-              rep["unreached"] == ["codes/20-2-3.json", "codes/10-2-3.json", "codes/8-2-2.json"])
+        check(
+            "unreached lists the rest in order",
+            rep["unreached"] == ["codes/20-2-3.json", "codes/10-2-3.json", "codes/8-2-2.json"],
+        )
         code, line = RB.verdict(rep)
         check("incomplete coverage is a failure", code == 1 and line.startswith("FAIL: incomplete coverage"))
         check("summary line carries the counts", RB.summary_line(rep).startswith("1/4 codes checked;"))
@@ -140,9 +151,12 @@ def test_signal_mid_entry_is_reported():
             return False, None, None, 100
 
         rep = RB.refute_paths(paths, 5, root=tmp, refute=stub, out=lambda s: None)
-        check("the interrupted entry and its successors are unreached",
-              rep["stopped_by"] == "SIGTERM" and rep["checked"] == 1
-              and rep["unreached"] == ["codes/20-2-3.json", "codes/10-2-3.json"])
+        check(
+            "the interrupted entry and its successors are unreached",
+            rep["stopped_by"] == "SIGTERM"
+            and rep["checked"] == 1
+            and rep["unreached"] == ["codes/20-2-3.json", "codes/10-2-3.json"],
+        )
         check("a signalled run fails", RB.verdict(rep)[0] == 1)
 
 
@@ -160,24 +174,43 @@ def test_refuted_and_errored_fail_closed():
 
         lines = []
         rep = RB.refute_paths(paths, 5, root=tmp, refute=stub, out=lines.append)
-        check("refutation recorded with claimed and found weights",
-              rep["refuted"] == [["codes/30-2-3.json", 2, 3, {"X": [0, 1]}]])
+        check(
+            "refutation recorded with claimed and found weights",
+            rep["refuted"] == [["codes/30-2-3.json", 2, 3, {"X": [0, 1]}]],
+        )
         check("error recorded, fails closed", rep["errored"] == [["codes/20-2-3.json", "RuntimeError: boom"]])
-        check("entry without a distance claim is skipped, not checked",
-              rep["skipped"] == ["codes/5-1-0.json"] and rep["checked"] == 2)
-        check("log lines keep the REFUTED/ERROR/ok prefixes",
-              [ln.split()[0] for ln in lines] == ["REFUTED", "ERROR", "ok"])
-        check("complete but dirty run fails",
-              RB.verdict(rep) == (1, "FAIL: distance claims need review (see REFUTED/ERROR above)."))
+        check(
+            "entry without a distance claim is skipped, not checked",
+            rep["skipped"] == ["codes/5-1-0.json"] and rep["checked"] == 2,
+        )
+        check(
+            "log lines keep the REFUTED/ERROR/ok prefixes",
+            [ln.split()[0] for ln in lines] == ["REFUTED", "ERROR", "ok"],
+        )
+        check(
+            "complete but dirty run fails",
+            RB.verdict(rep) == (1, "FAIL: distance claims need review (see REFUTED/ERROR above)."),
+        )
 
 
 def test_summarize():
     def rep(shard, complete=True, refuted=(), errored=(), unreached=()):
-        return {"shard": shard, "seed": 1, "total": 10, "checked": 10 - len(unreached), "skipped": [],
-                "refuted": list(refuted), "errored": list(errored), "unreached": list(unreached),
-                "stopped_by": None if complete else "budget", "complete": complete, "seconds": 600.0}
+        return {
+            "shard": shard,
+            "seed": 1,
+            "total": 10,
+            "checked": 10 - len(unreached),
+            "skipped": [],
+            "refuted": list(refuted),
+            "errored": list(errored),
+            "unreached": list(unreached),
+            "stopped_by": None if complete else "budget",
+            "complete": complete,
+            "seconds": 600.0,
+        }
 
     with tempfile.TemporaryDirectory() as tmp:
+
         def write(i, r):
             p = os.path.join(tmp, f"refute-shard-{i}.json")
             json.dump(r, open(p, "w"))
@@ -188,17 +221,23 @@ def test_summarize():
         pattern = os.path.join(tmp, "refute-shard-*.json")
         out = []
         check("two clean complete shards pass", RB.summarize([pattern], expect=2, out=out.append) == 0)
-        check("table lists both shards and a total row",
-              out[-1].count("| complete |") == 2 and "| all | | 20/20 |" in out[-1])
+        check(
+            "table lists both shards and a total row",
+            out[-1].count("| complete |") == 2 and "| all | | 20/20 |" in out[-1],
+        )
         check("a missing shard report fails", RB.summarize([pattern], expect=3, out=lambda s: None) == 1)
         write(1, rep("1/2", complete=False, unreached=["codes/10-2-3.json"]))
         check("an incomplete shard fails", RB.summarize([pattern], expect=2, out=lambda s: None) == 1)
         write(1, rep("1/2", refuted=[["codes/30-2-3.json", 2, 3, {"X": [0]}]]))
         out = []
-        check("a refutation fails and is named", RB.summarize([pattern], expect=2, out=out.append) == 1
-              and "REFUTED codes/30-2-3.json" in out[-1])
-        check("no reports at all fails", RB.summarize([os.path.join(tmp, "nothing-*.json")], expect=2,
-                                                      out=lambda s: None) == 1)
+        check(
+            "a refutation fails and is named",
+            RB.summarize([pattern], expect=2, out=out.append) == 1 and "REFUTED codes/30-2-3.json" in out[-1],
+        )
+        check(
+            "no reports at all fails",
+            RB.summarize([os.path.join(tmp, "nothing-*.json")], expect=2, out=lambda s: None) == 1,
+        )
 
 
 def main():

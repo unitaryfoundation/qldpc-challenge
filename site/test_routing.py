@@ -1,6 +1,7 @@
 """Heuristic routing cost on the site (issue #1847): shown on code pages and
 as an optional sortable column on the board, labeled heuristic, never a rank;
-codes without a layout get no value."""
+codes without a layout get no value.
+"""
 
 import copy
 import importlib.util
@@ -11,8 +12,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_routing", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_routing", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -20,7 +20,8 @@ def load_site_build():
 
 def _build(tmp_path):
     """A three-code board from one fixture: the bilayer layout as shipped, a
-    cap-exceeding line layout (unrestricted with coordinates), and no layout."""
+    cap-exceeding line layout (unrestricted with coordinates), and no layout.
+    """
     build = load_site_build()
     with open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")) as f:
         doc = json.load(f)
@@ -30,8 +31,7 @@ def _build(tmp_path):
         json.dump(doc, f)
     line = copy.deepcopy(doc)
     line["name"] = "line layout"
-    line["locality"] = {"coordinates": [[float(i), 0.0] for i in range(doc["n"])],
-                        "layers": 1}
+    line["locality"] = {"coordinates": [[float(i), 0.0] for i in range(doc["n"])], "layers": 1}
     with open(codes / "72-6-6-line.json", "w") as f:
         json.dump(line, f)
     bare = copy.deepcopy(doc)
@@ -69,9 +69,10 @@ def test_code_page_shows_the_cost_labeled_heuristic(tmp_path):
     by = {e["slug"]: e for e in build.load_entries()}
     page = _read(build, "codes", "72-6-6-line.html")
     e = by["72-6-6-line"]
-    assert f'<div class=l>swaps</div><div class=v>{e["route_total"]}</div>' in page
-    assert (f'{e["route_total"]} nearest-neighbor SWAPs per round in total, '
-            f'at most {e["route_max"]} for one check') in page
+    assert f"<div class=l>swaps</div><div class=v>{e['route_total']}</div>" in page
+    assert (
+        f"{e['route_total']} nearest-neighbor SWAPs per round in total, at most {e['route_max']} for one check"
+    ) in page
     assert "heuristic: MST lower bound" in page
     assert "minimum qubit spacing" in page
     assert "not a rank" in page
@@ -97,11 +98,9 @@ def test_board_has_an_optional_sortable_swaps_column(tmp_path):
     # each row sorts on its total; a layout-less code sorts last with a dot
     for slug in ("72-6-6", "72-6-6-line"):
         assert f'data-route="{by[slug]["route_total"]}"' in index
-        assert (f'title="heuristic routing cost: {by[slug]["route_total"]} '
-                'nearest-neighbor SWAPs') in index
+        assert (f'title="heuristic routing cost: {by[slug]["route_total"]} nearest-neighbor SWAPs') in index
     assert 'data-route="-1"' in index
-    assert ('data-label="swaps" title="no verified layout; routing cost '
-            'undefined">&middot;</td>') in index
+    assert ('data-label="swaps" title="no verified layout; routing cost undefined">&middot;</td>') in index
     # the swaps>=N search term is documented and parsed
     assert "swaps&lt;=50" in index
     assert "|swaps|route|ler|asym)" in index
