@@ -78,15 +78,19 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
         "--shards", str(int(shards)),
         "--out", str(out_dir),
     ]
+    # QEDist's exit codes (docs/usage.md): 0 exact or completed interval, 10 a
+    # witness lighter than the cutoff, 75 an incomplete search, 2 a failure;
+    # the first three leave a result.json to read, and the audit mirrors them.
+    OK_EXITS = (0, 10, 75)
     t0 = time.time()
     proc = subprocess.run(cmd, capture_output=True, text=True)
     wall = round(time.time() - t0, 1)
-    if proc.returncode != 0:
+    if proc.returncode not in OK_EXITS:
         raise QEDistStabilizerCertifyError(
             f"QEDist failed (exit {proc.returncode}): {(proc.stderr or proc.stdout)[-300:]}"
         )
     aproc = subprocess.run(prefix + ["audit-stabilizer", str(out_dir)], capture_output=True, text=True)
-    if aproc.returncode != 0:
+    if aproc.returncode not in OK_EXITS:
         raise QEDistStabilizerCertifyError(f"QEDist audit failed: {(aproc.stderr or aproc.stdout)[-300:]}")
     result = json.loads((out_dir / "result.json").read_text())
 
@@ -115,8 +119,8 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
     }
     if witness is not None:
         blk["witness"] = [int(x) for x in witness]
-    if lb is not None:
-        blk["lower_bound"] = int(lb)
+    if lb is not None and int(lb) > 1 and not exact:
+        blk["lower_bound"] = int(lb)          # a bound of 1 is the trivial one
     if ub is not None:
         blk["upper_bound"] = int(ub)
 
@@ -124,7 +128,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
     if result.get("exact_distance") is not None and int(result["exact_distance"]) != d:
         overall = False
 
-    return {
+    rec = {
         "name": doc.get("name"),
         "d": d,
         "sides": {"P": blk},
@@ -136,6 +140,11 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, shards=1):
             "note": "QEDist Pauli-weight exhaustive search; witness re-checked by audit.",
         },
     }
+    if not overall:
+        from check_certs import checks_sha256
+        rec["d_lower"] = int(blk.get("lower_bound") or 1)
+        rec["verification"]["checks_sha256"] = checks_sha256(doc)
+    return rec
 
 
 def main(argv=None):

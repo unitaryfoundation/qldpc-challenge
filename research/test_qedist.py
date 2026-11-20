@@ -190,3 +190,35 @@ class SymmetryAndStampTests(unittest.TestCase):
         self.assertIn("symmetry generators supplied", cert["verification"]["note"])
         self.assertIn("(yeon-lee/QEDist)", cert["solver"])
 
+
+class StabilizerExitCodeTests(unittest.TestCase):
+    """The stabilizer certifier reads QEDist's incomplete result instead of failing on exit 75."""
+
+    def test_an_incomplete_stabilizer_search_is_a_partial_record(self):
+        import json as _json
+        import subprocess
+        from unittest import mock
+        sys.path.insert(0, str(ROOT / "research" / "certs"))
+        sys.path.insert(0, str(ROOT / "verify"))
+        import qedist_stabilizer_certify as QS
+
+        def fake_run(cmd, **kw):
+            if cmd[1] == "certify-stabilizer":
+                out_dir = cmd[cmd.index("--out") + 1]
+                os.makedirs(out_dir, exist_ok=True)
+                Path(out_dir, "result.json").write_text(_json.dumps(
+                    {"status": "INCOMPLETE", "distance_lower_bound": 2, "distance_upper_bound": 3}))
+                return subprocess.CompletedProcess(cmd, 75, "", "")
+            if cmd[1] == "audit-stabilizer":
+                return subprocess.CompletedProcess(cmd, 75, "", "")
+            return subprocess.CompletedProcess(cmd, 0, "QEDist 0.1\n", "")
+
+        with mock.patch.object(QS, "qedist_root", lambda root=None: ["fake-qedist"]), \
+                mock.patch.object(QS.subprocess, "run", fake_run):
+            cert = QS.certify(_stabilizer_doc(), tlim=1)
+        self.assertFalse(cert["d_exact"])
+        self.assertEqual(cert["sides"]["P"]["status"], "TIMEOUT")
+        self.assertEqual(cert["sides"]["P"]["lower_bound"], 2)
+        self.assertEqual(cert["d_lower"], 2)
+        self.assertIn("checks_sha256", cert["verification"])
+
