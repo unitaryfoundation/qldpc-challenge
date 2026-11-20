@@ -273,3 +273,14 @@ def test_classify_mode_tier_1_exit_0(tmp_path):
     root, base = _repo(tmp_path, {"verify/qldpc_verify.py": "x = 1\n"},
                        {"verify/qldpc_verify.py": "x = 2\n"})
     assert S.main(["--root", root, "--base", base, "--classify"]) == 0
+
+
+# -- nested code paths (PR #6849 packaging mistake) -------------------------
+def test_a_nested_code_path_is_refused(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
+        {"codes/x-1-1.json/x-1-1.json": '{"n": 1}'})
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "single file, codes/<slug>.json" in out
+    assert "codes/x-1-1.json/x-1-1.json" in out
