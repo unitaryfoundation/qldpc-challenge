@@ -975,7 +975,6 @@ def finish(notes, layers, HX, HZ, d, rounds, doc_witnesses, seed, seconds,
                                   "witness": wit}
         stem = SIDE_FILES[basis]
         files[stem + ".stim"] = str(noisy) + "\n"
-        files[stem + ".dem"] = str(dem) + "\n"
     return block, files
 
 
@@ -1090,7 +1089,6 @@ def from_files(doc, directory, rounds=None, seed=0, seconds=180.0,
         block["d_circ"][basis] = {"value": int(w), "confidence": "upper_bound",
                                   "witness": [int(i) for i in wit]}
         files[stem + ".stim"] = text if text.endswith("\n") else text + "\n"
-        files[stem + ".dem"] = str(dem) + "\n"
     return block, files, "submitter-provided"
 
 

@@ -24,7 +24,7 @@
     "verify/check_tree_consistency.py": "1d477721d54adcf67d86a574137801a55d01ab0bf187031c58517d8cfcda1411",
     "verify/check_validator_integrity.py": "34cb1c32d29cd5c953200c2e586c77c01f8ff47a6e76d1b6c54819f8d5a5c680",
     "verify/circuit_tools.py": "431e665bc1b4b4afbe5037746982886fb2b7a395090e5018af45f52e10e1f9aa",
-    "verify/circuit_verify.py": "77c49384d3f2a84883777e8ec64b142575ae9635172ceeb80df97d5de6c5b95e",
+    "verify/circuit_verify.py": "709d27efa0defb9f214fbe8e4ac5dfc34f9705eb2ce6d7373098676a2ef6078d",
     "verify/fixtures/72-6-6.json": "5660f9b429f507276fade0aa1a4dbed5a7ecd384f4a333c28daaa83255ccad4b",
     "verify/gate_changed.py": "959fbe3b31b3650b2c3dd7f0f9b594e557773e1ab09fab0230b2cce114ac4da0",
     "verify/gf2.py": "47e8999a4e22a12a852d81ce0f5a9e0248cd04a9d8940b9cb3edba7e85ad5508",

@@ -115,11 +115,12 @@ def baseline(doc, circuits_dir):
     out = {"d_circ": {b: cb["d_circ"][b]["value"] for b in ("X", "Z")},
            "rounds": cb["rounds"], "notes": cb.get("notes", ""), "mechanisms": {}}
     for b in ("X", "Z"):
-        p = os.path.join(circuits_dir, SIDE_FILES[b] + ".dem")
+        p = os.path.join(circuits_dir, SIDE_FILES[b] + ".stim")
         try:
-            with open(p, encoding="utf-8") as f:
-                out["mechanisms"][b] = stim.DetectorErrorModel(f.read()).num_errors
-        except (OSError, ValueError):
+            circuit = stim.Circuit(open(p, encoding="utf-8").read())
+            dem = ct.derive_dem(circuit)
+            out["mechanisms"][b] = dem.num_errors
+        except (OSError, ValueError, Exception):
             out["mechanisms"][b] = None
     out["score"] = list(score_of(cb["d_circ"]))
     return out
@@ -273,8 +274,13 @@ def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, 
                               f"{seconds:g} s per basis) over the committed schedule of {slug}")
             dc = {b: block["d_circ"][b]["value"] for b in ("X", "Z")}
             row["d_circ"], row["score"] = dc, list(score_of(block["d_circ"]))
-            row["mechanisms"] = {b: stim.DetectorErrorModel(files[SIDE_FILES[b] + ".dem"]).num_errors
-                                 for b in ("X", "Z")}
+            row["mechanisms"] = {}
+            for b in ("X", "Z"):
+                try:
+                    c = stim.Circuit(files[SIDE_FILES[b] + ".stim"])
+                    row["mechanisms"][b] = ct.derive_dem(c).num_errors
+                except Exception:
+                    row["mechanisms"][b] = None
             row["improving"] = tuple(row["score"]) > tuple(base["score"])
             if ler:
                 row["ler"] = measure_ler(files, n, rounds, ler_p, seed, ler_shots)

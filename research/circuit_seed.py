@@ -171,7 +171,7 @@ def main():
                      f"pattern pair is not full-distance after all")
         stem = os.path.join(outdir, f"memory_{basis.lower()}")
         open(stem + ".stim", "w").write(str(noisy) + "\n")
-        open(stem + ".dem", "w").write(str(dem) + "\n")
+        # .dem is derived from the .stim; no longer committed (issue: size)
         block["d_circ"][basis] = {"value": best, "confidence": "upper_bound",
                                   "witness": wit}
 
