@@ -88,7 +88,8 @@ _MAX_DEGREE = 20
 
 def _poly_mulmod(a, b, mod):
     """Carryless product of two GF(2) polynomials (int bitmasks), reduced mod
-    ``mod``."""
+    ``mod``.
+    """
     res = 0
     while b:
         if b & 1:
@@ -115,17 +116,12 @@ def _poly_powmod(base, expn, mod):
 def _primitive_poly(e):
     """Verified primitive polynomial of degree ``e`` as an int bitmask."""
     if e not in _PRIM_EXPONENTS:
-        raise ValueError(
-            f"no primitive polynomial tabulated for degree {e} "
-            f"(max {_MAX_DEGREE}); shrink the grid"
-        )
+        raise ValueError(f"no primitive polynomial tabulated for degree {e} (max {_MAX_DEGREE}); shrink the grid")
     poly = sum(1 << i for i in _PRIM_EXPONENTS[e])
     m = (1 << e) - 1
     for p in _MERSENNE_FACTORS[e]:
         if _poly_powmod(2, m // p, poly) == 1:
-            raise RuntimeError(
-                f"tabulated degree-{e} polynomial is not " "primitive -- fix the table"
-            )
+            raise RuntimeError(f"tabulated degree-{e} polynomial is not primitive -- fix the table")
     return poly
 
 
@@ -164,10 +160,7 @@ def _gf(e):
 def _ord2(L):
     """Multiplicative order of 2 modulo odd L >= 1."""
     if L % 2 == 0:
-        raise ValueError(
-            f"grid dimension lcm {L} is even: non-semisimple "
-            "ring, spectral formulas do not apply"
-        )
+        raise ValueError(f"grid dimension lcm {L} is even: non-semisimple ring, spectral formulas do not apply")
     e, v = 1, 2 % L
     while v != 1:
         v = v * 2 % L
@@ -183,10 +176,7 @@ def _root_tabs(l, m):
     L = math.lcm(l, m)
     e = _ord2(L)
     if e > _MAX_DEGREE:
-        raise ValueError(
-            f"field degree {e} > {_MAX_DEGREE} for lcm({l},{m})"
-            f"={L}; shrink the grid"
-        )
+        raise ValueError(f"field degree {e} > {_MAX_DEGREE} for lcm({l},{m})={L}; shrink the grid")
     gf = _gf(e)
     M = gf.order
     ii = np.arange(l)
@@ -198,7 +188,8 @@ def _root_tabs(l, m):
 
 def _eval_grid(l, m, terms, gf, alpha_tab, beta_tab):
     """Evaluate sum_{(u,v) in terms} x^u y^v at every grid point (alpha^i,
-    beta^j). Returns an (l, m) int64 array of field codes; 0 = vanishes."""
+    beta^j). Returns an (l, m) int64 array of field codes; 0 = vanishes.
+    """
     acc = np.zeros((l, m), dtype=np.int64)
     ii = np.arange(l)
     jj = np.arange(m)
@@ -225,10 +216,7 @@ def spectral_regions(l, m, A_terms, B_terms):
     Uab = Za & ~Zb
     Uba = Zb & ~Za
     F = ~(Za | Zb)
-    counts = {
-        name: int(arr.sum())
-        for name, arr in (("T", T), ("Uab", Uab), ("Uba", Uba), ("F", F))
-    }
+    counts = {name: int(arr.sum()) for name, arr in (("T", T), ("Uab", Uab), ("Uba", Uba), ("F", F))}
     return dict(Za=Za, Zb=Zb, T=T, Uab=Uab, Uba=Uba, F=F, counts=counts)
 
 
@@ -247,8 +235,7 @@ def _longest_cyclic_run(mask):
     best = cur = 0
     for v in np.concatenate([mask, mask]):
         cur = cur + 1 if v else 0
-        if cur > best:
-            best = cur
+        best = max(best, cur)
     return min(best, n)
 
 
@@ -256,7 +243,8 @@ def bch_strip_bound(S):
     """Proven lower bound for the classical 2D cyclic code C(S) = {f : f
     vanishes on S}, from full zero strips (Thm 58). S is an (l, m) boolean
     array, True = defining zero. Empty S means the whole ring (d = 1); S
-    everything means the zero code."""
+    everything means the zero code.
+    """
     S = np.asarray(S, dtype=bool)
     if not S.any():
         return 1
@@ -284,7 +272,8 @@ def colon_lower_bound(l, m, A_terms, B_terms):
 def cover_k(l, m, A_terms, B_terms, s):
     """Exact k of the s-fold cover BB(s*l, s*m) with the same polynomial
     supports (Thm 126: k_h = k + 2|delta-Z|; we simply count common zeros on
-    the cover grid). ``s`` must be odd so the cover ring stays semisimple."""
+    the cover grid). ``s`` must be odd so the cover ring stays semisimple.
+    """
     if s % 2 == 0:
         raise ValueError("cover degree s must be odd (semisimple cover ring)")
     return spectral_k(s * l, s * m, A_terms, B_terms)
@@ -294,11 +283,11 @@ def cover_k(l, m, A_terms, B_terms, s):
 # Self-test / calibration demo.
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    import sys
     import os
+    import sys
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from bb import build_bb, KNOWN
+    from bb import KNOWN, build_bb
     from css import compute_k
     from surrogate import distance_rand
 
@@ -307,15 +296,9 @@ if __name__ == "__main__":
     lb = colon_lower_bound(p["l"], p["m"], p["A"], p["B"])
     HX, HZ = build_bb(p["l"], p["m"], p["A"], p["B"])
     k_true = compute_k(HX, HZ)
-    print(
-        f"   spectral k = {lb['k']}  matrix k = {k_true}  "
-        f"{'MATCH' if lb['k'] == k_true else 'MISMATCH'}"
-    )
+    print(f"   spectral k = {lb['k']}  matrix k = {k_true}  {'MATCH' if lb['k'] == k_true else 'MISMATCH'}")
     print(f"   regions = {spectral_regions(p['l'], p['m'], p['A'], p['B'])['counts']}")
-    print(
-        f"   floor: E_a={lb['Ea']} E_b={lb['Eb']} N={lb['N']} "
-        f"-> d >= {lb['d_lower']} (board d = 10)"
-    )
+    print(f"   floor: E_a={lb['Ea']} E_b={lb['Eb']} N={lb['N']} -> d >= {lb['d_lower']} (board d = 10)")
 
     print("2) exact-k validation on random odd grids (vs matrix rank)")
     rng = np.random.default_rng(7)
@@ -351,7 +334,4 @@ if __name__ == "__main__":
     for s in (3, 5):
         pred = cover_k(l, m, A, B, s)
         got = compute_k(*build_bb(s * l, s * m, A, B))
-        print(
-            f"   s={s}: predicted {pred}, built {got}  "
-            f"{'MATCH' if pred == got else 'MISMATCH'}"
-        )
+        print(f"   s={s}: predicted {pred}, built {got}  {'MATCH' if pred == got else 'MISMATCH'}")

@@ -12,16 +12,14 @@ import json
 import os
 import shutil
 
+import circuit_verify as cv
 import numpy as np
 import pytest
-
-import circuit_verify as cv
 import qldpc
 from qldpc_verify import _matrix, verify
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FAST = ["--trials", "300", "--fast-trials", "0",
-        "--circuit-seconds", "3", "--circuit-candidates", "2"]
+FAST = ["--trials", "300", "--fast-trials", "0", "--circuit-seconds", "3", "--circuit-candidates", "2"]
 
 
 @pytest.fixture(scope="module")
@@ -29,22 +27,19 @@ def npz(tmp_path_factory):
     doc = json.load(open(os.path.join(ROOT, "codes", "12-4-2.json")))
     n = doc["n"]
     path = tmp_path_factory.mktemp("in") / "bb12.npz"
-    np.savez(path, hx=_matrix(doc["checks"]["X"], n),
-             hz=_matrix(doc["checks"]["Z"], n))
+    np.savez(path, hx=_matrix(doc["checks"]["X"], n), hz=_matrix(doc["checks"]["Z"], n))
     return str(path)
 
 
 @pytest.fixture(autouse=True)
 def _no_board(monkeypatch):
     monkeypatch.setattr(qldpc, "_load_board_entries", lambda: [])
-    monkeypatch.setattr(qldpc, "_board_identities",
-                        lambda: ([], lambda rep: (set(), set())))
+    monkeypatch.setattr(qldpc, "_board_identities", lambda: ([], lambda rep: (set(), set())))
 
 
 def test_dry_run_generates_and_verifies_circuits(npz, capsys, tmp_path):
     out = str(tmp_path / "codes")
-    rc = qldpc.main(["submit", npz, "--authors", "@me", "--dry-run",
-                     "--out", out, *FAST])
+    rc = qldpc.main(["submit", npz, "--authors", "@me", "--dry-run", "--out", out, *FAST])
     assert rc == 0
     text = capsys.readouterr().out
     assert "schedule family: two-block interleaved" in text
@@ -62,8 +57,7 @@ def test_submit_writes_circuits_beside_the_code(npz, capsys, tmp_path):
     text = capsys.readouterr().out
     doc = json.load(open(os.path.join(out, "12-4-2.json")))
     circuits_dir = str(tmp_path / "circuits" / "12-4-2")
-    assert sorted(os.listdir(circuits_dir)) == [
-        "memory_x.stim", "memory_z.stim"]
+    assert sorted(os.listdir(circuits_dir)) == ["memory_x.stim", "memory_z.stim"]
     assert doc["schema_version"] == "0.2"
     assert doc["circuit"]["rounds"] == 2
     # the written artifacts pass both verifiers, exactly as CI runs them
@@ -80,8 +74,7 @@ def test_submit_writes_circuits_beside_the_code(npz, capsys, tmp_path):
 
 def test_no_circuit_opts_out(npz, capsys, tmp_path):
     out = str(tmp_path / "codes")
-    rc = qldpc.main(["submit", npz, "--authors", "@me", "--out", out,
-                     "--no-circuit", *FAST])
+    rc = qldpc.main(["submit", npz, "--authors", "@me", "--out", out, "--no-circuit", *FAST])
     assert rc == 0
     doc = json.load(open(os.path.join(out, "12-4-2.json")))
     assert "circuit" not in doc and doc["schema_version"] == "0.1"
@@ -93,11 +86,9 @@ def test_own_circuits_override_generation(npz, capsys, tmp_path):
     own = tmp_path / "own"
     own.mkdir()
     for side in ("x", "z"):
-        shutil.copy(os.path.join(ROOT, "circuits", "12-4-2",
-                                 f"memory_{side}.stim"), own)
+        shutil.copy(os.path.join(ROOT, "circuits", "12-4-2", f"memory_{side}.stim"), own)
     out = str(tmp_path / "codes")
-    rc = qldpc.main(["submit", npz, "--authors", "@me", "--out", out,
-                     "--circuits", str(own), *FAST])
+    rc = qldpc.main(["submit", npz, "--authors", "@me", "--out", out, "--circuits", str(own), *FAST])
     assert rc == 0
     text = capsys.readouterr().out
     assert "submitter-provided" in text
@@ -105,37 +96,33 @@ def test_own_circuits_override_generation(npz, capsys, tmp_path):
     assert doc["circuit"]["notes"].startswith("submitter-provided")
     circuits_dir = str(tmp_path / "circuits" / "12-4-2")
     assert cv.verify_circuit(doc, circuits_dir)["ok"]
-    assert (open(os.path.join(circuits_dir, "memory_x.stim")).read()
-            == (own / "memory_x.stim").read_text())
+    assert open(os.path.join(circuits_dir, "memory_x.stim")).read() == (own / "memory_x.stim").read_text()
 
 
 def test_own_circuits_that_fail_are_a_hard_error(npz, tmp_path):
     own = tmp_path / "own"
     own.mkdir()
     for side in ("x", "z"):
-        text = open(os.path.join(ROOT, "circuits", "12-4-2",
-                                 f"memory_{side}.stim")).read()
-        (own / f"memory_{side}.stim").write_text(
-            text.replace("DEPOLARIZE2(0.001)", "DEPOLARIZE2(0.002)", 1))
+        text = open(os.path.join(ROOT, "circuits", "12-4-2", f"memory_{side}.stim")).read()
+        (own / f"memory_{side}.stim").write_text(text.replace("DEPOLARIZE2(0.001)", "DEPOLARIZE2(0.002)", 1))
     out = str(tmp_path / "codes")
     with pytest.raises(SystemExit, match="--circuits"):
-        qldpc.main(["submit", npz, "--authors", "@me", "--out", out,
-                    "--circuits", str(own), *FAST])
+        qldpc.main(["submit", npz, "--authors", "@me", "--out", out, "--circuits", str(own), *FAST])
     assert not os.path.exists(out)
 
 
 def test_pr_body_states_the_circuit_tier():
     doc = json.load(open(os.path.join(ROOT, "codes", "12-4-2.json")))
-    report = {"computed": {"max_check_weight": 6,
-                           "locality_class": "unrestricted",
-                           "weight_class": "weight-6"},
-              "earned_distance": {"d": {"value": 2, "tier": "upper_bound"}}}
+    report = {
+        "computed": {"max_check_weight": 6, "locality_class": "unrestricted", "weight_class": "weight-6"},
+        "earned_distance": {"d": {"value": 2, "tier": "upper_bound"}},
+    }
 
     class A:
         family = "bivariate-bicycle"
         construction = ""
+
     body = qldpc.pr_body(doc, report, A(), "codes/12-4-2.json")
     assert "- Circuit tier: d_circ <= 2 (X 2, Z 2) at rounds 2" in body
     assert "`circuits/12-4-2/`" in body
-    assert "- [x] `python verify/circuit_verify.py codes/12-4-2.json` " \
-           "passes locally" in body
+    assert "- [x] `python verify/circuit_verify.py codes/12-4-2.json` passes locally" in body

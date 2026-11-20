@@ -20,20 +20,17 @@ without it, an ordinary re-submit would copy someone else's construction
 text under a new name.
 """
 
+import heuristic_distance as hd
 import numpy as np
 import pytest
-
-import heuristic_distance as hd
 import qldpc
 
 # A small CSS code (n = 6, k = 2) with logicals of more than one weight on
 # each side, so a test can put a heavy witness in the draft and let the
 # accelerator find a lighter one. Every qubit is covered by a check, so the
 # distance is 2 rather than 1.
-HX = np.array([[1, 1, 1, 1, 0, 0],
-               [0, 0, 0, 0, 1, 1]], dtype=np.uint8)
-HZ = np.array([[1, 1, 0, 0, 1, 1],
-               [0, 0, 1, 1, 1, 1]], dtype=np.uint8)
+HX = np.array([[1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 1]], dtype=np.uint8)
+HZ = np.array([[1, 1, 0, 0, 1, 1], [0, 0, 1, 1, 1, 1]], dtype=np.uint8)
 
 
 def _logicals(H_ker, H_row, n=6):
@@ -85,14 +82,11 @@ def _draft(x_witness, z_witness, **overrides):
         "code_type": "CSS",
         "n": 6,
         "k": 2,
-        "checks": {"X": [[0, 1, 2, 3], [4, 5]],
-                   "Z": [[0, 1, 4, 5], [2, 3, 4, 5]]},
+        "checks": {"X": [[0, 1, 2, 3], [4, 5]], "Z": [[0, 1, 4, 5], [2, 3, 4, 5]]},
         "distance": {
             "d": min(len(x_witness), len(z_witness)),
-            "X": {"value": len(x_witness), "confidence": "upper_bound",
-                  "witness": list(x_witness)},
-            "Z": {"value": len(z_witness), "confidence": "upper_bound",
-                  "witness": list(z_witness)},
+            "X": {"value": len(x_witness), "confidence": "upper_bound", "witness": list(x_witness)},
+            "Z": {"value": len(z_witness), "confidence": "upper_bound", "witness": list(z_witness)},
         },
         "provenance": {
             "authors": ["@someoneelse"],
@@ -109,8 +103,7 @@ def _submit(monkeypatch, draft, extra=(), matrices=(HX, HZ)):
     """Run `qldpc submit` on `draft` and return the document it built."""
     built = []
 
-    monkeypatch.setattr(qldpc, "load_checks",
-                        lambda _p: (matrices[0], matrices[1], None, draft))
+    monkeypatch.setattr(qldpc, "load_checks", lambda _p: (matrices[0], matrices[1], None, draft))
     monkeypatch.setattr(qldpc, "attach_circuit_tier", lambda _d, _a: None)
 
     def fake_verify(doc, refute):
@@ -118,14 +111,14 @@ def _submit(monkeypatch, draft, extra=(), matrices=(HX, HZ)):
         return {"ok": True, "checks": [], "computed": {}, "earned_distance": {}}
 
     monkeypatch.setattr(qldpc, "verify", fake_verify)
-    rc = qldpc.main(["submit", "x.json", "--authors", "@me", "--dry-run",
-                     "--no-circuit", *extra])
+    rc = qldpc.main(["submit", "x.json", "--authors", "@me", "--dry-run", "--no-circuit", *extra])
     assert rc == 0
     return built[0]
 
 
 def _no_search(monkeypatch):
     """Make the RIS search fail loudly if a reuse run reaches it."""
+
     def boom(*_a, **_kw):
         raise AssertionError("the RIS search must not run in reuse mode")
 
@@ -162,8 +155,7 @@ def test_reuse_takes_the_weight_from_the_witness_not_the_drafts_value(monkeypatc
     assert doc["distance"]["X"]["witness"] == HEAVY_X
 
 
-def test_reuse_reports_a_draft_whose_value_disagrees_with_its_witness(
-        monkeypatch, capsys):
+def test_reuse_reports_a_draft_whose_value_disagrees_with_its_witness(monkeypatch, capsys):
     _no_search(monkeypatch)
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, LIGHT_Z)
@@ -181,7 +173,7 @@ def test_reuse_reports_a_draft_whose_value_disagrees_with_its_witness(
 def test_reuse_refuses_a_witness_that_is_not_a_logical(monkeypatch):
     _no_search(monkeypatch)
     monkeypatch.setattr(hd, "_fast", _FakeFast())
-    draft = _draft([0], LIGHT_Z)          # a single qubit is not a logical here
+    draft = _draft([0], LIGHT_Z)  # a single qubit is not a logical here
 
     with pytest.raises(SystemExit, match="X witness is not a nontrivial logical"):
         _submit(monkeypatch, draft, extra=["--reuse-witnesses"])
@@ -230,8 +222,7 @@ def test_reuse_refuses_a_draft_with_no_witness_at_all(monkeypatch):
 
 def test_a_refused_reuse_does_not_fall_back_to_the_search(monkeypatch):
     """The refusal is the point: a fallback would hand back a different claim."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda *a, **k: pytest.fail("the search must not run"))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda *a, **k: pytest.fail("the search must not run"))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft([0], LIGHT_Z)
 
@@ -240,12 +231,10 @@ def test_a_refused_reuse_does_not_fall_back_to_the_search(monkeypatch):
 
 
 def test_reuse_refuses_an_input_that_is_not_a_json_draft(monkeypatch):
-    monkeypatch.setattr(qldpc, "load_checks",
-                        lambda _p: (HX, HZ, None, None))
+    monkeypatch.setattr(qldpc, "load_checks", lambda _p: (HX, HZ, None, None))
 
     with pytest.raises(SystemExit, match="no JSON draft"):
-        qldpc.main(["submit", "x.npz", "--authors", "@me", "--dry-run",
-                    "--no-circuit", "--reuse-witnesses"])
+        qldpc.main(["submit", "x.npz", "--authors", "@me", "--dry-run", "--no-circuit", "--reuse-witnesses"])
 
 
 def test_reuse_refuses_a_run_without_the_accelerator_pass(monkeypatch):
@@ -261,8 +250,7 @@ def test_reuse_refuses_a_run_with_the_accelerator_switched_off(monkeypatch):
     draft = _draft(HEAVY_X, LIGHT_Z)
 
     with pytest.raises(SystemExit, match="--fast-trials 0"):
-        _submit(monkeypatch, draft,
-                extra=["--reuse-witnesses", "--fast-trials", "0"])
+        _submit(monkeypatch, draft, extra=["--reuse-witnesses", "--fast-trials", "0"])
 
 
 # ----------------------------------------------------------------------------
@@ -292,16 +280,17 @@ def test_the_accelerator_can_tighten_a_reused_witness(monkeypatch):
     assert doc["distance"]["Z"]["witness"] == LIGHT_Z
 
 
-def test_a_witness_the_accelerator_found_replaces_the_drafts_provenance(
-        monkeypatch):
+def test_a_witness_the_accelerator_found_replaces_the_drafts_provenance(monkeypatch):
     _no_search(monkeypatch)
     draft = _draft(HEAVY_X, LIGHT_Z)
     draft["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@someoneelse"], "date": "2026-01-02",
+        "found_by": ["@someoneelse"],
+        "date": "2026-01-02",
         "found_at_samples": 1000,
     }
     draft["distance"]["Z"]["witness_provenance"] = {
-        "found_by": ["@someoneelse"], "date": "2026-01-02",
+        "found_by": ["@someoneelse"],
+        "date": "2026-01-02",
         "found_at_samples": 1000,
     }
     monkeypatch.setattr(hd, "_fast", _FakeFast(side="X", support=LIGHT_X))
@@ -312,8 +301,7 @@ def test_a_witness_the_accelerator_found_replaces_the_drafts_provenance(
     assert wp["found_by"] == ["@me"]
     assert wp["found_at_samples"] == 2_000_000
     # the side the accelerator did not touch keeps the draft's record
-    assert doc["distance"]["Z"]["witness_provenance"]["found_by"] == \
-        ["@someoneelse"]
+    assert doc["distance"]["Z"]["witness_provenance"]["found_by"] == ["@someoneelse"]
 
 
 # ----------------------------------------------------------------------------
@@ -339,8 +327,7 @@ def test_an_explicit_construction_wins_over_the_drafts(monkeypatch):
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, LIGHT_Z)
 
-    doc = _submit(monkeypatch, draft,
-                  extra=["--reuse-witnesses", "--construction", "mine"])
+    doc = _submit(monkeypatch, draft, extra=["--reuse-witnesses", "--construction", "mine"])
 
     assert doc["provenance"]["construction"] == "mine"
 
@@ -350,8 +337,10 @@ def test_reuse_keeps_the_drafts_witness_provenance(monkeypatch):
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, LIGHT_Z)
     draft["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@someoneelse"], "date": "2026-01-02",
-        "found_at_samples": 1000, "tool": "ris_gpu",
+        "found_by": ["@someoneelse"],
+        "date": "2026-01-02",
+        "found_at_samples": 1000,
+        "tool": "ris_gpu",
     }
 
     doc = _submit(monkeypatch, draft, extra=["--reuse-witnesses"])
@@ -361,8 +350,7 @@ def test_reuse_keeps_the_drafts_witness_provenance(monkeypatch):
     assert wp["tool"] == "ris_gpu"
 
 
-def test_an_import_of_a_published_code_is_recorded_as_known_parameters(
-        monkeypatch):
+def test_an_import_of_a_published_code_is_recorded_as_known_parameters(monkeypatch):
     _no_search(monkeypatch)
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, LIGHT_Z)
@@ -386,9 +374,7 @@ def test_the_drafts_own_novelty_is_kept(monkeypatch):
 
 def test_without_the_flag_the_drafts_construction_is_not_copied(monkeypatch):
     """An ordinary re-submit must not copy someone else's construction text."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(LIGHT_X),
-                                                      _vector(LIGHT_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(LIGHT_X), _vector(LIGHT_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, LIGHT_Z)
 
@@ -403,9 +389,7 @@ def test_without_the_flag_the_drafts_construction_is_not_copied(monkeypatch):
 # ----------------------------------------------------------------------------
 def test_without_the_flag_a_lighter_draft_witness_is_kept(monkeypatch):
     """The problem the flag exists for is fixed on every re-submit."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(HEAVY_X),
-                                                      _vector(HEAVY_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(HEAVY_X), _vector(HEAVY_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(LIGHT_X, LIGHT_Z)
 
@@ -417,9 +401,7 @@ def test_without_the_flag_a_lighter_draft_witness_is_kept(monkeypatch):
 
 def test_without_the_flag_a_heavier_search_witness_wins(monkeypatch):
     """The search still replaces the draft's witness when it is lighter."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(LIGHT_X),
-                                                      _vector(LIGHT_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(LIGHT_X), _vector(LIGHT_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(HEAVY_X, HEAVY_Z)
 
@@ -429,12 +411,9 @@ def test_without_the_flag_a_heavier_search_witness_wins(monkeypatch):
     assert doc["distance"]["Z"]["witness"] == LIGHT_Z
 
 
-def test_without_the_flag_an_unusable_draft_witness_is_reported(monkeypatch,
-                                                                 capsys):
+def test_without_the_flag_an_unusable_draft_witness_is_reported(monkeypatch, capsys):
     """No silence: the draft's witness is checked, and the check is said out."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(LIGHT_X),
-                                                      _vector(LIGHT_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(LIGHT_X), _vector(LIGHT_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft([0], LIGHT_Z)
 
@@ -447,13 +426,12 @@ def test_without_the_flag_an_unusable_draft_witness_is_reported(monkeypatch,
 
 
 def test_a_kept_draft_witness_carries_the_drafts_witness_provenance(monkeypatch):
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(HEAVY_X),
-                                                      _vector(HEAVY_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(HEAVY_X), _vector(HEAVY_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(LIGHT_X, LIGHT_Z)
     draft["distance"]["X"]["witness_provenance"] = {
-        "found_by": ["@someoneelse"], "date": "2026-01-02",
+        "found_by": ["@someoneelse"],
+        "date": "2026-01-02",
         "found_at_samples": 1000,
     }
 
@@ -465,9 +443,7 @@ def test_a_kept_draft_witness_carries_the_drafts_witness_provenance(monkeypatch)
 
 def test_a_draft_witness_provenance_that_does_not_fit_is_dropped(monkeypatch):
     """The document has to stay schema-valid, so a bad record is dropped."""
-    monkeypatch.setattr(hd, "ris_min_logical",
-                        lambda HX, HZ, trials, seed: (len(HEAVY_X),
-                                                      _vector(HEAVY_X)))
+    monkeypatch.setattr(hd, "ris_min_logical", lambda HX, HZ, trials, seed: (len(HEAVY_X), _vector(HEAVY_X)))
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _draft(LIGHT_X, LIGHT_Z)
     draft["distance"]["X"]["witness_provenance"] = {"found_by": ["@me"]}
@@ -486,12 +462,8 @@ def test_a_draft_witness_provenance_that_does_not_fit_is_dropped(monkeypatch):
 # what makes the code NOT CSS up to a local Clifford (a qubit carrying all
 # three letters rules the map out), so the CLI takes the stabilizer path.
 # k = 1, and the lightest logical is Z on the untouched qubit 3.
-SA = np.array([[1, 0, 0, 0],
-               [1, 1, 0, 0],
-               [0, 1, 1, 0]], dtype=np.uint8)
-SB = np.array([[0, 1, 0, 0],
-               [1, 0, 1, 0],
-               [1, 0, 0, 0]], dtype=np.uint8)
+SA = np.array([[1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 1, 0]], dtype=np.uint8)
+SB = np.array([[0, 1, 0, 0], [1, 0, 1, 0], [1, 0, 0, 0]], dtype=np.uint8)
 
 
 def _stabilizer_draft(**overrides):
@@ -501,13 +473,10 @@ def _stabilizer_draft(**overrides):
         "code_type": "stabilizer",
         "n": 4,
         "k": 1,
-        "checks": {"S": [{"X": [0], "Z": [1]},
-                         {"X": [0, 1], "Z": [0, 2]},
-                         {"X": [1, 2], "Z": [0]}]},
+        "checks": {"S": [{"X": [0], "Z": [1]}, {"X": [0, 1], "Z": [0, 2]}, {"X": [1, 2], "Z": [0]}]},
         "distance": {
             "d": 1,
-            "P": {"value": 1, "confidence": "upper_bound",
-                  "witness": {"X": [], "Z": [3]}},
+            "P": {"value": 1, "confidence": "upper_bound", "witness": {"X": [], "Z": [3]}},
         },
         "provenance": {
             "authors": ["@someoneelse"],
@@ -525,8 +494,7 @@ def test_reuse_keeps_a_stabilizer_drafts_pauli_witness(monkeypatch):
     monkeypatch.setattr(hd, "_fast", _FakeFast())
     draft = _stabilizer_draft()
 
-    doc = _submit(monkeypatch, draft, extra=["--reuse-witnesses"],
-                  matrices=(SA, SB))
+    doc = _submit(monkeypatch, draft, extra=["--reuse-witnesses"], matrices=(SA, SB))
 
     assert doc["code_type"] == "stabilizer"
     assert doc["distance"]["P"]["value"] == 1
@@ -540,8 +508,7 @@ def test_reuse_refuses_a_stabilizer_draft_with_no_pauli_witness(monkeypatch):
     del draft["distance"]["P"]["witness"]
 
     with pytest.raises(SystemExit, match="no Pauli witness"):
-        _submit(monkeypatch, draft, extra=["--reuse-witnesses"],
-                matrices=(SA, SB))
+        _submit(monkeypatch, draft, extra=["--reuse-witnesses"], matrices=(SA, SB))
 
 
 def test_reuse_refuses_a_pauli_witness_index_outside_the_code(monkeypatch):
@@ -551,9 +518,7 @@ def test_reuse_refuses_a_pauli_witness_index_outside_the_code(monkeypatch):
     draft["distance"]["P"]["witness"] = {"X": [], "Z": [7]}
 
     with pytest.raises(SystemExit, match=r"outside \[0, 4\)"):
-        _submit(monkeypatch, draft, extra=["--reuse-witnesses"],
-                matrices=(SA, SB))
-
+        _submit(monkeypatch, draft, extra=["--reuse-witnesses"], matrices=(SA, SB))
 
 
 # ----------------------------------------------------------------------------
@@ -601,8 +566,9 @@ def test_npz_path_tightened_doc_passes_real_verify(monkeypatch):
         return {"ok": True, "checks": [], "computed": {}, "earned_distance": {}}
 
     monkeypatch.setattr(qldpc, "verify", fake_verify)
-    rc = qldpc.main(["submit", "x.npz", "--authors", "@me", "--dry-run",
-                     "--no-circuit", "--fast-trials", "300000", "--seed", "1"])
+    rc = qldpc.main(
+        ["submit", "x.npz", "--authors", "@me", "--dry-run", "--no-circuit", "--fast-trials", "300000", "--seed", "1"]
+    )
     assert rc == 0
     doc = built[0]
 

@@ -9,8 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_layout_flags", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_layout_flags", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -47,8 +46,7 @@ def test_modular_flag_and_diagnostics_render(tmp_path):
     modular = copy.deepcopy(plain)
     modular["schema_version"] = "0.3"
     modular["name"] = "modular copy"
-    modular["locality"]["modules"] = [
-        0 if c[1] < 3 else 1 for c in modular["locality"]["coordinates"]]
+    modular["locality"]["modules"] = [0 if c[1] < 3 else 1 for c in modular["locality"]["coordinates"]]
     build = _build(tmp_path, {"72-6-6": plain, "72-6-6-mod": modular})
 
     index = _read(build, "index.html")
@@ -62,7 +60,7 @@ def test_modular_flag_and_diagnostics_render(tmp_path):
     assert "<b>modules</b> 2" in page
     assert "<b>max ports per module</b> 1" in page
     assert "cross-module checks" in page
-    assert 'class=modtable' in page
+    assert "class=modtable" in page
 
     plain_page = _read(build, "codes", "72-6-6.html")
     assert "Modular layout" not in plain_page
@@ -76,13 +74,14 @@ def test_modular_flag_leaves_scores_alone(tmp_path):
     modular["locality"]["modules"] = [3] * modular["n"]
     build = load_site_build()
     import sys
+
     sys.path.insert(0, os.path.join(ROOT, "verify"))
     import qldpc_verify
+
     a, b = qldpc_verify.verify(plain), qldpc_verify.verify(modular)
     assert a["computed"]["locality_class"] == b["computed"]["locality_class"]
     n, k, d = plain["n"], plain["k"], plain["distance"]["d"]
-    assert (build.geo_score(plain, n, k, d, "x")
-            == build.geo_score(modular, n, k, d, "x"))
+    assert build.geo_score(plain, n, k, d, "x") == build.geo_score(modular, n, k, d, "x")
 
 
 PLAQUETTE = {
@@ -98,8 +97,7 @@ PLAQUETTE = {
         "Z": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
     },
     "provenance": {"authors": ["@test"], "construction": "one plaquette"},
-    "locality": {"coordinates": [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]],
-                 "layers": 1},
+    "locality": {"coordinates": [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]], "layers": 1},
 }
 
 
@@ -118,8 +116,10 @@ def _lift_to_3d(doc):
 
 def test_geometric_efficiency_by_dimension():
     """D = 3 (issue #1849): g = 2 sqrt(2) kd/(n rho r^3); the [[4,2,2]]
-    plaquette is the stated reference at 1, and D = 2 is unchanged."""
+    plaquette is the stated reference at 1, and D = 2 is unchanged.
+    """
     import math
+
     build = load_site_build()
     g, r, rho = build.geo_score(PLAQUETTE, 4, 2, 2, "unrestricted")
     assert abs(g - 1.0) < 1e-12 and abs(r - math.sqrt(2)) < 1e-12 and rho == 1
@@ -133,11 +133,11 @@ def test_geometric_efficiency_by_dimension():
     plain = _fixture()
     n, k, d = plain["n"], plain["k"], plain["distance"]["d"]
     g2, r2, rho2 = build.geo_score(plain, n, k, d, "x")
-    assert abs(g2 - 4.0 * k * d * d / (n * rho2 ** 2 * r2 ** 4)) < 1e-12
+    assert abs(g2 - 4.0 * k * d * d / (n * rho2**2 * r2**4)) < 1e-12
     lifted = _lift_to_3d(plain)
     g3, r3, rho3 = build.geo_score(lifted, n, k, d, "x")
     assert rho3 == 1 and r3 > r2
-    assert abs(g3 - 2 * math.sqrt(2) * k * d / (n * r3 ** 3)) < 1e-12
+    assert abs(g3 - 2 * math.sqrt(2) * k * d / (n * r3**3)) < 1e-12
 
     mixed = copy.deepcopy(lifted)
     mixed["locality"]["coordinates"][0] = mixed["locality"]["coordinates"][0][:2]

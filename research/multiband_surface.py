@@ -46,6 +46,7 @@ at rows = 4. Two bands can pack tighter than three or more can.
 
 Run `python3 multiband.py` for the self-test against the published builder.
 """
+
 import os
 import sys
 
@@ -78,8 +79,8 @@ def occupied_sites(d, rows, m, pitch):
     """
     sites = set()
     for x0, y0, r in patch_origins(d, rows, m, pitch):
-        ph_v = 0 if r % 2 == 0 else 2      # vertical edge columns
-        ph_h = 2 - ph_v                    # horizontal edge rows, reverse phase
+        ph_v = 0 if r % 2 == 0 else 2  # vertical edge columns
+        ph_h = 2 - ph_v  # horizontal edge rows, reverse phase
         for y in range(y0 + 1, y0 + 2 * d):
             for x in range(x0 + 1, x0 + 2 * d):
                 if (x + y) % 2 == 0:
@@ -110,12 +111,12 @@ def build(d, rows=2, m=3, pitch=None, drop_empty=False):
     index = {c: i for i, c in enumerate(data)}
 
     rows_x, rows_z = [], []
-    for (x, y) in sites:
+    for x, y in sites:
         if (x, y) in index:
             continue
-        sup = sorted(index[(x + dx, y + dy)]
-                     for dx, dy in ((-1, -1), (-1, 1), (1, -1), (1, 1))
-                     if (x + dx, y + dy) in index)
+        sup = sorted(
+            index[(x + dx, y + dy)] for dx, dy in ((-1, -1), (-1, 1), (1, -1), (1, 1)) if (x + dx, y + dy) in index
+        )
         if drop_empty and not sup:
             continue
         (rows_x if (x + y) % 4 == 2 else rows_z).append(sup)
@@ -169,8 +170,13 @@ def params(d, rows=2, m=3, pitch=None):
         return dict(d=d, rows=rows, m=m, pitch=pitch, n=0, k=0, ok=False)
     k = n - gf2.rank(hx) - gf2.rank(hz)
     return dict(
-        d=d, rows=rows, m=m, pitch=(d - 1 if pitch is None else pitch),
-        n=n, k=k, k_formula=rows * m - rows // 2,
+        d=d,
+        rows=rows,
+        m=m,
+        pitch=(d - 1 if pitch is None else pitch),
+        n=n,
+        k=k,
+        k_formula=rows * m - rows // 2,
         w=int(max(hx.sum(1).max(), hz.sum(1).max())),
         css=bool((hx @ hz.T % 2).max() == 0),
         connected=connected(hx, hz),
@@ -188,15 +194,21 @@ def _selftest():
     for d in (3, 5, 7, 9):
         rhx, rhz, rco, rdata, rsites = ref.build(d)
         hx, hz, co, _ = build(d, rows=2, m=3, pitch=d - 1)
-        same = (hx.shape == rhx.shape and hz.shape == rhz.shape
-                and np.array_equal(hx, rhx) and np.array_equal(hz, rhz)
-                and np.array_equal(co, rco))
+        same = (
+            hx.shape == rhx.shape
+            and hz.shape == rhz.shape
+            and np.array_equal(hx, rhx)
+            and np.array_equal(hz, rhz)
+            and np.array_equal(co, rco)
+        )
         ok &= same
         p = params(d, 2, 3)
-        print(f"  d={d}: published [[{rhx.shape[1]},?]] vs general -> "
-              f"bit-exact {'YES' if same else 'NO'}   "
-              f"[[{p['n']},{p['k']},{d}]] w={p['w']} css={p['css']} "
-              f"conn={p['connected']} empty={p['empty_rows']}")
+        print(
+            f"  d={d}: published [[{rhx.shape[1]},?]] vs general -> "
+            f"bit-exact {'YES' if same else 'NO'}   "
+            f"[[{p['n']},{p['k']},{d}]] w={p['w']} css={p['css']} "
+            f"conn={p['connected']} empty={p['empty_rows']}"
+        )
     print("\nself-test:", "PASS" if ok else "FAIL")
     return ok
 

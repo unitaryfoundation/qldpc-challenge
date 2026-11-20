@@ -16,11 +16,12 @@ trivariate codes of arXiv:2406.19151 use a *dependent* third variable
 Sanity anchor: with dims (l, m, 1, 1) and terms padded with zeros, this
 module reproduces ``bb.build_bb`` exactly.
 """
+
 import numpy as np
 
 
 def _shift(r):
-    """r x r cyclic shift matrix S with S[i, (i+1) % r] = 1 (int8)."""
+    """R x r cyclic shift matrix S with S[i, (i+1) % r] = 1 (int8)."""
     S = np.zeros((r, r), dtype=np.int8)
     idx = np.arange(r)
     S[idx, (idx + 1) % r] = 1
@@ -62,8 +63,9 @@ def build_quad(dims, A_terms, B_terms):
     return HX, HZ
 
 
-def sample_quadricycle(num, *, dim_range=(2, 11), max_site=350, weight=2,
-                       seed=0, n_range=None, max_weight=None, audit=None):
+def sample_quadricycle(
+    num, *, dim_range=(2, 11), max_site=350, weight=2, seed=0, n_range=None, max_weight=None, audit=None
+):
     """Yield ``num`` random quadricycle candidates ``(spec, HX, HZ)``.
 
     Each picks a random torus with prod(dims) <= ``max_site`` (so
@@ -88,8 +90,9 @@ def sample_quadricycle(num, *, dim_range=(2, 11), max_site=350, weight=2,
                 break
         else:
             continue
-        grid = [(a, b, c, d) for a in range(dims[0]) for b in range(dims[1])
-                for c in range(dims[2]) for d in range(dims[3])]
+        grid = [
+            (a, b, c, d) for a in range(dims[0]) for b in range(dims[1]) for c in range(dims[2]) for d in range(dims[3])
+        ]
         A = [grid[i] for i in rng.choice(len(grid), size=weight, replace=False)]
         B = [grid[i] for i in rng.choice(len(grid), size=weight, replace=False)]
         tally["sampled"] += 1
@@ -102,12 +105,12 @@ def sample_quadricycle(num, *, dim_range=(2, 11), max_site=350, weight=2,
             continue
         tally["built"] += 1
         HX, HZ = build_quad(dims, A, B)
-        yield ({"family": "quadricycle", "dims": dims, "A": [list(t) for t in A],
-                "B": [list(t) for t in B]}, HX, HZ)
+        yield ({"family": "quadricycle", "dims": dims, "A": [list(t) for t in A], "B": [list(t) for t in B]}, HX, HZ)
 
 
 if __name__ == "__main__":
     import sys
+
     sys.path.insert(0, "research/kit")
     from bb import build_bb
     from css import compute_k, verify_css

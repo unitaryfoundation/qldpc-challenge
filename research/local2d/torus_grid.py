@@ -33,11 +33,10 @@ The radius it prints is the quantity ``verify/qldpc_verify.py`` measures, and th
 occupancy and spacing it reports are its two honesty checks. The verifier, not
 this script, is the authority on whether a layout is accepted.
 """
+
 import argparse
 import json
 import math
-import os
-import sys
 from collections import Counter
 
 CONVENTIONS = ((False, False), (True, False), (False, True), (True, True))
@@ -48,8 +47,7 @@ def supports(doc):
     """Check supports, X rows then Z rows; None for a non-CSS entry."""
     if doc["code_type"] != "CSS":
         return None
-    return ([list(map(int, r)) for r in doc["checks"]["X"]] +
-            [list(map(int, r)) for r in doc["checks"]["Z"]])
+    return [list(map(int, r)) for r in doc["checks"]["X"]] + [list(map(int, r)) for r in doc["checks"]["Z"]]
 
 
 def divisors(n):
@@ -65,28 +63,25 @@ def divisors(n):
 
 
 def grid(l, m, fold_i=False, fold_j=False):
-    """coords for the two-block index convention on Z_l x Z_m."""
+    """Coords for the two-block index convention on Z_l x Z_m."""
     coords = []
     for q in range(2 * l * m):
         _, r = divmod(q, l * m)
         i, j = divmod(r, m)
-        coords.append((min(i, l - i) if fold_i else i,
-                       min(j, m - j) if fold_j else j))
+        coords.append((min(i, l - i) if fold_i else i, min(j, m - j) if fold_j else j))
     return coords
 
 
 def radius(sup, pts):
     """Max check diameter, the verifier's interaction radius."""
-    return max((max(math.dist(pts[a], pts[b]) for a in s for b in s)
-                for s in sup), default=0.0)
+    return max((max(math.dist(pts[a], pts[b]) for a in s for b in s) for s in sup), default=0.0)
 
 
 def honesty(coords):
     """(max qubits per site, min spacing between distinct sites)."""
     mult = Counter(coords)
     sites = sorted(mult)
-    md = min((math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1:]),
-             default=float("inf"))
+    md = min((math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1 :]), default=float("inf"))
     return max(mult.values()), (0.0 if md == float("inf") else round(md, 6))
 
 
@@ -100,7 +95,7 @@ def scan(doc, occupancy=2, top=1):
     if sup is None or doc["n"] % 2:
         return []
     cands = []
-    for (l, m) in divisors(doc["n"] // 2):
+    for l, m in divisors(doc["n"] // 2):
         for fi, fj in CONVENTIONS:
             pts = grid(l, m, fi, fj)
             cands.append((radius(sup, pts), l, m, fi, fj))
@@ -115,21 +110,31 @@ def scan(doc, occupancy=2, top=1):
         if occ > occupancy or spacing < 1.0 - 1e-9:
             continue
         cap = SINGLE_CAP if occ == 1 else BILAYER_CAP
-        out.append({"l": l, "m": m, "fold": (fi, fj), "layers": occ,
-                    "radius": round(r, 4), "spacing": spacing,
-                    "within_cap": r <= cap + 1e-9})
+        out.append(
+            {
+                "l": l,
+                "m": m,
+                "fold": (fi, fj),
+                "layers": occ,
+                "radius": round(r, 4),
+                "spacing": spacing,
+                "within_cap": r <= cap + 1e-9,
+            }
+        )
         if len(out) >= top:
             break
     return out
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("doc", help="a codes/<n>-<k>-<d>.json entry")
-    ap.add_argument("--occupancy", type=int, default=2,
-                    help="max qubits per site to admit (default 2, the only "
-                         "value a 2D class cap allows)")
+    ap.add_argument(
+        "--occupancy",
+        type=int,
+        default=2,
+        help="max qubits per site to admit (default 2, the only value a 2D class cap allows)",
+    )
     ap.add_argument("--top", type=int, default=1, help="how many candidates")
     ap.add_argument("--json", action="store_true", help="emit JSON")
     args = ap.parse_args(argv)
@@ -141,14 +146,19 @@ def main(argv=None):
         print(json.dumps(got, indent=1))
         return 0
     if not got:
-        print("no torus-grid layout at that occupancy: this entry is not a "
-              "two-block code on Z_l x Z_m with the bb.py index convention")
+        print(
+            "no torus-grid layout at that occupancy: this entry is not a "
+            "two-block code on Z_l x Z_m with the bb.py index convention"
+        )
         return 1
     for c in got:
-        tag = (f"within the {'single-layer' if c['layers'] == 1 else 'bilayer'} "
-               f"cap" if c["within_cap"] else "over the cap")
-        print(f"Z_{c['l']} x Z_{c['m']} fold={c['fold']} layers={c['layers']} "
-              f"radius={c['radius']} spacing={c['spacing']} -- {tag}")
+        tag = (
+            f"within the {'single-layer' if c['layers'] == 1 else 'bilayer'} cap" if c["within_cap"] else "over the cap"
+        )
+        print(
+            f"Z_{c['l']} x Z_{c['m']} fold={c['fold']} layers={c['layers']} "
+            f"radius={c['radius']} spacing={c['spacing']} -- {tag}"
+        )
     return 0
 
 

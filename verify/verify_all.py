@@ -135,7 +135,8 @@ filled in for it. Without the flag nothing changes, and every check runs in
 this process as before.
 
 The structural pass and the collision scan are never skipped: they are the
-part of this file that needs the whole board, and they are the cheap part."""
+part of this file that needs the whole board, and they are the cheap part.
+"""
 
 import argparse
 import concurrent.futures
@@ -149,10 +150,10 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from qldpc_verify import _board_entry, board_reports, file_size_error, identity_keys
 from circuit_verify import verify_circuit
 from gate_changed import changed_codes as changed_code_paths
 from ler_verify import summary_rate, verify_ler
+from qldpc_verify import _board_entry, board_reports, file_size_error, identity_keys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -188,7 +189,7 @@ def _identity_entry(path):
         with open(path, "rb") as f:
             doc = json.loads(f.read())
         return identity_keys(doc)
-    except Exception:                       # noqa: BLE001 -- fail closed: verify it
+    except Exception:  # noqa: BLE001 -- fail closed: verify it
         return None
 
 
@@ -211,8 +212,7 @@ def board_entries_since(base, code_root, codes_dir, jobs):
     verdict is the base branch's.
     """
     if circuit_stack_changed(base):
-        print(f"note: the verifier stack differs from {base}, or could not be compared "
-              "with it; verifying every entry")
+        print(f"note: the verifier stack differs from {base}, or could not be compared with it; verifying every entry")
         return None
     changed = board_slugs_to_verify(base, code_root)
     if changed is None:
@@ -236,8 +236,7 @@ def board_entries_since(base, code_root, codes_dir, jobs):
             light.append(path)
     workers = (os.cpu_count() or 1) if jobs == 0 else max(1, int(jobs))
     if workers > 1 and len(light) > 1:
-        with concurrent.futures.ProcessPoolExecutor(
-                max_workers=min(workers, len(light))) as pool:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=min(workers, len(light))) as pool:
             keys = list(pool.map(_identity_entry, light, chunksize=16))
     else:
         keys = [_identity_entry(path) for path in light]
@@ -254,16 +253,25 @@ def board_entries_since(base, code_root, codes_dir, jobs):
         # report holds the identity keys and nothing else: no "ok", no
         # verdict. Every reader of entries skips a base_verdict entry before
         # it reads a verdict; the doc is kept for the readers that count claims.
-        entries[path] = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
-                         "doc": doc, "report": key, "size_error": None,
-                         "load_error": None, "base_verdict": True}
+        entries[path] = {
+            "path": path,
+            "slug": os.path.splitext(os.path.basename(path))[0],
+            "doc": doc,
+            "report": key,
+            "size_error": None,
+            "load_error": None,
+            "base_verdict": True,
+        }
     for path in full:
         entry = dict(_board_entry(path, raw[path]))
         entry["base_verdict"] = False
         entries[path] = entry
-    print(f"structural pass: {len(full)} entries verified ({len(changed)} changed since "
-          f"{base}, the rest name one of them); {len(entries) - len(full)} unchanged entries "
-          f"keep the base branch's verdict and were scanned for duplicates", flush=True)
+    print(
+        f"structural pass: {len(full)} entries verified ({len(changed)} changed since "
+        f"{base}, the rest name one of them); {len(entries) - len(full)} unchanged entries "
+        f"keep the base branch's verdict and were scanned for duplicates",
+        flush=True,
+    )
     return [entries[path] for path in paths]
 
 
@@ -292,9 +300,8 @@ def ler_sample(claims, k, seed):
     that case is the weekly re-measure of every claim, and the review a change
     to the stack gets. Asking for more claims than there are returns them all.
     """
-    ranked = sorted(set(claims), key=lambda slug: hashlib.sha256(
-        f"ler-sample\0{seed}\0{slug}".encode()).digest())
-    return set(ranked[:max(0, k)])
+    ranked = sorted(set(claims), key=lambda slug: hashlib.sha256(f"ler-sample\0{seed}\0{slug}".encode()).digest())
+    return set(ranked[: max(0, k)])
 
 
 # Every file a circuit verdict can depend on besides the entry and its
@@ -350,8 +357,11 @@ def circuit_stack_changed(base, root=ROOT):
     try:
         rc = subprocess.run(
             ["git", "diff", "--quiet", f"{base}...HEAD", "--", *CIRCUIT_STACK],
-            cwd=root, check=False, stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL).returncode
+            cwd=root,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).returncode
     except OSError:
         return True
     return rc != 0
@@ -427,17 +437,14 @@ def load_circuit_record(path, stack):
         print(f"note: no circuit record at {path}; checking every circuit tier")
         return {}
     except (OSError, ValueError) as e:
-        print(f"note: circuit record at {path} is unreadable ({type(e).__name__}); "
-              "checking every circuit tier")
+        print(f"note: circuit record at {path} is unreadable ({type(e).__name__}); checking every circuit tier")
         return {}
     passed = data.get("passed") if isinstance(data, dict) else None
     if not isinstance(passed, dict) or data.get("version") != RECORD_VERSION:
-        print(f"note: circuit record at {path} is not a version-{RECORD_VERSION} record; "
-              "checking every circuit tier")
+        print(f"note: circuit record at {path} is not a version-{RECORD_VERSION} record; checking every circuit tier")
         return {}
     if data.get("stack") != stack:
-        print(f"note: circuit record at {path} was made under another verifier stack; "
-              "checking every circuit tier")
+        print(f"note: circuit record at {path} was made under another verifier stack; checking every circuit tier")
         return {}
     return {s: k for s, k in passed.items() if isinstance(s, str) and isinstance(k, str)}
 
@@ -448,8 +455,7 @@ def save_circuit_record(path, stack, passed):
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         tmp = f"{path}.tmp"
         with open(tmp, "w", encoding="utf-8") as f:
-            json.dump({"version": RECORD_VERSION, "stack": stack,
-                       "passed": dict(sorted(passed.items()))}, f, indent=0)
+            json.dump({"version": RECORD_VERSION, "stack": stack, "passed": dict(sorted(passed.items()))}, f, indent=0)
             f.write("\n")
         os.replace(tmp, path)
     except OSError as e:
@@ -477,11 +483,9 @@ def check_circuits_in_pool(jobs, workers, on_report=None):
     called in this process as each check finishes.
     """
     reports = {}
-    pool = concurrent.futures.ProcessPoolExecutor(
-        max_workers=workers, mp_context=multiprocessing.get_context("spawn"))
+    pool = concurrent.futures.ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn"))
     try:
-        futures = {pool.submit(verify_circuit, doc, circuits_dir): slug
-                   for slug, doc, circuits_dir in jobs}
+        futures = {pool.submit(verify_circuit, doc, circuits_dir): slug for slug, doc, circuits_dir in jobs}
         for done, future in enumerate(concurrent.futures.as_completed(futures), 1):
             slug = futures[future]
             reports[slug] = future.result()
@@ -496,50 +500,88 @@ def check_circuits_in_pool(jobs, workers, on_report=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", default=ROOT,
-                    help="repository tree containing codes/ to verify; verifier "
-                         "code and fixtures still come from this checkout")
-    ap.add_argument("--ler-base", default=None, metavar="REF",
-                    help="re-measure circuit.ler claims only for entries whose "
-                         "codes/<slug>.json or circuits/<slug>/ changed since "
-                         "this git ref (PR runs); omit to re-measure every claim")
-    ap.add_argument("--ler-sample", default=None, type=int, metavar="K",
-                    help="re-measure K circuit.ler claims chosen by --ler-seed, "
-                         "and those --ler-base selects, in place of every "
-                         "claim: for a run that changed the stack that "
-                         "measures them. The rest are left to the weekly runs. "
-                         "Never narrows a --ler-base whose diff cannot be "
-                         "computed")
-    ap.add_argument("--ler-seed", default=0, type=int, metavar="N",
-                    help="what --ler-sample draws with (the pull request "
-                         "number or the run id); the same seed draws the same "
-                         "claims")
-    ap.add_argument("--circuit-base", default=None, metavar="REF",
-                    help="run the circuit tier only for entries whose "
-                         "codes/<slug>.json or circuits/<slug>/ changed since "
-                         "this git ref. Only sound when the verifier is the "
-                         "one REF was checked with, so the flag is void when a "
-                         "CIRCUIT_STACK file differs from REF; omit to check "
-                         "every circuit tier")
-    ap.add_argument("--circuit-record", default=None, metavar="PATH",
-                    help="skip the circuit tier for entries this JSON record "
-                         "says passed it on the same bytes under the same "
-                         "verifier stack, and write the record back with this "
-                         "run's passes. A trusted input: for runs on main only")
-    ap.add_argument("--board-base", default=None, metavar="REF",
-                    help="verify in full only the entries changed since REF and the "
-                         "entries that name them; the rest keep REF's structural "
-                         "verdict and contribute identity keys to the duplicate scan. "
-                         "Void when the verifier stack differs from REF or the diff "
-                         "fails (every entry is verified). For a sweep no gate follows: "
-                         "a gate reads the sweep's memo and would pay the pass itself")
-    ap.add_argument("--jobs", default=1, type=int, metavar="N",
-                    help="processes for the structural pass and the identity keys: "
-                         "1 (default) for this process alone, 0 for one per CPU")
-    ap.add_argument("--circuit-jobs", default=1, type=int, metavar="N",
-                    help="check the circuit tier in N processes, before any "
-                         "entry is reported; 0 means one per CPU. The default "
-                         "of 1 checks each entry in this process, in order")
+    ap.add_argument(
+        "--root",
+        default=ROOT,
+        help="repository tree containing codes/ to verify; verifier code and fixtures still come from this checkout",
+    )
+    ap.add_argument(
+        "--ler-base",
+        default=None,
+        metavar="REF",
+        help="re-measure circuit.ler claims only for entries whose "
+        "codes/<slug>.json or circuits/<slug>/ changed since "
+        "this git ref (PR runs); omit to re-measure every claim",
+    )
+    ap.add_argument(
+        "--ler-sample",
+        default=None,
+        type=int,
+        metavar="K",
+        help="re-measure K circuit.ler claims chosen by --ler-seed, "
+        "and those --ler-base selects, in place of every "
+        "claim: for a run that changed the stack that "
+        "measures them. The rest are left to the weekly runs. "
+        "Never narrows a --ler-base whose diff cannot be "
+        "computed",
+    )
+    ap.add_argument(
+        "--ler-seed",
+        default=0,
+        type=int,
+        metavar="N",
+        help="what --ler-sample draws with (the pull request "
+        "number or the run id); the same seed draws the same "
+        "claims",
+    )
+    ap.add_argument(
+        "--circuit-base",
+        default=None,
+        metavar="REF",
+        help="run the circuit tier only for entries whose "
+        "codes/<slug>.json or circuits/<slug>/ changed since "
+        "this git ref. Only sound when the verifier is the "
+        "one REF was checked with, so the flag is void when a "
+        "CIRCUIT_STACK file differs from REF; omit to check "
+        "every circuit tier",
+    )
+    ap.add_argument(
+        "--circuit-record",
+        default=None,
+        metavar="PATH",
+        help="skip the circuit tier for entries this JSON record "
+        "says passed it on the same bytes under the same "
+        "verifier stack, and write the record back with this "
+        "run's passes. A trusted input: for runs on main only",
+    )
+    ap.add_argument(
+        "--board-base",
+        default=None,
+        metavar="REF",
+        help="verify in full only the entries changed since REF and the "
+        "entries that name them; the rest keep REF's structural "
+        "verdict and contribute identity keys to the duplicate scan. "
+        "Void when the verifier stack differs from REF or the diff "
+        "fails (every entry is verified). For a sweep no gate follows: "
+        "a gate reads the sweep's memo and would pay the pass itself",
+    )
+    ap.add_argument(
+        "--jobs",
+        default=1,
+        type=int,
+        metavar="N",
+        help="processes for the structural pass and the identity keys: "
+        "1 (default) for this process alone, 0 for one per CPU",
+    )
+    ap.add_argument(
+        "--circuit-jobs",
+        default=1,
+        type=int,
+        metavar="N",
+        help="check the circuit tier in N processes, before any "
+        "entry is reported; 0 means one per CPU. The default "
+        "of 1 checks each entry in this process, in order",
+    )
     args = ap.parse_args(argv)
     if args.circuit_jobs < 0:
         ap.error("--circuit-jobs must be 0 (one per CPU) or a positive count")
@@ -551,13 +593,14 @@ def main(argv=None):
         # --ler-base selects".
         ap.error("--ler-sample must be a positive count")
     code_root = os.path.abspath(args.root)
-    ler_slugs = (ler_slugs_to_measure(args.ler_base, code_root)
-                 if args.ler_base else None)
+    ler_slugs = ler_slugs_to_measure(args.ler_base, code_root) if args.ler_base else None
     circuit_slugs = None
     if args.circuit_base:
         if circuit_stack_changed(args.circuit_base):
-            print(f"note: the verifier stack differs from {args.circuit_base}, or could "
-                  "not be compared with it; checking every circuit tier")
+            print(
+                f"note: the verifier stack differs from {args.circuit_base}, or could "
+                "not be compared with it; checking every circuit tier"
+            )
         else:
             circuit_slugs = circuit_slugs_to_check(args.circuit_base, code_root)
     stack = recorded = None
@@ -574,8 +617,10 @@ def main(argv=None):
     if board_base and args.ler_sample is not None:
         # The sample draws from every claim on the board and re-measures
         # what it draws, which an entry left at the base's verdict is not.
-        print(f"note: --ler-sample re-measures claims across the board, so --board-base "
-              f"{board_base} is not applied; verifying every entry")
+        print(
+            f"note: --ler-sample re-measures claims across the board, so --board-base "
+            f"{board_base} is not applied; verifying every entry"
+        )
         board_base = None
 
     def shared_pass(directory):
@@ -602,17 +647,23 @@ def main(argv=None):
         # An entry that parses to something other than an object, or whose
         # circuit block is not one, carries no claim to draw. The loop below
         # reports it as the failure it is.
-        claims = sorted(e["slug"] for e, is_code in entries
-                        if is_code and isinstance(e["doc"], dict)
-                        and isinstance(e["doc"].get("circuit"), dict)
-                        and e["doc"]["circuit"].get("ler"))
+        claims = sorted(
+            e["slug"]
+            for e, is_code in entries
+            if is_code
+            and isinstance(e["doc"], dict)
+            and isinstance(e["doc"].get("circuit"), dict)
+            and e["doc"]["circuit"].get("ler")
+        )
         sampled = ler_sample(claims, args.ler_sample, args.ler_seed)
         ler_slugs = (ler_slugs or set()) | sampled
         ler_skip_note = ", ler outside this run's sample (re-measured weekly)"
-        print(f"ler tier: re-measuring a sample of {len(sampled)} of {len(claims)} "
-              f"claims (seed {args.ler_seed}): {', '.join(sorted(sampled)) or 'none'}"
-              + (f"; and every entry changed since {args.ler_base}" if args.ler_base else ""),
-              flush=True)
+        print(
+            f"ler tier: re-measuring a sample of {len(sampled)} of {len(claims)} "
+            f"claims (seed {args.ler_seed}): {', '.join(sorted(sampled)) or 'none'}"
+            + (f"; and every entry changed since {args.ler_base}" if args.ler_base else ""),
+            flush=True,
+        )
     keys = {}
 
     def entry_key(slug, entry_path, circuits_dir):
@@ -660,8 +711,7 @@ def main(argv=None):
             jobs.append((slug, e["doc"], circuits_dir))
         workers = circuit_workers(args.circuit_jobs, len(jobs))
         if workers > 1:
-            print(f"circuit tier: checking {len(jobs)} entries in {workers} processes",
-                  flush=True)
+            print(f"circuit tier: checking {len(jobs)} entries in {workers} processes", flush=True)
 
             def pooled(slug, crep):
                 # keys holds every job's key already (None without a record).
@@ -700,8 +750,7 @@ def main(argv=None):
         if e.get("base_verdict"):
             # --board-base: unchanged since the base, so the structural
             # verdict is the base branch's; only the duplicate scan reads it
-            print(f"BASE  {rel}  -> unchanged since {board_base}; structural "
-                  "verdict is the base branch's")
+            print(f"BASE  {rel}  -> unchanged since {board_base}; structural verdict is the base branch's")
             file_identity(rel, e["report"])
             base_verdicts += 1
             continue
@@ -741,13 +790,11 @@ def main(argv=None):
                 if crep.get("skipped"):
                     pass
                 elif crep["ok"]:
-                    circ = (f", d_circ<="
-                            f"{crep['earned_d_circ']['d_circ']['value']}")
+                    circ = f", d_circ<={crep['earned_d_circ']['d_circ']['value']}"
                     record_pass(slug, key)
                 else:
                     rep["ok"] = False
-                    rep["checks"] += [c for c in crep["checks"]
-                                      if not c["ok"]]
+                    rep["checks"] += [c for c in crep["checks"] if not c["ok"]]
             # measured-rate tier: an ler claim is re-measured,
             # never trusted; a missing decoder fails the claim rather than
             # skipping it, so an unverifiable number cannot merge.
@@ -761,16 +808,13 @@ def main(argv=None):
                     pass
                 elif lrep["ok"]:
                     rate = summary_rate(doc)
-                    circ += (f", ler/round<={rate:.3g} at the gate point"
-                             if rate is not None else ", ler verified")
+                    circ += f", ler/round<={rate:.3g} at the gate point" if rate is not None else ", ler verified"
                 else:
                     rep["ok"] = False
-                    rep["checks"] += [c for c in lrep["checks"]
-                                      if not c["ok"]]
+                    rep["checks"] += [c for c in lrep["checks"] if not c["ok"]]
         if rep["ok"]:
             ed = rep["earned_distance"].get("d", {})
-            print(f"PASS  {rel}  -> d{ed.get('value','?')} "
-                  f"({ed.get('tier','-')}){circ}")
+            print(f"PASS  {rel}  -> d{ed.get('value', '?')} ({ed.get('tier', '-')}){circ}")
             if is_code:
                 file_identity(rel, rep)
         else:
@@ -781,10 +825,8 @@ def main(argv=None):
     # identical codes (same stabilizer group, same labeling): a hard error.
     # A stabilizer entry filed under its own CSS image is one entry twice,
     # not a collision, so count distinct entries per fingerprint.
-    fps = {h: v for h, v in fps.items()
-           if len({x.split(" (")[0] for x in v}) > 1}
-    sigs = {h: v for h, v in sigs.items()
-            if len({x.split(" (")[0] for x in v}) > 1}
+    fps = {h: v for h, v in fps.items() if len({x.split(" (")[0] for x in v}) > 1}
+    sigs = {h: v for h, v in sigs.items() if len({x.split(" (")[0] for x in v}) > 1}
     identical = {h: v for h, v in fps.items() if len(v) > 1}
     if identical:
         print("\nIDENTICAL CODES (same stabilizer group) -- reject:")
@@ -792,28 +834,27 @@ def main(argv=None):
             print(f"  {', '.join(v)}")
     # same WL signature but not identical: likely permutation-equivalent, flag
     # for human review (WL is a strong necessary condition, not a proof).
-    soft = {h: v for h, v in sigs.items()
-            if len(v) > 1 and not any(set(v) <= set(iv)
-                                      for iv in identical.values())}
+    soft = {h: v for h, v in sigs.items() if len(v) > 1 and not any(set(v) <= set(iv) for iv in identical.values())}
     if soft:
-        print("\nPOSSIBLE EQUIVALENT CODES (same Weisfeiler-Leman signature; "
-              "review):")
+        print("\nPOSSIBLE EQUIVALENT CODES (same Weisfeiler-Leman signature; review):")
         for h, v in soft.items():
             print(f"  {h}: {', '.join(v)}")
 
     if skipped_circuits:
-        print(f"\ncircuit tier not re-run for {skipped_circuits} entries "
-              f"unchanged since {args.circuit_base}")
+        print(f"\ncircuit tier not re-run for {skipped_circuits} entries unchanged since {args.circuit_base}")
     if recorded is not None:
         # The finished record holds this run's entries only, so an entry
         # that left the board, or stopped passing, leaves the record.
         save_circuit_record(args.circuit_record, stack, passed)
-        print(f"\ncircuit tier not re-run for {recorded_circuits} entries recorded as "
-              f"passing on these bytes; {len(passed)} passes now in {args.circuit_record}")
+        print(
+            f"\ncircuit tier not re-run for {recorded_circuits} entries recorded as "
+            f"passing on these bytes; {len(passed)} passes now in {args.circuit_record}"
+        )
     verified = len(entries) - base_verdicts
-    print(f"\n{verified-len(failed)}/{verified} passed"
-          + (f"; {base_verdicts} unchanged since {board_base} keep the base "
-             "branch's verdict" if base_verdicts else ""))
+    print(
+        f"\n{verified - len(failed)}/{verified} passed"
+        + (f"; {base_verdicts} unchanged since {board_base} keep the base branch's verdict" if base_verdicts else "")
+    )
     return 1 if (failed or identical) else 0
 
 

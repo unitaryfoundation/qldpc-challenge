@@ -7,6 +7,7 @@ is the same as not having it. What is tested here is that the default output
 stays bounded regardless of history size, that the filters narrow both
 sections, and that --full still reaches everything.
 """
+
 import io
 import json
 import os
@@ -22,8 +23,7 @@ import qldpc  # noqa: E402
 
 
 def _git(repo, *args):
-    subprocess.run(["git", *args], cwd=repo, check=True,
-                   capture_output=True, text=True)
+    subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True)
 
 
 @pytest.fixture(scope="module")
@@ -38,34 +38,39 @@ def repo(tmp_path_factory):
         (r / d).mkdir()
     for i in range(25):
         fam = "bivariate-bicycle" if i % 2 else "lifted-product"
-        (r / "codes" / f"{100 + i}-4-6.json").write_text(json.dumps(
-            {"n": 100 + i, "k": 4, "family": fam, "name": f"test code {i}"}))
+        (r / "codes" / f"{100 + i}-4-6.json").write_text(
+            json.dumps({"n": 100 + i, "k": 4, "family": fam, "name": f"test code {i}"})
+        )
     (r / "notes" / "100-4-6.md").write_text("# note\n")
     # two committed campaign summaries (item 4 of issue #2314): one closed
     # lifted-product family with nothing surviving, one bicycle sweep with a
     # survivor; a third directory without a summary must not appear
     camp = r / "research" / "campaigns"
-    for cid, fam, surv, neg in (("lp-sweep", "lifted-product", 0, 2),
-                                ("bb-sweep", "bivariate-bicycle", 1, 0)):
+    for cid, fam, surv, neg in (("lp-sweep", "lifted-product", 0, 2), ("bb-sweep", "bivariate-bicycle", 1, 0)):
         (camp / cid).mkdir(parents=True)
-        (camp / cid / "summary.json").write_text(json.dumps({
-            "summary_version": 1, "campaign_id": cid,
-            "campaign_name": f"{fam} sweep", "status": "completed",
-            "stopped_by": {"type": "budget_exhausted", "detail": "done"},
-            "budget": {"consumed": {"candidates_screened": 40}},
-            "experiments": [{"family": fam, "seed": s, "survivors": surv}
-                            for s in range(3)],
-            "survivors": [{"slug": "200-8-10"}] * surv,
-            "frontier_advances": surv,
-            "negative_results": [{"what": "gate rejected"}] * neg,
-            "report": f"research/campaigns/{cid}/REPORT.md"}))
+        (camp / cid / "summary.json").write_text(
+            json.dumps(
+                {
+                    "summary_version": 1,
+                    "campaign_id": cid,
+                    "campaign_name": f"{fam} sweep",
+                    "status": "completed",
+                    "stopped_by": {"type": "budget_exhausted", "detail": "done"},
+                    "budget": {"consumed": {"candidates_screened": 40}},
+                    "experiments": [{"family": fam, "seed": s, "survivors": surv} for s in range(3)],
+                    "survivors": [{"slug": "200-8-10"}] * surv,
+                    "frontier_advances": surv,
+                    "negative_results": [{"what": "gate rejected"}] * neg,
+                    "report": f"research/campaigns/{cid}/REPORT.md",
+                }
+            )
+        )
     (camp / "no-summary").mkdir()
     (camp / "no-summary" / "campaign.json").write_text("{}")
-    for name, topics in (("a", "[bivariate-bicycle, calibration]"),
-                         ("b", "[lifted-product]"),
-                         ("c", "[budgeting]")):
+    for name, topics in (("a", "[bivariate-bicycle, calibration]"), ("b", "[lifted-product]"), ("c", "[budgeting]")):
         (r / "fieldnotes" / f"2026-01-0{ord(name) - 96}-{name}.md").write_text(
-            f"---\ntitle: fieldnote {name}\ntopics: {topics}\n---\n\nbody\n")
+            f"---\ntitle: fieldnote {name}\ntopics: {topics}\n---\n\nbody\n"
+        )
     _git(r, "init", "-q")
     _git(r, "config", "user.email", "t@example.com")
     _git(r, "config", "user.name", "t")
@@ -89,7 +94,7 @@ def _run(*argv):
 def test_default_output_is_bounded_and_says_what_it_held_back():
     out = _run()
     assert "25 codes (1 with a research note), 3 fieldnotes" in out
-    assert out.count("[[") == 10           # the --limit default
+    assert out.count("[[") == 10  # the --limit default
     assert "... 15 more" in out
 
 
@@ -97,7 +102,7 @@ def test_limit_bounds_both_sections():
     out = _run("--limit", "2")
     assert out.count("[[") == 2
     assert "... 23 more" in out
-    assert "... 1 more" in out             # fieldnotes: 3 shown as 2
+    assert "... 1 more" in out  # fieldnotes: 3 shown as 2
 
 
 def test_full_prints_every_row():
@@ -113,8 +118,7 @@ def test_family_filter_narrows_every_section():
     assert "fieldnote a" not in out
     assert "lp-sweep: completed, 3 experiments, 0 survivors" in out
     assert "bb-sweep" not in out
-    assert ("(of 25 codes, 3 fieldnotes, and 2 campaign summaries in the "
-            "window)") in out
+    assert ("(of 25 codes, 3 fieldnotes, and 2 campaign summaries in the window)") in out
 
 
 def test_committed_campaign_summaries_are_listed_as_data():
@@ -122,11 +126,13 @@ def test_committed_campaign_summaries_are_listed_as_data():
     assert "3 fieldnotes, 2 campaign summaries" in out
     assert "campaign summaries (committed research/campaigns/*/summary.json):" in out
     assert "research/campaigns/bb-sweep/summary.json" in out
-    assert ("bb-sweep: completed, 3 experiments, 1 survivor, "
-            "1 frontier advance, 0 negative results  [bivariate-bicycle]") in out
-    assert ("lp-sweep: completed, 3 experiments, 0 survivors, "
-            "0 frontier advances, 2 negative results  [lifted-product]") in out
-    assert "no-summary" not in out            # a directory without a summary
+    assert (
+        "bb-sweep: completed, 3 experiments, 1 survivor, 1 frontier advance, 0 negative results  [bivariate-bicycle]"
+    ) in out
+    assert (
+        "lp-sweep: completed, 3 experiments, 0 survivors, 0 frontier advances, 2 negative results  [lifted-product]"
+    ) in out
+    assert "no-summary" not in out  # a directory without a summary
 
 
 def test_limit_bounds_the_campaign_section_too():
@@ -141,8 +147,7 @@ def test_json_record_carries_all_three_sections():
         assert qldpc.main(["recent", "--json", "--family", "lifted-product"]) == 0
     rec = json.loads(buf.getvalue())
     assert rec["ok"] and rec["days"] == 14 and rec["filters"] == ["lifted-product"]
-    assert rec["counts"] == {"codes": 25, "fieldnotes": 3, "campaigns": 2,
-                             "codes_with_note": 1}
+    assert rec["counts"] == {"codes": 25, "fieldnotes": 3, "campaigns": 2, "codes_with_note": 1}
     assert len(rec["codes"]) == 13 and all("hay" not in c for c in rec["codes"])
     assert [f["title"] for f in rec["fieldnotes"]] == ["fieldnote b"]
     (c,) = rec["campaigns"]

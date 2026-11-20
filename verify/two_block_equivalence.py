@@ -21,6 +21,7 @@ O(phi(m) * m) set comparisons rather than a search over permutations.
 This decides the family that holds most of the board's top entries, which is
 what the WL signature cannot do on its own.
 """
+
 import collections
 import glob
 import json
@@ -129,9 +130,9 @@ def scan(paths):
         if not c.get("checks", {}).get("X"):
             continue
         if not is_generalised_bicycle(c):
-            continue                       # shaped like a two-block code is
-                                           # not enough; the search needs the
-                                           # circulant structure to be sound
+            continue  # shaped like a two-block code is
+            # not enough; the search needs the
+            # circulant structure to be sound
         docs[re.sub(r"\.json$", "", path.rsplit("/", 1)[-1])] = c
     by = collections.defaultdict(list)
     for s, c in docs.items():
@@ -151,11 +152,9 @@ def scan(paths):
 
 if __name__ == "__main__":
     if sys.argv[1:2] == ["--scan"]:
-        hits = scan(sorted(glob.glob(sys.argv[2] if len(sys.argv) > 2
-                                     else "codes/*.json")))
+        hits = scan(sorted(glob.glob(sys.argv[2] if len(sys.argv) > 2 else "codes/*.json")))
         for a, b, (u, sw) in hits:
-            print(f"EQUIVALENT  {a}  ==  {b}   (x -> x^{u}"
-                  f"{', blocks swapped' if sw else ''})")
+            print(f"EQUIVALENT  {a}  ==  {b}   (x -> x^{u}{', blocks swapped' if sw else ''})")
         print(f"{len(hits)} permutation-equivalent pair(s)")
         raise SystemExit(1 if hits else 0)
     groups = json.loads(sys.argv[1])

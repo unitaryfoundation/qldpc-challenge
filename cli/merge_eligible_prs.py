@@ -240,7 +240,7 @@ def _inherited_metadata_gap(
     try:
         base_doc = _cached_read_code_document(repo, base_path or path, base)
     except GitHubCLIError:
-        return False                      # no base entry: the PR adds it
+        return False  # no base entry: the PR adds it
     if not isinstance(base_doc, dict) or not isinstance(document, dict):
         return False
     if metadata_error(base_doc) != error:
@@ -279,7 +279,7 @@ def circuit_regression(repo: str, path: str, document: Any, files: list[dict[str
     side. A lowered reading on the unchanged circuit is a refutation and is
     left to the refutation binding.
     """
-    slug = path[len("codes/"):-len(".json")] if path.startswith("codes/") and path.endswith(".json") else None
+    slug = path[len("codes/") : -len(".json")] if path.startswith("codes/") and path.endswith(".json") else None
     if slug is None:
         return None
     prefix = f"circuits/{slug}/"
@@ -288,10 +288,13 @@ def circuit_regression(repo: str, path: str, document: Any, files: list[dict[str
     try:
         base_doc = _cached_read_code_document(repo, path, base)
     except GitHubCLIError:
-        return None                       # a new entry: nothing to regress from
+        return None  # a new entry: nothing to regress from
     before, after = _circuit_sides(base_doc), _circuit_sides(document)
-    fallen = [f"{side} {before[side]} -> {after[side]}" for side in ("X", "Z")
-              if side in before and side in after and after[side] < before[side]]
+    fallen = [
+        f"{side} {before[side]} -> {after[side]}"
+        for side in ("X", "Z")
+        if side in before and side in after and after[side] < before[side]
+    ]
     if not fallen:
         return None
     return f"{path}: the replacement circuit lowers d_circ ({', '.join(fallen)}); the committed circuit is better"
@@ -419,8 +422,10 @@ def metadata_comment_body(result: Evaluation) -> str | None:
     for path, error in relevant:
         lines.append(f"- `{path}`: `{error}`.")
     if any("provenance.model" in error for _, error in relevant):
-        lines.append("Add a non-empty `provenance.model` value (an exact model version, or omit it; "
-             "`human` claims a person, not a model, produced the code) to the code JSON.")
+        lines.append(
+            "Add a non-empty `provenance.model` value (an exact model version, or omit it; "
+            "`human` claims a person, not a model, produced the code) to the code JSON."
+        )
     if any("provenance.authors" in error for _, error in relevant):
         lines.append(
             "Add one or more non-empty names to `provenance.authors`; the `verify` check validates the author binding."
@@ -558,8 +563,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if non_draft_prs:
         max_workers = min(8, len(non_draft_prs))
-        if max_workers < 1:
-            max_workers = 1
+        max_workers = max(max_workers, 1)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             outcomes = list(executor.map(_safe_evaluate, non_draft_prs))
         for pr, outcome in zip(non_draft_prs, outcomes):

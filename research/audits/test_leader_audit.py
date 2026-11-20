@@ -482,7 +482,7 @@ def test_pair_writes_the_record_the_packaging_paths_consume(monkeypatch, entry, 
     """--json-out is what ./qldpc submit --peer-audit and promote.py read (issue #4236)."""
     import peer_audit
 
-    peer = _write(tmp_path, "peer.json", 2)   # both claims hold at the stubbed reading
+    peer = _write(tmp_path, "peer.json", 2)  # both claims hold at the stubbed reading
     monkeypatch.setattr(la, "ris", lambda *a, **k: (WITNESS[0], WITNESS[1], WITNESS[2], 0.0))
     args = _pair_args(entry, [peer], seeds=(1, 2))
     args.json_out = str(tmp_path / "out" / "audit.json")
@@ -498,15 +498,19 @@ def test_pair_writes_the_record_the_packaging_paths_consume(monkeypatch, entry, 
 
 def test_pair_qedist_records_tool_seconds_and_bound(monkeypatch, entry, tmp_path):
     import types
+
     import peer_audit
 
     peer = _write(tmp_path, "peer.json", 2)
     monkeypatch.setattr(
-        la, "qedist_certify",
-        types.SimpleNamespace(certify=lambda doc, **kw: {
-            "d_exact": True,
-            "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
-        }),
+        la,
+        "qedist_certify",
+        types.SimpleNamespace(
+            certify=lambda doc, **kw: {
+                "d_exact": True,
+                "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
+            }
+        ),
     )
     args = _pair_args(entry, [peer])
     args.backend = "qedist"
@@ -528,23 +532,31 @@ def test_measure_qedist_handles_stabilizer(monkeypatch, tmp_path):
     import types
 
     stab_doc = {
-        "n": 5, "k": 1, "code_type": "stabilizer", "name": "[[5,1,3]]",
-        "checks": {"S": [
-            {"X": [0, 3], "Z": [1, 2]},
-            {"X": [1, 4], "Z": [2, 3]},
-            {"X": [0, 2], "Z": [3, 4]},
-            {"X": [1, 3], "Z": [0, 4]},
-        ]},
+        "n": 5,
+        "k": 1,
+        "code_type": "stabilizer",
+        "name": "[[5,1,3]]",
+        "checks": {
+            "S": [
+                {"X": [0, 3], "Z": [1, 2]},
+                {"X": [1, 4], "Z": [2, 3]},
+                {"X": [0, 2], "Z": [3, 4]},
+                {"X": [1, 3], "Z": [0, 4]},
+            ]
+        },
         "distance": {"d": 3, "P": {"value": 3}},
     }
     stab_path = tmp_path / "stab.json"
     stab_path.write_text(json.dumps(stab_doc))
     monkeypatch.setattr(
-        la, "qedist_stabilizer_certify",
-        types.SimpleNamespace(certify=lambda doc, **kw: {
-            "d_exact": True,
-            "sides": {"P": {"lower_bound": 3, "status": "UNSAT"}},
-        }),
+        la,
+        "qedist_stabilizer_certify",
+        types.SimpleNamespace(
+            certify=lambda doc, **kw: {
+                "d_exact": True,
+                "sides": {"P": {"lower_bound": 3, "status": "UNSAT"}},
+            }
+        ),
     )
     m = la._measure_qedist(str(stab_path), 10.0, 1, None)
     assert m is not None
@@ -557,11 +569,14 @@ def test_screen_accepts_qedist_flags(monkeypatch, entry):
     import types
 
     monkeypatch.setattr(
-        la, "qedist_certify",
-        types.SimpleNamespace(certify=lambda doc, **kw: {
-            "d_exact": True,
-            "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
-        }),
+        la,
+        "qedist_certify",
+        types.SimpleNamespace(
+            certify=lambda doc, **kw: {
+                "d_exact": True,
+                "sides": {"X": {"lower_bound": 2, "status": "UNSAT"}, "Z": {"lower_bound": 2, "status": "UNSAT"}},
+            }
+        ),
     )
     rc = la.main(["screen", entry, "--backend", "qedist", "--seconds", "5"])
     assert rc == la.EXIT_OK

@@ -25,6 +25,7 @@ carried so a reader can see when one side is the weak one.
     uv run python research/audits/surface_code_map.py --markdown
     uv run python research/audits/surface_code_map.py --out research/audits/surface_code_map-<date>.json
 """
+
 import argparse
 import datetime
 import importlib.util
@@ -37,9 +38,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 
 LOCALITY_ORDER = {"local-2d-single": 0, "local-2d-bilayer": 1, "unrestricted": 2}
-TRACKS = (("local-2d-single", "2D single-layer"),
-          ("local-2d-bilayer", "2D bilayer"),
-          ("unrestricted", "unrestricted"))
+TRACKS = (("local-2d-single", "2D single-layer"), ("local-2d-bilayer", "2D bilayer"), ("unrestricted", "unrestricted"))
 WEIGHT_CAPS = (4, 6, 8, None)
 K_TARGETS = (1, 10, 25, 50, 100)
 D_MIN = 3
@@ -55,15 +54,16 @@ def load_site_build():
 
 def _head():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
 
 def _w(e):
     w = e.get("w")
-    return w if isinstance(w, int) else 10 ** 6
+    return w if isinstance(w, int) else 10**6
 
 
 def eligible(e, locality, weight_cap, code_type="CSS"):
@@ -72,9 +72,11 @@ def eligible(e, locality, weight_cap, code_type="CSS"):
     Locality classes nest: a single-layer code is also a bilayer code and an
     unrestricted one. A weight cap of None admits every check weight.
     """
-    return (e.get("code_type", "CSS") == code_type
-            and LOCALITY_ORDER.get(e.get("locality_class"), 9) <= LOCALITY_ORDER[locality]
-            and (weight_cap is None or _w(e) <= weight_cap))
+    return (
+        e.get("code_type", "CSS") == code_type
+        and LOCALITY_ORDER.get(e.get("locality_class"), 9) <= LOCALITY_ORDER[locality]
+        and (weight_cap is None or _w(e) <= weight_cap)
+    )
 
 
 def is_board_surface(e):
@@ -83,8 +85,7 @@ def is_board_surface(e):
     These are the weight-4 single-layer 2D entries tagged topological: rotated,
     dense-packed, and holey surface codes, and toric codes.
     """
-    return (e.get("family") == "topological" and e.get("locality_class") == "local-2d-single"
-            and _w(e) <= 4)
+    return e.get("family") == "topological" and e.get("locality_class") == "local-2d-single" and _w(e) <= 4
 
 
 def best_entry(pool, k, d):
@@ -96,18 +97,26 @@ def best_entry(pool, k, d):
     cands = [e for e in pool if e["k"] >= k and e["d"] >= d]
     if not cands:
         return None
-    return min(cands, key=lambda e: (e["n"], 0 if e.get("tier") == "exact" else 1,
-                                     -e["k"], _w(e), e["slug"]))
+    return min(cands, key=lambda e: (e["n"], 0 if e.get("tier") == "exact" else 1, -e["k"], _w(e), e["slug"]))
 
 
 def _summary(e):
-    return {"n": e["n"], "k": e["k"], "d": e["d"], "d_X": e.get("d_X"), "d_Z": e.get("d_Z"),
-            "w": e.get("w"), "tier": e.get("tier"), "locality_class": e.get("locality_class"),
-            "family": e.get("family")}
+    return {
+        "n": e["n"],
+        "k": e["k"],
+        "d": e["d"],
+        "d_X": e.get("d_X"),
+        "d_Z": e.get("d_Z"),
+        "w": e.get("w"),
+        "tier": e.get("tier"),
+        "locality_class": e.get("locality_class"),
+        "family": e.get("family"),
+    }
 
 
-def finite_size_map(entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEIGHT_CAPS,
-                    d_min=D_MIN, code_type="CSS", per_k_max=100):
+def finite_size_map(
+    entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEIGHT_CAPS, d_min=D_MIN, code_type="CSS", per_k_max=100
+):
     """Build the map from a list of board entries.
 
     Per (track, weight cap, k target): the best entry at each d against k d^2.
@@ -124,12 +133,20 @@ def finite_size_map(entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEI
         return e["slug"]
 
     surface = [e for e in entries if e.get("code_type", "CSS") == code_type and is_board_surface(e)]
-    out = {"code_type": code_type, "k_targets": list(k_targets), "d_min": d_min,
-           "baseline": "k independent rotated surface-code patches: n = k d^2 data qubits, "
-                       "exact distance d, max check weight 4, one layer",
-           "cells": [], "board_surface": [], "locality_price": [], "per_k": []}
-    pools = {(loc, cap): [e for e in entries if eligible(e, loc, cap, code_type)]
-             for loc, _ in tracks for cap in weight_caps}
+    out = {
+        "code_type": code_type,
+        "k_targets": list(k_targets),
+        "d_min": d_min,
+        "baseline": "k independent rotated surface-code patches: n = k d^2 data qubits, "
+        "exact distance d, max check weight 4, one layer",
+        "cells": [],
+        "board_surface": [],
+        "locality_price": [],
+        "per_k": [],
+    }
+    pools = {
+        (loc, cap): [e for e in entries if eligible(e, loc, cap, code_type)] for loc, _ in tracks for cap in weight_caps
+    }
     for loc, label in tracks:
         for cap in weight_caps:
             pool = pools[(loc, cap)]
@@ -141,20 +158,37 @@ def finite_size_map(entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEI
                     if b is None:
                         continue
                     n_sc = k * d * d
-                    rows.append({"d": d, "n_patches": n_sc, "best": name(b),
-                                 "ratio": round(n_sc / b["n"], 3), "beats": b["n"] < n_sc})
+                    rows.append(
+                        {
+                            "d": d,
+                            "n_patches": n_sc,
+                            "best": name(b),
+                            "ratio": round(n_sc / b["n"], 3),
+                            "beats": b["n"] < n_sc,
+                        }
+                    )
                 beats = [r for r in rows if r["beats"]]
                 top = max(beats, key=lambda r: r["ratio"]) if beats else None
-                out["cells"].append({
-                    "track": loc, "label": label, "weight_cap": cap, "k": k,
-                    "entries_in_pool": len(pool), "rows": rows,
-                    "first_d_beating": beats[0]["d"] if beats else None,
-                    "last_d_beating": beats[-1]["d"] if beats else None,
-                    "d_beating_count": len(beats),
-                    "best": {"d": top["d"], "ratio": top["ratio"], "slug": top["best"]} if top else None})
+                out["cells"].append(
+                    {
+                        "track": loc,
+                        "label": label,
+                        "weight_cap": cap,
+                        "k": k,
+                        "entries_in_pool": len(pool),
+                        "rows": rows,
+                        "first_d_beating": beats[0]["d"] if beats else None,
+                        "last_d_beating": beats[-1]["d"] if beats else None,
+                        "d_beating_count": len(beats),
+                        "best": {"d": top["d"], "ratio": top["ratio"], "slug": top["best"]} if top else None,
+                    }
+                )
     for k in k_targets:
-        unres, bil, sing = (pools[("unrestricted", None)], pools[("local-2d-bilayer", None)],
-                            pools[("local-2d-single", None)])
+        unres, bil, sing = (
+            pools[("unrestricted", None)],
+            pools[("local-2d-bilayer", None)],
+            pools[("local-2d-single", None)],
+        )
         d_max = max((e["d"] for e in unres if e["k"] >= k), default=0)
         for d in range(d_min, d_max + 1):
             s = best_entry(surface, k, d)
@@ -164,11 +198,18 @@ def finite_size_map(entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEI
             if bu is None:
                 continue
             bb, bs = best_entry(bil, k, d), best_entry(sing, k, d)
-            out["locality_price"].append({
-                "k": k, "d": d, "n_patches": k * d * d,
-                "unrestricted": name(bu), "bilayer": name(bb), "single": name(bs),
-                "bilayer_over_unrestricted": round(bb["n"] / bu["n"], 3) if bb else None,
-                "single_over_unrestricted": round(bs["n"] / bu["n"], 3) if bs else None})
+            out["locality_price"].append(
+                {
+                    "k": k,
+                    "d": d,
+                    "n_patches": k * d * d,
+                    "unrestricted": name(bu),
+                    "bilayer": name(bb),
+                    "single": name(bs),
+                    "bilayer_over_unrestricted": round(bb["n"] / bu["n"], 3) if bb else None,
+                    "single_over_unrestricted": round(bs["n"] / bu["n"], 3) if bs else None,
+                }
+            )
     for k in range(1, per_k_max + 1):
         rec = {"k": k}
         for loc, _ in tracks:
@@ -190,11 +231,17 @@ def finite_size_map(entries, k_targets=K_TARGETS, tracks=TRACKS, weight_caps=WEI
 def record(entries, **kw):
     """Wrap the map with the provenance a committed record carries."""
     today = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
-    rec = {"schema": SCHEMA, "generated": today, "head": _head(),
-           "entries_considered": len(entries),
-           "note": ("Structural comparison on data qubits only; board distances at tier ub are "
-                    "witness-backed upper bounds and beat the exact-distance baseline only if tight. "
-                    "An entry with k' >= k stands in for k logical qubits (spare logicals are wasted).")}
+    rec = {
+        "schema": SCHEMA,
+        "generated": today,
+        "head": _head(),
+        "entries_considered": len(entries),
+        "note": (
+            "Structural comparison on data qubits only; board distances at tier ub are "
+            "witness-backed upper bounds and beat the exact-distance baseline only if tight. "
+            "An entry with k' >= k stands in for k logical qubits (spare logicals are wasted)."
+        ),
+    }
     rec.update(finite_size_map(entries, **kw))
     return rec
 
@@ -213,15 +260,21 @@ def markdown(rec):
         b = E[r["best"]]
         return f"{r['best']} (n={b['n']}, x{r['ratio']}, {b['tier']})"
 
-    lines = [f"# Finite-size map against the surface code ({rec['generated']}, head {str(rec['head'])[:9]}, "
-             f"{rec['entries_considered']} entries)", ""]
+    lines = [
+        f"# Finite-size map against the surface code ({rec['generated']}, head {str(rec['head'])[:9]}, "
+        f"{rec['entries_considered']} entries)",
+        "",
+    ]
     cells = {(c["track"], c["weight_cap"], c["k"]): c for c in rec["cells"]}
     surface = {(s["k"], s["d"]): s["slug"] for s in rec["board_surface"]}
     cols = [("local-2d-single", None), ("local-2d-bilayer", None), ("unrestricted", 8), ("unrestricted", None)]
     for k in rec["k_targets"]:
-        lines += [f"## k = {k}", "",
-                  "| d | k d^2 | board surface | " + " | ".join(_cellname(*c) for c in cols) + " |",
-                  "|---:|---:|---|" + "---|" * len(cols)]
+        lines += [
+            f"## k = {k}",
+            "",
+            "| d | k d^2 | board surface | " + " | ".join(_cellname(*c) for c in cols) + " |",
+            "|---:|---:|---|" + "---|" * len(cols),
+        ]
         ds = sorted({r["d"] for c in cols for r in cells[(c[0], c[1], k)]["rows"]})
         for d in ds:
             cells_d = []
@@ -236,22 +289,32 @@ def markdown(rec):
             cell = cells[(c[0], c[1], k)]
             if cell["best"]:
                 b = cell["best"]
-                lines.append(f"- {_cellname(*c)}: beats k d^2 first at d = {cell['first_d_beating']}, last at "
-                             f"d = {cell['last_d_beating']} ({cell['d_beating_count']} distances in all); best "
-                             f"factor x{b['ratio']} at d = {b['d']} ({b['slug']}, n = {E[b['slug']]['n']}, "
-                             f"{E[b['slug']]['tier']})")
+                lines.append(
+                    f"- {_cellname(*c)}: beats k d^2 first at d = {cell['first_d_beating']}, last at "
+                    f"d = {cell['last_d_beating']} ({cell['d_beating_count']} distances in all); best "
+                    f"factor x{b['ratio']} at d = {b['d']} ({b['slug']}, n = {E[b['slug']]['n']}, "
+                    f"{E[b['slug']]['tier']})"
+                )
             else:
                 lines.append(f"- {_cellname(*c)}: nothing beats k d^2 at any d")
         lines.append("")
-    lines += ["## Price of 2D locality (any weight; n of the best 2D entry over n of the best unrestricted entry)",
-              "", "| k | d | unrestricted | bilayer | single |", "|---:|---:|---|---|---|"]
+    lines += [
+        "## Price of 2D locality (any weight; n of the best 2D entry over n of the best unrestricted entry)",
+        "",
+        "| k | d | unrestricted | bilayer | single |",
+        "|---:|---:|---|---|---|",
+    ]
     for p in rec["locality_price"]:
+
         def _s(key, ratio):
             s = p[key]
             return f"{s} n={E[s]['n']} (x{p[ratio]})" if s else "none"
+
         u = p["unrestricted"]
-        lines.append(f"| {p['k']} | {p['d']} | {u} n={E[u]['n']} | "
-                     f"{_s('bilayer', 'bilayer_over_unrestricted')} | {_s('single', 'single_over_unrestricted')} |")
+        lines.append(
+            f"| {p['k']} | {p['d']} | {u} n={E[u]['n']} | "
+            f"{_s('bilayer', 'bilayer_over_unrestricted')} | {_s('single', 'single_over_unrestricted')} |"
+        )
     lines.append("")
     return "\n".join(lines)
 

@@ -3,6 +3,7 @@
 Schema 0.6, the verifier's cross-field checks and computed summary, and the
 authorship binding for a donated comparison.
 """
+
 import copy
 
 import check_authorship as A
@@ -11,18 +12,19 @@ import validation_gate as G
 
 
 def _block(**over):
-    b = {"hardware_track": "2d-nearest-neighbor",
-         "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
-         "surface_baseline": {"slug": "25-1-5"},
-         "decoder": {"name": "pymatching", "implementation": "pymatching 2.2.1"},
-         "resources": {"candidate": {"data_qubits": 7, "ancilla_qubits": 6,
-                                     "total_qubits": 13, "rounds": 3},
-                       "baseline": {"data_qubits": 25, "ancilla_qubits": 24,
-                                    "total_qubits": 49, "rounds": 5}},
-         "logical_error_rate": {"target": 0.01, "candidate": 0.004, "baseline": 0.003,
-                                "per": "round"},
-         "status": "documented",
-         "method": "test fixture: the numbers are illustrative"}
+    b = {
+        "hardware_track": "2d-nearest-neighbor",
+        "noise_model": {"kind": "circuit-level-depolarizing", "p": 0.001},
+        "surface_baseline": {"slug": "25-1-5"},
+        "decoder": {"name": "pymatching", "implementation": "pymatching 2.2.1"},
+        "resources": {
+            "candidate": {"data_qubits": 7, "ancilla_qubits": 6, "total_qubits": 13, "rounds": 3},
+            "baseline": {"data_qubits": 25, "ancilla_qubits": 24, "total_qubits": 49, "rounds": 5},
+        },
+        "logical_error_rate": {"target": 0.01, "candidate": 0.004, "baseline": 0.003, "per": "round"},
+        "status": "documented",
+        "method": "test fixture: the numbers are illustrative",
+    }
     b.update(over)
     return b
 
@@ -80,39 +82,54 @@ def test_totals_must_add_up():
 def test_baseline_slug_must_be_on_the_board():
     failed = _failed(V.verify(_doc(surface_baseline={"slug": "999-1-3"}), refute=False))
     assert "benchmark_baseline_on_board" in failed
-    assert "benchmark_baseline_data_qubits" not in failed   # nothing to compare against
+    assert "benchmark_baseline_data_qubits" not in failed  # nothing to compare against
 
 
 def test_baseline_must_encode_at_least_k():
-    doc = G.css_doc("[[4,2,2]] (benchmark test)", [[1, 1, 1, 1]], [[1, 1, 1, 1]], 2,
-                    construction="the four-qubit code", confidence="upper_bound")
+    doc = G.css_doc(
+        "[[4,2,2]] (benchmark test)",
+        [[1, 1, 1, 1]],
+        [[1, 1, 1, 1]],
+        2,
+        construction="the four-qubit code",
+        confidence="upper_bound",
+    )
     doc["schema_version"] = "0.6"
-    doc["benchmark"] = _block(resources={"candidate": {"data_qubits": 4, "ancilla_qubits": 2},
-                                         "baseline": {"data_qubits": 25, "ancilla_qubits": 24}})
+    doc["benchmark"] = _block(
+        resources={
+            "candidate": {"data_qubits": 4, "ancilla_qubits": 2},
+            "baseline": {"data_qubits": 25, "ancilla_qubits": 24},
+        }
+    )
     failed = _failed(V.verify(doc, refute=False))
     assert "benchmark_baseline_k" in failed, failed
 
 
 def test_patches_baseline_counts_k_d_squared_data_qubits():
-    good = _doc(surface_baseline={"patches": {"d": 5}},
-                resources={"candidate": {"data_qubits": 7, "ancilla_qubits": 6},
-                           "baseline": {"data_qubits": 25, "ancilla_qubits": 24}})
+    good = _doc(
+        surface_baseline={"patches": {"d": 5}},
+        resources={
+            "candidate": {"data_qubits": 7, "ancilla_qubits": 6},
+            "baseline": {"data_qubits": 25, "ancilla_qubits": 24},
+        },
+    )
     rep = V.verify(good, refute=False)
     assert rep["ok"], _failed(rep)
-    assert rep["computed"]["benchmark"]["baseline"] == {"patches": {"count": 1, "d": 5},
-                                                         "n": 25, "k": 1}
+    assert rep["computed"]["benchmark"]["baseline"] == {"patches": {"count": 1, "d": 5}, "n": 25, "k": 1}
     bad = copy.deepcopy(good)
     bad["benchmark"]["resources"]["baseline"]["data_qubits"] = 24
     assert "benchmark_baseline_data_qubits" in _failed(V.verify(bad, refute=False))
 
 
 def test_the_schema_holds_the_vocabulary_and_ranges():
-    for over in ({"surface_baseline": {"slug": "25-1-5", "patches": {"d": 5}}},
-                 {"status": "verified"},
-                 {"hardware_track": "3d"},
-                 {"logical_error_rate": {"target": 0.6, "candidate": 0.004, "per": "round"}},
-                 {"noise_model": {"kind": "circuit-level-depolarizing", "p": 0}},
-                 {"method": ""}):
+    for over in (
+        {"surface_baseline": {"slug": "25-1-5", "patches": {"d": 5}}},
+        {"status": "verified"},
+        {"hardware_track": "3d"},
+        {"logical_error_rate": {"target": 0.6, "candidate": 0.004, "per": "round"}},
+        {"noise_model": {"kind": "circuit-level-depolarizing", "p": 0}},
+        {"method": ""},
+    ):
         assert "schema_valid" in _failed(V.verify(_doc(**over), refute=False)), over
 
 
@@ -127,4 +144,4 @@ def test_a_non_author_may_add_a_first_benchmark_block():
     other["k"] = 2
     assert not A.benchmark_binding("bench", base, other)[0]
     assert not A.benchmark_binding("someone", base, new)[0]
-    assert not A.benchmark_binding("bench", new, new)[0]   # replacing one stays with the authors
+    assert not A.benchmark_binding("bench", new, new)[0]  # replacing one stays with the authors

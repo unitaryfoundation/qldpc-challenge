@@ -1,7 +1,9 @@
-# Ruff lint + format check (issue #658). The repo-wide report tracks legacy
-# debt but remains advisory until the separate mechanical cleanup. Newly added
-# Python files must be clean; edits to existing files are not forced to reformat
-# unrelated legacy code.
+# Ruff lint + format check (issue #658). The mechanical cleanup (ruff format
+# plus the safe fixes over the whole tree) landed on 2026-11-20; the repo-wide
+# report tracks what the fixer could not touch (about 700 findings, mostly
+# docstring shape) and stays advisory until those are worked off by rule.
+# Newly added Python files must be clean; edits to existing files are not
+# forced to fix unrelated legacy findings.
 name: lint
 
 permissions:

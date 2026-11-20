@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -46,10 +45,20 @@ def audit(code_path, circuits_dir, *, seconds=60.0):
             td = Path(td)
             model = td / "model.json"
             run_dir = td / "run"
-            _run(prefix + ["import-circuit", str(base.with_suffix(".stim")),
-                           "--output", str(model)])
-            _run(prefix + ["certify-circuit", str(model), "--out", str(run_dir),
-                           "--cutoff", str(claim - 1), "--seconds", str(seconds)])
+            _run(prefix + ["import-circuit", str(base.with_suffix(".stim")), "--output", str(model)])
+            _run(
+                prefix
+                + [
+                    "certify-circuit",
+                    str(model),
+                    "--out",
+                    str(run_dir),
+                    "--cutoff",
+                    str(claim - 1),
+                    "--seconds",
+                    str(seconds),
+                ]
+            )
             result = json.loads((run_dir / "result.json").read_text())
             out["sides"][side] = {
                 "claimed_d_circ": claim,
@@ -79,11 +88,12 @@ def main(argv=None):
         print(json.dumps(result, indent=2))
     else:
         for side, info in result["sides"].items():
-            print(f"{side}: claimed={info['claimed_d_circ']} lower_bound={info['lower_bound']} "
-                  f"status={info['status']} completed={info['completed']}")
+            print(
+                f"{side}: claimed={info['claimed_d_circ']} lower_bound={info['lower_bound']} "
+                f"status={info['status']} completed={info['completed']}"
+            )
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

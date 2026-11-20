@@ -1,4 +1,5 @@
 """Tests for the CSS row-space intersection diagnostic."""
+
 import json
 import os
 import sys
@@ -16,21 +17,17 @@ from qldpc_verify import (  # noqa: E402
 
 
 def dim(hx, hz):
-    return css_row_space_intersection_dimension(
-        np.asarray(hx, dtype=np.uint8), np.asarray(hz, dtype=np.uint8)
-    )
+    return css_row_space_intersection_dimension(np.asarray(hx, dtype=np.uint8), np.asarray(hz, dtype=np.uint8))
 
 
 def test_known_intersection_dimension():
     # row(HX)=<e0,e1>, row(HZ)=<e1,e2>; the intersection is <e1>.
-    assert dim([[1, 0, 0], [0, 1, 0]],
-               [[0, 1, 0], [0, 0, 1]]) == 1
+    assert dim([[1, 0, 0], [0, 1, 0]], [[0, 1, 0], [0, 0, 1]]) == 1
 
 
 def test_disjoint_and_identical_row_spaces():
     assert dim([[1, 0, 0]], [[0, 1, 0]]) == 0
-    assert dim([[1, 0, 1], [0, 1, 1]],
-               [[1, 0, 1], [0, 1, 1]]) == 2
+    assert dim([[1, 0, 1], [0, 1, 1]], [[1, 0, 1], [0, 1, 1]]) == 2
 
 
 def test_generator_basis_and_redundancy_do_not_change_it():
@@ -39,8 +36,7 @@ def test_generator_basis_and_redundancy_do_not_change_it():
     expected = dim(hx, hz)
     # Replace the second X generator by its XOR with the first, then add
     # duplicate/dependent rows. The generated row spaces are unchanged.
-    hx2 = [[1, 0, 1, 0], [1, 1, 0, 0],
-           [1, 0, 1, 0], [0, 1, 1, 0]]
+    hx2 = [[1, 0, 1, 0], [1, 1, 0, 0], [1, 0, 1, 0], [0, 1, 1, 0]]
     assert dim(hx2, hz) == expected
 
 
@@ -107,7 +103,4 @@ def test_real_board_regressions_separate_same_parameter_entries():
 def test_verifier_reports_the_css_diagnostic_without_making_it_a_check():
     report = verify(_load_code("144-8-16"))
     assert report["computed"]["diagnostics"]["row_space_intersection_dimension"] == 8
-    assert all(
-        check["check"] != "row_space_intersection_dimension"
-        for check in report["checks"]
-    )
+    assert all(check["check"] != "row_space_intersection_dimension" for check in report["checks"])

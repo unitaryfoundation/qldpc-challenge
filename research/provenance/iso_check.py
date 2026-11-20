@@ -26,13 +26,34 @@ import time
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from iso_common import (DATA, HERE, Code, load_board_codes, iter_literature_matrices,  # noqa: E402
-                    nauty_certificate, nauty_permutation, verify_permutation,
-                    signature, signature_swapped)
+from iso_common import (
+    HERE,
+    iter_literature_matrices,  # noqa: E402
+    load_board_codes,
+    nauty_certificate,
+    nauty_permutation,
+    signature,
+    signature_swapped,
+    verify_permutation,
+)
 
-FIELDS = ["board_slug", "board_n", "board_k", "board_d", "board_w", "board_family",
-          "board_novelty", "on_frontier_now", "match_kind", "other_id", "other_source",
-          "other_d", "other_w", "xz_swapped", "permutation_verified"]
+FIELDS = [
+    "board_slug",
+    "board_n",
+    "board_k",
+    "board_d",
+    "board_w",
+    "board_family",
+    "board_novelty",
+    "on_frontier_now",
+    "match_kind",
+    "other_id",
+    "other_source",
+    "other_d",
+    "other_w",
+    "xz_swapped",
+    "permutation_verified",
+]
 
 
 def board_certificates(codes):
@@ -61,16 +82,18 @@ def main():
                 seen_pairs.add((slug, other))
                 perm = nauty_permutation(codes[slug], codes[other])
                 ok = perm is not None and verify_permutation(codes[slug], codes[other], perm)
-                rows.append(_row(slug, meta[slug], "board", other, "board", meta[other]["d"],
-                                 meta[other]["w"], False, ok))
+                rows.append(
+                    _row(slug, meta[slug], "board", other, "board", meta[other]["d"], meta[other]["w"], False, ok)
+                )
         if c1 != c0:
             for other in by_cert.get(c1, []):
                 if other != slug and (other, slug) not in seen_pairs:
                     seen_pairs.add((slug, other))
                     perm = nauty_permutation(codes[slug], codes[other], swap=True)
                     ok = perm is not None and verify_permutation(codes[slug], codes[other], perm, swap=True)
-                    rows.append(_row(slug, meta[slug], "board", other, "board", meta[other]["d"],
-                                     meta[other]["w"], True, ok))
+                    rows.append(
+                        _row(slug, meta[slug], "board", other, "board", meta[other]["d"], meta[other]["w"], True, ok)
+                    )
     # board vs literature
     nk = defaultdict(list)
     for slug, c in codes.items():
@@ -97,11 +120,10 @@ def main():
             continue
         n_sig += 1
         if n_sig % 200 == 0:
-            print(f"  {n_sig} signature-matched literature codes so far ({time.time()-t1:.0f}s)", flush=True)
+            print(f"  {n_sig} signature-matched literature codes so far ({time.time() - t1:.0f}s)", flush=True)
         cert = nauty_certificate(lc)
         lit_by_cert[cert].append(lc.id)
-        lit_meta[lc.id] = {"source": lc.meta["source"], "d": lc.meta.get("d"), "w": lc.meta.get("w"),
-                           "code": lc}
+        lit_meta[lc.id] = {"source": lc.meta["source"], "d": lc.meta.get("d"), "w": lc.meta.get("w"), "code": lc}
     for slug, (c0, c1) in certs.items():
         for swapped, cert in ((False, c0), (True, c1)):
             if swapped and c1 == c0:
@@ -112,8 +134,7 @@ def main():
                 lm = lit_meta[lid]
                 perm = nauty_permutation(codes[slug], lm["code"], swap=swapped)
                 ok = perm is not None and verify_permutation(codes[slug], lm["code"], perm, swap=swapped)
-                rows.append(_row(slug, meta[slug], "literature", lid, lm["source"], lm["d"], lm["w"],
-                                 swapped, ok))
+                rows.append(_row(slug, meta[slug], "literature", lid, lm["source"], lm["d"], lm["w"], swapped, ok))
     out = os.path.join(HERE, "isomorphism_matches.csv")
     with open(out, "w", newline="") as f:
         wr = csv.DictWriter(f, fieldnames=FIELDS)
@@ -127,11 +148,14 @@ def main():
         "literature_candidates_same_nk": n_cand,
         "literature_candidates_same_signature": n_sig,
         "board_board_pairs": len([r for r in rows if r["match_kind"] == "board"]),
-        "board_slugs_with_board_duplicate": len({r["board_slug"] for r in rows if r["match_kind"] == "board"}
-                                                 | {r["other_id"] for r in rows if r["match_kind"] == "board"}),
+        "board_slugs_with_board_duplicate": len(
+            {r["board_slug"] for r in rows if r["match_kind"] == "board"}
+            | {r["other_id"] for r in rows if r["match_kind"] == "board"}
+        ),
         "board_slugs_isomorphic_to_literature": len({r["board_slug"] for r in lit_rows}),
         "board_slugs_isomorphic_to_literature_non_baseline": len(
-            {r["board_slug"] for r in lit_rows if r["other_source"] != "board_baseline"}),
+            {r["board_slug"] for r in lit_rows if r["other_source"] != "board_baseline"}
+        ),
         "unverified_matches": len([r for r in rows if not r["permutation_verified"]]),
         "time_board_certificates_s": round(t_board, 1),
         "time_total_s": round(time.time() - t0, 1),
@@ -142,11 +166,23 @@ def main():
 
 
 def _row(slug, m, kind, other, source, od, ow, swapped, ok):
-    return {"board_slug": slug, "board_n": m.get("n"), "board_k": m["k"], "board_d": m["d"],
-            "board_w": m["w"], "board_family": m["family"], "board_novelty": m["novelty"],
-            "on_frontier_now": m["on_frontier_now"], "match_kind": kind, "other_id": other,
-            "other_source": source, "other_d": od, "other_w": ow, "xz_swapped": swapped,
-            "permutation_verified": ok}
+    return {
+        "board_slug": slug,
+        "board_n": m.get("n"),
+        "board_k": m["k"],
+        "board_d": m["d"],
+        "board_w": m["w"],
+        "board_family": m["family"],
+        "board_novelty": m["novelty"],
+        "on_frontier_now": m["on_frontier_now"],
+        "match_kind": kind,
+        "other_id": other,
+        "other_source": source,
+        "other_d": od,
+        "other_w": ow,
+        "xz_swapped": swapped,
+        "permutation_verified": ok,
+    }
 
 
 if __name__ == "__main__":

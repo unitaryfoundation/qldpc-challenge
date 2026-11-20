@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """CSS children via code-calculus v0.2 sector swap + bounded sector search."""
-import argparse, collections, datetime, json, os, sys, time
+
+import argparse
+import datetime
+import json
+import os
+import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
@@ -13,10 +18,8 @@ if CC not in sys.path:
 
 os.environ.setdefault("QLDPC_RUN_ID", "cc-sector-swap-css")
 import coordination
-import qldpc_verify as V
-
-from machine.priced_calculus import CodeState, DistanceLedger, export_challenge_entry
 from machine.planner import bounded_sector_search
+from machine.priced_calculus import CodeState, DistanceLedger, export_challenge_entry
 
 TODAY = datetime.date.today().isoformat()
 N_CAP = 60
@@ -24,6 +27,8 @@ BUDGET = 64
 
 
 import glob
+
+
 def parents(n_cap):
     out = []
     for p in sorted(glob.glob(os.path.join(ROOT, "codes", "*.json"))):
@@ -57,8 +62,15 @@ def main():
         st = CodeState.from_challenge(doc)
         ld = DistanceLedger.from_challenge(st, doc)
         try:
-            res = bounded_sector_search(st, ld, target_sector="X", target=doc["distance"]["d"],
-                                       budget=args.budget, max_depth=1, sector_swap=True)
+            res = bounded_sector_search(
+                st,
+                ld,
+                target_sector="X",
+                target=doc["distance"]["d"],
+                budget=args.budget,
+                max_depth=1,
+                sector_swap=True,
+            )
         except Exception as e:
             print(f"  {slug}: search error {e}", flush=True)
             continue
@@ -68,19 +80,25 @@ def main():
             cstate = cand["state"]
             cledger = cand["ledger"]
             try:
-                entry = export_challenge_entry(doc, cstate, cledger,
+                entry = export_challenge_entry(
+                    doc,
+                    cstate,
+                    cledger,
                     f"[[{cstate.n()},{cstate.k()},{cledger.full.upper or doc['distance']['d']}]] sector-swap of {slug}",
                     f"E-LOCAL-HADAMARD/sector-swap chain from codes/{slug}.json",
-                    TODAY)
+                    TODAY,
+                )
             except Exception as e:
                 print(f"    export error {e}", flush=True)
                 continue
-            path = coordination.unique_path(os.path.join(staging, f"{cstate.n()}-{cstate.k()}-{cledger.full.upper or 0}.json"), entry)
+            path = coordination.unique_path(
+                os.path.join(staging, f"{cstate.n()}-{cstate.k()}-{cledger.full.upper or 0}.json"), entry
+            )
             with open(path, "w") as f:
                 json.dump(entry, f, indent=2)
             try:
                 verdict, _ = coordination.gate_and_record(path)
-            except coordination.PreflightFailure as e:
+            except coordination.PreflightFailure:
                 print(f"    preflight refused {os.path.basename(path)}", flush=True)
                 continue
             gated += 1

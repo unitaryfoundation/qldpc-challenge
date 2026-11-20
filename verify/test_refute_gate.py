@@ -15,15 +15,17 @@ SEED  The refutation seed is random by default (so an over-claim can't reliably
 
 Run: uv run python verify/test_refute_gate.py  (or pytest)
 """
+
 import copy
 import json
 import os
 import sys
+
+import gf2
+import heuristic_distance
 import numpy as np
 import pytest
-import gf2
 import qldpc_verify
-import heuristic_distance
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _fail = []
@@ -45,10 +47,10 @@ def _matrix(supports, n):
 
 def _heavy_logical(own_H, opp_H, n, target, seed):
     """A genuine nontrivial logical (in ker(opp_H), not in rowspace(own_H)) made
-    heavy by XOR-ing in stabilizer rows -- same logical class, inflated weight."""
+    heavy by XOR-ing in stabilizer rows -- same logical class, inflated weight.
+    """
     rng = np.random.default_rng(seed)
-    v = next(row.copy() % 2 for row in gf2.kernel_basis(opp_H)
-             if not gf2.in_rowspace(row, own_H))
+    v = next(row.copy() % 2 for row in gf2.kernel_basis(opp_H) if not gf2.in_rowspace(row, own_H))
     stab = own_H % 2
     for _ in range(3000):
         if int(v.sum()) >= target:
@@ -95,25 +97,30 @@ def main():
     good = json.load(open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")))
     orig = heuristic_distance.refute_check
     try:
+
         def boom(*a, **k):
             raise RuntimeError("simulated refuter failure")
+
         heuristic_distance.refute_check = boom
         r = qldpc_verify.verify(good, refute=True, seed=0)
     finally:
         heuristic_distance.refute_check = orig
     nd = next((c for c in r["checks"] if c["check"] == "distance_not_refuted"), None)
     check("refuter error makes verify FAIL (not pass)", not r["ok"])
-    check("distance_not_refuted failed closed with a clear message",
-          nd is not None and not nd["ok"] and "failing closed" in nd["detail"])
+    check(
+        "distance_not_refuted failed closed with a clear message",
+        nd is not None and not nd["ok"] and "failing closed" in nd["detail"],
+    )
     # sanity: the same code passes cleanly when the refuter works
-    check("valid code still passes with a working refuter",
-          qldpc_verify.verify(good, refute=True, seed=0)["ok"])
+    check("valid code still passes with a working refuter", qldpc_verify.verify(good, refute=True, seed=0)["ok"])
 
     print("\nrandom-by-default: two no-seed runs draw different seeds")
-    d1 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"]
-              if c["check"] == "distance_not_refuted")["detail"]
-    d2 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"]
-              if c["check"] == "distance_not_refuted")["detail"]
+    d1 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"] if c["check"] == "distance_not_refuted")[
+        "detail"
+    ]
+    d2 = next(c for c in qldpc_verify.verify(good, refute=True)["checks"] if c["check"] == "distance_not_refuted")[
+        "detail"
+    ]
     check("no-seed runs are non-deterministic (different seeds reported)", d1 != d2)
 
     print("\nCELL: deep-tier record detection is cell-aware, not global")
@@ -121,36 +128,38 @@ def main():
     # count as a record (and so face the deep refutation tier). Regression for
     # the locality-blind global frontier the gate used before.
     import tempfile
+
     import gate_changed
+
     with tempfile.TemporaryDirectory() as td:
         cd = os.path.join(td, "codes")
         os.makedirs(cd)
         docs = {
             # local-2d-single record: nothing in its cell dominates it
-            "local-rec": {"n": 4, "k": 2, "distance": {"d": 2},
-                          "checks": {"X": [[0, 1]], "Z": [[2, 3]]},
-                          "locality": {"coordinates": [[0, 0], [1, 0],
-                                                       [0, 1], [1, 1]],
-                                       "layers": 1}},
+            "local-rec": {
+                "n": 4,
+                "k": 2,
+                "distance": {"d": 2},
+                "checks": {"X": [[0, 1]], "Z": [[2, 3]]},
+                "locality": {"coordinates": [[0, 0], [1, 0], [0, 1], [1, 1]], "layers": 1},
+            },
             # nonlocal code that dominates local-rec on every (n,k,d,w) axis
-            "global-dom": {"n": 2, "k": 9, "distance": {"d": 9},
-                           "checks": {"X": [[0, 1]], "Z": [[0, 1]]}},
+            "global-dom": {"n": 2, "k": 9, "distance": {"d": 9}, "checks": {"X": [[0, 1]], "Z": [[0, 1]]}},
             # local code dominated INSIDE its own cell by local-rec
-            "local-dominated": {"n": 6, "k": 1, "distance": {"d": 1},
-                                "checks": {"X": [[0, 1]], "Z": [[4, 5]]},
-                                "locality": {"coordinates": [[0, 0], [1, 0],
-                                                             [2, 0], [0, 1],
-                                                             [1, 1], [2, 1]],
-                                             "layers": 1}},
+            "local-dominated": {
+                "n": 6,
+                "k": 1,
+                "distance": {"d": 1},
+                "checks": {"X": [[0, 1]], "Z": [[4, 5]]},
+                "locality": {"coordinates": [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]], "layers": 1},
+            },
         }
         for slug, doc in docs.items():
             json.dump(doc, open(os.path.join(cd, f"{slug}.json"), "w"))
         rec = gate_changed.board_record_slugs(td)
-        check("locally-undominated code is a record despite global domination",
-              "local-rec" in rec)
+        check("locally-undominated code is a record despite global domination", "local-rec" in rec)
         check("globally-undominated code is still a record", "global-dom" in rec)
-        check("code dominated within its own cell is not a record",
-              "local-dominated" not in rec)
+        check("code dominated within its own cell is not a record", "local-dominated" not in rec)
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
     return 1 if _fail else 0
@@ -158,13 +167,16 @@ def main():
 
 def _synthetic_gb_matrices(L=21, a=(0, 3, 6, 12), b=(0, 7)):
     """A circulant GB code from its symbols: H_X = [circ(a)|circ(b)],
-    H_Z = [circ(b)^T|circ(a)^T]. Its lightest single-block logical is weight 3."""
+    H_Z = [circ(b)^T|circ(a)^T]. Its lightest single-block logical is weight 3.
+    """
+
     def circ(sym):
         M = np.zeros((L, L), dtype=np.int8)
         for i in range(L):
             for e in sym:
                 M[i, (e + i) % L] = 1
         return M
+
     A, B = circ(a), circ(b)
     return np.hstack([A, B]).astype(np.int8), np.hstack([B.T, A.T]).astype(np.int8)
 
@@ -192,15 +204,15 @@ def _synthetic_gb_doc(claim):
         "schema_version": "0.2",
         "name": f"[[{n},8,{claim}]] synthetic circulant GB test fixture",
         "code_type": "CSS",
-        "n": n, "k": 8,
+        "n": n,
+        "k": 8,
         "checks": {"X": sup(HX), "Z": sup(HZ)},
         "distance": {
             "d": claim,
             "X": {"value": claim, "confidence": "upper_bound", "witness": one(vx)},
             "Z": {"value": claim, "confidence": "upper_bound", "witness": one(vz)},
         },
-        "provenance": {"authors": ["@test"], "construction": "test fixture",
-                       "date": "2026-01-01"},
+        "provenance": {"authors": ["@test"], "construction": "test fixture", "date": "2026-01-01"},
         "family": "generalized-bicycle",
     }
 
@@ -213,29 +225,28 @@ def test_structural_gb_pass():
     safety argument -- the pass is strictly additive and never a prerequisite.
     """
     try:
-        import gf2_fast                                     # noqa: F401
+        import gf2_fast  # noqa: F401
     except ImportError:
         import pytest
-        pytest.skip("gf2_fast not built (run `make fast`); the structural pass "
-                    "is strictly additive, so the gate is unchanged without it.")
+
+        pytest.skip(
+            "gf2_fast not built (run `make fast`); the structural pass "
+            "is strictly additive, so the gate is unchanged without it."
+        )
     import gate_changed as G
 
     # A code that is not a circulant GB must be reported as NOT SEARCHED
     # (trials 0), so the caller leaves it out of the mechanism list entirely
     # rather than recording a meaningless null result against it.
     doc = json.load(open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")))
-    ref, found, wit, tr = G._structural_refute(doc, seed=11,
-                                               trials=G.STRUCT_TRIALS_STD)
-    check("non-circulant code is not searched",
-          (ref, found, wit, tr) == (False, None, None, 0))
+    ref, found, wit, tr = G._structural_refute(doc, seed=11, trials=G.STRUCT_TRIALS_STD)
+    check("non-circulant code is not searched", (ref, found, wit, tr) == (False, None, None, 0))
 
     # An over-claimed circulant GB entry is refuted, with a witness the pinned
     # python stack validated (_structural_refute returns None otherwise).
     over = _synthetic_gb_doc(claim=8)
-    ref, found, wit, tr = G._structural_refute(over, seed=11,
-                                               trials=G.STRUCT_TRIALS_STD)
-    check("over-claimed circulant GB code is refuted",
-          bool(ref and found is not None and found < 8 and wit))
+    ref, found, wit, tr = G._structural_refute(over, seed=11, trials=G.STRUCT_TRIALS_STD)
+    check("over-claimed circulant GB code is refuted", bool(ref and found is not None and found < 8 and wit))
     if wit:
         n = over["n"]
         v = np.zeros(n, dtype=np.int8)
@@ -246,8 +257,7 @@ def test_structural_gb_pass():
 
     # And a claim nothing can beat is left alone.
     honest = _synthetic_gb_doc(claim=1)
-    ref, found, wit, tr = G._structural_refute(honest, seed=11,
-                                               trials=G.STRUCT_TRIALS_STD)
+    ref, found, wit, tr = G._structural_refute(honest, seed=11, trials=G.STRUCT_TRIALS_STD)
     check("un-beatable claim is not refuted", not ref and tr > 0)
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
@@ -270,11 +280,11 @@ def test_structural_stage_ordering():
       * not circulant -> stage 1 is a no-op and the battery runs as before.
     """
     try:
-        import gf2_fast                                     # noqa: F401
+        import gf2_fast  # noqa: F401
     except ImportError:
         import pytest
-        pytest.skip("gf2_fast not built (run `make fast`); without it stage 1 "
-                    "never runs and the gate is unchanged.")
+
+        pytest.skip("gf2_fast not built (run `make fast`); without it stage 1 never runs and the gate is unchanged.")
     import shutil
     import subprocess
     import tempfile
@@ -290,9 +300,19 @@ def test_structural_stage_ordering():
         try:
             with tempfile.TemporaryDirectory() as rd:
                 subprocess.run(
-                    [sys.executable, os.path.join(ROOT, "verify", "gate_changed.py"),
-                     "--seed", "0", "--receipt-dir", rd, dst],
-                    cwd=ROOT, capture_output=True, text=True)
+                    [
+                        sys.executable,
+                        os.path.join(ROOT, "verify", "gate_changed.py"),
+                        "--seed",
+                        "0",
+                        "--receipt-dir",
+                        rd,
+                        dst,
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                )
                 rp = os.path.join(rd, "zz-stage-probe.json")
                 if not os.path.exists(rp):
                     return None
@@ -304,27 +324,22 @@ def test_structural_stage_ordering():
     g = gate_receipt(doc=_synthetic_gb_doc(claim=8))
     if g is not None:
         check("over-claimed circulant refutes at stage 1", bool(g["refuted"]))
-        check("stage 1 hit short-circuits the battery",
-              g.get("short_circuited_by") == "circulant-GB")
-        check("only the structural mechanism ran",
-              list(g["methods"]) == ["circulant-GB"])
+        check("stage 1 hit short-circuits the battery", g.get("short_circuited_by") == "circulant-GB")
+        check("only the structural mechanism ran", list(g["methods"]) == ["circulant-GB"])
         check("no general trials were spent", g["trials"] == 0 and not g["seeds"])
 
     g = gate_receipt(doc=_synthetic_gb_doc(claim=1))
     if g is not None:
         check("un-beatable circulant is not refuted", not g["refuted"])
         check("stage 1 runs on it", "circulant-GB" in g["methods"])
-        check("a stage 1 MISS still pays the full battery",
-              any(m.startswith("RIS#") for m in g["methods"]))
+        check("a stage 1 MISS still pays the full battery", any(m.startswith("RIS#") for m in g["methods"]))
         check("no short circuit on a miss", g.get("short_circuited_by") is None)
         check("general trials were spent", g["trials"] > 0)
 
     g = gate_receipt(src=os.path.join("verify", "fixtures", "72-6-6.json"))
     if g is not None:
-        check("non-circulant code never reaches the structural search",
-              "circulant-GB" not in g["methods"])
-        check("non-circulant code runs the battery immediately",
-              any(m.startswith("RIS#") for m in g["methods"]))
+        check("non-circulant code never reaches the structural search", "circulant-GB" not in g["methods"])
+        check("non-circulant code runs the battery immediately", any(m.startswith("RIS#") for m in g["methods"]))
         check("structural trials are zero for it", g["structural_trials"] == 0)
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
@@ -336,7 +351,7 @@ def test_refute_gate():
 
 
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 
@@ -396,11 +411,11 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
     full = FakeGF()
     monkeypatch.setattr(gc, "GF", full)
     gc._fast_refute(doc, 7, sum(t for t, _ in slow.calls) + 10_000, max_seconds=None)
-    assert full.calls[:len(slow.calls)] == slow.calls
+    assert full.calls[: len(slow.calls)] == slow.calls
 
     # A genuine lighter logical proposed in a LATER slice is validated and
     # counted, with the completed trials still reported truthfully.
-    L = gf2.logical_basis(HX, HZ)                 # Z-type logicals (in ker H_X)
+    L = gf2.logical_basis(HX, HZ)  # Z-type logicals (in ker H_X)
     sup = [int(q) for q in np.flatnonzero(L[0])]
     claim = copy.deepcopy(doc)
     claim["distance"]["d"] = len(sup) + 1
@@ -425,7 +440,7 @@ def test_fast_pass_wall_clock_cap(monkeypatch):
 
     # A valid but non-improving proposal is reported as the found weight.
     heavy = copy.deepcopy(doc)
-    heavy["distance"]["d"] = len(sup)             # claim equals the find: not lighter
+    heavy["distance"]["d"] = len(sup)  # claim equals the find: not lighter
     fake = FakeGF(hits={1: (len(sup), "Z", sup)})
     monkeypatch.setattr(gc, "GF", fake)
     assert gc._fast_refute(heavy, 7, 10_000, max_seconds=None) == (False, len(sup), None, 10_000)
@@ -435,7 +450,8 @@ def _fold_fixture_doc(claim):
     """A cyclic GB code on Z_175 (two 7- and 11-term symbols) whose lightest
     logicals have weight 40 and are constant on the orbits of the order-5
     shift -- the shape the general battery passed and the orbit-fold pass
-    exists for. Inline symbols, not a board file (see _synthetic_gb_doc)."""
+    exists for. Inline symbols, not a board file (see _synthetic_gb_doc).
+    """
     L = 175
     a, b = (6, 38, 42, 60, 65, 89, 120), (3, 11, 15, 29, 46, 60, 64, 79, 82, 90, 91)
 
@@ -445,6 +461,7 @@ def _fold_fixture_doc(claim):
             for e in sym:
                 M[i, (e + i) % L] = 1
         return M
+
     A, B = circ(a), circ(b)
     HX = np.hstack([A, B]).astype(np.int8)
     HZ = np.hstack([B.T, A.T]).astype(np.int8)
@@ -455,20 +472,22 @@ def _fold_fixture_doc(claim):
 
     def one(v):
         return sorted(int(j) for j in np.nonzero(v)[0])
+
     vx, _ = _heavy_logical(HX, HZ, n, target=claim, seed=1)
     vz, _ = _heavy_logical(HZ, HX, n, target=claim, seed=2)
     return {
         "schema_version": "0.2",
         "name": f"[[{n},20,{claim}]] synthetic cyclic GB fold fixture",
-        "code_type": "CSS", "n": n, "k": 20,
+        "code_type": "CSS",
+        "n": n,
+        "k": 20,
         "checks": {"X": sup(HX), "Z": sup(HZ)},
         "distance": {
             "d": claim,
             "X": {"value": claim, "confidence": "upper_bound", "witness": one(vx)},
             "Z": {"value": claim, "confidence": "upper_bound", "witness": one(vz)},
         },
-        "provenance": {"authors": ["@test"], "construction": "test fixture",
-                       "date": "2026-01-01"},
+        "provenance": {"authors": ["@test"], "construction": "test fixture", "date": "2026-01-01"},
         "family": "generalized-bicycle",
     }
 
@@ -500,9 +519,20 @@ def test_orbit_fold_stage_ordering():
         try:
             with tempfile.TemporaryDirectory() as rd:
                 subprocess.run(
-                    [sys.executable, os.path.join(ROOT, "verify", "gate_changed.py"),
-                     "--seed", "0", "--receipt-dir", rd, dst],
-                    cwd=ROOT, capture_output=True, text=True, check=False)
+                    [
+                        sys.executable,
+                        os.path.join(ROOT, "verify", "gate_changed.py"),
+                        "--seed",
+                        "0",
+                        "--receipt-dir",
+                        rd,
+                        dst,
+                    ],
+                    cwd=ROOT,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
                 rp = os.path.join(rd, "zz-fold-probe.json")
                 if not os.path.exists(rp):
                     return None
@@ -515,8 +545,7 @@ def test_orbit_fold_stage_ordering():
     check("fold fixture produced a receipt", g is not None)
     if g is not None:
         check("over-claimed symmetric code is refuted", bool(g["refuted"]))
-        check("refuted before the general battery",
-              g.get("short_circuited_by") in ("orbit-fold", "circulant-GB"))
+        check("refuted before the general battery", g.get("short_circuited_by") in ("orbit-fold", "circulant-GB"))
         if g.get("short_circuited_by") == "orbit-fold":
             check("orbit-fold is the mechanism that hit", "orbit-fold" in g["methods"])
             check("partitions were searched", g["fold_partitions"] > 0)
@@ -527,16 +556,14 @@ def test_orbit_fold_stage_ordering():
     if g is not None:
         check("un-beatable symmetric code is not refuted", not g["refuted"])
         check("the fold ran on it", "orbit-fold" in g["methods"] and g["fold_partitions"] > 0)
-        check("a fold MISS still pays the full battery",
-              any(m.startswith("RIS#") for m in g["methods"]))
+        check("a fold MISS still pays the full battery", any(m.startswith("RIS#") for m in g["methods"]))
         check("no short circuit on a miss", g.get("short_circuited_by") is None)
 
     g = gate_receipt(src=os.path.join("verify", "fixtures", "72-6-6.json"))
     if g is not None:
         check("code without symmetry skips the fold", "orbit-fold" not in g["methods"])
         check("fold partitions are zero for it", g["fold_partitions"] == 0)
-        check("its battery runs immediately",
-              any(m.startswith("RIS#") for m in g["methods"]))
+        check("its battery runs immediately", any(m.startswith("RIS#") for m in g["methods"]))
 
     print(f"\n{'ALL PASS' if not _fail else 'FAILURES: ' + ', '.join(_fail)}")
     assert not _fail, _fail

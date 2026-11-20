@@ -43,7 +43,7 @@ the target distance. Distances found here are upper bounds carrying a witness.
 
 import argparse
 import sys
-from collections import defaultdict, deque
+from collections import defaultdict
 
 import numpy as np
 
@@ -65,10 +65,7 @@ def mat_key(a, q):
 
 
 def mat_mul(a, b, q):
-    return tuple(
-        tuple(sum(a[i][k] * b[k][j] for k in range(2)) % q for j in range(2))
-        for i in range(2)
-    )
+    return tuple(tuple(sum(a[i][k] * b[k][j] for k in range(2)) % q for j in range(2)) for i in range(2))
 
 
 def mat_inv(a, q):
@@ -110,8 +107,7 @@ def subgroup_generated(gens, psl, q):
     while stack:
         cur = stack.pop()
         for gk in keys:
-            for nxt in (mat_key(mat_mul(psl[cur], psl[gk], q), q),
-                        mat_key(mat_mul(psl[gk], psl[cur], q), q)):
+            for nxt in (mat_key(mat_mul(psl[cur], psl[gk], q), q), mat_key(mat_mul(psl[gk], psl[cur], q), q)):
                 if nxt not in seen:
                     seen.add(nxt)
                     stack.append(nxt)
@@ -136,7 +132,8 @@ def _cosets(H, psl, q, index):
 
 def assemble(x, y, xy, psl, q, Q, p):
     """Build (n, X, Z) for one generator pair, or None if the cellulation is
-    not a valid closed orientable {p,p} complex."""
+    not a valid closed orientable {p,p} complex.
+    """
     Qlist = sorted(Q)
     index = {gk: i for i, gk in enumerate(Qlist)}
 
@@ -196,8 +193,7 @@ def assemble(x, y, xy, psl, q, Q, p):
 def generator_pairs(q, p, psl):
     """Yield every (x, y) meeting the paper's conditions."""
     identity = identity_key(q)
-    xs = [m for m in psl.values()
-          if _safe_order(m, q, identity) == p]
+    xs = [m for m in psl.values() if _safe_order(m, q, identity) == p]
     js, seen = [], set()
     for a in range(q):
         for b in range(q):
@@ -265,16 +261,11 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("q", type=int, help="prime field size")
     ap.add_argument("p", type=int, help="tiling parameter p of the {p,p} tiling")
-    ap.add_argument("--list", action="store_true",
-                    help="enumerate and report the distinct codes")
-    ap.add_argument("--build", type=int, metavar="CLASS",
-                    help="write HX/HZ .npy for one class index")
-    ap.add_argument("--scan", action="store_true",
-                    help="measure classes until one reaches --target")
-    ap.add_argument("--target", type=int, default=0,
-                    help="stop once a class reaches this distance")
-    ap.add_argument("--budget", type=int, default=40,
-                    help="how many classes --scan may measure")
+    ap.add_argument("--list", action="store_true", help="enumerate and report the distinct codes")
+    ap.add_argument("--build", type=int, metavar="CLASS", help="write HX/HZ .npy for one class index")
+    ap.add_argument("--scan", action="store_true", help="measure classes until one reaches --target")
+    ap.add_argument("--target", type=int, default=0, help="stop once a class reaches this distance")
+    ap.add_argument("--budget", type=int, default=40, help="how many classes --scan may measure")
     ap.add_argument("--trials", type=int, default=4000)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--outdir", default=".")
@@ -306,8 +297,10 @@ def main():
             okz = validate_logical(HX, HZ, "Z", wz, sx)
             okx = validate_logical(HX, HZ, "X", wx, sX)
             d = min(wz, wx)
-            print(f"class {i}: n={HX.shape[1]} k={compute_k(HX, HZ)} "
-                  f"dZ={wz} dX={wx} validated={okz[0] and okx[0]}", flush=True)
+            print(
+                f"class {i}: n={HX.shape[1]} k={compute_k(HX, HZ)} dZ={wz} dX={wx} validated={okz[0] and okx[0]}",
+                flush=True,
+            )
             if args.target and d >= args.target:
                 print(f"reached target d>={args.target} at class {i}")
                 return

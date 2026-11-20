@@ -1,4 +1,5 @@
 """The board's proven lower bound (issue #4230): the interval mark and what earns it."""
+
 import importlib.util
 import os
 
@@ -13,8 +14,13 @@ def load_site_build():
     return module
 
 
-DOC = {"n": 8, "k": 2, "code_type": "CSS", "checks": {"X": [[0, 1, 2, 3]], "Z": [[4, 5, 6, 7]]},
-       "distance": {"d": 20, "X": {"value": 21}, "Z": {"value": 20}}}
+DOC = {
+    "n": 8,
+    "k": 2,
+    "code_type": "CSS",
+    "checks": {"X": [[0, 1, 2, 3]], "Z": [[4, 5, 6, 7]]},
+    "distance": {"d": 20, "X": {"value": 21}, "Z": {"value": 20}},
+}
 
 
 def test_the_badge_reads_as_an_interval_below_the_witness():
@@ -28,8 +34,10 @@ def test_the_badge_reads_as_an_interval_below_the_witness():
 
 def test_no_badge_modifier_is_also_a_standalone_rule():
     """`.b.lb` once shared its modifier with `.lb`, the leaderboard card, and the
-    interval badge took the card's margin, border and radius."""
+    interval badge took the card's margin, border and radius.
+    """
     import re
+
     build = load_site_build()
     marks = build.badge("exact") + build.badge("ub") + build.badge("ub", 7)
     modifiers = {c for cls in re.findall(r'class="([^"]+)"', marks) for c in cls.split()} - {"b"}
@@ -40,16 +48,21 @@ def test_no_badge_modifier_is_also_a_standalone_rule():
 
 def test_a_partial_certificate_is_honored_by_its_binding_hash_not_by_the_claim():
     build = load_site_build()
-    cert = {"d": 25, "d_exact": False, "d_lower": 7,
-            "sides": {"X": {"proved_min": 9}, "Z": {"proved_min": 7}},
-            "verification": {"level": "solver", "checks_sha256": build.checks_sha256(DOC)}}
+    cert = {
+        "d": 25,
+        "d_exact": False,
+        "d_lower": 7,
+        "sides": {"X": {"proved_min": 9}, "Z": {"proved_min": 7}},
+        "verification": {"level": "solver", "checks_sha256": build.checks_sha256(DOC)},
+    }
     # the certificate was made against a claim of 25 that has since been corrected to 20: the bound survives
     assert build.cert_lower_bounds(cert, DOC) == {"d": 7, "X": 9, "Z": 7, "P": None}
     other = dict(cert, verification={"level": "solver", "checks_sha256": "0" * 64})
     assert build.cert_lower_bounds(other, DOC) == {"d": None, "X": None, "Z": None, "P": None}
     above = dict(cert, d_lower=21)
-    assert build.cert_lower_bounds(above, DOC) == {"d": None, "X": None, "Z": None, "P": None}, \
+    assert build.cert_lower_bounds(above, DOC) == {"d": None, "X": None, "Z": None, "P": None}, (
         "a bound above the verified witness is a contradiction, not a board update"
+    )
     trivial = dict(cert, d_lower=1)
     assert build.cert_lower_bounds(trivial, DOC)["d"] is None
     assert build.cert_lower_bounds(None, DOC)["d"] is None

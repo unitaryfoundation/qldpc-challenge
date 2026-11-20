@@ -1,4 +1,5 @@
 """The stabilizer cross-checks confirm a true certificate and expose an inflated one (issue #4939)."""
+
 import importlib.util
 import json
 import os
@@ -14,8 +15,9 @@ import heuristic_distance as HD  # noqa: E402
 
 
 def _module():
-    spec = importlib.util.spec_from_file_location("stabilizer_crosscheck_mod",
-                                                  os.path.join(_HERE, "stabilizer_crosscheck.py"))
+    spec = importlib.util.spec_from_file_location(
+        "stabilizer_crosscheck_mod", os.path.join(_HERE, "stabilizer_crosscheck.py")
+    )
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m

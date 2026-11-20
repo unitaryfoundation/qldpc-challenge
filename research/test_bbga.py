@@ -10,13 +10,13 @@ is also checked for its weight-3 witness.
 
 Run: uv run pytest research/test_bbga.py
 """
+
 import hashlib
 
 import numpy as np
 import pytest
 from css import compute_k, verify_css
-from group_algebra import (A4C6_DIGESTS, PAPER_INSTANCES, build_paper_instance,
-                           weighted_shifts)
+from group_algebra import A4C6_DIGESTS, PAPER_INSTANCES, build_paper_instance, weighted_shifts
 from surrogate import distance_rand
 
 

@@ -10,6 +10,7 @@ the candidate, a refutation is never replaced by a clean result, and a reused
 record carries the seed of the run that searched rather than the seed of the
 run serving it.
 """
+
 import json
 import os
 
@@ -26,8 +27,7 @@ HITS = {"RIS#0": (5, [1, 2, 3])}
 @pytest.fixture
 def manifest(tmp_path):
     p = tmp_path / "validator_manifest.json"
-    p.write_text(json.dumps({"files": {"verify/gate_changed.py": "aa",
-                                       "verify/heuristic_distance.py": "bb"}}))
+    p.write_text(json.dumps({"files": {"verify/gate_changed.py": "aa", "verify/heuristic_distance.py": "bb"}}))
     return str(p)
 
 
@@ -41,17 +41,16 @@ def test_a_clean_result_is_never_stored(cache, manifest):
 
     A clean result carries nothing a reader can re-check.
     """
-    assert RC.store(cache, DOC, CLEAN, {}, deep=False, accelerated=False,
-                    head_sha="abc1234", manifest_path=manifest) is None
-    assert RC.load(cache, DOC, deep=False, accelerated=False,
-                   manifest_path=manifest) is None
+    assert (
+        RC.store(cache, DOC, CLEAN, {}, deep=False, accelerated=False, head_sha="abc1234", manifest_path=manifest)
+        is None
+    )
+    assert RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=manifest) is None
 
 
 def test_a_stored_refutation_comes_back(cache, manifest):
-    RC.store(cache, DOC, REFUTED, HITS, deep=False, accelerated=False,
-             head_sha="abc1234", manifest_path=manifest)
-    rec = RC.load(cache, DOC, deep=False, accelerated=False,
-                  manifest_path=manifest)
+    RC.store(cache, DOC, REFUTED, HITS, deep=False, accelerated=False, head_sha="abc1234", manifest_path=manifest)
+    rec = RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=manifest)
     assert rec["gate"]["refuted"] is True and rec["hits"]
 
 
@@ -75,8 +74,7 @@ def test_a_changed_closure_retires_the_search(cache, tmp_path, manifest):
     """
     RC.store(cache, DOC, REFUTED, HITS, deep=False, accelerated=False, manifest_path=manifest)
     other = tmp_path / "other_manifest.json"
-    other.write_text(json.dumps({"files": {"verify/gate_changed.py": "CHANGED",
-                                           "verify/heuristic_distance.py": "bb"}}))
+    other.write_text(json.dumps({"files": {"verify/gate_changed.py": "CHANGED", "verify/heuristic_distance.py": "bb"}}))
     assert RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=str(other)) is None
 
 
@@ -88,8 +86,7 @@ def test_a_missing_manifest_is_its_own_namespace(tmp_path):
 def test_a_refutation_is_never_replaced_by_a_clean_result(cache, manifest):
     """The search is one-sided, so the witness is the fact and silence is not."""
     RC.store(cache, DOC, REFUTED, HITS, deep=False, accelerated=False, manifest_path=manifest)
-    assert RC.store(cache, DOC, CLEAN, {}, deep=False, accelerated=False,
-                    manifest_path=manifest) is None
+    assert RC.store(cache, DOC, CLEAN, {}, deep=False, accelerated=False, manifest_path=manifest) is None
     rec = RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=manifest)
     assert rec["gate"]["refuted"] is True
     gate, hits = RC.restored(rec)
@@ -103,20 +100,24 @@ def test_a_shallow_record_does_not_answer_for_an_accelerated_run(cache, manifest
     three-python-seed record for a healthy run to reuse in place of the
     150x pass.
     """
-    RC.store(cache, DOC, REFUTED, HITS, deep=True, accelerated=False,
-             manifest_path=manifest)
-    assert RC.load(cache, DOC, deep=True, accelerated=True,
-                   manifest_path=manifest) is None
-    assert RC.load(cache, DOC, deep=True, accelerated=False,
-                   manifest_path=manifest)
+    RC.store(cache, DOC, REFUTED, HITS, deep=True, accelerated=False, manifest_path=manifest)
+    assert RC.load(cache, DOC, deep=True, accelerated=True, manifest_path=manifest) is None
+    assert RC.load(cache, DOC, deep=True, accelerated=False, manifest_path=manifest)
 
 
 def test_a_reused_record_carries_the_searching_run_s_seed(cache, manifest):
     """So the printed seed still reproduces the verdict it belongs to."""
-    RC.store(cache, DOC, dict(REFUTED, seed=11), HITS, deep=False,
-             accelerated=False, head_sha="deadbeefcafe", manifest_path=manifest)
-    gate, _ = RC.restored(RC.load(cache, DOC, deep=False, accelerated=False,
-                                  manifest_path=manifest))
+    RC.store(
+        cache,
+        DOC,
+        dict(REFUTED, seed=11),
+        HITS,
+        deep=False,
+        accelerated=False,
+        head_sha="deadbeefcafe",
+        manifest_path=manifest,
+    )
+    gate, _ = RC.restored(RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=manifest))
     assert gate["seed"] == 11
     assert gate["reused_from"]["head_sha"] == "deadbeefcafe"
     assert gate["reused_from"]["seed"] == 11
@@ -128,8 +129,15 @@ def test_the_circuit_block_is_not_reused(cache, manifest):
     It decides whether to search by diffing against the base branch, which
     moves, so its result is not a function of the candidate's bytes.
     """
-    RC.store(cache, DOC, dict(REFUTED, circuit={"searched": True}), HITS,
-             deep=False, accelerated=False, manifest_path=manifest)
+    RC.store(
+        cache,
+        DOC,
+        dict(REFUTED, circuit={"searched": True}),
+        HITS,
+        deep=False,
+        accelerated=False,
+        manifest_path=manifest,
+    )
     rec = RC.load(cache, DOC, deep=False, accelerated=False, manifest_path=manifest)
     assert "circuit" not in rec["gate"]
 
@@ -137,8 +145,7 @@ def test_the_circuit_block_is_not_reused(cache, manifest):
 def test_no_cache_directory_means_every_run_searches(manifest):
     """Absent the flag, this module is inert and the gate behaves as before."""
     assert RC.load(None, DOC, deep=False, accelerated=False, manifest_path=manifest) is None
-    assert RC.store(None, DOC, REFUTED, HITS, deep=False, accelerated=False,
-                    manifest_path=manifest) is None
+    assert RC.store(None, DOC, REFUTED, HITS, deep=False, accelerated=False, manifest_path=manifest) is None
 
 
 def test_a_torn_entry_is_a_miss_and_not_a_crash(cache, manifest):
