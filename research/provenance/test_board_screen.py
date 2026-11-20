@@ -5,6 +5,7 @@ signature is a review item and nothing stronger; a different WL signature
 rules a permutation out. The committed record has to be well formed and
 describe today's codes/, or say so.
 """
+
 import json
 import os
 import sys
@@ -19,11 +20,13 @@ import board_screen as bs  # noqa: E402
 
 def _docs():
     doc = {"provenance": {}}
-    return {"ref": (doc, "fpA", "wl1"),
-            "twin": (doc, "fpA", "wl1"),      # same rref: the same code
-            "perm": (doc, "fpB", "wl1"),      # same WL, other rref: review
-            "other": (doc, "fpC", "wl2"),     # nothing in common
-            "ref2": (doc, "fpD", "wl1")}      # a second reference with the WL hash
+    return {
+        "ref": (doc, "fpA", "wl1"),
+        "twin": (doc, "fpA", "wl1"),  # same rref: the same code
+        "perm": (doc, "fpB", "wl1"),  # same WL, other rref: review
+        "other": (doc, "fpC", "wl2"),  # nothing in common
+        "ref2": (doc, "fpD", "wl1"),
+    }  # a second reference with the WL hash
 
 
 def test_the_three_verdicts_and_what_each_lists():
@@ -32,8 +35,7 @@ def test_the_three_verdicts_and_what_each_lists():
     assert e["twin"]["verdict"] == "exact_match"
     assert [m["slug"] for m in e["twin"]["matches"] if m["by"] == "fingerprint"] == ["ref"]
     assert e["perm"]["verdict"] == "review"
-    assert {m["slug"]: m.get("audit") for m in e["perm"]["matches"]} == \
-        {"ref": "inequivalent", "ref2": None}
+    assert {m["slug"]: m.get("audit") for m in e["perm"]["matches"]} == {"ref": "inequivalent", "ref2": None}
     assert e["other"]["verdict"] == "distinct" and e["other"]["matches"] == []
     # a reference entry is screened against the rest of the reference set only
     assert e["ref"]["verdict"] == "review" and e["ref"]["in_reference"]

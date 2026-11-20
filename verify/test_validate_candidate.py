@@ -17,17 +17,18 @@ off-board fixture keep the run deterministic and fast.
 
 Run: uv run python verify/test_validate_candidate.py  (or pytest)
 """
+
 import copy
 import json
 import os
 import sys
 
+import gf2
 import numpy as np
 import pytest
-import gf2
+import validate_candidate as V
 from bb import build_bb
 from submit import make_submission
-import validate_candidate as V
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEED = 0
@@ -45,7 +46,8 @@ def check(name, cond):
 
 def heavy_witness(own_H, opp_H, n, target, seed):
     """A genuine nontrivial logical (in ker(opp)\\rowspace(own)) padded with
-    stabilizer rows until its weight reaches `target` -- same class, inflated weight."""
+    stabilizer rows until its weight reaches `target` -- same class, inflated weight.
+    """
     rng = np.random.default_rng(seed)
     v = next(r.copy() % 2 for r in gf2.kernel_basis(opp_H) if not gf2.in_rowspace(r, own_H))
     stab = own_H % 2
@@ -57,8 +59,9 @@ def heavy_witness(own_H, opp_H, n, target, seed):
 def main():
     HX, HZ = build_bb(*FRESH)
     n = HX.shape[1]
-    good = make_submission(HX, HZ, name="fresh BB", construction="test fixture",
-                           authors=["t"], family="bivariate-bicycle", trials=4000)
+    good = make_submission(
+        HX, HZ, name="fresh BB", construction="test fixture", authors=["t"], family="bivariate-bicycle", trials=4000
+    )
 
     print("1. a genuinely-new valid code PASSES:")
     vg = V.validate_candidate(good, seed=SEED)
@@ -66,8 +69,7 @@ def main():
     check("verifies", vg["gates"]["verify"]["ok"])
     check("not refuted", not vg["gates"]["refute"]["refuted"])
     check("not a board duplicate", vg["gates"]["dedup"]["exact_duplicate_of"] is None)
-    check("computed cell is weight-6 x unrestricted",
-          vg["gates"]["novelty"]["cell"] == ["weight-6", "unrestricted"])
+    check("computed cell is weight-6 x unrestricted", vg["gates"]["novelty"]["cell"] == ["weight-6", "unrestricted"])
 
     print("1c. a document carrying harness passes packaging:")
     harness_doc = copy.deepcopy(good)
@@ -81,19 +83,21 @@ def main():
     # novelty verdict is withheld rather than reported as "not board-advancing",
     # which would read as a rejection on merit when none happened.
     import glob
-    onboard = sorted(glob.glob(os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "codes", "*.json")))
+
+    onboard = sorted(
+        glob.glob(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "codes", "*.json"))
+    )
     if onboard:
         with open(onboard[0]) as f:
             dup = json.load(f)
         vd = V.validate_candidate(dup, seed=SEED)
         check("dedup fires", vd["gates"]["dedup"]["exact_duplicate_of"] is not None)
-        check("novelty verdict withheld, not falsified",
-              vd["gates"]["novelty"]["board_advancing"] is None)
-        check("label names the duplicate, not a cell failure",
-              any("already on the board" in x for x in vd["labels"])
-              and not any("not board-advancing" in x for x in vd["labels"]))
+        check("novelty verdict withheld, not falsified", vd["gates"]["novelty"]["board_advancing"] is None)
+        check(
+            "label names the duplicate, not a cell failure",
+            any("already on the board" in x for x in vd["labels"])
+            and not any("not board-advancing" in x for x in vd["labels"]),
+        )
         check("still fails the gate", not vd["passed"])
 
     print("2. an OVER-CLAIM (same checks, inflated witnesses) is rejected:")
@@ -109,29 +113,25 @@ def main():
     vo = V.validate_candidate(over, seed=SEED)
     check("does not pass", not vo["passed"])
     check("caught by refute", vo["gates"]["refute"]["refuted"])
-    check("verifier still accepts the structure (isolates the distance gate)",
-          vo["gates"]["verify"]["ok"])
-    check("NOT flagged a duplicate (isolates the distance gate)",
-          vo["gates"]["dedup"]["exact_duplicate_of"] is None)
+    check("verifier still accepts the structure (isolates the distance gate)", vo["gates"]["verify"]["ok"])
+    check("NOT flagged a duplicate (isolates the distance gate)", vo["gates"]["dedup"]["exact_duplicate_of"] is None)
 
     print("3. an exact BOARD DUPLICATE verifies but does not pass:")
     dup = json.load(open(os.path.join(ROOT, "codes", "16-2-4.json")))
     vd = V.validate_candidate(dup, seed=SEED)
     check("verifies", vd["gates"]["verify"]["ok"])
-    check("flagged exact duplicate of 16-2-4.json",
-          vd["gates"]["dedup"]["exact_duplicate_of"] == "16-2-4.json")
+    check("flagged exact duplicate of 16-2-4.json", vd["gates"]["dedup"]["exact_duplicate_of"] == "16-2-4.json")
     check("does not pass", not vd["passed"])
 
     print("4. a SCHEMA-BROKEN candidate fails at verify and short-circuits:")
     broken = copy.deepcopy(dup)
-    broken["k"] = 999                                  # k will not match the recomputed value
+    broken["k"] = 999  # k will not match the recomputed value
     vb = V.validate_candidate(broken, seed=SEED)
     check("fails the verify gate", not vb["gates"]["verify"]["ok"])
     check("does not pass", not vb["passed"])
 
     print("5. provenance stamp:")
-    check("verdict stamps this validator's source hash",
-          vg["validator"]["source_sha256"] == V.source_sha256())
+    check("verdict stamps this validator's source hash", vg["validator"]["source_sha256"] == V.source_sha256())
     check("source hash is 64 hex chars", len(vg["validator"]["source_sha256"]) == 64)
 
     print("6. a win whose ONLY strict axis is d is labelled as the suspect pattern:")
@@ -142,30 +142,38 @@ def main():
     w6 = max(int(HX.sum(axis=1).max()), int(HZ.sum(axis=1).max()))
 
     def peer(k_peer, d_peer):
-        return {"name": f"peer-{k_peer}-{d_peer}.json", "n": n, "k": k_peer,
-                "d": d_peer, "fingerprint": "not-the-candidate", "sig": "neither",
-                "weight_class": "weight-6", "w": w6, "locality_class": "unrestricted"}
+        return {
+            "name": f"peer-{k_peer}-{d_peer}.json",
+            "n": n,
+            "k": k_peer,
+            "d": d_peer,
+            "fingerprint": "not-the-candidate",
+            "sig": "neither",
+            "weight_class": "weight-6",
+            "w": w6,
+            "locality_class": "unrestricted",
+        }
 
     try:
-        V._board_entries = lambda: [peer(4, 5)]            # ties n, k, w; loses on d only
+        V._board_entries = lambda: [peer(4, 5)]  # ties n, k, w; loses on d only
         vd1 = V.validate_candidate(good, seed=SEED, refute=False)
         nov = vd1["gates"]["novelty"]
         check("flagged d_only_gain", nov["d_only_gain"] is True)
         check("advances_by is exactly ['d']", nov["advances_by"] == ["d"])
-        check("peer named for the audit",
-              nov["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"])
-        check("label says ONLY on d and names the suspect axis",
-              any("ONLY on d" in x and "suspect axis" in x for x in vd1["labels"]))
-        check("still passes (the flag is a label, not a pass condition)",
-              vd1["passed"])
+        check("peer named for the audit", nov["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"])
+        check(
+            "label says ONLY on d and names the suspect axis",
+            any("ONLY on d" in x and "suspect axis" in x for x in vd1["labels"]),
+        )
+        check("still passes (the flag is a label, not a pass condition)", vd1["passed"])
 
-        V._board_entries = lambda: [peer(3, 5)]            # wins on k as well as d
+        V._board_entries = lambda: [peer(3, 5)]  # wins on k as well as d
         vd2 = V.validate_candidate(good, seed=SEED, refute=False)
-        check("a win on a structural axis too is NOT d-only",
-              vd2["gates"]["novelty"]["d_only_gain"] is False
-              and vd2["gates"]["novelty"]["advances_by"] == ["d", "k"])
-        check("generic advance label",
-              any(x == "advances the weight-6 x unrestricted board" for x in vd2["labels"]))
+        check(
+            "a win on a structural axis too is NOT d-only",
+            vd2["gates"]["novelty"]["d_only_gain"] is False and vd2["gates"]["novelty"]["advances_by"] == ["d", "k"],
+        )
+        check("generic advance label", any(x == "advances the weight-6 x unrestricted board" for x in vd2["labels"]))
 
         # Two peers at once: one beaten on d alone, one on d and k. The whole
         # advance is no longer d-only, but the win over the first peer still
@@ -173,35 +181,38 @@ def main():
         V._board_entries = lambda: [peer(4, 5), peer(3, 5)]
         vd4 = V.validate_candidate(good, seed=SEED, refute=False)
         nov4 = vd4["gates"]["novelty"]
-        check("a structural win elsewhere does NOT clear the d-only flag",
-              nov4["d_only_gain"] is False
-              and nov4["advances_by"] == ["d", "k"])
-        check("the d-only peer is still listed",
-              nov4["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"])
+        check(
+            "a structural win elsewhere does NOT clear the d-only flag",
+            nov4["d_only_gain"] is False and nov4["advances_by"] == ["d", "k"],
+        )
+        check(
+            "the d-only peer is still listed", nov4["d_only_peers"] == [f"[[{n},{good['k']},5]] w={w6} peer-4-5.json"]
+        )
         label4 = next((x for x in vd4["labels"] if "advances the" in x), "")
-        check("label still names the advance",
-              label4.startswith("advances the weight-6 x unrestricted board on d, k"))
-        check("label still hands back the peer to re-measure",
-              "peer-4-5.json" in label4 and "suspect axis" in label4
-              and "matched depth" in label4)
-        check("still passes (the flag is a label, not a pass condition)",
-              vd4["passed"])
+        check("label still names the advance", label4.startswith("advances the weight-6 x unrestricted board on d, k"))
+        check(
+            "label still hands back the peer to re-measure",
+            "peer-4-5.json" in label4 and "suspect axis" in label4 and "matched depth" in label4,
+        )
+        check("still passes (the flag is a label, not a pass condition)", vd4["passed"])
 
-        V._board_entries = lambda: [peer(4, 1)]            # d = 1 placeholder: not a d-only peer
+        V._board_entries = lambda: [peer(4, 1)]  # d = 1 placeholder: not a d-only peer
         vdp = V.validate_candidate(good, seed=SEED, refute=False)
         novp = vdp["gates"]["novelty"]
-        check("a d = 1 placeholder is not a d-only peer",
-              novp["d_only_peers"] == [])
-        check("so a gain over it alone is not d-only",
-              novp["d_only_gain"] is False)
+        check("a d = 1 placeholder is not a d-only peer", novp["d_only_peers"] == [])
+        check("so a gain over it alone is not d-only", novp["d_only_gain"] is False)
 
-        V._board_entries = lambda: [peer(4, 9)]            # board entry dominates
+        V._board_entries = lambda: [peer(4, 9)]  # board entry dominates
         vd3 = V.validate_candidate(good, seed=SEED, refute=False)
-        check("dominated -> no advance, no d-only flag",
-              vd3["gates"]["novelty"]["board_advancing"] is False
-              and vd3["gates"]["novelty"]["d_only_gain"] is False
-              and any(x.startswith("not board-advancing") and "dominated by" in x
-                      and "non-frontier" in x for x in vd3["labels"]))
+        check(
+            "dominated -> no advance, no d-only flag",
+            vd3["gates"]["novelty"]["board_advancing"] is False
+            and vd3["gates"]["novelty"]["d_only_gain"] is False
+            and any(
+                x.startswith("not board-advancing") and "dominated by" in x and "non-frontier" in x
+                for x in vd3["labels"]
+            ),
+        )
     finally:
         V._board_entries = real_board
 
@@ -218,7 +229,7 @@ def test_validate_candidate():
 
 @pytest.mark.usefixtures("board_memo")
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 

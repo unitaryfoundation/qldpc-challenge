@@ -20,6 +20,7 @@ distance, because a revision renames the file (#6793 renamed 390-82-38 to
 exactly what the board copy did. The board-wide scan below still reads
 codes/ as it is.
 """
+
 import copy
 import glob
 import json
@@ -34,7 +35,6 @@ sys.path.insert(0, _HERE)
 
 from qldpc_verify import signature  # noqa: E402
 from two_block_equivalence import equivalent, scan  # noqa: E402
-
 
 FIXTURES = os.path.join(_HERE, "fixtures", "equivalence")
 
@@ -119,7 +119,7 @@ def test_two_block_shape_without_the_circulant_structure_is_refused():
 
     a, b = fixture("390-82-31"), fixture("390-82-31-b")
     assert is_generalised_bicycle(a) and is_generalised_bicycle(b)
-    assert equivalent(a, b) is not None            # the genuine pair still decides
+    assert equivalent(a, b) is not None  # the genuine pair still decides
 
     broken = copy.deepcopy(a)
     n = broken["n"]

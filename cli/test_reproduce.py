@@ -11,6 +11,7 @@ proving it.
 The fixture is `verify/fixtures/72-6-6.json`, copied into a throwaway tree, so
 the tests do not depend on any particular board entry surviving a refutation.
 """
+
 import json
 import os
 import shutil
@@ -29,8 +30,7 @@ import qldpc  # noqa: E402
 def tree(tmp_path, monkeypatch):
     """Build a throwaway repo holding one entry and nothing else."""
     (tmp_path / "codes").mkdir()
-    shutil.copy(os.path.join(_ROOT, "verify", "fixtures", "72-6-6.json"),
-                tmp_path / "codes" / "72-6-6.json")
+    shutil.copy(os.path.join(_ROOT, "verify", "fixtures", "72-6-6.json"), tmp_path / "codes" / "72-6-6.json")
     monkeypatch.setattr(qldpc, "_repro_root", lambda: str(tmp_path))
     return tmp_path
 
@@ -88,11 +88,15 @@ def test_construction_without_a_recipe_is_not_reproducible(tree):
 def test_a_manifest_reason_reaches_the_receipt(tree):
     """When an entry declares why it cannot be rebuilt, the receipt says so."""
     (tree / "repro").mkdir()
-    (tree / "repro" / "72-6-6.json").write_text(json.dumps({
-        "manifest_version": "1", "slug": "72-6-6",
-        "stages": {"construction": {"status": "not_reproducible",
-                                    "reason": "the sweep was never committed"}},
-    }))
+    (tree / "repro" / "72-6-6.json").write_text(
+        json.dumps(
+            {
+                "manifest_version": "1",
+                "slug": "72-6-6",
+                "stages": {"construction": {"status": "not_reproducible", "reason": "the sweep was never committed"}},
+            }
+        )
+    )
     out = tree / "receipt.json"
     assert _run("72-6-6", "--construction", "--out", str(out)) == 0
     r = json.loads(out.read_text())
@@ -107,10 +111,16 @@ def test_a_changed_entry_is_reported_not_hidden(tree, capsys):
     still proceeds: a stale manifest is not a reason to refuse to reproduce.
     """
     (tree / "repro").mkdir()
-    (tree / "repro" / "72-6-6.json").write_text(json.dumps({
-        "manifest_version": "1", "slug": "72-6-6",
-        "artifact_sha256": "0" * 64, "stages": {},
-    }))
+    (tree / "repro" / "72-6-6.json").write_text(
+        json.dumps(
+            {
+                "manifest_version": "1",
+                "slug": "72-6-6",
+                "artifact_sha256": "0" * 64,
+                "stages": {},
+            }
+        )
+    )
     out = tree / "receipt.json"
     assert _run("72-6-6", "--out", str(out)) == 0
     assert "has changed since the manifest" in capsys.readouterr().out

@@ -19,11 +19,12 @@ group-algebra qubits (index = i*m + j for cell (i mod l, j mod m)).
 Targets the ``bivariate bicycle (periodic)`` track; checks have weight
 |A_terms| + |B_terms| (filtered by the w slider on the board, not a track).
 """
+
 import numpy as np
 
 
 def _shift(r):
-    """r x r cyclic shift matrix S with S[i, (i+1) % r] = 1 (int8)."""
+    """R x r cyclic shift matrix S with S[i, (i+1) % r] = 1 (int8)."""
     S = np.zeros((r, r), dtype=np.int8)
     idx = np.arange(r)
     S[idx, (idx + 1) % r] = 1
@@ -40,7 +41,7 @@ def _monomial(l, m, a, b):
 def poly_matrix(l, m, terms):
     """Sum of monomials (mod 2) for ``terms`` = list of (a, b) exponent pairs."""
     M = np.zeros((l * m, l * m), dtype=np.int8)
-    for (a, b) in terms:
+    for a, b in terms:
         M = (M + _monomial(l, m, a, b)) % 2
     return M.astype(np.int8)
 
@@ -69,16 +70,16 @@ def build_bb(l, m, A_terms, B_terms):
 # Known records (Bravyi et al.) for validation / as starting points.
 # term lists use (x-exponent, y-exponent).
 KNOWN = {
-    "[[72,12,6]]":   dict(l=6,  m=6,  A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
-    "[[90,8,10]]":   dict(l=15, m=3,  A=[(9, 0), (0, 1), (0, 2)], B=[(0, 0), (2, 0), (7, 0)]),
-    "[[108,8,10]]":  dict(l=9,  m=6,  A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
-    "[[144,12,12]]": dict(l=12, m=6,  A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
+    "[[72,12,6]]": dict(l=6, m=6, A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
+    "[[90,8,10]]": dict(l=15, m=3, A=[(9, 0), (0, 1), (0, 2)], B=[(0, 0), (2, 0), (7, 0)]),
+    "[[108,8,10]]": dict(l=9, m=6, A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
+    "[[144,12,12]]": dict(l=12, m=6, A=[(3, 0), (0, 1), (0, 2)], B=[(0, 3), (1, 0), (2, 0)]),
     "[[288,12,18]]": dict(l=12, m=12, A=[(3, 0), (0, 2), (0, 7)], B=[(0, 3), (1, 0), (2, 0)]),
 }
 
 
 if __name__ == "__main__":
-    from css import verify_css, compute_k
+    from css import compute_k, verify_css
     from surrogate import distance_rand
 
     print(f"{'code':>16}  {'n':>4} {'k':>3}  css  {'d<=':>5}")

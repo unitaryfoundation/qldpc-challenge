@@ -49,6 +49,7 @@ a frontier, or a score beyond ``d_circ`` and, when measured, LER points.
     uv run --extra research python research/kit/circuit_search.py 72-12-6 --attempts 12 --seconds 60
     uv run --extra research python research/kit/circuit_search.py 12-2-3 --attempts 3 --seconds 5 --ler
 """
+
 import argparse
 import copy
 import datetime
@@ -82,8 +83,10 @@ def load_entry(slug):
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
     if not doc.get("circuit"):
-        raise SystemExit(f"{slug}: no circuit tier to improve on; qldpc submit --circuits "
-                         "or research/circuit_autogen.py adds a first one")
+        raise SystemExit(
+            f"{slug}: no circuit tier to improve on; qldpc submit --circuits "
+            "or research/circuit_autogen.py adds a first one"
+        )
     if doc.get("code_type") == "stabilizer":
         raise SystemExit(f"{slug}: the schedule search covers CSS memory experiments only")
     return doc, os.path.join(CIRCUITS, slug)
@@ -112,14 +115,19 @@ def score_of(dc):
 def baseline(doc, circuits_dir):
     """Read what the committed circuits claim and how big their models are."""
     cb = doc["circuit"]
-    out = {"d_circ": {b: cb["d_circ"][b]["value"] for b in ("X", "Z")},
-           "rounds": cb["rounds"], "notes": cb.get("notes", ""), "mechanisms": {}}
+    out = {
+        "d_circ": {b: cb["d_circ"][b]["value"] for b in ("X", "Z")},
+        "rounds": cb["rounds"],
+        "notes": cb.get("notes", ""),
+        "mechanisms": {},
+    }
     for b in ("X", "Z"):
-        p = os.path.join(circuits_dir, SIDE_FILES[b] + ".dem")
+        p = os.path.join(circuits_dir, SIDE_FILES[b] + ".stim")
         try:
             with open(p, encoding="utf-8") as f:
-                out["mechanisms"][b] = stim.DetectorErrorModel(f.read()).num_errors
-        except (OSError, ValueError):
+                circuit = stim.Circuit(f.read())
+            out["mechanisms"][b] = ct.derive_dem(circuit).num_errors
+        except Exception:
             out["mechanisms"][b] = None
     out["score"] = list(score_of(cb["d_circ"]))
     return out
@@ -129,7 +137,8 @@ def families(HX, HZ, coords, seed, only=FAMILIES, rounds=None):
     """Every applicable schedule family as (name, label, candidate iterator);
     with `rounds` the two-block and generic families yield their flagged
     variants first (circuit_autogen's Johnson-coil and span flags, issue
-    #4231), sized to fit the verifier's caps at that round count."""
+    #4231), sized to fit the verifier's caps at that round count.
+    """
     rng = np.random.default_rng(seed)
     out = []
     if "two-block" in only:
@@ -146,8 +155,7 @@ def families(HX, HZ, coords, seed, only=FAMILIES, rounds=None):
     return out
 
 
-def screen_candidate(HX, HZ, layers, seed, rounds=ca.SCREEN_ROUNDS, trials=ca.SCREEN_TRIALS,
-                     seconds=ca.SCREEN_SECONDS):
+def screen_candidate(HX, HZ, layers, seed, rounds=ca.SCREEN_ROUNDS, trials=ca.SCREEN_TRIALS, seconds=ca.SCREEN_SECONDS):
     """Quick RIS bounds at few rounds, per basis; None when a detector is not deterministic.
 
     Fewer rounds can only overestimate d_circ, so a bound found here is a
@@ -167,8 +175,9 @@ def screen_candidate(HX, HZ, layers, seed, rounds=ca.SCREEN_ROUNDS, trials=ca.SC
 
 def _head():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=_ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=_ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -197,6 +206,7 @@ def stage_attempt(run_dir, k, doc, block, files, notes):
 def measure_ler(files, n, rounds, p, seed, shots):
     """Measure the per-round logical error rate of a staged schedule at one rate, per basis."""
     import ler_measure as lm
+
     out = {}
     for basis in ("X", "Z"):
         circuit = stim.Circuit(files[SIDE_FILES[basis] + ".stim"])
@@ -205,8 +215,21 @@ def measure_ler(files, n, rounds, p, seed, shots):
     return out
 
 
-def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, only=FAMILIES,
-           out=None, ler=False, ler_p=0.01, ler_shots=20000, log=print):
+def search(
+    slug,
+    *,
+    attempts=8,
+    seed=0,
+    seconds=60.0,
+    screen=True,
+    rounds=None,
+    only=FAMILIES,
+    out=None,
+    ler=False,
+    ler_p=0.01,
+    ler_shots=20000,
+    log=print,
+):
     """Run the search for one entry; returns the summary (also written to the run directory)."""
     doc, circuits_dir = load_entry(slug)
     HX, HZ = matrices(doc)
@@ -214,12 +237,17 @@ def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, 
     base = baseline(doc, circuits_dir)
     rounds = max(int(rounds or base["rounds"]), d)
     wits = {s: doc["distance"][s]["witness"] for s in ("X", "Z") if s in doc["distance"]}
-    run_dir = out or os.path.join(coordination.staging_dir(), "circuit-search",
-                                  f"{slug}-{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}")
+    run_dir = out or os.path.join(
+        coordination.staging_dir(),
+        "circuit-search",
+        f"{slug}-{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%SZ}",
+    )
     os.makedirs(run_dir, exist_ok=True)
     ledger = os.path.join(run_dir, "ledger.jsonl")
-    log(f"{slug}: committed d_circ X {base['d_circ']['X']}, Z {base['d_circ']['Z']} at rounds "
-        f"{base['rounds']}; searching {attempts} schedules at rounds {rounds}, {seconds:g} s per basis")
+    log(
+        f"{slug}: committed d_circ X {base['d_circ']['X']}, Z {base['d_circ']['Z']} at rounds "
+        f"{base['rounds']}; searching {attempts} schedules at rounds {rounds}, {seconds:g} s per basis"
+    )
     fams = families(HX, HZ, coords_of(doc), seed, only, rounds)
     log("  families: " + ", ".join(f"{name} ({label})" for name, label, _ in fams))
     if ler:
@@ -240,9 +268,19 @@ def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, 
             taken += 1
             k += 1
             t0 = time.perf_counter()
-            row = {"attempt": k, "family": name, "schedule": notes_text, "seed": seed,
-                   "screen": None, "d_circ": None, "score": None, "verdict_ok": None,
-                   "improving": False, "staged": None, "reason": None}
+            row = {
+                "attempt": k,
+                "family": name,
+                "schedule": notes_text,
+                "seed": seed,
+                "screen": None,
+                "d_circ": None,
+                "score": None,
+                "verdict_ok": None,
+                "improving": False,
+                "staged": None,
+                "reason": None,
+            }
             if screen:
                 bounds = screen_candidate(HX, HZ, layers, seed)
                 row["screen"] = bounds
@@ -254,63 +292,88 @@ def search(slug, *, attempts=8, seed=0, seconds=60.0, screen=True, rounds=None, 
                     continue
                 found = [v for v in bounds.values() if v is not None]
                 if found and min(found) < base["score"][0]:
-                    row["reason"] = (f"screen at {ca.SCREEN_ROUNDS} rounds found a weight-{min(found)} "
-                                     f"fault set, below the committed {base['score'][0]}")
+                    row["reason"] = (
+                        f"screen at {ca.SCREEN_ROUNDS} rounds found a weight-{min(found)} "
+                        f"fault set, below the committed {base['score'][0]}"
+                    )
                     rows.append(row)
                     _append(ledger, row)
                     log(f"  attempt {k} ({name}): screen {bounds}, cannot beat the baseline")
                     continue
             try:
-                block, files = ca.finish(notes_text, layers, HX, HZ, d, rounds, wits, seed, seconds,
-                                         log=lambda s: None)
+                block, files = ca.finish(notes_text, layers, HX, HZ, d, rounds, wits, seed, seconds, log=lambda s: None)
             except ca.CircuitUnavailable as e:
                 row["reason"] = f"deep search: {e}"
                 rows.append(row)
                 _append(ledger, row)
                 log(f"  attempt {k} ({name}): {e}")
                 continue
-            block["notes"] = (notes_text + f"; found by research/kit/circuit_search.py (seed {seed}, "
-                              f"{seconds:g} s per basis) over the committed schedule of {slug}")
+            block["notes"] = (
+                notes_text + f"; found by research/kit/circuit_search.py (seed {seed}, "
+                f"{seconds:g} s per basis) over the committed schedule of {slug}"
+            )
             dc = {b: block["d_circ"][b]["value"] for b in ("X", "Z")}
             row["d_circ"], row["score"] = dc, list(score_of(block["d_circ"]))
-            row["mechanisms"] = {b: stim.DetectorErrorModel(files[SIDE_FILES[b] + ".dem"]).num_errors
-                                 for b in ("X", "Z")}
+            row["mechanisms"] = {}
+            for b in ("X", "Z"):
+                try:
+                    c = stim.Circuit(files[SIDE_FILES[b] + ".stim"])
+                    row["mechanisms"][b] = ct.derive_dem(c).num_errors
+                except Exception:
+                    row["mechanisms"][b] = None
             row["improving"] = tuple(row["score"]) > tuple(base["score"])
             if ler:
                 row["ler"] = measure_ler(files, n, rounds, ler_p, seed, ler_shots)
-            notes_md = (f"# {slug} attempt {k}: {name}\n\n{notes_text}\n\n"
-                        f"Screen at {ca.SCREEN_ROUNDS} rounds: {row['screen']}. Deep RIS at rounds {rounds}, "
-                        f"{seconds:g} s per basis: d_circ X {dc['X']}, Z {dc['Z']} "
-                        f"(committed X {base['d_circ']['X']}, Z {base['d_circ']['Z']}); mechanisms "
-                        f"{row['mechanisms']}; {'improving' if row['improving'] else 'not improving'}.\n"
-                        + (f"LER per round at p={ler_p}: {row.get('ler')} (committed {base.get('ler')}).\n"
-                           if ler else "")
-                        + "\nEvery value is a witness-backed upper bound clamped to <= d; the gate's own "
-                        "refutation search decides what a promoted schedule keeps.\n")
+            notes_md = (
+                f"# {slug} attempt {k}: {name}\n\n{notes_text}\n\n"
+                f"Screen at {ca.SCREEN_ROUNDS} rounds: {row['screen']}. Deep RIS at rounds {rounds}, "
+                f"{seconds:g} s per basis: d_circ X {dc['X']}, Z {dc['Z']} "
+                f"(committed X {base['d_circ']['X']}, Z {base['d_circ']['Z']}); mechanisms "
+                f"{row['mechanisms']}; {'improving' if row['improving'] else 'not improving'}.\n"
+                + (f"LER per round at p={ler_p}: {row.get('ler')} (committed {base.get('ler')}).\n" if ler else "")
+                + "\nEvery value is a witness-backed upper bound clamped to <= d; the gate's own "
+                "refutation search decides what a promoted schedule keeps.\n"
+            )
             adir, verdict = stage_attempt(run_dir, k, doc, block, files, notes_md)
             row["verdict_ok"], row["staged"] = bool(verdict["ok"]), os.path.relpath(adir, _ROOT)
             row["seconds"] = round(time.perf_counter() - t0, 1)
             rows.append(row)
             _append(ledger, row)
-            log(f"  attempt {k} ({name}): d_circ X {dc['X']}, Z {dc['Z']}; gate "
+            log(
+                f"  attempt {k} ({name}): d_circ X {dc['X']}, Z {dc['Z']}; gate "
                 f"{'ok' if verdict['ok'] else 'FAILED'}; {'improving' if row['improving'] else 'not improving'}"
-                f" ({row['seconds']} s)")
+                f" ({row['seconds']} s)"
+            )
     ranked = sorted((r for r in rows if r["score"]), key=lambda r: tuple(r["score"]), reverse=True)
     survivors = [r for r in ranked if r["improving"] and r["verdict_ok"]]
-    summary = {"slug": slug, "head": _head(), "date": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-               "rounds": rounds, "seconds_per_basis": seconds, "attempts": rows, "baseline": base,
-               "ranking": [r["attempt"] for r in ranked], "survivors": [r["attempt"] for r in survivors],
-               "authority": ("staged for human review; a survivor is promoted by replacing the entry's "
-                             "circuit block and circuits/<slug>/ in a PR with circuit.contributed_by.by "
-                             "naming the schedule's author; d_circ stays a witness-backed upper bound "
-                             "and the gate's refutation search is the evaluator")}
+    summary = {
+        "slug": slug,
+        "head": _head(),
+        "date": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "rounds": rounds,
+        "seconds_per_basis": seconds,
+        "attempts": rows,
+        "baseline": base,
+        "ranking": [r["attempt"] for r in ranked],
+        "survivors": [r["attempt"] for r in survivors],
+        "authority": (
+            "staged for human review; a survivor is promoted by replacing the entry's "
+            "circuit block and circuits/<slug>/ in a PR with circuit.contributed_by.by "
+            "naming the schedule's author; d_circ stays a witness-backed upper bound "
+            "and the gate's refutation search is the evaluator"
+        ),
+    }
     _write(os.path.join(run_dir, "summary.json"), json.dumps(summary, indent=1, sort_keys=True) + "\n")
-    log(f"  {len(rows)} attempts, {len(ranked)} evaluated, {len(survivors)} survivor(s); run at "
-        f"{os.path.relpath(run_dir, _ROOT)}")
+    log(
+        f"  {len(rows)} attempts, {len(ranked)} evaluated, {len(survivors)} survivor(s); run at "
+        f"{os.path.relpath(run_dir, _ROOT)}"
+    )
     if survivors:
         best = survivors[0]
-        log(f"  best: attempt {best['attempt']} ({best['family']}) d_circ X {best['d_circ']['X']}, "
-            f"Z {best['d_circ']['Z']} vs committed X {base['d_circ']['X']}, Z {base['d_circ']['Z']}")
+        log(
+            f"  best: attempt {best['attempt']} ({best['family']}) d_circ X {best['d_circ']['X']}, "
+            f"Z {best['d_circ']['Z']} vs committed X {base['d_circ']['X']}, Z {base['d_circ']['Z']}"
+        )
     return summary
 
 
@@ -329,14 +392,25 @@ def main(argv=None):
     ap.add_argument("--no-screen", action="store_true", help="skip the two-round screen")
     ap.add_argument("--families", nargs="+", choices=FAMILIES, default=list(FAMILIES))
     ap.add_argument("--out", default=None, help="run directory (default: under coordination.staging_dir())")
-    ap.add_argument("--ler", action="store_true",
-                    help="also measure LER per round for the baseline and each evaluated schedule")
+    ap.add_argument(
+        "--ler", action="store_true", help="also measure LER per round for the baseline and each evaluated schedule"
+    )
     ap.add_argument("--ler-p", type=float, default=0.01)
     ap.add_argument("--ler-shots", type=int, default=20000)
     a = ap.parse_args(argv)
-    search(a.slug, attempts=a.attempts, seed=a.seed, seconds=a.seconds, screen=not a.no_screen,
-           rounds=a.rounds, only=tuple(a.families), out=a.out, ler=a.ler, ler_p=a.ler_p,
-           ler_shots=a.ler_shots)
+    search(
+        a.slug,
+        attempts=a.attempts,
+        seed=a.seed,
+        seconds=a.seconds,
+        screen=not a.no_screen,
+        rounds=a.rounds,
+        only=tuple(a.families),
+        out=a.out,
+        ler=a.ler,
+        ler_p=a.ler_p,
+        ler_shots=a.ler_shots,
+    )
     return 0
 
 

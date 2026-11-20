@@ -12,6 +12,7 @@ trusted validator.  Only validator-passing, board-advancing rows count.
 Everything is persisted: per-row staged JSON + verdict under
 research/candidates/, plus this script (committed) as the audit trail.
 """
+
 from __future__ import annotations
 
 import json
@@ -76,7 +77,8 @@ def main() -> None:
         seed = 260514173 + row
         d = distance_rand(hx, hz, trials=trials, seed=seed)
         doc = make_submission(
-            hx, hz,
+            hx,
+            hz,
             name=f"[[{N},{k},d<={d}]] univariate bicycle UB(a,l={ell})",
             construction=(
                 f"Univariate bicycle code over R_{n} = F2[x]/(x^{n}-1); "
@@ -95,18 +97,21 @@ def main() -> None:
                 f"{trials} trials."
             ),
             confidence="upper_bound",
-            trials=trials, seed=seed,
+            trials=trials,
+            seed=seed,
         )
         path = OUT / f"ub-{N}-{k}-{d}.json"
         errs = save_submission(doc, str(path))
         verdict = validate_candidate(doc, seed=seed + 777, refute=True)
-        path.with_suffix(".verdict.json").write_text(
-            json.dumps(verdict, indent=2) + "\n")
+        path.with_suffix(".verdict.json").write_text(json.dumps(verdict, indent=2) + "\n")
         nov = verdict.get("gates", {}).get("novelty", {})
         rec = {
-            "row": row, "a": a_exp, "ell": ell,
+            "row": row,
+            "a": a_exp,
+            "ell": ell,
             "paper": [N, k_claim, d_claim],
-            "reconstructed_k": k, "witnessed_d": d,
+            "reconstructed_k": k,
+            "witnessed_d": d,
             "k_matches_paper": k == k_claim,
             "passed": verdict.get("passed"),
             "board_advancing": nov.get("board_advancing"),
@@ -116,8 +121,7 @@ def main() -> None:
         results.append(rec)
         print(json.dumps(rec), flush=True)
 
-    (OUT / "ub-sweep-summary.json").write_text(
-        json.dumps(results, indent=2) + "\n")
+    (OUT / "ub-sweep-summary.json").write_text(json.dumps(results, indent=2) + "\n")
     adv = [r for r in results if r["passed"] and r["board_advancing"]]
     print(f"\n{len(adv)} board-advancing validated rows")
 

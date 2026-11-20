@@ -42,11 +42,11 @@ CRITICAL_PREFIXES = (
     "verify/",
 )
 CRITICAL_FILES = {
-    "Makefile",         # builds the optional refutation accelerator
+    "Makefile",  # builds the optional refutation accelerator
     "site/build.py",
     "pyproject.toml",
     "uv.lock",
-    "run_tests.py",     # executes the self-tests CI relies on
+    "run_tests.py",  # executes the self-tests CI relies on
 }
 # Everything a submission PR may carry: the entry, its circuit tier, its note or
 # fieldnote, its repro manifest, its certificate. docs/ is rebuilt by site.yml,
@@ -62,9 +62,8 @@ REPRO_MANIFEST = re.compile(r"^repro/([^/]+)\.json$")
 def _diff_names(diff_filter, base, root):
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-only", f"--diff-filter={diff_filter}",
-             f"{base}...HEAD"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-only", f"--diff-filter={diff_filter}", f"{base}...HEAD"], cwd=root, text=True
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}; failing closed")
         return None
@@ -104,8 +103,9 @@ def is_code_submission(path):
     A board entry, or its circuit-tier artifacts under circuits/<slug>/ (the
     claim surface PR #1012 binds to the entry).
     """
-    return ((path.startswith("codes/") and path.endswith(".json"))
-            or (path.startswith("circuits/") and path.count("/") >= 2))
+    return (path.startswith("codes/") and path.endswith(".json")) or (
+        path.startswith("circuits/") and path.count("/") >= 2
+    )
 
 
 def submission_slug(path):
@@ -159,17 +159,29 @@ def misplaced_repro(files, slugs, deleted=()):
     return bad
 
 
+def added_dems(files):
+    """Return the .dem files a PR adds under circuits/.
+
+    The DEM is derived from the committed .stim by the pinned verifier, so a
+    committed .dem is redundant -- ~90% of the circuit tier's bytes for no
+    additional check (the gate re-derives and compares regardless). Legacy
+    committed .dem files are still accepted by circuit_verify; new ones are
+    not.
+    """
+    return [f for f in files if f.startswith("circuits/") and f.endswith(".dem")]
+
+
 def main(argv):
     root = ROOT
     if "--root" in argv:
         i = argv.index("--root")
         root = os.path.abspath(argv[i + 1])
-        argv = argv[:i] + argv[i + 2:]
+        argv = argv[:i] + argv[i + 2 :]
     base = "origin/main"
     if "--base" in argv:
         i = argv.index("--base")
         base = argv[i + 1]
-        argv = argv[:i] + argv[i + 2:]
+        argv = argv[:i] + argv[i + 2 :]
 
     classify_mode = "--classify" in argv
     if classify_mode:
@@ -191,7 +203,7 @@ def main(argv):
                 print("  %s" % f)
         else:
             print("reasons: none (no verifier-critical paths changed)")
-        print("required standard: see AGENTS.md, \"Two tiers of change\".")
+        print('required standard: see AGENTS.md, "Two tiers of change".')
         # Informational only: never fail the classify mode itself.
         return 0
 
@@ -201,16 +213,38 @@ def main(argv):
         return 1
     codes = [f for f in files if is_code_submission(f)]
     new_codes = [f for f in added if is_code_submission(f)]
+    # A board entry is one file, codes/<slug>.json. A path nested under
+    # codes/ (e.g. codes/<slug>.json/<slug>.json) is a packaging mistake that
+    # slips past the surface check because it still ends in .json (PR #6849).
+    bad_code_paths = [f for f in codes if f.startswith("codes/") and not re.match(r"^codes/[^/]+\.json$", f)]
+    if bad_code_paths:
+        print("Code submission paths must be a single file, codes/<slug>.json,")
+        print("not a directory or a nested path:")
+        for f in bad_code_paths:
+            print(f"  {f}")
+        return 1
     new_slugs = sorted({submission_slug(f) for f in new_codes})
     critical = [f for f in files if is_critical(f)]
     # One new code per PR: the deep refutation gate budgets ~10 min per code, so
     # a PR that batches submissions would either blow the CI budget or dilute the
     # per-code scrutiny. Corrections to existing entries are not capped.
     if len(new_slugs) > 1:
-        print("Submission PR adds more than one new code; submit one code per PR "
-              "so each gets the full refutation budget.")
+        print(
+            "Submission PR adds more than one new code; submit one code per PR so each gets the full refutation budget."
+        )
         print("\nNew code submissions:")
         for f in new_codes:
+            print(f"  {f}")
+        return 1
+    dems = added_dems(added)
+    if dems:
+        print(
+            "Submission PR adds committed .dem files; the DEM is derived "
+            "from the committed .stim by the pinned verifier, so a "
+            "committed .dem is redundant bulk."
+        )
+        print("\nAdded .dem files:")
+        for f in dems:
             print(f"  {f}")
         return 1
     if not codes:
@@ -236,8 +270,7 @@ def main(argv):
         for f in outside:
             print(f"  {f}")
         return 1
-    misplaced = misplaced_repro(files, {submission_slug(f) for f in codes},
-                                set(deleted))
+    misplaced = misplaced_repro(files, {submission_slug(f) for f in codes}, set(deleted))
     if misplaced:
         print("Submission PR carries files under repro/ that are not its entry's manifest.")
         print("repro/ holds one file per entry, repro/<slug>.json, the manifest that")

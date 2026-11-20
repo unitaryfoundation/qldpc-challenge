@@ -12,6 +12,7 @@ the next divergence fails here instead of merging.
   uv run --frozen python run_tests.py           # what CI runs
 """
 
+import glob
 import os
 import re
 import sys
@@ -22,6 +23,8 @@ import pytest
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
 _WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "verify.yml")
+_WORKFLOWS_DIR = os.path.join(_ROOT, ".github", "workflows")
+_PROOF_REPLAY_WORKFLOW = os.path.join(_ROOT, ".github", "workflows", "proof-replay.yml")
 
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
@@ -123,6 +126,58 @@ def test_workflow_triggers_for_the_test_runner_itself():
         "a change to run_tests.py itself has to re-run the suite it defines; "
         "add a run_tests.py entry to .github/workflows/verify.yml"
     )
+
+
+def test_external_workflow_actions_are_pinned_to_full_commit_shas():
+    unpinned = []
+    workflows = sorted(
+        glob.glob(os.path.join(_WORKFLOWS_DIR, "*.yml")) + glob.glob(os.path.join(_WORKFLOWS_DIR, "*.yaml"))
+    )
+    for path in workflows:
+        with open(path, encoding="utf-8") as f:
+            refs = re.findall(r"^\s*uses:\s*([^\s#]+)", f.read(), re.M)
+        for ref in refs:
+            if ref.startswith(("./", "docker://")):
+                continue
+            if not re.fullmatch(r"[^@]+@[0-9a-f]{40}", ref):
+                unpinned.append(f"{os.path.relpath(path, _ROOT)}: {ref}")
+    assert not unpinned, "workflow actions must use immutable full SHAs:\n" + "\n".join(unpinned)
+
+
+def test_workflow_triggers_for_verifier_claim_surfaces():
+    patterns = pull_request_paths()
+    uncovered = [surface for surface in ("codes", "circuits", "certs") if not covers(patterns, surface)]
+    assert not uncovered, (
+        f"a PR changing only {uncovered} skips the trusted submission checks; "
+        "add each claim surface to .github/workflows/verify.yml"
+    )
+
+
+def test_weekly_proof_replay_fails_on_incomplete_shards():
+    with open(_PROOF_REPLAY_WORKFLOW, encoding="utf-8") as f:
+        workflow = f.read()
+    shards = re.search(r'^  SHARDS: "(\d+)"$', workflow, re.M)
+    matrix = re.search(r"^        shard: \[([0-9, ]+)\]$", workflow, re.M)
+    assert shards and matrix, "update the proof-replay shard count and matrix together"
+    shard_ids = [int(value) for value in re.findall(r"\d+", matrix.group(1))]
+    assert shard_ids == list(range(int(shards.group(1)))), "proof-replay matrix must cover every shard named by SHARDS"
+
+    replay_job = workflow.split("  replay:\n", 1)[1]
+    timeout = re.search(r"^    timeout-minutes: (\d+)$", replay_job, re.M)
+    budget = re.search(r"--max-minutes (\d+)", replay_job)
+    assert timeout and budget and int(budget.group(1)) + 30 <= int(timeout.group(1)), (
+        "the per-shard replay budget must leave 30 minutes below the job timeout"
+    )
+    budget_check = re.search(
+        r'(?m)^          if grep -q "left unopened" replay\.txt; then\n'
+        r"(?P<body>(?:^            .*\n)+)          fi$",
+        replay_job,
+    )
+    assert budget_check and "exit 1" in budget_check.group("body"), (
+        "a scheduled proof replay with entries left unopened must fail"
+    )
+    assert "verify/replay_proofs.py --sample 12" in workflow, "keep the bounded rotating pull-request proof sample"
+
 
 
 def test_collected_directories_exist(runner_cmd):

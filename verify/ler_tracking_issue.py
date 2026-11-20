@@ -18,6 +18,7 @@ Usage:
   python verify/ler_tracking_issue.py [--root DIR] --out BODY  # body to a file,
         one line on stdout: points=N failed=F unverifiable=U stale=S receipts=R
 """
+
 import argparse
 import glob
 import json
@@ -70,12 +71,20 @@ def collect(root=ROOT):
                 claimed_p = r.get("claimed_p_shot")
                 if claimed_p is None and q and q.get("shots"):
                     claimed_p = q["failures"] / q["shots"]
-                rows.append({"slug": slug, "basis": side, "p": str(p), "status": r["status"],
-                             "claimed_p_shot": claimed_p, "replica_p_shot": r.get("replica_p_shot"),
-                             "replica_shots": r.get("replica_shots", 0),
-                             "replica_failures": r.get("replica_failures", 0),
-                             "detectable_factor": r.get("detectable_factor"),
-                             "measured_at": rec.get("measured_at")})
+                rows.append(
+                    {
+                        "slug": slug,
+                        "basis": side,
+                        "p": str(p),
+                        "status": r["status"],
+                        "claimed_p_shot": claimed_p,
+                        "replica_p_shot": r.get("replica_p_shot"),
+                        "replica_shots": r.get("replica_shots", 0),
+                        "replica_failures": r.get("replica_failures", 0),
+                        "detectable_factor": r.get("detectable_factor"),
+                        "measured_at": rec.get("measured_at"),
+                    }
+                )
     rows.sort(key=lambda r: (REPORTED.index(r["status"]), r["slug"], r["basis"], -float(r["p"])))
     return rows, stale, receipts
 
@@ -86,40 +95,53 @@ def _rate(x):
 
 def body(rows, stale, receipts):
     """Render the issue body: a marker, the explanation, one table row per point, a footer."""
-    lines = [MARKER,
-             "Points of measured-rate claims whose weekly re-measurement (`ler-weekly`, "
-             "`verify/ler_replicate.py`) disagreed with the claim (failed) or could not reach the "
-             "admissibility bound inside its budget (unverifiable). A failed point is a claim on the board "
-             "that an independent replica contradicts. The entry page shows the same status, and neither "
-             "kind counts toward the frontier. Written from `receipts/ler/` by "
-             "`verify/ler_tracking_issue.py`, which reports and changes nothing (issue #2820).",
-             ""]
+    lines = [
+        MARKER,
+        "Points of measured-rate claims whose weekly re-measurement (`ler-weekly`, "
+        "`verify/ler_replicate.py`) disagreed with the claim (failed) or could not reach the "
+        "admissibility bound inside its budget (unverifiable). A failed point is a claim on the board "
+        "that an independent replica contradicts. The entry page shows the same status, and neither "
+        "kind counts toward the frontier. Written from `receipts/ler/` by "
+        "`verify/ler_tracking_issue.py`, which reports and changes nothing (issue #2820).",
+        "",
+    ]
     if rows:
-        lines += ["| entry | basis | p | status | claimed p_shot | replica p_shot | replica shots (failures) | "
-                  "detectable factor | measured at |",
-                  "|---|---|---|---|---|---|---|---|---|"]
+        lines += [
+            "| entry | basis | p | status | claimed p_shot | replica p_shot | replica shots (failures) | "
+            "detectable factor | measured at |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
         for r in rows:
-            lines.append(f"| `{r['slug']}` | {r['basis']} | {r['p']} | {r['status']} | "
-                         f"{_rate(r['claimed_p_shot'])} | {_rate(r['replica_p_shot'])} | "
-                         f"{r['replica_shots']} ({r['replica_failures']}) | "
-                         f"{r['detectable_factor'] if r['detectable_factor'] is not None else 'n/a'} | "
-                         f"{r['measured_at'] or 'n/a'} |")
+            lines.append(
+                f"| `{r['slug']}` | {r['basis']} | {r['p']} | {r['status']} | "
+                f"{_rate(r['claimed_p_shot'])} | {_rate(r['replica_p_shot'])} | "
+                f"{r['replica_shots']} ({r['replica_failures']}) | "
+                f"{r['detectable_factor'] if r['detectable_factor'] is not None else 'n/a'} | "
+                f"{r['measured_at'] or 'n/a'} |"
+            )
         lines.append("")
     n_failed = sum(r["status"] == "failed" for r in rows)
     entries = len({r["slug"] for r in rows})
-    lines.append(f"{len(rows)} point(s) ({n_failed} failed, {len(rows) - n_failed} unverifiable) across "
-                 f"{entries} entr{'y' if entries == 1 else 'ies'}, from {receipts} receipt(s).")
+    lines.append(
+        f"{len(rows)} point(s) ({n_failed} failed, {len(rows) - n_failed} unverifiable) across "
+        f"{entries} entr{'y' if entries == 1 else 'ies'}, from {receipts} receipt(s)."
+    )
     if stale:
-        lines.append(f"{len(stale)} receipt(s) left out as stale, pending on the site until the next run: "
-                     + ", ".join(f"`{slug}` ({why})" for slug, why in stale) + ".")
+        lines.append(
+            f"{len(stale)} receipt(s) left out as stale, pending on the site until the next run: "
+            + ", ".join(f"`{slug}` ({why})" for slug, why in stale)
+            + "."
+        )
     return "\n".join(lines) + "\n"
 
 
 def summary(rows, stale, receipts):
     """Render the one-line summary the workflow parses."""
     n_failed = sum(r["status"] == "failed" for r in rows)
-    return (f"points={len(rows)} failed={n_failed} unverifiable={len(rows) - n_failed} "
-            f"stale={len(stale)} receipts={receipts}")
+    return (
+        f"points={len(rows)} failed={n_failed} unverifiable={len(rows) - n_failed} "
+        f"stale={len(stale)} receipts={receipts}"
+    )
 
 
 def main(argv=None):

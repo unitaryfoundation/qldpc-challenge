@@ -61,6 +61,7 @@ A *plan* is ``{"candidate": "<path to the validated JSON>", "evidence": {...}}``
 or a list of those. ``EVIDENCE_REQUIRED`` names the fields the note cannot be
 written without; they are the research judgment the tool has no way to derive.
 """
+
 import argparse
 import copy
 import datetime
@@ -102,12 +103,18 @@ NOTE_CAP_BYTES = 10 * 1024
 # The evidence a note cannot be written without. Each is research judgment or a
 # measurement only the campaign has; nothing here is derivable from the
 # document, which is exactly why these stay inputs.
-EVIDENCE_REQUIRED = ("headline", "direction", "searched", "ladder", "frontier",
-                     "reproduction")
+EVIDENCE_REQUIRED = ("headline", "direction", "searched", "ladder", "frontier", "reproduction")
 
 EVIDENCE_KEYS = EVIDENCE_REQUIRED + (
-    "ladder_note", "dead_ends", "tools", "peer_audit", "construction",
-    "references", "equivalence", "budget")
+    "ladder_note",
+    "dead_ends",
+    "tools",
+    "peer_audit",
+    "construction",
+    "references",
+    "equivalence",
+    "budget",
+)
 
 # provenance.construction as cli/qldpc.py defaults it: present, and says nothing.
 _CLI_DEFAULT_CONSTRUCTION = "contributed via qldpc submit"
@@ -138,8 +145,7 @@ def load_plan(path):
         cand = plan["candidate"]
         recipe = plan.get("recipe")
         if isinstance(cand, str):
-            cand_path = cand if os.path.isabs(cand) else os.path.join(
-                os.path.dirname(os.path.abspath(path)), cand)
+            cand_path = cand if os.path.isabs(cand) else os.path.join(os.path.dirname(os.path.abspath(path)), cand)
             if not os.path.exists(cand_path):
                 cand_path = os.path.join(_ROOT, cand)
             with open(cand_path, encoding="utf-8") as f:
@@ -155,12 +161,10 @@ def check_evidence(evidence):
     problems = []
     unknown = sorted(set(evidence) - set(EVIDENCE_KEYS))
     if unknown:
-        problems.append(f"unknown evidence key(s) {unknown}; allowed: "
-                        f"{list(EVIDENCE_KEYS)}")
+        problems.append(f"unknown evidence key(s) {unknown}; allowed: {list(EVIDENCE_KEYS)}")
     for key in EVIDENCE_REQUIRED:
         value = evidence.get(key)
-        if value is None or (isinstance(value, str) and not value.strip()) \
-                or (isinstance(value, list) and not value):
+        if value is None or (isinstance(value, str) and not value.strip()) or (isinstance(value, list) and not value):
             problems.append(f"evidence.{key} is required and is empty")
     return problems
 
@@ -207,20 +211,23 @@ def ladder_blockers(facts, min_deep_trials):
         out.append(
             f"the ladder's best reading is d <= {facts['cumulative_best_bound']} "
             f"but the document claims d = {facts['claimed_d']}: repackage the "
-            f"candidate at the reading the ladder actually reached")
+            f"candidate at the reading the ladder actually reached"
+        )
     if facts["deepest_fresh_trials"] < min_deep_trials:
         out.append(
             f"deepest fresh-seed rung is {facts['deepest_fresh_trials']:,} "
             f"trials per side, below the {min_deep_trials:,} this module "
             f"requires before it will reuse a witness instead of re-searching; "
             f"run a deeper rung, or package with ./qldpc submit, which searches "
-            f"again itself")
+            f"again itself"
+        )
     if facts["flat_fresh_rungs_at_best"] < escalation.MIN_FLAT_RUNGS:
         out.append(
             f"only {facts['flat_fresh_rungs_at_best']} fresh-seed rung(s) agree "
             f"at d <= {facts['cumulative_best_bound']}; "
             f"{escalation.MIN_FLAT_RUNGS} are required before the bound counts "
-            f"as settled (research/kit/escalation.py)")
+            f"as settled (research/kit/escalation.py)"
+        )
     return out
 
 
@@ -233,7 +240,9 @@ def candidate_slug(doc):
 
 
 def _code_axes(doc):
-    n = int(doc["n"]); k = int(doc["k"]); d = int(doc["distance"]["d"])
+    n = int(doc["n"])
+    k = int(doc["k"])
+    d = int(doc["distance"]["d"])
     checks = doc.get("checks") or {}
     if "S" in checks:
         w = max(len(set(s.get("X", [])) | set(s.get("Z", []))) for s in checks["S"])
@@ -245,7 +254,7 @@ def _code_axes(doc):
 
 
 def _same_code(new, old):
-    return (new.get("checks") == old.get("checks"))
+    return new.get("checks") == old.get("checks")
 
 
 def _strictly_improves(new, old):
@@ -253,8 +262,9 @@ def _strictly_improves(new, old):
     n_o, k_o, d_o, w_o = _code_axes(old)
     if w_n is None or w_o is None:
         return False
-    return (n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o
-            and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o))
+    return (
+        n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o)
+    )
 
 
 def _compare_status(new, old):
@@ -282,17 +292,24 @@ def _suggested_slug(slug, root):
 
 
 def _revision_info(new, old, code_rel):
-    status = "strictly better" if _strictly_improves(new, old) else (
-        "strictly worse" if _strictly_improves(old, new) else "lateral")
+    status = (
+        "strictly better"
+        if _strictly_improves(new, old)
+        else ("strictly worse" if _strictly_improves(old, new) else "lateral")
+    )
     n_n, k_n, d_n, w_n = _code_axes(new)
     n_o, k_o, d_o, w_o = _code_axes(old)
     same = _same_code(new, old)
     if same and n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o and d_n != d_o:
         status = "strictly better"
-    return {"is_revision": True, "existing": code_rel,
-            "same_code": same, "comparison": status,
-            "old_axes": [n_o, k_o, d_o, w_o],
-            "new_axes": [n_n, k_n, d_n, w_n]}
+    return {
+        "is_revision": True,
+        "existing": code_rel,
+        "same_code": same,
+        "comparison": status,
+        "old_axes": [n_o, k_o, d_o, w_o],
+        "new_axes": [n_n, k_n, d_n, w_n],
+    }
 
 
 def build_doc(candidate, evidence, facts, *, authors=None, date=None):
@@ -308,13 +325,13 @@ def build_doc(candidate, evidence, facts, *, authors=None, date=None):
         prov["authors"] = list(authors)
     if not prov.get("authors"):
         raise PromoteError("no authors: pass --authors or set provenance.authors")
-    construction = ((evidence.get("construction") or "").strip()
-                    or (prov.get("construction") or "").strip())
+    construction = (evidence.get("construction") or "").strip() or (prov.get("construction") or "").strip()
     if not construction or construction == _CLI_DEFAULT_CONSTRUCTION:
         raise PromoteError(
             "provenance.construction is the schema's own required field and is "
             "empty or still the CLI placeholder; set evidence.construction to "
-            "how the code was actually built (family, polynomials, search)")
+            "how the code was actually built (family, polynomials, search)"
+        )
     prov["construction"] = construction
     if evidence.get("references"):
         prov["references"] = list(evidence["references"])
@@ -355,9 +372,7 @@ def _wrap(text, width=NOTE_WIDTH):
 
     def flush():
         if buf:
-            out.extend(textwrap.wrap(" ".join(buf), width=width,
-                                     break_long_words=False,
-                                     break_on_hyphens=False))
+            out.extend(textwrap.wrap(" ".join(buf), width=width, break_long_words=False, break_on_hyphens=False))
             buf.clear()
 
     for ln in text.strip().split("\n"):
@@ -365,8 +380,12 @@ def _wrap(text, width=NOTE_WIDTH):
             flush()
             fenced = not fenced
             out.append(ln)
-        elif (fenced or not ln.strip() or ln.startswith(("|", "    ", "\t"))
-                or ln.lstrip().startswith(("- ", "* ", "> ", "#"))):
+        elif (
+            fenced
+            or not ln.strip()
+            or ln.startswith(("|", "    ", "\t"))
+            or ln.lstrip().startswith(("- ", "* ", "> ", "#"))
+        ):
             flush()
             out.append(ln)
         else:
@@ -377,10 +396,15 @@ def _wrap(text, width=NOTE_WIDTH):
 
 def _bullets(items):
     return "\n".join(
-        textwrap.fill(f"- {str(x).strip()}", width=NOTE_WIDTH,
-                      subsequent_indent="  ", break_long_words=False,
-                      break_on_hyphens=False)
-        for x in items)
+        textwrap.fill(
+            f"- {str(x).strip()}",
+            width=NOTE_WIDTH,
+            subsequent_indent="  ",
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        for x in items
+    )
 
 
 def _confidence_line(doc):
@@ -399,16 +423,14 @@ def _tools_paragraph(doc, evidence):
     parts = []
     model = tools.get("model") or (doc.get("provenance") or {}).get("model")
     if model:
-        parts.append(f"Model: {model}"
-                     + (f" ({tools['harness']})" if tools.get("harness") else "")
-                     + ".")
+        parts.append(f"Model: {model}" + (f" ({tools['harness']})" if tools.get("harness") else "") + ".")
     elif tools.get("harness"):
         parts.append(f"Harness: {tools['harness']}.")
     if tools.get("modules"):
-        parts.append("Repo tooling: "
-                     + ", ".join(f"`{m}`" for m in tools["modules"]) + ".")
-    parts.append("The local verdict is `verify/validate_candidate.py`; the "
-                 "bundle was assembled by `research/kit/promote.py`.")
+        parts.append("Repo tooling: " + ", ".join(f"`{m}`" for m in tools["modules"]) + ".")
+    parts.append(
+        "The local verdict is `verify/validate_candidate.py`; the bundle was assembled by `research/kit/promote.py`."
+    )
     if tools.get("compute"):
         parts.append(f"Compute: {tools['compute']}.")
     return " ".join(parts)
@@ -423,47 +445,66 @@ def note_markdown(doc, evidence, facts):
     ``verify/check_prose.py`` rejects when they drift) cannot drift.
     """
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
-    lines = [f"# [[{n},{k},{d}]] {evidence['headline'].strip()}", "",
-             "## Direction & hypothesis", "",
-             _wrap(evidence["direction"]), "",
-             "## What was searched", "",
-             _wrap(evidence["searched"]), "",
-             "## Evidence trail", "",
-             _wrap("Confirmation ladder for the submitted code, each rung a "
-                   "fresh seed unless marked otherwise, reading the lightest "
-                   "logical found:"),
-             "",
-             "| budget (trials/side) | lightest logical |",
-             "| ---: | ---: |"]
+    lines = [
+        f"# [[{n},{k},{d}]] {evidence['headline'].strip()}",
+        "",
+        "## Direction & hypothesis",
+        "",
+        _wrap(evidence["direction"]),
+        "",
+        "## What was searched",
+        "",
+        _wrap(evidence["searched"]),
+        "",
+        "## Evidence trail",
+        "",
+        _wrap(
+            "Confirmation ladder for the submitted code, each rung a "
+            "fresh seed unless marked otherwise, reading the lightest "
+            "logical found:"
+        ),
+        "",
+        "| budget (trials/side) | lightest logical |",
+        "| ---: | ---: |",
+    ]
     for r in facts["rungs"]:
         label = f" ({r['label']})" if r["label"] else ""
         held = "" if r["fresh"] else " (same seed)"
         lines.append(f"| {r['trials']:,}{label}{held} | {r['d']} |")
-    lines += ["",
-              _wrap(f"{facts['flat_fresh_rungs_at_best']} fresh-seed rung(s) "
-                    f"agree at the best bound, the deepest of them at "
-                    f"{facts['deepest_fresh_trials']:,} trials per side. The "
-                    f"submitted witness reproduces it: "
-                    f"{_confidence_line(doc)}.")]
+    lines += [
+        "",
+        _wrap(
+            f"{facts['flat_fresh_rungs_at_best']} fresh-seed rung(s) "
+            f"agree at the best bound, the deepest of them at "
+            f"{facts['deepest_fresh_trials']:,} trials per side. The "
+            f"submitted witness reproduces it: "
+            f"{_confidence_line(doc)}."
+        ),
+    ]
     if evidence.get("peer_audit"):
         audit = evidence["peer_audit"]
         if isinstance(audit, dict):
             detail = audit.get("decision", "")
             if audit.get("trials"):
-                detail += (f" (matched depth: {int(audit['trials']):,} trials, "
-                           f"seeds {audit.get('seeds', 'unrecorded')})")
+                detail += f" (matched depth: {int(audit['trials']):,} trials, seeds {audit.get('seeds', 'unrecorded')})"
         else:
             detail = str(audit)
-        lines += ["", _wrap(f"Matched-depth peer audit "
-                            f"(`research/audits/leader_audit.py` pair): "
-                            f"{detail.strip()}")]
+        lines += ["", _wrap(f"Matched-depth peer audit (`research/audits/leader_audit.py` pair): {detail.strip()}")]
     if evidence.get("ladder_note"):
         lines += ["", _wrap(evidence["ladder_note"])]
     lines += ["", "## Dead ends", ""]
-    lines.append(_bullets(evidence["dead_ends"]) if evidence.get("dead_ends")
-                 else "None recorded for this candidate.")
-    lines += ["", "## Tools", "", _wrap(_tools_paragraph(doc, evidence)),
-              "", "## Reproduction", "", _wrap(evidence["reproduction"]), ""]
+    lines.append(_bullets(evidence["dead_ends"]) if evidence.get("dead_ends") else "None recorded for this candidate.")
+    lines += [
+        "",
+        "## Tools",
+        "",
+        _wrap(_tools_paragraph(doc, evidence)),
+        "",
+        "## Reproduction",
+        "",
+        _wrap(evidence["reproduction"]),
+        "",
+    ]
     return "\n".join(lines)
 
 
@@ -472,9 +513,9 @@ def note_markdown(doc, evidence, facts):
 # ----------------------------------------------------------------------------
 def _descriptor_args(doc, evidence):
     return types.SimpleNamespace(
-        construction=(doc.get("provenance") or {}).get("construction", "")
-        or evidence.get("headline", ""),
-        family=doc.get("family"))
+        construction=(doc.get("provenance") or {}).get("construction", "") or evidence.get("headline", ""),
+        family=doc.get("family"),
+    )
 
 
 def bundle_title(doc, evidence):
@@ -507,24 +548,40 @@ def equivalence_finding(verdict, doc):
     dedup = (verdict.get("gates") or {}).get("dedup") or {}
     exact, wl = dedup.get("exact_duplicate_of"), dedup.get("wl_equivalent_of")
     if exact:
-        return False, (f"the gate reports this code is already on the board as "
-                       f"{exact}")
+        return False, (f"the gate reports this code is already on the board as {exact}")
     notes = ((doc.get("provenance") or {}).get("notes") or "").strip()
     if wl:
         if notes:
-            return True, (f"`verify/validate_candidate.py` flags the same "
-                          f"Weisfeiler-Leman signature as board entry {wl}; "
-                          f"`provenance.notes` records the comparison")
-        return False, (f"the gate flags board entry {wl} as possibly equivalent "
-                       f"(same WL signature) and `provenance.notes` says nothing "
-                       f"about it; record the comparison there, or withdraw the "
-                       f"candidate")
-    return True, ("`verify/validate_candidate.py` found no board entry sharing "
-                  "this code's fingerprint or Weisfeiler-Leman signature")
+            return True, (
+                f"`verify/validate_candidate.py` flags the same "
+                f"Weisfeiler-Leman signature as board entry {wl}; "
+                f"`provenance.notes` records the comparison"
+            )
+        return False, (
+            f"the gate flags board entry {wl} as possibly equivalent "
+            f"(same WL signature) and `provenance.notes` says nothing "
+            f"about it; record the comparison there, or withdraw the "
+            f"candidate"
+        )
+    return True, (
+        "`verify/validate_candidate.py` found no board entry sharing "
+        "this code's fingerprint or Weisfeiler-Leman signature"
+    )
 
 
-def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
-            repro_rel=None, reproducible=False, frontier_record=None):
+def pr_body(
+    doc,
+    report,
+    verdict,
+    evidence,
+    facts,
+    *,
+    code_rel,
+    note_rel,
+    repro_rel=None,
+    reproducible=False,
+    frontier_record=None,
+):
     """Render the PR body from the verified document and the gate's own verdict.
 
     Same sections as ``.github/pull_request_template.md`` and the same frontier
@@ -536,18 +593,15 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
     comp = report.get("computed", {})
     wmax = comp.get("max_check_weight")
-    track = " / ".join(x for x in (comp.get("locality_class"),
-                                   comp.get("weight_class")) if x)
+    track = " / ".join(x for x in (comp.get("locality_class"), comp.get("weight_class")) if x)
     stab = doc.get("code_type") == "stabilizer"
     lines = [
         "## Code submission",
         "",
         f"- Parameters: [[n, k, d]] = [[{n},{k},{d}]]",
         f"- Tracks: {track} (computed by the verifier from H and the layout)"
-        + ("; general stabilizer code, ranked on the stabilizer board"
-           if stab else ""),
-        f"- Distance confidence: {_confidence_line(doc)}"
-        + (" (Pauli weight, one side)" if stab else ""),
+        + ("; general stabilizer code, ranked on the stabilizer board" if stab else ""),
+        f"- Distance confidence: {_confidence_line(doc)}" + (" (Pauli weight, one side)" if stab else ""),
         f"- Search behind the claim: {facts['deepest_fresh_trials']:,} RIS "
         f"trials per side at the deepest fresh-seed rung, "
         f"{facts['flat_fresh_rungs_at_best']} fresh rung(s) flat there, "
@@ -555,23 +609,20 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
         "",
     ]
     if doc.get("family"):
-        lines += [f"Family tag: {doc['family']} (a self-declared filter, never "
-                  f"used for ranking).", ""]
+        lines += [f"Family tag: {doc['family']} (a self-declared filter, never used for ranking).", ""]
     ticked, reason = equivalence_finding(verdict, doc)
     construction = ((doc.get("provenance") or {}).get("construction") or "").strip()
-    lines += ["### Checklist",
-              "- [x] One JSON file under `codes/`, conforming to "
-              "`schema/code.schema.json`",
-              "- [x] Distance witness(es) included for each reported side",
-              f"- [x] `python verify/qldpc_verify.py {code_rel}` passes locally"]
+    lines += [
+        "### Checklist",
+        "- [x] One JSON file under `codes/`, conforming to `schema/code.schema.json`",
+        "- [x] Distance witness(es) included for each reported side",
+        f"- [x] `python verify/qldpc_verify.py {code_rel}` passes locally",
+    ]
     if construction:
-        lines.append("- [x] Construction and references filled in under "
-                     "`provenance`")
+        lines.append("- [x] Construction and references filled in under `provenance`")
     if ticked:
-        lines.append("- [x] If this may be equivalent to an existing entry, "
-                     f"noted in `provenance.notes`: {reason}")
-    lines += ["", "### What frontier does this advance?", "",
-              evidence["frontier"].strip()]
+        lines.append(f"- [x] If this may be equivalent to an existing entry, noted in `provenance.notes`: {reason}")
+    lines += ["", "### What frontier does this advance?", "", evidence["frontier"].strip()]
     front = cli.frontier_summary(doc, report)
     if front:
         lines += [""] + front
@@ -579,23 +630,31 @@ def pr_body(doc, report, verdict, evidence, facts, *, code_rel, note_rel,
         # The gate's own dominators, where the reviewer reads the claim: this
         # entry is a record of a valid code and claims no frontier advance.
         lines += ["", frontier.body_line(frontier_record["dominated_by"])]
-    lines += ["",
-              f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight "
-              f"{wmax}, locality class {comp.get('locality_class', 'unknown')}. "
-              f"Board-relative, and literature novelty is unverified: the gate "
-              f"deduplicates against this board only.",
-              ""]
+    lines += [
+        "",
+        f"Score kd^2/n = {round(k * d * d / n, 3)}, max check weight "
+        f"{wmax}, locality class {comp.get('locality_class', 'unknown')}. "
+        f"Board-relative, and literature novelty is unverified: the gate "
+        f"deduplicates against this board only.",
+        "",
+    ]
     if construction:
         lines += [f"Construction: {construction}", ""]
     lines += [f"Research note: `{note_rel}`", ""]
     if repro_rel:
-        lines += [f"Reproduction manifest: `{repro_rel}`" + (
-            f"; `./qldpc reproduce {n}-{k}-{d} --construction` rebuilds the code "
-            "from its recipe with `research/kit/rebuild.py` and compares "
-            "fingerprints." if reproducible else
-            "; its construction stage is declared not reproducible, since the "
-            "recorded spec carries no constructor and params for "
-            "`research/kit/rebuild.py` to run."), ""]
+        lines += [
+            f"Reproduction manifest: `{repro_rel}`"
+            + (
+                f"; `./qldpc reproduce {n}-{k}-{d} --construction` rebuilds the code "
+                "from its recipe with `research/kit/rebuild.py` and compares "
+                "fingerprints."
+                if reproducible
+                else "; its construction stage is declared not reproducible, since the "
+                "recorded spec carries no constructor and params for "
+                "`research/kit/rebuild.py` to run."
+            ),
+            "",
+        ]
     return "\n".join(lines)
 
 
@@ -629,8 +688,16 @@ def check_prose_cmd(root, body_file, files, pr_author=None):
     proved nothing about the attribution gate (issue #2328, R2). Building the
     command in one place is what keeps the two the same.
     """
-    cmd = [sys.executable, os.path.join(root, "verify", "check_prose.py"),
-           "--root", root, "--body-file", body_file, "--files", *files]
+    cmd = [
+        sys.executable,
+        os.path.join(root, "verify", "check_prose.py"),
+        "--root",
+        root,
+        "--body-file",
+        body_file,
+        "--files",
+        *files,
+    ]
     if pr_author:
         cmd += ["--pr-author", pr_author.lstrip("@")]
     return cmd
@@ -638,17 +705,33 @@ def check_prose_cmd(root, body_file, files, pr_author=None):
 
 def _run_check_prose(root, body_file, files, pr_author=None):
     cmd = check_prose_cmd(root, body_file, files, pr_author)
-    proc = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
-                          check=False)
-    return {"ok": proc.returncode == 0, "returncode": proc.returncode,
-            "output": (proc.stdout + proc.stderr).strip(),
-            "command": " ".join(cmd[1:])}
+    proc = subprocess.run(cmd, cwd=root, capture_output=True, text=True, check=False)
+    return {
+        "ok": proc.returncode == 0,
+        "returncode": proc.returncode,
+        "output": (proc.stdout + proc.stderr).strip(),
+        "command": " ".join(cmd[1:]),
+    }
 
 
-def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
-            min_deep_trials=DEFAULT_MIN_DEEP_TRIALS, pr_author=None,
-            body_dir=None, write=True, force=False, seed=None, base="main",
-            recipe=None, allow_non_frontier=False):
+def promote(
+    candidate,
+    evidence,
+    *,
+    root=_ROOT,
+    authors=None,
+    date=None,
+    min_deep_trials=DEFAULT_MIN_DEEP_TRIALS,
+    pr_author=None,
+    body_dir=None,
+    write=True,
+    force=False,
+    seed=None,
+    base="main",
+    recipe=None,
+    allow_non_frontier=False,
+    slug=None,
+):
     """Build one submission bundle and return its report.
 
     The order is fixed and is the point: evidence, then the trusted gate on the
@@ -668,10 +751,22 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     it; ``report["frontier"]`` carries the label, the dominators, and whether
     the opt-in was used, and the PR body names the dominators (issue #5700).
     """
-    report = {"schema": REPORT_SCHEMA, "ok": False, "slug": None, "title": None,
-              "branch": None, "files": {}, "body_file": None, "gates": {},
-              "blocked_by": [], "needs_human": [], "commands": [],
-              "ladder": None, "frontier": None, "revision": None}
+    report = {
+        "schema": REPORT_SCHEMA,
+        "ok": False,
+        "slug": None,
+        "title": None,
+        "branch": None,
+        "files": {},
+        "body_file": None,
+        "gates": {},
+        "blocked_by": [],
+        "needs_human": [],
+        "commands": [],
+        "ladder": None,
+        "frontier": None,
+        "revision": None,
+    }
     blocked = report["blocked_by"]
 
     problems = check_evidence(evidence)
@@ -683,7 +778,8 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
             "the candidate carries no distance block, so there is no validated "
             "witness to reuse; package it with "
             "research/kit/submit.make_submission and pass it through "
-            "verify/validate_candidate.py first")
+            "verify/validate_candidate.py first"
+        )
         return report
     try:
         facts = ladder_facts(evidence["ladder"], candidate["distance"]["d"])
@@ -701,9 +797,11 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     tools_model = (evidence.get("tools") or {}).get("model")
     prov_model = (candidate.get("provenance") or {}).get("model")
     if tools_model and prov_model and tools_model != prov_model:
-        blocked.append(f"evidence.tools.model ({tools_model!r}) and the "
-                       f"candidate's provenance.model ({prov_model!r}) "
-                       f"disagree; notes/TEMPLATE.md requires them to match")
+        blocked.append(
+            f"evidence.tools.model ({tools_model!r}) and the "
+            f"candidate's provenance.model ({prov_model!r}) "
+            f"disagree; notes/TEMPLATE.md requires them to match"
+        )
     if blocked:
         return report
 
@@ -711,17 +809,22 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     verdict = gate.validate_candidate(doc, seed=seed)
     report["gates"]["validate_candidate"] = verdict
     if not verdict.get("passed"):
-        blocked.append("verify/validate_candidate.py did not pass this "
-                       "document: " + "; ".join(verdict.get("labels") or []))
+        blocked.append(
+            "verify/validate_candidate.py did not pass this document: " + "; ".join(verdict.get("labels") or [])
+        )
         return report
     novelty = (verdict.get("gates") or {}).get("novelty") or {}
     # A d-only gain owes the matched-depth audit (issue #4236). The rule lives
     # in research/kit/peer_audit.py, shared with ./qldpc submit; the depth the
     # claim rests on is the ladder's deepest fresh rung.
-    blocked.extend(peer_audit.blockers(
-        novelty.get("d_only_peers") or [], evidence.get("peer_audit"),
-        required_trials=facts["deepest_fresh_trials"],
-        attach="put the record it writes in evidence.peer_audit"))
+    blocked.extend(
+        peer_audit.blockers(
+            novelty.get("d_only_peers") or [],
+            evidence.get("peer_audit"),
+            required_trials=facts["deepest_fresh_trials"],
+            attach="put the record it writes in evidence.peer_audit",
+        )
+    )
     # A dominated code is a valid code and a non-frontier result (AGENTS.md,
     # The motto). The gate labels it and never refuses on it; this is where a
     # frontier claim gets written into a PR body, so this is where the label
@@ -735,17 +838,22 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         "advances_by": list(novelty.get("advances_by") or []),
         "filed_as_non_frontier": bool(allow_non_frontier) and advancing is False,
     }
-    blocked.extend(frontier.blockers(
-        dominated_by, advancing, allowed=allow_non_frontier,
-        attach=f"pass allow_non_frontier=True ({frontier.FLAG}) to file it as a "
-               f"non-frontier record, which the PR body then says"))
+    blocked.extend(
+        frontier.blockers(
+            dominated_by,
+            advancing,
+            allowed=allow_non_frontier,
+            attach=f"pass allow_non_frontier=True ({frontier.FLAG}) to file it as a "
+            f"non-frontier record, which the PR body then says",
+        )
+    )
     ticked, reason = equivalence_finding(verdict, doc)
     if not ticked:
         blocked.append(reason)
     if blocked:
         return report
 
-    slug = candidate_slug(doc)
+    slug = slug or candidate_slug(doc)
     report["slug"] = slug
     report["branch"] = f"submit-{slug}"
     code_rel = os.path.join("codes", f"{slug}.json")
@@ -769,7 +877,7 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         if same:
             n_n, k_n, d_n, w_n = _code_axes(doc)
             n_o, k_o, d_o, w_o = _code_axes(old_doc)
-            if (n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o):
+            if n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o:
                 allowed = True
         if not allowed:
             status = _compare_status(doc, old_doc)
@@ -780,17 +888,18 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
                     f"{os.path.basename(code_path)}; new version is "
                     f"{status}; does not advance over the version it replaces; "
                     f"distinct code collides with the existing entry; file it "
-                    f"as a suffixed slug ({suggested}) instead of overwriting")
+                    f"as a suffixed slug ({suggested}) instead of overwriting"
+                )
             else:
                 blocked.append(
                     f"{code_rel} overwrites existing entry "
                     f"{os.path.basename(code_path)}; new version is "
-                    f"{status}; does not advance over the version it replaces")
+                    f"{status}; does not advance over the version it replaces"
+                )
     if not force and not blocked:
         for p, rel in written:
             if os.path.exists(p):
-                blocked.append(f"{rel} already exists; pass force=True to "
-                               f"overwrite or pick another candidate")
+                blocked.append(f"{rel} already exists; pass force=True to overwrite or pick another candidate")
     if blocked:
         return report
 
@@ -798,13 +907,23 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
     report_verify = qldpc_verify.verify(doc, refute=False)
     note_md = note_markdown(doc, evidence, facts)
     if len(note_md.encode()) > NOTE_CAP_BYTES:
-        blocked.append(f"{note_rel} is {len(note_md.encode())} bytes, over the "
-                       f"{NOTE_CAP_BYTES}-byte note cap; trim the evidence record")
+        blocked.append(
+            f"{note_rel} is {len(note_md.encode())} bytes, over the "
+            f"{NOTE_CAP_BYTES}-byte note cap; trim the evidence record"
+        )
         return report
-    body = pr_body(doc, report_verify, verdict, evidence, facts,
-                   code_rel=code_rel, note_rel=note_rel, repro_rel=repro_rel,
-                   reproducible=recipe_from_spec(recipe) is not None,
-                   frontier_record=report["frontier"])
+    body = pr_body(
+        doc,
+        report_verify,
+        verdict,
+        evidence,
+        facts,
+        code_rel=code_rel,
+        note_rel=note_rel,
+        repro_rel=repro_rel,
+        reproducible=recipe_from_spec(recipe) is not None,
+        frontier_record=report["frontier"],
+    )
     report["title"] = bundle_title(doc, evidence)
     report["files"] = {"code": code_rel, "note": note_rel}
     if repro_rel:
@@ -822,84 +941,105 @@ def promote(candidate, evidence, *, root=_ROOT, authors=None, date=None,
         with open(note_path, "w", encoding="utf-8", newline="\n") as f:
             f.write(note_md)
         if repro_rel:
-            write_repro_manifest(doc, slug, recipe,
-                                 repro_dir=os.path.join(root, "repro"),
-                                 artifact_path=code_path)
+            write_repro_manifest(doc, slug, recipe, repro_dir=os.path.join(root, "repro"), artifact_path=code_path)
         with open(body_file, "w", encoding="utf-8", newline="\n") as f:
             f.write(body)
         report["body_file"] = body_file
         # 3. the prose gate, on what is actually on disk.
-        prose = _run_check_prose(root, body_file,
-                                 [rel for _, rel in written],
-                                 pr_author=pr_author)
+        prose = _run_check_prose(root, body_file, [rel for _, rel in written], pr_author=pr_author)
         report["gates"]["check_prose"] = prose
         if not prose["ok"]:
-            blocked.append("verify/check_prose.py rejected the bundle; its "
-                           "output is in gates.check_prose.output")
+            blocked.append("verify/check_prose.py rejected the bundle; its output is in gates.check_prose.output")
     else:
         report["note_markdown"], report["body_markdown"] = note_md, body
-        report["gates"]["check_prose"] = {
-            "ok": None,
-            "skipped": "dry run: nothing was written for the checker to read"}
+        report["gates"]["check_prose"] = {"ok": None, "skipped": "dry run: nothing was written for the checker to read"}
 
-    report["needs_human"] = needs_human(doc, verdict, body_file if write else None,
-                                        evidence=evidence,
-                                        frontier_record=report["frontier"])
-    report["commands"] = _git_commands(slug, report["title"], code_rel, note_rel,
-                                       body_file, base=base,
-                                       extra=[repro_rel] if repro_rel else ())
+    report["needs_human"] = needs_human(
+        doc, verdict, body_file if write else None, evidence=evidence, frontier_record=report["frontier"]
+    )
+    report["commands"] = _git_commands(
+        slug, report["title"], code_rel, note_rel, body_file, base=base, extra=[repro_rel] if repro_rel else ()
+    )
     report["ok"] = not blocked
     return report
 
 
 def needs_human(doc, verdict, body_file, evidence=None, frontier_record=None):
     """List what this bundle still needs a person for, and why."""
-    items = [{"item": "literature novelty",
-              "why": "the gate deduplicates against this board only and labels "
-                     "literature novelty unverified; nothing here checks the "
-                     "wider literature"},
-             {"item": "the frontier claim in the PR body",
-              "why": "it is board-relative and was supplied as evidence, not "
-                     "derived; read it against the board before requesting "
-                     "review"},
-             {"item": "opening the PR",
-              "why": "publication authorization is the contributor's per "
-                     "AGENTS.md; this module writes files and never runs git "
-                     "or gh"}]
+    items = [
+        {
+            "item": "literature novelty",
+            "why": "the gate deduplicates against this board only and labels "
+            "literature novelty unverified; nothing here checks the "
+            "wider literature",
+        },
+        {
+            "item": "the frontier claim in the PR body",
+            "why": "it is board-relative and was supplied as evidence, not "
+            "derived; read it against the board before requesting "
+            "review",
+        },
+        {
+            "item": "opening the PR",
+            "why": "publication authorization is the contributor's per "
+            "AGENTS.md; this module writes files and never runs git "
+            "or gh",
+        },
+    ]
     wl = ((verdict.get("gates") or {}).get("dedup") or {}).get("wl_equivalent_of")
     if wl:
-        items.append({"item": f"the equivalence comparison against {wl}",
-                      "why": "the gate found the same Weisfeiler-Leman "
-                             "signature; provenance.notes records a judgment "
-                             "that only a person can make"})
+        items.append(
+            {
+                "item": f"the equivalence comparison against {wl}",
+                "why": "the gate found the same Weisfeiler-Leman "
+                "signature; provenance.notes records a judgment "
+                "that only a person can make",
+            }
+        )
     if (frontier_record or {}).get("filed_as_non_frontier"):
         doms = ", ".join(frontier_record.get("dominated_by") or []) or "a cell entry"
-        items.append({"item": "the non-frontier filing",
-                      "why": f"the gate reports this code is dominated by {doms}; "
-                             f"it was packaged with allow_non_frontier, so the "
-                             f"body calls it a record and not a frontier "
-                             f"advance; confirm that a record is what is wanted "
-                             f"before opening the PR"})
+        items.append(
+            {
+                "item": "the non-frontier filing",
+                "why": f"the gate reports this code is dominated by {doms}; "
+                f"it was packaged with allow_non_frontier, so the "
+                f"body calls it a record and not a frontier "
+                f"advance; confirm that a record is what is wanted "
+                f"before opening the PR",
+            }
+        )
     gates = verdict.get("gates") or {}
     peers = (gates.get("novelty") or {}).get("d_only_peers") or []
     audit = (evidence or {}).get("peer_audit")
     if peers and audit and not peer_audit.is_checkable(audit):
-        items.append({"item": f"the matched-depth peer audit over {', '.join(peers)}",
-                      "why": "evidence.peer_audit is prose, so its depth, seeds, "
-                             "and decision were not checked; "
-                             "research/audits/leader_audit.py pair --json-out "
-                             "writes a record that is"})
+        items.append(
+            {
+                "item": f"the matched-depth peer audit over {', '.join(peers)}",
+                "why": "evidence.peer_audit is prose, so its depth, seeds, "
+                "and decision were not checked; "
+                "research/audits/leader_audit.py pair --json-out "
+                "writes a record that is",
+            }
+        )
     if doc.get("code_type", "CSS") == "CSS" and "circuit" not in doc:
-        items.append({"item": "the circuit tier",
-                      "why": "this module does not generate memory circuits; "
-                             "./qldpc submit does, and d_circ is penalty-only, "
-                             "so the entry is submitted without one"})
+        items.append(
+            {
+                "item": "the circuit tier",
+                "why": "this module does not generate memory circuits; "
+                "./qldpc submit does, and d_circ is penalty-only, "
+                "so the entry is submitted without one",
+            }
+        )
     if body_file:
-        items.append({"item": "the clean-worktree prose gate",
-                      "why": f"verify/prepush_prose_check.sh {body_file} runs "
-                             f"against committed content and refuses a dirty "
-                             f"tree, so it can only run after the commit; it "
-                             f"is in commands"})
+        items.append(
+            {
+                "item": "the clean-worktree prose gate",
+                "why": f"verify/prepush_prose_check.sh {body_file} runs "
+                f"against committed content and refuses a dirty "
+                f"tree, so it can only run after the commit; it "
+                f"is in commands",
+            }
+        )
     return items
 
 
@@ -914,14 +1054,18 @@ def promote_all(plans, **kwargs):
 
 def script_for(reports, *, shell="#!/bin/sh\nset -eu\n"):
     """Render the command sequence for every ready bundle as one runnable script."""
-    out = [shell,
-           "# Generated by research/kit/promote.py. One code per branch and per",
-           "# PR, as verify/check_submission_scope.py requires. Review each body",
-           "# before running this.", ""]
+    out = [
+        shell,
+        "# Generated by research/kit/promote.py. One code per branch and per",
+        "# PR, as verify/check_submission_scope.py requires. Review each body",
+        "# before running this.",
+        "",
+    ]
     for rep in reports:
         if not rep.get("ok") or not rep.get("body_file"):
-            out.append(f"# skipped {rep.get('slug') or 'candidate'}: "
-                       + "; ".join(rep.get("blocked_by") or ["not ready"]))
+            out.append(
+                f"# skipped {rep.get('slug') or 'candidate'}: " + "; ".join(rep.get("blocked_by") or ["not ready"])
+            )
             continue
         out.append(f"# {rep['title']}")
         out.extend(rep["commands"])
@@ -930,47 +1074,53 @@ def script_for(reports, *, shell="#!/bin/sh\nset -eu\n"):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(
-        prog="promote",
-        description="assemble submission bundles for validated candidates")
+    ap = argparse.ArgumentParser(prog="promote", description="assemble submission bundles for validated candidates")
     ap.add_argument("plans", nargs="+", help="plan file(s): {candidate, evidence}")
     ap.add_argument("--root", default=_ROOT)
-    ap.add_argument("--authors", nargs="*", default=None,
-                    help="override provenance.authors (@handle and/or 'First Last')")
-    ap.add_argument("--pr-author", default=None,
-                    help="GitHub login the PR will be opened by; passed to "
-                         "check_prose.py exactly as CI passes it")
+    ap.add_argument(
+        "--authors", nargs="*", default=None, help="override provenance.authors (@handle and/or 'First Last')"
+    )
+    ap.add_argument(
+        "--pr-author",
+        default=None,
+        help="GitHub login the PR will be opened by; passed to check_prose.py exactly as CI passes it",
+    )
     ap.add_argument("--date", default=None)
     ap.add_argument("--min-deep-trials", type=int, default=DEFAULT_MIN_DEEP_TRIALS)
-    ap.add_argument("--seed", type=int, default=None,
-                    help="seed for the trusted gate (default: fresh and random)")
+    ap.add_argument("--seed", type=int, default=None, help="seed for the trusted gate (default: fresh and random)")
     ap.add_argument("--base", default="main")
-    ap.add_argument("--force", action="store_true",
-                    help="overwrite an existing codes/<slug>.json or note")
-    ap.add_argument("--allow-non-frontier", action="store_true",
-                    help="package a candidate the gate labels dominated "
-                         "(gates.novelty.board_advancing false) as a "
-                         "non-frontier record; without it such a candidate is "
-                         "refused with its dominators named, and with it the "
-                         "PR body names them and claims no frontier advance "
-                         "(AGENTS.md, The motto; issue #5700)")
-    ap.add_argument("--dry-run", action="store_true",
-                    help="render and gate without writing any file")
-    ap.add_argument("--json", default=None, metavar="FILE",
-                    help="write the reports here as well as to stdout")
-    ap.add_argument("--script", default=None, metavar="FILE",
-                    help="write the branch/commit/push/PR commands here")
+    ap.add_argument("--force", action="store_true", help="overwrite an existing codes/<slug>.json or note")
+    ap.add_argument(
+        "--allow-non-frontier",
+        action="store_true",
+        help="package a candidate the gate labels dominated "
+        "(gates.novelty.board_advancing false) as a "
+        "non-frontier record; without it such a candidate is "
+        "refused with its dominators named, and with it the "
+        "PR body names them and claims no frontier advance "
+        "(AGENTS.md, The motto; issue #5700)",
+    )
+    ap.add_argument("--dry-run", action="store_true", help="render and gate without writing any file")
+    ap.add_argument("--json", default=None, metavar="FILE", help="write the reports here as well as to stdout")
+    ap.add_argument("--script", default=None, metavar="FILE", help="write the branch/commit/push/PR commands here")
     args = ap.parse_args(argv)
 
     plans = []
     for path in args.plans:
         plans.extend(load_plan(path))
-    reports = promote_all(plans, root=os.path.abspath(args.root),
-                          authors=args.authors, date=args.date,
-                          min_deep_trials=args.min_deep_trials,
-                          pr_author=args.pr_author, write=not args.dry_run,
-                          force=args.force, seed=args.seed, base=args.base,
-                          allow_non_frontier=args.allow_non_frontier)
+    reports = promote_all(
+        plans,
+        root=os.path.abspath(args.root),
+        authors=args.authors,
+        date=args.date,
+        min_deep_trials=args.min_deep_trials,
+        pr_author=args.pr_author,
+        write=not args.dry_run,
+        force=args.force,
+        seed=args.seed,
+        base=args.base,
+        allow_non_frontier=args.allow_non_frontier,
+    )
     text = json.dumps(reports, indent=1)
     print(text)
     if args.json:

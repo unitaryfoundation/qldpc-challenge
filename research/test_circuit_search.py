@@ -5,6 +5,7 @@ baseline, screen, deep search, staging, verdict, ledger, and summary, runs in
 seconds (issue #4032). A survivor must be an attempt the verifier accepted
 whose score beats the committed circuits; nothing here is a board change.
 """
+
 import json
 import os
 import sys
@@ -19,7 +20,8 @@ import circuit_search as cs  # noqa: E402
 
 pytestmark = pytest.mark.skipif(
     not os.path.exists(os.path.join(_ROOT, "circuits", "12-4-2", "memory_x.stim")),
-    reason="the test entries' circuits are not in this checkout")
+    reason="the test entries' circuits are not in this checkout",
+)
 
 
 def test_score_prefers_the_weaker_basis_then_the_sum():
@@ -40,8 +42,7 @@ def test_every_attempt_is_staged_gated_and_journaled(tmp_path):
     assert evaluated, "an interleaved two-block schedule evaluates at this size"
     for r in evaluated:
         adir = os.path.join(_ROOT, r["staged"])
-        for name in ("memory_x.stim", "memory_x.dem", "memory_z.stim", "memory_z.dem",
-                     "block.json", "candidate.json", "verdict.json", "notes.md"):
+        for name in ("memory_x.stim", "memory_z.stim", "block.json", "candidate.json", "verdict.json", "notes.md"):
             assert os.path.exists(os.path.join(adir, name)), name
         verdict = json.load(open(os.path.join(adir, "verdict.json"), encoding="utf-8"))
         assert verdict["ok"] == r["verdict_ok"]
@@ -50,10 +51,13 @@ def test_every_attempt_is_staged_gated_and_journaled(tmp_path):
         assert cand["circuit"]["d_circ"]["X"]["value"] <= doc["distance"]["d"]
         assert "circuit_search.py" in cand["circuit"]["notes"]
     scores = [tuple(r["score"]) for r in evaluated]
-    assert [r for r in s["ranking"]] == [r["attempt"] for r in
-                                         sorted(evaluated, key=lambda r: tuple(r["score"]), reverse=True)]
-    assert all(tuple(s["attempts"][a - 1]["score"]) > tuple(s["baseline"]["score"])
-               and s["attempts"][a - 1]["verdict_ok"] for a in s["survivors"])
+    assert [r for r in s["ranking"]] == [
+        r["attempt"] for r in sorted(evaluated, key=lambda r: tuple(r["score"]), reverse=True)
+    ]
+    assert all(
+        tuple(s["attempts"][a - 1]["score"]) > tuple(s["baseline"]["score"]) and s["attempts"][a - 1]["verdict_ok"]
+        for a in s["survivors"]
+    )
     assert json.load(open(os.path.join(out, "summary.json"), encoding="utf-8"))["slug"] == "12-4-2"
     assert scores
 

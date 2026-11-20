@@ -21,6 +21,7 @@ shows both, and neither counts as a verified point.
 The scheduled workflow (.github/workflows/ler-weekly.yml) runs this on
 Mondays and commits the receipts.
 """
+
 import argparse
 import glob
 import json
@@ -62,8 +63,7 @@ def main(argv=None):
     ap.add_argument("--budget", type=float, default=lv.REPLICATE_SECONDS)
     ap.add_argument("--seeds", type=int, default=lv.REPLICATE_SEEDS)
     ap.add_argument("--job-seconds", type=float, default=5 * 3600)
-    ap.add_argument("--only-stale", action="store_true",
-                    help="skip entries whose receipt matches the current claim")
+    ap.add_argument("--only-stale", action="store_true", help="skip entries whose receipt matches the current claim")
     ap.add_argument("--slugs", nargs="*", default=None)
     ap.add_argument("--head-sha", default=None)
     a = ap.parse_args(argv)
@@ -80,23 +80,18 @@ def main(argv=None):
             skipped += 1
             continue
         if time.monotonic() - t0 > a.job_seconds:
-            print(f"job budget reached after {done} entries; "
-                  f"{len(todo) - done - skipped} left for the next run")
+            print(f"job budget reached after {done} entries; {len(todo) - done - skipped} left for the next run")
             break
         cdir = os.path.join(root, "circuits", slug)
         print(f"== {slug}", flush=True)
-        rep = lv.verify_ler(doc, cdir, mode="all", budget=a.budget,
-                            seeds=a.seeds)
+        rep = lv.verify_ler(doc, cdir, mode="all", budget=a.budget, seeds=a.seeds)
         for c in rep["checks"]:
-            print(f"  {'ok ' if c['ok'] else 'BAD'} {c['check']}: "
-                  f"{c['detail'][:200]}", flush=True)
-        receipt = lr.make_receipt(slug, lr.claim_digest(doc, cdir), rep,
-                                  head_sha=a.head_sha)
+            print(f"  {'ok ' if c['ok'] else 'BAD'} {c['check']}: {c['detail'][:200]}", flush=True)
+        receipt = lr.make_receipt(slug, lr.claim_digest(doc, cdir), rep, head_sha=a.head_sha)
         path = lr.write_receipt(root, receipt)
         print(f"  receipt {os.path.relpath(path, root)}", flush=True)
         done += 1
-    print(f"replicated {done} entries, skipped {skipped} current, "
-          f"{time.monotonic() - t0:.0f} s")
+    print(f"replicated {done} entries, skipped {skipped} current, {time.monotonic() - t0:.0f} s")
     return 0
 
 

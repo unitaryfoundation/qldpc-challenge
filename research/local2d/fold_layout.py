@@ -15,6 +15,7 @@ incremental cost update (only the checks touching a moved qubit change).  The
 reported radius is recomputed from scratch and is exactly the quantity
 `verify/qldpc_verify.py` measures.
 """
+
 import math
 import random
 
@@ -26,8 +27,7 @@ def _diam(sup, site_of, sites):
         for j in range(i + 1, len(sup)):
             xj, yj = sites[site_of[sup[j]]]
             dd = (xi - xj) ** 2 + (yi - yj) ** 2
-            if dd > m:
-                m = dd
+            m = max(m, dd)
     return math.sqrt(m)
 
 
@@ -38,13 +38,11 @@ def radius(checks, coords):
         for i in range(len(s)):
             for j in range(i + 1, len(s)):
                 d = math.dist(coords[s[i]], coords[s[j]])
-                if d > best:
-                    best = d
+                best = max(best, d)
     return best
 
 
-def anneal(checks, n, sites, layers=1, seed=0, iters=200000,
-           t_hi=0.35, t_lo=0.004, init=None, power=6.0):
+def anneal(checks, n, sites, layers=1, seed=0, iters=200000, t_hi=0.35, t_lo=0.004, init=None, power=6.0):
     """Return (coords, radius) for the best layout found."""
     rng = random.Random(seed)
     ns = len(sites)
@@ -66,7 +64,7 @@ def anneal(checks, n, sites, layers=1, seed=0, iters=200000,
         occ[s] += 1
 
     dia = [_diam(s, site_of, sites) for s in checks]
-    cost = sum(d ** power for d in dia)
+    cost = sum(d**power for d in dia)
     best_r = max(dia)
     best = list(site_of)
     scale = max(cost / len(checks), 1e-9)
@@ -95,7 +93,7 @@ def anneal(checks, n, sites, layers=1, seed=0, iters=200000,
             aff = sorted(set(touching[q]) | set(touching[q2]))
 
         newd = [_diam(checks[c], site_of, sites) for c in aff]
-        delta = sum(d ** power for d in newd) - sum(dia[c] ** power for c in aff)
+        delta = sum(d**power for d in newd) - sum(dia[c] ** power for c in aff)
         if delta <= 0 or rng.random() < math.exp(-delta / max(T * scale, 1e-12)):
             cost += delta
             for c, d in zip(aff, newd):
@@ -118,8 +116,7 @@ def box_sites(w, h):
     return [(x, y) for x in range(w) for y in range(h)]
 
 
-def search_layout(checks, n, layers, target, seed0=0, boxes=None, iters=150000,
-                  restarts=4, verbose=False):
+def search_layout(checks, n, layers, target, seed0=0, boxes=None, iters=150000, restarts=4, verbose=False):
     """Try several bounding boxes / seeds; return the best (coords, radius)."""
     need = math.ceil(n / layers)
     if boxes is None:
@@ -132,12 +129,11 @@ def search_layout(checks, n, layers, target, seed0=0, boxes=None, iters=150000,
                     boxes.append((w, h + extra))
         boxes = sorted(set(boxes), key=lambda b: (b[0] * b[1], max(b)))[:8]
     bestc, bestr = None, float("inf")
-    for (w, h) in boxes:
+    for w, h in boxes:
         if w * h * layers < n:
             continue
         for r in range(restarts):
-            coords, rad = anneal(checks, n, box_sites(w, h), layers=layers,
-                                 seed=seed0 + 1000 * r + w, iters=iters)
+            coords, rad = anneal(checks, n, box_sites(w, h), layers=layers, seed=seed0 + 1000 * r + w, iters=iters)
             if verbose:
                 print(f"    box {w}x{h} seed{r}: r={rad:.4f}")
             if rad < bestr:

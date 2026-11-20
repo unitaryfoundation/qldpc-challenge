@@ -12,12 +12,13 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_SCRIPT = re.compile(
     r'<script id="([A-Za-z][A-Za-z0-9_-]*)" '
-    r'type="application/json">(.*?)</script>', re.DOTALL)
+    r'type="application/json">(.*?)</script>',
+    re.DOTALL,
+)
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_security", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_security", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -26,8 +27,7 @@ def load_site_build():
 def unrestricted_string_paths(node, path=()):
     """Find free-form schema strings that must stay covered by the XSS test."""
     found = set()
-    if (isinstance(node, dict) and node.get("type") == "string"
-            and not {"enum", "const", "pattern"}.intersection(node)):
+    if isinstance(node, dict) and node.get("type") == "string" and not {"enum", "const", "pattern"}.intersection(node):
         found.add("/".join(path))
     if isinstance(node, dict):
         for key, value in node.items():
@@ -93,7 +93,7 @@ def test_free_form_schema_fields_are_deliberately_covered():
 
 def test_context_helpers_reject_active_content():
     build = load_site_build()
-    payload = '</script><script>globalThis.qldpcXssRegression=1</script>\u2028&<>'
+    payload = "</script><script>globalThis.qldpcXssRegression=1</script>\u2028&<>"
 
     encoded = build.json_for_html({"future_field": payload})
     assert "</script>" not in encoded.lower()
@@ -101,9 +101,8 @@ def test_context_helpers_reject_active_content():
     assert "\\u003c/script\\u003e" in encoded.lower()
     assert json.loads(encoded)["future_field"] == payload
 
-    assert 'href="https://arxiv.org/abs/2504.08887v2"' in build.cite(
-        "arXiv:2504.08887v2")
-    malformed = build.cite('arxiv:\"><img src=x onerror=alert(1)>')
+    assert 'href="https://arxiv.org/abs/2504.08887v2"' in build.cite("arXiv:2504.08887v2")
+    malformed = build.cite('arxiv:"><img src=x onerror=alert(1)>')
     assert "href=" not in malformed
     assert "<img" not in malformed
 
@@ -129,20 +128,20 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
     with open(fixture) as f:
         doc = copy.deepcopy(json.load(f))
 
-    close_script = (
-        '</script><script>globalThis.qldpcXssRegression=1</script>')
-    attr_breakout = (
-        '\"><img src=x onerror=globalThis.qldpcXssRegression=2>')
+    close_script = "</script><script>globalThis.qldpcXssRegression=1</script>"
+    attr_breakout = '"><img src=x onerror=globalThis.qldpcXssRegression=2>'
     doc["name"] = f"Future code {attr_breakout}"
     model = f"Model 5.1 {close_script}\u2028"
-    doc["provenance"].update({
-        "authors": ["@safe-author", f"Alice {close_script}"],
-        "construction": f"New construction {attr_breakout}",
-        "model": [model, "Model 6.0"] if model_as_list else model,
-        "harness": f"harness {attr_breakout}",
-        "references": [f"arxiv:{attr_breakout}"],
-        "notes": f"Notes {attr_breakout}",
-    })
+    doc["provenance"].update(
+        {
+            "authors": ["@safe-author", f"Alice {close_script}"],
+            "construction": f"New construction {attr_breakout}",
+            "model": [model, "Model 6.0"] if model_as_list else model,
+            "harness": f"harness {attr_breakout}",
+            "references": [f"arxiv:{attr_breakout}"],
+            "notes": f"Notes {attr_breakout}",
+        }
+    )
     doc["distance"]["X"]["witness_provenance"] = {
         "found_by": ["@safe-author"],
         "date": "2026-08-20",
@@ -155,10 +154,7 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
         "method": f"layout method {attr_breakout}",
     }
     doc["circuit"] = {
-        "d_circ": {
-            side: {"value": 1, "confidence": "upper_bound", "witness": [0]}
-            for side in ("X", "Z")
-        },
+        "d_circ": {side: {"value": 1, "confidence": "upper_bound", "witness": [0]} for side in ("X", "Z")},
         "rounds": 6,
         "stim_version": "1.15.0",
         "notes": f"circuit notes {close_script}",
@@ -188,15 +184,13 @@ def test_free_text_submission_payloads_render_inert(tmp_path, model_as_list):
     build.build()
 
     pages = []
-    for path in glob.glob(os.path.join(build.DOCS, "**", "*.html"),
-                          recursive=True):
+    for path in glob.glob(os.path.join(build.DOCS, "**", "*.html"), recursive=True):
         with open(path) as f:
             pages.append(f.read())
 
     rendered = "\n".join(pages)
     index = (tmp_path / "docs" / "index.html").read_text()
-    data = {match.group(1): json.loads(match.group(2))
-            for match in DATA_SCRIPT.finditer(index)}
+    data = {match.group(1): json.loads(match.group(2)) for match in DATA_SCRIPT.finditer(index)}
 
     assert pages
     assert close_script not in rendered
@@ -214,6 +208,7 @@ def test_harness_line_renders_claimed_mark(tmp_path):
     with open(fixture) as f:
         doc = json.loads(f.read()) if False else json.load(f)
     import copy
+
     doc = copy.deepcopy(doc)
     doc.setdefault("provenance", {})["harness"] = "OpenCode agent harness"
     codes = tmp_path / "codes"

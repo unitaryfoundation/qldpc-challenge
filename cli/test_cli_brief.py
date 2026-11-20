@@ -1,5 +1,7 @@
 """Tests for `qldpc brief` (#2955, item 4): one bounded snapshot composed from
-the cell frontier, the screening registry, recent codes, and fieldnotes."""
+the cell frontier, the screening registry, recent codes, and fieldnotes.
+"""
+
 import io
 import json
 import os
@@ -13,18 +15,44 @@ sys.path.insert(0, os.path.join(_ROOT, "cli"))
 import qldpc  # noqa: E402
 
 ENTRIES = [
-    {"n": 100, "k": 2, "d": 6, "w": 6, "slug": "100-2-6", "family": "bivariate-bicycle",
-     "locality_class": "unrestricted", "weight_class": "weight-6", "board_advancing": True},
-    {"n": 144, "k": 12, "d": 12, "w": 6, "slug": "144-12-12", "family": "bivariate-bicycle",
-     "locality_class": "unrestricted", "weight_class": "weight-6", "board_advancing": True},
-    {"n": 90, "k": 8, "d": 10, "w": 8, "slug": "90-8-10", "family": "generalized-bicycle",
-     "locality_class": "unrestricted", "weight_class": "weight-8", "board_advancing": True},
+    {
+        "n": 100,
+        "k": 2,
+        "d": 6,
+        "w": 6,
+        "slug": "100-2-6",
+        "family": "bivariate-bicycle",
+        "locality_class": "unrestricted",
+        "weight_class": "weight-6",
+        "board_advancing": True,
+    },
+    {
+        "n": 144,
+        "k": 12,
+        "d": 12,
+        "w": 6,
+        "slug": "144-12-12",
+        "family": "bivariate-bicycle",
+        "locality_class": "unrestricted",
+        "weight_class": "weight-6",
+        "board_advancing": True,
+    },
+    {
+        "n": 90,
+        "k": 8,
+        "d": 10,
+        "w": 8,
+        "slug": "90-8-10",
+        "family": "generalized-bicycle",
+        "locality_class": "unrestricted",
+        "weight_class": "weight-8",
+        "board_advancing": True,
+    },
 ]
 
 
 def _args(**over):
-    base = {"cell": "weight-6/unrestricted", "family": "", "days": 30, "top": 6,
-            "limit": 8, "json": False}
+    base = {"cell": "weight-6/unrestricted", "family": "", "days": 30, "top": 6, "limit": 8, "json": False}
     base.update(over)
     return type("A", (), base)()
 
@@ -32,11 +60,35 @@ def _args(**over):
 @pytest.fixture
 def small_board(monkeypatch):
     monkeypatch.setattr(qldpc, "_load_board_entries", lambda quiet=False: ENTRIES)
-    monkeypatch.setattr(qldpc, "screening_rows", lambda family="", params=None, verdicts=(): (
-        [{"campaign_id": "c1", "family": family, "params": {"l": 12}, "screened_d": 12,
-          "trials": 20000, "verdict": "held", "backend": "", "backfilled": False}] if family else [], [], 1))
-    monkeypatch.setattr(qldpc, "_recent_code_rows", lambda days, family: [
-        {"date": "2026-10-01", "slug": "144-12-12", "family": "bivariate-bicycle", "name": "gross"}])
+    monkeypatch.setattr(
+        qldpc,
+        "screening_rows",
+        lambda family="", params=None, verdicts=(): (
+            [
+                {
+                    "campaign_id": "c1",
+                    "family": family,
+                    "params": {"l": 12},
+                    "screened_d": 12,
+                    "trials": 20000,
+                    "verdict": "held",
+                    "backend": "",
+                    "backfilled": False,
+                }
+            ]
+            if family
+            else [],
+            [],
+            1,
+        ),
+    )
+    monkeypatch.setattr(
+        qldpc,
+        "_recent_code_rows",
+        lambda days, family: [
+            {"date": "2026-10-01", "slug": "144-12-12", "family": "bivariate-bicycle", "name": "gross"}
+        ],
+    )
 
 
 def test_brief_reports_the_cell_frontier_and_bar(small_board):

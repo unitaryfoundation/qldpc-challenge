@@ -2,6 +2,7 @@
 a `{constructor, params}` recipe to the verifier's fingerprint, and
 submit.write_repro_manifest emits the manifest `qldpc reproduce` reads.
 """
+
 import json
 import os
 import subprocess
@@ -17,36 +18,51 @@ sys.path.insert(0, os.path.join(ROOT, "verify"))
 import rebuild  # noqa: E402
 from submit import recipe_from_spec, write_repro_manifest  # noqa: E402
 
-GROSS = {"constructor": "bb.build_bb",
-         "params": {"l": 12, "m": 6, "A_terms": [[3, 0], [0, 2], [0, 1]], "B_terms": [[2, 0], [1, 0], [0, 3]]}}
+GROSS = {
+    "constructor": "bb.build_bb",
+    "params": {"l": 12, "m": 6, "A_terms": [[3, 0], [0, 2], [0, 1]], "B_terms": [[2, 0], [1, 0], [0, 3]]},
+}
 
 
 def test_the_gross_code_rebuilds_to_the_board_entry_fingerprint():
     HX, HZ = rebuild.rebuild(GROSS["constructor"], GROSS["params"])
     assert HX.shape == (72, 144) and HZ.shape == (72, 144)
     from qldpc_verify import verify
+
     doc = json.load(open(os.path.join(ROOT, "codes", "144-12-12.json")))
     assert rebuild.fingerprint_of(HX, HZ) == verify(doc)["fingerprint"]
 
 
 def test_the_script_prints_the_fingerprint_line_reproduce_reads():
-    out = subprocess.run([sys.executable, os.path.join(HERE, "kit", "rebuild.py"),
-                          "--constructor", GROSS["constructor"], "--params", json.dumps(GROSS["params"])],
-                         capture_output=True, text=True, check=True).stdout
+    out = subprocess.run(
+        [
+            sys.executable,
+            os.path.join(HERE, "kit", "rebuild.py"),
+            "--constructor",
+            GROSS["constructor"],
+            "--params",
+            json.dumps(GROSS["params"]),
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
     lines = [l for l in out.splitlines() if l.startswith("fingerprint=")]
     assert len(lines) == 1 and len(lines[0].split("=", 1)[1]) == 16
 
 
 def test_bad_recipes_are_refused():
     import pytest
+
     with pytest.raises(ValueError):
-        rebuild.rebuild("build_bb", {})                       # no module
+        rebuild.rebuild("build_bb", {})  # no module
     with pytest.raises(ValueError):
         rebuild.rebuild("bb.no_such_function", {})
     with pytest.raises(ValueError):
-        rebuild.rebuild("os.system", {})                       # not a kit module
+        rebuild.rebuild("os.system", {})  # not a kit module
     # a constructor that returns non-commuting checks is refused
     import types
+
     fake = types.ModuleType("fakector")
     fake.build = lambda: (np.array([[1, 1, 0]], dtype=np.int8), np.array([[1, 0, 0]], dtype=np.int8))
     sys.modules["fakector"] = fake
@@ -67,8 +83,13 @@ def test_recipe_from_spec_requires_both_keys():
 
 def test_write_repro_manifest_emits_a_runnable_construction_stage(tmp_path):
     doc = json.load(open(os.path.join(ROOT, "codes", "144-12-12.json")))
-    path = write_repro_manifest(doc, "144-12-12", {**GROSS, "family": "bivariate-bicycle"},
-                                repro_dir=str(tmp_path), artifact_path=os.path.join(ROOT, "codes", "144-12-12.json"))
+    path = write_repro_manifest(
+        doc,
+        "144-12-12",
+        {**GROSS, "family": "bivariate-bicycle"},
+        repro_dir=str(tmp_path),
+        artifact_path=os.path.join(ROOT, "codes", "144-12-12.json"),
+    )
     m = json.load(open(path))
     c = m["stages"]["construction"]
     assert c["status"] == "applicable" and c["script"] == "research/kit/rebuild.py"
@@ -78,9 +99,11 @@ def test_write_repro_manifest_emits_a_runnable_construction_stage(tmp_path):
     assert len(m["artifact_sha256"]) == 64
     assert m["stages"]["verify"] == {"status": "applicable"}
     # running the declared command reproduces the entry's fingerprint
-    out = subprocess.run([sys.executable, os.path.join(ROOT, c["script"]), *c["args"]],
-                         capture_output=True, text=True, check=True).stdout
+    out = subprocess.run(
+        [sys.executable, os.path.join(ROOT, c["script"]), *c["args"]], capture_output=True, text=True, check=True
+    ).stdout
     from qldpc_verify import verify
+
     assert f"fingerprint={verify(doc)['fingerprint']}" in out
 
 

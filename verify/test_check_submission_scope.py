@@ -4,6 +4,7 @@ codes/*.json and anything under circuits/<slug>/ are code data, so a PR
 cannot pair a circuit-artifact change with a verifier edit any more than a
 codes/ change.
 """
+
 import subprocess
 
 import check_submission_scope as S
@@ -26,9 +27,13 @@ def test_verifier_stack_is_critical_not_code_data():
 def test_one_entry_with_its_circuit_artifacts_is_one_submission():
     # A first circuit tier adds four files under circuits/<slug>/ next to an
     # existing codes/<slug>.json; that is one submission, not five.
-    paths = ["codes/72-6-6.json", "circuits/72-6-6/memory_x.stim",
-             "circuits/72-6-6/memory_x.dem", "circuits/72-6-6/memory_z.stim",
-             "circuits/72-6-6/memory_z.dem"]
+    paths = [
+        "codes/72-6-6.json",
+        "circuits/72-6-6/memory_x.stim",
+        "circuits/72-6-6/memory_x.dem",
+        "circuits/72-6-6/memory_z.stim",
+        "circuits/72-6-6/memory_z.dem",
+    ]
     assert {S.submission_slug(p) for p in paths} == {"72-6-6"}
     assert S.submission_slug("codes/168-20-14.json") == "168-20-14"
     assert {S.submission_slug(p) for p in ("codes/a-1-1.json", "circuits/b-2-2/x.stim")} == {"a-1-1", "b-2-2"}
@@ -43,6 +48,7 @@ def test_one_entry_with_its_circuit_artifacts_is_one_submission():
 # run it saw any code data, so the check was skipped and verify_all ran from
 # the PR's own tree rather than the trusted one.
 
+
 def _repo(tmp_path, base_files, change):
     """Build a repo with `base_files`, then apply `change`; return (root, base).
 
@@ -54,8 +60,7 @@ def _repo(tmp_path, base_files, change):
     root.mkdir()
 
     def run(*a):
-        return subprocess.run(["git", *a], cwd=root, check=True,
-                              capture_output=True, text=True)
+        return subprocess.run(["git", *a], cwd=root, check=True, capture_output=True, text=True)
 
     run("init", "-q", "-b", "work")
     run("config", "user.email", "t@example.com")
@@ -84,17 +89,15 @@ def test_a_deleted_entry_counts_as_code_data(tmp_path):
     root, base = _repo(
         tmp_path,
         {"codes/72-6-6.json": '{"n": 72}', "verify/qldpc_verify.py": "x = 1\n"},
-        {"codes/72-6-6.json": None, "verify/qldpc_verify.py": "x = 2\n"})
-    assert "codes/72-6-6.json" in S.changed_files(base, root), \
-        "a deletion is a change to the board"
-    assert S.main(["--root", root, "--base", base]) == 1, \
-        "deleting entries while editing the verifier must be refused"
+        {"codes/72-6-6.json": None, "verify/qldpc_verify.py": "x = 2\n"},
+    )
+    assert "codes/72-6-6.json" in S.changed_files(base, root), "a deletion is a change to the board"
+    assert S.main(["--root", root, "--base", base]) == 1, "deleting entries while editing the verifier must be refused"
 
 
 def test_a_deletion_alone_is_still_fine(tmp_path):
     """Removing an entry on its own is an ordinary board correction."""
-    root, base = _repo(tmp_path, {"codes/72-6-6.json": '{"n": 72}'},
-                       {"codes/72-6-6.json": None})
+    root, base = _repo(tmp_path, {"codes/72-6-6.json": '{"n": 72}'}, {"codes/72-6-6.json": None})
     assert S.main(["--root", root, "--base", base]) == 0
 
 
@@ -109,7 +112,8 @@ def test_a_deletion_does_not_consume_the_one_new_code_budget(tmp_path):
     root, base = _repo(
         tmp_path,
         {"codes/a-1-1.json": '{"n": 1}', "codes/b-2-2.json": '{"n": 2}'},
-        {"codes/a-1-1.json": None, "codes/c-3-3.json": '{"n": 3}'})
+        {"codes/a-1-1.json": None, "codes/c-3-3.json": '{"n": 3}'},
+    )
     assert S.added_files(base, root) == ["codes/c-3-3.json"]
     assert S.main(["--root", root, "--base", base]) == 0
 
@@ -123,20 +127,38 @@ def test_a_deletion_does_not_consume_the_one_new_code_budget(tmp_path):
 # Slugs here are fictitious: a test anchored to a real entry goes stale when
 # that entry is corrected, and the workflow runs any test naming a changed slug.
 
+
 def test_the_surface_is_the_entry_and_its_own_artifacts():
-    inside = ["codes/x-1-1.json", "circuits/x-1-1/memory_x.stim", "notes/x-1-1.md",
-              "fieldnotes/2026-10-14-concatenation.md", "repro/x-1-1.json", "certs/x-1-1.json"]
+    inside = [
+        "codes/x-1-1.json",
+        "circuits/x-1-1/memory_x.stim",
+        "notes/x-1-1.md",
+        "fieldnotes/2026-10-14-concatenation.md",
+        "repro/x-1-1.json",
+        "certs/x-1-1.json",
+    ]
     assert S.outside_surface(inside) == []
-    scratch = ["research/build_concat.py", "research/pr-bodies/x-1-1.md",
-               "research/campaigns/z4/summary.json", "docs/codes/x-1-1.html", "README.md"]
+    scratch = [
+        "research/build_concat.py",
+        "research/pr-bodies/x-1-1.md",
+        "research/campaigns/z4/summary.json",
+        "docs/codes/x-1-1.html",
+        "README.md",
+    ]
     assert S.outside_surface(inside + scratch) == scratch
 
 
 def test_scratch_riding_on_a_submission_is_refused(tmp_path, capsys):
     root, base = _repo(
-        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
-        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n",
-         "research/build_concat.py": "x = 1\n", "research/pr-bodies/x-1-1.md": "body\n"})
+        tmp_path,
+        {"codes/y-2-2.json": '{"n": 2}'},
+        {
+            "codes/x-1-1.json": '{"n": 1}',
+            "notes/x-1-1.md": "# [[x,1,1]]\n",
+            "research/build_concat.py": "x = 1\n",
+            "research/pr-bodies/x-1-1.md": "body\n",
+        },
+    )
     assert S.main(["--root", root, "--base", base]) == 1
     out = capsys.readouterr().out
     assert "outside the submission surface" in out
@@ -145,33 +167,68 @@ def test_scratch_riding_on_a_submission_is_refused(tmp_path, capsys):
     assert "notes/x-1-1.md" not in listed and "codes/x-1-1.json" not in listed
 
 
+def test_a_committed_dem_is_refused(tmp_path, capsys):
+    root, base = _repo(
+        tmp_path,
+        {"codes/y-2-2.json": '{"n": 2}'},
+        {
+            "codes/x-1-1.json": '{"n": 1}',
+            "notes/x-1-1.md": "# [[x,1,1]]\n",
+            "circuits/x-1-1/memory_x.stim": "# x\n",
+            "circuits/x-1-1/memory_x.dem": "# x\n",
+        },
+    )
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "adds committed .dem files" in out
+    assert "circuits/x-1-1/memory_x.dem" in out
+
+
+def test_deleting_a_dem_is_not_refused(tmp_path):
+    root, base = _repo(
+        tmp_path,
+        {"codes/x-1-1.json": '{"n": 1}', "circuits/x-1-1/memory_x.dem": "# x\n"},
+        {"circuits/x-1-1/memory_x.dem": None},
+    )
+    assert S.main(["--root", root, "--base", base]) == 0
+
+
 def test_an_entry_with_its_own_artifacts_passes(tmp_path):
     root, base = _repo(
-        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
-        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n",
-         "fieldnotes/2026-10-14-concatenation.md": "---\nauthor: t\n---\n",
-         "repro/x-1-1.json": "{}", "certs/x-1-1.json": "{}",
-         "circuits/x-1-1/memory_x.stim": "H 0\n"})
+        tmp_path,
+        {"codes/y-2-2.json": '{"n": 2}'},
+        {
+            "codes/x-1-1.json": '{"n": 1}',
+            "notes/x-1-1.md": "# [[x,1,1]]\n",
+            "fieldnotes/2026-10-14-concatenation.md": "---\nauthor: t\n---\n",
+            "repro/x-1-1.json": "{}",
+            "certs/x-1-1.json": "{}",
+            "circuits/x-1-1/memory_x.stim": "H 0\n",
+        },
+    )
     assert S.main(["--root", root, "--base", base]) == 0
 
 
 def test_research_changes_without_code_data_are_not_a_submission(tmp_path):
-    root, base = _repo(tmp_path, {"research/x.py": "x = 1\n"},
-                       {"research/x.py": "x = 2\n", "research/y.py": "y = 1\n"})
+    root, base = _repo(tmp_path, {"research/x.py": "x = 1\n"}, {"research/x.py": "x = 2\n", "research/y.py": "y = 1\n"})
     assert S.main(["--root", root, "--base", base]) == 0
 
 
 def test_a_correction_that_removes_an_entry_is_held_to_the_surface(tmp_path):
     root, base = _repo(
-        tmp_path, {"codes/x-1-1.json": '{"n": 1}', "research/x.py": "x = 1\n"},
-        {"codes/x-1-1.json": None, "research/x.py": "x = 2\n"})
+        tmp_path,
+        {"codes/x-1-1.json": '{"n": 1}', "research/x.py": "x = 1\n"},
+        {"codes/x-1-1.json": None, "research/x.py": "x = 2\n"},
+    )
     assert S.main(["--root", root, "--base", base]) == 1
 
 
 def test_the_trust_boundary_message_still_wins_over_the_surface_message(tmp_path, capsys):
     root, base = _repo(
-        tmp_path, {"verify/qldpc_verify.py": "x = 1\n"},
-        {"codes/x-1-1.json": '{"n": 1}', "verify/qldpc_verify.py": "x = 2\n"})
+        tmp_path,
+        {"verify/qldpc_verify.py": "x = 1\n"},
+        {"codes/x-1-1.json": '{"n": 1}', "verify/qldpc_verify.py": "x = 2\n"},
+    )
     assert S.main(["--root", root, "--base", base]) == 1
     assert "verifier-critical" in capsys.readouterr().out
 
@@ -198,14 +255,15 @@ BUNDLE = {
 
 def test_under_repro_only_the_entrys_own_manifest_passes():
     slugs = {"x-1-1"}
-    assert S.misplaced_repro(
-        ["codes/x-1-1.json", "notes/x-1-1.md", "repro/x-1-1.json"], slugs) == []
+    assert S.misplaced_repro(["codes/x-1-1.json", "notes/x-1-1.md", "repro/x-1-1.json"], slugs) == []
     assert S.misplaced_repro(sorted(BUNDLE), slugs) == sorted(BUNDLE)
     # a manifest, but for an entry this PR does not touch
     assert S.misplaced_repro(["repro/y-2-2.json"], slugs) == ["repro/y-2-2.json"]
     # not a manifest: the wrong extension, or the right name one level down
-    assert S.misplaced_repro(["repro/x-1-1.md", "repro/x-1-1/x-1-1.json"], slugs) \
-        == ["repro/x-1-1.md", "repro/x-1-1/x-1-1.json"]
+    assert S.misplaced_repro(["repro/x-1-1.md", "repro/x-1-1/x-1-1.json"], slugs) == [
+        "repro/x-1-1.md",
+        "repro/x-1-1/x-1-1.json",
+    ]
     # a removal is never refused
     gone = "repro/x-1-1/results/run-ris.stdout"
     assert S.misplaced_repro([gone], slugs, deleted={gone}) == []
@@ -213,8 +271,10 @@ def test_under_repro_only_the_entrys_own_manifest_passes():
 
 def test_an_evidence_directory_riding_on_a_submission_is_refused(tmp_path, capsys):
     root, base = _repo(
-        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
-        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n", **BUNDLE})
+        tmp_path,
+        {"codes/y-2-2.json": '{"n": 2}'},
+        {"codes/x-1-1.json": '{"n": 1}', "notes/x-1-1.md": "# [[x,1,1]]\n", **BUNDLE},
+    )
     assert S.main(["--root", root, "--base", base]) == 1
     out = capsys.readouterr().out
     assert "not its entry's manifest" in out
@@ -226,22 +286,21 @@ def test_an_evidence_directory_riding_on_a_submission_is_refused(tmp_path, capsy
 
 def test_a_manifest_for_another_entry_is_refused(tmp_path):
     root, base = _repo(
-        tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
-        {"codes/x-1-1.json": '{"n": 1}', "repro/y-2-2.json": "{}"})
+        tmp_path, {"codes/y-2-2.json": '{"n": 2}'}, {"codes/x-1-1.json": '{"n": 1}', "repro/y-2-2.json": "{}"}
+    )
     assert S.main(["--root", root, "--base", base]) == 1
 
 
 def test_a_circuit_tier_may_carry_its_entrys_manifest(tmp_path):
     # circuits/<slug>/ is code data for <slug>, so the manifest binds to it too
     root, base = _repo(
-        tmp_path, {"codes/x-1-1.json": '{"n": 1}'},
-        {"circuits/x-1-1/memory_x.stim": "H 0\n", "repro/x-1-1.json": "{}"})
+        tmp_path, {"codes/x-1-1.json": '{"n": 1}'}, {"circuits/x-1-1/memory_x.stim": "H 0\n", "repro/x-1-1.json": "{}"}
+    )
     assert S.main(["--root", root, "--base", base]) == 0
 
 
 def test_an_entry_may_leave_with_its_evidence_directory(tmp_path):
-    had = {"codes/x-1-1.json": '{"n": 1}', "repro/x-1-1.json": "{}",
-           "repro/x-1-1/deep-search.json": "{}"}
+    had = {"codes/x-1-1.json": '{"n": 1}', "repro/x-1-1.json": "{}", "repro/x-1-1/deep-search.json": "{}"}
     root, base = _repo(tmp_path, had, {p: None for p in had})
     assert set(S.deleted_files(base, root)) == set(had)
     assert S.main(["--root", root, "--base", base]) == 0
@@ -264,12 +323,19 @@ def test_classify_verify_change_is_tier_1():
 
 
 def test_classify_mode_exit_0(tmp_path):
-    root, base = _repo(tmp_path, {"codes/y-2-2.json": '{"n": 2}'},
-                       {"codes/x-1-1.json": '{"n": 1}'})
+    root, base = _repo(tmp_path, {"codes/y-2-2.json": '{"n": 2}'}, {"codes/x-1-1.json": '{"n": 1}'})
     assert S.main(["--root", root, "--base", base, "--classify"]) == 0
 
 
 def test_classify_mode_tier_1_exit_0(tmp_path):
-    root, base = _repo(tmp_path, {"verify/qldpc_verify.py": "x = 1\n"},
-                       {"verify/qldpc_verify.py": "x = 2\n"})
+    root, base = _repo(tmp_path, {"verify/qldpc_verify.py": "x = 1\n"}, {"verify/qldpc_verify.py": "x = 2\n"})
     assert S.main(["--root", root, "--base", base, "--classify"]) == 0
+
+
+# -- nested code paths (PR #6849 packaging mistake) -------------------------
+def test_a_nested_code_path_is_refused(tmp_path, capsys):
+    root, base = _repo(tmp_path, {"codes/y-2-2.json": '{"n": 2}'}, {"codes/x-1-1.json/x-1-1.json": '{"n": 1}'})
+    assert S.main(["--root", root, "--base", base]) == 1
+    out = capsys.readouterr().out
+    assert "single file, codes/<slug>.json" in out
+    assert "codes/x-1-1.json/x-1-1.json" in out

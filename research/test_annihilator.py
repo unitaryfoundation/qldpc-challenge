@@ -13,6 +13,7 @@ every entry on every CI run. The test that pinned it turned one legitimate
 tightening into a red verify for every open PR, so an entry's checks are read
 here and its claims are not.
 """
+
 import json
 import os
 import sys
@@ -34,13 +35,11 @@ from annihilator import (  # noqa: E402
     verify_finding,
 )
 
-AUDIT = os.path.join(_ROOT, "research", "audits",
-                     "annihilator-sweep-2026-09-29.json")
+AUDIT = os.path.join(_ROOT, "research", "audits", "annihilator-sweep-2026-09-29.json")
 
 
 def _code(slug):
-    with open(os.path.join(_ROOT, "codes", slug + ".json"),
-              encoding="utf-8") as f:
+    with open(os.path.join(_ROOT, "codes", slug + ".json"), encoding="utf-8") as f:
         doc = json.load(f)
     n = doc["n"]
     return doc, matrix(doc["checks"]["X"], n), matrix(doc["checks"]["Z"], n)
@@ -59,11 +58,14 @@ def test_the_subspace_is_what_one_block_annihilates():
         assert int((HX @ v % 2).sum()) == 0
 
 
-@pytest.mark.parametrize("slug,side,block,weight", [
-    ("312-10-26", "Z", "left", 26),
-    ("360-10-28", "Z", "right", 30),
-    ("824-210-20", "Z", "left", 24),
-])
+@pytest.mark.parametrize(
+    "slug,side,block,weight",
+    [
+        ("312-10-26", "Z", "left", 26),
+        ("360-10-28", "Z", "right", 30),
+        ("824-210-20", "Z", "left", 24),
+    ],
+)
 def test_it_reproduces_the_committed_sweep(slug, side, block, weight):
     """The 2026-09-29 sweep's findings, re-found rather than trusted."""
     _, HX, HZ = _code(slug)
@@ -89,22 +91,19 @@ def test_a_stabilizer_is_not_reported_as_a_logical():
 
 
 def test_a_non_css_entry_is_skipped_rather_than_failed():
-    doc = {"n": 10, "checks": {"S": [[0, 1]]},
-           "distance": {"d": 3}}
+    doc = {"n": 10, "checks": {"S": [[0, 1]]}, "distance": {"d": 3}}
     out = attack(doc, trials=100)
     assert out["verdict"] == "skipped" and "not CSS" in out["detail"]
 
 
 def test_an_odd_blocklength_is_skipped():
-    doc = {"n": 7, "checks": {"X": [[0, 1]], "Z": [[0, 1]]},
-           "distance": {"d": 3}}
+    doc = {"n": 7, "checks": {"X": [[0, 1]], "Z": [[0, 1]]}, "distance": {"d": 3}}
     assert attack(doc, trials=100)["verdict"] == "skipped"
 
 
 def test_the_committed_audit_is_internally_consistent():
     """Counts, per-target times, and findings have to agree."""
-    path = os.path.join(_ROOT, "research", "audits",
-                        "annihilator-sweep-2026-10-04.json")
+    path = os.path.join(_ROOT, "research", "audits", "annihilator-sweep-2026-10-04.json")
     with open(path, encoding="utf-8") as f:
         a = json.load(f)
     assert a["targets_run"] == len(a["results"]) == len(a["seconds_per_target"])
@@ -115,4 +114,3 @@ def test_the_committed_audit_is_internally_consistent():
     for r in a["results"]:
         if r["verdict"] in ("refuted", "tightened"):
             assert r["findings"], f"{r['slug']}: a verdict with no finding"
-

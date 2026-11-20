@@ -127,6 +127,11 @@ whole file.
 
 The two rules, here so they are never missed:
 
+**Dedup before submitting.** Before opening PRs for a batch of candidates, run
+`uv run python research/kit/dedup_submissions.py <candidate files...>` and collapse each
+`(n,k,d,w)` / canonical-form group to one representative. Do not open multiple PRs for
+the same `(n,k,d,w)`.
+
 **No code is a "find" until `verify/validate_candidate.py` returns `passed: true` for it.**
 Run it as `uv run --extra research python research/kit/coordination.py gate <path>`, which
 calls the gate unchanged and writes its verdict to `<path>.verdict.json` beside the candidate;
@@ -206,6 +211,11 @@ fail remotely. Before every `git push` of a submission branch, run:
 ```
 verify/prepush_prose_check.sh <pr-body.md>
 ```
+
+Enable the repository's local hooks once per clone so the validator-integrity
+check runs on every commit (it fails in under a second if a critical file
+changed without re-pinning `verify/validator_manifest.json`):
+`git config core.hooksPath .githooks`.
 
 It re-runs the check inside a clean worktree of HEAD (committed content only), which fails
 exactly when CI would, and it runs the submission scope check first: a submission PR

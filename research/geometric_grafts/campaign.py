@@ -27,16 +27,20 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = next(p for p in HERE.parents if (p / "verify/gf2.py").exists())
-sys.path[:0] = [str(ROOT / "research/kit"), str(ROOT / "verify"),
-                str(ROOT / "research/local2d"), str(HERE / "874-157-3")]
+sys.path[:0] = [
+    str(ROOT / "research/kit"),
+    str(ROOT / "verify"),
+    str(ROOT / "research/local2d"),
+    str(HERE / "874-157-3"),
+]
 
-from gf2 import rref                           # noqa: E402
+from gf2 import rref  # noqa: E402
 from qldpc_verify import _stabilizer_block_count  # noqa: E402
-from reproduce import construct, supports     # noqa: E402
+from reproduce import construct, supports  # noqa: E402
 
 try:
     import gf2_fast as _fast
-except ImportError:                            # portable fallback
+except ImportError:  # portable fallback
     _fast = None
 
 
@@ -61,7 +65,7 @@ def _basis(H):
 
 
 def _residual(v, basis):
-    """v minus its rowspace projection, in O(|supp v|).
+    """V minus its rowspace projection, in O(|supp v|).
 
     In RREF no row carries a second pivot column, so eliminating pivot p[i]
     never re-sets a pivot already cleared: the reduction is exactly
@@ -93,7 +97,7 @@ def _weight_le_2_logicals(H_same, H_opp, basis):
         key = H_opp[:, q].tobytes()
         probes = []
         if not any(key):
-            probes.append(q)            # e_q: a zero opposite column
+            probes.append(q)  # e_q: a zero opposite column
         if key in seen:
             probes.append((seen[key], q))  # e_a + e_q: matching columns
         else:
@@ -117,8 +121,7 @@ def exact_ge_3(HX, HZ):
     bz, rz = _basis(HZ)
     if bx is None or bz is None:
         return False
-    return (_weight_le_2_logicals(HX, HZ, bx)
-            and _weight_le_2_logicals(HZ, HX, bz))
+    return _weight_le_2_logicals(HX, HZ, bx) and _weight_le_2_logicals(HZ, HX, bz)
 
 
 def _block_count(Rx, Rz, n):
@@ -160,8 +163,7 @@ def _admissible(HX, HZ, k0):
         return False
     if HX.shape[1] - rx - rz != k0:
         return False
-    if not (_weight_le_2_logicals(HX, HZ, bx)
-            and _weight_le_2_logicals(HZ, HX, bz)):
+    if not (_weight_le_2_logicals(HX, HZ, bx) and _weight_le_2_logicals(HZ, HX, bz)):
         return False
     return _block_count(bx[0], bz[0], HX.shape[1]) == 1
 
@@ -176,8 +178,7 @@ def _blocks(HX, HZ, n):
     rows = []
     for H in (HX, HZ):
         R, _ = _rref(H)
-        rows.extend([int(q) for q in np.nonzero(np.asarray(r))[0]]
-                    for r in np.asarray(R))
+        rows.extend([int(q) for q in np.nonzero(np.asarray(r))[0]] for r in np.asarray(R))
     parent = list(range(n))
 
     def find(a):
@@ -227,8 +228,7 @@ def project_k0(HX, HZ, coords, originals):
     ok, blocks_n, sizes = one_connected(a, b)
     if not ok:
         raise ValueError(f"core not connected: {blocks_n} blocks {sizes}")
-    return (a, b, np.asarray(coords)[idx], [originals[i] for i in idx],
-            (total_k, len(idx)))
+    return (a, b, np.asarray(coords)[idx], [originals[i] for i in idx], (total_k, len(idx)))
 
 
 def _pivot_move(HX, HZ, q, side, r):
@@ -259,8 +259,9 @@ def _pivot_move(HX, HZ, q, side, r):
     return (A2, B2) if own_is_x else (B2, A2)
 
 
-def graft_campaign(HX, HZ, coords, originals, *, k0, seed, d_floor=3,
-                   verbose=False, rng=None, progress=None, degree_max=3):
+def graft_campaign(
+    HX, HZ, coords, originals, *, k0, seed, d_floor=3, verbose=False, rng=None, progress=None, degree_max=3
+):
     """Shrink the code while keeping k, exact d >= 3 and one connected block.
 
     Tries every qubit, on each side where it is covered, against each pivot
@@ -285,8 +286,7 @@ def graft_campaign(HX, HZ, coords, originals, *, k0, seed, d_floor=3,
             break
         # boundary-first: the note's contractions paid off on the rim
         rng.shuffle(cands)
-        cands.sort(key=lambda tc: -_edge_distance(coords, int(tc[1]),
-                                                  xmin, xmax, ymin, ymax))
+        cands.sort(key=lambda tc: -_edge_distance(coords, int(tc[1]), xmin, xmax, ymin, ymax))
         accepted = False
         for t, q, deg in cands:
             A = HX if t == "X" else HZ
@@ -358,9 +358,15 @@ def main():
         if best is None:
             return
         (_, k), HX, HZ, coords, orig, meta = best
-        out = {"meta": meta, "n": int(HX.shape[1]), "k": int(-k),
-               "coords": coords.tolist(), "originals": orig,
-               "checks": supports(HX), "checks_Z": supports(HZ)}
+        out = {
+            "meta": meta,
+            "n": int(HX.shape[1]),
+            "k": int(-k),
+            "coords": coords.tolist(),
+            "originals": orig,
+            "checks": supports(HX),
+            "checks_Z": supports(HZ),
+        }
         p = args.out / f"contracted-{out['n']}-{out['k']}-3.json"
         p.write_text(json.dumps(out))
         print("wrote", p, flush=True)
@@ -383,25 +389,32 @@ def main():
         for seed in (0, 1, 2, 3, 4, 5):
             r = np.random.default_rng(seed)
             a, b, c, o, rm = graft_campaign(
-                HX.copy(), HZ.copy(), coords.copy(), list(orig),
-                k0=k0, seed=seed, rng=r, d_floor=3)
+                HX.copy(), HZ.copy(), coords.copy(), list(orig), k0=k0, seed=seed, rng=r, d_floor=3
+            )
             n1 = a.shape[1]
             ok, blocks, sizes = one_connected(a, b)
             g = 9 * k0 / n1
-            print(f"{W}x{H} p=({px},{pz}) o={order} seed={seed}: "
-                  f"n {n0}->{n1} (-{rm}) k={k0} g={g:.4f} blocks={blocks} "
-                  f"{time.time()-t0:.1f}s", flush=True)
+            print(
+                f"{W}x{H} p=({px},{pz}) o={order} seed={seed}: "
+                f"n {n0}->{n1} (-{rm}) k={k0} g={g:.4f} blocks={blocks} "
+                f"{time.time() - t0:.1f}s",
+                flush=True,
+            )
             if ok and (best is None or (n1, -k0) < best[0]):
-                best = ((n1, -k0), a, b, c, o,
-                        (W, H, px, pz, order, seed, n0, n1, k0))
+                best = ((n1, -k0), a, b, c, o, (W, H, px, pz, order, seed, n0, n1, k0))
                 dump(best)
     if best is None:
         print("nothing survived")
         return
     (_, k), HX, HZ, coords, orig, meta = best
-    out = {"meta": meta, "n": int(HX.shape[1]), "k": int(-k),
-           "coords": coords.tolist(), "originals": orig,
-           "checks": supports(HX)}
+    out = {
+        "meta": meta,
+        "n": int(HX.shape[1]),
+        "k": int(-k),
+        "coords": coords.tolist(),
+        "originals": orig,
+        "checks": supports(HX),
+    }
     out["checks_Z"] = supports(HZ)
     p = args.out / f"contracted-{out['n']}-{out['k']}-3.json"
     p.write_text(json.dumps(out))

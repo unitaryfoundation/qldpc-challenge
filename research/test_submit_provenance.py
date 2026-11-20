@@ -7,6 +7,7 @@ here: the block is written on both sides, it validates, the credit defaults
 to the authors as handles and can be overridden, and an author that is not a
 handle does not produce an invalid document.
 """
+
 import os
 import sys
 
@@ -31,8 +32,9 @@ def code():
 
 def _doc(code, **kw):
     HX, HZ = code
-    args = dict(name="[[72,12,6]] test", construction="bb", authors=["tester"],
-                family="bivariate-bicycle", trials=300, seed=5)
+    args = dict(
+        name="[[72,12,6]] test", construction="bb", authors=["tester"], family="bivariate-bicycle", trials=300, seed=5
+    )
     args.update(kw)
     return make_submission(HX, HZ, **args)
 
@@ -53,8 +55,7 @@ def test_both_sides_carry_the_search_that_found_them(code):
 def test_credit_can_name_someone_other_than_the_packager(code):
     doc = _doc(code, found_by=["@finder", "helper"])
     for side in ("X", "Z"):
-        assert doc["distance"][side]["witness_provenance"]["found_by"] == \
-            ["@finder", "@helper"]
+        assert doc["distance"][side]["witness_provenance"]["found_by"] == ["@finder", "@helper"]
     assert doc["provenance"]["authors"] == ["tester"]
     assert not validate(doc)
 
@@ -78,6 +79,7 @@ def test_the_budget_recorded_is_the_budget_spent(code):
 
 def test_the_verifier_accepts_the_block(code):
     import qldpc_verify
+
     doc = _doc(code)
     rep = qldpc_verify.verify(doc, refute=False)
     assert rep["ok"], [c for c in rep["checks"] if not c["ok"]]

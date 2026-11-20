@@ -12,6 +12,7 @@ The board is deliberately not one of them. Only the refutation is cached;
 ``dedup`` and ``novelty`` are recomputed on every call, which is what a hit
 is tested to do.
 """
+
 import json
 import os
 import subprocess
@@ -69,8 +70,13 @@ def candidate(**over):
             "X": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
             "Z": {"value": 2, "confidence": "upper_bound", "witness": [0, 2]},
         },
-        "provenance": {"authors": ["@tester"], "construction": "a test fixture",
-                       "date": "2026-09-28", "references": [], "notes": ""},
+        "provenance": {
+            "authors": ["@tester"],
+            "construction": "a test fixture",
+            "date": "2026-09-28",
+            "references": [],
+            "notes": "",
+        },
     }
     doc.update(over)
     return doc
@@ -95,8 +101,7 @@ def direct_sum_candidate():
     then still spends the random search on it, because the witnesses on the
     first block verify and earn a distance to refute.
     """
-    return candidate(n=8, k=4, checks={"X": [[0, 1, 2, 3], [4, 5, 6, 7]],
-                                       "Z": [[0, 1, 2, 3], [4, 5, 6, 7]]})
+    return candidate(n=8, k=4, checks={"X": [[0, 1, 2, 3], [4, 5, 6, 7]], "Z": [[0, 1, 2, 3], [4, 5, 6, 7]]})
 
 
 REFUTE_OK = {"refuted": False, "seed": 7, "detail": "no lighter operator"}
@@ -105,13 +110,17 @@ REFUTED = {"refuted": True, "seed": 9, "detail": "found weight 1 < 2"}
 
 def stamped(passed=True, refute=None, **over):
     """A verdict shaped like the gate's, carrying the real source stamp."""
-    v = {"passed": passed,
-         "candidate": {"n": 4, "k": 2, "d": 2, "fingerprint": "abc123"},
-         "gates": {"refute": dict(REFUTE_OK if refute is None else refute),
-                   "dedup": {"exact_duplicate_of": None},
-                   "novelty": {"board_advancing": False}},
-         "labels": [],
-         "validator": {"source_sha256": validator_sha256(), "seed": 7}}
+    v = {
+        "passed": passed,
+        "candidate": {"n": 4, "k": 2, "d": 2, "fingerprint": "abc123"},
+        "gates": {
+            "refute": dict(REFUTE_OK if refute is None else refute),
+            "dedup": {"exact_duplicate_of": None},
+            "novelty": {"board_advancing": False},
+        },
+        "labels": [],
+        "validator": {"source_sha256": validator_sha256(), "seed": 7},
+    }
     v.update(over)
     return v
 
@@ -121,6 +130,7 @@ def cache_at(tmp_path, board=None):
 
 
 # -- run identity and staging ---------------------------------------------
+
 
 def test_a_run_id_is_a_usable_directory_name(monkeypatch):
     monkeypatch.delenv(RUN_ID_ENV, raising=False)
@@ -153,17 +163,18 @@ def test_a_session_id_is_one_terminal_and_run_id_is_one_process(monkeypatch):
     monkeypatch.delenv(SESSION_ENV, raising=False)
     monkeypatch.delenv(RUN_ID_ENV, raising=False)
     env = dict(os.environ)
-    env["PYTHONPATH"] = os.pathsep.join(
-        [os.path.join(_HERE, "kit"), env.get("PYTHONPATH", "")])
+    env["PYTHONPATH"] = os.pathsep.join([os.path.join(_HERE, "kit"), env.get("PYTHONPATH", "")])
     out = subprocess.run(
-        [sys.executable, "-c",
-         "import coordination; print(coordination.session_id()); "
-         "print(coordination.run_id())"],
-        env=env, capture_output=True, text=True, check=False)
+        [sys.executable, "-c", "import coordination; print(coordination.session_id()); print(coordination.run_id())"],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert out.returncode == 0, out.stderr
     their_session, their_run = out.stdout.split()
-    assert their_session == session_id()      # another process, the same terminal
-    assert their_run != run_id()              # another process, another run
+    assert their_session == session_id()  # another process, the same terminal
+    assert their_run != run_id()  # another process, another run
 
 
 def test_two_runs_stage_into_separate_directories(tmp_path):
@@ -175,21 +186,29 @@ def test_two_runs_stage_into_separate_directories(tmp_path):
 
 # -- content addressing ---------------------------------------------------
 
+
 def test_the_digest_ignores_who_packaged_a_candidate():
     """Two sessions that find the same code must land on one cache entry."""
     a = candidate()
     b = candidate(name="a different name")
-    b["provenance"] = {"authors": ["@someone-else"], "construction": "elsewhere",
-                       "date": "2026-01-01", "references": ["arXiv:1234.5678"],
-                       "notes": "found independently"}
+    b["provenance"] = {
+        "authors": ["@someone-else"],
+        "construction": "elsewhere",
+        "date": "2026-01-01",
+        "references": ["arXiv:1234.5678"],
+        "notes": "found independently",
+    }
     assert content_digest(a) == content_digest(b)
 
 
-@pytest.mark.parametrize("field,value", [
-    ("n", 5),
-    ("k", 1),
-    ("family", "bivariate-bicycle"),
-])
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("n", 5),
+        ("k", 1),
+        ("family", "bivariate-bicycle"),
+    ],
+)
 def test_the_digest_follows_what_the_gate_reads(field, value):
     assert content_digest(candidate()) != content_digest(candidate(**{field: value}))
 
@@ -209,6 +228,7 @@ def test_a_model_claim_is_inside_the_key():
 
 
 # -- staging without clobbering -------------------------------------------
+
 
 def test_a_free_path_is_used_as_written(tmp_path):
     p = str(tmp_path / "4-2-2.json")
@@ -260,6 +280,7 @@ def test_a_caller_that_means_to_replace_still_can(tmp_path):
 
 # -- the verdict cache ----------------------------------------------------
 
+
 def test_a_stored_refutation_comes_back_unchanged(tmp_path):
     c = cache_at(tmp_path)
     assert c.get(candidate()) is None
@@ -271,8 +292,7 @@ def test_a_refutation_is_reused_for_the_same_code_packaged_by_someone_else(tmp_p
     c = cache_at(tmp_path)
     c.put(candidate(), stamped())
     mine = candidate(name="my own name")
-    mine["provenance"] = {"authors": ["@me"], "construction": "my own search",
-                          "date": "2026-09-30"}
+    mine["provenance"] = {"authors": ["@me"], "construction": "my own search", "date": "2026-09-30"}
     assert c.get(mine) == REFUTE_OK
 
 
@@ -280,8 +300,7 @@ def test_a_verdict_without_the_gate_s_stamp_is_refused(tmp_path):
     """Otherwise the cache is a place to plant a pass, not a cache."""
     c = cache_at(tmp_path)
     assert c.put(candidate(), stamped(validator={})) is None
-    assert c.put(candidate(),
-                 stamped(validator={"source_sha256": "0" * 64})) is None
+    assert c.put(candidate(), stamped(validator={"source_sha256": "0" * 64})) is None
     assert c.get(candidate()) is None
 
 
@@ -365,15 +384,16 @@ def test_an_unreadable_entry_is_a_miss_and_not_a_crash(tmp_path):
 
 # -- the wrapper ----------------------------------------------------------
 
+
 def test_a_hit_still_runs_the_gate_and_only_skips_the_search(tmp_path):
     """Reuse is of the refutation alone; the board half is always recomputed."""
     seen = []
 
     def fake_gate(doc, *, seed=None, refute=True):
         seen.append(refute)
-        return stamped(**({"gates": dict(stamped()["gates"],
-                                         novelty={"board_advancing": True})}
-                          if len(seen) > 1 else {}))
+        return stamped(
+            **({"gates": dict(stamped()["gates"], novelty={"board_advancing": True})} if len(seen) > 1 else {})
+        )
 
     c = cache_at(tmp_path)
     first, reused = validate_cached(candidate(), cache=c, validator=fake_gate)
@@ -381,8 +401,7 @@ def test_a_hit_still_runs_the_gate_and_only_skips_the_search(tmp_path):
     second, reused = validate_cached(candidate(), cache=c, validator=fake_gate)
     assert reused is True
     assert seen == [True, False], "the second call must skip only the search"
-    assert second["gates"]["novelty"]["board_advancing"] is True, \
-        "novelty came from the fresh call, not the cache"
+    assert second["gates"]["novelty"]["board_advancing"] is True, "novelty came from the fresh call, not the cache"
     assert second["gates"]["refute"] == REFUTE_OK
 
 
@@ -439,16 +458,17 @@ def test_a_shallow_run_neither_reads_nor_writes_the_cache(tmp_path):
         seen.append(refute)
         return stamped(passed=False)
 
-    verdict, reused = validate_cached(candidate(), cache=c, validator=fake_gate,
-                                      refute=False)
+    verdict, reused = validate_cached(candidate(), cache=c, validator=fake_gate, refute=False)
     assert seen == [False] and reused is False and verdict["passed"] is False
-    assert c.get(candidate()) == REFUTED             # the deep answer survives
+    assert c.get(candidate()) == REFUTED  # the deep answer survives
 
 
 # -- the verdict beside the candidate (issue #2781) -------------------------
 
+
 def test_the_verdict_lives_beside_the_candidate_under_its_own_suffix():
     from coordination import verdict_path
+
     assert verdict_path("/s/run/72-12-6.json") == "/s/run/72-12-6.verdict.json"
     assert verdict_path("/s/run/72-12-6-b.json") == "/s/run/72-12-6-b.verdict.json"
     # A verdict is never itself a candidate: the suffix is two extensions deep
@@ -460,6 +480,7 @@ def test_the_verdict_lives_beside_the_candidate_under_its_own_suffix():
 def test_gate_and_record_writes_the_full_verdict_next_to_the_candidate(tmp_path):
     """The documented CLI prints and forgets; this keeps what the gate said."""
     from coordination import gate_and_record, verdict_path
+
     doc = candidate()
     path = str(tmp_path / "4-2-2.json")
     save_submission(doc, path)
@@ -469,8 +490,7 @@ def test_gate_and_record_writes_the_full_verdict_next_to_the_candidate(tmp_path)
         calls.append((seed, refute))
         return stamped(passed=True)
 
-    verdict, out = gate_and_record(path, cache=cache_at(tmp_path),
-                                   validator=fake_gate, seed=7)
+    verdict, out = gate_and_record(path, cache=cache_at(tmp_path), validator=fake_gate, seed=7)
     assert out == verdict_path(path) and os.path.exists(out)
     with open(out, encoding="utf-8") as f:
         on_disk = json.load(f)
@@ -489,6 +509,7 @@ def test_gate_and_record_writes_the_full_verdict_next_to_the_candidate(tmp_path)
 def test_gate_and_record_goes_through_the_refutation_cache(tmp_path):
     """A refutation found once is reused and the record says so."""
     from coordination import gate_and_record
+
     doc = candidate()
     path = str(tmp_path / "4-2-2.json")
     save_submission(doc, path)
@@ -509,20 +530,21 @@ def test_gate_and_record_goes_through_the_refutation_cache(tmp_path):
 def test_a_failed_gate_is_recorded_too(tmp_path):
     """Negative verdicts are evidence as well; the file is written either way."""
     from coordination import gate_and_record
+
     path = str(tmp_path / "4-2-2.json")
     save_submission(candidate(), path)
     verdict, out = gate_and_record(
-        path, cache=cache_at(tmp_path),
-        validator=lambda d, *, seed=None, refute=True: stamped(passed=False))
+        path, cache=cache_at(tmp_path), validator=lambda d, *, seed=None, refute=True: stamped(passed=False)
+    )
     assert verdict["passed"] is False and os.path.exists(out)
 
 
 def test_the_gate_cli_mode_exits_with_the_verdict(tmp_path, monkeypatch, capsys):
     import coordination
+
     path = str(tmp_path / "4-2-2.json")
     save_submission(candidate(), path)
-    monkeypatch.setattr(coordination, "validate_cached",
-                        lambda doc, **kw: (stamped(passed=False), False))
+    monkeypatch.setattr(coordination, "validate_cached", lambda doc, **kw: (stamped(passed=False), False))
     rc = coordination._main(["gate", path])
     assert rc == 1
     out = capsys.readouterr()
@@ -542,19 +564,19 @@ def test_the_gate_cli_mode_exits_with_the_verdict(tmp_path, monkeypatch, capsys)
 # is written), and a refutation recorded beside a candidate is not searched
 # for twice.
 
+
 def test_saving_what_the_gate_would_refuse_keeps_it_out_of_the_way(tmp_path):
     doc = direct_sum_candidate()
     path = str(tmp_path / "8-4-2.json")
     with pytest.raises(PreflightFailure) as info:
         save_submission(doc, path)
-    assert not os.path.exists(path)                      # nothing to gate under the name
+    assert not os.path.exists(path)  # nothing to gate under the name
     kept = rejected_path(path)
-    assert os.path.exists(kept) and holds_same_candidate(kept, doc)   # the witness survived
+    assert os.path.exists(kept) and holds_same_candidate(kept, doc)  # the witness survived
     report = preflight_path(kept)
     with open(report, encoding="utf-8") as f:
         rep = json.load(f)
-    assert [x["check"] for x in rep["failed"]] == ["tanner_connected",
-                                                   "stabilizer_group_connected"]
+    assert [x["check"] for x in rep["failed"]] == ["tanner_connected", "stabilizer_group_connected"]
     assert rep["recorded"]["content_digest"] == content_digest(doc)
     err = info.value
     assert err.kept == (kept, report) and err.path == path
@@ -567,14 +589,14 @@ def test_two_refused_documents_of_one_name_both_survive(tmp_path):
     path = str(tmp_path / "8-4-2.json")
     a = direct_sum_candidate()
     b = direct_sum_candidate()
-    b["distance"]["X"]["witness"] = [2, 3]               # another witness, another candidate
+    b["distance"]["X"]["witness"] = [2, 3]  # another witness, another candidate
     for doc in (a, b):
         with pytest.raises(PreflightFailure):
             save_submission(doc, path)
     kept = sorted(os.listdir(os.path.join(str(tmp_path), REJECTED_DIRNAME)))
     assert len([k for k in kept if k.endswith(PREFLIGHT_SUFFIX)]) == 2
     assert len([k for k in kept if not k.endswith(PREFLIGHT_SUFFIX)]) == 2
-    assert "8-4-2.json" in kept                           # the first keeps the plain name
+    assert "8-4-2.json" in kept  # the first keeps the plain name
 
 
 def test_a_caller_that_means_to_stage_it_anyway_still_can(tmp_path):
@@ -602,8 +624,8 @@ def test_gate_and_record_refuses_before_the_gate_and_keeps_the_report(tmp_path):
 
     with pytest.raises(PreflightFailure) as info:
         gate_and_record(path, cache=cache_at(tmp_path), validator=gate)
-    assert calls == []                                   # the search was never spent
-    assert not os.path.exists(verdict_path(path))        # no verdict: the gate did not run
+    assert calls == []  # the search was never spent
+    assert not os.path.exists(verdict_path(path))  # no verdict: the gate did not run
     report = preflight_path(path)
     assert info.value.kept == (report,) and os.path.exists(report)
     with open(report, encoding="utf-8") as f:
@@ -615,13 +637,17 @@ def test_gate_and_record_can_be_told_to_gate_regardless(tmp_path):
     path = str(tmp_path / "8-4-2.json")
     save_submission(direct_sum_candidate(), path, preflight=False)
     verdict, out = gate_and_record(
-        path, cache=cache_at(tmp_path), preflight=False,
-        validator=lambda d, *, seed=None, refute=True: stamped(passed=False))
+        path,
+        cache=cache_at(tmp_path),
+        preflight=False,
+        validator=lambda d, *, seed=None, refute=True: stamped(passed=False),
+    )
     assert verdict["passed"] is False and os.path.exists(out)
 
 
 def test_the_gate_cli_prints_the_report_and_not_a_verdict(tmp_path, capsys):
     import coordination
+
     path = str(tmp_path / "8-4-2.json")
     save_submission(direct_sum_candidate(), path, preflight=False)
     assert coordination._main(["gate", path]) == 1
@@ -639,12 +665,11 @@ def test_a_refutation_recorded_beside_the_candidate_is_not_searched_again(tmp_pa
     path = str(tmp_path / "4-2-2.json")
     save_submission(doc, path)
     record = stamped(passed=False, refute=REFUTED)
-    record["recorded"] = {"candidate": "4-2-2.json",
-                          "content_digest": content_digest(doc)}
+    record["recorded"] = {"candidate": "4-2-2.json", "content_digest": content_digest(doc)}
     with open(verdict_path(path), "w", encoding="utf-8") as f:
         json.dump(record, f)
     cache = cache_at(tmp_path)
-    assert cache.get(doc) is None                         # the cache was emptied
+    assert cache.get(doc) is None  # the cache was emptied
 
     def gate_without_search(d, *, seed=None, refute=True):
         assert refute is False, "the recorded refutation must be reused"
@@ -652,7 +677,7 @@ def test_a_refutation_recorded_beside_the_candidate_is_not_searched_again(tmp_pa
 
     verdict, out = gate_and_record(path, cache=cache, validator=gate_without_search)
     assert verdict["passed"] is False and verdict["gates"]["refute"] == REFUTED
-    assert cache.get(doc) == REFUTED                      # and the cache has it back
+    assert cache.get(doc) == REFUTED  # and the cache has it back
     with open(out, encoding="utf-8") as f:
         assert json.load(f)["recorded"]["refutation_reused"] is True
 
@@ -663,12 +688,11 @@ def test_only_this_documents_own_refutation_seeds_the_cache(tmp_path):
     save_submission(doc, path)
     mine = {"content_digest": content_digest(doc)}
     cases = {
-        "another document": dict(stamped(passed=False, refute=REFUTED),
-                                 recorded={"content_digest": "not-this-one"}),
+        "another document": dict(stamped(passed=False, refute=REFUTED), recorded={"content_digest": "not-this-one"}),
         "a clean search": dict(stamped(passed=True), recorded=mine),
-        "another validator": dict(stamped(passed=False, refute=REFUTED,
-                                          validator={"source_sha256": "stale", "seed": 9}),
-                                  recorded=mine),
+        "another validator": dict(
+            stamped(passed=False, refute=REFUTED, validator={"source_sha256": "stale", "seed": 9}), recorded=mine
+        ),
     }
     for why, record in cases.items():
         cache = VerdictCache(root=str(tmp_path / why.replace(" ", "-")))
@@ -692,8 +716,7 @@ T0 = datetime(2026, 10, 8, 12, 0, tzinfo=timezone.utc)
 
 
 def test_a_claim_records_who_and_when_it_expires(tmp_path):
-    rec = claim("weight-6/unrestricted", campaign="bb-1155", rid="s1",
-                root=str(tmp_path), now=T0, minutes=30)
+    rec = claim("weight-6/unrestricted", campaign="bb-1155", rid="s1", root=str(tmp_path), now=T0, minutes=30)
     assert rec["cell"] == "weight-6/unrestricted"
     assert rec["cell_key"] == ["weight-6", "unrestricted"]
     assert rec["session_id"] == "s1" and rec["campaign"] == "bb-1155"
@@ -703,11 +726,9 @@ def test_a_claim_records_who_and_when_it_expires(tmp_path):
 
 def test_an_expired_claim_reads_as_absent(tmp_path):
     """The squat case: a killed session must not hold a cell forever."""
-    claim("weight-6/unrestricted", rid="dead", root=str(tmp_path), now=T0,
-          minutes=30)
+    claim("weight-6/unrestricted", rid="dead", root=str(tmp_path), now=T0, minutes=30)
     just_before = T0 + timedelta(minutes=29, seconds=59)
-    assert read_claim("weight-6/unrestricted", root=str(tmp_path),
-                      now=just_before) is not None
+    assert read_claim("weight-6/unrestricted", root=str(tmp_path), now=just_before) is not None
     after = T0 + timedelta(minutes=31)
     assert read_claim("weight-6/unrestricted", root=str(tmp_path), now=after) is None
     assert live_claims(root=str(tmp_path), now=after) == []
@@ -717,10 +738,8 @@ def test_an_expired_claim_reads_as_absent(tmp_path):
 
 def test_a_second_session_is_told_whose_claim_it_displaced(tmp_path):
     """Advisory means reported, never refused."""
-    claim("weight-6/unrestricted", campaign="first", rid="s1",
-          root=str(tmp_path), now=T0, minutes=30)
-    rec = claim("weight-6/unrestricted", campaign="second", rid="s2",
-                root=str(tmp_path), now=T0, minutes=30)
+    claim("weight-6/unrestricted", campaign="first", rid="s1", root=str(tmp_path), now=T0, minutes=30)
+    rec = claim("weight-6/unrestricted", campaign="second", rid="s2", root=str(tmp_path), now=T0, minutes=30)
     assert rec["session_id"] == "s2"
     assert rec["displaced"]["session_id"] == "s1"
     assert rec["displaced"]["campaign"] == "first"
@@ -735,20 +754,16 @@ def test_reclaiming_your_own_cell_is_not_a_collision(tmp_path):
 
 
 def test_release_only_works_for_the_holder(tmp_path):
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=30)
-    assert release("weight-6/unrestricted", rid="s2", root=str(tmp_path),
-                   now=T0) is False
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=30)
+    assert release("weight-6/unrestricted", rid="s2", root=str(tmp_path), now=T0) is False
     assert read_claim("weight-6/unrestricted", root=str(tmp_path), now=T0)
-    assert release("weight-6/unrestricted", rid="s1", root=str(tmp_path),
-                   now=T0) is True
+    assert release("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0) is True
     assert read_claim("weight-6/unrestricted", root=str(tmp_path), now=T0) is None
 
 
 def test_release_defaults_to_this_session_not_to_anyone(tmp_path):
     """A caller that forgets rid= must not get the permissive behaviour."""
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=30)
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=30)
     monkey = os.environ.get(RUN_ID_ENV)
     os.environ[RUN_ID_ENV] = "somebody-else"
     try:
@@ -770,12 +785,12 @@ def test_a_claim_is_held_by_the_session_not_by_the_process(tmp_path, monkeypatch
     environment variable.
     """
     import coordination
+
     monkeypatch.delenv(SESSION_ENV, raising=False)
     monkeypatch.delenv(RUN_ID_ENV, raising=False)
     runs = iter(["20261008-112521-host-38319", "20261008-112544-host-38327"])
     monkeypatch.setattr(coordination, "run_id", lambda: next(runs))
-    rec = claim("weight-6/unrestricted", campaign="bb-1155",
-                root=str(tmp_path), now=T0, minutes=30)
+    rec = claim("weight-6/unrestricted", campaign="bb-1155", root=str(tmp_path), now=T0, minutes=30)
     # The session is who may release it; the run is only who wrote the note.
     assert rec["session_id"] == session_id()
     assert rec["run_id"] == "20261008-112521-host-38319"
@@ -784,34 +799,28 @@ def test_a_claim_is_held_by_the_session_not_by_the_process(tmp_path, monkeypatch
 
 
 def test_releasing_an_expired_claim_reports_nothing_to_release(tmp_path):
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=5)
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=5)
     after = T0 + timedelta(minutes=10)
-    assert release("weight-6/unrestricted", rid="s1", root=str(tmp_path),
-                   now=after) is False
+    assert release("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=after) is False
 
 
 def test_a_zero_lifetime_claim_is_refused_rather_than_written(tmp_path):
     """0 would write a claim its own author cannot see."""
     with pytest.raises(ValueError):
-        claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-              minutes=0)
+        claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=0)
     assert os.listdir(tmp_path) == []
 
 
 def test_a_half_written_claim_does_not_break_the_listing(tmp_path):
     """A session killed mid-write leaves a file no reader may choke on."""
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=30)
-    (tmp_path / "weight-8__unrestricted.json").write_text("{ truncated",
-                                                           encoding="utf-8")
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=30)
+    (tmp_path / "weight-8__unrestricted.json").write_text("{ truncated", encoding="utf-8")
     assert [c["session_id"] for c in live_claims(root=str(tmp_path), now=T0)] == ["s1"]
     assert read_claim("weight-8/unrestricted", root=str(tmp_path), now=T0) is None
 
 
 def test_a_claim_from_an_older_version_is_ignored(tmp_path):
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=30)
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=30)
     path = tmp_path / "weight-6__unrestricted.json"
     stale = json.loads(path.read_text(encoding="utf-8"))
     stale["claim_version"] = 0
@@ -830,16 +839,13 @@ def test_the_cell_name_is_a_filename_and_not_a_path(tmp_path):
 
 
 def test_live_claims_are_newest_first_and_skip_the_claims_dir(tmp_path):
-    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0,
-          minutes=30)
-    claim("weight-8/unrestricted", rid="s2",
-          root=str(tmp_path), now=T0 + timedelta(minutes=1), minutes=30)
+    claim("weight-6/unrestricted", rid="s1", root=str(tmp_path), now=T0, minutes=30)
+    claim("weight-8/unrestricted", rid="s2", root=str(tmp_path), now=T0 + timedelta(minutes=1), minutes=30)
     (tmp_path / "notes.txt").write_text("not a claim", encoding="utf-8")
     assert [c["session_id"] for c in live_claims(root=str(tmp_path), now=T0)] == ["s2", "s1"]
 
 
 def test_reading_claims_in_a_missing_directory_is_empty_not_an_error(tmp_path):
     assert live_claims(root=str(tmp_path / "nope"), now=T0) == []
-    assert read_claim("weight-6/unrestricted", root=str(tmp_path / "nope"),
-                      now=T0) is None
+    assert read_claim("weight-6/unrestricted", root=str(tmp_path / "nope"), now=T0) is None
     assert prune_claims(root=str(tmp_path / "nope"), now=T0) == 0

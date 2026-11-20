@@ -30,19 +30,20 @@ def check(label, cond):
 def main():
     # --- _entry_for shapes a candidate like the site's load_entries ---------
     doc = {
-        "n": 98, "k": 6,
+        "n": 98,
+        "k": 6,
         "distance": {"d": 12, "X": {"value": 12}, "Z": {"value": 12}},
     }
     report = {
-        "computed": {"max_check_weight": 6, "locality_class": "unrestricted",
-                     "weight_class": "weight-6"},
+        "computed": {"max_check_weight": 6, "locality_class": "unrestricted", "weight_class": "weight-6"},
         "earned_distance": {"d": {"value": 12, "tier": "upper_bound"}},
     }
     e = qldpc._entry_for(doc, report)
     check("entry carries n/k/d", (e["n"], e["k"], e["d"]) == (98, 6, 12))
-    check("entry carries w and classes",
-          (e["w"], e["locality_class"], e["weight_class"])
-          == (6, "unrestricted", "weight-6"))
+    check(
+        "entry carries w and classes",
+        (e["w"], e["locality_class"], e["weight_class"]) == (6, "unrestricted", "weight-6"),
+    )
     check("eff = kd^2/n rounded", e["eff"] == round(6 * 12 * 12 / 98, 3))
 
     # --- frontier_summary runs against the real board -----------------------
@@ -74,7 +75,7 @@ def main():
 
 
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 

@@ -6219,45 +6219,37 @@
    ]
   },
   "Z": {
-   "value": 24,
+   "value": 20,
    "confidence": "upper_bound",
    "witness": [
-    483,
-    486,
-    491,
-    496,
-    499,
-    501,
-    523,
-    526,
-    583,
-    591,
-    610,
-    615,
-    636,
-    654,
-    663,
-    676,
-    687,
-    692,
-    725,
-    744,
-    746,
-    796,
-    806,
-    820
+    0,
+    14,
+    35,
+    61,
+    83,
+    124,
+    153,
+    169,
+    221,
+    231,
+    321,
+    383,
+    418,
+    444,
+    457,
+    613,
+    621,
+    696,
+    789,
+    815
    ],
    "witness_provenance": {
     "found_by": [
      "@vprusso"
     ],
-    "date": "2026-10-03",
-    "tool": "single-block annihilator + ISD in the subspace",
-    "found_at_samples": 3,
-    "survived_samples": 40000,
-    "seeds": [
-     20261003
-    ]
+    "date": "2026-11-20",
+    "found_at_samples": 10250136,
+    "tool": "QEDist 0.1 aeb7006147b7 exhaustive search (found_at_samples = nodes)"
    }
   }
  },
@@ -6270,7 +6262,7 @@
    "arXiv:2607.14091"
   ],
   "date": "2026-09-26",
-  "notes": "Checked against the board: no same-parameter or WL-equivalent entry; see notes/824-210-20.md. Revision 2026-10-03 (@vprusso): single-block annihilator with information-set decoding inside the subspace, Z side 28 to 24 (right block, annihilator subspace of dimension 105, found at information set 3, nothing lighter in 40,000); d unchanged at the minimum over the sides. Still a witness-backed upper bound.",
+  "notes": "Checked against the board: no same-parameter or WL-equivalent entry; see notes/824-210-20.md. Revision 2026-10-03 (@vprusso): single-block annihilator with information-set decoding inside the subspace, Z side 28 to 24 (right block, annihilator subspace of dimension 105, found at information set 3, nothing lighter in 40,000); d unchanged at the minimum over the sides. Still a witness-backed upper bound. Z-side value lowered from 24 to 20 by @vprusso on 2026-11-20: QEDist's exhaustive search (yeon-lee/QEDist, through research/certs/qedist_certify.py) exhibited a weight-20 Z-logical; found_at_samples counts the tool's search nodes (issue #6867); d = 20 is unchanged.",
   "model": "MiMo-V2.6-Flash",
   "origin": "submission"
  },

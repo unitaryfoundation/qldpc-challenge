@@ -55,6 +55,7 @@ This module is outside the trust spine and cannot reach into it:
   gate unchanged; one that fails is kept, with the verifier's report, and
   gets no verdict, because the gate was never run on it (issue #3616).
 """
+
 import errno
 import hashlib
 import json
@@ -102,20 +103,21 @@ class PreflightFailure(RuntimeError):
         self.result = result
         self.kept = tuple(kept)
         self.path = path
-        lines = [f"{path or 'candidate'}: {what}; the gate's verify step "
-                 "would refuse this document"]
+        lines = [f"{path or 'candidate'}: {what}; the gate's verify step would refuse this document"]
         for f in result.get("failed") or ():
             lines.append(f"  {f['check']} ({f['kind']}): {f['detail']}")
-        lines.append("the code is inadmissible; no edit to the document fixes it"
-                     if result.get("code_at_fault") else
-                     "the document is wrong and the code may be fine; fix the "
-                     "document and save it again")
+        lines.append(
+            "the code is inadmissible; no edit to the document fixes it"
+            if result.get("code_at_fault")
+            else "the document is wrong and the code may be fine; fix the document and save it again"
+        )
         if self.kept:
             lines.append("kept: " + ", ".join(self.kept))
         super().__init__("\n".join(lines))
 
 
 # -- identity and staging -------------------------------------------------
+
 
 def run_id():
     """Identify this executor: ``$QLDPC_RUN_ID`` if set, else host-pid-time.
@@ -164,7 +166,7 @@ def session_id():
     host = _slug(socket.gethostname().split(".")[0] or "host")
     try:
         sid = os.getsid(0)
-    except (AttributeError, OSError):            # not POSIX: per-process, as run_id
+    except (AttributeError, OSError):  # not POSIX: per-process, as run_id
         sid = os.getpid()
     return f"{host}-{sid}"
 
@@ -202,8 +204,7 @@ def staging_dir(rid=None, *, root=None, create=True):
 CLAIMS = os.path.join(_ROOT, "research", "claims")
 CLAIM_VERSION = 1
 DEFAULT_CLAIM_MINUTES = 120
-CLAIM_FIELDS = ("cell", "cell_key", "session_id", "run_id", "campaign",
-                "note", "claimed_at", "expires_at")
+CLAIM_FIELDS = ("cell", "cell_key", "session_id", "run_id", "campaign", "note", "claimed_at", "expires_at")
 
 
 def cell_slug(cell):
@@ -261,8 +262,7 @@ def read_claim(cell, *, root=None, now=None):
     return rec
 
 
-def claim(cell, *, campaign="", note="", minutes=DEFAULT_CLAIM_MINUTES,
-          rid=None, root=None, now=None):
+def claim(cell, *, campaign="", note="", minutes=DEFAULT_CLAIM_MINUTES, rid=None, root=None, now=None):
     """Record that this session is aiming at ``cell``; return the record.
 
     Never raises because someone else holds the cell. The displaced claim,
@@ -277,8 +277,7 @@ def claim(cell, *, campaign="", note="", minutes=DEFAULT_CLAIM_MINUTES,
     """
     minutes = int(minutes)
     if minutes < 1:
-        raise ValueError("a claim needs a positive lifetime; 0 would make "
-                         "it invisible to the session that wrote it")
+        raise ValueError("a claim needs a positive lifetime; 0 would make it invisible to the session that wrote it")
     here = _now(now)
     mine = rid or session_id()
     # Read the incumbent before writing, so it can be reported back. This is
@@ -289,8 +288,7 @@ def claim(cell, *, campaign="", note="", minutes=DEFAULT_CLAIM_MINUTES,
     rec = {
         "claim_version": CLAIM_VERSION,
         "cell": "/".join(cell_slug(cell).split("__")),
-        "cell_key": ([p for p in re.split(r"[/,]+", cell) if p]
-                     if isinstance(cell, str) else list(cell)),
+        "cell_key": ([p for p in re.split(r"[/,]+", cell) if p] if isinstance(cell, str) else list(cell)),
         "session_id": mine,
         "run_id": run_id(),
         "campaign": campaign,
@@ -299,8 +297,7 @@ def claim(cell, *, campaign="", note="", minutes=DEFAULT_CLAIM_MINUTES,
         "expires_at": (here + timedelta(minutes=minutes)).isoformat(),
     }
     if prior is not None and prior["session_id"] != mine:
-        rec["displaced"] = {k: prior[k] for k in CLAIM_FIELDS
-                            if k in prior and k != "cell_key"}
+        rec["displaced"] = {k: prior[k] for k in CLAIM_FIELDS if k in prior and k != "cell_key"}
     _write_atomic(claim_path(cell, root=root), rec)
     return rec
 
@@ -333,7 +330,7 @@ def release(cell, *, rid=None, root=None, now=None):
         return False
     try:
         os.unlink(path)
-    except FileNotFoundError:                  # pragma: no cover
+    except FileNotFoundError:  # pragma: no cover
         return False
     return True
 
@@ -398,22 +395,21 @@ def prune_claims(*, root=None, now=None):
             try:
                 os.unlink(path)
                 gone += 1
-            except OSError:                           # pragma: no cover
+            except OSError:  # pragma: no cover
                 pass
     return gone
 
 
 # -- content addressing ---------------------------------------------------
 
+
 def _canonical(doc):
     """Reduce a submission to the part the gate's verdict depends on."""
     keyed = {k: v for k, v in doc.items() if k not in UNKEYED_TOP}
     prov = keyed.get("provenance")
     if isinstance(prov, dict):
-        keyed["provenance"] = {k: v for k, v in prov.items()
-                               if k not in UNKEYED_PROVENANCE}
-    return json.dumps(keyed, sort_keys=True, separators=(",", ":"),
-                      default=str)
+        keyed["provenance"] = {k: v for k, v in prov.items() if k not in UNKEYED_PROVENANCE}
+    return json.dumps(keyed, sort_keys=True, separators=(",", ":"), default=str)
 
 
 def content_digest(doc):
@@ -443,8 +439,7 @@ def unique_path(path, doc=None):
     stem, ext = os.path.splitext(path)
     tag = content_digest(doc)[:16] if doc is not None else _file_digest(path)[:16]
     nth = f"{stem}-{tag}{ext}"
-    if not os.path.exists(nth) or (doc is not None
-                                   and holds_same_candidate(nth, doc)):
+    if not os.path.exists(nth) or (doc is not None and holds_same_candidate(nth, doc)):
         return nth
     i = 2
     while os.path.exists(f"{stem}-{tag}-{i}{ext}"):
@@ -485,6 +480,7 @@ def _preflight(doc):
     if _HERE not in sys.path:
         sys.path.insert(0, _HERE)
     import prescreen
+
     return prescreen.preflight(doc)
 
 
@@ -495,7 +491,7 @@ def preflight_path(path):
     and for the same reason: two extensions deep, no ``checks`` field, so a
     ``*.json`` glob for candidates cannot mistake it for one.
     """
-    base = path[:-len(".json")] if path.endswith(".json") else path
+    base = path[: -len(".json")] if path.endswith(".json") else path
     return base + PREFLIGHT_SUFFIX
 
 
@@ -546,6 +542,7 @@ def quarantine(path, doc, result):
 
 # -- what a cached verdict is allowed to outlive --------------------------
 
+
 def validator_sha256(path=None):
     """SHA-256 of ``verify/validate_candidate.py``, read and never written.
 
@@ -575,7 +572,7 @@ def _schema_errors(doc):
     """Return schema violations in ``doc``, or None without jsonschema."""
     try:
         import jsonschema
-    except ImportError:                          # pragma: no cover
+    except ImportError:  # pragma: no cover
         return None
     schema_path = os.path.join(_ROOT, "schema", "code.schema.json")
     with open(schema_path, encoding="utf-8") as f:
@@ -684,7 +681,7 @@ class VerdictCache:
         prior = self.entry(doc)
         attempts = (prior or {}).get("attempts", 0) + 1
         if prior and prior["refute"].get("refuted") and not ref.get("refuted"):
-            ref = prior["refute"]            # a witness found once stays found
+            ref = prior["refute"]  # a witness found once stays found
         entry = {
             "entry_version": ENTRY_VERSION,
             "content_digest": content_digest(doc),
@@ -711,7 +708,7 @@ def _write_atomic(path, obj):
         f.write("\n")
     try:
         os.replace(tmp, path)
-    except OSError:                              # pragma: no cover
+    except OSError:  # pragma: no cover
         os.unlink(tmp)
         raise
     return path
@@ -723,6 +720,7 @@ def _gate():
     if vdir not in sys.path:
         sys.path.insert(0, vdir)
     import validate_candidate
+
     return validate_candidate.validate_candidate
 
 
@@ -738,7 +736,7 @@ def _with_refutation(verdict, ref):
     out = dict(verdict)
     gates = dict(out.get("gates") or {})
     if "refute" not in gates:
-        return out                           # structural failure: nothing to splice
+        return out  # structural failure: nothing to splice
     gates["refute"] = ref
     out["gates"] = gates
     if ref.get("refuted"):
@@ -773,8 +771,7 @@ def validate_cached(doc, *, cache=None, validator=None, seed=None, refute=True):
             "passed": False,
             "candidate": None,
             "gates": {"refute": ref},
-            "labels": [f"refuted (over-claimed distance): "
-                       f"{ref.get('detail')}"],
+            "labels": [f"refuted (over-claimed distance): {ref.get('detail')}"],
             "validator": {"source_sha256": cache.validator()},
         }
         return verdict, True
@@ -783,7 +780,7 @@ def validate_cached(doc, *, cache=None, validator=None, seed=None, refute=True):
     verdict = gate(doc, seed=seed, refute=refute)
     try:
         cache.put(doc, verdict, refuted=refute)
-    except OSError as e:                         # pragma: no cover
+    except OSError as e:  # pragma: no cover
         if e.errno not in (errno.EACCES, errno.EROFS, errno.ENOSPC):
             raise
     return verdict, False
@@ -801,7 +798,7 @@ def verdict_path(path):
     ``*.json`` for candidates can mistake a verdict for one: a verdict has
     no ``checks`` and fails the schema, and the name says what it is first.
     """
-    base = path[:-len(".json")] if path.endswith(".json") else path
+    base = path[: -len(".json")] if path.endswith(".json") else path
     return base + VERDICT_SUFFIX
 
 
@@ -830,8 +827,7 @@ def seed_cache_from_record(cache, doc, record_path):
     return cache.put(doc, rec) is not None
 
 
-def gate_and_record(path, *, seed=None, refute=True, cache=None,
-                    validator=None, preflight=True):
+def gate_and_record(path, *, seed=None, refute=True, cache=None, validator=None, preflight=True):
     """Run the gate on the candidate at ``path`` and keep the verdict beside it.
 
     Returns ``(verdict, out_path)``. The verdict is the gate's own, obtained
@@ -869,8 +865,7 @@ def gate_and_record(path, *, seed=None, refute=True, cache=None,
             raise PreflightFailure(result, (report,), path=path, what="not gated")
     cache = VerdictCache() if cache is None else cache
     seed_cache_from_record(cache, doc, verdict_path(path))
-    verdict, reused = validate_cached(doc, cache=cache, validator=validator,
-                                      seed=seed, refute=refute)
+    verdict, reused = validate_cached(doc, cache=cache, validator=validator, seed=seed, refute=refute)
     out = verdict_path(path)
     record = dict(verdict)
     record["recorded"] = {

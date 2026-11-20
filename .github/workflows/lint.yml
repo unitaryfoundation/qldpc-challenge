@@ -1,7 +1,9 @@
-# Ruff lint + format check (issue #658). The repo-wide report tracks legacy
-# debt but remains advisory until the separate mechanical cleanup. Newly added
-# Python files must be clean; edits to existing files are not forced to reformat
-# unrelated legacy code.
+# Ruff lint + format check (issue #658). The mechanical cleanup (ruff format
+# plus the safe fixes over the whole tree) landed on 2026-11-20; the repo-wide
+# report tracks what the fixer could not touch (about 700 findings, mostly
+# docstring shape) and stays advisory until those are worked off by rule.
+# Newly added Python files must be clean; edits to existing files are not
+# forced to fix unrelated legacy findings.
 name: lint
 
 permissions:
@@ -17,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           # The merge commit and its first parent are enough for an added-file list.
           fetch-depth: 2
@@ -28,7 +30,7 @@ jobs:
             pyproject.toml
             uv.lock
           sparse-checkout-cone-mode: false
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
       - name: repo-wide Ruff baseline (advisory)
         shell: bash
         run: |

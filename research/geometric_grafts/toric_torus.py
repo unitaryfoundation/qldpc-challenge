@@ -40,10 +40,12 @@ def plaquettes(L):
     for i in range(L):
         for j in range(L):
             support = sorted(
-                ((i % L) * L + (j % L),
-                 ((i + 1) % L) * L + (j % L),
-                 (i % L) * L + ((j + 1) % L),
-                 ((i + 1) % L) * L + ((j + 1) % L))
+                (
+                    (i % L) * L + (j % L),
+                    ((i + 1) % L) * L + (j % L),
+                    (i % L) * L + ((j + 1) % L),
+                    ((i + 1) % L) * L + ((j + 1) % L),
+                )
             )
             (HX if (i + j) % 2 == 0 else HZ).append(support)
     return HX, HZ

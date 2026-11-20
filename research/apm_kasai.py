@@ -44,6 +44,7 @@ Usage
 arXiv:2604.16209 (Zhao et al.), which is the check that this transcription of
 the construction is faithful: n=1152, k=580, H_X H_Z^T = 0.
 """
+
 import argparse
 import json
 import random
@@ -54,16 +55,17 @@ import numpy as np
 sys.path.insert(0, "research/kit")
 sys.path.insert(0, "verify")
 
-HALF = 6   # L/2: number of f-blocks and of g-blocks
-J = 3      # active block rows
+HALF = 6  # L/2: number of f-blocks and of g-blocks
+J = 3  # active block rows
 
 
 # --------------------------------------------------------------------------
 # affine arithmetic on Z_P, as pairs (a, b) meaning x -> a x + b mod P
 # --------------------------------------------------------------------------
 
+
 def compose(f, g, P):
-    """f . g (apply g first)."""
+    """F . g (apply g first)."""
     a1, b1 = f
     a2, b2 = g
     return ((a1 * a2) % P, (a1 * b2 + b1) % P)
@@ -105,6 +107,7 @@ def centralizer(A, P):
 # matrices
 # --------------------------------------------------------------------------
 
+
 def apm(P, f):
     """The P x P permutation matrix of the affine map f.
 
@@ -125,10 +128,10 @@ def build(P, F, G):
     HZ = np.zeros((J * P, n), dtype=np.int64)
     for j in range(J):
         for l in range(HALF):
-            HX[j * P:(j + 1) * P, l * P:(l + 1) * P] = apm(P, F[(l - j) % HALF])
-            HX[j * P:(j + 1) * P, (HALF + l) * P:(HALF + l + 1) * P] = apm(P, G[(l - j) % HALF])
-            HZ[j * P:(j + 1) * P, l * P:(l + 1) * P] = apm(P, G[(j - l) % HALF]).T
-            HZ[j * P:(j + 1) * P, (HALF + l) * P:(HALF + l + 1) * P] = apm(P, F[(j - l) % HALF]).T
+            HX[j * P : (j + 1) * P, l * P : (l + 1) * P] = apm(P, F[(l - j) % HALF])
+            HX[j * P : (j + 1) * P, (HALF + l) * P : (HALF + l + 1) * P] = apm(P, G[(l - j) % HALF])
+            HZ[j * P : (j + 1) * P, l * P : (l + 1) * P] = apm(P, G[(j - l) % HALF]).T
+            HZ[j * P : (j + 1) * P, (HALF + l) * P : (HALF + l + 1) * P] = apm(P, F[(j - l) % HALF]).T
     return HX % 2, HZ % 2
 
 
@@ -140,8 +143,7 @@ def orthogonal(P, F, G):
         for k in range(J):
             S = np.zeros((P, P), dtype=np.int64)
             for i in range(HALF):
-                S = (S + Fm[(i - j) % HALF] @ Gm[(k - i) % HALF]
-                     + Gm[(i - j) % HALF] @ Fm[(k - i) % HALF]) % 2
+                S = (S + Fm[(i - j) % HALF] @ Gm[(k - i) % HALF] + Gm[(i - j) % HALF] @ Fm[(k - i) % HALF]) % 2
             if S.any():
                 return False
     return True
@@ -191,8 +193,18 @@ PAPER_P96_G = [(61, 15), (1, 24), (89, 62), (25, 22), (85, 93), (25, 78)]
 SUBMITTED_P = 58
 SUBMITTED_A = (1, 2)
 SUBMITTED_BLOCKS = [
-    (1, 37), (1, 56), (1, 33), (1, 20), (1, 42), (1, 23),
-    (1, 25), (1, 43), (1, 17), (1, 10), (1, 36), (1, 45),
+    (1, 37),
+    (1, 56),
+    (1, 33),
+    (1, 20),
+    (1, 42),
+    (1, 23),
+    (1, 25),
+    (1, 43),
+    (1, 17),
+    (1, 10),
+    (1, 36),
+    (1, 45),
 ]
 
 
@@ -204,27 +216,32 @@ def submitted_matrices():
 def reproduce_paper():
     HX, HZ = build(96, PAPER_P96_F, PAPER_P96_G)
     from css import compute_k, verify_css
-    print(f"paper P=96: n={HX.shape[1]} k={compute_k(HX, HZ)} "
-          f"commutes={verify_css(HX, HZ)}   (expected n=1152 k=580 True)")
+
+    print(
+        f"paper P=96: n={HX.shape[1]} k={compute_k(HX, HZ)} "
+        f"commutes={verify_css(HX, HZ)}   (expected n=1152 k=580 True)"
+    )
 
 
 def report(tag, P, HX, HZ):
     from css import compute_k, verify_css
+
     k = compute_k(HX, HZ)
-    print(f"{tag}: n={HX.shape[1]} k={k} commutes={verify_css(HX, HZ)} "
-          f"connected={connected(HX, HZ)} "
-          f"max_check_weight={int(HX.sum(axis=1).max())}")
+    print(
+        f"{tag}: n={HX.shape[1]} k={k} commutes={verify_css(HX, HZ)} "
+        f"connected={connected(HX, HZ)} "
+        f"max_check_weight={int(HX.sum(axis=1).max())}"
+    )
     return k
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--reproduce", action="store_true",
-                    help="rebuild the paper's P=96 instance as a transcription check")
-    ap.add_argument("--build", type=int, metavar="P",
-                    help="build and report the submitted instance at this P")
-    ap.add_argument("--search", type=int, metavar="P",
-                    help="search for connected instances at this P")
+    ap.add_argument(
+        "--reproduce", action="store_true", help="rebuild the paper's P=96 instance as a transcription check"
+    )
+    ap.add_argument("--build", type=int, metavar="P", help="build and report the submitted instance at this P")
+    ap.add_argument("--search", type=int, metavar="P", help="search for connected instances at this P")
     ap.add_argument("--A", type=int, nargs=2, help="reference APM a b for --search")
     ap.add_argument("--draws", type=int, default=3000)
     ap.add_argument("--trials", type=int, default=400)
@@ -243,10 +260,11 @@ def main():
             ap.error("--search needs --A a b")
         P, A = args.search, tuple(args.A)
         C = [t for t in centralizer(A, P) if t != identity(P)]
-        print(f"P={P} n={2*HALF*P} A={A} orbits={orbits(A, P)} |C(A)|={len(C)}")
+        print(f"P={P} n={2 * HALF * P} A={A} orbits={orbits(A, P)} |C(A)|={len(C)}")
         rng = random.Random(args.seed)
         from css import verify_css
         from surrogate import distance_rand
+
         kept, tried = [], 0
         while len(kept) < 20 and tried < args.draws:
             tried += 1
@@ -254,9 +272,13 @@ def main():
             HX, HZ = build(P, list(b[:HALF]), list(b[HALF:]))
             if not verify_css(HX, HZ) or not connected(HX, HZ):
                 continue
-            kept.append((compute_k_safe(HX, HZ),
-                         distance_rand(HX, HZ, trials=args.trials,
-                                       seed=args.seed), [list(t) for t in b]))
+            kept.append(
+                (
+                    compute_k_safe(HX, HZ),
+                    distance_rand(HX, HZ, trials=args.trials, seed=args.seed),
+                    [list(t) for t in b],
+                )
+            )
         kept.sort(key=lambda r: (-r[0], -r[1]))
         for k, d, b in kept:
             print(f"  k={k} d<={d:.0f}")
@@ -269,6 +291,7 @@ def main():
 
 def compute_k_safe(HX, HZ):
     from css import compute_k
+
     return compute_k(HX, HZ)
 
 

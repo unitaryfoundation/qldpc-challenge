@@ -14,23 +14,22 @@ import os
 import subprocess
 import sys
 import tempfile
+
 import check_authorship
 
 BASE_DOC = {
     "schema_version": "0.1",
     "name": "[[60,8,6]] synthetic test code",
     "code_type": "CSS",
-    "n": 60, "k": 8,
+    "n": 60,
+    "k": 8,
     "checks": {"X": [[0, 1, 2]], "Z": [[3, 4, 5]]},
     "distance": {
         "d": 6,
-        "X": {"value": 6, "confidence": "upper_bound",
-              "witness": [0, 1, 2, 3, 4, 5]},
-        "Z": {"value": 7, "confidence": "upper_bound",
-              "witness": [0, 1, 2, 3, 4, 5, 6]},
+        "X": {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]},
+        "Z": {"value": 7, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5, 6]},
     },
-    "provenance": {"authors": ["@alice"], "construction": "synthetic",
-                   "notes": "original."},
+    "provenance": {"authors": ["@alice"], "construction": "synthetic", "notes": "original."},
 }
 
 _fail = []
@@ -43,8 +42,7 @@ def check(name, cond):
 
 
 def git(td, *args):
-    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
-                    *args], cwd=td, check=True, capture_output=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", *args], cwd=td, check=True, capture_output=True)
 
 
 def write_file(td, rel, content):
@@ -74,11 +72,13 @@ def refuted(with_wp=True, found_by="@bob"):
     doc = copy.deepcopy(BASE_DOC)
     doc["name"] = "[[60,8,5]] synthetic test code"
     doc["schema_version"] = "0.2"
-    doc["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
-                            "witness": [0, 1, 2, 3, 4]}
+    doc["distance"]["X"] = {"value": 5, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4]}
     if with_wp:
         doc["distance"]["X"]["witness_provenance"] = {
-            "found_by": [found_by], "date": "2026-08-19", "found_at_samples": 10 ** 9}
+            "found_by": [found_by],
+            "date": "2026-08-19",
+            "found_at_samples": 10**9,
+        }
     doc["distance"]["d"] = 5
     doc["provenance"]["notes"] += " Refuted."
     return doc
@@ -95,17 +95,16 @@ def run_rename(name, base_fname, new_fname, expect_ok, author="bob"):
         git(td, "mv", f"codes/{base_fname}", f"codes/{new_fname}")
         git(td, "add", "-A")
         git(td, "commit", "-q", "-m", "rename")
-        rc = check_authorship.main(
-            ["--author", author, "--root", td, "--base", "main"])
+        rc = check_authorship.main(["--author", author, "--root", td, "--base", "main"])
         check(name, (rc == 0) == expect_ok)
 
 
-def run_case(name, edit, expect_ok, author="bob", rename=True,
-             base_doc=None, base_files=(), files=()):
+def run_case(name, edit, expect_ok, author="bob", rename=True, base_doc=None, base_files=(), files=()):
     """edit() returns the new doc, or None to leave codes/ untouched -- which
     is the interesting shape for circuits/, where the claim surface moves
     outside the JSON. base_files/files are (relpath, content) written on the
-    base commit and on the change."""
+    base commit and on the change.
+    """
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=base_doc, extra=base_files)
         doc = edit() if edit is not None else None
@@ -120,61 +119,59 @@ def run_case(name, edit, expect_ok, author="bob", rename=True,
             write_file(td, rel, content)
         git(td, "add", "-A")
         git(td, "commit", "-q", "-m", "change")
-        rc = check_authorship.main(
-            ["--author", author, "--root", td, "--base", "main"])
+        rc = check_authorship.main(["--author", author, "--root", td, "--base", "main"])
         check(name, (rc == 0) == expect_ok)
 
 
 def main():
     print("refutation binding (issue #611):")
     run_case("clean refutation by @bob binds", refuted, True)
-    run_case("in-place (no rename) refutation binds",
-             refuted, True, rename=False)
-    run_case("owner @alice still binds via authors",
-             refuted, True, author="alice")
+    run_case("in-place (no rename) refutation binds", refuted, True, rename=False)
+    run_case("owner @alice still binds via authors", refuted, True, author="alice")
 
     def no_wp():
         return refuted(with_wp=False)
-    run_case("lighter witness without witness_provenance rejected",
-             no_wp, False)
+
+    run_case("lighter witness without witness_provenance rejected", no_wp, False)
 
     def wrong_credit():
         return refuted(found_by="@carol")
-    run_case("witness_provenance crediting someone else rejected",
-             wrong_credit, False)
+
+    run_case("witness_provenance crediting someone else rejected", wrong_credit, False)
 
     def touches_checks():
         doc = refuted()
         doc["checks"]["X"] = [[0, 1, 3]]
         return doc
-    run_case("refutation that also edits checks rejected", touches_checks,
-             False)
+
+    run_case("refutation that also edits checks rejected", touches_checks, False)
 
     def appends_author():
         doc = refuted()
         doc["provenance"]["authors"].append("@bob")
         return doc
-    run_case("refutation that also appends to authors rejected",
-             appends_author, False)
+
+    run_case("refutation that also appends to authors rejected", appends_author, False)
 
     def swaps_author():
         doc = copy.deepcopy(BASE_DOC)
         doc["provenance"]["authors"] = ["@bob"]
         return doc
-    run_case("author swap on someone else's code rejected", swaps_author,
-             False, rename=False)
+
+    run_case("author swap on someone else's code rejected", swaps_author, False, rename=False)
 
     def owner_adds_coauthor():
         doc = copy.deepcopy(BASE_DOC)
         doc["provenance"]["authors"] = ["@alice", "@carol"]
         return doc
-    run_case("existing author may edit the author list",
-             owner_adds_coauthor, True, author="alice", rename=False)
+
+    run_case("existing author may edit the author list", owner_adds_coauthor, True, author="alice", rename=False)
 
     def rewrites_notes():
         doc = refuted()
         doc["provenance"]["notes"] = "Mine now."
         return doc
+
     run_case("refutation that rewrites notes rejected", rewrites_notes, False)
 
     def loosens():
@@ -184,24 +181,31 @@ def main():
         doc["distance"]["d"] = 7
         doc["name"] = BASE_DOC["name"]
         return doc
+
     run_case("loosened bound rejected (no strict decrease)", loosens, False)
 
     def stamp_only():
         doc = copy.deepcopy(BASE_DOC)
         doc["schema_version"] = "0.2"
         doc["distance"]["X"]["witness_provenance"] = {
-            "found_by": ["@bob"], "date": "2026-08-19", "found_at_samples": 10 ** 9}
+            "found_by": ["@bob"],
+            "date": "2026-08-19",
+            "found_at_samples": 10**9,
+        }
         return doc
-    run_case("survival stamp alone does not grant edit rights", stamp_only,
-             False, rename=False)
+
+    run_case("survival stamp alone does not grant edit rights", stamp_only, False, rename=False)
 
     def stamp_riding_along():
         doc = refuted()
         doc["distance"]["Z"]["witness_provenance"] = {
-            "found_by": ["@bob"], "date": "2026-08-19", "found_at_samples": 10 ** 9}
+            "found_by": ["@bob"],
+            "date": "2026-08-19",
+            "found_at_samples": 10**9,
+        }
         return doc
-    run_case("survival stamp riding on a real refutation binds",
-             stamp_riding_along, True)
+
+    run_case("survival stamp riding on a real refutation binds", stamp_riding_along, True)
 
     print("\nexact-claim corrections (PR review round 2):")
     EXACT_BASE = copy.deepcopy(BASE_DOC)
@@ -211,32 +215,34 @@ def main():
         doc = refuted()
         doc["distance"]["X"]["confidence"] = "upper_bound"
         return doc
-    run_case("refuted exact claim demoting to upper_bound binds",
-             demotes_exact, True, base_doc=EXACT_BASE)
+
+    run_case("refuted exact claim demoting to upper_bound binds", demotes_exact, True, base_doc=EXACT_BASE)
 
     def keeps_exact():
         doc = refuted()
         doc["distance"]["X"]["confidence"] = "exact"
         return doc
-    run_case("refuted exact claim keeping 'exact' rejected",
-             keeps_exact, False, base_doc=EXACT_BASE)
+
+    run_case("refuted exact claim keeping 'exact' rejected", keeps_exact, False, base_doc=EXACT_BASE)
 
     def upgrades_to_exact():
         doc = refuted()
         doc["distance"]["X"]["confidence"] = "exact"
         return doc
-    run_case("correction claiming 'exact' at the new value rejected",
-             upgrades_to_exact, False)
+
+    run_case("correction claiming 'exact' at the new value rejected", upgrades_to_exact, False)
 
     def stamp_upgrades_conf():
         doc = refuted()
         doc["distance"]["Z"]["confidence"] = "exact"
         doc["distance"]["Z"]["witness_provenance"] = {
-            "found_by": ["@bob"], "date": "2026-08-19",
-            "found_at_samples": 10 ** 9}
+            "found_by": ["@bob"],
+            "date": "2026-08-19",
+            "found_at_samples": 10**9,
+        }
         return doc
-    run_case("survival stamp that upgrades confidence rejected",
-             stamp_upgrades_conf, False)
+
+    run_case("survival stamp that upgrades confidence rejected", stamp_upgrades_conf, False)
 
     print("\nbaselines (no @handle authors):")
     BASELINE = copy.deepcopy(BASE_DOC)
@@ -247,18 +253,20 @@ def main():
         doc["provenance"]["authors"] = ["Kitaev", "@bob"]
         doc["n"] = 61
         return doc
-    run_case("first @handle claim on a baseline rejected",
-             claims_baseline, False, rename=False, base_doc=BASELINE)
+
+    run_case("first @handle claim on a baseline rejected", claims_baseline, False, rename=False, base_doc=BASELINE)
 
     def refutes_baseline():
         doc = refuted()
         doc["provenance"]["authors"] = ["Kitaev"]
         return doc
-    run_case("pure refutation of a baseline still accepted (exempt)",
-             refutes_baseline, True, base_doc=BASELINE)
 
-    print("\nrename detection (a real refutation is ~98% similar, which git "
-          "folds\ninto an R line unless the gate splits renames):")
+    run_case("pure refutation of a baseline still accepted (exempt)", refutes_baseline, True, base_doc=BASELINE)
+
+    print(
+        "\nrename detection (a real refutation is ~98% similar, which git "
+        "folds\ninto an R line unless the gate splits renames):"
+    )
     BIG = copy.deepcopy(BASE_DOC)
     BIG["checks"]["X"] = [[i, i + 1, i + 2] for i in range(500)]
 
@@ -266,28 +274,31 @@ def main():
         doc = copy.deepcopy(BIG)
         doc["name"] = "[[60,8,5]] synthetic test code"
         doc["schema_version"] = "0.2"
-        doc["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
-                                "witness": [0, 1, 2, 3, 4],
-                                "witness_provenance": {
-                                    "found_by": ["@bob"],
-                                    "date": "2026-08-19",
-                                    "found_at_samples": 10 ** 9}}
+        doc["distance"]["X"] = {
+            "value": 5,
+            "confidence": "upper_bound",
+            "witness": [0, 1, 2, 3, 4],
+            "witness_provenance": {"found_by": ["@bob"], "date": "2026-08-19", "found_at_samples": 10**9},
+        }
         doc["distance"]["d"] = 5
         doc["provenance"]["notes"] += " Refuted."
         return doc
-    run_case("high-similarity rename: clean refutation still binds",
-             refuted_big, True, base_doc=BIG)
+
+    run_case("high-similarity rename: clean refutation still binds", refuted_big, True, base_doc=BIG)
 
     def refuted_big_tampered():
         doc = refuted_big()
         doc["provenance"]["authors"] = ["@bob"]
         return doc
-    run_case("high-similarity rename: tampered refutation still caught",
-             refuted_big_tampered, False, base_doc=BIG)
+
+    run_case("high-similarity rename: tampered refutation still caught", refuted_big_tampered, False, base_doc=BIG)
 
     print("\nlayout binding (first locality block):")
-    LAYOUT = {"coordinates": [[float(i), 0.0] for i in range(60)], "layers": 2,
-              "contributed_by": {"by": ["@bob"], "date": "2026-08-20"}}
+    LAYOUT = {
+        "coordinates": [[float(i), 0.0] for i in range(60)],
+        "layers": 2,
+        "contributed_by": {"by": ["@bob"], "date": "2026-08-20"},
+    }
 
     def adds_layout(base=BASE_DOC, credit=True):
         doc = copy.deepcopy(base)
@@ -298,45 +309,48 @@ def main():
         doc["name"] += ", two-layer layout"
         doc["provenance"]["notes"] += " Layout added."
         return doc
-    run_case("layout addition credited in contributed_by binds",
-             adds_layout, True, rename=False)
-    run_case("layout addition on a no-handle baseline binds",
-             lambda: adds_layout(base=BASELINE), True, rename=False,
-             base_doc=BASELINE)
+
+    run_case("layout addition credited in contributed_by binds", adds_layout, True, rename=False)
+    run_case(
+        "layout addition on a no-handle baseline binds",
+        lambda: adds_layout(base=BASELINE),
+        True,
+        rename=False,
+        base_doc=BASELINE,
+    )
 
     def layout_no_credit():
         return adds_layout(credit=False)
-    run_case("layout addition without contributed_by credit rejected",
-             layout_no_credit, False, rename=False)
+
+    run_case("layout addition without contributed_by credit rejected", layout_no_credit, False, rename=False)
 
     def layout_wrong_credit():
         doc = adds_layout()
         doc["locality"]["contributed_by"]["by"] = ["@carol"]
         return doc
-    run_case("layout addition crediting someone else rejected",
-             layout_wrong_credit, False, rename=False)
+
+    run_case("layout addition crediting someone else rejected", layout_wrong_credit, False, rename=False)
 
     def layout_appends_author():
         doc = adds_layout()
-        doc["provenance"]["authors"] = (
-            list(doc["provenance"]["authors"]) + ["@bob"])
+        doc["provenance"]["authors"] = list(doc["provenance"]["authors"]) + ["@bob"]
         return doc
-    run_case("layout addition that also appends to authors rejected",
-             layout_appends_author, False, rename=False)
+
+    run_case("layout addition that also appends to authors rejected", layout_appends_author, False, rename=False)
 
     def layout_sets_model():
         doc = adds_layout()
         doc["provenance"]["model"] = "TestModel 1.0"
         return doc
-    run_case("layout addition that also sets model rejected",
-             layout_sets_model, False, rename=False)
+
+    run_case("layout addition that also sets model rejected", layout_sets_model, False, rename=False)
 
     def layout_touches_checks():
         doc = adds_layout()
         doc["checks"]["X"] = [[0, 1, 3]]
         return doc
-    run_case("layout addition that also edits checks rejected",
-             layout_touches_checks, False, rename=False)
+
+    run_case("layout addition that also edits checks rejected", layout_touches_checks, False, rename=False)
 
     def layout_touches_distance():
         doc = adds_layout()
@@ -344,19 +358,18 @@ def main():
         doc["distance"]["X"]["witness"] = [0, 1, 2, 3, 4]
         doc["distance"]["d"] = 5
         return doc
-    run_case("layout addition that also edits distance rejected",
-             layout_touches_distance, False, rename=False)
+
+    run_case("layout addition that also edits distance rejected", layout_touches_distance, False, rename=False)
 
     def layout_rewrites_notes():
         doc = adds_layout()
         doc["provenance"]["notes"] = "Mine now."
         return doc
-    run_case("layout addition that rewrites notes rejected",
-             layout_rewrites_notes, False, rename=False)
+
+    run_case("layout addition that rewrites notes rejected", layout_rewrites_notes, False, rename=False)
 
     HAS_LAYOUT = copy.deepcopy(BASE_DOC)
-    HAS_LAYOUT["locality"] = {"coordinates": LAYOUT["coordinates"],
-                              "layers": 2}
+    HAS_LAYOUT["locality"] = {"coordinates": LAYOUT["coordinates"], "layers": 2}
 
     def layout_replaces():
         doc = copy.deepcopy(HAS_LAYOUT)
@@ -365,21 +378,20 @@ def main():
         doc["locality"]["layers"] = 1
         doc["provenance"]["notes"] += " Better layout."
         return doc
-    run_case("replacing an existing layout rejected",
-             layout_replaces, False, rename=False, base_doc=HAS_LAYOUT)
+
+    run_case("replacing an existing layout rejected", layout_replaces, False, rename=False, base_doc=HAS_LAYOUT)
 
     print("\ncircuit binding (first circuit block):")
     CIRCUIT = {
-        "d_circ": {"X": {"value": 6, "confidence": "upper_bound",
-                         "witness": [0, 1, 2, 3, 4, 5]},
-                   "Z": {"value": 6, "confidence": "upper_bound",
-                         "witness": [1, 2, 3, 4, 5, 6]}},
-        "rounds": 6, "stim_version": "1.16.0",
-        "contributed_by": {"by": ["@bob"], "date": "2026-09-11",
-                           "method": "hand-scheduled, depth 7"},
+        "d_circ": {
+            "X": {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]},
+            "Z": {"value": 6, "confidence": "upper_bound", "witness": [1, 2, 3, 4, 5, 6]},
+        },
+        "rounds": 6,
+        "stim_version": "1.16.0",
+        "contributed_by": {"by": ["@bob"], "date": "2026-09-11", "method": "hand-scheduled, depth 7"},
     }
-    STIM = [("circuits/60-8-6/memory_x.stim", "# synthetic\n"),
-            ("circuits/60-8-6/memory_z.stim", "# synthetic\n")]
+    STIM = [("circuits/60-8-6/memory_x.stim", "# synthetic\n"), ("circuits/60-8-6/memory_z.stim", "# synthetic\n")]
 
     def adds_circuit(base=BASE_DOC, credit=True):
         doc = copy.deepcopy(base)
@@ -390,45 +402,59 @@ def main():
         doc["name"] += ", d_circ = 6"
         doc["provenance"]["notes"] += " Circuit tier added."
         return doc
-    run_case("circuit addition credited in contributed_by binds",
-             adds_circuit, True, rename=False, files=STIM)
-    run_case("circuit addition on a no-handle baseline binds",
-             lambda: adds_circuit(base=BASELINE), True, rename=False,
-             base_doc=BASELINE, files=STIM)
+
+    run_case("circuit addition credited in contributed_by binds", adds_circuit, True, rename=False, files=STIM)
+    run_case(
+        "circuit addition on a no-handle baseline binds",
+        lambda: adds_circuit(base=BASELINE),
+        True,
+        rename=False,
+        base_doc=BASELINE,
+        files=STIM,
+    )
 
     def circuit_no_credit():
         return adds_circuit(credit=False)
-    run_case("circuit addition without contributed_by credit rejected",
-             circuit_no_credit, False, rename=False, files=STIM)
+
+    run_case(
+        "circuit addition without contributed_by credit rejected", circuit_no_credit, False, rename=False, files=STIM
+    )
 
     def circuit_wrong_credit():
         doc = adds_circuit()
         doc["circuit"]["contributed_by"]["by"] = ["@carol"]
         return doc
-    run_case("circuit addition crediting someone else rejected",
-             circuit_wrong_credit, False, rename=False, files=STIM)
+
+    run_case("circuit addition crediting someone else rejected", circuit_wrong_credit, False, rename=False, files=STIM)
 
     def circuit_appends_author():
         doc = adds_circuit()
-        doc["provenance"]["authors"] = (
-            list(doc["provenance"]["authors"]) + ["@bob"])
+        doc["provenance"]["authors"] = list(doc["provenance"]["authors"]) + ["@bob"]
         return doc
-    run_case("circuit addition that also appends to authors rejected",
-             circuit_appends_author, False, rename=False, files=STIM)
+
+    run_case(
+        "circuit addition that also appends to authors rejected",
+        circuit_appends_author,
+        False,
+        rename=False,
+        files=STIM,
+    )
 
     def circuit_sets_model():
         doc = adds_circuit()
         doc["provenance"]["model"] = "TestModel 1.0"
         return doc
-    run_case("circuit addition that also sets model rejected",
-             circuit_sets_model, False, rename=False, files=STIM)
+
+    run_case("circuit addition that also sets model rejected", circuit_sets_model, False, rename=False, files=STIM)
 
     def circuit_touches_checks():
         doc = adds_circuit()
         doc["checks"]["X"] = [[0, 1, 3]]
         return doc
-    run_case("circuit addition that also edits checks rejected",
-             circuit_touches_checks, False, rename=False, files=STIM)
+
+    run_case(
+        "circuit addition that also edits checks rejected", circuit_touches_checks, False, rename=False, files=STIM
+    )
 
     def circuit_touches_distance():
         doc = adds_circuit()
@@ -436,28 +462,34 @@ def main():
         doc["distance"]["X"]["witness"] = [0, 1, 2, 3, 4]
         doc["distance"]["d"] = 5
         return doc
-    run_case("circuit addition that also edits distance rejected",
-             circuit_touches_distance, False, rename=False, files=STIM)
+
+    run_case(
+        "circuit addition that also edits distance rejected", circuit_touches_distance, False, rename=False, files=STIM
+    )
 
     def circuit_rewrites_notes():
         doc = adds_circuit()
         doc["provenance"]["notes"] = "Mine now."
         return doc
-    run_case("circuit addition that rewrites notes rejected",
-             circuit_rewrites_notes, False, rename=False, files=STIM)
+
+    run_case("circuit addition that rewrites notes rejected", circuit_rewrites_notes, False, rename=False, files=STIM)
 
     def circuit_and_layout():
         doc = adds_circuit()
         doc["locality"] = copy.deepcopy(LAYOUT)
         return doc
-    run_case("circuit addition that also adds a layout rejected (one "
-             "artifact per binding)", circuit_and_layout, False,
-             rename=False, files=STIM)
+
+    run_case(
+        "circuit addition that also adds a layout rejected (one artifact per binding)",
+        circuit_and_layout,
+        False,
+        rename=False,
+        files=STIM,
+    )
 
     HAS_CIRCUIT = copy.deepcopy(BASE_DOC)
     HAS_CIRCUIT["schema_version"] = "0.2"
-    HAS_CIRCUIT["circuit"] = {k: v for k, v in CIRCUIT.items()
-                              if k != "contributed_by"}
+    HAS_CIRCUIT["circuit"] = {k: v for k, v in CIRCUIT.items() if k != "contributed_by"}
 
     def circuit_replaces():
         doc = copy.deepcopy(HAS_CIRCUIT)
@@ -465,56 +497,92 @@ def main():
         doc["circuit"]["rounds"] = 8
         doc["provenance"]["notes"] += " Better schedule."
         return doc
-    run_case("replacing an existing circuit tier rejected", circuit_replaces,
-             False, rename=False, base_doc=HAS_CIRCUIT, files=STIM)
-    run_case("a listed author may replace the circuit tier", circuit_replaces,
-             True, author="alice", rename=False, base_doc=HAS_CIRCUIT,
-             files=STIM)
+
+    run_case(
+        "replacing an existing circuit tier rejected",
+        circuit_replaces,
+        False,
+        rename=False,
+        base_doc=HAS_CIRCUIT,
+        files=STIM,
+    )
+    run_case(
+        "a listed author may replace the circuit tier",
+        circuit_replaces,
+        True,
+        author="alice",
+        rename=False,
+        base_doc=HAS_CIRCUIT,
+        files=STIM,
+    )
 
     print("\ncircuits/<slug>/ is part of the entry's claim surface:")
-    run_case("swapping committed circuits with the JSON untouched rejected",
-             None, False, base_files=STIM,
-             files=[("circuits/60-8-6/memory_x.stim", "# tampered\n")],
-             base_doc=HAS_CIRCUIT)
-    run_case("a listed author may swap the committed circuits",
-             None, True, author="alice", base_files=STIM,
-             files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")],
-             base_doc=HAS_CIRCUIT)
-    run_case("orphaned circuits fail closed when no code entry exists",
-             None, False,
-             base_files=[("circuits/70-4-8/memory_x.stim", "# orphan\n")],
-             files=[("circuits/70-4-8/memory_x.stim", "# changed\n")],
-             base_doc=HAS_CIRCUIT)
+    run_case(
+        "swapping committed circuits with the JSON untouched rejected",
+        None,
+        False,
+        base_files=STIM,
+        files=[("circuits/60-8-6/memory_x.stim", "# tampered\n")],
+        base_doc=HAS_CIRCUIT,
+    )
+    run_case(
+        "a listed author may swap the committed circuits",
+        None,
+        True,
+        author="alice",
+        base_files=STIM,
+        files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")],
+        base_doc=HAS_CIRCUIT,
+    )
+    run_case(
+        "orphaned circuits fail closed when no code entry exists",
+        None,
+        False,
+        base_files=[("circuits/70-4-8/memory_x.stim", "# orphan\n")],
+        files=[("circuits/70-4-8/memory_x.stim", "# changed\n")],
+        base_doc=HAS_CIRCUIT,
+    )
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=HAS_CIRCUIT, extra=STIM)
-        git(td, "rm", "-q", "codes/60-8-6.json",
-            *[path for path, _ in STIM])
+        git(td, "rm", "-q", "codes/60-8-6.json", *[path for path, _ in STIM])
         git(td, "commit", "-q", "-m", "delete code and all circuits")
-        rc = check_authorship.main(
-            ["--author", "bob", "--root", td, "--base", "main"])
+        rc = check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
         check("deleting a code and all its circuits together passes", rc == 0)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        dems = [("circuits/60-8-6/memory_x.dem", "# dem\n"), ("circuits/60-8-6/memory_z.dem", "# dem\n")]
+        make_repo(td, base_doc=HAS_CIRCUIT, extra=STIM + dems)
+        git(td, "rm", "-q", *[path for path, _ in dems])
+        git(td, "commit", "-q", "-m", "drop legacy .dem files")
+        rc = check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
+        check(
+            "deleting legacy .dem files by a non-author passes",
+            rc == 0 and not check_authorship.circuits_changed("main", td, "60-8-6"),
+        )
 
     OTHER = copy.deepcopy(BASE_DOC)
     OTHER["n"], OTHER["k"] = 70, 4
     OTHER["schema_version"] = "0.2"
-    OTHER["provenance"] = {"authors": ["@carol"], "construction": "synthetic",
-                           "notes": "carol's."}
-    OTHER["circuit"] = {k: v for k, v in CIRCUIT.items()
-                        if k != "contributed_by"}
-    run_case("a bound circuit addition may not also touch another entry's "
-             "circuits", adds_circuit, False, rename=False,
-             base_files=STIM + [("codes/70-4-8.json", json.dumps(OTHER)),
-                                ("circuits/70-4-8/memory_x.stim", "# c\n")],
-             files=[("circuits/70-4-8/memory_x.stim", "# tampered\n")])
+    OTHER["provenance"] = {"authors": ["@carol"], "construction": "synthetic", "notes": "carol's."}
+    OTHER["circuit"] = {k: v for k, v in CIRCUIT.items() if k != "contributed_by"}
+    run_case(
+        "a bound circuit addition may not also touch another entry's circuits",
+        adds_circuit,
+        False,
+        rename=False,
+        base_files=STIM + [("codes/70-4-8.json", json.dumps(OTHER)), ("circuits/70-4-8/memory_x.stim", "# c\n")],
+        files=[("circuits/70-4-8/memory_x.stim", "# tampered\n")],
+    )
 
-    print("\nmerged-state escalation (the author list is the privilege "
-          "boundary;\na merged binding must not widen the contributor's "
-          "rights on the next PR):")
+    print(
+        "\nmerged-state escalation (the author list is the privilege "
+        "boundary;\na merged binding must not widen the contributor's "
+        "rights on the next PR):"
+    )
 
     def merged_state_case(name, followup_edit, expect_ok, merged_doc=None):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
-            make_repo(td)                       # base on main, branch 'change'
-            git(td, "checkout", "-q", "main")   # merge the binding into main
+            make_repo(td)  # base on main, branch 'change'
+            git(td, "checkout", "-q", "main")  # merge the binding into main
             write_code(td, "60-8-6.json", merged_doc or adds_layout())
             git(td, "add", "codes")
             git(td, "commit", "-q", "-m", "layout binding merged")
@@ -522,8 +590,7 @@ def main():
             write_code(td, "60-8-6.json", followup_edit())
             git(td, "add", "codes")
             git(td, "commit", "-q", "-m", "followup")
-            rc = check_authorship.main(
-                ["--author", "bob", "--root", td, "--base", "main"])
+            rc = check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
             check(name, (rc == 0) == expect_ok)
 
     def bob_rewrites_after_merge():
@@ -533,54 +600,58 @@ def main():
         doc["distance"]["d"] = 7
         doc["provenance"]["construction"] = "bob's construction"
         return doc
-    merged_state_case("after a merged layout binding, @bob still cannot "
-                      "edit the code", bob_rewrites_after_merge, False)
+
+    merged_state_case("after a merged layout binding, @bob still cannot edit the code", bob_rewrites_after_merge, False)
 
     def bob_refutes_after_merge():
         doc = adds_layout()
         doc["name"] = "[[60,8,5]] synthetic test code, two-layer layout"
         doc["distance"]["X"] = {
-            "value": 5, "confidence": "upper_bound",
+            "value": 5,
+            "confidence": "upper_bound",
             "witness": [0, 1, 2, 3, 4],
-            "witness_provenance": {"found_by": ["@bob"],
-                                   "date": "2026-08-20",
-                                   "found_at_samples": 10 ** 9}}
+            "witness_provenance": {"found_by": ["@bob"], "date": "2026-08-20", "found_at_samples": 10**9},
+        }
         doc["distance"]["d"] = 5
         doc["provenance"]["notes"] += " Refuted."
         return doc
-    merged_state_case("after a merged layout binding, a clean refutation "
-                      "by @bob still binds", bob_refutes_after_merge, True)
+
+    merged_state_case(
+        "after a merged layout binding, a clean refutation by @bob still binds", bob_refutes_after_merge, True
+    )
 
     def bob_rewrites_after_circuit_merge():
         doc = adds_circuit()
         doc["checks"]["Z"] = [[3, 4, 6]]
         doc["provenance"]["construction"] = "bob's construction"
         return doc
-    merged_state_case("after a merged circuit binding, @bob still cannot "
-                      "edit the code", bob_rewrites_after_circuit_merge,
-                      False, merged_doc=adds_circuit())
+
+    merged_state_case(
+        "after a merged circuit binding, @bob still cannot edit the code",
+        bob_rewrites_after_circuit_merge,
+        False,
+        merged_doc=adds_circuit(),
+    )
 
     print("\nmalformed input:")
     missing_side = copy.deepcopy(BASE_DOC)
     del missing_side["distance"]["Z"]
-    ok, why = check_authorship.refutation_binding(
-        "bob", BASE_DOC, missing_side)
-    check("missing side named in the rejection reason",
-          not ok and "distance.Z is missing" in why)
+    ok, why = check_authorship.refutation_binding("bob", BASE_DOC, missing_side)
+    check("missing side named in the rejection reason", not ok and "distance.Z is missing" in why)
 
     print("\nplain submissions (original binding):")
+
     def new_code():
         return copy.deepcopy(BASE_DOC)
+
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
         write_code(td, "61-9-6.json", new_code())
         git(td, "add", "codes")
         git(td, "commit", "-q", "-m", "new")
-        rc = check_authorship.main(
-            ["--author", "bob", "--root", td, "--base", "main"])
+        rc = check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
         check("new code by non-author still rejected", rc == 1)
-        rc = check_authorship.main(
-            ["--author", "alice", "--root", td, "--base", "main"])
+        rc = check_authorship.main(["--author", "alice", "--root", td, "--base", "main"])
         check("new code by its author still accepted", rc == 0)
 
     print("fail closed on git failure:")
@@ -588,8 +659,7 @@ def main():
         make_repo(td)
         # a base ref that cannot resolve makes the diff fail; the check must
         # exit nonzero rather than silently passing
-        rc = check_authorship.main(
-            ["--author", "alice", "--root", td, "--base", "no-such-ref"])
+        rc = check_authorship.main(["--author", "alice", "--root", td, "--base", "no-such-ref"])
         check("unresolvable base ref exits nonzero", rc == 1)
     print("\nnew submissions must bind to a @handle:")
 
@@ -603,21 +673,17 @@ def main():
         write_code(td, "60-8-7.json", doc)
         git(td, "add", "codes")
         git(td, "commit", "-q", "-m", "new")
-        return check_authorship.main(
-            ["--author", "bob", "--root", td, "--base", "main"])
+        return check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
-        check("new submission with no @handle rejected",
-              submit_new(td, ["Jane Roe"]) == 1)
+        check("new submission with no @handle rejected", submit_new(td, ["Jane Roe"]) == 1)
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
-        check("new baseline submission with no @handle exempt",
-              submit_new(td, ["Jane Roe"], origin="baseline") == 0)
+        check("new baseline submission with no @handle exempt", submit_new(td, ["Jane Roe"], origin="baseline") == 0)
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td)
-        check("new submission with only a malformed handle rejected",
-              submit_new(td, ["@bad!handle"]) == 1)
+        check("new submission with only a malformed handle rejected", submit_new(td, ["@bad!handle"]) == 1)
 
     # A stale slug is a path that disagrees with the file it holds, and the
     # slug is derived from the JSON, so correcting it changes no claim and
@@ -637,17 +703,18 @@ def main():
 
     stale = copy.deepcopy(BASE_DOC)
     stale["name"] = "[[60,8,9]] synthetic test code"
-    run_case("non-author may correct a stale name to the entry's parameters",
-             renamed_title, True, rename=False, base_doc=stale)
-    run_case("non-author may not write other parameters into the name",
-             retitled, False, rename=False, base_doc=stale)
+    run_case(
+        "non-author may correct a stale name to the entry's parameters",
+        renamed_title,
+        True,
+        rename=False,
+        base_doc=stale,
+    )
+    run_case("non-author may not write other parameters into the name", retitled, False, rename=False, base_doc=stale)
 
-    run_rename("non-author may move an entry onto its own [[n,k,d]] slug",
-               "60-8-9.json", "60-8-6.json", True)
-    run_rename("non-author may not rename an entry to an unrelated slug",
-               "60-8-6.json", "60-8-4.json", False)
-    run_rename("author may rename an entry to an unrelated slug",
-               "60-8-6.json", "60-8-4.json", True, author="alice")
+    run_rename("non-author may move an entry onto its own [[n,k,d]] slug", "60-8-9.json", "60-8-6.json", True)
+    run_rename("non-author may not rename an entry to an unrelated slug", "60-8-6.json", "60-8-4.json", False)
+    run_rename("author may rename an entry to an unrelated slug", "60-8-6.json", "60-8-4.json", True, author="alice")
 
     # The family tag carries no claim, and a mis-tag costs everyone who
     # searches by family while costing its author nothing, so correcting it
@@ -659,6 +726,7 @@ def main():
             d["family"] = "other"
             d.update(also)
             return d
+
         base = copy.deepcopy(BASE_DOC)
         base["family"] = family
         return edit, base
@@ -677,50 +745,43 @@ def main():
             for k, v in also.items():
                 d[k] = v
             return d
+
         return edit, base
 
     e, b = tagged("other", "pair-partition-cpm")
-    run_case("non-author may correct a family tag", e, True,
-             rename=False, base_doc=b)
+    run_case("non-author may correct a family tag", e, True, rename=False, base_doc=b)
 
     e, b = tagged(None, "pair-partition-cpm")
-    run_case("non-author may add a missing family tag", e, True,
-             rename=False, base_doc=b)
+    run_case("non-author may add a missing family tag", e, True, rename=False, base_doc=b)
 
     e, b = tagged("other", None)
-    run_case("non-author may not remove a family tag", e, False,
-             rename=False, base_doc=b)
+    run_case("non-author may not remove a family tag", e, False, rename=False, base_doc=b)
 
     e, b = tagged("other", "pair-partition-cpm", n=61)
-    run_case("a family re-tag may not carry another field", e, False,
-             rename=False, base_doc=b)
+    run_case("a family re-tag may not carry another field", e, False, rename=False, base_doc=b)
 
     def retag_plus_note():
         d = copy.deepcopy(BASE_DOC)
         d["family"] = "pair-partition-cpm"
-        d["provenance"] = dict(d["provenance"],
-                               notes="original. and a word from me")
+        d["provenance"] = dict(d["provenance"], notes="original. and a word from me")
         return d
+
     base = copy.deepcopy(BASE_DOC)
     base["family"] = "other"
-    run_case("a family re-tag may not append to provenance.notes",
-             retag_plus_note, False, rename=False, base_doc=base)
+    run_case("a family re-tag may not append to provenance.notes", retag_plus_note, False, rename=False, base_doc=base)
 
     e, b = tagged("other", "pair-partition-cpm")
-    run_case("a family re-tag plus a rename is not a family re-tag", e, False,
-             rename=True, base_doc=b)
+    run_case("a family re-tag plus a rename is not a family re-tag", e, False, rename=True, base_doc=b)
 
     # Not through run_case: an unchanged tag with nothing else changed is not
     # a diff, so there is no commit to make. Asserted against the binding.
     same = copy.deepcopy(BASE_DOC)
     same["family"] = "other"
-    ok, why = check_authorship.family_binding("bob", same,
-                                              copy.deepcopy(same))
+    ok, why = check_authorship.family_binding("bob", same, copy.deepcopy(same))
     check("an unchanged family tag binds nothing", not ok and "unchanged" in why)
 
     e, b = tagged("other", "pair-partition-cpm")
-    run_case("an author may re-tag their own entry", e, True,
-             rename=False, base_doc=b, author="alice")
+    run_case("an author may re-tag their own entry", e, True, rename=False, base_doc=b, author="alice")
 
     # A literature match withdraws a novelty claim rather than making one, so
     # recording it binds for anyone (#1204): novelty to known_parameters, a
@@ -734,32 +795,27 @@ def main():
             for k, v in also.items():
                 d[k] = v
             return d
+
         return edit
 
-    run_case("non-author may record a literature match", matched(), True,
-             rename=False)
-    run_case("non-author may add a reference alone", matched(novelty=None), True,
-             rename=False)
+    run_case("non-author may record a literature match", matched(), True, rename=False)
+    run_case("non-author may add a reference alone", matched(novelty=None), True, rename=False)
     claimed = copy.deepcopy(BASE_DOC)
     claimed["provenance"]["novelty"] = "new_parameters"
-    run_case("a literature match may withdraw a new_parameters claim",
-             matched(), True, rename=False, base_doc=claimed)
-    run_case("non-author may not assert new_parameters",
-             matched(novelty="new_parameters"), False, rename=False)
-    run_case("known_parameters without a reference does not bind",
-             matched(refs=()), False, rename=False)
+    run_case("a literature match may withdraw a new_parameters claim", matched(), True, rename=False, base_doc=claimed)
+    run_case("non-author may not assert new_parameters", matched(novelty="new_parameters"), False, rename=False)
+    run_case("known_parameters without a reference does not bind", matched(refs=()), False, rename=False)
 
     def dropped_ref():
         d = copy.deepcopy(BASE_DOC)
         d["provenance"]["novelty"] = "known_parameters"
         d["provenance"]["references"] = ["arXiv:2306.16400"]
         return d
+
     with_ref = copy.deepcopy(BASE_DOC)
     with_ref["provenance"]["references"] = ["arXiv:0000.00001"]
-    run_case("a literature match may not remove a reference", dropped_ref, False,
-             rename=False, base_doc=with_ref)
-    run_case("a literature match may not carry another field",
-             matched(family="other"), False, rename=False)
+    run_case("a literature match may not remove a reference", dropped_ref, False, rename=False, base_doc=with_ref)
+    run_case("a literature match may not carry another field", matched(family="other"), False, rename=False)
     same = copy.deepcopy(BASE_DOC)
     ok, why = check_authorship.novelty_binding("bob", same, copy.deepcopy(BASE_DOC))
     check("an unchanged novelty binds nothing", not ok and "nothing" in why)
@@ -779,67 +835,93 @@ def main():
 def _rate_cases():
     """Measured-rate points (schema 0.5, #1278): adding points to an existing
     circuit.ler binds for anyone, since the gate re-measures them; changing
-    or removing an existing point, or anything else, does not."""
-    legacy = {"p": 0.001, "shots": 10000, "failures": 154, "seed": 7,
-              "decoder": "bposd-cs-10", "ler_per_round": 0.0052,
-              "ci95": [0.0044, 0.006]}
-    higher = {"p": 0.005, "shots": 10000, "failures": 1250, "seed": 7,
-              "decoder": "bposd-cs-10", "ler_per_round": 0.045,
-              "ci95": [0.042, 0.048]}
+    or removing an existing point, or anything else, does not.
+    """
+    legacy = {
+        "p": 0.001,
+        "shots": 10000,
+        "failures": 154,
+        "seed": 7,
+        "decoder": "bposd-cs-10",
+        "ler_per_round": 0.0052,
+        "ci95": [0.0044, 0.006],
+    }
+    higher = {
+        "p": 0.005,
+        "shots": 10000,
+        "failures": 1250,
+        "seed": 7,
+        "decoder": "bposd-cs-10",
+        "ler_per_round": 0.045,
+        "ci95": [0.042, 0.048],
+    }
     base = copy.deepcopy(BASE_DOC)
-    base["circuit"] = {"rounds": 3, "stim_version": "1.16.0",
-                       "d_circ": {"X": {"value": 3, "witness": [0, 1, 2]},
-                                  "Z": {"value": 3, "witness": [3, 4, 5]}},
-                       "ler": {"X": dict(legacy), "Z": dict(legacy)}}
+    base["circuit"] = {
+        "rounds": 3,
+        "stim_version": "1.16.0",
+        "d_circ": {"X": {"value": 3, "witness": [0, 1, 2]}, "Z": {"value": 3, "witness": [3, 4, 5]}},
+        "ler": {"X": dict(legacy), "Z": dict(legacy)},
+    }
 
     def migrated(**also):
         def edit():
             d = copy.deepcopy(base)
             d["schema_version"] = "0.5"
-            d["circuit"]["ler"] = {"X": [dict(higher), dict(legacy)],
-                                   "Z": [dict(higher), dict(legacy)]}
+            d["circuit"]["ler"] = {"X": [dict(higher), dict(legacy)], "Z": [dict(higher), dict(legacy)]}
             for k, v in also.items():
                 d[k] = v
             return d
+
         return edit
 
-    run_case("non-author may add measured-rate points to an existing ler",
-             migrated(), True, rename=False, base_doc=base)
+    run_case(
+        "non-author may add measured-rate points to an existing ler", migrated(), True, rename=False, base_doc=base
+    )
 
     def altered():
         d = migrated()()
-        d["circuit"]["ler"]["X"][1]["failures"] = 100   # the old point moved
+        d["circuit"]["ler"]["X"][1]["failures"] = 100  # the old point moved
         return d
-    run_case("non-author may not alter an existing rate point",
-             altered, False, rename=False, base_doc=base)
+
+    run_case("non-author may not alter an existing rate point", altered, False, rename=False, base_doc=base)
 
     def dropped_basis():
         d = migrated()()
         del d["circuit"]["ler"]["Z"]
         return d
-    run_case("non-author may not drop a basis while adding points",
-             dropped_basis, False, rename=False, base_doc=base)
+
+    run_case("non-author may not drop a basis while adding points", dropped_basis, False, rename=False, base_doc=base)
 
     def nothing_added():
         d = copy.deepcopy(base)
         d["schema_version"] = "0.5"
         d["circuit"]["ler"] = {"X": [dict(legacy)], "Z": [dict(legacy)]}
         return d
-    run_case("rewriting the legacy object as a one-point list adds nothing",
-             nothing_added, False, rename=False, base_doc=base)
+
+    run_case(
+        "rewriting the legacy object as a one-point list adds nothing",
+        nothing_added,
+        False,
+        rename=False,
+        base_doc=base,
+    )
 
     def other_circuit_field():
         d = migrated()()
         d["circuit"]["rounds"] = 4
         return d
-    run_case("adding rate points may not touch the rest of the circuit block",
-             other_circuit_field, False, rename=False, base_doc=base)
 
-    run_case("adding rate points may not carry another field",
-             migrated(n=61), False, rename=False, base_doc=base)
+    run_case(
+        "adding rate points may not touch the rest of the circuit block",
+        other_circuit_field,
+        False,
+        rename=False,
+        base_doc=base,
+    )
 
-    run_case("the listed author may add rate points too",
-             migrated(), True, author="alice", rename=False, base_doc=base)
+    run_case("adding rate points may not carry another field", migrated(n=61), False, rename=False, base_doc=base)
+
+    run_case("the listed author may add rate points too", migrated(), True, author="alice", rename=False, base_doc=base)
 
 
 def _memory_text(per_round, rounds, qubits=4, flip=False):
@@ -865,204 +947,242 @@ def _circuit_improvement_cases():
     and higher on at least one, at no fewer rounds, credited in the new
     block's contributed_by. A reading that is lower anywhere, fewer rounds, a
     dropped field, a schedule with measured-rate points, or any change
-    outside the circuit block stays with the listed authors."""
+    outside the circuit block stays with the listed authors.
+    """
     print("\ncircuit improvement binding (a better schedule):")
     base = copy.deepcopy(BASE_DOC)
     base["schema_version"] = "0.2"
     base["circuit"] = {
-        "d_circ": {"X": {"value": 4, "confidence": "upper_bound",
-                         "witness": [0, 1, 2, 3]},
-                   "Z": {"value": 5, "confidence": "upper_bound",
-                         "witness": [1, 2, 3, 4, 5]}},
-        "rounds": 6, "stim_version": "1.16.0",
+        "d_circ": {
+            "X": {"value": 4, "confidence": "upper_bound", "witness": [0, 1, 2, 3]},
+            "Z": {"value": 5, "confidence": "upper_bound", "witness": [1, 2, 3, 4, 5]},
+        },
+        "rounds": 6,
+        "stim_version": "1.16.0",
         "notes": "edge-coloring schedule.",
     }
-    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"),
-            ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
-    better = [("circuits/60-8-6/memory_x.stim", "# rescheduled\n"),
-              ("circuits/60-8-6/memory_z.stim", "# rescheduled\n")]
+    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"), ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
+    better = [
+        ("circuits/60-8-6/memory_x.stim", "# rescheduled\n"),
+        ("circuits/60-8-6/memory_z.stim", "# rescheduled\n"),
+    ]
 
     def improved(x=6, z=5, rounds=6, credit="@bob", **also):
         def edit():
             d = copy.deepcopy(base)
-            d["circuit"]["d_circ"]["X"] = {
-                "value": x, "confidence": "upper_bound",
-                "witness": list(range(x))}
-            d["circuit"]["d_circ"]["Z"] = {
-                "value": z, "confidence": "upper_bound",
-                "witness": list(range(1, z + 1))}
+            d["circuit"]["d_circ"]["X"] = {"value": x, "confidence": "upper_bound", "witness": list(range(x))}
+            d["circuit"]["d_circ"]["Z"] = {"value": z, "confidence": "upper_bound", "witness": list(range(1, z + 1))}
             d["circuit"]["rounds"] = rounds
             d["circuit"]["notes"] = "PPO-chosen schedule."
-            d["circuit"]["contributed_by"] = {
-                "by": [credit], "date": "2026-10-16",
-                "method": "schedule synthesis"}
+            d["circuit"]["contributed_by"] = {"by": [credit], "date": "2026-10-16", "method": "schedule synthesis"}
             d["provenance"]["notes"] += " Schedule improved."
             for k, v in also.items():
                 d[k] = v
             return d
+
         return edit
 
     def case(name, edit, ok, base_doc=base, base_files=stim, files=better, **kw):
-        run_case(name, edit, ok, rename=False, base_doc=base_doc,
-                 base_files=base_files, files=files, **kw)
+        run_case(name, edit, ok, rename=False, base_doc=base_doc, base_files=base_files, files=files, **kw)
 
-    case("non-author may replace the circuit tier when d_circ rises on one "
-         "side", improved(), True)
+    case("non-author may replace the circuit tier when d_circ rises on one side", improved(), True)
     case("a rise on both sides binds", improved(x=6, z=6), True)
     case("a rise at more rounds binds", improved(rounds=7), True)
-    case("the same d_circ on both sides is a replacement, not a rise",
-         improved(x=4, z=5), False)
-    case("a lower reading on one side is rejected even when the other rises",
-         improved(x=6, z=4), False)
+    case("the same d_circ on both sides is a replacement, not a rise", improved(x=4, z=5), False)
+    case("a lower reading on one side is rejected even when the other rises", improved(x=6, z=4), False)
     case("a rise read at fewer rounds is rejected", improved(rounds=5), False)
 
     def uncredited():
         d = improved()()
         del d["circuit"]["contributed_by"]
         return d
-    case("a rise without contributed_by credit is rejected", uncredited,
-         False)
-    case("a rise crediting someone else is rejected",
-         improved(credit="@carol"), False)
+
+    case("a rise without contributed_by credit is rejected", uncredited, False)
+    case("a rise crediting someone else is rejected", improved(credit="@carol"), False)
 
     def drops_notes():
         d = improved()()
         del d["circuit"]["notes"]
         return d
-    case("a rise that drops a field the block carried is rejected",
-         drops_notes, False)
+
+    case("a rise that drops a field the block carried is rejected", drops_notes, False)
 
     def appends_author():
         d = improved()()
         d["provenance"]["authors"].append("@bob")
         return d
-    case("a rise that also appends to authors is rejected", appends_author,
-         False)
+
+    case("a rise that also appends to authors is rejected", appends_author, False)
 
     def rewrites_notes():
         d = improved()()
         d["provenance"]["notes"] = "rewritten."
         return d
-    case("a rise that rewrites provenance.notes is rejected", rewrites_notes,
-         False)
+
+    case("a rise that rewrites provenance.notes is rejected", rewrites_notes, False)
     case("a rise may not carry another field", improved(n=61), False)
 
     def touches_distance():
         d = improved()()
-        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
-                              "witness": [0, 1, 2, 3, 4]}
+        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4]}
         d["distance"]["d"] = 5
         return d
-    case("a rise that also edits the distance is rejected", touches_distance,
-         False)
+
+    case("a rise that also edits the distance is rejected", touches_distance, False)
 
     measured = copy.deepcopy(base)
     measured["circuit"]["ler"] = {
         "X": [{"p": 0.001, "shots": 1000, "failures": 5}],
-        "Z": [{"p": 0.001, "shots": 1000, "failures": 7}]}
+        "Z": [{"p": 0.001, "shots": 1000, "failures": 7}],
+    }
 
     def improved_measured():
         d = improved()()
         d["circuit"]["ler"] = copy.deepcopy(measured["circuit"]["ler"])
         return d
-    case("replacing a schedule that carries measured-rate points is "
-         "reserved to the listed authors", improved_measured, False,
-         base_doc=measured)
-    case("the listed author may replace a measured schedule",
-         improved_measured, True, base_doc=measured, author="alice")
-    case("the listed author may still replace the tier without a rise",
-         improved(x=4, z=5), True, author="alice")
+
+    case(
+        "replacing a schedule that carries measured-rate points is reserved to the listed authors",
+        improved_measured,
+        False,
+        base_doc=measured,
+    )
+    case(
+        "the listed author may replace a measured schedule", improved_measured, True, base_doc=measured, author="alice"
+    )
+    case("the listed author may still replace the tier without a rise", improved(x=4, z=5), True, author="alice")
 
     # the shallower-schedule route (issue #6834): the same d_circ on both
     # sides binds when the new circuits have strictly fewer layers per round
     # on both bases and no more qubits; memory files are real stim text so
     # check_authorship.circuit_schedules can read their depth
     def pair(x_text, z_text):
-        return [("circuits/60-8-6/memory_x.stim", x_text),
-                ("circuits/60-8-6/memory_z.stim", z_text)]
+        return [("circuits/60-8-6/memory_x.stim", x_text), ("circuits/60-8-6/memory_z.stim", z_text)]
+
     deep = pair(_memory_text(12, 6), _memory_text(12, 6))
     shallow = pair(_memory_text(6, 6), _memory_text(6, 6))
     half = pair(_memory_text(6, 6), _memory_text(12, 6))
     same_depth = pair(_memory_text(12, 6, flip=True), _memory_text(12, 6, flip=True))
     wide = pair(_memory_text(6, 6, qubits=6), _memory_text(6, 6, qubits=6))
-    case("the same d_circ from a schedule strictly shallower on both bases "
-         "binds", improved(x=4, z=5), True, base_files=deep, files=shallow)
-    case("a schedule shallower on one basis and as deep on the other is a "
-         "replacement", improved(x=4, z=5), False, base_files=deep, files=half)
-    case("other circuits at the same depth are a replacement, not an "
-         "improvement", improved(x=4, z=5), False, base_files=deep,
-         files=same_depth)
-    case("a shallower schedule that addresses more qubits is a replacement",
-         improved(x=4, z=5), False, base_files=deep, files=wide)
-    case("a shallower schedule read at fewer rounds is rejected",
-         improved(x=4, z=5, rounds=5), False, base_files=deep, files=shallow)
-    case("a shallower schedule that also raises a side binds",
-         improved(x=6, z=5), True, base_files=deep, files=shallow)
+    case(
+        "the same d_circ from a schedule strictly shallower on both bases binds",
+        improved(x=4, z=5),
+        True,
+        base_files=deep,
+        files=shallow,
+    )
+    case(
+        "a schedule shallower on one basis and as deep on the other is a replacement",
+        improved(x=4, z=5),
+        False,
+        base_files=deep,
+        files=half,
+    )
+    case(
+        "other circuits at the same depth are a replacement, not an improvement",
+        improved(x=4, z=5),
+        False,
+        base_files=deep,
+        files=same_depth,
+    )
+    case(
+        "a shallower schedule that addresses more qubits is a replacement",
+        improved(x=4, z=5),
+        False,
+        base_files=deep,
+        files=wide,
+    )
+    case(
+        "a shallower schedule read at fewer rounds is rejected",
+        improved(x=4, z=5, rounds=5),
+        False,
+        base_files=deep,
+        files=shallow,
+    )
+    case("a shallower schedule that also raises a side binds", improved(x=6, z=5), True, base_files=deep, files=shallow)
 
     def uncredited_same():
         d = improved(x=4, z=5)()
         del d["circuit"]["contributed_by"]
         return d
-    case("a shallower schedule without contributed_by credit is rejected",
-         uncredited_same, False, base_files=deep, files=shallow)
+
+    case(
+        "a shallower schedule without contributed_by credit is rejected",
+        uncredited_same,
+        False,
+        base_files=deep,
+        files=shallow,
+    )
 
     def shallower_measured():
         d = improved(x=4, z=5)()
         d["circuit"]["ler"] = copy.deepcopy(measured["circuit"]["ler"])
         return d
-    case("a shallower schedule over a measured one is reserved to the listed "
-         "authors", shallower_measured, False, base_doc=measured,
-         base_files=deep, files=shallow)
-    case("a shallower schedule binds when the base circuits are unreadable "
-         "only for the listed author", improved(x=4, z=5), False,
-         base_files=pair("not a circuit\n", "not a circuit\n"), files=shallow)
 
-    check("the evident binding for the same d_circ from other circuits is "
-          "the improvement",
-          check_authorship.evident_binding(base, improved(x=4, z=5)())
-          == "circuit_improvement")
+    case(
+        "a shallower schedule over a measured one is reserved to the listed authors",
+        shallower_measured,
+        False,
+        base_doc=measured,
+        base_files=deep,
+        files=shallow,
+    )
+    case(
+        "a shallower schedule binds when the base circuits are unreadable only for the listed author",
+        improved(x=4, z=5),
+        False,
+        base_files=pair("not a circuit\n", "not a circuit\n"),
+        files=shallow,
+    )
+
+    check(
+        "the evident binding for the same d_circ from other circuits is the improvement",
+        check_authorship.evident_binding(base, improved(x=4, z=5)()) == "circuit_improvement",
+    )
     depth = lambda layers, qubits=4: {"layers": layers, "qubits": qubits}  # noqa: E731
     bc, nc = {"rounds": 6}, {"rounds": 6}
     ok, why = check_authorship.shallower_schedule(bc, nc, None)
-    check("no schedules means no rise and nothing else",
-          not ok and why == "no side's circuit fault distance rose")
+    check("no schedules means no rise and nothing else", not ok and why == "no side's circuit fault distance rose")
+    ok, why = check_authorship.shallower_schedule(bc, nc, {"base": {}, "new": {}, "errors": ["circuits/x: ValueError"]})
+    check(
+        "an unreadable circuit refuses with the file named",
+        not ok and "could not be compared" in why and "circuits/x" in why,
+    )
     ok, why = check_authorship.shallower_schedule(
-        bc, nc, {"base": {}, "new": {}, "errors": ["circuits/x: ValueError"]})
-    check("an unreadable circuit refuses with the file named",
-          not ok and "could not be compared" in why and "circuits/x" in why)
+        bc, nc, {"base": {"X": depth(74), "Z": depth(74)}, "new": {"X": depth(38), "Z": depth(74)}, "errors": []}
+    )
+    check(
+        "a basis that is not shallower is named with both depths",
+        not ok and "Z memory circuit is not shallower (12 vs 12" in why,
+    )
     ok, why = check_authorship.shallower_schedule(
-        bc, nc, {"base": {"X": depth(74), "Z": depth(74)},
-                 "new": {"X": depth(38), "Z": depth(74)}, "errors": []})
-    check("a basis that is not shallower is named with both depths",
-          not ok and "Z memory circuit is not shallower (12 vs 12" in why)
+        bc,
+        nc,
+        {"base": {"X": depth(74), "Z": depth(74)}, "new": {"X": depth(38), "Z": depth(38, qubits=5)}, "errors": []},
+    )
+    check("more qubits on a shallower basis is named", not ok and "addresses more qubits (5 vs 4)" in why)
     ok, why = check_authorship.shallower_schedule(
-        bc, nc, {"base": {"X": depth(74), "Z": depth(74)},
-                 "new": {"X": depth(38), "Z": depth(38, qubits=5)}, "errors": []})
-    check("more qubits on a shallower basis is named",
-          not ok and "addresses more qubits (5 vs 4)" in why)
-    ok, why = check_authorship.shallower_schedule(
-        bc, {"rounds": 7}, {"base": {"X": depth(74), "Z": depth(74)},
-                            "new": {"X": depth(79), "Z": depth(79)}, "errors": []})
-    check("depth is compared per round, so more rounds at the same total "
-          "layers is shallower", ok and why == "")
+        bc,
+        {"rounds": 7},
+        {"base": {"X": depth(74), "Z": depth(74)}, "new": {"X": depth(79), "Z": depth(79)}, "errors": []},
+    )
+    check("depth is compared per round, so more rounds at the same total layers is shallower", ok and why == "")
 
-    check("the evident binding for a d_circ change is the improvement",
-          check_authorship.evident_binding(base, improved()())
-          == "circuit_improvement")
-    ok, why = check_authorship.circuit_improvement_binding(
-        "bob", base, improved(x=4, z=5)())
-    check("a no-rise replacement names the reason",
-          not ok and "no side" in why)
-    ok, why = check_authorship.circuit_improvement_binding(
-        "bob", base, improved(x=6, z=4)())
-    check("a fall on one side names the side",
-          not ok and "d_circ.Z fell" in why)
+    check(
+        "the evident binding for a d_circ change is the improvement",
+        check_authorship.evident_binding(base, improved()()) == "circuit_improvement",
+    )
+    ok, why = check_authorship.circuit_improvement_binding("bob", base, improved(x=4, z=5)())
+    check("a no-rise replacement names the reason", not ok and "no side" in why)
+    ok, why = check_authorship.circuit_improvement_binding("bob", base, improved(x=6, z=4)())
+    check("a fall on one side names the side", not ok and "d_circ.Z fell" in why)
 
     def bob_rewrites_after_improvement():
         d = improved()()
         d["checks"]["Z"] = [[3, 4, 6]]
         d["provenance"]["construction"] = "bob's construction"
         return d
+
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         make_repo(td, base_doc=base, extra=stim)
         git(td, "checkout", "-q", "main")
@@ -1075,10 +1195,8 @@ def _circuit_improvement_cases():
         write_code(td, "60-8-6.json", bob_rewrites_after_improvement())
         git(td, "add", "-A")
         git(td, "commit", "-q", "-m", "followup")
-        rc = check_authorship.main(
-            ["--author", "bob", "--root", td, "--base", "main"])
-        check("after a merged improvement, @bob still cannot edit the code",
-              rc != 0)
+        rc = check_authorship.main(["--author", "bob", "--root", td, "--base", "main"])
+        check("after a merged improvement, @bob still cannot edit the code", rc != 0)
 
 
 def _circuit_refutation_cases():
@@ -1096,105 +1214,106 @@ def _circuit_refutation_cases():
     base = copy.deepcopy(BASE_DOC)
     base["schema_version"] = "0.2"
     base["circuit"] = {
-        "d_circ": {"X": {"value": 6, "confidence": "upper_bound",
-                         "witness": [0, 1, 2, 3, 4, 5]},
-                   "Z": {"value": 6, "confidence": "upper_bound",
-                         "witness": [1, 2, 3, 4, 5, 6]}},
-        "rounds": 6, "stim_version": "1.16.0",
+        "d_circ": {
+            "X": {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]},
+            "Z": {"value": 6, "confidence": "upper_bound", "witness": [1, 2, 3, 4, 5, 6]},
+        },
+        "rounds": 6,
+        "stim_version": "1.16.0",
         "notes": "edge-coloring schedule.",
-        "contributed_by": {"by": ["@alice"], "date": "2026-10-01",
-                           "method": "edge coloring"},
+        "contributed_by": {"by": ["@alice"], "date": "2026-10-01", "method": "edge coloring"},
     }
-    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"),
-            ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
+    stim = [("circuits/60-8-6/memory_x.stim", "# baseline\n"), ("circuits/60-8-6/memory_z.stim", "# baseline\n")]
 
-    def refuted(x=3, z=6, credit="@bob", confidence="upper_bound",
-                witness_len=None, note=" Circuit distance refuted by {credit}: "
-                "an undetected logical fault set of weight 3 in the committed "
-                "X-memory DEM."):
+    def refuted(
+        x=3,
+        z=6,
+        credit="@bob",
+        confidence="upper_bound",
+        witness_len=None,
+        note=" Circuit distance refuted by {credit}: "
+        "an undetected logical fault set of weight 3 in the committed "
+        "X-memory DEM.",
+    ):
         def edit():
             d = copy.deepcopy(base)
             for side, v in (("X", x), ("Z", z)):
                 if v != base["circuit"]["d_circ"][side]["value"]:
                     w = v if witness_len is None else witness_len
-                    d["circuit"]["d_circ"][side] = {
-                        "value": v, "confidence": confidence,
-                        "witness": list(range(w))}
+                    d["circuit"]["d_circ"][side] = {"value": v, "confidence": confidence, "witness": list(range(w))}
             d["provenance"]["notes"] += note.format(credit=credit)
             return d
+
         return edit
 
     def case(name, edit, ok, base_doc=base, files=(), **kw):
-        run_case(name, edit, ok, rename=False, base_doc=base_doc,
-                 base_files=stim, files=files, **kw)
+        run_case(name, edit, ok, rename=False, base_doc=base_doc, base_files=stim, files=files, **kw)
 
-    case("non-author may lower one side's d_circ with a witness of the new "
-         "weight", refuted(), True)
+    case("non-author may lower one side's d_circ with a witness of the new weight", refuted(), True)
     case("lowering both sides binds", refuted(x=3, z=4), True)
     case("the listed author binds as before", refuted(), True, author="alice")
+
     def restamped():
         d = refuted(x=6, note=" Re-stamped by {credit}.")()
         d["circuit"]["d_circ"]["X"]["witness"] = [0, 1, 2, 3, 4, 7]
         return d
-    case("the same d_circ with a changed witness is not a refutation",
-         restamped, False)
-    case("a rise on one side with a fall on the other is rejected",
-         refuted(x=3, z=7), False)
-    case("a witness that is not exactly the new weight is rejected",
-         refuted(witness_len=4), False)
-    case("a corrected value may not claim exact", refuted(confidence="exact"),
-         False)
-    case("appended notes that do not name the refuter are rejected",
-         refuted(note=" Circuit distance corrected."), False)
-    case("notes crediting someone else are rejected",
-         refuted(credit="@carol"), False)
+
+    case("the same d_circ with a changed witness is not a refutation", restamped, False)
+    case("a rise on one side with a fall on the other is rejected", refuted(x=3, z=7), False)
+    case("a witness that is not exactly the new weight is rejected", refuted(witness_len=4), False)
+    case("a corrected value may not claim exact", refuted(confidence="exact"), False)
+    case(
+        "appended notes that do not name the refuter are rejected", refuted(note=" Circuit distance corrected."), False
+    )
+    case("notes crediting someone else are rejected", refuted(credit="@carol"), False)
 
     def touches_contributed_by():
         d = refuted()()
         d["circuit"]["contributed_by"]["by"].append("@bob")
         return d
-    case("a refutation that edits contributed_by is rejected",
-         touches_contributed_by, False)
+
+    case("a refutation that edits contributed_by is rejected", touches_contributed_by, False)
 
     def drops_rounds():
         d = refuted()()
         d["circuit"]["rounds"] = 5
         return d
+
     case("a refutation that changes rounds is rejected", drops_rounds, False)
 
     def rewrites_notes():
         d = refuted()()
         d["provenance"]["notes"] = "rewritten by @bob."
         return d
-    case("a refutation that rewrites provenance.notes is rejected",
-         rewrites_notes, False)
+
+    case("a refutation that rewrites provenance.notes is rejected", rewrites_notes, False)
 
     def touches_distance():
         d = refuted()()
-        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound",
-                              "witness": [0, 1, 2, 3, 4]}
+        d["distance"]["X"] = {"value": 5, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4]}
         d["distance"]["d"] = 5
         return d
-    case("a refutation that also edits the distance is rejected",
-         touches_distance, False)
-    case("a refutation that also replaces the committed circuits is rejected",
-         refuted(), False,
-         files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")])
 
-    check("the evident binding for a lowered d_circ is the refutation",
-          check_authorship.evident_binding(base, refuted()())
-          == "circuit_refutation")
-    ok, why = check_authorship.circuit_refutation_binding(
-        "bob", base, restamped())
-    check("a no-fall change names the reason",
-          not ok and "without its value decreasing" in why)
-    ok, why = check_authorship.circuit_refutation_binding(
-        "bob", base, refuted(x=3, z=7)())
+    case("a refutation that also edits the distance is rejected", touches_distance, False)
+    case(
+        "a refutation that also replaces the committed circuits is rejected",
+        refuted(),
+        False,
+        files=[("circuits/60-8-6/memory_x.stim", "# rescheduled\n")],
+    )
+
+    check(
+        "the evident binding for a lowered d_circ is the refutation",
+        check_authorship.evident_binding(base, refuted()()) == "circuit_refutation",
+    )
+    ok, why = check_authorship.circuit_refutation_binding("bob", base, restamped())
+    check("a no-fall change names the reason", not ok and "without its value decreasing" in why)
+    ok, why = check_authorship.circuit_refutation_binding("bob", base, refuted(x=3, z=7)())
     check("a rise names the side", not ok and "d_circ.Z rose" in why)
 
 
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 

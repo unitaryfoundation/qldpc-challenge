@@ -46,6 +46,7 @@ entry's partial certificate has the single Pauli-weight side `P` instead of
     python verify/check_certs.py            # validate every certificate
     python verify/check_certs.py --level    # print the level mix
 """
+
 import argparse
 import glob
 import json
@@ -115,8 +116,9 @@ def evidence_problems(slug, cert):
         # solver verdict claims a check that did not happen.
         for field in ("artifact", "checker", "reference"):
             if v.get(field):
-                out.append(f"{slug}: level 'solver' names a {field}; if "
-                           "something was checked, claim the level it earns")
+                out.append(
+                    f"{slug}: level 'solver' names a {field}; if something was checked, claim the level it earns"
+                )
         return out
     # A stronger level needs evidence a third party can act on. That can be
     # a file in the tree, or it can be the instance plus the recipe that
@@ -129,19 +131,22 @@ def evidence_problems(slug, cert):
     art = v.get("artifact")
     replay = v.get("replay")
     if art and not _inside_tree(art):
-        out.append(f"{slug}: level {level!r} names {art}, which is not a file "
-                   "committed in this tree")
+        out.append(f"{slug}: level {level!r} names {art}, which is not a file committed in this tree")
     if not art and not replay:
-        out.append(f"{slug}: level {level!r} with neither an artifact in the "
-                   "tree nor a replay recipe; one of the two has to be there "
-                   "or the level claims a check nobody can repeat")
+        out.append(
+            f"{slug}: level {level!r} with neither an artifact in the "
+            "tree nor a replay recipe; one of the two has to be there "
+            "or the level claims a check nobody can repeat"
+        )
     if not v.get("checker"):
         out.append(f"{slug}: level {level!r} with no checker recorded")
     if level == "proof_log" and not art and not v.get("cnf_sha256"):
-        out.append(f"{slug}: level 'proof_log' replayed rather than stored "
-                   "needs cnf_sha256, since a regenerated formula that is "
-                   "not the one that was refuted proves nothing about this "
-                   "entry")
+        out.append(
+            f"{slug}: level 'proof_log' replayed rather than stored "
+            "needs cnf_sha256, since a regenerated formula that is "
+            "not the one that was refuted proves nothing about this "
+            "entry"
+        )
     if level == "formal":
         # The binding is checked, not just present. The theorem is about a
         # matrix pair inside the development; the hash says it is this
@@ -150,14 +155,18 @@ def evidence_problems(slug, cert):
         want = v.get("checks_sha256")
         doc = _code_doc(slug)
         if doc is None:
-            out.append(f"{slug}: level 'formal' but codes/{slug}.json is not "
-                       "on the board, so there is nothing for the proof to "
-                       "be about")
+            out.append(
+                f"{slug}: level 'formal' but codes/{slug}.json is not "
+                "on the board, so there is nothing for the proof to "
+                "be about"
+            )
         elif want != checks_sha256(doc):
-            out.append(f"{slug}: level 'formal' checks_sha256 does not match "
-                       f"codes/{slug}.json (recorded {str(want)[:16]}, the "
-                       f"entry hashes to {checks_sha256(doc)[:16]}); the "
-                       "theorem is bound to some other matrix pair")
+            out.append(
+                f"{slug}: level 'formal' checks_sha256 does not match "
+                f"codes/{slug}.json (recorded {str(want)[:16]}, the "
+                f"entry hashes to {checks_sha256(doc)[:16]}); the "
+                "theorem is bound to some other matrix pair"
+            )
     return out
 
 
@@ -191,28 +200,35 @@ def bound_problems(slug, cert):
     stab = doc is not None and doc.get("code_type") == "stabilizer"
     if exact:
         if d_lower is not None and d_lower != d:
-            out.append(f"{slug}: d_exact with d_lower {d_lower} != d {d}; an exact "
-                       "certificate's lower bound is its distance")
+            out.append(
+                f"{slug}: d_exact with d_lower {d_lower} != d {d}; an exact certificate's lower bound is its distance"
+            )
         for side, blk in sides.items():
             pm = (blk or {}).get("proved_min")
             if pm is not None and pm != d:
                 out.append(f"{slug}: {side} side is exact but proved_min is {pm}, not {d}")
     else:
         if d_lower is None:
-            return out                      # the schema already reports it
+            return out  # the schema already reports it
         if d_lower < 2:
-            out.append(f"{slug}: partial certificate with d_lower {d_lower}; d >= 1 "
-                       "proves nothing and is not a certificate")
+            out.append(
+                f"{slug}: partial certificate with d_lower {d_lower}; d >= 1 proves nothing and is not a certificate"
+            )
         if d_lower >= d:
-            out.append(f"{slug}: partial certificate with d_lower {d_lower} >= d {d}; "
-                       "a bound that reaches the claim is d_exact, and one above it "
-                       "contradicts the verified witness")
+            out.append(
+                f"{slug}: partial certificate with d_lower {d_lower} >= d {d}; "
+                "a bound that reaches the claim is d_exact, and one above it "
+                "contradicts the verified witness"
+            )
         if stab and set(sides) != {"P"}:
-            out.append(f"{slug}: partial certificate on a stabilizer entry needs the Pauli "
-                       f"side P, has {sorted(sides)}; a CSS side bounds nothing there")
+            out.append(
+                f"{slug}: partial certificate on a stabilizer entry needs the Pauli "
+                f"side P, has {sorted(sides)}; a CSS side bounds nothing there"
+            )
         elif not stab and set(sides) != {"X", "Z"}:
-            out.append(f"{slug}: partial certificate needs both sides, has "
-                       f"{sorted(sides)}; a bound on one side bounds nothing")
+            out.append(
+                f"{slug}: partial certificate needs both sides, has {sorted(sides)}; a bound on one side bounds nothing"
+            )
         mins = []
         for side, blk in sides.items():
             blk = blk or {}
@@ -224,53 +240,66 @@ def bound_problems(slug, cert):
             if blk.get("exact") and pm != d:
                 out.append(f"{slug}: {side} side is exact but proved_min is {pm}, not {d}")
             if blk.get("status") == "SAT":
-                out.append(f"{slug}: {side} side is SAT; a logical lighter than the claim "
-                           "is a refutation, not a certificate")
+                out.append(
+                    f"{slug}: {side} side is SAT; a logical lighter than the claim is a refutation, not a certificate"
+                )
             ladder = blk.get("ladder")
             if ladder is not None:
                 if any(r.get("status") == "SAT" for r in ladder):
-                    out.append(f"{slug}: {side} side ladder has a SAT rung; a logical "
-                               "lighter than the claim is a refutation, not a certificate")
+                    out.append(
+                        f"{slug}: {side} side ladder has a SAT rung; a logical "
+                        "lighter than the claim is a refutation, not a certificate"
+                    )
                 want = _top_unsat(ladder)
                 if pm != want:
-                    out.append(f"{slug}: {side} side proved_min {pm} is not backed by its "
-                               f"ladder, whose top UNSAT rung gives {want}")
+                    out.append(
+                        f"{slug}: {side} side proved_min {pm} is not backed by its "
+                        f"ladder, whose top UNSAT rung gives {want}"
+                    )
         if mins and min(mins) != d_lower:
-            out.append(f"{slug}: d_lower {d_lower} is not the minimum of the sides' "
-                       f"proved_min {sorted(mins)}")
+            out.append(f"{slug}: d_lower {d_lower} is not the minimum of the sides' proved_min {sorted(mins)}")
         v = cert.get("verification") or {}
         want = v.get("checks_sha256")
         if doc is None:
-            out.append(f"{slug}: partial certificate but codes/{slug}.json is not on the "
-                       "board, so there is nothing for the bound to be about")
+            out.append(
+                f"{slug}: partial certificate but codes/{slug}.json is not on the "
+                "board, so there is nothing for the bound to be about"
+            )
         else:
             if want and want != checks_sha256(doc):
-                out.append(f"{slug}: partial certificate checks_sha256 does not match "
-                           f"codes/{slug}.json (recorded {str(want)[:16]}, the entry "
-                           f"hashes to {checks_sha256(doc)[:16]}); the bound is about "
-                           "some other matrix pair")
+                out.append(
+                    f"{slug}: partial certificate checks_sha256 does not match "
+                    f"codes/{slug}.json (recorded {str(want)[:16]}, the entry "
+                    f"hashes to {checks_sha256(doc)[:16]}); the bound is about "
+                    "some other matrix pair"
+                )
             dist = doc.get("distance") or {}
             if isinstance(dist.get("d"), int) and dist["d"] < d_lower:
-                out.append(f"{slug}: the entry's verified witness gives d <= {dist['d']} "
-                           f"but the certificate proves d >= {d_lower}; the witness "
-                           "verifier or the certificate is wrong (issue #4230)")
+                out.append(
+                    f"{slug}: the entry's verified witness gives d <= {dist['d']} "
+                    f"but the certificate proves d >= {d_lower}; the witness "
+                    "verifier or the certificate is wrong (issue #4230)"
+                )
             for side, blk in sides.items():
                 pm = (blk or {}).get("proved_min")
                 sv = (dist.get(side) or {}).get("value") if isinstance(dist.get(side), dict) else None
                 if isinstance(pm, int) and isinstance(sv, int) and sv < pm:
-                    out.append(f"{slug}: the entry's {side} witness gives d_{side} <= {sv} "
-                               f"but the certificate proves d_{side} >= {pm}; the "
-                               "witness verifier or the certificate is wrong (issue #4230)")
+                    out.append(
+                        f"{slug}: the entry's {side} witness gives d_{side} <= {sv} "
+                        f"but the certificate proves d_{side} >= {pm}; the "
+                        "witness verifier or the certificate is wrong (issue #4230)"
+                    )
     return out
 
 
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--level", action="store_true",
-                    help="print the level mix and exit")
-    ap.add_argument("--checks-sha256", metavar="SLUG",
-                    help="print the binding hash of codes/<SLUG>.json for a "
-                         "formal certificate and exit")
+    ap.add_argument("--level", action="store_true", help="print the level mix and exit")
+    ap.add_argument(
+        "--checks-sha256",
+        metavar="SLUG",
+        help="print the binding hash of codes/<SLUG>.json for a formal certificate and exit",
+    )
     a = ap.parse_args(argv)
     if a.checks_sha256:
         doc = _code_doc(a.checks_sha256)
@@ -292,11 +321,11 @@ def main(argv):
 
     try:
         import jsonschema
+
         validator = jsonschema.Draft202012Validator(load_schema())
-    except ImportError:                       # pragma: no cover
+    except ImportError:  # pragma: no cover
         validator = None
-        print("note: jsonschema unavailable; structural check skipped, "
-              "evidence rules still enforced")
+        print("note: jsonschema unavailable; structural check skipped, evidence rules still enforced")
 
     problems, mix, partial = [], dict.fromkeys(LEVELS, 0), 0
     for path in certs:
@@ -329,9 +358,11 @@ def main(argv):
         if len(problems) > 40:
             print(f"  ... and {len(problems) - 40} more")
         return 1
-    print(f"ok: {len(certs)} certificates valid "
-          + ", ".join(f"{mix[lv]} {lv}" for lv in LEVELS)
-          + (f"; {partial} partial" if partial else ""))
+    print(
+        f"ok: {len(certs)} certificates valid "
+        + ", ".join(f"{mix[lv]} {lv}" for lv in LEVELS)
+        + (f"; {partial} partial" if partial else "")
+    )
     return 0
 
 

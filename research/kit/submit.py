@@ -31,6 +31,7 @@ The result is a dict you can write to ``codes/your-code.json`` and submit.
     save_submission(doc, "codes/my-code.json")
     # then: uv run python verify/qldpc_verify.py codes/my-code.json
 """
+
 import datetime
 import json
 import math
@@ -64,9 +65,11 @@ def _interaction_radius(checks, coordinates):
 
     The quantity the verifier recomputes for the locality tracks.
     """
+
     def diam(sup):
         pts = [coordinates[q] for q in sup]
         return max((math.dist(a, b) for a in pts for b in pts), default=0.0)
+
     return max((diam(s) for s in checks), default=0.0)
 
 
@@ -82,14 +85,16 @@ def validate(doc):
     try:
         import jsonschema
     except ImportError as e:
-        raise RuntimeError("jsonschema is required to validate a submission "
-                           "and is a core dependency; run under `uv run`") from e
+        raise RuntimeError(
+            "jsonschema is required to validate a submission and is a core dependency; run under `uv run`"
+        ) from e
     with open(_SCHEMA_PATH, encoding="utf-8") as f:
         schema = json.load(f)
     v = jsonschema.Draft202012Validator(schema)
-    return [f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
-            for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))]
-
+    return [
+        f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
+        for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))
+    ]
 
 
 _HANDLE = re.compile(r"^@[A-Za-z0-9-]+$")
@@ -106,12 +111,9 @@ def _handles(names):
 
 
 _FAMILY_RULES = [
-    ("pair-partition-cpm",
-     re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
-    ("bivariate-bicycle",
-     re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
-    ("generalized-bicycle",
-     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
+    ("pair-partition-cpm", re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
+    ("bivariate-bicycle", re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
+    ("generalized-bicycle", re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
 ]
 
 
@@ -120,15 +122,31 @@ def infer_family(construction):
     opening = con[:90]
     for family, pat in _FAMILY_RULES:
         m = pat.search(opening)
-        if m and not re.search(r"\\bquotient of\\b", opening[:m.start()], re.I):
+        if m and not re.search(r"\\bquotient of\\b", opening[: m.start()], re.I):
             return family
     return None
 
 
-def make_submission(HX, HZ, *, name, construction, authors, family=None,
-                    references=None, notes=None, date=None, tracks=(),
-                    confidence="upper_bound", coordinates=None, layers=None,
-                    trials=8000, seed=0, found_by=None, witnesses=None):
+def make_submission(
+    HX,
+    HZ,
+    *,
+    name,
+    construction,
+    authors,
+    family=None,
+    references=None,
+    notes=None,
+    date=None,
+    tracks=(),
+    confidence="upper_bound",
+    coordinates=None,
+    layers=None,
+    trials=8000,
+    seed=0,
+    found_by=None,
+    witnesses=None,
+):
     """Build a submission dict for the CSS code (HX, HZ).
 
     Parameters
@@ -196,7 +214,8 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
             "refuses a direct sum (its tanner_connected and "
             "stabilizer_group_connected checks), so it is not packaged. Build "
             "each block as its own candidate, or filter the generator with "
-            "prescreen.block_structure (issue #3620)")
+            "prescreen.block_structure (issue #3620)"
+        )
     n = HX.shape[1]
     k = compute_k(HX, HZ)
 
@@ -209,8 +228,7 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
         wx, xwit = lightest_logical(HX, HZ, trials=trials, seed=seed)
         wz, zwit = lightest_logical(HZ, HX, trials=trials, seed=seed + 1)
     if not xwit or not zwit:
-        raise ValueError("no nontrivial logical found on some side "
-                         f"(k={k}); is this a valid encoding code?")
+        raise ValueError(f"no nontrivial logical found on some side (k={k}); is this a valid encoding code?")
     # Mirror the verifier's witness criteria so the doc is guaranteed to pass.
     xv, zv = _vec(xwit, n), _vec(zwit, n)
     assert wx == len(set(xwit)), "X witness weight mismatch"
@@ -223,11 +241,14 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
     handles = _handles(found_by if found_by is not None else authors)
 
     def _provenance(side_seed):
-        return {"found_by": handles, "date": today,
-                "found_at_samples": int(trials),
-                "survived_samples": int(trials),
-                "tool": "research/kit/surrogate.lightest_logical",
-                "seeds": [int(side_seed)]}
+        return {
+            "found_by": handles,
+            "date": today,
+            "found_at_samples": int(trials),
+            "survived_samples": int(trials),
+            "tool": "research/kit/surrogate.lightest_logical",
+            "seeds": [int(side_seed)],
+        }
 
     doc = {
         # 0.2 is the version that introduced witness_provenance; the schema
@@ -259,17 +280,15 @@ def make_submission(HX, HZ, *, name, construction, authors, family=None,
         if inferred is not None:
             family = inferred
     if family is not None:
-        doc["family"] = family            # Layer-2 tag (filterable, never ranked)
+        doc["family"] = family  # Layer-2 tag (filterable, never ranked)
     if tracks:
-        doc["tracks"] = list(tracks)      # deprecated; only if explicitly passed
+        doc["tracks"] = list(tracks)  # deprecated; only if explicitly passed
     if coordinates is not None:
         coords = [[float(v) for v in row] for row in coordinates]
         assert len(coords) == n, f"need {n} coordinates, got {len(coords)}"
-        assert all(len(row) in (2, 3) for row in coords), \
-            "coordinates must be [x, y] or [x, y, z]"
+        assert all(len(row) in (2, 3) for row in coords), "coordinates must be [x, y] or [x, y, z]"
         radius = _interaction_radius(doc["checks"]["X"] + doc["checks"]["Z"], coords)
-        doc["locality"] = {"coordinates": coords,
-                           "interaction_radius": radius}
+        doc["locality"] = {"coordinates": coords, "interaction_radius": radius}
         if layers is not None:
             doc["locality"]["layers"] = int(layers)
     return doc
@@ -318,8 +337,7 @@ def save_submission(doc, path, *, on_collision="error", preflight=True, spec=Non
     path through ``coordination.unique_path(path, doc)`` first.
     """
     if on_collision not in ("error", "overwrite"):
-        raise ValueError(f"on_collision: unknown mode {on_collision!r}; "
-                         "use 'error' or 'overwrite'")
+        raise ValueError(f"on_collision: unknown mode {on_collision!r}; use 'error' or 'overwrite'")
     # A submission is one file, codes/<slug>.json. A directory or a nested path
     # is a packaging mistake (issue #3810 / PR 6849) and must never be written.
     if os.path.isdir(path):
@@ -328,14 +346,14 @@ def save_submission(doc, path, *, on_collision="error", preflight=True, spec=Non
     if not str(path).endswith(".json"):
         raise ValueError(f"{path} must end in .json; a code submission is a "
                          "single file codes/<slug>.json")
-    if on_collision == "error" and os.path.exists(path) \
-            and not holds_same_candidate(path, doc):
+    if on_collision == "error" and os.path.exists(path) and not holds_same_candidate(path, doc):
         raise CandidateCollision(
             f"{path} already holds a different candidate. Overwriting it would "
             "destroy a witness no one can recompute cheaply. Stage under "
             "coordination.staging_dir(), or pass "
             "coordination.unique_path(path, doc), or pass "
-            "on_collision='overwrite' if replacing it is what you mean.")
+            "on_collision='overwrite' if replacing it is what you mean."
+        )
     if preflight:
         result = run_preflight(doc)
         if not result["ok"]:
@@ -350,8 +368,7 @@ def save_submission(doc, path, *, on_collision="error", preflight=True, spec=Non
 
 
 if __name__ == "__main__":
-    print("submit.py is a library; see research/test_smoke.py for end-to-end usage.",
-          file=sys.stderr)
+    print("submit.py is a library; see research/test_smoke.py for end-to-end usage.", file=sys.stderr)
 
 
 # -- reproduction manifests for `qldpc reproduce` (#2955, item 3) --------------
@@ -367,7 +384,7 @@ def recipe_path(path):
     Two extensions deep and without a ``checks`` field, like ``.verdict.json``
     and ``.preflight.json``, so a ``*.json`` glob for candidates skips it.
     """
-    base = path[:-len(".json")] if path.endswith(".json") else path
+    base = path[: -len(".json")] if path.endswith(".json") else path
     return base + RECIPE_SUFFIX
 
 
@@ -383,13 +400,16 @@ def write_recipe(doc, path, spec):
     manifest will then say ``not_reproducible``.
     """
     if not isinstance(spec, dict):
-        raise TypeError("spec must be a JSON object (the screening spec the "
-                        f"code was built from), not {type(spec).__name__}")
-    rec = {"recipe_version": RECIPE_VERSION,
-           "slug": f"{doc.get('n')}-{doc.get('k')}-{(doc.get('distance') or {}).get('d')}",
-           "candidate": os.path.basename(path),
-           "reproducible": recipe_from_spec(spec) is not None,
-           "spec": spec}
+        raise TypeError(
+            f"spec must be a JSON object (the screening spec the code was built from), not {type(spec).__name__}"
+        )
+    rec = {
+        "recipe_version": RECIPE_VERSION,
+        "slug": f"{doc.get('n')}-{doc.get('k')}-{(doc.get('distance') or {}).get('d')}",
+        "candidate": os.path.basename(path),
+        "reproducible": recipe_from_spec(spec) is not None,
+        "spec": spec,
+    }
     out = recipe_path(path)
     with open(out, "w", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(rec, indent=1, sort_keys=True) + "\n")
@@ -423,34 +443,43 @@ def recipe_from_spec(spec):
     return {"constructor": c, "params": p}
 
 
-def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None,
-                         budget_seconds=300, notes=""):
+def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None, budget_seconds=300, notes=""):
     """Write <repro_dir>/<slug>.json. Construction stage runs rebuild.py with
     the recipe from spec, or is declared not_reproducible; other stages follow
-    what the entry carries. Returns the path."""
+    what the entry carries. Returns the path.
+    """
     import hashlib
+
     recipe = recipe_from_spec(spec)
     if recipe:
         construction = {
             "status": "applicable",
             "script": "research/kit/rebuild.py",
-            "args": ["--constructor", recipe["constructor"],
-                     "--params", json.dumps(recipe["params"], separators=(",", ":"))],
+            "args": [
+                "--constructor",
+                recipe["constructor"],
+                "--params",
+                json.dumps(recipe["params"], separators=(",", ":")),
+            ],
             "budget_seconds": int(budget_seconds),
         }
     else:
-        construction = {"status": "not_reproducible",
-                        "reason": "the spec recorded for this entry carries no "
-                                  "{constructor, params} recipe the kit can replay"}
+        construction = {
+            "status": "not_reproducible",
+            "reason": "the spec recorded for this entry carries no {constructor, params} recipe the kit can replay",
+        }
     circ = doc.get("circuit") or {}
     stages = {
         "verify": {"status": "applicable"},
         "construction": construction,
-        "certify": {"status": "applicable", "tlim_seconds": 600} if doc.get("n", 10**9) <= 144
+        "certify": {"status": "applicable", "tlim_seconds": 600}
+        if doc.get("n", 10**9) <= 144
         else {"status": "not_applicable", "reason": "above the certifier's demonstrated range"},
-        "circuits": {"status": "applicable"} if circ.get("d_circ")
+        "circuits": {"status": "applicable"}
+        if circ.get("d_circ")
         else {"status": "not_applicable", "reason": "the entry has no circuit block"},
-        "ler": {"status": "applicable", "tolerance": "ci95"} if circ.get("ler")
+        "ler": {"status": "applicable", "tolerance": "ci95"}
+        if circ.get("ler")
         else {"status": "not_applicable", "reason": "the entry has no measured rate"},
     }
     manifest = {
@@ -458,13 +487,17 @@ def write_repro_manifest(doc, slug, spec, *, repro_dir, artifact_path=None,
         "slug": slug,
         "stages": stages,
         "environment": {"extras": ["research"]},
-        "notes": notes or ("Emitted by research/kit/submit.write_repro_manifest from the "
-                           "screening spec; the construction stage replays the recipe with "
-                           "research/kit/rebuild.py and compares fingerprints."),
+        "notes": notes
+        or (
+            "Emitted by research/kit/submit.write_repro_manifest from the "
+            "screening spec; the construction stage replays the recipe with "
+            "research/kit/rebuild.py and compares fingerprints."
+        ),
     }
     if spec is not None:
-        extra = {k: v for k, v in spec.items() if k not in ("constructor", "params")} \
-            if isinstance(spec, dict) else None
+        extra = (
+            {k: v for k, v in spec.items() if k not in ("constructor", "params")} if isinstance(spec, dict) else None
+        )
         if extra:
             manifest["spec_context"] = extra
     if artifact_path and os.path.exists(artifact_path):
