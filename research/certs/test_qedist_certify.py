@@ -190,3 +190,41 @@ def test_a_lighter_witness_exit_10_is_a_refutation(monkeypatch):
     assert not cert["d_exact"]
     assert all(b["status"] == "SAT" and b["witness"] == [4, 5, 6] for b in cert["sides"].values())
 
+
+def test_an_asymmetric_entry_gets_one_run_per_side_value(monkeypatch):
+    """d_X != d_Z: each side is asked at its own value - 1, as the tropidist certifier does."""
+    import subprocess
+    M = _module()
+    monkeypatch.setattr(M, "qedist_root", lambda root=None: ["fake-qedist"])
+    cutoffs = []
+
+    def fake_run(cmd, **kw):
+        if cmd[1] == "certify":
+            c = int(cmd[cmd.index("--cutoff") + 1])
+            cutoffs.append(c)
+            out_dir = cmd[cmd.index("--out") + 1]
+            os.makedirs(out_dir, exist_ok=True)
+            # the tool excludes both sectors through c: lower = c + 1 on each
+            with open(os.path.join(out_dir, "result.json"), "w", encoding="utf-8") as f:
+                json.dump({"sector_bounds": {"X": {"lower": c + 1}, "Z": {"lower": c + 1}},
+                           "exact_distance": c + 1 if c == 2 else None}, f)
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+        if cmd[1] == "audit":
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+        return subprocess.CompletedProcess(cmd, 0, "QEDist 0.1\n", "")
+
+    monkeypatch.setattr(M.subprocess, "run", fake_run)
+    doc = _steane_claiming(3)
+    doc["distance"]["Z"]["value"] = 5
+    cert = M.certify(doc, tlim=1)
+    assert sorted(cutoffs) == [2, 4]
+    assert cert["d_exact"] and cert["d"] == 3
+    assert cert["sides"]["X"] == {"value": 3, "secs": cert["sides"]["X"]["secs"], "exact": True,
+                                  "status": "UNSAT", "note": "no logical < 3 exists"}
+    assert cert["sides"]["Z"]["value"] == 5 and cert["sides"]["Z"]["exact"]
+    assert "own claimed value" in cert["verification"]["note"]
+    # a symmetric entry is still one run
+    cutoffs.clear()
+    M.certify(_steane_claiming(3), tlim=1)
+    assert cutoffs == [2]
+

@@ -784,3 +784,21 @@ def test_qedist_backend_and_reopened_partial(tmp_path):
         os.path.join(codes, "p.json"), "p", 120, "/tmp/qedist", 1, 30, script=str(dummy)
     )
     assert err is None and not killed and rec["d_exact"] is True
+
+
+def test_tool_backends_open_entries_whose_sides_differ(tmp_path):
+    """The SAT path skips d_X != d_Z (it asks both sides at d); tropidist and QEDist ask each
+    side at its own value, so with tool=True the entry is opened (issue #6867)."""
+    S = _script()
+    codes = tmp_path / "codes"
+    certs = tmp_path / "certs"
+    certs.mkdir()
+    doc = {"n": 12, "k": 2, "code_type": "CSS", "checks": {"X": [[0, 1]], "Z": [[2, 3]]},
+           "distance": {"d": 2, "X": {"value": 2}, "Z": {"value": 4}}}
+    _write(str(codes / "asym.json"), doc)
+    queue = {"entries": [_row("asym", d=2, x=2, z=4)]}
+    chosen, skipped, _ = S.select(queue, last={}, tlim=60, certs_dir=str(certs), codes_dir=str(codes))
+    assert not chosen and skipped.get("side_mismatch") == 1
+    chosen, skipped, _ = S.select(queue, last={}, tlim=60, certs_dir=str(certs), codes_dir=str(codes), tool=True)
+    assert [r["slug"] for r in chosen] == ["asym"] and not skipped.get("side_mismatch")
+

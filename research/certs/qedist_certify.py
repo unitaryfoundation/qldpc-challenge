@@ -64,17 +64,81 @@ def qedist_root(path=None):
     return find_qedist()
 
 
+OK_EXITS = (0, 10, 75)   # QEDist (docs/usage.md): exact or interval, witness found, incomplete; 2 is an error
+
+
+def _run_cutoff(doc, prefix, cutoff, tlim, threads, out_dir, symmetries):
+    """One `qedist certify` at one cutoff; returns (result.json as a dict, wall seconds, generators used).
+
+    Tanner-graph symmetries cut the search roots to one per orbit (issue
+    #6867); the tool verifies them and refuses a wrong one, in which case the
+    run is repeated without them. Exit codes 0, 10, and 75 all leave a result
+    to read, and `qedist audit` mirrors the run's code.
+    """
+    out_dir = Path(out_dir)
+    inp = challenge_to_qedist(doc, include_witnesses=True, symmetries=symmetries)
+    n_sym = len(inp.get("symmetry_generators") or [])
+    input_path = out_dir.parent / (out_dir.name + ".input.json")
+    input_path.write_text(json.dumps(inp, indent=2) + "\n")
+    cmd = prefix + [
+        "certify", str(input_path),
+        "--profile", "css",
+        "--cutoff", str(int(cutoff)),
+        "--seconds-per-shard", str(float(tlim)),
+        "--workers", str(int(threads)),
+        "--out", str(out_dir),
+    ]
+    if out_dir.exists():
+        cmd.insert(-2, "--resume")
+    t0 = time.time()
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode not in OK_EXITS and n_sym and "symmetr" in (proc.stderr + proc.stdout).lower():
+        inp.pop("symmetry_generators", None)
+        n_sym = 0
+        input_path.write_text(json.dumps(inp, indent=2) + "\n")
+        if out_dir.exists():
+            import shutil
+            shutil.rmtree(out_dir)
+        cmd = [a for a in cmd if a != "--resume"]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+    wall = round(time.time() - t0, 1)
+    if proc.returncode not in OK_EXITS:
+        raise QEDistCertifyError(
+            f"QEDist failed (exit {proc.returncode}): {(proc.stderr or proc.stdout)[-300:]}"
+        )
+    aproc = subprocess.run(prefix + ["audit", str(out_dir)], capture_output=True, text=True)
+    if aproc.returncode not in OK_EXITS:
+        raise QEDistCertifyError(f"QEDist audit failed: {(aproc.stderr or aproc.stdout)[-300:]}")
+    return json.loads((out_dir / "result.json").read_text()), wall, n_sym
+
+
 def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
             symmetries=True):
+    """Certify a CSS entry's per-side distances with QEDist; return the certificate record.
+
+    Each side is asked at its own claimed value, as tropidist_certify does, so
+    an entry whose sides differ (d_X != d_Z) gets one run per distinct cutoff
+    and each side is read from the run at its own value - 1; a symmetric
+    entry gets one run. An explicit ``cutoff`` (the ladder's rung) is one run
+    for both sides at that cutoff.
+    """
     if doc.get("code_type") != "CSS":
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
+    sides_in = doc["distance"]
+    # a side without its own block is asked at d, as the tropidist certifier does
+    claims = {s: int((sides_in.get(s) or {}).get("value", d)) for s in ("X", "Z")}
     if cutoff is None:
-        cutoff = d - 1
-    if cutoff > MAX_CUTOFF:
-        raise QEDistCertifyError(f"cutoff {cutoff} exceeds QEDist's cap ({MAX_CUTOFF})")
-    if cutoff < 1:
-        raise QEDistCertifyError("cutoff must be at least 1")
+        plan = {}
+        for side, value in claims.items():
+            plan.setdefault(value - 1, []).append(side)
+    else:
+        plan = {int(cutoff): list(claims)}
+    for c in plan:
+        if c > MAX_CUTOFF:
+            raise QEDistCertifyError(f"cutoff {c} exceeds QEDist's cap ({MAX_CUTOFF})")
+        if c < 1:
+            raise QEDistCertifyError("cutoff must be at least 1")
 
     prefix = qedist_root(root)
     if prefix is None:
@@ -84,71 +148,28 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
 
     import tempfile
     tmp = Path(work_dir) if work_dir is not None else Path(tempfile.mkdtemp(prefix="qedist-cert-"))
-    try:
-        # Tanner-graph symmetries cut the search roots to one per orbit
-        # (issue #6867); the tool verifies them and refuses a wrong one, in
-        # which case the run is repeated without them.
-        inp = challenge_to_qedist(doc, include_witnesses=True, symmetries=symmetries)
-        n_sym = len(inp.get("symmetry_generators") or [])
-        input_path = tmp / "input.json"
-        input_path.write_text(json.dumps(inp, indent=2) + "\n")
-        out_dir = tmp / "run"
-        cmd = prefix + [
-            "certify", str(input_path),
-            "--profile", "css",
-            "--cutoff", str(cutoff),
-            "--seconds-per-shard", str(float(tlim)),
-            "--workers", str(int(threads)),
-            "--out", str(out_dir),
-        ]
-        if out_dir.exists():
-            cmd.insert(-2, "--resume")
-        # QEDist's exit codes (docs/usage.md): 0 exact or completed interval,
-        # 10 a witness lighter than the cutoff, 75 an incomplete search, 2 an
-        # invalid input or a failure. The first three leave a result.json to
-        # read; only the last is an error here.
-        OK_EXITS = (0, 10, 75)
-        t0 = time.time()
-        proc = subprocess.run(cmd, capture_output=True, text=True)
-        if proc.returncode not in OK_EXITS and n_sym and "symmetr" in (proc.stderr + proc.stdout).lower():
-            inp.pop("symmetry_generators", None)
-            n_sym = 0
-            input_path.write_text(json.dumps(inp, indent=2) + "\n")
-            if out_dir.exists():
-                import shutil
-                shutil.rmtree(out_dir)
-            cmd = [a for a in cmd if a != "--resume"]
-            proc = subprocess.run(cmd, capture_output=True, text=True)
-        wall = round(time.time() - t0, 1)
-        if proc.returncode not in OK_EXITS:
-            raise QEDistCertifyError(
-                f"QEDist failed (exit {proc.returncode}): {(proc.stderr or proc.stdout)[-300:]}"
-            )
-        # audit (its exit code mirrors the run's: 75 for an incomplete search is not a failure)
-        aproc = subprocess.run(prefix + ["audit", str(out_dir)], capture_output=True, text=True)
-        if aproc.returncode not in OK_EXITS:
-            raise QEDistCertifyError(f"QEDist audit failed: {(aproc.stderr or aproc.stdout)[-300:]}")
-        result = json.loads((out_dir / "result.json").read_text())
-    finally:
-        # leave artifacts for debugging? remove to save space
-        pass
+    per_side = {}            # side -> (sector bound, wall)
+    results = {}             # cutoff -> result
+    n_sym = 0
+    for c, side_list in sorted(plan.items()):
+        out_dir = tmp / ("run" if cutoff is not None else f"run-{c}")
+        result, wall, used = _run_cutoff(doc, prefix, c, tlim, threads, out_dir, symmetries)
+        results[c] = result
+        n_sym = max(n_sym, used)
+        for side in side_list:
+            per_side[side] = ((result.get("sector_bounds") or {}).get(side, {}), wall)
 
     n = doc["n"]
     HX = HD._matrix(doc["checks"]["X"], n)
     HZ = HD._matrix(doc["checks"]["Z"], n)
-    sides_in = doc["distance"]
     cert_sides = {}
-    sector_bounds = result.get("sector_bounds", {})
-    for side in ("X", "Z"):
-        if side not in sides_in:
-            continue
-        claim = int(sides_in[side]["value"])
-        sb = sector_bounds.get(side, {})
+    for side, claim in claims.items():
+        sb, wall = per_side[side]
         lb = sb.get("lower")
         ub = sb.get("upper")
         witness = sb.get("witness")
-        blk = {"value": claim, "secs": wall / 2.0}
-        blk["secs"] = round(blk["secs"], 1)
+        blk = {"value": claim, "secs": round(wall / len(plan.get(claim - 1, [side])) if cutoff is None
+                                             else wall / 2.0, 1)}
         # refuted?
         if ub is not None and int(ub) < claim:
             ok = False
@@ -181,8 +202,9 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
         cert_sides[side] = blk
 
     overall = bool(cert_sides) and all(b.get("exact") for b in cert_sides.values())
-    # also require QEDist's own exact flag when present
-    if result.get("exact_distance") is not None and int(result["exact_distance"]) != d:
+    # the run at d - 1 is the one whose exact_distance speaks about d
+    base = results.get(d - 1)
+    if base is not None and base.get("exact_distance") is not None and int(base["exact_distance"]) != d:
         overall = False
 
     verification = {
@@ -191,7 +213,8 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
                 "(tree search with bounds and symmetries); the vector it returned "
                 "was re-verified by verify/heuristic_distance.py. Solver verdict only. "
                 + (f"{n_sym} Tanner-graph symmetry generators supplied and verified by the tool."
-                   if n_sym else "No symmetry generators supplied."),
+                   if n_sym else "No symmetry generators supplied.")
+                + (" Each side asked at its own claimed value." if len(plan) > 1 else ""),
     }
     rec = {
         "name": doc.get("name"),
@@ -210,7 +233,6 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
         rec["d_lower"] = min(side_lbs) if side_lbs else 1
         verification["checks_sha256"] = checks_sha256(doc)
     return rec
-
 
 def _vector_from_support(support, n):
     v = np.zeros(n, dtype=np.int8)

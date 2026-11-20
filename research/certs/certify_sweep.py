@@ -300,7 +300,10 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
             r = dict(r, start=int(lb), raise_from=on_file)
         values = {s: v.get("value") for s, v in (r.get("sides") or {}).items()}
         want = {"P"} if stab else {"X", "Z"}
-        if set(values) != want or any(v != r["d"] for v in values.values()):
+        if set(values) != want or (not tool and any(v != r["d"] for v in values.values())):
+            # the SAT path asks both sides at d; the tool backends (tropidist,
+            # QEDist) ask each side at its own value, so a side above d is a
+            # certificate they can file (issue #6867)
             skip(slug, "side_mismatch",
                  f"side values {values} differ from d = {r['d']}; a certificate at d would not be honored")
             continue
