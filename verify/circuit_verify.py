@@ -55,9 +55,10 @@ from qldpc_verify import _matrix
 
 # A memory DEM's text runs about 80 bytes per mechanism, so the file cap
 # follows the mechanism cap below (10.6 MB at m = 130,972 measured
-# 2026-10-06 on [[144,10,16]] at rounds = 16); the .stim is a tenth of that.
-# Plain text on purpose: a compressed artifact is not auditable in a diff.
-MAX_CIRCUIT_FILE_BYTES = 12_000_000
+# 2026-10-06 on [[144,10,16]] at rounds = 16, 24 MB at the 300,000 cap); the
+# .stim is a tenth of that. Plain text on purpose: a compressed artifact is
+# not auditable in a diff.
+MAX_CIRCUIT_FILE_BYTES = 27_000_000
 
 # Verification-budget cap for the circuit tier (the RFC's "cap the tier by
 # n*rounds", enforced on the actual cost driver): the refutation gate searches
@@ -70,10 +71,15 @@ MAX_CIRCUIT_FILE_BYTES = 12_000_000
 # circuit_tools.ris_dem), which yields the same candidates at ~5e-13 r^2 m s
 # per trial on 4 threads: 4.9 ms at m = 23,940, r = 810 ([[90,4,9]]); 277 ms
 # at m = 130,972, r = 2,304 ([[144,10,16]] at rounds = 16, the largest
-# efficiency-frontier memory the generator builds). At this cap the 120 s
-# target still buys a few hundred trials per basis, more than the old cap
-# bought at 25,000. Raise-only, as the search stack improves.
-MAX_DEM_MECHANISMS = 135_000
+# efficiency-frontier memory the generator builds at that cap). Raised from
+# 135,000 to 300,000 on issue #4715 (2026-11-20): the backfill of the
+# rare-family entries found 64 memories at 137,000 to 283,000 mechanisms at
+# rounds = d, generalized-bicycle codes with d from 7 to 22 near n = 200,
+# whose detector counts run 1,400 to 2,300, so a trial costs about 0.4 to
+# 1 s there and the 120 s target still buys a few hundred trials per basis,
+# as it does for the n = 144 memories at the old cap. Raise-only, as the
+# search stack improves.
+MAX_DEM_MECHANISMS = 300_000
 
 # The tier's reach in qubits. Decided on #2797 and #2811 (MathysRennela,
 # FarLab, vprusso, 2026-10-06): the circuit tier is for instances that can be
