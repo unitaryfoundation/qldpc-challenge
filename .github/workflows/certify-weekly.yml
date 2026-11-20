@@ -163,9 +163,12 @@ jobs:
             done
           fi
           set +e
-          case "$BACKEND" in sat|tropidist|tropidist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
+          case "$BACKEND" in sat|tropidist|tropidist+sat|qedist|qedist+sat) ;; *) echo "invalid backend: $BACKEND"; exit 1;; esac
           tool=""
-          case "$BACKEND" in *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";; esac
+          case "$BACKEND" in
+            *qedist*) tool="--qedist $QEDIST_ROOT --tropidist $TROPIDIST_ROOT --threads 4";;
+            *tropidist*) tool="--tropidist $TROPIDIST_ROOT --threads 4";;
+          esac
           uv run --frozen --extra research python research/certs/certify_sweep.py run \
             --out-dir "$OUT_DIR" --tlim "$TLIM" --job-seconds $(( JOB_MINUTES * 60 )) \
             --backend "$BACKEND" $tool \
