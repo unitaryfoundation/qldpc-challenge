@@ -207,6 +207,11 @@ fail remotely. Before every `git push` of a submission branch, run:
 verify/prepush_prose_check.sh <pr-body.md>
 ```
 
+Enable the repository's local hooks once per clone so the validator-integrity
+check runs on every commit (it fails in under a second if a critical file
+changed without re-pinning `verify/validator_manifest.json`):
+`git config core.hooksPath .githooks`.
+
 It re-runs the check inside a clean worktree of HEAD (committed content only), which fails
 exactly when CI would, and it runs the submission scope check first: a submission PR
 carries the entry, its note, and at most its `repro/<slug>.json` manifest, so a stray file
