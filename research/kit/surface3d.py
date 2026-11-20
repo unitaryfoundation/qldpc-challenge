@@ -1,4 +1,5 @@
 """Surface-code-like CSS construction from classical parity checks."""
+
 import numpy as np
 
 
@@ -24,9 +25,9 @@ def surface_code_3d(H1, H2, H3):
     m2, n2 = H2.shape
     m3, n3 = H3.shape
 
-    n_qubits = m1*n2*n3 + n1*m2*n3 + n1*n2*m3
+    n_qubits = m1 * n2 * n3 + n1 * m2 * n3 + n1 * n2 * m3
     n_x = n1 * n2 * n3
-    n_z = m1*m2*n3 + m1*n2*m3 + n1*m2*m3
+    n_z = m1 * m2 * n3 + m1 * n2 * m3 + n1 * m2 * m3
 
     HX = np.zeros((n_x, n_qubits), dtype=np.int8)
     HZ = np.zeros((n_z, n_qubits), dtype=np.int8)
