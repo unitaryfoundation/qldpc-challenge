@@ -67,4 +67,7 @@ the current board and `measured_slug` retains the original name. Its `blob`,
 input at the recorded measurement date; they are not measurements of the
 revised distance claim. The rendered table labels those rows. A fresh run
 without `--resume` measures the revised inputs; `--resume` retains the stored
-historical records.
+historical records. `test_measure.py` accepts a grid entry under either
+name, so the grid can follow a revision before the revision merges; a
+revision PR may not touch `research/`, and the grid cannot name a slug that
+only exists after it.

@@ -1,6 +1,6 @@
 Measured 2026-10-23 on Apple M5 Pro (18 cores), Python 3.13.15, numpy 2.4.6, scipy 1.17.1, accelerator built; board at d5a2a7406. Cold board pass before the first gate call: 421 s. Certification: MILP time limit 60.0 s per generator, wall cap 120.0 s per side. Times are this machine's, not a guarantee.
 
-Current entry slugs are shown below. The d column is the claimed bound at measurement. For renamed entries, d and all timings still describe the original measured input; measured_slug and blob in the JSON preserve its identity: 960-24-40 -> 960-24-38; 662-122-95 -> 662-122-86.
+Current entry slugs are shown below. The d column is the claimed bound at measurement. For renamed entries, d and all timings still describe the original measured input; measured_slug and blob in the JSON preserve its identity: 682-132-64 -> 682-132-56; 960-24-40 -> 960-24-38; 662-122-95 -> 662-122-86.
 
 | entry | type | n | k | d at measurement | w | gate | of which refute | RIS 20,000/side (measured, or implied from a smaller count) | fast 200,000 | fast 2,000,000 | submit search | certify X | certify Z |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -15,7 +15,7 @@ Current entry slugs are shown below. The d column is the claimed bound at measur
 | 700-140-22 | CSS | 700 | 140 | 22 | 9 | 14.4 s | 14.1 s | ~1,555 s (from 2,000 trials in 155 s) / ~1,544 s (from 2,000 trials in 154 s) | 79.2 s | 796 s | ~3,896 s | wall cap, 120 s | wall cap, 120 s |
 | 700-20-60 | CSS | 700 | 20 | 60 | 16 | 18.3 s | 15.6 s | ~990 s (from 2,000 trials in 99.0 s) / ~765 s (from 2,000 trials in 76.5 s) | 74.4 s | 1,080 s | ~2,835 s | wall cap, 120 s | wall cap, 120 s |
 | 696-352-10 | CSS | 696 | 352 | 10 | 12 | 45.1 s | 42.2 s | ~5,194 s (from 2,000 trials in 519 s) / ~5,330 s (from 2,000 trials in 533 s) | 173 s | 1,670 s | ~12,194 s | wall cap, 120 s | wall cap, 120 s |
-| 682-132-64 | CSS | 682 | 132 | 64 | 24 | 23.3 s | 20.2 s | ~1,310 s (from 2,000 trials in 131 s) / ~1,335 s (from 2,000 trials in 134 s) | 94.3 s | 760 s | ~3,404 s | wall cap, 120 s | wall cap, 120 s |
+| 682-132-56 | CSS | 682 | 132 | 64 | 24 | 23.3 s | 20.2 s | ~1,310 s (from 2,000 trials in 131 s) / ~1,335 s (from 2,000 trials in 134 s) | 94.3 s | 760 s | ~3,404 s | wall cap, 120 s | wall cap, 120 s |
 | 682-142-54 | CSS | 682 | 142 | 54 | 32 | 21.3 s | 19.2 s | ~1,251 s (from 2,000 trials in 125 s) / ~1,250 s (from 2,000 trials in 125 s) | 78.1 s | 792 s | ~3,293 s | wall cap, 120 s | wall cap, 120 s |
 | 960-24-38 | CSS | 960 | 24 | 40 | 6 | 21.6 s | 16.2 s | ~1,340 s (from 2,000 trials in 134 s) / ~1,344 s (from 2,000 trials in 134 s) | 119 s | 1,191 s | ~3,876 s | wall cap, 120 s | wall cap, 120 s |
 | 968-18-31 | CSS | 968 | 18 | 31 | 8 | 14.9 s | 12.6 s | ~907 s (from 2,000 trials in 90.7 s) / ~927 s (from 2,000 trials in 92.7 s) | 83.3 s | 839 s | ~2,673 s | wall cap, 120 s | wall cap, 120 s |
