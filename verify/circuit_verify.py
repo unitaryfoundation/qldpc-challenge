@@ -30,7 +30,11 @@ Checks, per basis (RFC 0001 numbering):
                     tolerance -- their last ulps are architecture-sensitive
                     and the distance tier never reads them), and the claimed
                     witness is an undetected logical fault set of the claimed
-                    weight in it, with value <= d (penalty-only clamp)
+                    weight in it, with value at most the distance of the
+                    logical that memory protects (penalty-only clamp, per
+                    basis: d_Z for the X memory, d_X for the Z memory, so
+                    the effective d_circ = min over bases stays <= d;
+                    issue #4715)
 
 Step 4 (circuit locality, geometric tier) is Phase B. Step 6, the adversarial
 refutation search, runs in the CI gate (gate_changed.py), not here: this file
@@ -87,6 +91,29 @@ MAX_CIRCUIT_N = 200
 
 SIDE_FILES = {"X": "memory_x", "Z": "memory_z"}
 SIDE_READOUT = {"X": "MX", "Z": "M"}
+# The S-basis memory reads out the S-type logicals, and an undetected fault
+# set flips one only by acting as a logical of the other type, so each
+# memory's circuit distance is bounded by the other type's code distance.
+OPPOSITE = {"X": "Z", "Z": "X"}
+
+
+def basis_cap(doc, side):
+    """Return the penalty-only cap on the d_circ claim of the `side` memory (issue #4715).
+
+    distance.Z.value for the X memory and distance.X.value for the Z memory:
+    the X memory measures the X-type logicals, which only a Z-type logical
+    operator flips undetected, and the lightest such operator weighs d_Z;
+    mirror for the Z memory. Until this rule both memories were clamped at
+    d = min(d_X, d_Z), which left nothing to record on the memory protecting
+    the longer logical of an asymmetric code (125 entries in the #4715
+    backfill). The effective d_circ, the minimum over the bases, is still at
+    most d. A document without the side's value falls back to d.
+    """
+    opp = (doc.get("distance") or {}).get(OPPOSITE[side]) or {}
+    value = opp.get("value")
+    if isinstance(value, int) and not isinstance(value, bool) and value >= 1:
+        return int(value)
+    return int(doc["distance"]["d"])
 
 
 def _resolve_records(flat):
@@ -308,10 +335,12 @@ def verify_circuit(doc, circuits_dir):
             continue
         werrs = ct.witness_errors(derived, claim["witness"], claim["value"],
                                   cols)
-        if claim["value"] > d:
-            werrs.append(f"claimed d_circ {claim['value']} exceeds code "
-                         f"distance d={d}: the tier is penalty-only, clamp "
-                         f"the claim to d")
+        cap = basis_cap(doc, side)
+        if claim["value"] > cap:
+            werrs.append(f"claimed d_circ {claim['value']} exceeds "
+                         f"d_{OPPOSITE[side]}={cap}, the distance of the "
+                         f"logical the {side} memory protects: the tier is "
+                         f"penalty-only, clamp the claim to {cap}")
         record(f"{side}_witness_valid", not werrs, "; ".join(werrs) or
                f"weight-{claim['value']} undetected logical fault set "
                f"confirmed in GF(2)")

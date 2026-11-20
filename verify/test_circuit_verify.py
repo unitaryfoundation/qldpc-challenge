@@ -116,6 +116,47 @@ def test_claim_above_code_distance_rejected(seed):
     assert not _status(report, "Z_witness_valid")
 
 
+def test_basis_cap_is_the_distance_of_the_logical_the_memory_protects():
+    """Each memory is capped by the distance of the logical it protects.
+
+    Issue #4715: the X memory reads out X-type logicals, which only a Z-type
+    logical flips undetected, so its cap is d_Z; mirror for Z; d when a side
+    is missing.
+    """
+    doc = {"distance": {"d": 5, "X": {"value": 5}, "Z": {"value": 7}}}
+    assert cv.basis_cap(doc, "X") == 7
+    assert cv.basis_cap(doc, "Z") == 5
+    assert cv.basis_cap({"distance": {"d": 4}}, "X") == 4
+    assert cv.basis_cap({"distance": {"d": 4, "Z": {"value": None}}}, "X") == 4
+
+
+def test_claim_between_d_and_the_protected_logicals_distance_is_admitted(
+        seed, monkeypatch):
+    """The Z memory may claim up to d_X when d_X > d.
+
+    With the witness check stubbed out the clamp alone decides, and it is the
+    per-basis cap, not d.
+    """
+    doc, d = seed
+    doc = copy.deepcopy(doc)
+    monkeypatch.setattr(ct, "witness_errors", lambda *a, **k: [])
+    dd = doc["distance"]["d"]
+    doc["distance"]["X"]["value"] = dd + 2      # the X-type logical is longer
+    doc["distance"]["Z"]["value"] = dd
+    doc["circuit"]["d_circ"]["Z"]["value"] = dd + 2
+    report = cv.verify_circuit(doc, d)
+    assert _status(report, "Z_witness_valid"), "d_X bounds the Z memory"
+    doc["circuit"]["d_circ"]["Z"]["value"] = dd + 3
+    report = cv.verify_circuit(doc, d)
+    assert not _status(report, "Z_witness_valid")
+    why = next(c["detail"] for c in report["checks"] if c["check"] == "Z_witness_valid")
+    assert f"exceeds d_X={dd + 2}" in why and "Z memory protects" in why
+    # the X memory is bounded by d_Z = d, so the same value is refused there
+    doc["circuit"]["d_circ"]["X"]["value"] = dd + 1
+    report = cv.verify_circuit(doc, d)
+    assert not _status(report, "X_witness_valid")
+
+
 def test_stale_dem_rejected(seed, tmp_path):
     doc, sd = seed
     d = _tampered_dir(sd, tmp_path, "memory_z.dem",

@@ -70,11 +70,14 @@ Two principles drive the format:
   circuits under `circuits/<slug>/` — `memory_x.stim`, `memory_z.stim`, and
   their derived `memory_x.dem`, `memory_z.dem` (committed so witnesses are
   checkable without running stim) — and claims a witness-backed circuit-level
-  distance per basis. The tier is penalty-only: the recorded `d_circ` is
-  clamped to `<= d`.
+  distance per basis. The tier is penalty-only: each basis's claim is
+  clamped to the distance of the logical that memory protects, `d_Z` for the
+  X memory and `d_X` for the Z memory (issue #4715), so the effective
+  `d_circ`, the minimum over the bases, is `<= d`.
   - `d_circ.X`, `d_circ.Z`: per-basis claims, mirroring `distance.X/Z`:
     - `value`: claimed circuit-level distance of that basis's memory
-      experiment; must equal `|witness|` and be `<= d`.
+      experiment; must equal `|witness|` and be at most `distance.Z.value`
+      for `X` and `distance.X.value` for `Z`.
     - `confidence`: `"upper_bound"` (the only tier so far; an exact tier via
       MILP over `H_dem` is deferred future work).
     - `witness`: sorted 0-based indices of `error(...)` instructions in that

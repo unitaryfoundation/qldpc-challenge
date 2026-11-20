@@ -224,8 +224,11 @@ a memory experiment of this code under the canonical noise recipe. The
 schedule is the submitter's degree of freedom, the noise placement is not.
 Like the code tier, `d_circ` is a witness-backed upper bound.
 
-The tier is penalty-only: `d_circ` is clamped to `<= d`, so a circuit can
-lower what the board shows for an entry and never raise it. The memory
+The tier is penalty-only: each memory's claim is clamped to the distance of
+the logical it protects, `d_Z` for the X memory and `d_X` for the Z memory
+(issue #4715), so the effective `d_circ`, the minimum over the bases, is
+`<= d`, and a circuit can lower what the board shows for an entry and never
+raise it. The memory
 experiment runs `rounds >= d` noisy extraction rounds, so a schedule cannot
 earn a higher circuit distance by measuring fewer rounds than the code
 distance. Nothing else changes: the entry stays in the same cells and keeps
