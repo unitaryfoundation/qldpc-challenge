@@ -39,6 +39,17 @@ Whether git saw a rename is reported but not judged: a fold-in that more than
 doubles the note can fall under git's similarity threshold and still keep
 every line.
 
+An entry's identity is its slug, so overwriting a board entry in place is not a
+revision (issue #5732). A modified `codes/<slug>.json` whose stabilizer group
+(checks, n, k, code_type) differs from base is refused: a different code with
+the same slug erases the original and every link to it, and the fix is a new,
+suffixed slug with its own note. A large in-place note rewrite is refused only
+as a secondary signal, when the PR also changed that entry's code file or the
+note's leading [[n,k,d]]: a note-only repair (replacing a stub with a real
+write-up, or trimming prose) leaves the identity alone and passes. In both
+checks the previous narrative can be carried forward in the note under the
+fold-in heading or into a fieldnote the PR touches (PR #3053).
+
 Only files CHANGED by the PR are checked. Notes already on the board are left
 alone; this guards what arrives from here on. `--all` sweeps every committed
 notes/ and fieldnotes/ file instead: the weekly prose-sweep workflow runs it and
@@ -55,6 +66,7 @@ input and must not reach a shell.
 """
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -494,39 +506,71 @@ def check_revisions(base, root, problems):
     return True
 
 
-def check_note_rewrites(base, root, problems):
-    """Refuse an in-place rewrite of an existing note that drops its body.
+def _canonical_json(value):
+    """Order-insensitive form of a JSON value, for comparing check matrices.
 
-    A modified ``notes/<slug>.md`` (git status M, same slug) whose body
-    retention falls below ``RETENTION_MIN`` is a wholesale replacement of
-    one entry's note by another's, not a revision: the entry it belongs to
-    did not change, so the narrative should not either. A new code belongs
-    under a suffixed slug with its own note (issue #5732, PR #6849).
-    Returns False only if git could not produce the diff.
+    The same stabilizer group can be listed with its generators or its support
+    indices in a different order. Folding those permutations away keeps a pure
+    reformatting from looking like an overwrite, while any real change to the
+    generators is still caught (issue #5732).
+    """
+    if isinstance(value, dict):
+        return tuple(sorted((k, _canonical_json(v)) for k, v in value.items()))
+    if isinstance(value, list):
+        return tuple(sorted((_canonical_json(v) for v in value), key=repr))
+    return value
+
+
+def modified_entries(base, root):
+    """Return (modified code paths, modified note paths) vs `base`.
+
+    Only in-place modifications (git status M) count: a rename already gives
+    the entry a new slug, which is the fix these checks ask for. Returns None
+    if git could not produce the diff.
     """
     try:
         out = subprocess.check_output(
-            ["git", "diff", "--name-status", f"{base}...HEAD", "--", "notes/"],
-            cwd=root, text=True)
+            ["git", "diff", "--name-status", f"{base}...HEAD", "--", "codes/", "notes/"], cwd=root, text=True
+        )
     except Exception as e:
         print(f"could not diff vs {base}: {e}")
-        return False
-    modified = []
+        return None
+    codes, notes = [], []
     for row in out.splitlines():
         parts = row.split("\t")
-        if len(parts) < 2:
-            continue
-        if parts[0][:1] != "M":
+        if len(parts) < 2 or parts[0][:1] != "M":
             continue
         rel = parts[-1]
-        if (rel.startswith("notes/") and rel.endswith(".md")
-                and os.path.basename(rel) not in ("README.md", "TEMPLATE.md")):
-            modified.append(rel)
-    for rel in sorted(modified):
+        if rel.startswith("codes/") and rel.endswith(".json"):
+            codes.append(rel)
+        elif (
+            rel.startswith("notes/")
+            and rel.endswith(".md")
+            and os.path.basename(rel) not in ("README.md", "TEMPLATE.md")
+        ):
+            notes.append(rel)
+    return codes, notes
+
+
+def check_code_overwrites(base, root, problems):
+    """Refuse an in-place overwrite of an existing entry's code (issue #5732).
+
+    A modified ``codes/<slug>.json`` whose stabilizer group (checks, n, k,
+    code_type) differs from base is a different code filed over an existing
+    entry: the original is erased while its slug and every link to it stay.
+    A correction is a rename to a new slug, never a swap of the checks in
+    place. Returns False only if git could not produce the diff.
+    """
+    found = modified_entries(base, root)
+    if found is None:
+        return False
+    codes, _ = found
+    frozen = ("checks", "n", "k", "code_type")
+    for rel in sorted(codes):
         try:
             old_text = subprocess.check_output(
-                ["git", "show", f"{base}:{rel}"], cwd=root, text=True,
-                stderr=subprocess.DEVNULL)
+                ["git", "show", f"{base}:{rel}"], cwd=root, text=True, stderr=subprocess.DEVNULL
+            )
         except subprocess.CalledProcessError:
             continue
         new_path = os.path.join(root, rel)
@@ -534,15 +578,84 @@ def check_note_rewrites(base, root, problems):
             continue
         with open(new_path, encoding="utf-8") as f:
             new_text = f.read()
-        kept = retention(old_text, new_text)
+        try:
+            old_doc, new_doc = json.loads(old_text), json.loads(new_text)
+        except (ValueError, TypeError):
+            continue  # malformed JSON is the schema gate's problem, not ours
+        changed = [key for key in frozen if _canonical_json(old_doc.get(key)) != _canonical_json(new_doc.get(key))]
+        if not changed:
+            continue
+        problems.append(
+            (
+                rel,
+                "code overwrite drops the previous entry",
+                f"{rel}: changed {', '.join(changed)} from {base}; an existing "
+                f"entry's code must not be replaced in place. File the new code "
+                f"under a suffixed slug with its own note, or rename this entry "
+                f"to a new [[n,k,d]] slug (issue #5732).",
+            )
+        )
+    return True
+
+
+def check_note_rewrites(base, root, problems):
+    """Refuse an in-place rewrite of an existing note that drops its body.
+
+    A modified ``notes/<slug>.md`` (git status M, same slug) whose body
+    retention falls below ``RETENTION_MIN`` is a wholesale replacement, but it
+    is only an overwrite when the entry it belongs to changed too: either its
+    code file was modified in the same PR, or the note's leading [[n,k,d]]
+    moved. A note-only repair (a stub replaced by a real write-up, a trim)
+    leaves the entry's identity alone and passes. Text moved into a fieldnote
+    the PR touches counts as carried forward, as it does for revisions (PR
+    #3053). Returns False only if git could not produce the diff.
+    """
+    found = modified_entries(base, root)
+    if found is None:
+        return False
+    codes, notes = found
+    code_set = set(codes)
+    touched = slug_changes(base, root)
+    carried = ""
+    if touched is not None:
+        for rel in touched[2]:
+            path = os.path.join(root, rel)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    carried += f.read() + "\n"
+    for rel in sorted(notes):
+        try:
+            old_text = subprocess.check_output(
+                ["git", "show", f"{base}:{rel}"], cwd=root, text=True, stderr=subprocess.DEVNULL
+            )
+        except subprocess.CalledProcessError:
+            continue
+        new_path = os.path.join(root, rel)
+        if not os.path.exists(new_path):
+            continue
+        with open(new_path, encoding="utf-8") as f:
+            new_text = f.read()
+        slug = rel[len("notes/") : -len(".md")]
+        identity_changed = f"codes/{slug}.json" in code_set
+        if not identity_changed:
+            old_params, new_params = NKD.findall(old_text), NKD.findall(new_text)
+            identity_changed = bool((old_params or new_params) and old_params[:1] != new_params[:1])
+        if not identity_changed:
+            continue
+        kept = retention(old_text, new_text + "\n" + carried)
         if kept >= RETENTION_MIN:
             continue
-        problems.append((rel, "note rewrite drops the previous note's body",
-                        f"{rel}: {kept:.0%} of its body lines survive "
-                        f"(minimum {RETENTION_MIN:.0%}); an existing entry's "
-                        f"note must not be replaced wholesale. File a new "
-                        f"code under a suffixed slug with its own note, or "
-                        f"carry the previous text under '{FOLD_IN_HEADING}'."))
+        problems.append(
+            (
+                rel,
+                "note rewrite drops the previous note's body",
+                f"{rel}: {kept:.0%} of its body lines survive (minimum "
+                f"{RETENTION_MIN:.0%}); an existing entry whose code or "
+                f"[[n,k,d]] changed must keep its note. File the new code under "
+                f"a suffixed slug with its own note, or carry the previous text "
+                f"under '{FOLD_IN_HEADING}' or into a fieldnote in this PR.",
+            )
+        )
     return True
 
 
@@ -602,20 +715,20 @@ def main(argv):
                 check_fieldnote_author(rel, f.read(), args.pr_author, problems)
 
     # Not under --all: a sweep has no diff to read revisions from. Under
-    # --files the diff is still the source of truth for this check, but the
+    # --files the diff is still the source of truth for these checks, but the
     # root may be a bare directory with no git history (the self-tests), so
     # only the CI shape, where the diff also chose the files, fails closed.
     if not args.all:
-        if not check_revisions(args.base, root, problems):
-            if files is not args.files:
-                print("failing closed")
-                return 1
-            print("skipping the revision check")
-        if not check_note_rewrites(args.base, root, problems):
-            if files is not args.files:
-                print("failing closed")
-                return 1
-            print("skipping the note-rewrite check")
+        for name, fn in (
+            ("revision", check_revisions),
+            ("code-overwrite", check_code_overwrites),
+            ("note-rewrite", check_note_rewrites),
+        ):
+            if not fn(args.base, root, problems):
+                if files is not args.files:
+                    print("failing closed")
+                    return 1
+                print(f"skipping the {name} check")
 
     if args.report:
         write_report(problems, len(files), args.report)
@@ -641,11 +754,16 @@ def main(argv):
         print("slug. If the narrative belongs elsewhere, move it to a dated fieldnotes/")
         print("entry in the same PR instead (PR #3053 did this for [[502,102,50]]). See")
         print("research/audits/README.md, 'Filing a distance revision'.")
+    if any(why.startswith("code overwrite") for _, why, _ in problems):
+        print("\nAn existing entry's code must not be replaced in place: file the new")
+        print("code under a suffixed slug with its own note, or rename the entry to a")
+        print("new [[n,k,d]] slug. See CONTRIBUTING.md, 'Revisions and overwrites")
+        print("(issue #5732)'.")
     if any(why.startswith("note rewrite drops") for _, why, _ in problems):
-        print("\nAn existing entry's note must not be replaced wholesale: file a new")
-        print("code under a suffixed slug with its own note, or carry the previous")
-        print(f"text under '{FOLD_IN_HEADING}'. See CONTRIBUTING.md,")
-        print("'Revisions and overwrites (issue #5732)' and PR #6849.")
+        print("\nWhen an entry's code or [[n,k,d]] changes, its note has to come along:")
+        print(f"carry the old text under '{FOLD_IN_HEADING}' or into a fieldnote in")
+        print("this PR, or file the new code under a suffixed slug with its own note.")
+        print("See CONTRIBUTING.md, 'Revisions and overwrites (issue #5732)'.")
 
     print("\nFix by pointing at something that exists in this PR, or by naming the")
     print("external source and pinning it (e.g. 'github.com/org/repo @ abc1234,")
