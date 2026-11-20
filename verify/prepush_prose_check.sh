@@ -57,21 +57,13 @@ if ! git rev-parse --verify --quiet "$BASE" >/dev/null; then
     exit 2
 fi
 
-# The branch must be based on (or ahead of) the base, but only when the base
-# is this repository's own main (not a fork's stale mirror): a stale base
-# turns the PR into a diff against an old main and makes every note look
-# changed (issue #6515). In a fork, being behind upstream/main is expected.
-_enforce_base=0
-if git remote get-url upstream >/dev/null 2>&1; then
-    if [ "$(git rev-parse origin/main 2>/dev/null)" = "$(git rev-parse upstream/main 2>/dev/null)" ]; then
-        _enforce_base=1
-    fi
-else
-    _enforce_base=1
-fi
-if [ "$_enforce_base" = "1" ] && ! git merge-base --is-ancestor "$BASE" HEAD; then
-    echo "ERROR: HEAD is not based on $BASE; rebase onto $BASE before pushing." >&2
-    exit 2
+# Staleness hint (non-fatal): how many commits the base is ahead of HEAD.
+# A branch behind the base is still diffed against its merge base, exactly as
+# CI does, so this never fails the gate; it only tells the contributor the
+# branch may want a rebase.
+_BEHIND=$(git rev-list --count HEAD.."$BASE" 2>/dev/null || echo 0)
+if [ "$_BEHIND" != "0" ]; then
+    echo "note: HEAD is $_BEHIND commit(s) behind $BASE; consider rebasing." >&2
 fi
 
 # A base the caller forced that disagrees with upstream/main is the stale
