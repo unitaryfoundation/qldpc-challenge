@@ -28,6 +28,7 @@ audit's default, since this runs inside a packaging command; an entry the
 smaller budget leaves ``undecided`` is one the full audit decides later.
 Nothing here touches ``verify/`` or changes a verdict.
 """
+
 import json
 import os
 import sys
@@ -38,7 +39,7 @@ for _p in (os.path.join(_ROOT, "research", "audits"), os.path.join(_ROOT, "verif
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-PACKAGING_BUDGET = 10 ** 7     # row sums the light-vector enumeration may plan per row space
+PACKAGING_BUDGET = 10**7  # row sums the light-vector enumeration may plan per row space
 RECORD_SUFFIX = ".equivalence.json"
 
 
@@ -59,14 +60,20 @@ def decide_pair(doc, against, *, root=_ROOT, budget=PACKAGING_BUDGET):
     a decision either way.
     """
     import permutation_audit as PA
+
     slug = _slug(against)
     path = os.path.join(root, "codes", slug + ".json")
     try:
         with open(path, encoding="utf-8") as fh:
             other = json.load(fh)
     except (OSError, ValueError) as e:
-        return {"first": "candidate", "second": slug, "against": slug, "verdict": "undecided",
-                "reason": f"board entry {path} could not be read ({type(e).__name__})"}
+        return {
+            "first": "candidate",
+            "second": slug,
+            "against": slug,
+            "verdict": "undecided",
+            "reason": f"board entry {path} could not be read ({type(e).__name__})",
+        }
     a = PA.code_from_doc("candidate", doc)
     b = PA.code_from_doc(slug, other)
     rec = PA.decide(a, b, doc, other, budget=budget)
@@ -90,13 +97,17 @@ def finding(record):
     verdict = record.get("verdict")
     if verdict == "equivalent":
         how = record.get("found_by") or "the audit"
-        return False, (f"a qubit permutation carries this code onto board entry {slug} "
-                       f"(found by {how}, re-verified by row-space mapping): it is that "
-                       "code, not a new one; withdraw it, or file a correction to that entry")
+        return False, (
+            f"a qubit permutation carries this code onto board entry {slug} "
+            f"(found by {how}, re-verified by row-space mapping): it is that "
+            "code, not a new one; withdraw it, or file a correction to that entry"
+        )
     if verdict == "inequivalent":
-        return True, (f"`research/audits/permutation_audit.py` separates it from board entry "
-                      f"{slug}, which shares its Weisfeiler-Leman signature: "
-                      f"{record.get('reason', 'a basis-independent invariant differs')}")
+        return True, (
+            f"`research/audits/permutation_audit.py` separates it from board entry "
+            f"{slug}, which shares its Weisfeiler-Leman signature: "
+            f"{record.get('reason', 'a basis-independent invariant differs')}"
+        )
     return None, (record.get("reason") or f"the audit could not decide against {slug}")
 
 

@@ -6,6 +6,7 @@ back ``equivalent`` with the permutation; the Steane code against a different
 separates them; a board entry that cannot be read is ``undecided``. The
 checklist text follows the verdict.
 """
+
 import json
 import os
 import sys
@@ -18,9 +19,7 @@ sys.path.insert(0, os.path.join(_HERE, "kit"))
 import equivalence as EQ  # noqa: E402
 from submit import make_submission  # noqa: E402
 
-STEANE = np.array([[1, 0, 1, 0, 1, 0, 1],
-                   [0, 1, 1, 0, 0, 1, 1],
-                   [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+STEANE = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
 
 
 def _doc(HX, HZ, name):
