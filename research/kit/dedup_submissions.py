@@ -20,8 +20,8 @@ for _p in ("verify", os.path.join("research", "kit")):
     if _full not in sys.path:
         sys.path.insert(0, _full)
 
-import numpy as np
 import gf2
+import numpy as np
 import qldpc_verify as V
 
 
@@ -107,5 +107,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-PY
-echo "created"
