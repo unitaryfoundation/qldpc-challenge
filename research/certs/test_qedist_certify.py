@@ -68,7 +68,7 @@ def test_ladder_stops_on_timeout_and_keeps_previous_completed_rung(monkeypatch):
     }
     seen = []
 
-    def fake_certify(d, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None):
+    def fake_certify(d, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None, sides=None, **kw):
         seen.append((cutoff, work_dir))
         if cutoff in (1, 2):
             lb = cutoff + 1
@@ -227,4 +227,48 @@ def test_an_asymmetric_entry_gets_one_run_per_side_value(monkeypatch):
     cutoffs.clear()
     M.certify(_steane_claiming(3), tlim=1)
     assert cutoffs == [2]
+
+
+def test_the_ladder_climbs_each_side_to_its_own_claim(monkeypatch):
+    """d_X = 3, d_Z = 5: X climbs rungs 1, 2 and Z climbs 1..4; both close, d_exact."""
+    import subprocess
+    M = _module()
+    monkeypatch.setattr(M, "qedist_root", lambda root=None: ["fake-qedist"])
+    seen = []
+
+    def fake_run(cmd, **kw):
+        if cmd[1] == "certify":
+            c = int(cmd[cmd.index("--cutoff") + 1])
+            out_dir = cmd[cmd.index("--out") + 1]
+            seen.append((os.path.basename(os.path.dirname(out_dir)), c))
+            os.makedirs(out_dir, exist_ok=True)
+            # both sectors exclude through c, except that X has a weight-3 logical
+            x = {"lower": 3, "upper": 3, "witness": [4, 5, 6]} if c >= 3 else {"lower": c + 1}
+            with open(os.path.join(out_dir, "result.json"), "w", encoding="utf-8") as f:
+                json.dump({"sector_bounds": {"X": x, "Z": {"lower": c + 1}}}, f)
+            return subprocess.CompletedProcess(cmd, 10 if c >= 3 else 0, "", "")
+        if cmd[1] == "audit":
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+        return subprocess.CompletedProcess(cmd, 0, "QEDist 0.1\n", "")
+
+    monkeypatch.setattr(M.subprocess, "run", fake_run)
+    doc = _steane_claiming(3)
+    doc["distance"]["Z"]["value"] = 5
+    cert = M.run_ladder(doc, budget=1)
+    # rungs 1 and 2 jointly (X closes at 2), then Z alone at 3 and 4 from its own directory
+    assert [c for _, c in seen] == [1, 2, 3, 4]
+    assert [side for side, c in seen if c >= 3] == ["Z", "Z"]
+    assert cert["d_exact"] and cert["sides"]["X"]["exact"] and cert["sides"]["Z"]["exact"]
+    assert cert["ladder"] == {"budget_per_side": 1}
+
+
+def test_a_closed_minimum_side_with_an_open_larger_side_is_not_filed(monkeypatch):
+    """X exact at d = 3, Z proved >= 3 but claimed 5: no certificate shape carries it."""
+    import pytest
+    M = _module()
+    _fake_tool(monkeypatch, M, 75, {"X": {"lower": 3}, "Z": {"lower": 3}})
+    doc = _steane_claiming(3)
+    doc["distance"]["Z"]["value"] = 5
+    with pytest.raises(M.QEDistCertifyError, match="did not close"):
+        M.certify(doc, tlim=1)
 

@@ -258,6 +258,9 @@ def select(queue, *, last, tlim, certs_dir=CERTS, codes_dir=CODES, slugs=None, r
         if not os.path.exists(os.path.join(codes_dir, slug + ".json")):
             skip(slug, "not_on_board", "no codes/ file: the queue is older than the board")
             continue
+        if int(r.get("d") or 0) < 2:
+            skip(slug, "placeholder", "d = 1: nothing to prove below the claim (a W = 0 rung)")
+            continue
         on_file = _cert_on_file(certs_dir, slug)
         if on_file is not None and (on_file.get("d_exact") or not on_file.get("d_lower")):
             skip(slug, "certified", "certs/ already has a file for it")

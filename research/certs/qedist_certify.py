@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -76,6 +77,7 @@ def _run_cutoff(doc, prefix, cutoff, tlim, threads, out_dir, symmetries):
     to read, and `qedist audit` mirrors the run's code.
     """
     out_dir = Path(out_dir)
+    out_dir.parent.mkdir(parents=True, exist_ok=True)
     inp = challenge_to_qedist(doc, include_witnesses=True, symmetries=symmetries)
     n_sym = len(inp.get("symmetry_generators") or [])
     input_path = out_dir.parent / (out_dir.name + ".input.json")
@@ -113,7 +115,7 @@ def _run_cutoff(doc, prefix, cutoff, tlim, threads, out_dir, symmetries):
 
 
 def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
-            symmetries=True):
+            symmetries=True, sides=None, intermediate=False):
     """Certify a CSS entry's per-side distances with QEDist; return the certificate record.
 
     Each side is asked at its own claimed value, as tropidist_certify does, so
@@ -126,8 +128,10 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
         raise QEDistCertifyError("QEDist handles CSS codes only")
     d = int(doc["distance"]["d"])
     sides_in = doc["distance"]
-    # a side without its own block is asked at d, as the tropidist certifier does
-    claims = {s: int((sides_in.get(s) or {}).get("value", d)) for s in ("X", "Z")}
+    # a side without its own block is asked at d, as the tropidist certifier does;
+    # ``sides`` restricts the record to those sides (the per-side ladder reads one)
+    claims = {s: int((sides_in.get(s) or {}).get("value", d))
+              for s in ("X", "Z") if sides is None or s in sides}
     if cutoff is None:
         plan = {}
         for side, value in claims.items():
@@ -152,7 +156,9 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
     results = {}             # cutoff -> result
     n_sym = 0
     for c, side_list in sorted(plan.items()):
-        out_dir = tmp / ("run" if cutoff is not None else f"run-{c}")
+        # one directory per cutoff: QEDist resumes only a run with the same
+        # cutoff, so a ladder sharing one directory died at its second rung
+        out_dir = tmp / f"run-{c}"
         result, wall, used = _run_cutoff(doc, prefix, c, tlim, threads, out_dir, symmetries)
         results[c] = result
         n_sym = max(n_sym, used)
@@ -201,12 +207,27 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
                    note=(f"lower bound {proved}" if proved is not None else "nothing proved"))
         cert_sides[side] = blk
 
-    overall = bool(cert_sides) and all(b.get("exact") for b in cert_sides.values())
-    # the run at d - 1 is the one whose exact_distance speaks about d
     base = results.get(d - 1)
-    if base is not None and base.get("exact_distance") is not None and int(base["exact_distance"]) != d:
-        overall = False
+    return _assemble(doc, cert_sides, prefix, tlim, n_sym,
+                     per_side=len(plan) > 1,
+                     tool_exact=(base.get("exact_distance") if base is not None else None),
+                     strict=not intermediate)
 
+
+def _assemble(doc, cert_sides, prefix, tlim, n_sym, *, per_side=False, tool_exact=None, ladder=None,
+              strict=True):
+    """Build the certificate record from per-side blocks.
+
+    d_exact needs every side exact at its own claim. A record whose sides are
+    all proved at least d but not all closed (the minimum side exact, a side
+    above d still open) has no certificate shape: it is neither exact nor a
+    partial with d_lower < d, so it is refused here rather than filed and
+    rejected by verify/check_certs.py (issue #6867).
+    """
+    d = int(doc["distance"]["d"])
+    overall = bool(cert_sides) and all(b.get("exact") for b in cert_sides.values())
+    if tool_exact is not None and int(tool_exact) != d:
+        overall = False
     verification = {
         "level": LEVEL,
         "note": "QEDist's lower bound is exhaustive search inside its kernel "
@@ -214,7 +235,7 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
                 "was re-verified by verify/heuristic_distance.py. Solver verdict only. "
                 + (f"{n_sym} Tanner-graph symmetry generators supplied and verified by the tool."
                    if n_sym else "No symmetry generators supplied.")
-                + (" Each side asked at its own claimed value." if len(plan) > 1 else ""),
+                + (" Each side asked at its own claimed value." if per_side else ""),
     }
     rec = {
         "name": doc.get("name"),
@@ -225,12 +246,21 @@ def certify(doc, *, root=None, tlim=60.0, threads=1, cutoff=None, work_dir=None,
         "tlim_per_solve": float(tlim),
         "verification": verification,
     }
+    if ladder is not None:
+        rec["ladder"] = {"budget_per_side": ladder}
     if not overall:
         side_lbs = [
             int(b["lower_bound"]) if b.get("lower_bound") is not None else (d if b.get("exact") else 1)
             for b in cert_sides.values()
         ]
-        rec["d_lower"] = min(side_lbs) if side_lbs else 1
+        lb = min(side_lbs) if side_lbs else 1
+        if strict and lb >= d and not any(b.get("status") == "SAT" for b in cert_sides.values()):
+            open_sides = [s for s, b in cert_sides.items() if not b.get("exact")]
+            raise QEDistCertifyError(
+                f"every side is proved >= {d} but side(s) {open_sides} above d did not close; "
+                "no certificate shape carries that (issue #6867)"
+            )
+        rec["d_lower"] = lb
         verification["checks_sha256"] = checks_sha256(doc)
     return rec
 
@@ -258,20 +288,43 @@ def _rung_completed(cert, w):
 
 
 def run_ladder(doc, *, root=None, budget=60.0, threads=1, kmin=None):
-    """Run ascending cutoffs 1..d-1 (or kmin..d-1), resuming QEDist and keeping the last completed rung."""
+    """Ascending cutoffs, keeping the last completed rung per side.
+
+    Both sides climb together to the smaller claim minus one (one run per
+    rung, as before); a side whose claim is larger then climbs on alone to
+    its own claim minus one, so an entry with d_X != d_Z gets its larger side
+    laddered past d instead of stopping where the smaller side's witness
+    appears. QEDist runs both sectors at every rung; only the climbing side
+    is read from its own runs.
+    """
     import tempfile
 
     d = int(doc["distance"]["d"])
+    dist = doc["distance"]
+    claims = {s: int((dist.get(s) or {}).get("value", d)) for s in ("X", "Z")}
+    low = min(claims.values())
     start = int(kmin) if kmin and int(kmin) > 1 else 1
-    last = None
-    first = None
+    n_sym = 0
+
+    def note_sym(c):
+        nonlocal n_sym
+        m = re.search(r"(\d+) Tanner-graph symmetry generators", (c.get("verification") or {}).get("note", ""))
+        n_sym = max(n_sym, int(m.group(1)) if m else 0)
+
+    def completed(blk, w):
+        return bool(blk.get("exact")) or (blk.get("lower_bound") or 0) >= w + 1
+
     with tempfile.TemporaryDirectory(prefix="qedist-ladder-") as td:
-        for w in range(start, d):
+        first = last = None
+        joint_rungs = range(start, low) if start < low else [low - 1]
+        for w in joint_rungs:
             try:
-                c = certify(doc, root=root, tlim=budget, threads=threads, cutoff=w, work_dir=td)
-            except Exception as exc:  # noqa: BLE001
+                c = certify(doc, root=root, tlim=budget, threads=threads, cutoff=w, work_dir=td,
+                            intermediate=True)
+            except QEDistCertifyError as exc:
                 print(f"cutoff {w}: {exc}", file=sys.stderr)
                 break
+            note_sym(c)
             if first is None:
                 first = c
             if any(b.get("status") == "SAT" for b in (c.get("sides") or {}).values()):
@@ -282,16 +335,35 @@ def run_ladder(doc, *, root=None, budget=60.0, threads=1, kmin=None):
             last = c
             if c.get("d_exact"):
                 break
-    if last is None:
-        if first is not None:
-            cert = first
-        else:
+        if last is None and first is None:
             raise QEDistCertifyError("ladder failed on the first rung")
-    else:
-        cert = last
-    cert.setdefault("ladder", {"budget_per_side": budget})
-    return cert
-
+        base = last if last is not None else first
+        blocks = dict(base["sides"])
+        reached = last is not None and _rung_completed(last, low - 1) \
+            and not any(b.get("status") == "SAT" for b in blocks.values())
+        if reached:
+            for side, claim in claims.items():
+                if claim <= low or blocks[side].get("exact"):
+                    continue
+                for w in range(low, claim):
+                    try:
+                        c = certify(doc, root=root, tlim=budget, threads=threads, cutoff=w,
+                                    work_dir=os.path.join(td, side), sides=[side], intermediate=True)
+                    except QEDistCertifyError as exc:
+                        print(f"{side} cutoff {w}: {exc}", file=sys.stderr)
+                        break
+                    note_sym(c)
+                    blk = c["sides"][side]
+                    if blk.get("status") == "SAT":
+                        blocks[side] = blk
+                        break
+                    if not completed(blk, w):
+                        break
+                    blocks[side] = blk
+                    if blk.get("exact"):
+                        break
+    return _assemble(doc, blocks, qedist_root(root), budget, n_sym,
+                     per_side=len(set(claims.values())) > 1, ladder=budget)
 
 def main(argv=None):
     import argparse
