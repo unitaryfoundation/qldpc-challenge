@@ -259,7 +259,8 @@
  },
  "provenance": {
   "authors": [
-   "autoresearch"
+   "autoresearch",
+   "@mathysrennela"
   ],
   "construction": "2D color code on a genus-2 surface (Dyck map) from Derks et al., 'High-rate low-distance color codes', arXiv:2611.23420 (Appendix F.3): two red faces removed from the closed m=4 lattice.",
   "references": [
