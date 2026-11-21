@@ -80,3 +80,38 @@ def test_the_per_side_marks_show_the_side_bounds():
     assert build.asym_detail(e) == "9 &le; d_X &le; 21, d_Z = 20 &middot; w_X = 4, w_Z = 4"
     e.update(lb_X=None)
     assert build.asym_detail(e).startswith("d_X &le; 21")
+
+
+def test_the_interval_mark_stays_inside_its_fixed_column(tmp_path):
+    """The interval mark no longer spills over kd^2/n (issue #7117).
+
+    The mark is wider than the board's fixed d column and the cell was nowrap.
+    Now the cell may wrap between the mark and the number, the mark itself
+    never breaks, and the column got the width that authors and model gave up.
+    """
+    import json
+    import re
+
+    build = load_site_build()
+    rule = re.search(r"\.board td\.col-d\{([^}]*)\}", build.CSS)
+    assert rule and "white-space:normal" in rule.group(1)
+    badge_rule = re.search(r"(?<![\w.-])\.b\{([^}]*)\}", build.CSS)
+    assert badge_rule and "white-space:nowrap" in badge_rule.group(1)
+
+    codes = tmp_path / "codes"
+    codes.mkdir()
+    with open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")) as f:
+        doc = json.load(f)
+    with open(codes / "72-6-6.json", "w") as f:
+        json.dump(doc, f)
+    build.ROOT = str(tmp_path)
+    build.DOCS = str(tmp_path / "docs")
+    build.CERTS = str(tmp_path / "certs")
+    build.build()
+    with open(tmp_path / "docs" / "index.html", encoding="utf-8") as f:
+        index = f.read()
+    cols = re.search(r"<colgroup>(.*?)</colgroup>", index).group(1)
+    widths = [int(w) for w in re.findall(r"width:(\d+)%", cols)]
+    assert widths[1] == 13 and widths[5] == 8 and sum(widths) == 100, widths
+    code_rule = re.search(r"\.board td\.codecell\{([^}]*)\}", build.CSS)
+    assert code_rule and "padding-left:.5rem" in code_rule.group(1)
