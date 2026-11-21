@@ -9473,6 +9473,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "90-21-11",
+      "n": 90,
+      "k": 21,
+      "d": 11,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "90-24-2",
       "n": 90,
       "k": 24,
@@ -10297,6 +10305,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "100-23-12",
+      "n": 100,
+      "k": 23,
+      "d": 12,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "100-24-5",
       "n": 100,
       "k": 24,
@@ -10977,6 +10993,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "110-25-13",
+      "n": 110,
+      "k": 25,
+      "d": 13,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "110-28-10",
       "n": 110,
       "k": 28,
@@ -11622,6 +11646,14 @@
       "k": 27,
       "d": 12,
       "tier": "exact",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "120-27-13",
+      "n": 120,
+      "k": 27,
+      "d": 13,
+      "tier": "ub",
       "code_type": "stabilizer"
     },
     {
@@ -12505,6 +12537,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "130-29-14",
+      "n": 130,
+      "k": 29,
+      "d": 14,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "131-22-2",
       "n": 131,
       "k": 22,
@@ -12993,6 +13033,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "140-31-15",
+      "n": 140,
+      "k": 31,
+      "d": 15,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "140-42-2",
       "n": 140,
       "k": 42,
@@ -13393,6 +13441,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "145-32-15",
+      "n": 145,
+      "k": 32,
+      "d": 15,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "146-18-4",
       "n": 146,
       "k": 18,
@@ -13569,6 +13625,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "150-33-16",
+      "n": 150,
+      "k": 33,
+      "d": 16,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "150-53-11",
       "n": 150,
       "k": 53,
@@ -13577,11 +13641,27 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "150-53-12",
+      "n": 150,
+      "k": 53,
+      "d": 12,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "150-62-7",
       "n": 150,
       "k": 62,
       "d": 7,
       "tier": "exact",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "150-62-8",
+      "n": 150,
+      "k": 62,
+      "d": 8,
+      "tier": "ub",
       "code_type": "stabilizer"
     },
     {
@@ -13965,6 +14045,14 @@
       "n": 160,
       "k": 35,
       "d": 16,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "160-35-17",
+      "n": 160,
+      "k": 35,
+      "d": 17,
       "tier": "ub",
       "code_type": "stabilizer"
     },
@@ -14461,6 +14549,14 @@
       "n": 168,
       "k": 59,
       "d": 12,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "168-59-13",
+      "n": 168,
+      "k": 59,
+      "d": 13,
       "tier": "ub",
       "code_type": "stabilizer"
     },
@@ -15097,6 +15193,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "180-39-18",
+      "n": 180,
+      "k": 39,
+      "d": 18,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "180-42-12",
       "n": 180,
       "k": 42,
@@ -15257,6 +15361,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "185-40-19",
+      "n": 185,
+      "k": 40,
+      "d": 19,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "185-64-5",
       "n": 185,
       "k": 64,
@@ -15401,6 +15513,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "186-65-15",
+      "n": 186,
+      "k": 65,
+      "d": 15,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "187-27-8",
       "n": 187,
       "k": 27,
@@ -15422,6 +15542,14 @@
       "k": 49,
       "d": 6,
       "tier": "exact",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "188-49-12",
+      "n": 188,
+      "k": 49,
+      "d": 12,
+      "tier": "ub",
       "code_type": "stabilizer"
     },
     {
@@ -15510,6 +15638,14 @@
       "k": 78,
       "d": 8,
       "tier": "exact",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "190-78-9",
+      "n": 190,
+      "k": 78,
+      "d": 9,
+      "tier": "ub",
       "code_type": "stabilizer"
     },
     {
@@ -16013,6 +16149,14 @@
       "n": 200,
       "k": 43,
       "d": 19,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "200-43-20",
+      "n": 200,
+      "k": 43,
+      "d": 20,
       "tier": "ub",
       "code_type": "stabilizer"
     },
@@ -16649,6 +16793,14 @@
       "code_type": "stabilizer"
     },
     {
+      "id": "220-47-21",
+      "n": 220,
+      "k": 47,
+      "d": 21,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "220-50-16",
       "n": 220,
       "k": 50,
@@ -16982,6 +17134,14 @@
       "k": 94,
       "d": 8,
       "tier": "exact",
+      "code_type": "stabilizer"
+    },
+    {
+      "id": "230-94-10",
+      "n": 230,
+      "k": 94,
+      "d": 10,
+      "tier": "ub",
       "code_type": "stabilizer"
     },
     {
@@ -21817,6 +21977,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "366-125-22",
+      "n": 366,
+      "k": 125,
+      "d": 22,
+      "tier": "ub",
+      "code_type": "stabilizer"
+    },
+    {
       "id": "367-19-5",
       "n": 367,
       "k": 19,
@@ -22637,6 +22805,14 @@
       "n": 390,
       "k": 82,
       "d": 35,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
+      "id": "390-84-22",
+      "n": 390,
+      "k": 84,
+      "d": 22,
       "tier": "ub",
       "code_type": "CSS"
     },
@@ -23569,10 +23745,10 @@
       "code_type": "CSS"
     },
     {
-      "id": "433-2-59",
+      "id": "433-2-40",
       "n": 433,
       "k": 2,
-      "d": 41,
+      "d": 40,
       "tier": "ub",
       "code_type": "CSS"
     },
@@ -24134,6 +24310,14 @@
       "k": 8,
       "d": 17,
       "tier": "exact",
+      "code_type": "CSS"
+    },
+    {
+      "id": "460-98-24",
+      "n": 460,
+      "k": 98,
+      "d": 24,
+      "tier": "ub",
       "code_type": "CSS"
     },
     {
@@ -30469,6 +30653,14 @@
       "n": 924,
       "k": 18,
       "d": 31,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
+      "id": "924-29-26",
+      "n": 924,
+      "k": 29,
+      "d": 26,
       "tier": "ub",
       "code_type": "CSS"
     },
