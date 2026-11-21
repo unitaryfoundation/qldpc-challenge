@@ -24,11 +24,11 @@ Environment variables (all optional, sensible defaults):
   CHUNK_SIZE    parents per checkpoint (default: 25)
   TRIALS        base witness-search trials per side (default: 2000; screen depth)
   TRIALS_PER_D  additional trials per unit of claimed d (default: 2000)
-  DEEP_RUNG_MIN_D  claimed d at which the mandatory deep rung applies (default: 20)
+  DEEP_RUNG_MIN_D  claimed d at which the mandatory deep rung applies (default: 10)
   DEEP_RUNG_BASE   deep-rung base trials (default: 200000)
   DEEP_RUNG_PER_D   deep-rung trials per unit d (default: 20000)
   DEEP_RUNG_CAP    deep-rung budget cap (default: 2000000)
-  GF2_TRIALS    gf2_fast pre-filter trials per child (default: 2000)
+  GF2_TRIALS    gf2_fast pre-filter trials per child (default: 20000)
   SKIP_DOMINATED  skip parents dominated by the board (default: 1)
   DEDUP_ORACLE  run research/kit/dedup_oracle.py before staging (default: 1)
   DEDUP_OPEN_PRS  index the codes/ files of open PRs as well as the board (default: 1)
@@ -93,7 +93,7 @@ N_MAX = int(os.environ.get("N_MAX", "1000"))
 WORKERS = int(os.environ.get("WORKERS", "4"))
 CHUNK_SIZE = int(os.environ.get("CHUNK_SIZE", "25"))
 TRIALS = int(os.environ.get("TRIALS", "2000"))  # screening depth; deep-confirm survivors at 20000+
-GF2_TRIALS = int(os.environ.get("GF2_TRIALS", "2000"))  # gf2_fast pre-filter trials per child
+GF2_TRIALS = int(os.environ.get("GF2_TRIALS", "20000"))  # gf2_fast pre-filter trials per child (issue #6196)
 SKIP_DOMINATED = os.environ.get("SKIP_DOMINATED", "1") == "1"
 
 # --- dedup oracle (issue #6814) ---------------------------------------------
@@ -105,7 +105,7 @@ OUT_DEDUP = os.environ.get("OUT_DEDUP", os.path.join(OUT_DIR, "dedup_oracle%s.js
 
 # --- screening budget: depth-proportional, not flat -------------------------
 TRIALS_PER_D = int(os.environ.get("TRIALS_PER_D", "2000"))
-DEEP_RUNG_MIN_D = int(os.environ.get("DEEP_RUNG_MIN_D", "20"))
+DEEP_RUNG_MIN_D = int(os.environ.get("DEEP_RUNG_MIN_D", "10"))  # calibrated on 2026-11-20 (issue #6196)
 DEEP_RUNG_BASE = int(os.environ.get("DEEP_RUNG_BASE", "200000"))
 DEEP_RUNG_PER_D = int(os.environ.get("DEEP_RUNG_PER_D", "20000"))
 DEEP_RUNG_CAP = int(os.environ.get("DEEP_RUNG_CAP", "2000000"))
