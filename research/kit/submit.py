@@ -338,6 +338,14 @@ def save_submission(doc, path, *, on_collision="error", preflight=True, spec=Non
     """
     if on_collision not in ("error", "overwrite"):
         raise ValueError(f"on_collision: unknown mode {on_collision!r}; use 'error' or 'overwrite'")
+    # A submission is one file, codes/<slug>.json. A directory or a nested path
+    # is a packaging mistake (issue #3810 / PR 6849) and must never be written.
+    if os.path.isdir(path):
+        raise ValueError(f"{path} is a directory; a code submission must be a "
+                         "single file codes/<slug>.json")
+    if not str(path).endswith(".json"):
+        raise ValueError(f"{path} must end in .json; a code submission is a "
+                         "single file codes/<slug>.json")
     if on_collision == "error" and os.path.exists(path) and not holds_same_candidate(path, doc):
         raise CandidateCollision(
             f"{path} already holds a different candidate. Overwriting it would "
