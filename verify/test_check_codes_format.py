@@ -78,3 +78,37 @@ def test_only_changed_codes_files_are_diffed(tmp_path):
 def test_a_failed_diff_fails_closed(tmp_path):
     assert ccf.changed_codes("nonexistent-base", str(tmp_path)) is None
     assert ccf.main(["--root", str(tmp_path), "--base", "nonexistent-base"]) == 1
+
+
+def _entry(n, k, d, stab=False):
+    dist = {"d": d, "P": {"value": d}} if stab else {"d": d, "X": {"value": d}, "Z": {"value": d}}
+    return {"schema_version": "0.3", "name": f"[[{n},{k},{d}]]", "n": n, "k": k, "distance": dist}
+
+
+def test_a_file_named_for_another_distance_is_refused(tmp_path, capsys):
+    (tmp_path / "codes").mkdir()
+    (tmp_path / "codes" / "209-39-23.json").write_text(ccf.canonical(_entry(209, 39, 17)))
+    rc = ccf.main(["--root", str(tmp_path), "--files", "codes/209-39-23.json"])
+    out = capsys.readouterr().out
+    assert rc == 1
+    assert "named for [[209,39,23]] but holds n=209, k=39, d=17" in out
+    assert "rename the file" in out and "--fix does not rename" in out
+    assert "--fix --files" not in out  # nothing here is a formatting fix
+
+
+def test_matching_slugs_pass_with_suffixes_and_for_stabilizer_entries(tmp_path):
+    (tmp_path / "codes").mkdir()
+    (tmp_path / "codes" / "209-39-17.json").write_text(ccf.canonical(_entry(209, 39, 17)))
+    (tmp_path / "codes" / "209-39-17-b.json").write_text(ccf.canonical(_entry(209, 39, 17)))
+    (tmp_path / "codes" / "5-1-3.json").write_text(ccf.canonical(_entry(5, 1, 3, stab=True)))
+    assert (
+        ccf.main(
+            ["--root", str(tmp_path), "--files", "codes/209-39-17.json", "codes/209-39-17-b.json", "codes/5-1-3.json"]
+        )
+        == 0
+    )
+
+
+def test_a_document_without_a_distance_block_is_left_to_the_schema():
+    assert ccf.slug_problem("codes/4-1-1.json", DOC) is None
+    assert ccf.slug_problem("codes/not-a-slug.json", _entry(4, 1, 1)) is None
