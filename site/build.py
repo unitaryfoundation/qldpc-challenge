@@ -759,6 +759,15 @@ background:var(--bg);box-shadow:0 2px 0 var(--ln)}}
 font-variant-numeric:tabular-nums}}
 .board td.auth{{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 max-width:220px}}
+/* the d cell holds a tier mark and a number; an interval mark ("24 &le; d &le;",
+   issue #4230) is wider than the fixed column, and a nowrap cell spills it
+   over kd2/n (issue #7117). Let the number drop under the mark instead. */
+.board td.col-d{{white-space:normal;line-height:1.6;padding-left:.4rem;
+padding-right:.4rem}}
+/* a four-digit n makes the code name wider than the code column's content
+   box and it ran under the type chips (same issue): tighter side padding
+   and a 13% column fit [[1000,200,29]] on one line */
+.board td.codecell{{padding-left:.5rem;padding-right:.5rem}}
 /* optional routing-cost column (issue #1847): off unless the table is
    filtered to an unrestricted cell with layouts or the swaps toggle is on */
 .board .col-route,.board col.colroute{{display:none;width:0}}
@@ -1039,7 +1048,7 @@ header.hero{{padding:34px 0 30px}}
 .stat-card{{padding:14px 16px}}.stat-card .v{{font-size:27px}}}}
 .claimed{{color:var(--mut);font-size:12px;font-style:italic}}
 .b{{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
-border-radius:5px;font-family:ui-monospace,monospace}}
+border-radius:5px;font-family:ui-monospace,monospace;white-space:nowrap}}
 .b.exact{{background:#d1fae5;color:var(--ex)}}.b.ub{{background:#eef2f7;
 color:var(--mut)}}.b.ivl{{background:#fef3c7;color:#92400e}}
 footer.foot{{margin-top:72px;border-top:1px solid var(--ln);
@@ -2560,20 +2569,6 @@ def badge(tier, lb=None):
     d on an upper-bound entry it turns the mark into the interval's left
     half, so the cell reads "7 &le; d &le; 20" (issue #4230).
     """
-    if tier == "exact":
-        return '<span class="b exact">d =</span>'
-    if lb and lb >= 2:
-        return (
-            f'<span class="b ivl" title="proven lower bound: a solver showed no '
-            f"logical lighter than {lb} exists on any side (a partial "
-            f"certificate in certs/), while the witness gives the upper "
-            f'bound">{lb} &le; d &le;</span>'
-        )
-    return (
-        '<span class="b ub" title="verified upper bound: an explicit '
-        "logical of this weight, and independent refutation searches "
-        'found nothing lighter">d &le;</span>'
-    )
     if tier == "exact":
         return '<span class="b exact">d =</span>'
     if lb and lb >= 2:
@@ -6142,13 +6137,13 @@ def board_table(entries, records, lrec=frozenset()):
     # stabilizer board (one Pauli-weight distance per code) has none
     show_asym = any(e["asym"] is not None for e in entries)
     cols = (
-        '<colgroup><col style="width:3%"><col style="width:11%">'
+        '<colgroup><col style="width:3%"><col style="width:13%">'
         '<col style="width:9%"><col style="width:5%"><col style="width:5%">'
-        '<col style="width:6%"><col style="width:7%"><col style="width:7%">'
+        '<col style="width:8%"><col style="width:7%"><col style="width:6%">'
         '<col style="width:5%"><col class=colroute>'
         + ('<col style="width:5%">' if show_asym else "")
         + '<col style="width:5%"><col style="width:5%">'
-        '<col style="width:11%"><col style="width:10%">'
+        '<col style="width:9%"><col style="width:9%">'
         '<col style="width:6%"></colgroup>'
     )
     head = (
