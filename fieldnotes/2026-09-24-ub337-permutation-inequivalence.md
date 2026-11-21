@@ -5,7 +5,7 @@ author: "@vprusso"
 topics: [generalized-bicycle, code-equivalence, cyclic-ideals]
 ---
 
-The two explicit [[674,170]] CSS constructions below are inequivalent to one another and to both compared [[674,170]] board matrix pairs under arbitrary physical qubit permutations, including permutations composed with a uniform global Hadamard. The board comparisons are [674-170-64](../codes/674-170-64.json) and [674-170-76](../codes/674-170-76.json); both compared JSON snapshots actually contain distance upper bounds of 64. The result concerns their matrices, independently of any distance estimate or stale filename. It establishes neither inequivalence under arbitrary local Clifford transformations nor novelty against the literature.
+The two explicit [[674,170]] CSS constructions below are inequivalent to one another and to both compared [[674,170]] board matrix pairs under arbitrary physical qubit permutations, including permutations composed with a uniform global Hadamard. The board comparisons are [674-170-64](../codes/674-170-64.json) and [674-170-76](../codes/674-170-64-b.json); both compared JSON snapshots actually contain distance upper bounds of 64. The result concerns their matrices, independently of any distance estimate or stale filename. It establishes neither inequivalence under arbitrary local Clifford transformations nor novelty against the literature.
 
 ## The two matrix pairs
 
