@@ -226,7 +226,9 @@ def main():
     real = os.path.join(ROOT, "notes", "300-60-14.md")
     if os.path.exists(real):
         r = subprocess.run(
-            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--files", "notes/300-60-14.md"],
+            # Pin the diff base to HEAD: in a fork origin/main can be stale, and
+            # this test is about the note's citation, not the checkout's remote.
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--base", "HEAD", "--files", "notes/300-60-14.md"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -354,6 +356,145 @@ def main():
             "entry revised with its note dropped fails",
             r.returncode == 1 and "no note under the new slug" in r.stdout,
             r.stdout[-300:],
+        )
+
+    # An in-place overwrite of an existing entry is not a revision (#5732).
+    # The code file is the source of truth: the note is only a secondary signal,
+    # and must not refuse a note-only repair (issue #6841).
+    OLD_CODE = (
+        '{"name":"[[10,2,6]]","code_type":"CSS","n":10,"k":2,"checks":{"X":[[0,1]],"Z":[[2,3]]},"distance":{"d":6}}\n'
+    )
+    NEW_CODE = OLD_CODE.replace('"X":[[0,1]]', '"X":[[4,5]]')
+    REORDERED_CODE = OLD_CODE.replace('"X":[[0,1]]', '"X":[[1,0]]')  # same generator, re-listed
+    NOTE_STUB = "# [[10,2,6]] a code\n\nOne sentence about it.\n"
+    NOTE_REWRITE = "# [[10,2,6]] a different code\n\nA completely new narrative about it.\n"
+
+    def inplace_repo(tmp, *, code=None, note=None, fieldnote=None):
+        """Commit a code+note on main, then edit them in place on a branch."""
+
+        def git(*args):
+            subprocess.run(
+                ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=tmp, check=True, capture_output=True
+            )
+
+        git("init", "-q")
+        git("symbolic-ref", "HEAD", "refs/heads/main")
+        os.makedirs(os.path.join(tmp, "codes"))
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "codes", "10-2-6.json"), "w") as f:
+            f.write(OLD_CODE)
+        with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+            f.write(NOTE_STUB)
+        git("add", "-A")
+        git("commit", "-q", "-m", "base")
+        git("checkout", "-q", "-b", "feature")
+        if code is not None:
+            with open(os.path.join(tmp, "codes", "10-2-6.json"), "w") as f:
+                f.write(code)
+        if note is not None:
+            with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+                f.write(note)
+        if fieldnote is not None:
+            os.makedirs(os.path.join(tmp, "fieldnotes"), exist_ok=True)
+            with open(os.path.join(tmp, "fieldnotes", "2026-11-01-ten-two.md"), "w") as f:
+                f.write(fieldnote)
+        git("add", "-A")
+        git("commit", "-q", "-m", "edit in place")
+
+    def guards(tmp):
+        code_out, note_out = [], []
+        ok_code = check_prose.check_code_overwrites("main", tmp, code_out)
+        ok_note = check_prose.check_note_rewrites("main", tmp, note_out)
+        return ok_code, ok_note, code_out + note_out
+
+    # 1. A stub replaced by a real write-up (the #6841 repair) leaves both the
+    #    code and the leading [[n,k,d]] alone, so neither guard fires.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, note=OLD_NOTE)
+        ok_code, ok_note, out = guards(tmp)
+        check("stub-to-note repair passes", ok_code and ok_note and not out, out)
+
+    # 2. Different checks under the same slug, note untouched: the real #5623
+    #    pattern. This is the one that passed every check before this guard.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "changed checks under the same slug fail",
+            ok_code and ok_note and any(w.startswith("code overwrite") for _, w, _ in out),
+            out,
+        )
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE)
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--base", "main"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        check(
+            "code overwrite fails end to end",
+            r.returncode == 1 and "code overwrite drops the previous entry" in r.stdout,
+            r.stdout[-400:],
+        )
+        check("...and names the suffixed-slug way out", "suffixed slug" in r.stdout, r.stdout[-400:])
+
+    # 3. Re-listing the same generators in a different order is not an overwrite.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=REORDERED_CODE)
+        ok_code, ok_note, out = guards(tmp)
+        check("reordering checks is not an overwrite", ok_code and ok_note and not out, out)
+
+    # 4. With the code (or the leading [[n,k,d]]) changed, a large rewrite is a
+    #    secondary signal: it fails, unless the old body is carried forward.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE, note=NOTE_REWRITE)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "code change plus note rewrite fails both guards",
+            ok_code
+            and ok_note
+            and any(w.startswith("code overwrite") for _, w, _ in out)
+            and any(w.startswith("note rewrite drops") for _, w, _ in out),
+            out,
+        )
+    folded = NOTE_REWRITE + "\n" + check_prose.FOLD_IN_HEADING + "\n\n" + NOTE_STUB
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE, note=folded)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "fold-in passes the note guard", ok_note and not any(w.startswith("note rewrite") for _, w, _ in out), out
+        )
+    with tempfile.TemporaryDirectory() as tmp:
+        fieldnote = '---\ntitle: old note\nauthor: "@t"\n---\n\n' + NOTE_STUB
+        inplace_repo(tmp, code=NEW_CODE, note=NOTE_REWRITE, fieldnote=fieldnote)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "fieldnote carries the old body past the note guard",
+            ok_note and not any(w.startswith("note rewrite") for _, w, _ in out),
+            out,
+        )
+
+    # 5. A bare directory with no git history skips the diff-based checks
+    #    instead of failing closed (the self-test / --files shape).
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+            f.write("# [[10,2,6]] clean\n")
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--files", "notes/10-2-6.md"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        check(
+            "a root without git skips the diff-based checks",
+            r.returncode == 0
+            and "skipping the code-overwrite check" in r.stdout
+            and "skipping the note-rewrite check" in r.stdout,
+            r.stdout[-400:],
         )
 
     print()
