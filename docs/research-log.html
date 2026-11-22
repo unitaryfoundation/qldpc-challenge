@@ -28179,7 +28179,17 @@ S = halved_checks(48, E)   # the 4P generators of codes/240-51-18.json, in order
 <p><code>m = 217</code>, <code>n = 2m = 434</code>. With <code>a = {4, 51, 60, 123, 141, 146, 154, 185, 208}</code> and <code>b = {33, 69, 104, 133, 158, 184, 199, 209, 211}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
 <p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The divisor is recovered as <code>gcd(a, b, x^217 - 1)</code>, of degree 26. The submitted <code>codes/434-52-48.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/434-52-48.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/446-74-48.html">[[446,74,48]] — 446-74-48</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<section class=blk><h3><a href="codes/446-74-46.html">[[446,74,46]] — 446-74-46</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<h3>[[446,74,46]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 223</h3>
+<h4>Revision 2026-11-22: [[446,74,48]] -&gt; [[446,74,46]]</h4>
+<p>[[446,74,46]] supersedes the board&#x27;s [[446,74,48]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 382.28 to 351.09. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 48 -&gt; 46: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 387,873,394 trials on this side on an NVIDIA L40, seed 1451868371.</li>
+<li>Z side 48 -&gt; 46: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 387,906,733 trials on this side on an NVIDIA L40, seed 1954434509.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 48 | 46 | 387,873,394 | 1451868371 | | Z | 48 | 46 | 387,906,733 | 1954434509 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/446-74-46.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
 <h3>[[446,74,48]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 223</h3>
 <p>At row weight 20 or lighter, the best distance on the board with <code>n &lt;= 446</code> and <code>k &gt;= 74</code> is 31, at <code>[[390,82,31]]</code> and row weight 16. This entry reaches 50. Allowing any row weight, the board&#x27;s best in the same <code>n</code> and <code>k</code> range is 38, at <code>[[390,82,38]]</code> and row weight 32.</p>
 <h4>Direction &amp; hypothesis</h4>
@@ -28203,7 +28213,7 @@ S = halved_checks(48, E)   # the 4P generators of codes/240-51-18.json, in order
 <h4>Reproduction</h4>
 <p><code>m = 223</code>, <code>n = 2m = 446</code>. With <code>a = {26, 42, 110, 144, 178, 184, 196, 205, 211}</code> and <code>b = {9, 14, 24, 51, 67, 83, 85, 151, 168, 176, 180}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
-<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The submitted <code>codes/446-74-48.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/446-74-48.md">raw markdown</a></div></details></section>
+<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The submitted <code>codes/446-74-46.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/446-74-46.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/446-76-44.html">[[446,76,44]] — 446-76-44</a></h3><div class=kv style="color:var(--mut)">2026-10-15 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
 <h3>[[446,76,44]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 223</h3>
 <h4>Revision 2026-11-21: [[446,76,47]] -&gt; [[446,76,44]]</h4>
