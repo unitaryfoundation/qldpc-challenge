@@ -1,6 +1,6 @@
 {
-  "verified_codes": 3909,
-  "css_codes": 3491,
+  "verified_codes": 3911,
+  "css_codes": 3493,
   "stabilizer_codes": 418,
   "certified_exact": 2642,
   "tracks": 12,
@@ -9,19 +9,19 @@
   "provenance": {
     "no_match": 2366,
     "literature": 489,
-    "not_derived": 220,
+    "not_derived": 222,
     "parameters_only": 416,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2877,
+    "unknown": 2879,
     "known_parameters": 955,
     "new_parameters": 77
   },
   "novelty_audited": 1032,
   "board_screen": {
-    "not_screened": 1032,
+    "not_screened": 1034,
     "distinct": 2422,
     "review": 37,
     "reference_entries": 771,
@@ -30,9 +30,9 @@
   },
   "family_concentration": {
     "global": {
-      "records": 1774,
+      "records": 1776,
       "families": 15,
-      "untagged": 496,
+      "untagged": 498,
       "untagged_share": 0.28,
       "top": [
         {
@@ -47,8 +47,8 @@
         }
       ],
       "top1_share": 0.321,
-      "top2_share": 0.423,
-      "hhi": 0.127
+      "top2_share": 0.422,
+      "hhi": 0.126
     },
     "cells": {
       "local-2d-bilayer~weight-4": {
@@ -415,9 +415,9 @@
         "moved": false
       },
       "unrestricted~weight-any": {
-        "records": 1774,
+        "records": 1776,
         "families": 15,
-        "untagged": 496,
+        "untagged": 498,
         "untagged_share": 0.28,
         "top": [
           {
@@ -432,9 +432,9 @@
           }
         ],
         "top1_share": 0.321,
-        "top2_share": 0.423,
-        "hhi": 0.127,
-        "members": 3491,
+        "top2_share": 0.422,
+        "hhi": 0.126,
+        "members": 3493,
         "leader": {
           "slug": "682-140-82",
           "family": "generalized-bicycle",
