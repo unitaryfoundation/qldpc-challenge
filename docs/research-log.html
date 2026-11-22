@@ -3269,7 +3269,17 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
 <p>Max check weight: 5. Group size m = 215 (Z_m). Matrices in codes/431-4-22.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/431-4-22.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/433-2-40.html">[[433,2,40]] — 433-2-40</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[433,2,40]] — Generalized bicycle</h3>
+<section class=blk><h3><a href="codes/433-2-38.html">[[433,2,38]] — 433-2-38</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[433,2,38]] — Generalized bicycle</h3>
+<h4>Revision 2026-11-21: [[433,2,40]] -&gt; [[433,2,38]]</h4>
+<p>[[433,2,38]] supersedes the board&#x27;s [[433,2,40]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 7.39 to 6.67. Before this revision the entry recorded the X bound as having survived 2,000 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
+<ul>
+<li>X side 41 -&gt; 39: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 32), 2,128,095 trials per side, seed 1137214609.</li>
+<li>Z side 40 -&gt; 38: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 301,281,752 trials on this side on an NVIDIA L40, seed 1783145107.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 41 | 39 | 2,128,095 | 1137214609 | | Z | 40 | 38 | 301,281,752 | 1783145107 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/433-2-38.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[433,2,40]] — Generalized bicycle</h3>
 <h4>Distance revision (2026-11-20)</h4>
 <p>The claimed distance comes down from 41 to 40. A 2,000,000-trial random information set ladder (<code>research/audits/leader_audit.py ladder</code>, gf2_fast backend, pair depth 64, seed 14, run for the screening-budget calibration of issue #6196) exhibited a Z-logical of weight 40; it is stored as the Z side&#x27;s witness with its <code>witness_provenance</code>, and the X side (41) is unchanged, so d = min(41, 40) = 40. The file was named <code>433-2-59</code> for the distance the construction predicted while the gate had already lowered the claim to 41 (issue #7108); this revision also moves it to its earned slug. Matrices, construction, and the original author&#x27;s provenance are untouched.</p>
 <h4>Original note, with the file paths updated</h4>
@@ -3285,7 +3295,7 @@ hx, hz, coords, _ = mb.build(6, rows=3, m=6, pitch=4, drop_empty=True)
 <h4>Tools</h4>
 <p>Model: Beam 1.0. Construction family: unspecified.</p>
 <h4>Reproduction</h4>
-<p>Max check weight: 14. Group size m = 216 (Z_m). Matrices in codes/433-2-40.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/433-2-40.md">raw markdown</a></div></details></section>
+<p>Max check weight: 14. Group size m = 216 (Z_m). Matrices in codes/433-2-38.json.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/433-2-38.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/433-30-23.html">[[433,30,23]] — 433-30-23</a></h3><div class=kv style="color:var(--mut)">2026-11-17 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[433,30,23]] — Generalized bicycle</h3>
 <p>Filed as <code>433-30-52</code>, the distance the construction predicted, while the entry&#x27;s <code>distance.d</code> already held the earned 23; moved to <code>433-30-23</code> on 2026-11-21 (issue #7108). Nothing but the file names and the <code>name</code> field changed.</p>
 <h4>Direction &amp; hypothesis</h4>
@@ -25186,7 +25196,17 @@ HX, HZ = build_2bga(mul, [0, 5, 6, 37], [0, 34, 36, 45])   # n = 98, k = 8
 <p>H_X(x) = [[a^top, b^top, c^top], [x^t c^top, a^top, b^top]]    (2 x 3) H_Z(x) = [b^2 + ac, ab + x^t c^2, a^2 + x^t bc]                 (1 x 3)</p>
 <p>where a^top = a(x^-1). Expand each entry as a block circulant whose first row is the coefficient vector and whose later rows are its right cyclic shifts, and concatenate the blocks: that binary pair is this entry.</p>
 <p>g = gcd(a, b, c, x^147+1) has degree 84 and weight 4 (support {0, 21, 42, 84}); g_1 = gcd(Delta_1, Delta_2, Delta_3, x^147+1) has degree 84, so f = g_1/g has degree 0 and k = 3 (84) + 2 (0) = 252.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/441-252-3.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/466-58-46.html">[[466,58,46]] — 466-58-46</a></h3><div class=kv style="color:var(--mut)">2026-10-16 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<section class=blk><h3><a href="codes/466-58-44.html">[[466,58,44]] — 466-58-44</a></h3><div class=kv style="color:var(--mut)">2026-10-16 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<h3>[[466,58,44]]: cyclic generalized-bicycle code at m = 233, row weight 14</h3>
+<h4>Revision 2026-11-21: [[466,58,46]] -&gt; [[466,58,44]]</h4>
+<p>[[466,58,44]] supersedes the board&#x27;s [[466,58,46]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 263.36 to 240.96.</p>
+<ul>
+<li>X side 48 -&gt; 46: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 64), 1,511,833 trials per side, seed 2125130413.</li>
+<li>Z side 46 -&gt; 44: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 32), 1,442,318 trials per side, seed 1051323629.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 48 | 46 | 1,511,833 | 2125130413 | | Z | 46 | 44 | 1,442,318 | 1051323629 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/466-58-44.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
 <h3>[[466,58,46]]: cyclic generalized-bicycle code at m = 233, row weight 14</h3>
 <h4>Revision 2026-11-18: [[466,58,50]] -&gt; [[466,58,46]]</h4>
 <p>[[466,58,46]] supersedes the board&#x27;s [[466,58,50]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 311.16 to 263.36. Before this revision the entry recorded the X bound as having survived 400 samples of &quot;research/kit/surrogate.lightest_logical&quot; and the Z bound as having survived 400 samples of &quot;research/kit/surrogate.lightest_logical&quot;.</p>
@@ -25195,7 +25215,7 @@ HX, HZ = build_2bga(mul, [0, 5, 6, 37], [0, 34, 36, 45])   # n = 98, k = 8
 <li>Z side 50 -&gt; 46: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 271,242,533 trials on this side on an NVIDIA L40, seed 128089835.</li>
 </ul>
 <p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 50 | 48 | 271,258,341 | 128089834 | | Z | 50 | 46 | 271,242,533 | 128089835 |</p>
-<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/466-58-46.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/466-58-44.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
 <h4>Original note, with the file paths updated</h4>
 <h3>[[466,58,50]]: cyclic generalized-bicycle code at m = 233, row weight 14</h3>
 <p>At row weight 14 or lighter, the best distance on the board with <code>n &lt;= 466</code> and <code>k &gt;= 58</code> is 26, at <code>[[390,68,26]]</code> and row weight 13. This entry reaches 50. Allowing any row weight the best in the same range is 57, at <code>[[466,60,57]]</code> and row weight 20, which is six weight steps heavier.</p>
@@ -25218,7 +25238,7 @@ HX, HZ = build_2bga(mul, [0, 5, 6, 37], [0, 34, 36, 45])   # n = 98, k = 8
 <h4>Reproduction</h4>
 <p><code>m = 233</code>, <code>n = 2m = 466</code>. With <code>a = {7, 20, 86, 139, 153, 195, 198}</code> and <code>b = {19, 87, 98, 148, 166, 187, 196}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
-<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The divisor is recovered as <code>gcd(a, b, x^233 - 1)</code>, of degree 29. The submitted <code>codes/466-58-46.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/466-58-46.md">raw markdown</a></div></details></section>
+<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The divisor is recovered as <code>gcd(a, b, x^233 - 1)</code>, of degree 29. The submitted <code>codes/466-58-44.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/466-58-44.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/466-60-49-b.html">[[466,60,49]] — 466-60-49-b</a></h3><div class=kv style="color:var(--mut)">2026-10-16 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
 <h3>[[466,60,49]]: cyclic generalized-bicycle code at m = 233, row weight 16</h3>
 <h4>Revision 2026-11-19: [[466,60,50]] -&gt; [[466,60,49]]</h4>
@@ -29508,7 +29528,17 @@ HX, HZ = build_2bga(mul, [0, 21], [0, 1, 5])
 <p><code>m = 233</code>, <code>n = 2m = 466</code>. With <code>a = {9, 23, 32, 34, 36, 40, 105, 109, 215, 219}</code> and <code>b = {48, 70, 101, 149, 164, 177, 224, 229}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
 <p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The submitted <code>codes/466-60-49.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/466-60-49.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/466-60-53-b.html">[[466,60,53]] — 466-60-53-b</a></h3><div class=kv style="color:var(--mut)">2026-10-14 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<section class=blk><h3><a href="codes/466-60-52.html">[[466,60,52]] — 466-60-52</a></h3><div class=kv style="color:var(--mut)">2026-10-14 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
+<h3>[[466,60,52]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 233</h3>
+<h4>Revision 2026-11-20: [[466,60,53]] -&gt; [[466,60,52]]</h4>
+<p>[[466,60,52]] supersedes the board&#x27;s [[466,60,53]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 361.67 to 348.15. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 53 -&gt; 52: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 269,186,293 trials on this side on an NVIDIA L40, seed 515381546.</li>
+<li>Z side 53 -&gt; 52: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 269,138,720 trials on this side on an NVIDIA L40, seed 1753273.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 53 | 52 | 269,186,293 | 515381546 | | Z | 53 | 52 | 269,138,720 | 1753273 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/466-60-52.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
 <h3>[[466,60,53]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 233</h3>
 <p>At row weight 20 or lighter, the best distance on the board with <code>n &lt;= 466</code> and <code>k &gt;= 60</code> is 31, at <code>[[390,82,31]]</code> and row weight 16. This entry reaches 57. Allowing any row weight, the board&#x27;s best in the same <code>n</code> and <code>k</code> range is 46, at <code>[[466,118,46]]</code> and row weight 30.</p>
 <h4>Direction &amp; hypothesis</h4>
@@ -29531,7 +29561,7 @@ HX, HZ = build_2bga(mul, [0, 21], [0, 1, 5])
 <h4>Reproduction</h4>
 <p><code>m = 233</code>, <code>n = 2m = 466</code>. With <code>a = {25, 63, 117, 125, 164, 179, 192, 227}</code> and <code>b = {10, 16, 19, 36, 73, 82, 88, 109, 124, 168, 196, 228}</code> as exponent sets,</p>
 <p>H_X = [circ(a) | circ(b)],    H_Z = [circ(b)^T | circ(a)^T]</p>
-<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The submitted <code>codes/466-60-53-b.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/466-60-53-b.md">raw markdown</a></div></details></section>
+<p>where <code>circ(s)[i, (i + e) mod m] = 1</code> for each <code>e</code> in <code>s</code>. The submitted <code>codes/466-60-49.json</code> carries both matrices row by row and both distance witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/466-60-52.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/482-48-50.html">[[482,48,50]] — 482-48-50</a></h3><div class=kv style="color:var(--mut)">2026-10-14 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><p>--- author: &quot;@vprusso&quot; ---</p>
 <h3>[[482,48,50]]: cyclic generalized-bicycle code from a designed divisor ideal at m = 241</h3>
 <p>At row weight 14 or lighter, the best distance on the board with <code>n &lt;= 482</code> and <code>k &gt;= 48</code> is 26, at <code>[[390,68,26]]</code> and row weight 13. This entry reaches 56. Allowing any row weight, the board&#x27;s best in the same <code>n</code> and <code>k</code> range is 60, at <code>[[482,50,60]]</code> and row weight 20.</p>
@@ -42531,6 +42561,15 @@ python research/sat_rungs.py --side 8 --G 25 --w 8 --t 3 --k-min 14 \
 <h4>Numbers</h4>
 <p>Max check weight 6 throughout. Interaction radius unchanged at 5.38516, so the reduced code is no less local than the source; layers unchanged. Qubit positions are the source&#x27;s — every surviving qubit keeps the coordinate it has in <code>codes/693-13-16.json</code>, and the reduction only deletes. kd²/n 4.802 → 4.887.</p>
 <p>It dominates <code>693-13-16</code> on (n, k, d, w).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/681-13-16.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/682-122-50.html">[[682,122,50]] — 682-122-50</a></h3><div class=kv style="color:var(--mut)">2026-10-04 &middot; submission note &middot; <a href="https://github.com/Ronaldoengenhariadacomputacao">@Ronaldoengenhariadacomputacao</a> and Ronaldo Rodrigues &middot; Claude Sonnet 5</div><details ><summary>note</summary><div class=notebody><h3>[[682,122,50]]</h3>
+<h4>Revision 2026-11-21: [[682,122,52]] -&gt; [[682,122,50]]</h4>
+<p>[[682,122,50]] supersedes the board&#x27;s [[682,122,52]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 483.71 to 447.21. The orbit-fold search looks only at logicals that are constant on the orbits of a symmetry of the checks, a small subspace that uniform information-set sampling of the whole code rarely lands in.</p>
+<ul>
+<li>X side 52 -&gt; 50: orbit-fold search (<code>verify/heuristic_distance.py</code>, <code>orbit_fold_refute</code>: logicals constant on the orbits of a symmetry of the checks, with the symmetries read from the matrices and from the automorphism group of the Tanner graph), 800,000 trials per folded code, seed 16338301.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 52 | 50 | 800,000 | 16338301 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/682-122-50.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/682-122-50.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/682-92-68.html">[[682,92,68]] — 682-92-68</a></h3><div class=kv style="color:var(--mut)">2026-10-04 &middot; submission note &middot; <a href="https://github.com/Ronaldoengenhariadacomputacao">@Ronaldoengenhariadacomputacao</a> and Ronaldo Rodrigues &middot; Claude Sonnet 5</div><details ><summary>note</summary><div class=notebody><h3>[[682,92,68]] — Generalized-bicycle code over Z_341, q=4 Frobenius recipe</h3>
 <h4>Correction (2026-10-04)</h4>
 <p>This entry originally claimed d=95 (kd^2/n=1217.449). The CI&#x27;s verify gate (RIS-fast pass, ~8,000,000 trials, ~74 minutes wall-clock) refuted that claim, finding a weight-94 X-type logical operator. Independently re-verified against our own H_X/H_Z: the operator commutes fully with H_Z and is not in the row space of H_X -- a genuine nontrivial logical, not a tool artifact. d_Z updated to 94 via the same qubit-permutation symmetry used throughout this session (negate the index mod 341 in each block, then swap blocks -- proven during the PR #2755 session); the Z-witness was derived from the confirmed X-witness and independently re-verified, not assumed. d updated 95 -&gt; 94; kd^2/n updated 1217.449 -&gt; 1191.953.</p>
@@ -79827,7 +79866,17 @@ b(x) = x^6 + x^22 + x^44 + x^87 + x^98 + x^105 + x^116 + x^186
 <p>GAP for <code>SmallGroup</code> enumeration and the repository&#x27;s <code>research/kit/group_algebra.py</code>, <code>submit.py</code>, and trusted validator. No changes to <code>verify/</code> were made.</p>
 <h4>Reproduction</h4>
 <p>Use GAP <code>SmallGroup(36,2)</code> and add the identity to the database supports: <code>a=1+g2+g3+g26</code>, <code>b=1+g6+g8+g31</code>, with the database&#x27;s 1-based element positions. Construct <code>H_X=[L(a)|R(b)]</code> and <code>H_Z=[R(b)^T|L(a)^T]</code> over GF(2), then run the repository validator.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/72-8-10.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/674-128-80.html">[[674,128,80]] — 674-128-80</a></h3><div class=kv style="color:var(--mut)">2026-08-16 &middot; submission note &middot; <a href="https://github.com/npdeep">@npdeep</a> &middot; Magic State Labs (Custom) v0.1</div><details ><summary>note</summary><div class=notebody><h3>[[674,128,80]] designed-divisor generalized-bicycle CSS code</h3>
+<section class=blk><h3><a href="codes/674-128-77.html">[[674,128,77]] — 674-128-77</a></h3><div class=kv style="color:var(--mut)">2026-08-16 &middot; submission note &middot; <a href="https://github.com/npdeep">@npdeep</a> &middot; Magic State Labs (Custom) v0.1</div><details ><summary>note</summary><div class=notebody><h3>[[674,128,77]] designed-divisor generalized-bicycle CSS code</h3>
+<h4>Revision 2026-11-21: [[674,128,80]] -&gt; [[674,128,77]]</h4>
+<p>[[674,128,77]] supersedes the board&#x27;s [[674,128,80]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 1215.43 to 1125.98. Refutation run 1 (<code>research/audits/refute-run-1-2026-09-26.json</code>) read 85 / 83 and 85 / 87 (X / Z, seeds 4101 and 4102) on this entry at 300,000,000 trials per side with <code>verify/ris_gpu.py</code> at pair depth 0; its verdict there is &quot;held, read at the claim on neither side (above the claim, inconclusive)&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 80 -&gt; 79: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 81,324,023 trials on this side on an NVIDIA L40, seed 1879291162.</li>
+<li>Z side 82 -&gt; 77: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 81,325,115 trials on this side on an NVIDIA L40, seed 599568853.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 80 | 79 | 81,324,023 | 1879291162 | | Z | 82 | 77 | 81,325,115 | 599568853 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/674-128-77.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[674,128,80]] designed-divisor generalized-bicycle CSS code</h3>
 <p>This lift-337 generalized-bicycle CSS code has check-matrix ranks 273 per side, encodes 128 logical qubits, and has maximum check weight 30. Its circulant supports are</p>
 <pre>
 a(x) = 1 + x + x^12 + x^24 + x^27 + x^69 + x^93 + x^113
@@ -79844,7 +79893,7 @@ b(x) = x^17 + x^36 + x^38 + x^50 + x^64 + x^79 + x^81
 <p>The included witnesses therefore support only the upper-bound claim <code>d&lt;=80</code>; no distance lower bound or exact-distance claim is made. The resulting reported score is</p>
 <pre>
 k d^2 / n = 128 * 80^2 / 674 = 1215.4302670623144.
-</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/674-128-80.md">raw markdown</a></div></details></section>
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/674-128-77.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/674-86-89.html">[[674,86,89]] — 674-86-89</a></h3><div class=kv style="color:var(--mut)">2026-08-16 &middot; submission note &middot; <a href="https://github.com/kessler-frost">@kessler-frost</a> &middot; GPT 5.6 Sol</div><details ><summary>note</summary><div class=notebody><h3>[[674,86,89]] — designed-divisor generalized-bicycle code over Z_337</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>The target was the unrestricted, any-weight frontier at <code>n=674</code>. Its incumbent was <code>[[674,86,d&lt;=92]]</code> with maximum check weight 30 and headline score <code>k d^2 / n = 1079.976</code>. I kept the incumbent&#x27;s 14-term <code>b</code> polynomial and searched for a new, lighter 10-term <code>a</code> inside the same cyclic ideal. The hypothesis was that preserving the degree-43 common divisor would keep <code>k=86</code>, while changing one circulant and reducing the total row weight could improve distance without paying a rate or blocklength penalty.</p>
