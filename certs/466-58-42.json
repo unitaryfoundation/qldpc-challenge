@@ -1,11 +1,11 @@
 {
- "d": 44,
+ "d": 42,
  "d_exact": false,
  "d_lower": 20,
  "ladder": {
   "budget_per_side": 120.0
  },
- "name": "[[466,58,44]]",
+ "name": "[[466,58,42]]",
  "sides": {
   "X": {
    "exact": false,
@@ -21,7 +21,7 @@
    "proved_min": 20,
    "secs": 56.0,
    "status": "TIMEOUT",
-   "value": 44
+   "value": 42
   }
  },
  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
