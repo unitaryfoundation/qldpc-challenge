@@ -1,11 +1,11 @@
 {
- "d": 40,
+ "d": 38,
  "d_exact": false,
  "d_lower": 20,
  "ladder": {
   "budget_per_side": 120.0
  },
- "name": "[[433,2,40]]",
+ "name": "[[433,2,38]]",
  "sides": {
   "X": {
    "exact": false,
@@ -13,7 +13,7 @@
    "proved_min": 20,
    "secs": 29.5,
    "status": "TIMEOUT",
-   "value": 41
+   "value": 39
   },
   "Z": {
    "exact": false,
@@ -21,7 +21,7 @@
    "proved_min": 20,
    "secs": 29.5,
    "status": "TIMEOUT",
-   "value": 40
+   "value": 38
   }
  },
  "solver": "QEDist 0.1 aeb7006147b7 (yeon-lee/QEDist) exhaustive search",
