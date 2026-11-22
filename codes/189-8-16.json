@@ -2310,11 +2310,12 @@
  "family": "other",
  "provenance": {
   "authors": [
-   "@metaspartan",
-   "Carsen Klock"
+   "@metaspartan"
   ],
   "date": "2026-11-21",
   "origin": "submission",
-  "construction": "Abelian mirror code (arXiv:2603.05496) over C_9 x C_21 (|G|=189, lexicographic indexing): A=[0, 97, 125], B=[0, 33, 34]; each generator g acts with Z on A+g and X on B-g (Y on overlaps, max Pauli weight <= 6, strictly non-CSS under all local Cliffords)."
+  "construction": "Abelian mirror code (arXiv:2603.05496) over C_9 x C_21 (|G|=189, lexicographic indexing): A=[0, 97, 125], B=[0, 33, 34]; each generator g acts with Z on A+g and X on B-g (Y on overlaps, max Pauli weight <= 6, strictly non-CSS under all local Cliffords).",
+  "model": "Gemini 4 Neon",
+  "harness": "Cybara"
  }
 }
