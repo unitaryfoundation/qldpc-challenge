@@ -129,6 +129,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "7-5-1-6f3d23cf7e4f4649",
+      "n": 7,
+      "k": 5,
+      "d": 1,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "7-5-1-b",
       "n": 7,
       "k": 5,
@@ -753,6 +761,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "11-9-1-ccpilot",
+      "n": 11,
+      "k": 9,
+      "d": 1,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "12-1-4-e",
       "n": 12,
       "k": 1,
@@ -969,6 +985,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "12-8-1-ccpilot",
+      "n": 12,
+      "k": 8,
+      "d": 1,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "12-8-2",
       "n": 12,
       "k": 8,
@@ -1145,6 +1169,14 @@
       "code_type": "CSS"
     },
     {
+      "id": "14-9-1-ccpilot",
+      "n": 14,
+      "k": 9,
+      "d": 1,
+      "tier": "ub",
+      "code_type": "CSS"
+    },
+    {
       "id": "14-10-1",
       "n": 14,
       "k": 10,
@@ -1167,6 +1199,14 @@
       "d": 3,
       "tier": "ub",
       "code_type": "stabilizer"
+    },
+    {
+      "id": "15-5-2-ccpilot",
+      "n": 15,
+      "k": 5,
+      "d": 2,
+      "tier": "ub",
+      "code_type": "CSS"
     },
     {
       "id": "15-5-3",
