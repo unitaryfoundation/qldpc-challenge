@@ -8,9 +8,9 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2366,
-    "not_derived": 223,
-    "literature": 489,
     "parameters_only": 416,
+    "literature": 489,
+    "not_derived": 223,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
@@ -32,13 +32,13 @@
     "global": {
       "records": 1776,
       "families": 15,
-      "untagged": 498,
+      "untagged": 497,
       "untagged_share": 0.28,
       "top": [
         {
           "family": "generalized-bicycle",
-          "records": 570,
-          "share": 0.321
+          "records": 571,
+          "share": 0.322
         },
         {
           "family": "bivariate-bicycle",
@@ -46,9 +46,9 @@
           "share": 0.102
         }
       ],
-      "top1_share": 0.321,
+      "top1_share": 0.322,
       "top2_share": 0.423,
-      "hhi": 0.126
+      "hhi": 0.127
     },
     "cells": {
       "local-2d-bilayer~weight-4": {
@@ -417,13 +417,13 @@
       "unrestricted~weight-any": {
         "records": 1776,
         "families": 15,
-        "untagged": 498,
+        "untagged": 497,
         "untagged_share": 0.28,
         "top": [
           {
             "family": "generalized-bicycle",
-            "records": 570,
-            "share": 0.321
+            "records": 571,
+            "share": 0.322
           },
           {
             "family": "bivariate-bicycle",
@@ -431,9 +431,9 @@
             "share": 0.102
           }
         ],
-        "top1_share": 0.321,
+        "top1_share": 0.322,
         "top2_share": 0.423,
-        "hhi": 0.126,
+        "hhi": 0.127,
         "members": 3494,
         "leader": {
           "slug": "682-140-82",
