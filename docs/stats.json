@@ -1,27 +1,27 @@
 {
-  "verified_codes": 3911,
-  "css_codes": 3493,
+  "verified_codes": 3912,
+  "css_codes": 3494,
   "stabilizer_codes": 418,
   "certified_exact": 2642,
   "tracks": 12,
   "best_kd2_over_n": 1380.29,
   "best_geometric_efficiency": 1.7555,
   "provenance": {
-    "not_derived": 222,
-    "parameters_only": 416,
     "no_match": 2366,
+    "not_derived": 223,
     "literature": 489,
+    "parameters_only": 416,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2879,
+    "unknown": 2880,
     "known_parameters": 955,
     "new_parameters": 77
   },
   "novelty_audited": 1032,
   "board_screen": {
-    "not_screened": 1034,
+    "not_screened": 1035,
     "distinct": 2422,
     "review": 37,
     "reference_entries": 771,
@@ -42,12 +42,12 @@
         },
         {
           "family": "bivariate-bicycle",
-          "records": 180,
-          "share": 0.101
+          "records": 181,
+          "share": 0.102
         }
       ],
       "top1_share": 0.321,
-      "top2_share": 0.422,
+      "top2_share": 0.423,
       "hhi": 0.126
     },
     "cells": {
@@ -394,14 +394,14 @@
           },
           {
             "family": "bivariate-bicycle",
-            "records": 139,
-            "share": 0.12
+            "records": 140,
+            "share": 0.121
           }
         ],
         "top1_share": 0.285,
-        "top2_share": 0.405,
+        "top2_share": 0.406,
         "hhi": 0.116,
-        "members": 2412,
+        "members": 2413,
         "leader": {
           "slug": "994-142-40",
           "family": "pair-partition-cpm",
@@ -427,14 +427,14 @@
           },
           {
             "family": "bivariate-bicycle",
-            "records": 180,
-            "share": 0.101
+            "records": 181,
+            "share": 0.102
           }
         ],
         "top1_share": 0.321,
-        "top2_share": 0.422,
+        "top2_share": 0.423,
         "hhi": 0.126,
-        "members": 3493,
+        "members": 3494,
         "leader": {
           "slug": "682-140-82",
           "family": "generalized-bicycle",
