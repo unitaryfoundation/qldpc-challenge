@@ -352,9 +352,17 @@ def slug_of(path):
 
 
 def revision_slug(codes_dir, old_slug, n, k, d_new):
-    """Return the revised entry's slug: ``<n>-<k>-<d_new>`` with the old suffix, else the next free letter."""
+    """Return the revised entry's slug.
+
+    A tightening that leaves d where it was keeps the slug: the slug encodes
+    d, and a side-only correction is an edit of the entry in place. When d
+    comes down the entry moves to ``<n>-<k>-<d_new>`` with its old suffix, or
+    the next free letter when that is taken.
+    """
     m = SLUG.match(old_slug)
     suffix = m.group(4) if m else ""
+    if m and int(m.group(3)) == int(d_new) and int(m.group(1)) == int(n) and int(m.group(2)) == int(k):
+        return old_slug
     candidates = [f"{n}-{k}-{d_new}{suffix}"] + [f"{n}-{k}-{d_new}-{c}" for c in SUFFIXES]
     for cand in candidates:
         if cand == old_slug:
@@ -413,7 +421,8 @@ def pr_text(old_slug, new_slug, old_doc, new_doc, best, *, backend, pair_depth, 
     where = (
         f"the entry `codes/{old_slug}.json` carried by PR #{pr}"
         if pr
-        else f"the existing entry `codes/{new_slug}.json` (filed as `{old_slug}` before this correction)"
+        else f"the existing entry `codes/{new_slug}.json`"
+        + ("" if new_slug == old_slug else f" (filed as `{old_slug}` before this correction)")
     )
     body = "\n".join(
         [
@@ -473,14 +482,16 @@ def apply_revision(checkout, old_slug, new_slug, new_doc, header):
     """
     codes_dir, notes_dir = os.path.join(checkout, "codes"), os.path.join(checkout, "notes")
     old_code, new_code = os.path.join(codes_dir, old_slug + ".json"), os.path.join(codes_dir, new_slug + ".json")
+    in_place = new_slug == old_slug
     if not os.path.exists(old_code):
         raise FileNotFoundError(f"{old_code} is not in the checkout; a revision applies to a board entry")
-    if os.path.exists(new_code):
+    if not in_place and os.path.exists(new_code):
         raise FileExistsError(f"{new_code} already exists")
     written = []
     with open(new_code, "w", encoding="utf-8") as fh:
         fh.write(canonical(new_doc))
-    os.remove(old_code)
+    if not in_place:
+        os.remove(old_code)
     written.append(new_code)
     old_note, new_note = os.path.join(notes_dir, old_slug + ".md"), os.path.join(notes_dir, new_slug + ".md")
     if os.path.exists(old_note):
@@ -499,7 +510,8 @@ def apply_revision(checkout, old_slug, new_slug, new_doc, header):
         os.makedirs(notes_dir, exist_ok=True)
         with open(new_note, "w", encoding="utf-8") as fh:
             fh.write(text)
-        os.remove(old_note)
+        if not in_place:
+            os.remove(old_note)
         written.append(new_note)
         if len(text.encode("utf-8")) > 10240:
             print(

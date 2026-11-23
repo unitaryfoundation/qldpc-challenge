@@ -164,7 +164,7 @@ def test_one_sided_tightening_keeps_the_other_witness(tmp_path):
     doc = shor_doc(3, [0, 1, 2], 5, [0, 1, 2, 3, 6])
     path, row = _run(tmp_path, doc, side_trials=300)
     assert row["verdict"] == "tightened" and set(row["sides"]) == {"Z"}
-    assert row["d_new"] == 3 and row["new_slug"] == "9-1-3-b", "d is unchanged, so the slug needs a suffix"
+    assert row["d_new"] == 3 and row["new_slug"] == "9-1-3", "d is unchanged, so the entry keeps its slug"
     assert row["title"] == "Distance revision: [[9,1,3]], Z side 5 -> 3"
     with open(row["revision"][:-5] + ".body.md", encoding="utf-8") as fh:
         body = fh.read()
@@ -201,6 +201,10 @@ def test_slug_choice_skips_an_occupied_slug_and_keeps_a_suffix(tmp_path):
     codes = tmp_path / "codes"
     codes.mkdir()
     assert RH.revision_slug(str(codes), "9-1-5", 9, 1, 3) == "9-1-3"
+    # a side-only tightening keeps the slug, suffix and all
+    _write(codes / "9-1-3.json", CORRECT)
+    assert RH.revision_slug(str(codes), "9-1-3", 9, 1, 3) == "9-1-3"
+    assert RH.revision_slug(str(codes), "9-1-3-b", 9, 1, 3) == "9-1-3-b"
     _write(codes / "9-1-3.json", CORRECT)
     assert RH.revision_slug(str(codes), "9-1-5", 9, 1, 3) == "9-1-3-b"
     assert RH.revision_slug(str(codes), "9-1-5-c", 9, 1, 3) == "9-1-3-c"
@@ -427,3 +431,25 @@ def test_max_minutes_leaves_entries_unopened(tmp_path, monkeypatch, capsys):
     assert rc == 0
     out = capsys.readouterr().out
     assert "left unopened at 1 min" in out
+
+
+def test_apply_corrects_a_side_in_place_when_d_is_unchanged(tmp_path):
+    checkout = tmp_path / "repo"
+    (checkout / "codes").mkdir(parents=True)
+    (checkout / "notes").mkdir()
+    doc = shor_doc(3, [0, 1, 2], 5, [0, 1, 2, 3, 6])
+    _write(checkout / "codes" / "9-1-3.json", doc)
+    (checkout / "notes" / "9-1-3.md").write_text("# [[9,1,3]]: Shor\n\nBody line kept.\n")
+    path, row = _run(tmp_path, doc, side_trials=300, apply_to=str(checkout), codes_dir=str(checkout / "codes"))
+    assert row["verdict"] == "tightened" and row["new_slug"] == "9-1-3"
+    assert row["applied"] == ["codes/9-1-3.json", "notes/9-1-3.md"]
+    new = json.loads((checkout / "codes" / "9-1-3.json").read_text())
+    assert new["distance"]["Z"]["value"] == 3 and new["distance"]["d"] == 3
+    assert new["distance"]["X"] == doc["distance"]["X"]
+    note = (checkout / "notes" / "9-1-3.md").read_text()
+    assert note.startswith("# [[9,1,3]]: distance revision, Z side 5 -> 3")
+    assert "Body line kept." in note
+    with open(row["revision"][:-5] + ".body.md", encoding="utf-8") as fh:
+        body = fh.read()
+    assert "filed as" not in body and "`codes/9-1-3.json`" in body
+    assert CA.refutation_binding("harvester", doc, new)[0]
