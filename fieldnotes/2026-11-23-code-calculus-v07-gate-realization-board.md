@@ -74,10 +74,10 @@ case was observed where the derived criterion disagreed with the oracle.
 
 ## Reproduction
 
-`research/campaigns/cc-v07-gate-realization-board/run.py` and `campaign.json`.
+`research/campaigns/cc-v07-gate-realization-board/run.py` and `results.json`.
 From `qldpc-challenge` with `CODE_CALCULUS_PATH` at PR #624:
 
 ```
 .venv/bin/python -u research/campaigns/cc-v07-gate-realization-board/run.py \
-  --limit 80 --n-hi 10 --gates 5 --additions 6 --out research/campaigns/cc-v07-gate-realization-board/campaign.json
+  --limit 80 --n-hi 10 --gates 5 --additions 6 --out research/campaigns/cc-v07-gate-realization-board/results.json
 ```

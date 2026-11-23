@@ -134,12 +134,12 @@ Raw data: `extended.json` in the campaign directory.
 ## Reproduction
 
 `research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py`, with
-`campaign.json`, `campaign_smalln.json`, and logs beside it. From
+`results.json`, `campaign_smalln.json`, and logs beside it. From
 `qldpc-challenge` with `CODE_CALCULUS_PATH` pointing at the PR #624 worktree:
 
 ```
 .venv/bin/python -u research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py \
-  --limit 60 --budget 64 --gate-cap 40 --open-prs --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign.json
+  --limit 60 --budget 64 --gate-cap 40 --open-prs --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/results.json
 .venv/bin/python -u research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py \
   --limit 80 --n-hi 80 --order n --budget 64 --gate-cap 25 --open-prs \
   --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign_smalln.json

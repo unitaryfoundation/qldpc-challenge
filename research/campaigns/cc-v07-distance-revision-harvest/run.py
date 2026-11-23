@@ -9,8 +9,8 @@ human to turn into a revision PR. This script never opens or edits a PR.
 
 Every distance here is a witness-backed upper bound. Nothing is certified.
 """
+
 import argparse
-import collections
 import glob
 import json
 import os
@@ -19,13 +19,12 @@ import time
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
-for _p in (os.path.join(ROOT, "verify"), os.path.join(ROOT, "research", "kit"),
-           os.path.join(ROOT, "research")):
+for _p in (os.path.join(ROOT, "verify"), os.path.join(ROOT, "research", "kit"), os.path.join(ROOT, "research")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from surrogate import lightest_logical  # noqa: E402
 from reachability_campaign import screening_trials  # noqa: E402
+from surrogate import lightest_logical  # noqa: E402
 
 
 def load_entries(n_hi, d_lo, limit):
@@ -46,6 +45,7 @@ def load_entries(n_hi, d_lo, limit):
 
 def checks_to_matrices(doc):
     import numpy as np
+
     n = doc["n"]
     HX = np.zeros((len(doc["checks"]["X"]), n), dtype=int)
     HZ = np.zeros((len(doc["checks"]["Z"]), n), dtype=int)
@@ -73,16 +73,14 @@ def main():
     ap.add_argument("--entries", type=int, default=24)
     ap.add_argument("--seeds", type=int, nargs="+", default=[51, 211, 307])
     ap.add_argument("--gate-cap", type=int, default=20)
-    ap.add_argument("--out", default=os.path.join(_HERE, "campaign.json"))
+    ap.add_argument("--out", default=os.path.join(_HERE, "results.json"))
     args = ap.parse_args()
 
+    from coordination import gate_and_record, staging_dir, unique_path
     from submit import make_submission, save_submission
-    from coordination import unique_path, gate_and_record, staging_dir
 
-    entries = spread(load_entries(args.n_hi, args.d_lo, args.limit),
-                     args.entries)
-    print(f"{len(entries)} board entries, d >= {args.d_lo}, n <= {args.n_hi}",
-          flush=True)
+    entries = spread(load_entries(args.n_hi, args.d_lo, args.limit), args.entries)
+    print(f"{len(entries)} board entries, d >= {args.d_lo}, n <= {args.n_hi}", flush=True)
     staging = staging_dir()
     os.makedirs(staging, exist_ok=True)
     records = []
@@ -103,15 +101,21 @@ def main():
             if best is None or cand[0] < best[0]:
                 best = cand
         measured, wx, xwit, wz, zwit = best
-        rec = {"slug": slug, "n": doc["n"], "k": doc["k"],
-               "claimed_d": claimed, "trials": trials,
-               "measured_d": measured, "wx": wx, "wz": wz,
-               "per_seed": per_seed,
-               "tightening": measured < claimed}
+        rec = {
+            "slug": slug,
+            "n": doc["n"],
+            "k": doc["k"],
+            "claimed_d": claimed,
+            "trials": trials,
+            "measured_d": measured,
+            "wx": wx,
+            "wz": wz,
+            "per_seed": per_seed,
+            "tightening": measured < claimed,
+        }
         if not rec["tightening"]:
             records.append(rec)
-            print(f"  [{ei}/{len(entries)}] {slug}: d={claimed} "
-                  f"stays >= {measured} at {trials} trials", flush=True)
+            print(f"  [{ei}/{len(entries)}] {slug}: d={claimed} stays >= {measured} at {trials} trials", flush=True)
             continue
         if gated >= args.gate_cap:
             rec["gate_skipped"] = "gate cap"
@@ -119,32 +123,34 @@ def main():
             continue
         try:
             sub = make_submission(
-                HX, HZ,
+                HX,
+                HZ,
                 name=f"[[{doc['n']},{doc['k']},{measured}]] revision",
-                construction=f"distance revision of codes/{slug}.json "
-                             f"(depth-proportional ladder, {trials} trials)",
-                authors=["mathysrennela"], family=None,
-                confidence="upper_bound", trials=trials,
+                construction=f"distance revision of codes/{slug}.json (depth-proportional ladder, {trials} trials)",
+                authors=["mathysrennela"],
+                family=None,
+                confidence="upper_bound",
+                trials=trials,
                 witnesses=(wx, xwit, wz, zwit),
-                notes=f"Correction from claimed d={claimed} to witnessed d={measured}.")
-            path = unique_path(os.path.join(
-                staging, f"{doc['n']}-{doc['k']}-{measured}-revision.json"), sub)
-            save_submission(sub, path, preflight=False, spec={
-                "constructor": "surrogate.lightest_logical",
-                "params": {"parent": slug, "trials": trials,
-                           "seeds": args.seeds, "claimed_d": claimed},
-            })
+                notes=f"Correction from claimed d={claimed} to witnessed d={measured}.",
+            )
+            path = unique_path(os.path.join(staging, f"{doc['n']}-{doc['k']}-{measured}-revision.json"), sub)
+            save_submission(
+                sub,
+                path,
+                preflight=False,
+                spec={
+                    "constructor": "surrogate.lightest_logical",
+                    "params": {"parent": slug, "trials": trials, "seeds": args.seeds, "claimed_d": claimed},
+                },
+            )
             verdict, _ = gate_and_record(path)
             gated += 1
-            rec.update({
-                "gate_passed": verdict.get("passed"),
-                "gate": verdict, "path": path})
-            print(f"  [{ei}/{len(entries)}] {slug}: d {claimed}->{measured} "
-                  f"gate={verdict.get('passed')}", flush=True)
+            rec.update({"gate_passed": verdict.get("passed"), "gate": verdict, "path": path})
+            print(f"  [{ei}/{len(entries)}] {slug}: d {claimed}->{measured} gate={verdict.get('passed')}", flush=True)
         except Exception as exc:
             rec["gate_error"] = f"{type(exc).__name__}: {str(exc)[:200]}"
-            print(f"  [{ei}/{len(entries)}] {slug}: GATE ERROR "
-                  f"{rec['gate_error'][:100]}", flush=True)
+            print(f"  [{ei}/{len(entries)}] {slug}: GATE ERROR {rec['gate_error'][:100]}", flush=True)
         records.append(rec)
 
     summary = {
@@ -160,8 +166,7 @@ def main():
     print("SUMMARY", json.dumps(summary), flush=True)
     for rec in records:
         if rec.get("tightening"):
-            print("REVISION", rec["slug"], rec["claimed_d"], "->",
-                  rec["measured_d"], rec.get("path", ""), flush=True)
+            print("REVISION", rec["slug"], rec["claimed_d"], "->", rec["measured_d"], rec.get("path", ""), flush=True)
 
 
 if __name__ == "__main__":

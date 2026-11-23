@@ -12,6 +12,7 @@ Applies the two rows of spec/JUDGMENT_LAYER.md §2h to CSS board entries:
 Also runs the state-vector oracle on the same real displays at pi/4 and reports
 disagreements. No candidate is staged or submitted: this is calibration.
 """
+
 import argparse
 import collections
 import glob
@@ -32,12 +33,22 @@ for _p in (CC, os.path.join(CC, "machine", "experiments"), ROOT):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from machine.priced_calculus import CodeState  # noqa: E402
 from gate_realization_rows import (  # noqa: E402
-    Display, Pauli, addition_survival_verdict, equal_syndrome, mask,
-    nontrivial, oracle_preserves, popcount, preserves_pi4, random_addable_row,
-    random_equal_syndrome_family, random_stabilizer, weight_floor, w_max,
+    Display,
+    Pauli,
+    addition_survival_verdict,
+    equal_syndrome,
+    nontrivial,
+    oracle_preserves,
+    popcount,
+    preserves_pi4,
+    random_addable_row,
+    random_equal_syndrome_family,
+    random_stabilizer,
+    w_max,
+    weight_floor,
 )
+from machine.priced_calculus import CodeState  # noqa: E402
 
 QUARTER = math.pi / 4
 
@@ -90,12 +101,11 @@ def main():
     ap.add_argument("--gates", type=int, default=4)
     ap.add_argument("--additions", type=int, default=6)
     ap.add_argument("--seed", type=int, default=7116)
-    ap.add_argument("--out", default=os.path.join(_HERE, "campaign.json"))
+    ap.add_argument("--out", default=os.path.join(_HERE, "results.json"))
     args = ap.parse_args()
 
     codes = load_codes(args.n_lo, args.n_hi, args.limit)
-    print(f"{len(codes)} CSS board entries n in [{args.n_lo},{args.n_hi}]",
-          flush=True)
+    print(f"{len(codes)} CSS board entries n in [{args.n_lo},{args.n_hi}]", flush=True)
     records = []
     stats = collections.Counter()
     started = time.time()
@@ -103,8 +113,7 @@ def main():
     for ci, (slug, doc, state) in enumerate(codes, 1):
         display = Display.from_code_state(state)
         d = doc["distance"]["d"]
-        rec = {"slug": slug, "n": state.n(), "k": state.k(), "d": d,
-               "gates": [], "weight": []}
+        rec = {"slug": slug, "n": state.n(), "k": state.k(), "d": d, "gates": [], "weight": []}
         rng = random.Random(args.seed + ci)
 
         # --- survival row on gates that preserve the real codespace ---
@@ -120,8 +129,7 @@ def main():
                     x = rng.randrange(1 << display.n)
                     z = rng.randrange(1 << display.n)
                     cand = Pauli(x, z, popcount(x & z) + 2 * rng.randrange(2))
-                if (cand.is_hermitian()
-                        and all(not cand.anticommutes(g) for g in gens)):
+                if cand.is_hermitian() and all(not cand.anticommutes(g) for g in gens):
                     gens.append(cand)
                 if len(gens) >= 2:
                     break
@@ -150,10 +158,8 @@ def main():
                     break
                 sector, row = choice
                 try:
-                    v_quarter = addition_survival_verdict(
-                        display, gens, eps, sector, row, [QUARTER] * len(gens))
-                    v_other = addition_survival_verdict(
-                        display, gens, eps, sector, row, [0.3] * len(gens))
+                    v_quarter = addition_survival_verdict(display, gens, eps, sector, row, [QUARTER] * len(gens))
+                    v_other = addition_survival_verdict(display, gens, eps, sector, row, [0.3] * len(gens))
                 except Exception as exc:
                     rec["gates"].append({"add_error": repr(exc)})
                     continue
@@ -162,9 +168,9 @@ def main():
                 stats[f"verdict_{v_other}"] += 1
                 if v_quarter == "not_yet_defined":
                     stats["unexpected_quarter_undefined"] += 1
-                rec["gates"].append({"sector": sector, "row_weight": popcount(row),
-                                     "verdict_pi4": v_quarter,
-                                     "verdict_other": v_other})
+                rec["gates"].append(
+                    {"sector": sector, "row_weight": popcount(row), "verdict_pi4": v_quarter, "verdict_other": v_other}
+                )
 
         # --- weight row on the board's own witness-derived logicals ---
         for fam in syndrome_families(display, rng):
@@ -173,10 +179,8 @@ def main():
             observed = w_max(gens)
             ok = observed >= floor
             stats["weight_checked"] += 1
-            stats["weight_tight" if observed == floor else
-                  "weight_above" if ok else "weight_violation"] += 1
-            rec["weight"].append({"w_max": observed, "floor": floor, "d": d,
-                                  "satisfied": ok})
+            stats["weight_tight" if observed == floor else "weight_above" if ok else "weight_violation"] += 1
+            rec["weight"].append({"w_max": observed, "floor": floor, "d": d, "satisfied": ok})
         rec["preserving_gates"] = preserving
         if preserving:
             stats["codes_with_preserving_gate"] += 1
@@ -184,12 +188,13 @@ def main():
             stats["codes_with_addressable_logical"] += 1
         records.append(rec)
         if ci % 10 == 0:
-            print(f"  [{ci}/{len(codes)}] {slug}: preserving={preserving} "
-                  f"weight_families={len(rec['weight'])}", flush=True)
+            print(
+                f"  [{ci}/{len(codes)}] {slug}: preserving={preserving} weight_families={len(rec['weight'])}",
+                flush=True,
+            )
 
     summary = dict(stats)
-    summary.update({"codes": len(codes), "seconds": round(time.time() - started, 1),
-                    "seed": args.seed})
+    summary.update({"codes": len(codes), "seconds": round(time.time() - started, 1), "seed": args.seed})
     with open(args.out, "w") as fh:
         json.dump({"summary": summary, "records": records}, fh, indent=2)
     print("SUMMARY", json.dumps(summary), flush=True)

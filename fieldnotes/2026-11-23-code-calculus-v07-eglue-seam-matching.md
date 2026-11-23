@@ -92,13 +92,13 @@ promotion of any staged child. Every distance is a witness-backed upper bound.
 
 ## Reproduction
 
-`research/campaigns/cc-v07-eglue-seam-systematic/run.py` and `campaign.json`.
+`research/campaigns/cc-v07-eglue-seam-systematic/run.py` and `results.json`.
 From `qldpc-challenge` with `CODE_CALCULUS_PATH` at PR #624:
 
 ```
 .venv/bin/python -u research/campaigns/cc-v07-eglue-seam-systematic/run.py \
   --n-lo 8 --n-hi 16 --parents 24 --pairs 40 --seams-per-pair 3 \
-  --max-size 4 --gate-cap 25 --open-prs --out research/campaigns/cc-v07-eglue-seam-systematic/campaign.json
+  --max-size 4 --gate-cap 25 --open-prs --out research/campaigns/cc-v07-eglue-seam-systematic/results.json
 ```
 
 No PR was opened for any find; promotion remains a human decision.

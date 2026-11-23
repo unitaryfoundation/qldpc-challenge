@@ -42,7 +42,7 @@ No revision candidate was staged or gated, and no PR was filed.
 
 Per entry the lightest X and Z witnesses both equalled the claimed d (e.g.
 `100-2-14`: w_X = w_Z = 14 at 30,000 trials; `108-4-15`: 15/15 at 32,000;
-`104-30-8`: 8/8 at 18,000). The full per-entry table is in `campaign.json`.
+`104-30-8`: 8/8 at 18,000). The full per-entry table is in `results.json`.
 
 ## Why this is not the whole direction
 
@@ -65,9 +65,9 @@ filing a revision PR, and unattended runs do not open PRs in any case.
 ## Reproduction
 
 `research/campaigns/cc-v07-distance-revision-harvest/run.py` and
-`campaign.json`. From `qldpc-challenge`:
+`results.json`. From `qldpc-challenge`:
 
 ```
 .venv/bin/python -u research/campaigns/cc-v07-distance-revision-harvest/run.py \
-  --limit 40 --entries 12 --seeds 51 307 --gate-cap 12 --out research/campaigns/cc-v07-distance-revision-harvest/campaign.json
+  --limit 40 --entries 12 --seeds 51 307 --gate-cap 12 --out research/campaigns/cc-v07-distance-revision-harvest/results.json
 ```

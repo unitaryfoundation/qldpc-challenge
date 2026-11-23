@@ -10,13 +10,12 @@ human review; this script never submits or opens a PR.
 
 Distances are witness-backed upper bounds, not certified.
 """
+
 import argparse
-import collections
 import glob
 import json
 import os
 import sys
-import time
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
@@ -24,19 +23,20 @@ CC = os.environ.get(
     "CODE_CALCULUS_PATH",
     "/Users/mathysrennela/GitHub/code-calculus-dev-7116-pr",
 )
-for _p in (CC, ROOT, os.path.join(ROOT, "verify"),
-           os.path.join(ROOT, "research", "kit")):
+for _p in (CC, ROOT, os.path.join(ROOT, "verify"), os.path.join(ROOT, "research", "kit")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from machine.priced_calculus import CodeState, DistanceLedger  # noqa: E402
 from machine.planner import bounded_sector_search, infer_target_sector  # noqa: E402
-from machine.priced_calculus import apply_operation  # noqa: E402
+from machine.priced_calculus import (  # noqa: E402
+    CodeState,
+    DistanceLedger,
+    apply_operation,  # noqa: E402
+)
 
 
 def check_weight(doc):
-    return max([len(c) for side in ("X", "Z")
-                for c in doc.get("checks", {}).get(side, [])] + [0])
+    return max([len(c) for side in ("X", "Z") for c in doc.get("checks", {}).get(side, [])] + [0])
 
 
 def load_board():
@@ -54,9 +54,11 @@ def load_board():
 
 
 def select_parents(board, limit, n_lo, n_hi, order="weight", parent_d=2):
-    pool = [s for s, d in board.items()
-            if n_lo <= d["n"] <= n_hi
-            and d["distance"]["d"] >= parent_d and check_weight(d) >= 5]
+    pool = [
+        s
+        for s, d in board.items()
+        if n_lo <= d["n"] <= n_hi and d["distance"]["d"] >= parent_d and check_weight(d) >= 5
+    ]
     if order == "n":
         pool.sort(key=lambda s: (board[s]["n"], s))
     else:
@@ -70,6 +72,7 @@ def select_parents(board, limit, n_lo, n_hi, order="weight", parent_d=2):
 
 def state_check_matrices(state):
     import numpy as np
+
     n = state.n()
     xrows = list(state.sector_rows("X"))
     zrows = list(state.sector_rows("Z"))
@@ -93,9 +96,10 @@ def child_weight(state):
 
 def choose(improving):
     """Prefer lower weight, then larger k, then smaller n, then higher d."""
+
     def key(c):
-        return (child_weight(c["state"]), -c["k"], c["n"],
-                -(c["ledger"].full.upper or 0))
+        return (child_weight(c["state"]), -c["k"], c["n"], -(c["ledger"].full.upper or 0))
+
     return min(improving, key=key)
 
 
@@ -106,32 +110,28 @@ def main():
     ap.add_argument("--n-hi", type=int, default=120)
     ap.add_argument("--order", choices=("weight", "n"), default="weight")
     ap.add_argument("--parent-d", type=int, default=2)
-    ap.add_argument("--min-d", type=int, default=1,
-                    help="only gate children whose witnessed distance is >= this")
-    ap.add_argument("--min-child-upper", type=int, default=None,
-                    help="transport-level distance floor passed to the search")
-    ap.add_argument("--no-rebase", action="store_true",
-                    help="skip P-REBASE enumeration (faster; it added no hits)")
+    ap.add_argument("--min-d", type=int, default=1, help="only gate children whose witnessed distance is >= this")
+    ap.add_argument(
+        "--min-child-upper", type=int, default=None, help="transport-level distance floor passed to the search"
+    )
+    ap.add_argument("--no-rebase", action="store_true", help="skip P-REBASE enumeration (faster; it added no hits)")
     ap.add_argument("--steps", type=int, default=3)
     ap.add_argument("--budget", type=int, default=64)
     ap.add_argument("--trials", type=int, default=8000)
     ap.add_argument("--gate-cap", type=int, default=40)
     ap.add_argument("--open-prs", action="store_true")
-    ap.add_argument("--out", default=os.path.join(_HERE, "campaign.json"))
+    ap.add_argument("--out", default=os.path.join(_HERE, "results.json"))
     args = ap.parse_args()
 
-    from submit import make_submission, save_submission
-    from coordination import unique_path, gate_and_record, staging_dir
     import dedup_oracle
+    from coordination import gate_and_record, staging_dir, unique_path
+    from submit import make_submission, save_submission
 
     board = load_board()
     index = dedup_oracle.combined_index(include_open_prs=args.open_prs)
-    print(f"dedup index: {len(index)} entries (open_prs={args.open_prs})",
-          flush=True)
-    parents = select_parents(board, args.limit, args.n_lo, args.n_hi,
-                             args.order, args.parent_d)
-    print(f"{len(parents)} parents, steps={args.steps}, budget={args.budget}",
-          flush=True)
+    print(f"dedup index: {len(index)} entries (open_prs={args.open_prs})", flush=True)
+    parents = select_parents(board, args.limit, args.n_lo, args.n_hi, args.order, args.parent_d)
+    print(f"{len(parents)} parents, steps={args.steps}, budget={args.budget}", flush=True)
 
     staging = staging_dir()
     os.makedirs(staging, exist_ok=True)
@@ -148,10 +148,16 @@ def main():
             ts = infer_target_sector(ledger, target)
             try:
                 search = bounded_sector_search(
-                    state, ledger, ts, target=target, budget=args.budget,
-                    objective="weight", sector_swap=False,
+                    state,
+                    ledger,
+                    ts,
+                    target=target,
+                    budget=args.budget,
+                    objective="weight",
+                    sector_swap=False,
                     rebase=not args.no_rebase,
-                    min_child_upper=args.min_child_upper)
+                    min_child_upper=args.min_child_upper,
+                )
             except Exception as exc:
                 chain.append({"step": step, "error": repr(exc)})
                 break
@@ -164,18 +170,21 @@ def main():
             ident = dedup_oracle.identity_matrices(HX, HZ)
             dup = dedup_oracle.check(ident, index)
             entry = {
-                "step": step, "operation": chosen["operation"],
-                "n": chosen["n"], "k": chosen["k"],
-                "w_before": parent_w, "w_after": child_w,
+                "step": step,
+                "operation": chosen["operation"],
+                "n": chosen["n"],
+                "k": chosen["k"],
+                "w_before": parent_w,
+                "w_after": child_w,
                 "d_upper": chosen["ledger"].full.upper,
                 "improving_pool": len(search["improving"]),
                 "exhausted": search["exhausted"],
-                "dedup_exact": len(dup["exact"]), "dedup_wl": len(dup["wl"]),
+                "dedup_exact": len(dup["exact"]),
+                "dedup_wl": len(dup["wl"]),
             }
             chain.append(entry)
             if dup["exact"] or gated >= args.gate_cap:
-                entry["gate_skipped"] = ("duplicate" if dup["exact"]
-                                         else "gate cap")
+                entry["gate_skipped"] = "duplicate" if dup["exact"] else "gate cap"
                 if dup["exact"]:
                     break
                 # advance anyway without gating
@@ -189,24 +198,36 @@ def main():
 
             try:
                 sub = make_submission(
-                    HX, HZ,
+                    HX,
+                    HZ,
                     name=f"[[{chosen['n']},{chosen['k']},?]] greedy-weight",
                     construction=f"code-calculus PR #624 greedy weight-shed from {slug} step {step}",
-                    authors=["mathysrennela"], family="code-calculus",
-                    confidence="upper_bound", trials=args.trials, seed=0)
+                    authors=["mathysrennela"],
+                    family="code-calculus",
+                    confidence="upper_bound",
+                    trials=args.trials,
+                    seed=0,
+                )
                 d = sub["distance"]["d"]
                 entry["d_witness"] = d  # gate-relevant upper bound from the witness
                 sub["name"] = f"[[{chosen['n']},{chosen['k']},{d}]] greedy-weight"
-                path = unique_path(os.path.join(
-                    staging, f"{chosen['n']}-{chosen['k']}-{d}-weight.json"), sub)
-                save_submission(sub, path, preflight=False, spec={
-                    "constructor": "planner.bounded_sector_search",
-                    "params": {"parent": slug, "step": step,
-                               "objective": "weight",
-                               "rebase": not args.no_rebase,
-                               "budget": args.budget,
-                               "min_child_upper": args.min_child_upper},
-                })
+                path = unique_path(os.path.join(staging, f"{chosen['n']}-{chosen['k']}-{d}-weight.json"), sub)
+                save_submission(
+                    sub,
+                    path,
+                    preflight=False,
+                    spec={
+                        "constructor": "planner.bounded_sector_search",
+                        "params": {
+                            "parent": slug,
+                            "step": step,
+                            "objective": "weight",
+                            "rebase": not args.no_rebase,
+                            "budget": args.budget,
+                            "min_child_upper": args.min_child_upper,
+                        },
+                    },
+                )
                 # Still staged above: the witness is never discarded even
                 # when the child is below the campaign's distance floor.
                 if d < args.min_d:
@@ -220,22 +241,24 @@ def main():
                     continue
                 verdict, _ = gate_and_record(path)
                 gated += 1
-                entry.update({
-                    "gate_passed": verdict.get("passed"),
-                    "board_advancing": (verdict.get("gates", {})
-                                        .get("novelty", {})
-                                        .get("board_advancing")),
-                    "gate": verdict,
-                    "path": path,
-                })
-                print(f"  [{pi}/{len(parents)}] {slug} s{step}: "
-                      f"w {parent_w}->{child_w} n={chosen['n']} k={chosen['k']} "
-                      f"d<={d} pass={verdict.get('passed')} "
-                      f"adv={entry['board_advancing']}", flush=True)
+                entry.update(
+                    {
+                        "gate_passed": verdict.get("passed"),
+                        "board_advancing": (verdict.get("gates", {}).get("novelty", {}).get("board_advancing")),
+                        "gate": verdict,
+                        "path": path,
+                    }
+                )
+                print(
+                    f"  [{pi}/{len(parents)}] {slug} s{step}: "
+                    f"w {parent_w}->{child_w} n={chosen['n']} k={chosen['k']} "
+                    f"d<={d} pass={verdict.get('passed')} "
+                    f"adv={entry['board_advancing']}",
+                    flush=True,
+                )
             except Exception as exc:
                 entry["gate_error"] = f"{type(exc).__name__}: {str(exc)[:200]}"
-                print(f"  [{pi}/{len(parents)}] {slug} s{step}: "
-                      f"GATE ERROR {entry['gate_error'][:100]}", flush=True)
+                print(f"  [{pi}/{len(parents)}] {slug} s{step}: GATE ERROR {entry['gate_error'][:100]}", flush=True)
 
             try:
                 state = apply_operation(state, chosen["operation"])
@@ -243,27 +266,43 @@ def main():
                 parent_w = child_w
             except Exception:
                 break
-        records.append({"parent": slug, "parent_n": doc["n"],
-                        "parent_k": doc["k"], "parent_d": target,
-                        "parent_w": check_weight(doc), "chain": chain})
+        records.append(
+            {
+                "parent": slug,
+                "parent_n": doc["n"],
+                "parent_k": doc["k"],
+                "parent_d": target,
+                "parent_w": check_weight(doc),
+                "chain": chain,
+            }
+        )
 
-    total_steps = sum(len([c for c in r["chain"] if "improving" in c])
-                      for r in records)
+    total_steps = sum(len([c for c in r["chain"] if "improving" in c]) for r in records)
     passed = sum(1 for r in records for c in r["chain"] if c.get("gate_passed"))
-    advancing = sum(1 for r in records for c in r["chain"]
-                    if c.get("board_advancing"))
-    summary = {"parents": len(parents), "gated": gated,
-               "weight_improving_steps": total_steps,
-               "gate_passed": passed, "board_advancing": advancing}
+    advancing = sum(1 for r in records for c in r["chain"] if c.get("board_advancing"))
+    summary = {
+        "parents": len(parents),
+        "gated": gated,
+        "weight_improving_steps": total_steps,
+        "gate_passed": passed,
+        "board_advancing": advancing,
+    }
     with open(args.out, "w") as fh:
         json.dump({"summary": summary, "records": records}, fh, indent=2)
     print("SUMMARY", json.dumps(summary), flush=True)
     for r in records:
         for c in r["chain"]:
             if c.get("board_advancing"):
-                print("FIND", r["parent"], c.get("n"), c.get("k"),
-                      c.get("d_witness"), c.get("w_after"), c.get("path"),
-                      flush=True)
+                print(
+                    "FIND",
+                    r["parent"],
+                    c.get("n"),
+                    c.get("k"),
+                    c.get("d_witness"),
+                    c.get("w_after"),
+                    c.get("path"),
+                    flush=True,
+                )
 
 
 if __name__ == "__main__":

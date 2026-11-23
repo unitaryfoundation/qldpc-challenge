@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Direction 2 of qldpc-challenge issue #7116: bounded sector search on the
+"""Direction 2 of qldpc-challenge issue #7116: bounded sector search.
+
 v0.2 negative pilots (campaigns 3 and 4), with per-move-family refusal reasons.
 
 This is a CALIBRATION run, not a submission campaign.  For each parent we
@@ -18,6 +19,7 @@ it separates "the move was inapplicable" from "the search did not reach it".
 No candidate is gated or staged here.  Distances are the carried ledger's
 upper bounds, never certified facts.
 """
+
 import argparse
 import collections
 import glob
@@ -36,19 +38,33 @@ for _p in (CC, ROOT):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from machine.planner import (  # noqa: E402
+    bounded_sector_search,
+    candidate_moves,
+    has_bare_qubit,
+    infer_target_sector,
+    reduce_display,
+    sector_targeted_improvement,
+)
 from machine.priced_calculus import (  # noqa: E402
-    CodeState, DistanceLedger, NoDerivation, Malformed, apply_operation,
+    CodeState,
+    DistanceLedger,
+    Malformed,
+    NoDerivation,
+    apply_operation,
     tanner_components,
 )
-from machine.planner import (  # noqa: E402
-    bounded_sector_search, infer_target_sector, candidate_moves,
-    has_bare_qubit, reduce_display, sector_targeted_improvement,
-)
 
-FAMILIES = ("C-DELETE-CHECK", "E-PEEL", "E-PUNCTURE", "E-EXTEND",
-            "E-GRAFT", "P-REBASE")
-DROP_REASONS = ("enumerated", "apply_fail", "bare_qubit", "disconnected",
-                "derive_fail", "survived", "improving_pre_budget")
+FAMILIES = ("C-DELETE-CHECK", "E-PEEL", "E-PUNCTURE", "E-EXTEND", "E-GRAFT", "P-REBASE")
+DROP_REASONS = (
+    "enumerated",
+    "apply_fail",
+    "bare_qubit",
+    "disconnected",
+    "derive_fail",
+    "survived",
+    "improving_pre_budget",
+)
 
 
 def check_weight(doc):
@@ -89,11 +105,9 @@ def deterministic_sample(items, limit, stride_seed=0):
 
 def select_parents(board, campaign, limit, n_floor=0, n_cap=10**9):
     if campaign == 3:
-        pool = [s for s, d in board.items()
-                if d["distance"]["d"] >= 8 and check_weight(d) in (8, 9)]
+        pool = [s for s, d in board.items() if d["distance"]["d"] >= 8 and check_weight(d) in (8, 9)]
     elif campaign == 4:
-        pool = [s for s, d in board.items()
-                if d["n"] >= 500 and d["distance"]["d"] >= 6]
+        pool = [s for s, d in board.items() if d["n"] >= 500 and d["distance"]["d"] >= 6]
     else:
         raise ValueError(campaign)
     pool = [s for s in pool if n_floor <= board[s]["n"] <= n_cap]
@@ -109,8 +123,7 @@ def diagnose(state, ledger, target, target_sector):
     """Replay the plan() single-step pipeline and record per-family drops."""
     per = {fam: collections.Counter() for fam in FAMILIES}
     working = reduce_display(state)
-    for op in candidate_moves(working, structural=True, reduce_display=False,
-                              rebase=False):
+    for op in candidate_moves(working, structural=True, reduce_display=False, rebase=False):
         fam = op.get("op")
         if fam not in per:
             per[fam] = collections.Counter()
@@ -127,18 +140,15 @@ def diagnose(state, ledger, target, target_sector):
             per[fam]["disconnected"] += 1
             continue
         try:
-            child_ld = ledger.propagate(op, child, parent_state=working,
-                                        observations=None, hypothesis=None)
+            child_ld = ledger.propagate(op, child, parent_state=working, observations=None, hypothesis=None)
         except (NoDerivation, Malformed):
             per[fam]["derive_fail"] += 1
             continue
         per[fam]["survived"] += 1
-        improves, _, _, _ = sector_targeted_improvement(
-            {"ledger": child_ld, "operation": op}, ledger, target_sector)
+        improves, _, _, _ = sector_targeted_improvement({"ledger": child_ld, "operation": op}, ledger, target_sector)
         if improves:
             per[fam]["improving_pre_budget"] += 1
-    return {fam: {r: per[fam].get(r, 0) for r in DROP_REASONS}
-            for fam in sorted(per)}
+    return {fam: {r: per[fam].get(r, 0) for r in DROP_REASONS} for fam in sorted(per)}
 
 
 def compact_swap(swap):
@@ -160,11 +170,9 @@ def run_parent(slug, doc, budget, do_diagnose, missing_set):
     target = doc["distance"]["d"]
     ts = infer_target_sector(ledger, target)
     started = time.time()
-    search = bounded_sector_search(state, ledger, ts, target=target,
-                                   budget=budget, sector_swap=True)
+    search = bounded_sector_search(state, ledger, ts, target=target, budget=budget, sector_swap=True)
     elapsed = time.time() - started
-    improving_ops = collections.Counter(
-        c["operation"]["op"] for c in search.get("improving", []))
+    improving_ops = collections.Counter(c["operation"]["op"] for c in search.get("improving", []))
     child_n = {c["n"] for c in search.get("improving", [])}
     rec = {
         "slug": slug,
@@ -223,19 +231,22 @@ def main():
 
     board = load_board()
     mset = set(missing_n(board))
-    parents = select_parents(board, args.campaign, args.limit,
-                             args.n_floor, args.n_cap)
-    print(f"campaign {args.campaign}: {len(parents)} parents "
-          f"(budget {args.budget}, diagnose={not args.no_diagnose})", flush=True)
+    parents = select_parents(board, args.campaign, args.limit, args.n_floor, args.n_cap)
+    print(
+        f"campaign {args.campaign}: {len(parents)} parents (budget {args.budget}, diagnose={not args.no_diagnose})",
+        flush=True,
+    )
 
     records = []
     for i, slug in enumerate(parents, 1):
-        rec = run_parent(slug, board[slug], args.budget,
-                         not args.no_diagnose, mset)
+        rec = run_parent(slug, board[slug], args.budget, not args.no_diagnose, mset)
         records.append(rec)
-        print(f"  [{i}/{len(parents)}] {slug}: eval={rec['budget_used']} "
-              f"exh={rec['exhausted']} impr={rec['improving_count']} "
-              f"{rec['seconds']}s", flush=True)
+        print(
+            f"  [{i}/{len(parents)}] {slug}: eval={rec['budget_used']} "
+            f"exh={rec['exhausted']} impr={rec['improving_count']} "
+            f"{rec['seconds']}s",
+            flush=True,
+        )
 
     summary = aggregate(records)
     summary["campaign"] = args.campaign
