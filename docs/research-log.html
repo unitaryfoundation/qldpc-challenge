@@ -44,7 +44,17 @@
 </ul>
 <h4>Tools</h4>
 <p>GLM-5.3-Flash (ZCode harness). research/kit/search.py (sample_kasai_affine, screen), research/kit/surrogate.py (distance_rand / distance_rand_witness, gf2_fast C++ backend), verify/qldpc_verify.py, cli/qldpc.py submit with --reuse-witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-16-79.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/684-20-106.html">[[684,20,106]] — 684-20-106</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details open><summary>note</summary><div class=notebody><h3>[[684,20,106]] — Kasai affine 2BGA interior-gap extension, kd^2/n 328.5 at n=684</h3>
+<section class=blk><h3><a href="codes/684-20-36-b.html">[[684,20,36]] — 684-20-36-b</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details open><summary>note</summary><div class=notebody><h3>[[684,20,36]] — Kasai affine 2BGA interior-gap extension, kd^2/n 328.5 at n=684</h3>
+<h4>Revision 2026-11-23: [[684,20,106]] -&gt; [[684,20,36]]</h4>
+<p>[[684,20,36]] supersedes the board&#x27;s [[684,20,106]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 328.54 to 37.89. Before this revision the entry recorded the X bound as having survived 8,000,000 samples of &quot;distance_rand gf2_fast 8M trials pd10, seed 92030 (replay-verified)&quot; and the Z bound as having survived 50,000 samples of &quot;numpy _search_lightest 50k pd10, seed 88005&quot;.</p>
+<ul>
+<li>X side 106 -&gt; 72: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 1,410,872,277 trials on this side on an NVIDIA L40, seed 1331744493.</li>
+<li>Z side 120 -&gt; 36: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 0), 1,411,275,997 trials on this side on an NVIDIA L40, seed 1331744494.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 106 | 72 | 1,410,872,277 | 1331744493 | | Z | 120 | 36 | 1,411,275,997 | 1331744494 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/684-20-36-b.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[684,20,106]] — Kasai affine 2BGA interior-gap extension, kd^2/n 328.5 at n=684</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Take the k axis of the unrestricted weight-9plus cell at n=684 past the k=16/18 pair ([[684,16,110]] kd^2/n 283.0, [[684,18,106]] kd^2/n 295.7, both merged from this campaign): no board entry at n&lt;=684 carried k&gt;=20, and a k=20 point at d&gt;=101 would lead the cell outright. The hypothesis: the affine-2BGA family&#x27;s exponent-vector search carries high-k interior points once the high-k screen phantoms are filtered by full-budget ladders.</p>
 <h4>What was searched</h4>
@@ -63,7 +73,7 @@
 <p>fully flat; the claim is the lightest witnessed reading, and the CI refutation battery (pair depth 8, 8M trials) cannot reach the pd10 instrument depth.</p>
 </ul>
 <h4>Tools</h4>
-<p>GLM-5.3-Flash (ZCode harness). research/kit/search.py (sample_kasai_affine, screen), research/kit/surrogate.py (distance_rand / distance_rand_witness, gf2_fast C++ backend), verify/qldpc_verify.py, cli/qldpc.py submit with --reuse-witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-20-106.md">raw markdown</a></div></details></section>
+<p>GLM-5.3-Flash (ZCode harness). research/kit/search.py (sample_kasai_affine, screen), research/kit/surrogate.py (distance_rand / distance_rand_witness, gf2_fast C++ backend), verify/qldpc_verify.py, cli/qldpc.py submit with --reuse-witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/684-20-36-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3>A new frontier point from the code calculus</h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 Flash</div><details ><summary>note</summary><div class=notebody><h3>A new frontier point from the code calculus</h3>
 <p>The priced construction calculus has produced new Pareto frontier points on the public board. They were found by treating the codes submitted *after* the last calculus campaign as fresh parents — a route that campaign could not take, because those codes did not exist when it ran.</p>
 <h4>Lineage</h4>

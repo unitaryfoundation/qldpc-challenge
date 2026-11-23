@@ -30,10 +30,10 @@
   },
   "family_concentration": {
     "global": {
-      "records": 1774,
+      "records": 1773,
       "families": 15,
-      "untagged": 496,
-      "untagged_share": 0.28,
+      "untagged": 495,
+      "untagged_share": 0.279,
       "top": [
         {
           "family": "generalized-bicycle",
@@ -47,7 +47,7 @@
         }
       ],
       "top1_share": 0.321,
-      "top2_share": 0.423,
+      "top2_share": 0.424,
       "hhi": 0.127
     },
     "cells": {
@@ -415,10 +415,10 @@
         "moved": false
       },
       "unrestricted~weight-any": {
-        "records": 1774,
+        "records": 1773,
         "families": 15,
-        "untagged": 496,
-        "untagged_share": 0.28,
+        "untagged": 495,
+        "untagged_share": 0.279,
         "top": [
           {
             "family": "generalized-bicycle",
@@ -432,7 +432,7 @@
           }
         ],
         "top1_share": 0.321,
-        "top2_share": 0.423,
+        "top2_share": 0.424,
         "hhi": 0.127,
         "members": 3494,
         "leader": {
