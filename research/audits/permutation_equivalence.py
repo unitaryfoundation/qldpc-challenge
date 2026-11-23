@@ -21,6 +21,7 @@ in which case the control is skipped and said so.
     uv run python research/audits/permutation_equivalence.py              # every pair in the ledger
     uv run python research/audits/permutation_equivalence.py A.json B.json --perm "[1,0,...]"
 """
+
 import argparse
 import json
 import os
@@ -74,8 +75,7 @@ def check_pair(a, b, perm, swap=False):
     sides = {"X": "X", "Z": "Z"} if not swap else {"X": "Z", "Z": "X"}
     detail, ok = {}, True
     for sa, sb in sides.items():
-        same, triple = same_row_space(permute(rows_as_ints(a["checks"][sa]), perm),
-                                      rows_as_ints(b["checks"][sb]))
+        same, triple = same_row_space(permute(rows_as_ints(a["checks"][sa]), perm), rows_as_ints(b["checks"][sb]))
         detail[sa] = triple
         ok = ok and same
     return ok, detail
@@ -119,9 +119,11 @@ def run_ledger(ledger=LEDGER, quiet=False):
         failures += 0 if ok else 1
         if not quiet:
             tag = "EQUIVALENT" if ok else "NOT EQUIVALENT"
-            ctrl_s = {True: "control rejects a perturbed permutation",
-                      False: "control skipped: the perturbation is an automorphism",
-                      None: ""}[ctrl]
+            ctrl_s = {
+                True: "control rejects a perturbed permutation",
+                False: "control skipped: the perturbation is an automorphism",
+                None: "",
+            }[ctrl]
             print(f"{tag}  {p['first']} -> {p['second']}  X {detail.get('X')}  Z {detail.get('Z')}  {ctrl_s}")
     return failures
 
@@ -130,8 +132,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("files", nargs="*", help="two code files; omit to check the ledger")
     ap.add_argument("--perm", help="JSON list, qubit i of the first file is qubit perm[i] of the second")
-    ap.add_argument("--swap", action="store_true",
-                    help="compare X rows of the first against Z rows of the second and vice versa")
+    ap.add_argument(
+        "--swap", action="store_true", help="compare X rows of the first against Z rows of the second and vice versa"
+    )
     args = ap.parse_args(argv)
     if not args.files:
         return 1 if run_ledger() else 0

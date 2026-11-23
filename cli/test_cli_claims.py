@@ -8,6 +8,7 @@ primitives are tested in research/test_coordination.py; these check that the
 CLI reads and writes them faithfully, and that adding a claim to a cell does
 not disturb the board numbers printed beside it.
 """
+
 import io
 import json
 import os
@@ -22,14 +23,30 @@ sys.path.insert(0, os.path.join(_ROOT, "cli"))
 import coordination  # noqa: E402
 import qldpc  # noqa: E402
 
-ENTRY = {"n": 100, "k": 2, "d": 6, "w": 6, "locality_class": "unrestricted",
-         "weight_class": "weight-6", "board_advancing": True}
+ENTRY = {
+    "n": 100,
+    "k": 2,
+    "d": 6,
+    "w": 6,
+    "locality_class": "unrestricted",
+    "weight_class": "weight-6",
+    "board_advancing": True,
+}
 
 
 def _args(**over):
-    base = {"cell": None, "n": None, "top": 6, "claim": "", "release": "",
-            "campaign": "", "note": "", "ttl": 60, "prune": False,
-            "json": False}
+    base = {
+        "cell": None,
+        "n": None,
+        "top": 6,
+        "claim": "",
+        "release": "",
+        "campaign": "",
+        "note": "",
+        "ttl": 60,
+        "prune": False,
+        "json": False,
+    }
     base.update(over)
     return type("A", (), base)()
 
@@ -60,20 +77,18 @@ def one_cell(monkeypatch):
 
 # -- taking and dropping a claim -------------------------------------------
 
+
 def test_claiming_a_cell_writes_the_record_and_says_so(claims_dir):
-    rc, out = _say(qldpc.cmd_targets,
-                   _args(claim="weight-6/unrestricted", campaign="bb-1155"))
+    rc, out = _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted", campaign="bb-1155"))
     assert rc == 0 and "claimed weight-6/unrestricted" in out
-    rec = coordination.read_claim("weight-6/unrestricted",
-                                  root=str(claims_dir))
+    rec = coordination.read_claim("weight-6/unrestricted", root=str(claims_dir))
     assert rec["campaign"] == "bb-1155" and rec["session_id"] == "session-a"
 
 
 def test_a_second_session_is_warned_and_not_blocked(claims_dir, monkeypatch):
     _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted", campaign="first"))
     monkeypatch.setenv(coordination.RUN_ID_ENV, "session-b")
-    rc, out = _say(qldpc.cmd_targets,
-                   _args(claim="weight-6/unrestricted", campaign="second"))
+    rc, out = _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted", campaign="second"))
     assert rc == 0
     assert "session-a had a live claim" in out
     assert "Nothing blocks either of you" in out
@@ -83,8 +98,10 @@ def test_a_second_session_is_warned_and_not_blocked(claims_dir, monkeypatch):
 
 def test_claiming_does_not_read_the_board(claims_dir, monkeypatch):
     """A claim is cheap, and an empty cell is the one worth claiming."""
+
     def boom():
         raise AssertionError("the board should not be read to take a claim")
+
     monkeypatch.setattr(qldpc, "_load_board_entries", boom)
     assert _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted"))[0] == 0
 
@@ -98,8 +115,7 @@ def test_releasing_reports_whether_this_session_held_it(claims_dir, monkeypatch)
     monkeypatch.setenv(coordination.RUN_ID_ENV, "session-a")
     rc, out = _say(qldpc.cmd_targets, _args(release="weight-6/unrestricted"))
     assert rc == 0 and "released weight-6/unrestricted" in out
-    assert coordination.read_claim("weight-6/unrestricted",
-                                   root=str(claims_dir)) is None
+    assert coordination.read_claim("weight-6/unrestricted", root=str(claims_dir)) is None
 
 
 def test_pruning_counts_only_what_expired(claims_dir):
@@ -117,15 +133,14 @@ def test_pruning_counts_only_what_expired(claims_dir):
 # each ./qldpc invocation is a new run, and a release cannot find the claim a
 # previous one wrote. The holder has to be the session, not the process.
 
+
 def test_the_documented_sequence_works_without_the_env_var(tmp_path, monkeypatch):
     monkeypatch.setattr(coordination, "CLAIMS", str(tmp_path / "claims"))
     monkeypatch.delenv(coordination.RUN_ID_ENV, raising=False)
     monkeypatch.delenv(coordination.SESSION_ENV, raising=False)
-    runs = iter(["20261008-112521-host-38319", "20261008-112544-host-38327",
-                 "20261008-112601-host-38330"])
+    runs = iter(["20261008-112521-host-38319", "20261008-112544-host-38327", "20261008-112601-host-38330"])
     monkeypatch.setattr(coordination, "run_id", lambda: next(runs))
-    rc, out = _say(qldpc.cmd_targets,
-                   _args(claim="weight-6/unrestricted", campaign="bb-1155"))
+    rc, out = _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted", campaign="bb-1155"))
     assert rc == 0 and "claimed weight-6/unrestricted" in out
     # A second claim from this shell refreshes its own note rather than
     # reporting a collision with itself.
@@ -133,8 +148,7 @@ def test_the_documented_sequence_works_without_the_env_var(tmp_path, monkeypatch
     assert rc == 0 and "had a live claim" not in out
     rc, out = _say(qldpc.cmd_targets, _args(release="weight-6/unrestricted"))
     assert rc == 0 and "released weight-6/unrestricted" in out
-    assert coordination.read_claim("weight-6/unrestricted",
-                                   root=str(tmp_path / "claims")) is None
+    assert coordination.read_claim("weight-6/unrestricted", root=str(tmp_path / "claims")) is None
 
 
 # -- naming a cell ---------------------------------------------------------
@@ -145,22 +159,24 @@ def test_the_documented_sequence_works_without_the_env_var(tmp_path, monkeypatch
 # with no displacement note. The axis names are module constants, so refusing
 # costs no board load and an empty cell stays claimable.
 
+
 def test_a_cell_name_is_written_weight_first(claims_dir, one_cell):
     rc, out = _say(qldpc.cmd_targets, _args(claim="unrestricted/weight-6"))
     assert rc == 0 and "claimed weight-6/unrestricted" in out
     assert (claims_dir / "weight-6__unrestricted.json").exists()
     _, listed = _say(qldpc.cmd_targets, _args(top=1))
-    assert "claimed by session-a" in listed      # the same cell, found by name
+    assert "claimed by session-a" in listed  # the same cell, found by name
     rc, out = _say(qldpc.cmd_targets, _args(release="unrestricted/weight-6"))
     assert rc == 0 and "released weight-6/unrestricted" in out
-    assert coordination.read_claim("weight-6/unrestricted",
-                                   root=str(claims_dir)) is None
+    assert coordination.read_claim("weight-6/unrestricted", root=str(claims_dir)) is None
 
 
 def test_a_name_that_is_not_a_cell_is_refused_with_the_valid_ones(claims_dir):
-    for flag, bad in (("claim", "weight6/unrestrcted"),
-                      ("release", "unrestricted/weight-6/typo"),
-                      ("claim", "weight-6")):
+    for flag, bad in (
+        ("claim", "weight6/unrestrcted"),
+        ("release", "unrestricted/weight-6/typo"),
+        ("claim", "weight-6"),
+    ):
         with pytest.raises(SystemExit) as exc:
             _say(qldpc.cmd_targets, _args(**{flag: bad}))
         message = str(exc.value)
@@ -181,16 +197,14 @@ def test_a_refused_cell_name_is_a_usage_error_under_json(claims_dir, capsys):
 
 # -- the listing -----------------------------------------------------------
 
-def test_a_claimed_cell_is_marked_and_its_numbers_do_not_move(
-        claims_dir, one_cell):
+
+def test_a_claimed_cell_is_marked_and_its_numbers_do_not_move(claims_dir, one_cell):
     _, plain = _say(qldpc.cmd_targets, _args(top=2))
-    _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted",
-                                  campaign="bb-1155"))
+    _say(qldpc.cmd_targets, _args(claim="weight-6/unrestricted", campaign="bb-1155"))
     _, claimed = _say(qldpc.cmd_targets, _args(top=2))
     assert "claimed by session-a (bb-1155)" in claimed
     assert "advisory, not enforced" in claimed
-    assert [x for x in plain.splitlines() if "kd2/n" in x] == \
-           [x for x in claimed.splitlines() if "kd2/n" in x]
+    assert [x for x in plain.splitlines() if "kd2/n" in x] == [x for x in claimed.splitlines() if "kd2/n" in x]
     assert "1 live claim" in claimed
 
 
@@ -215,16 +229,15 @@ def test_the_json_record_carries_claims_as_data(claims_dir, one_cell, capsys):
     rc = qldpc.main(["targets", "--json"])
     captured = capsys.readouterr()
     assert rc == 0
-    record = json.loads(captured.out)                # one object, nothing else
+    record = json.loads(captured.out)  # one object, nothing else
     assert record["ok"] and record["exit_code"] == 0
     assert [c["cell"] for c in record["claims"]] == ["weight-6/unrestricted"]
     assert record["claims"][0]["session_id"] == "session-a"
-    assert "codes across" in captured.err             # the prose went to stderr
+    assert "codes across" in captured.err  # the prose went to stderr
 
 
 def test_the_json_record_reports_a_claim_action(claims_dir, capsys):
-    rc = qldpc.main(["targets", "--claim", "weight-8/unrestricted",
-                     "--campaign", "sweep-2", "--json"])
+    rc = qldpc.main(["targets", "--claim", "weight-8/unrestricted", "--campaign", "sweep-2", "--json"])
     captured = capsys.readouterr()
     assert rc == 0
     record = json.loads(captured.out)

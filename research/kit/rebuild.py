@@ -9,6 +9,7 @@ keyword arguments; it must return (HX, HZ). The fingerprint is
 qldpc_verify.css_fingerprint, which `qldpc reproduce --construction`
 compares against the entry (#2220, #2955 item 3).
 """
+
 import argparse
 import importlib
 import json
@@ -47,6 +48,7 @@ def rebuild(constructor, params):
 
 def fingerprint_of(HX, HZ):
     from qldpc_verify import css_fingerprint
+
     return css_fingerprint(HX, HZ)
 
 
@@ -54,8 +56,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--constructor", required=True, help="<module>.<function> under research/kit")
     ap.add_argument("--params", default="{}", help="JSON object of keyword arguments")
-    ap.add_argument("--recipe", default=None,
-                    help="JSON file holding {constructor, params}; overrides the two flags")
+    ap.add_argument("--recipe", default=None, help="JSON file holding {constructor, params}; overrides the two flags")
     args = ap.parse_args(argv)
     if args.recipe:
         with open(args.recipe, encoding="utf-8") as f:

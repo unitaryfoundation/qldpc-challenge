@@ -35,11 +35,14 @@ dev = [
 ]
 
 # Lint and format: ruff, with vprusso/toqito's configuration as the baseline
-# (issue #658). Until the one-time mechanical `ruff check --fix` + `ruff format`
-# pass lands as its own PR, CI reports whole-tree debt and blocks only new
-# Python files; edits to existing files stay advisory so a verifier change does
-# not carry an unrelated reformat and manifest re-pin. After that pass, CI can
-# make the whole tree blocking. Docstring-content rules (D1xx, D417) come last.
+# (issue #658). The one-time mechanical `ruff format` + `ruff check --fix`
+# pass landed on 2026-11-20 as its own PR (the whole tree reformatted, the
+# safe fixes applied, the integrity manifest re-pinned). CI blocks on new
+# Python files and reports the remaining whole-tree debt; edits to existing
+# files stay advisory until the findings the fixer cannot touch (about 700,
+# mostly D205 and D401 docstring shape, then E741, E501, PLW2901, PLW1510,
+# E731, F841) are worked off by rule in their own passes, after which the
+# whole tree can turn blocking. Docstring-content rules (D1xx, D417) come last.
 [tool.ruff]
 line-length = 120
 target-version = "py312"    # site/build.py uses 3.12-only f-string
@@ -51,6 +54,9 @@ extend-exclude = [
     "learn",                # PI's personal study notes, exempt from tooling
     "build",                # compiled artifacts
     "docs",                 # generated site output
+    "*.md",                 # ruff 0.16 formats fenced code in Markdown; notes
+                            # and fieldnotes are prose with their own checks
+                            # and a size cap, so the formatter stays out
 ]
 
 [tool.ruff.lint]

@@ -10,6 +10,7 @@ the script accepts.
 
 Run: uv run pytest verify/test_replay_formal.py
 """
+
 import json
 import os
 import subprocess
@@ -22,9 +23,19 @@ import replay_formal as rf  # noqa: E402
 
 
 def _git(cwd, *args):
-    subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True,
-                   env={**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
-                        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"})
+    subprocess.run(
+        ["git", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_NAME": "t",
+            "GIT_AUTHOR_EMAIL": "t@t",
+            "GIT_COMMITTER_NAME": "t",
+            "GIT_COMMITTER_EMAIL": "t@t",
+        },
+    )
 
 
 @pytest.fixture
@@ -37,16 +48,26 @@ def repo(tmp_path):
     (r / "lean-toolchain").write_text("leanprover/lean4:v0.0.0\n")
     _git(r, "add", "-A")
     _git(r, "commit", "-q", "-m", "one")
-    sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=r, check=True,
-                         capture_output=True, text=True).stdout.strip()
+    sha = subprocess.run(["git", "rev-parse", "HEAD"], cwd=r, check=True, capture_output=True, text=True).stdout.strip()
     return r, sha
 
 
 def _cert(repo_path, sha, build, toolchain="leanprover/lean4:v9.9.9"):
-    return {"d": 6, "d_exact": True, "verification": {
-        "level": "formal", "checker": "test",
-        "replay": {"repo": f"file://{repo_path}", "commit": sha, "build": build,
-                   "theorem": "T", "toolchain": toolchain}}}
+    return {
+        "d": 6,
+        "d_exact": True,
+        "verification": {
+            "level": "formal",
+            "checker": "test",
+            "replay": {
+                "repo": f"file://{repo_path}",
+                "commit": sha,
+                "build": build,
+                "theorem": "T",
+                "toolchain": toolchain,
+            },
+        },
+    }
 
 
 def test_recipe_replays_and_the_recorded_toolchain_is_written(repo, tmp_path):

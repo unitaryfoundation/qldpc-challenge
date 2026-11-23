@@ -15,6 +15,7 @@ Combined verdict:
 
 Usage: python verify/heuristic_certify.py codes/foo.json [--trials N] [--seed S] [--write]
 """
+
 import argparse
 import json
 import os
@@ -30,7 +31,8 @@ def _syndrome(doc, trials, seed):
     """Run the BP+OSD cross-check if available; return its result or None."""
     try:
         sys.path.insert(0, os.path.join(ROOT, "decode"))
-        import distance as sd                      # decode/distance.py (needs ldpc)
+        import distance as sd  # decode/distance.py (needs ldpc)
+
         return sd.estimate(doc, trials=trials, seed=seed)
     except Exception:
         return None
@@ -40,12 +42,15 @@ def certify(doc, trials=200000, seed=0):
     claimed = int(doc["distance"]["d"])
     methods = {}
     r = ris.estimate(doc, trials=trials, seed=seed)
-    methods["ris"] = {"d": r["d_heuristic"], "verdict": r["verdict"],
-                      "trials": r["trials"], "sides": r["sides"]}
+    methods["ris"] = {"d": r["d_heuristic"], "verdict": r["verdict"], "trials": r["trials"], "sides": r["sides"]}
     s = _syndrome(doc, trials, seed)
     if s is not None:
-        methods["syndrome_decoder"] = {"d": s["d_heuristic"], "verdict": s["verdict"],
-                                       "trials": s["trials"], "sides": s["sides"]}
+        methods["syndrome_decoder"] = {
+            "d": s["d_heuristic"],
+            "verdict": s["verdict"],
+            "trials": s["trials"],
+            "sides": s["sides"],
+        }
 
     found = [m["d"] for m in methods.values() if m["d"] is not None]
     d_heur = min(found) if found else None
@@ -53,15 +58,20 @@ def certify(doc, trials=200000, seed=0):
 
     if d_heur is not None and d_heur < claimed:
         verdict = "refuted"
-    elif (d_heur == claimed
-          and all(m["verdict"] == "corroborated" for m in methods.values())):
+    elif d_heur == claimed and all(m["verdict"] == "corroborated" for m in methods.values()):
         verdict = "corroborated"
     else:
         verdict = "inconclusive"
 
-    return {"name": doc.get("name", ""), "claimed_d": claimed,
-            "d_heuristic": d_heur, "verdict": verdict, "agree": agree,
-            "methods": methods, "seed": seed}
+    return {
+        "name": doc.get("name", ""),
+        "claimed_d": claimed,
+        "d_heuristic": d_heur,
+        "verdict": verdict,
+        "agree": agree,
+        "methods": methods,
+        "seed": seed,
+    }
 
 
 def main(path, trials, seed, write):
@@ -72,8 +82,10 @@ def main(path, trials, seed, write):
         os.makedirs(outdir, exist_ok=True)
         slug = os.path.basename(path)
         json.dump(res, open(os.path.join(outdir, slug), "w"), indent=2)
-        print(f"wrote certs/heuristic/{slug}  verdict={res['verdict']} "
-              f"d_heuristic={res['d_heuristic']} methods={list(res['methods'])}")
+        print(
+            f"wrote certs/heuristic/{slug}  verdict={res['verdict']} "
+            f"d_heuristic={res['d_heuristic']} methods={list(res['methods'])}"
+        )
     else:
         print(json.dumps(res, indent=2))
     return 2 if res["verdict"] == "refuted" else 0

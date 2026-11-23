@@ -21,6 +21,7 @@ inside it is found exactly by enumerating subsets in order of weight.
 Nothing here is trusted: the ranking picks which schedule the deep RIS search
 and the verifier (verify/circuit_verify.py) then evaluate, exactly as before.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -32,9 +33,9 @@ from scipy.optimize import Bounds, LinearConstraint, milp
 
 DEFAULT_SIZE = 16
 DEFAULT_SEEDS = 2
-DEFAULT_HOOD = 400          # mechanisms in a witness-centered neighborhood for the MILP search
-DEFAULT_HOOK_LIMIT = 48     # hook-like seeds per basis
-DEFAULT_MIN_DETECTORS = 4   # a seed is hook-like when it fires at least this many detectors
+DEFAULT_HOOD = 400  # mechanisms in a witness-centered neighborhood for the MILP search
+DEFAULT_HOOK_LIMIT = 48  # hook-like seeds per basis
+DEFAULT_MIN_DETECTORS = 4  # a seed is hook-like when it fires at least this many detectors
 MILP_SECONDS = 20.0
 
 
@@ -155,15 +156,17 @@ def profile(cols, witness_sets, size=DEFAULT_SIZE, cap=None):
             vals[u] = cap if p is None else p
             counts[u] = c
     if not vals:
-        return {"p_min": None, "p_mean": None, "at_min": 0, "seeds": 0, "completions": None,
-                "per_seed": {}}
+        return {"p_min": None, "p_mean": None, "at_min": 0, "seeds": 0, "completions": None, "per_seed": {}}
     arr = np.array(list(vals.values()), dtype=float)
     cnt = np.array(list(counts.values()), dtype=float)
-    return {"p_min": int(arr.min()), "p_mean": round(float(arr.mean()), 3),
-            "at_min": int((arr == arr.min()).sum()), "seeds": int(arr.size),
-            "completions": round(float(cnt.mean()), 3),
-            "per_seed": {int(k): [int(v), int(counts[k])] for k, v in vals.items()}}
-
+    return {
+        "p_min": int(arr.min()),
+        "p_mean": round(float(arr.mean()), 3),
+        "at_min": int((arr == arr.min()).sum()),
+        "seeds": int(arr.size),
+        "completions": round(float(cnt.mean()), 3),
+        "per_seed": {int(k): [int(v), int(counts[k])] for k, v in vals.items()},
+    }
 
 
 def neighborhood_layers(cols, by_det, witness, size):
@@ -189,7 +192,7 @@ def neighborhood_layers(cols, by_det, witness, size):
             break
         if len(Q) + len(layer) > size:
             if first:
-                Q.extend(sorted(layer)[:max(0, size - len(Q))])
+                Q.extend(sorted(layer)[: max(0, size - len(Q))])
             break
         Q.extend(sorted(layer))
         frontier = layer
@@ -241,7 +244,7 @@ def proximity_milp(cols, seed, Q, cap=None, seconds=MILP_SECONDS):
         for o in cols[j][1]:
             A[nd + opos[o], col] = 1.0
     for i in range(nd):
-        A[i, nf + i] = -2.0      # A f - 2 y = s: the count of faults on a detector has the seed's parity
+        A[i, nf + i] = -2.0  # A f - 2 y = s: the count of faults on a detector has the seed's parity
     for o in range(no):
         A[nd + o, nf + nd + o] = -1.0
         A[nd + o, nf + nd + no + o] = 2.0
@@ -251,14 +254,19 @@ def proximity_milp(cols, seed, Q, cap=None, seconds=MILP_SECONDS):
         lo[dpos[d]] = hi[dpos[d]] = 1.0 if d in s_seed else 0.0
     for o in obs:
         lo[nd + opos[o]] = hi[nd + opos[o]] = 1.0 if o in l_seed else 0.0
-    A[nd + no, nf + nd:nf + nd + no] = 1.0
+    A[nd + no, nf + nd : nf + nd + no] = 1.0
     lo[nd + no], hi[nd + no] = 1.0, no
     c = np.zeros(nv)
     c[:nf] = 1.0
     lb = np.concatenate([np.zeros(nf), np.zeros(nd), np.zeros(no), np.full(no, -np.inf)])
     ub = np.concatenate([np.ones(nf), np.full(nd, np.inf), np.ones(no), np.full(no, np.inf)])
-    res = milp(c=c, constraints=LinearConstraint(A, lo, hi), integrality=np.ones(nv),
-               bounds=Bounds(lb, ub), options={"time_limit": float(seconds), "disp": False})
+    res = milp(
+        c=c,
+        constraints=LinearConstraint(A, lo, hi),
+        integrality=np.ones(nv),
+        bounds=Bounds(lb, ub),
+        options={"time_limit": float(seconds), "disp": False},
+    )
     if res.status != 0 or res.x is None:
         return None
     w = int(round(float(res.fun)))
@@ -267,8 +275,15 @@ def proximity_milp(cols, seed, Q, cap=None, seconds=MILP_SECONDS):
     return w
 
 
-def profile_hooks(cols, witness, size=DEFAULT_HOOD, limit=DEFAULT_HOOK_LIMIT,
-                  min_detectors=DEFAULT_MIN_DETECTORS, cap=None, seconds=MILP_SECONDS):
+def profile_hooks(
+    cols,
+    witness,
+    size=DEFAULT_HOOD,
+    limit=DEFAULT_HOOK_LIMIT,
+    min_detectors=DEFAULT_MIN_DETECTORS,
+    cap=None,
+    seconds=MILP_SECONDS,
+):
     """Proximity profile over hook-like seeds in a witness-centered neighborhood.
 
     The witness (an undetected logical fault set of weight d_circ) anchors the
@@ -289,18 +304,32 @@ def profile_hooks(cols, witness, size=DEFAULT_HOOD, limit=DEFAULT_HOOK_LIMIT,
     for u in seeds:
         p = proximity_milp(cols, u, Q, cap=cap, seconds=seconds)
         vals[u] = cap if p is None else p
-    out = {"p_min": None, "p_mean": None, "at_min": 0, "seeds": len(vals), "completions": None,
-           "neighborhood": len(Q), "cap": cap, "per_seed": {int(k): int(v) for k, v in vals.items()}}
+    out = {
+        "p_min": None,
+        "p_mean": None,
+        "at_min": 0,
+        "seeds": len(vals),
+        "completions": None,
+        "neighborhood": len(Q),
+        "cap": cap,
+        "per_seed": {int(k): int(v) for k, v in vals.items()},
+    }
     if vals:
         arr = np.array(list(vals.values()), dtype=float)
-        out.update(p_min=int(arr.min()), p_mean=round(float(arr.mean()), 3),
-                   at_min=int((arr == arr.min()).sum()))
+        out.update(p_min=int(arr.min()), p_mean=round(float(arr.mean()), 3), at_min=int((arr == arr.min()).sum()))
     return out
 
 
-
-def profile_decoder(dem, witness, limit=DEFAULT_HOOK_LIMIT, min_detectors=DEFAULT_MIN_DETECTORS,
-                    size=DEFAULT_HOOD, cap=None, decoder_factory=None, targets="parity"):
+def profile_decoder(
+    dem,
+    witness,
+    limit=DEFAULT_HOOK_LIMIT,
+    min_detectors=DEFAULT_MIN_DETECTORS,
+    size=DEFAULT_HOOD,
+    cap=None,
+    decoder_factory=None,
+    targets="parity",
+):
     """Proximity profile over hook-like seeds, completions found by the pinned decoder.
 
     The exact local search does not scale (HiGHS hits its time limit on a
@@ -348,18 +377,32 @@ def profile_decoder(dem, witness, limit=DEFAULT_HOOK_LIMIT, min_detectors=DEFAUL
             if best is None or w < best:
                 best = w
         vals[u] = cap if best is None or best > cap else best
-    out = {"p_min": None, "p_mean": None, "at_min": 0, "seeds": len(vals), "completions": None,
-           "neighborhood": len(Q), "cap": cap, "method": f"decoder/{targets}",
-           "per_seed": {int(a): int(b) for a, b in vals.items()}}
+    out = {
+        "p_min": None,
+        "p_mean": None,
+        "at_min": 0,
+        "seeds": len(vals),
+        "completions": None,
+        "neighborhood": len(Q),
+        "cap": cap,
+        "method": f"decoder/{targets}",
+        "per_seed": {int(a): int(b) for a, b in vals.items()},
+    }
     if vals:
         arr = np.array(list(vals.values()), dtype=float)
-        out.update(p_min=int(arr.min()), p_mean=round(float(arr.mean()), 3),
-                   at_min=int((arr == arr.min()).sum()))
+        out.update(p_min=int(arr.min()), p_mean=round(float(arr.mean()), 3), at_min=int((arr == arr.min()).sum()))
     return out
 
 
-def dem_profile(dem, trials, size=DEFAULT_SIZE, seeds=DEFAULT_SEEDS, max_seconds=None,
-                extra_witnesses=(), hook_limit=DEFAULT_HOOK_LIMIT):
+def dem_profile(
+    dem,
+    trials,
+    size=DEFAULT_SIZE,
+    seeds=DEFAULT_SEEDS,
+    max_seconds=None,
+    extra_witnesses=(),
+    hook_limit=DEFAULT_HOOK_LIMIT,
+):
     """Profile of one memory circuit's DEM.
 
     The seeds are the lightest RIS witness sets plus ``extra_witnesses``, undetected

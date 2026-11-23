@@ -13,7 +13,6 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -34,28 +33,26 @@ def _d(doc):
     raise ValueError("entry has no distance.d or distance.P.value")
 
 
-def certify(doc, *, qedist_root=None, tropidist_root=None, tlim=60.0, threads=4, shards=1,
-            ladder=None, kmin=None):
+def certify(doc, *, qedist_root=None, tropidist_root=None, tlim=60.0, threads=4, shards=1, ladder=None, kmin=None):
     d = _d(doc)
     ctype = doc.get("code_type")
     use_qedist = d <= 65  # QEDist cutoff cap is d-1 <= 64
     if ctype == "stabilizer":
         if use_qedist:
-            return qedist_stabilizer_certify.certify(
-                doc, root=qedist_root, tlim=tlim, threads=threads, shards=shards)
+            return qedist_stabilizer_certify.certify(doc, root=qedist_root, tlim=tlim, threads=threads, shards=shards)
     elif ctype == "CSS":
         if use_qedist:
             if ladder:
                 # ascending cutoffs, so an entry the single cutoff d - 1 cannot
                 # close in the budget still files the lower bound it proved
-                return qedist_certify.run_ladder(doc, root=qedist_root, budget=ladder,
-                                                 threads=threads, kmin=kmin)
+                return qedist_certify.run_ladder(doc, root=qedist_root, budget=ladder, threads=threads, kmin=kmin)
             return qedist_certify.certify(doc, root=qedist_root, tlim=tlim, threads=threads)
     else:
         raise ValueError(f"unsupported code_type {ctype!r}")
 
     # Fallback to tropidist for high distance.
     import tropidist_certify  # noqa: E402
+
     if tropidist_root is None:
         tropidist_root = os.environ.get("TROPIDIST_ROOT")
     if not tropidist_root:
@@ -71,16 +68,28 @@ def main(argv=None):
     ap.add_argument("--tlim", type=float, default=60.0)
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--shards", type=int, default=1)
-    ap.add_argument("--ladder", type=float, default=None, metavar="SECONDS",
-                    help="CSS entries: ascending cutoffs with this budget per rung (qedist_certify.run_ladder)")
+    ap.add_argument(
+        "--ladder",
+        type=float,
+        default=None,
+        metavar="SECONDS",
+        help="CSS entries: ascending cutoffs with this budget per rung (qedist_certify.run_ladder)",
+    )
     ap.add_argument("--kmin", type=int, default=None, help="first rung of the ladder")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     with open(args.path, encoding="utf-8") as f:
         doc = json.load(f)
-    cert = certify(doc, qedist_root=args.qedist, tropidist_root=args.tropidist,
-                   tlim=args.tlim, threads=args.threads, shards=args.shards,
-                   ladder=args.ladder, kmin=args.kmin)
+    cert = certify(
+        doc,
+        qedist_root=args.qedist,
+        tropidist_root=args.tropidist,
+        tlim=args.tlim,
+        threads=args.threads,
+        shards=args.shards,
+        ladder=args.ladder,
+        kmin=args.kmin,
+    )
     print(json.dumps(cert, indent=2))
     return 0
 

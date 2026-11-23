@@ -39,6 +39,7 @@ until a certificate says otherwise, and the queue certifies nothing.
     uv run python research/certs/certification_queue.py            # writes todo.json
     uv run python research/certs/certification_queue.py --check    # is the committed queue current?
 """
+
 import argparse
 import datetime
 import glob
@@ -58,20 +59,21 @@ TODO = os.path.join(HERE, "todo.json")
 COST = os.path.join(ROOT, "research", "cost", "cost_table.json")
 
 BANDS = {
-    "A": "at least three certified peers (within 25% of n, within 2 of d) with a median "
-         "side time under 600 s",
+    "A": "at least three certified peers (within 25% of n, within 2 of d) with a median side time under 600 s",
     "B": "a certified peer under 3,600 s, or n <= 400 and d <= 16 (the region the October "
-         "2026 Perlmutter run closed at 2,400 s per solve)",
+    "2026 Perlmutter run closed at 2,400 s per solve)",
     "C": "n <= 700 and d <= 24: beyond any certified peer, inside what the SAT tier has "
-         "reached (largest certified d is 19)",
+    "reached (largest certified d is 19)",
     "D": "n > 700 or d > 24: nothing certified on main resembles it",
     "P": "stabilizer code: certified in Pauli weight only by the sweep's tropidist backend (solver level)",
 }
 BAND_ORDER = {b: i for i, b in enumerate("ABCDP")}
-RULE = ("records first (on a cell frontier or the global one), then band A to D (P last), then "
-        "cheapest first by the peers' median side seconds and then by n, then slug; regenerated "
-        "from codes/ and certs/, so an honored certificate removes an entry and a changed distance "
-        "re-lists it at the new value")
+RULE = (
+    "records first (on a cell frontier or the global one), then band A to D (P last), then "
+    "cheapest first by the peers' median side seconds and then by n, then slug; regenerated "
+    "from codes/ and certs/, so an honored certificate removes an entry and a changed distance "
+    "re-lists it at the new value"
+)
 
 
 def load_site_build():
@@ -138,8 +140,7 @@ def cost_table_shapes():
     out = []
     for e in table.get("entries", []):
         c = e.get("certify") or {}
-        status = {s: c[s].get("status") for s in ("X", "Z") if isinstance(c.get(s), dict)} \
-            or {"P": c.get("status")}
+        status = {s: c[s].get("status") for s in ("X", "Z") if isinstance(c.get(s), dict)} or {"P": c.get("status")}
         out.append((e["n"], e["w"], e["code_type"], e["slug"], status))
     return out
 
@@ -148,13 +149,14 @@ def nearest_measured(n, w, code_type, shapes):
     cands = [s for s in shapes if s[2] == code_type]
     if not cands:
         return None
-    best = min(cands, key=lambda s: (abs(s[0] - n) / max(n, 1) + abs(s[1] - w) / max(w, 1)))
+    best = min(cands, key=lambda s: abs(s[0] - n) / max(n, 1) + abs(s[1] - w) / max(w, 1))
     return {"slug": best[3], "n": best[0], "w": best[1], "certify": best[4]}
 
 
 def build_queue(build, entries, records):
     import gf2
     import qldpc_verify as V
+
     honored = honored_certs(build)
     rows = peer_costs(honored)
     shapes = cost_table_shapes()
@@ -167,12 +169,22 @@ def build_queue(build, entries, records):
             doc = json.load(f)
         stab = doc.get("code_type") == "stabilizer"
         n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
-        rec = {"slug": slug, "code_type": "stabilizer" if stab else "CSS", "n": n, "k": k, "d": d,
-               "w": e["w"], "record": i in records,
-               "cells": [f"{L}~{W}" for (L, W) in build.cells(e)], "sides": {}}
+        rec = {
+            "slug": slug,
+            "code_type": "stabilizer" if stab else "CSS",
+            "n": n,
+            "k": k,
+            "d": d,
+            "w": e["w"],
+            "record": i in records,
+            "cells": [f"{L}~{W}" for (L, W) in build.cells(e)],
+            "sides": {},
+        }
         if stab:
-            rec["sides"]["P"] = {"value": (doc["distance"].get("P") or {}).get("value", d),
-                                 "note": "Pauli weight; tropidist backend only"}
+            rec["sides"]["P"] = {
+                "value": (doc["distance"].get("P") or {}).get("value", d),
+                "note": "Pauli weight; tropidist backend only",
+            }
         else:
             HX = V._matrix(doc["checks"]["X"], n)
             HZ = V._matrix(doc["checks"]["Z"], n)
@@ -182,10 +194,13 @@ def build_queue(build, entries, records):
                 claim = doc["distance"].get(side)
                 if not claim:
                     continue
-                rec["sides"][side] = {"value": claim["value"], "generators": gens,
-                                      "lp_vars": n + rank_kernel + 1,
-                                      "lp_constraints": rank_kernel + 2,
-                                      "milps_at_most": gens}
+                rec["sides"][side] = {
+                    "value": claim["value"],
+                    "generators": gens,
+                    "lp_vars": n + rank_kernel + 1,
+                    "lp_constraints": rank_kernel + 2,
+                    "milps_at_most": gens,
+                }
         if e.get("d_lb"):
             # a partial certificate on file (issue #4718): the entry stays in the
             # queue, and the sweep reopens it at this bound rather than at 1
@@ -197,9 +212,15 @@ def build_queue(build, entries, records):
         if near:
             rec["measured_shape"] = near
         queue.append(rec)
-    queue.sort(key=lambda r: (0 if r["record"] else 1, BAND_ORDER[r["band"]],
-                              r["peers"]["median_side_secs"] if r["peers"]["median_side_secs"] is not None
-                              else float("inf"), r["n"], r["slug"]))
+    queue.sort(
+        key=lambda r: (
+            0 if r["record"] else 1,
+            BAND_ORDER[r["band"]],
+            r["peers"]["median_side_secs"] if r["peers"]["median_side_secs"] is not None else float("inf"),
+            r["n"],
+            r["slug"],
+        )
+    )
     for pos, r in enumerate(queue, 1):
         r["position"] = pos
     return queue, len(honored), len(rows)
@@ -207,22 +228,36 @@ def build_queue(build, entries, records):
 
 def payload(build, entries, records):
     queue, n_honored, n_timed = build_queue(build, entries, records)
-    counts = {"upper_bound": len(queue), "records": sum(r["record"] for r in queue),
-              "by_band": {b: sum(r["band"] == b for r in queue) for b in BANDS},
-              "exact": n_honored, "entries": len(entries),
-              "certificates_with_seconds": n_timed}
+    counts = {
+        "upper_bound": len(queue),
+        "records": sum(r["record"] for r in queue),
+        "by_band": {b: sum(r["band"] == b for r in queue) for b in BANDS},
+        "exact": n_honored,
+        "entries": len(entries),
+        "certificates_with_seconds": n_timed,
+    }
     try:
-        head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         head = None
-    return {"queue_version": 1, "issue": 4027,
-            "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(), "head": head,
-            "rule": RULE, "bands": BANDS,
-            "caveat": ("every d here is a witnessed upper bound until a certificate says otherwise; "
-                       "the band is an estimate from other entries' certificates on other machines, "
-                       "not a promise"),
-            "counts": counts, "next_ten": [r["slug"] for r in queue[:10]], "entries": queue}
+    return {
+        "queue_version": 1,
+        "issue": 4027,
+        "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
+        "head": head,
+        "rule": RULE,
+        "bands": BANDS,
+        "caveat": (
+            "every d here is a witnessed upper bound until a certificate says otherwise; "
+            "the band is an estimate from other entries' certificates on other machines, "
+            "not a promise"
+        ),
+        "counts": counts,
+        "next_ten": [r["slug"] for r in queue[:10]],
+        "entries": queue,
+    }
 
 
 def write(p, path=TODO):
@@ -233,17 +268,20 @@ def write(p, path=TODO):
 
 def summary(p):
     c = p["counts"]
-    lines = [f"{c['upper_bound']} upper-bound entries ({c['records']} records) of {c['entries']}; "
-             f"{c['exact']} exact; bands " + ", ".join(f"{b} {n}" for b, n in c["by_band"].items()),
-             "next ten: " + " ".join(p["next_ten"])]
+    lines = [
+        f"{c['upper_bound']} upper-bound entries ({c['records']} records) of {c['entries']}; "
+        f"{c['exact']} exact; bands " + ", ".join(f"{b} {n}" for b, n in c["by_band"].items()),
+        "next ten: " + " ".join(p["next_ten"]),
+    ]
     return "\n".join(lines)
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", default=TODO)
-    ap.add_argument("--check", action="store_true",
-                    help="exit 1 when the committed queue's membership differs from today's board")
+    ap.add_argument(
+        "--check", action="store_true", help="exit 1 when the committed queue's membership differs from today's board"
+    )
     a = ap.parse_args(argv)
     build = load_site_build()
     entries = build.load_entries()

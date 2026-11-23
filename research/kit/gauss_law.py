@@ -37,6 +37,7 @@ which gives the optimal 1D quantum Gauss's law code [[N d(d+1)/2, N, d]].
 Everything here is a plain NumPy construction; the distance claim of the
 paper is not reproduced by this module (the trusted gate measures it).
 """
+
 import numpy as np
 
 
@@ -107,7 +108,7 @@ def optimal_1d_multiplicities(N, d):
         raise ValueError("N must be even (Theorem III.5 assumes it)")
     p = []
     for n in range(N):
-        if n % 2 == 0:                       # n congruent 0 mod 2
+        if n % 2 == 0:  # n congruent 0 mod 2
             p.append(int(np.ceil((d - 1) / 2)))
         else:
             p.append(int(np.ceil(d / 2)) - 1)
@@ -157,7 +158,7 @@ def quantum_gauss_law_1d(N, d, p=None, q=None):
         blocks = np.nonzero(c)[0]
         r = np.zeros(n_out * d, dtype=np.int8)
         for b in blocks:
-            r[b * d:(b + 1) * d] = 1
+            r[b * d : (b + 1) * d] = 1
         hz_rows.append(r)
 
     HX = np.array(hx_rows, dtype=np.int8)
@@ -189,12 +190,15 @@ def quantum_gauss_law_1d_coordinates(N, d, p=None, q=None):
 
 
 if __name__ == "__main__":
-    from css import verify_css, compute_k
-    for (N, d) in [(6, 3), (8, 4), (10, 5), (12, 6), (20, 8)]:
+    from css import compute_k, verify_css
+
+    for N, d in [(6, 3), (8, 4), (10, 5), (12, 6), (20, 8)]:
         HX, HZ = quantum_gauss_law_1d(N, d)
         p, q = optimal_1d_multiplicities(N, d)
         n_out = sum(p) + sum(q)
-        print(f"N={N} d={d}: n={HX.shape[1]} (expect {N*d*(d+1)//2}) "
-              f"k={compute_k(HX, HZ)} (expect {N}) "
-              f"wX={int(HX.sum(1).max())} wZ={int(HZ.sum(1).max())} "
-              f"css={verify_css(HX, HZ)}")
+        print(
+            f"N={N} d={d}: n={HX.shape[1]} (expect {N * d * (d + 1) // 2}) "
+            f"k={compute_k(HX, HZ)} (expect {N}) "
+            f"wX={int(HX.sum(1).max())} wZ={int(HZ.sum(1).max())} "
+            f"css={verify_css(HX, HZ)}"
+        )

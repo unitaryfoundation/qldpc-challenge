@@ -20,6 +20,7 @@ The end-to-end test points the gate at an empty board directory so the run is
 about this module and not about what happens to be on the board that day; the
 verifier and its refutation are the real ones throughout.
 """
+
 import json
 import os
 import subprocess
@@ -36,27 +37,21 @@ from submit import make_submission  # noqa: E402
 ROOT = P._ROOT
 
 # A settled ladder: the screen reads high, two fresh deep rungs agree at 6.
-SETTLED = [{"trials": 20_000, "d": 8, "label": "screen"},
-           {"trials": 1_000_000, "d": 6},
-           {"trials": 2_000_000, "d": 6}]
+SETTLED = [{"trials": 20_000, "d": 8, "label": "screen"}, {"trials": 1_000_000, "d": 6}, {"trials": 2_000_000, "d": 6}]
 
 
 def _evidence(**over):
     ev = {
         "headline": "bivariate bicycle on the 6 x 6 torus",
         "direction": "A weight-6 unrestricted cell with room at small n; the "
-                     "torus family is the cheapest thing that lands there.",
-        "searched": "40 sampled torus pairs screened at 120 RIS trials per "
-                    "side, one carried forward.",
+        "torus family is the cheapest thing that lands there.",
+        "searched": "40 sampled torus pairs screened at 120 RIS trials per side, one carried forward.",
         "ladder": list(SETTLED),
-        "frontier": "Fills a weight-6 unrestricted cell the board does not "
-                    "carry at this blocklength.",
-        "reproduction": "build_bb(6, 6, A, B) with the monomials recorded in "
-                        "`research/kit/bb.py` under KNOWN.",
+        "frontier": "Fills a weight-6 unrestricted cell the board does not carry at this blocklength.",
+        "reproduction": "build_bb(6, 6, A, B) with the monomials recorded in `research/kit/bb.py` under KNOWN.",
         "construction": "Bivariate bicycle on Z_6 x Z_6.",
         "dead_ends": ["Even lifts produced k = 0."],
-        "tools": {"harness": "pytest", "modules": ["research/kit/bb.py"],
-                  "compute": "seconds"},
+        "tools": {"harness": "pytest", "modules": ["research/kit/bb.py"], "compute": "seconds"},
     }
     ev.update(over)
     return {k: v for k, v in ev.items() if v is not None}
@@ -65,9 +60,15 @@ def _evidence(**over):
 def _doc():
     p = KNOWN["[[72,12,6]]"]
     HX, HZ = build_bb(p["l"], p["m"], p["A"], p["B"])
-    return make_submission(HX, HZ, name="[[72,12,6]] test", authors=["@tester"],
-                           construction="Bivariate bicycle on Z_6 x Z_6.",
-                           family="bivariate-bicycle", trials=1000)
+    return make_submission(
+        HX,
+        HZ,
+        name="[[72,12,6]] test",
+        authors=["@tester"],
+        construction="Bivariate bicycle on Z_6 x Z_6.",
+        family="bivariate-bicycle",
+        trials=1000,
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -78,9 +79,19 @@ def small_board(monkeypatch):
     unchanged here; handing it a fixed board keeps these tests about the bundle
     and off the several-thousand-entry structural pass the real one costs.
     """
-    board = [{"slug": "80-4-8", "n": 80, "k": 4, "d": 8, "code_type": "CSS",
-              "eff": 3.2, "w": 6, "locality_class": "unrestricted",
-              "weight_class": "weight-6"}]
+    board = [
+        {
+            "slug": "80-4-8",
+            "n": 80,
+            "k": 4,
+            "d": 8,
+            "code_type": "CSS",
+            "eff": 3.2,
+            "w": 6,
+            "locality_class": "unrestricted",
+            "weight_class": "weight-6",
+        }
+    ]
     monkeypatch.setattr(P.cli, "_load_board_entries", lambda: list(board))
     return board
 
@@ -94,8 +105,7 @@ def _farm(tmp_path):
     """
     root = tmp_path / "root"
     root.mkdir()
-    for name in ("verify", "research", "site", "schema", "cli", "fieldnotes",
-                 "docs", "decode", "certs", "circuits"):
+    for name in ("verify", "research", "site", "schema", "cli", "fieldnotes", "docs", "decode", "certs", "circuits"):
         src = os.path.join(ROOT, name)
         if os.path.isdir(src):
             os.symlink(src, root / name)
@@ -111,16 +121,15 @@ def test_flat_rung_count_matches_the_escalation_gate():
     A note and a budget decision must not disagree about whether a bound
     settled.
     """
-    for ladder in (SETTLED,
-                   [(20_000, 8), (100_000, 7), (1_000_000, 6)],
-                   [(20_000, 6), (500_000, 6), (1_000_000, 6), (2_000_000, 6)]):
-        facts = P.ladder_facts(ladder, claimed_d=min(r[1] if isinstance(r, tuple)
-                                                     else r["d"] for r in ladder))
+    for ladder in (
+        SETTLED,
+        [(20_000, 8), (100_000, 7), (1_000_000, 6)],
+        [(20_000, 6), (500_000, 6), (1_000_000, 6), (2_000_000, 6)],
+    ):
+        facts = P.ladder_facts(ladder, claimed_d=min(r[1] if isinstance(r, tuple) else r["d"] for r in ladder))
         brief = E.rung_brief(72, 12, ladder, bar=1.0)
-        assert (facts["flat_fresh_rungs_at_best"]
-                == brief["facts"]["flat_fresh_rungs_at_best"])
-        assert (facts["cumulative_best_bound"]
-                == brief["facts"]["cumulative_best_bound"])
+        assert facts["flat_fresh_rungs_at_best"] == brief["facts"]["flat_fresh_rungs_at_best"]
+        assert facts["cumulative_best_bound"] == brief["facts"]["cumulative_best_bound"]
         assert facts["trials_spent"] == brief["facts"]["trials_spent"]
 
 
@@ -171,11 +180,15 @@ def test_note_states_its_own_nkd_first_and_renders_the_ladder():
     doc = _doc()
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
     md = P.note_markdown(doc, _evidence(), facts)
-    assert md.splitlines()[0].startswith(f"# [[{doc['n']},{doc['k']},"
-                                         f"{doc['distance']['d']}]]")
-    for heading in ("## Direction & hypothesis", "## What was searched",
-                    "## Evidence trail", "## Dead ends", "## Tools",
-                    "## Reproduction"):
+    assert md.splitlines()[0].startswith(f"# [[{doc['n']},{doc['k']},{doc['distance']['d']}]]")
+    for heading in (
+        "## Direction & hypothesis",
+        "## What was searched",
+        "## Evidence trail",
+        "## Dead ends",
+        "## Tools",
+        "## Reproduction",
+    ):
         assert heading in md
     assert "| 2,000,000 | 6 |" in md
     assert "| 20,000 (screen) | 8 |" in md
@@ -187,8 +200,7 @@ def test_note_is_hard_wrapped_like_the_notes_on_the_board():
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
     long_para = ("A paragraph long enough to need wrapping. " * 8).strip()
     md = P.note_markdown(doc, _evidence(direction=long_para), facts)
-    prose = [ln for ln in md.splitlines()
-             if ln and not ln.startswith(("|", "    ", "#", "```"))]
+    prose = [ln for ln in md.splitlines() if ln and not ln.startswith(("|", "    ", "#", "```"))]
     assert max(len(ln) for ln in prose) <= P.NOTE_WIDTH
     assert long_para.split(". ")[0] + "." in " ".join(prose)
 
@@ -204,8 +216,7 @@ def test_note_leaves_fenced_code_alone():
 def test_note_carries_the_peer_audit_when_one_was_run():
     doc = _doc()
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
-    ev = _evidence(peer_audit={"decision": "credible: both claims held",
-                               "trials": 2_000_000, "seeds": [51, 52]})
+    ev = _evidence(peer_audit={"decision": "credible: both claims held", "trials": 2_000_000, "seeds": [51, 52]})
     flat = " ".join(P.note_markdown(doc, ev, facts).split())
     assert "credible: both claims held" in flat
     assert "2,000,000 trials" in flat
@@ -225,8 +236,7 @@ def _verdict(dedup):
 
 
 def test_equivalence_box_is_ticked_from_the_gates_own_dedup():
-    ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": None}), _doc())
+    ticked, reason = P.equivalence_finding(_verdict({"exact_duplicate_of": None, "wl_equivalent_of": None}), _doc())
     assert ticked
     assert "fingerprint" in reason
 
@@ -236,8 +246,8 @@ def test_wl_equivalent_peer_without_a_note_is_a_blocker(monkeypatch):
     monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
         "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
     ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}),
-        _doc())
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc()
+    )
     assert not ticked
     assert "72-12-6.json" in reason
 
@@ -248,8 +258,8 @@ def test_wl_equivalent_peer_with_a_note_is_ticked(monkeypatch):
     doc = _doc()
     doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
     ticked, reason = P.equivalence_finding(
-        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}),
-        doc)
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), doc
+    )
     assert ticked
     assert "provenance.notes" in reason
 
@@ -311,11 +321,15 @@ def test_fresh_body_carries_no_scaffolding_the_prose_gate_rejects():
     doc = _doc()
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
     report = P.qldpc_verify.verify(doc, refute=False)
-    body = P.pr_body(doc, report,
-                     _verdict({"exact_duplicate_of": None,
-                               "wl_equivalent_of": None}),
-                     _evidence(), facts,
-                     code_rel="codes/72-12-6.json", note_rel="notes/72-12-6.md")
+    body = P.pr_body(
+        doc,
+        report,
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": None}),
+        _evidence(),
+        facts,
+        code_rel="codes/72-12-6.json",
+        note_rel="notes/72-12-6.md",
+    )
     for why, pat in check_prose.SCAFFOLDING:
         assert not pat.search(body), why
     assert "- [x] If this may be equivalent" in body
@@ -331,10 +345,15 @@ def test_body_carries_the_boards_own_frontier_lines():
     doc = _doc()
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
     report = P.qldpc_verify.verify(doc, refute=False)
-    body = P.pr_body(doc, report, _verdict({"exact_duplicate_of": None,
-                                            "wl_equivalent_of": None}),
-                     _evidence(), facts,
-                     code_rel="codes/72-12-6.json", note_rel="notes/72-12-6.md")
+    body = P.pr_body(
+        doc,
+        report,
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": None}),
+        _evidence(),
+        facts,
+        code_rel="codes/72-12-6.json",
+        note_rel="notes/72-12-6.md",
+    )
     assert "Pareto frontier" in body
     assert _evidence()["frontier"] in body
 
@@ -343,10 +362,15 @@ def test_body_states_the_search_depth_behind_the_claim():
     doc = _doc()
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
     report = P.qldpc_verify.verify(doc, refute=False)
-    body = P.pr_body(doc, report, _verdict({"exact_duplicate_of": None,
-                                            "wl_equivalent_of": None}),
-                     _evidence(), facts,
-                     code_rel="codes/72-12-6.json", note_rel="notes/72-12-6.md")
+    body = P.pr_body(
+        doc,
+        report,
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": None}),
+        _evidence(),
+        facts,
+        code_rel="codes/72-12-6.json",
+        note_rel="notes/72-12-6.md",
+    )
     assert "Search behind the claim" in body
     assert "literature novelty is unverified" in body
 
@@ -357,8 +381,7 @@ def test_title_and_note_header_carry_one_description():
     title = P.bundle_title(doc, ev)
     assert title == f"Add [[72,12,6]] {ev['headline']}"
     facts = P.ladder_facts(SETTLED, doc["distance"]["d"])
-    assert P.note_markdown(doc, ev, facts).startswith(f"# [[72,12,6]] "
-                                                      f"{ev['headline']}")
+    assert P.note_markdown(doc, ev, facts).startswith(f"# [[72,12,6]] {ev['headline']}")
 
 
 def test_title_falls_back_to_the_clis_descriptor():
@@ -371,16 +394,14 @@ def test_title_falls_back_to_the_clis_descriptor():
 
 # ------------------------------------------------------------- the contract
 def test_check_prose_command_matches_what_ci_runs():
-    cmd = P.check_prose_cmd("/repo", "/tmp/body.md",
-                            ["codes/a.json", "notes/a.md"], pr_author="@vprusso")
+    cmd = P.check_prose_cmd("/repo", "/tmp/body.md", ["codes/a.json", "notes/a.md"], pr_author="@vprusso")
     assert cmd[-2:] == ["--pr-author", "vprusso"]
     assert "--body-file" in cmd and "/tmp/body.md" in cmd
     assert P.check_prose_cmd("/repo", "/tmp/body.md", [])[-1] == "--files"
 
 
 def test_commands_open_one_pr_per_code():
-    cmds = P._git_commands("72-12-6", "Add [[72,12,6]]", "codes/72-12-6.json",
-                           "notes/72-12-6.md", "/tmp/body.md")
+    cmds = P._git_commands("72-12-6", "Add [[72,12,6]]", "codes/72-12-6.json", "notes/72-12-6.md", "/tmp/body.md")
     assert cmds[0] == "git checkout -b submit-72-12-6 main"
     assert cmds[1] == "git add codes/72-12-6.json notes/72-12-6.md"
     assert any(c.startswith("verify/prepush_prose_check.sh") for c in cmds)
@@ -421,22 +442,24 @@ def test_placeholder_construction_is_refused():
 def test_model_disagreement_between_note_and_provenance_is_refused():
     doc = _doc()
     doc["provenance"]["model"] = "Claude Opus 4.8"
-    rep = P.promote(doc, _evidence(tools={"model": "MiMo-V2.6-Flash"}),
-                    write=False)
+    rep = P.promote(doc, _evidence(tools={"model": "MiMo-V2.6-Flash"}), write=False)
     assert any("disagree" in b for b in rep["blocked_by"])
 
 
 def test_script_skips_bundles_that_are_not_ready():
-    ready = {"ok": True, "title": "Add [[72,12,6]]", "slug": "72-12-6",
-             "body_file": "/tmp/body.md",
-             "commands": ["git checkout -b submit-72-12-6 main"]}
+    ready = {
+        "ok": True,
+        "title": "Add [[72,12,6]]",
+        "slug": "72-12-6",
+        "body_file": "/tmp/body.md",
+        "commands": ["git checkout -b submit-72-12-6 main"],
+    }
     blocked = {"ok": False, "slug": "80-4-8", "blocked_by": ["ladder too shallow"]}
     script = P.script_for([ready, blocked])
     assert "git checkout -b submit-72-12-6 main" in script
     assert "# skipped 80-4-8: ladder too shallow" in script
     # a dry run has no body on disk, so it is never scripted either
-    assert "# skipped 90-2-9: not ready" in P.script_for(
-        [{"ok": True, "slug": "90-2-9", "commands": []}])
+    assert "# skipped 90-2-9: not ready" in P.script_for([{"ok": True, "slug": "90-2-9", "commands": []}])
     assert "80-4-8" not in script.replace("# skipped 80-4-8: ladder too shallow", "")
 
 
@@ -457,14 +480,12 @@ def empty_board(tmp_path, monkeypatch):
 
 def test_bundle_is_assembled_gated_and_written(tmp_path, empty_board):
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(), root=root, authors=["@tester"],
-                    body_dir=str(tmp_path / "bodies"), seed=7)
+    rep = P.promote(_doc(), _evidence(), root=root, authors=["@tester"], body_dir=str(tmp_path / "bodies"), seed=7)
     assert rep["ok"], rep["blocked_by"]
     assert rep["schema"] == P.REPORT_SCHEMA
     assert rep["slug"] == "72-12-6"
     assert rep["branch"] == "submit-72-12-6"
-    assert rep["files"] == {"code": "codes/72-12-6.json",
-                            "note": "notes/72-12-6.md"}
+    assert rep["files"] == {"code": "codes/72-12-6.json", "note": "notes/72-12-6.md"}
     assert rep["gates"]["validate_candidate"]["passed"]
     assert rep["gates"]["check_prose"]["ok"], rep["gates"]["check_prose"]["output"]
 
@@ -480,20 +501,20 @@ def test_bundle_is_assembled_gated_and_written(tmp_path, empty_board):
 
 def test_written_bundle_passes_the_real_verifier_on_disk(tmp_path, empty_board):
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(), root=root, authors=["@tester"],
-                    body_dir=str(tmp_path / "bodies"), seed=7)
+    rep = P.promote(_doc(), _evidence(), root=root, authors=["@tester"], body_dir=str(tmp_path / "bodies"), seed=7)
     assert rep["ok"], rep["blocked_by"]
     proc = subprocess.run(
-        [sys.executable, os.path.join(ROOT, "verify", "qldpc_verify.py"),
-         os.path.join(root, rep["files"]["code"])],
-        capture_output=True, text=True, check=False)
+        [sys.executable, os.path.join(ROOT, "verify", "qldpc_verify.py"), os.path.join(root, rep["files"]["code"])],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert proc.returncode == 0, proc.stdout + proc.stderr
 
 
 def test_existing_board_slug_is_not_overwritten(tmp_path, empty_board):
     root = _farm(tmp_path)
-    kw = dict(root=root, authors=["@tester"], body_dir=str(tmp_path / "bodies"),
-              seed=7)
+    kw = dict(root=root, authors=["@tester"], body_dir=str(tmp_path / "bodies"), seed=7)
     assert P.promote(_doc(), _evidence(), **kw)["ok"]
     again = P.promote(_doc(), _evidence(), **kw)
     assert not again["ok"]
@@ -506,8 +527,7 @@ def test_plan_file_drives_a_batch(tmp_path, empty_board):
     plan = tmp_path / "plan.json"
     plan.write_text(json.dumps([{"candidate": _doc(), "evidence": _evidence()}]))
     plans = P.load_plan(str(plan))
-    reports = P.promote_all(plans, root=root, authors=["@tester"],
-                            body_dir=str(tmp_path / "bodies"), seed=7)
+    reports = P.promote_all(plans, root=root, authors=["@tester"], body_dir=str(tmp_path / "bodies"), seed=7)
     assert len(reports) == 1 and reports[0]["ok"], reports[0]["blocked_by"]
     script = P.script_for(reports)
     assert "gh pr create" in script
@@ -525,34 +545,42 @@ def test_plan_file_drives_a_batch(tmp_path, empty_board):
 # check_prose diffs fieldnotes/ against origin/main, and the farm is not a
 # git repository.
 
-RECIPE_72 = {"constructor": "bb.build_bb",
-             "params": {"l": 6, "m": 6, "A_terms": [[3, 0], [0, 1], [0, 2]],
-                        "B_terms": [[0, 3], [1, 0], [2, 0]]},
-             "family": "bivariate-bicycle"}
+RECIPE_72 = {
+    "constructor": "bb.build_bb",
+    "params": {"l": 6, "m": 6, "A_terms": [[3, 0], [0, 1], [0, 2]], "B_terms": [[0, 3], [1, 0], [2, 0]]},
+    "family": "bivariate-bicycle",
+}
 
 
 def _passing_verdict(doc, seed=None, **kw):
     """Return a gate verdict shaped like the real one, for a code the board already holds."""
-    return {"passed": True,
-            "labels": ["advances the weight-6 x unrestricted board",
-                       "literature novelty UNVERIFIED"],
-            "gates": {"verify": {"ok": True, "failed_checks": []},
-                      "refute": {"refuted": False, "seed": 1, "detail": "none"},
-                      "dedup": {"exact_duplicate_of": None, "wl_equivalent_of": None},
-                      "novelty": {"board_advancing": True, "advances_by": ["n"],
-                                  "d_only_gain": False, "d_only_peers": [],
-                                  "dominated_by": []}},
-            "validator": {"source_sha256": "test", "seed": 1}}
+    return {
+        "passed": True,
+        "labels": ["advances the weight-6 x unrestricted board", "literature novelty UNVERIFIED"],
+        "gates": {
+            "verify": {"ok": True, "failed_checks": []},
+            "refute": {"refuted": False, "seed": 1, "detail": "none"},
+            "dedup": {"exact_duplicate_of": None, "wl_equivalent_of": None},
+            "novelty": {
+                "board_advancing": True,
+                "advances_by": ["n"],
+                "d_only_gain": False,
+                "d_only_peers": [],
+                "dominated_by": [],
+            },
+        },
+        "validator": {"source_sha256": "test", "seed": 1},
+    }
 
 
 def test_a_recipe_becomes_a_manifest_bound_to_the_committed_file(tmp_path, monkeypatch):
     import hashlib
 
     import rebuild
+
     monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(), recipe=RECIPE_72, root=root,
-                    body_dir=str(tmp_path / "bodies"))
+    rep = P.promote(_doc(), _evidence(), recipe=RECIPE_72, root=root, body_dir=str(tmp_path / "bodies"))
     assert rep["ok"], rep["blocked_by"]
     repro_rel = rep["files"]["repro"]
     assert repro_rel == os.path.join("repro", "72-12-6.json")
@@ -579,8 +607,7 @@ def test_a_recipe_becomes_a_manifest_bound_to_the_committed_file(tmp_path, monke
 def test_a_spec_without_a_recipe_gives_an_honest_manifest(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(), recipe={"note": "hand-built"}, root=root,
-                    body_dir=str(tmp_path / "bodies"))
+    rep = P.promote(_doc(), _evidence(), recipe={"note": "hand-built"}, root=root, body_dir=str(tmp_path / "bodies"))
     assert rep["ok"], rep["blocked_by"]
     with open(os.path.join(root, rep["files"]["repro"]), encoding="utf-8") as f:
         assert json.load(f)["stages"]["construction"]["status"] == "not_reproducible"
@@ -591,8 +618,7 @@ def test_a_spec_without_a_recipe_gives_an_honest_manifest(tmp_path, monkeypatch)
 def test_without_a_recipe_no_manifest_is_written(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(), root=root,
-                    body_dir=str(tmp_path / "bodies"))
+    rep = P.promote(_doc(), _evidence(), root=root, body_dir=str(tmp_path / "bodies"))
     assert rep["ok"], rep["blocked_by"]
     assert "repro" not in rep["files"] and not os.path.exists(os.path.join(root, "repro"))
     assert "git add codes/72-12-6.json notes/72-12-6.md" in rep["commands"]
@@ -612,14 +638,23 @@ def test_an_existing_manifest_blocks_without_force(tmp_path, monkeypatch):
 
 def test_load_plan_reads_the_recipe_kept_beside_the_candidate(tmp_path):
     from submit import save_submission
+
     cand = _doc()
     save_submission(cand, str(tmp_path / "72-12-6.json"), spec=RECIPE_72)
     plan = tmp_path / "plan.json"
     with open(plan, "w", encoding="utf-8") as f:
-        json.dump([{"candidate": "72-12-6.json", "evidence": _evidence()},
-                   {"candidate": "72-12-6.json", "evidence": _evidence(),
-                    "recipe": {"note": "the plan's own recipe wins"}},
-                   {"candidate": cand, "evidence": _evidence()}], f)
+        json.dump(
+            [
+                {"candidate": "72-12-6.json", "evidence": _evidence()},
+                {
+                    "candidate": "72-12-6.json",
+                    "evidence": _evidence(),
+                    "recipe": {"note": "the plan's own recipe wins"},
+                },
+                {"candidate": cand, "evidence": _evidence()},
+            ],
+            f,
+        )
     plans = P.load_plan(str(plan))
     assert [p[2] for p in plans] == [RECIPE_72, {"note": "the plan's own recipe wins"}, None]
     assert plans[0][0] == cand
@@ -633,6 +668,7 @@ def test_promote_all_takes_plans_with_or_without_a_recipe():
         return {"ok": True}
 
     from unittest import mock
+
     with mock.patch.object(P, "promote", fake):
         P.promote_all([({}, {}), ({}, {}, RECIPE_72)])
     assert seen == [None, RECIPE_72]
@@ -646,16 +682,24 @@ D_ONLY_PEER = "[[72,12,5]] w=6 72-12-5.json"
 def _d_only_verdict(doc, seed=None, **kw):
     """Return a passing verdict whose only strict gain over one board entry is d."""
     v = _passing_verdict(doc, seed, **kw)
-    v["gates"]["novelty"].update(advances_by=["d"], d_only_gain=True,
-                                 d_only_peers=[D_ONLY_PEER])
+    v["gates"]["novelty"].update(advances_by=["d"], d_only_gain=True, d_only_peers=[D_ONLY_PEER])
     return v
 
 
 def _audit(**over):
-    rec = {"schema": "qldpc-peer-audit/1", "candidate": "cand.json",
-           "peers": ["codes/72-12-5.json"], "trials": 2_000_000, "seeds": [51, 52],
-           "pair_depth": 8, "threads": 8, "decision": "credible: both claims held",
-           "exit_code": 0, "results": [], "recorded": "2026-11-05"}
+    rec = {
+        "schema": "qldpc-peer-audit/1",
+        "candidate": "cand.json",
+        "peers": ["codes/72-12-5.json"],
+        "trials": 2_000_000,
+        "seeds": [51, 52],
+        "pair_depth": 8,
+        "threads": 8,
+        "decision": "credible: both claims held",
+        "exit_code": 0,
+        "results": [],
+        "recorded": "2026-11-05",
+    }
     rec.update(over)
     return rec
 
@@ -664,16 +708,15 @@ def test_a_d_only_gain_without_an_audit_is_blocked_with_the_command(tmp_path, mo
     monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
     rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False)
     assert not rep["ok"]
-    block, = rep["blocked_by"]
+    (block,) = rep["blocked_by"]
     assert D_ONLY_PEER in block and "leader_audit.py pair" in block
-    assert "--trials 2000000" in block            # the ladder's deepest fresh rung
+    assert "--trials 2000000" in block  # the ladder's deepest fresh rung
     assert block.endswith("put the record it writes in evidence.peer_audit")
 
 
 def test_a_checkable_audit_at_depth_discharges_the_gain(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
-    rep = P.promote(_doc(), _evidence(peer_audit=_audit()), root=_farm(tmp_path),
-                    write=False)
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit()), root=_farm(tmp_path), write=False)
     assert rep["ok"], rep["blocked_by"]
     assert not [i for i in rep["needs_human"] if "peer audit" in i["item"]]
     flat = " ".join(rep["note_markdown"].split())
@@ -683,20 +726,19 @@ def test_a_checkable_audit_at_depth_discharges_the_gain(tmp_path, monkeypatch):
 def test_a_shallow_or_undecided_audit_is_blocked(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
     root = _farm(tmp_path)
-    rep = P.promote(_doc(), _evidence(peer_audit=_audit(trials=1_000_000)), root=root,
-                    write=False)
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit(trials=1_000_000)), root=root, write=False)
     assert not rep["ok"] and "shallower than the 2,000,000" in rep["blocked_by"][0]
-    rep = P.promote(_doc(), _evidence(peer_audit=_audit(decision="redirect: peer soft")),
-                    root=root, write=False)
+    rep = P.promote(_doc(), _evidence(peer_audit=_audit(decision="redirect: peer soft")), root=root, write=False)
     assert not rep["ok"] and "distance revision" in rep["blocked_by"][0]
 
 
 def test_prose_evidence_still_passes_and_is_reported_as_unchecked(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _d_only_verdict)
-    rep = P.promote(_doc(), _evidence(peer_audit="credible at 10M trials, seeds 4242, 5353"),
-                    root=_farm(tmp_path), write=False)
+    rep = P.promote(
+        _doc(), _evidence(peer_audit="credible at 10M trials, seeds 4242, 5353"), root=_farm(tmp_path), write=False
+    )
     assert rep["ok"], rep["blocked_by"]
-    item, = [i for i in rep["needs_human"] if "peer audit" in i["item"]]
+    (item,) = [i for i in rep["needs_human"] if "peer audit" in i["item"]]
     assert D_ONLY_PEER in item["item"] and "--json-out" in item["why"]
 
 
@@ -708,10 +750,8 @@ DOMINATOR = "[[72,12,7]] w=6 72-12-7.json"
 def _dominated_verdict(doc, seed=None, **kw):
     """Return a passing verdict for a code one board entry dominates."""
     v = _passing_verdict(doc, seed, **kw)
-    v["labels"] = ["does not advance its weight-6 x unrestricted board cell",
-                   "literature novelty UNVERIFIED"]
-    v["gates"]["novelty"].update(board_advancing=False, advances_by=[],
-                                 dominated_by=[DOMINATOR])
+    v["labels"] = ["does not advance its weight-6 x unrestricted board cell", "literature novelty UNVERIFIED"]
+    v["gates"]["novelty"].update(board_advancing=False, advances_by=[], dominated_by=[DOMINATOR])
     return v
 
 
@@ -719,30 +759,35 @@ def test_a_dominated_code_is_blocked_with_its_dominators_named(tmp_path, monkeyp
     monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
     rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False)
     assert not rep["ok"]
-    block, = rep["blocked_by"]
+    (block,) = rep["blocked_by"]
     assert block.startswith(f"not board-advancing: dominated in its track cell by {DOMINATOR}")
     assert "non-frontier result" in block and "allow_non_frontier=True" in block
-    assert rep["frontier"] == {"board_advancing": False, "dominated_by": [DOMINATOR],
-                               "advances_by": [], "filed_as_non_frontier": False}
-    assert rep["slug"] is None                     # refused before any file was named
+    assert rep["frontier"] == {
+        "board_advancing": False,
+        "dominated_by": [DOMINATOR],
+        "advances_by": [],
+        "filed_as_non_frontier": False,
+    }
+    assert rep["slug"] is None  # refused before any file was named
 
 
 def test_the_opt_in_files_a_dominated_code_as_a_non_frontier_record(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
-    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
-                    allow_non_frontier=True)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False, allow_non_frontier=True)
     assert rep["ok"], rep["blocked_by"]
     assert rep["frontier"]["filed_as_non_frontier"]
-    assert (f"- Non-frontier result: dominated in its track cell by {DOMINATOR}. "
-            f"Filed with --allow-non-frontier") in rep["body_markdown"]
-    item, = [i for i in rep["needs_human"] if i["item"] == "the non-frontier filing"]
+    assert (
+        f"- Non-frontier result: dominated in its track cell by {DOMINATOR}. Filed with --allow-non-frontier"
+    ) in rep["body_markdown"]
+    (item,) = [i for i in rep["needs_human"] if i["item"] == "the non-frontier filing"]
     assert DOMINATOR in item["why"]
 
 
 def test_a_non_frontier_body_passes_the_prose_gate_on_disk(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _dominated_verdict)
-    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path),
-                    body_dir=str(tmp_path / "bodies"), allow_non_frontier=True)
+    rep = P.promote(
+        _doc(), _evidence(), root=_farm(tmp_path), body_dir=str(tmp_path / "bodies"), allow_non_frontier=True
+    )
     assert rep["ok"], rep["blocked_by"]
     assert rep["gates"]["check_prose"]["ok"], rep["gates"]["check_prose"]["output"]
     with open(rep["body_file"], encoding="utf-8") as f:
@@ -751,24 +796,25 @@ def test_a_non_frontier_body_passes_the_prose_gate_on_disk(tmp_path, monkeypatch
 
 def test_an_advancing_code_records_the_label_and_no_opt_in(tmp_path, monkeypatch):
     monkeypatch.setattr(P.gate, "validate_candidate", _passing_verdict)
-    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
-                    allow_non_frontier=True)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False, allow_non_frontier=True)
     assert rep["ok"] and rep["frontier"] == {
-        "board_advancing": True, "dominated_by": [], "advances_by": ["n"],
-        "filed_as_non_frontier": False}
+        "board_advancing": True,
+        "dominated_by": [],
+        "advances_by": ["n"],
+        "filed_as_non_frontier": False,
+    }
     assert "Non-frontier result" not in rep["body_markdown"]
     assert not [i for i in rep["needs_human"] if i["item"] == "the non-frontier filing"]
 
 
-def test_a_verdict_that_never_decided_the_frontier_is_blocked_even_with_the_opt_in(
-        tmp_path, monkeypatch):
+def test_a_verdict_that_never_decided_the_frontier_is_blocked_even_with_the_opt_in(tmp_path, monkeypatch):
     def unlabeled(doc, seed=None, **kw):
         v = _passing_verdict(doc, seed, **kw)
         del v["gates"]["novelty"]
         return v
+
     monkeypatch.setattr(P.gate, "validate_candidate", unlabeled)
-    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False,
-                    allow_non_frontier=True)
+    rep = P.promote(_doc(), _evidence(), root=_farm(tmp_path), write=False, allow_non_frontier=True)
     assert not rep["ok"] and "never decided" in rep["blocked_by"][0]
 
 
@@ -780,7 +826,7 @@ def test_the_command_line_flag_reaches_the_bundle(tmp_path, monkeypatch, capsys)
     assert P.main(common) == 1
     assert "not board-advancing" in json.loads(capsys.readouterr().out)[0]["blocked_by"][0]
     assert P.main(common + ["--allow-non-frontier"]) == 0
-    rep, = json.loads(capsys.readouterr().out)
+    (rep,) = json.loads(capsys.readouterr().out)
     assert rep["frontier"]["filed_as_non_frontier"]
 
 

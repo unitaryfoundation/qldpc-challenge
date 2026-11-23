@@ -5,6 +5,7 @@ encode when a side is doubled or halved, which is what the lift exists to
 show; a recipe with no rule or no kit module is labeled, not guessed; and
 the committed table has to agree with a fresh run (issue #4031).
 """
+
 import json
 import os
 import sys
@@ -22,8 +23,16 @@ GROSS = {"l": 12, "m": 6, "A_terms": [[3, 0], [0, 2], [0, 1]], "B_terms": [[2, 0
 
 def test_the_bb_lift_names_the_neighbors_and_the_doublings():
     labels = [lab for lab, _ in ms.lift_bb(GROSS)]
-    assert labels == ["l=11, m=6", "l=13, m=6", "l=12, m=5", "l=12, m=7", "l=24, m=6", "l=12, m=12",
-                      "l=6, m=6", "l=12, m=3"]
+    assert labels == [
+        "l=11, m=6",
+        "l=13, m=6",
+        "l=12, m=5",
+        "l=12, m=7",
+        "l=24, m=6",
+        "l=12, m=12",
+        "l=6, m=6",
+        "l=12, m=3",
+    ]
     assert [lab for lab, _ in ms.lift_cyclic_gb({"m": 31, "a": [0, 1], "b": [0, 3]})] == ["m=30", "m=32"]
 
 
@@ -40,8 +49,11 @@ def test_the_gross_code_is_a_construction_under_doubling_not_under_one_step():
 def test_recipes_without_a_rule_or_a_module_are_labeled():
     rec = ms.analyze("128-8-9", json.load(open(os.path.join(_ROOT, "repro", "128-8-9.json"), encoding="utf-8")))
     assert rec["status"] == "no_lift_rule" and rec["own"]["pass"] and rec["reproduces_entry"] is True
-    fake = {"stages": {"construction": {"status": "applicable",
-                                        "args": ["--constructor", "nowhere.build", "--params", "{}"]}}}
+    fake = {
+        "stages": {
+            "construction": {"status": "applicable", "args": ["--constructor", "nowhere.build", "--params", "{}"]}
+        }
+    }
     assert ms.analyze("x", fake)["status"] == "constructor_missing"
     assert ms.analyze("x", {"stages": {"construction": {"status": "not_reproducible"}}})["status"] == "no_recipe"
 

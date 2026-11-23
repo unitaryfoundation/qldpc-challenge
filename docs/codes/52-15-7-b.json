@@ -1,0 +1,595 @@
+{
+ "schema_version": "0.4",
+ "code_type": "stabilizer",
+ "n": 52,
+ "k": 15,
+ "checks": {
+  "S": [
+   {
+    "X": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "Z": []
+   },
+   {
+    "X": [
+     8,
+     9,
+     10,
+     11,
+     12,
+     13
+    ],
+    "Z": [
+     1,
+     4
+    ]
+   },
+   {
+    "X": [
+     14,
+     15,
+     16,
+     17
+    ],
+    "Z": [
+     0,
+     6,
+     9,
+     11
+    ]
+   },
+   {
+    "X": [
+     18,
+     19,
+     20,
+     21
+    ],
+    "Z": [
+     8,
+     13,
+     15,
+     16
+    ]
+   },
+   {
+    "X": [
+     22,
+     23,
+     24,
+     25
+    ],
+    "Z": [
+     14,
+     17,
+     19,
+     20
+    ]
+   },
+   {
+    "X": [
+     26,
+     27,
+     28,
+     29
+    ],
+    "Z": [
+     18,
+     21,
+     23,
+     24
+    ]
+   },
+   {
+    "X": [
+     30,
+     31,
+     32,
+     33
+    ],
+    "Z": [
+     22,
+     25,
+     27,
+     28
+    ]
+   },
+   {
+    "X": [
+     34,
+     35,
+     36,
+     37
+    ],
+    "Z": [
+     26,
+     29,
+     31,
+     32
+    ]
+   },
+   {
+    "X": [
+     38,
+     39,
+     40,
+     41
+    ],
+    "Z": [
+     30,
+     33,
+     35,
+     36
+    ]
+   },
+   {
+    "X": [
+     42,
+     43,
+     44,
+     45
+    ],
+    "Z": [
+     34,
+     37,
+     39,
+     40
+    ]
+   },
+   {
+    "X": [
+     46,
+     47,
+     48,
+     49
+    ],
+    "Z": [
+     38,
+     41,
+     43,
+     44
+    ]
+   },
+   {
+    "X": [
+     50,
+     51
+    ],
+    "Z": [
+     3,
+     5,
+     42,
+     45,
+     47,
+     48
+    ]
+   },
+   {
+    "X": [],
+    "Z": [
+     2,
+     7,
+     10,
+     12,
+     46,
+     49,
+     50,
+     51
+    ]
+   },
+   {
+    "X": [
+     0,
+     16,
+     33,
+     35
+    ],
+    "Z": [
+     15,
+     21,
+     46,
+     48
+    ]
+   },
+   {
+    "X": [
+     5,
+     8,
+     20,
+     37,
+     39
+    ],
+    "Z": [
+     19,
+     25,
+     51
+    ]
+   },
+   {
+    "X": [
+     2,
+     12,
+     14,
+     24,
+     41,
+     43
+    ],
+    "Z": [
+     23,
+     29
+    ]
+   },
+   {
+    "X": [
+     18,
+     28,
+     45,
+     47
+    ],
+    "Z": [
+     0,
+     4,
+     27,
+     33
+    ]
+   },
+   {
+    "X": [
+     22,
+     32,
+     49,
+     50
+    ],
+    "Z": [
+     8,
+     11,
+     31,
+     37
+    ]
+   },
+   {
+    "X": [
+     26,
+     36
+    ],
+    "Z": [
+     3,
+     7,
+     14,
+     16,
+     35,
+     41
+    ]
+   },
+   {
+    "X": [
+     1,
+     30,
+     40
+    ],
+    "Z": [
+     10,
+     18,
+     20,
+     39,
+     45
+    ]
+   },
+   {
+    "X": [
+     6,
+     9,
+     34,
+     44
+    ],
+    "Z": [
+     22,
+     24,
+     43,
+     49
+    ]
+   },
+   {
+    "X": [
+     3,
+     13,
+     15,
+     38,
+     48
+    ],
+    "Z": [
+     26,
+     28,
+     47
+    ]
+   },
+   {
+    "X": [
+     10,
+     17,
+     19,
+     42,
+     51
+    ],
+    "Z": [
+     30,
+     32,
+     50
+    ]
+   },
+   {
+    "X": [
+     7,
+     21,
+     23,
+     46
+    ],
+    "Z": [
+     2,
+     6,
+     34,
+     36
+    ]
+   },
+   {
+    "X": [
+     4,
+     25,
+     27
+    ],
+    "Z": [
+     1,
+     5,
+     13,
+     38,
+     40
+    ]
+   },
+   {
+    "X": [
+     11,
+     29,
+     31
+    ],
+    "Z": [
+     9,
+     12,
+     17,
+     42,
+     44
+    ]
+   },
+   {
+    "X": [
+     0,
+     11,
+     15,
+     25
+    ],
+    "Z": [
+     18,
+     32,
+     35,
+     37
+    ]
+   },
+   {
+    "X": [
+     8,
+     16,
+     19,
+     29
+    ],
+    "Z": [
+     22,
+     36,
+     39,
+     41
+    ]
+   },
+   {
+    "X": [
+     14,
+     20,
+     23,
+     33
+    ],
+    "Z": [
+     26,
+     40,
+     43,
+     45
+    ]
+   },
+   {
+    "X": [
+     18,
+     24,
+     27,
+     37
+    ],
+    "Z": [
+     30,
+     44,
+     47,
+     49
+    ]
+   },
+   {
+    "X": [
+     3,
+     22,
+     28,
+     31,
+     41
+    ],
+    "Z": [
+     34,
+     48,
+     50
+    ]
+   },
+   {
+    "X": [
+     7,
+     10,
+     26,
+     32,
+     35,
+     45
+    ],
+    "Z": [
+     38,
+     51
+    ]
+   },
+   {
+    "X": [
+     2,
+     30,
+     36,
+     39,
+     49
+    ],
+    "Z": [
+     1,
+     6,
+     42
+    ]
+   },
+   {
+    "X": [
+     34,
+     40,
+     43
+    ],
+    "Z": [
+     3,
+     4,
+     9,
+     13,
+     46
+    ]
+   },
+   {
+    "X": [
+     5,
+     38,
+     44,
+     47
+    ],
+    "Z": [
+     10,
+     11,
+     15,
+     17
+    ]
+   },
+   {
+    "X": [
+     6,
+     12,
+     42,
+     48,
+     50
+    ],
+    "Z": [
+     16,
+     19,
+     21
+    ]
+   },
+   {
+    "X": [
+     13,
+     46,
+     51
+    ],
+    "Z": [
+     0,
+     7,
+     20,
+     23,
+     25
+    ]
+   },
+   {
+    "X": [
+     1,
+     17
+    ],
+    "Z": [
+     2,
+     5,
+     8,
+     24,
+     27,
+     29
+    ]
+   },
+   {
+    "X": [
+     4,
+     9,
+     21
+    ],
+    "Z": [
+     12,
+     14,
+     28,
+     31,
+     33
+    ]
+   }
+  ]
+ },
+ "distance": {
+  "d": 7,
+  "P": {
+   "value": 7,
+   "confidence": "upper_bound",
+   "witness": {
+    "X": [
+     0,
+     9,
+     12,
+     15,
+     46
+    ],
+    "Z": [
+     21,
+     46,
+     47
+    ]
+   }
+  }
+ },
+ "name": "[[52,15,7]] plain-fold CPM pair-partition, (J,L)=(3,8), P=13",
+ "provenance": {
+  "authors": [
+   "Lee, Jong Yeon",
+   "Okada, Koki",
+   "Maskara, Nishad",
+   "Kasai, Kenta",
+   "Zhou, Hengyun"
+  ],
+  "model": "Claude Fable 5.2 (Claude Code)",
+  "origin": "baseline",
+  "construction": "Plain fold of a pair-partition CPM CSS code of arXiv:2609.30069 with J = 3, L = 8, P = 13. Parent qubit q = t*L + b. Parent X row (i,t) meets ((t - E[i][b]) mod P)*L + b for each block b. The involution is pi(t,b) = ((t - B[sigma[b]]) mod P, sigma[b]). Each folded qubit pairs a representative from the instance file's fold_representatives with its partner. Each parent X row becomes one generator, X on representatives and Z on partners. E = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 6, 2, 8, 11, 1, 7, 10], [0, 11, 6, 4, 12, 8, 9, 5]], sigma = [5, 7, 4, 6, 2, 0, 3, 1], B = [2, 1, 12, 11, 1, 11, 2, 12].",
+  "references": [
+   "arXiv:2609.30069",
+   "https://github.com/ultra-high-rate-qec/design-principles-data"
+  ],
+  "date": "2026",
+  "novelty": "known_parameters",
+  "notes": "Literature baseline: a reproduction of a code published with arXiv:2609.30069, rebuilt from the authors' data repository (https://github.com/ultra-high-rate-qec/design-principles-data/blob/306b31d/codes/plain_fold/j3l8/instances/j3l8_p13_00382.json). Not a new construction. The authors report d = 7 as exact. Their lower-bound search output is not in the repository, so this entry carries an upper bound backed by their weight-7 Pauli logical, stored as the witness."
+ }
+}

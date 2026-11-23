@@ -1,4 +1,5 @@
 """The finite-size map picks the smallest-n entry at each (k, d) and compares it with k d^2 surface patches."""
+
 import glob
 import importlib.util
 import json
@@ -15,25 +16,42 @@ def _script():
 
 
 def _e(slug, n, k, d, w, loc, tier="ub", family="other", code_type="CSS"):
-    return {"slug": slug, "n": n, "k": k, "d": d, "d_X": d, "d_Z": d, "w": w, "locality_class": loc,
-            "tier": tier, "family": family, "code_type": code_type}
+    return {
+        "slug": slug,
+        "n": n,
+        "k": k,
+        "d": d,
+        "d_X": d,
+        "d_Z": d,
+        "w": w,
+        "locality_class": loc,
+        "tier": tier,
+        "family": family,
+        "code_type": code_type,
+    }
 
 
 def test_best_entry_prefers_smaller_n_then_exact_then_more_logicals():
     mod = _script()
-    pool = [_e("a-2-5", 30, 2, 5, 6, "unrestricted"), _e("b-1-5", 30, 1, 5, 6, "unrestricted", tier="exact"),
-            _e("c-1-6", 40, 1, 6, 4, "local-2d-single")]
-    assert mod.best_entry(pool, 1, 5)["slug"] == "b-1-5"        # same n: the exact distance wins
+    pool = [
+        _e("a-2-5", 30, 2, 5, 6, "unrestricted"),
+        _e("b-1-5", 30, 1, 5, 6, "unrestricted", tier="exact"),
+        _e("c-1-6", 40, 1, 6, 4, "local-2d-single"),
+    ]
+    assert mod.best_entry(pool, 1, 5)["slug"] == "b-1-5"  # same n: the exact distance wins
     assert mod.best_entry(pool, 1, 6)["slug"] == "c-1-6"
     assert mod.best_entry(pool, 2, 6) is None
     pool[1]["tier"] = "ub"
-    assert mod.best_entry(pool, 1, 5)["slug"] == "a-2-5"        # same n and tier: more logical qubits
+    assert mod.best_entry(pool, 1, 5)["slug"] == "a-2-5"  # same n and tier: more logical qubits
 
 
 def test_locality_pools_nest_and_weight_caps_apply():
     mod = _script()
-    single, bil, un = (_e("s", 25, 1, 5, 4, "local-2d-single"), _e("b", 20, 1, 5, 8, "local-2d-bilayer"),
-                       _e("u", 10, 1, 5, 12, "unrestricted"))
+    single, bil, un = (
+        _e("s", 25, 1, 5, 4, "local-2d-single"),
+        _e("b", 20, 1, 5, 8, "local-2d-bilayer"),
+        _e("u", 10, 1, 5, 12, "unrestricted"),
+    )
     assert mod.eligible(single, "unrestricted", None) and mod.eligible(single, "local-2d-single", 4)
     assert not mod.eligible(bil, "local-2d-single", None) and not mod.eligible(bil, "local-2d-bilayer", 6)
     assert mod.eligible(bil, "local-2d-bilayer", 8) and not mod.eligible(un, "local-2d-bilayer", None)
@@ -42,9 +60,11 @@ def test_locality_pools_nest_and_weight_caps_apply():
 
 def test_rows_compare_with_k_d_squared_and_name_every_entry_once():
     mod = _script()
-    entries = [_e("25-1-5", 25, 1, 5, 4, "local-2d-single", tier="exact", family="topological"),
-               _e("17-1-5", 17, 1, 5, 6, "unrestricted", tier="exact"),
-               _e("44-2-10", 44, 2, 10, 8, "local-2d-bilayer")]
+    entries = [
+        _e("25-1-5", 25, 1, 5, 4, "local-2d-single", tier="exact", family="topological"),
+        _e("17-1-5", 17, 1, 5, 6, "unrestricted", tier="exact"),
+        _e("44-2-10", 44, 2, 10, 8, "local-2d-bilayer"),
+    ]
     rec = mod.finite_size_map(entries, k_targets=(1,), d_min=3, per_k_max=2)
     cell = {(c["track"], c["weight_cap"]): c for c in rec["cells"] if c["k"] == 1}
     row5 = [r for r in cell[("unrestricted", None)]["rows"] if r["d"] == 5][0]
@@ -52,9 +72,9 @@ def test_rows_compare_with_k_d_squared_and_name_every_entry_once():
     assert row5["ratio"] == round(25 / 17, 3)
     assert {"k": 1, "d": 5, "slug": "25-1-5"} in rec["board_surface"]
     row10 = [r for r in cell[("local-2d-bilayer", None)]["rows"] if r["d"] == 10][0]
-    assert row10["best"] == "44-2-10" and row10["beats"]            # k' = 2 stands in for k = 1
+    assert row10["best"] == "44-2-10" and row10["beats"]  # k' = 2 stands in for k = 1
     single = cell[("local-2d-single", 4)]
-    assert single["rows"][-1]["d"] == 5 and not single["rows"][-1]["beats"]   # 25 is not < 25
+    assert single["rows"][-1]["d"] == 5 and not single["rows"][-1]["beats"]  # 25 is not < 25
     assert single["best"] is None and single["d_beating_count"] == 0
     price = [p for p in rec["locality_price"] if p["d"] == 10][0]
     assert price["unrestricted"] == "44-2-10" and price["bilayer"] == "44-2-10" and price["single"] is None

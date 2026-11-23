@@ -38,6 +38,7 @@ week, and an accepted layout is left alone for 14 days while its PR lands.
     uv run python research/local2d/layout_sweep.py stage --out-dir research/out/layout_sweep
     uv run python research/local2d/layout_sweep.py pr-body --out-dir research/out/layout_sweep --out body.md
 """
+
 import argparse
 import contextlib
 import copy
@@ -77,8 +78,9 @@ def utc_today():
 
 def git_head():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -162,9 +164,13 @@ def select(entries, *, last, entry_seconds, stages=STAGES, slugs=None, retry=Fal
             if age is None or age <= AWAITING_DAYS:
                 skipped["awaiting_pr"] += 1
                 continue
-        if (prev and not retry and prev.get("outcome") == "miss"
-                and (prev.get("entry_seconds") or 0) >= entry_seconds
-                and set(prev.get("stages") or STAGES) >= set(stages)):
+        if (
+            prev
+            and not retry
+            and prev.get("outcome") == "miss"
+            and (prev.get("entry_seconds") or 0) >= entry_seconds
+            and set(prev.get("stages") or STAGES) >= set(stages)
+        ):
             skipped["missed_at_budget"] += 1
             continue
         chosen.append((slug, doc))
@@ -179,7 +185,7 @@ def honesty(coords):
     """Return (max qubits per site, min spacing between distinct sites), the verifier's two checks."""
     mult = Counter(tuple(p) for p in coords)
     sites = sorted(mult)
-    spacing = min((math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1:]), default=float("inf"))
+    spacing = min((math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1 :]), default=float("inf"))
     return max(mult.values()), spacing
 
 
@@ -194,8 +200,13 @@ def candidate(checks, coords, how, stage):
         return None
     # The claim is rounded up: the verifier requires measured <= claimed, and
     # round(sqrt(17), 4) is below sqrt(17).
-    return {"coordinates": [[float(x) for x in p] for p in coords], "layers": occ,
-            "radius": math.ceil(r * 1e4) / 1e4, "method": how, "stage": stage}
+    return {
+        "coordinates": [[float(x) for x in p] for p in coords],
+        "layers": occ,
+        "radius": math.ceil(r * 1e4) / 1e4,
+        "method": how,
+        "stage": stage,
+    }
 
 
 def screen(doc, checks):
@@ -205,8 +216,10 @@ def screen(doc, checks):
         return None, (got[0]["radius"] if got else None)
     c = got[0]
     coords = tg.grid(c["l"], c["m"], *c["fold"])
-    how = (f"torus_grid.py: the two-block index convention read off as a Z_{c['l']} x Z_{c['m']} grid, "
-           f"one qubit of each block per site, no search; radius measured with the verifier's rule ({TOOL})")
+    how = (
+        f"torus_grid.py: the two-block index convention read off as a Z_{c['l']} x Z_{c['m']} grid, "
+        f"one qubit of each block per site, no search; radius measured with the verifier's rule ({TOOL})"
+    )
     return candidate(checks, coords, how, "screen"), c["radius"]
 
 
@@ -229,8 +242,10 @@ def fold(checks, n, layers, target, deadline, iters, seed=0):
         coords, r = fl.anneal(checks, n, fl.box_sites(w, h), layers=layers, seed=seed + w, iters=iters)
         if r < best_r:
             best_c, best_r = coords, r
-            how = (f"fold_layout.anneal on a {w} x {h} integer grid, {layers} per site, seed {seed + w}, "
-                   f"{iters} iterations ({TOOL})")
+            how = (
+                f"fold_layout.anneal on a {w} x {h} integer grid, {layers} per site, seed {seed + w}, "
+                f"{iters} iterations ({TOOL})"
+            )
         if r <= target + 1e-9:
             return candidate(checks, coords, how, "fold"), best_c, best_r
     return None, best_c, best_r
@@ -246,8 +261,10 @@ def hinge(checks, n, init, deadline, iters, seeds):
             r, coords, it, _, tag = ha.run_job((seed, h, w, hh, init, iters, checks, n))
             best_r = min(best_r, r)
             if tag == "feasible":
-                how = (f"hinge_anneal.run_job: hinge cost at radius {ha.TARGET}, lattice step {h}, seed {seed}, "
-                       f"{it} of {iters} iterations from a fold_layout integer-grid start ({TOOL})")
+                how = (
+                    f"hinge_anneal.run_job: hinge cost at radius {ha.TARGET}, lattice step {h}, seed {seed}, "
+                    f"{it} of {iters} iterations from a fold_layout integer-grid start ({TOOL})"
+                )
                 return candidate(checks, coords, how, "hinge"), best_r
     return None, best_r
 
@@ -285,8 +302,10 @@ def attach(doc, layout, *, credit, date):
         new["schema_version"] = "0.2"
     prov = new.setdefault("provenance", {})
     kind = "single-layer" if layers == 1 else "bilayer"
-    note = (f"Layout added {date} by {credit}: {kind} coordinates with interaction radius "
-            f"{layout['radius']} ({TOOL}, {layout['stage']} stage).")
+    note = (
+        f"Layout added {date} by {credit}: {kind} coordinates with interaction radius "
+        f"{layout['radius']} ({TOOL}, {layout['stage']} stage)."
+    )
     prov["notes"] = (prov["notes"] + " " + note) if prov.get("notes") else note
     return new
 
@@ -294,6 +313,7 @@ def attach(doc, layout, *, credit, date):
 def verify_layout(doc):
     """Return (ok, locality class, failed check names) from the verifier."""
     import qldpc_verify as V
+
     with contextlib.redirect_stdout(io.StringIO()):
         rep = V.verify(doc, refute=False)
     cls = rep.get("computed", {}).get("locality_class", "unrestricted")
@@ -301,8 +321,9 @@ def verify_layout(doc):
     return bool(rep.get("ok")), cls, failed
 
 
-def attempt(slug, doc, path, *, stages, entry_seconds, fold_iters, hinge_iters, hinge_seeds, tri_iters,
-            tri_rate=8000.0):
+def attempt(
+    slug, doc, path, *, stages, entry_seconds, fold_iters, hinge_iters, hinge_seeds, tri_iters, tri_rate=8000.0
+):
     """Run the stages on one entry; return a result dict with the accepted layout when there is one."""
     t0 = time.time()
     deadline = t0 + entry_seconds
@@ -331,13 +352,31 @@ def attempt(slug, doc, path, *, stages, entry_seconds, fold_iters, hinge_iters, 
     if found is None and "tri" in stages and deadline - time.time() >= tri_iters / tri_rate:
         found, r = tri(path, checks, tri_iters)
         better(r)
-    return {"layout": found, "best_radius": round(best_r, 4) if best_r is not None else None,
-            "secs": round(time.time() - t0, 1)}
+    return {
+        "layout": found,
+        "best_radius": round(best_r, 4) if best_r is not None else None,
+        "secs": round(time.time() - t0, 1),
+    }
 
 
-def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, stages=STAGES, codes_dir=CODES,
-              slugs=None, retry=False, max_entries=0, max_layouts=0, fold_iters=100_000, hinge_iters=150_000,
-              hinge_seeds=4, tri_iters=2_000_000):
+def run_sweep(
+    *,
+    out_dir,
+    attempts_path,
+    credit,
+    job_seconds,
+    entry_seconds,
+    stages=STAGES,
+    codes_dir=CODES,
+    slugs=None,
+    retry=False,
+    max_entries=0,
+    max_layouts=0,
+    fold_iters=100_000,
+    hinge_iters=150_000,
+    hinge_seeds=4,
+    tri_iters=2_000_000,
+):
     """Open layoutless entries smallest first until the budget is spent; keep what the verifier accepts.
 
     ``max_layouts`` stops the run once that many layouts are accepted, so the PR
@@ -346,14 +385,33 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
     """
     date, head, url = utc_today(), git_head(), run_url()
     last = {r["slug"]: r for r in load_jsonl(attempts_path)}
-    chosen, skipped = select(layoutless(codes_dir), last=last, entry_seconds=entry_seconds, stages=stages,
-                             slugs=slugs, retry=retry, today=date)
+    chosen, skipped = select(
+        layoutless(codes_dir),
+        last=last,
+        entry_seconds=entry_seconds,
+        stages=stages,
+        slugs=slugs,
+        retry=retry,
+        today=date,
+    )
     if max_entries:
         chosen = chosen[:max_entries]
-    manifest = {"date": date, "head": head, "run": url, "credit": credit, "job_seconds": job_seconds,
-                "entry_seconds": entry_seconds, "stages": list(stages), "selected": len(chosen),
-                "skipped": dict(skipped), "results": [], "staged": [], "stopped_by_budget": False,
-                "stopped_by_cap": False, "left": 0}
+    manifest = {
+        "date": date,
+        "head": head,
+        "run": url,
+        "credit": credit,
+        "job_seconds": job_seconds,
+        "entry_seconds": entry_seconds,
+        "stages": list(stages),
+        "selected": len(chosen),
+        "skipped": dict(skipped),
+        "results": [],
+        "staged": [],
+        "stopped_by_budget": False,
+        "stopped_by_cap": False,
+        "left": 0,
+    }
     os.makedirs(os.path.join(out_dir, "layouts"), exist_ok=True)
     os.makedirs(os.path.join(out_dir, "codes"), exist_ok=True)
     t_start = time.time()
@@ -365,13 +423,35 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
             manifest["stopped_by_cap"], manifest["left"] = True, len(chosen) - i
             break
         path = os.path.join(codes_dir, slug + ".json")
-        got = attempt(slug, doc, path, stages=stages, entry_seconds=entry_seconds, fold_iters=fold_iters,
-                      hinge_iters=hinge_iters, hinge_seeds=hinge_seeds, tri_iters=tri_iters)
-        row = {"date": date, "head": head, "run": url, "slug": slug, "n": doc["n"], "k": doc["k"],
-               "d": doc["distance"]["d"], "family": doc.get("family"), "entry_seconds": entry_seconds,
-               "stages": list(stages),
-               "secs": got["secs"], "best_radius": got["best_radius"], "outcome": "miss", "stage": None,
-               "layers": None, "class": None}
+        got = attempt(
+            slug,
+            doc,
+            path,
+            stages=stages,
+            entry_seconds=entry_seconds,
+            fold_iters=fold_iters,
+            hinge_iters=hinge_iters,
+            hinge_seeds=hinge_seeds,
+            tri_iters=tri_iters,
+        )
+        row = {
+            "date": date,
+            "head": head,
+            "run": url,
+            "slug": slug,
+            "n": doc["n"],
+            "k": doc["k"],
+            "d": doc["distance"]["d"],
+            "family": doc.get("family"),
+            "entry_seconds": entry_seconds,
+            "stages": list(stages),
+            "secs": got["secs"],
+            "best_radius": got["best_radius"],
+            "outcome": "miss",
+            "stage": None,
+            "layers": None,
+            "class": None,
+        }
         layout = got["layout"]
         if layout is not None:
             new = attach(doc, layout, credit=credit, date=date)
@@ -389,10 +469,16 @@ def run_sweep(*, out_dir, attempts_path, credit, job_seconds, entry_seconds, sta
                 row["note"] = "the verifier refused the layout: " + (", ".join(failed) or cls)
         append_jsonl(attempts_path, row)
         manifest["results"].append(row)
-        print(f"{slug}: {row['outcome']}" + (f" ({row['stage']}, {row['layers']} layers, radius {row.get('radius')}, "
-                                              f"{row['class']})" if row["outcome"] == "accepted" else
-                                              f" (best radius {row['best_radius']})") + f" in {row['secs']} s",
-              flush=True)
+        print(
+            f"{slug}: {row['outcome']}"
+            + (
+                f" ({row['stage']}, {row['layers']} layers, radius {row.get('radius')}, {row['class']})"
+                if row["outcome"] == "accepted"
+                else f" (best radius {row['best_radius']})"
+            )
+            + f" in {row['secs']} s",
+            flush=True,
+        )
     manifest["opened"] = len(manifest["results"])
     manifest["seconds"] = round(time.time() - t_start, 1)
     manifest["outcomes"] = dict(Counter(r["outcome"] for r in manifest["results"]))
@@ -419,21 +505,34 @@ def _counts(d):
 
 def summary_markdown(m):
     o = m.get("outcomes", {})
-    lines = [f"## layout sweep of {m['date']}", "",
-             f"main at {(m.get('head') or '?')[:12]}, {m['entry_seconds']} s per entry, job budget "
-             f"{m['job_seconds']} s, stages {', '.join(m['stages'])}. Opened {m.get('opened', 0)} of "
-             f"{m['selected']} selected entries in {m.get('seconds', 0)} s"
-             + (f"; stopped by the budget with {m['left']} left for the next run." if m.get("stopped_by_budget")
-                else f"; stopped at the layout cap with {m['left']} left for the next run."
-                if m.get("stopped_by_cap") else "."), "",
-             f"accepted {o.get('accepted', 0)} (" + (_counts(m.get("by_stage", {})) or "none")
-             + f"), miss {o.get('miss', 0)}; skipped " + (_counts(m["skipped"]) or "none"), ""]
+    lines = [
+        f"## layout sweep of {m['date']}",
+        "",
+        f"main at {(m.get('head') or '?')[:12]}, {m['entry_seconds']} s per entry, job budget "
+        f"{m['job_seconds']} s, stages {', '.join(m['stages'])}. Opened {m.get('opened', 0)} of "
+        f"{m['selected']} selected entries in {m.get('seconds', 0)} s"
+        + (
+            f"; stopped by the budget with {m['left']} left for the next run."
+            if m.get("stopped_by_budget")
+            else f"; stopped at the layout cap with {m['left']} left for the next run."
+            if m.get("stopped_by_cap")
+            else "."
+        ),
+        "",
+        f"accepted {o.get('accepted', 0)} ("
+        + (_counts(m.get("by_stage", {})) or "none")
+        + f"), miss {o.get('miss', 0)}; skipped "
+        + (_counts(m["skipped"]) or "none"),
+        "",
+    ]
     acc = [r for r in m["results"] if r["outcome"] == "accepted"]
     if acc:
         lines += ["| entry | family | layers | radius | class | stage | s |", "|---|---|---|---|---|---|---|"]
         for r in acc:
-            lines.append(f"| {r['slug']} | {r.get('family') or ''} | {r['layers']} | {r['radius']} | {r['class']} | "
-                         f"{r['stage']} | {r['secs']} |")
+            lines.append(
+                f"| {r['slug']} | {r.get('family') or ''} | {r['layers']} | {r['radius']} | {r['class']} | "
+                f"{r['stage']} | {r['secs']} |"
+            )
         lines.append("")
     refused = [r for r in m["results"] if r.get("note")]
     if refused:
@@ -505,35 +604,41 @@ def pr_text(m, staged=None):
         f"binding verify/check_authorship.py uses for a first layout, and is {m['credit']}, the handle the "
         "workflow is configured to open the PR under. It widens no edit rights over the entries.",
         "",
-        "Each entry competed only in the unrestricted cells. " + ", ".join(
-            f"{v} {'enter' if v != 1 else 'enters'} {k}" for k, v in sorted(classes.items())) + ".",
+        "Each entry competed only in the unrestricted cells. "
+        + ", ".join(f"{v} {'enter' if v != 1 else 'enters'} {k}" for k, v in sorted(classes.items()))
+        + ".",
         "",
-        "| entry | family | layers | radius | class | stage |", "|---|---|---|---|---|---|"]
+        "| entry | family | layers | radius | class | stage |",
+        "|---|---|---|---|---|---|",
+    ]
     for r in rows:
-        body.append(f"| {r['slug']} | {r.get('family') or ''} | {r['layers']} | {r['radius']} | {r['class']} | "
-                    f"{r['stage']} |")
-    body += ["",
-             "How the layouts were found, cheapest tool first, and the stage column says which one placed each "
-             f"entry: {by_stage.get('screen', 0)} by research/local2d/torus_grid.py, the exact screen that reads "
-             "a two-block code's grid off its index convention and searches nothing; "
-             f"{by_stage.get('fold', 0)} by research/local2d/fold_layout.py, simulated annealing over "
-             f"integer-grid sites; {by_stage.get('hinge', 0)} by research/local2d/hinge_anneal.py, the hinge-cost "
-             f"annealer of #2156 started from a fold_layout embedding; {by_stage.get('tri', 0)} by "
-             "research/local2d/tri_hinge_anneal.py, one long chain on a triangular lattice. The exact seeds and "
-             "iteration counts are in each entry's contributed_by.method.",
-             "",
-             "How they were checked: every entry was re-run through verify/qldpc_verify.py with the layout "
-             "attached, which recomputes the interaction radius from the coordinates and the two honesty "
-             "conditions (at most layers qubits per site, distinct sites at least one unit apart), and was "
-             "accepted only on ok with the class shown above. The workflow also ran "
-             "verify/check_codes_format.py, verify/check_authorship.py for the credited handle, and "
-             "verify/check_submission_scope.py on this branch before opening the PR. The entries the sweep "
-             "opened and could not place are in research/local2d/sweep_attempts.jsonl on main.",
-             "",
-             "Opened by the layouts-weekly workflow. A pull request opened with the Actions token gets no "
-             "pull_request runs, and verify.yml binds a first layout to the PR author, so the gate passes only "
-             "on a PR opened by the credited handle. The workflow's run summary has the output of the checks it "
-             "ran on this branch."]
+        body.append(
+            f"| {r['slug']} | {r.get('family') or ''} | {r['layers']} | {r['radius']} | {r['class']} | {r['stage']} |"
+        )
+    body += [
+        "",
+        "How the layouts were found, cheapest tool first, and the stage column says which one placed each "
+        f"entry: {by_stage.get('screen', 0)} by research/local2d/torus_grid.py, the exact screen that reads "
+        "a two-block code's grid off its index convention and searches nothing; "
+        f"{by_stage.get('fold', 0)} by research/local2d/fold_layout.py, simulated annealing over "
+        f"integer-grid sites; {by_stage.get('hinge', 0)} by research/local2d/hinge_anneal.py, the hinge-cost "
+        f"annealer of #2156 started from a fold_layout embedding; {by_stage.get('tri', 0)} by "
+        "research/local2d/tri_hinge_anneal.py, one long chain on a triangular lattice. The exact seeds and "
+        "iteration counts are in each entry's contributed_by.method.",
+        "",
+        "How they were checked: every entry was re-run through verify/qldpc_verify.py with the layout "
+        "attached, which recomputes the interaction radius from the coordinates and the two honesty "
+        "conditions (at most layers qubits per site, distinct sites at least one unit apart), and was "
+        "accepted only on ok with the class shown above. The workflow also ran "
+        "verify/check_codes_format.py, verify/check_authorship.py for the credited handle, and "
+        "verify/check_submission_scope.py on this branch before opening the PR. The entries the sweep "
+        "opened and could not place are in research/local2d/sweep_attempts.jsonl on main.",
+        "",
+        "Opened by the layouts-weekly workflow. A pull request opened with the Actions token gets no "
+        "pull_request runs, and verify.yml binds a first layout to the PR author, so the gate passes only "
+        "on a PR opened by the credited handle. The workflow's run summary has the output of the checks it "
+        "ran on this branch.",
+    ]
     return title, "\n".join(body) + "\n"
 
 
@@ -550,8 +655,12 @@ def main(argv=None):
     r.add_argument("--slugs", nargs="*", default=None)
     r.add_argument("--retry", action="store_true", help="reopen entries missed at this budget")
     r.add_argument("--max-entries", type=int, default=0, help="open at most this many entries")
-    r.add_argument("--max-layouts", type=int, default=0,
-                   help="stop once this many layouts are accepted (one PR's worth for the verify job)")
+    r.add_argument(
+        "--max-layouts",
+        type=int,
+        default=0,
+        help="stop once this many layouts are accepted (one PR's worth for the verify job)",
+    )
     r.add_argument("--fold-iters", type=int, default=100_000)
     r.add_argument("--hinge-iters", type=int, default=150_000)
     r.add_argument("--hinge-seeds", type=int, default=4)
@@ -567,13 +676,27 @@ def main(argv=None):
     if a.cmd == "run":
         if not a.credit.startswith("@"):
             ap.error("--credit is an @handle")
-        m = run_sweep(out_dir=a.out_dir, attempts_path=a.attempts, credit=a.credit, job_seconds=a.job_seconds,
-                      entry_seconds=a.entry_seconds, stages=tuple(a.stages), slugs=a.slugs, retry=a.retry,
-                      max_entries=a.max_entries, max_layouts=a.max_layouts, fold_iters=a.fold_iters,
-                      hinge_iters=a.hinge_iters, hinge_seeds=a.hinge_seeds, tri_iters=a.tri_iters)
+        m = run_sweep(
+            out_dir=a.out_dir,
+            attempts_path=a.attempts,
+            credit=a.credit,
+            job_seconds=a.job_seconds,
+            entry_seconds=a.entry_seconds,
+            stages=tuple(a.stages),
+            slugs=a.slugs,
+            retry=a.retry,
+            max_entries=a.max_entries,
+            max_layouts=a.max_layouts,
+            fold_iters=a.fold_iters,
+            hinge_iters=a.hinge_iters,
+            hinge_seeds=a.hinge_seeds,
+            tri_iters=a.tri_iters,
+        )
         o = m["outcomes"]
-        print(f"opened {m['opened']} of {m['selected']}: accepted {o.get('accepted', 0)} (staged under "
-              f"{os.path.relpath(a.out_dir, ROOT)}), miss {o.get('miss', 0)}, left {m['left']}")
+        print(
+            f"opened {m['opened']} of {m['selected']}: accepted {o.get('accepted', 0)} (staged under "
+            f"{os.path.relpath(a.out_dir, ROOT)}), miss {o.get('miss', 0)}, left {m['left']}"
+        )
         return 0
     if a.cmd == "stage":
         staged, skipped = stage(a.out_dir, credit=a.credit)

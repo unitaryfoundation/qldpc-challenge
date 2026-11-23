@@ -508,9 +508,7 @@ def run_census(args, stream: TextIO) -> dict:
     unresolved = 0
     for n in range(args.n_min, args.n_max + 1):
         k_max = n if args.k_max is None else min(n, args.k_max)
-        for x_rows, z_rows, k in iter_css_classes(
-            n, k_min=args.k_min, k_max=k_max, canonicalizer=args.canonicalizer
-        ):
+        for x_rows, z_rows, k in iter_css_classes(n, k_min=args.k_min, k_max=k_max, canonicalizer=args.canonicalizer):
             classes_seen += 1
             HX = _matrix_from_masks(x_rows, n)
             HZ = _matrix_from_masks(z_rows, n)

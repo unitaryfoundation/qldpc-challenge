@@ -24,6 +24,7 @@ Pinned decoder: BpOsdDecoder, osd_cs, order 10, max_iter 30.
 
 Usage: python decode/distance.py codes/foo.json [--trials N] [--seed S]
 """
+
 import argparse
 import json
 import os
@@ -48,8 +49,7 @@ def _matrix(supports, n):
 
 def _osd_order(H, want):
     """OSD order clamped to the redundancy k = n - rank(H); see issue #1616."""
-    A = np.asarray(H.todense() if hasattr(H, "todense") else H,
-                   dtype=np.uint8).copy() % 2
+    A = np.asarray(H.todense() if hasattr(H, "todense") else H, dtype=np.uint8).copy() % 2
     rank, rows = 0, A.shape[0]
     for col in range(A.shape[1]):
         piv = next((r for r in range(rank, rows) if A[r, col]), None)
@@ -62,22 +62,31 @@ def _osd_order(H, want):
     return max(0, min(want, A.shape[1] - rank))
 
 
-
 def _side(Hcheck, Lopp, n, weights, trials, seed, max_seconds=None):
     """Min residual logical weight from decoder failures (one Pauli sector).
     Errors of weight in `weights` are injected; Hcheck detects them; Lopp is the
     opposite-type logical basis used to test nontriviality. Returns (weight, witness).
-    Stops after `trials` or `max_seconds` wall-clock (keeps the CI gate bounded)."""
+    Stops after `trials` or `max_seconds` wall-clock (keeps the CI gate bounded).
+    """
     import time
+
     rng = np.random.default_rng(seed)
     # Same clamp as verify/ler_tools: ldpc 2.4.1 writes osd_order entries into
     # an array of size k = n - rank(H), so an order above k corrupts the heap
     # (#1616). A no-op wherever k >= OSD_ORDER.
     order = _osd_order(Hcheck, OSD_ORDER)
-    decs = {w: BpOsdDecoder(Hcheck, error_rate=min(0.4, max(1e-3, w / n)),
-                            max_iter=30, bp_method="minimum_sum",
-                            ms_scaling_factor=0.625, osd_method="osd_cs",
-                            osd_order=order) for w in weights}
+    decs = {
+        w: BpOsdDecoder(
+            Hcheck,
+            error_rate=min(0.4, max(1e-3, w / n)),
+            max_iter=30,
+            bp_method="minimum_sum",
+            ms_scaling_factor=0.625,
+            osd_method="osd_cs",
+            osd_order=order,
+        )
+        for w in weights
+    }
     best, wit = n + 1, None
     deadline = (time.monotonic() + max_seconds) if max_seconds else None
     for t in range(trials):
@@ -85,7 +94,7 @@ def _side(Hcheck, Lopp, n, weights, trials, seed, max_seconds=None):
         e = np.zeros(n, np.uint8)
         e[rng.choice(n, w, replace=False)] = 1
         r = (e + decs[w].decode((Hcheck @ e) % 2)) % 2
-        if np.any((Lopp @ r) % 2):                 # nontrivial logical
+        if np.any((Lopp @ r) % 2):  # nontrivial logical
             wt = int(r.sum())
             if wt < best:
                 best, wit = wt, r.copy()
@@ -102,21 +111,19 @@ def estimate(doc, trials=200000, seed=0, max_seconds=None):
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
     claimed = int(doc["distance"]["d"])
-    LZ = (gf2.logical_basis(HX, HZ) % 2).astype(np.uint8)   # for X residuals
-    LX = (gf2.logical_basis(HZ, HX) % 2).astype(np.uint8)   # for Z residuals
+    LZ = (gf2.logical_basis(HX, HZ) % 2).astype(np.uint8)  # for X residuals
+    LX = (gf2.logical_basis(HZ, HX) % 2).astype(np.uint8)  # for Z residuals
     w0 = (claimed + 1) // 2
-    weights = list(range(max(1, w0), w0 + 3))               # ceil(d/2) .. +2
+    weights = list(range(max(1, w0), w0 + 3))  # ceil(d/2) .. +2
 
     sides = {}
-    half = (max_seconds / 2) if max_seconds else None       # split budget per side
-    wX, witX = _side(HZ, LZ, n, weights, trials, seed, half)       # X (ker HZ)
-    wZ, witZ = _side(HX, LX, n, weights, trials, seed + 1, half)   # Z (ker HX)
+    half = (max_seconds / 2) if max_seconds else None  # split budget per side
+    wX, witX = _side(HZ, LZ, n, weights, trials, seed, half)  # X (ker HZ)
+    wZ, witZ = _side(HX, LX, n, weights, trials, seed + 1, half)  # Z (ker HX)
     if witX is not None:
-        sides["X"] = {"lightest_found": wX,
-                      "witness": sorted(int(j) for j in np.nonzero(witX)[0])}
+        sides["X"] = {"lightest_found": wX, "witness": sorted(int(j) for j in np.nonzero(witX)[0])}
     if witZ is not None:
-        sides["Z"] = {"lightest_found": wZ,
-                      "witness": sorted(int(j) for j in np.nonzero(witZ)[0])}
+        sides["Z"] = {"lightest_found": wZ, "witness": sorted(int(j) for j in np.nonzero(witZ)[0])}
     found = [w for w in (wX, wZ) if w is not None]
     d_heur = min(found) if found else None
 
@@ -128,15 +135,23 @@ def estimate(doc, trials=200000, seed=0, max_seconds=None):
         verdict = "corroborated"
     else:
         verdict = "inconclusive"
-    return {"name": doc.get("name", ""), "claimed_d": claimed,
-            "d_heuristic": d_heur, "verdict": verdict, "sides": sides,
-            "trials": trials, "seed": seed, "method": "syndrome_decoder"}
+    return {
+        "name": doc.get("name", ""),
+        "claimed_d": claimed,
+        "d_heuristic": d_heur,
+        "verdict": verdict,
+        "sides": sides,
+        "trials": trials,
+        "seed": seed,
+        "method": "syndrome_decoder",
+    }
 
 
 def refute_check(doc, seed=0, max_seconds=10.0):
     """CI cross-check gate. Bounded, time-capped syndrome-decoder search; returns
     (refuted, d_found, witness, trials). refuted iff a logical lighter than the
-    claimed distance was found. An independent mechanism to the RIS gate."""
+    claimed distance was found. An independent mechanism to the RIS gate.
+    """
     n = doc["n"]
     trials = min(200000, 40000 + 800 * n)
     res = estimate(doc, trials=trials, seed=seed, max_seconds=max_seconds)

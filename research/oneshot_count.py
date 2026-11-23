@@ -24,6 +24,7 @@ board by itself:
 
     uv run --frozen python research/oneshot_count.py
 """
+
 import glob
 import json
 import os
@@ -61,8 +62,8 @@ def incidences(HX, HZ):
 def qubit_count(n, P, T, A, S, m=3):
     """Qubit count for the m-sheet level map (App. A cell inventory, Eq. 249)."""
     E = m - 1
-    Y1x = m * (P + T + A) + E * (P + A)     # E(K^x) x V  +  V(G^x) x E
-    Y0q = m * (n + S)                      # V(K^q) x V
+    Y1x = m * (P + T + A) + E * (P + A)  # E(K^x) x V  +  V(G^x) x E
+    Y0q = m * (n + S)  # V(K^q) x V
     return int(Y1x + Y0q)
 
 
@@ -83,17 +84,22 @@ def main(limit=200):
         HX = to_matrix(doc["checks"]["X"], n)
         HZ = to_matrix(doc["checks"]["Z"], n)
         nn, P, T, A, S = incidences(HX, HZ)
-        rows.append((os.path.basename(path), n, doc["k"],
-                     qubit_count(nn, P, T, A, S, 3) / n,
-                     qubit_count(nn, P, T, A, S, 2) / n))
+        rows.append(
+            (
+                os.path.basename(path),
+                n,
+                doc["k"],
+                qubit_count(nn, P, T, A, S, 3) / n,
+                qubit_count(nn, P, T, A, S, 2) / n,
+            )
+        )
     rows.sort(key=lambda r: -r[3])
     print(f"{'entry':>22s} {'n':>5s} {'k':>4s} {'n3/n':>9s} {'n2/n':>9s}")
     for r in rows:
         print(f"{r[0]:>22s} {r[1]:5d} {r[2]:4d} {r[3]:9.1f} {r[4]:9.1f}")
     print(f"\n{len(rows)} CSS entries with n <= {limit}")
     print("n3/n, n2/n: qubit-count inflation of one level at m = 3 and m = 2 sheets.")
-    print("k' = k throughout (Lemma 118), so every one of these is dominated by "
-          "its own input.")
+    print("k' = k throughout (Lemma 118), so every one of these is dominated by its own input.")
 
 
 if __name__ == "__main__":

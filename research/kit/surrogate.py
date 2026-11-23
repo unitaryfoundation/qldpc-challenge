@@ -29,11 +29,11 @@ The default path is pure numpy. An optional ``gf2_fast`` backend accelerates the
 randomized screening search after ``make fast``; no exact-solver or decoder
 dependency is needed here.
 """
+
 from collections import namedtuple
 
 import numpy as np
-
-from css import kernel_basis, logical_basis, commutes, in_rowspace
+from css import commutes, in_rowspace, kernel_basis, logical_basis
 
 try:
     import gf2_fast as _fast
@@ -41,8 +41,7 @@ except ImportError:
     _fast = None
 
 
-class LogicalWitness(namedtuple("LogicalWitness",
-                                "weight side support rejected")):
+class LogicalWitness(namedtuple("LogicalWitness", "weight side support rejected")):
     """A logical operator found by the search, or the absence of one.
 
     ``weight`` is its Hamming weight and an upper bound on the distance;
@@ -117,9 +116,13 @@ def _fast_witness(HX, HZ, trials, seed, threads, pair_depth):
     if _fast is None:
         raise RuntimeError("gf2_fast backend is unavailable")
     weight, side, support = _fast.distance_rand_witness(
-        np.asarray(HX, dtype=np.int8), np.asarray(HZ, dtype=np.int8),
-        trials=int(trials), seed=int(seed), pair_depth=int(pair_depth),
-        threads=int(threads))
+        np.asarray(HX, dtype=np.int8),
+        np.asarray(HZ, dtype=np.int8),
+        trials=int(trials),
+        seed=int(seed),
+        pair_depth=int(pair_depth),
+        threads=int(threads),
+    )
     n = int(np.asarray(HX).shape[1])
     if side not in ("X", "Z"):
         # The n+1 sentinel: no logical of either type. That is a result, not a
@@ -130,8 +133,7 @@ def _fast_witness(HX, HZ, trials, seed, threads, pair_depth):
     ok, why = validate_logical(HX, HZ, side, weight, support)
     if not ok:
         return NO_LOGICAL._replace(rejected=why)
-    return LogicalWitness(_weight_or_inf(weight, n), side,
-                          sorted(int(q) for q in support), "")
+    return LogicalWitness(_weight_or_inf(weight, n), side, sorted(int(q) for q in support), "")
 
 
 # =====================================================================
@@ -162,22 +164,23 @@ def _polygon_area(v):
     n = len(v)
     if n < 3:
         return 0.0
-    return abs(sum(v[i][0] * v[(i + 1) % n][1] - v[(i + 1) % n][0] * v[i][1]
-                   for i in range(n))) / 2.0
+    return abs(sum(v[i][0] * v[(i + 1) % n][1] - v[(i + 1) % n][0] * v[i][1] for i in range(n))) / 2.0
 
 
 def _minkowski(P, Q):
     """Minkowski sum of two convex hulls via pairwise sums + re-hull (hulls here
-    have <= 4 vertices, so the brute force is correct and free)."""
+    have <= 4 vertices, so the brute force is correct and free).
+    """
     if not P or not Q:
         return []
     return convex_hull_2d([(p[0] + q[0], p[1] + q[1]) for p in P for q in Q])
 
 
 def mixed_volume(S_f, S_g):
-    """k upper bound = Area(N(f)+N(g)) - Area(N(f)) - Area(N(g)) for the Newton
+    """K upper bound = Area(N(f)+N(g)) - Area(N(f)) - Area(N(g)) for the Newton
     polygons of two bivariate monomial sets ``S_f``, ``S_g`` (lists of (i, j)
-    exponent pairs)."""
+    exponent pairs).
+    """
     hf, hg = convex_hull_2d(S_f), convex_hull_2d(S_g)
     af, ag = _polygon_area(hf), _polygon_area(hg)
     a_sum = _polygon_area(convex_hull_2d(_minkowski(hf, hg)))
@@ -189,7 +192,8 @@ def mixed_volume(S_f, S_g):
 # =====================================================================
 def _rref_perm(M, perm):
     """RREF over GF(2) visiting columns in the order ``perm``; returns the
-    nonzero reduced rows."""
+    nonzero reduced rows.
+    """
     M = M.copy() % 2
     rows = M.shape[0]
     r = 0
@@ -228,8 +232,7 @@ class PreparedSearch:
         self.HZ = np.asarray(HZ, dtype=np.int8) % 2
         self.n = int(self.HX.shape[1])
         self._sides = {}
-        for tag, Hself, Hopp in (("X", self.HX, self.HZ),
-                                 ("Z", self.HZ, self.HX)):
+        for tag, Hself, Hopp in (("X", self.HX, self.HZ), ("Z", self.HZ, self.HX)):
             K = kernel_basis(Hopp)
             LO = logical_basis(Hself, Hopp)
             self._sides[tag] = (Hself, Hopp, K, LO)
@@ -266,10 +269,10 @@ def _search_lightest(Hself, Hopp, trials, seed, pair_depth=10, bases=None):
     Hopp = np.asarray(Hopp, dtype=np.int8) % 2
     n = Hself.shape[1]
     if bases is None:
-        K = kernel_basis(Hopp)        # operators commuting with the opposite checks
-        LO = logical_basis(Hself, Hopp)   # opposite-type logicals -> nontriviality
+        K = kernel_basis(Hopp)  # operators commuting with the opposite checks
+        LO = logical_basis(Hself, Hopp)  # opposite-type logicals -> nontriviality
     else:
-        K, LO = bases                 # prepared once; never written through here
+        K, LO = bases  # prepared once; never written through here
     if K.size == 0 or LO.size == 0:
         return float("inf"), []
     rng = np.random.default_rng(seed)
@@ -282,10 +285,10 @@ def _search_lightest(Hself, Hopp, trials, seed, pair_depth=10, bases=None):
             if int(w[i]) < best_w:
                 best_w, best_v = int(w[i]), red[i].copy() % 2
         if pair_depth > 1 and red.shape[0] >= 2:
-            light = np.argsort(w)[:min(pair_depth, red.shape[0])]
+            light = np.argsort(w)[: min(pair_depth, red.shape[0])]
             sub = red[light]
             for i in range(len(light)):
-                pr = (sub[i] + sub[i + 1:]) % 2
+                pr = (sub[i] + sub[i + 1 :]) % 2
                 if pr.size == 0:
                     continue
                 pw = pr.sum(axis=1)
@@ -308,9 +311,9 @@ def lightest_logical(Hself, Hopp, trials=8000, seed=0, pair_depth=10):
     return _search_lightest(Hself, Hopp, trials, seed, pair_depth=pair_depth)
 
 
-def distance_rand_witness(HX=None, HZ=None, trials=2000, seed=0, *,
-                          backend="numpy", threads=1, pair_depth=10,
-                          prepared=None):
+def distance_rand_witness(
+    HX=None, HZ=None, trials=2000, seed=0, *, backend="numpy", threads=1, pair_depth=10, prepared=None
+):
     """Search both sides for the lightest logical.
 
     Returns a :class:`LogicalWitness`.
@@ -362,10 +365,8 @@ def distance_rand_witness(HX=None, HZ=None, trials=2000, seed=0, *,
     else:
         hx_self, hx_opp, kx, lx = prepared.side("X")
         hz_self, hz_opp, kz, lz = prepared.side("Z")
-        wx, sx = _search_lightest(hx_self, hx_opp, trials, x_seed,
-                                  pair_depth=pair_depth, bases=(kx, lx))
-        wz, sz = _search_lightest(hz_self, hz_opp, trials, z_seed,
-                                  pair_depth=pair_depth, bases=(kz, lz))
+        wx, sx = _search_lightest(hx_self, hx_opp, trials, x_seed, pair_depth=pair_depth, bases=(kx, lx))
+        wz, sz = _search_lightest(hz_self, hz_opp, trials, z_seed, pair_depth=pair_depth, bases=(kz, lz))
     side, weight, support = ("X", wx, sx) if wx <= wz else ("Z", wz, sz)
     n = int(np.asarray(HX).shape[1])
     if weight > n:
@@ -373,12 +374,10 @@ def distance_rand_witness(HX=None, HZ=None, trials=2000, seed=0, *,
     ok, why = validate_logical(HX, HZ, side, weight, support)
     if not ok:
         return NO_LOGICAL._replace(rejected=why)
-    return LogicalWitness(int(weight), side,
-                          sorted(int(q) for q in support), "")
+    return LogicalWitness(int(weight), side, sorted(int(q) for q in support), "")
 
 
-def distance_rand(HX=None, HZ=None, trials=2000, seed=0, *,
-                  backend="numpy", threads=1, pair_depth=10, prepared=None):
+def distance_rand(HX=None, HZ=None, trials=2000, seed=0, *, backend="numpy", threads=1, pair_depth=10, prepared=None):
     """Return a randomized upper bound on ``d = min(d_X, d_Z)``.
 
     This is the weight of :func:`distance_rand_witness`, for callers that only want the
@@ -386,21 +385,25 @@ def distance_rand(HX=None, HZ=None, trials=2000, seed=0, *,
     fails Python validation raises here rather than reading as no logical,
     because a caller taking the scalar has nowhere to see the reason.
     """
-    found = distance_rand_witness(HX, HZ, trials, seed, backend=backend,
-                                  threads=threads, pair_depth=pair_depth,
-                                  prepared=prepared)
+    found = distance_rand_witness(
+        HX, HZ, trials, seed, backend=backend, threads=threads, pair_depth=pair_depth, prepared=prepared
+    )
     if found.rejected:
-        raise RuntimeError(
-            f"{backend} backend returned an invalid logical witness: "
-            f"{found.rejected}")
+        raise RuntimeError(f"{backend} backend returned an invalid logical witness: {found.rejected}")
     return found.weight
 
 
 if __name__ == "__main__":
     # k-proxy calibration against the BB trinomial families (true k known).
     print("mixed_volume (k upper bound) vs known k:")
-    cases = {6: (-1, -2, 1, -1), 7: (-1, 1, 1, 3), 8: (-1, 2, 1, 3),
-             11: (-1, -3, 1, -3), 12: (-1, 2, 1, 5), 13: (5, 1, 3, -1)}
+    cases = {
+        6: (-1, -2, 1, -1),
+        7: (-1, 1, 1, 3),
+        8: (-1, 2, 1, 3),
+        11: (-1, -3, 1, -3),
+        12: (-1, 2, 1, 5),
+        13: (5, 1, 3, -1),
+    }
     for k, (a, b, c, d) in cases.items():
         mv = mixed_volume([(0, 0), (1, 0), (a, b)], [(0, 0), (0, 1), (c, d)])
         print(f"  true k={k:2d}  MV={mv:2d}  {'ok' if mv == k else 'MISMATCH'}")

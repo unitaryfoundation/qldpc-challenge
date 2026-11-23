@@ -30,6 +30,7 @@ the board real entries before:
     if led.stop_reason():                        # which condition fired
         json.dump(led.summary(), open(out, "w"), indent=2)
 """
+
 import copy
 import hashlib
 import json
@@ -41,14 +42,13 @@ from datetime import datetime, timezone
 
 try:
     import jsonschema
-except ImportError:                              # pragma: no cover
+except ImportError:  # pragma: no cover
     jsonschema = None
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(os.path.dirname(_HERE))
 SCHEMA_PATH = os.path.join(_ROOT, "schema", "campaign.schema.json")
-SUMMARY_SCHEMA_PATH = os.path.join(_ROOT, "schema",
-                                   "campaign_summary.schema.json")
+SUMMARY_SCHEMA_PATH = os.path.join(_ROOT, "schema", "campaign_summary.schema.json")
 SUMMARY_VERSION = 1
 CURVE_VERSION = 1
 JOURNAL_VERSION = 2
@@ -85,19 +85,18 @@ def contract_hash(run_contract):
     """
     if not run_contract:
         return None
-    blob = json.dumps({"v": CONTRACT_VERSION,
-                       "template": run_contract["template"],
-                       "parameters": run_contract["parameters"]},
-                      sort_keys=True)
+    blob = json.dumps(
+        {"v": CONTRACT_VERSION, "template": run_contract["template"], "parameters": run_contract["parameters"]},
+        sort_keys=True,
+    )
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
 
 
 def _git(root, *args):
     """Run one git command under ``root``; None if git or the repo is absent."""
     try:
-        out = subprocess.run(("git", "-C", root) + args, capture_output=True,
-                             text=True, timeout=30, check=False)
-    except (OSError, subprocess.SubprocessError):       # pragma: no cover
+        out = subprocess.run(("git", "-C", root) + args, capture_output=True, text=True, timeout=30, check=False)
+    except (OSError, subprocess.SubprocessError):  # pragma: no cover
         return None
     return out.stdout.strip() if out.returncode == 0 else None
 
@@ -120,17 +119,20 @@ def repo_snapshot(root=_ROOT):
     """
     head = _git(root, "rev-parse", "HEAD")
     if head is None:
-        return {"head": None, "branch": None, "dirty": None,
-                "diff_sha256": None,
-                "note": "not a git checkout, or git unavailable"}
+        return {
+            "head": None,
+            "branch": None,
+            "dirty": None,
+            "diff_sha256": None,
+            "note": "not a git checkout, or git unavailable",
+        }
     diff = _git(root, "diff", "HEAD") or ""
     untracked = _git(root, "ls-files", "--others", "--exclude-standard") or ""
     return {
         "head": head,
         "branch": _git(root, "rev-parse", "--abbrev-ref", "HEAD"),
         "dirty": bool(diff),
-        "diff_sha256": hashlib.sha256(diff.encode()).hexdigest() if diff
-                       else None,
+        "diff_sha256": hashlib.sha256(diff.encode()).hexdigest() if diff else None,
         "untracked_count": len([x for x in untracked.splitlines() if x]),
     }
 
@@ -150,11 +152,13 @@ def read_log_excerpt(path, *, limit=MAX_LOG_EXCERPT):
     except OSError as e:
         return {"path": path, "error": str(e)}
     body = text[-limit:]
-    return {"path": path,
-            "sha256": hashlib.sha256(text.encode()).hexdigest(),
-            "bytes": len(text.encode()),
-            "truncated": len(body) < len(text),
-            "excerpt": body}
+    return {
+        "path": path,
+        "sha256": hashlib.sha256(text.encode()).hexdigest(),
+        "bytes": len(text.encode()),
+        "truncated": len(body) < len(text),
+        "excerpt": body,
+    }
 
 
 def _schema(path=SCHEMA_PATH):
@@ -173,8 +177,7 @@ RANKING_VERDICTS = {"passed": 1, "held": 1, "refuted": 0}
 # How a candidate was arrived at. The kit's samplers are rejection sampling
 # with no memory between candidates, so anything driven by search.py is
 # novel_generation unless its caller says otherwise.
-MODES = ("novel_generation", "cross_pollination", "refinement", "repair",
-         "enumeration", "hand_built")
+MODES = ("novel_generation", "cross_pollination", "refinement", "repair", "enumeration", "hand_built")
 
 
 def validate_summary(obj):
@@ -186,11 +189,10 @@ def validate_summary(obj):
     a verdict bug, so this raises rather than warns and nothing downstream
     treats a summary as authoritative either way.
     """
-    if jsonschema is None:                       # pragma: no cover
+    if jsonschema is None:  # pragma: no cover
         raise CampaignError("jsonschema is required to validate a summary")
     try:
-        jsonschema.Draft202012Validator(
-            _schema(SUMMARY_SCHEMA_PATH)).validate(obj)
+        jsonschema.Draft202012Validator(_schema(SUMMARY_SCHEMA_PATH)).validate(obj)
     except jsonschema.ValidationError as e:
         where = "/".join(str(p) for p in e.absolute_path) or "(root)"
         raise CampaignError(f"{where}: {e.message}") from None
@@ -240,16 +242,17 @@ def validate_campaign(obj):
     handful of things JSON Schema cannot say about one field in terms of
     another.
     """
-    if jsonschema is None:                       # pragma: no cover
+    if jsonschema is None:  # pragma: no cover
         raise CampaignError("jsonschema is required to validate a campaign")
     if isinstance(obj, dict) and "campaign" not in obj and "id" in obj:
         # The common slip (issue #2780): the fields handed over bare. The
         # schema's own message names a missing property rather than the
         # mistake, so say what the shape is.
         raise CampaignError(
-            "a campaign definition wraps its fields as {\"campaign\": {...}}; "
+            'a campaign definition wraps its fields as {"campaign": {...}}; '
             "this object has them at the top level. scaffold_campaign(...) "
-            "builds the wrapped form")
+            "builds the wrapped form"
+        )
     try:
         jsonschema.Draft202012Validator(_schema()).validate(obj)
     except jsonschema.ValidationError as e:
@@ -261,8 +264,8 @@ def validate_campaign(obj):
         rng = (c.get("constraints") or {}).get(field)
         if rng and rng[0] > rng[1]:
             raise CampaignError(
-                f"constraints.{field}: [{rng[0]}, {rng[1]}] is empty; the low "
-                "bound is above the high one")
+                f"constraints.{field}: [{rng[0]}, {rng[1]}] is empty; the low bound is above the high one"
+            )
     rc = c.get("run_contract")
     if rc is not None:
         holes = set(placeholders(rc["template"]))
@@ -271,33 +274,36 @@ def validate_campaign(obj):
             raise CampaignError(
                 "run_contract: template uses "
                 f"{', '.join(sorted(holes - given))} with no value in "
-                "parameters, so the recorded invocation is not resolvable")
+                "parameters, so the recorded invocation is not resolvable"
+            )
         if given - holes:
             raise CampaignError(
                 "run_contract: parameters declares "
                 f"{', '.join(sorted(given - holes))} which the template "
-                "never uses, so the recorded depth is not the depth that ran")
+                "never uses, so the recorded depth is not the depth that ran"
+            )
     for cond in c["stopping"]:
         if cond["type"] == "candidates_found" and not cond.get("count"):
             raise CampaignError(
-                "stopping candidates_found: needs a count, otherwise nothing "
-                "says how many survivors is enough")
+                "stopping candidates_found: needs a count, otherwise nothing says how many survivors is enough"
+            )
         if cond["type"] == "no_progress" and not cond.get("experiments"):
             raise CampaignError(
-                "stopping no_progress: needs experiments, otherwise nothing "
-                "says how long a dry spell has to be")
+                "stopping no_progress: needs experiments, otherwise nothing says how long a dry spell has to be"
+            )
         if cond["type"] == "target_reached":
             if "target" not in c["objective"]:
                 raise CampaignError(
-                    "stopping target_reached: objective.target is not set, so "
-                    "there is no target to reach")
+                    "stopping target_reached: objective.target is not set, so there is no target to reach"
+                )
             metric = c["objective"]["metric"]
             if metric not in SCORABLE_METRICS:
                 raise CampaignError(
                     f"stopping target_reached: objective.metric {metric!r} is "
                     "not computed from a survivor's (n, k, d), so the "
                     "condition could never fire; use one of "
-                    f"{', '.join(SCORABLE_METRICS)}")
+                    f"{', '.join(SCORABLE_METRICS)}"
+                )
     return obj
 
 
@@ -310,18 +316,28 @@ def load_campaign(path):
         raise CampaignError(f"{path}: not valid JSON ({e})") from None
     camp = Campaign(validate_campaign(obj), path=path)
     home = os.path.dirname(os.path.abspath(path))
-    if os.path.basename(os.path.dirname(home)) == "campaigns" \
-            and os.path.basename(home) != camp.id:
+    if os.path.basename(os.path.dirname(home)) == "campaigns" and os.path.basename(home) != camp.id:
         raise CampaignError(
             f"{path}: campaign id {camp.id!r} is not the directory name "
             f"{os.path.basename(home)!r}; a copied definition would file its "
-            "ledger under the campaign it was copied from")
+            "ledger under the campaign it was copied from"
+        )
     return camp
 
 
-def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
-                      direction="maximize", stopping=None, families=None,
-                      status="draft", card=None, **fields):
+def scaffold_campaign(
+    id,
+    name,
+    *,
+    budget,
+    metric="kd2_over_n",
+    direction="maximize",
+    stopping=None,
+    families=None,
+    status="draft",
+    card=None,
+    **fields,
+):
     """Return a validated campaign definition with the required fields filled.
 
     ``card`` is the direction card (issue #4028): why this campaign, where it
@@ -362,7 +378,8 @@ def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
             "card={hypothesis, cell, family, bar, budget, feasibility, "
             "novelty, expected_value, abandon_criterion, "
             "what_a_negative_would_teach}; a null direction is reserved for "
-            "the campaigns defined before the card existed")
+            "the campaigns defined before the card existed"
+        )
     c = {
         "schema_version": 1,
         "id": id,
@@ -371,8 +388,7 @@ def scaffold_campaign(id, name, *, budget, metric="kd2_over_n",
         "objective": {"metric": metric, "direction": direction},
         "direction": copy.deepcopy(card),
         "budget": dict(budget),
-        "stopping": list(stopping) if stopping is not None
-        else [{"type": "budget_exhausted"}],
+        "stopping": list(stopping) if stopping is not None else [{"type": "budget_exhausted"}],
     }
     if families is not None:
         c["methods"] = {"families": list(families)}
@@ -400,16 +416,14 @@ def write_campaign(campaign, path, *, overwrite=False):
     validate_campaign(obj)
     path = os.path.abspath(path)
     home = os.path.dirname(path)
-    if os.path.basename(os.path.dirname(home)) == "campaigns" \
-            and os.path.basename(home) != obj["campaign"]["id"]:
+    if os.path.basename(os.path.dirname(home)) == "campaigns" and os.path.basename(home) != obj["campaign"]["id"]:
         raise CampaignError(
             f"{path}: campaign id {obj['campaign']['id']!r} is not the "
             f"directory name {os.path.basename(home)!r}; load_campaign would "
-            "refuse this file for the same reason")
+            "refuse this file for the same reason"
+        )
     if os.path.exists(path) and not overwrite:
-        raise CampaignError(
-            f"{path} exists; pass overwrite=True to replace a committed "
-            "campaign definition")
+        raise CampaignError(f"{path} exists; pass overwrite=True to replace a committed campaign definition")
     os.makedirs(home, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(obj, f, indent=2, sort_keys=True)
@@ -508,16 +522,12 @@ class Campaign:
             return False
         if d is not None and con.get("min_distance") and d < con["min_distance"]:
             return False
-        if w is not None and con.get("max_check_weight") \
-                and w > con["max_check_weight"]:
+        if w is not None and con.get("max_check_weight") and w > con["max_check_weight"]:
             return False
         if locality is not None and con.get("locality"):
-            want, order = con["locality"], ("local-2d-single",
-                                            "local-2d-bilayer", "unrestricted")
+            want, order = con["locality"], ("local-2d-single", "local-2d-bilayer", "unrestricted")
             if locality not in order:
-                raise CampaignError(
-                    f"unknown locality class {locality!r}; the schema's "
-                    f"classes are {', '.join(order)}")
+                raise CampaignError(f"unknown locality class {locality!r}; the schema's classes are {', '.join(order)}")
             # the classes nest: a single-layer code satisfies a bilayer ask
             if order.index(locality) > order.index(want):
                 return False
@@ -537,8 +547,7 @@ class Campaign:
         return None
 
 
-BUDGET_FIELDS = ("cpu_hours", "gpu_hours", "walltime_hours",
-                 "candidates_screened")
+BUDGET_FIELDS = ("cpu_hours", "gpu_hours", "walltime_hours", "candidates_screened")
 
 
 class Ledger:
@@ -592,8 +601,7 @@ class Ledger:
         self._dry_streak = 0
 
     # -- experiments ------------------------------------------------------
-    def start_experiment(self, family, *, seed=None, note="", mode=None,
-                         params=None, **overrides):
+    def start_experiment(self, family, *, seed=None, note="", mode=None, params=None, **overrides):
         """Begin one run: a family, a budget slice, a seed, and its depth.
 
         Any further keyword is an argv-style override of the campaign's run
@@ -605,19 +613,22 @@ class Ledger:
         """
         if family not in self.campaign.families and self.campaign.families:
             raise CampaignError(
-                f"family {family!r} is not one of this campaign's families "
-                f"({', '.join(self.campaign.families)})")
+                f"family {family!r} is not one of this campaign's families ({', '.join(self.campaign.families)})"
+            )
         if mode is not None and mode not in MODES:
-            raise CampaignError(
-                f"mode {mode!r} is not one of {', '.join(MODES)}")
+            raise CampaignError(f"mode {mode!r} is not one of {', '.join(MODES)}")
         resolved, deviations = self.campaign.resolved_params(**overrides)
         # The construction parameters that identify this family member sit
         # beside the resolved run parameters, because a later session matches
         # on both: "was this member screened" and "at what depth".
         resolved.update(params or {})
-        self._current = {"family": family, "seed": seed, "note": note,
-                         "spent": dict.fromkeys(BUDGET_FIELDS, 0),
-                         "survivors": 0}
+        self._current = {
+            "family": family,
+            "seed": seed,
+            "note": note,
+            "spent": dict.fromkeys(BUDGET_FIELDS, 0),
+            "survivors": 0,
+        }
         if mode is not None:
             self._current["mode"] = mode
         if self.campaign.run_contract or resolved:
@@ -626,12 +637,10 @@ class Ledger:
         if deviations:
             self._current["contract_deviations"] = deviations
         self._exp_t0 = time.monotonic()
-        self._mark = (len(self.survivors), len(self.negative_results),
-                      len(self.errors))
+        self._mark = (len(self.survivors), len(self.negative_results), len(self.errors))
         return self._current
 
-    def record_screen(self, *, trials, d=None, backend=None, rung=None,
-                      n=None, k=None):
+    def record_screen(self, *, trials, d=None, backend=None, rung=None, n=None, k=None):
         """Record what the cheap screen read on the open experiment.
 
         ``d`` is the lightest logical weight the screen found, which is an
@@ -669,8 +678,7 @@ class Ledger:
         if self._current is None:
             raise CampaignError("record_verdict without start_experiment")
         if verdict not in VERDICTS:
-            raise CampaignError(
-                f"verdict {verdict!r} is not one of {', '.join(VERDICTS)}")
+            raise CampaignError(f"verdict {verdict!r} is not one of {', '.join(VERDICTS)}")
         self._current["verdict"] = verdict
         return verdict
 
@@ -695,11 +703,9 @@ class Ledger:
         out = []
         for family in sorted(by_family):
             xs, ys = by_family[family]
-            row = {"family": family, "pairs": len(xs),
-                   "spearman": spearman(xs, ys)}
+            row = {"family": family, "pairs": len(xs), "spearman": spearman(xs, ys)}
             if row["spearman"] is None:
-                row["note"] = ("undefined: the rows carry no spread in the "
-                               "screen or in the verdict")
+                row["note"] = "undefined: the rows carry no spread in the screen or in the verdict"
             out.append(row)
         return out
 
@@ -725,10 +731,12 @@ class Ledger:
         # reading, a gate verdict, or a survivor. A negative result is not
         # on that list on purpose, because filing the crash as a negative is
         # the pattern that hid both failures.
-        measured = (any(v > 0 for k, v in exp["spent"].items()
-                        if k != "walltime_hours")
-                    or exp.get("screened") or exp.get("verdict")
-                    or exp.get("survivors"))
+        measured = (
+            any(v > 0 for k, v in exp["spent"].items() if k != "walltime_hours")
+            or exp.get("screened")
+            or exp.get("verdict")
+            or exp.get("survivors")
+        )
         if not exp.get("aborted") and not empty_ok and not measured:
             raise CampaignError(
                 "end_experiment: this experiment screened zero candidates and "
@@ -737,10 +745,10 @@ class Ledger:
                 "a result; if the sampler legitimately yields nothing at these "
                 "parameters, close with end_experiment(empty_ok=True). A zero "
                 "filed as a negative is indistinguishable from a search that "
-                "ran, which is how two broken sweeps read as clean negatives")
+                "ran, which is how two broken sweeps read as clean negatives"
+            )
         elapsed = (time.monotonic() - self._exp_t0) / 3600
-        exp["spent"]["walltime_hours"] = max(exp["spent"]["walltime_hours"],
-                                             elapsed)
+        exp["spent"]["walltime_hours"] = max(exp["spent"]["walltime_hours"], elapsed)
         self.experiments.append(exp)
         # An aborted experiment measured nothing, so it neither resets nor
         # advances the no-progress streak: a campaign cannot stop for lack of
@@ -752,8 +760,7 @@ class Ledger:
         else:
             self._dry_streak += 1
         si, ni, ei = self._mark
-        self._append_journal(exp, self.survivors[si:],
-                             self.negative_results[ni:], self.errors[ei:])
+        self._append_journal(exp, self.survivors[si:], self.negative_results[ni:], self.errors[ei:])
         self._current = None
         self._exp_t0 = None
         # The boundary is where a manifest is worth writing: it is the point
@@ -768,13 +775,15 @@ class Ledger:
         """Append one experiment and what it produced, then force it to disk."""
         if not self.journal:
             return None
-        record = {"record_version": JOURNAL_VERSION,
-                  "campaign_id": self.campaign.id,
-                  "recorded_at": datetime.now(timezone.utc).isoformat(),
-                  "experiment": exp,
-                  "survivors": list(survivors),
-                  "negative_results": list(negatives),
-                  "errors": list(errors)}
+        record = {
+            "record_version": JOURNAL_VERSION,
+            "campaign_id": self.campaign.id,
+            "recorded_at": datetime.now(timezone.utc).isoformat(),
+            "experiment": exp,
+            "survivors": list(survivors),
+            "negative_results": list(negatives),
+            "errors": list(errors),
+        }
         parent = os.path.dirname(os.path.abspath(self.journal))
         os.makedirs(parent, exist_ok=True)
         with open(self.journal, "a", encoding="utf-8", newline="\n") as f:
@@ -811,15 +820,16 @@ class Ledger:
                 rec = json.loads(line)
             except json.JSONDecodeError:
                 if i == len(lines) - 1:
-                    break                        # the tail a kill truncated
+                    break  # the tail a kill truncated
                 raise CampaignError(
                     f"{path}: line {i + 1} is not valid JSON, and it is not "
                     "the last line, so this is corruption rather than an "
-                    "interrupted write") from None
+                    "interrupted write"
+                ) from None
             if rec.get("campaign_id") != self.campaign.id:
                 raise CampaignError(
-                    f"{path}: journal is for campaign "
-                    f"{rec.get('campaign_id')!r}, not {self.campaign.id!r}")
+                    f"{path}: journal is for campaign {rec.get('campaign_id')!r}, not {self.campaign.id!r}"
+                )
             exp = rec.get("experiment") or {}
             exp.setdefault("spent", dict.fromkeys(BUDGET_FIELDS, 0))
             self.experiments.append(exp)
@@ -829,8 +839,7 @@ class Ledger:
             # A version-1 record has no errors field; it predates the
             # distinction and is read as having recorded none.
             self.errors.extend(rec.get("errors") or [])
-        self.spent = {f: sum(e["spent"].get(f, 0) for e in self.experiments)
-                      for f in BUDGET_FIELDS}
+        self.spent = {f: sum(e["spent"].get(f, 0) for e in self.experiments) for f in BUDGET_FIELDS}
         self._recount()
         return self
 
@@ -853,7 +862,8 @@ class Ledger:
             raise CampaignError(
                 f"merge: {other.campaign.id!r} is a different campaign from "
                 f"{self.campaign.id!r}; their budgets and objectives are not "
-                "the same task and adding them up would say nothing")
+                "the same task and adding them up would say nothing"
+            )
         out = Ledger(self.campaign)
         seen, dropped = set(), []
         for src in (self, other):
@@ -864,15 +874,14 @@ class Ledger:
                     continue
                 seen.add(key)
                 out.experiments.append(exp)
-        out.spent = {f: self.spent.get(f, 0) + other.spent.get(f, 0)
-                     - sum(d["spent"].get(f, 0) for d in dropped)
-                     for f in BUDGET_FIELDS}
+        out.spent = {
+            f: self.spent.get(f, 0) + other.spent.get(f, 0) - sum(d["spent"].get(f, 0) for d in dropped)
+            for f in BUDGET_FIELDS
+        }
         keys = set()
         for src in (self, other):
             for row in src.survivors:
-                key = row.get("fingerprint") or (
-                    row.get("n"), row.get("k"), row.get("d"),
-                    tuple(row.get("cell") or ()))
+                key = row.get("fingerprint") or (row.get("n"), row.get("k"), row.get("d"), tuple(row.get("cell") or ()))
                 if key in keys:
                     continue
                 keys.add(key)
@@ -894,10 +903,8 @@ class Ledger:
 
     def _recount(self):
         """Recompute the derived counters from the rows now held."""
-        self.frontier_advances = sum(1 for r in self.survivors
-                                     if r.get("advanced_frontier"))
-        self._walltime_base = sum(e.get("spent", {}).get("walltime_hours", 0)
-                                  for e in self.experiments)
+        self.frontier_advances = sum(1 for r in self.survivors if r.get("advanced_frontier"))
+        self._walltime_base = sum(e.get("spent", {}).get("walltime_hours", 0) for e in self.experiments)
         streak = 0
         for exp in reversed(self.experiments):
             if exp.get("aborted"):
@@ -928,22 +935,26 @@ class Ledger:
         if not (verdict or {}).get("passed"):
             raise CampaignError(
                 "record_candidate: the verdict does not say passed: true. A "
-                "candidate is not a find until the gate accepts it")
+                "candidate is not a find until the gate accepts it"
+            )
         if self._current is None:
             raise CampaignError(
                 "record_candidate without start_experiment: a survivor no "
                 "experiment accounts for leaves the ledger contradicting "
-                "itself about what the budget bought")
+                "itself about what the budget bought"
+            )
         gates = verdict.get("gates") or {}
         novelty = gates.get("novelty") or {}
         if advanced_frontier is None:
             advanced_frontier = bool(novelty.get("board_advancing"))
         row = {
-            "n": doc["n"], "k": doc["k"], "d": doc["distance"]["d"],
+            "n": doc["n"],
+            "k": doc["k"],
+            "d": doc["distance"]["d"],
             # the weight class the verifier computed; the gate does not put a
             # raw max check weight in its verdict
             "weight_class": (verdict.get("candidate") or {}).get("weight_class")
-                            or (gates.get("verify") or {}).get("weight_class"),
+            or (gates.get("verify") or {}).get("weight_class"),
             "cell": novelty.get("cell"),
             "board_advancing": novelty.get("board_advancing"),
             # the entries that beat it, in the gate's words, so a survivor
@@ -961,8 +972,7 @@ class Ledger:
         if row["n"]:
             eff = row["k"] * row["d"] * row["d"] / row["n"]
             prev = self._current.get("verified_kd2_over_n")
-            self._current["verified_kd2_over_n"] = (
-                eff if prev is None else max(prev, eff))
+            self._current["verified_kd2_over_n"] = eff if prev is None else max(prev, eff)
         if advanced_frontier:
             self.frontier_advances += 1
         return row
@@ -1020,16 +1030,14 @@ class Ledger:
             raise CampaignError(f"restate_survivor: no survivor matching {key!r}")
         row = self.survivors[i]
         if recorded is None:
-            recorded = {"n": row.get("n"), "k": row.get("k"),
-                        "d": row.get("d")}
+            recorded = {"n": row.get("n"), "k": row.get("k"), "d": row.get("d")}
         row["recorded"] = recorded
         row["d"] = int(d)
         if reason:
             row["restate_reason"] = reason
         return row
 
-    def retract_survivor(self, key, *, reason="", recorded=None, d=None,
-                         **kw):
+    def retract_survivor(self, key, *, reason="", recorded=None, d=None, **kw):
         """Move a survivor whose claim no longer stands into ``retracted``.
 
         Loses no information: the original row (and the reason) travel with
@@ -1043,8 +1051,7 @@ class Ledger:
         entry = dict(row)
         entry["reason"] = reason
         if recorded is None:
-            recorded = {"n": row.get("n"), "k": row.get("k"),
-                        "d": row.get("d")}
+            recorded = {"n": row.get("n"), "k": row.get("k"), "d": row.get("d")}
         entry["recorded"] = recorded
         if d is not None:
             entry["d"] = int(d)
@@ -1062,8 +1069,7 @@ class Ledger:
     mark_retracted = retract_survivor
     record_restate = restate_survivor
 
-    def record_negative(self, what, detail, *, assumptions=None, revisit_if=None,
-                        family=None, params=None):
+    def record_negative(self, what, detail, *, assumptions=None, revisit_if=None, family=None, params=None):
         """Record something that did not work, and why.
 
         A closed family, a wall, a ladder that collapsed. This is the half of a
@@ -1082,18 +1088,21 @@ class Ledger:
         """
         item = {"what": what, "detail": detail}
         if assumptions is not None:
-            if (isinstance(assumptions, str) or not isinstance(assumptions, (list, tuple))
-                    or not assumptions
-                    or not all(isinstance(a, str) and a.strip() for a in assumptions)):
+            if (
+                isinstance(assumptions, str)
+                or not isinstance(assumptions, (list, tuple))
+                or not assumptions
+                or not all(isinstance(a, str) and a.strip() for a in assumptions)
+            ):
                 raise CampaignError(
-                    "record_negative: assumptions is a non-empty list of strings, "
-                    "one precondition each")
+                    "record_negative: assumptions is a non-empty list of strings, one precondition each"
+                )
             item["assumptions"] = list(assumptions)
         if revisit_if is not None:
             if not isinstance(revisit_if, str) or not revisit_if.strip():
                 raise CampaignError(
-                    "record_negative: revisit_if is a sentence naming the change "
-                    "that would make this worth retrying")
+                    "record_negative: revisit_if is a sentence naming the change that would make this worth retrying"
+                )
             item["revisit_if"] = revisit_if
         current = self._current or {}
         family = current.get("family") if family is None else family
@@ -1116,8 +1125,7 @@ class Ledger:
         if self._current is None:
             raise CampaignError("record_error without start_experiment")
         self._current["aborted"] = True
-        self.errors.append({"what": what, "detail": detail,
-                            "experiment": len(self.experiments)})
+        self.errors.append({"what": what, "detail": detail, "experiment": len(self.experiments)})
 
     # -- stopping ---------------------------------------------------------
     def consumed(self):
@@ -1146,8 +1154,9 @@ class Ledger:
         condition on the objective cannot fire on a screening number for a
         candidate the gate went on to refuse.
         """
-        scores = [s for s in (self.campaign.score(n=r["n"], k=r["k"], d=r["d"])
-                              for r in self.survivors) if s is not None]
+        scores = [
+            s for s in (self.campaign.score(n=r["n"], k=r["k"], d=r["d"]) for r in self.survivors) if s is not None
+        ]
         if not scores:
             return None
         up = self.campaign.c["objective"]["direction"] == "maximize"
@@ -1214,11 +1223,9 @@ class Ledger:
             "written_at": datetime.now(timezone.utc).isoformat(),
             "snapshot": self.snapshot,
             "params": self.params,
-            "seeds": [e.get("seed") for e in self.experiments
-                      if e.get("seed") is not None],
+            "seeds": [e.get("seed") for e in self.experiments if e.get("seed") is not None],
             "experiments": len(self.experiments),
-            "consumed": {f: round(v, 3) for f, v in self.consumed().items()
-                         if v},
+            "consumed": {f: round(v, 3) for f, v in self.consumed().items() if v},
             # Dead ends travel with the run, not only with the summary. A
             # stage-only run that is never promoted writes no note, and
             # AUTORESEARCH.md counts collapsed ladders and closed routes as
@@ -1226,16 +1233,15 @@ class Ledger:
             # lost with the staging directory.
             "negative_results": list(self.negative_results),
             "errors": list(self.errors),
-            "aborted_experiments": sum(1 for e in self.experiments
-                                       if e.get("aborted")),
+            "aborted_experiments": sum(1 for e in self.experiments if e.get("aborted")),
             "survivor_verdicts": [
-                {"n": s.get("n"), "k": s.get("k"), "d": s.get("d"),
-                 "fingerprint": _verdict_fingerprint(s)}
-                for s in self.survivors],
+                {"n": s.get("n"), "k": s.get("k"), "d": s.get("d"), "fingerprint": _verdict_fingerprint(s)}
+                for s in self.survivors
+            ],
             "logs": self.log_excerpts,
             "authority": "this manifest records what ran; what a run is "
-                         "allowed to claim is still decided by "
-                         "verify/validate_candidate.py",
+            "allowed to claim is still decided by "
+            "verify/validate_candidate.py",
         }
 
     # -- output -----------------------------------------------------------
@@ -1250,8 +1256,7 @@ class Ledger:
         fired = self.stop_reason()
         budget = self.campaign.c["budget"]
         spent = self.consumed()
-        shown = [f for f in BUDGET_FIELDS if spent[f] and
-                 (f != "walltime_hours" or f in budget)]
+        shown = [f for f in BUDGET_FIELDS if spent[f] and (f != "walltime_hours" or f in budget)]
         if status is None:
             status = "completed" if fired else "paused"
         return {
@@ -1277,12 +1282,14 @@ class Ledger:
             # currently reconstructs after the fact.
             "run_contract": self.campaign.run_contract,
             "contract_hash": self.campaign.contract_hash,
-            "stopped_by": {"type": fired[0], "detail": fired[1]} if fired
-                          else {"type": None, "detail": "still running"},
-            "budget": {"declared": budget,
-                       "consumed": {f: round(spent[f], 3) for f in shown},
-                       "remaining": {f: round(budget[f] - spent.get(f, 0), 3)
-                                     for f in budget}},
+            "stopped_by": {"type": fired[0], "detail": fired[1]}
+            if fired
+            else {"type": None, "detail": "still running"},
+            "budget": {
+                "declared": budget,
+                "consumed": {f: round(spent[f], 3) for f in shown},
+                "remaining": {f: round(budget[f] - spent.get(f, 0), 3) for f in budget},
+            },
             "experiments": self.experiments,
             # How well the cheap screen ordered this campaign's candidates
             # against the gate, per family. Rank correlation, not error: the
@@ -1303,13 +1310,12 @@ class Ledger:
             # experiments, 0 survivors" can be read as what was measured
             # rather than what was attempted.
             "errors": self.errors,
-            "aborted_experiments": sum(1 for e in self.experiments
-                                       if e.get("aborted")),
+            "aborted_experiments": sum(1 for e in self.experiments if e.get("aborted")),
             "required_outputs": self.campaign.required_outputs,
             "report": report,
             "authority": "candidates listed here passed "
-                         "verify/validate_candidate.py; nothing here is a "
-                         "board entry until a human reviews and submits it",
+            "verify/validate_candidate.py; nothing here is a "
+            "board entry until a human reviews and submits it",
         }
 
 
@@ -1318,8 +1324,7 @@ def _verdict_fingerprint(survivor):
     v = survivor.get("verdict")
     if v is None:
         return None
-    return hashlib.sha256(
-        json.dumps(v, sort_keys=True, default=str).encode()).hexdigest()[:16]
+    return hashlib.sha256(json.dumps(v, sort_keys=True, default=str).encode()).hexdigest()[:16]
 
 
 def write_manifest(manifest, path):
@@ -1346,8 +1351,7 @@ def _row_efficiency(exp):
 
     def _num(key):
         v = params.get(key)
-        return v if isinstance(v, (int, float)) and not isinstance(v, bool) \
-            else None
+        return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
 
     n, k, d = _num("n"), _num("k"), screened.get("d")
     derived = (k * d * d / n) if (n and k and d) else None
@@ -1376,44 +1380,54 @@ def curve_from_summary(summary, *, bar=None, bar_source=None):
     for exp in summary.get("experiments") or []:
         family = exp.get("family") or "other"
         if family not in families:
-            families[family] = {"family": family, "points": [],
-                                "trials": 0, "best_verified": None,
-                                "trials_to_bar": None}
+            families[family] = {
+                "family": family,
+                "points": [],
+                "trials": 0,
+                "best_verified": None,
+                "trials_to_bar": None,
+            }
             order.append(family)
         f = families[family]
         screened_eff, verified = _row_efficiency(exp)
         f["trials"] += int((exp.get("screened") or {}).get("trials") or 0)
         if verified is not None:
-            f["best_verified"] = (verified if f["best_verified"] is None
-                                  else max(f["best_verified"], verified))
-        if (bar is not None and f["trials_to_bar"] is None
-                and f["best_verified"] is not None
-                and f["best_verified"] >= bar):
+            f["best_verified"] = verified if f["best_verified"] is None else max(f["best_verified"], verified)
+        if (
+            bar is not None
+            and f["trials_to_bar"] is None
+            and f["best_verified"] is not None
+            and f["best_verified"] >= bar
+        ):
             f["trials_to_bar"] = f["trials"]
-        f["points"].append({
-            "trials_cumulative": f["trials"],
-            "screened_kd2_over_n": screened_eff,
-            "verified_best_kd2_over_n": f["best_verified"],
-            "verdict": exp.get("verdict"),
-        })
+        f["points"].append(
+            {
+                "trials_cumulative": f["trials"],
+                "screened_kd2_over_n": screened_eff,
+                "verified_best_kd2_over_n": f["best_verified"],
+                "verdict": exp.get("verdict"),
+            }
+        )
 
     out = []
     for family in order:
         f = families[family]
-        out.append({"family": family, "points": f["points"],
-                    "trials_spent": f["trials"],
-                    "best_verified_kd2_over_n": f["best_verified"],
-                    "trials_to_bar": f["trials_to_bar"],
-                    "reached_bar": f["trials_to_bar"] is not None})
+        out.append(
+            {
+                "family": family,
+                "points": f["points"],
+                "trials_spent": f["trials"],
+                "best_verified_kd2_over_n": f["best_verified"],
+                "trials_to_bar": f["trials_to_bar"],
+                "reached_bar": f["trials_to_bar"] is not None,
+            }
+        )
 
-    best = [f["best_verified_kd2_over_n"] for f in out
-            if f["best_verified_kd2_over_n"] is not None]
-    reached = [f["trials_to_bar"] for f in out
-               if f["trials_to_bar"] is not None]
+    best = [f["best_verified_kd2_over_n"] for f in out if f["best_verified_kd2_over_n"] is not None]
+    reached = [f["trials_to_bar"] for f in out if f["trials_to_bar"] is not None]
     screened_over_bar = bar is not None and any(
-        p["screened_kd2_over_n"] is not None
-        and p["screened_kd2_over_n"] >= bar
-        for f in out for p in f["points"])
+        p["screened_kd2_over_n"] is not None and p["screened_kd2_over_n"] >= bar for f in out for p in f["points"]
+    )
     return {
         "curve_version": CURVE_VERSION,
         "campaign_id": summary.get("campaign_id"),
@@ -1427,8 +1441,7 @@ def curve_from_summary(summary, *, bar=None, bar_source=None):
             # The 2026-09-20 shape: the screen read above the bar and the
             # gate never did. Distinguishes a ladder that collapsed from one
             # that never climbed.
-            "screened_reached_bar_but_gate_did_not": bool(
-                screened_over_bar and not reached),
+            "screened_reached_bar_but_gate_did_not": bool(screened_over_bar and not reached),
         },
     }
 

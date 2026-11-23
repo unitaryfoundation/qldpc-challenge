@@ -1,4 +1,5 @@
 """The board's proven lower bound (issue #4230): the interval mark and what earns it."""
+
 import importlib.util
 import os
 
@@ -13,8 +14,13 @@ def load_site_build():
     return module
 
 
-DOC = {"n": 8, "k": 2, "code_type": "CSS", "checks": {"X": [[0, 1, 2, 3]], "Z": [[4, 5, 6, 7]]},
-       "distance": {"d": 20, "X": {"value": 21}, "Z": {"value": 20}}}
+DOC = {
+    "n": 8,
+    "k": 2,
+    "code_type": "CSS",
+    "checks": {"X": [[0, 1, 2, 3]], "Z": [[4, 5, 6, 7]]},
+    "distance": {"d": 20, "X": {"value": 21}, "Z": {"value": 20}},
+}
 
 
 def test_the_badge_reads_as_an_interval_below_the_witness():
@@ -28,8 +34,10 @@ def test_the_badge_reads_as_an_interval_below_the_witness():
 
 def test_no_badge_modifier_is_also_a_standalone_rule():
     """`.b.lb` once shared its modifier with `.lb`, the leaderboard card, and the
-    interval badge took the card's margin, border and radius."""
+    interval badge took the card's margin, border and radius.
+    """
     import re
+
     build = load_site_build()
     marks = build.badge("exact") + build.badge("ub") + build.badge("ub", 7)
     modifiers = {c for cls in re.findall(r'class="([^"]+)"', marks) for c in cls.split()} - {"b"}
@@ -40,16 +48,21 @@ def test_no_badge_modifier_is_also_a_standalone_rule():
 
 def test_a_partial_certificate_is_honored_by_its_binding_hash_not_by_the_claim():
     build = load_site_build()
-    cert = {"d": 25, "d_exact": False, "d_lower": 7,
-            "sides": {"X": {"proved_min": 9}, "Z": {"proved_min": 7}},
-            "verification": {"level": "solver", "checks_sha256": build.checks_sha256(DOC)}}
+    cert = {
+        "d": 25,
+        "d_exact": False,
+        "d_lower": 7,
+        "sides": {"X": {"proved_min": 9}, "Z": {"proved_min": 7}},
+        "verification": {"level": "solver", "checks_sha256": build.checks_sha256(DOC)},
+    }
     # the certificate was made against a claim of 25 that has since been corrected to 20: the bound survives
     assert build.cert_lower_bounds(cert, DOC) == {"d": 7, "X": 9, "Z": 7, "P": None}
     other = dict(cert, verification={"level": "solver", "checks_sha256": "0" * 64})
     assert build.cert_lower_bounds(other, DOC) == {"d": None, "X": None, "Z": None, "P": None}
     above = dict(cert, d_lower=21)
-    assert build.cert_lower_bounds(above, DOC) == {"d": None, "X": None, "Z": None, "P": None}, \
+    assert build.cert_lower_bounds(above, DOC) == {"d": None, "X": None, "Z": None, "P": None}, (
         "a bound above the verified witness is a contradiction, not a board update"
+    )
     trivial = dict(cert, d_lower=1)
     assert build.cert_lower_bounds(trivial, DOC)["d"] is None
     assert build.cert_lower_bounds(None, DOC)["d"] is None
@@ -67,3 +80,38 @@ def test_the_per_side_marks_show_the_side_bounds():
     assert build.asym_detail(e) == "9 &le; d_X &le; 21, d_Z = 20 &middot; w_X = 4, w_Z = 4"
     e.update(lb_X=None)
     assert build.asym_detail(e).startswith("d_X &le; 21")
+
+
+def test_the_interval_mark_stays_inside_its_fixed_column(tmp_path):
+    """The interval mark no longer spills over kd^2/n (issue #7117).
+
+    The mark is wider than the board's fixed d column and the cell was nowrap.
+    Now the cell may wrap between the mark and the number, the mark itself
+    never breaks, and the column got the width that authors and model gave up.
+    """
+    import json
+    import re
+
+    build = load_site_build()
+    rule = re.search(r"\.board td\.col-d\{([^}]*)\}", build.CSS)
+    assert rule and "white-space:normal" in rule.group(1)
+    badge_rule = re.search(r"(?<![\w.-])\.b\{([^}]*)\}", build.CSS)
+    assert badge_rule and "white-space:nowrap" in badge_rule.group(1)
+
+    codes = tmp_path / "codes"
+    codes.mkdir()
+    with open(os.path.join(ROOT, "verify", "fixtures", "72-6-6.json")) as f:
+        doc = json.load(f)
+    with open(codes / "72-6-6.json", "w") as f:
+        json.dump(doc, f)
+    build.ROOT = str(tmp_path)
+    build.DOCS = str(tmp_path / "docs")
+    build.CERTS = str(tmp_path / "certs")
+    build.build()
+    with open(tmp_path / "docs" / "index.html", encoding="utf-8") as f:
+        index = f.read()
+    cols = re.search(r"<colgroup>(.*?)</colgroup>", index).group(1)
+    widths = [int(w) for w in re.findall(r"width:(\d+)%", cols)]
+    assert widths[1] == 13 and widths[5] == 8 and sum(widths) == 100, widths
+    code_rule = re.search(r"\.board td\.codecell\{([^}]*)\}", build.CSS)
+    assert code_rule and "padding-left:.5rem" in code_rule.group(1)

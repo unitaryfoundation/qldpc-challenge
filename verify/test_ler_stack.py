@@ -35,7 +35,7 @@ def imported_names(path):
         for raw in f:
             line = raw.strip()
             if line.startswith("import "):
-                for part in line[len("import "):].split(","):
+                for part in line[len("import ") :].split(","):
                     names.add(part.split(" as ")[0].strip().split(".")[0])
             elif line.startswith("from "):
                 names.add(line.split()[1].split(".")[0])
@@ -81,7 +81,7 @@ def test_the_workflow_list_is_the_import_closure():
 
 def test_both_diff_rules_read_the_list():
     _, text = workflow_ler_stack()
-    assert text.count('...HEAD -- $LER_STACK; then') == 2, (
+    assert text.count("...HEAD -- $LER_STACK; then") == 2, (
         "the pull_request and push diff rules in verify.yml must both diff against $LER_STACK"
     )
 

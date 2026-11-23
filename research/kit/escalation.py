@@ -45,6 +45,7 @@ Stdlib only: the kit's numpy modules are not needed to decide where budget
 goes, and keeping this module dependency-free lets an agent harness run it
 anywhere.
 """
+
 import hashlib
 import json
 import math
@@ -53,14 +54,19 @@ from datetime import datetime, timezone
 
 # Policy constants. HOLD is the default; the fences are enforced in code so no
 # verdict, however confident, can open them.
-HOLD_CONFIDENCE = 0.60   # below this a verdict is not trusted to choose
-MIN_FLAT_RUNGS = 2       # fresh-seed rungs flat at the best bound before abandon is legal
+HOLD_CONFIDENCE = 0.60  # below this a verdict is not trusted to choose
+MIN_FLAT_RUNGS = 2  # fresh-seed rungs flat at the best bound before abandon is legal
 
 ACTIONS = ("promote-next-rung", "hold-deepen", "abandon-ladder")
 
 # The jev_decide MCP tool's input limits; test_escalation pins the brief to them.
-JEV_LIMITS = {"decision": 1500, "evidence": 12000, "priorities": 2000,
-              "candidate_description": 2000, "requirement": 500}
+JEV_LIMITS = {
+    "decision": 1500,
+    "evidence": 12000,
+    "priorities": 2000,
+    "candidate_description": 2000,
+    "requirement": 500,
+}
 
 _DECISION = (
     "Ladder escalation for a screened qLDPC candidate: should the next RIS "
@@ -81,31 +87,35 @@ _PRIORITIES = (
 )
 
 _CANDIDATES = [
-    {"id": "promote-next-rung",
-     "description": "Spend the next, deeper rung on this candidate. Justified "
-                    "when the ladder still has room above the bar or the "
-                    "trend is promising and the remaining budget covers the "
-                    "cost."},
-    {"id": "hold-deepen",
-     "description": "Repeat the current rung depth on fresh seeds before "
-                    "deciding. The honest default when readings are unstable, "
-                    "the ladder is still descending, or the verdict itself is "
-                    "uncertain."},
-    {"id": "abandon-ladder",
-     "description": "Stop spending on this candidate. Only defensible when "
-                    "the cumulative best bound already scores below the cell "
-                    "bar on flat fresh-seed rungs, so deeper trials cannot "
-                    "rescue it (an upper bound can only fall)."},
+    {
+        "id": "promote-next-rung",
+        "description": "Spend the next, deeper rung on this candidate. Justified "
+        "when the ladder still has room above the bar or the "
+        "trend is promising and the remaining budget covers the "
+        "cost.",
+    },
+    {
+        "id": "hold-deepen",
+        "description": "Repeat the current rung depth on fresh seeds before "
+        "deciding. The honest default when readings are unstable, "
+        "the ladder is still descending, or the verdict itself is "
+        "uncertain.",
+    },
+    {
+        "id": "abandon-ladder",
+        "description": "Stop spending on this candidate. Only defensible when "
+        "the cumulative best bound already scores below the cell "
+        "bar on flat fresh-seed rungs, so deeper trials cannot "
+        "rescue it (an upper bound can only fall).",
+    },
 ]
 
 _REQUIREMENTS = [
     "Never select abandon unless the evidence shows the cumulative best bound "
     "below the cell bar, at least 2 flat fresh-seed rungs, and no frontier "
     "flag.",
-    "If the ladder is still descending (the last rung improved the bound), "
-    "prefer hold-deepen or promote over abandon.",
-    "Weigh trial cost against information gain; the harness holds anyway on "
-    "low confidence.",
+    "If the ladder is still descending (the last rung improved the bound), prefer hold-deepen or promote over abandon.",
+    "Weigh trial cost against information gain; the harness holds anyway on low confidence.",
 ]
 
 
@@ -140,14 +150,15 @@ norm_rung = _norm_rung
 
 
 def _brief_id(n, k, bar, family, spec, rungs):
-    payload = json.dumps({"n": n, "k": k, "bar": bar, "family": family,
-                          "spec": spec, "rungs": rungs},
-                         sort_keys=True, separators=(",", ":"))
+    payload = json.dumps(
+        {"n": n, "k": k, "bar": bar, "family": family, "spec": spec, "rungs": rungs},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
-def rung_brief(n, k, rungs, *, bar, family="", spec=None,
-               budget_remaining=None, next_rung_trials=None, context=None):
+def rung_brief(n, k, rungs, *, bar, family="", spec=None, budget_remaining=None, next_rung_trials=None, context=None):
     """Build the rung-boundary brief: deterministic facts plus a jev_request.
 
     ``rungs`` is the ladder so far, oldest first: dicts (``trials``, ``d``,
@@ -184,9 +195,10 @@ def rung_brief(n, k, rungs, *, bar, family="", spec=None,
         "n": n,
         "k": k,
         "cumulative_best_bound": best,
-        "ladder": [{"trials": r["trials"], "d": r["d"], "fresh": r["fresh"],
-                    **({"label": r["label"]} if r["label"] else {})}
-                   for r in rungs],
+        "ladder": [
+            {"trials": r["trials"], "d": r["d"], "fresh": r["fresh"], **({"label": r["label"]} if r["label"] else {})}
+            for r in rungs
+        ],
         "flat_fresh_rungs_at_best": flat,
         "ladder_still_descending": descending,
         "efficiency_at_best": eff,
@@ -218,9 +230,12 @@ def rung_brief(n, k, rungs, *, bar, family="", spec=None,
         assert len(c["description"]) <= JEV_LIMITS["candidate_description"]
     for r in _REQUIREMENTS:
         assert len(r) <= JEV_LIMITS["requirement"]
-    return {"kind": "rung-escalation",
-            "id": _brief_id(n, k, bar, family, spec, facts["ladder"]),
-            "facts": facts, "jev_request": request}
+    return {
+        "kind": "rung-escalation",
+        "id": _brief_id(n, k, bar, family, spec, facts["ladder"]),
+        "facts": facts,
+        "jev_request": request,
+    }
 
 
 def _parse_verdict(verdict):
@@ -236,8 +251,7 @@ def _parse_verdict(verdict):
     if not isinstance(rec, dict):
         return None
     action, conf = rec.get("selected"), rec.get("confidence")
-    if not isinstance(action, str) or not isinstance(conf, (int, float)) \
-            or isinstance(conf, bool):
+    if not isinstance(action, str) or not isinstance(conf, (int, float)) or isinstance(conf, bool):
         return None
     return action, float(conf), bool(rec.get("escaped", False))
 
@@ -250,9 +264,11 @@ def _abandon_is_proven_safe(facts):
     agree at that bound to rule out seed-correlated readings, and nothing
     frontier-flagged is being thrown away.
     """
-    return (not facts["best_at_or_above_bar"]
-            and facts["flat_fresh_rungs_at_best"] >= MIN_FLAT_RUNGS
-            and not facts["frontier_flagged"])
+    return (
+        not facts["best_at_or_above_bar"]
+        and facts["flat_fresh_rungs_at_best"] >= MIN_FLAT_RUNGS
+        and not facts["frontier_flagged"]
+    )
 
 
 def harness_override(action, facts, *, level=0, n_levels=2):
@@ -265,18 +281,17 @@ def harness_override(action, facts, *, level=0, n_levels=2):
     if flat < MIN_FLAT_RUNGS:
         return action, None
     if action != "abandon-ladder" and _abandon_is_proven_safe(facts):
-        return "abandon-ladder", ("harness: ladder proven below bar (bound "
-                                  "can only fall), abandoning on its own "
-                                  "authority")
+        return "abandon-ladder", (
+            "harness: ladder proven below bar (bound can only fall), abandoning on its own authority"
+        )
     if action == "hold-deepen" and level < n_levels - 1:
         return "promote-next-rung", (
-            f"harness: bound settled over {MIN_FLAT_RUNGS} fresh rungs, "
-            "advancing depth on its own authority")
+            f"harness: bound settled over {MIN_FLAT_RUNGS} fresh rungs, advancing depth on its own authority"
+        )
     return action, None
 
 
-def apply_verdict(brief, verdict=None, *, budget_remaining=None, level=None,
-                  n_levels=None):
+def apply_verdict(brief, verdict=None, *, budget_remaining=None, level=None, n_levels=None):
     """Enforce the policy: turn a brief + verdict into an audited decision.
 
     The fences, in order of authority:
@@ -308,25 +323,32 @@ def apply_verdict(brief, verdict=None, *, budget_remaining=None, level=None,
             level = 0
         if n_levels is None:
             n_levels = 2
-        new_action, why = harness_override(action, facts, level=level,
-                                          n_levels=n_levels)
+        new_action, why = harness_override(action, facts, level=level, n_levels=n_levels)
         reason = "no parsable verdict; default holds and deepens"
         if why:
             action = new_action
             reason = reason + "; " + why
         # Confidence is unknown without a verdict; keep the no-verdict advisory.
-        return {"action": action, "reason": reason, "confidence": None,
-                "escaped": False, "brief_id": brief["id"],
-                "advisories": advisories}
+        return {
+            "action": action,
+            "reason": reason,
+            "confidence": None,
+            "escaped": False,
+            "brief_id": brief["id"],
+            "advisories": advisories,
+        }
     action, conf, escaped = parsed
 
     if escaped:
         advisories.append("escaped-verdict")
     if conf < HOLD_CONFIDENCE:
         advisories.append("low-confidence")
-    if action == "promote-next-rung" and facts["next_rung_trials"] is not None \
-            and facts["budget_remaining"] is not None \
-            and facts["budget_remaining"] < facts["next_rung_trials"]:
+    if (
+        action == "promote-next-rung"
+        and facts["next_rung_trials"] is not None
+        and facts["budget_remaining"] is not None
+        and facts["budget_remaining"] < facts["next_rung_trials"]
+    ):
         advisories.append("budget-exhausted")
     if action == "abandon-ladder" and not _abandon_is_proven_safe(facts):
         advisories.append("abandon-unproven")
@@ -338,16 +360,23 @@ def apply_verdict(brief, verdict=None, *, budget_remaining=None, level=None,
         action = "hold-deepen"
     elif action == "abandon-ladder" and not _abandon_is_proven_safe(facts):
         action = "hold-deepen"
-    elif action == "promote-next-rung" and facts["next_rung_trials"] is not None \
-            and facts["budget_remaining"] is not None \
-            and facts["budget_remaining"] < facts["next_rung_trials"]:
+    elif (
+        action == "promote-next-rung"
+        and facts["next_rung_trials"] is not None
+        and facts["budget_remaining"] is not None
+        and facts["budget_remaining"] < facts["next_rung_trials"]
+    ):
         action = "hold-deepen"
 
-    reason = ("verdict honored inside the fences" if not advisories else
-              "fenced: " + ", ".join(advisories))
-    return {"action": action, "reason": reason, "confidence": conf,
-            "escaped": escaped, "brief_id": brief["id"],
-            "advisories": advisories}
+    reason = "verdict honored inside the fences" if not advisories else "fenced: " + ", ".join(advisories)
+    return {
+        "action": action,
+        "reason": reason,
+        "confidence": conf,
+        "escaped": escaped,
+        "brief_id": brief["id"],
+        "advisories": advisories,
+    }
 
 
 def append_journal(decision, brief, *, path):
@@ -358,9 +387,12 @@ def append_journal(decision, brief, *, path):
     repository's evidence trail. Jev verdicts are advisory model output, not
     repo evidence; nothing in this record is citable in notes or PR bodies.
     """
-    record = {"timestamp": datetime.now(timezone.utc).isoformat(),
-              "decision": decision, "brief_id": brief["id"],
-              "facts": brief["facts"]}
+    record = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "decision": decision,
+        "brief_id": brief["id"],
+        "facts": brief["facts"],
+    }
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(record, sort_keys=True) + "\n")
 
@@ -380,25 +412,32 @@ def exact_first_applies(n, d, *, css=True, max_n=EXACT_FIRST_MAX_N, max_d=EXACT_
     return bool(css) and isinstance(n, int) and isinstance(d, int) and 1 <= n <= max_n and 1 <= d <= max_d
 
 
-def exact_first(HX, HZ, d_screened, *, tlim=EXACT_FIRST_TLIM, max_n=EXACT_FIRST_MAX_N,
-                max_d=EXACT_FIRST_MAX_D):
+def exact_first(HX, HZ, d_screened, *, tlim=EXACT_FIRST_TLIM, max_n=EXACT_FIRST_MAX_N, max_d=EXACT_FIRST_MAX_D):
     """certify.certify on (HX, HZ) at d_screened when exact_first_applies,
-    else None. Adds `outcome`: exact | refuted | timeout."""
+    else None. Adds `outcome`: exact | refuted | timeout.
+    """
     import numpy as np
+
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
     n = int(HX.shape[1])
     if not exact_first_applies(n, int(d_screened), max_n=max_n, max_d=max_d):
         return None
     import sys
+
     vdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "verify")
     if vdir not in sys.path:
         sys.path.insert(0, vdir)
     from certify import certify
-    doc = {"n": n, "checks": {"X": [sorted(map(int, np.flatnonzero(r))) for r in HX],
-                               "Z": [sorted(map(int, np.flatnonzero(r))) for r in HZ]},
-           "distance": {"d": int(d_screened),
-                        "X": {"value": int(d_screened)}, "Z": {"value": int(d_screened)}}}
+
+    doc = {
+        "n": n,
+        "checks": {
+            "X": [sorted(map(int, np.flatnonzero(r))) for r in HX],
+            "Z": [sorted(map(int, np.flatnonzero(r))) for r in HZ],
+        },
+        "distance": {"d": int(d_screened), "X": {"value": int(d_screened)}, "Z": {"value": int(d_screened)}},
+    }
     res = certify(doc, float(tlim))
     sides = res.get("sides") or {}
     if res.get("d_exact"):
@@ -439,10 +478,12 @@ def cc_first_applies(n, d, *, css=True, max_n=CC_FIRST_MAX_N, max_d=CC_FIRST_MAX
 
 def _kit_distance():
     import sys
+
     here = os.path.dirname(os.path.abspath(__file__))
     if here not in sys.path:
         sys.path.insert(0, here)
     import distance
+
     return distance
 
 
@@ -455,8 +496,9 @@ def cc_available():
     return True
 
 
-def cc_first(HX, HZ, d_screened, *, tlim=CC_FIRST_TLIM, max_n=CC_FIRST_MAX_N,
-             max_d=CC_FIRST_MAX_D, threads=1, k=None, bar=None):
+def cc_first(
+    HX, HZ, d_screened, *, tlim=CC_FIRST_TLIM, max_n=CC_FIRST_MAX_N, max_d=CC_FIRST_MAX_D, threads=1, k=None, bar=None
+):
     """Qubitserf's connected-cluster distance of (HX, HZ) when ``cc_first_applies``, else None.
 
     Returns a record with ``method`` (``qubitserf-cc``), ``d`` (the answer, or
@@ -481,47 +523,63 @@ def cc_first(HX, HZ, d_screened, *, tlim=CC_FIRST_TLIM, max_n=CC_FIRST_MAX_N,
     cell bar.
     """
     import numpy as np
+
     HX = np.asarray(HX, dtype=np.int8)
     HZ = np.asarray(HZ, dtype=np.int8)
     n = int(HX.shape[1])
     d_screened = int(d_screened)
     if not cc_first_applies(n, d_screened, max_n=max_n, max_d=max_d):
         return None
-    res = {"method": CC_FIRST_METHOD, "d": None, "d_screened": d_screened, "n": n,
-           "tlim": float(tlim), "calibration": CC_FIRST_CALIBRATION, "ends_ladder": False,
-           "seconds": 0.0}
+    res = {
+        "method": CC_FIRST_METHOD,
+        "d": None,
+        "d_screened": d_screened,
+        "n": n,
+        "tlim": float(tlim),
+        "calibration": CC_FIRST_CALIBRATION,
+        "ends_ladder": False,
+        "seconds": 0.0,
+    }
     if not cc_available():
-        res.update(outcome="unavailable",
-                   advice="no Qubitserf build; the ladder proceeds as it was")
+        res.update(outcome="unavailable", advice="no Qubitserf build; the ladder proceeds as it was")
         return res
     import time
+
     t0 = time.monotonic()
     try:
-        d_cc = _kit_distance().qubitserf_distance(HX, HZ, method="cc", which="min",
-                                                  threads=threads, tlim=tlim)
+        d_cc = _kit_distance().qubitserf_distance(HX, HZ, method="cc", which="min", threads=threads, tlim=tlim)
     except RuntimeError as e:
-        res.update(outcome="error", error=str(e)[:300], seconds=round(time.monotonic() - t0, 2),
-                   advice="the build raised; the ladder proceeds as it was")
+        res.update(
+            outcome="error",
+            error=str(e)[:300],
+            seconds=round(time.monotonic() - t0, 2),
+            advice="the build raised; the ladder proceeds as it was",
+        )
         return res
     res["seconds"] = round(time.monotonic() - t0, 2)
     if d_cc is None:
-        res.update(outcome="timeout",
-                   advice=f"no answer in {tlim:g} s; the ladder proceeds as it was")
+        res.update(outcome="timeout", advice=f"no answer in {tlim:g} s; the ladder proceeds as it was")
         return res
     d_cc = int(d_cc)
     res["d"] = d_cc
     if d_cc < d_screened:
-        res.update(outcome="screen_inflated",
-                   advice=f"the screened reading {d_screened} is too high; search for a weight-{d_cc} "
-                          f"witness and package it as upper_bound, and do not start the ladder at {d_screened}")
+        res.update(
+            outcome="screen_inflated",
+            advice=f"the screened reading {d_screened} is too high; search for a weight-{d_cc} "
+            f"witness and package it as upper_bound, and do not start the ladder at {d_screened}",
+        )
     elif d_cc == d_screened:
-        res.update(outcome="confirmed",
-                   advice=f"connected cluster agrees with the screened {d_screened}; a deeper ladder "
-                          "cannot lower it, so spend on witnesses and certification instead")
+        res.update(
+            outcome="confirmed",
+            advice=f"connected cluster agrees with the screened {d_screened}; a deeper ladder "
+            "cannot lower it, so spend on witnesses and certification instead",
+        )
     else:
-        res.update(outcome="inconsistent",
-                   advice=f"connected cluster reports {d_cc}, above the witnessed bound {d_screened}; "
-                          "trust the witness, ignore this reading, and report the build")
+        res.update(
+            outcome="inconsistent",
+            advice=f"connected cluster reports {d_cc}, above the witnessed bound {d_screened}; "
+            "trust the witness, ignore this reading, and report the build",
+        )
     if k is not None and bar is not None and d_cc <= d_screened:
         eff = _efficiency(n, int(k), d_cc)
         res["efficiency_at_cc"] = round(eff, 4)
@@ -529,8 +587,7 @@ def cc_first(HX, HZ, d_screened, *, tlim=CC_FIRST_TLIM, max_n=CC_FIRST_MAX_N,
     return res
 
 
-def exact_or_cc_first(HX, HZ, d_screened, *, tlim_exact=EXACT_FIRST_TLIM,
-                      tlim_cc=CC_FIRST_TLIM, **cc_kwargs):
+def exact_or_cc_first(HX, HZ, d_screened, *, tlim_exact=EXACT_FIRST_TLIM, tlim_cc=CC_FIRST_TLIM, **cc_kwargs):
     """``exact_first`` where the certifier reaches, ``cc_first`` beyond it, None past both.
 
     The certifier stays the decider: inside its band its verdict is returned

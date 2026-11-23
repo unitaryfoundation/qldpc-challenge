@@ -9,6 +9,7 @@ logical); and the automorphism count of the Steane code's incidence graph
 
 Run: uv run pytest research/test_supports.py
 """
+
 import itertools
 
 import numpy as np
@@ -43,14 +44,12 @@ def test_paper_counts_for_the_weighted_18_4_3():
     xs, xl = split_stabilizers(low_weight_kernel(HZ, 6)[0], HX, n)
     zs, zl = split_stabilizers(low_weight_kernel(HX, 6)[0], HZ, n)
     assert min(len(v) for v in xs | zs) == 6
-    assert len({v for v in xs | zs if len(v) == 6}) == 38          # paper, Sec. 5
+    assert len({v for v in xs | zs if len(v) == 6}) == 38  # paper, Sec. 5
     assert min(len(v) for v in xl) == 3 and min(len(v) for v in zl) == 3
 
 
 def test_steane_incidence_graph_has_168_automorphisms():
-    H = np.array([[1, 0, 1, 0, 1, 0, 1],
-                  [0, 1, 1, 0, 0, 1, 1],
-                  [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+    H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
     sup = {v for v in low_weight_kernel(H, 4)[0] if len(v) == 4}
     assert len(sup) == 7
     order, orbits, _backend, capped = automorphisms(7, sup)

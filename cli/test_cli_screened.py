@@ -6,6 +6,7 @@ here is that the question can be asked in one call, that a parameter query
 narrows by subset rather than by exact document, and that a miss is reported
 as a miss instead of as an empty success.
 """
+
 import io
 import json
 import os
@@ -20,9 +21,13 @@ import qldpc  # noqa: E402
 
 
 def _summary(cid, experiments, quality=None):
-    return {"summary_version": 1, "campaign_id": cid, "status": "completed",
-            "experiments": experiments,
-            "screen_quality": quality or []}
+    return {
+        "summary_version": 1,
+        "campaign_id": cid,
+        "status": "completed",
+        "experiments": experiments,
+        "screen_quality": quality or [],
+    }
 
 
 @pytest.fixture
@@ -30,35 +35,45 @@ def registry(tmp_path, monkeypatch):
     """Build a repo root holding two committed summaries."""
     root = tmp_path / "research" / "campaigns"
     rows_a = [
-        {"family": "generalized-bicycle",
-         "params": {"ring": "Z_341", "l": 11},
-         "screened": {"d": 78, "trials": 300000, "backend": "fast"},
-         "verdict": "passed", "mode": "novel_generation", "survivors": 1},
-        {"family": "generalized-bicycle",
-         "params": {"ring": "Z_341", "l": 31},
-         "screened": {"d": 61, "trials": 300000, "backend": "fast"},
-         "verdict": "refuted", "mode": "novel_generation", "survivors": 0},
+        {
+            "family": "generalized-bicycle",
+            "params": {"ring": "Z_341", "l": 11},
+            "screened": {"d": 78, "trials": 300000, "backend": "fast"},
+            "verdict": "passed",
+            "mode": "novel_generation",
+            "survivors": 1,
+        },
+        {
+            "family": "generalized-bicycle",
+            "params": {"ring": "Z_341", "l": 31},
+            "screened": {"d": 61, "trials": 300000, "backend": "fast"},
+            "verdict": "refuted",
+            "mode": "novel_generation",
+            "survivors": 0,
+        },
     ]
     rows_b = [
-        {"family": "bivariate-bicycle", "params": {"l": 6, "m": 6},
-         "screened": {"d": 6, "trials": 2000, "backend": "numpy"},
-         "verdict": "not_run", "survivors": 0},
+        {
+            "family": "bivariate-bicycle",
+            "params": {"l": 6, "m": 6},
+            "screened": {"d": 6, "trials": 2000, "backend": "numpy"},
+            "verdict": "not_run",
+            "survivors": 0,
+        },
     ]
-    quality = [{"family": "generalized-bicycle", "pairs": 2,
-                "spearman": 1.0}]
+    quality = [{"family": "generalized-bicycle", "pairs": 2, "spearman": 1.0}]
     for cid, rows, q in (("cyc-341", rows_a, quality), ("bb-small", rows_b, [])):
         d = root / cid
         d.mkdir(parents=True)
-        (d / "summary.json").write_text(
-            json.dumps(_summary(cid, rows, q)), encoding="utf-8")
+        (d / "summary.json").write_text(json.dumps(_summary(cid, rows, q)), encoding="utf-8")
     monkeypatch.setattr(qldpc, "_ROOT", str(tmp_path))
     return tmp_path
 
 
 def _run(**kw):
-    args = type("A", (), {"family": "", "param": [], "params": "",
-                          "verdict": [], "limit": 20, "full": False,
-                          "json": False})()
+    args = type(
+        "A", (), {"family": "", "param": [], "params": "", "verdict": [], "limit": 20, "full": False, "json": False}
+    )()
     for k, v in kw.items():
         setattr(args, k, v)
     buf = io.StringIO()
@@ -68,8 +83,7 @@ def _run(**kw):
 
 
 def test_one_call_answers_was_this_member_screened(registry):
-    out, res = _run(family="generalized-bicycle",
-                    param=["ring=Z_341", "l=31"])
+    out, res = _run(family="generalized-bicycle", param=["ring=Z_341", "l=31"])
     assert res["matches"] == 1
     row = res["rows"][0]
     assert row["screened_d"] == 61 and row["trials"] == 300000
@@ -130,17 +144,15 @@ def test_coverage_is_summarized(registry):
     assert res["matches"] == 3
     assert "registry coverage: 3 of 3 rows carry a screened weight" in out
     assert "(3 a trial count), 3 a verdict" in out
-    assert "no screen-quality rows" not in out      # cyc-341 supplies quality
+    assert "no screen-quality rows" not in out  # cyc-341 supplies quality
 
 
 def test_missing_depth_is_reported_as_what_it_costs(tmp_path, monkeypatch):
     """A depth-less row is a gap in the anti-repeat check, and is labelled one."""
     root = tmp_path / "research" / "campaigns" / "structural"
     root.mkdir(parents=True)
-    rows = [{"family": "bivariate-bicycle", "params": {"l": 6},
-             "verdict": "not_run", "survivors": 0}]
-    (root / "summary.json").write_text(
-        json.dumps(_summary("structural", rows, [])), encoding="utf-8")
+    rows = [{"family": "bivariate-bicycle", "params": {"l": 6}, "verdict": "not_run", "survivors": 0}]
+    (root / "summary.json").write_text(json.dumps(_summary("structural", rows, [])), encoding="utf-8")
     monkeypatch.setattr(qldpc, "_ROOT", str(tmp_path))
 
     out, res = _run()

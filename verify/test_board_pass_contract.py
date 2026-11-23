@@ -19,6 +19,7 @@ same code while both look healthy. So this pins three things:
 The field lists are the contract. Adding a read to either consumer without
 adding it here is the mistake this catches.
 """
+
 import glob
 import json
 import os
@@ -121,9 +122,7 @@ def test_both_consumers_read_the_same_report_objects(board, monkeypatch):
     """
     passes = []
     real = Q.verify
-    monkeypatch.setattr(
-        Q, "verify",
-        lambda doc, *a, **k: (passes.append(1), real(doc, *a, **k))[1])
+    monkeypatch.setattr(Q, "verify", lambda doc, *a, **k: (passes.append(1), real(doc, *a, **k))[1])
 
     first = Q.board_reports(str(board))
     assert len(passes) == 2, "one structural verification per entry"
@@ -164,8 +163,7 @@ def test_the_gate_does_not_read_the_diagnostics_block(board, board_memo, monkeyp
     for b in entries:
         keys |= set(b)
     assert "diagnostics" not in keys
-    assert not any("girth" in k or "trapping" in k or "profile" in k
-                   for k in keys), sorted(keys)
+    assert not any("girth" in k or "trapping" in k or "profile" in k for k in keys), sorted(keys)
 
 
 def test_the_site_s_board_loop_reads_nothing_this_file_does_not_list():
@@ -179,7 +177,7 @@ def test_the_site_s_board_loop_reads_nothing_this_file_does_not_list():
     with open(src, encoding="utf-8") as f:
         lines = f.readlines()
     start = next(i for i, ln in enumerate(lines) if "board_reports(" in ln)
-    body = "".join(lines[start:start + 160])
+    body = "".join(lines[start : start + 160])
 
     known = {p.split(".")[-1] for p in SITE_READS + SITE_READS_OPTIONAL}
     known |= {"computed", "ok", "earned_distance"}
@@ -188,4 +186,5 @@ def test_the_site_s_board_loop_reads_nothing_this_file_does_not_list():
     unlisted = sorted(seen - known)
     assert not unlisted, (
         "site/build.py reads report fields this contract does not list: "
-        f"{unlisted}. Add them to SITE_READS so a split cannot drop them.")
+        f"{unlisted}. Add them to SITE_READS so a split cannot drop them."
+    )

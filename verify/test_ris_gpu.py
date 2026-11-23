@@ -14,10 +14,9 @@ import subprocess
 import sys
 import tempfile
 
+import gf2
 import numpy as np
 import pytest
-
-import gf2
 import ris_gpu
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,19 +61,24 @@ def test_input_file_format():
         assert (n, k_null, k_logical, nw) == (70, 3, 2, 2)
         assert len(blob) == 8 + 16 + (3 + 2) * nw * 8
         words = np.frombuffer(blob, dtype="<u8", offset=24)
-        assert words[0] == 1          # W_null row 0 = e_0
-        assert words[2 * 2] == 4      # row 2 = e_2
+        assert words[0] == 1  # W_null row 0 = e_0
+        assert words[2 * 2] == 4  # row 2 = e_2
     finally:
         os.unlink(path)
 
 
 def test_campaign_manifest_resolution_and_batch_format(tmp_path):
     manifest_path = tmp_path / "campaign.json"
-    manifest_path.write_text(json.dumps({
-        "defaults": {"mode": "estimate", "trials": 123, "seed": 9},
-        "codes": [{"id": "steane", "code": os.path.join(ROOT, "codes", "7-1-3.json"),
-                   "sides": ["X"], "target": 3}],
-    }))
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "defaults": {"mode": "estimate", "trials": 123, "seed": 9},
+                "codes": [
+                    {"id": "steane", "code": os.path.join(ROOT, "codes", "7-1-3.json"), "sides": ["X"], "target": 3}
+                ],
+            }
+        )
+    )
     manifest, requests = ris_gpu.resolve_campaign_requests(str(manifest_path))
     assert manifest["defaults"]["seed"] == 9
     assert len(requests) == 1
@@ -90,8 +94,7 @@ def test_campaign_manifest_resolution_and_batch_format(tmp_path):
 
 
 def test_parse_output():
-    res = ris_gpu.parse_output(
-        "mode=recover\nn=7\ntrials=100000\nbest_weight=3\nsupport=0,1,2\n")
+    res = ris_gpu.parse_output("mode=recover\nn=7\ntrials=100000\nbest_weight=3\nsupport=0,1,2\n")
     assert res["best_weight"] == 3
     assert res["trials"] == 100000
     assert res["support"] == [0, 1, 2]
@@ -167,9 +170,11 @@ def test_end_to_end_gpu():
     try:
         ris_gpu.write_input(path, gf2.kernel_basis(HZ), L_opp, n)
         proc = subprocess.run(
-            [binary, path, "--mode", "recover", "--trials", "200000",
-             "--seed", "5", "--k-sub", "8"],
-            capture_output=True, text=True, check=True)
+            [binary, path, "--mode", "recover", "--trials", "200000", "--seed", "5", "--k-sub", "8"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         res = ris_gpu.parse_output(proc.stdout)
         assert res["best_weight"] == 3, res  # Steane distance is exactly 3
         assert ris_gpu.cpu_verify(res["support"], n, HZ, L_opp)
@@ -183,8 +188,8 @@ def test_pair_depth_flag_surface():
     # binary usage text must document it (parsed here from the .cu so the
     # check runs without nvcc).
     r = subprocess.run(
-        [sys.executable, os.path.join(ROOT, "verify", "ris_gpu.py"), "--help"],
-        capture_output=True, text=True)
+        [sys.executable, os.path.join(ROOT, "verify", "ris_gpu.py"), "--help"], capture_output=True, text=True
+    )
     assert r.returncode == 0
     assert "--pair-depth" in r.stdout
     with open(os.path.join(ROOT, "verify", "ris_gpu.cu")) as f:
@@ -207,9 +212,11 @@ def test_end_to_end_gpu_pair_depth():
     try:
         ris_gpu.write_input(path, gf2.kernel_basis(HZ), L_opp, n)
         proc = subprocess.run(
-            [binary, path, "--mode", "recover", "--trials", "50000",
-             "--seed", "5", "--pair-depth", "8"],
-            capture_output=True, text=True, check=True)
+            [binary, path, "--mode", "recover", "--trials", "50000", "--seed", "5", "--pair-depth", "8"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         res = ris_gpu.parse_output(proc.stdout)
         assert res["best_weight"] == 3, res
         assert ris_gpu.cpu_verify(res["support"], n, HZ, L_opp)
@@ -242,9 +249,24 @@ def test_end_to_end_gpu_pair_depth_hybrid():
     try:
         ris_gpu.write_input(path, K, L_opp, n)
         proc = subprocess.run(
-            [binary, path, "--mode", "recover", "--trials", "100000",
-             "--seed", "5", "--k-sub", "8", "--pair-depth", "8"],
-            capture_output=True, text=True, check=True)
+            [
+                binary,
+                path,
+                "--mode",
+                "recover",
+                "--trials",
+                "100000",
+                "--seed",
+                "5",
+                "--k-sub",
+                "8",
+                "--pair-depth",
+                "8",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         res = ris_gpu.parse_output(proc.stdout)
         assert res["k_sub"] == 8, res
         if res.get("support"):
@@ -274,9 +296,11 @@ def test_gpu_pair_depth_midsize():
     try:
         ris_gpu.write_input(path, gf2.kernel_basis(HZ), L_opp, n)
         proc = subprocess.run(
-            [binary, path, "--mode", "recover", "--trials", "100000",
-             "--seed", "11", "--pair-depth", "24"],
-            capture_output=True, text=True, check=True)
+            [binary, path, "--mode", "recover", "--trials", "100000", "--seed", "11", "--pair-depth", "24"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
         res = ris_gpu.parse_output(proc.stdout)
         assert res["best_weight"] == 14, res
         w = ris_gpu.cpu_verify(res["support"], n, HZ, L_opp)
@@ -307,9 +331,11 @@ def test_gpu_pair_stage_matters():
         best = {}
         for pd in (1, 24):
             proc = subprocess.run(
-                [binary, path, "--mode", "estimate", "--trials", "20000",
-                 "--seed", "11", "--pair-depth", str(pd)],
-                capture_output=True, text=True, check=True)
+                [binary, path, "--mode", "estimate", "--trials", "20000", "--seed", "11", "--pair-depth", str(pd)],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
             best[pd] = ris_gpu.parse_output(proc.stdout)["best_weight"]
         assert best[24] < best[1], best
     finally:
@@ -317,12 +343,18 @@ def test_gpu_pair_stage_matters():
 
 
 if __name__ == "__main__":
-    for fn in (test_pack_rows_layout, test_input_file_format,
-               test_parse_output, test_cpu_verify_gate,
-               test_pair_depth_flag_surface, test_end_to_end_gpu,
-               test_end_to_end_gpu_pair_depth,
-               test_end_to_end_gpu_pair_depth_hybrid,
-               test_gpu_pair_depth_midsize, test_gpu_pair_stage_matters):
+    for fn in (
+        test_pack_rows_layout,
+        test_input_file_format,
+        test_parse_output,
+        test_cpu_verify_gate,
+        test_pair_depth_flag_surface,
+        test_end_to_end_gpu,
+        test_end_to_end_gpu_pair_depth,
+        test_end_to_end_gpu_pair_depth_hybrid,
+        test_gpu_pair_depth_midsize,
+        test_gpu_pair_stage_matters,
+    ):
         try:
             fn()
         except pytest.skip.Exception as e:
@@ -345,8 +377,7 @@ def test_gpu_recover_blocks_without_a_logical_write_nothing():
     binary = os.path.join(ROOT, "build", "ris_gpu")
     if not gpu_available(binary):
         pytest.skip("no ris_gpu binary or no GPU")
-    for slug in ("961-1-31", "841-1-29", "729-1-27", "625-1-25",
-                 "529-1-23", "289-1-17"):
+    for slug in ("961-1-31", "841-1-29", "729-1-27", "625-1-25", "529-1-23", "289-1-17"):
         with open(os.path.join(ROOT, "codes", f"{slug}.json")) as f:
             doc = json.load(f)
         n = doc["n"]
@@ -360,9 +391,11 @@ def test_gpu_recover_blocks_without_a_logical_write_nothing():
             try:
                 ris_gpu.write_input(path, gf2.kernel_basis(check), L_opp, n)
                 proc = subprocess.run(
-                    [binary, path, "--mode", "recover", "--trials", "1000000",
-                     "--seed", "4101"],
-                    capture_output=True, text=True, check=True)
+                    [binary, path, "--mode", "recover", "--trials", "1000000", "--seed", "4101"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
             finally:
                 os.unlink(path)
             res = ris_gpu.parse_output(proc.stdout)
@@ -383,9 +416,11 @@ def _ris_compile_block():
     with open(_WORKFLOW, encoding="utf-8") as f:
         lines = f.read().splitlines()
     start = lines.index("  ris-compile:")
-    end = next(i for i in range(start + 1, len(lines))
-               if lines[i].strip() and not lines[i].startswith(" " * 4)
-               and not lines[i].lstrip().startswith("#"))
+    end = next(
+        i
+        for i in range(start + 1, len(lines))
+        if lines[i].strip() and not lines[i].startswith(" " * 4) and not lines[i].lstrip().startswith("#")
+    )
     return lines[start:end]
 
 
@@ -395,7 +430,7 @@ def _ris_detect_script():
     header = lines.index("      - name: detect CUDA RIS changes")
     run = next(i for i in range(header + 1, len(lines)) if lines[i] == "        run: |")
     body = []
-    for line in lines[run + 1:]:
+    for line in lines[run + 1 :]:
         if line.strip() and not line.startswith(" " * 10):
             break
         body.append(line[10:])
@@ -407,8 +442,13 @@ def _run_ris_detect(tmp_path, change, base_ref="origin/main"):
     repo.mkdir(parents=True)
 
     def git(*args):
-        subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
-                       cwd=repo, check=True, capture_output=True, text=True)
+        subprocess.run(
+            ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
 
     git("init", "-q", "-b", "work")
     for rel, content in {
@@ -435,21 +475,29 @@ def _run_ris_detect(tmp_path, change, base_ref="origin/main"):
     out = tmp_path / "github_output"
     out.write_text("")
     env = dict(os.environ, BASE_REF=base_ref, GITHUB_OUTPUT=str(out))
-    done = subprocess.run(["bash", "--noprofile", "--norc", "-e", "-c", _ris_detect_script()],
-                          cwd=repo, env=env, capture_output=True, text=True, check=False)
+    done = subprocess.run(
+        ["bash", "--noprofile", "--norc", "-e", "-c", _ris_detect_script()],
+        cwd=repo,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert done.returncode == 0, done.stderr
     return dict(line.split("=", 1) for line in out.read_text().splitlines())
 
 
 def test_ris_compile_skips_unrelated_prs_and_runs_when_cuda_or_workflow_changes(tmp_path):
-    assert _run_ris_detect(tmp_path / "data", {"codes/a-1-1.json": '{"n": 2}\n',
-                                               "circuits/a-1-1/memory_x.stim": "# new\n"}) == {"changed": "false"}
+    assert _run_ris_detect(
+        tmp_path / "data", {"codes/a-1-1.json": '{"n": 2}\n', "circuits/a-1-1/memory_x.stim": "# new\n"}
+    ) == {"changed": "false"}
     assert _run_ris_detect(tmp_path / "py", {"verify/qldpc_verify.py": "x = 2\n"}) == {"changed": "false"}
     assert _run_ris_detect(tmp_path / "cu", {"verify/ris_gpu.cu": "int x = 1;\n"}) == {"changed": "true"}
     assert _run_ris_detect(tmp_path / "wf", {".github/workflows/verify.yml": "name: v2\n"}) == {"changed": "true"}
     # Fail closed if the base ref is missing or unusable.
-    assert _run_ris_detect(tmp_path / "noref", {"codes/a-1-1.json": '{"n": 2}\n'},
-                           base_ref="origin/no-such-branch") == {"changed": "true"}
+    assert _run_ris_detect(
+        tmp_path / "noref", {"codes/a-1-1.json": '{"n": 2}\n'}, base_ref="origin/no-such-branch"
+    ) == {"changed": "true"}
 
 
 def test_ris_compile_advisory_is_step_level_on_toolkit_install_only():

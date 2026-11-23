@@ -8,6 +8,7 @@ turns the test red. One positive case still runs against the real repository,
 because a note citing a pinned external artifact passing is a property worth
 holding live.
 """
+
 import os
 import subprocess
 import sys
@@ -37,94 +38,103 @@ def main():
         os.makedirs(os.path.join(tmp, "research", "kit"))
         open(os.path.join(tmp, "research", "kit", "group_algebra.py"), "w").close()
 
-        check("path that exists resolves",
-              problems_for("built with `research/kit/group_algebra.py`", tmp) == [])
+        check("path that exists resolves", problems_for("built with `research/kit/group_algebra.py`", tmp) == [])
 
-        check("module.function form resolves",
-              problems_for("call `research/kit/group_algebra.build_2bga`", tmp) == [])
+        check("module.function form resolves", problems_for("call `research/kit/group_algebra.build_2bga`", tmp) == [])
 
-        check("file::symbol form resolves",
-              problems_for("see `research/kit/group_algebra.py::build_2bga`", tmp) == [])
+        check("file::symbol form resolves", problems_for("see `research/kit/group_algebra.py::build_2bga`", tmp) == [])
 
-        check("missing path is caught",
-              problems_for("MILP via `evaluation/distance_milp.py`", tmp)
-              == ["path does not exist in this tree"])
+        check(
+            "missing path is caught",
+            problems_for("MILP via `evaluation/distance_milp.py`", tmp) == ["path does not exist in this tree"],
+        )
 
-        check("missing path is allowed when an external source is named",
-              problems_for(
-                  "MILP via `evaluation/distance_milp.py` from "
-                  "https://github.com/qiskit-community/qcode-discovery", tmp) == [])
+        check(
+            "missing path is allowed when an external source is named",
+            problems_for(
+                "MILP via `evaluation/distance_milp.py` from https://github.com/qiskit-community/qcode-discovery", tmp
+            )
+            == [],
+        )
 
-        check("pinned external artifact passes",
-              problems_for(
-                  "taken from github.com/a7b/yarn @ 82fb695, "
-                  "`processor_codes/mitten/Hx.npy`", tmp) == [])
+        check(
+            "pinned external artifact passes",
+            problems_for("taken from github.com/a7b/yarn @ 82fb695, `processor_codes/mitten/Hx.npy`", tmp) == [],
+        )
 
-        check("gitignored dir is caught even with an external source named",
-              problems_for(
-                  "evidence in `research/candidates/run1/` see https://example.com",
-                  tmp) == ["gitignored working output cited as evidence"])
+        check(
+            "gitignored dir is caught even with an external source named",
+            problems_for("evidence in `research/candidates/run1/` see https://example.com", tmp)
+            == ["gitignored working output cited as evidence"],
+        )
 
-        check("absolute local path is caught",
-              "absolute local path"
-              in problems_for("ran /Users/me/scratch/search.py", tmp))
+        check(
+            "absolute local path is caught",
+            "absolute local path" in problems_for("ran /Users/me/scratch/search.py", tmp),
+        )
 
-        check("session URL is caught",
-              "session URL" in problems_for(
-                  "https://claude.ai/code/session_01ABC", tmp))
+        check("session URL is caught", "session URL" in problems_for("https://claude.ai/code/session_01ABC", tmp))
 
-        check("scaffolding is caught",
-              "leftover scaffolding" in problems_for(
-                  "Drafted by `qldpc submit`; edit before requesting review.", tmp))
+        check(
+            "scaffolding is caught",
+            "leftover scaffolding" in problems_for("Drafted by `qldpc submit`; edit before requesting review.", tmp),
+        )
 
-        check("unticked checkbox is caught",
-              "leftover scaffolding" in problems_for("- [ ] verified", tmp))
+        check("unticked checkbox is caught", "leftover scaffolding" in problems_for("- [ ] verified", tmp))
 
-        check("arXiv id is not treated as a path",
-              problems_for("see quant-ph/9601029 for the original", tmp) == [])
+        check("arXiv id is not treated as a path", problems_for("see quant-ph/9601029 for the original", tmp) == [])
 
-        check("placeholder path is not treated as a path",
-              problems_for("writes `codes/<n>-<k>-<d>.json`", tmp) == [])
+        check("placeholder path is not treated as a path", problems_for("writes `codes/<n>-<k>-<d>.json`", tmp) == [])
 
-        check("note slug mismatch is caught",
-              "note's first [[n,k,d]] disagrees with its filename"
-              in problems_for("# [[270,54,12]] code", tmp, slug=("270", "54", "10")))
+        check(
+            "note slug mismatch is caught",
+            "note's first [[n,k,d]] disagrees with its filename"
+            in problems_for("# [[270,54,12]] code", tmp, slug=("270", "54", "10")),
+        )
 
-        check("note with no params is caught",
-              "note states no [[n,k,d]]"
-              in problems_for("A note with no parameters.", tmp,
-                              slug=("482", "146", "42")))
+        check(
+            "note with no params is caught",
+            "note states no [[n,k,d]]" in problems_for("A note with no parameters.", tmp, slug=("482", "146", "42")),
+        )
 
-        check("matching note slug passes",
-              problems_for("# [[270,54,10]] code", tmp, slug=("270", "54", "10"))
-              == [])
+        check("matching note slug passes", problems_for("# [[270,54,10]] code", tmp, slug=("270", "54", "10")) == [])
 
         # #3379: a path under this repo's own top-level directories is a claim
         # about this tree, whatever else the text cites.
-        check("repo path is caught even with an external source named",
-              problems_for("built with `research/kit/clp.py`, see "
-                           "https://arxiv.org/abs/2607.14091", tmp)
-              == ["path does not exist in this tree"])
+        check(
+            "repo path is caught even with an external source named",
+            problems_for("built with `research/kit/clp.py`, see https://arxiv.org/abs/2607.14091", tmp)
+            == ["path does not exist in this tree"],
+        )
 
-        check("external artifact under a codes/ of its own repo still passes",
-              problems_for("`codes/GB_106_w8_X.mtx` from github.com/a/b @ 1234abc", tmp)
-              == [])
+        check(
+            "external artifact under a codes/ of its own repo still passes",
+            problems_for("`codes/GB_106_w8_X.mtx` from github.com/a/b @ 1234abc", tmp) == [],
+        )
 
-        check("repo path inside a backticked command is caught",
-              problems_for("gate it with `python verify/coordination.py gate x.json`", tmp)
-              == ["path does not exist in this tree"])
+        check(
+            "repo path inside a backticked command is caught",
+            problems_for("gate it with `python verify/coordination.py gate x.json`", tmp)
+            == ["path does not exist in this tree"],
+        )
 
-        check("command naming an existing repo path passes",
-              problems_for("run `uv run python research/kit/group_algebra.py`", tmp) == [])
+        check(
+            "command naming an existing repo path passes",
+            problems_for("run `uv run python research/kit/group_algebra.py`", tmp) == [],
+        )
 
-        check("a call on a module resolves to the module",
-              problems_for("`research/kit/group_algebra.py::build_2bga(mul, a, b)`", tmp) == [])
+        check(
+            "a call on a module resolves to the module",
+            problems_for("`research/kit/group_algebra.py::build_2bga(mul, a, b)`", tmp) == [],
+        )
 
     # --all sweeps what is committed, and --report writes the grouped body the
     # weekly tracking issue carries (#3379).
     with tempfile.TemporaryDirectory() as tmp:
+
         def git(*args):
             subprocess.run(["git", *args], cwd=tmp, check=True, capture_output=True)
+
         git("init", "-q")
         os.makedirs(os.path.join(tmp, "notes"))
         with open(os.path.join(tmp, "notes", "1-1-1.md"), "w") as f:
@@ -136,17 +146,27 @@ def main():
         git("add", "notes/1-1-1.md", "notes/2-1-1.md")
         git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x")
         report = os.path.join(tmp, "report.md")
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--root", tmp, "--all", "--report", report],
-                           cwd=ROOT, capture_output=True, text=True, check=False)
-        check("--all sweeps committed prose only",
-              r.returncode == 1 and "notes/1-1-1.md" in r.stdout
-              and "notes/3-1-1.md" not in r.stdout, r.stdout[-200:])
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--all", "--report", report],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        check(
+            "--all sweeps committed prose only",
+            r.returncode == 1 and "notes/1-1-1.md" in r.stdout and "notes/3-1-1.md" not in r.stdout,
+            r.stdout[-200:],
+        )
         with open(report) as f:
             body = f.read()
-        check("--report groups by target",
-              "over 2 committed" in body and "1 problem(s) in 1 file(s)" in body
-              and "`research/kit/missing.py` in 1 file(s): `notes/1-1-1.md`" in body, body)
+        check(
+            "--report groups by target",
+            "over 2 committed" in body
+            and "1 problem(s) in 1 file(s)" in body
+            and "`research/kit/missing.py` in 1 file(s): `notes/1-1-1.md`" in body,
+            body,
+        )
 
     # A body-sourced problem must say so and point the reader at the PR
     # description; a file-only failure must not mention the body (issue #897).
@@ -154,23 +174,27 @@ def main():
         body = os.path.join(tmp, "body.md")
         with open(body, "w") as f:
             f.write("Research note: `notes/700-206-74.md`\n")
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--root", tmp, "--files", "--body-file", body],
-                           cwd=ROOT, capture_output=True, text=True)
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--files", "--body-file", body],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
         check("body-only problem fails", r.returncode == 1)
         check("body problem is labelled as such", "PR body:" in r.stdout)
-        check("body problem points at the PR description",
-              "editing the PR body" in r.stdout, r.stdout.strip()[-80:])
+        check("body problem points at the PR description", "editing the PR body" in r.stdout, r.stdout.strip()[-80:])
 
         note = os.path.join(tmp, "n.md")
         with open(note, "w") as f:
             f.write("Built with `evaluation/distance_milp.py`\n")
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--root", tmp, "--files", note],
-                           cwd=ROOT, capture_output=True, text=True)
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--files", note],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
         check("file-only problem fails", r.returncode == 1)
-        check("file-only problem does not blame the PR body",
-              "editing the PR body" not in r.stdout)
+        check("file-only problem does not blame the PR body", "editing the PR body" not in r.stdout)
 
         # The gitignored-output rule, end to end through the CLI. It has to run
         # against a synthetic note: the first version asserted this on a real
@@ -181,15 +205,19 @@ def main():
         os.makedirs(dirty, exist_ok=True)
         dirty_note = os.path.join(dirty, "9-3-3.md")
         with open(dirty_note, "w") as f:
-            f.write("# [[9,3,3]]\n\nevidence in `research/candidates/run1/` "
-                    "see https://example.com\n")
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--root", tmp, "--files", dirty_note],
-                           cwd=ROOT, capture_output=True, text=True)
-        check("a note citing gitignored output fails end to end",
-              r.returncode == 1, r.stdout.strip().splitlines()[-1:] or "")
-        check("...and names the reason",
-              "gitignored working output" in r.stdout)
+            f.write("# [[9,3,3]]\n\nevidence in `research/candidates/run1/` see https://example.com\n")
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--files", dirty_note],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        check(
+            "a note citing gitignored output fails end to end",
+            r.returncode == 1,
+            r.stdout.strip().splitlines()[-1:] or "",
+        )
+        check("...and names the reason", "gitignored working output" in r.stdout)
 
     # Against the real tree: a note whose citation is sound passes. The
     # converse is not asserted against a real file -- see above; the board is
@@ -197,41 +225,57 @@ def main():
     # note to stay green.
     real = os.path.join(ROOT, "notes", "300-60-14.md")
     if os.path.exists(real):
-        r = subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                            "--files", "notes/300-60-14.md"],
-                           cwd=ROOT, capture_output=True, text=True)
-        check("real note with a pinned external artifact passes",
-              r.returncode == 0, r.stdout.strip().splitlines()[-1:] or "")
+        r = subprocess.run(
+            # Pin the diff base to HEAD: in a fork origin/main can be stale, and
+            # this test is about the note's citation, not the checkout's remote.
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--base", "HEAD", "--files", "notes/300-60-14.md"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        check(
+            "real note with a pinned external artifact passes",
+            r.returncode == 0,
+            r.stdout.strip().splitlines()[-1:] or "",
+        )
 
     # A distance revision must carry the previous note's body forward (#3388).
-    check("slug update inside a fold-in is not a loss",
-          check_prose.retention("built as `codes/10-2-6.json`, see [[10,2,6]]\n",
-                                "built as `codes/10-2-5.json`, see [[10,2,5]]\n") == 1.0)
-    check("headings, tables, fences, and comments are not body",
-          check_prose.retention("# [[10,2,6]]\n| a | b |\n```\nx = 1\n```\n<!-- c -->\n",
-                                "") == 1.0)
+    check(
+        "slug update inside a fold-in is not a loss",
+        check_prose.retention(
+            "built as `codes/10-2-6.json`, see [[10,2,6]]\n", "built as `codes/10-2-5.json`, see [[10,2,5]]\n"
+        )
+        == 1.0,
+    )
+    check(
+        "headings, tables, fences, and comments are not body",
+        check_prose.retention("# [[10,2,6]]\n| a | b |\n```\nx = 1\n```\n<!-- c -->\n", "") == 1.0,
+    )
     table = {}
     check_prose.slug_into("codes/12-4-2-b.json", table)
     check_prose.slug_into("notes/12-4-3-b.md", table)
     check_prose.slug_into("codes/12-4-2.json", table)
-    check("a suffixed slug pairs only with its own suffix",
-          table == {("12", "4", "-b"): {"2", "3"}, ("12", "4", ""): {"2"}}, table)
-    check("a stub keeps nothing",
-          check_prose.retention("# t\n\nline one\nline two\n", "# t\n\nother\n") == 0.0)
+    check(
+        "a suffixed slug pairs only with its own suffix",
+        table == {("12", "4", "-b"): {"2", "3"}, ("12", "4", ""): {"2"}},
+        table,
+    )
+    check("a stub keeps nothing", check_prose.retention("# t\n\nline one\nline two\n", "# t\n\nother\n") == 0.0)
 
-    OLD_NOTE = ("# [[10,2,6]] a construction\n\n## What was searched\n\n"
-                "Rebuild from `codes/10-2-6.json`.\n"
-                + "".join(f"Sweep {i} at {1000 * (i + 1)} trials found nothing lighter "
-                          "than weight 6.\n" for i in range(12)))
+    OLD_NOTE = "# [[10,2,6]] a construction\n\n## What was searched\n\nRebuild from `codes/10-2-6.json`.\n" + "".join(
+        f"Sweep {i} at {1000 * (i + 1)} trials found nothing lighter than weight 6.\n" for i in range(12)
+    )
     OLD_NOTE_UPDATED = OLD_NOTE.replace("10-2-6", "10-2-5").replace("[[10,2,6]]", "[[10,2,5]]")
-    STUB = ("# [[10,2,5]] distance revision\n\nOnly the distance block differs; "
-            "a weight-5 logical was found.\n")
+    STUB = "# [[10,2,5]] distance revision\n\nOnly the distance block differs; a weight-5 logical was found.\n"
 
     def revision_repo(tmp, new_note, fieldnote=None, mv=True):
         """Commit the old entry on main, then a revision of it on a branch."""
+
         def git(*args):
-            subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
-                           cwd=tmp, check=True, capture_output=True)
+            subprocess.run(
+                ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=tmp, check=True, capture_output=True
+            )
+
         git("init", "-q")
         git("symbolic-ref", "HEAD", "refs/heads/main")
         os.makedirs(os.path.join(tmp, "codes"))
@@ -261,40 +305,197 @@ def main():
                 f.write(fieldnote)
         git("add", "-A")
         git("commit", "-q", "-m", "Tighten [[10,2,6]] to 5")
-        return subprocess.run([sys.executable, os.path.join(_HERE, "check_prose.py"),
-                               "--root", tmp, "--base", "main"],
-                              cwd=ROOT, capture_output=True, text=True, check=False)
+        return subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--base", "main"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
 
     folded = STUB + "\n## Original note, with the file paths updated\n\n" + OLD_NOTE_UPDATED
     with tempfile.TemporaryDirectory() as tmp:
         r = revision_repo(tmp, folded)
-        check("fold-in under the heading passes", r.returncode == 0,
-              r.stdout[-200:] + r.stderr[-300:])
+        check("fold-in under the heading passes", r.returncode == 0, r.stdout[-200:] + r.stderr[-300:])
     with tempfile.TemporaryDirectory() as tmp:
         r = revision_repo(tmp, STUB, mv=False)
-        check("stub replacing the note fails", r.returncode == 1
-              and "distance revision drops the previous note's body" in r.stdout
-              and "notes/10-2-6.md -> notes/10-2-5.md: 0% of its body lines" in r.stdout
-              and "delete beside an add" in r.stdout, r.stdout[-300:])
+        check(
+            "stub replacing the note fails",
+            r.returncode == 1
+            and "distance revision drops the previous note's body" in r.stdout
+            and "notes/10-2-6.md -> notes/10-2-5.md: 0% of its body lines" in r.stdout
+            and "delete beside an add" in r.stdout,
+            r.stdout[-300:],
+        )
         check("...and names the way out", "Filing a distance revision" in r.stdout)
     # Nine of thirteen body lines kept: similar enough for git to call it a
     # rename, and still a third of the record gone.
-    partial = (STUB + "\n## Original note, with the file paths updated\n\n"
-               + "\n".join(OLD_NOTE_UPDATED.splitlines()[:-4]) + "\n")
+    partial = (
+        STUB
+        + "\n## Original note, with the file paths updated\n\n"
+        + "\n".join(OLD_NOTE_UPDATED.splitlines()[:-4])
+        + "\n"
+    )
     with tempfile.TemporaryDirectory() as tmp:
         r = revision_repo(tmp, partial, mv=True)
-        check("a rename that drops a third of the body still fails", r.returncode == 1
-              and "69% of its body lines" in r.stdout
-              and "git saw a rename" in r.stdout, r.stdout[-300:])
+        check(
+            "a rename that drops a third of the body still fails",
+            r.returncode == 1 and "69% of its body lines" in r.stdout and "git saw a rename" in r.stdout,
+            r.stdout[-300:],
+        )
     with tempfile.TemporaryDirectory() as tmp:
-        fieldnote = ("---\ntitle: ten-two search\nauthor: \"@t\"\n---\n\n"
-                     "# The search behind [[10,2,5]]\n\n" + OLD_NOTE_UPDATED.split("\n", 2)[2])
+        fieldnote = (
+            '---\ntitle: ten-two search\nauthor: "@t"\n---\n\n'
+            "# The search behind [[10,2,5]]\n\n" + OLD_NOTE_UPDATED.split("\n", 2)[2]
+        )
         r = revision_repo(tmp, STUB, fieldnote=fieldnote, mv=False)
         check("narrative moved to a fieldnote passes", r.returncode == 0, r.stdout[-200:])
     with tempfile.TemporaryDirectory() as tmp:
         r = revision_repo(tmp, None, mv=False)
-        check("entry revised with its note dropped fails",
-              r.returncode == 1 and "no note under the new slug" in r.stdout, r.stdout[-300:])
+        check(
+            "entry revised with its note dropped fails",
+            r.returncode == 1 and "no note under the new slug" in r.stdout,
+            r.stdout[-300:],
+        )
+
+    # An in-place overwrite of an existing entry is not a revision (#5732).
+    # The code file is the source of truth: the note is only a secondary signal,
+    # and must not refuse a note-only repair (issue #6841).
+    OLD_CODE = (
+        '{"name":"[[10,2,6]]","code_type":"CSS","n":10,"k":2,"checks":{"X":[[0,1]],"Z":[[2,3]]},"distance":{"d":6}}\n'
+    )
+    NEW_CODE = OLD_CODE.replace('"X":[[0,1]]', '"X":[[4,5]]')
+    REORDERED_CODE = OLD_CODE.replace('"X":[[0,1]]', '"X":[[1,0]]')  # same generator, re-listed
+    NOTE_STUB = "# [[10,2,6]] a code\n\nOne sentence about it.\n"
+    NOTE_REWRITE = "# [[10,2,6]] a different code\n\nA completely new narrative about it.\n"
+
+    def inplace_repo(tmp, *, code=None, note=None, fieldnote=None):
+        """Commit a code+note on main, then edit them in place on a branch."""
+
+        def git(*args):
+            subprocess.run(
+                ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args], cwd=tmp, check=True, capture_output=True
+            )
+
+        git("init", "-q")
+        git("symbolic-ref", "HEAD", "refs/heads/main")
+        os.makedirs(os.path.join(tmp, "codes"))
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "codes", "10-2-6.json"), "w") as f:
+            f.write(OLD_CODE)
+        with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+            f.write(NOTE_STUB)
+        git("add", "-A")
+        git("commit", "-q", "-m", "base")
+        git("checkout", "-q", "-b", "feature")
+        if code is not None:
+            with open(os.path.join(tmp, "codes", "10-2-6.json"), "w") as f:
+                f.write(code)
+        if note is not None:
+            with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+                f.write(note)
+        if fieldnote is not None:
+            os.makedirs(os.path.join(tmp, "fieldnotes"), exist_ok=True)
+            with open(os.path.join(tmp, "fieldnotes", "2026-11-01-ten-two.md"), "w") as f:
+                f.write(fieldnote)
+        git("add", "-A")
+        git("commit", "-q", "-m", "edit in place")
+
+    def guards(tmp):
+        code_out, note_out = [], []
+        ok_code = check_prose.check_code_overwrites("main", tmp, code_out)
+        ok_note = check_prose.check_note_rewrites("main", tmp, note_out)
+        return ok_code, ok_note, code_out + note_out
+
+    # 1. A stub replaced by a real write-up (the #6841 repair) leaves both the
+    #    code and the leading [[n,k,d]] alone, so neither guard fires.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, note=OLD_NOTE)
+        ok_code, ok_note, out = guards(tmp)
+        check("stub-to-note repair passes", ok_code and ok_note and not out, out)
+
+    # 2. Different checks under the same slug, note untouched: the real #5623
+    #    pattern. This is the one that passed every check before this guard.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "changed checks under the same slug fail",
+            ok_code and ok_note and any(w.startswith("code overwrite") for _, w, _ in out),
+            out,
+        )
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE)
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--base", "main"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        check(
+            "code overwrite fails end to end",
+            r.returncode == 1 and "code overwrite drops the previous entry" in r.stdout,
+            r.stdout[-400:],
+        )
+        check("...and names the suffixed-slug way out", "suffixed slug" in r.stdout, r.stdout[-400:])
+
+    # 3. Re-listing the same generators in a different order is not an overwrite.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=REORDERED_CODE)
+        ok_code, ok_note, out = guards(tmp)
+        check("reordering checks is not an overwrite", ok_code and ok_note and not out, out)
+
+    # 4. With the code (or the leading [[n,k,d]]) changed, a large rewrite is a
+    #    secondary signal: it fails, unless the old body is carried forward.
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE, note=NOTE_REWRITE)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "code change plus note rewrite fails both guards",
+            ok_code
+            and ok_note
+            and any(w.startswith("code overwrite") for _, w, _ in out)
+            and any(w.startswith("note rewrite drops") for _, w, _ in out),
+            out,
+        )
+    folded = NOTE_REWRITE + "\n" + check_prose.FOLD_IN_HEADING + "\n\n" + NOTE_STUB
+    with tempfile.TemporaryDirectory() as tmp:
+        inplace_repo(tmp, code=NEW_CODE, note=folded)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "fold-in passes the note guard", ok_note and not any(w.startswith("note rewrite") for _, w, _ in out), out
+        )
+    with tempfile.TemporaryDirectory() as tmp:
+        fieldnote = '---\ntitle: old note\nauthor: "@t"\n---\n\n' + NOTE_STUB
+        inplace_repo(tmp, code=NEW_CODE, note=NOTE_REWRITE, fieldnote=fieldnote)
+        ok_code, ok_note, out = guards(tmp)
+        check(
+            "fieldnote carries the old body past the note guard",
+            ok_note and not any(w.startswith("note rewrite") for _, w, _ in out),
+            out,
+        )
+
+    # 5. A bare directory with no git history skips the diff-based checks
+    #    instead of failing closed (the self-test / --files shape).
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, "notes"))
+        with open(os.path.join(tmp, "notes", "10-2-6.md"), "w") as f:
+            f.write("# [[10,2,6]] clean\n")
+        r = subprocess.run(
+            [sys.executable, os.path.join(_HERE, "check_prose.py"), "--root", tmp, "--files", "notes/10-2-6.md"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        check(
+            "a root without git skips the diff-based checks",
+            r.returncode == 0
+            and "skipping the code-overwrite check" in r.stdout
+            and "skipping the note-rewrite check" in r.stdout,
+            r.stdout[-400:],
+        )
 
     print()
     if FAILURES:
@@ -305,7 +506,7 @@ def main():
 
 
 def test_main():
-    """pytest entry point; the suite body lives in main()."""
+    """Pytest entry point; the suite body lives in main()."""
     assert main() == 0
 
 

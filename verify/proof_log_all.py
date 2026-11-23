@@ -19,6 +19,7 @@ carries the formula's hash and the recipe to regenerate and re-check it, and
     python verify/proof_log_all.py --max-n 144 --workers 4 --tlim 120
     python verify/proof_log_all.py --slugs 90-8-10 72-8-10 --append
 """
+
 import argparse
 import glob
 import json
@@ -69,16 +70,19 @@ def one(job):
     t0 = time.time()
     try:
         out = certify(doc, tlim=tlim, proof_dir=work, slug=slug)
-    except Exception as e:                       # noqa: BLE001
-        return {"slug": slug, "n": n, "level": "error", "detail": str(e)[:300],
-                "secs": round(time.time() - t0, 1)}
+    except Exception as e:  # noqa: BLE001
+        return {"slug": slug, "n": n, "level": "error", "detail": str(e)[:300], "secs": round(time.time() - t0, 1)}
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
     v = out.get("verification") or {}
-    rec = {"slug": slug, "n": n, "level": v.get("level"),
-           "secs": round(time.time() - t0, 1),
-           "detail": v.get("note", "")[:300]}
+    rec = {
+        "slug": slug,
+        "n": n,
+        "level": v.get("level"),
+        "secs": round(time.time() - t0, 1),
+        "detail": v.get("note", "")[:300],
+    }
     for side, blk in (out.get("sides") or {}).items():
         pr = blk.get("proof") or {}
         rec[f"{side}_cnf_clauses"] = (pr.get("cnf") or {}).get("clauses")
@@ -100,22 +104,19 @@ def one(job):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--max-n", type=int, default=144)
-    ap.add_argument("--limit", type=int, default=0,
-                    help="stop after this many entries (0 = all)")
-    ap.add_argument("--slugs", nargs="*", default=(),
-                    help="run only these entries")
+    ap.add_argument("--limit", type=int, default=0, help="stop after this many entries (0 = all)")
+    ap.add_argument("--slugs", nargs="*", default=(), help="run only these entries")
     ap.add_argument("--tlim", type=int, default=120)
     ap.add_argument("--workers", type=int, default=4)
-    ap.add_argument("--log", default=os.path.join(ROOT, "certs",
-                                                  "proof_log_batch.jsonl"))
-    ap.add_argument("--append", action="store_true",
-                    help="replace this run's entries in the log rather than "
-                         "rewriting it")
+    ap.add_argument("--log", default=os.path.join(ROOT, "certs", "proof_log_batch.jsonl"))
+    ap.add_argument(
+        "--append", action="store_true", help="replace this run's entries in the log rather than rewriting it"
+    )
     a = ap.parse_args(argv)
 
     todo = in_range(a.max_n, set(a.slugs))
     if a.limit:
-        todo = todo[:a.limit]
+        todo = todo[: a.limit]
     jobs = [(n, slug, cp, dp, a.tlim) for n, slug, cp, dp in todo]
     print(f"{len(jobs)} exact certificates at n <= {a.max_n}")
 
@@ -132,8 +133,7 @@ def main(argv=None):
             counts[rec["level"]] = counts.get(rec["level"], 0) + 1
             results.append(rec)
             if i % 25 == 0 or i == len(jobs):
-                print(f"  {i}/{len(jobs)}  {counts}  "
-                      f"{round(time.time() - t0)}s")
+                print(f"  {i}/{len(jobs)}  {counts}  {round(time.time() - t0)}s")
     rows = sorted(kept + results, key=lambda r: (r.get("n", 0), r["slug"]))
     with open(a.log, "w", encoding="utf-8", newline="\n") as log:
         for rec in rows:
