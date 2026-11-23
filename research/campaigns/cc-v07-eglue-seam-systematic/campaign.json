@@ -1,0 +1,4645 @@
+{
+  "summary": {
+    "pairs": 40,
+    "seams_total": 29224,
+    "cross_seams_total": 14426,
+    "children_tried": 120,
+    "gated": 25,
+    "passed": 25,
+    "advancing": 9,
+    "seconds": 121.0,
+    "open_prs": true
+  },
+  "records": [
+    {
+      "left": "10-2-3-b",
+      "right": "10-4-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 182,
+      "cross_seams": 30,
+      "children": [
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              1,
+              2,
+              13
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 5,
+          "max_w": 4,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 5,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-4",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "84d4e2b5453ec2a7",
+              "signature": "879276cb50e559fc"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-4",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "detail": "no lighter logical in 3300 RIS trials (seed 2038524833)",
+                "refuted": false,
+                "seed": 2038524833
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-4",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,5,1]] w=4 10-5-1.json",
+                  "[[11,5,1]] w=4 11-5-1.json",
+                  "[[12,5,1]] w=4 12-5-1-b.json",
+                  "[[12,5,1]] w=4 12-5-1.json",
+                  "[[12,5,2]] w=4 12-5-2-d.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[16,5,2]] w=4 16-5-2.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[8,5,1]] w=4 8-5-1-64b4b354f2379296.json",
+                  "[[8,5,1]] w=4 8-5-1-714718feeaa44e62.json",
+                  "[[8,5,1]] w=4 8-5-1-8bf0bb06bb2532c6.json",
+                  "[[8,5,1]] w=4 8-5-1-99826a95cc6cebda.json",
+                  "[[8,5,1]] w=4 8-5-1-b.json",
+                  "[[8,5,1]] w=4 8-5-1-bc16cdc3f19fc228.json",
+                  "[[8,5,1]] w=4 8-5-1-c.json",
+                  "[[9,5,1]] w=4 9-5-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json"
+                ],
+                "advances_by": [
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,5,1]] w=4 10-5-1.json and 18 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1533150170
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-5-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              3,
+              6,
+              14
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 5,
+          "max_w": 4,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 5,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-4",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "d37f651777a79b51",
+              "signature": "18a97551ecda3638"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-4",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 260293468,
+                "detail": "no lighter logical in 3300 RIS trials (seed 260293468)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-4",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,5,1]] w=4 10-5-1.json",
+                  "[[11,5,1]] w=4 11-5-1.json",
+                  "[[12,5,1]] w=4 12-5-1-b.json",
+                  "[[12,5,1]] w=4 12-5-1.json",
+                  "[[12,5,2]] w=4 12-5-2-d.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[16,5,2]] w=4 16-5-2.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[8,5,1]] w=4 8-5-1-64b4b354f2379296.json",
+                  "[[8,5,1]] w=4 8-5-1-714718feeaa44e62.json",
+                  "[[8,5,1]] w=4 8-5-1-8bf0bb06bb2532c6.json",
+                  "[[8,5,1]] w=4 8-5-1-99826a95cc6cebda.json",
+                  "[[8,5,1]] w=4 8-5-1-b.json",
+                  "[[8,5,1]] w=4 8-5-1-bc16cdc3f19fc228.json",
+                  "[[8,5,1]] w=4 8-5-1-c.json",
+                  "[[9,5,1]] w=4 9-5-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json"
+                ],
+                "advances_by": [
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,5,1]] w=4 10-5-1.json and 18 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 260293468
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-5-1-eglue-f9bf82591f5aacf0.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              2,
+              6,
+              9,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 5,
+          "max_w": 4,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 5,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-4",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "73746ff933c80143",
+              "signature": "18a97551ecda3638"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-4",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 2002593495,
+                "detail": "no lighter logical in 3300 RIS trials (seed 2002593495)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-4",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,5,1]] w=4 10-5-1.json",
+                  "[[11,5,1]] w=4 11-5-1.json",
+                  "[[12,5,1]] w=4 12-5-1-b.json",
+                  "[[12,5,1]] w=4 12-5-1.json",
+                  "[[12,5,2]] w=4 12-5-2-d.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[16,5,2]] w=4 16-5-2.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[8,5,1]] w=4 8-5-1-64b4b354f2379296.json",
+                  "[[8,5,1]] w=4 8-5-1-714718feeaa44e62.json",
+                  "[[8,5,1]] w=4 8-5-1-8bf0bb06bb2532c6.json",
+                  "[[8,5,1]] w=4 8-5-1-99826a95cc6cebda.json",
+                  "[[8,5,1]] w=4 8-5-1-b.json",
+                  "[[8,5,1]] w=4 8-5-1-bc16cdc3f19fc228.json",
+                  "[[8,5,1]] w=4 8-5-1-c.json",
+                  "[[9,5,1]] w=4 9-5-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json"
+                ],
+                "advances_by": [
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,5,1]] w=4 10-5-1.json and 18 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 2002593495
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-5-1-eglue-ca2e65149e51b199.json"
+        }
+      ]
+    },
+    {
+      "left": "10-2-3-b",
+      "right": "10-6-2-b",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 340,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              10,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 7,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 10, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              10,
+              13,
+              14,
+              15
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 7,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 10, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              12,
+              14,
+              17,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 7,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 10, 10). The gate ref"
+        }
+      ]
+    },
+    {
+      "left": "10-2-3-b",
+      "right": "11-3-3-b",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 115,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              5
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              10,
+              14,
+              17,
+              19
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              13,
+              17,
+              18
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        }
+      ]
+    },
+    {
+      "left": "10-2-3-b",
+      "right": "11-3-3",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 115,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              5
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              10,
+              14,
+              17,
+              18
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              13,
+              14,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 4,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        }
+      ]
+    },
+    {
+      "left": "10-4-1",
+      "right": "10-6-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 602,
+      "cross_seams": 294,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              5,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "3f08a78412398afb",
+              "signature": "b5bb447f79416c42"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 795742921,
+                "detail": "no lighter logical in 3300 RIS trials (seed 795742921)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 795742921
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              2,
+              5,
+              14
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "83b6f1924e6dd9a3",
+              "signature": "86405bf9e7a9361f"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 810761153,
+                "detail": "no lighter logical in 3300 RIS trials (seed 810761153)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 810761153
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue-dbe8dfbfeb828850.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              5,
+              9,
+              14
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "f213b4c7e7bf37a4",
+              "signature": "86405bf9e7a9361f"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 243771153,
+                "detail": "no lighter logical in 3300 RIS trials (seed 243771153)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 243771153
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue-9045ebc66837aca3.json"
+        }
+      ]
+    },
+    {
+      "left": "10-4-1",
+      "right": "10-8-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 944,
+      "cross_seams": 352,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              5,
+              10
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "bcc1004d323bcf27",
+              "signature": "7f5c5976bdaa5755"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 608272640,
+                "detail": "no lighter logical in 3300 RIS trials (seed 608272640)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 608272640
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              11,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "653ec387bf1f9e3a",
+              "signature": "e28018ca66d49074"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 755798786,
+                "detail": "no lighter logical in 3300 RIS trials (seed 755798786)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 755798786
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue-6141b21de136d69b.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              3,
+              12,
+              15,
+              16
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "c52c307120beed1e",
+              "signature": "b4f2eae55a85d663"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1057756806,
+                "detail": "no lighter logical in 3300 RIS trials (seed 1057756806)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1057756806
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue-8de6a51d1fb83747.json"
+        }
+      ]
+    },
+    {
+      "left": "10-4-1",
+      "right": "11-3-3-h",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 226,
+      "cross_seams": 39,
+      "children": [
+        {
+          "seam": [
+            "Z",
+            [
+              3,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 21,
+              "k": 6,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "116493a918c15fb6",
+              "signature": "7f2e8149a6f43744"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 2081078564,
+                "detail": "no lighter logical in 3340 RIS trials (seed 2081078564)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,6,1]] w=5 10-6-1-b.json",
+                  "[[10,6,1]] w=6 10-6-1.json",
+                  "[[10,7,1]] w=6 10-7-1-b.json",
+                  "[[10,7,1]] w=6 10-7-1-c.json",
+                  "[[10,7,1]] w=6 10-7-1.json",
+                  "[[10,8,1]] w=6 10-8-1.json",
+                  "[[11,6,1]] w=5 11-6-1.json",
+                  "[[11,7,1]] w=5 11-7-1.json",
+                  "[[11,8,1]] w=6 11-8-1-c.json",
+                  "[[11,8,1]] w=5 11-8-1.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[12,6,1]] w=5 12-6-1.json",
+                  "[[12,6,2]] w=6 12-6-2-b.json",
+                  "[[12,6,2]] w=5 12-6-2.json",
+                  "[[12,7,1]] w=5 12-7-1-b.json",
+                  "[[12,7,1]] w=6 12-7-1.json",
+                  "[[12,7,2]] w=6 12-7-2-b.json",
+                  "[[12,7,2]] w=6 12-7-2.json",
+                  "[[12,8,1]] w=6 12-8-1.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[14,6,2]] w=6 14-6-2.json",
+                  "[[14,7,1]] w=6 14-7-1.json",
+                  "[[14,7,2]] w=6 14-7-2.json",
+                  "[[15,6,1]] w=5 15-6-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[16,6,3]] w=6 16-6-3.json",
+                  "[[16,8,2]] w=6 16-8-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[21,6,2]] w=6 21-6-2.json",
+                  "[[8,6,1]] w=6 8-6-1-ca6696bffd91d382.json",
+                  "[[8,6,1]] w=6 8-6-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=5 9-6-1-b.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json",
+                  "[[9,6,1]] w=6 9-6-1.json",
+                  "[[9,7,1]] w=6 9-7-1.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,6,1]] w=5 10-6-1-b.json and 41 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 2081078564
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/21-6-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 21,
+              "k": 6,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "d509ce3298be67b1",
+              "signature": "d8ab32f4b007c22b"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 27975513,
+                "detail": "no lighter logical in 3340 RIS trials (seed 27975513)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,6,1]] w=5 10-6-1-b.json",
+                  "[[10,6,1]] w=6 10-6-1.json",
+                  "[[10,7,1]] w=6 10-7-1-b.json",
+                  "[[10,7,1]] w=6 10-7-1-c.json",
+                  "[[10,7,1]] w=6 10-7-1.json",
+                  "[[10,8,1]] w=6 10-8-1.json",
+                  "[[11,6,1]] w=5 11-6-1.json",
+                  "[[11,7,1]] w=5 11-7-1.json",
+                  "[[11,8,1]] w=6 11-8-1-c.json",
+                  "[[11,8,1]] w=5 11-8-1.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[12,6,1]] w=5 12-6-1.json",
+                  "[[12,6,2]] w=6 12-6-2-b.json",
+                  "[[12,6,2]] w=5 12-6-2.json",
+                  "[[12,7,1]] w=5 12-7-1-b.json",
+                  "[[12,7,1]] w=6 12-7-1.json",
+                  "[[12,7,2]] w=6 12-7-2-b.json",
+                  "[[12,7,2]] w=6 12-7-2.json",
+                  "[[12,8,1]] w=6 12-8-1.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[14,6,2]] w=6 14-6-2.json",
+                  "[[14,7,1]] w=6 14-7-1.json",
+                  "[[14,7,2]] w=6 14-7-2.json",
+                  "[[15,6,1]] w=5 15-6-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[16,6,3]] w=6 16-6-3.json",
+                  "[[16,8,2]] w=6 16-8-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[21,6,2]] w=6 21-6-2.json",
+                  "[[8,6,1]] w=6 8-6-1-ca6696bffd91d382.json",
+                  "[[8,6,1]] w=6 8-6-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=5 9-6-1-b.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json",
+                  "[[9,6,1]] w=6 9-6-1.json",
+                  "[[9,7,1]] w=6 9-7-1.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,6,1]] w=5 10-6-1-b.json and 41 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 27975513
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/21-6-1-eglue-2bc76ee06474211a.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              8,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 21,
+              "k": 6,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "f5ec4a3263540c9f",
+              "signature": "d8ab32f4b007c22b"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1869620670,
+                "detail": "no lighter logical in 3340 RIS trials (seed 1869620670)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,6,1]] w=5 10-6-1-b.json",
+                  "[[10,6,1]] w=6 10-6-1.json",
+                  "[[10,7,1]] w=6 10-7-1-b.json",
+                  "[[10,7,1]] w=6 10-7-1-c.json",
+                  "[[10,7,1]] w=6 10-7-1.json",
+                  "[[10,8,1]] w=6 10-8-1.json",
+                  "[[11,6,1]] w=5 11-6-1.json",
+                  "[[11,7,1]] w=5 11-7-1.json",
+                  "[[11,8,1]] w=6 11-8-1-c.json",
+                  "[[11,8,1]] w=5 11-8-1.json",
+                  "[[12,6,1]] w=4 12-6-1-b.json",
+                  "[[12,6,1]] w=5 12-6-1.json",
+                  "[[12,6,2]] w=6 12-6-2-b.json",
+                  "[[12,6,2]] w=5 12-6-2.json",
+                  "[[12,7,1]] w=5 12-7-1-b.json",
+                  "[[12,7,1]] w=6 12-7-1.json",
+                  "[[12,7,2]] w=6 12-7-2-b.json",
+                  "[[12,7,2]] w=6 12-7-2.json",
+                  "[[12,8,1]] w=6 12-8-1.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[14,6,2]] w=6 14-6-2.json",
+                  "[[14,7,1]] w=6 14-7-1.json",
+                  "[[14,7,2]] w=6 14-7-2.json",
+                  "[[15,6,1]] w=5 15-6-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,6,2]] w=4 16-6-2-b.json",
+                  "[[16,6,3]] w=6 16-6-3.json",
+                  "[[16,8,2]] w=6 16-8-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[21,6,2]] w=6 21-6-2.json",
+                  "[[8,6,1]] w=6 8-6-1-ca6696bffd91d382.json",
+                  "[[8,6,1]] w=6 8-6-1.json",
+                  "[[9,6,1]] w=4 9-6-1-47c2912b9067610a.json",
+                  "[[9,6,1]] w=5 9-6-1-b.json",
+                  "[[9,6,1]] w=4 9-6-1-c.json",
+                  "[[9,6,1]] w=6 9-6-1.json",
+                  "[[9,7,1]] w=6 9-7-1.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,6,1]] w=5 10-6-1-b.json and 41 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1869620670
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/21-6-1-eglue-8abde9b184f1460b.json"
+        }
+      ]
+    },
+    {
+      "left": "10-4-2",
+      "right": "10-6-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 428,
+      "cross_seams": 132,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              3,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "991917a7e6ec7f15",
+              "signature": "63eff3734058d0ec"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 413694169,
+                "detail": "no lighter logical in 3300 RIS trials (seed 413694169)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 413694169
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue-34c3dbee7546a97f.json"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              4,
+              6,
+              9,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "3f534c84cc4bd772",
+              "signature": "01344dae5d1e0412"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 219241461,
+                "detail": "no lighter logical in 3300 RIS trials (seed 219241461)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 219241461
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue-595ab3e5d65d9d9c.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              9,
+              10,
+              17
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 9,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "fef5108be60aaa78",
+              "signature": "3e626251c48baf2d"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 168904298,
+                "detail": "no lighter logical in 3300 RIS trials (seed 168904298)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[13,9,1]] w=5 13-9-1.json and 6 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 168904298
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-9-1-eglue-b742fabad8323cdc.json"
+        }
+      ]
+    },
+    {
+      "left": "10-4-2",
+      "right": "10-8-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1012,
+      "cross_seams": 432,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              3,
+              10
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "557c8ce36659acf5",
+              "signature": "2815fc8d27a97376"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 307844858,
+                "detail": "no lighter logical in 3300 RIS trials (seed 307844858)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 307844858
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue-56aaadc609f891b9.json"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              3,
+              4,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "0c5592851edf8300",
+              "signature": "754aec4ee1abc356"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 983928635,
+                "detail": "no lighter logical in 3300 RIS trials (seed 983928635)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 983928635
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue-8964b053877b0aed.json"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              6,
+              8,
+              13
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 11,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "a5bf925315bba4c5",
+              "signature": "754aec4ee1abc356"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1805340894,
+                "detail": "no lighter logical in 3300 RIS trials (seed 1805340894)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1805340894
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-11-1-eglue-ccd0f89f5180e13e.json"
+        }
+      ]
+    },
+    {
+      "left": "10-4-2",
+      "right": "11-3-3-h",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 175,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              3
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              5,
+              6,
+              9
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              14,
+              17,
+              20
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_error": "ValueError: not one code: Tanner graph has 2 connected component(s); stabilizer group splits into 2 independent block(s) on disjoint qubit sets (sizes 11, 10). The gate ref"
+        }
+      ]
+    },
+    {
+      "left": "10-5-1",
+      "right": "10-6-2-b",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 739,
+      "cross_seams": 231,
+      "children": [
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              10,
+              12
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 10,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "3b2b83bfccf44f6e",
+              "signature": "a5c486bb3f9feac4"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1319112844,
+                "detail": "no lighter logical in 3300 RIS trials (seed 1319112844)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[12,10,1]] w=8 12-10-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,10,2]] w=8 16-10-2.json",
+                  "[[16,11,2]] w=8 16-11-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[18,10,2]] w=8 18-10-2.json",
+                  "[[18,12,2]] w=9 18-12-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[20,12,2]] w=8 20-12-2.json",
+                  "[[20,13,2]] w=8 20-13-2.json",
+                  "[[20,14,2]] w=8 20-14-2.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[12,10,1]] w=8 12-10-1.json and 11 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1319112844
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-10-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              6,
+              11,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 10,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "3536ba38ddaef6f2",
+              "signature": "fd442a15628006c0"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 637193475,
+                "detail": "no lighter logical in 3300 RIS trials (seed 637193475)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[12,10,1]] w=8 12-10-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,10,2]] w=8 16-10-2.json",
+                  "[[16,11,2]] w=8 16-11-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[18,10,2]] w=8 18-10-2.json",
+                  "[[18,12,2]] w=9 18-12-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[20,12,2]] w=8 20-12-2.json",
+                  "[[20,13,2]] w=8 20-13-2.json",
+                  "[[20,14,2]] w=8 20-14-2.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[12,10,1]] w=8 12-10-1.json and 11 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 637193475
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-10-1-eglue-b6d5d86683950a26.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              12,
+              15,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 10,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "8bcd9658c743aead",
+              "signature": "6d43a73a8a8e3641"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1629562325,
+                "detail": "no lighter logical in 3300 RIS trials (seed 1629562325)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[12,10,1]] w=8 12-10-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,10,2]] w=8 16-10-2.json",
+                  "[[16,11,2]] w=8 16-11-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[18,10,2]] w=8 18-10-2.json",
+                  "[[18,12,2]] w=9 18-12-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[20,12,2]] w=8 20-12-2.json",
+                  "[[20,13,2]] w=8 20-13-2.json",
+                  "[[20,14,2]] w=8 20-14-2.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[12,10,1]] w=8 12-10-1.json and 11 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1629562325
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-10-1-eglue-1f51495991a0ed5e.json"
+        }
+      ]
+    },
+    {
+      "left": "10-5-1",
+      "right": "10-8-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1331,
+      "cross_seams": 643,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              5,
+              10
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 12,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "15845d685ac59016",
+              "signature": "e37ad7395745362c"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 724328038,
+                "detail": "no lighter logical in 3300 RIS trials (seed 724328038)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 724328038
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-12-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              5,
+              16,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 12,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "a1a91fb36f34937c",
+              "signature": "e900648fd70fc94d"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1345507831,
+                "detail": "no lighter logical in 3300 RIS trials (seed 1345507831)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1345507831
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-12-1-eglue-1674773fe63a6e3b.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              5,
+              11,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 20,
+              "k": 12,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "239911399a81742c",
+              "signature": "e900648fd70fc94d"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 2023850371,
+                "detail": "no lighter logical in 3300 RIS trials (seed 2023850371)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [
+                  "k",
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-6 x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 2023850371
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/20-12-1-eglue-b370c176f03379f5.json"
+        }
+      ]
+    },
+    {
+      "left": "10-5-1",
+      "right": "11-3-3-h",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 361,
+      "cross_seams": 78,
+      "children": [
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 21,
+              "k": 7,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-6",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "c5a8a59fbf6f8360",
+              "signature": "1703da1b41a276b6"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-6",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 2030267039,
+                "detail": "no lighter logical in 3340 RIS trials (seed 2030267039)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-6",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[10,7,1]] w=6 10-7-1-b.json",
+                  "[[10,7,1]] w=6 10-7-1-c.json",
+                  "[[10,7,1]] w=6 10-7-1.json",
+                  "[[10,8,1]] w=6 10-8-1.json",
+                  "[[11,7,1]] w=5 11-7-1.json",
+                  "[[11,8,1]] w=6 11-8-1-c.json",
+                  "[[11,8,1]] w=5 11-8-1.json",
+                  "[[12,7,1]] w=5 12-7-1-b.json",
+                  "[[12,7,1]] w=6 12-7-1.json",
+                  "[[12,7,2]] w=6 12-7-2-b.json",
+                  "[[12,7,2]] w=6 12-7-2.json",
+                  "[[12,8,1]] w=6 12-8-1.json",
+                  "[[13,7,1]] w=4 13-7-1.json",
+                  "[[13,9,1]] w=5 13-9-1.json",
+                  "[[14,10,1]] w=5 14-10-1.json",
+                  "[[14,7,1]] w=6 14-7-1.json",
+                  "[[14,7,2]] w=6 14-7-2.json",
+                  "[[16,10,1]] w=5 16-10-1.json",
+                  "[[16,8,2]] w=6 16-8-2.json",
+                  "[[17,10,1]] w=5 17-10-1.json",
+                  "[[17,9,2]] w=5 17-9-2.json",
+                  "[[18,9,2]] w=6 18-9-2.json",
+                  "[[20,10,2]] w=6 20-10-2.json",
+                  "[[9,7,1]] w=6 9-7-1.json"
+                ],
+                "advances_by": [
+                  "n"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[10,7,1]] w=6 10-7-1-b.json and 23 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 2030267039
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-225213-Mathyss-MacBook-Air-9745/21-7-1-eglue.json"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              8,
+              10,
+              11,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-5-2",
+      "right": "10-6-2",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1475,
+      "cross_seams": 984,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              5,
+              10,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              4,
+              11,
+              16
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              5,
+              9,
+              13,
+              16
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-5-2",
+      "right": "11-3-3-c",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 261,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              5
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              3,
+              6,
+              7
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              10,
+              12,
+              16
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 7,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-5-2",
+      "right": "11-4-1",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 401,
+      "cross_seams": 120,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              5,
+              12,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              8,
+              9,
+              12,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              9,
+              11,
+              19
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-1-b",
+      "right": "10-7-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1333,
+      "cross_seams": 812,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              9,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              7,
+              11,
+              15
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              2,
+              6,
+              13,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-1-b",
+      "right": "11-3-3-f",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 391,
+      "cross_seams": 78,
+      "children": [
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              2,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              6,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-1",
+      "right": "10-6-2",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1024,
+      "cross_seams": 523,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              9,
+              10,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              3,
+              16,
+              17
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              5,
+              14,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 11,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-1",
+      "right": "11-3-3-c",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 309,
+      "cross_seams": 38,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              9,
+              10,
+              12,
+              13
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              1,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              4,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-1",
+      "right": "11-4-1",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 490,
+      "cross_seams": 199,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              9,
+              12,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              1,
+              8,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              2,
+              5,
+              11,
+              19
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-2-b",
+      "right": "10-7-2",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 2740,
+      "cross_seams": 2090,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              10,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              8,
+              12,
+              17
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              4,
+              5,
+              17,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-2-b",
+      "right": "11-3-3-g",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 375,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              4,
+              6,
+              8
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              4,
+              5,
+              6,
+              7
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-2",
+      "right": "10-7-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 1797,
+      "cross_seams": 1210,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              3,
+              15,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              9,
+              16,
+              19
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 12,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-6-2",
+      "right": "11-3-3-f",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 379,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              4,
+              6,
+              7
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              4,
+              5,
+              6,
+              7
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 8,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1-b",
+      "right": "10-7-1",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 3297,
+      "cross_seams": 2580,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              2,
+              11,
+              12
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              4,
+              5,
+              7,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1-b",
+      "right": "11-3-3-f",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 639,
+      "cross_seams": 130,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              10,
+              11,
+              17
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              10,
+              18,
+              19
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              6,
+              11,
+              15,
+              20
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1-c",
+      "right": "10-7-2",
+      "n_left": 10,
+      "n_right": 10,
+      "seams_total": 3320,
+      "cross_seams": 2540,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              10,
+              11
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              9,
+              15,
+              17
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              7,
+              13,
+              18
+            ]
+          ],
+          "child_n": 20,
+          "child_k": 13,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1-c",
+      "right": "11-3-3-g",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 625,
+      "cross_seams": 120,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              10,
+              13,
+              14
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              11,
+              13,
+              15
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              6,
+              12,
+              13,
+              18
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1",
+      "right": "11-3-3-b",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 431,
+      "cross_seams": 74,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              10,
+              12,
+              14
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              10,
+              12,
+              14
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              10,
+              12,
+              20
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-1",
+      "right": "11-3-3",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 431,
+      "cross_seams": 74,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              1,
+              10,
+              12,
+              13
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              10,
+              12,
+              13
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              10,
+              12,
+              20
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-2",
+      "right": "11-3-3-d",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 424,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              7,
+              8,
+              9
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              11,
+              13,
+              19,
+              20
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 9,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-7-2",
+      "right": "11-4-2",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 936,
+      "cross_seams": 503,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              11,
+              12
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              2,
+              6,
+              17,
+              18
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              6,
+              9,
+              17,
+              18
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 10,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "10-8-1",
+      "right": "11-3-3-h",
+      "n_left": 10,
+      "n_right": 11,
+      "seams_total": 675,
+      "cross_seams": 120,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              10,
+              13,
+              14
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              3,
+              11,
+              14,
+              16
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              6,
+              12,
+              16,
+              19
+            ]
+          ],
+          "child_n": 21,
+          "child_k": 10,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-b",
+      "right": "11-3-3-f",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 149,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              2,
+              4
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              11,
+              12,
+              13,
+              21
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              1,
+              2,
+              5
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-c",
+      "right": "11-3-3-e",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 149,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              2,
+              3
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              11,
+              12,
+              14,
+              17
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              1,
+              2,
+              10
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-d",
+      "right": "11-3-3-e",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 148,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              9
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              6,
+              7,
+              9,
+              10
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              13,
+              18,
+              19
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-e",
+      "right": "11-3-3-f",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 148,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              5,
+              6,
+              8,
+              9
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              16,
+              18,
+              21
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-f",
+      "right": "11-3-3-h",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 149,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              0,
+              1,
+              7
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              11,
+              12,
+              14,
+              17
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              1,
+              2,
+              6
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 5,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    },
+    {
+      "left": "11-3-3-g",
+      "right": "11-4-2",
+      "n_left": 11,
+      "n_right": 11,
+      "seams_total": 158,
+      "cross_seams": 0,
+      "children": [
+        {
+          "seam": [
+            "X",
+            [
+              12,
+              13
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "X",
+            [
+              12,
+              14,
+              15,
+              17
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        },
+        {
+          "seam": [
+            "Z",
+            [
+              0,
+              2,
+              4,
+              5
+            ]
+          ],
+          "child_n": 22,
+          "child_k": 6,
+          "max_w": 6,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "gate_skipped": "gate cap"
+        }
+      ]
+    }
+  ]
+}
