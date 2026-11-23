@@ -241,7 +241,10 @@ def test_equivalence_box_is_ticked_from_the_gates_own_dedup():
     assert "fingerprint" in reason
 
 
-def test_wl_equivalent_peer_without_a_note_is_a_blocker():
+def test_wl_equivalent_peer_without_a_note_is_a_blocker(monkeypatch):
+    # the audit did not decide the pair, so the human rule applies (issue #6186)
+    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
+        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
     ticked, reason = P.equivalence_finding(
         _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc()
     )
@@ -249,7 +252,9 @@ def test_wl_equivalent_peer_without_a_note_is_a_blocker():
     assert "72-12-6.json" in reason
 
 
-def test_wl_equivalent_peer_with_a_note_is_ticked():
+def test_wl_equivalent_peer_with_a_note_is_ticked(monkeypatch):
+    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
+        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
     doc = _doc()
     doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
     ticked, reason = P.equivalence_finding(
@@ -257,6 +262,51 @@ def test_wl_equivalent_peer_with_a_note_is_ticked():
     )
     assert ticked
     assert "provenance.notes" in reason
+
+
+def test_an_exhibited_permutation_refuses_the_candidate_even_with_a_note(monkeypatch):
+    """Issue #6186: the audit decides the WL flag; a permutation means it is that code."""
+    doc = _doc()
+    doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
+    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
+        "against": "72-12-6", "verdict": "equivalent", "found_by": "tanner",
+        "permutation": list(range(d["n"]))})
+    ticked, reason = P.equivalence_finding(
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), doc)
+    assert not ticked
+    assert "permutation" in reason and "72-12-6" in reason and "withdraw" in reason
+
+
+def test_a_separating_invariant_ticks_the_box_without_a_note(monkeypatch):
+    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
+        "against": "72-12-6", "verdict": "inequivalent",
+        "reason": "hull_X differs in both orientations"})
+    ticked, reason = P.equivalence_finding(
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc())
+    assert ticked
+    assert "permutation_audit" in reason and "hull_X differs" in reason
+
+
+def test_an_undecided_pair_keeps_the_notes_rule(monkeypatch):
+    monkeypatch.setattr(P.equivalence, "decide_pair", lambda d, s, root=None: {
+        "against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
+    verdict = _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"})
+    ticked, reason = P.equivalence_finding(verdict, _doc())
+    assert not ticked and "72-12-6.json" in reason
+    doc = _doc()
+    doc["provenance"]["notes"] = "Compared against 72-12-6.json; different code."
+    ticked, reason = P.equivalence_finding(verdict, doc)
+    assert ticked and "provenance.notes" in reason
+
+
+def test_a_precomputed_record_is_used_without_deciding_again(monkeypatch):
+    monkeypatch.setattr(P.equivalence, "decide_pair",
+                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("decided twice")))
+    audit = {"against": "72-12-6", "verdict": "inequivalent", "reason": "low_X differs"}
+    ticked, reason = P.equivalence_finding(
+        _verdict({"exact_duplicate_of": None, "wl_equivalent_of": "72-12-6.json"}), _doc(),
+        audit=audit)
+    assert ticked and "low_X differs" in reason
 
 
 def test_fresh_body_carries_no_scaffolding_the_prose_gate_rejects():

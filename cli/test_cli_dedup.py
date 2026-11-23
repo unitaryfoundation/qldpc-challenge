@@ -15,6 +15,7 @@ These tests pin the two halves of the fix:
   the exclusion does not become a way to file the same code twice.
 """
 
+import json
 import os
 
 import numpy as np
@@ -199,3 +200,40 @@ def test_written_file_is_named_as_the_exclusion(monkeypatch, tmp_path):
     assert got == {"checked": True, "match": None, "kind": None}, got
     box = qldpc._equivalence_box(got)
     assert box.startswith("- [x]"), box
+    # (PR 6926 tests retained)
+
+
+def test_box_follows_the_audit_when_a_wl_match_is_decided():
+    """Issue #6186: a WL match the permutation audit separates ticks the box with
+    the invariant; one it joins by a permutation stays unticked as a duplicate."""
+    sep = {"checked": True, "match": "72-12-6.json", "kind": "WL signature",
+           "audit": {"against": "72-12-6", "verdict": "inequivalent",
+                     "reason": "hull_X differs in both orientations"}}
+    line = qldpc._equivalence_box(sep)
+    assert line.startswith("- [x]") and "hull_X differs" in line and "72-12-6" in line
+    dup = dict(sep, audit={"against": "72-12-6", "verdict": "equivalent", "found_by": "tanner"})
+    line = qldpc._equivalence_box(dup)
+    assert line.startswith("- [ ]") and "permutation" in line and "withdraw" in line
+    und = dict(sep, audit={"against": "72-12-6", "verdict": "undecided", "reason": "over budget"})
+    line = qldpc._equivalence_box(und)
+    assert line.startswith("- [ ]") and "provenance.notes" in line
+
+
+def test_audit_wl_match_attaches_and_writes_the_record(monkeypatch, tmp_path):
+    calls = []
+
+    def fake_decide(doc, against, root=None):
+        calls.append((against, root))
+        return {"against": "72-12-6", "verdict": "inequivalent", "reason": "low_Z differs"}
+    monkeypatch.setattr(qldpc.equivalence, "decide_pair", fake_decide)
+    dedup = {"checked": True, "match": "72-12-6.json", "kind": "WL signature"}
+    got = qldpc.audit_wl_match({"n": 7}, dedup, root=str(tmp_path))
+    assert got["audit"]["verdict"] == "inequivalent"
+    assert calls == [("72-12-6.json", str(tmp_path))]
+    rec = tmp_path / "research" / "candidates" / "equivalence" / "candidate-vs-72-12-6.equivalence.json"
+    assert rec.exists() and json.load(open(rec))["reason"] == "low_Z differs"
+    # exact matches and clean boards are not audited
+    for other in ({"checked": True, "match": "7-1-3.json", "kind": "exact fingerprint"},
+                  {"checked": True, "match": None, "kind": None}, None):
+        assert qldpc.audit_wl_match({"n": 7}, other, root=str(tmp_path)) == other
+    assert len(calls) == 1
