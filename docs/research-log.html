@@ -24,7 +24,217 @@
 <li>B = {(2,4), (1,2), (4,3)}.</li>
 </ul>
 <p>For each group element g, create one X row from g+A in the first block and g+B in the second. Create one Z row from g−B in the first block and g−A in the second. Reduce coordinates modulo 14 and 6 and add 84 to second-block indices. These supports reproduce the submitted matrices. Multiple search hits shared an output filename; the supports above were checked against the archived matrix.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/168-14-14.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/544-16-48.html">[[544,16,48]] — 544-16-48</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details open><summary>note</summary><div class=notebody><h3>[[544,16,48]] — Kasai affine 2BGA interior-gap extension, kd^2/n 183.6 at n=544</h3>
+<section class=blk><h3>Greedy weight shedding with objective-aware search: 15 board-advancing codes</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Used the objective-aware search from code-calculus-dev <a href="https://github.com/unitaryfoundation/code-calculus-dev/pull/624">PR #624</a> (<code>objective=&quot;weight&quot;</code>, <code>rebase=True</code>) to run a greedy weight-shedding campaign over 140 CSS board parents. Of 157 single-step attempts, 23 produced a weight-improving child; all 23 were staged with witnesses and gated, **all 23 passed<b>, and </b>15 were board-advancing** (gate `gates.novelty.board_advancing: true`). Dedup against the board and open PRs found 0 exact/WL duplicates, and the 15 finds are mutually non-duplicate. Every find is a d=1, weight-reduced variant in the <code>weight-9plus</code>/unrestricted cell; none is a d-only gain. These are staged for human review only — no PR was opened.</p>
+<h4>What was run</h4>
+<ul>
+<li>Tool: <code>code-calculus-dev</code> PR #624 worktree @ <code>6b02aba</code> (branch</li>
+<p><code>codex/issue-7116-consumer-diagnostics</code>, base <code>origin/main</code> <code>dae82da</code>).</p>
+<li>Two waves: (1) 60 parents, n ∈ [10,120], weighted toward high check weight;</li>
+<p>(2) 80 parents, n ∈ [10,80], ordered by n (the productive pilot regime). Both: CSS, d ≥ 2, parent w ≥ 5, 3 greedy steps, sector budget 64.</p>
+<li>Each step called `bounded_sector_search(..., objective=&quot;weight&quot;,</li>
+<p>sector_swap=False, rebase=True)`; the best child was chosen by (lower max check weight, larger k, smaller n, higher carried upper bound).</p>
+<li>Every chosen child was packaged with <code>submit.make_submission</code> (8,000 witness</li>
+<p>trials), staged via <code>save_submission(..., spec=)</code> with the parent/step/ objective recorded, and gated via <code>coordination.gate_and_record</code>. Dedup used <code>dedup_oracle.combined_index(include_open_prs=True)</code> (3,695 entries).</p>
+<li>Sector swaps were excluded by construction: they change no weight and PR</li>
+<p>#624 reports them separately as presentation-only.</p>
+</ul>
+<h4>Numbers</h4>
+<p>| | Wave 1 | Wave 2 | Total | |---|---:|---:|---:| | Parents | 60 | 80 | 140 | | Single-step attempts | 64 | 93 | 157 | | Steps with a weight-improving child | 5 | 18 | <b>23</b> | | Candidates gated | 5 | 18 | 23 | | Gate <code>passed: true</code> | 5 | 18 | <b>23</b> | | <code>board_advancing: true</code> | 2 | 13 | <b>15</b> | | Duplicates (board + open PRs) | 0 | 0 | 0 | | d-only gains | 0 | 0 | 0 |</p>
+<p>Hit rate: 23/157 = 14.6% of steps produced a gateable child; 15/23 = 65% of gated children advanced the board. A large majority of steps (134/157) found no weight-improving child at this budget — consistent with the v0.2 finding that single-step weight reduction is rare, but now measured on the correct axis instead of the distance interval.</p>
+<h4>The 15 finds</h4>
+<p>All are <code>[[n,k,d]] = [[n,k,1]]</code> with d witnessed at 8,000 trials; <code>w</code> is the max check weight after the greedy chain, and the parent is the chain origin.</p>
+<p>| Parent | n | k | w | Parent | n | k | w | |---|---:|---:|---:|---|---:|---:|---:| | 62-42-2 | 60 | 45 | 30 | 35-17-3 | 34 | 27 | 18 | | 62-42-2 | 59 | 45 | 29 | 35-17-3 | 33 | 27 | 17 | | 29-23-2 | 28 | 23 | 15 | 35-17-3 | 32 | 27 | 16 | | 36-19-3 | 34 | 27 | 17 | 38-32-2 | 37 | 32 | 21 | | 36-19-3 | 33 | 28 | 16 | 38-32-2 | 36 | 32 | 20 | | 46-30-2 | 43 | 33 | 21 | 38-32-2 | 35 | 32 | 19 | | 63-48-3 | 62 | 53 | 31 | 63-48-3 | 61 | 53 | 30 | | 63-48-3 | 60 | 53 | 29 | | | | |</p>
+<p>The most productive parents were chains of 3 steps (<code>62-42-2</code>, <code>35-17-3</code>, <code>38-32-2</code>, <code>63-48-3</code>), each shedding one unit of n and w per step while preserving k. The single largest one-step shed was <code>29-23-2</code> → <code>[[28,23,1]]</code>, w 21 → 15.</p>
+<p>Each staged candidate carries its gate verdict and reproduction spec beside it in gitignored working output; none of those paths is cited here as a board entry.</p>
+<h4>Extended arm: forcing distance ≥ 2</h4>
+<p>A follow-up run targeted the question left open by the first campaign — all 15 finds were d=1 — by adding two floors to the same objective search: <code>min_child_upper=3</code> (transport-level) and <code>min_d=2</code> (only children whose witnessed distance is ≥ 2 are gated; lower-d children are still staged so no witness is discarded). Parents were CSS, d ≥ 3, n ∈ [80,160] (120 parents, 3 steps, budget 64). Rebase was disabled after measuring that its O(m²) enumeration costs &gt;2 min per parent without producing hits the punctures did not already find.</p>
+<p>| | Extended arm | |---|---:| | Parents / steps | 120 / 125 | | Weight-improving children | 5 | | Staged with witness d = 1 (skipped by floor) | 4 | | Staged with witness d = 3 (gated) | 1 | | Gate passed | 1 | | Board-advancing | <b>0</b> |</p>
+<p>The single d≥2 candidate, <code>103-30-7</code> → <code>[[102,36,3]]</code> w=8 (parent w=14), passed the gate but was dominated by 6 board entries. The 4 d=1 children came from <code>141-44-4</code>, <code>158-52-3</code> and <code>80-16-4</code>, where the carried upper bound stayed at 3 or 4 but the witness search found a weight-1 logical — a direct illustration that a transported upper bound is not a witnessed distance.</p>
+<p><b>Conclusion:</b> across 157 + 125 = 282 greedy steps, this objective produced <b>0 gate-passing, board-advancing codes with d ≥ 2</b>. Weight shedding preserves or lowers the ledger&#x27;s upper endpoint but frequently drops the *witnessed* distance to 1; the few children that keep d ≥ 2 are dominated. Reaching the thin high-distance cells needs a different move family (one that provably preserves distance), not a larger budget on these moves.</p>
+<p>Raw data: <code>extended.json</code> in the campaign directory.</p>
+<h4>Negative results and boundaries</h4>
+<ul>
+<li><code>rebase=True</code> did not change the hit rate (2/30 vs 2/30 on a fixed parent</li>
+<p>slice): P-REBASE was enumerated but did not produce weight-improving children within the budget. This does not rule out a different row-mix schedule.</p>
+<li>The missing-n objective (<code>{&quot;axis&quot;:&quot;n&quot;,&quot;targets&quot;:...}</code>) found 0 children on</li>
+<p>small parents — their peel/puncture children land at n &lt; 86, outside the missing-n set. It needs n ≥ 500 parents and was not run here.</p>
+<li>All finds are d=1. The thinnest high-distance cell (<code>w4·d≥16</code>, 65 board</li>
+<p>entries) was <b>not</b> reached: weight shedding preserved d and reduced w by 1 per step from w ≥ 9, so w ≤ 4 would need many more steps. No claim is made about reaching that cell.</p>
+<li>One wave-2 run crashed on a child with an empty check sector (the verifier</li>
+<p>requires an explicit 0×n matrix); the helper was fixed and the wave rerun in full. No witness was lost: the crash happened before staging that child.</p>
+</ul>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py</code>, with <code>results.json</code>, <code>campaign_smalln.json</code>, and logs beside it. From <code>qldpc-challenge</code> with <code>CODE_CALCULUS_PATH</code> pointing at the PR #624 worktree:</p>
+<pre>
+.venv/bin/python -u research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py \
+  --limit 60 --budget 64 --gate-cap 40 --open-prs --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/results.json
+.venv/bin/python -u research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/run.py \
+  --limit 80 --n-hi 80 --order n --budget 64 --gate-cap 25 --open-prs \
+  --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign_smalln.json
+</pre>
+<p>No PR was opened for any find; promotion remains a human decision.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-pr624-weight-shedding-greedy.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Distance-revision harvest, cheap rung: 12 high-d board entries, 0 tightenings</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Direction 5 of issue #7116 asks for a re-gating harvest over sweep entries and open-PR parents with the depth-proportional ladder (<code>screening_trials</code> from PR #6195). This run took the cheap rung: 12 CSS board entries with d ∈ [8,15], n ≈ 100–112, re-measured on <b>both sectors</b> at <code>screening_trials(d)</code> (18,000–32,000 trials) across two seeds. <b>0 tightenings</b> were found: every entry&#x27;s claimed distance survived as a witnessed upper bound on both sides. No revision candidate was staged or gated, and no PR was filed.</p>
+<h4>What was run</h4>
+<ul>
+<li>Tool: <code>research/kit/surrogate.lightest_logical</code> (the verifier&#x27;s own</li>
+<p>witness-search entry point), <code>reachability_campaign.screening_trials</code>.</p>
+<li>For each entry: X-side search <code>(HX, HZ)</code> and Z-side search <code>(HZ, HX)</code> at</li>
+<p><code>trials = screening_trials(claimed_d)</code> for seeds 51 and 307 (+1 for the Z side), keeping the lightest witness per side across seeds.</p>
+<li>A tightening is recorded only when <code>min(w_X, w_Z) &lt; claimed_d</code>. Found</li>
+<p>witnesses would have been packaged with <code>make_submission(..., witnesses=)</code> and gated; none qualified.</p>
+</ul>
+<h4>Numbers</h4>
+<p>| Metric | Value | |---|---:| | Board entries re-measured | 12 | | Claimed d range | 8–15 | | n range | 100–112 | | Trials per side | 18,000–32,000 (depth-proportional) | | Seeds | 51, 307 (2 per side) | | Searches run | 48 | | Tightenings found | <b>0</b> | | Candidates staged / gated | 0 / 0 |</p>
+<p>Per entry the lightest X and Z witnesses both equalled the claimed d (e.g. <code>100-2-14</code>: w_X = w_Z = 14 at 30,000 trials; <code>108-4-15</code>: 15/15 at 32,000; <code>104-30-8</code>: 8/8 at 18,000). The full per-entry table is in <code>results.json</code>.</p>
+<h4>Why this is not the whole direction</h4>
+<p>This is the cheap rung only. The mature revision workflow in this repository measures at <b>2,000,000</b> trials with three seeds and a matched-depth <code>leader_audit</code> comparison; the four revisions merged during v0.2 came from that depth. At 18k–32k trials this run can only detect a loose claim whose true distance is well below the board value — and on these 12 entries none is. It does <b>not</b> rule out tightenings that only appear at the deep rungs, and it did not cover the 2026-11-17 sweep entries or open-PR parents specifically (the selection was the 12 smallest-n CSS entries with d ≥ 8). Those remain open.</p>
+<h4>Boundary</h4>
+<p>All distances reported here are witness-backed upper bounds. A non-tightening is not a certificate: it says no lighter logical was found at this budget, not that the claimed d is exact. No evidence was produced that would support filing a revision PR, and unattended runs do not open PRs in any case.</p>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v07-distance-revision-harvest/run.py</code> and <code>results.json</code>. From <code>qldpc-challenge</code>:</p>
+<pre>
+.venv/bin/python -u research/campaigns/cc-v07-distance-revision-harvest/run.py \
+  --limit 40 --entries 12 --seeds 51 307 --gate-cap 12 --out research/campaigns/cc-v07-distance-revision-harvest/results.json
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-v07-distance-revision-harvest.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Systematic E-GLUE seam matching: the enumerator works, but only cross-factor seams produce admissible children</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Direction 6 (formerly 7) of issue #7116 re-opens the v0.1 directions: stabilizer parents, ledger lower-bound pruning, reverse search, and systematic <code>E-GLUE</code> seam matching. This note runs the last of those. The v0.2 probe reported **0 successful glues** &quot;because the seam certificate was not satisfiable without a proper seam enumerator.&quot; code-calculus now exposes <code>enumerate_seam_checks(left, right, max_size=3)</code>; using it over 40 pairs of small CSS board parents produced <b>29,224 seams</b>, of which **14,426 span both factors<b>, and </b>25 gate-passing children, 9 board-advancing** (2 distinct <code>(n,k,d,w)</code> points, both d=1). The old zero is explained: the default <code>max_size=3</code> yields <b>no cross-factor seams at all</b>, so every glued child is a direct sum and the gate refuses it before distance.</p>
+<h4>What was run</h4>
+<ul>
+<li>Tool: code-calculus PR #624 worktree @ <code>6b02aba</code>, <code>enumerate_seam_checks</code></li>
+<p>and <code>apply_operation({&quot;op&quot;:&quot;E-GLUE&quot;, ...})</code>; gated with the trusted gate.</p>
+<li>Parents: 24 CSS board entries, n ∈ [8,16]; 40 deterministic pairs. The right</li>
+<p>factor was shifted to a disjoint qubit namespace and its row ids re-minted with <code>relabel_identifiers</code> (E-GLUE refuses overlapping namespaces/used sets).</p>
+<li>Seam certificate <code>{&quot;move_words&quot;:[&quot;U&quot;,&quot;U&quot;], &quot;evidence&quot;:...}</code>; one cross-factor</li>
+<p>seam per child, up to 3 per pair; <code>max_size=4</code>. Each child was staged with <code>make_submission</code> (8,000 witness trials), <code>save_submission(..., spec=)</code>, and gated. Dedup against board + open PRs (3,695 entries).</p>
+<li>Control run at <code>max_size=3</code>: 28 pairs, 4,744 seams, <b>0 cross-factor</b>, 0</li>
+<p>connected children — all refused as &quot;not one code&quot;. At <code>max_size=4</code> the same pair type yields 30–136 cross seams.</p>
+</ul>
+<h4>Numbers</h4>
+<p>| Metric | Value | |---|---:| | Pairs | 40 | | Seams enumerated | 29,224 | | Cross-factor seams | 14,426 (49.4%) | | Children applied and validated | 120 | | Derive failures | 0 | | Duplicates (board + open PRs) | 0 | | Gated (cap 25) | 25 | | Gate <code>passed: true</code> | 25 | | <code>board_advancing: true</code> | <b>9</b> | | Distinct <code>(n,k,d,w)</code> among the 9 | <b>2</b> | | Witnessed d among all gated children | d=1 (25/25) | | d-only gains | 0 |</p>
+<p>The two distinct points are <code>[[20,11,1]]</code> w=6 (from 10-4-1+10-8-1 and 10-4-2+10-8-1) and <code>[[20,12,1]]</code> w=6 (from 10-5-1+10-8-1). The nine staged files have no exact fingerprint duplicates; three WL-signature overlaps mark probable permutations. All were d=1, so none approaches the thin high-distance cells. The 83 remaining children were not gated only because the 25-gate cap was reached, not because they failed.</p>
+<h4>The other three sub-items</h4>
+<ul>
+<li><b>Stabilizer parents / symplectic state model.</b> Already exercised: the</li>
+<p>v0.1 pilot (<code>research/campaigns/cc-stabilizer-parents-2026-11-05/</code>) used 54 stabilizer parents and produced <b>176 board-advancing</b> children (240/248 gated passed, 8 exact duplicates), from 172 E-PUNCTURE and 4 E-PEEL children. The board now holds <b>262 stabilizer entries</b> (n 5–761, d 2–86). Those codes are dominated by CSS entries at the same <code>(n,k)</code> because the two boards are ranked apart by rule — an occupancy fact, not a move failure. The machine side has <code>SymplecticState</code>, <code>SymplecticLedger</code>, and the <code>SYM-*</code> / <code>X-SYMPLECTIC-*</code> move set, but no <code>from_challenge</code> loader and no admitted calculus layer, so re-running it needs a document adapter rather than a new search.</p>
+<li><b>Ledger lower-bound pruning for delete/peel/puncture.</b> Still unavailable,</li>
+<p>and correctly so: the transported lower endpoint is 0 for these moves, and supplying a nonzero bound would be a proof obligation, not a consumer shortcut. No script or fieldnote claims it done. The measured consequence is that reachability pruning removes only 5.4% of derivable children (<code>research/audits/cc_reachability.py</code>). This remains a code-calculus-dev obligation, not a campaign task.</p>
+<li><b>Reverse search.</b> No design, script, or helper exists in either repo</li>
+<p>(grep for <code>reverse|inverse|unapply|backward</code> in <code>planner.py</code>, <code>sequence.py</code>, and all fieldnotes returns nothing relevant). The only &quot;direction 6&quot; prior art is a *forward* reachability prune from #4478. This is genuinely unrun and needs a design decision before a campaign can be specified.</p>
+</ul>
+<h4>Boundary</h4>
+<p>One seam per child, <code>max_size=4</code>, parents n ≤ 16, 3 seams per pair, gate cap 25. No multi-seam chains, no larger parents, no deep distance ladder, and no promotion of any staged child. Every distance is a witness-backed upper bound.</p>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v07-eglue-seam-systematic/run.py</code> and <code>results.json</code>. From <code>qldpc-challenge</code> with <code>CODE_CALCULUS_PATH</code> at PR #624:</p>
+<pre>
+.venv/bin/python -u research/campaigns/cc-v07-eglue-seam-systematic/run.py \
+  --n-lo 8 --n-hi 16 --parents 24 --pairs 40 --seams-per-pair 3 \
+  --max-size 4 --gate-cap 25 --open-prs --out research/campaigns/cc-v07-eglue-seam-systematic/results.json
+</pre>
+<p>No PR was opened for any find; promotion remains a human decision.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-v07-eglue-seam-matching.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Gate-realization judgments on real board codes: the rows decide, and one branch stays not-yet-defined</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Direction 3 of issue #7116 applies the two gate-realization judgment rows of github.com/unitaryfoundation/code-calculus-dev @ 4c98904, <code>spec/JUDGMENT_LAYER.md</code> §2h to real CSS board entries, not synthetic small displays. On 23 board codes with n ∈ [4,10], d ≥ 2: 115 gate-preservation checks produced 37 preserving and 78 non-preserving gates, and <b>0 disagreements</b> with the state-vector oracle at θ = π/4. Of 222 addable-row survival checks, most carried at π/4, 10 did not carry, and 119 stayed <code>not_yet_defined</code> at a non-π/4 angle with an anticommuting generator — exactly the branch the judgment leaves open. The equal-syndrome weight row held on all 16 sampled families on 12 codes: <code>w_max ≥ ⌈d/2⌉</code> was satisfied, never violated, and never tight in this sample. A wider n ≤ 14 run was attempted but stopped: the harness&#x27;s <code>random_addable_row</code> enumerates all 2^n masks with a basis reduction per mask, so the run stalled after 10 of 64 entries (~5 min) without completing a single additional verdict. The completed n ≤ 10 slice below is the reported result.</p>
+<h4>What was run</h4>
+<ul>
+<li>Tool: code-calculus PR #624 worktree, github.com/unitaryfoundation/code-calculus-dev @ 4c98904, <code>machine/experiments/gate_realization_rows.py</code></li>
+<p>(<code>Display.from_code_state</code>, <code>preserves_pi4</code>, <code>addition_survival_verdict</code>, <code>oracle_preserves</code>, <code>random_equal_syndrome_family</code>, <code>weight_floor</code>, <code>w_max</code>).</p>
+<li>Board entries: 23 CSS codes, n ∈ [4,10], d ≥ 2, seed 7116. Each code got 5</li>
+<p>seeded commuting Hermitian gate families and up to 6 addable check rows.</p>
+<li>The survival row was evaluated at θ = π/4 and at θ = 0.3 for the same added</li>
+<p>row, so the <code>not_yet_defined</code> branch is counted explicitly.</p>
+<li>The weight row needs a family of commuting Paulis with one **common nonzero</li>
+<p>syndrome**. A CSS stabilizer logical commutes with every check, so it has zero syndrome and cannot seed the row; families were therefore sampled from physical Paulis on each real display with the harness&#x27;s own generator.</p>
+</ul>
+<h4>Numbers (n ≤ 10 slice)</h4>
+<p>| Metric | Value | |---|---:| | Board codes | 23 | | Preservation checks (oracle: π/4) | 115 | | — preserving | 37 | | — not preserving | 78 | | Oracle disagreements | <b>0</b> | | Codes with a preserving gate | 19 | | Survival checks | 222 | | Verdicts at π/4 | carries 212, does_not_carry 10 | | Verdicts at θ = 0.3 | carries 103, not_yet_defined 119 | | Codes with an addressable logical family | 12 | | Weight-row families checked | 16 | | — satisfied, above floor | 16 | | — violated / tight | 0 / 0 |</p>
+<p>The three-branch verdict behaves as stated: when every generator commutes with the added row, the row carries at every angle; when a generator anticommutes and the angle is π/4, the stabilizer-membership test decides; when the angle is not π/4 and a generator anticommutes, the judgment is <code>not_yet_defined</code>. No case was observed where the derived criterion disagreed with the oracle.</p>
+<h4>Boundary</h4>
+<ul>
+<li>The weight row was sampled, not exhaustively enumerated: 16 equal-syndrome</li>
+<p>families on 12 codes. It was never tight and never violated, so this sample cannot distinguish &quot;the row is loose on these codes&quot; from &quot;the sampler did not hit the minimum-weight family&quot;. The board&#x27;s witnessed d was used as the comparison distance; no exact-distance certificate was assumed.</p>
+<li>The <code>not_yet_defined</code> count is about the judgment&#x27;s domain, not a failed</li>
+<p>prediction: those cases are deliberately outside the two derived rows.</p>
+<li>This is evidence that the transcription matches the oracle on real displays,</li>
+<p>not a proof of soundness (AGENTS.md).</p>
+</ul>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v07-gate-realization-board/run.py</code> and <code>results.json</code>. From <code>qldpc-challenge</code> with <code>CODE_CALCULUS_PATH</code> at PR #624:</p>
+<pre>
+.venv/bin/python -u research/campaigns/cc-v07-gate-realization-board/run.py \
+  --limit 80 --n-hi 10 --gates 5 --additions 6 --out research/campaigns/cc-v07-gate-realization-board/results.json
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-v07-gate-realization-board.md">raw markdown</a></div></details></section>
+<section class=blk><h3>Direction 2 calibration: the v0.2 negative pilots fail on objective mismatch, not inapplicability</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Direction 2 of issue #7116 asked whether the v0.2 campaigns 3 (weight-shedding) and 4 (puncture/peel toward missing n) failed because the moves were inapplicable or because the search missed them. Re-running their parents with <code>bounded_sector_search</code> and replaying the <code>plan</code> pipeline with per-family drop reasons answers <b>neither</b>: 56,346 derived children were produced across 66 parents and 8,448 budgeted evaluations, and <b>not one</b> improved the target-sector distance interval. The only six candidates the search called &quot;improving&quot; were <code>E-LOCAL-HADAMARD</code> sector swaps, which leave the full distance unchanged. The cause is an <b>objective mismatch</b>: the search optimizes the carried *distance interval*, while campaigns 3 and 4 target *check weight* and *n*. Its improvement predicate cannot see a w-gain or an n-gain, so it reports zero for every derived transformation. No candidate was gated or staged; this is calibration, not a find.</p>
+<h4>What was asked and what was spent</h4>
+<ul>
+<li>Direction 2 of <a href="https://github.com/unitaryfoundation/qldpc-challenge/issues/7116">#7116</a>:</li>
+<p>re-run campaigns 3/4 parents with <code>bounded_sector_search</code>, record refusal reasons per move family. This is the calibration requested by code-calculus-dev <a href="https://github.com/unitaryfoundation/code-calculus-dev/issues/592">#592</a>.</p>
+<li>Tool: <code>unitaryfoundation/code-calculus</code> @ <code>c7e435f912111c03dcae988548d9bf99510d8247</code></li>
+<p>(public v0.3.0), Python 3.12, <code>.venv/bin/python</code>.</p>
+<li>Budget: 128 sector evaluations per parent; 60 campaign-3 parents (CSS,</li>
+<p>d ≥ 8, w ∈ {8,9}, n ≤ 300, deterministic spread over 345 eligible) and 6 campaign-4 parents (CSS, n ≥ 500, d ≥ 6, deterministic spread over 588 eligible). Both runs <b>exhausted their budget on every parent</b>.</p>
+<li>Compute: 1,402 s total (509 s + 893 s). The largest single parent,</li>
+<p><code>1000-200-29</code>, cost 357 s; the single-step plan replay is O(n²) in enumerated puncture/deletion moves.</p>
+</ul>
+<h4>Numbers</h4>
+<p>| | Campaign 3 | Campaign 4 | Total | |---|---:|---:|---:| | Parents | 60 | 6 | 66 | | Sector evals (all exhausted) | 7,680 | 768 | 8,448 | | Derived children (survived full plan pipeline) | 39,930 | 16,416 | 56,346 | | Derived children improving target-sector interval | 0 | 0 | <b>0</b> | | &quot;Improving&quot; candidates reported by the search | 4 | 2 | 6 | | — of which sector swaps | 4 | 2 | <b>6</b> | | Missing-n hits in [86,400] | 0 | 0 | 0 |</p>
+<p>Per-family drop reasons (counts are enumerated moves, attributed at the first stage that rejects them; <code>survived</code> means derived, transported and ranked):</p>
+<p>| Family | Enumerated | <code>apply_operation</code> fail | bare-qubit | disconnected | Derive fail | Survived | Improving | |---|---:|---:|---:|---:|---:|---:|---:| | C-DELETE-CHECK | 12,718 | 0 | 0 | 0 | 0 | 12,718 | 0 | | E-PUNCTURE | 14,379 | 0 | 55 | 9 | 0 | 14,315 | 0 | | E-GRAFT | 28,758 | 206 | 0 | 0 | 0 | 28,552 | 0 | | E-PEEL | 762 | 0 | 0 | 1 | 0 | 761 | 0 | | E-EXTEND | 28,824 | <b>28,758 (99.77%)</b> | 66 | 0 | 0 | <b>0</b> | 0 | | P-REBASE | 0 | — | — | — | — | 0 | 0 |</p>
+<p>The six &quot;improving&quot; candidates were <code>E-LOCAL-HADAMARD</code> swaps on <code>183-12-10</code>, <code>240-13-15</code>, <code>242-12-12</code>, <code>270-54-10</code> (campaign 3) and <code>606-2-49</code>, <code>682-92-64</code> (campaign 4). Each fired because the carried Z upper bound was one greater than X; the record itself states the full distance is unchanged (§4.27). They are presentation symmetries, not distance gains, and they do not shed weight or change n.</p>
+<h4>What this means</h4>
+<p>There are three distinct outcomes, and the v0.2 pilots conflated them:</p>
+<p>1. <b>Inapplicable.</b> Real, but not dominant. <code>E-EXTEND</code> fails <code>apply_operation</code> on 99.77% of enumerated candidates (28,758/28,824); the rest are bare-qubit. <code>E-PEEL</code> yields only ~11 candidates per parent (762 over 66 parents) and was absent entirely on many small parents. <code>P-REBASE</code> is not enabled by <code>candidate_moves</code>&#x27; default flags, so it was never enumerated here. 2. <b>Search missed them.</b> Ruled out at this budget: every one of the 8,448 evaluations was spent, and the pre-budget replay found zero improving derived moves, so a larger budget would not have surfaced one. 3. <b>Objective mismatch (the actual cause).</b> 56,346 children derive and are transported, but <code>sector_targeted_improvement</code> only counts a raise in the target sector&#x27;s lower endpoint or a tightening of its upper endpoint. All these parents carry a vacuous lower endpoint (0) and a witness upper bound equal to the board distance; the transformation moves preserve it. Campaign 3 wants lower *check weight* and campaign 4 wants a different *n* — neither axis appears in the predicate. The search is therefore blind to precisely the gains those campaigns were looking for.</p>
+<h4>Boundary</h4>
+<p>This is a claim about the v0.3.0 consumer&#x27;s search objective, on 66 CSS parents in the two stated regions, at 128 sector evaluations each. It does not rule out that <code>P-REBASE</code>/<code>E-GRAFT</code> can shed weight under a *weight-aware* objective, nor that peel/puncture can land on a missing n under an *n-aware* one; those were not measured here. It also says nothing about the constructors (<code>empty</code>/<code>free</code>/<code>pullback</code>/<code>pushout</code>/CSS-preserving CNOT-SWAP, nor the newer dev constructors): <code>plan</code> does not enumerate them, and they belong to direction 1. Distances quoted from the ledger are witness-backed upper bounds, not certified.</p>
+<h4>Follow-up</h4>
+<ul>
+<li>Give the planner per-family applicability diagnostics that report the drop</li>
+<p>reason (<code>apply_operation</code> non-derivation, bare-qubit, connectivity, transport non-derivation) instead of silently skipping — code-calculus-dev #592.</p>
+<li>Expose an objective parameter to <code>bounded_sector_search</code> (weight / n /</li>
+<p>distance) so campaigns 3/4 can measure the axis they target. The current distance-interval-only predicate should not be reused as a proxy.</p>
+<li>Do not count <code>E-LOCAL-HADAMARD</code> swaps as improving candidates in campaign</li>
+<p>tallies; they change no distance, weight or n.</p>
+</ul>
+<h4>Reproduction</h4>
+<p>Script and raw outputs: <code>research/campaigns/cc-v03-direction2-sector-calibration/</code> (<code>run.py</code>, <code>campaign3.json</code>, <code>campaign4.json</code>, logs). From <code>qldpc-challenge</code> with <code>CODE_CALCULUS_PATH</code> pointing at code-calculus @ <code>c7e435f</code>:</p>
+<pre>
+.venv/bin/python -u research/campaigns/cc-v03-direction2-sector-calibration/run.py \
+  --campaign 3 --limit 60 --n-cap 300 --budget 128 --out research/campaigns/cc-v03-direction2-sector-calibration/campaign3.json
+.venv/bin/python -u research/campaigns/cc-v03-direction2-sector-calibration/run.py \
+  --campaign 4 --limit 6 --budget 128 --out research/campaigns/cc-v03-direction2-sector-calibration/campaign4.json
+</pre>
+<p>Each record carries the full <code>bounded_sector_search</code> summary plus the replayed per-family diagnosis; <code>run.py</code> documents the stage attribution.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-v0p3-direction2-sector-calibration.md">raw markdown</a></div></details></section>
+<section class=blk><h3>New code-calculus constructors: 75/75 derive, but the weight-4 yield is direct sums</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Extension of issue #7116 direction 1 to the constructors added on <code>code-calculus-dev</code> after public v0.3.0: <code>L-PAIR-PARTITION</code>, <code>PP-SCALE</code>, and the nonabelian <code>L-GROUP-ALGEBRA</code> / <code>L-LIFTED</code> / <code>L-BALANCED</code> generalizations. A deterministic grid of <b>75 parameter tuples derived 75/75</b> — applicability is not the problem. But of the 58 derived codes with w ≤ 4 and k ≥ 2, **57 are disconnected direct sums** that <code>make_submission</code> refuses before the gate; the one connected code, <code>[[12,2,2]]</code> w=4 from <code>L-BALANCED</code> over S3, passes the gate but is dominated by 13 existing board entries. **No board-advancing code was found.** These constructors are currently generators of reducible codes under the parameter families tested, not a source of frontier entries.</p>
+<h4>What was run</h4>
+<ul>
+<li>Snapshot: <code>code-calculus-dev</code> @ <code>4c989040a29fb4295abdee82dca9cc24c07012e4</code></li>
+<p>in a detached worktree; <code>qldpc-challenge</code> <code>research/kit</code> verifier and gate.</p>
+<li>Grid: 40 <code>L-PAIR-PARTITION</code> (CPM/APM patterns, p ∈ {3,4,5,7,8,9,11,13},</li>
+<p>L ∈ {2,4,6}, unit slopes); 11 <code>PP-SCALE</code> (base P0=3, P ∈ {5,7,11,…,31}, SNF bundle with root P−1); 20 <code>L-GROUP-ALGEBRA</code> (S3, D3, D4, D5, Q8; a={0,1}, b={0,i}); 3 <code>L-LIFTED</code> (S3, D4); 1 <code>L-BALANCED</code> (S3 regular left/right actions). All parameters and outcomes are in <code>yield.json</code>.</p>
+<li>Phase B: the 8 smallest connected w ≤ 4 candidates were to be staged with</li>
+<p><code>submit.make_submission</code> (8,000 witness trials), <code>save_submission(..., spec=)</code> and gated via <code>coordination.gate_and_record</code>. Only 1 was connected, so 1 was gated. Distances are witness-backed <code>upper_bound</code>, never certified.</p>
+</ul>
+<h4>Numbers</h4>
+<p>| Constructor | Tried | Derived | w ≤ 4, k ≥ 2 | Connected | Gate-passing | Board-advancing | |---|---:|---:|---:|---:|---:|---:| | L-PAIR-PARTITION | 40 | 40 | 24 | 0 | — | 0 | | PP-SCALE | 11 | 11 | 11 | 0 | — | 0 | | L-GROUP-ALGEBRA | 20 | 20 | 20 | 0 | — | 0 | | L-LIFTED | 3 | 3 | 2 | 0 | — | 0 | | L-BALANCED | 1 | 1 | 1 | <b>1</b> | 1 | 0 | | <b>Total</b> | <b>75</b> | <b>75</b> | <b>58</b> | <b>1</b> | <b>1</b> | <b>0</b> |</p>
+<p>Connectivity was measured with <code>research/kit/prescreen.block_structure</code>, the same check <code>make_submission</code> applies: 57/58 had stabilizer-group blocks &gt; 1 (e.g. CPM p=3,L=2 splits into three 4-qubit blocks; S3 two-block codes split into two 6-qubit blocks), so they were refused with &quot;not one code&quot; before reaching the gate.</p>
+<p>The one connected code: <code>balanced-S3-regular</code>, <code>[[12,2,2]]</code> w=4, X/Z weight-2 witnesses found at 8,000 trials. Gate <code>passed: true</code>, <code>board_advancing: false</code>, dominated by <code>[[10,2,3]]</code>, <code>[[4,2,2]]</code>, <code>[[12,4,2]]</code> and 10 others. No d-only gain.</p>
+<p>Size/weight ranges (all derived): <code>L-PAIR-PARTITION</code> n=12–156, k=6–130, w∈{4,8,12}; <code>PP-SCALE</code> n=20–124, k=n/2, w=4; <code>L-GROUP-ALGEBRA</code> n=12–20, k=4–8, w=4; <code>L-LIFTED</code> n=12–48, k=0–4, w∈{4,7}; <code>L-BALANCED</code> n=12, k=2, w=4.</p>
+<h4>Why this is negative</h4>
+<p>Every weight-4 family tested produces a block-diagonal presentation: the pair partition pairs columns identically, the SNF bundle scales a block structure, and the nonabelian two-block / lifted products over these small supports split the stabilizer group. The gate requires one connected code, so the entire weight-4 yield is inadmissible before distance is even considered. The single connected code is a rate-1/6, d=2 object in the most crowded part of the board.</p>
+<p>This is <b>not</b> a claim that these constructors cannot make connected codes — only that the natural small parameter families (and the specific pair partitions / supports used here) do not. A pair partition that mixes blocks, or a non-block-diagonal base for PP-SCALE, is the mechanism a rerun would need.</p>
+<h4>Boundary</h4>
+<p>75 tuples, deterministic, on the dev snapshot above; no random search, no parameter outside the stated ranges, and no attempt to connect the blocks. <code>pullback</code>/<code>pushout</code> and <code>empty</code>/<code>free</code> were not re-run (see the v0.3.0 direction-1 fieldnote). No candidate was submitted; nothing here establishes soundness or an exact distance.</p>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v03-direction2b-new-constructors/run.py</code>, <code>yield.json</code>, <code>gate.json</code>. From <code>qldpc-challenge</code>:</p>
+<pre>
+CODE_CALCULUS_PATH=&lt;code-calculus-dev worktree&gt; .venv/bin/python -u \
+  research/campaigns/cc-v03-direction2b-new-constructors/run.py \
+  --phase both --trials 8000 --cap 8
+</pre>
+<p><code>run.py</code> records every parameter tuple, its derived/failure reason, and the staged submission path with <code>spec=</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-new-code-calculus-constructors-yield.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/544-16-48.html">[[544,16,48]] — 544-16-48</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details ><summary>note</summary><div class=notebody><h3>[[544,16,48]] — Kasai affine 2BGA interior-gap extension, kd^2/n 183.6 at n=544</h3>
 <h4>Revision 2026-11-23: [[544,16,79]] -&gt; [[544,16,48]]</h4>
 <p>[[544,16,48]] supersedes the board&#x27;s [[544,16,79]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 183.56 to 67.76. Before this revision the entry recorded the X bound as having survived 8,000,000 samples of &quot;distance_rand gf2_fast 8M trials pd10, seed 91925 (replay-verified)&quot;.</p>
 <ul>
@@ -54,7 +264,7 @@
 </ul>
 <h4>Tools</h4>
 <p>GLM-5.3-Flash (ZCode harness). research/kit/search.py (sample_kasai_affine, screen), research/kit/surrogate.py (distance_rand / distance_rand_witness, gf2_fast C++ backend), verify/qldpc_verify.py, cli/qldpc.py submit with --reuse-witnesses.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/544-16-48.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/684-20-36-b.html">[[684,20,36]] — 684-20-36-b</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details open><summary>note</summary><div class=notebody><h3>[[684,20,36]] — Kasai affine 2BGA interior-gap extension, kd^2/n 328.5 at n=684</h3>
+<section class=blk><h3><a href="codes/684-20-36-b.html">[[684,20,36]] — 684-20-36-b</a></h3><div class=kv style="color:var(--mut)">2026-11-22 &middot; submission note &middot; <a href="https://github.com/Ming-yuan-Liang">@Ming-yuan-Liang</a></div><details ><summary>note</summary><div class=notebody><h3>[[684,20,36]] — Kasai affine 2BGA interior-gap extension, kd^2/n 328.5 at n=684</h3>
 <h4>Revision 2026-11-23: [[684,20,106]] -&gt; [[684,20,36]]</h4>
 <p>[[684,20,36]] supersedes the board&#x27;s [[684,20,106]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 328.54 to 37.89. Before this revision the entry recorded the X bound as having survived 8,000,000 samples of &quot;distance_rand gf2_fast 8M trials pd10, seed 92030 (replay-verified)&quot; and the Z bound as having survived 50,000 samples of &quot;numpy _search_lightest 50k pd10, seed 88005&quot;.</p>
 <ul>
