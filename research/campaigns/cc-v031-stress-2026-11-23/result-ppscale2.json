@@ -1,0 +1,305 @@
+{
+ "cc": "/Users/mathysrennela/GitHub/code-calculus-dev",
+ "args": {
+  "arm": "ppscale",
+  "limit": 24,
+  "n_lo": 10,
+  "n_hi": 120,
+  "order": "n",
+  "steps": 4,
+  "budget": 64,
+  "trials": 8000,
+  "gate_cap": 12,
+  "cap": 12,
+  "max_w": 10,
+  "label_contains": "q(1",
+  "open_prs": true,
+  "out": "research/campaigns/cc-v031-stress-2026-11-23/result-ppscale2.json"
+ },
+ "started": "2026-11-23T17:15:44",
+ "ppscale": {
+  "derived": 12,
+  "connected": 12,
+  "staged": 12,
+  "gate_passed": 0,
+  "board_advancing": 0,
+  "records": [
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-identity-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-identity-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-identity-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 4,
+    "dedup_wl": 7,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 3,
+    "dedup_wl": 8,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-all0-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-all0-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-all0-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-all0-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-alternating-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-alternating-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 4,
+    "dedup_wl": 7,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-alternating-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-pairwise-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-pairwise-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-pairwise-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-reverse-P7",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-reverse-P11",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-identity-reverse-P13",
+    "constructor": "PP-SCALE",
+    "reason": "NoDerivation: L-PAIR-PARTITION: block rows (0, 0) do not admit a relative-affine pair partition"
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-alternating-all0-P7",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     28
+    ],
+    "n": 28,
+    "k": 14,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-alternating-all0-P11",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     44
+    ],
+    "n": 44,
+    "k": 22,
+    "w": 4,
+    "dedup_exact": 4,
+    "dedup_wl": 7,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   },
+   {
+    "label": "ppscale-q(1, 1, 1, 1)(0, 0, 0, 0)-alternating-all0-P13",
+    "constructor": "PP-SCALE",
+    "connected": true,
+    "blocks": 1,
+    "block_sizes": [
+     52
+    ],
+    "n": 52,
+    "k": 26,
+    "w": 4,
+    "dedup_exact": 2,
+    "dedup_wl": 4,
+    "gate_skipped": "exact duplicate",
+    "tanner_connected": true
+   }
+  ]
+ },
+ "finished": "2026-11-23T17:15:44",
+ "pairpartition": {
+  "derived": null,
+  "connected": null,
+  "staged": null,
+  "gate_passed": null,
+  "board_advancing": null,
+  "records": []
+ }
+}
