@@ -1,0 +1,1742 @@
+{
+  "summary": {
+    "parents": 120,
+    "gated": 1,
+    "weight_improving_steps": 120,
+    "gate_passed": 1,
+    "board_advancing": 0
+  },
+  "records": [
+    {
+      "parent": "96-30-8",
+      "parent_n": 96,
+      "parent_k": 30,
+      "parent_d": 8,
+      "parent_w": 32,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "89-49-3",
+      "parent_n": 89,
+      "parent_k": 49,
+      "parent_d": 3,
+      "parent_w": 31,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-8-12",
+      "parent_n": 108,
+      "parent_k": 8,
+      "parent_d": 12,
+      "parent_w": 26,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "85-41-5",
+      "parent_n": 85,
+      "parent_k": 41,
+      "parent_d": 5,
+      "parent_w": 24,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "141-44-4",
+      "parent_n": 141,
+      "parent_k": 44,
+      "parent_d": 4,
+      "parent_w": 20,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 126
+          },
+          "n": 140,
+          "k": 68,
+          "w_before": 20,
+          "w_after": 17,
+          "d_upper": 4,
+          "improving_pool": 55,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_skipped": "d=1 < 2"
+        },
+        {
+          "step": 1,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 14
+          },
+          "n": 139,
+          "k": 90,
+          "w_before": 17,
+          "w_after": 16,
+          "d_upper": 4,
+          "improving_pool": 10,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_skipped": "d=1 < 2"
+        },
+        {
+          "step": 2,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "158-52-3",
+      "parent_n": 158,
+      "parent_k": 52,
+      "parent_d": 3,
+      "parent_w": 19,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 37
+          },
+          "n": 157,
+          "k": 79,
+          "w_before": 19,
+          "w_after": 18,
+          "d_upper": 3,
+          "improving_pool": 39,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_skipped": "d=1 < 2"
+        },
+        {
+          "step": 1,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-36-6",
+      "parent_n": 84,
+      "parent_k": 36,
+      "parent_d": 6,
+      "parent_w": 18,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "128-12-16",
+      "parent_n": 128,
+      "parent_k": 12,
+      "parent_d": 16,
+      "parent_w": 16,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "103-30-7",
+      "parent_n": 103,
+      "parent_k": 30,
+      "parent_d": 7,
+      "parent_w": 14,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 6
+          },
+          "n": 102,
+          "k": 36,
+          "w_before": 14,
+          "w_after": 8,
+          "d_upper": 8,
+          "improving_pool": 8,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 3,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 102,
+              "k": 36,
+              "d": 3,
+              "family": "code-calculus",
+              "weight_class": "weight-8",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 4,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 4,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "317d83a117436546",
+              "signature": "cead9d67d9739fe4"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-8",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1270346509,
+                "detail": "no lighter logical in 6580 RIS trials (seed 1270346509)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-8",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[72,38,3]] w=8 72-38-3.json",
+                  "[[84,38,3]] w=7 84-38-3.json",
+                  "[[94,36,3]] w=6 94-36-3.json",
+                  "[[96,36,3]] w=6 96-36-3.json",
+                  "[[96,36,4]] w=8 96-36-4.json",
+                  "[[96,37,3]] w=6 96-37-3.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[72,38,3]] w=8 72-38-3.json and 5 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1270346509
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-223232-Mathyss-MacBook-Air-93542/102-36-3-weight.json"
+        },
+        {
+          "step": 1,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-16-4",
+      "parent_n": 80,
+      "parent_k": 16,
+      "parent_d": 4,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 54
+          },
+          "n": 79,
+          "k": 23,
+          "w_before": 12,
+          "w_after": 11,
+          "d_upper": 4,
+          "improving_pool": 1,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_skipped": "d=1 < 2"
+        },
+        {
+          "step": 1,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "107-58-3",
+      "parent_n": 107,
+      "parent_k": 58,
+      "parent_d": 3,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-6-16",
+      "parent_n": 126,
+      "parent_k": 6,
+      "parent_d": 16,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "132-30-12",
+      "parent_n": 132,
+      "parent_k": 30,
+      "parent_d": 12,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "135-42-8",
+      "parent_n": 135,
+      "parent_k": 42,
+      "parent_d": 8,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "135-46-6",
+      "parent_n": 135,
+      "parent_k": 46,
+      "parent_d": 6,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "136-35-9",
+      "parent_n": 136,
+      "parent_k": 35,
+      "parent_d": 9,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "136-6-17",
+      "parent_n": 136,
+      "parent_k": 6,
+      "parent_d": 17,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "143-78-3",
+      "parent_n": 143,
+      "parent_k": 78,
+      "parent_d": 3,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "82-22-3",
+      "parent_n": 82,
+      "parent_k": 22,
+      "parent_d": 3,
+      "parent_w": 11,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "114-44-3",
+      "parent_n": 114,
+      "parent_k": 44,
+      "parent_d": 3,
+      "parent_w": 11,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-24-8",
+      "parent_n": 80,
+      "parent_k": 24,
+      "parent_d": 8,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-10-12",
+      "parent_n": 84,
+      "parent_k": 10,
+      "parent_d": 12,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-18-9",
+      "parent_n": 90,
+      "parent_k": 18,
+      "parent_d": 9,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-24-8",
+      "parent_n": 96,
+      "parent_k": 24,
+      "parent_d": 8,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "98-18-10",
+      "parent_n": 98,
+      "parent_k": 18,
+      "parent_d": 10,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "104-4-16",
+      "parent_n": 104,
+      "parent_k": 4,
+      "parent_d": 16,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-4-16",
+      "parent_n": 108,
+      "parent_k": 4,
+      "parent_d": 16,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-18-14",
+      "parent_n": 126,
+      "parent_k": 18,
+      "parent_d": 14,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "83-8-11",
+      "parent_n": 83,
+      "parent_k": 8,
+      "parent_d": 11,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-4-13",
+      "parent_n": 84,
+      "parent_k": 4,
+      "parent_d": 13,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-12-11",
+      "parent_n": 90,
+      "parent_k": 12,
+      "parent_d": 11,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-4-14",
+      "parent_n": 90,
+      "parent_k": 4,
+      "parent_d": 14,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "102-16-11",
+      "parent_n": 102,
+      "parent_k": 16,
+      "parent_d": 11,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-16-13",
+      "parent_n": 120,
+      "parent_k": 16,
+      "parent_d": 13,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-24-8",
+      "parent_n": 120,
+      "parent_k": 24,
+      "parent_d": 8,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-18-13",
+      "parent_n": 126,
+      "parent_k": 18,
+      "parent_d": 13,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "140-12-15",
+      "parent_n": 140,
+      "parent_k": 12,
+      "parent_d": 15,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "146-18-15",
+      "parent_n": 146,
+      "parent_k": 18,
+      "parent_d": 15,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "150-8-18",
+      "parent_n": 150,
+      "parent_k": 8,
+      "parent_d": 18,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-20-5",
+      "parent_n": 80,
+      "parent_k": 20,
+      "parent_d": 5,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-6-12",
+      "parent_n": 80,
+      "parent_k": 6,
+      "parent_d": 12,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-9-8",
+      "parent_n": 80,
+      "parent_k": 9,
+      "parent_d": 8,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "88-2-14",
+      "parent_n": 88,
+      "parent_k": 2,
+      "parent_d": 14,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-10-11",
+      "parent_n": 90,
+      "parent_k": 10,
+      "parent_d": 11,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "92-2-14",
+      "parent_n": 92,
+      "parent_k": 2,
+      "parent_d": 14,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "95-21-6",
+      "parent_n": 95,
+      "parent_k": 21,
+      "parent_d": 6,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-20-8",
+      "parent_n": 96,
+      "parent_k": 20,
+      "parent_d": 8,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-22-8",
+      "parent_n": 96,
+      "parent_k": 22,
+      "parent_d": 8,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-4-14",
+      "parent_n": 96,
+      "parent_k": 4,
+      "parent_d": 14,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "98-6-14-b",
+      "parent_n": 98,
+      "parent_k": 6,
+      "parent_d": 14,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "100-28-5",
+      "parent_n": 100,
+      "parent_k": 28,
+      "parent_d": 5,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "102-22-9",
+      "parent_n": 102,
+      "parent_k": 22,
+      "parent_d": 9,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "104-6-13",
+      "parent_n": 104,
+      "parent_k": 6,
+      "parent_d": 13,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "106-2-15",
+      "parent_n": 106,
+      "parent_k": 2,
+      "parent_d": 15,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-8-13",
+      "parent_n": 108,
+      "parent_k": 8,
+      "parent_d": 13,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-12-12",
+      "parent_n": 112,
+      "parent_k": 12,
+      "parent_d": 12,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-8-13",
+      "parent_n": 112,
+      "parent_k": 8,
+      "parent_d": 13,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "116-4-15",
+      "parent_n": 116,
+      "parent_k": 4,
+      "parent_d": 15,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-18-12",
+      "parent_n": 120,
+      "parent_k": 18,
+      "parent_d": 12,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-6-15",
+      "parent_n": 120,
+      "parent_k": 6,
+      "parent_d": 15,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-20-10",
+      "parent_n": 126,
+      "parent_k": 20,
+      "parent_d": 10,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-46-3",
+      "parent_n": 126,
+      "parent_k": 46,
+      "parent_d": 3,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "128-14-12",
+      "parent_n": 128,
+      "parent_k": 14,
+      "parent_d": 12,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "128-66-4",
+      "parent_n": 128,
+      "parent_k": 66,
+      "parent_d": 4,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "132-8-16",
+      "parent_n": 132,
+      "parent_k": 8,
+      "parent_d": 16,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "136-4-18",
+      "parent_n": 136,
+      "parent_k": 4,
+      "parent_d": 18,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "140-10-10",
+      "parent_n": 140,
+      "parent_k": 10,
+      "parent_d": 10,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "144-16-10",
+      "parent_n": 144,
+      "parent_k": 16,
+      "parent_d": 10,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "144-6-15",
+      "parent_n": 144,
+      "parent_k": 6,
+      "parent_d": 15,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "146-18-14",
+      "parent_n": 146,
+      "parent_k": 18,
+      "parent_d": 14,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "148-4-18",
+      "parent_n": 148,
+      "parent_k": 4,
+      "parent_d": 18,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "154-8-17",
+      "parent_n": 154,
+      "parent_k": 8,
+      "parent_d": 17,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "160-4-19",
+      "parent_n": 160,
+      "parent_k": 4,
+      "parent_d": 19,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "83-14-6",
+      "parent_n": 83,
+      "parent_k": 14,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-14-6",
+      "parent_n": 84,
+      "parent_k": 14,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "89-16-6",
+      "parent_n": 89,
+      "parent_k": 16,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-16-7",
+      "parent_n": 90,
+      "parent_k": 16,
+      "parent_d": 7,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-12-9",
+      "parent_n": 96,
+      "parent_k": 12,
+      "parent_d": 9,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-4-13",
+      "parent_n": 96,
+      "parent_k": 4,
+      "parent_d": 13,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-8-12-b",
+      "parent_n": 108,
+      "parent_k": 8,
+      "parent_d": 12,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "116-18-6",
+      "parent_n": 116,
+      "parent_k": 18,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-16-8",
+      "parent_n": 120,
+      "parent_k": 16,
+      "parent_d": 8,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "124-22-6",
+      "parent_n": 124,
+      "parent_k": 22,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-18-7",
+      "parent_n": 126,
+      "parent_k": 18,
+      "parent_d": 7,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "140-6-15",
+      "parent_n": 140,
+      "parent_k": 6,
+      "parent_d": 15,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "145-18-8",
+      "parent_n": 145,
+      "parent_k": 18,
+      "parent_d": 8,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "160-8-14",
+      "parent_n": 160,
+      "parent_k": 8,
+      "parent_d": 14,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "81-31-3",
+      "parent_n": 81,
+      "parent_k": 31,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "88-4-12",
+      "parent_n": 88,
+      "parent_k": 4,
+      "parent_d": 12,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-10-7",
+      "parent_n": 90,
+      "parent_k": 10,
+      "parent_d": 7,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-8-10",
+      "parent_n": 90,
+      "parent_k": 8,
+      "parent_d": 10,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "94-36-3",
+      "parent_n": 94,
+      "parent_k": 36,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-34-4",
+      "parent_n": 96,
+      "parent_k": 34,
+      "parent_d": 4,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-37-3",
+      "parent_n": 96,
+      "parent_k": 37,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "98-6-12",
+      "parent_n": 98,
+      "parent_k": 6,
+      "parent_d": 12,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-12-7",
+      "parent_n": 108,
+      "parent_k": 12,
+      "parent_d": 7,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-12-8",
+      "parent_n": 112,
+      "parent_k": 12,
+      "parent_d": 8,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-6-7",
+      "parent_n": 112,
+      "parent_k": 6,
+      "parent_d": 7,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "118-2-15",
+      "parent_n": 118,
+      "parent_k": 2,
+      "parent_d": 15,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "119-35-3",
+      "parent_n": 119,
+      "parent_k": 35,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "119-37-4",
+      "parent_n": 119,
+      "parent_k": 37,
+      "parent_d": 4,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-35-4",
+      "parent_n": 120,
+      "parent_k": 35,
+      "parent_d": 4,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "123-10-9",
+      "parent_n": 123,
+      "parent_k": 10,
+      "parent_d": 9,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "125-6-13",
+      "parent_n": 125,
+      "parent_k": 6,
+      "parent_d": 13,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "126-18-6",
+      "parent_n": 126,
+      "parent_k": 18,
+      "parent_d": 6,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "128-6-8",
+      "parent_n": 128,
+      "parent_k": 6,
+      "parent_d": 8,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "130-8-7",
+      "parent_n": 130,
+      "parent_k": 8,
+      "parent_d": 7,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "144-12-12",
+      "parent_n": 144,
+      "parent_k": 12,
+      "parent_d": 12,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "144-4-16",
+      "parent_n": 144,
+      "parent_k": 4,
+      "parent_d": 16,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "153-6-15",
+      "parent_n": 153,
+      "parent_k": 6,
+      "parent_d": 15,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "154-8-8",
+      "parent_n": 154,
+      "parent_k": 8,
+      "parent_d": 8,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "159-40-3",
+      "parent_n": 159,
+      "parent_k": 40,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "160-36-6",
+      "parent_n": 160,
+      "parent_k": 36,
+      "parent_d": 6,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-6-6",
+      "parent_n": 84,
+      "parent_k": 6,
+      "parent_d": 6,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-6-6",
+      "parent_n": 96,
+      "parent_k": 6,
+      "parent_d": 6,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-6-8",
+      "parent_n": 112,
+      "parent_k": 6,
+      "parent_d": 8,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-2-12",
+      "parent_n": 120,
+      "parent_k": 2,
+      "parent_d": 12,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "132-4-12",
+      "parent_n": 132,
+      "parent_k": 4,
+      "parent_d": 12,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "144-2-13",
+      "parent_n": 144,
+      "parent_k": 2,
+      "parent_d": 13,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "152-6-9",
+      "parent_n": 152,
+      "parent_k": 6,
+      "parent_d": 9,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    }
+  ]
+}

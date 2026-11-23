@@ -1,0 +1,1262 @@
+{
+  "summary": {
+    "parents": 60,
+    "gated": 5,
+    "weight_improving_steps": 59,
+    "gate_passed": 5,
+    "board_advancing": 2
+  },
+  "records": [
+    {
+      "parent": "62-42-2",
+      "parent_n": 62,
+      "parent_k": 42,
+      "parent_d": 2,
+      "parent_w": 32,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 6
+          },
+          "n": 61,
+          "k": 45,
+          "w_before": 32,
+          "w_after": 31,
+          "d_upper": 2,
+          "improving_pool": 24,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 61,
+              "k": 45,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "e29517fccc7a028a",
+              "signature": "8f2d69a7e4b61b25"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "detail": "no lighter logical in 4940 RIS trials (seed 1493860766)",
+                "refuted": false,
+                "seed": 1493860766
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[61,49,2]] w=31 61-49-2.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[61,49,2]] w=31 61-49-2.json; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 120790667
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-194423-Mathyss-MacBook-Air-78555/61-45-1-weight.json"
+        },
+        {
+          "step": 1,
+          "operation": {
+            "op": "E-PEEL",
+            "qubit": 20,
+            "sector": "X",
+            "row_id": "a2"
+          },
+          "n": 60,
+          "k": 45,
+          "w_before": 31,
+          "w_after": 30,
+          "d_upper": 2,
+          "improving_pool": 12,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 60,
+              "k": 45,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "5316425e3b2ea6df",
+              "signature": "0adc44cf7c79d583"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "detail": "no lighter logical in 4900 RIS trials (seed 460969232)",
+                "refuted": false,
+                "seed": 460969232
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-9plus x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1748875483
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-194423-Mathyss-MacBook-Air-78555/60-45-1-weight.json"
+        },
+        {
+          "step": 2,
+          "operation": {
+            "op": "E-PEEL",
+            "qubit": 29,
+            "sector": "X",
+            "row_id": "a3"
+          },
+          "n": 59,
+          "k": 45,
+          "w_before": 30,
+          "w_after": 29,
+          "d_upper": 2,
+          "improving_pool": 5,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": true,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 59,
+              "k": 45,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 3,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 3,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "1100ff4810dd0419",
+              "signature": "569fe07beed3e4e2"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "detail": "no lighter logical in 4860 RIS trials (seed 104954375)",
+                "refuted": false,
+                "seed": 104954375
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": true,
+                "dominated_by": [],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "advances the weight-9plus x unrestricted board",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1734399931
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-194423-Mathyss-MacBook-Air-78555/59-45-1-weight.json"
+        }
+      ]
+    },
+    {
+      "parent": "56-36-4",
+      "parent_n": 56,
+      "parent_k": 36,
+      "parent_d": 4,
+      "parent_w": 28,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "71-53-2",
+      "parent_n": 71,
+      "parent_k": 53,
+      "parent_d": 2,
+      "parent_w": 28,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "54-36-3",
+      "parent_n": 54,
+      "parent_k": 36,
+      "parent_d": 3,
+      "parent_w": 27,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "48-30-4",
+      "parent_n": 48,
+      "parent_k": 30,
+      "parent_d": 4,
+      "parent_w": 24,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "41-16-4",
+      "parent_n": 41,
+      "parent_k": 16,
+      "parent_d": 4,
+      "parent_w": 21,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 39
+          },
+          "n": 40,
+          "k": 31,
+          "w_before": 21,
+          "w_after": 20,
+          "d_upper": 4,
+          "improving_pool": 57,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 1,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 40,
+              "k": 31,
+              "d": 1,
+              "family": "code-calculus",
+              "weight_class": "weight-9plus",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 1,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 1,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "c1e1bc8ff1a5b6c8",
+              "signature": "578bed650742b9db"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-9plus",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1076521648,
+                "detail": "no lighter logical in 4100 RIS trials (seed 1076521648)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-9plus",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[35,31,1]] w=19 35-31-1.json"
+                ],
+                "advances_by": [
+                  "k",
+                  "n",
+                  "w"
+                ],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[35,31,1]] w=19 35-31-1.json; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1076521648
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-194423-Mathyss-MacBook-Air-78555/40-31-1-weight.json"
+        },
+        {
+          "step": 1,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "80-45-5",
+      "parent_n": 80,
+      "parent_k": 45,
+      "parent_d": 5,
+      "parent_w": 20,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "79-44-4",
+      "parent_n": 79,
+      "parent_k": 44,
+      "parent_d": 4,
+      "parent_w": 18,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "39-25-3",
+      "parent_n": 39,
+      "parent_k": 25,
+      "parent_d": 3,
+      "parent_w": 16,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-36-3",
+      "parent_n": 108,
+      "parent_k": 36,
+      "parent_d": 3,
+      "parent_w": 16,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "70-22-5",
+      "parent_n": 70,
+      "parent_k": 22,
+      "parent_d": 5,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "107-63-2",
+      "parent_n": 107,
+      "parent_k": 63,
+      "parent_d": 2,
+      "parent_w": 12,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "19-9-3",
+      "parent_n": 19,
+      "parent_k": 9,
+      "parent_d": 3,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "operation": {
+            "op": "E-PUNCTURE",
+            "qubit": 5
+          },
+          "n": 18,
+          "k": 10,
+          "w_before": 10,
+          "w_after": 8,
+          "d_upper": 3,
+          "improving_pool": 5,
+          "exhausted": true,
+          "dedup_exact": 0,
+          "dedup_wl": 0,
+          "d_witness": 2,
+          "gate_passed": true,
+          "board_advancing": false,
+          "gate": {
+            "passed": true,
+            "candidate": {
+              "n": 18,
+              "k": 10,
+              "d": 2,
+              "family": "code-calculus",
+              "weight_class": "weight-8",
+              "locality_class": "unrestricted",
+              "sector_distances": {
+                "X": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "Z": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false,
+                  "witness_weight": 2,
+                  "refuted_to": null
+                },
+                "d": {
+                  "upper": 2,
+                  "lower": null,
+                  "exact": false
+                }
+              },
+              "fingerprint": "30d785770ddb3a16",
+              "signature": "f77394c214e9c5ce"
+            },
+            "gates": {
+              "verify": {
+                "ok": true,
+                "failed_checks": [],
+                "weight_class": "weight-8",
+                "locality_class": "unrestricted"
+              },
+              "refute": {
+                "refuted": false,
+                "seed": 1161905299,
+                "detail": "no lighter logical in 3220 RIS trials (seed 1161905299)"
+              },
+              "dedup": {
+                "exact_duplicate_of": null,
+                "wl_equivalent_of": null
+              },
+              "novelty": {
+                "cell": [
+                  "weight-8",
+                  "unrestricted"
+                ],
+                "board": "CSS",
+                "board_advancing": false,
+                "dominated_by": [
+                  "[[16,10,2]] w=8 16-10-2.json",
+                  "[[16,11,2]] w=8 16-11-2.json"
+                ],
+                "advances_by": [],
+                "d_only_gain": false,
+                "d_only_peers": [],
+                "literature_novelty": "unverified"
+              }
+            },
+            "labels": [
+              "not board-advancing: dominated by [[16,10,2]] w=8 16-10-2.json and 1 more; recorded as a non-frontier result",
+              "literature novelty UNVERIFIED"
+            ],
+            "validator": {
+              "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+              "seed": 1161905299
+            }
+          },
+          "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-194423-Mathyss-MacBook-Air-78555/18-10-2-weight.json"
+        },
+        {
+          "step": 1,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "47-23-3",
+      "parent_n": 47,
+      "parent_k": 23,
+      "parent_d": 3,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "66-4-12",
+      "parent_n": 66,
+      "parent_k": 4,
+      "parent_d": 12,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "90-12-12",
+      "parent_n": 90,
+      "parent_k": 12,
+      "parent_d": 12,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "108-6-16",
+      "parent_n": 108,
+      "parent_k": 6,
+      "parent_d": 16,
+      "parent_w": 10,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "40-16-4",
+      "parent_n": 40,
+      "parent_k": 16,
+      "parent_d": 4,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "72-48-2",
+      "parent_n": 72,
+      "parent_k": 48,
+      "parent_d": 2,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "98-12-12",
+      "parent_n": 98,
+      "parent_k": 12,
+      "parent_d": 12,
+      "parent_w": 9,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "15-7-3-b",
+      "parent_n": 15,
+      "parent_k": 7,
+      "parent_d": 3,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "22-2-6",
+      "parent_n": 22,
+      "parent_k": 2,
+      "parent_d": 6,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "28-4-6-b",
+      "parent_n": 28,
+      "parent_k": 4,
+      "parent_d": 6,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "32-20-2",
+      "parent_n": 32,
+      "parent_k": 20,
+      "parent_d": 2,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "36-8-6",
+      "parent_n": 36,
+      "parent_k": 8,
+      "parent_d": 6,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "42-2-9",
+      "parent_n": 42,
+      "parent_k": 2,
+      "parent_d": 9,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "49-13-4",
+      "parent_n": 49,
+      "parent_k": 13,
+      "parent_d": 4,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "54-12-7",
+      "parent_n": 54,
+      "parent_k": 12,
+      "parent_d": 7,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "60-18-6",
+      "parent_n": 60,
+      "parent_k": 18,
+      "parent_d": 6,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "64-14-4",
+      "parent_n": 64,
+      "parent_k": 14,
+      "parent_d": 4,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "68-38-2",
+      "parent_n": 68,
+      "parent_k": 38,
+      "parent_d": 2,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "72-8-10",
+      "parent_n": 72,
+      "parent_k": 8,
+      "parent_d": 10,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-14-10",
+      "parent_n": 84,
+      "parent_k": 14,
+      "parent_d": 10,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "95-22-7",
+      "parent_n": 95,
+      "parent_k": 22,
+      "parent_d": 7,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "98-8-13",
+      "parent_n": 98,
+      "parent_k": 8,
+      "parent_d": 13,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "104-54-2",
+      "parent_n": 104,
+      "parent_k": 54,
+      "parent_d": 2,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "111-12-11",
+      "parent_n": 111,
+      "parent_k": 12,
+      "parent_d": 11,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-44-3",
+      "parent_n": 120,
+      "parent_k": 44,
+      "parent_d": 3,
+      "parent_w": 8,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "41-6-6",
+      "parent_n": 41,
+      "parent_k": 6,
+      "parent_d": 6,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "55-14-5",
+      "parent_n": 55,
+      "parent_k": 14,
+      "parent_d": 5,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "84-12-8",
+      "parent_n": 84,
+      "parent_k": 12,
+      "parent_d": 8,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "95-21-5",
+      "parent_n": 95,
+      "parent_k": 21,
+      "parent_d": 5,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "117-36-2",
+      "parent_n": 117,
+      "parent_k": 36,
+      "parent_d": 2,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-8-14",
+      "parent_n": 120,
+      "parent_k": 8,
+      "parent_d": 14,
+      "parent_w": 7,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "12-7-2",
+      "parent_n": 12,
+      "parent_k": 7,
+      "parent_d": 2,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "23-2-5",
+      "parent_n": 23,
+      "parent_k": 2,
+      "parent_d": 5,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "30-4-6",
+      "parent_n": 30,
+      "parent_k": 4,
+      "parent_d": 6,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "40-2-8",
+      "parent_n": 40,
+      "parent_k": 2,
+      "parent_d": 8,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "48-16-3",
+      "parent_n": 48,
+      "parent_k": 16,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "53-8-5",
+      "parent_n": 53,
+      "parent_k": 8,
+      "parent_d": 5,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "60-30-2",
+      "parent_n": 60,
+      "parent_k": 30,
+      "parent_d": 2,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "68-2-11",
+      "parent_n": 68,
+      "parent_k": 2,
+      "parent_d": 11,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "74-2-11",
+      "parent_n": 74,
+      "parent_k": 2,
+      "parent_d": 11,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "88-44-2",
+      "parent_n": 88,
+      "parent_k": 44,
+      "parent_d": 2,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "96-36-3",
+      "parent_n": 96,
+      "parent_k": 36,
+      "parent_d": 3,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "112-42-2",
+      "parent_n": 112,
+      "parent_k": 42,
+      "parent_d": 2,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "120-37-4",
+      "parent_n": 120,
+      "parent_k": 37,
+      "parent_d": 4,
+      "parent_w": 6,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "28-12-2",
+      "parent_n": 28,
+      "parent_k": 12,
+      "parent_d": 2,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "37-13-2-b",
+      "parent_n": 37,
+      "parent_k": 13,
+      "parent_d": 2,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    },
+    {
+      "parent": "69-6-5",
+      "parent_n": 69,
+      "parent_k": 6,
+      "parent_d": 5,
+      "parent_w": 5,
+      "chain": [
+        {
+          "step": 0,
+          "improving": 0
+        }
+      ]
+    }
+  ]
+}

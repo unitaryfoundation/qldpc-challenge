@@ -1,0 +1,291 @@
+{
+  "summary": {
+    "entries": 12,
+    "tightenings": 0,
+    "gated": 0,
+    "gate_passed": 0,
+    "seconds": 967.9,
+    "seeds": [
+      51,
+      307
+    ]
+  },
+  "records": [
+    {
+      "slug": "100-2-10-b",
+      "n": 100,
+      "k": 2,
+      "claimed_d": 10,
+      "trials": 22000,
+      "measured_d": 10,
+      "wx": 10,
+      "wz": 10,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 10,
+          "wz": 10
+        },
+        {
+          "seed": 307,
+          "wx": 10,
+          "wz": 10
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "100-2-14",
+      "n": 100,
+      "k": 2,
+      "claimed_d": 14,
+      "trials": 30000,
+      "measured_d": 14,
+      "wx": 14,
+      "wz": 14,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 14,
+          "wz": 14
+        },
+        {
+          "seed": 307,
+          "wx": 14,
+          "wz": 14
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "100-4-14",
+      "n": 100,
+      "k": 4,
+      "claimed_d": 14,
+      "trials": 30000,
+      "measured_d": 14,
+      "wx": 14,
+      "wz": 14,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 14,
+          "wz": 14
+        },
+        {
+          "seed": 307,
+          "wx": 14,
+          "wz": 14
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "102-20-10",
+      "n": 102,
+      "k": 20,
+      "claimed_d": 10,
+      "trials": 22000,
+      "measured_d": 10,
+      "wx": 10,
+      "wz": 10,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 10,
+          "wz": 10
+        },
+        {
+          "seed": 307,
+          "wx": 10,
+          "wz": 10
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "104-30-8",
+      "n": 104,
+      "k": 30,
+      "claimed_d": 8,
+      "trials": 18000,
+      "measured_d": 8,
+      "wx": 8,
+      "wz": 8,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 8,
+          "wz": 8
+        },
+        {
+          "seed": 307,
+          "wx": 8,
+          "wz": 8
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "104-6-13",
+      "n": 104,
+      "k": 6,
+      "claimed_d": 13,
+      "trials": 28000,
+      "measured_d": 13,
+      "wx": 13,
+      "wz": 13,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 13,
+          "wz": 13
+        },
+        {
+          "seed": 307,
+          "wx": 13,
+          "wz": 13
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "108-10-12",
+      "n": 108,
+      "k": 10,
+      "claimed_d": 12,
+      "trials": 26000,
+      "measured_d": 12,
+      "wx": 12,
+      "wz": 12,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 12,
+          "wz": 12
+        },
+        {
+          "seed": 307,
+          "wx": 12,
+          "wz": 12
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "108-4-15",
+      "n": 108,
+      "k": 4,
+      "claimed_d": 15,
+      "trials": 32000,
+      "measured_d": 15,
+      "wx": 15,
+      "wz": 15,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 15,
+          "wz": 15
+        },
+        {
+          "seed": 307,
+          "wx": 15,
+          "wz": 15
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "108-8-10",
+      "n": 108,
+      "k": 8,
+      "claimed_d": 10,
+      "trials": 22000,
+      "measured_d": 10,
+      "wx": 10,
+      "wz": 10,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 10,
+          "wz": 10
+        },
+        {
+          "seed": 307,
+          "wx": 10,
+          "wz": 10
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "108-8-14",
+      "n": 108,
+      "k": 8,
+      "claimed_d": 14,
+      "trials": 30000,
+      "measured_d": 14,
+      "wx": 14,
+      "wz": 14,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 14,
+          "wz": 14
+        },
+        {
+          "seed": 307,
+          "wx": 14,
+          "wz": 14
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "110-8-11",
+      "n": 110,
+      "k": 8,
+      "claimed_d": 11,
+      "trials": 24000,
+      "measured_d": 11,
+      "wx": 11,
+      "wz": 11,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 11,
+          "wz": 11
+        },
+        {
+          "seed": 307,
+          "wx": 11,
+          "wz": 11
+        }
+      ],
+      "tightening": false
+    },
+    {
+      "slug": "112-12-12",
+      "n": 112,
+      "k": 12,
+      "claimed_d": 12,
+      "trials": 26000,
+      "measured_d": 12,
+      "wx": 12,
+      "wz": 12,
+      "per_seed": [
+        {
+          "seed": 51,
+          "wx": 12,
+          "wz": 12
+        },
+        {
+          "seed": 307,
+          "wx": 12,
+          "wz": 12
+        }
+      ],
+      "tightening": false
+    }
+  ]
+}
