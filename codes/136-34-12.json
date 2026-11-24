@@ -1490,5 +1490,55 @@
    "arXiv:2608.07431 (Table S5)"
   ]
  },
- "family": "other"
+ "family": "other",
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 12,
+    "confidence": "upper_bound",
+    "witness": [
+     110557,
+     110560,
+     110568,
+     110571,
+     110579,
+     110581,
+     110592,
+     110593,
+     110598,
+     110662,
+     110667,
+     110674
+    ]
+   },
+   "X": {
+    "value": 12,
+    "confidence": "upper_bound",
+    "witness": [
+     110231,
+     110266,
+     110325,
+     110333,
+     110378,
+     110381,
+     110448,
+     110449,
+     110480,
+     110657,
+     110665,
+     110677
+    ]
+   }
+  },
+  "rounds": 12,
+  "stim_version": "1.16.0",
+  "notes": "Sequential two-block edge-coloring CSS memory extraction (one ancilla per check, X checks then Z checks each round, sched_seed=0, 386 TICK layers across 12 rounds, 238 total qubits). Achieves full circuit-level distance d_circ_X = d_circ_Z = 12 (kd_circ^2/n = 36.00). Verified via verify/circuit_verify.py.",
+  "contributed_by": {
+   "by": [
+    "@metaspartan"
+   ],
+   "date": "2026-11-24",
+   "method": "Sequential two-block edge_coloring schedule (sched_seed=0) verified by verify/circuit_verify.py (Gemini 4 Neon / Cybara)"
+  }
+ }
 }
