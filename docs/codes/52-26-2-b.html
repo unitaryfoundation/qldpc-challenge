@@ -1,0 +1,134 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>[[52,26,2]] · QEC Challenge</title><link rel=icon type="image/svg+xml" href="../favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="../style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"code_family":"other","code_origin":"submission","code_tier":"ub","locality_class":"unrestricted","page_type":"code_detail","weight_class":"weight-4"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
+<div class=wrap>
+<a class=back href="../index.html">&larr; back to the board</a>
+<div class=codehead><span class="mono big">[[52,26,2]]</span> <span class="b ub" title="verified upper bound: an explicit logical of this weight, and independent refutation searches found nothing lighter">d &le;</span></div>
+<div class=params>
+<div class=cell title="physical qubits"><div class=l>n</div><div class=v>52</div></div>
+<div class=cell title="logical qubits"><div class=l>k</div><div class=v>26</div></div>
+<div class=cell title="distance (smallest undetectable error)"><div class=l>d</div><div class=v>2</div></div>
+<div class=cell title="operational efficiency (BPT ratio), compared within a track at comparable n"><div class=l>kd&sup2;/n</div><div class=v>2.0</div></div>
+<div class=cell title="max check weight"><div class=l>w</div><div class=v>4</div></div>
+<div class=cell title="distance asymmetry max(d_X,d_Z)/min(d_X,d_Z): 1 = both Pauli types equally protected; larger = one side protected further, which biased-noise hardware and erasure decoding can exploit"><div class=l>X/Z</div><div class=v>1</div></div>
+</div>
+<section class=blk><h3>Share this result</h3><div class=share><button class=sharebtn type=button data-copy="https://unitaryfoundation.github.io/qldpc-challenge/codes/52-26-2-b.html" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></button><a class=sharebtn href="https://twitter.com/intent/tweet?text=%5B%5B52%2C26%2C2%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge&amp;url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/52-26-2-b.html" target=_blank rel=noopener aria-label="Post on X" title="Post on X"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a><a class=sharebtn href="https://bsky.app/intent/compose?text=%5B%5B52%2C26%2C2%5D%5D%20quantum%20LDPC%20code%20on%20the%20QEC%20Challenge%20https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/52-26-2-b.html" target=_blank rel=noopener aria-label="Share on Bluesky" title="Bluesky"><svg viewBox="0 0 568 501" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.193 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.889-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.66 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg></a><a class=sharebtn href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A//unitaryfoundation.github.io/qldpc-challenge/codes/52-26-2-b.html" target=_blank rel=noopener aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg></a></div></section>
+<section class=blk><h3>Distance</h3>
+<div class=kv><b>X/Z asymmetry</b> 1 &middot; d_X &le; 2, d_Z &le; 2 &middot; w_X = 4, w_Z = 4 <span class=claimed>(max(d_X,d_Z)/min(d_X,d_Z); each side carries its own earned tier: = certified exact, &le; witness upper bound)</span></div>
+<div class=kv><b>d_X</b> 2 &middot; witness weight 2 (claimed upper_bound)</div>
+<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[15, 41]</div></details>
+<div class=kv><b>d_Z</b> 2 &middot; witness weight 2 (claimed upper_bound)</div>
+<details><summary>witness operator (support, 2 qubits)</summary><div class=wit>[15, 41]</div></details>
+<div class=kv><b>certificate</b> <span class=cert-no>none yet &middot; distance stands as a self-certified upper bound (d &le;)</span></div>
+</section>
+
+<section class=blk><h3>Diagnostics</h3>
+<div class=kv style="color:var(--mut)">computed by the verifier from the parity checks, the layout, and the stored witnesses; shown as evidence, not used for ranking</div>
+<div class=kv title="Tanner-graph girth: the shortest cycle in the check/qubit graph a decoder runs on, per side (H_X detects Z errors, H_Z detects X errors). Longer is friendlier to belief propagation. A diagnostic computed by the verifier from H, never a ranking axis."><b>girth</b> H_X acyclic &middot; H_Z acyclic <span class=claimed>(shortest cycle of each side&rsquo;s Tanner graph; longer is friendlier to belief propagation)</span></div>
+<div class=kv title="row weights of each side, min to max with the mean"><b>check weights</b> H_X 4 &middot; H_Z 4</div>
+<div class=kv title="column weights of each side: how many checks of that type touch a qubit, min to max with the mean"><b>qubit degrees</b> H_X 1 &middot; H_Z 1</div>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_X</b> (1,1)×52 (2,0)×78 (3,1)×52 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_X</summary><div class=wit>(1,1): 52
+(2,0): 78
+(3,1): 52</div></details>
+<div class=kv title="(a,b) trapping sets: connected sets of a qubits whose error pattern has syndrome weight b; small b at small a is what stalls iterative decoders. Shown: the smallest b at each size and how many sets reach it, sizes up to 3 within the verifier&#x27;s cost cap."><b>trapping sets H_Z</b> (1,1)×52 (2,0)×78 (3,1)×52 <span class=claimed>(smallest syndrome weight at each size, connected sets of up to 3 qubits)</span></div>
+<details><summary>full (size, syndrome weight): count census for H_Z</summary><div class=wit>(1,1): 52
+(2,0): 78
+(3,1): 52</div></details>
+</section>
+<section class=blk><h3>Circuit tier</h3>
+<div class=kv style="color:var(--mut)">syndrome-extraction memory circuits committed under <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/circuits/52-26-2-b">circuits/52-26-2-b/</a> &middot; canonical noise recipe, 2 rounds, stim 1.16.0</div>
+<div class=kv title="schedule of the committed memory circuits, computed at build time and never ranked: qubits is every qubit the circuit addresses (data, ancilla, and flag), layers is the number of TICK-delimited parallel gate layers in the whole memory experiment, layers per round divides the layers between the data preparation and the final readout by the rounds, 2q layers and 2q gates per round are the two-qubit-gate layers and gates of one extraction round, 2q gates per layer is their mean over the two-qubit layers (the parallelism), and qubit-layers is qubits times layers, a spacetime volume"><b>schedule</b> <span class=claimed>(computed from the committed circuits; displayed, never ranked)</span></div><table class="lerpts sched"><thead><tr><th>basis</th><th>qubits</th><th>layers</th><th>layers / round</th><th>2q layers / round</th><th>2q gates / round</th><th>2q gates / layer</th><th>qubit-layers</th></tr></thead><tbody><tr><td>X, Z</td><td class=num>182</td><td class=num>54</td><td class=num>26</td><td class=num>24</td><td class=num>312</td><td class=num>13.0</td><td class=num>9,828</td></tr></tbody></table>
+<div class=kv><b>d_circ</b> &le; 2 <span class=claimed>(min over bases; penalty-only, each basis clamped to the distance of the logical it protects, so the min is &le; d)</span> &middot; 26 layers per round <span class=claimed>(the deeper basis; computed, never ranked)</span></div>
+<div class=kv><b>d_circ^X</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 2)</summary><div class=wit>[32, 46]</div></details>
+<div class=kv><b>d_circ^Z</b> 2 &middot; fault-set witness of 2 mechanisms (claimed upper_bound)</div>
+<details><summary>witness fault set (mechanism indices in the DEM derived from the committed .stim, 2)</summary><div class=wit>[124, 177]</div></details>
+<div class=kv style="color:var(--mut)">no measured logical error rate yet; d_circ is a floor, and the measured tier records the prefactor it cannot see</div>
+</section>
+<section class=blk><h3>Construction &amp; provenance</h3>
+<div class=kv><b>authors</b> <a href="https://github.com/mathysrennela">@mathysrennela</a></div>
+<div class=kv><b>provenance</b> submitted through the challenge</div>
+<div class=kv><b>novelty</b> novelty not audited</div>
+<div class=kv><b>construction</b> code-calculus v0.3.1rc PP-SCALE (SNF bundle P0=3, Q=0, P=13, roots 12; equals CPM-PP p=13 all0-alternating)</div>
+<div class=kv><b>model</b> <span class=modelmark></span>Beam 1.0, GLM-5.3-Flash <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>harness</b> OpenCode <span class=claimed>(claimed, not verified)</span></div>
+<div class=kv><b>date</b> 2026-11-23</div>
+<div class=kv><b>family</b> other <span class=claimed>(a tag, not a ranking)</span></div>
+<div class=kv><b>locality</b> unrestricted <span class=claimed>(computed from the layout)</span></div>
+<div class=kv><b>weight class</b> weight ≤ 4 <span class=claimed>(computed)</span></div>
+</section>
+<section class=blk><h3>How this code was found</h3><div class=kv style="color:var(--mut)">the research note submitted with this code &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-26-2-b.md">raw markdown</a> &middot; <a href="../research-log.html">all notes</a></div><div class=notebody><h3>[[52,26,2]] — PP-SCALE explicit extension of a pair-partition base, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 52. The lead is the v0.3.1rc release&#x27;s second new constructor: <code>PP-SCALE</code>, promoted to rung 3 (<code>transition-defined</code>) in this release — the Kasai 2026 explicit-extension scaling of pair-partition codes through a Smith-normal-form parameter bundle, evaluated at a target lift size P. The 2026-11-22 yield fieldnote had found 0/8 PP-SCALE derivations connected on block-diagonal bases; the open question was whether the SNF-bundle route, evaluated at untried sizes, yields connected codes the board does not already hold.</p>
+<h4>What was searched</h4>
+<p>A deterministic SNF-bundle grid: base at P0 = 3 (root r = 2 of order 2, reproducing slope patterns {1, −1} through Q rows in {0, 1}), shift patterns from the five classic block-mixing patterns, and target lift sizes P ∈ {7, 11, 13} with roots_r = [P − 1] — 960 parameter tuples, of which 192 derived and 144 had a one-component Tanner graph. The first 20 connected derivations were packaged and gated: 6 passed (all at P = 13) and 14 were refused locally as exact duplicates — the unit-slope P = 7 and P = 11 members coincide with matrices the board or open PRs already carry. This note&#x27;s code is the canonical <code>all0-alternating</code> member at P = 13.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the SNF bundle reproduces the base code at P0 = 3</li>
+<p>(the consumer&#x27;s reproduction check) and evaluates cleanly at P = 13 (12² = 1 mod 13); the paired relative-affine orthogonality premise holds.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s witness search found weight-2 logicals on both</li>
+<p>sides at 8,000 RIS trials per side; the submitted claim is d ≤ 2 (<code>upper_bound</code>). No lower endpoint is claimed.</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>Note: at Q = 0 the bundle evaluates to the plain CPM-PP pattern at p = 13,</li>
+<p>so this entry is the p = 13 member of the pair-partition family reached through the PP-SCALE transition; the parameters n = 52, k = 26, w = 4.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>All-(−1)-slope bundles (Q rows = 1): 12/12 staged derivations were exact</li>
+<p>duplicates — negating every column slope is a position reflection, so the matrices coincide with the unit-slope grid the board already holds ([[28,14,2]] ×2, [[44,22,2]] ×4, [[52,26,2]] ×2 sources).</p>
+<li>Uniform-slope P = 7 and P = 11 members: exact duplicates of existing</li>
+<p>entries, refused locally before spending a witness search.</p>
+<li>Identical X/Z shift patterns: disconnected (p 4-qubit blocks), refused at</li>
+<p>staging.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>PP-SCALE</code> via <code>construct</code>, SNF bundle evaluation), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/52-26-2-b.py</code> in this PR rebuilds H_X and H_Z from the evaluated target pattern (P = 13, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>52-26-2-b.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 52-26-2-b.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly (the SNF-bundle route this release admits):</p>
+<pre>
+bundle = {&quot;P0&quot;: 3, &quot;orders_e&quot;: [2], &quot;roots_r0&quot;: [2],
+          &quot;Q_x&quot;: [[0], [0], [0], [0]], &quot;Q_z&quot;: [[0], [0], [0], [0]],
+          &quot;G_x&quot;: [[0], [0], [0], [0]], &quot;G_z&quot;: [[0], [1], [0], [1]],
+          &quot;theta_x&quot;: [1], &quot;theta_z&quot;: [1],
+          &quot;blocks_x0&quot;: [[(1, 0), (1, 0), (1, 0), (1, 0)]],
+          &quot;blocks_z0&quot;: [[(1, 0), (1, 0), (1, 0), (1, 0)]]}
+bundle[&quot;roots_r&quot;] = [12]
+construct({&quot;constructor&quot;: &quot;PP-SCALE&quot;, &quot;state&quot;: base, &quot;P&quot;: 13, &quot;bundle&quot;: bundle})
+</pre></div></section>
+<section class=blk><h3>Parity checks</h3>
+<div class=kv><b>X-checks</b> 13 (max weight 4) &middot; <b style="min-width:auto">Z-checks</b> 13 (max weight 4)</div>
+<details><summary>H_X (13 checks, sparse supports)</summary><div class=wit>[0, 13, 26, 39]
+[1, 14, 27, 40]
+[2, 15, 28, 41]
+[3, 16, 29, 42]
+[4, 17, 30, 43]
+[5, 18, 31, 44]
+[6, 19, 32, 45]
+[7, 20, 33, 46]
+[8, 21, 34, 47]
+[9, 22, 35, 48]
+[10, 23, 36, 49]
+[11, 24, 37, 50]
+[12, 25, 38, 51]</div></details>
+<details><summary>H_Z (13 checks, sparse supports)</summary><div class=wit>[0, 14, 26, 40]
+[1, 15, 27, 41]
+[2, 16, 28, 42]
+[3, 17, 29, 43]
+[4, 18, 30, 44]
+[5, 19, 31, 45]
+[6, 20, 32, 46]
+[7, 21, 33, 47]
+[8, 22, 34, 48]
+[9, 23, 35, 49]
+[10, 24, 36, 50]
+[11, 25, 37, 51]
+[12, 13, 38, 39]</div></details>
+<div class=kv style="margin-top:10px"><b>Code ID</b> <code>52-26-2-b</code> &middot; <a href="52-26-2-b.json" download title="the verified submission, served by this site">download JSON</a> &middot; <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/codes/52-26-2-b.json">raw on GitHub</a></div>
+</section>
+<script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{navigator.clipboard.writeText(b.dataset.copy);const o=b.innerHTML;plausible('Result Link Copied');b.innerHTML='\u2713';b.title='link copied';setTimeout(()=>{b.innerHTML=o;b.title='Copy link';},1400);}));document.querySelectorAll('.lofig').forEach(svg=>{const dots={};svg.querySelectorAll('[data-s]').forEach(d=>{(dots[d.dataset.s]=dots[d.dataset.s]||[]).push(d);});let pin=null;const clear=()=>{svg.classList.remove('lo-hover');svg.querySelectorAll('.lo-cur,.lo-mem').forEach(e=>e.classList.remove('lo-cur','lo-mem'));};const show=el=>{clear();svg.classList.add('lo-hover');el.classList.add('lo-cur');el.dataset.sites.split(' ').forEach(s=>(dots[s]||[]).forEach(d=>d.classList.add('lo-mem')));};svg.querySelectorAll('.lo-chk').forEach(el=>{el.addEventListener('mouseenter',()=>{if(!pin)show(el);});el.addEventListener('mouseleave',()=>{if(!pin)clear();});el.addEventListener('click',e=>{e.stopPropagation();const stack=document.elementsFromPoint(e.clientX,e.clientY).filter(x=>x.classList&&x.classList.contains('lo-chk')&&svg.contains(x));if(!stack.length)return;const i=pin?stack.indexOf(pin):-1;pin=stack[(i+1)%stack.length];show(pin);});});svg.addEventListener('click',()=>{if(pin){pin=null;clear();}});});</script>
+</div></body></html>

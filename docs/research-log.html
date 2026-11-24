@@ -59,7 +59,59 @@
 <li><code>a = [5, 36, 40]</code></li>
 <li><code>b = [35, 40]</code></li>
 </ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/84-6-6-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/168-14-14.html">[[168,14,14]] — 168-14-14</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/bhooi">@bhooi</a> &middot; DeepSeek-V4.1-Flash-1017</div><details open><summary>note</summary><div class=notebody><h3>[[168,14,14]] weight-seven bivariate bicycle code</h3>
+<section class=blk><h3><a href="codes/102-68-2.html">[[102,68,2]] — 102-68-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details open><summary>note</summary><div class=notebody><h3>[[102,68,2]] — weight-6 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-6 / unrestricted</code> CSS cell. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-6 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 17, L = 6, one X block of shifts <code>[0, 0, 0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 0, 1, 1, 2, 2]</code> (pairwise). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 102, k = 68 and maximum row weight 6 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/102-68-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/114-76-2.html">[[114,76,2]] — 114-76-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[114,76,2]] — weight-6 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-6 / unrestricted</code> CSS cell. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-6 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 19, L = 6, one X block of shifts <code>[0, 0, 0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 0, 1, 1, 2, 2]</code> (pairwise). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 114, k = 76 and maximum row weight 6 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/114-76-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/116-58-2.html">[[116,58,2]] — 116-58-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[116,58,2]] — weight-4 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-4 / unrestricted</code> CSS cell. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-4 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 29, L = 4, one X block of shifts <code>[0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 1, 0, 1]</code> (alternating). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 116, k = 58 and maximum row weight 4 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/116-58-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/138-92-2.html">[[138,92,2]] — 138-92-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[138,92,2]] — weight-6 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-6 / unrestricted</code> CSS cell. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-6 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 23, L = 6, one X block of shifts <code>[0, 0, 0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 0, 1, 1, 2, 2]</code> (pairwise). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 138, k = 92 and maximum row weight 6 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/138-92-2.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/168-14-14.html">[[168,14,14]] — 168-14-14</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/bhooi">@bhooi</a> &middot; DeepSeek-V4.1-Flash-1017</div><details ><summary>note</summary><div class=notebody><h3>[[168,14,14]] weight-seven bivariate bicycle code</h3>
 <p>Submitted by Bryan Hooi (@bhooi).</p>
 <h4>Direction and hypothesis</h4>
 <p>We searched for a binary CSS code on at most 168 data qubits encoding at least 14 logical qubits with maximum check weight seven. The challenge lists a weight-seven [[168,14,12]] code. Two commuting blocks of order 84 allow us to enforce the qubit and check-weight budgets before testing rank or distance.</p>
@@ -80,6 +132,134 @@
 <li>B = {(2,4), (1,2), (4,3)}.</li>
 </ul>
 <p>For each group element g, create one X row from g+A in the first block and g+B in the second. Create one Z row from g−B in the first block and g−A in the second. Reduce coordinates modulo 14 and 6 and add 84 to second-block indices. These supports reproduce the submitted matrices. Multiple search hits shared an output filename; the supports above were checked against the archived matrix.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/168-14-14.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/28-14-2-b.html">[[28,14,2]] — 28-14-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[28,14,2]] — PP-SCALE with mixed ±1 column slopes, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted. The lead: the 2026-11-23 stress campaign found that <code>PP-SCALE</code>&#x27;s rung-3 SNF path recaptures known matrices whenever the slope pattern is uniform (all-−1-slope bundles are position reflections of the unit-slope grid), so the productive part of the family is bundles whose slope pattern is *not* uniform across columns. A mixed ±1 pattern (Q rows alternating 1, 0, 1, 0) gives columns with slopes 1 and P − 1 = −1; the resulting matrices are not in the unit-slope grid, and the question was whether they are new to the board and gate-passing.</p>
+<h4>What was searched</h4>
+<p>Mixed-slope subset of the deterministic SNF grid: Q rows alternating (1, 0, 1, 0) (both sectors matched or x/z-crossed), shift patterns from the five classic block-mixing patterns, base at P0 = 3 (root r = 2 of order 2), target sizes P ∈ {7, 11, 13} with roots_r = [P − 1] — 480 tuples attempted, of which 384 derived; 96 had fingerprints new to the dedup index (board + open PRs + every staged find of this campaign). The first 8 new-fingerprint, connected derivations were packaged and gated: 8/8 passed and were board-advancing. This note&#x27;s code is the canonical <code>all0-alternating</code> member at P = 7.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the SNF bundle reproduces the base code at P0 = 3 (the</li>
+<p>consumer&#x27;s reproduction check; the base carries slopes 2 = −1 and 1 on alternating columns) and evaluates cleanly at P = 7 (6² = 1 mod 7).</p>
+<li>Newness: <code>dedup_oracle</code> fingerprints (canonical form + WL) do not match</li>
+<p>any board entry, open PR, or staged candidate of this campaign — unlike the uniform-slope bundles, which were all exact duplicates.</p>
+<li>Distance: the verifier&#x27;s witness search found weight-2 logicals on both</li>
+<p>sides at 8,000 RIS trials per side; the submitted claim is d ≤ 2 (<code>upper_bound</code>). No lower endpoint is claimed.</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>Parameters: n = 28, k = 14, w = 4.</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Uniform all-(−1)-slope bundles: 12/12 exact duplicates (position</li>
+<p>reflection of the unit-slope grid) — the negative result that motivated the mixed-slope lead.</p>
+<li>The x/z-crossed slope assignments (Q_x ≠ Q_z) mostly fail the paired</li>
+<p>relative-affine orthogonality premise (the relative maps stop pairing); the matched-slope subset carries the yield.</p>
+<li>Identical X/Z shift patterns: disconnected (p 4-qubit blocks).</li>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>PP-SCALE</code> via <code>construct</code>, SNF bundle evaluation), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/28-14-2-b.py</code> in this PR rebuilds H_X and H_Z from the evaluated target pattern (P = 7, L = 4, column slopes (6, 1, 6, 1) — i.e. ±1 — X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>28-14-2-b.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 28-14-2-b.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly (the SNF-bundle route this release admits):</p>
+<pre>
+bundle = {&quot;P0&quot;: 3, &quot;orders_e&quot;: [2], &quot;roots_r0&quot;: [2],
+          &quot;Q_x&quot;: [[1], [0], [1], [0]], &quot;Q_z&quot;: [[1], [0], [1], [0]],
+          &quot;G_x&quot;: [[0], [0], [0], [0]], &quot;G_z&quot;: [[0], [1], [0], [1]],
+          &quot;theta_x&quot;: [1], &quot;theta_z&quot;: [1],
+          &quot;blocks_x0&quot;: [[(2, 0), (1, 0), (2, 0), (1, 0)]],
+          &quot;blocks_z0&quot;: [[(2, 0), (1, 0), (2, 0), (1, 0)]]}
+bundle[&quot;roots_r&quot;] = [6]
+construct({&quot;constructor&quot;: &quot;PP-SCALE&quot;, &quot;state&quot;: base, &quot;P&quot;: 7, &quot;bundle&quot;: bundle})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/28-14-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/52-26-2-b.html">[[52,26,2]] — 52-26-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[52,26,2]] — PP-SCALE explicit extension of a pair-partition base, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 52. The lead is the v0.3.1rc release&#x27;s second new constructor: <code>PP-SCALE</code>, promoted to rung 3 (<code>transition-defined</code>) in this release — the Kasai 2026 explicit-extension scaling of pair-partition codes through a Smith-normal-form parameter bundle, evaluated at a target lift size P. The 2026-11-22 yield fieldnote had found 0/8 PP-SCALE derivations connected on block-diagonal bases; the open question was whether the SNF-bundle route, evaluated at untried sizes, yields connected codes the board does not already hold.</p>
+<h4>What was searched</h4>
+<p>A deterministic SNF-bundle grid: base at P0 = 3 (root r = 2 of order 2, reproducing slope patterns {1, −1} through Q rows in {0, 1}), shift patterns from the five classic block-mixing patterns, and target lift sizes P ∈ {7, 11, 13} with roots_r = [P − 1] — 960 parameter tuples, of which 192 derived and 144 had a one-component Tanner graph. The first 20 connected derivations were packaged and gated: 6 passed (all at P = 13) and 14 were refused locally as exact duplicates — the unit-slope P = 7 and P = 11 members coincide with matrices the board or open PRs already carry. This note&#x27;s code is the canonical <code>all0-alternating</code> member at P = 13.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the SNF bundle reproduces the base code at P0 = 3</li>
+<p>(the consumer&#x27;s reproduction check) and evaluates cleanly at P = 13 (12² = 1 mod 13); the paired relative-affine orthogonality premise holds.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s witness search found weight-2 logicals on both</li>
+<p>sides at 8,000 RIS trials per side; the submitted claim is d ≤ 2 (<code>upper_bound</code>). No lower endpoint is claimed.</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>Note: at Q = 0 the bundle evaluates to the plain CPM-PP pattern at p = 13,</li>
+<p>so this entry is the p = 13 member of the pair-partition family reached through the PP-SCALE transition; the parameters n = 52, k = 26, w = 4.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>All-(−1)-slope bundles (Q rows = 1): 12/12 staged derivations were exact</li>
+<p>duplicates — negating every column slope is a position reflection, so the matrices coincide with the unit-slope grid the board already holds ([[28,14,2]] ×2, [[44,22,2]] ×4, [[52,26,2]] ×2 sources).</p>
+<li>Uniform-slope P = 7 and P = 11 members: exact duplicates of existing</li>
+<p>entries, refused locally before spending a witness search.</p>
+<li>Identical X/Z shift patterns: disconnected (p 4-qubit blocks), refused at</li>
+<p>staging.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>PP-SCALE</code> via <code>construct</code>, SNF bundle evaluation), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/52-26-2-b.py</code> in this PR rebuilds H_X and H_Z from the evaluated target pattern (P = 13, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>52-26-2-b.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 52-26-2-b.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly (the SNF-bundle route this release admits):</p>
+<pre>
+bundle = {&quot;P0&quot;: 3, &quot;orders_e&quot;: [2], &quot;roots_r0&quot;: [2],
+          &quot;Q_x&quot;: [[0], [0], [0], [0]], &quot;Q_z&quot;: [[0], [0], [0], [0]],
+          &quot;G_x&quot;: [[0], [0], [0], [0]], &quot;G_z&quot;: [[0], [1], [0], [1]],
+          &quot;theta_x&quot;: [1], &quot;theta_z&quot;: [1],
+          &quot;blocks_x0&quot;: [[(1, 0), (1, 0), (1, 0), (1, 0)]],
+          &quot;blocks_z0&quot;: [[(1, 0), (1, 0), (1, 0), (1, 0)]]}
+bundle[&quot;roots_r&quot;] = [12]
+construct({&quot;constructor&quot;: &quot;PP-SCALE&quot;, &quot;state&quot;: base, &quot;P&quot;: 13, &quot;bundle&quot;: bundle})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/52-26-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/68-34-2-b.html">[[68,34,2]] — 68-34-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[68,34,2]] — weight-4 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-4 / unrestricted</code> CSS cell. The board already holds a <code>[[68,34,2]]</code> entry at check weight 6 (<code>codes/68-34-2.json</code>). A distinct code with the same <code>n, k, d</code> but lower check weight strictly improves the Pareto axis <code>w</code>, so a weight-4 construction at these parameters extends the frontier. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose smallest tested lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>For this code the X and Z witnesses both have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [&quot;d&quot;,&quot;k&quot;,&quot;n&quot;]</code>, <code>dominated_by: []</code>, <code>d_only_gain: false</code>, cell <code>weight-4 / unrestricted</code>. A second independent gate run reached the same verdict. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 17, L = 4, one X block of shifts <code>[0,0,0,0]</code> (all-zero) and one Z block of shifts <code>[0,1,0,1]</code> (alternating). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 68, k = 34 and maximum row weight 4 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/68-34-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/76-38-2-b.html">[[76,38,2]] — 76-38-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[76,38,2]] — weight-4 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-4 / unrestricted</code> CSS cell. The board already holds a <code>76-38-2</code> entry at check weight 6 (<code>codes/76-38-2.json</code>). A distinct code with the same <code>n, k, d</code> but lower check weight strictly improves the Pareto axis <code>w</code>, so this weight-4 construction extends the frontier.</p>
+<p>The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-4 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 19, L = 4, one X block of shifts <code>[0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 1, 0, 1]</code> (alternating). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 76, k = 38 and maximum row weight 4 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/76-38-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/92-46-2-b.html">[[92,46,2]] — 92-46-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[92,46,2]] — weight-4 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: the <code>weight-4 / unrestricted</code> CSS cell. The board already holds a <code>92-46-2</code> entry at check weight 6 (<code>codes/92-46-2.json</code>). A distinct code with the same <code>n, k, d</code> but lower check weight strictly improves the Pareto axis <code>w</code>, so this weight-4 construction extends the frontier.</p>
+<p>The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
+<h4>What was searched</h4>
+<p>The <code>cc v0.3.1 pair-partition arm</code> swept p in {17, 19, 23, 29}, block counts L in {4, 6} and five shift patterns (all-zero, identity, alternating, pairwise, reverse) for each of the X and Z block sets — 200 deterministic specifications. Applicability is decided by the constructor; 80 of the extended-grid specs were derivable and 40 produced connected codes. Each connected child was packaged with an explicit weight-2 logical on both sides and screened at 8,000 surrogate trials per side before the trusted gate.</p>
+<h4>Evidence trail</h4>
+<p>Both witnesses have weight 2 and survived 8,000 samples each, so <code>d &lt;= 2</code> on both sides. The trusted gate (<code>verify/validate_candidate.py</code>, full refutation on a fresh seed) returned <code>passed: true</code> and <code>board_advancing: true</code> with an empty <code>dominated_by</code> list and <code>d_only_gain: false</code> in the `weight-4 / unrestricted` cell. The claim is a witness-backed <b>upper bound</b>, not an exact distance.</p>
+<h4>Dead ends</h4>
+<p>Of the 200 extended-grid specs, 120 were rejected by the constructor as inapplicable (no relative-affine block-row solution) and 40 had identical X/Z shift sets, which give a direct sum the gate refuses. The companion PP-SCALE arm produced 60 connected children but all were exact duplicates of earlier staged finds and contributed nothing new. No d=3 rung was found in this grid.</p>
+<h4>Tools</h4>
+<p>Model: Hy 4 flash. Harness: opencode. Construction: code-calculus v0.3.1 <code>L-PAIR-PARTITION</code> priced constructor; witness search with <code>research/kit/surrogate.py</code> and the <code>gf2_fast</code> accelerator; packaging and verification through <code>research/kit/submit.py</code> and <code>verify/validate_candidate.py</code>. Compute: a few thousand cheap screens plus one full gate per survivor.</p>
+<h4>Reproduction</h4>
+<p>Constructor <code>L-PAIR-PARTITION</code> with p = 23, L = 4, one X block of shifts <code>[0, 0, 0, 0]</code> (all-zero) and one Z block of shifts <code>[0, 1, 0, 1]</code> (alternating). The two check matrices are the block-circulant lifts of these shift vectors over Z_p, with the X and Z blocks paired by the constructor. Seeds 0 (X witness) and 1 (Z witness). The resulting checks have n = 92, k = 46 and maximum row weight 4 on both sides.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/92-46-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Greedy weight shedding with objective-aware search: 15 board-advancing codes</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Used the objective-aware search from code-calculus-dev <a href="https://github.com/unitaryfoundation/code-calculus-dev/pull/624">PR #624</a> (<code>objective=&quot;weight&quot;</code>, <code>rebase=True</code>) to run a greedy weight-shedding campaign over 140 CSS board parents. Of 157 single-step attempts, 23 produced a weight-improving child; all 23 were staged with witnesses and gated, **all 23 passed<b>, and </b>15 were board-advancing** (gate `gates.novelty.board_advancing: true`). Dedup against the board and open PRs found 0 exact/WL duplicates, and the 15 finds are mutually non-duplicate. Every find is a d=1, weight-reduced variant in the <code>weight-9plus</code>/unrestricted cell; none is a d-only gain. These are staged for human review only — no PR was opened.</p>
 <h4>What was run</h4>
