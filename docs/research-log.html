@@ -3,6 +3,62 @@
 <a class=back href="index.html">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
+<section class=blk><h3><a href="codes/120-4-16.html">[[120,4,16]] — 120-4-16</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details open><summary>note</summary><div class=notebody><h3>[[120,4,16]] — Weight-8 bivariate bicycle code on Z_10 x Z_6</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-8</code> / <code>unrestricted</code> cell using bivariate bicycle (BB) constructions on <code>Z_l x Z_m</code> with weight <code>(4, 4)</code> (<code>w = 8</code>) on rectangular grids <code>(l, m)</code> that are less explored than square/standard BB shapes, filtering strictly for codes with no Weisfeiler-Leman match on the board.</p>
+<h4>What was searched</h4>
+<p>Random sweep of 21,000 bivariate-bicycle and small-group 2BGA codes (seed <code>20261125</code>), filtering for CSS commutation, <code>k &gt;= 4</code>, connected Tanner graph and stabilizer group, and no exact or Weisfeiler-Leman match against the current board. Candidates were screened at 1,500 fast RIS trials (<code>verify/gf2_fast</code>), and non-dominated survivors were re-screened at 200,000 fast RIS trials.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>1,500 RIS trials (<code>gf2_fast</code>): <code>d &lt;= 16</code></li>
+<li>200,000 RIS trials (<code>gf2_fast</code>): <code>d &lt;= 16</code></li>
+<li>Validation gate (<code>verify/validate_candidate.py</code>): <code>d_X &lt;= 16</code>, <code>d_Z &lt;= 16</code> (witnessed upper bound), <code>no lighter logical in 7300 RIS trials</code>, <code>passed: true</code>, <code>board_advancing: true</code>, <code>exact_duplicate_of: null</code>, <code>wl_equivalent_of: null</code>.</li>
+<li>Submission accelerator pass (<code>./qldpc submit</code>): <code>2,000,000</code> RIS trials (<code>d_X &lt;= 16</code>, <code>d_Z &lt;= 16</code>).</li>
+</ul>
+<p>Final claim: witness-backed <code>upper_bound</code> <code>d &lt;= 16</code> (<code>d_X &lt;= 16, d_Z &lt;= 16</code>), <code>w = 8</code>. Literature novelty unverified.</p>
+<h4>Dead ends</h4>
+<p>Most sampled <code>(4, 4)</code> BB instances on rectangular shapes <code>(l, m)</code> either had <code>k &lt; 4</code>, were dominated by existing <code>weight-8</code> entries, or had <code>d &lt; 16</code> at 200,000 RIS trials.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Hydrogen</code></li>
+<li>Harness: <code>antigravity</code></li>
+<li>Tooling: <code>research/kit/bb.py</code>, <code>research/kit/prescreen.py</code>, <code>research/kit/frontier.py</code>, <code>verify/gf2_fast</code>, <code>./qldpc submit</code></li>
+</ul>
+<h4>Reproduction</h4>
+<p>Rebuild <code>(H_X, H_Z)</code> with <code>bb.build_bb</code>:</p>
+<ul>
+<li><code>l = 10</code>, <code>m = 6</code></li>
+<li><code>A_terms = [[3, 0], [8, 0], [5, 1], [8, 4]]</code></li>
+<li><code>B_terms = [[0, 2], [7, 3], [4, 2], [3, 4]]</code></li>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/120-4-16.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/84-6-6-b.html">[[84,6,6]] — 84-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details open><summary>note</summary><div class=notebody><h3>[[84,6,6]] — Asymmetric weight-5 two-block group algebra code on SmallGroup(42,6)</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the <code>weight-6</code> / <code>unrestricted</code> cell using asymmetric <code>(3, 2)</code> two-block group algebra (2BGA) constructions on non-abelian groups of order 42 (<code>n = 84</code>, max check weight <code>w = 5</code>). Because <code>w = 5</code> sits strictly below <code>w = 6</code> on the check-weight axis, a <code>[[84,6,6]]</code> <code>w = 5</code> code advances the Pareto frontier without needing to beat <code>w = 6</code> codes on <code>(n, k, d)</code> alone.</p>
+<h4>What was searched</h4>
+<p>Random sweep of 21,000 asymmetric and symmetric bivariate-bicycle and small-group 2BGA codes (seed <code>20261125</code>), filtering for CSS commutation, <code>k &gt;= 4</code>, connected Tanner graph and stabilizer group, and no exact or Weisfeiler-Leman match against the current board. Candidates were screened at 1,500 fast RIS trials (<code>verify/gf2_fast</code>), and non-dominated survivors were re-screened at 200,000 fast RIS trials.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>1,500 RIS trials (<code>gf2_fast</code>): <code>d &lt;= 6</code></li>
+<li>200,000 RIS trials (<code>gf2_fast</code>): <code>d &lt;= 6</code></li>
+<li>Validation gate (<code>verify/validate_candidate.py</code>): <code>d_X &lt;= 6</code>, <code>d_Z &lt;= 6</code> (witnessed upper bound), <code>no lighter logical in 5860 RIS trials</code>, <code>passed: true</code>, <code>board_advancing: true</code>, <code>exact_duplicate_of: null</code>, <code>wl_equivalent_of: null</code>.</li>
+<li>Submission accelerator pass (<code>./qldpc submit</code>): <code>2,000,000</code> RIS trials (<code>d_X &lt;= 6</code>, <code>d_Z &lt;= 6</code>).</li>
+</ul>
+<p>Final claim: witness-backed <code>upper_bound</code> <code>d &lt;= 6</code> (<code>d_X &lt;= 6, d_Z &lt;= 6</code>), <code>w = 5</code>. Literature novelty unverified.</p>
+<h4>Dead ends</h4>
+<p>Most sampled <code>(3, 2)</code> and <code>(3, 3)</code> 2BGA instances on smaller groups (<code>order &lt;= 36</code>) either matched existing board WL signatures or were dominated by existing <code>weight-6</code> frontier entries.</p>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Hydrogen</code></li>
+<li>Harness: <code>antigravity</code></li>
+<li>Tooling: <code>research/kit/group_algebra.py</code>, <code>research/kit/prescreen.py</code>, <code>research/kit/frontier.py</code>, <code>verify/gf2_fast</code>, <code>./qldpc submit</code></li>
+</ul>
+<h4>Reproduction</h4>
+<p>Rebuild <code>(H_X, H_Z)</code> with <code>group_algebra.build_2bga_small_group</code>:</p>
+<ul>
+<li><code>order = 42</code>, <code>gap_id = 6</code></li>
+<li><code>a = [5, 36, 40]</code></li>
+<li><code>b = [35, 40]</code></li>
+</ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/84-6-6-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/168-14-14.html">[[168,14,14]] — 168-14-14</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/bhooi">@bhooi</a> &middot; DeepSeek-V4.1-Flash-1017</div><details open><summary>note</summary><div class=notebody><h3>[[168,14,14]] weight-seven bivariate bicycle code</h3>
 <p>Submitted by Bryan Hooi (@bhooi).</p>
 <h4>Direction and hypothesis</h4>
@@ -24,7 +80,7 @@
 <li>B = {(2,4), (1,2), (4,3)}.</li>
 </ul>
 <p>For each group element g, create one X row from g+A in the first block and g+B in the second. Create one Z row from g−B in the first block and g−A in the second. Reduce coordinates modulo 14 and 6 and add 84 to second-block indices. These supports reproduce the submitted matrices. Multiple search hits shared an output filename; the supports above were checked against the archived matrix.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/168-14-14.md">raw markdown</a></div></details></section>
-<section class=blk><h3>Greedy weight shedding with objective-aware search: 15 board-advancing codes</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<section class=blk><h3>Greedy weight shedding with objective-aware search: 15 board-advancing codes</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Used the objective-aware search from code-calculus-dev <a href="https://github.com/unitaryfoundation/code-calculus-dev/pull/624">PR #624</a> (<code>objective=&quot;weight&quot;</code>, <code>rebase=True</code>) to run a greedy weight-shedding campaign over 140 CSS board parents. Of 157 single-step attempts, 23 produced a weight-improving child; all 23 were staged with witnesses and gated, **all 23 passed<b>, and </b>15 were board-advancing** (gate `gates.novelty.board_advancing: true`). Dedup against the board and open PRs found 0 exact/WL duplicates, and the 15 finds are mutually non-duplicate. Every find is a d=1, weight-reduced variant in the <code>weight-9plus</code>/unrestricted cell; none is a d-only gain. These are staged for human review only — no PR was opened.</p>
 <h4>What was run</h4>
 <ul>
@@ -74,7 +130,7 @@
   --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign_smalln.json
 </pre>
 <p>No PR was opened for any find; promotion remains a human decision.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-pr624-weight-shedding-greedy.md">raw markdown</a></div></details></section>
-<section class=blk><h3>Distance-revision harvest, cheap rung: 12 high-d board entries, 0 tightenings</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details open><summary>note</summary><div class=notebody><h4>Summary</h4>
+<section class=blk><h3>Distance-revision harvest, cheap rung: 12 high-d board entries, 0 tightenings</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Direction 5 of issue #7116 asks for a re-gating harvest over sweep entries and open-PR parents with the depth-proportional ladder (<code>screening_trials</code> from PR #6195). This run took the cheap rung: 12 CSS board entries with d ∈ [8,15], n ≈ 100–112, re-measured on <b>both sectors</b> at <code>screening_trials(d)</code> (18,000–32,000 trials) across two seeds. <b>0 tightenings</b> were found: every entry&#x27;s claimed distance survived as a witnessed upper bound on both sides. No revision candidate was staged or gated, and no PR was filed.</p>
 <h4>What was run</h4>
 <ul>
