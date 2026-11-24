@@ -367,5 +367,5 @@
   "model": "Hy 4 flash",
   "harness": "opencode"
  },
- "family": "other"
+ "family": "pair-partition-cpm"
 }
