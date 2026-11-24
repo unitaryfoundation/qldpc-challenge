@@ -81,9 +81,16 @@ def run_rung(
     row_sort=False,
     dimension=2,
     max_diameter=None,
+    modules=None,
+    max_modules_per_check=None,
+    module_capacity=None,
     verbose=True,
 ):
     """Run one rung and return its record.
+
+    ``modules``, ``max_modules_per_check``, ``module_capacity`` are the
+    module predicate of ``local_sat.build_local_cnf`` (issue #5836); the
+    found model's assignment is written beside its matrices.
 
     ``conflicts`` caps the conflicts spent on one formula (one model's
     search) and ``wall_hours`` caps the whole run. Neither can interrupt
@@ -127,6 +134,9 @@ def run_rung(
         budget_check=budget_check,
         dimension=dimension,
         max_diameter=max_diameter,
+        modules=modules,
+        max_modules_per_check=max_modules_per_check,
+        module_capacity=module_capacity,
     )
     found, seen, best_k = [], 0, None
     try:
@@ -163,6 +173,12 @@ def run_rung(
             f"{side}x{side}{f'x{side}' if dimension == 3 else ''}"
             f"{'x2' if layers == 2 else ''} G={G} w{w} t={t}"
             + (f" diam<={max_diameter:g}" if max_diameter is not None else "")
+            + (
+                f" mod{modules if isinstance(modules, int) else 'fixed'}"
+                f"<={1 if max_modules_per_check is None else max_modules_per_check}"
+                if modules is not None
+                else ""
+            )
         ),
         "side": side,
         "dimension": dimension,
@@ -173,6 +189,10 @@ def run_rung(
         "t": t,
         "radius": radius,
         "max_diameter": max_diameter,
+        "modules": (modules if isinstance(modules, int) else "fixed") if modules is not None else None,
+        "max_modules_per_check": (1 if max_modules_per_check is None else max_modules_per_check)
+        if modules is not None
+        else None,
         "status": status,
         "solver": f"CaDiCaL {_solver_version(solver)} via python-sat",
         "conflict_cap": conflicts,
@@ -206,6 +226,7 @@ def run_rung(
                         "sites": sites,
                         "anchors_x": ax,
                         "anchors_z": az,
+                        "modules": spec.get("modules"),
                         "k": k,
                     },
                     f,
@@ -265,7 +286,36 @@ def main(argv=None):
         help="no check acts on two qubits farther apart than this "
         "(bounds the measured interaction radius by construction)",
     )
+    ap.add_argument(
+        "--modules",
+        type=int,
+        default=None,
+        help="co-search a partition into this many hardware modules (issue #5836)",
+    )
+    ap.add_argument(
+        "--grid-blocks",
+        type=int,
+        default=None,
+        help="fix the partition to this many grid tiles per axis instead (local_sat.grid_block_modules)",
+    )
+    ap.add_argument(
+        "--max-modules-per-check",
+        type=int,
+        default=None,
+        help="a check acts on qubits from at most this many modules (default 1 when a partition is given)",
+    )
+    ap.add_argument(
+        "--module-capacity",
+        type=int,
+        default=None,
+        help="qubits per co-searched module (default: the balanced ceil(n / modules))",
+    )
     a = ap.parse_args(argv)
+    if a.modules is not None and a.grid_blocks is not None:
+        ap.error("--modules and --grid-blocks are two ways to give one partition; pass one")
+    modules = a.modules
+    if a.grid_blocks is not None:
+        modules = local_sat.grid_block_modules(a.side, a.grid_blocks, dimension=a.dimension, layers=a.layers)
 
     rec = run_rung(
         a.side,
@@ -284,6 +334,9 @@ def main(argv=None):
         row_sort=a.row_sort,
         dimension=a.dimension,
         max_diameter=a.max_diameter,
+        modules=modules,
+        max_modules_per_check=a.max_modules_per_check,
+        module_capacity=a.module_capacity,
     )
     os.makedirs(os.path.dirname(a.log), exist_ok=True)
     with open(a.log, "a", encoding="utf-8") as f:

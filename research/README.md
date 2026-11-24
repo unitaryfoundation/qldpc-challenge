@@ -28,7 +28,7 @@ nothing; **audit** re-prices or triages what already exists.
 | Script | Status | What it does |
 |---|---|---|
 | `cyclic_gb.py` | canonical | cyclic generalized-bicycle search stack over Z_m: designed-divisor construction plus the staged distance ladder |
-| `local_sat.py` | canonical | 2D-local SAT search: every check is anchored at a lattice site and acts within a radius, so each find carries a layout and a geometric-efficiency score |
+| `local_sat.py` | canonical | 2D-local SAT search: every check is anchored at a lattice site and acts within a radius, and optionally inside at most M hardware modules (a fixed grid-block partition or a co-searched one, issue #5836), so each find carries a layout, a module assignment when asked for, and a geometric-efficiency score |
 | `sat_rungs.py` | canonical | runs one rung of the 2D-local SAT ladder on `local_sat.py` and records how it ended (issue #2703) |
 | `sat_search.py` | base | the unconstrained SAT formulation `local_sat.py` extends; its finds carry no layout and cannot enter the 2D-local tracks |
 | `build_halved_pp.py` | canonical | symplectic-halved CPM pair-partition codes (arXiv:2609.30069) |
