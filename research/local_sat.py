@@ -82,6 +82,9 @@ def build_local_cnf(
     row_sort=False,
     dimension=2,
     max_diameter=None,
+    modules=None,
+    max_modules_per_check=None,
+    module_capacity=None,
 ):
     """Build the locality-constrained CNF and return its variable maps.
 
@@ -90,6 +93,18 @@ def build_local_cnf(
     when given, no check acts on two qubits farther apart than this, so the
     layout's interaction radius (the verifier's largest check diameter) is
     bounded by construction; the anchor radius should be at least as large.
+
+    ``modules`` (issue #5836): a module predicate beside the radius one. A
+    sequence of one module id per qubit fixes the partition (for instance
+    :func:`grid_block_modules`); an int M co-searches a partition into M
+    modules, every module holding at least one and at most
+    ``module_capacity`` qubits (default ceil(n / M), the balanced chiplet).
+    Either way no check acts on qubits from more than
+    ``max_modules_per_check`` distinct modules (default 1: every check
+    stays inside a module). The assignment decodes with the model, so a
+    find carries ``locality.modules`` and the verifier's ``modular`` flag.
+    Module ids are a cardinality bound, not a distance, so the predicate
+    composes with the radius one and costs far fewer clauses.
 
     Returns a dict with keys: ``sites``, ``n``, ``G``, ``xr``, ``zr``, ``ax``,
     ``az``, ``clauses``, ``incidence_vars``, ``iter_errors``,
@@ -373,6 +388,65 @@ def build_local_cnf(
                 emit([-xr[(g, q1)], -xr[(g, q2)]])
                 emit([-zr[(g, q1)], -zr[(g, q2)]])
 
+    # --- module predicate (issue #5836): a check touches at most
+    # max_modules_per_check distinct modules. touched[side, g, m] is forced
+    # true by any qubit of module m in row g (a spurious true only tightens
+    # the bound, so the one direction is sound), then a sequential counter
+    # caps the touched modules per row.
+    mod = None
+    fixed_modules = None
+    n_modules = None
+    span_bound = None
+    cap = None
+    if modules is not None:
+        span_bound = 1 if max_modules_per_check is None else int(max_modules_per_check)
+        if span_bound < 1:
+            raise ValueError("max_modules_per_check must be at least 1")
+        if isinstance(modules, (int, np.integer)):
+            n_modules = int(modules)
+            if not 1 <= n_modules <= n:
+                raise ValueError(f"modules must be between 1 and n={n}, not {n_modules}")
+            cap = math.ceil(n / n_modules) if module_capacity is None else int(module_capacity)
+            if cap * n_modules < n:
+                raise ValueError(f"module_capacity {cap} over {n_modules} modules cannot hold {n} qubits")
+            mod = {(q, m): A(("mod", q, m)) for q in range(n) for m in range(n_modules)}
+            for q in range(n):
+                lits = [mod[(q, m)] for m in range(n_modules)]
+                emit(lits)  # every qubit sits in a module
+                for a, b in itertools.combinations(lits, 2):
+                    emit([-a, -b])  # and in only one
+            for m in range(n_modules):
+                column = [mod[(q, m)] for q in range(n)]
+                emit(list(column))  # every module holds a qubit
+                for _c in seq_counter(column, cap, ("cap", m)):
+                    emit(_c)
+                if m >= 1:
+                    # value symmetry: module m appears only after module m-1
+                    # has, so ids are in order of first use and the M!
+                    # relabelings collapse to one
+                    for q in range(n):
+                        emit([-mod[(q, m)]] + [mod[(q2, m - 1)] for q2 in range(q)])
+        else:
+            fixed_modules = [int(m) for m in modules]
+            if len(fixed_modules) != n:
+                raise ValueError(f"modules has {len(fixed_modules)} ids for n={n} qubits")
+            if min(fixed_modules) < 0:
+                raise ValueError("module ids are non-negative integers")
+            ids = sorted(set(fixed_modules))
+            n_modules = len(ids)
+            index = {mid: j for j, mid in enumerate(ids)}
+        for side, varmap in ((0, xr), (1, zr)):
+            for g in range(G):
+                touched = [A(("mt", side, g, m)) for m in range(n_modules)]
+                for q in range(n):
+                    if mod is None:
+                        emit([-varmap[(g, q)], touched[index[fixed_modules[q]]]])
+                    else:
+                        for m in range(n_modules):
+                            emit([-varmap[(g, q)], -mod[(q, m)], touched[m]])
+                for _c in seq_counter(touched, span_bound, ("mspan", side, g)):
+                    emit(_c)
+
     if row_sort:
         _n_vars = add_row_sort_clauses({"n": n, "G": G, "xr": xr, "zr": zr, "n_vars": len(aux)}, emit)
     else:
@@ -399,7 +473,35 @@ def build_local_cnf(
         "iter_errors": iter_errors,
         "detect_clauses": detect_clauses,
         "n_vars": _n_vars,  # highest var allocated; static symmetry aux starts above this
+        # module predicate (issue #5836): the fixed ids, or the one-hot
+        # assignment variables of a co-searched partition
+        "modules": fixed_modules,
+        "mod": mod,
+        "n_modules": n_modules,
+        "max_modules_per_check": span_bound,
+        "module_capacity": cap,
     }
+
+
+def grid_block_modules(n_side, blocks, dimension=2, layers=1):
+    """Return one module id per qubit from a grid tiled into ``blocks`` tiles per axis.
+
+    Ids follow the site order of :func:`_grid_sites`. The grid-blocking partition of issue #5836, the cheap fixed-partition
+    input to the module predicate: a 6x6 grid at ``blocks=2`` is four 3x3
+    chiplets. A bilayer repeats the ids for its second layer. Ids need not
+    be contiguous when ``n_side`` does not divide evenly; the verifier and
+    the encoder both accept that.
+    """
+    if not 1 <= blocks <= n_side:
+        raise ValueError(f"blocks must be between 1 and n_side={n_side}, not {blocks}")
+    tile = math.ceil(n_side / blocks)
+    ids = []
+    for site in _grid_sites(n_side, dimension):
+        idx = 0
+        for c in site:
+            idx = idx * blocks + min(int(c) // tile, blocks - 1)
+        ids.append(idx)
+    return ids * int(layers)
 
 
 # --- D4 orbit machinery for symmetry-aware enumeration ----------------------
@@ -651,6 +753,9 @@ def enumerate_local_sat_codes(
     budget_check=None,
     dimension=2,
     max_diameter=None,
+    modules=None,
+    max_modules_per_check=None,
+    module_capacity=None,
 ):
     """Yield ``(spec, HX, HZ)`` for distinct
     CSS codes whose checks are all local under the returned layout.
@@ -715,6 +820,12 @@ def enumerate_local_sat_codes(
                    cannot interrupt a running solve (``interrupt`` raises
                    NotImplementedError): solve in conflict chunks and let
                    the caller decide between chunks.
+    modules, max_modules_per_check, module_capacity : the module predicate
+                   of :func:`build_local_cnf` (issue #5836). The decoded
+                   assignment travels in ``spec["modules"]``, one id per
+                   qubit, so a consumer can file it as ``locality.modules``.
+                   A fixed partition is not invariant under the grid
+                   isometries, so it only runs with ``symmetry="none"``.
     stats        : if a dict is passed, it receives ``rounds``, ``yielded``,
                    ``rejected`` (by reason), ``final`` (``"UNSAT"`` when the
                    solver proved the remaining formula empty, ``"budget"``
@@ -753,6 +864,8 @@ def enumerate_local_sat_codes(
         )
     if symmetry not in ("none", "orbit", "lex"):
         raise ValueError(f"unknown symmetry {symmetry!r}; choose none|orbit|lex")
+    if modules is not None and not isinstance(modules, (int, np.integer)) and symmetry != "none":
+        raise ValueError("a fixed module partition is not invariant under the grid isometries; use symmetry='none'")
 
     perms = _site_permutations(n_side, dimension) if symmetry == "orbit" else None
 
@@ -774,6 +887,9 @@ def enumerate_local_sat_codes(
             row_sort=row_sort,
             dimension=dimension,
             max_diameter=max_diameter,
+            modules=modules,
+            max_modules_per_check=max_modules_per_check,
+            module_capacity=module_capacity,
         )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, solver_obj.add_clause)
@@ -790,6 +906,9 @@ def enumerate_local_sat_codes(
             row_sort=row_sort,
             dimension=dimension,
             max_diameter=max_diameter,
+            modules=modules,
+            max_modules_per_check=max_modules_per_check,
+            module_capacity=module_capacity,
         )
         if symmetry == "lex":
             add_static_symmetry_clauses(cnf, cnf["clauses"].append)
@@ -803,6 +922,7 @@ def enumerate_local_sat_codes(
     az = cnf["az"]
     incidence_vars = cnf["incidence_vars"]
     iter_errors = cnf["iter_errors"]
+    mod = cnf["mod"]
     if interrupt_handle is not None:
         interrupt_handle.append(solver_obj)
     if solver == "cryptominisat":
@@ -859,6 +979,10 @@ def enumerate_local_sat_codes(
                     HZ[g, q] = 1 if zr[(g, q)] in model else 0
             anchors_x = [next(i for i in range(n) if ax[(g, i)] in model) for g in range(G)]
             anchors_z = [next(i for i in range(n) if az[(g, i)] in model) for g in range(G)]
+            if mod is not None:
+                module_ids = [next(m for m in range(cnf["n_modules"]) if mod[(q, m)] in model) for q in range(n)]
+            else:
+                module_ids = cnf["modules"]
             if row_sort:
                 block = [(-v if v in model else v) for v in incidence_vars]
             else:
@@ -907,6 +1031,9 @@ def enumerate_local_sat_codes(
                 "sites": list(sites),
                 "anchors_x": list(anchors_x),
                 "anchors_z": list(anchors_z),
+                "modules": list(module_ids) if module_ids is not None else None,
+                "max_modules_per_check": cnf["max_modules_per_check"],
+                "module_capacity": cnf["module_capacity"],
             }
             yield (spec, HX, HZ)
             count += 1
@@ -964,9 +1091,15 @@ def search_local_sat(
     keep=25,
     verbose=True,
     layers=1,
+    modules=None,
+    max_modules_per_check=None,
+    module_capacity=None,
 ):
     """Generate up to ``count`` locality-constrained SAT codes, screen them
     with the kit's funnel, and rank by geometric efficiency g.
+
+    ``modules``, ``max_modules_per_check``, ``module_capacity``: the module
+    predicate (issue #5836); each record's spec then carries the assignment.
     """
     from search import screen
 
@@ -979,6 +1112,9 @@ def search_local_sat(
         seed=seed,
         max_codes=count,
         layers=layers,
+        modules=modules,
+        max_modules_per_check=max_modules_per_check,
+        module_capacity=module_capacity,
     )
     recs = screen(gen, min_k=min_k, min_d=min_d, trials=trials)
     if verbose:

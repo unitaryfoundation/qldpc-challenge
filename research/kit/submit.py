@@ -142,6 +142,7 @@ def make_submission(
     confidence="upper_bound",
     coordinates=None,
     layers=None,
+    modules=None,
     trials=8000,
     seed=0,
     found_by=None,
@@ -170,6 +171,11 @@ def make_submission(
         derives the 2d-local track membership.
     layers : optional int
         Physical layers for the locality block (e.g. 2 for a flip-chip bilayer).
+    modules : optional list of int, length n
+        One hardware-module id per qubit for the locality block (issue
+        #5836); needs ``coordinates``. The verifier reports the cross-module
+        checks and the ports per module from it and awards the ``modular``
+        flag; the schema asks for version 0.3 or later when it is present.
     tracks : optional list of str
         DEPRECATED and ignored for ranking; retained only for backward
         compatibility. Track membership is computed by the verifier. Leave unset.
@@ -291,6 +297,15 @@ def make_submission(
         doc["locality"] = {"coordinates": coords, "interaction_radius": radius}
         if layers is not None:
             doc["locality"]["layers"] = int(layers)
+        if modules is not None:
+            mods = [int(m) for m in modules]
+            assert len(mods) == n, f"need {n} module ids, got {len(mods)}"
+            assert min(mods) >= 0, "module ids are non-negative integers"
+            doc["locality"]["modules"] = mods
+            if doc["schema_version"] in ("0.1", "0.2"):
+                doc["schema_version"] = "0.3"
+    elif modules is not None:
+        raise ValueError("modules need coordinates: a module assignment is part of a layout")
     return doc
 
 
