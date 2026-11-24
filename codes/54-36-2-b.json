@@ -189,7 +189,7 @@
    "notes": "deterministic L-PAIR-PARTITION grid at untried p values; connectivity via Tanner block structure; gate verdict board_advancing before submission"
   }
  },
- "family": "other",
+ "family": "pair-partition-cpm",
  "circuit": {
   "d_circ": {
    "Z": {
