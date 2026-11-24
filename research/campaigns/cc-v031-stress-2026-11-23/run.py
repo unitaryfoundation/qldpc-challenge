@@ -36,10 +36,10 @@ for _p in (CC, ROOT, os.path.join(ROOT, "verify"), os.path.join(ROOT, "research"
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from machine.priced_calculus import CodeState, DistanceLedger, apply_operation  # noqa: E402
-from machine.constructors import construct, structural_profile, ADMITTED_CONSTRUCTORS  # noqa: E402
+from constructors import jsonable_params, pair_partition_specs, pp_scale_specs, resolve_spec  # noqa: E402
+from machine.constructors import ADMITTED_CONSTRUCTORS, construct  # noqa: E402
 from machine.planner import bounded_sector_search, infer_target_sector  # noqa: E402
-from constructors import pair_partition_specs, pp_scale_specs, resolve_spec, jsonable_params  # noqa: E402
+from machine.priced_calculus import CodeState, DistanceLedger, apply_operation  # noqa: E402
 
 PRIOR_CAMPAIGNS = (
     "research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign.json",
@@ -151,9 +151,9 @@ def choose(improving):
 
 def stage_and_gate(state, label, constructor, params, index, args):
     """Package a child with witnesses, stage it with its recipe, gate it."""
-    from submit import make_submission, save_submission
-    from coordination import unique_path, gate_and_record, staging_dir
     import dedup_oracle
+    from coordination import gate_and_record, staging_dir, unique_path
+    from submit import make_submission, save_submission
 
     entry = {"label": label, "constructor": constructor, "params": params,
              "n": state.n(), "k": state.k(), "w": child_weight(state)}
@@ -277,7 +277,7 @@ def arm_constructors(args, index, specs):
 
 
 def summarize_search(search):
-    """The v0.3.1 stop/budget/applicability reporting, verbatim."""
+    """Return the v0.3.1 stop/budget/applicability reporting, verbatim."""
     out = {
         "evaluated": search.get("evaluated"),
         "budget": search.get("budget"),
