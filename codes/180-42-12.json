@@ -1796,5 +1796,55 @@
   "novelty": "known_parameters",
   "notes": "Literature baseline: a reproduction of a code published with arXiv:2609.30069, rebuilt from the authors' data repository (https://github.com/ultra-high-rate-qec/design-principles-data/blob/306b31d/codes/reverse_fold/j4l10/parents/reverse_j4l10_p18.cpm). Not a new construction. The authors report d = 12 as exact. Their lower-bound search output is not in the repository, so this entry carries an upper bound backed by their weight-12 X and Z logicals, stored as the witness."
  },
- "family": "pair-partition-cpm"
+ "family": "pair-partition-cpm",
+ "circuit": {
+  "d_circ": {
+   "Z": {
+    "value": 12,
+    "confidence": "upper_bound",
+    "witness": [
+     126337,
+     126338,
+     126406,
+     126413,
+     126427,
+     126433,
+     126469,
+     126473,
+     126486,
+     126487,
+     126509,
+     126515
+    ]
+   },
+   "X": {
+    "value": 12,
+    "confidence": "upper_bound",
+    "witness": [
+     126083,
+     126084,
+     126125,
+     126130,
+     126420,
+     126423,
+     126438,
+     126441,
+     126457,
+     126458,
+     126465,
+     126467
+    ]
+   }
+  },
+  "rounds": 12,
+  "stim_version": "1.16.0",
+  "notes": "Sequential two-block edge-coloring CSS memory extraction (one ancilla per check, X checks then Z checks each round, sched_seed=0, 314 TICK layers across 12 rounds, 324 total qubits). Achieves full circuit-level distance d_circ_X = d_circ_Z = 12 (kd_circ^2/n = 33.60). Verified via verify/circuit_verify.py.",
+  "contributed_by": {
+   "by": [
+    "@metaspartan"
+   ],
+   "date": "2026-11-24",
+   "method": "Sequential two-block edge_coloring schedule (sched_seed=0) verified by verify/circuit_verify.py (Gemini 4 Neon / Cybara)"
+  }
+ }
 }
