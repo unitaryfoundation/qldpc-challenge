@@ -3908,7 +3908,8 @@
    "arXiv:2611.28847v1"
   ],
   "date": "2026-11-24",
-  "notes": "Reconstructed from public construction data (kasaikenta/apm-pp-distance-extensions)."
+  "notes": "Reconstructed from public construction data (kasaikenta/apm-pp-distance-extensions).",
+  "model": "Beam 1.0"
  },
  "family": "pair-partition-cpm"
 }
