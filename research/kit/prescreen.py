@@ -281,14 +281,32 @@ def kind_of(check, detail=""):
     return "packaging"
 
 
+# Mirror verify/test_family_tag_consistency.py so the staging-time check agrees
+# with CI byte for byte. A family named in the construction's opening (90 chars)
+# must agree with the self-declared tag, unless the tag is at least as specific
+# (MORE_SPECIFIC) or the family is the operand of a "quotient of".
+_NOT_BASE = r"(?![- ]base\b)"
 _FAMILY_RULES = [
     ("pair-partition-cpm",
      re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
     ("bivariate-bicycle",
-     re.compile(r"\bbivariate[- ]bicycle\b", re.I)),
+     re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
     ("generalized-bicycle",
-     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b", re.I)),
+     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
 ]
+_FAMILY_MORE_SPECIFIC = {
+    "pair-partition-cpm": {"lifted-product", "hypergraph-product", "other"},
+    "tile": {"bivariate-bicycle", "generalized-bicycle", "topological",
+             "other"},
+    "2bga-coset": {"generalized-bicycle", "other"},
+    "check-deletion": {"bivariate-bicycle", "generalized-bicycle",
+                       "pair-partition-cpm", "lifted-product",
+                       "hypergraph-product", "tile", "other"},
+}
+
+
+def _family_excused(tag, family):
+    return tag == family or family in _FAMILY_MORE_SPECIFIC.get(tag, ())
 
 
 def _family_contradictions(doc):
@@ -300,12 +318,12 @@ def _family_contradictions(doc):
     out = []
     opening = con[:90]
     for family, pat in _FAMILY_RULES:
+        if _family_excused(tag, family):
+            continue
         m = pat.search(opening)
         if not m:
             continue
-        if tag == family:
-            continue
-        if re.search(r"\\bquotient of\\b", opening[:m.start()], re.I):
+        if re.search(r"\bquotient of\b", opening[:m.start()], re.I):
             continue
         out.append({"check": "family_tag_consistency",
                     "detail": (f"construction names {family!r} (matched "

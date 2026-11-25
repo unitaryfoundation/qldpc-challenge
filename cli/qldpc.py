@@ -2083,7 +2083,7 @@ def _recent_code_rows(days, family):
     name mentions `family`."""
     r = subprocess.run(["git", "log", "--diff-filter=A", f"--since={days} days ago",
                         "--name-only", "--pretty=format:%as", "--", "codes/"],
-                       cwd=_ROOT, capture_output=True, text=True)
+                       cwd=_ROOT, capture_output=True, text=True, check=False)
     rows, date = [], ""
     for line in r.stdout.splitlines():
         line = line.strip()
@@ -3240,6 +3240,58 @@ def cmd_reproduce(args):
     return 1 if failed else 0
 
 
+def cmd_preflight(args):
+    """Run the cheap pre-submission checks (scope, ruff, family tag, board tests,
+    prose) and exit non-zero on the first failure."""
+    import subprocess as _sp
+
+    base = args.base_ref or ""
+    if not base:
+        # prefer upstream/main when available, fall back to origin/main
+        try:
+            _sp.run(["git", "remote", "get-url", "upstream"],
+                    check=True, capture_output=True)
+            base = "upstream/main"
+        except Exception:
+            base = "origin/main"
+
+    steps = []
+
+    def run(label, cmd):
+        print(f"== {label} ==")
+        r = _sp.run(cmd, cwd=_ROOT, check=False)
+        if r.returncode != 0:
+            print(f"preflight: FAILED at {label}", file=sys.stderr)
+            raise SystemExit(r.returncode)
+
+    run("submission scope",
+        ["uv", "run", "python", "verify/check_submission_scope.py",
+         "--root", _ROOT, "--base", base])
+
+    # ruff on added Python files
+    out = _sp.run(["git", "diff", "--name-only", "--no-renames",
+                   "--diff-filter=A", "-z", f"{base}...HEAD", "--", "*.py"],
+                  cwd=_ROOT, capture_output=True, text=True, check=False)
+    added = [f for f in out.stdout.split("\x00") if f]
+    if added:
+        run("ruff check", ["uv", "run", "--frozen", "--only-group", "dev",
+                           "ruff", "check", *added])
+        run("ruff format", ["uv", "run", "--frozen", "--only-group", "dev",
+                            "ruff", "format", "--check", *added])
+
+    run("family-tag consistency",
+        ["uv", "run", "--frozen", "--extra", "research", "python", "-m",
+         "pytest", "-q", "verify/test_family_tag_consistency.py"])
+    run("board-marked tests",
+        ["uv", "run", "--frozen", "--extra", "research", "python",
+         "run_tests.py", "-m", "board"])
+
+    if getattr(args, "body_file", ""):
+        run("prose", ["verify/prepush_prose_check.sh", args.body_file])
+
+    print("preflight: OK")
+
+
 def main(argv=None):
     # Windows consoles default to a legacy code page, and the summaries print
     # "≤" (d <= 12, weight ≤ 6). Without this the run dies in the final print,
@@ -3421,6 +3473,14 @@ def main(argv=None):
                         "afterwards, so successive --open-pr runs from one "
                         "checkout produce independent one-code PRs")
     s.set_defaults(func=cmd_submit)
+
+    pf = sub.add_parser("preflight", help="run pre-submission checks "
+                                 "(scope, ruff, family tag, board tests, prose)")
+    pf.add_argument("--body-file", default="",
+                    help="PR body file to also run the prose check against")
+    pf.add_argument("--base-ref", default="",
+                    help="base ref to diff against (default: upstream/main or origin/main)")
+    pf.set_defaults(func=cmd_preflight)
 
     r = sub.add_parser("recent", help="what landed recently: codes, research "
                                       "notes, fieldnotes (read before you "

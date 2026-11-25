@@ -556,6 +556,12 @@ codes. Goal: find a CSS qLDPC code that advances a frontier, and submit it.
    https://github.com/unitaryfoundation/qldpc-challenge.git && git fetch
    upstream) or pass BASE=<remote>/main. It must exit 0 before the push.
 
+   Run the full pre-submission check in one command instead of the steps
+   above: `./qldpc preflight` (or `./qldpc preflight --body-file <body.md>`)
+   runs the submission scope, ruff, family-tag consistency, board-marked
+   tests, and prose checks in order and exits non-zero on the first
+   failure.
+
    Enable the repository's local git hooks so the codes-format, prose, and
    validator-integrity checks run before each commit:
        git config core.hooksPath .githooks
@@ -700,6 +706,9 @@ stages the verified document and prints the `pair` command to run.
 
 ## Tips
 
+- Pre-submission: `./qldpc preflight` runs the scope, ruff, family-tag,
+  board-marked, and prose checks in one command. `scripts/prepush_check.sh`
+  does the same inside a clean worktree of HEAD.
 - Lint before pushing: `uv run ruff check .` and `uv run ruff format --check .`
   use the repository's pinned configuration (see `[tool.ruff]` in
   `pyproject.toml`). The CI job is advisory while the existing code is brought
