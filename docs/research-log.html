@@ -127,6 +127,33 @@
 <li><code>A_terms = [[3, 0], [8, 0], [5, 1], [8, 4]]</code></li>
 <li><code>B_terms = [[0, 2], [7, 3], [4, 2], [3, 4]]</code></li>
 </ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/120-4-16.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/402-137-22.html">[[402,137,22]] — 402-137-22</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[402,137,22]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=67</h3>
+<h4>Revision 2026-11-25: [[402,137,30]] -&gt; [[402,137,22]]</h4>
+<p>[[402,137,22]] supersedes the board&#x27;s [[402,137,30]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 306.72 to 164.95.</p>
+<ul>
+<li>P side 30 -&gt; 22: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 24,341,359 trials on this side on an NVIDIA L40, seed 149492741.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 30 | 22 | 24,341,359 | 149492741 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/402-137-22.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/402-137-22.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/474-161-24.html">[[474,161,24]] — 474-161-24</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[474,161,24]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=79</h3>
+<h4>Revision 2026-11-25: [[474,161,49]] -&gt; [[474,161,24]]</h4>
+<p>[[474,161,24]] supersedes the board&#x27;s [[474,161,49]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 815.53 to 195.65.</p>
+<ul>
+<li>P side 49 -&gt; 24: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 18,581,776 trials on this side on an NVIDIA L40, seed 318600084.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 49 | 24 | 18,581,776 | 318600084 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/474-161-24.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/474-161-24.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/582-197-59.html">[[582,197,59]] — 582-197-59</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[582,197,59]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=97</h3>
+<h4>Revision 2026-11-25: [[582,197,67]] -&gt; [[582,197,59]]</h4>
+<p>[[582,197,59]] supersedes the board&#x27;s [[582,197,67]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 1519.47 to 1178.28.</p>
+<ul>
+<li>P side 67 -&gt; 59: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 64), 200,108 trials per side, seed 569299264.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 67 | 59 | 200,108 | 569299264 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/582-197-59.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/582-197-59.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/84-6-6-b.html">[[84,6,6]] — 84-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details ><summary>note</summary><div class=notebody><h3>[[84,6,6]] — Asymmetric weight-5 two-block group algebra code on SmallGroup(42,6)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-6</code> / <code>unrestricted</code> cell using asymmetric <code>(3, 2)</code> two-block group algebra (2BGA) constructions on non-abelian groups of order 42 (<code>n = 84</code>, max check weight <code>w = 5</code>). Because <code>w = 5</code> sits strictly below <code>w = 6</code> on the check-weight axis, a <code>[[84,6,6]]</code> <code>w = 5</code> code advances the Pareto frontier without needing to beat <code>w = 6</code> codes on <code>(n, k, d)</code> alone.</p>

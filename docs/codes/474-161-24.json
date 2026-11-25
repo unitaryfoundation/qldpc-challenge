@@ -5696,79 +5696,54 @@
   ]
  },
  "distance": {
-  "d": 49,
+  "d": 24,
   "P": {
-   "value": 49,
+   "value": 24,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     1,
-     13,
-     19,
-     22,
-     24,
-     48,
-     51,
-     53,
-     57,
-     65,
-     84,
-     105,
-     131,
-     158,
-     175,
-     198,
-     204,
-     207,
-     216,
-     234,
-     318,
-     324,
-     327,
-     330,
-     333,
-     335,
-     336,
-     344,
-     347,
-     380,
-     383
+     5,
+     17,
+     40,
+     66,
+     202,
+     220,
+     222,
+     226,
+     359,
+     363,
+     369,
+     392
     ],
     "Z": [
-     13,
-     19,
-     21,
-     24,
+     3,
+     15,
      33,
-     39,
-     51,
-     62,
-     68,
-     71,
-     81,
-     82,
-     87,
-     99,
-     107,
-     123,
-     131,
-     152,
-     158,
-     196,
-     222,
-     234,
+     59,
+     86,
+     90,
+     92,
+     110,
      318,
-     335,
-     341,
-     347,
-     383,
-     385,
-     388
+     364,
+     387,
+     393
+    ]
+   },
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab"
+    ],
+    "date": "2026-11-25",
+    "found_at_samples": 18581776,
+    "tool": "verify/ris_gpu.py, pair depth 16, NVIDIA L40",
+    "seeds": [
+     318600084
     ]
    }
   }
  },
- "name": "[[474,161,49]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=79",
+ "name": "[[474,161,24]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=79",
  "provenance": {
   "authors": [
    "@metaspartan"
@@ -5781,6 +5756,6 @@
   ],
   "date": "2026-11-24",
   "novelty": "new_parameters",
-  "notes": "Discovered by lifting the (J,L)=(4,12) reversing-fold CPM pair-partition linear system to prime P=79 (zero cyclic subcodes). Tightened via 450,000 C++ symplectic Stern ISD trials (200,000 block-biased + 100,000 uniform + 15x10,000 4-block subcode)."
+  "notes": "Discovered by lifting the (J,L)=(4,12) reversing-fold CPM pair-partition linear system to prime P=79 (zero cyclic subcodes). Tightened via 450,000 C++ symplectic Stern ISD trials (200,000 block-biased + 100,000 uniform + 15x10,000 4-block subcode). Distance revision 2026-11-25 (witness by @FarLab): P side 49 -> 24 (GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 16), 18,581,776 trials on this side on an NVIDIA L40, seed 318600084)."
  }
 }
