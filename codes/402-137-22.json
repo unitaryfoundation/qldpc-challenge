@@ -4832,49 +4832,54 @@
   ]
  },
  "distance": {
-  "d": 30,
+  "d": 22,
   "P": {
-   "value": 30,
+   "value": 22,
    "confidence": "upper_bound",
    "witness": {
     "X": [
-     67,
-     96,
-     143,
-     158,
-     181,
-     194,
-     208,
-     226,
-     248,
-     287,
-     298,
-     328,
-     329,
-     340,
-     366,
-     391
+     6,
+     30,
+     49,
+     50,
+     148,
+     185,
+     204,
+     228,
+     230,
+     254,
+     277,
+     284,
+     339,
+     386
     ],
     "Z": [
-     21,
-     23,
-     97,
-     103,
-     122,
-     175,
-     191,
-     236,
-     238,
-     301,
-     305,
-     317,
-     336,
-     388
+     6,
+     18,
+     24,
+     50,
+     87,
+     134,
+     210,
+     362,
+     363,
+     398
+    ]
+   },
+   "witness_provenance": {
+    "found_by": [
+     "@FarLab"
+    ],
+    "date": "2026-11-25",
+    "found_at_samples": 24341359,
+    "tool": "verify/ris_gpu.py, pair depth 16, NVIDIA L40",
+    "seeds": [
+     149492741
     ]
    }
   }
  },
- "name": "[[402,137,30]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=67",
+ "name": "[[402,137,22]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=67",
  "provenance": {
   "authors": [
    "@metaspartan"
@@ -4887,6 +4892,6 @@
   ],
   "date": "2026-11-24",
   "novelty": "new_parameters",
-  "notes": "Discovered by lifting the (J,L)=(4,12) reversing-fold CPM pair-partition linear system to prime P=67 (zero cyclic subcodes). Tightened via 785,000 C++ symplectic Stern ISD trials plus 8,000,000 RIS-fast trials (minimum found Pauli logical weight d=30, backed by an explicit weight-30 witness)."
+  "notes": "Discovered by lifting the (J,L)=(4,12) reversing-fold CPM pair-partition linear system to prime P=67 (zero cyclic subcodes). Tightened via 785,000 C++ symplectic Stern ISD trials plus 8,000,000 RIS-fast trials (minimum found Pauli logical weight d=30, backed by an explicit weight-30 witness). Distance revision 2026-11-25 (witness by @FarLab): P side 30 -> 22 (GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 16), 24,341,359 trials on this side on an NVIDIA L40, seed 149492741)."
  }
 }
