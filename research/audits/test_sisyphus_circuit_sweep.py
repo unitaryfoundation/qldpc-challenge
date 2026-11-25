@@ -194,3 +194,17 @@ def test_the_real_search_refutes_an_overclaim_and_leaves_an_honest_claim(surface
     assert over["t_below_claim"] is not None and over["peak"]["processes"] >= 3
     honest = SW.run_basis(path, 3, seconds=3)
     assert honest["status"] == "ok" and honest["lightest"] == 3
+
+
+def test_merge_keeps_each_entry_once_and_recomputes_the_summary():
+    def entry(slug, status):
+        peak = {"processes": 5, "leader_rss_gb": 1.0, "rss_sum_gb": 2.0, "pss_sum_gb": 1.5}
+        basis = {"status": status, "claim": 5, "lightest": 5, "setup_seconds": 1.0, "wall_seconds": 2.0, "peak": peak}
+        return {"slug": slug, "bases": {"X": basis}}
+
+    a = {"seconds_per_basis": 60.0, "shard": "0/2", "entries": [entry("b", "ok"), entry("a", "ok")], "summary": {}}
+    b = {"seconds_per_basis": 60.0, "shard": "1/2", "entries": [entry("c", "crash"), entry("a", "ok")], "summary": {}}
+    m = SW.merge([a, b])
+    assert [e["slug"] for e in m["entries"]] == ["a", "b", "c"] and m["merged_from"] == 2
+    assert m["seconds_per_basis"] == 60.0 and "shard" not in m
+    assert m["summary"]["status"] == {"ok": 2, "crash": 1} and m["summary"]["peak_memory_measure"] == "pss_sum_gb"
