@@ -1,6 +1,6 @@
 {
-  "verified_codes": 3939,
-  "css_codes": 3511,
+  "verified_codes": 3940,
+  "css_codes": 3512,
   "stabilizer_codes": 428,
   "certified_exact": 2642,
   "tracks": 12,
@@ -8,21 +8,21 @@
   "best_geometric_efficiency": 1.7555,
   "provenance": {
     "no_match": 2583,
-    "parameters_only": 421,
     "literature": 489,
-    "not_derived": 18,
+    "parameters_only": 421,
+    "not_derived": 19,
     "method": "isomorphism against the literature index",
     "caveat": "no_match means the index holds no match, not that the code is unpublished: two sparse generating sets of one stabilizer group can have non-isomorphic Tanner graphs"
   },
   "novelty": {
-    "unknown": 2901,
+    "unknown": 2902,
     "known_parameters": 957,
     "new_parameters": 81
   },
   "novelty_audited": 1038,
   "board_screen": {
+    "not_screened": 1061,
     "distinct": 2414,
-    "not_screened": 1060,
     "review": 37,
     "reference_entries": 771,
     "method": "fingerprint and Weisfeiler-Leman signature against the board's seeded and literature entries",
@@ -30,7 +30,7 @@
   },
   "family_concentration": {
     "global": {
-      "records": 1727,
+      "records": 1728,
       "families": 15,
       "untagged": 468,
       "untagged_share": 0.271,
@@ -415,7 +415,7 @@
         "moved": false
       },
       "unrestricted~weight-any": {
-        "records": 1727,
+        "records": 1728,
         "families": 15,
         "untagged": 468,
         "untagged_share": 0.271,
@@ -434,7 +434,7 @@
         "top1_share": 0.312,
         "top2_share": 0.417,
         "hhi": 0.123,
-        "members": 3511,
+        "members": 3512,
         "leader": {
           "slug": "682-140-82",
           "family": "generalized-bicycle",
