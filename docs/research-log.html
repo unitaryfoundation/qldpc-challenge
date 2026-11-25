@@ -298,6 +298,82 @@ bundle = {&quot;P0&quot;: 3, &quot;orders_e&quot;: [2], &quot;roots_r0&quot;: [2
 bundle[&quot;roots_r&quot;] = [6]
 construct({&quot;constructor&quot;: &quot;PP-SCALE&quot;, &quot;state&quot;: base, &quot;P&quot;: 7, &quot;bundle&quot;: bundle})
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/28-14-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/36-18-2-b.html">[[36,18,2]] — 36-18-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[36,18,2]] — pair-partition relative-permutation CSS, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at sizes the board did not yet hold from this construction family. The lead came from the code-calculus v0.3.1rc release: its newly admitted <code>L-PAIR-PARTITION</code> constructor (pair-partition relative-permutation CSS, Okada–Kasai v4 Thm 4; CPM-PP/APM-PP) derives a one-parameter family n = L·p, k = n/2, w = L, and the deterministic block-mixing shift grids (fieldnote 2026-11-22) had produced gate-passing, board-advancing codes at p ∈ {3, 5, 7}. The untried p values 9, 11, 13 were the natural next rungs.</p>
+<h4>What was searched</h4>
+<p>A deterministic grid: p ∈ {9, 11, 13}, L ∈ {4, 6}, and 5 × 5 block-mixing shift-pattern pairs (all0 / identity / alternating / pairwise / reverse, one block row per sector, unit slopes) — 75 parameter tuples. Each tuple was derived by the v0.3.1rc consumer (<code>machine.constructors.construct</code>, which enforces the paired relative-affine orthogonality premise); 38 tuples derived, 20 had a one-component Tanner graph (checked with the gate&#x27;s own block-structure screen), and 20 were packaged with witness searches and judged by the unchanged trusted gate — 20/20 passed, all 20 board-advancing. This note&#x27;s code is the canonical <code>all0-alternating</code> member of the p = 9, L = 4 group.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the consumer&#x27;s applicability premise (paired relative-affine</li>
+<p>orthogonality) held; natural X and Z rows commute.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s own witness search found weight-2 logicals on</li>
+<p>both sides at 8,000 RIS trials per side, so the submitted claim is d ≤ 2 (<code>upper_bound</code> on both sectors and full distance). No lower endpoint is claimed; the interval ledger carries 0 as the lower bound.</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>The five sibling fingerprints of the same group gate-passed identically;</li>
+<p>this one was chosen as the canonical pattern for submission.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Nine of the 75 grid tuples did not admit a relative-affine pair partition</li>
+<p>(the premise is a parity condition on the shift differences); they were refused by the consumer before any distance work.</p>
+<li>The identical-shift pairs (X pattern = Z pattern) all split into p</li>
+<p>4-qubit blocks and were refused at staging as disconnected direct sums — the mechanism recorded in the 2026-11-22 yield fieldnote.</p>
+<li>The uniform (−1)-slope PP-SCALE variants of the same family recaptured</li>
+<p>already-known matrices (exact duplicates of board/open-PR entries); the new content lives in the mixed-slope bundles and the untried p values.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>L-PAIR-PARTITION</code> via <code>construct</code>), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/36-18-2-b.py</code> in this PR rebuilds H_X and H_Z from the parameters (p = 9, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>36-18-2.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 36-18-2.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly:</p>
+<pre>
+construct({&quot;constructor&quot;: &quot;L-PAIR-PARTITION&quot;, &quot;p&quot;: 9,
+           &quot;blocks_x&quot;: [[0, 0, 0, 0]], &quot;blocks_z&quot;: [[0, 1, 0, 1]]})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-18-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/44-22-2-b.html">[[44,22,2]] — 44-22-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[44,22,2]] — pair-partition relative-permutation CSS, code-calculus v0.3.1rc, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 44 from the pair-partition family. The v0.3.1rc <code>L-PAIR-PARTITION</code> constructor gives n = L·p, k = n/2, w = L; the block-mixing grids had produced advancing codes at p ∈ {3, 5, 7}, and p = 11 was untried. The lead came from the code-calculus v0.3.1rc release: its newly admitted <code>L-PAIR-PARTITION</code> constructor (pair-partition relative-permutation CSS, Okada–Kasai v4 Thm 4; CPM-PP/APM-PP) derives a one-parameter family n = L·p, k = n/2, w = L, and the deterministic block-mixing shift grids (fieldnote 2026-11-22) had produced gate-passing, board-advancing codes at p ∈ {3, 5, 7}. The untried p values 9, 11, 13 were the natural next rungs.</p>
+<h4>What was searched</h4>
+<p>A deterministic grid: p ∈ {9, 11, 13}, L ∈ {4, 6}, and 5 × 5 block-mixing shift-pattern pairs (all0 / identity / alternating / pairwise / reverse, one block row per sector, unit slopes) — 75 parameter tuples. Each tuple was derived by the v0.3.1rc consumer (<code>machine.constructors.construct</code>, which enforces the paired relative-affine orthogonality premise); 38 tuples derived, 20 had a one-component Tanner graph (checked with the gate&#x27;s own block-structure screen), and 20 were packaged with witness searches and judged by the unchanged trusted gate — 20/20 passed, all 20 board-advancing. This note&#x27;s code is the canonical <code>all0-alternating</code> member of the p = 11, L = 4 group.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the consumer&#x27;s applicability premise (paired relative-affine</li>
+<p>orthogonality) held; natural X and Z rows commute.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s own witness search found weight-2 logicals on</li>
+<p>both sides at 8,000 RIS trials per side, so the submitted claim is d ≤ 2 (<code>upper_bound</code> on both sectors and full distance). No lower endpoint is claimed; the interval ledger carries 0 as the lower bound. Parameters: n = 44, k = 22, w = 4; the interval ledger the consumer carried before packaging was [0, 2] per sector (witness-backed upper endpoint, no lower endpoint).</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>The eight sibling fingerprints of the same parameters gate-passed</li>
+<p>identically (six pair-partition patterns and three mixed-slope PP-SCALE bundles share the group); this one was chosen as the canonical pair-partition pattern for submission.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Nine of the 75 grid tuples did not admit a relative-affine pair partition</li>
+<p>(the premise is a parity condition on the shift differences); they were refused by the consumer before any distance work.</p>
+<li>The identical-shift pairs (X pattern = Z pattern) all split into p</li>
+<p>4-qubit blocks and were refused at staging as disconnected direct sums — the mechanism recorded in the 2026-11-22 yield fieldnote.</p>
+<li>The uniform (−1)-slope PP-SCALE variants of the same family recaptured</li>
+<p>already-known matrices (exact duplicates of board/open-PR entries); the new content lives in the mixed-slope bundles and the untried p values.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>L-PAIR-PARTITION</code> via <code>construct</code>), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/44-22-2-b.py</code> in this PR rebuilds H_X and H_Z from the parameters (p = 11, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>44-22-2-b.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 44-22-2-b.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly:</p>
+<pre>
+construct({&quot;constructor&quot;: &quot;L-PAIR-PARTITION&quot;, &quot;p&quot;: 11,
+           &quot;blocks_x&quot;: [[0, 0, 0, 0]], &quot;blocks_z&quot;: [[0, 1, 0, 1]]})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/44-22-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/52-26-2-b.html">[[52,26,2]] — 52-26-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[52,26,2]] — PP-SCALE explicit extension of a pair-partition base, code-calculus v0.3.1rc</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 52. The lead is the v0.3.1rc release&#x27;s second new constructor: <code>PP-SCALE</code>, promoted to rung 3 (<code>transition-defined</code>) in this release — the Kasai 2026 explicit-extension scaling of pair-partition codes through a Smith-normal-form parameter bundle, evaluated at a target lift size P. The 2026-11-22 yield fieldnote had found 0/8 PP-SCALE derivations connected on block-diagonal bases; the open question was whether the SNF-bundle route, evaluated at untried sizes, yields connected codes the board does not already hold.</p>
