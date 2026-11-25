@@ -19,6 +19,7 @@ Dedup covers the board, open PRs, and the previously staged (unsubmitted)
 finds of the 2026-11-22 v0.3rc campaign, so a re-derivation of an already
 staged code is refused locally rather than re-counted.
 """
+
 import argparse
 import glob
 import json
@@ -50,8 +51,7 @@ PRIOR_CAMPAIGNS = (
 
 
 def check_weight(doc):
-    return max([len(c) for side in ("X", "Z")
-                for c in doc.get("checks", {}).get(side, [])] + [0])
+    return max([len(c) for side in ("X", "Z") for c in doc.get("checks", {}).get(side, [])] + [0])
 
 
 def load_board():
@@ -75,7 +75,7 @@ def prior_parents():
             continue
         with open(path) as fh:
             data = json.load(fh)
-        for rec in (data.get("records") or data.get("greedy") or []):
+        for rec in data.get("records") or data.get("greedy") or []:
             if rec.get("parent"):
                 used.add(rec["parent"])
     return used
@@ -109,10 +109,11 @@ def prior_staged_paths():
 
 def select_parents(board, limit, n_lo, n_hi, order="n"):
     used = prior_parents()
-    pool = [s for s, d in board.items()
-            if n_lo <= d["n"] <= n_hi
-            and d["distance"]["d"] >= 2 and check_weight(d) >= 5
-            and s not in used]
+    pool = [
+        s
+        for s, d in board.items()
+        if n_lo <= d["n"] <= n_hi and d["distance"]["d"] >= 2 and check_weight(d) >= 5 and s not in used
+    ]
     if order == "weight":
         pool.sort(key=lambda s: (-check_weight(board[s]), board[s]["n"], s))
     else:
@@ -125,6 +126,7 @@ def select_parents(board, limit, n_lo, n_hi, order="n"):
 
 def state_check_matrices(state):
     import numpy as np
+
     n = state.n()
     HX = np.zeros((len(state.sector_rows("X")), n), dtype=int)
     HZ = np.zeros((len(state.sector_rows("Z")), n), dtype=int)
@@ -144,8 +146,8 @@ def child_weight(state):
 
 def choose(improving):
     def key(c):
-        return (child_weight(c["state"]), -c["k"], c["n"],
-                -(c["ledger"].full.upper or 0))
+        return (child_weight(c["state"]), -c["k"], c["n"], -(c["ledger"].full.upper or 0))
+
     return min(improving, key=key)
 
 
@@ -155,9 +157,16 @@ def stage_and_gate(state, label, constructor, params, index, args):
     from coordination import gate_and_record, staging_dir, unique_path
     from submit import make_submission, save_submission
 
-    entry = {"label": label, "constructor": constructor, "params": params,
-             "n": state.n(), "k": state.k(), "w": child_weight(state)}
+    entry = {
+        "label": label,
+        "constructor": constructor,
+        "params": params,
+        "n": state.n(),
+        "k": state.k(),
+        "w": child_weight(state),
+    }
     from prescreen import block_structure
+
     HX, HZ = state_check_matrices(state)
     structure = block_structure(HX, HZ)
     entry["tanner_connected"] = structure["connected"]
@@ -172,40 +181,52 @@ def stage_and_gate(state, label, constructor, params, index, args):
     if dup["exact"]:
         entry["gate_skipped"] = "exact duplicate"
         return entry, None
-    index.append({"source": "this-run", "name": label,
-                  "fingerprints": ident["fingerprints"],
-                  "signatures": ident["signatures"]})
+    index.append(
+        {"source": "this-run", "name": label, "fingerprints": ident["fingerprints"], "signatures": ident["signatures"]}
+    )
     try:
         doc = make_submission(
-            HX, HZ,
+            HX,
+            HZ,
             name=f"[[{state.n()},{state.k()},?]] {label}",
-            construction=f"code-calculus v0.3.1 constructor run {label}; "
-                         f"stress campaign",
-            authors=["mathysrennela"], family="code-calculus",
-            confidence="upper_bound", trials=args.trials, seed=0,
+            construction=f"code-calculus v0.3.1 constructor run {label}; stress campaign",
+            authors=["mathysrennela"],
+            family="code-calculus",
+            confidence="upper_bound",
+            trials=args.trials,
+            seed=0,
         )
         d = doc["distance"]["d"]
         doc["name"] = f"[[{state.n()},{state.k()},{d}]] {label}"
         entry["d_witness"] = d
-        path = unique_path(os.path.join(
-            staging_dir(), f"{state.n()}-{state.k()}-{d}-{label[:24]}.json"), doc)
-        save_submission(doc, path, preflight=False, spec={
-            "constructor": constructor, "params": params,
-        })
+        path = unique_path(os.path.join(staging_dir(), f"{state.n()}-{state.k()}-{d}-{label[:24]}.json"), doc)
+        save_submission(
+            doc,
+            path,
+            preflight=False,
+            spec={
+                "constructor": constructor,
+                "params": params,
+            },
+        )
         entry["path"] = path
         verdict, _ = gate_and_record(path)
         nov = verdict.get("gates", {}).get("novelty", {})
-        entry.update({
-            "gate_passed": verdict.get("passed"),
-            "board_advancing": nov.get("board_advancing"),
-            "dominated_by": nov.get("dominated_by"),
-            "d_only_gain": nov.get("d_only_gain"),
-            "cell": nov.get("cell"),
-            "gate": verdict,
-        })
-        print(f"  GATE {label}: n={state.n()} k={state.k()} d<={d} w={entry['w']} "
-              f"pass={verdict.get('passed')} adv={nov.get('board_advancing')}",
-              flush=True)
+        entry.update(
+            {
+                "gate_passed": verdict.get("passed"),
+                "board_advancing": nov.get("board_advancing"),
+                "dominated_by": nov.get("dominated_by"),
+                "d_only_gain": nov.get("d_only_gain"),
+                "cell": nov.get("cell"),
+                "gate": verdict,
+            }
+        )
+        print(
+            f"  GATE {label}: n={state.n()} k={state.k()} d<={d} w={entry['w']} "
+            f"pass={verdict.get('passed')} adv={nov.get('board_advancing')}",
+            flush=True,
+        )
         return entry, doc
     except Exception as exc:
         entry["gate_error"] = f"{type(exc).__name__}: {str(exc)[:200]}"
@@ -215,8 +236,7 @@ def stage_and_gate(state, label, constructor, params, index, args):
 
 def derive_seed(label, spec):
     """Derive one constructor spec; return the seed record."""
-    rec = {"label": label, "constructor": spec["constructor"],
-           "params": jsonable_params(spec)}
+    rec = {"label": label, "constructor": spec["constructor"], "params": jsonable_params(spec)}
     try:
         label, spec = resolve_spec(label, spec)
         res = construct(spec)
@@ -227,11 +247,18 @@ def derive_seed(label, spec):
         return rec
     HX, HZ = state_check_matrices(st)
     from prescreen import block_structure
+
     gate_struct = block_structure(HX, HZ)
-    rec.update({"connected": gate_struct["connected"],
-                "blocks": gate_struct["blocks"],
-                "block_sizes": gate_struct["block_sizes"],
-                "n": st.n(), "k": st.k(), "w": child_weight(st)})
+    rec.update(
+        {
+            "connected": gate_struct["connected"],
+            "blocks": gate_struct["blocks"],
+            "block_sizes": gate_struct["block_sizes"],
+            "n": st.n(),
+            "k": st.k(),
+            "w": child_weight(st),
+        }
+    )
     rec["_state"] = st
     rec["_spec"] = spec
     return rec
@@ -260,8 +287,7 @@ def arm_constructors(args, index, specs):
             records.append({k: v for k, v in rec.items() if not k.startswith("_")})
             continue
         staged += 1
-        entry, _ = stage_and_gate(rec["_state"], rec["label"], rec["constructor"],
-                                  rec["params"], index, args)
+        entry, _ = stage_and_gate(rec["_state"], rec["label"], rec["constructor"], rec["params"], index, args)
         rec = {k: v for k, v in rec.items() if not k.startswith("_")}
         rec.update(entry)
         if entry.get("gate_passed"):
@@ -269,11 +295,19 @@ def arm_constructors(args, index, specs):
         if entry.get("board_advancing"):
             advancing += 1
         records.append(rec)
-    print(f"constructor arm: derived={derived} connected={connected} "
-          f"staged={staged} gate-passed={gated} board-advancing={advancing}",
-          flush=True)
-    return {"records": records, "derived": derived, "connected": connected,
-            "staged": staged, "gate_passed": gated, "board_advancing": advancing}
+    print(
+        f"constructor arm: derived={derived} connected={connected} "
+        f"staged={staged} gate-passed={gated} board-advancing={advancing}",
+        flush=True,
+    )
+    return {
+        "records": records,
+        "derived": derived,
+        "connected": connected,
+        "staged": staged,
+        "gate_passed": gated,
+        "board_advancing": advancing,
+    }
 
 
 def summarize_search(search):
@@ -295,8 +329,7 @@ def arm_greedy(args, index):
     print("== arm: objective-aware greedy (weight) ==", flush=True)
     board = load_board()
     parents = select_parents(board, args.limit, args.n_lo, args.n_hi, args.order)
-    print(f"{len(parents)} fresh parents, steps={args.steps}, "
-          f"budget={args.budget}", flush=True)
+    print(f"{len(parents)} fresh parents, steps={args.steps}, budget={args.budget}", flush=True)
     records = []
     gated = advancing = 0
     for pi, slug in enumerate(parents, 1):
@@ -314,26 +347,35 @@ def arm_greedy(args, index):
             ts = infer_target_sector(ledger, target)
             try:
                 search = bounded_sector_search(
-                    state, ledger, ts, target=target, budget=args.budget,
-                    objective="weight", sector_swap=False, rebase=True)
+                    state,
+                    ledger,
+                    ts,
+                    target=target,
+                    budget=args.budget,
+                    objective="weight",
+                    sector_swap=False,
+                    rebase=True,
+                )
             except Exception as exc:
                 chain.append({"step": step, "search_error": repr(exc)})
                 break
             improving = search.get("improving", [])
-            chain.append({"step": step, "improving": len(improving),
-                          "search": summarize_search(search)})
+            chain.append({"step": step, "improving": len(improving), "search": summarize_search(search)})
             if not improving:
                 break
             chosen = choose(improving)
             child_w = child_weight(chosen["state"])
             op = chosen.get("operation", {})
             from prescreen import block_structure
+
             _hx, _hz = state_check_matrices(chosen["state"])
             prof = block_structure(_hx, _hz)
             entry = {
                 "operation": op.get("op") if isinstance(op, dict) else str(op),
-                "n": chosen["n"], "k": chosen["k"],
-                "w_before": parent_w, "w_after": child_w,
+                "n": chosen["n"],
+                "k": chosen["k"],
+                "w_before": parent_w,
+                "w_after": child_w,
                 "d_upper": chosen["ledger"].full.upper,
                 "improving_pool": len(improving),
                 "connected": prof["connected"],
@@ -346,9 +388,13 @@ def arm_greedy(args, index):
             else:
                 label = f"greedy-{slug}-s{step}"
                 stage_entry, _ = stage_and_gate(
-                    chosen["state"], label, "planner.bounded_sector_search",
-                    {"parent": slug, "step": step, "objective": "weight",
-                     "rebase": True, "budget": args.budget}, index, args)
+                    chosen["state"],
+                    label,
+                    "planner.bounded_sector_search",
+                    {"parent": slug, "step": step, "objective": "weight", "rebase": True, "budget": args.budget},
+                    index,
+                    args,
+                )
                 chain[-1].update(stage_entry)
                 if stage_entry.get("gate_passed"):
                     gated += 1
@@ -365,19 +411,23 @@ def arm_greedy(args, index):
             except Exception as exc:
                 chain.append({"step": step, "advance_error": repr(exc)})
                 break
-        records.append({"parent": slug, "parent_n": doc["n"],
-                        "parent_k": doc["k"], "parent_d": target,
-                        "parent_w": check_weight(doc), "chain": chain})
-    print(f"greedy arm: {gated} gate-passed, {advancing} board-advancing",
-          flush=True)
-    return {"records": records, "gate_passed": gated,
-            "board_advancing": advancing}
+        records.append(
+            {
+                "parent": slug,
+                "parent_n": doc["n"],
+                "parent_k": doc["k"],
+                "parent_d": target,
+                "parent_w": check_weight(doc),
+                "chain": chain,
+            }
+        )
+    print(f"greedy arm: {gated} gate-passed, {advancing} board-advancing", flush=True)
+    return {"records": records, "gate_passed": gated, "board_advancing": advancing}
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", choices=("pairpartition", "ppscale", "greedy", "all"),
-                    default="all")
+    ap.add_argument("--arm", choices=("pairpartition", "ppscale", "greedy", "all"), default="all")
     ap.add_argument("--limit", type=int, default=24)
     ap.add_argument("--n-lo", type=int, default=10)
     ap.add_argument("--n-hi", type=int, default=120)
@@ -386,32 +436,28 @@ def main():
     ap.add_argument("--budget", type=int, default=64)
     ap.add_argument("--trials", type=int, default=8000)
     ap.add_argument("--gate-cap", type=int, default=12)
-    ap.add_argument("--cap", type=int, default=15,
-                    help="max staged derivations per constructor arm (0 = all)")
+    ap.add_argument("--cap", type=int, default=15, help="max staged derivations per constructor arm (0 = all)")
     ap.add_argument("--max-w", type=int, default=10)
-    ap.add_argument("--label-contains", default=None,
-                    help="only run specs whose label contains this substring")
+    ap.add_argument("--label-contains", default=None, help="only run specs whose label contains this substring")
     ap.add_argument("--open-prs", action="store_true", default=True)
     ap.add_argument("--out", default=os.path.join(_HERE, "result.json"))
     args = ap.parse_args()
 
     import dedup_oracle
-    index = dedup_oracle.combined_index(include_open_prs=args.open_prs,
-                                        extra_paths=prior_staged_paths())
-    print(f"dedup index: {len(index)} entries "
-          f"(board + open PRs + {len(prior_staged_paths())} prior staged finds)",
-          flush=True)
 
-    result = {"cc": CC, "args": vars(args),
-              "started": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    index = dedup_oracle.combined_index(include_open_prs=args.open_prs, extra_paths=prior_staged_paths())
+    print(
+        f"dedup index: {len(index)} entries (board + open PRs + {len(prior_staged_paths())} prior staged finds)",
+        flush=True,
+    )
+
+    result = {"cc": CC, "args": vars(args), "started": time.strftime("%Y-%m-%dT%H:%M:%S")}
     if args.arm in ("pairpartition", "all"):
-        result["pairpartition"] = arm_constructors(
-            args, index, pair_partition_specs())
+        result["pairpartition"] = arm_constructors(args, index, pair_partition_specs())
         with open(args.out, "w") as fh:
             json.dump(result, fh, indent=2, default=str)
     if args.arm in ("ppscale", "all"):
-        result["ppscale"] = arm_constructors(
-            args, index, pp_scale_specs())
+        result["ppscale"] = arm_constructors(args, index, pp_scale_specs())
         with open(args.out, "w") as fh:
             json.dump(result, fh, indent=2, default=str)
     if args.arm in ("greedy", "all"):
