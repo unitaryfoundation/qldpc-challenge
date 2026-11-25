@@ -2739,7 +2739,7 @@ def research_log_page(entries, fieldnotes):
 
     P = [head("Research log · QEC Challenge", page_properties={"page_type": "research_log"})]
     P.append("<div class=wrap>")
-    P.append('<a class=back href="index.html">&larr; back to the board</a>')
+    P.append('<a class=back href="./">&larr; back to the board</a>')
     P.append("<h1>Research log</h1>")
     P.append(
         "<p class=sub>The search behind the board: every submission ships a "
@@ -3180,7 +3180,7 @@ def detail_page(e):
     if stab:
         P.append('<a class=back href="../stabilizer.html">&larr; back to the stabilizer board</a>')
     else:
-        P.append('<a class=back href="../index.html">&larr; back to the board</a>')
+        P.append('<a class=back href="../">&larr; back to the board</a>')
     P.append(
         f'<div class=codehead><span class="mono big">[[{n},{k},{d}]]</span> '
         f"{badge(e['tier'], e.get('d_lb'))}"
@@ -3935,7 +3935,7 @@ def references_page(entries):
                 citers.setdefault(k, []).append((ent["slug"], ent["n"], ent["k"], ent["d"]))
     P = [head("References | QEC Challenge", rel="", page_properties={"page_type": "references"})]
     P.append("<div class=wrap>")
-    P.append('<a class=back href="index.html">&larr; back to the board</a>')
+    P.append('<a class=back href="./">&larr; back to the board</a>')
     P.append('<h1 style="margin:.4rem 0 0">References</h1>')
     P.append(
         '<p style="color:var(--mut);max-width:60ch">Every paper and tool '
@@ -4760,7 +4760,7 @@ FAQ = [
 def faq_page():
     P = [head("FAQ | QEC Challenge", rel="", page_properties={"page_type": "faq"})]
     P.append("<div class=wrap>")
-    P.append('<a class=back href="index.html">&larr; back to the board</a>')
+    P.append('<a class=back href="./">&larr; back to the board</a>')
     P.append('<h1 style="margin:.4rem 0 0">FAQ</h1>')
     for q, a in FAQ:
         question = html.escape(html.unescape(q))
@@ -6440,7 +6440,7 @@ def page_footer():
         f'<a href="{REPO}/CONTRIBUTING.md">Contribute</a>'
         f'<a href="{REPO}/schema/SCHEMA.md">Schema</a>'
         f'<a href="{REPO}/TRACKS.md">Tracks</a>'
-        '<a href="index.html">CSS board</a>'
+        '<a href="./">CSS board</a>'
         '<a href="stabilizer.html">Stabilizer board</a>'
         '<a href="faq.html">FAQ</a>'
         '<a href="research-log.html">Research log</a>'
@@ -6533,8 +6533,8 @@ def stabilizer_page(entries):
         page_hero(
             "Stabilizer board",
             "General (non-CSS) stabilizer codes, verified and ranked apart from "
-            'the CSS board. <a href="index.html">Back to the CSS board.</a>',
-            ("index.html", "CSS board"),
+            'the CSS board. <a href="./">Back to the CSS board.</a>',
+            ("./", "CSS board"),
         )
     )
     P.append("<div class=wrap>")
