@@ -545,3 +545,37 @@ writes the corrected `codes/` documents of the refuted entries in the shape
 of the circuit refutation binding (issue #4723): the refuted sides lowered to
 the verified fault sets at `upper_bound`, the rest of the circuit block
 untouched, and a sentence naming the refuter appended to `provenance.notes`.
+
+## What a second circuit search would cost and find: `sisyphus_circuit_sweep.py`
+
+The gate's circuit search (`circuit_tools.ris_dem`) cannot test a `d_circ`
+claim on a large detector error model: above about 50,000 mechanisms it gets
+a few hundred trials and its lightest fault set is far above any claim.
+Sisyphus (`sisyphus-qec`, github.com/varunmenon1310/sisyphus) reaches those
+claims, and the first seven it undercut were corrected in PRs #7266 to
+#7272. PR #7264 proposes it as a second searcher in the gate, and the review
+there asked for its cost on the whole board first. This script produces
+that: it runs the search over the committed circuits outside the gate, in a
+process group of its own, and records per basis the outcome (`ok`,
+`refuted`, `rejected`, `crash`, `timeout`), set-up time apart from search
+time, when the search first held a fault set at the claim and below it, and
+the peak memory of the whole group (on Linux the sum of proportional set
+sizes, since forked workers share pages). A lighter fault set counts as
+`refuted` only after `verify/circuit_tools.witness_errors` accepts it.
+Nothing here edits `codes/` or `circuits/`.
+
+Sisyphus is not a dependency of the repository, so it is named on the
+command line, and the record keeps the version that ran:
+
+```
+uv run --frozen --extra research --with sisyphus-qec==0.2.1 \
+    python research/audits/sisyphus_circuit_sweep.py sweep \
+    --min-mechanisms 50000 --seconds 60 --shard 0/4 --out sisyphus_circuit_sweep-<date>-0.json
+uv run --frozen python research/audits/sisyphus_circuit_sweep.py report sisyphus_circuit_sweep-<date>-*.json
+```
+
+`--shard I/N` takes every Nth entry, largest circuits first, so several
+machines can split the board evenly; a record is resumable. The timings mean
+what they say only on a machine shaped like the one they are meant to
+predict, which for the gate is the CI runner (4 cores, 16 GB). No record is
+committed yet.
