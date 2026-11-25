@@ -1116,6 +1116,12 @@ _CODE_SWEEP = _PR_SWEEPS[0]
 _GATE = "distance refutation gate (trusted verifier for code changes)"
 _SEARCH_RESTORE = "restore completed searches"
 _MEMO = "          QLDPC_BOARD_CACHE: ${{ runner.temp }}/board-memo"
+# The memo runs on main carry between them (issue #7253): a workspace path,
+# restored on a push and saved from main, as the circuit record is.
+_MAIN_MEMO = "          QLDPC_BOARD_CACHE: ${{ github.workspace }}/board-memo"
+_MEMO_RESTORE = "restore the board memo (push to main)"
+_MEMO_SAVE = "save the board memo (runs on main)"
+_SITE_WORKFLOW = os.path.join(os.path.dirname(_WORKFLOW), "site.yml")
 
 
 def _every_workflow():
@@ -1129,11 +1135,16 @@ def _every_workflow():
 
 
 def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
-    """Filled by the trusted sweep, read by the trusted gate, named nowhere else."""
+    """On a pull request: filled by the trusted sweep, read by the trusted gate, named nowhere else.
+
+    The two sweeps that run on main carry a memo of their own between runs
+    (issue #7253), under a workspace path the next test pins; the pull
+    request steps keep the job-local directory under the runner's temp.
+    """
     steps = _workflow_steps()
     users = [name for name, lines in steps.items() if any("QLDPC_BOARD_CACHE" in ln for ln in _code(lines))]
-    assert users == [_CODE_SWEEP, _GATE], users
-    for name in users:
+    assert users == [_CODE_SWEEP, _PUSH_SWEEP, _FULL_SWEEP, _GATE], users
+    for name in (_CODE_SWEEP, _GATE):
         assert _MEMO in steps[name], name
         assert "        working-directory: trusted" in steps[name], name
         assert not any("continue-on-error" in ln for ln in _code(steps[name])), name
@@ -1145,17 +1156,22 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     # the same `if:`, with no always() to outlive a sweep that failed.
     assert cond(_GATE) == cond(_CODE_SWEEP) and "always()" not in cond(_GATE)
     # Every mention in every workflow, not only in the named steps of this
-    # one: no job-level or workflow-level env sets it, and the one other
-    # workflow that names it, reproduce.yml, hands it to a single step on
-    # the same terms (issue #5578, change G): a step-level env, the
-    # directory emptied by the first line of that step's script, and no
-    # cache or artifact path naming it.
+    # one: no job-level or workflow-level env sets it. reproduce.yml hands
+    # it to a single step on the pull request terms (issue #5578, change G):
+    # a step-level env, the directory emptied by the first line of that
+    # step's script, and no cache or artifact path naming it. verify.yml's
+    # two main sweeps and site.yml's build name the carried memo.
     workflows = _every_workflow()
     mentions = [(wf, ln.strip()) for wf, lines in workflows.items() for ln in lines if "QLDPC_BOARD_CACHE" in ln]
     assert mentions == [
         ("reproduce.yml", _MEMO.strip()),
         ("reproduce.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+        ("site.yml", _MAIN_MEMO.strip()),
         ("verify.yml", _MEMO.strip()),
+        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
+        ("verify.yml", _MAIN_MEMO.strip()),
+        ("verify.yml", _MAIN_MEMO.strip()),
+        ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
         ("verify.yml", 'rm -rf "$QLDPC_BOARD_CACHE"'),
         ("verify.yml", _MEMO.strip()),
     ], mentions
@@ -1166,15 +1182,74 @@ def test_the_board_memo_is_handed_to_one_sweep_and_its_gate():
     assert not any(("runner.temp" in ln or "board-memo" in ln) and ln != _MEMO for ln in reproduce), (
         "reproduce.yml names the memo directory only in that env line"
     )
-    # Nothing saves or restores it, so no run reads what another wrote: in
-    # this workflow the runner's temp directory is named by those two lines
-    # and by no cache or artifact path.
-    temp = [
-        ln
-        for ln in workflows["verify.yml"]
-        if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln or "board-memo" in ln
-    ]
+    # The pull request memo lives under the runner's temp directory, which
+    # no cache or artifact path names, so no run reads what another wrote.
+    temp = [ln for ln in workflows["verify.yml"] if "runner.temp" in ln or "RUNNER_TEMP" in ln or "_temp" in ln]
     assert temp == [_MEMO, _MEMO], temp
+
+    # No pull request step names the carried memo: the steps that do are
+    # the two main sweeps and the two cache steps.
+    def names_carried(ln):
+        return "workspace }}/board-memo" in ln or ln.strip() == "path: board-memo" or "board-memo-" in ln
+
+    carried = [name for name, lines in steps.items() if any(names_carried(ln) for ln in _code(lines))]
+    assert carried == [_MEMO_RESTORE, _PUSH_SWEEP, _FULL_SWEEP, _MEMO_SAVE], carried
+
+
+def test_the_carried_board_memo_is_restored_and_saved_only_on_main():
+    """The structural record of issue #7253 lives on the circuit record's terms."""
+    steps = _workflow_steps()
+    assert "        if: github.event_name == 'push'" in steps[_MEMO_RESTORE]
+    assert _uses_cache(steps[_MEMO_RESTORE], "restore")
+    assert [ln.strip() for ln in steps[_MEMO_RESTORE] if ln.strip().startswith("path:")] == ["path: board-memo"]
+    cond = next(ln for ln in steps[_MEMO_SAVE] if ln.startswith("        if: "))[len("        if: ") :]
+    for clause in ("always()", "github.event_name != 'pull_request'", "github.ref == 'refs/heads/main'"):
+        assert clause in cond.split(" && "), (clause, cond)
+    assert _uses_cache(steps[_MEMO_SAVE], "save")
+    assert not _uses_combined_cache(steps[_MEMO_RESTORE] + steps[_MEMO_SAVE])
+    # Both main sweeps read the restored directory, and nothing in between
+    # them and the restore is a pull request step.
+    for name in (_PUSH_SWEEP, _FULL_SWEEP):
+        assert _MAIN_MEMO in steps[name], name
+    names = list(steps)
+    assert names.index(_MEMO_RESTORE) < names.index(_PUSH_SWEEP) < names.index(_FULL_SWEEP) < names.index(_MEMO_SAVE)
+    for name in names[names.index(_MEMO_RESTORE) + 1 : names.index(_PUSH_SWEEP)]:
+        cond = next((ln[len("        if: ") :] for ln in steps[name] if ln.startswith("        if: ")), "")
+        assert _cannot_run_on_a_code_submission(cond), (name, cond)
+
+
+def test_the_full_sweep_empties_the_memo_except_on_a_push(tmp_path):
+    """A push extends the restored memo; a pull request, the schedule and a dispatch start empty."""
+    script = _script(_workflow_steps()[_FULL_SWEEP])
+    kinds = (("push", True), ("pull_request", False), ("schedule", False), ("workflow_dispatch", False))
+    for event, survives in kinds:
+        memo = tmp_path / f"memo-{event}"
+        (memo / "ab").mkdir(parents=True)
+        (memo / "ab" / "planted.json").write_text("{}")
+        _verify_all_argv(
+            script, tmp_path, EVENT_NAME=event, BEFORE="abc123", QLDPC_BOARD_CACHE=str(memo), **_SAMPLE_ENV
+        )
+        assert memo.exists() is survives, event
+
+
+def test_the_site_build_reads_and_saves_the_carried_memo():
+    """site.yml runs on pushes to main only, and hands the memo to the one step that builds."""
+    with open(_SITE_WORKFLOW, encoding="utf-8") as f:
+        text = f.read()
+    lines = _code(text.splitlines())
+    assert "\non:\n  push:\n    branches: [main]\n" in text
+    assert "pull_request" not in text and "schedule" not in text and "workflow_dispatch" not in text
+    assert lines.count(_MAIN_MEMO) == 1
+    env_at = lines.index(_MAIN_MEMO)
+    assert lines[env_at - 1] == "        env:" and lines[env_at + 1] == "        run: |"
+    assert not any("rm -rf" in ln and "QLDPC_BOARD_CACHE" in ln for ln in lines)
+    assert _uses_cache(lines, "restore") and _uses_cache(lines, "save") and not _uses_combined_cache(lines)
+    paths = [ln.strip() for ln in lines if ln.strip().startswith("path:")]
+    assert paths == ["path: board-memo", "path: board-memo"], paths
+    keys = [ln.strip() for ln in lines if ln.strip().startswith("key:")]
+    assert all(k.startswith("key: board-memo-") for k in keys) and len(keys) == 2, keys
+    save_if = next(ln for ln in lines if ln.startswith("        if: always()"))
+    assert "github.ref == 'refs/heads/main'" in save_if and "hashFiles('board-memo/**')" in save_if
 
 
 def test_the_sweep_empties_the_board_memo_before_filling_it(tmp_path):

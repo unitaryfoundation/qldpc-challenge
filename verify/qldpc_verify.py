@@ -608,10 +608,14 @@ def resource_errors(doc):
     return errs
 
 
+def _checkout_codes_dir():
+    """Return this checkout's codes/: where verify() reads the entries a document names."""
+    return os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "codes")
+
+
 def _board_code(slug):
     """Return codes/<slug>.json from this checkout, or None if absent."""
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(root, "codes", f"{slug}.json")
+    path = os.path.join(_checkout_codes_dir(), f"{slug}.json")
     try:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
@@ -2446,15 +2450,22 @@ def board_cache_dir():
     crosses from one run to the next. Keeping the directory that way is the
     job's to arrange: verify.yml wipes it in the step that first writes it.
 
-    One condition comes with sharing it. A report is filed under its
-    entry's bytes and the validator closure (_memo_path), and that is not
-    all a report depends on: verify() also reads other entries from its own
-    checkout's codes/ (_board_code: a benchmark's baseline, an
-    architecture's partners, the parent of a declared relabeling). So the
-    processes that share a directory must run from one checkout whose
-    codes/ does not change between them. The sweep and the gate of one job
-    do: both run from the trusted tree. A memo carried from one state of the
-    board to another would need those entries in its key as well.
+    A report is filed under its entry's bytes, the validator closure, and
+    the bytes of every other entry verify() reads for it from its own
+    checkout's codes/ (_memo_path; _partner_slugs names them: a benchmark's
+    baseline, an architecture's partners, the parent of a declared
+    relabeling). That is everything a structural verdict depends on, so a
+    memo may be carried from one state of the board to another: an entry
+    whose own bytes, partners and verifier are unchanged can only get the
+    report it got before. Runs on main do carry one (issue #7253, the
+    structural counterpart of verify_all's circuit record): verify.yml
+    restores it only on a push to main, saves it only from a run on main,
+    and the weekly run starts from an empty directory, so no line of it is
+    more than a week from a verification made from scratch; site.yml reads
+    and saves the same cache, so a site rebuild verifies the merge and not
+    the board. No pull request step is handed it, and GitHub scopes a cache
+    to the ref that wrote it, so a pull request can neither write what main
+    reads nor be answered from it.
     """
     override = os.environ.get(BOARD_CACHE_ENV)
     if override is not None:
@@ -2465,6 +2476,64 @@ def board_cache_dir():
     return os.path.join(root, BOARD_CACHE_DIRNAME)
 
 
+# The byte patterns that mark an entry as one verify() reads another entry
+# for. An entry without any of them is keyed on its own bytes alone, so the
+# common case costs no parse.
+_PARTNER_MARKERS = (b"surface_baseline", b"clifford_relabel_of", b'"partner"')
+
+
+def _partner_slugs(doc):
+    """Return the slugs of the board entries verify() reads for ``doc``, sorted.
+
+    The three places a document names another entry: the benchmark block's
+    surface baseline (benchmark_checks), the partner of an architecture
+    gadget (architecture_checks), and the parent of a declared Clifford
+    relabeling (_verify_semantic). verify() reads each through _board_code,
+    so the verdict depends on those entries' bytes as well as on the
+    document's own. A field of the wrong shape names nothing: verify()
+    fails it on its own terms and the report is keyed on the bytes that
+    produced that failure.
+    """
+    out = set()
+    if not isinstance(doc, dict):
+        return []
+    sb = ((doc.get("benchmark") or {}) if isinstance(doc.get("benchmark"), dict) else {}).get("surface_baseline")
+    if isinstance(sb, dict) and isinstance(sb.get("slug"), str):
+        out.add(sb["slug"])
+    arch = doc.get("architecture")
+    if isinstance(arch, dict):
+        for g in arch.get("gadgets") or []:
+            if isinstance(g, dict) and isinstance(g.get("partner"), str):
+                out.add(g["partner"])
+    prov = doc.get("provenance")
+    if isinstance(prov, dict) and isinstance(prov.get("clifford_relabel_of"), str):
+        out.add(prov["clifford_relabel_of"])
+    return sorted(out)
+
+
+def _partner_bytes(data):
+    """Return (slug, bytes-or-None) for every entry verify() would read for these bytes.
+
+    What _board_code reads: codes/<slug>.json in this checkout. An absent
+    partner is part of the key too, since its absence is part of the
+    verdict (the partner-on-board checks fail).
+    """
+    if not any(marker in data for marker in _PARTNER_MARKERS):
+        return []
+    try:
+        doc = json.loads(data)
+    except ValueError:
+        return []
+    out = []
+    for slug in _partner_slugs(doc):
+        try:
+            with open(os.path.join(_checkout_codes_dir(), f"{slug}.json"), "rb") as f:
+                out.append((slug, f.read()))
+        except OSError:
+            out.append((slug, None))
+    return out
+
+
 def _memo_path(cache_dir, data):
     """Where the cached report for these exact entry bytes lives.
 
@@ -2472,6 +2541,11 @@ def _memo_path(cache_dir, data):
     memo cannot amortise across a campaign: one merged submission changes one
     byte and re-arms all 1,782 entries. Keyed per entry, that merge
     re-verifies one.
+
+    The key is the validator closure, the entry's bytes, and the bytes of
+    every entry verify() reads for it (_partner_bytes), so a memo answers
+    only when nothing the verdict was computed from has changed, whichever
+    state of the board it was written under (issue #7253).
     """
     import hashlib
 
@@ -2479,6 +2553,9 @@ def _memo_path(cache_dir, data):
     h.update(validator_closure_digest().encode("utf-8"))
     h.update(b"\0")
     h.update(data)
+    for slug, partner in _partner_bytes(data):
+        h.update(b"\0partner\0" + slug.encode("utf-8") + b"\0")
+        h.update(partner if partner is not None else b"<absent>")
     key = h.hexdigest()
     return os.path.join(cache_dir, key[:2], key[2:] + ".json")
 
@@ -2536,7 +2613,7 @@ def _memo_write(cache_dir, data, entry):
         pass
 
 
-_BOARD_MEMO_VERSION = 1
+_BOARD_MEMO_VERSION = 2  # 2: partner bytes in the key (issue #7253)
 
 
 def board_reports(code_dir, jobs=1):
