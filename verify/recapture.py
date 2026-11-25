@@ -43,6 +43,7 @@ what a failure-mechanism count or a d-only comparison needs. So the vector
 itself is recorded too, as ``op``. The estimator reports either unit; the
 calibration in ``research/audits/test_recapture.py`` uses both.
 """
+
 import datetime
 import hashlib
 import json
@@ -106,8 +107,7 @@ def canonicalizers(doc):
     if H._is_stabilizer(doc):
         A, B = H.stabilizer_matrices(doc)
         return {"P": Canonicalizer(np.concatenate([A, B], axis=1))}
-    return {"X": Canonicalizer(H._matrix(doc["checks"]["X"], n)),
-            "Z": Canonicalizer(H._matrix(doc["checks"]["Z"], n))}
+    return {"X": Canonicalizer(H._matrix(doc["checks"]["X"], n)), "Z": Canonicalizer(H._matrix(doc["checks"]["Z"], n))}
 
 
 class SideSink:
@@ -116,9 +116,9 @@ class SideSink:
     def __init__(self, threshold, cap=DEFAULT_CAP):
         self.threshold = int(threshold)
         self.cap = int(cap)
-        self.found = {}          # vector bytes -> weight
-        self.hits = 0            # every time the search produced a kept-or-counted logical
-        self.overflow = 0        # distinct vectors seen past the cap
+        self.found = {}  # vector bytes -> weight
+        self.hits = 0  # every time the search produced a kept-or-counted logical
+        self.overflow = 0  # distinct vectors seen past the cap
 
     def add(self, rows, weights):
         """Record the rows ``consider`` found at weight <= threshold."""
@@ -177,15 +177,17 @@ def battery_of(capture, max_seconds=10.0):
     res = capture.result or {}
     method = str(res.get("method") or "ris")
     bare = re.sub(r"\(.*?\)", "", method)
-    return {"method": method,
-            "key": f"{bare}/{'fast' if 'gf2_fast' in method else 'py'}/{max_seconds:g}s",
-            "trials": res.get("trials"), "max_seconds": max_seconds,
-            "accelerated": "gf2_fast" in method,
-            "fold_partitions": res.get("fold_partitions", 0)}
+    return {
+        "method": method,
+        "key": f"{bare}/{'fast' if 'gf2_fast' in method else 'py'}/{max_seconds:g}s",
+        "trials": res.get("trials"),
+        "max_seconds": max_seconds,
+        "accelerated": "gf2_fast" in method,
+        "fold_partitions": res.get("fold_partitions", 0),
+    }
 
 
-def entry_record(doc, slug, *, run_seed, file_seed, capture, seconds, refuted,
-                 d_found, trials, battery):
+def entry_record(doc, slug, *, run_seed, file_seed, capture, seconds, refuted, d_found, trials, battery):
     """One entry's record for one run: what was searched and what was found.
 
     Each side's logicals are stored as three parallel lists, ``w``, ``op``,
@@ -197,20 +199,32 @@ def entry_record(doc, slug, *, run_seed, file_seed, capture, seconds, refuted,
     for name, sink in capture.sides.items():
         rows = []
         for v, w in sink.vectors():
-            rows.append((int(w), operator_id(v),
-                         canon[name].class_id(v) if name in canon else None))
+            rows.append((int(w), operator_id(v), canon[name].class_id(v) if name in canon else None))
         rows.sort(key=lambda r: (r[0], r[1]))
-        sides[name] = {"captured": len(rows), "overflow": sink.overflow, "hits": sink.hits,
-                       "w": [r[0] for r in rows], "op": [r[1] for r in rows],
-                       "cls": [r[2] for r in rows]}
-    return {"record_version": RECORD_VERSION, "slug": slug,
-            "run_seed": int(run_seed), "file_seed": int(file_seed),
-            "claimed_d": int(doc["distance"]["d"]), "threshold": capture.threshold,
-            "cap": capture.cap, "trials": trials, "seconds": round(float(seconds), 2),
-            "battery": battery, "refuted": bool(refuted), "d_found": d_found,
-            "sides": sides,
-            "recorded_at": datetime.datetime.now(datetime.timezone.utc)
-            .isoformat(timespec="seconds")}
+        sides[name] = {
+            "captured": len(rows),
+            "overflow": sink.overflow,
+            "hits": sink.hits,
+            "w": [r[0] for r in rows],
+            "op": [r[1] for r in rows],
+            "cls": [r[2] for r in rows],
+        }
+    return {
+        "record_version": RECORD_VERSION,
+        "slug": slug,
+        "run_seed": int(run_seed),
+        "file_seed": int(file_seed),
+        "claimed_d": int(doc["distance"]["d"]),
+        "threshold": capture.threshold,
+        "cap": capture.cap,
+        "trials": trials,
+        "seconds": round(float(seconds), 2),
+        "battery": battery,
+        "refuted": bool(refuted),
+        "d_found": d_found,
+        "sides": sides,
+        "recorded_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+    }
 
 
 def append_record(path, rec):

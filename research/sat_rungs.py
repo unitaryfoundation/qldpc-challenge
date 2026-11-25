@@ -27,6 +27,7 @@ fieldnote is written from the log rather than from memory.
     python research/sat_rungs.py --side 7 --G 28 --w 6 --t 2 --layers 2 \\
         --radius 3.5 --solver cadical195 --conflicts 20000000 --wall-hours 3
 """
+
 import argparse
 import json
 import os
@@ -50,24 +51,46 @@ def _peak_rss_gb():
     """Return this process's peak resident set in GB."""
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     # ru_maxrss is bytes on macOS and kilobytes on Linux.
-    return round(rss / (1024 ** 3 if platform.system() == "Darwin"
-                        else 1024 ** 2), 2)
+    return round(rss / (1024**3 if platform.system() == "Darwin" else 1024**2), 2)
 
 
 def _solver_version(name):
     """Return the CaDiCaL version behind a python-sat solver key, if known."""
-    return {"cadical": "1.5.3", "cadical153": "1.5.3", "cadical195": "1.9.5",
-            "cadical300": "3.0.0"}.get(name, name)
+    return {"cadical": "1.5.3", "cadical153": "1.5.3", "cadical195": "1.9.5", "cadical300": "3.0.0"}.get(name, name)
 
 
-CONF_CHUNK = 250_000   # conflicts per solve call; the wall is checked between
+CONF_CHUNK = 250_000  # conflicts per solve call; the wall is checked between
 
 
-def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
-             conflicts=None, wall_hours=None, k_min=0, max_models=None,
-             out_dir=None, exact_on_reject=True, nonempty_rows=True,
-             row_sort=False, dimension=2, max_diameter=None, verbose=True):
+def run_rung(
+    side,
+    G,
+    w,
+    t,
+    radius,
+    *,
+    layers=1,
+    solver="cadical195",
+    conflicts=None,
+    wall_hours=None,
+    k_min=0,
+    max_models=None,
+    out_dir=None,
+    exact_on_reject=True,
+    nonempty_rows=True,
+    row_sort=False,
+    dimension=2,
+    max_diameter=None,
+    modules=None,
+    max_modules_per_check=None,
+    module_capacity=None,
+    verbose=True,
+):
     """Run one rung and return its record.
+
+    ``modules``, ``max_modules_per_check``, ``module_capacity`` are the
+    module predicate of ``local_sat.build_local_cnf`` (issue #5836); the
+    found model's assignment is written beside its matrices.
 
     ``conflicts`` caps the conflicts spent on one formula (one model's
     search) and ``wall_hours`` caps the whole run. Neither can interrupt
@@ -93,12 +116,28 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
 
     chunk = CONF_CHUNK if conflicts is None else min(conflicts, CONF_CHUNK)
     gen = local_sat.enumerate_local_sat_codes(
-        side, G, w, t, radius, solver=solver, layers=layers,
-        conf_budget=chunk, stream=True, shared_t3=(t >= 2),
-        max_codes=max_models, nonempty_rows=nonempty_rows,
-        row_sort=row_sort, exact_on_reject=exact_on_reject, stats=stats,
-        budget_check=budget_check, dimension=dimension,
-        max_diameter=max_diameter)
+        side,
+        G,
+        w,
+        t,
+        radius,
+        solver=solver,
+        layers=layers,
+        conf_budget=chunk,
+        stream=True,
+        shared_t3=(t >= 2),
+        max_codes=max_models,
+        nonempty_rows=nonempty_rows,
+        row_sort=row_sort,
+        exact_on_reject=exact_on_reject,
+        stats=stats,
+        budget_check=budget_check,
+        dimension=dimension,
+        max_diameter=max_diameter,
+        modules=modules,
+        max_modules_per_check=max_modules_per_check,
+        module_capacity=module_capacity,
+    )
     found, seen, best_k = [], 0, None
     try:
         for spec, HX, HZ in gen:
@@ -111,8 +150,7 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
             k = int(compute_k(HX, HZ))
             best_k = k if best_k is None else max(best_k, k)
             if verbose and (seen <= 5 or seen % 100 == 0 or k >= k_min):
-                print(f"  model {seen} k={k} at {round(time.time() - t0)}s",
-                      flush=True)
+                print(f"  model {seen} k={k} at {round(time.time() - t0)}s", flush=True)
             if k >= k_min:
                 found.append((spec, HX, HZ, sites, ax, az, k))
                 break
@@ -131,20 +169,44 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
     else:
         status = "walled"
     rec = {
-        "rung": (f"{side}x{side}{f'x{side}' if dimension == 3 else ''}"
-                 f"{'x2' if layers == 2 else ''} G={G} w{w} t={t}"
-                 + (f" diam<={max_diameter:g}" if max_diameter is not None else "")),
-        "side": side, "dimension": dimension, "layers": layers,
-        "n": side ** dimension * layers, "G": G,
-        "w": w, "t": t, "radius": radius, "max_diameter": max_diameter,
+        "rung": (
+            f"{side}x{side}{f'x{side}' if dimension == 3 else ''}"
+            f"{'x2' if layers == 2 else ''} G={G} w{w} t={t}"
+            + (f" diam<={max_diameter:g}" if max_diameter is not None else "")
+            + (
+                f" mod{modules if isinstance(modules, int) else 'fixed'}"
+                f"<={1 if max_modules_per_check is None else max_modules_per_check}"
+                if modules is not None
+                else ""
+            )
+        ),
+        "side": side,
+        "dimension": dimension,
+        "layers": layers,
+        "n": side**dimension * layers,
+        "G": G,
+        "w": w,
+        "t": t,
+        "radius": radius,
+        "max_diameter": max_diameter,
+        "modules": (modules if isinstance(modules, int) else "fixed") if modules is not None else None,
+        "max_modules_per_check": (1 if max_modules_per_check is None else max_modules_per_check)
+        if modules is not None
+        else None,
         "status": status,
         "solver": f"CaDiCaL {_solver_version(solver)} via python-sat",
-        "conflict_cap": conflicts, "wall_cap_hours": wall_hours,
-        "wall_hit": interrupted["wall"], "secs": secs,
-        "k_min": k_min, "models_seen": seen, "best_k_seen": best_k,
+        "conflict_cap": conflicts,
+        "wall_cap_hours": wall_hours,
+        "wall_hit": interrupted["wall"],
+        "secs": secs,
+        "k_min": k_min,
+        "models_seen": seen,
+        "best_k_seen": best_k,
         "conflicts_total": stats.get("conflicts"),
-        "peak_rss_gb": _peak_rss_gb(), "rounds": stats.get("rounds"),
-        "rejected": stats.get("rejected"), "final": stats.get("final"),
+        "peak_rss_gb": _peak_rss_gb(),
+        "rounds": stats.get("rounds"),
+        "rejected": stats.get("rejected"),
+        "final": stats.get("final"),
         "date": time.strftime("%Y-%m-%d"),
         "host": platform.node(),
     }
@@ -154,13 +216,21 @@ def run_rung(side, G, w, t, radius, *, layers=1, solver="cadical195",
         rec["max_row_weight"] = int(max(HX.sum(1).max(), HZ.sum(1).max()))
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
-            path = os.path.join(out_dir, rec["rung"].replace(" ", "_")
-                                .replace("=", "") + ".json")
+            path = os.path.join(out_dir, rec["rung"].replace(" ", "_").replace("=", "") + ".json")
             with open(path, "w", encoding="utf-8") as f:
-                json.dump({"spec": spec, "HX": HX.tolist(),
-                           "HZ": HZ.tolist(), "sites": sites,
-                           "anchors_x": ax, "anchors_z": az, "k": k},
-                          f)
+                json.dump(
+                    {
+                        "spec": spec,
+                        "HX": HX.tolist(),
+                        "HZ": HZ.tolist(),
+                        "sites": sites,
+                        "anchors_x": ax,
+                        "anchors_z": az,
+                        "modules": spec.get("modules"),
+                        "k": k,
+                    },
+                    f,
+                )
             rec["model_path"] = os.path.relpath(path, _ROOT)
     return rec
 
@@ -171,44 +241,103 @@ def main(argv=None):
     ap.add_argument("--G", type=int, required=True)
     ap.add_argument("--w", type=int, required=True)
     ap.add_argument("--t", type=int, required=True)
-    ap.add_argument("--radius", type=float, default=2.0,
-                    help="anchor radius (default 2.0, interaction radius "
-                         "4.0; the bilayer rungs used 3.5)")
+    ap.add_argument(
+        "--radius",
+        type=float,
+        default=2.0,
+        help="anchor radius (default 2.0, interaction radius 4.0; the bilayer rungs used 3.5)",
+    )
     ap.add_argument("--layers", type=int, default=1)
     ap.add_argument("--solver", default="cadical195")
     ap.add_argument("--conflicts", type=int, default=None)
     ap.add_argument("--wall-hours", type=float, default=None)
-    ap.add_argument("--k-min", type=int, default=0,
-                    help="enumerate until a model has at least this many "
-                         "logical qubits (default 0: the first model)")
-    ap.add_argument("--max-models", type=int, default=None,
-                    help="stop after this many models even if none reached "
-                         "--k-min")
-    ap.add_argument("--out-dir", default=None,
-                    help="where a found model is written (not filed)")
+    ap.add_argument(
+        "--k-min",
+        type=int,
+        default=0,
+        help="enumerate until a model has at least this many logical qubits (default 0: the first model)",
+    )
+    ap.add_argument(
+        "--max-models", type=int, default=None, help="stop after this many models even if none reached --k-min"
+    )
+    ap.add_argument("--out-dir", default=None, help="where a found model is written (not filed)")
     ap.add_argument("--log", default=RUNG_LOG)
-    ap.add_argument("--block-on-reject", action="store_true",
-                    help="block the whole model on a post-check rejection "
-                         "(the pre-#2703 behavior) instead of adding the "
-                         "exact detection constraint")
-    ap.add_argument("--row-sort", action="store_true",
-                    help="enforce non-decreasing generator rows (row-permutation "
-                         "symmetry break)")
-    ap.add_argument("--dimension", type=int, default=2, choices=(2, 3),
-                    help="2 for the n_side x n_side square, 3 for the cube "
-                         "(issue #5840)")
-    ap.add_argument("--max-diameter", type=float, default=None,
-                    help="no check acts on two qubits farther apart than this "
-                         "(bounds the measured interaction radius by construction)")
+    ap.add_argument(
+        "--block-on-reject",
+        action="store_true",
+        help="block the whole model on a post-check rejection "
+        "(the pre-#2703 behavior) instead of adding the "
+        "exact detection constraint",
+    )
+    ap.add_argument(
+        "--row-sort", action="store_true", help="enforce non-decreasing generator rows (row-permutation symmetry break)"
+    )
+    ap.add_argument(
+        "--dimension",
+        type=int,
+        default=2,
+        choices=(2, 3),
+        help="2 for the n_side x n_side square, 3 for the cube (issue #5840)",
+    )
+    ap.add_argument(
+        "--max-diameter",
+        type=float,
+        default=None,
+        help="no check acts on two qubits farther apart than this "
+        "(bounds the measured interaction radius by construction)",
+    )
+    ap.add_argument(
+        "--modules",
+        type=int,
+        default=None,
+        help="co-search a partition into this many hardware modules (issue #5836)",
+    )
+    ap.add_argument(
+        "--grid-blocks",
+        type=int,
+        default=None,
+        help="fix the partition to this many grid tiles per axis instead (local_sat.grid_block_modules)",
+    )
+    ap.add_argument(
+        "--max-modules-per-check",
+        type=int,
+        default=None,
+        help="a check acts on qubits from at most this many modules (default 1 when a partition is given)",
+    )
+    ap.add_argument(
+        "--module-capacity",
+        type=int,
+        default=None,
+        help="qubits per co-searched module (default: the balanced ceil(n / modules))",
+    )
     a = ap.parse_args(argv)
+    if a.modules is not None and a.grid_blocks is not None:
+        ap.error("--modules and --grid-blocks are two ways to give one partition; pass one")
+    modules = a.modules
+    if a.grid_blocks is not None:
+        modules = local_sat.grid_block_modules(a.side, a.grid_blocks, dimension=a.dimension, layers=a.layers)
 
-    rec = run_rung(a.side, a.G, a.w, a.t, a.radius, layers=a.layers,
-                   solver=a.solver, conflicts=a.conflicts,
-                   wall_hours=a.wall_hours, k_min=a.k_min,
-                   max_models=a.max_models,
-                   out_dir=a.out_dir, exact_on_reject=not a.block_on_reject,
-                   row_sort=a.row_sort, dimension=a.dimension,
-                   max_diameter=a.max_diameter)
+    rec = run_rung(
+        a.side,
+        a.G,
+        a.w,
+        a.t,
+        a.radius,
+        layers=a.layers,
+        solver=a.solver,
+        conflicts=a.conflicts,
+        wall_hours=a.wall_hours,
+        k_min=a.k_min,
+        max_models=a.max_models,
+        out_dir=a.out_dir,
+        exact_on_reject=not a.block_on_reject,
+        row_sort=a.row_sort,
+        dimension=a.dimension,
+        max_diameter=a.max_diameter,
+        modules=modules,
+        max_modules_per_check=a.max_modules_per_check,
+        module_capacity=a.module_capacity,
+    )
     os.makedirs(os.path.dirname(a.log), exist_ok=True)
     with open(a.log, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, sort_keys=True) + "\n")

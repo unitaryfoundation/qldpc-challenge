@@ -17,6 +17,7 @@ family unambiguously, the tag has to agree. It deliberately does not check the
 converse, because a construction is free not to mention its family, so a
 missing tag is a gap rather than a contradiction.
 """
+
 import json
 import os
 import re
@@ -58,15 +59,11 @@ _NOT_BASE = r"(?![- ]base\b)"
 # it does not have to agree with the tag.
 _DERIVED_FROM = re.compile(r"\bquotient of\b", re.I)
 RULES = [
-    ("pair-partition-cpm",
-     re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
-    ("bivariate-bicycle",
-     re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
-    ("generalized-bicycle",
-     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
+    ("pair-partition-cpm", re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
+    ("bivariate-bicycle", re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
+    ("generalized-bicycle", re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
 ]
-assert all(f in _FAMILIES for f, _ in RULES), \
-    "a rule names a family the verifier does not accept"
+assert all(f in _FAMILIES for f, _ in RULES), "a rule names a family the verifier does not accept"
 
 # Two families can both be true of one code, and then the more specific tag is
 # the right one. A construction naming F excuses tag T only when T is at least
@@ -82,12 +79,17 @@ assert all(f in _FAMILIES for f, _ in RULES), \
 # from the text.
 MORE_SPECIFIC = {
     "pair-partition-cpm": {"lifted-product", "hypergraph-product", "other"},
-    "tile": {"bivariate-bicycle", "generalized-bicycle", "topological",
-             "other"},
+    "tile": {"bivariate-bicycle", "generalized-bicycle", "topological", "other"},
     "2bga-coset": {"generalized-bicycle", "other"},
-    "check-deletion": {"bivariate-bicycle", "generalized-bicycle",
-                       "pair-partition-cpm", "lifted-product",
-                       "hypergraph-product", "tile", "other"},
+    "check-deletion": {
+        "bivariate-bicycle",
+        "generalized-bicycle",
+        "pair-partition-cpm",
+        "lifted-product",
+        "hypergraph-product",
+        "tile",
+        "other",
+    },
 }
 
 
@@ -113,15 +115,16 @@ def _contradictions(slug, doc):
     out = []
     for family, pat in RULES:
         if _excused(tag, family):
-            continue          # `continue`, not `break`: later rules apply too
+            continue  # `continue`, not `break`: later rules apply too
         m = pat.search(con[:OPENING])
-        if m and _DERIVED_FROM.search(con[:m.start()]):
-            continue          # the family is the quotient's operand
+        if m and _DERIVED_FROM.search(con[: m.start()]):
+            continue  # the family is the quotient's operand
         if m:
             out.append(
                 f"  {slug}: construction names {family!r} "
                 f"(matched {m.group(0)!r}) but family={tag!r}\n"
-                f"      {con[:OPENING].strip()}")
+                f"      {con[:OPENING].strip()}"
+            )
     return out
 
 
@@ -132,30 +135,29 @@ def test_a_construction_that_names_its_family_carries_that_tag():
         problems.extend(_contradictions(slug, doc))
     assert not problems, (
         f"{len(problems)} entries whose family tag contradicts their own "
-        "construction text; a filter by family will not find them:\n"
-        + "\n".join(problems[:20]))
+        "construction text; a filter by family will not find them:\n" + "\n".join(problems[:20])
+    )
 
 
 def test_a_derived_code_naming_its_base_family_is_not_a_contradiction():
     def doc(family, construction):
         return {"family": family, "provenance": {"construction": construction}}
 
-    derived = ("One amplification of [[126,20,11]] bivariate-bicycle base by "
-               "flagged [[4,2,2]] amplifier (arXiv:2609.37231).")
+    derived = (
+        "One amplification of [[126,20,11]] bivariate-bicycle base by flagged [[4,2,2]] amplifier (arXiv:2609.37231)."
+    )
     assert _contradictions("x", doc("other", derived)) == []
     assert _contradictions("x", doc("distance-amplified", derived)) == []
-    assert _contradictions(
-        "x", doc("other", "Generalized-bicycle base, amplified once")) == []
-    genon = ("Genon code: quotient of the [[288,12,18]] bivariate-bicycle code "
-             "by the ZX-duality D_{(0,1)}: g -> (0,1)-g (arXiv:2611.09538v1).")
+    assert _contradictions("x", doc("other", "Generalized-bicycle base, amplified once")) == []
+    genon = (
+        "Genon code: quotient of the [[288,12,18]] bivariate-bicycle code "
+        "by the ZX-duality D_{(0,1)}: g -> (0,1)-g (arXiv:2611.09538v1)."
+    )
     assert _contradictions("x", doc("other", genon)) == []
-    assert _contradictions(
-        "x", doc("other", "Bivariate-bicycle code, quotient by D_{(0,1)}"))
+    assert _contradictions("x", doc("other", "Bivariate-bicycle code, quotient by D_{(0,1)}"))
     # the entry's own family is still checked, including the word "based"
-    assert _contradictions(
-        "x", doc("other", "Bivariate-bicycle code (A = x^3 + y + y^2)"))
-    assert _contradictions(
-        "x", doc("other", "Bivariate-bicycle based CSS code, l=6 m=6"))
+    assert _contradictions("x", doc("other", "Bivariate-bicycle code (A = x^3 + y + y^2)"))
+    assert _contradictions("x", doc("other", "Bivariate-bicycle based CSS code, l=6 m=6"))
 
 
 def test_every_rule_family_has_a_site_label():
@@ -167,6 +169,7 @@ def test_every_rule_family_has_a_site_label():
     """
     sys.path.insert(0, os.path.join(_ROOT, "site"))
     from build import FAMILY_LABEL, FAMILY_TERM
+
     for family, _ in RULES:
         assert family in _FAMILIES, f"{family} missing from _FAMILIES"
         assert family in FAMILY_LABEL, f"{family} has no site label"

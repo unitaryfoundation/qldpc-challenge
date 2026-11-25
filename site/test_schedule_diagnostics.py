@@ -22,8 +22,7 @@ import circuit_tools as ct  # noqa: E402
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_schedule", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_schedule", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -45,8 +44,7 @@ def _memory_pair(doc, rounds):
     """Build the canonical noisy X- and Z-basis memory circuits of a CSS doc."""
     n = doc["n"]
     HX, HZ = _matrix(doc["checks"]["X"], n), _matrix(doc["checks"]["Z"], n)
-    return {side: ct.apply_noise(ct.build_css_memory(HX, HZ, rounds, basis=side), n)
-            for side in ("X", "Z")}
+    return {side: ct.apply_noise(ct.build_css_memory(HX, HZ, rounds, basis=side), n) for side in ("X", "Z")}
 
 
 def test_reference_skeleton_of_the_422_code():
@@ -75,6 +73,7 @@ def test_reference_skeleton_of_the_422_code():
 def test_noise_and_annotations_do_not_count_as_layers_or_gates():
     build = load_site_build()
     import stim
+
     c = stim.Circuit("""
         R 0 1 2
         X_ERROR(0.01) 0 1 2
@@ -90,7 +89,7 @@ def test_noise_and_annotations_do_not_count_as_layers_or_gates():
         OBSERVABLE_INCLUDE(0) rec[-2]
     """)
     s = build.schedule_of_circuit(c, 1)
-    assert s["layers"] == 3          # R, CX, M; the noise-only and empty segments are not layers
+    assert s["layers"] == 3  # R, CX, M; the noise-only and empty segments are not layers
     assert s["two_qubit_layers"] == 1 and s["two_qubit_gates"] == 1
     assert s["layers_per_round"] == 1
     assert s["qubits"] == 3 and s["qubit_layers"] == 9
@@ -99,6 +98,7 @@ def test_noise_and_annotations_do_not_count_as_layers_or_gates():
 def test_per_round_figures_keep_a_decimal_when_rounds_do_not_divide():
     build = load_site_build()
     import stim
+
     c = stim.Circuit("R 0 1\nTICK\nCX 0 1\nTICK\nCX 0 1\nTICK\nCX 0 1\nTICK\nM 0 1")
     s = build.schedule_of_circuit(c, 2)
     assert s["two_qubit_layers_per_round"] == 1.5
@@ -107,9 +107,15 @@ def test_per_round_figures_keep_a_decimal_when_rounds_do_not_divide():
 
 def test_schedule_table_collapses_equal_bases_and_keeps_unequal_ones():
     build = load_site_build()
-    row = {"qubits": 144, "layers": 56, "layers_per_round": 9,
-           "two_qubit_layers_per_round": 7, "two_qubit_gates_per_round": 432,
-           "mean_parallel": 61.7, "qubit_layers": 8064}
+    row = {
+        "qubits": 144,
+        "layers": 56,
+        "layers_per_round": 9,
+        "two_qubit_layers_per_round": 7,
+        "two_qubit_gates_per_round": 432,
+        "mean_parallel": 61.7,
+        "qubit_layers": 8064,
+    }
     one = build.schedule_table({"X": row, "Z": dict(row)})
     assert one.count("<tr>") == 2 and "<td>X, Z</td>" in one
     assert "<td class=num>8,064</td>" in one and "<td class=num>61.7</td>" in one
@@ -122,11 +128,10 @@ def test_schedule_table_collapses_equal_bases_and_keeps_unequal_ones():
 def test_code_page_shows_the_schedule_of_the_committed_circuits(tmp_path):
     build = load_site_build()
     doc = _fixture("72-6-6.json")
-    doc["schema_version"] = "0.5"   # a circuit block needs 0.5 or later
+    doc["schema_version"] = "0.5"  # a circuit block needs 0.5 or later
     rounds = doc["distance"]["d"]
     side = {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]}
-    doc["circuit"] = {"d_circ": {"X": side, "Z": dict(side)},
-                      "rounds": rounds, "stim_version": "1.16.0"}
+    doc["circuit"] = {"d_circ": {"X": side, "Z": dict(side)}, "rounds": rounds, "stim_version": "1.16.0"}
     plain = _fixture("17-1-7.json")
     (tmp_path / "codes").mkdir()
     for slug, d in (("72-6-6", doc), ("17-1-7", plain)):
@@ -147,14 +152,13 @@ def test_code_page_shows_the_schedule_of_the_committed_circuits(tmp_path):
     want = build.schedule_of_circuit(pair["Z"], rounds)
     assert want["qubits"] == 72 + 36 + 37
     assert '<table class="lerpts sched">' in page
-    assert "<td>X, Z</td>" in page       # same skeleton, read out in the other basis
-    assert f'<td class=num>{want["qubits"]}</td>' in page
-    assert f'<td class=num>{want["layers"]}</td>' in page
-    assert f'<td class=num>{want["two_qubit_layers_per_round"]}</td>' in page
-    assert f'<td class=num>{want["two_qubit_gates_per_round"]}</td>' in page
-    assert f'<td class=num>{want["qubit_layers"]:,}</td>' in page
-    assert "What is the schedule table on a code page?" in open(
-        tmp_path / "docs" / "faq.html", encoding="utf-8").read()
+    assert "<td>X, Z</td>" in page  # same skeleton, read out in the other basis
+    assert f"<td class=num>{want['qubits']}</td>" in page
+    assert f"<td class=num>{want['layers']}</td>" in page
+    assert f"<td class=num>{want['two_qubit_layers_per_round']}</td>" in page
+    assert f"<td class=num>{want['two_qubit_gates_per_round']}</td>" in page
+    assert f"<td class=num>{want['qubit_layers']:,}</td>" in page
+    assert "What is the schedule table on a code page?" in open(tmp_path / "docs" / "faq.html", encoding="utf-8").read()
     # the depth travels with d_circ (issue #6834): on the code page's d_circ
     # line and in the board row's gear chip
     depth = want["layers_per_round"]

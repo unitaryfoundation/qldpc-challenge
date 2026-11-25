@@ -44,6 +44,7 @@ The checkout is given by --tropidist or the TROPIDIST_ROOT environment
 variable; the tool needs numpy and a C compiler (its kernels build on first
 use) and is run as ``python -m cdist`` from that directory.
 """
+
 import argparse
 import json
 import os
@@ -69,7 +70,8 @@ VERIFICATION_NOTE = (
     "tropidist's lower bound is exhaustion inside its kernel (cut-rank dynamic program, "
     "weight-truncated DP, weight-bounded search; completeness proved in the paper, no "
     "replayable artifact), so this is a solver verdict; the vector it returned was "
-    "re-verified by verify/heuristic_distance.py")
+    "re-verified by verify/heuristic_distance.py"
+)
 
 
 class TropidistError(RuntimeError):
@@ -91,8 +93,9 @@ def tropidist_root(path=None):
 def tropidist_commit(root):
     """Return the checkout's commit, or None when it is not a git tree."""
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -118,7 +121,7 @@ def css_problems(doc):
     k = n - gf2.rank(HX) - gf2.rank(HZ)
     out = {}
     for side, H_same, H_opp in (("X", HX, HZ), ("Z", HZ, HX)):
-        L = gf2.logical_basis(H_same, H_opp)   # ker(H_same) modulo row(H_opp): the opposite-type logicals
+        L = gf2.logical_basis(H_same, H_opp)  # ker(H_same) modulo row(H_opp): the opposite-type logicals
         spanned = gf2.rank(np.vstack([H_opp, L])) - gf2.rank(H_opp) if len(L) else 0
         if spanned != k:
             raise ValueError(f"{side} side: pairing set spans {spanned} of {k} logical classes")
@@ -214,12 +217,23 @@ def run_cdist(H, L, *, root, tlim, threads=1, kmin=None, python=None, tag="side"
         rec_path = os.path.join(tmp, f"{tag}.json")
         write_mtx(h_path, H)
         write_mtx(l_path, L)
-        cmd = [python or sys.executable, "-m", "cdist", "--matrices", h_path, l_path,
-               "--threads", str(int(threads)), "--time-limit", str(float(tlim)), "--out", rec_path]
+        cmd = [
+            python or sys.executable,
+            "-m",
+            "cdist",
+            "--matrices",
+            h_path,
+            l_path,
+            "--threads",
+            str(int(threads)),
+            "--time-limit",
+            str(float(tlim)),
+            "--out",
+            rec_path,
+        ]
         if kmin and int(kmin) > 1:
             cmd += ["--config", f"kmin={int(kmin)}"]
-        proc = subprocess.run(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-                              check=False)
+        proc = subprocess.run(cmd, cwd=root, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=False)
         if not os.path.exists(rec_path):
             tail = (proc.stderr or proc.stdout or "").strip().splitlines()
             raise TropidistError("tropidist wrote no record" + (f": {tail[-1]}" if tail else ""))
@@ -242,19 +256,31 @@ def side_block(doc, side, claim, rec, *, tlim):
     if ub is not None and int(ub) < int(claim):
         ok, weight = check_vector(doc, side, rec.get("witness") or [])
         if not ok or weight != int(ub):
-            raise TropidistError(f"{side} side: the tool's weight-{ub} vector is not a nontrivial "
-                                 f"logical of weight {ub} by the board's check (weight {weight}, valid {ok})")
-        blk.update(exact=False, status="SAT", witness=[int(c) for c in rec["witness"]],
-                   note=f"REFUTED: logical of weight {ub} exists")
+            raise TropidistError(
+                f"{side} side: the tool's weight-{ub} vector is not a nontrivial "
+                f"logical of weight {ub} by the board's check (weight {weight}, valid {ok})"
+            )
+        blk.update(
+            exact=False,
+            status="SAT",
+            witness=[int(c) for c in rec["witness"]],
+            note=f"REFUTED: logical of weight {ub} exists",
+        )
         return blk
     if lb is not None and int(lb) > int(claim):
-        raise TropidistError(f"{side} side: the tool proved d >= {lb} against a verified witness of weight "
-                             f"{claim}; the problem it was handed is not this entry's")
+        raise TropidistError(
+            f"{side} side: the tool proved d >= {lb} against a verified witness of weight "
+            f"{claim}; the problem it was handed is not this entry's"
+        )
     if lb is not None and int(lb) == int(claim):
         blk.update(exact=True, status="UNSAT", note=f"no logical < {claim} exists")
         return blk
-    blk.update(exact=False, status="TIMEOUT", lower_bound=int(lb) if lb is not None else None,
-               note=(f"lower bound {lb} after {tlim} s" if lb is not None else f"nothing proved in {tlim} s"))
+    blk.update(
+        exact=False,
+        status="TIMEOUT",
+        lower_bound=int(lb) if lb is not None else None,
+        note=(f"lower bound {lb} after {tlim} s" if lb is not None else f"nothing proved in {tlim} s"),
+    )
     return blk
 
 
@@ -270,14 +296,21 @@ def certify(doc, *, root, tlim=600, threads=1, slug=None, kmin=None, runner=None
     dist = doc["distance"]
     d = int(dist["d"])
     run = runner or run_cdist
-    out = {"name": doc.get("name"), "d": d, "solver": solver_string(root) if root else f"tropidist ({PAPER})",
-           "encoding": "pauli-mechanisms" if "P" in probs else "css-sides",
-           "tlim_per_solve": tlim, "logical_classes": k, "sides": {}}
+    out = {
+        "name": doc.get("name"),
+        "d": d,
+        "solver": solver_string(root) if root else f"tropidist ({PAPER})",
+        "encoding": "pauli-mechanisms" if "P" in probs else "css-sides",
+        "tlim_per_solve": tlim,
+        "logical_classes": k,
+        "sides": {},
+    }
     for side, (H, L) in probs.items():
         claim = int((dist.get(side) or {}).get("value", d))
         t0 = time.time()
-        rec = run(H, L, root=root, tlim=tlim, threads=threads,
-                  kmin=(kmin or {}).get(side), tag=f"{slug or 'entry'}.{side}")
+        rec = run(
+            H, L, root=root, tlim=tlim, threads=threads, kmin=(kmin or {}).get(side), tag=f"{slug or 'entry'}.{side}"
+        )
         blk = side_block(doc, side, claim, rec, tlim=tlim)
         blk.setdefault("secs", round(time.time() - t0, 1))
         out["sides"][side] = blk
@@ -320,9 +353,13 @@ def main(argv=None):
     ap.add_argument("--tropidist", default=None, help=f"the checkout to run (default: ${ENV_ROOT})")
     ap.add_argument("--tlim", type=float, default=600, help="seconds per side (default 600)")
     ap.add_argument("--threads", type=int, default=1)
-    ap.add_argument("--kmin", default=None, metavar="K",
-                    help="start the search at a threshold already proved (a partial certificate's proved_min): "
-                         "an integer for every side, or per side as X=15,Z=14 (issue #4718)")
+    ap.add_argument(
+        "--kmin",
+        default=None,
+        metavar="K",
+        help="start the search at a threshold already proved (a partial certificate's proved_min): "
+        "an integer for every side, or per side as X=15,Z=14 (issue #4718)",
+    )
     ap.add_argument("--json", action="store_true", help="print the record instead of a summary line")
     a = ap.parse_args(argv)
     try:
@@ -345,8 +382,10 @@ def main(argv=None):
     if a.json:
         print(json.dumps(out, indent=1, sort_keys=True))
     else:
-        bits = [f"{s} {b['status']} {b['secs']} s" + (f" (d >= {b['lower_bound']})" if b.get("lower_bound") else "")
-                for s, b in out["sides"].items()]
+        bits = [
+            f"{s} {b['status']} {b['secs']} s" + (f" (d >= {b['lower_bound']})" if b.get("lower_bound") else "")
+            for s, b in out["sides"].items()
+        ]
         print(f"{slug}: d_exact={out['d_exact']} " + "; ".join(bits))
     return 0 if out["d_exact"] else 1
 

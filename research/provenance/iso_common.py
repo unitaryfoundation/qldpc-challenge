@@ -47,10 +47,10 @@ DATA = os.environ.get("LITERATURE_INDEX") or os.path.join(HERE, "index")
 sys.path.insert(0, os.path.join(REPO, "verify"))
 import gf2  # noqa: E402  (repo GF(2) utilities, read-only)
 
-
 # --------------------------------------------------------------------------
 # GF(2) helpers
 # --------------------------------------------------------------------------
+
 
 def rows_to_ints(rows: Iterable[Iterable[int]]) -> list[int]:
     """Sparse supports -> Python ints (bit i set <=> qubit i in support)."""
@@ -79,7 +79,8 @@ def ints_to_rows(ints: Iterable[int]) -> list[list[int]]:
 
 def rank_ints(vecs: Sequence[int]) -> int:
     """GF(2) rank of a list of bit-packed vectors (Gaussian elimination on
-    Python ints; much faster than the int8 schoolbook for n <= 1000)."""
+    Python ints; much faster than the int8 schoolbook for n <= 1000).
+    """
     basis: dict[int, int] = {}  # leading bit -> vector
     r = 0
     for v in vecs:
@@ -114,6 +115,7 @@ def check_rank_agrees_with_repo(rows, n) -> bool:
 # Code container
 # --------------------------------------------------------------------------
 
+
 @dataclass
 class Code:
     id: str
@@ -137,8 +139,13 @@ class Code:
 
     @staticmethod
     def from_lit_json(d: dict) -> "Code":
-        return Code(d["id"], int(d["n"]), d["checks"]["X"], d["checks"]["Z"],
-                    {k: v for k, v in d.items() if k not in ("checks",)})
+        return Code(
+            d["id"],
+            int(d["n"]),
+            d["checks"]["X"],
+            d["checks"]["Z"],
+            {k: v for k, v in d.items() if k not in ("checks",)},
+        )
 
     def normalized(self) -> tuple[list[int], list[int]]:
         """Distinct nonzero rows of each side as sorted bit-packed ints."""
@@ -168,7 +175,8 @@ class Code:
         any qubit touched by no check contributing a trivial [[1,1,1]]
         summand), so its distance is the minimum over the summands and it
         should not count as a single code of those parameters. Union-find on
-        qubits: every row merges its support into one class."""
+        qubits: every row merges its support into one class.
+        """
         parent = list(range(self.n))
 
         def find(i):
@@ -197,10 +205,12 @@ class Code:
 # Tanner graph, invariants, isomorphism
 # --------------------------------------------------------------------------
 
+
 def tanner_graph(code: Code, swap: bool = False) -> nx.Graph:
     """Typed Tanner graph on the normalized generating sets. Node attribute
     `t` is 'q' (qubit), 'x' (X-check) or 'z' (Z-check). With swap=True the
-    X and Z rows exchange types (used to test equivalence up to X/Z swap)."""
+    X and Z rows exchange types (used to test equivalence up to X/Z swap).
+    """
     X, Z = code.normalized()
     if swap:
         X, Z = Z, X
@@ -228,7 +238,8 @@ def wl_hash(code: Code, swap: bool = False, iterations: int = 4) -> str:
 def signature(code: Code) -> tuple:
     """Cheap permutation invariants of the *generating set*, X and Z ordered:
     (n, rank_X, rank_Z, sorted X row weights, sorted Z row weights,
-     sorted qubit X-degrees, sorted qubit Z-degrees)."""
+     sorted qubit X-degrees, sorted qubit Z-degrees).
+    """
     X, Z = code.normalized()
     degx = [0] * code.n
     degz = [0] * code.n
@@ -238,10 +249,15 @@ def signature(code: Code) -> tuple:
     for v in Z:
         for i in ints_to_rows([v])[0]:
             degz[i] += 1
-    return (code.n, rank_ints(X), rank_ints(Z),
-            tuple(sorted(v.bit_count() for v in X)),
-            tuple(sorted(v.bit_count() for v in Z)),
-            tuple(sorted(degx)), tuple(sorted(degz)))
+    return (
+        code.n,
+        rank_ints(X),
+        rank_ints(Z),
+        tuple(sorted(v.bit_count() for v in X)),
+        tuple(sorted(v.bit_count() for v in Z)),
+        tuple(sorted(degx)),
+        tuple(sorted(degz)),
+    )
 
 
 def signature_swapped(sig: tuple) -> tuple:
@@ -255,6 +271,7 @@ def sig_hash(sig: tuple) -> str:
 
 def _nauty_graph(code: Code, swap: bool):
     import pynauty
+
     X, Z = code.normalized()
     if swap:
         X, Z = Z, X
@@ -271,26 +288,28 @@ def _nauty_graph(code: Code, swap: bool):
             v >>= 1
             i += 1
         adj[c] = nb
-    coloring = [set(range(n)), set(range(n, n + len(X))),
-                set(range(n + len(X), nv))]
+    coloring = [set(range(n)), set(range(n, n + len(X))), set(range(n + len(X), nv))]
     coloring = [s for s in coloring if s]
-    return pynauty.Graph(nv, directed=False, adjacency_dict=adj,
-                         vertex_coloring=coloring), n
+    return pynauty.Graph(nv, directed=False, adjacency_dict=adj, vertex_coloring=coloring), n
 
 
 def nauty_certificate(code: Code, swap: bool = False) -> bytes:
     """Canonical form of the typed Tanner graph (nauty). Two codes have equal
     certificates iff their typed Tanner graphs are isomorphic, i.e. iff the
-    given generating sets are permutation-equivalent row-set to row-set."""
+    given generating sets are permutation-equivalent row-set to row-set.
+    """
     import pynauty
+
     g, _ = _nauty_graph(code, swap)
     return pynauty.certificate(g)
 
 
 def nauty_permutation(a: Code, b: Code, swap: bool = False):
     """Qubit permutation a -> b from the canonical labelings, or None if the
-    certificates differ."""
+    certificates differ.
+    """
     import pynauty
+
     ga, n = _nauty_graph(a, False)
     gb, _ = _nauty_graph(b, swap)
     if pynauty.certificate(ga) != pynauty.certificate(gb):
@@ -307,7 +326,8 @@ def nauty_permutation(a: Code, b: Code, swap: bool = False):
 
 def tanner_isomorphic(a: Code, b: Code, swap: bool = False):
     """Exact typed Tanner-graph isomorphism (VF2). Returns the qubit
-    permutation as a dict a_qubit -> b_qubit, or None."""
+    permutation as a dict a_qubit -> b_qubit, or None.
+    """
     Ga = tanner_graph(a)
     Gb = tanner_graph(b, swap)
     nm = nx.algorithms.isomorphism.categorical_node_match("t", None)
@@ -321,7 +341,8 @@ def tanner_isomorphic(a: Code, b: Code, swap: bool = False):
 def verify_permutation(a: Code, b: Code, perm: dict, swap: bool = False) -> bool:
     """Independent check that perm maps rowspace(H_X(a)) onto rowspace(H_X(b))
     and likewise for Z (roles swapped if swap). This is the actual definition
-    of equivalence; the Tanner isomorphism only supplies the candidate pi."""
+    of equivalence; the Tanner isomorphism only supplies the candidate pi.
+    """
     Xa, Za = a.normalized()
     Xb, Zb = b.normalized()
     if swap:
@@ -348,7 +369,8 @@ def verify_permutation(a: Code, b: Code, perm: dict, swap: bool = False) -> bool
 def low_weight_enumerator(vecs: Sequence[int], wmax: int, limit: int = 2_000_000):
     """Exact count of rowspace vectors of weight <= wmax, by enumerating the
     whole rowspace. Only feasible for small rank; returns None when 2**rank >
-    limit. Basis-independent, so it is a genuine invariant of the code."""
+    limit. Basis-independent, so it is a genuine invariant of the code.
+    """
     basis = []
     piv = {}
     for v in vecs:
@@ -362,12 +384,12 @@ def low_weight_enumerator(vecs: Sequence[int], wmax: int, limit: int = 2_000_000
                 basis.append(w)
                 break
     r = len(basis)
-    if 2 ** r > limit:
+    if 2**r > limit:
         return None
     counts = [0] * (wmax + 1)
     # Gray-code enumeration
     cur = 0
-    for g in range(1, 2 ** r):
+    for g in range(1, 2**r):
         cur ^= basis[(g & -g).bit_length() - 1]
         c = cur.bit_count()
         if c <= wmax:
@@ -378,17 +400,18 @@ def low_weight_enumerator(vecs: Sequence[int], wmax: int, limit: int = 2_000_000
 def rowspace_invariants(code: Code, wmax: int | None = None):
     """Basis-independent invariants: (n, rank_X, rank_Z, lowX, lowZ) where
     lowX/lowZ are exact counts of rowspace vectors of weight <= wmax (None
-    when the rank is too large to enumerate)."""
+    when the rank is too large to enumerate).
+    """
     X, Z = code.normalized()
     if wmax is None:
         wmax = code.max_weight()
-    return (code.n, rank_ints(X), rank_ints(Z),
-            low_weight_enumerator(X, wmax), low_weight_enumerator(Z, wmax))
+    return (code.n, rank_ints(X), rank_ints(Z), low_weight_enumerator(X, wmax), low_weight_enumerator(Z, wmax))
 
 
 # --------------------------------------------------------------------------
 # Board and literature loading
 # --------------------------------------------------------------------------
+
 
 def board_code_path(slug: str) -> str:
     return os.path.join(REPO, "codes", slug + ".json")
@@ -414,21 +437,24 @@ def load_board_codes() -> dict[str, Code]:
         except (OSError, ValueError):
             continue
         if doc.get("code_type", "CSS") != "CSS":
-            continue          # general stabilizer entries rank separately
+            continue  # general stabilizer entries rank separately
         try:
             c = Code.from_board_json(path)
         except Exception:
             continue
         checks = doc.get("checks") or {}
-        w = max((len(r) for side in ("X", "Z") for r in checks.get(side, [])),
-                default=None)
+        w = max((len(r) for side in ("X", "Z") for r in checks.get(side, [])), default=None)
         prov = doc.get("provenance") or {}
-        c.meta.update({"k": doc.get("k"),
-                       "d": (doc.get("distance") or {}).get("d"),
-                       "w": w,
-                       "family": doc.get("family") or prov.get("family"),
-                       "novelty": doc.get("novelty") or prov.get("novelty"),
-                       "on_frontier_now": None})
+        c.meta.update(
+            {
+                "k": doc.get("k"),
+                "d": (doc.get("distance") or {}).get("d"),
+                "w": w,
+                "family": doc.get("family") or prov.get("family"),
+                "novelty": doc.get("novelty") or prov.get("novelty"),
+                "on_frontier_now": None,
+            }
+        )
         out[slug] = c
     return out
 

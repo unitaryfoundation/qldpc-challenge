@@ -5,6 +5,7 @@ has the degree asked for, the sampler's codes have the k their divisor
 designs, and the thing the sampler exists to avoid is real: random supports
 at the same weight encode k = 2 nearly every time.
 """
+
 import os
 import random
 import sys
@@ -64,8 +65,7 @@ def test_sparse_multiples_are_multiples_in_the_weight_band():
 
 def test_the_sampler_designs_k_and_the_verifier_agrees():
     audit = {}
-    codes = list(sample_cyclic_gb(4, m_range=(93, 93), weight=(6, 8),
-                                  k_band=(40, 60), seed=11, audit=audit))
+    codes = list(sample_cyclic_gb(4, m_range=(93, 93), weight=(6, 8), k_band=(40, 60), seed=11, audit=audit))
     assert len(codes) == 4 and audit["built"] == 4
     for spec, HX, HZ in codes:
         assert verify_css(HX, HZ)
@@ -82,6 +82,5 @@ def test_random_supports_at_the_same_weight_encode_almost_nothing():
     weights are even), so k is 0 or 2 nearly every time.
     """
     rng = np.random.default_rng(7)
-    ks = [P.designed_k(93, rng.choice(93, 7, replace=False),
-                       rng.choice(93, 7, replace=False)) for _ in range(40)]
+    ks = [P.designed_k(93, rng.choice(93, 7, replace=False), rng.choice(93, 7, replace=False)) for _ in range(40)]
     assert sum(k <= 2 for k in ks) >= 32, ks

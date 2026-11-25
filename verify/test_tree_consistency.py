@@ -18,6 +18,7 @@ is the documented state of roughly 170 codes and this checker must not touch
 it; and the documentation files and the non-artifact files under `certs/` and
 `receipts/ler/` are not artifacts of a code at all.
 """
+
 import os
 import sys
 
@@ -132,8 +133,7 @@ def test_the_report_spells_each_artifact_path(tree, capsys):
     (tree / "circuits" / "18-2-7").mkdir()
     assert T.main(["--root", str(tree)]) == 1
     out = capsys.readouterr().out
-    for path in ("certs/heuristic/18-2-5.json", "receipts/ler/18-2-6.json",
-                 "circuits/18-2-7/"):
+    for path in ("certs/heuristic/18-2-5.json", "receipts/ler/18-2-6.json", "circuits/18-2-7/"):
         assert f"    {path}" in out
 
 

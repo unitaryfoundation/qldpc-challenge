@@ -6,6 +6,7 @@ nothing in them is importable by name. Every test used to open with its own
 `sys.path.insert` pair to work around that. pytest imports this file before
 collecting anything, so the fix belongs here once instead of in every test.
 """
+
 import os
 import sys
 
@@ -75,12 +76,14 @@ def board_memo(_no_board_memo, session_board_memo, monkeypatch):
     by hand, is not seen; for those the rule is all there is.
     """
     import qldpc_verify
+
     real = qldpc_verify.verify
     monkeypatch.setenv("QLDPC_BOARD_CACHE", session_board_memo)
     yield session_board_memo
     assert qldpc_verify.verify is real, (
         "a test that holds board_memo replaced qldpc_verify.verify: the session's "
-        "board memo may now hold reports the real verifier did not compute")
+        "board memo may now hold reports the real verifier did not compute"
+    )
 
 
 def pytest_configure(config):
@@ -121,4 +124,5 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         "board: reads the committed codes/, circuits/, certs/ or repro/ tree as a whole; "
-        "verify.yml runs these in place of the suite for a data-only pull request")
+        "verify.yml runs these in place of the suite for a data-only pull request",
+    )

@@ -1,0 +1,142 @@
+[
+  {
+    "label": "balanced-S3-regular",
+    "constructor": "L-BALANCED",
+    "n": 12,
+    "k": 2,
+    "w": 4,
+    "distance": {
+      "d": 2,
+      "X": {
+        "value": 2,
+        "confidence": "upper_bound",
+        "witness": [
+          6,
+          7
+        ],
+        "witness_provenance": {
+          "found_by": [
+            "@mathysrennela"
+          ],
+          "date": "2026-11-22",
+          "found_at_samples": 8000,
+          "survived_samples": 8000,
+          "tool": "research/kit/surrogate.lightest_logical",
+          "seeds": [
+            0
+          ]
+        }
+      },
+      "Z": {
+        "value": 2,
+        "confidence": "upper_bound",
+        "witness": [
+          2,
+          4
+        ],
+        "witness_provenance": {
+          "found_by": [
+            "@mathysrennela"
+          ],
+          "date": "2026-11-22",
+          "found_at_samples": 8000,
+          "survived_samples": 8000,
+          "tool": "research/kit/surrogate.lightest_logical",
+          "seeds": [
+            1
+          ]
+        }
+      }
+    },
+    "gate_passed": true,
+    "board_advancing": false,
+    "gate": {
+      "passed": true,
+      "candidate": {
+        "n": 12,
+        "k": 2,
+        "d": 2,
+        "family": "code-calculus",
+        "weight_class": "weight-4",
+        "locality_class": "unrestricted",
+        "sector_distances": {
+          "X": {
+            "upper": 2,
+            "lower": null,
+            "exact": false,
+            "witness_weight": 2,
+            "refuted_to": null
+          },
+          "Z": {
+            "upper": 2,
+            "lower": null,
+            "exact": false,
+            "witness_weight": 2,
+            "refuted_to": null
+          },
+          "d": {
+            "upper": 2,
+            "lower": null,
+            "exact": false
+          }
+        },
+        "fingerprint": "7c181ffa67b968ca",
+        "signature": "49ed206ea8e4f209"
+      },
+      "gates": {
+        "verify": {
+          "ok": true,
+          "failed_checks": [],
+          "weight_class": "weight-4",
+          "locality_class": "unrestricted"
+        },
+        "refute": {
+          "detail": "no lighter logical in 2980 RIS trials (seed 810306025)",
+          "refuted": false,
+          "seed": 810306025
+        },
+        "dedup": {
+          "exact_duplicate_of": null,
+          "wl_equivalent_of": "12-2-3.json"
+        },
+        "novelty": {
+          "cell": [
+            "weight-4",
+            "unrestricted"
+          ],
+          "board": "CSS",
+          "board_advancing": false,
+          "dominated_by": [
+            "[[10,2,3]] w=4 10-2-3-b.json",
+            "[[12,2,3]] w=4 12-2-3.json",
+            "[[12,4,2]] w=4 12-4-2-c.json",
+            "[[12,4,2]] w=4 12-4-2-d.json",
+            "[[12,4,2]] w=4 12-4-2-e.json",
+            "[[12,5,2]] w=4 12-5-2-d.json",
+            "[[4,2,2]] w=4 4-2-2.json",
+            "[[8,3,2]] w=4 8-3-2-b.json",
+            "[[8,3,2]] w=4 8-3-2.json",
+            "[[8,4,2]] w=4 8-4-2-b.json",
+            "[[9,2,2]] w=4 9-2-2.json",
+            "[[9,3,2]] w=4 9-3-2-b.json",
+            "[[9,3,2]] w=4 9-3-2.json"
+          ],
+          "advances_by": [],
+          "d_only_gain": false,
+          "d_only_peers": [],
+          "literature_novelty": "unverified"
+        }
+      },
+      "labels": [
+        "possibly equivalent (same WL signature) to 12-2-3.json",
+        "not board-advancing: dominated by [[10,2,3]] w=4 10-2-3-b.json and 12 more; recorded as a non-frontier result",
+        "literature novelty UNVERIFIED"
+      ],
+      "validator": {
+        "source_sha256": "2a6f68e79b78641e599db20610b1c19eb588cdc7779bb80b3d922bd1bc0b0b29",
+        "seed": 383039477
+      }
+    },
+    "path": "/Users/mathysrennela/GitHub/qldpc-challenge/research/candidates/20261122-184604-Mathyss-MacBook-Air-68702/12-2-L-BALANCED.json"
+  }
+]

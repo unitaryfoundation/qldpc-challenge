@@ -16,6 +16,7 @@ as a standalone script:
   uv run pytest verify/test_verifier.py::test_main # one test
   uv run pytest -k refute -x --pdb                 # match, stop, drop into pdb
 """
+
 import argparse
 import os
 import subprocess
@@ -40,8 +41,7 @@ SLOW = [
 
 def main(argv):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--skip-slow", action="store_true",
-                    help="skip the tests listed in SLOW")
+    ap.add_argument("--skip-slow", action="store_true", help="skip the tests listed in SLOW")
     args, extra = ap.parse_known_args(argv)
 
     cmd = [sys.executable, "-m", "pytest", "verify", "research", "site", "cli"]

@@ -44,6 +44,7 @@ research/audits/.
 
 The record is resumable: entries already in --out are skipped.
 """
+
 import argparse
 import concurrent.futures
 import datetime
@@ -65,8 +66,28 @@ CIRCUITS = os.path.join(ROOT, "circuits")
 SIDE_FILES = {"X": "memory_x", "Z": "memory_z"}
 TYPE_X, TYPE_Z = 0, 3
 MEASURE = {"M": "Z", "MR": "Z", "MX": "X", "MRX": "X"}
-TWO_QUBIT = {"CX", "CNOT", "ZCX", "CZ", "ZCZ", "CY", "ZCY", "XCX", "XCY", "XCZ", "YCX", "YCY", "YCZ",
-             "SWAP", "ISWAP", "CXSWAP", "SWAPCX", "SQRT_XX", "SQRT_YY", "SQRT_ZZ"}
+TWO_QUBIT = {
+    "CX",
+    "CNOT",
+    "ZCX",
+    "CZ",
+    "ZCZ",
+    "CY",
+    "ZCY",
+    "XCX",
+    "XCY",
+    "XCZ",
+    "YCX",
+    "YCY",
+    "YCZ",
+    "SWAP",
+    "ISWAP",
+    "CXSWAP",
+    "SWAPCX",
+    "SQRT_XX",
+    "SQRT_YY",
+    "SQRT_ZZ",
+}
 FLAG_POLICIES = ("basis", "check", "memory")
 _LOCK = threading.Lock()
 
@@ -162,6 +183,7 @@ def detector_coordinates(circuit, n, basis, flag_policy="basis"):
 def annotate(circuit, n, basis, flag_policy="basis"):
     """Return a copy of ``circuit`` whose DETECTOR instructions carry (check, 0, round, type) coordinates."""
     import stim
+
     coords = detector_coordinates(circuit, n, basis, flag_policy)
     out = stim.Circuit()
     i = 0
@@ -187,8 +209,9 @@ def tropidist_root(path=None):
 
 def tropidist_commit(root):
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -199,6 +222,7 @@ def _bench(root):
         if p not in sys.path:
             sys.path.insert(0, p)
     import common  # noqa: F401  (tropidist's bench/common.py)
+
     return common
 
 
@@ -210,8 +234,7 @@ def export_instance(root, circuit, directory, basis, slug):
     """
     common = _bench(root)
     parent, name = os.path.split(directory)
-    meta = {"family": "qldpc-challenge", "description": f"circuits/{slug}/{SIDE_FILES[basis]}.stim",
-            "source": slug}
+    meta = {"family": "qldpc-challenge", "description": f"circuits/{slug}/{SIDE_FILES[basis]}.stim", "source": slug}
     try:
         out = common.export_circuit_instance(name, circuit, [], dict(meta), root=parent, high=(basis == "Z"))
     except Exception:
@@ -219,17 +242,29 @@ def export_instance(root, circuit, directory, basis, slug):
         return "full"
     for variant in out["variants"]:
         prob = common.to_cdist(common.load(directory, variant))
-        out["variants"][variant].update(common.export_problem(directory, variant, prob,
-                                                              common.lattice_perms(prob)))
+        out["variants"][variant].update(common.export_problem(directory, variant, prob, common.lattice_perms(prob)))
     common.write_meta(directory, out)
     return "sector+collapse"
 
 
 def run_pipeline(root, directory, out_path, *, tlim, threads):
     """Run the tool's benchmark pipeline (the configuration of python -m cdist) on an exported instance."""
-    cmd = [sys.executable, os.path.join(root, "bench", "adapters", "ours_pipeline.py"), "--instance", directory,
-           "--variant", "full", "--threads", str(int(threads)), "--time-limit", str(float(tlim)),
-           "--config", "dp=2", "--out", out_path]
+    cmd = [
+        sys.executable,
+        os.path.join(root, "bench", "adapters", "ours_pipeline.py"),
+        "--instance",
+        directory,
+        "--variant",
+        "full",
+        "--threads",
+        str(int(threads)),
+        "--time-limit",
+        str(float(tlim)),
+        "--config",
+        "dp=2",
+        "--out",
+        out_path,
+    ]
     proc = subprocess.run(cmd, cwd=root, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
     if not os.path.exists(out_path):
         tail = (proc.stderr or "").strip().splitlines()
@@ -283,6 +318,7 @@ def map_witness(directory, witness, dem):
 def bound_basis(root, slug, doc, basis, *, tlim, threads, work_dir):
     """Run the tool on one memory basis; return the per-basis record."""
     import stim
+
     n = doc["n"]
     claim = int(doc["circuit"]["d_circ"][basis]["value"])
     base = os.path.join(CIRCUITS, slug, SIDE_FILES[basis])
@@ -299,6 +335,7 @@ def bound_basis(root, slug, doc, basis, *, tlim, threads, work_dir):
             break
         if os.path.isdir(directory):
             import shutil
+
             shutil.rmtree(directory)
         reduction = export_instance(root, annotated, directory, basis, slug)
         if reduction != "full":
@@ -309,22 +346,27 @@ def bound_basis(root, slug, doc, basis, *, tlim, threads, work_dir):
     rec.update(reduction=reduction, flag_policy=policy)
     t0 = time.time()
     try:
-        tool = run_pipeline(root, directory, os.path.join(work_dir, f"{slug}-{basis}.json"), tlim=tlim,
-                            threads=threads)
+        tool = run_pipeline(root, directory, os.path.join(work_dir, f"{slug}-{basis}.json"), tlim=tlim, threads=threads)
     except RuntimeError as e:
         rec.update(status="error", note=str(e), seconds=round(time.time() - t0, 1))
         return rec
     lb, ub = tool.get("lower_bound"), tool.get("upper_bound")
-    rec.update(lower_bound=lb, upper_bound=ub, status=tool.get("status"),
-               seconds=round(float(tool.get("seconds") or time.time() - t0), 1),
-               mechanisms=tool.get("cols"), detectors=tool.get("rows"))
+    rec.update(
+        lower_bound=lb,
+        upper_bound=ub,
+        status=tool.get("status"),
+        seconds=round(float(tool.get("seconds") or time.time() - t0), 1),
+        mechanisms=tool.get("cols"),
+        detectors=tool.get("rows"),
+    )
     if ub is not None and int(ub) < claim:
-        with open(base + ".dem", encoding="utf-8") as f:
-            dem = stim.DetectorErrorModel(f.read())
+        circuit = stim.Circuit(open(base + ".stim", encoding="utf-8").read())
+        dem = CT.derive_dem(circuit)
         mapped = map_witness(directory, tool.get("witness") or [], dem)
         errs = CT.witness_errors(dem, mapped, int(ub)) if mapped is not None else ["no mapping to the committed .dem"]
-        rec.update(witness=mapped, witness_errors=errs,
-                   verdict="refuted" if mapped is not None and not errs else "error")
+        rec.update(
+            witness=mapped, witness_errors=errs, verdict="refuted" if mapped is not None and not errs else "error"
+        )
     elif lb is not None and int(lb) > claim:
         rec.update(verdict="error", note=f"lower bound {lb} exceeds the verified claim {claim}")
     elif lb is not None and int(lb) == claim:
@@ -337,21 +379,37 @@ def bound_basis(root, slug, doc, basis, *, tlim, threads, work_dir):
 def bound_entry(root, slug, *, tlim, threads, work_dir):
     with open(os.path.join(CODES, slug + ".json"), encoding="utf-8") as f:
         doc = json.load(f)
-    out = {"slug": slug, "n": doc["n"], "k": doc["k"], "d": doc["distance"]["d"],
-           "rounds": doc["circuit"].get("rounds"), "bases": {}}
+    out = {
+        "slug": slug,
+        "n": doc["n"],
+        "k": doc["k"],
+        "d": doc["distance"]["d"],
+        "rounds": doc["circuit"].get("rounds"),
+        "bases": {},
+    }
     for basis in ("X", "Z"):
         out["bases"][basis] = bound_basis(root, slug, doc, basis, tlim=tlim, threads=threads, work_dir=work_dir)
     verdicts = {b["verdict"] for b in out["bases"].values()}
-    out["verdict"] = ("refuted" if "refuted" in verdicts else "error" if "error" in verdicts
-                      else "exact" if verdicts == {"exact"} else "open")
+    out["verdict"] = (
+        "refuted"
+        if "refuted" in verdicts
+        else "error"
+        if "error" in verdicts
+        else "exact"
+        if verdicts == {"exact"}
+        else "open"
+    )
     out["d_circ_lower_bound"] = min((b.get("lower_bound") or 0) for b in out["bases"].values())
     return out
 
 
 # ---------------------------------------------------------------------------- the run
 def circuit_slugs():
-    return sorted(os.path.splitext(f)[0] for f in os.listdir(CODES)
-                  if f.endswith(".json") and os.path.isdir(os.path.join(CIRCUITS, os.path.splitext(f)[0])))
+    return sorted(
+        os.path.splitext(f)[0]
+        for f in os.listdir(CODES)
+        if f.endswith(".json") and os.path.isdir(os.path.join(CIRCUITS, os.path.splitext(f)[0]))
+    )
 
 
 def load_record(path):
@@ -380,6 +438,7 @@ def tightened_doc(doc, entry, *, by, date, record_name):
     sentence naming the refuter. Returns None when no basis is refuted.
     """
     import copy
+
     out = copy.deepcopy(doc)
     sentences = []
     for basis in ("X", "Z"):
@@ -387,16 +446,24 @@ def tightened_doc(doc, entry, *, by, date, record_name):
         if b.get("verdict") != "refuted" or b.get("witness_errors"):
             continue
         weight = len(b["witness"])
-        out["circuit"]["d_circ"][basis] = {"value": weight, "confidence": "upper_bound",
-                                           "witness": [int(i) for i in b["witness"]]}
-        sentences.append(f"the {basis}-memory circuit has an undetected logical fault set of weight {weight} "
-                         f"in its committed detector error model (claimed {b['claim']}), with a proved lower "
-                         f"bound of {b['lower_bound']}")
+        out["circuit"]["d_circ"][basis] = {
+            "value": weight,
+            "confidence": "upper_bound",
+            "witness": [int(i) for i in b["witness"]],
+        }
+        sentences.append(
+            f"the {basis}-memory circuit has an undetected logical fault set of weight {weight} "
+            f"in its committed detector error model (claimed {b['claim']}), with a proved lower "
+            f"bound of {b['lower_bound']}"
+        )
     if not sentences:
         return None
-    note = (f" Circuit fault distance corrected on {date} by {by}: " + "; ".join(sentences)
-            + ". Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model"
-            f" (record {record_name}).")
+    note = (
+        f" Circuit fault distance corrected on {date} by {by}: "
+        + "; ".join(sentences)
+        + ". Found by tropidist (arXiv:2611.08247) and re-verified in the committed detector error model"
+        f" (record {record_name})."
+    )
     prov = out.setdefault("provenance", {})
     prov["notes"] = (prov.get("notes") or "") + note
     return out
@@ -415,24 +482,29 @@ def write_tightenings(record, out_dir, *, by, record_name):
         if new is None:
             continue
         with open(os.path.join(out_dir, e["slug"] + ".json"), "w", encoding="utf-8") as f:
-            f.write(json.dumps(new, indent=1) + "\n")     # the board's canonical form (verify/check_codes_format.py)
+            f.write(json.dumps(new, indent=1) + "\n")  # the board's canonical form (verify/check_codes_format.py)
         written.append(e["slug"])
     return written
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--tighten", default=None, metavar="OUT_DIR",
-                    help="write the corrected codes/ documents of the refuted entries in --out to this directory "
-                         "and exit (no tool run)")
+    ap.add_argument(
+        "--tighten",
+        default=None,
+        metavar="OUT_DIR",
+        help="write the corrected codes/ documents of the refuted entries in --out to this directory "
+        "and exit (no tool run)",
+    )
     ap.add_argument("--by", default="@vprusso", help="the refuter's handle written into provenance.notes")
     ap.add_argument("--tropidist", default=None, help="the checkout to run (default: $TROPIDIST_ROOT)")
     ap.add_argument("--slugs", nargs="*", default=None, help="entries to run (default: every circuit tier)")
     ap.add_argument("--tlim", type=float, default=60.0, help="seconds per basis (default 60)")
     ap.add_argument("--threads", type=int, default=2)
     ap.add_argument("--jobs", type=int, default=1, help="entries run at once")
-    ap.add_argument("--out", default=None,
-                    help="record path (default research/audits/circuit_distance_bounds-<date>.json)")
+    ap.add_argument(
+        "--out", default=None, help="record path (default research/audits/circuit_distance_bounds-<date>.json)"
+    )
     a = ap.parse_args(argv)
     today = datetime.date.today().isoformat()
     out_path = a.out or os.path.join(HERE, f"circuit_distance_bounds-{today}.json")
@@ -448,9 +520,15 @@ def main(argv=None):
     if root is None:
         print("no tropidist checkout: pass --tropidist or set TROPIDIST_ROOT", file=sys.stderr)
         return 2
-    record = load_record(out_path) or {"date": today, "tool": "tropidist", "commit": tropidist_commit(root),
-                                        "paper": "arXiv:2611.08247", "tlim_per_basis": a.tlim, "threads": a.threads,
-                                        "entries": []}
+    record = load_record(out_path) or {
+        "date": today,
+        "tool": "tropidist",
+        "commit": tropidist_commit(root),
+        "paper": "arXiv:2611.08247",
+        "tlim_per_basis": a.tlim,
+        "threads": a.threads,
+        "entries": [],
+    }
     done = {e["slug"] for e in record["entries"]}
     slugs = [s for s in (a.slugs or circuit_slugs()) if s not in done]
     work = tempfile.mkdtemp(prefix="circuit-bounds-")
@@ -458,7 +536,7 @@ def main(argv=None):
     def one(slug):
         try:
             return bound_entry(root, slug, tlim=a.tlim, threads=a.threads, work_dir=work)
-        except Exception as e:      # one broken entry must not end the run
+        except Exception as e:  # one broken entry must not end the run
             return {"slug": slug, "verdict": "error", "note": f"{type(e).__name__}: {e}", "bases": {}}
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, a.jobs)) as ex:
@@ -469,8 +547,10 @@ def main(argv=None):
                 with open(out_path, "w", encoding="utf-8") as f:
                     json.dump(record, f, indent=1, sort_keys=True)
                     f.write("\n")
-            bits = " ".join(f"{b}:{v.get('lower_bound')}/{v.get('claim')}({v.get('reduction', '?')[:4]})"
-                            for b, v in sorted(entry.get("bases", {}).items()))
+            bits = " ".join(
+                f"{b}:{v.get('lower_bound')}/{v.get('claim')}({v.get('reduction', '?')[:4]})"
+                for b, v in sorted(entry.get("bases", {}).items())
+            )
             print(f"{entry['slug']}: {entry['verdict']} {bits}", flush=True)
     print(json.dumps(record.get("summary")))
     return 0

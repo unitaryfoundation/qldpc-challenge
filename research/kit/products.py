@@ -19,8 +19,8 @@ regular reps commute for LP.
 
 The sampler functions yield (spec, HX, HZ) triples consumable by kit/search.screen.
 """
-import numpy as np
 
+import numpy as np
 from group_algebra import L_rep, R_rep, build_2bga
 
 
@@ -50,15 +50,19 @@ def hypergraph_product(H1, H2):
     I_m1 = np.eye(m1, dtype=np.int8)
     I_m2 = np.eye(m2, dtype=np.int8)
 
-    HX = np.hstack([
-        np.kron(H1, I_n2),      # (m1*n2, n1*n2)
-        np.kron(I_m1, H2.T),    # (m1*n2, m1*m2)
-    ]).astype(np.int8)
+    HX = np.hstack(
+        [
+            np.kron(H1, I_n2),  # (m1*n2, n1*n2)
+            np.kron(I_m1, H2.T),  # (m1*n2, m1*m2)
+        ]
+    ).astype(np.int8)
 
-    HZ = np.hstack([
-        np.kron(I_n1, H2),      # (n1*m2, n1*n2)
-        np.kron(H1.T, I_m2),    # (n1*m2, m1*m2)
-    ]).astype(np.int8)
+    HZ = np.hstack(
+        [
+            np.kron(I_n1, H2),  # (n1*m2, n1*n2)
+            np.kron(H1.T, I_m2),  # (n1*m2, m1*m2)
+        ]
+    ).astype(np.int8)
 
     return HX, HZ
 
@@ -139,6 +143,7 @@ def _rand_classical(rows, cols, weight, rng):
 def _build_group(order, rng):
     """Try to build a group of the given order. Returns (mul, N) or None."""
     from group_algebra import cyclic_product, dihedral, metacyclic
+
     if order <= 12 and order % 2 == 0 and rng.random() < 0.6:
         mul, _ = dihedral(order // 2)
         if mul.shape[0] == order:
@@ -158,8 +163,7 @@ def _build_group(order, rng):
     return mul if mul.shape[0] == order else None
 
 
-def sample_hypergraph_product(num, *, n_range=(4, 12), m_range=(3, 8),
-                              row_w=3, seed=0):
+def sample_hypergraph_product(num, *, n_range=(4, 12), m_range=(3, 8), row_w=3, seed=0):
     """Yield ``num`` random HP codes ``(spec, HX, HZ)``."""
     rng = np.random.default_rng(seed)
     yielded = 0
@@ -171,23 +175,20 @@ def sample_hypergraph_product(num, *, n_range=(4, 12), m_range=(3, 8),
         H1 = _rand_classical(m1, n1, min(row_w, n1), rng)
         if rng.random() < 0.5:
             HX, HZ = hypergraph_product(H1, H1)
-            spec = {"family": "hypergraph-product",
-                    "H1_shape": [m1, n1], "H2_shape": [m1, n1]}
+            spec = {"family": "hypergraph-product", "H1_shape": [m1, n1], "H2_shape": [m1, n1]}
         else:
             m2 = int(rng.integers(max(2, m_range[0]), m_range[1] + 1))
             n2 = int(rng.integers(max(3, n_range[0]), n_range[1] + 1))
             H2 = _rand_classical(m2, n2, min(row_w, n2), rng)
             HX, HZ = hypergraph_product(H1, H2)
-            spec = {"family": "hypergraph-product",
-                    "H1_shape": [m1, n1], "H2_shape": [m2, n2]}
+            spec = {"family": "hypergraph-product", "H1_shape": [m1, n1], "H2_shape": [m2, n2]}
         if HX.shape[1] > 800:
             continue
         yield (spec, HX, HZ)
         yielded += 1
 
 
-def sample_lifted_product(num, *, order_range=(6, 20),
-                          weight_a=3, weight_b=3, seed=0):
+def sample_lifted_product(num, *, order_range=(6, 20), weight_a=3, weight_b=3, seed=0):
     """Yield ``num`` random LP codes ``(spec, HX, HZ)``."""
     rng = np.random.default_rng(seed)
     yielded = 0
@@ -204,8 +205,7 @@ def sample_lifted_product(num, *, order_range=(6, 20),
         HX, HZ = lifted_product(g, a, b)
         if HX.shape[1] > 800:
             continue
-        spec = {"family": "lifted-product", "group_order": N,
-                "support_a": sorted(a), "support_b": sorted(b)}
+        spec = {"family": "lifted-product", "group_order": N, "support_a": sorted(a), "support_b": sorted(b)}
         yield (spec, HX, HZ)
         yielded += 1
 
@@ -230,9 +230,11 @@ def sample_balanced_product(num, *, order_range=(4, 12), seed=0):
         HX, HZ = balanced_product(g1, a1, b1, g2, a2, b2)
         if HX.shape[1] > 800:
             continue
-        spec = {"family": "balanced-product",
-                "parent1": {"order": N1, "a": sorted(a1), "b": sorted(b1)},
-                "parent2": {"order": N2, "a": sorted(a2), "b": sorted(b2)}}
+        spec = {
+            "family": "balanced-product",
+            "parent1": {"order": N1, "a": sorted(a1), "b": sorted(b1)},
+            "parent2": {"order": N2, "a": sorted(a2), "b": sorted(b2)},
+        }
         yield (spec, HX, HZ)
         yielded += 1
 
@@ -241,13 +243,13 @@ def sample_balanced_product(num, *, order_range=(4, 12), seed=0):
 #  Self-test
 # ======================================================================
 if __name__ == "__main__":
-    from css import verify_css, compute_k
+    from css import compute_k, verify_css
     from surrogate import distance_rand
 
     print("=== product constructions self-test ===\n")
 
     # 1. Hypergraph product
-    H1 = np.array([[1,1,0,0],[0,1,1,0],[0,0,1,1]], dtype=np.int8)
+    H1 = np.array([[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1]], dtype=np.int8)
     HX_hp, HZ_hp = hypergraph_product(H1, H1)
     n_hp = HX_hp.shape[1]
     k_hp = compute_k(HX_hp, HZ_hp)
@@ -257,8 +259,9 @@ if __name__ == "__main__":
 
     # 2. Lifted product on Z_6
     from group_algebra import cyclic_product
+
     mul6, _ = cyclic_product(6)
-    HX_lp, HZ_lp = lifted_product(mul6, [0,1,2], [0,1,2])
+    HX_lp, HZ_lp = lifted_product(mul6, [0, 1, 2], [0, 1, 2])
     n_lp = HX_lp.shape[1]
     k_lp = compute_k(HX_lp, HZ_lp)
     css_lp = verify_css(HX_lp, HZ_lp)
@@ -267,9 +270,10 @@ if __name__ == "__main__":
 
     # 3. Balanced product
     from group_algebra import build_2bga
+
     mul4, _ = cyclic_product(4)
     mul6, _ = cyclic_product(6)
-    HX_bp, HZ_bp = balanced_product(mul4,[0,1,2],[0,1,2], mul6,[0,1,2],[0,1,2])
+    HX_bp, HZ_bp = balanced_product(mul4, [0, 1, 2], [0, 1, 2], mul6, [0, 1, 2], [0, 1, 2])
     n_bp = HX_bp.shape[1]
     k_bp = compute_k(HX_bp, HZ_bp)
     css_bp = verify_css(HX_bp, HZ_bp)
@@ -278,8 +282,10 @@ if __name__ == "__main__":
 
     # 4. Sampler smoke
     print("\n=== sampler smoke ===")
-    for name, fn, n in [("HP", sample_hypergraph_product, 10),
-                         ("LP", sample_lifted_product, 10),
-                         ("BP", sample_balanced_product, 5)]:
+    for name, fn, n in [
+        ("HP", sample_hypergraph_product, 10),
+        ("LP", sample_lifted_product, 10),
+        ("BP", sample_balanced_product, 5),
+    ]:
         count = sum(1 for _ in fn(n, seed=42))
         print(f"  {name}: {count} codes")

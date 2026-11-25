@@ -1,18 +1,16 @@
 """Tests for the SAT-based lower-bound screening helpers (PR #4311)."""
+
 import os
 import sys
 
 import numpy as np
-import pytest
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(_HERE, "kit"))
 
 from distance import sat_lower_bound, sat_screen, weight_one_logical_exists
 
-STEANE = np.array([[1, 0, 1, 0, 1, 0, 1],
-                   [0, 1, 1, 0, 0, 1, 1],
-                   [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+STEANE = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
 # A code with a qubit in no check on either side -> distance 1.
 D1_HX = np.array([[1, 0]], dtype=np.int8)
 D1_HZ = np.array([[0, 0]], dtype=np.int8)
@@ -41,8 +39,8 @@ def test_sat_lower_bound_proved_on_steane():
 
 
 def test_sat_lower_bound_timeout_is_not_refutation():
-    import numpy as np
-    from bb import build_bb, KNOWN
+    from bb import KNOWN, build_bb
+
     p = KNOWN["[[72,12,6]]"]
     HX, HZ = build_bb(p["l"], p["m"], p["A"], p["B"])
     r = sat_lower_bound(HX, HZ, min_d=6, tlim=0.001)

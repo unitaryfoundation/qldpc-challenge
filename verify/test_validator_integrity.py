@@ -10,8 +10,8 @@ import pytest
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 
-import check_validator_integrity as integrity
 import check_submission_scope as submission_scope
+import check_validator_integrity as integrity
 
 
 def _copy_closure(root):
@@ -22,8 +22,7 @@ def _copy_closure(root):
         shutil.copyfile(source, destination)
     manifest = os.path.join("verify", "validator_manifest.json")
     os.makedirs(os.path.join(root, "verify"), exist_ok=True)
-    shutil.copyfile(os.path.join(integrity._ROOT, manifest),
-                    os.path.join(root, manifest))
+    shutil.copyfile(os.path.join(integrity._ROOT, manifest), os.path.join(root, manifest))
 
 
 def test_manifest_matches_declared_execution_closure():
@@ -34,8 +33,7 @@ def test_manifest_matches_declared_execution_closure():
 
 
 def test_execution_closure_is_submission_critical():
-    assert all(submission_scope.is_critical(path)
-               for path in integrity.trusted_files())
+    assert all(submission_scope.is_critical(path) for path in integrity.trusted_files())
 
 
 @pytest.mark.parametrize("relative", integrity.trusted_files())

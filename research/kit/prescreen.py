@@ -52,6 +52,7 @@ already staged as a file:
 prints the preflight, the structure, and the board match and exits 1 when
 the gate would refuse the candidate on any of them.
 """
+
 import argparse
 import json
 import os
@@ -106,12 +107,14 @@ def block_structure(HX, HZ):
     """
     HX, HZ = _as_matrices(HX, HZ)
     n = int(HX.shape[1])
-    components = qldpc_verify._tanner_component_count(
-        {"X": _supports(HX), "Z": _supports(HZ)}, n)
+    components = qldpc_verify._tanner_component_count({"X": _supports(HX), "Z": _supports(HZ)}, n)
     blocks, sizes = qldpc_verify._stabilizer_block_count(HX, HZ, n)
-    return {"tanner_components": int(components), "blocks": int(blocks),
-            "block_sizes": [int(s) for s in sizes],
-            "connected": components == 1 and blocks == 1}
+    return {
+        "tanner_components": int(components),
+        "blocks": int(blocks),
+        "block_sizes": [int(s) for s in sizes],
+        "connected": components == 1 and blocks == 1,
+    }
 
 
 def describe_structure(structure):
@@ -120,15 +123,16 @@ def describe_structure(structure):
         return "one connected code"
     parts = []
     if structure["tanner_components"] != 1:
-        parts.append(f"Tanner graph has {structure['tanner_components']} "
-                     "connected component(s)")
+        parts.append(f"Tanner graph has {structure['tanner_components']} connected component(s)")
     if structure["blocks"] != 1:
         sizes = ", ".join(map(str, structure["block_sizes"][:6]))
         if structure["blocks"] > 6:
             sizes += ", ..."
-        parts.append(f"stabilizer group splits into {structure['blocks']} "
-                     f"independent block(s) on disjoint qubit sets "
-                     f"(sizes {sizes})")
+        parts.append(
+            f"stabilizer group splits into {structure['blocks']} "
+            f"independent block(s) on disjoint qubit sets "
+            f"(sizes {sizes})"
+        )
     return "; ".join(parts)
 
 
@@ -144,10 +148,8 @@ def identity(HX, HZ):
     # signature() hashes n, the recomputed k, the check-weight profile, and
     # the WL colors; it only copies "k" and "distance" into its return value,
     # so the placeholders below never reach the hash.
-    doc = {"code_type": "CSS", "n": n, "k": 0, "distance": {"d": 0},
-           "checks": {"X": _supports(HX), "Z": _supports(HZ)}}
-    return {"fingerprint": qldpc_verify.css_fingerprint(HX, HZ),
-            "signature": qldpc_verify.signature(doc)["hash"]}
+    doc = {"code_type": "CSS", "n": n, "k": 0, "distance": {"d": 0}, "checks": {"X": _supports(HX), "Z": _supports(HZ)}}
+    return {"fingerprint": qldpc_verify.css_fingerprint(HX, HZ), "signature": qldpc_verify.signature(doc)["hash"]}
 
 
 _CACHE = {}
@@ -170,9 +172,16 @@ def board_index(*, refresh=False):
         for b in validate_candidate._board_entries():
             fps = {b.get("fingerprint")} | set(b.get("css_fingerprints") or [])
             sigs = {b.get("sig")} | set(b.get("css_sigs") or [])
-            out.append({"name": b["name"], "n": b["n"], "k": b["k"],
-                        "d": b["d"], "fingerprints": fps - {None},
-                        "signatures": sigs - {None}})
+            out.append(
+                {
+                    "name": b["name"],
+                    "n": b["n"],
+                    "k": b["k"],
+                    "d": b["d"],
+                    "fingerprints": fps - {None},
+                    "signatures": sigs - {None},
+                }
+            )
         _CACHE["index"] = out
     return _CACHE["index"]
 
@@ -192,9 +201,7 @@ def lookup(ident, index=None):
         index = board_index()
     fp, sig = ident["fingerprint"], ident["signature"]
     exact = next((b["name"] for b in index if fp in b["fingerprints"]), None)
-    wl = next((b["name"] for b in index
-               if sig in b["signatures"] and fp not in b["fingerprints"]),
-              None)
+    wl = next((b["name"] for b in index if sig in b["signatures"] and fp not in b["fingerprints"]), None)
     return {"exact": exact, "wl": wl}
 
 
@@ -222,9 +229,14 @@ def prescreen(HX, HZ, *, index=None, board=True):
         reasons.append(f"duplicate: identical to board entry {match['exact']}")
     if match["wl"]:
         labels.append(f"possibly equivalent (same WL signature) to {match['wl']}")
-    return {"structure": structure, "identity": ident, "board": match,
-            "gate_would_refuse": bool(reasons), "reasons": reasons,
-            "labels": labels}
+    return {
+        "structure": structure,
+        "identity": ident,
+        "board": match,
+        "gate_would_refuse": bool(reasons),
+        "reasons": reasons,
+        "labels": labels,
+    }
 
 
 # -- the verifier's structural half on a packaged document (issue #3616) ----
@@ -237,24 +249,40 @@ def prescreen(HX, HZ, *, index=None, board=True):
 # cover the qubits, a benchmark or architecture block that contradicts the
 # entry.
 KINDS = {
-    "construction": ("tanner_connected", "stabilizer_group_connected",
-                     "css_commutation", "stabilizer_commutation",
-                     "k_at_least_1"),
+    "construction": (
+        "tanner_connected",
+        "stabilizer_group_connected",
+        "css_commutation",
+        "stabilizer_commutation",
+        "k_at_least_1",
+    ),
     "weight": ("check_weight_is_ldpc",),
-    "typing": ("stabilizer_code_is_not_css",
-               "stabilizer_code_is_not_locally_css"),
-    "layout": ("coordinates_cover_all_qubits", "coordinates_uniform_dimension",
-               "interaction_radius_within_claim", "site_occupancy_within_layers",
-               "site_spacing_at_least_one", "modules_cover_all_qubits"),
-    "benchmark": ("benchmark_candidate_data_qubits", "benchmark_qubit_totals",
-                  "benchmark_baseline_on_board", "benchmark_baseline_k",
-                  "benchmark_baseline_data_qubits"),
-    "architecture": ("architecture_gadget_fault_distance", "architecture_gadget_data_qubits",
-                     "architecture_qubit_totals", "architecture_partner_on_board",
-                     "architecture_magic_state_gain",
-                     "architecture_blocks_cover_logical_qubits",
-                     "architecture_physical_qubits_cover_blocks",
-                     "architecture_factory_footprint"),
+    "typing": ("stabilizer_code_is_not_css", "stabilizer_code_is_not_locally_css"),
+    "layout": (
+        "coordinates_cover_all_qubits",
+        "coordinates_uniform_dimension",
+        "interaction_radius_within_claim",
+        "site_occupancy_within_layers",
+        "site_spacing_at_least_one",
+        "modules_cover_all_qubits",
+    ),
+    "benchmark": (
+        "benchmark_candidate_data_qubits",
+        "benchmark_qubit_totals",
+        "benchmark_baseline_on_board",
+        "benchmark_baseline_k",
+        "benchmark_baseline_data_qubits",
+    ),
+    "architecture": (
+        "architecture_gadget_fault_distance",
+        "architecture_gadget_data_qubits",
+        "architecture_qubit_totals",
+        "architecture_partner_on_board",
+        "architecture_magic_state_gain",
+        "architecture_blocks_cover_logical_qubits",
+        "architecture_physical_qubits_cover_blocks",
+        "architecture_factory_footprint",
+    ),
     "other": ("verifier_ran",),
 }
 CODE_KINDS = frozenset({"construction", "weight"})
@@ -273,8 +301,8 @@ def kind_of(check, detail=""):
         if check in names:
             return kind
     if check == "schema_valid" and any(
-            part.startswith("checks/") and "is too long" in part
-            for part in detail.split("; ")):
+        part.startswith("checks/") and "is too long" in part for part in detail.split("; ")
+    ):
         return "weight"
     if check.startswith(("distance_", "d_matches_")):
         return "witness"
@@ -287,21 +315,23 @@ def kind_of(check, detail=""):
 # (MORE_SPECIFIC) or the family is the operand of a "quotient of".
 _NOT_BASE = r"(?![- ]base\b)"
 _FAMILY_RULES = [
-    ("pair-partition-cpm",
-     re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
-    ("bivariate-bicycle",
-     re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
-    ("generalized-bicycle",
-     re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
+    ("pair-partition-cpm", re.compile(r"pair[- ]partition|2607\.14091|2609\.30069", re.I)),
+    ("bivariate-bicycle", re.compile(r"\bbivariate[- ]bicycle\b" + _NOT_BASE, re.I)),
+    ("generalized-bicycle", re.compile(r"\bgenerali[sz]ed[- ]bicycle\b" + _NOT_BASE, re.I)),
 ]
 _FAMILY_MORE_SPECIFIC = {
     "pair-partition-cpm": {"lifted-product", "hypergraph-product", "other"},
-    "tile": {"bivariate-bicycle", "generalized-bicycle", "topological",
-             "other"},
+    "tile": {"bivariate-bicycle", "generalized-bicycle", "topological", "other"},
     "2bga-coset": {"generalized-bicycle", "other"},
-    "check-deletion": {"bivariate-bicycle", "generalized-bicycle",
-                       "pair-partition-cpm", "lifted-product",
-                       "hypergraph-product", "tile", "other"},
+    "check-deletion": {
+        "bivariate-bicycle",
+        "generalized-bicycle",
+        "pair-partition-cpm",
+        "lifted-product",
+        "hypergraph-product",
+        "tile",
+        "other",
+    },
 }
 
 
@@ -311,6 +341,7 @@ def _family_excused(tag, family):
 
 def _family_contradictions(doc):
     import re
+
     con = str((doc.get("provenance") or {}).get("construction") or "")
     tag = doc.get("family")
     if not con or not tag:
@@ -323,12 +354,15 @@ def _family_contradictions(doc):
         m = pat.search(opening)
         if not m:
             continue
-        if re.search(r"\bquotient of\b", opening[:m.start()], re.I):
+        if re.search(r"\bquotient of\b", opening[: m.start()], re.I):
             continue
-        out.append({"check": "family_tag_consistency",
-                    "detail": (f"construction names {family!r} (matched "
-                               f"{m.group(0)!r}) but family={tag!r}"),
-                    "kind": "packaging"})
+        out.append(
+            {
+                "check": "family_tag_consistency",
+                "detail": (f"construction names {family!r} (matched {m.group(0)!r}) but family={tag!r}"),
+                "kind": "packaging",
+            }
+        )
     return out
 
 
@@ -352,29 +386,34 @@ def preflight(doc):
     there, so this decides nothing the gate would not.
     """
     rep = qldpc_verify.verify(doc, refute=False)
-    failed = [{"check": c["check"], "detail": c.get("detail", ""),
-               "kind": kind_of(c["check"], c.get("detail", ""))}
-              for c in rep["checks"]
-              if not c["ok"] and c["check"] != "distance_not_refuted"]
+    failed = [
+        {"check": c["check"], "detail": c.get("detail", ""), "kind": kind_of(c["check"], c.get("detail", ""))}
+        for c in rep["checks"]
+        if not c["ok"] and c["check"] != "distance_not_refuted"
+    ]
     failed = failed + _family_contradictions(doc)
     kinds = sorted({f["kind"] for f in failed})
     comp = rep.get("computed") or {}
     keep = ("code_type", "n", "k", "max_check_weight", "weight_class")
-    return {"ok": not failed, "failed": failed, "kinds": kinds,
-            "code_at_fault": any(k in CODE_KINDS for k in kinds),
-            "computed": {k: comp[k] for k in keep if k in comp}}
+    return {
+        "ok": not failed,
+        "failed": failed,
+        "kinds": kinds,
+        "code_at_fault": any(k in CODE_KINDS for k in kinds),
+        "computed": {k: comp[k] for k in keep if k in comp},
+    }
 
 
 def describe_preflight(result):
     """One line per failed check, then what kind of fix there is."""
     if result["ok"]:
         return "the verifier's structural checks all pass"
-    lines = [f"{f['check']} ({f['kind']}): {f['detail']}"
-             for f in result["failed"]]
-    lines.append("the code is inadmissible; no edit to the document fixes it"
-                 if result["code_at_fault"] else
-                 "the document is wrong and the code may be fine; fix the "
-                 "document and save it again")
+    lines = [f"{f['check']} ({f['kind']}): {f['detail']}" for f in result["failed"]]
+    lines.append(
+        "the code is inadmissible; no edit to the document fixes it"
+        if result["code_at_fault"]
+        else "the document is wrong and the code may be fine; fix the document and save it again"
+    )
     return "\n".join(lines)
 
 
@@ -393,29 +432,28 @@ def load_matrices(path):
                 if key in z.files:
                     return z[key]
             raise KeyError(f"{path}: no array under any of {keys}")
+
         return pick(("hx", "HX", "H_X", "Hx")), pick(("hz", "HZ", "H_Z", "Hz"))
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
     if qldpc_verify.is_stabilizer(doc):
-        raise ValueError(f"{path}: a stabilizer candidate; this pre-check "
-                         "reads CSS candidates only, the gate handles the rest")
+        raise ValueError(
+            f"{path}: a stabilizer candidate; this pre-check reads CSS candidates only, the gate handles the rest"
+        )
     n = int(doc["n"])
-    return (qldpc_verify._matrix(doc["checks"]["X"], n),
-            qldpc_verify._matrix(doc["checks"]["Z"], n))
+    return (qldpc_verify._matrix(doc["checks"]["X"], n), qldpc_verify._matrix(doc["checks"]["Z"], n))
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description="Decide, before the gate, whether a candidate is one "
-                    "connected code, whether the board already holds it, "
-                    "and (for a .json document) whether the gate's verify "
-                    "step would refuse it.")
-    ap.add_argument("path", nargs="?",
-                    help="candidate .json or .npz; with none, run the demo")
-    ap.add_argument("--no-board", action="store_true",
-                    help="structural check only, no board scan")
-    ap.add_argument("--json", action="store_true",
-                    help="print the verdict as JSON")
+        "connected code, whether the board already holds it, "
+        "and (for a .json document) whether the gate's verify "
+        "step would refuse it."
+    )
+    ap.add_argument("path", nargs="?", help="candidate .json or .npz; with none, run the demo")
+    ap.add_argument("--no-board", action="store_true", help="structural check only, no board scan")
+    ap.add_argument("--json", action="store_true", help="print the verdict as JSON")
     args = ap.parse_args(argv)
     if args.path is None:
         return _demo()
@@ -428,8 +466,7 @@ def main(argv=None):
             # the structure and board checks here read CSS matrices; the
             # gate's own dedup covers a stabilizer candidate
             if args.json:
-                print(json.dumps({"preflight": pre,
-                                  "gate_would_refuse": not pre["ok"]}, indent=1))
+                print(json.dumps({"preflight": pre, "gate_would_refuse": not pre["ok"]}, indent=1))
             else:
                 print(f"{args.path}: a stabilizer candidate; preflight only")
                 for line in describe_preflight(pre).split("\n"):
@@ -453,32 +490,34 @@ def main(argv=None):
             if match["exact"]:
                 print(f"  board: identical to {match['exact']}")
             elif match["wl"]:
-                print(f"  board: same WL signature as {match['wl']} (a probable "
-                      "permutation; the gate admits it with a label you must "
-                      "resolve in provenance.notes)")
+                print(
+                    f"  board: same WL signature as {match['wl']} (a probable "
+                    "permutation; the gate admits it with a label you must "
+                    "resolve in provenance.notes)"
+                )
             else:
                 print("  board: no entry shares this fingerprint or WL signature")
         for reason in verdict["reasons"]:
             print(f"  REFUSE  {reason}")
-        print("  the gate would refuse this candidate"
-              if verdict["gate_would_refuse"] else
-              "  worth gating; the distance is the gate's to decide")
+        print(
+            "  the gate would refuse this candidate"
+            if verdict["gate_would_refuse"]
+            else "  worth gating; the distance is the gate's to decide"
+        )
     return 1 if verdict["gate_would_refuse"] else 0
 
 
 def _demo():
     """Steane's [[7,1,3]] is on the board; two copies of it are a direct sum."""
-    H = np.array([[1, 0, 1, 0, 1, 0, 1],
-                  [0, 1, 1, 0, 0, 1, 1],
-                  [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
+    H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
     H2 = direct_sum(H, H)
-    for label, HX, HZ in (("Steane [[7,1,3]]", H, H),
-                          ("Steane plus Steane", H2, H2)):
+    for label, HX, HZ in (("Steane [[7,1,3]]", H, H), ("Steane plus Steane", H2, H2)):
         v = prescreen(HX, HZ)
-        print(f"{label}: {describe_structure(v['structure'])}; board exact="
-              f"{v['board']['exact']} wl={v['board']['wl']}; "
-              + ("the gate would refuse" if v["gate_would_refuse"]
-                 else "worth gating"))
+        print(
+            f"{label}: {describe_structure(v['structure'])}; board exact="
+            f"{v['board']['exact']} wl={v['board']['wl']}; "
+            + ("the gate would refuse" if v["gate_would_refuse"] else "worth gating")
+        )
     return 0
 
 

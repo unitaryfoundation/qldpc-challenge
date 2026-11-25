@@ -65,6 +65,7 @@ Usage::
 Nothing here touches ``verify/`` or changes a verdict: a candidate this
 script emits is filed through the gate like every other correction.
 """
+
 import argparse
 import base64
 import copy
@@ -137,8 +138,18 @@ def fetch_open_pr_codes(out_dir, *, limit=200, gh=_gh_json):
     reported and skipped; the harvest never fails on a PR it cannot see.
     """
     try:
-        prs = gh(["pr", "list", "--state", "open", "--limit", str(limit),
-                  "--json", "number,headRefName,headRepository,headRepositoryOwner,files"])
+        prs = gh(
+            [
+                "pr",
+                "list",
+                "--state",
+                "open",
+                "--limit",
+                str(limit),
+                "--json",
+                "number,headRefName,headRepository,headRepositoryOwner,files",
+            ]
+        )
     except (subprocess.CalledProcessError, OSError, json.JSONDecodeError) as e:
         print(f"open PRs: could not list them ({e}); none harvested", flush=True)
         return []
@@ -154,8 +165,9 @@ def fetch_open_pr_codes(out_dir, *, limit=200, gh=_gh_json):
             if not (path.startswith("codes/") and path.endswith(".json")):
                 continue
             try:
-                res = gh(["api", "--method", "GET", f"repos/{owner}/{repo}/contents/{path}",
-                          "--field", f"ref={branch}"])
+                res = gh(
+                    ["api", "--method", "GET", f"repos/{owner}/{repo}/contents/{path}", "--field", f"ref={branch}"]
+                )
                 doc = json.loads(base64.b64decode(res.get("content", ""), validate=False).decode("utf-8"))
             except Exception as e:  # noqa: BLE001 - one unreadable file must not end the harvest
                 print(f"open PR #{number}: could not read {path} ({str(e)[:80]}); skipped", flush=True)
@@ -235,8 +247,13 @@ def search_entry(doc, *, trials, seeds, threads=8, pair_depth=10, side_trials=0,
             log(f"    seed={seed}: lightest {side} logical {weight} [{dt:.0f}s]")
             joint = min(joint, int(weight))
             if side in claims and int(weight) < claims[side] and int(weight) < best.get(side, {}).get("weight", n + 1):
-                best[side] = {"weight": int(weight), "support": sorted(int(q) for q in support),
-                              "seed": int(seed), "trials_at": int(trials) * (i + 1), "backend": backend_name()}
+                best[side] = {
+                    "weight": int(weight),
+                    "support": sorted(int(q) for q in support),
+                    "seed": int(seed),
+                    "trials_at": int(trials) * (i + 1),
+                    "backend": backend_name(),
+                }
         else:
             log(f"    seed={seed}: no logical found [{dt:.0f}s]")
     if side_trials and seeds:
@@ -244,8 +261,9 @@ def search_entry(doc, *, trials, seeds, threads=8, pair_depth=10, side_trials=0,
             if side in best or side not in claims:
                 continue
             t1 = time.time()
-            weight, support = surrogate.lightest_logical(hself, hopp, int(side_trials), int(seeds[0]),
-                                                         pair_depth=pair_depth)
+            weight, support = surrogate.lightest_logical(
+                hself, hopp, int(side_trials), int(seeds[0]), pair_depth=pair_depth
+            )
             if not support or weight > n:
                 log(f"    {side} side, {side_trials} NumPy trials: no logical found [{time.time() - t1:.0f}s]")
                 continue
@@ -256,8 +274,13 @@ def search_entry(doc, *, trials, seeds, threads=8, pair_depth=10, side_trials=0,
             log(f"    {side} side, {side_trials} NumPy trials: lightest {weight} [{time.time() - t1:.0f}s]")
             joint = min(joint, int(weight))
             if int(weight) < claims[side]:
-                best[side] = {"weight": int(weight), "support": sorted(int(q) for q in support),
-                              "seed": int(seeds[0]), "trials_at": int(side_trials), "backend": "numpy per side"}
+                best[side] = {
+                    "weight": int(weight),
+                    "support": sorted(int(q) for q in support),
+                    "seed": int(seeds[0]),
+                    "trials_at": int(side_trials),
+                    "backend": "numpy per side",
+                }
     return {"best": best, "joint": joint, "seconds": time.time() - t0}
 
 
@@ -268,10 +291,12 @@ def verdict(joint, d_claim):
 # --- the revision document ---------------------------------------------------
 def rename_params(name, n, k, d_new):
     """Rewrite the first ``[[n,k,d]]`` of ``name`` to the new d; a name without one is returned as is."""
+
     def sub(m):
         if int(m.group(1)) == int(n) and int(m.group(2)) == int(k):
             return f"[[{n},{k},{d_new}]]"
         return m.group(0)
+
     return PARAMS.sub(sub, name or "", count=1)
 
 
@@ -303,9 +328,11 @@ def revise_doc(doc, best, *, handle, date, trials, pair_depth, backend):
                 "seeds": [int(b["seed"])],
             },
         }
-        parts.append(f"{side} side {old} -> {b['weight']} (random information-set search, "
-                     f"research/revision_harvest.py, backend {side_backend}, pair depth {pair_depth}, "
-                     f"{b['trials_at']:,} trials, seed {b['seed']})")
+        parts.append(
+            f"{side} side {old} -> {b['weight']} (random information-set search, "
+            f"research/revision_harvest.py, backend {side_backend}, pair depth {pair_depth}, "
+            f"{b['trials_at']:,} trials, seed {b['seed']})"
+        )
     sides = [int(new["distance"][s]["value"]) for s in ("X", "Z") if s in new["distance"]]
     new["distance"]["d"] = min(sides)
     new["name"] = rename_params(new.get("name"), n, k, new["distance"]["d"])
@@ -314,8 +341,9 @@ def revise_doc(doc, best, *, handle, date, trials, pair_depth, backend):
     prov = new.setdefault("provenance", {})
     old_notes = prov.get("notes", "") or ""
     sentence = f"Distance revision {date} (witnesses by @{handle.lstrip('@')}): " + "; ".join(parts) + "."
-    prov["notes"] = (old_notes + (" " if old_notes and not old_notes.endswith(" ") else "") + sentence
-                     if old_notes else sentence)
+    prov["notes"] = (
+        old_notes + (" " if old_notes and not old_notes.endswith(" ") else "") + sentence if old_notes else sentence
+    )
     return new
 
 
@@ -324,9 +352,17 @@ def slug_of(path):
 
 
 def revision_slug(codes_dir, old_slug, n, k, d_new):
-    """Return the revised entry's slug: ``<n>-<k>-<d_new>`` with the old suffix, else the next free letter."""
+    """Return the revised entry's slug.
+
+    A tightening that leaves d where it was keeps the slug: the slug encodes
+    d, and a side-only correction is an edit of the entry in place. When d
+    comes down the entry moves to ``<n>-<k>-<d_new>`` with its old suffix, or
+    the next free letter when that is taken.
+    """
     m = SLUG.match(old_slug)
     suffix = m.group(4) if m else ""
+    if m and int(m.group(3)) == int(d_new) and int(m.group(1)) == int(n) and int(m.group(2)) == int(k):
+        return old_slug
     candidates = [f"{n}-{k}-{d_new}{suffix}"] + [f"{n}-{k}-{d_new}-{c}" for c in SUFFIXES]
     for cand in candidates:
         if cand == old_slug:
@@ -349,66 +385,87 @@ def pr_text(old_slug, new_slug, old_doc, new_doc, best, *, backend, pair_depth, 
     """Return the PR title, body, and note header for a revision, in the shape of the merged corrections."""
     n, k = int(old_doc["n"]), int(old_doc["k"])
     d_old, d_new = int(old_doc["distance"]["d"]), int(new_doc["distance"]["d"])
-    sides_text = ", ".join(f"{s} side {int(old_doc['distance'][s]['value'])} -> {best[s]['weight']}"
-                           for s in ("X", "Z") if s in best)
+    sides_text = ", ".join(
+        f"{s} side {int(old_doc['distance'][s]['value'])} -> {best[s]['weight']}" for s in ("X", "Z") if s in best
+    )
     if d_new < d_old:
         change = f"[[{n},{k},{d_old}]] -> [[{n},{k},{d_new}]]"
         title = f"Distance revision: {change}"
         headline = f"{change}; kd^2/n {_eff(n, k, d_old):.2f} -> {_eff(n, k, d_new):.2f}."
-        supersedes = (f"[[{n},{k},{d_new}]] supersedes the board's [[{n},{k},{d_old}]] entry. The code, its checks, "
-                      f"and its original provenance are unchanged; only the distance claim is corrected. The headline "
-                      f"kd^2/n falls from {_eff(n, k, d_old):.2f} to {_eff(n, k, d_new):.2f}.")
+        supersedes = (
+            f"[[{n},{k},{d_new}]] supersedes the board's [[{n},{k},{d_old}]] entry. The code, its checks, "
+            f"and its original provenance are unchanged; only the distance claim is corrected. The headline "
+            f"kd^2/n falls from {_eff(n, k, d_old):.2f} to {_eff(n, k, d_new):.2f}."
+        )
     else:
         change = f"[[{n},{k},{d_old}]], {sides_text}"
         title = f"Distance revision: {change}"
-        headline = (f"d stays {d_old} ({sides_text}); kd^2/n unchanged at {_eff(n, k, d_old):.2f}, the looser side's "
-                    "claim is corrected.")
-        supersedes = (f"The entry keeps d = {d_old}; {sides_text}. The code, its checks, and its original provenance "
-                      "are unchanged; only the looser side's claim is corrected.")
+        headline = (
+            f"d stays {d_old} ({sides_text}); kd^2/n unchanged at {_eff(n, k, d_old):.2f}, the looser side's "
+            "claim is corrected."
+        )
+        supersedes = (
+            f"The entry keeps d = {d_old}; {sides_text}. The code, its checks, and its original provenance "
+            "are unchanged; only the looser side's claim is corrected."
+        )
     lines = []
     for side in ("X", "Z"):
         if side in best:
             b = best[side]
-            lines.append(f"- {side} side {int(old_doc['distance'][side]['value'])} -> {b['weight']}: random "
-                         f"information-set search (`research/revision_harvest.py`, backend "
-                         f"{b.get('backend', backend)}, pair depth {pair_depth}), {b['trials_at']:,} trials, "
-                         f"seed {b['seed']}.")
-    where = (f"the entry `codes/{old_slug}.json` carried by PR #{pr}" if pr
-             else f"the existing entry `codes/{new_slug}.json` (filed as `{old_slug}` before this correction)")
-    body = "\n".join([
-        f"Correction to {where}, by the route in CONTRIBUTING.md (\"Correcting a distance already on the "
-        "board\"): matrices untouched, the tightened side(s) lowered with the witness stored under "
-        "`witness_provenance`, name and note heading updated, one sentence appended to `provenance.notes`. "
-        "No survival stamp, so the gate prices this as a tightening.",
-        "",
-        *lines,
-        "",
-        headline,
-        "",
-        "Each witness was validated against the entry's check matrices when it was found (zero syndrome "
-        "against the opposite side's checks, outside the row space of its own side by rank over GF(2)). "
-        + ("" if pr else f"The previous note is kept in full under the revision record in `notes/{new_slug}.md`. ")
-        + "The distance remains a witness-backed upper bound.",
-        "",
-    ])
-    header = "\n".join([
-        f"# [[{n},{k},{d_new}]]: distance revision"
-        + (f" of [[{n},{k},{d_old}]]" if d_new < d_old else f", {sides_text}"),
-        f"## Revision {new_doc['distance'][next(iter(best))]['witness_provenance']['date']}: {change}",
-        supersedes,
-        *lines,
-        "",
-        "| side | claimed | lightest logical found | trials | seed |",
-        "|---|---|---|---|---|",
-        *[f"| {s} | {int(old_doc['distance'][s]['value'])} | {best[s]['weight']} | {best[s]['trials_at']:,} | "
-          f"{best[s]['seed']} |" for s in ("X", "Z") if s in best],
-        "",
-        f"Each witness was validated against the check matrices of `codes/{new_slug}.json` when it was found: "
-        "zero syndrome against the opposite side's checks, and outside the row space of its own side by rank "
-        "over GF(2). A side that did not come down keeps its original witness. The distance remains a "
-        "witness-backed upper bound, not an exact claim.",
-        "",
-    ])
+            lines.append(
+                f"- {side} side {int(old_doc['distance'][side]['value'])} -> {b['weight']}: random "
+                f"information-set search (`research/revision_harvest.py`, backend "
+                f"{b.get('backend', backend)}, pair depth {pair_depth}), {b['trials_at']:,} trials, "
+                f"seed {b['seed']}."
+            )
+    where = (
+        f"the entry `codes/{old_slug}.json` carried by PR #{pr}"
+        if pr
+        else f"the existing entry `codes/{new_slug}.json`"
+        + ("" if new_slug == old_slug else f" (filed as `{old_slug}` before this correction)")
+    )
+    body = "\n".join(
+        [
+            f'Correction to {where}, by the route in CONTRIBUTING.md ("Correcting a distance already on the '
+            'board"): matrices untouched, the tightened side(s) lowered with the witness stored under '
+            "`witness_provenance`, name and note heading updated, one sentence appended to `provenance.notes`. "
+            "No survival stamp, so the gate prices this as a tightening.",
+            "",
+            *lines,
+            "",
+            headline,
+            "",
+            "Each witness was validated against the entry's check matrices when it was found (zero syndrome "
+            "against the opposite side's checks, outside the row space of its own side by rank over GF(2)). "
+            + ("" if pr else f"The previous note is kept in full under the revision record in `notes/{new_slug}.md`. ")
+            + "The distance remains a witness-backed upper bound.",
+            "",
+        ]
+    )
+    header = "\n".join(
+        [
+            f"# [[{n},{k},{d_new}]]: distance revision"
+            + (f" of [[{n},{k},{d_old}]]" if d_new < d_old else f", {sides_text}"),
+            f"## Revision {new_doc['distance'][next(iter(best))]['witness_provenance']['date']}: {change}",
+            supersedes,
+            *lines,
+            "",
+            "| side | claimed | lightest logical found | trials | seed |",
+            "|---|---|---|---|---|",
+            *[
+                f"| {s} | {int(old_doc['distance'][s]['value'])} | {best[s]['weight']} | {best[s]['trials_at']:,} | "
+                f"{best[s]['seed']} |"
+                for s in ("X", "Z")
+                if s in best
+            ],
+            "",
+            f"Each witness was validated against the check matrices of `codes/{new_slug}.json` when it was found: "
+            "zero syndrome against the opposite side's checks, and outside the row space of its own side by rank "
+            "over GF(2). A side that did not come down keeps its original witness. The distance remains a "
+            "witness-backed upper bound, not an exact claim.",
+            "",
+        ]
+    )
     return title, body, header
 
 
@@ -425,14 +482,16 @@ def apply_revision(checkout, old_slug, new_slug, new_doc, header):
     """
     codes_dir, notes_dir = os.path.join(checkout, "codes"), os.path.join(checkout, "notes")
     old_code, new_code = os.path.join(codes_dir, old_slug + ".json"), os.path.join(codes_dir, new_slug + ".json")
+    in_place = new_slug == old_slug
     if not os.path.exists(old_code):
         raise FileNotFoundError(f"{old_code} is not in the checkout; a revision applies to a board entry")
-    if os.path.exists(new_code):
+    if not in_place and os.path.exists(new_code):
         raise FileExistsError(f"{new_code} already exists")
     written = []
     with open(new_code, "w", encoding="utf-8") as fh:
         fh.write(canonical(new_doc))
-    os.remove(old_code)
+    if not in_place:
+        os.remove(old_code)
     written.append(new_code)
     old_note, new_note = os.path.join(notes_dir, old_slug + ".md"), os.path.join(notes_dir, new_slug + ".md")
     if os.path.exists(old_note):
@@ -442,7 +501,7 @@ def apply_revision(checkout, old_slug, new_slug, new_doc, header):
         if old_text.startswith("---\n"):
             end = old_text.find("\n---\n", 4)
             if end != -1:
-                front, body = old_text[:end + 5], old_text[end + 5:]
+                front, body = old_text[: end + 5], old_text[end + 5 :]
         body = body.replace(f"codes/{old_slug}.json", f"codes/{new_slug}.json")
         body = body.replace(f"notes/{old_slug}.md", f"notes/{new_slug}.md")
         text = front + header + "## Original note, with the file paths updated\n" + body.lstrip("\n")
@@ -451,11 +510,15 @@ def apply_revision(checkout, old_slug, new_slug, new_doc, header):
         os.makedirs(notes_dir, exist_ok=True)
         with open(new_note, "w", encoding="utf-8") as fh:
             fh.write(text)
-        os.remove(old_note)
+        if not in_place:
+            os.remove(old_note)
         written.append(new_note)
         if len(text.encode("utf-8")) > 10240:
-            print(f"  note {new_note} is {len(text.encode('utf-8'))} bytes; the site truncates a note over "
-                  "10240 bytes on render, so trim the original narrative or move it to a fieldnote", flush=True)
+            print(
+                f"  note {new_note} is {len(text.encode('utf-8'))} bytes; the site truncates a note over "
+                "10240 bytes on render, so trim the original narrative or move it to a fieldnote",
+                flush=True,
+            )
     return written
 
 
@@ -492,11 +555,32 @@ def _append(path, row):
 
 
 # --- one entry ---------------------------------------------------------------------------
-def harvest_one(path, *, out_dir, handle, date, seeds, scale, min_trials, max_trials, threads, pair_depth,
-                codes_dir, pr=None, apply_to=None, side_trials=0, log=print):
+def harvest_one(
+    path,
+    *,
+    out_dir,
+    handle,
+    date,
+    seeds,
+    scale,
+    min_trials,
+    max_trials,
+    threads,
+    pair_depth,
+    codes_dir,
+    pr=None,
+    apply_to=None,
+    side_trials=0,
+    log=print,
+):
     """Harvest one file. Returns its ``harvest.jsonl`` row."""
-    row = {"schema": SCHEMA, "path": os.path.relpath(path, _ROOT) if path.startswith(_ROOT) else path,
-           "pr": pr, "slug": slug_of(path), "date": date}
+    row = {
+        "schema": SCHEMA,
+        "path": os.path.relpath(path, _ROOT) if path.startswith(_ROOT) else path,
+        "pr": pr,
+        "slug": slug_of(path),
+        "date": date,
+    }
     try:
         with open(path, encoding="utf-8") as fh:
             doc = json.load(fh)
@@ -513,32 +597,47 @@ def harvest_one(path, *, out_dir, handle, date, seeds, scale, min_trials, max_tr
     n, k, d_claim = int(doc["n"]), int(doc["k"]), int(doc["distance"]["d"])
     trials = ladder_trials(d_claim, scale=scale, min_trials=min_trials, max_trials=max_trials)
     backend = backend_name()
-    row.update(n=n, k=k, claim=d_claim, claims=claims, trials=trials, seeds=list(seeds), pair_depth=pair_depth,
-               backend=backend, key=state_key(doc))
-    log(f"{row['slug']}: [[{n},{k},{d_claim}]] X {claims['X']} Z {claims['Z']}, {trials:,} trials x "
-        f"{len(seeds)} seeds ({backend}, pair depth {pair_depth})")
+    row.update(
+        n=n,
+        k=k,
+        claim=d_claim,
+        claims=claims,
+        trials=trials,
+        seeds=list(seeds),
+        pair_depth=pair_depth,
+        backend=backend,
+        key=state_key(doc),
+    )
+    log(
+        f"{row['slug']}: [[{n},{k},{d_claim}]] X {claims['X']} Z {claims['Z']}, {trials:,} trials x "
+        f"{len(seeds)} seeds ({backend}, pair depth {pair_depth})"
+    )
     try:
-        found = search_entry(doc, trials=trials, seeds=seeds, threads=threads, pair_depth=pair_depth,
-                             side_trials=side_trials, log=log)
+        found = search_entry(
+            doc, trials=trials, seeds=seeds, threads=threads, pair_depth=pair_depth, side_trials=side_trials, log=log
+        )
     except Exception as e:  # noqa: BLE001 - a search that errors is reported, never read as all clear
         row.update(verdict="error", error=f"search failed: {e}")
         return row
     best = found["best"]
     kept = [claims[s] for s in claims if s not in best]
     d_after = min([b["weight"] for b in best.values()] + kept) if best else d_claim
-    row.update(seconds=round(found["seconds"], 1), joint=found["joint"] if found["joint"] <= n else None,
-               verdict=(verdict(found["joint"], d_claim) if not best
-                        else ("refuted" if d_after < d_claim else "tightened")),
-               sides={s: {"claim": claims[s], "found": b["weight"], "seed": b["seed"], "trials_at": b["trials_at"]}
-                      for s, b in best.items()})
+    row.update(
+        seconds=round(found["seconds"], 1),
+        joint=found["joint"] if found["joint"] <= n else None,
+        verdict=(verdict(found["joint"], d_claim) if not best else ("refuted" if d_after < d_claim else "tightened")),
+        sides={
+            s: {"claim": claims[s], "found": b["weight"], "seed": b["seed"], "trials_at": b["trials_at"]}
+            for s, b in best.items()
+        },
+    )
     if not best:
         log(f"  {row['verdict']}: nothing lighter than the claim (lightest seen {row['joint']})")
         return row
     new_doc = revise_doc(doc, best, handle=handle, date=date, trials=trials, pair_depth=pair_depth, backend=backend)
     old_slug = slug_of(path)
     new_slug = revision_slug(codes_dir, old_slug, n, k, new_doc["distance"]["d"])
-    title, body, header = pr_text(old_slug, new_slug, doc, new_doc, best, backend=backend, pair_depth=pair_depth,
-                                  pr=pr)
+    title, body, header = pr_text(old_slug, new_slug, doc, new_doc, best, backend=backend, pair_depth=pair_depth, pr=pr)
     rev_dir = os.path.join(out_dir, "revisions")
     os.makedirs(rev_dir, exist_ok=True)
     stem = os.path.join(rev_dir, new_slug if pr is None else f"pr-{pr}-{new_slug}")
@@ -546,10 +645,26 @@ def harvest_one(path, *, out_dir, handle, date, seeds, scale, min_trials, max_tr
         fh.write(canonical(new_doc))
     with open(stem + ".body.md", "w", encoding="utf-8") as fh:
         fh.write(body)
-    record = {"schema": SCHEMA, "source": row["path"], "pr": pr, "old_slug": old_slug, "new_slug": new_slug,
-              "n": n, "k": k, "d_old": d_claim, "d_new": new_doc["distance"]["d"], "sides": row["sides"],
-              "trials": trials, "seeds": list(seeds), "pair_depth": pair_depth, "backend": backend,
-              "title": title, "note_header": header, "candidate": stem + ".json", "body": stem + ".body.md"}
+    record = {
+        "schema": SCHEMA,
+        "source": row["path"],
+        "pr": pr,
+        "old_slug": old_slug,
+        "new_slug": new_slug,
+        "n": n,
+        "k": k,
+        "d_old": d_claim,
+        "d_new": new_doc["distance"]["d"],
+        "sides": row["sides"],
+        "trials": trials,
+        "seeds": list(seeds),
+        "pair_depth": pair_depth,
+        "backend": backend,
+        "title": title,
+        "note_header": header,
+        "candidate": stem + ".json",
+        "body": stem + ".body.md",
+    }
     with open(stem + ".revision.json", "w", encoding="utf-8") as fh:
         json.dump(record, fh, indent=1, sort_keys=True)
         fh.write("\n")
@@ -571,31 +686,56 @@ def harvest_one(path, *, out_dir, handle, date, seeds, scale, min_trials, max_tr
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("paths", nargs="*", help="entry files or globs (codes/*.json, staged candidates)")
-    ap.add_argument("--list", action="append", default=[], metavar="FILE",
-                    help="a file with one entry path per line (# comments allowed)")
-    ap.add_argument("--from-note", action="append", default=[], metavar="FILE",
-                    help="harvest the codes/ entries a note or fieldnote names ([[n,k,d]] or codes/ paths)")
+    ap.add_argument(
+        "--list",
+        action="append",
+        default=[],
+        metavar="FILE",
+        help="a file with one entry path per line (# comments allowed)",
+    )
+    ap.add_argument(
+        "--from-note",
+        action="append",
+        default=[],
+        metavar="FILE",
+        help="harvest the codes/ entries a note or fieldnote names ([[n,k,d]] or codes/ paths)",
+    )
     ap.add_argument("--open-prs", action="store_true", help="also harvest the codes/ files of open PRs (via gh)")
     ap.add_argument("--open-pr-limit", type=int, default=200)
-    ap.add_argument("--handle", default=os.environ.get("QLDPC_HANDLE"),
-                    help="your GitHub handle, written to witness_provenance.found_by (or $QLDPC_HANDLE)")
+    ap.add_argument(
+        "--handle",
+        default=os.environ.get("QLDPC_HANDLE"),
+        help="your GitHub handle, written to witness_provenance.found_by (or $QLDPC_HANDLE)",
+    )
     ap.add_argument("--out", default=None, help="output directory (default: research/candidates/<run>/harvest)")
     ap.add_argument("--seeds", type=int, nargs="+", default=None, help="RIS seeds (default: two fresh random ones)")
     ap.add_argument("--trials-scale", type=float, default=1.0, help="multiply the ladder budget")
     ap.add_argument("--min-trials", type=int, default=1)
     ap.add_argument("--max-trials", type=int, default=None)
     ap.add_argument("--threads", type=int, default=min(8, os.cpu_count() or 1))
-    ap.add_argument("--pair-depth", type=int, default=10,
-                    help="pair depth of the search; match the depth the claim's own ladder used")
-    ap.add_argument("--side-trials", type=int, default=0,
-                    help="NumPy trials per side the joint search did not report (slow at large n; default off)")
+    ap.add_argument(
+        "--pair-depth",
+        type=int,
+        default=10,
+        help="pair depth of the search; match the depth the claim's own ladder used",
+    )
+    ap.add_argument(
+        "--side-trials",
+        type=int,
+        default=0,
+        help="NumPy trials per side the joint search did not report (slow at large n; default off)",
+    )
     ap.add_argument("--order", choices=("n-desc", "n-asc"), default="n-desc")
     ap.add_argument("--shard", default=None, help="I/K: every K-th entry of the order starting at I")
     ap.add_argument("--max-minutes", type=float, default=None, help="open no new entry after this wall clock")
     ap.add_argument("--state", default=None, help="JSON ledger of budgets spent per entry, kept across runs")
     ap.add_argument("--rerun", action="store_true", help="ignore --state and open every entry")
-    ap.add_argument("--apply", default=None, metavar="CHECKOUT",
-                    help="perform the filing steps in this checkout for board entries that came down")
+    ap.add_argument(
+        "--apply",
+        default=None,
+        metavar="CHECKOUT",
+        help="perform the filing steps in this checkout for board entries that came down",
+    )
     ap.add_argument("--codes-dir", default=os.path.join(_ROOT, "codes"), help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
 
@@ -603,6 +743,7 @@ def main(argv=None):
         ap.error("--handle (or $QLDPC_HANDLE) is required: it is written to witness_provenance.found_by")
     if args.out is None:
         from coordination import staging_dir
+
         args.out = os.path.join(staging_dir(), "harvest")
     os.makedirs(args.out, exist_ok=True)
     date = datetime.date.today().isoformat()
@@ -648,31 +789,59 @@ def main(argv=None):
             with open(path, encoding="utf-8") as fh:
                 doc = json.load(fh)
             key = state_key(doc)
-            planned = ladder_trials(int(doc["distance"]["d"]), scale=args.trials_scale,
-                                    min_trials=args.min_trials, max_trials=args.max_trials)
+            planned = ladder_trials(
+                int(doc["distance"]["d"]),
+                scale=args.trials_scale,
+                min_trials=args.min_trials,
+                max_trials=args.max_trials,
+            )
         except Exception:  # noqa: BLE001 - harvest_one reports the unreadable file
             key, planned = None, None
         prior = state.get(key) if key else None
         spent = int(prior.get("trials", 0)) * len(prior.get("seeds", [])) if prior else 0
         if prior and not args.rerun and spent >= planned * len(seeds):
-            print(f"{slug_of(path)}: skipped, {prior['trials']:,} trials x {len(prior.get('seeds', []))} seeds "
-                  f"already spent on {prior.get('date')} ({prior.get('verdict')})", flush=True)
+            print(
+                f"{slug_of(path)}: skipped, {prior['trials']:,} trials x {len(prior.get('seeds', []))} seeds "
+                f"already spent on {prior.get('date')} ({prior.get('verdict')})",
+                flush=True,
+            )
             continue
-        row = harvest_one(path, out_dir=args.out, handle=args.handle, date=date, seeds=seeds,
-                          scale=args.trials_scale, min_trials=args.min_trials, max_trials=args.max_trials,
-                          threads=args.threads, pair_depth=args.pair_depth, codes_dir=args.codes_dir,
-                          pr=pr_of.get(path), apply_to=args.apply, side_trials=args.side_trials)
+        row = harvest_one(
+            path,
+            out_dir=args.out,
+            handle=args.handle,
+            date=date,
+            seeds=seeds,
+            scale=args.trials_scale,
+            min_trials=args.min_trials,
+            max_trials=args.max_trials,
+            threads=args.threads,
+            pair_depth=args.pair_depth,
+            codes_dir=args.codes_dir,
+            pr=pr_of.get(path),
+            apply_to=args.apply,
+            side_trials=args.side_trials,
+        )
         _append(ledger, row)
         counts[row["verdict"]] = counts.get(row["verdict"], 0) + 1
         if row.get("revision"):
             revisions.append(row["revision"])
         if row.get("key") and row["verdict"] in VERDICTS:
-            state[row["key"]] = {"slug": row["slug"], "trials": row["trials"], "seeds": row["seeds"],
-                                 "verdict": row["verdict"], "date": date, "pair_depth": row["pair_depth"]}
+            state[row["key"]] = {
+                "slug": row["slug"],
+                "trials": row["trials"],
+                "seeds": row["seeds"],
+                "verdict": row["verdict"],
+                "date": date,
+                "pair_depth": row["pair_depth"],
+            }
             save_state(args.state, state)
-    print(f"harvest: {counts['refuted']} refuted, {counts['tightened']} tightened on one side, {counts['holds']} "
-          f"hold, {counts['inconclusive']} inconclusive, {counts['skipped']} skipped, {counts['error']} errors, "
-          f"{counts['unopened']} unopened; ledger {ledger}", flush=True)
+    print(
+        f"harvest: {counts['refuted']} refuted, {counts['tightened']} tightened on one side, {counts['holds']} "
+        f"hold, {counts['inconclusive']} inconclusive, {counts['skipped']} skipped, {counts['error']} errors, "
+        f"{counts['unopened']} unopened; ledger {ledger}",
+        flush=True,
+    )
     for r in revisions:
         print(f"  revision candidate: {r}", flush=True)
     return 1 if counts["error"] else 0

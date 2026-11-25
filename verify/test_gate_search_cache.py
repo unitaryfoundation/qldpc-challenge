@@ -9,6 +9,7 @@ discarded rather than believed. That is the whole reason a cache written by
 the submitted tree is safe to read, so it is tested against main() and not
 only against the module.
 """
+
 import json
 import os
 import subprocess
@@ -25,23 +26,28 @@ OVERCLAIMED = {
     "schema_version": "0.1",
     "name": "[[4,2,3]] synthetic over-claim",
     "code_type": "CSS",
-    "n": 4, "k": 2,
+    "n": 4,
+    "k": 2,
     "checks": {"X": [[0, 1, 2, 3]], "Z": [[0, 1, 2, 3]]},
     "distance": {
         "d": 3,
         "X": {"value": 3, "confidence": "upper_bound", "witness": [0, 1, 2]},
         "Z": {"value": 3, "confidence": "upper_bound", "witness": [0, 1, 3]},
     },
-    "provenance": {"authors": ["@tester"], "construction": "synthetic",
-                   "date": "2026-10-01", "references": [], "notes": ""},
+    "provenance": {
+        "authors": ["@tester"],
+        "construction": "synthetic",
+        "date": "2026-10-01",
+        "references": [],
+        "notes": "",
+    },
 }
 REAL_WITNESS = {"RIS#0": [2, [0, 1]]}
 SLUG = "4-2-3"
 
 
 def _git(root, *args):
-    subprocess.run(["git", *args], cwd=root, check=True,
-                   capture_output=True, text=True)
+    subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True)
 
 
 @pytest.fixture
@@ -55,8 +61,7 @@ def repo(tmp_path):
     (root / "README.md").write_text("base\n")
     _git(root, "add", "-A")
     _git(root, "commit", "-q", "-m", "base")
-    base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root,
-                                   text=True).strip()
+    base = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
     with open(root / "codes" / f"{SLUG}.json", "w", encoding="utf-8") as f:
         json.dump(OVERCLAIMED, f)
     _git(root, "add", "-A")
@@ -69,9 +74,7 @@ def _run(repo_and_base, cache, monkeypatch, record=None, hits=None):
     repo, base = repo_and_base
     searched = []
     real = H.refute_check
-    monkeypatch.setattr(H, "refute_check",
-                        lambda *a, **k: (searched.append(1),
-                                         real(*a, **k))[1])
+    monkeypatch.setattr(H, "refute_check", lambda *a, **k: (searched.append(1), real(*a, **k))[1])
     path = os.path.join("codes", f"{SLUG}.json")
     with open(repo / path, "rb") as f:
         doc_bytes = f.read()
@@ -82,20 +85,21 @@ def _run(repo_and_base, cache, monkeypatch, record=None, hits=None):
         # into tests of a cache miss.
         deep = SLUG in G.board_record_slugs(str(repo))
         assert deep, "expected the only entry to be a cell record"
-        RC.store(cache, doc_bytes, record, hits or {}, deep=deep,
-                 accelerated=G.GF is not None, head_sha="cafebabe" * 5)
-    rc = G.main([base, path, "--code-root", str(repo),
-                 "--search-cache", cache, "--seed", "7"])
+        RC.store(cache, doc_bytes, record, hits or {}, deep=deep, accelerated=G.GF is not None, head_sha="cafebabe" * 5)
+    rc = G.main([base, path, "--code-root", str(repo), "--search-cache", cache, "--seed", "7"])
     return rc, searched
 
 
-def test_a_cached_refutation_still_fails_the_run(repo, tmp_path, monkeypatch,
-                                                 capsys):
+def test_a_cached_refutation_still_fails_the_run(repo, tmp_path, monkeypatch, capsys):
     """The property that would be a disaster to get wrong."""
     cache = str(tmp_path / "searchcache")
-    rc, searched = _run(repo, cache, monkeypatch,
-                        record={"refuted": True, "seed": 11, "trials": 900},
-                        hits={k: tuple(v) for k, v in REAL_WITNESS.items()})
+    rc, searched = _run(
+        repo,
+        cache,
+        monkeypatch,
+        record={"refuted": True, "seed": 11, "trials": 900},
+        hits={k: tuple(v) for k, v in REAL_WITNESS.items()},
+    )
     out = capsys.readouterr().out
     assert rc == 1, "a reused refutation must fail the gate"
     assert "REFUTED" in out
@@ -104,17 +108,16 @@ def test_a_cached_refutation_still_fails_the_run(repo, tmp_path, monkeypatch,
     assert "witness re-checked" in out
 
 
-def test_a_record_whose_witness_does_not_validate_is_discarded(
-        repo, tmp_path, monkeypatch, capsys):
+def test_a_record_whose_witness_does_not_validate_is_discarded(repo, tmp_path, monkeypatch, capsys):
     """Why a cache the submitted tree can write is safe to read.
 
     The support here is a stabilizer, not a logical, so the pinned check
     refuses it and the gate searches instead of taking the record's word.
     """
     cache = str(tmp_path / "searchcache")
-    rc, searched = _run(repo, cache, monkeypatch,
-                        record={"refuted": True, "seed": 11, "trials": 900},
-                        hits={"RIS#0": (2, [0, 1, 2, 3])})
+    rc, searched = _run(
+        repo, cache, monkeypatch, record={"refuted": True, "seed": 11, "trials": 900}, hits={"RIS#0": (2, [0, 1, 2, 3])}
+    )
     out = capsys.readouterr().out
     assert "did not re-validate" in out
     assert searched, "the gate must fall back to searching"
@@ -122,8 +125,7 @@ def test_a_record_whose_witness_does_not_validate_is_discarded(
     assert rc in (0, 1)
 
 
-def test_an_empty_cache_searches_and_stores_nothing_for_a_clean_run(
-        repo, tmp_path, monkeypatch):
+def test_an_empty_cache_searches_and_stores_nothing_for_a_clean_run(repo, tmp_path, monkeypatch):
     """A clean verdict is never written, so there is nothing to forge."""
     cache = str(tmp_path / "searchcache")
     good = json.loads(json.dumps(OVERCLAIMED))

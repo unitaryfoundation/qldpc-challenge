@@ -5,6 +5,7 @@ committed memory circuit, shallowest first; one with points is listed apart,
 deepest first, with its worst rate at p = 0.001. Fixtures are written to a
 temporary codes/ and circuits/ tree, so no board file is read.
 """
+
 import json
 import os
 import sys
@@ -19,8 +20,7 @@ def _doc(n, k, d, d_circ=None, rounds=None, ler=None):
     doc = {"n": n, "k": k, "distance": {"d": d}, "checks": {"X": [], "Z": []}}
     if d_circ is not None:
         side = {"value": d_circ, "confidence": "upper_bound", "witness": list(range(d_circ))}
-        doc["circuit"] = {"d_circ": {"X": side, "Z": dict(side)}, "rounds": rounds or d,
-                          "stim_version": "1.16.0"}
+        doc["circuit"] = {"d_circ": {"X": side, "Z": dict(side)}, "rounds": rounds or d, "stim_version": "1.16.0"}
         if ler is not None:
             doc["circuit"]["ler"] = ler
     return doc
@@ -35,14 +35,25 @@ def _tree(tmp_path):
     codes.mkdir()
     circuits.mkdir()
     entries = {
-        "30-2-6": (_doc(30, 2, 6, d_circ=6, rounds=6), 6 * 30),      # deep: 30 per round
-        "40-4-6": (_doc(40, 4, 6, d_circ=6, rounds=6), 6 * 6),       # shallow: 6 per round
-        "50-4-6": (_doc(50, 4, 6, d_circ=5, rounds=6), 6 * 6),       # shallow, lower d_circ
-        "20-2-4": (_doc(20, 2, 4, d_circ=4, rounds=4, ler={
-            "X": [{"p": 0.001, "ler_per_round": 0.01}, {"p": 0.005, "ler_per_round": 0.2}],
-            "Z": [{"p": 0.001, "ler_per_round": 0.03}]}), 4 * 20),   # measured, 20 per round
-        "10-1-3": (_doc(10, 1, 3), None),                            # no circuit
-        "60-2-6": (_doc(60, 2, 6, d_circ=6, rounds=6), None),        # circuit, file missing
+        "30-2-6": (_doc(30, 2, 6, d_circ=6, rounds=6), 6 * 30),  # deep: 30 per round
+        "40-4-6": (_doc(40, 4, 6, d_circ=6, rounds=6), 6 * 6),  # shallow: 6 per round
+        "50-4-6": (_doc(50, 4, 6, d_circ=5, rounds=6), 6 * 6),  # shallow, lower d_circ
+        "20-2-4": (
+            _doc(
+                20,
+                2,
+                4,
+                d_circ=4,
+                rounds=4,
+                ler={
+                    "X": [{"p": 0.001, "ler_per_round": 0.01}, {"p": 0.005, "ler_per_round": 0.2}],
+                    "Z": [{"p": 0.001, "ler_per_round": 0.03}],
+                },
+            ),
+            4 * 20,
+        ),  # measured, 20 per round
+        "10-1-3": (_doc(10, 1, 3), None),  # no circuit
+        "60-2-6": (_doc(60, 2, 6, d_circ=6, rounds=6), None),  # circuit, file missing
     }
     for slug, (doc, ticks) in entries.items():
         with open(codes / f"{slug}.json", "w") as fh:
@@ -84,15 +95,15 @@ def test_queue_filters(tmp_path):
 
 def test_command_names_the_measurement_tool_and_the_grid():
     cmd = LP.command({"slug": "40-4-6"})
-    assert cmd == ("uv run --extra research python verify/ler_measure.py codes/40-4-6.json "
-                   "--p 0.01 0.005 0.002 0.001")
+    assert cmd == ("uv run --extra research python verify/ler_measure.py codes/40-4-6.json --p 0.01 0.005 0.002 0.001")
 
 
 def test_main_prints_the_queue_the_commands_and_the_measured_list(tmp_path, capsys):
     codes, circuits = _tree(tmp_path)
     out_json = tmp_path / "q.json"
-    assert LP.main(["--codes-dir", codes, "--circuits-dir", circuits, "--max-depth", "20",
-                    "--json", str(out_json)]) == 0
+    assert (
+        LP.main(["--codes-dir", codes, "--circuits-dir", circuits, "--max-depth", "20", "--json", str(out_json)]) == 0
+    )
     out = capsys.readouterr().out
     assert "5 entries with circuits, 4 without a measured rate; 2 queued at depth <= 20" in out
     assert out.index("40-4-6") < out.index("50-4-6")

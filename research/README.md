@@ -28,7 +28,7 @@ nothing; **audit** re-prices or triages what already exists.
 | Script | Status | What it does |
 |---|---|---|
 | `cyclic_gb.py` | canonical | cyclic generalized-bicycle search stack over Z_m: designed-divisor construction plus the staged distance ladder |
-| `local_sat.py` | canonical | 2D-local SAT search: every check is anchored at a lattice site and acts within a radius, so each find carries a layout and a geometric-efficiency score |
+| `local_sat.py` | canonical | 2D-local SAT search: every check is anchored at a lattice site and acts within a radius, and optionally inside at most M hardware modules (a fixed grid-block partition or a co-searched one, issue #5836), so each find carries a layout, a module assignment when asked for, and a geometric-efficiency score |
 | `sat_rungs.py` | canonical | runs one rung of the 2D-local SAT ladder on `local_sat.py` and records how it ended (issue #2703) |
 | `sat_search.py` | base | the unconstrained SAT formulation `local_sat.py` extends; its finds carry no layout and cannot enter the 2D-local tracks |
 | `build_halved_pp.py` | canonical | symplectic-halved CPM pair-partition codes (arXiv:2609.30069) |
@@ -50,6 +50,7 @@ nothing; **audit** re-prices or triages what already exists.
 | `foldbound.py` | audit | distance upper bound by folding a code onto a symmetric subspace; a refuter, not a layout tool |
 | `qedist_audit.py` | audit | certify a challenge CSS code's exact distance with the optional external QEDist tool (research/kit/qedist.py); evidence only, not board certification || `annihilator_sweep.py` | audit | the annihilator attack over the board's uncertified block-shaped entries (issue #2706) |
 | `board_bar.py` | audit | the smallest undominated d for a candidate (n, k, w), read off the board before any distance search |
+| `kit/equivalence.py` | canonical | decides a Weisfeiler-Leman equivalence flag at packaging time with `audits/permutation_audit.py`'s procedure, so `kit/promote.py` and `qldpc submit` refuse an exhibited permutation and tick the box on a separating invariant (issue #6186) |
 | `does_it_advance.py` | audit | mirror of the gate's novelty block: would this candidate beat the board, and on which axes, before paying for the gate |
 | `derive_provenance.py` | audit | literature-versus-discovered provenance for every entry from the isomorphism check (issue #1279) |
 | `reachability_campaign.py` | canonical | unified reachability campaign driver: enumerates parents, runs the distance ladder, asks `kit/dedup_oracle.py` whether the board or an open PR already holds each child (issue #6814), and stages the rest (issue #5822) |

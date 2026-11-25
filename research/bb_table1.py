@@ -29,6 +29,7 @@ sector and k = 12 for that row, and it reproduces all ten of Table 1.
 Nothing here computes a distance or asserts a track: verify/validate_candidate.py
 decides both. Run this file directly to print the reproduction table.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -36,16 +37,16 @@ import numpy as np
 # Table 1 of arXiv:2407.03973 as (label, l, m, c_support, d_support).
 # x^i y^j is the exponent pair (i, j), reduced mod l (x order) and mod m (y order).
 TABLE_1 = {
-    "90-8-10":   (3, 15, [(0, 0), (0, 1), (0, 5)], [(0, 3), (1, 0), (2, 0)]),
+    "90-8-10": (3, 15, [(0, 0), (0, 1), (0, 5)], [(0, 3), (1, 0), (2, 0)]),
     "144-12-12": (12, 6, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]),
-    "108-16-6":  (6, 9,  [(0, 0), (0, 1), (0, 2)], [(0, 3), (2, 0), (4, 0)]),
-    "128-14-12": (8, 8,  [(2, 0), (0, 1), (0, 3), (0, 4)], [(0, 2), (1, 0), (3, 0), (4, 0)]),
-    "162-4-16":  (9, 9,  [(0, 0), (1, 0), (0, 1)], [(3, 0), (0, 1), (0, 2)]),
-    "162-12-8":  (9, 9,  [(0, 0), (1, 0), (0, 6)], [(0, 3), (2, 0), (3, 0)]),
-    "162-24-6":  (9, 9,  [(0, 0), (0, 1), (0, 2)], [(0, 3), (3, 0), (6, 0)]),
-    "270-8-18":  (9, 15, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]),
-    "98-6-12":   (7, 7,  [(1, 0), (0, 3), (0, 4)], [(0, 1), (3, 0), (4, 0)]),
-    "162-8-12":  (9, 9,  [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]),
+    "108-16-6": (6, 9, [(0, 0), (0, 1), (0, 2)], [(0, 3), (2, 0), (4, 0)]),
+    "128-14-12": (8, 8, [(2, 0), (0, 1), (0, 3), (0, 4)], [(0, 2), (1, 0), (3, 0), (4, 0)]),
+    "162-4-16": (9, 9, [(0, 0), (1, 0), (0, 1)], [(3, 0), (0, 1), (0, 2)]),
+    "162-12-8": (9, 9, [(0, 0), (1, 0), (0, 6)], [(0, 3), (2, 0), (3, 0)]),
+    "162-24-6": (9, 9, [(0, 0), (0, 1), (0, 2)], [(0, 3), (3, 0), (6, 0)]),
+    "270-8-18": (9, 15, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]),
+    "98-6-12": (7, 7, [(1, 0), (0, 3), (0, 4)], [(0, 1), (3, 0), (4, 0)]),
+    "162-8-12": (9, 9, [(3, 0), (0, 1), (0, 2)], [(0, 3), (1, 0), (2, 0)]),
 }
 
 # The row this campaign submitted.
@@ -69,7 +70,7 @@ def _shift_matrix(l: int, m: int, i: int, j: int) -> np.ndarray:
 def poly_matrix(terms, l: int, m: int) -> np.ndarray:
     """M(p) = sum over the support of p of M_{(i,j)}, over GF(2)."""
     M = np.zeros((l * m, l * m), dtype=np.int64)
-    for (i, j) in terms:
+    for i, j in terms:
         M ^= _shift_matrix(l, m, i, j)
     return M
 
@@ -115,5 +116,4 @@ if __name__ == "__main__":
         w = max(int(r.sum()) for r in HX)
         commute = not bool(((HX @ HZ.T) % 2).any())
         claimed = "-".join(label.split("-"))
-        print(f"{label:12s} n={n:4d} k={k:3d} w={w:2d} "
-              f"commutes={commute}  (paper: [[{claimed}]])")
+        print(f"{label:12s} n={n:4d} k={k:3d} w={w:2d} commutes={commute}  (paper: [[{claimed}]])")

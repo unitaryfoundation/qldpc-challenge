@@ -82,6 +82,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _SCHEMA_PATH = os.path.join(_HERE, "..", "schema", "code.schema.json")
 try:
     import jsonschema
+
     with open(_SCHEMA_PATH) as _f:
         _SCHEMA = json.load(_f)
 except Exception:
@@ -89,25 +90,40 @@ except Exception:
     _SCHEMA = None
 
 # minimal required structure, used when jsonschema is unavailable
-_REQUIRED = ["schema_version", "name", "code_type", "n", "k", "checks",
-             "distance", "provenance"]
+_REQUIRED = ["schema_version", "name", "code_type", "n", "k", "checks", "distance", "provenance"]
 
 # Layer-2 family vocabulary. Self-declared (not recoverable from H), used only as
 # a filterable tag. Validated here too, so enforcement holds even when jsonschema
 # is unavailable and the minimal structure check runs instead.
-_FAMILIES = {"bivariate-bicycle", "generalized-bicycle", "2bga-coset",
-             "hypergraph-product", "lifted-product", "balanced-product",
-             "quantum-tanner", "tile", "pair-partition-cpm", "topological",
-             "other"}
+_FAMILIES = {
+    "bivariate-bicycle",
+    "generalized-bicycle",
+    "2bga-coset",
+    "hypergraph-product",
+    "lifted-product",
+    "balanced-product",
+    "quantum-tanner",
+    "tile",
+    "pair-partition-cpm",
+    "topological",
+    "other",
+}
 _NOVELTY = {"unknown", "known_parameters", "new_parameters"}
 
 # Tier B benchmark metadata (issues #4601, #4603): optional and non-scoring.
 # The schema holds the vocabulary and ranges; benchmark_checks() below holds
 # the cross-field half. The required set is mirrored here so the minimal
 # structure check still enforces the shape when jsonschema is unavailable.
-_BENCHMARK_REQUIRED = ("hardware_track", "noise_model", "surface_baseline",
-                       "decoder", "resources", "logical_error_rate", "status",
-                       "method")
+_BENCHMARK_REQUIRED = (
+    "hardware_track",
+    "noise_model",
+    "surface_baseline",
+    "decoder",
+    "resources",
+    "logical_error_rate",
+    "status",
+    "method",
+)
 _BENCHMARK_SCHEMA_VERSIONS = ("0.6", "0.7")
 
 # Tier C architecture metadata (issues #4601, #4674): optional, non-scoring,
@@ -142,11 +158,11 @@ def admissible(n, max_check_weight, claimed_d):
     """The blocklength contract as one boolean: n <= BASE_MAX_N, or n <= MAX_N
     with max check weight <= EXT_MAX_CHECK_WEIGHT and claimed d <= EXT_MAX_D.
     Call it before searching, with the parameters a candidate would have, to
-    know whether the board can accept it at all."""
+    know whether the board can accept it at all.
+    """
     if n <= BASE_MAX_N:
         return True
-    return (n <= MAX_N and max_check_weight <= EXT_MAX_CHECK_WEIGHT
-            and claimed_d <= EXT_MAX_D)
+    return n <= MAX_N and max_check_weight <= EXT_MAX_CHECK_WEIGHT and claimed_d <= EXT_MAX_D
 
 
 def file_size_error(path):
@@ -252,7 +268,7 @@ def is_css_up_to_local_hadamard(A, B):
         return None
     n = A.shape[1]
     parent = list(range(n))
-    parity = [0] * n           # h_q xor h_parent[q]
+    parity = [0] * n  # h_q xor h_parent[q]
 
     def find(q):
         """Return (root, h_q xor h_root), compressing the path.
@@ -279,7 +295,7 @@ def is_css_up_to_local_hadamard(A, B):
         t0 = int(B[i, q0])
         for qq in sup[1:]:
             q = int(qq)
-            want = t0 ^ int(B[i, q])          # h_q0 xor h_q
+            want = t0 ^ int(B[i, q])  # h_q0 xor h_q
             ra, pa = find(q0)
             rb, pb = find(q)
             if ra == rb:
@@ -323,7 +339,7 @@ def is_css_up_to_local_clifford(A, B):
     # letter of generator i on qubit q: 1 = X, 2 = Z, 3 = Y
     letter = A.astype(np.int8) + 2 * B.astype(np.int8)
     parent = list(range(m))
-    parity = [0] * m           # t_i xor t_parent[i]
+    parity = [0] * m  # t_i xor t_parent[i]
 
     def find(i):
         path = []
@@ -347,7 +363,7 @@ def is_css_up_to_local_clifford(A, B):
         parity[rj] = pi ^ pj ^ want
         return True
 
-    present = {}               # qubit -> {letter: first generator carrying it}
+    present = {}  # qubit -> {letter: first generator carrying it}
     for q in range(n):
         gens = np.nonzero(letter[:, q])[0]
         if len(gens) == 0:
@@ -380,13 +396,12 @@ def is_css_up_to_local_clifford(A, B):
         q carries go to their generators' targets; whatever is left goes to
         Y (two letters present) or stays put where it can.
         """
-        img = {name[L]: (swap[types[i]] if flip else types[i])
-               for L, i in first.items()}
+        img = {name[L]: (swap[types[i]] if flip else types[i]) for L, i in first.items()}
         if len(img) == 1:
-            (L, t), = img.items()
+            ((L, t),) = img.items()
             if L != t:
                 other = ({"X", "Y", "Z"} - {L, t}).pop()
-                img[t] = L          # swap the two, fix the third
+                img[t] = L  # swap the two, fix the third
                 img[other] = other
         else:
             rest = ({"X", "Y", "Z"} - set(img)).pop()
@@ -401,8 +416,7 @@ def is_css_up_to_local_clifford(A, B):
         by_comp.setdefault(r, []).append((q, perm_on(first, False), perm_on(first, True)))
     ops = {}
     for r, rows in by_comp.items():
-        flip = (sum(p1 != "XYZ" for _, _, p1 in rows)
-                < sum(p0 != "XYZ" for _, p0, _ in rows))
+        flip = sum(p1 != "XYZ" for _, _, p1 in rows) < sum(p0 != "XYZ" for _, p0, _ in rows)
         if flip:
             for i in range(m):
                 if roots[i][0] == r:
@@ -426,8 +440,7 @@ def clifford_css_images(doc, types):
     for g, t in zip(doc["checks"]["S"], types):
         (X if t == "X" else Z).append(sorted(set(g["X"]) | set(g["Z"])))
     base = {"n": doc["n"], "k": doc["k"], "distance": {"d": doc["distance"]["d"]}}
-    return [dict(base, code_type="CSS", checks={"X": X, "Z": Z}),
-            dict(base, code_type="CSS", checks={"X": Z, "Z": X})]
+    return [dict(base, code_type="CSS", checks={"X": X, "Z": Z}), dict(base, code_type="CSS", checks={"X": Z, "Z": X})]
 
 
 def hadamard_css_images(doc, hadamard_qubits):
@@ -448,8 +461,7 @@ def hadamard_css_images(doc, hadamard_qubits):
             raise ValueError("Hadamard subset does not make every generator pure")
         (X if xs else Z).append(sorted(xs or zs))
     base = {"n": n, "k": doc["k"], "distance": {"d": doc["distance"]["d"]}}
-    return [dict(base, code_type="CSS", checks={"X": X, "Z": Z}),
-            dict(base, code_type="CSS", checks={"X": Z, "Z": X})]
+    return [dict(base, code_type="CSS", checks={"X": X, "Z": Z}), dict(base, code_type="CSS", checks={"X": Z, "Z": X})]
 
 
 def css_local_hadamard_images(doc, max_images=1024):
@@ -520,7 +532,8 @@ def css_local_hadamard_images(doc, max_images=1024):
 def css_fingerprint(HX, HZ):
     """Exact-duplicate fingerprint of a CSS code (see _verify_semantic)."""
     import hashlib
-    fp = (gf2.rref(HX)[0].tobytes() + b"|" + gf2.rref(HZ)[0].tobytes())
+
+    fp = gf2.rref(HX)[0].tobytes() + b"|" + gf2.rref(HZ)[0].tobytes()
     return hashlib.sha256(fp).hexdigest()[:16]
 
 
@@ -555,10 +568,12 @@ def resource_errors(doc):
         if n > MAX_N:
             errs.append(f"n={n} exceeds the blocklength cap {MAX_N}")
         else:
-            errs.append(f"n={n} is above {BASE_MAX_N}, where the cap admits only "
-                        f"max check weight <= {EXT_MAX_CHECK_WEIGHT} and claimed "
-                        f"d <= {EXT_MAX_D} (found weight {max_weight}, claimed "
-                        f"d {claimed})")
+            errs.append(
+                f"n={n} is above {BASE_MAX_N}, where the cap admits only "
+                f"max check weight <= {EXT_MAX_CHECK_WEIGHT} and claimed "
+                f"d <= {EXT_MAX_D} (found weight {max_weight}, claimed "
+                f"d {claimed})"
+            )
     if is_stabilizer(doc):
         # one matrix S = (A | B), m x 2n; isotropy is the m x m product
         m = len(doc["checks"]["S"])
@@ -575,28 +590,22 @@ def resource_errors(doc):
             errs.append(f"{label} has {rows} rows, limit is {MAX_CHECKS_PER_SIDE}")
     total_support = sum(len(s) for s in supports)
     if total_support > MAX_TOTAL_SUPPORT:
-        errs.append(f"total support entries {total_support} exceeds limit "
-                    f"{MAX_TOTAL_SUPPORT}")
+        errs.append(f"total support entries {total_support} exceeds limit {MAX_TOTAL_SUPPORT}")
     if max_weight > MAX_CHECK_WEIGHT:
         errs.append(f"max check weight {max_weight} exceeds limit {MAX_CHECK_WEIGHT}")
     for label, cells in dense:
         if cells > MAX_DENSE_MATRIX_CELLS:
-            errs.append(f"{label} dense allocation would have {cells} cells, "
-                        f"limit is {MAX_DENSE_MATRIX_CELLS}")
+            errs.append(f"{label} dense allocation would have {cells} cells, limit is {MAX_DENSE_MATRIX_CELLS}")
     if comm_cells > MAX_COMMUTATION_CELLS:
-        errs.append(f"{comm_label} check would have {comm_cells} cells, "
-                    f"limit is {MAX_COMMUTATION_CELLS}")
+        errs.append(f"{comm_label} check would have {comm_cells} cells, limit is {MAX_COMMUTATION_CELLS}")
     loc = doc.get("locality") or {}
     coords = loc.get("coordinates") or []
     if len(coords) > MAX_COORDINATES:
-        errs.append(f"locality.coordinates has {len(coords)} points, limit is "
-                    f"{MAX_COORDINATES}")
+        errs.append(f"locality.coordinates has {len(coords)} points, limit is {MAX_COORDINATES}")
     modules = loc.get("modules") or []
     if len(modules) > MAX_COORDINATES:
-        errs.append(f"locality.modules has {len(modules)} entries, limit is "
-                    f"{MAX_COORDINATES}")
+        errs.append(f"locality.modules has {len(modules)} entries, limit is {MAX_COORDINATES}")
     return errs
-
 
 
 def _board_code(slug):
@@ -631,50 +640,66 @@ def benchmark_checks(doc, record):
     b = doc["benchmark"]
     n, k = doc["n"], doc["k"]
     cand, base = b["resources"]["candidate"], b["resources"]["baseline"]
-    record("benchmark_candidate_data_qubits", cand["data_qubits"] == n,
-           f"benchmark.resources.candidate.data_qubits={cand['data_qubits']}, n={n}")
-    bad_totals = [side for side, blk in (("candidate", cand), ("baseline", base))
-                  if "total_qubits" in blk
-                  and blk["total_qubits"] != blk["data_qubits"] + blk["ancilla_qubits"]]
-    record("benchmark_qubit_totals", not bad_totals,
-           "total_qubits = data_qubits + ancilla_qubits"
-           + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""))
+    record(
+        "benchmark_candidate_data_qubits",
+        cand["data_qubits"] == n,
+        f"benchmark.resources.candidate.data_qubits={cand['data_qubits']}, n={n}",
+    )
+    bad_totals = [
+        side
+        for side, blk in (("candidate", cand), ("baseline", base))
+        if "total_qubits" in blk and blk["total_qubits"] != blk["data_qubits"] + blk["ancilla_qubits"]
+    ]
+    record(
+        "benchmark_qubit_totals",
+        not bad_totals,
+        "total_qubits = data_qubits + ancilla_qubits"
+        + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""),
+    )
     sb = b["surface_baseline"]
     bn = None
     if "slug" in sb:
         bdoc = _board_code(sb["slug"])
-        on_board = (isinstance(bdoc, dict)
-                    and all(isinstance(bdoc.get(f), int) for f in ("n", "k")))
-        record("benchmark_baseline_on_board", on_board,
-               f"codes/{sb['slug']}.json" + ("" if on_board else " is not a board entry"))
+        on_board = isinstance(bdoc, dict) and all(isinstance(bdoc.get(f), int) for f in ("n", "k"))
+        record(
+            "benchmark_baseline_on_board",
+            on_board,
+            f"codes/{sb['slug']}.json" + ("" if on_board else " is not a board entry"),
+        )
         baseline = {"slug": sb["slug"]}
         if on_board:
             bn, bk = bdoc["n"], bdoc["k"]
-            record("benchmark_baseline_k", bk >= k,
-                   f"baseline k={bk}, entry k={k}: the baseline must encode "
-                   "at least as many logical qubits")
+            record(
+                "benchmark_baseline_k",
+                bk >= k,
+                f"baseline k={bk}, entry k={k}: the baseline must encode at least as many logical qubits",
+            )
             baseline.update(n=bn, k=bk)
     else:
         d = sb["patches"]["d"]
         bn = k * d * d
         baseline = {"patches": {"count": k, "d": d}, "n": bn, "k": k}
     if bn is not None:
-        record("benchmark_baseline_data_qubits", base["data_qubits"] == bn,
-               f"benchmark.resources.baseline.data_qubits={base['data_qubits']}, "
-               f"baseline data qubits={bn}")
+        record(
+            "benchmark_baseline_data_qubits",
+            base["data_qubits"] == bn,
+            f"benchmark.resources.baseline.data_qubits={base['data_qubits']}, baseline data qubits={bn}",
+        )
     ler = b["logical_error_rate"]
     ct, bt = _resource_total(cand), _resource_total(base)
     meets = ler["candidate"] <= ler["target"]
-    return {"status": b["status"],
-            "hardware_track": b["hardware_track"],
-            "noise": {"kind": b["noise_model"]["kind"], "p": b["noise_model"]["p"]},
-            "baseline": baseline,
-            "candidate_total_qubits": ct,
-            "baseline_total_qubits": bt,
-            "qubit_ratio": round(bt / ct, 4) if ct else None,
-            "meets_target": bool(meets),
-            "fewer_qubits": bool(ct < bt),
-            "beats_baseline": bool(meets and ct < bt)}
+    return {
+        "status": b["status"],
+        "hardware_track": b["hardware_track"],
+        "noise": {"kind": b["noise_model"]["kind"], "p": b["noise_model"]["p"]},
+        "baseline": baseline,
+        "candidate_total_qubits": ct,
+        "baseline_total_qubits": bt,
+        "qubit_ratio": round(bt / ct, 4) if ct else None,
+        "meets_target": bool(meets),
+        "fewer_qubits": bool(ct < bt),
+        "beats_baseline": bool(meets and ct < bt),
+    }
 
 
 def _baseline_block(doc):
@@ -687,8 +712,7 @@ def _baseline_block(doc):
     sb = doc["benchmark"]["surface_baseline"]
     if "slug" in sb:
         bdoc = _board_code(sb["slug"])
-        if (isinstance(bdoc, dict)
-                and all(isinstance(bdoc.get(f), int) for f in ("n", "k"))):
+        if isinstance(bdoc, dict) and all(isinstance(bdoc.get(f), int) for f in ("n", "k")):
             return bdoc["n"], bdoc["k"]
         return None
     d = sb["patches"]["d"]
@@ -715,40 +739,62 @@ def architecture_checks(doc, record):
     gadgets = a.get("gadgets") or []
     if gadgets:
         over = [g["operation"] for g in gadgets if g["fault_distance"] > d]
-        record("architecture_gadget_fault_distance", not over,
-               f"every gadget fault distance <= d={d}"
-               + (f"; above it: {', '.join(over)}" if over else ""))
-        short = [g["operation"] for g in gadgets
-                 if g["resources"]["data_qubits"] < g["blocks"] * n]
-        record("architecture_gadget_data_qubits", not short,
-               f"every gadget counts at least blocks x n={n} data qubits"
-               + (f"; short: {', '.join(short)}" if short else ""))
-        bad_totals = [g["operation"] for g in gadgets
-                      if "total_qubits" in g["resources"]
-                      and g["resources"]["total_qubits"]
-                      != g["resources"]["data_qubits"] + g["resources"]["ancilla_qubits"]]
-        record("architecture_qubit_totals", not bad_totals,
-               "total_qubits = data_qubits + ancilla_qubits"
-               + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""))
+        record(
+            "architecture_gadget_fault_distance",
+            not over,
+            f"every gadget fault distance <= d={d}" + (f"; above it: {', '.join(over)}" if over else ""),
+        )
+        short = [g["operation"] for g in gadgets if g["resources"]["data_qubits"] < g["blocks"] * n]
+        record(
+            "architecture_gadget_data_qubits",
+            not short,
+            f"every gadget counts at least blocks x n={n} data qubits"
+            + (f"; short: {', '.join(short)}" if short else ""),
+        )
+        bad_totals = [
+            g["operation"]
+            for g in gadgets
+            if "total_qubits" in g["resources"]
+            and g["resources"]["total_qubits"] != g["resources"]["data_qubits"] + g["resources"]["ancilla_qubits"]
+        ]
+        record(
+            "architecture_qubit_totals",
+            not bad_totals,
+            "total_qubits = data_qubits + ancilla_qubits"
+            + (f"; violated by {', '.join(bad_totals)}" if bad_totals else ""),
+        )
         partners = sorted({g["partner"] for g in gadgets if "partner" in g})
         if partners:
             missing = [s for s in partners if not isinstance(_board_code(s), dict)]
-            record("architecture_partner_on_board", not missing,
-                   ", ".join(f"codes/{s}.json" for s in partners)
-                   + (f"; not a board entry: {', '.join(missing)}" if missing else ""))
-        out["gadgets"] = [{"kind": g["kind"], "operation": g["operation"],
-                           "blocks": g["blocks"], "fault_distance": g["fault_distance"],
-                           "total_qubits": _resource_total(g["resources"])}
-                          for g in gadgets]
+            record(
+                "architecture_partner_on_board",
+                not missing,
+                ", ".join(f"codes/{s}.json" for s in partners)
+                + (f"; not a board entry: {', '.join(missing)}" if missing else ""),
+            )
+        out["gadgets"] = [
+            {
+                "kind": g["kind"],
+                "operation": g["operation"],
+                "blocks": g["blocks"],
+                "fault_distance": g["fault_distance"],
+                "total_qubits": _resource_total(g["resources"]),
+            }
+            for g in gadgets
+        ]
     ms = a.get("magic_states")
     if ms is not None:
         if ms["protocol"] in ("distillation", "cultivation") and "input_error_rate" in ms:
-            record("architecture_magic_state_gain",
-                   ms["output_error_rate"] < ms["input_error_rate"],
-                   f"{ms['protocol']} delivers {ms['output_error_rate']} from "
-                   f"{ms['input_error_rate']}")
-        out["magic_states"] = {"protocol": ms["protocol"], "state": ms["state"],
-                               "output_error_rate": ms["output_error_rate"]}
+            record(
+                "architecture_magic_state_gain",
+                ms["output_error_rate"] < ms["input_error_rate"],
+                f"{ms['protocol']} delivers {ms['output_error_rate']} from {ms['input_error_rate']}",
+            )
+        out["magic_states"] = {
+            "protocol": ms["protocol"],
+            "state": ms["state"],
+            "output_error_rate": ms["output_error_rate"],
+        }
     est = a.get("algorithm_estimate")
     if est is not None:
         base_nk = _baseline_block(doc)
@@ -758,30 +804,48 @@ def architecture_checks(doc, record):
         sides = [("candidate", est["candidate"], n, k)]
         if base_nk is not None:
             sides.append(("baseline", est["baseline"], base_nk[0], base_nk[1]))
-        held = {side: blk.get("logical_qubits", est["logical_qubits"])
-                for side, blk, _, _ in sides}
-        short = [f"{side}: {blk['code_blocks']} blocks x k={kk} < {held[side]}"
-                 for side, blk, _, kk in sides if blk["code_blocks"] * kk < held[side]]
-        record("architecture_blocks_cover_logical_qubits", not short,
-               f"code_blocks x k >= logical qubits held, {est['logical_qubits']} in the workload"
-               + (f"; short: {'; '.join(short)}" if short else ""))
-        short = [f"{side}: {blk['physical_qubits']} < {blk['code_blocks']} blocks x n={nn}"
-                 for side, blk, nn, _ in sides if blk["physical_qubits"] < blk["code_blocks"] * nn]
-        record("architecture_physical_qubits_cover_blocks", not short,
-               "physical_qubits >= code_blocks x n of the code"
-               + (f"; short: {'; '.join(short)}" if short else ""))
+        held = {side: blk.get("logical_qubits", est["logical_qubits"]) for side, blk, _, _ in sides}
+        short = [
+            f"{side}: {blk['code_blocks']} blocks x k={kk} < {held[side]}"
+            for side, blk, _, kk in sides
+            if blk["code_blocks"] * kk < held[side]
+        ]
+        record(
+            "architecture_blocks_cover_logical_qubits",
+            not short,
+            f"code_blocks x k >= logical qubits held, {est['logical_qubits']} in the workload"
+            + (f"; short: {'; '.join(short)}" if short else ""),
+        )
+        short = [
+            f"{side}: {blk['physical_qubits']} < {blk['code_blocks']} blocks x n={nn}"
+            for side, blk, nn, _ in sides
+            if blk["physical_qubits"] < blk["code_blocks"] * nn
+        ]
+        record(
+            "architecture_physical_qubits_cover_blocks",
+            not short,
+            "physical_qubits >= code_blocks x n of the code" + (f"; short: {'; '.join(short)}" if short else ""),
+        )
         cand = est["candidate"]
         if ms is not None and "factories" in cand and "qubits_per_factory" in ms:
             footprint = cand["factories"] * ms["qubits_per_factory"]
-            record("architecture_factory_footprint", footprint <= cand["physical_qubits"],
-                   f"{cand['factories']} factories x {ms['qubits_per_factory']} qubits = "
-                   f"{footprint} within candidate.physical_qubits={cand['physical_qubits']}")
+            record(
+                "architecture_factory_footprint",
+                footprint <= cand["physical_qubits"],
+                f"{cand['factories']} factories x {ms['qubits_per_factory']} qubits = "
+                f"{footprint} within candidate.physical_qubits={cand['physical_qubits']}",
+            )
         cp, bp = cand["physical_qubits"], est["baseline"]["physical_qubits"]
-        summary = {"workload": est["workload"], "logical_qubits": est["logical_qubits"],
-                   "target": est["logical_error_rate_target"],
-                   "baseline_block": ({"n": base_nk[0], "k": base_nk[1]} if base_nk else None),
-                   "candidate_physical_qubits": cp, "baseline_physical_qubits": bp,
-                   "qubit_ratio": round(bp / cp, 4), "fewer_qubits": bool(cp < bp)}
+        summary = {
+            "workload": est["workload"],
+            "logical_qubits": est["logical_qubits"],
+            "target": est["logical_error_rate_target"],
+            "baseline_block": ({"n": base_nk[0], "k": base_nk[1]} if base_nk else None),
+            "candidate_physical_qubits": cp,
+            "baseline_physical_qubits": bp,
+            "qubit_ratio": round(bp / cp, 4),
+            "fewer_qubits": bool(cp < bp),
+        }
         cv, bv = cand.get("spacetime_volume"), est["baseline"].get("spacetime_volume")
         if cv and bv:
             summary["spacetime_ratio"] = round(bv / cv, 4)
@@ -792,49 +856,54 @@ def architecture_checks(doc, record):
 
 def structure_errors(doc):
     """Return a list of human-readable structural problems, or [] if the doc
-    conforms. Uses jsonschema when installed, else a minimal key/type check."""
+    conforms. Uses jsonschema when installed, else a minimal key/type check.
+    """
     if not isinstance(doc, dict):
         return ["top-level value is not a JSON object"]
     if jsonschema is not None and _SCHEMA is not None:
         v = jsonschema.Draft202012Validator(_SCHEMA)
-        errs = [f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
-                for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))]
+        errs = [
+            f"{'/'.join(str(p) for p in e.path) or '<root>'}: {e.message}"
+            for e in sorted(v.iter_errors(doc), key=lambda e: list(e.path))
+        ]
     else:
         errs = [f"missing field: {k}" for k in _REQUIRED if k not in doc]
         if is_stabilizer(doc):
-            if "checks" in doc and not (isinstance(doc["checks"], dict)
-                                        and "S" in doc["checks"]):
+            if "checks" in doc and not (isinstance(doc["checks"], dict) and "S" in doc["checks"]):
                 errs.append("checks must have an S generator list")
-            if "distance" in doc and not (isinstance(doc["distance"], dict)
-                                          and all(k in doc["distance"] for k in ("d", "P"))):
+            if "distance" in doc and not (
+                isinstance(doc["distance"], dict) and all(k in doc["distance"] for k in ("d", "P"))
+            ):
                 errs.append("distance must have d and a P witness block")
             if "circuit" in doc:
                 errs.append("circuit is not accepted on a stabilizer entry")
         else:
-            if "checks" in doc and not (isinstance(doc["checks"], dict)
-                                        and "X" in doc["checks"] and "Z" in doc["checks"]):
+            if "checks" in doc and not (
+                isinstance(doc["checks"], dict) and "X" in doc["checks"] and "Z" in doc["checks"]
+            ):
                 errs.append("checks must have X and Z support lists")
-            if "distance" in doc and not (isinstance(doc["distance"], dict)
-                                          and all(k in doc["distance"] for k in ("d", "X", "Z"))):
+            if "distance" in doc and not (
+                isinstance(doc["distance"], dict) and all(k in doc["distance"] for k in ("d", "X", "Z"))
+            ):
                 errs.append("distance must have d, X, and Z witness blocks")
-        if "locality" in doc and not (isinstance(doc["locality"], dict)
-                                      and "coordinates" in doc["locality"]
-                                      and "layers" in doc["locality"]):
+        if "locality" in doc and not (
+            isinstance(doc["locality"], dict) and "coordinates" in doc["locality"] and "layers" in doc["locality"]
+        ):
             errs.append("locality must have coordinates and layers")
         if "benchmark" in doc:
             if not isinstance(doc["benchmark"], dict):
                 errs.append("benchmark must be an object")
             else:
-                errs += [f"benchmark missing field: {k}" for k in _BENCHMARK_REQUIRED
-                         if k not in doc["benchmark"]]
+                errs += [f"benchmark missing field: {k}" for k in _BENCHMARK_REQUIRED if k not in doc["benchmark"]]
                 if doc.get("schema_version") not in _BENCHMARK_SCHEMA_VERSIONS:
                     errs.append("benchmark requires schema_version 0.6 or later")
         if "architecture" in doc:
             if not isinstance(doc["architecture"], dict):
                 errs.append("architecture must be an object")
             else:
-                errs += [f"architecture missing field: {k}" for k in _ARCHITECTURE_REQUIRED
-                         if k not in doc["architecture"]]
+                errs += [
+                    f"architecture missing field: {k}" for k in _ARCHITECTURE_REQUIRED if k not in doc["architecture"]
+                ]
                 if not any(k in doc["architecture"] for k in _ARCHITECTURE_PARTS):
                     errs.append("architecture needs gadgets, magic_states, or algorithm_estimate")
                 if "benchmark" not in doc:
@@ -847,7 +916,7 @@ def structure_errors(doc):
 
 
 def _computed_k(doc):
-    """k from the matrices, so the signature cannot depend on a claim."""
+    """K from the matrices, so the signature cannot depend on a claim."""
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
@@ -863,8 +932,10 @@ def signature(doc):
     plain degree multiset: it propagates neighborhood structure several hops.
 
     A stabilizer code takes the labeled variant (_signature_stabilizer); the
-    CSS path below is unchanged, so every existing entry keeps its hash."""
+    CSS path below is unchanged, so every existing entry keeps its hash.
+    """
     import hashlib
+
     if is_stabilizer(doc):
         return _signature_stabilizer(doc)
     n = doc["n"]
@@ -883,8 +954,7 @@ def signature(doc):
     # initial colors by node type: qubit=0, X-check=1, Z-check=2
     color = [0] * n + [1] * mx + [2] * len(Z)
     for _ in range(min(6, len(nbr))):
-        keyed = [(color[v], tuple(sorted(color[u] for u in nbr[v])))
-                 for v in range(len(nbr))]
+        keyed = [(color[v], tuple(sorted(color[u] for u in nbr[v]))) for v in range(len(nbr))]
         order = {k: idx for idx, k in enumerate(sorted(set(keyed)))}
         newc = [order[k] for k in keyed]
         if newc == color:
@@ -901,8 +971,7 @@ def signature(doc):
     # claim was doing most of the separating.
     weights = sorted(collections.Counter(len(set(r)) for r in X + Z).items())
     payload = json.dumps([n, _computed_k(doc), weights, cert])
-    return {"hash": hashlib.sha256(payload.encode()).hexdigest()[:16],
-            "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
+    return {"hash": hashlib.sha256(payload.encode()).hexdigest()[:16], "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
 
 
 def _signature_stabilizer(doc):
@@ -916,10 +985,11 @@ def _signature_stabilizer(doc):
     payload is tagged so a stabilizer hash can never equal a CSS one.
     """
     import hashlib
+
     n = doc["n"]
     gens = doc["checks"]["S"]
     m = len(gens)
-    nbr = [[] for _ in range(n + m)]      # (edge label, neighbor)
+    nbr = [[] for _ in range(n + m)]  # (edge label, neighbor)
     for i, g in enumerate(gens):
         xs, zs = set(g["X"]), set(g["Z"])
         for q in xs | zs:
@@ -929,8 +999,8 @@ def _signature_stabilizer(doc):
     color = [0] * n + [1] * m
 
     def refine(color):
-        return [(color[v], tuple(sorted((lab, color[u]) for lab, u in nbr[v])))
-                for v in range(len(nbr))]
+        return [(color[v], tuple(sorted((lab, color[u]) for lab, u in nbr[v]))) for v in range(len(nbr))]
+
     keyed = refine(color)
     for _ in range(min(6, len(nbr))):
         order = {k: idx for idx, k in enumerate(sorted(set(keyed)))}
@@ -945,8 +1015,7 @@ def _signature_stabilizer(doc):
     # would be the same for every letter pattern on the same supports.
     cert = sorted(keyed)
     payload = json.dumps(["stabilizer", n, doc["k"], doc["distance"]["d"], cert])
-    return {"hash": hashlib.sha256(payload.encode()).hexdigest()[:16],
-            "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
+    return {"hash": hashlib.sha256(payload.encode()).hexdigest()[:16], "n": n, "k": doc["k"], "d": doc["distance"]["d"]}
 
 
 def _matrix(support_list, n):
@@ -1051,7 +1120,8 @@ def lattice_steps(a, b, step):
     """Nearest-neighbor hops between two layout points: their Euclidean
     distance in units of ``step`` (the layout's minimum site spacing), rounded
     up. Two qubits stacked on one site (a flip-chip pair) count as adjacent,
-    so the result is never below 1."""
+    so the result is never below 1.
+    """
     return max(1, math.ceil(math.dist(a, b) / step - 1e-9))
 
 
@@ -1062,7 +1132,8 @@ def check_routing_cost(support, coords, step):
     least s - 1 nearest-neighbor SWAPs before its two qubits touch, and the
     MST is the cheapest tree to make the support connected, so this is a
     lower bound on any SWAP schedule, not an optimal one. A check whose
-    support already forms a connected nearest-neighbor cluster costs 0."""
+    support already forms a connected nearest-neighbor cluster costs 0.
+    """
     m = len(support)
     if m <= 1:
         return 0
@@ -1128,6 +1199,7 @@ def tanner_girth(checks, n):
     vertices, and the whole computation to milliseconds.
     """
     from collections import deque
+
     nbr = _side_graph(checks, n)
     nv = len(nbr)
     nedges = sum(len(s) for s in checks)
@@ -1190,8 +1262,8 @@ def weight_profile(checks, n):
     def prof(ws):
         if not ws:
             return {"min": 0, "max": 0, "mean": 0.0}
-        return {"min": min(ws), "max": max(ws),
-                "mean": round(sum(ws) / len(ws), 3)}
+        return {"min": min(ws), "max": max(ws), "mean": round(sum(ws) / len(ws), 3)}
+
     return {"row": prof(rows), "column": prof(cols)}
 
 
@@ -1203,6 +1275,7 @@ def _in_check_subsets(checks, r):
     weight so the Python loop runs over distinct weights, not over checks.
     """
     from itertools import combinations
+
     by_weight = {}
     for s in checks:
         qs = sorted(set(s))
@@ -1217,8 +1290,7 @@ def _in_check_subsets(checks, r):
     return np.concatenate(out)
 
 
-def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
-                  max_candidates=TS_MAX_CANDIDATES):
+def trapping_sets(checks, n, max_size=TS_MAX_SIZE, max_candidates=TS_MAX_CANDIDATES):
     """Count the small connected (a, b) trapping sets of one side.
 
     An (a, b) trapping set is a set S of a qubits such that exactly b checks
@@ -1241,6 +1313,7 @@ def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
     defect; the census is the classical Tanner-graph notion, reported as such.
     """
     from itertools import combinations
+
     col = np.zeros(n, dtype=np.int64)
     for s in checks:
         for q in s:
@@ -1251,10 +1324,10 @@ def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
     if max_size < 2:
         return {"complete_through_size": 1, "counts": counts}
     pairs = _in_check_subsets(checks, 2)
-    if not len(pairs):     # no two qubits share a check: nothing connected above size 1
+    if not len(pairs):  # no two qubits share a check: nothing connected above size 1
         return {"complete_through_size": max_size, "counts": counts}
     key = pairs[:, 0] * n + pairs[:, 1]
-    ukey, ov = np.unique(key, return_counts=True)   # ov = checks shared by the pair
+    ukey, ov = np.unique(key, return_counts=True)  # ov = checks shared by the pair
     u, v = ukey // n, ukey % n
     b2 = col[u] + col[v] - 2 * ov
     for b, c in zip(*np.unique(b2, return_counts=True)):
@@ -1266,8 +1339,7 @@ def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
     # A path a-b-c has one center; a triangle is generated from all three of
     # its vertices and is weighted 1/3, so no deduplication pass is needed.
     deg = np.bincount(np.concatenate([u, v]), minlength=n)
-    in_check_triples = sum(len(s) * (len(s) - 1) * (len(s) - 2) // 6
-                           for s in checks)
+    in_check_triples = sum(len(s) * (len(s) - 1) * (len(s) - 2) // 6 for s in checks)
     if int((deg * (deg - 1) // 2).sum()) + in_check_triples > max_candidates:
         return {"complete_through_size": 2, "counts": counts}
     src = np.concatenate([u, v])
@@ -1280,17 +1352,18 @@ def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
     # blocklength cap is what keeps it small, so refuse anything above it here
     # rather than rely on the caller having enforced the cap.
     if n > MAX_N:
-        raise ValueError(f"trapping_sets: n={n} exceeds MAX_N={MAX_N}; the "
-                         f"dense pair-overlap matrix is sized for the cap")
+        raise ValueError(
+            f"trapping_sets: n={n} exceeds MAX_N={MAX_N}; the dense pair-overlap matrix is sized for the cap"
+        )
     pair_over = np.zeros((n, n), dtype=np.int32)
     pair_over[u, v] = ov
     pair_over[v, u] = ov
     centers, ends_a, ends_c = [], [], []
     for g in np.unique(deg[deg >= 2]):
         bs = np.nonzero(deg == g)[0]
-        nb = dst[first[bs][:, None] + np.arange(g)[None, :]]     # (len(bs), g)
+        nb = dst[first[bs][:, None] + np.arange(g)[None, :]]  # (len(bs), g)
         idx = np.asarray(list(combinations(range(int(g)), 2)), dtype=np.int64)
-        pairs = np.sort(nb[:, idx], axis=2).reshape(-1, 2)      # a < c
+        pairs = np.sort(nb[:, idx], axis=2).reshape(-1, 2)  # a < c
         centers.append(np.repeat(bs, len(idx)))
         ends_a.append(pairs[:, 0])
         ends_c.append(pairs[:, 1])
@@ -1306,16 +1379,14 @@ def trapping_sets(checks, n, max_size=TS_MAX_SIZE,
     if tri.any():
         in3 = _in_check_subsets(checks, 3)
         if len(in3):
-            tk, tc = np.unique((in3[:, 0] * n + in3[:, 1]) * n + in3[:, 2],
-                               return_counts=True)
+            tk, tc = np.unique((in3[:, 0] * n + in3[:, 1]) * n + in3[:, 2], return_counts=True)
             t = np.sort(np.stack([a[tri], b[tri], c[tri]], axis=1), axis=1)
             key = (t[:, 0] * n + t[:, 1]) * n + t[:, 2]
             pos = np.minimum(np.searchsorted(tk, key), len(tk) - 1)
             triple_over[tri] = np.where(tk[pos] == key, tc[pos], 0)
     # a check meeting the triple once or three times is odd: by inclusion and
     # exclusion the count of such checks is sum(col) - 2 sum(pair) + 4 triple.
-    b3 = (col[a] + col[b] + col[c]
-          - 2 * (pair_over[a, b] + pair_over[b, c] + o_ac) + 4 * triple_over)
+    b3 = col[a] + col[b] + col[c] - 2 * (pair_over[a, b] + pair_over[b, c] + o_ac) + 4 * triple_over
     weight = np.where(tri, 1.0 / 3.0, 1.0)
     for bb, cnt in enumerate(np.bincount(b3, weights=weight)):
         if cnt > 0.5:
@@ -1330,8 +1401,7 @@ def support_diameter(coords, support):
     diameter 0.0.
     """
     ps = [coords[q] for q in support]
-    return max((math.dist(a, b) for i, a in enumerate(ps) for b in ps[i + 1:]),
-               default=0.0)
+    return max((math.dist(a, b) for i, a in enumerate(ps) for b in ps[i + 1 :]), default=0.0)
 
 
 def checks_sha256(doc):
@@ -1350,13 +1420,14 @@ def checks_sha256(doc):
     """
     checks = doc["checks"]
     if "S" in checks and "X" not in checks:
-        canon = {"S": sorted([sorted(int(q) for q in row.get("X", [])),
-                              sorted(int(q) for q in row.get("Z", []))]
-                             for row in checks["S"])}
+        canon = {
+            "S": sorted(
+                [sorted(int(q) for q in row.get("X", [])), sorted(int(q) for q in row.get("Z", []))]
+                for row in checks["S"]
+            )
+        }
     else:
-        canon = {side: sorted(sorted(int(q) for q in row)
-                              for row in checks[side])
-                 for side in ("X", "Z")}
+        canon = {side: sorted(sorted(int(q) for q in row) for row in checks[side]) for side in ("X", "Z")}
     blob = json.dumps(canon, separators=(",", ":"), sort_keys=True)
     return hashlib.sha256(blob.encode("ascii")).hexdigest()
 
@@ -1381,16 +1452,14 @@ def sector_distances(doc, earned, refutation=None):
     for side in sides:
         e = earned.get(side) if earned else None
         wt = int(e["value"]) if e else None
-        entry = {"upper": wt, "lower": None, "exact": False,
-                 "witness_weight": wt, "refuted_to": None}
-        if (refutation and refutation.get("side") == side and wt is not None
-                and refutation["weight"] < wt):
+        entry = {"upper": wt, "lower": None, "exact": False, "witness_weight": wt, "refuted_to": None}
+        if refutation and refutation.get("side") == side and wt is not None and refutation["weight"] < wt:
             entry["upper"] = entry["refuted_to"] = int(refutation["weight"])
         out[side] = entry
         uppers.append(entry["upper"])
     d_up = min(uppers) if uppers and all(u is not None for u in uppers) else None
     if refutation and d_up is not None and refutation["weight"] < d_up:
-        d_up = int(refutation["weight"])     # a lighter logical bounds d whatever its side
+        d_up = int(refutation["weight"])  # a lighter logical bounds d whatever its side
     out["d"] = {"upper": d_up, "lower": None, "exact": False}
     return out
 
@@ -1434,8 +1503,7 @@ def apply_certificate(sector, doc, cert):
             return out
         for key in sides + ["d"]:
             up = out[key]["upper"]
-            val = (doc["distance"]["d"] if key == "d"
-                   else (doc["distance"].get(key) or {}).get("value"))
+            val = doc["distance"]["d"] if key == "d" else (doc["distance"].get(key) or {}).get("value")
             if up is not None and val is not None and up == val:
                 out[key].update(lower=int(val), exact=True)
         return out
@@ -1465,13 +1533,18 @@ def verify(doc, refute=False, seed=None, cert=None):
     failing run is reproducible (re-run with that seed). Pass an explicit ``seed``
     to reproduce a run or for a deterministic test. ``cert`` is the entry's
     certificate (certs/<slug>.json) when the caller has one; it fills the lower
-    bounds of ``computed.sector_distances`` and changes no check (issue #6812)."""
-    report = {"name": doc.get("name") if isinstance(doc, dict) else None,
-              "checks": [], "ok": True, "computed": {}, "earned_distance": {}}
+    bounds of ``computed.sector_distances`` and changes no check (issue #6812).
+    """
+    report = {
+        "name": doc.get("name") if isinstance(doc, dict) else None,
+        "checks": [],
+        "ok": True,
+        "computed": {},
+        "earned_distance": {},
+    }
 
     def record(label, ok, detail=""):
-        report["checks"].append({"check": label, "ok": bool(ok),
-                                  "detail": detail})
+        report["checks"].append({"check": label, "ok": bool(ok), "detail": detail})
         if not ok:
             report["ok"] = False
 
@@ -1510,7 +1583,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     # index bounds already gated in verify(); safe to build matrices.
     if stab:
         A, B = stabilizer_matrices(doc)
-        S = np.concatenate([A, B], axis=1)          # m x 2n, S = (A | B)
+        S = np.concatenate([A, B], axis=1)  # m x 2n, S = (A | B)
         HX = HZ = None
     else:
         HX = _matrix(doc["checks"]["X"], n)
@@ -1522,9 +1595,9 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     # equivalent. Permuted copies are caught by the WL signature instead.
     # A stabilizer code has one matrix, so its fingerprint is rref(S).
     import hashlib
+
     if stab:
-        report["fingerprint"] = hashlib.sha256(
-            gf2.rref(S)[0].tobytes()).hexdigest()[:16]
+        report["fingerprint"] = hashlib.sha256(gf2.rref(S)[0].tobytes()).hexdigest()[:16]
     else:
         report["fingerprint"] = css_fingerprint(HX, HZ)
 
@@ -1533,20 +1606,20 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     #    stabilizer generator the X list and the Z list are each checked; a
     #    qubit in both is a Y, not a repeat.
     if stab:
-        empty_rows = [i for i, g in enumerate(doc["checks"]["S"])
-                      if len(set(g["X"])) != len(g["X"])
-                      or len(set(g["Z"])) != len(g["Z"])]
+        empty_rows = [
+            i
+            for i, g in enumerate(doc["checks"]["S"])
+            if len(set(g["X"])) != len(g["X"]) or len(set(g["Z"])) != len(g["Z"])
+        ]
     else:
         empty_rows = [i for i, s in enumerate(supports) if len(set(s)) != len(s)]
-    record("no_repeated_qubits_in_a_check", not empty_rows,
-           f"rows with repeats: {empty_rows[:5]}")
+    record("no_repeated_qubits_in_a_check", not empty_rows, f"rows with repeats: {empty_rows[:5]}")
 
     # The challenge rule applies to the combined X/Z Tanner graph. Count all
     # qubit and check vertices, including isolated vertices, so a disconnected
     # direct sum or an unused qubit cannot pass by construction.
     ncomponents = _tanner_component_count(supports, n)
-    record("tanner_connected", ncomponents == 1,
-           f"Tanner graph has {ncomponents} connected component(s)")
+    record("tanner_connected", ncomponents == 1, f"Tanner graph has {ncomponents} connected component(s)")
     # The same rule applied to the stabilizer group rather than the submitted
     # rows: a direct sum padded with a redundant cross-block check, or a qubit
     # frozen by a weight-1 stabilizer hiding in the row space, has a connected
@@ -1556,9 +1629,11 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     else:
         nblocks, block_sizes = _stabilizer_block_count(HX, HZ, n)
     shown = ", ".join(map(str, block_sizes[:6])) + (", ..." if nblocks > 6 else "")
-    record("stabilizer_group_connected", nblocks == 1,
-           f"stabilizer group splits into {nblocks} independent block(s) on "
-           f"disjoint qubit sets (sizes {shown})")
+    record(
+        "stabilizer_group_connected",
+        nblocks == 1,
+        f"stabilizer group splits into {nblocks} independent block(s) on disjoint qubit sets (sizes {shown})",
+    )
 
     # 3. commutation. CSS: H_X H_Z^T = 0. Stabilizer: the symplectic product
     #    of every pair of generators vanishes, A B^T + B A^T = 0 (isotropy),
@@ -1566,20 +1641,22 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     #    H'_X = (A | B), H'_Z = (B | A) of arXiv:2609.30069, Sec. IV.A.
     if stab:
         css = not bool(((A @ B.T + B @ A.T) % 2).any())
-        record("stabilizer_commutation", css,
-               "A B^T + B A^T = 0 over GF(2) (every pair of generators commutes)")
+        record("stabilizer_commutation", css, "A B^T + B A^T = 0 over GF(2) (every pair of generators commutes)")
         # A stabilizer submission must genuinely need the general format. If
         # every generator is pure X or pure Z the code is CSS, and typing it
         # "stabilizer" would drop it out of the CSS board and its per-side
         # semantics, so it is rejected with the fix spelled out.
         pure = all(not g["X"] or not g["Z"] for g in doc["checks"]["S"])
-        record("stabilizer_code_is_not_css", not pure,
-               "every generator is pure X or pure Z, so this is a CSS code: "
-               "set code_type to \"CSS\" and give the generators as checks.X "
-               "and checks.Z with distance.X and distance.Z witnesses"
-               if pure else
-               f"{sum(1 for g in doc['checks']['S'] if g['X'] and g['Z'])} of "
-               f"{len(doc['checks']['S'])} generators mix X and Z")
+        record(
+            "stabilizer_code_is_not_css",
+            not pure,
+            "every generator is pure X or pure Z, so this is a CSS code: "
+            'set code_type to "CSS" and give the generators as checks.X '
+            "and checks.Z with distance.X and distance.Z witnesses"
+            if pure
+            else f"{sum(1 for g in doc['checks']['S'] if g['X'] and g['Z'])} of "
+            f"{len(doc['checks']['S'])} generators mix X and Z",
+        )
     else:
         css = not bool(((HX @ HZ.T) % 2).any())
         record("css_commutation", css, "H_X H_Z^T = 0 over GF(2)")
@@ -1593,12 +1670,10 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         rx, rz = gf2.rank(HX), gf2.rank(HZ)
         k_computed = n - rx - rz
         report["computed"].update(n=n, rank_HX=rx, rank_HZ=rz, k=k_computed)
-    record("k_matches_claim", k_computed == doc["k"],
-           f"computed k={k_computed}, claimed {doc['k']}")
+    record("k_matches_claim", k_computed == doc["k"], f"computed k={k_computed}, claimed {doc['k']}")
     # A code must encode at least one logical qubit; k<=0 is degenerate (nothing
     # to protect) and has no distance, so reject it outright.
-    record("k_at_least_1", k_computed >= 1,
-           f"computed k={k_computed}; a submission must encode >= 1 logical qubit")
+    record("k_at_least_1", k_computed >= 1, f"computed k={k_computed}; a submission must encode >= 1 logical qubit")
 
     # 5. check weights (for the weight-bounded tracks); for a stabilizer
     #    generator this is |A_i union B_i|, the number of qubits it acts on
@@ -1608,15 +1683,18 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     # The tightest cap the max check weight fits under; ">8" for anything heavier
     # so every code still has a home on the weight axis.
     report["computed"]["weight_class"] = (
-        "weight-4" if wmax <= 4 else "weight-6" if wmax <= 6
-        else "weight-8" if wmax <= 8 else "weight-9plus")
+        "weight-4" if wmax <= 4 else "weight-6" if wmax <= 6 else "weight-8" if wmax <= 8 else "weight-9plus"
+    )
     # Sparsity backstop: LDPC means a bounded, small check weight. The cap is far
     # above any plausible qLDPC code on this board (weights run to ~10), so it
     # only rejects a dense matrix submitted as a "code", not a real entry.
-    record("check_weight_is_ldpc", wmax <= MAX_CHECK_WEIGHT,
-           f"max check weight {wmax} far exceeds LDPC sparsity "
-           f"(cap {MAX_CHECK_WEIGHT})"
-           if wmax > MAX_CHECK_WEIGHT else f"max check weight {wmax}")
+    record(
+        "check_weight_is_ldpc",
+        wmax <= MAX_CHECK_WEIGHT,
+        f"max check weight {wmax} far exceeds LDPC sparsity (cap {MAX_CHECK_WEIGHT})"
+        if wmax > MAX_CHECK_WEIGHT
+        else f"max check weight {wmax}",
+    )
 
     # 5a. decoder-friendliness diagnostics (issue #1844), read off each side's
     #     Tanner graph: girth, weight profiles, and a bounded trapping-set
@@ -1624,15 +1702,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     #     and no verdict depends on it. See tanner_girth and trapping_sets.
     #     A stabilizer code has one Tanner graph, over the generator
     #     supports, reported under the side key "S".
-    diag = {"tanner_girth": {}, "weight_profile": {},
-            "trapping_sets": {"max_size": TS_MAX_SIZE,
-                              "candidate_cap": TS_MAX_CANDIDATES}}
+    diag = {
+        "tanner_girth": {},
+        "weight_profile": {},
+        "trapping_sets": {"max_size": TS_MAX_SIZE, "candidate_cap": TS_MAX_CANDIDATES},
+    }
     if not stab:
-        diag["row_space_intersection_dimension"] = (
-            css_row_space_intersection_dimension(HX, HZ, rx, rz)
-        )
-    diag_sides = (("S", supports),) if stab else (
-        ("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"]))
+        diag["row_space_intersection_dimension"] = css_row_space_intersection_dimension(HX, HZ, rx, rz)
+    diag_sides = (("S", supports),) if stab else (("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"]))
     for side, rows in diag_sides:
         g = tanner_girth(rows, n)
         diag["tanner_girth"][side] = "acyclic" if g is None else g
@@ -1649,12 +1726,14 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         # an ensemble of models: every named member must carry a version
         model = ", ".join(str(x) for x in model)
     if model and model.strip() and model.strip().lower() != "human":
-        specific = all(any(ch.isdigit() for ch in part)
-                       for part in model.split(",") if part.strip())
-        record("model_version_specified", specific,
-               model if specific else
-               f"'{model}' names no version; give the exact model, e.g. "
-               "'Claude Opus 4.8', or omit the field")
+        specific = all(any(ch.isdigit() for ch in part) for part in model.split(",") if part.strip())
+        record(
+            "model_version_specified",
+            specific,
+            model
+            if specific
+            else f"'{model}' names no version; give the exact model, e.g. 'Claude Opus 4.8', or omit the field",
+        )
 
     # Layer-2 family tag: optional, but if present must be from the vocabulary.
     family = doc.get("family")
@@ -1664,21 +1743,27 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         # because the vocabulary has not caught up. Accept a well-formed new tag
         # and flag it for review; the family is a filter, never a ranking input.
         wellformed = bool(re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", str(family)))
-        record("family_in_vocabulary", known or wellformed,
-               family if known
-               else f"'{family}' is a new family tag, accepted but not yet in "
-                    "the vocabulary; please open an issue so the tracks and the "
-                    "site labels can follow"
-               if wellformed
-               else f"'{family}' is malformed; use a lowercase-hyphenated tag, "
-                    f"e.g. one of {sorted(_FAMILIES)}")
+        record(
+            "family_in_vocabulary",
+            known or wellformed,
+            family
+            if known
+            else f"'{family}' is a new family tag, accepted but not yet in "
+            "the vocabulary; please open an issue so the tracks and the "
+            "site labels can follow"
+            if wellformed
+            else f"'{family}' is malformed; use a lowercase-hyphenated tag, e.g. one of {sorted(_FAMILIES)}",
+        )
 
     novelty = (doc.get("provenance") or {}).get("novelty")
     if novelty is not None:
-        record("novelty_in_vocabulary", novelty in _NOVELTY,
-               novelty if novelty in _NOVELTY
-               else f"'{novelty}' is not a known novelty status; use one of "
-               f"{sorted(_NOVELTY)}")
+        record(
+            "novelty_in_vocabulary",
+            novelty in _NOVELTY,
+            novelty
+            if novelty in _NOVELTY
+            else f"'{novelty}' is not a known novelty status; use one of {sorted(_NOVELTY)}",
+        )
 
     # A declared Clifford relabeling (issue #2802). A Clifford on blocks of
     # qubits maps a board entry to a code with the same n, k and code space
@@ -1690,28 +1775,44 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     parent = (doc.get("provenance") or {}).get("clifford_relabel_of")
     if parent is not None:
         pdoc = _board_code(parent)
-        record("clifford_relabel_parent_on_board", pdoc is not None,
-               f"codes/{parent}.json" if pdoc is not None else
-               f"clifford_relabel_of names codes/{parent}.json, which is not "
-               "on the board; a relabeling of an entry that does not exist "
-               "declares nothing")
+        record(
+            "clifford_relabel_parent_on_board",
+            pdoc is not None,
+            f"codes/{parent}.json"
+            if pdoc is not None
+            else f"clifford_relabel_of names codes/{parent}.json, which is not "
+            "on the board; a relabeling of an entry that does not exist "
+            "declares nothing",
+        )
         if pdoc is not None:
-            same = (pdoc.get("n") == doc.get("n") and pdoc.get("k") == doc.get("k"))
-            record("clifford_relabel_same_n_k", same,
-                   f"parent [[{pdoc.get('n')},{pdoc.get('k')}]], this "
-                   f"[[{doc.get('n')},{doc.get('k')}]]" + ("" if same else
-                   "; a Clifford image has its parent's n and k, so this is "
-                   "not a relabeling of that entry"))
-            self_ref = (pdoc.get("checks") == doc.get("checks"))
-            record("clifford_relabel_is_not_itself", not self_ref,
-                   "parent differs" if not self_ref else
-                   "the named parent has identical checks; a code is not a "
-                   "relabeling of itself")
-        record("clifford_relabel_not_new_parameters",
-               novelty != "new_parameters",
-               "novelty is not new_parameters" if novelty != "new_parameters"
-               else "a Clifford image shares its parent's [[n,k,d]] up to the "
-               "relabeling, so it cannot also claim new_parameters")
+            same = pdoc.get("n") == doc.get("n") and pdoc.get("k") == doc.get("k")
+            record(
+                "clifford_relabel_same_n_k",
+                same,
+                f"parent [[{pdoc.get('n')},{pdoc.get('k')}]], this "
+                f"[[{doc.get('n')},{doc.get('k')}]]"
+                + (
+                    ""
+                    if same
+                    else "; a Clifford image has its parent's n and k, so this is not a relabeling of that entry"
+                ),
+            )
+            self_ref = pdoc.get("checks") == doc.get("checks")
+            record(
+                "clifford_relabel_is_not_itself",
+                not self_ref,
+                "parent differs"
+                if not self_ref
+                else "the named parent has identical checks; a code is not a relabeling of itself",
+            )
+        record(
+            "clifford_relabel_not_new_parameters",
+            novelty != "new_parameters",
+            "novelty is not new_parameters"
+            if novelty != "new_parameters"
+            else "a Clifford image shares its parent's [[n,k,d]] up to the "
+            "relabeling, so it cannot also claim new_parameters",
+        )
 
     # 6. distance witnesses (self-certifying upper bounds)
     dist = doc["distance"]
@@ -1728,9 +1829,11 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         side_specs = [("X", HZ, HX), ("Z", HX, HZ)]
     for side, opp_H, own_H in side_specs:
         if side not in dist:
-            record(f"distance_{side}_present", False,
-                   "a P distance witness is required" if stab else
-                   "both X and Z distance witnesses are required")
+            record(
+                f"distance_{side}_present",
+                False,
+                "a P distance witness is required" if stab else "both X and Z distance witnesses are required",
+            )
             continue
         sd = dist[side]
         if stab:
@@ -1739,52 +1842,55 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
             in_ker = symplectic_commutes(x, z, A, B)
             nontrivial = not gf2.in_rowspace(np.concatenate([x, z]), S)
             hamming = int(x.sum() + z.sum())
-            extra = (f", hamming={hamming} (Y factors: {hamming - wt})"
-                     if hamming != wt else "")
+            extra = f", hamming={hamming} (Y factors: {hamming - wt})" if hamming != wt else ""
         else:
             v = _vec(sd["witness"], n)
             wt = int(v.sum())
-            in_ker = gf2.commutes(v, opp_H)          # commutes with opposite checks
+            in_ker = gf2.commutes(v, opp_H)  # commutes with opposite checks
             nontrivial = not gf2.in_rowspace(v, own_H)  # not a stabilizer product
             extra = ""
         good = (wt == sd["value"]) and in_ker and nontrivial
-        record(f"distance_{side}_witness", good,
-               f"weight={wt} (claim {sd['value']}), in_ker={in_ker}, "
-               f"nontrivial={nontrivial}{extra}")
+        record(
+            f"distance_{side}_witness",
+            good,
+            f"weight={wt} (claim {sd['value']}), in_ker={in_ker}, nontrivial={nontrivial}{extra}",
+        )
         if good:
             tier = "upper_bound"  # 'exact' must be earned by server cert
-            report["earned_distance"][side] = {"value": sd["value"],
-                                               "tier": tier}
+            report["earned_distance"][side] = {"value": sd["value"], "tier": tier}
             earned_d.append(sd["value"])
             earned_sides.add(side)
             if sd["confidence"] == "exact":
-                record(f"distance_{side}_exact_flagged", True,
-                       "exact claim accepted as upper_bound pending server "
-                       "certification" if not stab else
-                       "exact claim accepted as upper_bound: the Pauli-weight "
-                       "certifier (verify/certify.py for stabilizer codes) is "
-                       "not available yet")
+                record(
+                    f"distance_{side}_exact_flagged",
+                    True,
+                    "exact claim accepted as upper_bound pending server certification"
+                    if not stab
+                    else "exact claim accepted as upper_bound: the Pauli-weight "
+                    "certifier (verify/certify.py for stabilizer codes) is "
+                    "not available yet",
+                )
 
     # 7. code distance consistency
     if stab and earned_sides == {"P"}:
         matches = dist["P"]["value"] == dist["d"]
-        record("d_matches_pauli_side", matches,
-               f"earned P = {dist['P']['value']}, claimed d = {dist['d']}")
+        record("d_matches_pauli_side", matches, f"earned P = {dist['P']['value']}, claimed d = {dist['d']}")
         if matches:
-            report["earned_distance"]["d"] = {"value": dist["d"],
-                                              "tier": "upper_bound"}
+            report["earned_distance"]["d"] = {"value": dist["d"], "tier": "upper_bound"}
     elif earned_sides == {"X", "Z"}:
         d_earned = min(earned_d)
         matches = d_earned == dist["d"]
-        record("d_matches_min_side", matches,
-               f"min earned side = {d_earned}, claimed d = {dist['d']}")
+        record("d_matches_min_side", matches, f"min earned side = {d_earned}, claimed d = {dist['d']}")
         if matches:
-            report["earned_distance"]["d"] = {"value": dist["d"],
-                                              "tier": "upper_bound"}
+            report["earned_distance"]["d"] = {"value": dist["d"], "tier": "upper_bound"}
     else:
-        record("distance_global_earned", False,
-               "a valid P witness is required to earn a distance" if stab else
-               "valid X and Z witnesses are required to earn a global distance")
+        record(
+            "distance_global_earned",
+            False,
+            "a valid P witness is required to earn a distance"
+            if stab
+            else "valid X and Z witnesses are required to earn a global distance",
+        )
 
     # 7a. local-Clifford equivalence. A CSS code with a single-qubit
     #     Clifford on some qubits (a Hadamard, an S, any of the six) is a
@@ -1804,9 +1910,11 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
             # No Clifford needed: every generator is already pure, which is
             # the CSS code step 3 rejects with its own instruction. A second
             # rejection naming zero qubits would only confuse the submitter.
-            record("stabilizer_code_is_not_locally_css", True,
-                   "every generator is already pure, see "
-                   "stabilizer_code_is_not_css")
+            record(
+                "stabilizer_code_is_not_locally_css",
+                True,
+                "every generator is already pure, see stabilizer_code_is_not_css",
+            )
         elif found is not None:
             types, ops = found
             images = clifford_css_images(doc, types)
@@ -1816,31 +1924,36 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
                 "clifford_qubits": qubits,
                 "clifford_ops": {str(q): ops[q] for q in qubits},
                 "x_type_generators": [i for i, t in enumerate(types) if t == "X"],
-                "fingerprints": [css_fingerprint(_matrix(im["checks"]["X"], n),
-                                                 _matrix(im["checks"]["Z"], n))
-                                 for im in images],
+                "fingerprints": [
+                    css_fingerprint(_matrix(im["checks"]["X"], n), _matrix(im["checks"]["Z"], n)) for im in images
+                ],
                 "signatures": [signature(im)["hash"] for im in images],
             }
             if kinds == ["ZYX"]:
                 report["css_equivalent"]["hadamard_qubits"] = qubits
                 what = f"a Hadamard on {len(qubits)} qubit(s)"
             else:
-                what = (f"single-qubit Cliffords on {len(qubits)} qubit(s) "
-                        f"(X,Y,Z -> {', '.join(kinds)})")
+                what = f"single-qubit Cliffords on {len(qubits)} qubit(s) (X,Y,Z -> {', '.join(kinds)})"
             shown = ", ".join(map(str, qubits[:12])) + (", ..." if len(qubits) > 12 else "")
             nx = sum(1 for t in types if t == "X")
-            record("stabilizer_code_is_not_locally_css", False,
-                   f"{what} [{shown}] makes every generator pure, so this is "
-                   f"a CSS code up to a local Clifford: set code_type to "
-                   f"\"CSS\" and submit that image, generator supports as "
-                   f"checks.X ({nx} generators) and checks.Z "
-                   f"({len(types) - nx}) with distance.X and distance.Z "
-                   f"witnesses (css_equivalent in this report names the "
-                   f"X-type generators and the Clifford per qubit)")
+            record(
+                "stabilizer_code_is_not_locally_css",
+                False,
+                f"{what} [{shown}] makes every generator pure, so this is "
+                f"a CSS code up to a local Clifford: set code_type to "
+                f'"CSS" and submit that image, generator supports as '
+                f"checks.X ({nx} generators) and checks.Z "
+                f"({len(types) - nx}) with distance.X and distance.Z "
+                f"witnesses (css_equivalent in this report names the "
+                f"X-type generators and the Clifford per qubit)",
+            )
         else:
-            record("stabilizer_code_is_not_locally_css", True,
-                   "no single-qubit Cliffords make every generator pure X or "
-                   "pure Z: the code is non-CSS under any local Clifford")
+            record(
+                "stabilizer_code_is_not_locally_css",
+                True,
+                "no single-qubit Cliffords make every generator pure X or "
+                "pure Z: the code is non-CSS under any local Clifford",
+            )
     else:
         # A CSS entry is filed under its own local-Hadamard images too, so the
         # two families are deduped up to the same relation. Without
@@ -1854,17 +1967,19 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
                 "of": "css",
                 "images": len(images),
                 "enumeration_capped": capped,
-                "fingerprints": [css_fingerprint(_matrix(im["checks"]["X"], n),
-                                                 _matrix(im["checks"]["Z"], n))
-                                 for im in images],
+                "fingerprints": [
+                    css_fingerprint(_matrix(im["checks"]["X"], n), _matrix(im["checks"]["Z"], n)) for im in images
+                ],
                 "signatures": [signature(im)["hash"] for im in images],
             }
-            record("local_hadamard_css_images", True,
-                   f"{len(images)} local-Hadamard image(s) of this CSS code "
-                   f"filed with it, so a Hadamard-relabelled copy collides "
-                   f"with it whichever code_type it is submitted under"
-                   + (" (enumeration capped; the X/Z swap was used)"
-                      if capped else ""))
+            record(
+                "local_hadamard_css_images",
+                True,
+                f"{len(images)} local-Hadamard image(s) of this CSS code "
+                f"filed with it, so a Hadamard-relabelled copy collides "
+                f"with it whichever code_type it is submitted under"
+                + (" (enumeration capped; the X/Z swap was used)" if capped else ""),
+            )
 
     # 8. independent distance refutation. A bounded RIS search must not find a
     #    logical lighter than the claimed distance. This is SOUND -- any hit is a
@@ -1886,17 +2001,26 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         run_seed = seed if seed is not None else secrets.randbelow(2**31)
         try:
             import heuristic_distance
+
             refuted, d_found, wit, ntr = heuristic_distance.refute_check(doc, seed=run_seed)
-            record("distance_not_refuted", not refuted,
-                   (f"found weight-{d_found} logical < claimed {dist['d']} "
-                    f"(seed {run_seed}); witness={wit}" if refuted
-                    else f"no lighter logical in {ntr} RIS trials (seed {run_seed})"))
+            record(
+                "distance_not_refuted",
+                not refuted,
+                (
+                    f"found weight-{d_found} logical < claimed {dist['d']} (seed {run_seed}); witness={wit}"
+                    if refuted
+                    else f"no lighter logical in {ntr} RIS trials (seed {run_seed})"
+                ),
+            )
             if refuted:
                 found = (d_found, wit)
         except Exception as e:
-            record("distance_not_refuted", False,
-                   f"refutation could not run ({type(e).__name__}: {e}; seed "
-                   f"{run_seed}); failing closed -- manual review required")
+            record(
+                "distance_not_refuted",
+                False,
+                f"refutation could not run ({type(e).__name__}: {e}; seed "
+                f"{run_seed}); failing closed -- manual review required",
+            )
 
     # 8a. sector distances (issue #6812): the per-side intervals, under
     #     computed so a gate verdict and a memoized board report carry them. A
@@ -1917,11 +2041,9 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
             elif gf2.commutes(v, HX) and not gf2.in_rowspace(v, HZ):
                 side_found = "Z"
         refutation = {"side": side_found, "weight": int(d_found), "witness": wit}
-    report["computed"]["sector_distances"] = sector_distances(
-        doc, report["earned_distance"], refutation)
+    report["computed"]["sector_distances"] = sector_distances(doc, report["earned_distance"], refutation)
     if cert:
-        report["computed"]["sector_distances"] = apply_certificate(
-            report["computed"]["sector_distances"], doc, cert)
+        report["computed"]["sector_distances"] = apply_certificate(report["computed"]["sector_distances"], doc, cert)
 
     # 9. locality / geometric 2D embedding. The locality CLASS is computed from
     #    the layout, never trusted from a self-declared track. A class is earned
@@ -1953,8 +2075,8 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     #    checked the same way, reported with dimension 3, and lands in
     #    `unrestricted`, where the site prices it by the D = 3 geometric
     #    efficiency (TRACKS.md).
-    LOCALITY_CLASSES = [   # tightest first
-        ("local-2d-single",  1, 4.0),
+    LOCALITY_CLASSES = [  # tightest first
+        ("local-2d-single", 1, 4.0),
         ("local-2d-bilayer", 2, 7.0),
     ]
     locality_class = "unrestricted"
@@ -1963,44 +2085,45 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
         coords = loc["coordinates"]
         layers = loc.get("layers", 1)
         cover = len(coords) == n
-        record("coordinates_cover_all_qubits", cover,
-               f"{len(coords)} coords, n={n}")
+        record("coordinates_cover_all_qubits", cover, f"{len(coords)} coords, n={n}")
         dims = {len(c) for c in coords}
         dim = next(iter(dims)) if len(dims) == 1 else None
         if cover:
-            record("coordinates_uniform_dimension", dim in (2, 3),
-                   f"D = {dim}" if dim in (2, 3)
-                   else f"points of dimension {sorted(dims)}; every point in "
-                        "a layout must be [x, y] or [x, y, z]")
+            record(
+                "coordinates_uniform_dimension",
+                dim in (2, 3),
+                f"D = {dim}"
+                if dim in (2, 3)
+                else f"points of dimension {sorted(dims)}; every point in a layout must be [x, y] or [x, y, z]",
+            )
         if cover and dim in (2, 3):
             pts = [tuple(c) for c in coords]
 
             def diam(sup):
                 ps = [coords[q] for q in sup]
-                return max((math.dist(a, b) for a in ps for b in ps),
-                           default=0.0)
+                return max((math.dist(a, b) for a in ps for b in ps), default=0.0)
+
             # radius over the generator supports (X and Z rows of a CSS
             # code, the qubit support of each stabilizer generator otherwise)
             radius = max((diam(s) for s in supports), default=0.0)
 
             from collections import Counter
+
             mult = Counter(pts)
             max_mult = max(mult.values())
             sites = sorted(mult)
-            min_spacing = min((math.dist(a, b)
-                               for i, a in enumerate(sites)
-                               for b in sites[i + 1:]), default=float("inf"))
+            min_spacing = min(
+                (math.dist(a, b) for i, a in enumerate(sites) for b in sites[i + 1 :]), default=float("inf")
+            )
             bbox = [round(max(axis) - min(axis), 4) for axis in zip(*pts)]
             extent = math.prod(bbox)
-            density_key = ("qubits_per_unit_area" if dim == 2
-                           else "qubits_per_unit_volume")
+            density_key = "qubits_per_unit_area" if dim == 2 else "qubits_per_unit_volume"
             report["computed"]["locality"] = {
                 "dimension": dim,
                 "interaction_radius": round(radius, 4),
                 "layers": layers,
                 "max_qubits_per_site": max_mult,
-                "min_site_spacing": (round(min_spacing, 4)
-                                     if min_spacing != float("inf") else None),
+                "min_site_spacing": (round(min_spacing, 4) if min_spacing != float("inf") else None),
                 density_key: round(len(pts) / extent, 4) if extent else None,
                 "bbox": bbox,
             }
@@ -2012,23 +2135,27 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
             ldiam = {}
             for side in sides(doc):
                 wit = (doc["distance"].get(side) or {}).get("witness") or []
-                if isinstance(wit, dict):        # Pauli witness: its qubit support
+                if isinstance(wit, dict):  # Pauli witness: its qubit support
                     wit = sorted(set(wit["X"]) | set(wit["Z"]))
                 if wit and all(0 <= q < n for q in wit):
                     ldiam[side] = round(support_diameter(coords, wit), 4)
             report["computed"]["diagnostics"]["logical_diameter"] = ldiam
             if "interaction_radius" in loc:
-                record("interaction_radius_within_claim",
-                       radius <= loc["interaction_radius"] + 1e-9,
-                       f"measured {radius:.4f} <= claim "
-                       f"{loc['interaction_radius']}")
-            record("site_occupancy_within_layers", max_mult <= layers,
-                   f"max {max_mult} qubit(s) per site, layers={layers}")
-            record("site_spacing_at_least_one",
-                   min_spacing >= 1.0 - 1e-9,
-                   "single occupied site" if min_spacing == float("inf")
-                   else f"min spacing between distinct sites "
-                        f"{min_spacing:.4f} (>= 1.0 required)")
+                record(
+                    "interaction_radius_within_claim",
+                    radius <= loc["interaction_radius"] + 1e-9,
+                    f"measured {radius:.4f} <= claim {loc['interaction_radius']}",
+                )
+            record(
+                "site_occupancy_within_layers", max_mult <= layers, f"max {max_mult} qubit(s) per site, layers={layers}"
+            )
+            record(
+                "site_spacing_at_least_one",
+                min_spacing >= 1.0 - 1e-9,
+                "single occupied site"
+                if min_spacing == float("inf")
+                else f"min spacing between distinct sites {min_spacing:.4f} (>= 1.0 required)",
+            )
             honest = max_mult <= layers and min_spacing >= 1.0 - 1e-9
             if honest:
                 # Heuristic routing cost (issue #1847), computed from every
@@ -2051,18 +2178,23 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
                     if layers <= max_layers and radius <= cap + 1e-9:
                         locality_class = cls
                         break
-                caps = ", ".join(f"{c} <= {cap} at <= {ml} layer(s)"
-                                 for c, ml, cap in LOCALITY_CLASSES)
-                record("locality_class_computed", True,
-                       locality_class if locality_class != "unrestricted"
-                       else f"unrestricted: radius {radius:.4f} at {layers} "
-                            f"layer(s) meets no class cap ({caps})")
+                caps = ", ".join(f"{c} <= {cap} at <= {ml} layer(s)" for c, ml, cap in LOCALITY_CLASSES)
+                record(
+                    "locality_class_computed",
+                    True,
+                    locality_class
+                    if locality_class != "unrestricted"
+                    else f"unrestricted: radius {radius:.4f} at {layers} layer(s) meets no class cap ({caps})",
+                )
             elif honest:
-                record("locality_class_computed", True,
-                       f"unrestricted: 3D layout (radius {radius:.4f} at "
-                       f"{layers} layer(s)); the 2D-local classes need planar "
-                       "coordinates, and the layout is priced by the D = 3 "
-                       "geometric efficiency")
+                record(
+                    "locality_class_computed",
+                    True,
+                    f"unrestricted: 3D layout (radius {radius:.4f} at "
+                    f"{layers} layer(s)); the 2D-local classes need planar "
+                    "coordinates, and the layout is priced by the D = 3 "
+                    "geometric efficiency",
+                )
 
     # 10. module structure (issue #1846). `locality.modules` assigns every
     #     qubit to a hardware module (one integer per qubit). It is the same
@@ -2080,16 +2212,15 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     modules = loc.get("modules") if loc is not None else None
     if modules is not None:
         cover_m = len(modules) == n
-        record("modules_cover_all_qubits", cover_m,
-               f"{len(modules)} module ids, n={n}")
+        record("modules_cover_all_qubits", cover_m, f"{len(modules)} module ids, n={n}")
         if cover_m:
             from collections import Counter
+
             ids = sorted(set(modules))
             per_module = Counter(modules)
             # crossings are reported by side for a CSS code (row index into
             # checks.X / checks.Z) and under "S" for a stabilizer code
-            mod_sides = ((("S", supports),) if stab else
-                         (("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"])))
+            mod_sides = (("S", supports),) if stab else (("X", doc["checks"]["X"]), ("Z", doc["checks"]["Z"]))
             crossing = {side: [] for side, _ in mod_sides}
             neighbors = {m: set() for m in ids}
             for side, rows in mod_sides:
@@ -2110,9 +2241,11 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
                 "max_ports": max(ports.values()),
             }
             modular = True
-            record("modules_computed", True,
-                   f"{len(ids)} module(s), {n_cross} cross-module check(s), "
-                   f"max {max(ports.values())} port(s) per module")
+            record(
+                "modules_computed",
+                True,
+                f"{len(ids)} module(s), {n_cross} cross-module check(s), max {max(ports.values())} port(s) per module",
+            )
 
     # 11. transversal logical gates (issue #1850, stage 1). Optional claims in
     #     circuit.gates: a qubit permutation, possibly with H or S on every
@@ -2128,6 +2261,7 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     #     entries by the schema; the per-basis machinery is CSS-only.
     if not stab:
         import transversal_gates
+
         gchecks, gcomputed = transversal_gates.verify_gates(doc, HX, HZ)
         for label, ok, detail in gchecks:
             record(label, ok, detail)
@@ -2153,16 +2287,15 @@ def _verify_semantic(doc, report, record, refute=False, seed=None, cert=None):
     # verified isotropy) instead, and the two never share a board.
     report["computed"]["locality_class"] = locality_class
     report["computed"]["flags"] = {
-        "css": bool(not stab and report["checks"] and
-                    all(c["ok"] for c in report["checks"]
-                        if c["check"] == "css_commutation")),
+        "css": bool(
+            not stab and report["checks"] and all(c["ok"] for c in report["checks"] if c["check"] == "css_commutation")
+        ),
         "stabilizer": bool(stab and css),
         "locality_class": locality_class,
         "modular": modular,
     }
 
     return report
-
 
 
 def identity_keys(doc):
@@ -2182,6 +2315,7 @@ def identity_keys(doc):
     then verifies that entry in full.
     """
     import hashlib
+
     n = doc["n"]
     sig = signature(doc)
     if is_stabilizer(doc):
@@ -2199,23 +2333,30 @@ def identity_keys(doc):
         images, _capped = css_local_hadamard_images(doc)
     ceq = None
     if images:
-        ceq = {"fingerprints": [css_fingerprint(_matrix(im["checks"]["X"], n),
-                                                _matrix(im["checks"]["Z"], n))
-                                for im in images],
-               "signatures": [signature(im)["hash"] for im in images]}
+        ceq = {
+            "fingerprints": [
+                css_fingerprint(_matrix(im["checks"]["X"], n), _matrix(im["checks"]["Z"], n)) for im in images
+            ],
+            "signatures": [signature(im)["hash"] for im in images],
+        }
     return {"fingerprint": fp, "signature": sig, "css_equivalent": ceq}
 
 
 def _board_entry(path, data):
     """Verify one board file from the bytes already read (None = oversize)."""
-    entry = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
-             "doc": None, "report": None,
-             "size_error": file_size_error(path) or None, "load_error": None}
+    entry = {
+        "path": path,
+        "slug": os.path.splitext(os.path.basename(path))[0],
+        "doc": None,
+        "report": None,
+        "size_error": file_size_error(path) or None,
+        "load_error": None,
+    }
     if entry["size_error"] is None and data is not None:
         try:
             entry["doc"] = json.loads(data)
             entry["report"] = verify(entry["doc"])
-        except Exception as e:                  # noqa: BLE001 -- recorded, caller decides
+        except Exception as e:  # noqa: BLE001 -- recorded, caller decides
             entry["load_error"] = f"{type(e).__name__}: {e}"
     return entry
 
@@ -2257,9 +2398,11 @@ def validator_closure_digest(manifest_path=None):
     distinct key rather than an error: a checkout without a manifest gets its
     own cache namespace instead of sharing a pinned one.
     """
-    path = os.path.abspath(manifest_path or os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "validator_manifest.json"))
+    path = os.path.abspath(
+        manifest_path or os.path.join(os.path.dirname(os.path.abspath(__file__)), "validator_manifest.json")
+    )
     import hashlib
+
     if path in _CLOSURE_DIGEST:
         return _CLOSURE_DIGEST[path]
     try:
@@ -2331,6 +2474,7 @@ def _memo_path(cache_dir, data):
     re-verifies one.
     """
     import hashlib
+
     h = hashlib.sha256()
     h.update(validator_closure_digest().encode("utf-8"))
     h.update(b"\0")
@@ -2357,9 +2501,14 @@ def _memo_read(cache_dir, path, data):
     report, load_error = memo.get("report"), memo.get("load_error")
     if report is None and load_error is None:
         return None
-    entry = {"path": path, "slug": os.path.splitext(os.path.basename(path))[0],
-             "doc": None, "report": report,
-             "size_error": None, "load_error": load_error}
+    entry = {
+        "path": path,
+        "slug": os.path.splitext(os.path.basename(path))[0],
+        "doc": None,
+        "report": report,
+        "size_error": None,
+        "load_error": load_error,
+    }
     if load_error is None:
         try:
             entry["doc"] = json.loads(data)
@@ -2370,9 +2519,12 @@ def _memo_read(cache_dir, path, data):
 
 def _memo_write(cache_dir, data, entry):
     """Store one entry's report. A cache that cannot be written is not an error."""
-    memo = {"memo_version": _BOARD_MEMO_VERSION,
-            "closure": validator_closure_digest(),
-            "report": entry["report"], "load_error": entry["load_error"]}
+    memo = {
+        "memo_version": _BOARD_MEMO_VERSION,
+        "closure": validator_closure_digest(),
+        "report": entry["report"],
+        "load_error": entry["load_error"],
+    }
     path = _memo_path(cache_dir, data)
     try:
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -2436,11 +2588,12 @@ def board_reports(code_dir, jobs=1):
     entries are SHARED between callers: treat doc and report as read-only.
     """
     import hashlib
+
     code_dir = os.path.abspath(code_dir)
     raw, h = [], hashlib.sha256()
     for p in sorted(glob.glob(os.path.join(code_dir, "*.json"))):
         data = None
-        if not file_size_error(p):              # never read an oversize file
+        if not file_size_error(p):  # never read an oversize file
             with open(p, "rb") as f:
                 data = f.read()
         h.update(os.path.basename(p).encode())
@@ -2470,6 +2623,7 @@ def board_reports(code_dir, jobs=1):
         # serially (the second is a memo hit there); each path then gets its
         # own entry around the shared doc and report, as _memo_read builds one.
         import concurrent.futures
+
         misses = {}
         for p, data in raw:
             hit = None
@@ -2479,10 +2633,10 @@ def board_reports(code_dir, jobs=1):
             if hit is None:
                 misses.setdefault(data, []).append(len(entries) - 1)
         work = [(ps[0], data) for data, ps in misses.items()]
-        with concurrent.futures.ProcessPoolExecutor(
-                max_workers=max(1, min(workers, len(work)))) as pool:
-            computed = list(pool.map(_board_entry, [raw[i][0] for i, _ in work],
-                                     [data for _, data in work], chunksize=8))
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max(1, min(workers, len(work)))) as pool:
+            computed = list(
+                pool.map(_board_entry, [raw[i][0] for i, _ in work], [data for _, data in work], chunksize=8)
+            )
         for (first, data), entry in zip(work, computed):
             if cache_dir and data is not None and entry["size_error"] is None:
                 _memo_write(cache_dir, data, entry)
@@ -2501,11 +2655,18 @@ def board_reports(code_dir, jobs=1):
 def main(path):
     ferr = file_size_error(path)
     if ferr:
-        print(json.dumps({"name": None,
-                          "checks": [{"check": "file_size_within_limit",
-                                      "ok": False, "detail": ferr}],
-                          "ok": False, "computed": {}, "earned_distance": {}},
-                         indent=2))
+        print(
+            json.dumps(
+                {
+                    "name": None,
+                    "checks": [{"check": "file_size_within_limit", "ok": False, "detail": ferr}],
+                    "ok": False,
+                    "computed": {},
+                    "earned_distance": {},
+                },
+                indent=2,
+            )
+        )
         return 1
     try:
         with open(path) as f:
@@ -2516,14 +2677,13 @@ def main(path):
     except json.JSONDecodeError as e:
         print(f"could not parse {path}: not valid JSON ({e})", file=sys.stderr)
         return 2
-    report = verify(doc, refute=True)   # the per-submission CLI runs the gate
+    report = verify(doc, refute=True)  # the per-submission CLI runs the gate
     print(json.dumps(report, indent=2))
     return 0 if report["ok"] else 1
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("usage: python qldpc_verify.py <submission.json>",
-              file=sys.stderr)
+        print("usage: python qldpc_verify.py <submission.json>", file=sys.stderr)
         sys.exit(2)
     sys.exit(main(sys.argv[1]))

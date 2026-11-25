@@ -1,0 +1,6000 @@
+{
+  "summary": {
+    "L-BALANCED|derived": 1,
+    "L-BALANCED|tried": 1,
+    "L-BALANCED|w4_k2": 1,
+    "L-GROUP-ALGEBRA|derived": 20,
+    "L-GROUP-ALGEBRA|tried": 20,
+    "L-GROUP-ALGEBRA|w4_k2": 20,
+    "L-LIFTED|derived": 3,
+    "L-LIFTED|tried": 3,
+    "L-LIFTED|w4_k2": 2,
+    "L-PAIR-PARTITION|derived": 40,
+    "L-PAIR-PARTITION|tried": 40,
+    "L-PAIR-PARTITION|w4_k2": 24,
+    "PP-SCALE|derived": 11,
+    "PP-SCALE|tried": 11,
+    "PP-SCALE|w4_k2": 11
+  },
+  "records": [
+    {
+      "label": "cpm-p3-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 3,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 12,
+      "k": 6,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p3-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 3,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 24,
+      "k": 18,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p3-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 3,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 36,
+      "k": 30,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p4-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 4,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 16,
+      "k": 8,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p4-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 4,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 32,
+      "k": 24,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p4-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 4,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 48,
+      "k": 40,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p5-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p5-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 40,
+      "k": 30,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p5-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 60,
+      "k": 50,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p7-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p7-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 56,
+      "k": 42,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p7-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 84,
+      "k": 70,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p8-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 8,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 32,
+      "k": 16,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p8-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 8,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 64,
+      "k": 48,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p8-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 8,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 96,
+      "k": 80,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p9-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 9,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 36,
+      "k": 18,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "cpm-p9-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 9,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 72,
+      "k": 54,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p9-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 9,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 108,
+      "k": 90,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p11-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p11-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 88,
+      "k": 66,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p11-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 132,
+      "k": 110,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0003
+    },
+    {
+      "label": "cpm-p13-L2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "cpm-p13-L4",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 104,
+      "k": 78,
+      "w": 8,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0003
+    },
+    {
+      "label": "cpm-p13-L6",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ],
+        "blocks_z": [
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        ]
+      },
+      "n": 156,
+      "k": 130,
+      "w": 12,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0004
+    },
+    {
+      "label": "apm-p5-a2-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p5-a2-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p5-a3-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p5-a3-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 5,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p7-a2-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p7-a2-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p7-a3-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p7-a3-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 7,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p11-a2-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p11-a2-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p11-a3-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "apm-p11-a3-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 11,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "apm-p13-a2-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "apm-p13-a2-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "apm-p13-a3-b2",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "apm-p13-a3-b3",
+      "constructor": "L-PAIR-PARTITION",
+      "params": {
+        "p": 13,
+        "blocks_x": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "blocks_z": [
+          [
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        ],
+        "pair_partition": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ]
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "pp-P5",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 5,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            4
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 20,
+      "k": 10,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "pp-P7",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 7,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            6
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 28,
+      "k": 14,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "pp-P11",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 11,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            10
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 44,
+      "k": 22,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0002
+    },
+    {
+      "label": "pp-P13",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 13,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            12
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 52,
+      "k": 26,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0003
+    },
+    {
+      "label": "pp-P16",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 16,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            15
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 64,
+      "k": 32,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0003
+    },
+    {
+      "label": "pp-P17",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 17,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            16
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 68,
+      "k": 34,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0003
+    },
+    {
+      "label": "pp-P19",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 19,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            18
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 76,
+      "k": 38,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0004
+    },
+    {
+      "label": "pp-P23",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 23,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            22
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 92,
+      "k": 46,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0005
+    },
+    {
+      "label": "pp-P25",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 25,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            24
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 100,
+      "k": 50,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0005
+    },
+    {
+      "label": "pp-P29",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 29,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            28
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 116,
+      "k": 58,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0007
+    },
+    {
+      "label": "pp-P31",
+      "constructor": "PP-SCALE",
+      "params": {
+        "state": {
+          "n": 12,
+          "k": 6
+        },
+        "P": 31,
+        "bundle": {
+          "P0": 3,
+          "orders_e": [
+            2
+          ],
+          "roots_r0": [
+            2
+          ],
+          "roots_r": [
+            30
+          ],
+          "shape_x": [
+            1,
+            4
+          ],
+          "shape_z": [
+            1,
+            4
+          ],
+          "Q_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "Q_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              1
+            ]
+          ],
+          "G_x": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "G_z": [
+            [
+              1
+            ],
+            [
+              1
+            ],
+            [
+              0
+            ],
+            [
+              0
+            ]
+          ],
+          "theta_x": [
+            2
+          ],
+          "theta_z": [
+            2
+          ],
+          "blocks_x0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "blocks_z0": [
+            [
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                2
+              ],
+              [
+                2,
+                0
+              ],
+              [
+                2,
+                0
+              ]
+            ]
+          ],
+          "pair_partition": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        }
+      },
+      "n": 124,
+      "k": 62,
+      "w": 4,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0008
+    },
+    {
+      "label": "lga-S3-a1-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-S3-a1-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-S3-a2-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-S3-a2-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D3-a1-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              2,
+              0,
+              4,
+              5,
+              3
+            ],
+            [
+              2,
+              0,
+              1,
+              5,
+              3,
+              4
+            ],
+            [
+              3,
+              5,
+              4,
+              0,
+              2,
+              1
+            ],
+            [
+              4,
+              3,
+              5,
+              1,
+              0,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D3-a1-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              2,
+              0,
+              4,
+              5,
+              3
+            ],
+            [
+              2,
+              0,
+              1,
+              5,
+              3,
+              4
+            ],
+            [
+              3,
+              5,
+              4,
+              0,
+              2,
+              1
+            ],
+            [
+              4,
+              3,
+              5,
+              1,
+              0,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D3-a2-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              2,
+              0,
+              4,
+              5,
+              3
+            ],
+            [
+              2,
+              0,
+              1,
+              5,
+              3,
+              4
+            ],
+            [
+              3,
+              5,
+              4,
+              0,
+              2,
+              1
+            ],
+            [
+              4,
+              3,
+              5,
+              1,
+              0,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D3-a2-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              2,
+              0,
+              4,
+              5,
+              3
+            ],
+            [
+              2,
+              0,
+              1,
+              5,
+              3,
+              4
+            ],
+            [
+              3,
+              5,
+              4,
+              0,
+              2,
+              1
+            ],
+            [
+              4,
+              3,
+              5,
+              1,
+              0,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D4-a1-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D4-a1-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D4-a2-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D4-a2-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 16,
+      "k": 8,
+      "w": 4,
+      "dropped_rows": 8,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D5-a1-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            [
+              1,
+              2,
+              3,
+              4,
+              0,
+              6,
+              7,
+              8,
+              9,
+              5
+            ],
+            [
+              2,
+              3,
+              4,
+              0,
+              1,
+              7,
+              8,
+              9,
+              5,
+              6
+            ],
+            [
+              3,
+              4,
+              0,
+              1,
+              2,
+              8,
+              9,
+              5,
+              6,
+              7
+            ],
+            [
+              4,
+              0,
+              1,
+              2,
+              3,
+              9,
+              5,
+              6,
+              7,
+              8
+            ],
+            [
+              5,
+              9,
+              8,
+              7,
+              6,
+              0,
+              4,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              5,
+              9,
+              8,
+              7,
+              1,
+              0,
+              4,
+              3,
+              2
+            ],
+            [
+              7,
+              6,
+              5,
+              9,
+              8,
+              2,
+              1,
+              0,
+              4,
+              3
+            ],
+            [
+              8,
+              7,
+              6,
+              5,
+              9,
+              3,
+              2,
+              1,
+              0,
+              4
+            ],
+            [
+              9,
+              8,
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 20,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D5-a1-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            [
+              1,
+              2,
+              3,
+              4,
+              0,
+              6,
+              7,
+              8,
+              9,
+              5
+            ],
+            [
+              2,
+              3,
+              4,
+              0,
+              1,
+              7,
+              8,
+              9,
+              5,
+              6
+            ],
+            [
+              3,
+              4,
+              0,
+              1,
+              2,
+              8,
+              9,
+              5,
+              6,
+              7
+            ],
+            [
+              4,
+              0,
+              1,
+              2,
+              3,
+              9,
+              5,
+              6,
+              7,
+              8
+            ],
+            [
+              5,
+              9,
+              8,
+              7,
+              6,
+              0,
+              4,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              5,
+              9,
+              8,
+              7,
+              1,
+              0,
+              4,
+              3,
+              2
+            ],
+            [
+              7,
+              6,
+              5,
+              9,
+              8,
+              2,
+              1,
+              0,
+              4,
+              3
+            ],
+            [
+              8,
+              7,
+              6,
+              5,
+              9,
+              3,
+              2,
+              1,
+              0,
+              4
+            ],
+            [
+              9,
+              8,
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 20,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D5-a2-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            [
+              1,
+              2,
+              3,
+              4,
+              0,
+              6,
+              7,
+              8,
+              9,
+              5
+            ],
+            [
+              2,
+              3,
+              4,
+              0,
+              1,
+              7,
+              8,
+              9,
+              5,
+              6
+            ],
+            [
+              3,
+              4,
+              0,
+              1,
+              2,
+              8,
+              9,
+              5,
+              6,
+              7
+            ],
+            [
+              4,
+              0,
+              1,
+              2,
+              3,
+              9,
+              5,
+              6,
+              7,
+              8
+            ],
+            [
+              5,
+              9,
+              8,
+              7,
+              6,
+              0,
+              4,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              5,
+              9,
+              8,
+              7,
+              1,
+              0,
+              4,
+              3,
+              2
+            ],
+            [
+              7,
+              6,
+              5,
+              9,
+              8,
+              2,
+              1,
+              0,
+              4,
+              3
+            ],
+            [
+              8,
+              7,
+              6,
+              5,
+              9,
+              3,
+              2,
+              1,
+              0,
+              4
+            ],
+            [
+              9,
+              8,
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 20,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-D5-a2-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            [
+              1,
+              2,
+              3,
+              4,
+              0,
+              6,
+              7,
+              8,
+              9,
+              5
+            ],
+            [
+              2,
+              3,
+              4,
+              0,
+              1,
+              7,
+              8,
+              9,
+              5,
+              6
+            ],
+            [
+              3,
+              4,
+              0,
+              1,
+              2,
+              8,
+              9,
+              5,
+              6,
+              7
+            ],
+            [
+              4,
+              0,
+              1,
+              2,
+              3,
+              9,
+              5,
+              6,
+              7,
+              8
+            ],
+            [
+              5,
+              9,
+              8,
+              7,
+              6,
+              0,
+              4,
+              3,
+              2,
+              1
+            ],
+            [
+              6,
+              5,
+              9,
+              8,
+              7,
+              1,
+              0,
+              4,
+              3,
+              2
+            ],
+            [
+              7,
+              6,
+              5,
+              9,
+              8,
+              2,
+              1,
+              0,
+              4,
+              3
+            ],
+            [
+              8,
+              7,
+              6,
+              5,
+              9,
+              3,
+              2,
+              1,
+              0,
+              4
+            ],
+            [
+              9,
+              8,
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 20,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-Q8-a1-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4,
+              7,
+              6
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              2,
+              1,
+              0,
+              7,
+              6,
+              5,
+              4
+            ],
+            [
+              4,
+              5,
+              6,
+              7,
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              7,
+              4,
+              5,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 16,
+      "k": 8,
+      "w": 4,
+      "dropped_rows": 8,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-Q8-a1-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4,
+              7,
+              6
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              2,
+              1,
+              0,
+              7,
+              6,
+              5,
+              4
+            ],
+            [
+              4,
+              5,
+              6,
+              7,
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              7,
+              4,
+              5,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          1
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-Q8-a2-b1",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4,
+              7,
+              6
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              2,
+              1,
+              0,
+              7,
+              6,
+              5,
+              4
+            ],
+            [
+              4,
+              5,
+              6,
+              7,
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              7,
+              4,
+              5,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          1
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lga-Q8-a2-b2",
+      "constructor": "L-GROUP-ALGEBRA",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4,
+              7,
+              6
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              2,
+              1,
+              0,
+              7,
+              6,
+              5,
+              4
+            ],
+            [
+              4,
+              5,
+              6,
+              7,
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              7,
+              4,
+              5,
+              2,
+              3,
+              0,
+              1
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "a": [
+          0,
+          2
+        ],
+        "b": [
+          0,
+          2
+        ]
+      },
+      "n": 16,
+      "k": 8,
+      "w": 4,
+      "dropped_rows": 8,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lift-S3-1x1",
+      "constructor": "L-LIFTED",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "A": [
+          [
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "B": [
+          [
+            [
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "n": 12,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lift-D4-1x1",
+      "constructor": "L-LIFTED",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "A": [
+          [
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "B": [
+          [
+            [
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "n": 16,
+      "k": 4,
+      "w": 4,
+      "dropped_rows": 4,
+      "derived": true,
+      "seconds": 0.0001
+    },
+    {
+      "label": "lift-D4-2x2",
+      "constructor": "L-LIFTED",
+      "params": {
+        "group": {
+          "table": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              1,
+              2,
+              3,
+              0,
+              5,
+              6,
+              7,
+              4
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              6,
+              7,
+              4,
+              5
+            ],
+            [
+              3,
+              0,
+              1,
+              2,
+              7,
+              4,
+              5,
+              6
+            ],
+            [
+              4,
+              7,
+              6,
+              5,
+              0,
+              3,
+              2,
+              1
+            ],
+            [
+              5,
+              4,
+              7,
+              6,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              6,
+              5,
+              4,
+              7,
+              2,
+              1,
+              0,
+              3
+            ],
+            [
+              7,
+              6,
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        },
+        "A": [
+          [
+            [
+              0,
+              1
+            ],
+            [
+              4
+            ]
+          ],
+          [
+            [
+              2
+            ],
+            [
+              0,
+              5
+            ]
+          ]
+        ],
+        "B": [
+          [
+            [
+              0,
+              4
+            ],
+            [
+              1,
+              6
+            ]
+          ]
+        ]
+      },
+      "n": 48,
+      "k": 0,
+      "w": 7,
+      "dropped_rows": 0,
+      "derived": true,
+      "seconds": 0.0005
+    },
+    {
+      "label": "balanced-S3-regular",
+      "constructor": "L-BALANCED",
+      "params": {
+        "group": {
+          "generators": [
+            [
+              1,
+              2,
+              0
+            ],
+            [
+              1,
+              0,
+              2
+            ]
+          ]
+        },
+        "H1": [
+          [
+            1,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        ],
+        "action1": {
+          "rows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4
+            ],
+            [
+              2,
+              4,
+              0,
+              5,
+              1,
+              3
+            ],
+            [
+              3,
+              5,
+              1,
+              4,
+              0,
+              2
+            ],
+            [
+              4,
+              2,
+              5,
+              0,
+              3,
+              1
+            ],
+            [
+              5,
+              3,
+              4,
+              1,
+              2,
+              0
+            ]
+          ],
+          "cols": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              0,
+              3,
+              2,
+              5,
+              4
+            ],
+            [
+              2,
+              4,
+              0,
+              5,
+              1,
+              3
+            ],
+            [
+              3,
+              5,
+              1,
+              4,
+              0,
+              2
+            ],
+            [
+              4,
+              2,
+              5,
+              0,
+              3,
+              1
+            ],
+            [
+              5,
+              3,
+              4,
+              1,
+              2,
+              0
+            ]
+          ]
+        },
+        "H2": [
+          [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            1
+          ]
+        ],
+        "action2": {
+          "rows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              0,
+              4,
+              5,
+              2,
+              3
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              5,
+              4
+            ],
+            [
+              3,
+              2,
+              5,
+              4,
+              0,
+              1
+            ],
+            [
+              4,
+              5,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ],
+          "cols": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              1,
+              0,
+              4,
+              5,
+              2,
+              3
+            ],
+            [
+              2,
+              3,
+              0,
+              1,
+              5,
+              4
+            ],
+            [
+              3,
+              2,
+              5,
+              4,
+              0,
+              1
+            ],
+            [
+              4,
+              5,
+              1,
+              0,
+              3,
+              2
+            ],
+            [
+              5,
+              4,
+              3,
+              2,
+              1,
+              0
+            ]
+          ]
+        }
+      },
+      "n": 12,
+      "k": 2,
+      "w": 4,
+      "dropped_rows": 2,
+      "derived": true,
+      "seconds": 0.0003
+    }
+  ]
+}

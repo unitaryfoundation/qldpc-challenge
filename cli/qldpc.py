@@ -63,14 +63,14 @@ sys.path.insert(0, os.path.join(_ROOT, "research"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "kit"))
 sys.path.insert(0, os.path.join(_ROOT, "research", "audits"))
 
-import gf2  # noqa: E402
-import heuristic_distance as hd  # noqa: E402
-
 # Reuse the site's computed-cell + Pareto-frontier helpers so the PR body
 # states exactly what the board will show (no drift between the two).
 import coordination  # noqa: E402
+import equivalence  # noqa: E402
 import frontier  # noqa: E402
 import frontier_history  # noqa: E402
+import gf2  # noqa: E402
+import heuristic_distance as hd  # noqa: E402
 import peer_audit  # noqa: E402
 from build import LOCALITY_LABEL, WEIGHT_LABEL, cells, pareto  # noqa: E402
 from campaign import curve_from_summary, write_curve  # noqa: E402
@@ -132,19 +132,19 @@ def load_checks(path):
         if S is not None:
             S = _as_dense_gf2(S)
             if S.ndim != 2 or S.shape[1] % 2:
-                raise SystemExit(f"{path}: key s must be an m x 2n matrix "
-                                 f"(A | B); got shape {S.shape}")
+                raise SystemExit(f"{path}: key s must be an m x 2n matrix (A | B); got shape {S.shape}")
             n = S.shape[1] // 2
             A, B = S[:, :n], S[:, n:]
         elif A is None or B is None:
-            raise SystemExit(f"{path}: a stabilizer code needs both a and b "
-                             f"(the X and Z halves of S), or s = (A | B); "
-                             f"found {list(z.keys())}")
+            raise SystemExit(
+                f"{path}: a stabilizer code needs both a and b "
+                f"(the X and Z halves of S), or s = (A | B); "
+                f"found {list(z.keys())}"
+            )
         else:
             A, B = _as_dense_gf2(A), _as_dense_gf2(B)
             if A.shape != B.shape:
-                raise SystemExit(f"{path}: a has shape {A.shape} but b has "
-                                 f"shape {B.shape}; both are m x n")
+                raise SystemExit(f"{path}: a has shape {A.shape} but b has shape {B.shape}; both are m x n")
         return A, B, coords, {"code_type": "stabilizer"}
     HX = _pick(z, ("hx", "HX", "H_X", "Hx"))
     HZ = _pick(z, ("hz", "HZ", "H_Z", "Hz"))
@@ -152,7 +152,8 @@ def load_checks(path):
         raise SystemExit(
             f"{path}: need H_X and H_Z arrays (keys hx/HX/H_X and hz/HZ/H_Z), "
             f"or a stabilizer code's s = (A | B) (or a and b); "
-            f"found {list(z.keys())}")
+            f"found {list(z.keys())}"
+        )
     HX, HZ = _as_dense_gf2(HX), _as_dense_gf2(HZ)
     return HX, HZ, coords, None
 
@@ -211,8 +212,7 @@ def _supports(H):
 REUSE_MIN_FAST_TRIALS = 1_000_000
 
 # The keys the schema's witnessProvenance accepts, and the ones it requires.
-_WP_KEYS = ("found_by", "date", "found_at_samples", "survived_samples", "tool",
-             "seeds")
+_WP_KEYS = ("found_by", "date", "found_at_samples", "survived_samples", "tool", "seeds")
 _WP_REQUIRED = ("found_by", "date", "found_at_samples")
 
 
@@ -228,16 +228,13 @@ def _reuse_index_list(side, lst, n):
     nothing about which witness was wrong.
     """
     if not isinstance(lst, (list, tuple)):
-        raise _WitnessError(
-            f"the {side} witness must be a list of qubit indices, got "
-            f"{type(lst).__name__}")
+        raise _WitnessError(f"the {side} witness must be a list of qubit indices, got {type(lst).__name__}")
     out = []
     for idx in lst:
-        if (not isinstance(idx, (int, np.integer)) or isinstance(idx, bool)
-                or int(idx) < 0 or int(idx) >= n):
+        if not isinstance(idx, (int, np.integer)) or isinstance(idx, bool) or int(idx) < 0 or int(idx) >= n:
             raise _WitnessError(
-                f"the {side} witness has index {idx!r} outside [0, {n}); this "
-                f"code's qubits are numbered from 0")
+                f"the {side} witness has index {idx!r} outside [0, {n}); this code's qubits are numbered from 0"
+            )
         out.append(int(idx))
     return out
 
@@ -253,8 +250,10 @@ def _reuse_value_note(side, claimed, weight):
     """Report a draft whose `value` disagrees with its own witness."""
     if claimed is None or int(claimed) == int(weight):
         return
-    print(f"  the draft's {side} value {claimed} does not match its witness "
-          f"weight {weight}; using the witness", flush=True)
+    print(
+        f"  the draft's {side} value {claimed} does not match its witness weight {weight}; using the witness",
+        flush=True,
+    )
 
 
 def _css_witnesses_from_draft(draft, HX, HZ, n):
@@ -271,12 +270,10 @@ def _css_witnesses_from_draft(draft, HX, HZ, n):
     wx = xdoc.get("witness")
     wz = zdoc.get("witness")
     if wx is None and wz is None:
-        return None, ("the draft carries no distance witness "
-                      "(distance.X.witness / distance.Z.witness)")
+        return None, ("the draft carries no distance witness (distance.X.witness / distance.Z.witness)")
     if wx is None or wz is None:
         missing = "Z" if wx is None else "X"
-        return None, (f"the draft carries a witness on one side only: "
-                      f"distance.{missing}.witness is missing")
+        return None, (f"the draft carries a witness on one side only: distance.{missing}.witness is missing")
     try:
         witX = np.zeros(n, dtype=np.int8)
         for i in _reuse_index_list("X", wx, n):
@@ -287,13 +284,17 @@ def _css_witnesses_from_draft(draft, HX, HZ, n):
     except _WitnessError as e:
         return None, str(e)
     if not hd._valid_logical(witX, HZ, HX):
-        return None, ("the X witness is not a nontrivial logical of the "
-                      "rebuilt matrices (it does not commute with H_X, or it "
-                      "lies in the row space of H_Z)")
+        return None, (
+            "the X witness is not a nontrivial logical of the "
+            "rebuilt matrices (it does not commute with H_X, or it "
+            "lies in the row space of H_Z)"
+        )
     if not hd._valid_logical(witZ, HX, HZ):
-        return None, ("the Z witness is not a nontrivial logical of the "
-                      "rebuilt matrices (it does not commute with H_Z, or it "
-                      "lies in the row space of H_X)")
+        return None, (
+            "the Z witness is not a nontrivial logical of the "
+            "rebuilt matrices (it does not commute with H_Z, or it "
+            "lies in the row space of H_X)"
+        )
     return (int(witX.sum()), witX, int(witZ.sum()), witZ), None
 
 
@@ -302,8 +303,7 @@ def _pauli_witness_from_draft(draft, A, B, n):
     pd = (draft.get("distance") or {}).get("P") or {}
     pw = pd.get("witness")
     if not isinstance(pw, dict):
-        return None, ("the draft carries no Pauli witness "
-                      "(distance.P.witness)")
+        return None, ("the draft carries no Pauli witness (distance.P.witness)")
     try:
         xlist = _reuse_index_list("P.X", pw.get("X") or [], n)
         zlist = _reuse_index_list("P.Z", pw.get("Z") or [], n)
@@ -317,8 +317,7 @@ def _pauli_witness_from_draft(draft, A, B, n):
     for i in zlist:
         v[n + i] = 1
     if not hd.valid_pauli_logical(v, A, B):
-        return None, ("the P witness is not a nontrivial logical of the "
-                      "rebuilt matrices")
+        return None, ("the P witness is not a nontrivial logical of the rebuilt matrices")
     return (int(hd.pauli_weight_rows(v[None, :], n)[0]), v), None
 
 
@@ -335,12 +334,14 @@ def _reuse_accelerator_requirement(args):
             raise SystemExit(
                 "--reuse-witnesses: the C++ accelerator is not built, so the "
                 "reused witness would be the only evidence behind the "
-                "claim; build it (make fast) or drop the flag")
+                "claim; build it (make fast) or drop the flag"
+            )
         if int(getattr(args, "fast_trials", 0)) <= 0:
             raise SystemExit(
                 "--reuse-witnesses: --fast-trials 0 leaves the reused witness "
                 "without a deep pass behind it; give it the accelerator's "
-                "budget or drop the flag")
+                "budget or drop the flag"
+            )
         trials = int(args.fast_trials)
         floor = int(getattr(args, "min_fast_trials", REUSE_MIN_FAST_TRIALS) or 0)
         if trials < floor:
@@ -348,7 +349,8 @@ def _reuse_accelerator_requirement(args):
                 f"--reuse-witnesses: {trials:,} accelerator trials is below "
                 f"the {floor:,} per side that research/kit/promote.py requires "
                 "before it reuses a witness; raise --fast-trials, or lower "
-                "--min-fast-trials to say the thinner claim is intended")
+                "--min-fast-trials to say the thinner claim is intended"
+            )
 
 
 def _accelerator_requirement(args):
@@ -368,7 +370,8 @@ def _accelerator_requirement(args):
             "the C++ accelerator (verify/gf2_fast) is not built, so the "
             f"--fast-trials {fast:,} pass would not run and the claim would "
             "rest on the RIS pass alone; build it (make fast) or pass "
-            "--fast-trials 0 to file without it, which the PR body then says")
+            "--fast-trials 0 to file without it, which the PR body then says"
+        )
 
 
 def _depth_line(args):
@@ -376,8 +379,7 @@ def _depth_line(args):
     trials = int(getattr(args, "trials", 0) or 0)
     fast = int(getattr(args, "fast_trials", 0) or 0)
     reused = bool(getattr(args, "reuse_witnesses", False))
-    parts = ["witnesses reused from the draft" if reused
-             else f"RIS {trials:,} trials per side"]
+    parts = ["witnesses reused from the draft" if reused else f"RIS {trials:,} trials per side"]
     if fast > 0 and hd._fast is not None:
         parts.append(f"accelerator {fast:,} trials per side at pair depth 8")
     else:
@@ -396,11 +398,12 @@ def _provenance(args, draft=None):
     construction text under a new name.
     """
     reuse = getattr(args, "reuse_witnesses", False)
-    prov = {"authors": args.authors,
-            "construction": (args.construction
-                             or "contributed via qldpc submit"),
-            "origin": "submission",
-            "date": args.date or datetime.date.today().isoformat()}
+    prov = {
+        "authors": args.authors,
+        "construction": (args.construction or "contributed via qldpc submit"),
+        "origin": "submission",
+        "date": args.date or datetime.date.today().isoformat(),
+    }
     if args.model:
         prov["model"] = args.model
     if getattr(args, "harness", ""):
@@ -429,13 +432,18 @@ def _provenance(args, draft=None):
         # rather than leaving the entry to imply a novelty claim it cannot
         # support.
         prov["novelty"] = "known_parameters"
-        print("  --reuse-witnesses: recording novelty: known_parameters "
-              "(the draft attributes the code to a published source)",
-              flush=True)
+        print(
+            "  --reuse-witnesses: recording novelty: known_parameters "
+            "(the draft attributes the code to a published source)",
+            flush=True,
+        )
     else:
-        print("  --reuse-witnesses: the draft declares no novelty; an "
-              "imported published code should carry novelty: "
-              "known_parameters", flush=True)
+        print(
+            "  --reuse-witnesses: the draft declares no novelty; an "
+            "imported published code should carry novelty: "
+            "known_parameters",
+            flush=True,
+        )
     return prov
 
 
@@ -452,28 +460,21 @@ def _reuse_witness_provenance(draft, side):
     wp = sd.get("witness_provenance")
     if not isinstance(wp, dict):
         return None
-    if any(k not in _WP_KEYS for k in wp) or any(k not in wp
-                                                 for k in _WP_REQUIRED):
-        print(f"  dropping the draft's {side} witness_provenance: it does "
-              f"not fit the schema", flush=True)
+    if any(k not in _WP_KEYS for k in wp) or any(k not in wp for k in _WP_REQUIRED):
+        print(f"  dropping the draft's {side} witness_provenance: it does not fit the schema", flush=True)
         return None
     handles = wp.get("found_by")
-    if not (isinstance(handles, list) and handles
-            and all(isinstance(a, str) and HANDLE.fullmatch(a)
-                    for a in handles)):
-        print(f"  dropping the draft's {side} witness_provenance: "
-              f"found_by is not a list of @handles", flush=True)
+    if not (isinstance(handles, list) and handles and all(isinstance(a, str) and HANDLE.fullmatch(a) for a in handles)):
+        print(f"  dropping the draft's {side} witness_provenance: found_by is not a list of @handles", flush=True)
         return None
-    if not (isinstance(wp.get("date"), str)
-            and re.fullmatch(r"\d{4}-\d{2}-\d{2}", wp["date"])):
-        print(f"  dropping the draft's {side} witness_provenance: the date "
-              f"is not YYYY-MM-DD", flush=True)
+    if not (isinstance(wp.get("date"), str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", wp["date"])):
+        print(f"  dropping the draft's {side} witness_provenance: the date is not YYYY-MM-DD", flush=True)
         return None
     samples = wp.get("found_at_samples")
-    if not (isinstance(samples, int) and not isinstance(samples, bool)
-            and samples >= 1):
-        print(f"  dropping the draft's {side} witness_provenance: "
-              f"found_at_samples is not a positive integer", flush=True)
+    if not (isinstance(samples, int) and not isinstance(samples, bool) and samples >= 1):
+        print(
+            f"  dropping the draft's {side} witness_provenance: found_at_samples is not a positive integer", flush=True
+        )
         return None
     return dict(wp)
 
@@ -488,10 +489,12 @@ def _accelerator_witness_provenance(args):
     handles = [a for a in getattr(args, "authors", []) if HANDLE.fullmatch(a)]
     if not handles:
         return None
-    return {"found_by": handles,
-            "date": datetime.date.today().isoformat(),
-            "found_at_samples": int(getattr(args, "fast_trials", 0)),
-            "tool": "gf2_fast"}
+    return {
+        "found_by": handles,
+        "date": datetime.date.today().isoformat(),
+        "found_at_samples": int(getattr(args, "fast_trials", 0)),
+        "tool": "gf2_fast",
+    }
 
 
 # ----------------------------------------------------------------------------
@@ -512,12 +515,15 @@ def build_stabilizer_submission(A, B, args):
     if B.shape != A.shape:
         raise SystemExit(f"A has shape {A.shape} but B has shape {B.shape}")
     if bool(((A @ B.T + B @ A.T) % 2).any()):
-        raise SystemExit("A B^T + B A^T != 0 over GF(2): the generators do not "
-                         "commute (check your matrices / ordering)")
+        raise SystemExit(
+            "A B^T + B A^T != 0 over GF(2): the generators do not commute (check your matrices / ordering)"
+        )
     if all(not (A[i].any() and B[i].any()) for i in range(A.shape[0])):
-        raise SystemExit("every generator is pure X or pure Z: this is a CSS "
-                         "code; submit it as H_X / H_Z (keys hx, hz) so it is "
-                         "typed CSS and ranked on the CSS board")
+        raise SystemExit(
+            "every generator is pure X or pure Z: this is a CSS "
+            "code; submit it as H_X / H_Z (keys hx, hz) so it is "
+            "typed CSS and ranked on the CSS board"
+        )
     found = is_css_up_to_local_clifford(A, B)
     if found is not None:
         types, ops = found
@@ -529,7 +535,8 @@ def build_stabilizer_submission(A, B, args):
             f"local Clifford, which the verifier rejects. Submit its CSS image "
             f"as H_X / H_Z (keys hx, hz): the supports of generators {xs[:8]}"
             f"{', ...' if len(xs) > 8 else ''} ({len(xs)} of {len(types)}) as "
-            f"H_X rows and the rest as H_Z rows")
+            f"H_X rows and the rest as H_Z rows"
+        )
     S = np.concatenate([A, B], axis=1)
     k = n - gf2.rank(S)
     if k < 1:
@@ -545,23 +552,18 @@ def build_stabilizer_submission(A, B, args):
         dw, reason = _pauli_witness_from_draft(draft, A, B, n)
         if dw is None:
             if reuse:
-                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
-                                 f"to search for the witness instead")
-            print(f"  the draft's witness is not usable ({reason}); searching "
-                  f"for a witness instead", flush=True)
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag to search for the witness instead")
+            print(f"  the draft's witness is not usable ({reason}); searching for a witness instead", flush=True)
     if reuse:
         if dw is None:
-            raise SystemExit("--reuse-witnesses: the input carries no draft "
-                             "to take the witness from")
+            raise SystemExit("--reuse-witnesses: the input carries no draft to take the witness from")
         dP, witP = dw
         _reuse_value_note("P", _draft_claimed(draft, "P"), dP)
         wp_reused = _reuse_witness_provenance(draft, "P")
         print(f"  reusing the draft's witness: d_P<={dP}", flush=True)
     else:
-        print(f"  searching for a Pauli-weight distance witness "
-              f"({args.trials} RIS trials)...", flush=True)
-        dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials,
-                                            seed=args.seed)
+        print(f"  searching for a Pauli-weight distance witness ({args.trials} RIS trials)...", flush=True)
+        dP, witP = hd.ris_min_pauli_logical(A, B, trials=args.trials, seed=args.seed)
         if dw is not None and (dP is None or dw[0] < dP):
             # the draft's witness can only be replaced by a strictly lighter
             # one, so the document keeps the better of the two
@@ -569,17 +571,14 @@ def build_stabilizer_submission(A, B, args):
             dP, witP = dw
             wp_reused = _reuse_witness_provenance(draft, "P")
         if dP is None:
-            raise SystemExit("RIS found no logical operator; "
-                             "cannot certify a distance")
+            raise SystemExit("RIS found no logical operator; cannot certify a distance")
     # accelerator on the symplectic doubling; runs on reused witnesses too.
     # A reused witness that the accelerator lightens is a different witness,
     # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
-        print(f"  accelerator pass on the doubled matrices "
-              f"({args.fast_trials} trials)...", flush=True)
+        print(f"  accelerator pass on the doubled matrices ({args.fast_trials} trials)...", flush=True)
         HX2, HZ2 = hd.doubled_matrices(A, B)
-        wf, side, sup = hd._fast.distance_rand_witness(
-            HX2, HZ2, args.fast_trials, args.seed, 8, 8)
+        wf, side, sup = hd._fast.distance_rand_witness(HX2, HZ2, args.fast_trials, args.seed, 8, 8)
         if wf is not None and side in ("X", "Z"):
             v = np.zeros(2 * n, dtype=np.int8)
             v[list(sup)] = 1
@@ -589,22 +588,20 @@ def build_stabilizer_submission(A, B, args):
                 dP, witP = wp, v
                 wp_reused = _accelerator_witness_provenance(args)
                 print(f"    accelerator tightened d to {wp}", flush=True)
-    print(f"  distance (witnessed upper bound, Pauli weight) d<={dP}",
-          flush=True)
+    print(f"  distance (witnessed upper bound, Pauli weight) d<={dP}", flush=True)
 
-    pside = {"value": int(dP), "confidence": "upper_bound",
-             "witness": hd.pauli_witness(witP, n)}
+    pside = {"value": int(dP), "confidence": "upper_bound", "witness": hd.pauli_witness(witP, n)}
     if wp_reused:
         pside["witness_provenance"] = wp_reused
     dist = {"d": int(dP), "P": pside}
     prov = _provenance(args, draft)
-    gens = [{"X": _supports(A[i:i + 1])[0], "Z": _supports(B[i:i + 1])[0]}
-            for i in range(A.shape[0])]
+    gens = [{"X": _supports(A[i : i + 1])[0], "Z": _supports(B[i : i + 1])[0]} for i in range(A.shape[0])]
     doc = {
-        "schema_version": "0.4",         # code_type stabilizer is a 0.4 feature
+        "schema_version": "0.4",  # code_type stabilizer is a 0.4 feature
         "name": args.name or f"[[{n},{k},{dP}]]",
         "code_type": "stabilizer",
-        "n": n, "k": int(k),
+        "n": n,
+        "k": int(k),
         "checks": {"S": gens},
         "distance": dist,
         "provenance": prov,
@@ -633,8 +630,7 @@ def build_submission(HX, HZ, args):
     if HZ.shape[1] != n:
         raise SystemExit(f"H_X has {n} columns but H_Z has {HZ.shape[1]}")
     if bool(((HX @ HZ.T) % 2).any()):
-        raise SystemExit("H_X H_Z^T != 0 over GF(2): not a CSS code "
-                         "(check your matrices / ordering)")
+        raise SystemExit("H_X H_Z^T != 0 over GF(2): not a CSS code (check your matrices / ordering)")
     k = n - gf2.rank(HX) - gf2.rank(HZ)
     if k < 1:
         raise SystemExit(f"computed k={k}: no logical qubits, nothing to submit")
@@ -650,24 +646,19 @@ def build_submission(HX, HZ, args):
         dw, reason = _css_witnesses_from_draft(draft, HX, HZ, n)
         if dw is None:
             if reuse:
-                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag "
-                                 f"to search for the witnesses instead")
-            print(f"  the draft's witnesses are not usable ({reason}); "
-                  f"searching for them instead", flush=True)
+                raise SystemExit(f"--reuse-witnesses: {reason}; drop the flag to search for the witnesses instead")
+            print(f"  the draft's witnesses are not usable ({reason}); searching for them instead", flush=True)
     if reuse:
         if dw is None:
-            raise SystemExit("--reuse-witnesses: the input carries no draft "
-                             "to take the witnesses from")
+            raise SystemExit("--reuse-witnesses: the input carries no draft to take the witnesses from")
         dX, witX, dZ, witZ = dw
         _reuse_value_note("X", _draft_claimed(draft, "X"), dX)
         _reuse_value_note("Z", _draft_claimed(draft, "Z"), dZ)
         wp_x = _reuse_witness_provenance(draft, "X")
         wp_z = _reuse_witness_provenance(draft, "Z")
-        print(f"  reusing the draft's witnesses: d_X<={dX}, d_Z<={dZ}",
-              flush=True)
+        print(f"  reusing the draft's witnesses: d_X<={dX}, d_Z<={dZ}", flush=True)
     else:
-        print(f"  searching for distance witnesses ({args.trials} RIS trials)...",
-              flush=True)
+        print(f"  searching for distance witnesses ({args.trials} RIS trials)...", flush=True)
         dX, witX = hd.ris_min_logical(HX, HZ, trials=args.trials, seed=args.seed)
         dZ, witZ = hd.ris_min_logical(HZ, HX, trials=args.trials, seed=args.seed)
         if dw is not None:
@@ -682,15 +673,13 @@ def build_submission(HX, HZ, args):
                 dZ, witZ = dw[2], dw[3]
                 wp_z = _reuse_witness_provenance(draft, "Z")
         if dX is None or dZ is None:
-            raise SystemExit("RIS found no logical operator on one side; "
-                             "cannot certify a distance")
+            raise SystemExit("RIS found no logical operator on one side; cannot certify a distance")
     # Let the C++ accelerator tighten the claim (runs on reused witnesses too).
     # A reused witness that the accelerator lightens is a different witness,
     # so the draft's witness_provenance no longer describes it.
     if hd._fast is not None and args.fast_trials > 0:
         print(f"  accelerator pass ({args.fast_trials} trials)...", flush=True)
-        wf, side, sup = hd._fast.distance_rand_witness(
-            HX, HZ, args.fast_trials, args.seed, 8, 8)
+        wf, side, sup = hd._fast.distance_rand_witness(HX, HZ, args.fast_trials, args.seed, 8, 8)
         if wf is not None and side in ("X", "Z"):
             v = np.zeros(n, dtype=np.int8)
             v[list(sup)] = 1
@@ -703,16 +692,12 @@ def build_submission(HX, HZ, args):
                 else:
                     dZ, witZ = int(v.sum()), v
                     wp_z = _accelerator_witness_provenance(args)
-                print(f"    accelerator tightened d_{side} to {int(v.sum())}",
-                      flush=True)
+                print(f"    accelerator tightened d_{side} to {int(v.sum())}", flush=True)
     d = min(dX, dZ)
-    print(f"  distance (witnessed upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})",
-          flush=True)
+    print(f"  distance (witnessed upper bound) d<={d}  (d_X<={dX}, d_Z<={dZ})", flush=True)
 
-    xside = {"value": int(dX), "confidence": "upper_bound",
-             "witness": sorted(int(q) for q in np.where(witX)[0])}
-    zside = {"value": int(dZ), "confidence": "upper_bound",
-             "witness": sorted(int(q) for q in np.where(witZ)[0])}
+    xside = {"value": int(dX), "confidence": "upper_bound", "witness": sorted(int(q) for q in np.where(witX)[0])}
+    zside = {"value": int(dZ), "confidence": "upper_bound", "witness": sorted(int(q) for q in np.where(witZ)[0])}
     if wp_x:
         xside["witness_provenance"] = wp_x
     if wp_z:
@@ -734,7 +719,8 @@ def build_submission(HX, HZ, args):
         "schema_version": _sv,
         "name": args.name or f"[[{n},{k},{d}]]",
         "code_type": "CSS",
-        "n": n, "k": int(k),
+        "n": n,
+        "k": int(k),
         "checks": {"X": _supports(HX), "Z": _supports(HZ)},
         "distance": dist,
         "provenance": prov,
@@ -757,8 +743,16 @@ def build_submission(HX, HZ, args):
 # compared across entries. Individual --budget-* flags override keys of a
 # --budget-json file, and an empty result leaves the document without the
 # block (and at schema 0.1).
-BUDGET_KEYS = ("candidates_screened", "ris_trials_per_side", "cpu_hours",
-               "gpu_hours", "llm_tokens", "wall_clock_hours", "tool", "notes")
+BUDGET_KEYS = (
+    "candidates_screened",
+    "ris_trials_per_side",
+    "cpu_hours",
+    "gpu_hours",
+    "llm_tokens",
+    "wall_clock_hours",
+    "tool",
+    "notes",
+)
 
 
 def _parse_llm_tokens(items):
@@ -771,9 +765,7 @@ def _parse_llm_tokens(items):
     for item in items or ():
         model, sep, count = str(item).rpartition("=")
         if not sep or not model.strip() or not count.strip().isdigit():
-            raise SystemExit(
-                f"--budget-llm-tokens expects MODEL=COUNT (e.g. "
-                f"'Claude Opus 4.8=1800000'), got {item!r}")
+            raise SystemExit(f"--budget-llm-tokens expects MODEL=COUNT (e.g. 'Claude Opus 4.8=1800000'), got {item!r}")
         out[model.strip()] = int(count)
     return out
 
@@ -799,9 +791,7 @@ def search_budget_from_args(args):
             raise SystemExit("--budget-json must hold a JSON object")
         unknown = sorted(set(loaded) - set(BUDGET_KEYS))
         if unknown:
-            raise SystemExit(
-                f"--budget-json: unknown key(s) {unknown}; allowed: "
-                f"{list(BUDGET_KEYS)}")
+            raise SystemExit(f"--budget-json: unknown key(s) {unknown}; allowed: {list(BUDGET_KEYS)}")
         budget.update(loaded)
     for key in BUDGET_KEYS:
         if key == "llm_tokens":
@@ -849,12 +839,14 @@ def _board_identities():
     in a process it is free.
     """
     import validate_candidate as vc
+
     return vc._board_entries(), vc._identity_sets
 
 
 def _board_codes_dir():
     """The directory `verify/validate_candidate.py` reads the board from."""
     import validate_candidate as vc
+
     return vc._CODES
 
 
@@ -905,8 +897,7 @@ def board_dedup(report, *, exclude=None):
         board, identity_sets = _board_identities()
         fps, sigs = identity_sets(report)
     except Exception as e:
-        print(f"  note: board dedup skipped ({e}); the equivalence box stays "
-              f"unticked for a human to answer")
+        print(f"  note: board dedup skipped ({e}); the equivalence box stays unticked for a human to answer")
         return {"checked": False, "match": None, "kind": None}
 
     others = [b for b in board if b["name"] != exclude]
@@ -926,26 +917,72 @@ def board_dedup(report, *, exclude=None):
     return {"checked": True, "match": None, "kind": None}
 
 
+def audit_wl_match(doc, dedup, *, root=None):
+    """Decide a WL-signature match with the permutation audit (issue #6186).
+
+    A dedup whose kind is a shared WL signature is handed to
+    ``equivalence.decide_pair`` against the entry it names; the record is
+    attached as ``dedup["audit"]`` and written under
+    ``research/candidates/equivalence/<slug>.equivalence.json`` (gitignored
+    working output, never part of the PR). Any other dedup is returned as is.
+    """
+    if not (dedup and dedup.get("match") and dedup.get("kind") == "WL signature"):
+        return dedup
+    root = root or _ROOT
+    try:
+        record = equivalence.decide_pair(doc, dedup["match"], root=root)
+    except Exception as e:  # noqa: BLE001 - the box falls back to the human rule
+        print(f"  note: permutation audit against {dedup['match']} skipped ({e})")
+        return dedup
+    dedup = dict(dedup, audit=record)
+    try:
+        out_dir = os.path.join(root, "research", "candidates", "equivalence")
+        os.makedirs(out_dir, exist_ok=True)
+        slug = os.path.splitext(os.path.basename(str(dedup["match"])))[0]
+        path = equivalence.save_record(
+            record, os.path.join(out_dir, f"candidate-vs-{slug}{equivalence.RECORD_SUFFIX}"))
+        print(f"  permutation audit against {dedup['match']}: {record.get('verdict')} "
+              f"({record.get('reason') or record.get('found_by')}); record -> {path}")
+    except OSError as e:
+        print(f"  note: equivalence record not written ({e})")
+    return dedup
+
+
 def _equivalence_box(dedup):
     """Return the equivalence checklist line, ticked only on evidence.
 
     No match on a checked board: ticked, and it says what was checked, so an
-    unedited draft passes the prose gate and --open-pr can succeed. A match,
-    or no board to check against: unticked, naming the entry, so the gate
-    holds the PR until a human has said in `provenance.notes` why this is a
-    different code.
+    unedited draft passes the prose gate and --open-pr can succeed. A WL match
+    the permutation audit decided (issue #6186): ticked with the separating
+    invariant, or unticked naming the exhibited permutation, which is a
+    duplicate to withdraw. A match the audit did not decide, or no board to
+    check against: unticked, naming the entry, so the gate holds the PR until
+    a human has said in `provenance.notes` why this is a different code.
     """
     if dedup and dedup.get("checked") and not dedup.get("match"):
-        return _box(True, "Checked against the current board by exact "
-                         "fingerprint and WL signature, local-Hadamard images "
-                         "included: no equivalent entry")
+        return _box(
+            True,
+            "Checked against the current board by exact "
+            "fingerprint and WL signature, local-Hadamard images "
+            "included: no equivalent entry",
+        )
+    if dedup and dedup.get("audit"):
+        decided, text = equivalence.finding(dedup["audit"])
+        if decided is not None:
+            return _box(decided, text[0].upper() + text[1:])
     if dedup and dedup.get("match"):
-        return _box(False, f"Possibly equivalent to `{dedup['match']}` "
-                          f"({dedup['kind']}): say in `provenance.notes` why "
-                          f"this is a different code, or withdraw")
-    return _box(False, "If this may be equivalent to an existing entry, noted "
-                      "in `provenance.notes` (the board could not be loaded "
-                      "for the automatic check)")
+        return _box(
+            False,
+            f"Possibly equivalent to `{dedup['match']}` "
+            f"({dedup['kind']}): say in `provenance.notes` why "
+            f"this is a different code, or withdraw",
+        )
+    return _box(
+        False,
+        "If this may be equivalent to an existing entry, noted "
+        "in `provenance.notes` (the board could not be loaded "
+        "for the automatic check)",
+    )
 
 
 def _repo_path(path):
@@ -965,11 +1002,13 @@ def pr_body(doc, report, args, out, note_out=None):
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
     comp = report.get("computed", {})
     wmax = comp.get("max_check_weight")
-    track = " / ".join(x for x in (comp.get("locality_class"),
-                                   comp.get("weight_class")) if x)
+    track = " / ".join(x for x in (comp.get("locality_class"), comp.get("weight_class")) if x)
     stab = doc.get("code_type") == "stabilizer"
-    conf = {side: doc["distance"][side]["confidence"]
-            for side in (("P",) if stab else ("X", "Z")) if side in doc["distance"]}
+    conf = {
+        side: doc["distance"][side]["confidence"]
+        for side in (("P",) if stab else ("X", "Z"))
+        if side in doc["distance"]
+    }
     conf_line = ", ".join(f"{s}: {c}" for s, c in conf.items())
     rel_out = _repo_path(out)
 
@@ -981,10 +1020,8 @@ def pr_body(doc, report, args, out, note_out=None):
         "",
         f"- Parameters: [[n, k, d]] = [[{n},{k},{d}]]",
         f"- Tracks: {track} (computed by the verifier from H and the layout)"
-        + ("; general stabilizer code, ranked on the stabilizer board"
-           if stab else ""),
-        f"- Distance confidence: {conf_line}"
-        + (" (Pauli weight, one side)" if stab else ""),
+        + ("; general stabilizer code, ranked on the stabilizer board" if stab else ""),
+        f"- Distance confidence: {conf_line}" + (" (Pauli weight, one side)" if stab else ""),
         f"- Local search depth: {_depth_line(args)}",
     ]
     circ = doc.get("circuit")
@@ -995,11 +1032,11 @@ def pr_body(doc, report, args, out, note_out=None):
             f"- Circuit tier: d_circ <= {min(dc['X']['value'], dc['Z']['value'])} "
             f"(X {dc['X']['value']}, Z {dc['Z']['value']}) at rounds "
             f"{circ['rounds']}, witness-backed, memory circuits under "
-            f"`circuits/{slug}/`")
+            f"`circuits/{slug}/`"
+        )
     lines.append("")
     if args.family:
-        lines += [f"Family tag: {args.family} (a self-declared filter, never "
-                  f"used for ranking).", ""]
+        lines += [f"Family tag: {args.family} (a self-declared filter, never used for ranking).", ""]
     # Checklist boxes are ticked only when the tool can vouch for them. The
     # construction box reflects whether --construction was given; the
     # equivalence box reflects the board dedup `qldpc submit` ran (see
@@ -1007,33 +1044,31 @@ def pr_body(doc, report, args, out, note_out=None):
     # otherwise left for a human, which the prose gate enforces.
     lines += [
         "### Checklist",
-        box(True, "One JSON file under `codes/`, conforming to "
-                  "`schema/code.schema.json`"),
+        box(True, "One JSON file under `codes/`, conforming to `schema/code.schema.json`"),
         box(True, "Distance witness(es) included for each reported side"),
         box(True, f"`python verify/qldpc_verify.py {rel_out}` passes locally"),
-        box(True, f"`python verify/circuit_verify.py {rel_out}` passes locally")
-        if circ else None,
-        box(bool((args.construction or "").strip()),
-            "Construction and references filled in under `provenance`")
-        if (args.construction or "").strip() else None,
+        box(True, f"`python verify/circuit_verify.py {rel_out}` passes locally") if circ else None,
+        box(bool((args.construction or "").strip()), "Construction and references filled in under `provenance`")
+        if (args.construction or "").strip()
+        else None,
         _equivalence_box(getattr(args, "_dedup", None)),
         "",
         "### What frontier does this advance?",
-        "(Computed by `qldpc submit` against the current board; review and "
-        "edit.)",
+        "(Computed by `qldpc submit` against the current board; review and edit.)",
     ]
     front = frontier_summary(doc, report)
     if front:
         lines += front
     else:
-        lines += ["(Name the track and the cell it lands in, any entry it "
-                  "dominates, and on which axis.)"]
+        lines += ["(Name the track and the cell it lands in, any entry it dominates, and on which axis.)"]
     peers = getattr(args, "_d_only_peers", None) or []
     audit = getattr(args, "_peer_audit", None)
     if peers and audit:
-        lines.append(f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
-                     f"peer audit (`research/audits/leader_audit.py pair`): "
-                     f"{peer_audit.summary(audit)}")
+        lines.append(
+            f"- Gain over {', '.join(peers)} is on d alone; matched-depth "
+            f"peer audit (`research/audits/leader_audit.py pair`): "
+            f"{peer_audit.summary(audit)}"
+        )
     dominated_by = getattr(args, "_non_frontier", None) or []
     if dominated_by:
         # --allow-non-frontier: the dominators, where the reviewer reads the
@@ -1088,22 +1123,24 @@ def _load_board_entries(quiet=False):
     try:
         from build import load_entries
     except Exception as e:
-        print(f"  note: could not load the current board for frontier "
-              f"comparison ({e}); leaving the frontier section as a TODO")
+        print(
+            f"  note: could not load the current board for frontier "
+            f"comparison ({e}); leaving the frontier section as a TODO"
+        )
         return []
     if not quiet:
-        print("  loading the board (structural verification pass over codes/)...",
-              file=sys.stderr)
+        print("  loading the board (structural verification pass over codes/)...", file=sys.stderr)
     t0 = time.time()
     try:
         entries = load_entries()
     except Exception as e:
-        print(f"  note: could not load the current board for frontier "
-              f"comparison ({e}); leaving the frontier section as a TODO")
+        print(
+            f"  note: could not load the current board for frontier "
+            f"comparison ({e}); leaving the frontier section as a TODO"
+        )
         return []
     if not quiet:
-        print(f"  loaded {_plural(len(entries), 'entry', 'entries')} in "
-              f"{time.time() - t0:.1f}s", file=sys.stderr)
+        print(f"  loaded {_plural(len(entries), 'entry', 'entries')} in {time.time() - t0:.1f}s", file=sys.stderr)
     return entries
 
 
@@ -1118,7 +1155,9 @@ def _entry_for(doc, report):
     d = earned["value"] if isinstance(earned, dict) else (earned or doc["distance"]["d"])
     return {
         "slug": f"{n}-{k}-{d}",
-        "n": n, "k": k, "d": d,
+        "n": n,
+        "k": k,
+        "d": d,
         "code_type": doc.get("code_type", "CSS"),
         "eff": round(k * d * d / n, 3),
         "w": comp.get("max_check_weight"),
@@ -1143,24 +1182,28 @@ def frontier_summary(doc, report):
         L, W = cell
         # peers share the cell and the board: CSS and stabilizer codes
         # rank separately
-        idxs = [i for i, e in enumerate(entries) if cell in cells(e)
-                and e.get("code_type", "CSS") == cand["code_type"]]
+        idxs = [i for i, e in enumerate(entries) if cell in cells(e) and e.get("code_type", "CSS") == cand["code_type"]]
         peers = [entries[i] for i in idxs]
         # pareto() returns the set of indices on the frontier; the candidate is
         # appended last, so its index is len(peers).
         on_front = len(peers) in pareto(peers + [cand])
         # existing entries the candidate strictly dominates on (n, k, d, w)
-        dominated = [e for e in peers
-                     if e["n"] >= cand["n"] and e["k"] <= cand["k"]
-                     and e["d"] <= cand["d"] and e["w"] >= cand["w"]
-                     and (e["n"] > cand["n"] or e["k"] < cand["k"]
-                          or e["d"] < cand["d"] or e["w"] > cand["w"])]
+        dominated = [
+            e
+            for e in peers
+            if e["n"] >= cand["n"]
+            and e["k"] <= cand["k"]
+            and e["d"] <= cand["d"]
+            and e["w"] >= cand["w"]
+            and (e["n"] > cand["n"] or e["k"] < cand["k"] or e["d"] < cand["d"] or e["w"] > cand["w"])
+        ]
         dominated.sort(key=lambda e: (-e["eff"], e["n"]))
-        head = (f"- **{LOCALITY_LABEL[L]} / {WEIGHT_LABEL[W]}**: "
-                f"{'on the Pareto frontier' if on_front else 'not on the frontier (dominated by a cell entry)'}")
+        head = (
+            f"- **{LOCALITY_LABEL[L]} / {WEIGHT_LABEL[W]}**: "
+            f"{'on the Pareto frontier' if on_front else 'not on the frontier (dominated by a cell entry)'}"
+        )
         if dominated:
-            names = ", ".join(f"[[{e['n']},{e['k']},{e['d']}]]"
-                              for e in dominated)
+            names = ", ".join(f"[[{e['n']},{e['k']},{e['d']}]]" for e in dominated)
             head += f" — dominates {names}"
         lines.append(head)
     return lines
@@ -1177,15 +1220,11 @@ def validate_authors(authors, anonymous=False):
             "Author values must not be empty or whitespace-only. Remove the "
             "empty value or replace it with a name or @handle."
         )
-    malformed = [
-        author for author in normalized
-        if author.startswith("@") and HANDLE.fullmatch(author) is None
-    ]
+    malformed = [author for author in normalized if author.startswith("@") and HANDLE.fullmatch(author) is None]
     if malformed:
         values = ", ".join(repr(author) for author in malformed)
         raise SystemExit(
-            f"Invalid author {values}. GitHub authors must use @yourhandle "
-            "with letters, numbers, or hyphens only."
+            f"Invalid author {values}. GitHub authors must use @yourhandle with letters, numbers, or hyphens only."
         )
 
     has_handle = any(HANDLE.fullmatch(author) for author in normalized)
@@ -1227,14 +1266,11 @@ def dry_run_summary(doc, report, out, novelty=None):
     dist = doc["distance"]
     per_side = []
     stab = doc.get("code_type") == "stabilizer"
-    for side in (("P",) if stab else ("X", "Z")):
+    for side in ("P",) if stab else ("X", "Z"):
         s = dist.get(side, {})
         witness = "witness found" if s.get("witness") else "no witness"
         per_side.append(f"{side}: <= {s.get('value')} ({s.get('confidence')}, {witness})")
-    track_cells = ", ".join(
-        f"{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}"
-        for L, W in cells(entry)
-    )
+    track_cells = ", ".join(f"{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}" for L, W in cells(entry))
     lines = [
         f"  code         [[{doc['n']},{doc['k']},{dist['d']}]]"
         + ("  (general stabilizer code, stabilizer board)" if stab else ""),
@@ -1247,12 +1283,19 @@ def dry_run_summary(doc, report, out, novelty=None):
     ]
     if novelty is not None:
         doms = novelty.get("dominated_by") or []
-        lines.append("  frontier     " + (
-            "board-advancing: no entry in its track cell dominates it" if not doms
-            else f"NOT board-advancing: dominated by {', '.join(doms)}"
-            + (" (filed as a non-frontier record)"
-               if novelty.get("filed_as_non_frontier") else
-               "; the real run refuses this without --allow-non-frontier")))
+        lines.append(
+            "  frontier     "
+            + (
+                "board-advancing: no entry in its track cell dominates it"
+                if not doms
+                else f"NOT board-advancing: dominated by {', '.join(doms)}"
+                + (
+                    " (filed as a non-frontier record)"
+                    if novelty.get("filed_as_non_frontier")
+                    else "; the real run refuses this without --allow-non-frontier"
+                )
+            )
+        )
     circ = doc.get("circuit")
     if circ:
         dc = circ["d_circ"]
@@ -1260,7 +1303,8 @@ def dry_run_summary(doc, report, out, novelty=None):
         lines.append(
             f"  circuit      d_circ <= {min(dc['X']['value'], dc['Z']['value'])} "
             f"(X {dc['X']['value']}, Z {dc['Z']['value']}), rounds "
-            f"{circ['rounds']} -> circuits/{slug}/memory_{{x,z}}.{{stim,dem}}")
+            f"{circ['rounds']} -> circuits/{slug}/memory_{{x,z}}.{{stim,dem}}"
+        )
     prov = doc.get("provenance", {})
     for label, value in (
         ("authors", ", ".join(prov.get("authors", []))),
@@ -1291,8 +1335,7 @@ def schema_version_for(doc):
     dist = doc.get("distance") or {}
     has_wp = False
     for side in ("X", "Z", "P"):
-        if isinstance(dist.get(side), dict) and dist[side].get(
-                "witness_provenance"):
+        if isinstance(dist.get(side), dict) and dist[side].get("witness_provenance"):
             has_wp = True
     if has_wp or doc.get("circuit"):
         return "0.2"
@@ -1314,20 +1357,35 @@ def attach_circuit_tier(doc, args):
     def log(msg):
         print(f"    {msg}", flush=True)
 
-    print("  circuit tier: " + ("reading circuits from " + args.circuits
-                                if args.circuits else
-                                "generating memory circuits (--no-circuit "
-                                "skips this step)..."), flush=True)
+    print(
+        "  circuit tier: "
+        + (
+            "reading circuits from " + args.circuits
+            if args.circuits
+            else "generating memory circuits (--no-circuit skips this step)..."
+        ),
+        flush=True,
+    )
     try:
         if args.circuits:
             block, files, family = ca.from_files(
-                doc, args.circuits, rounds=args.circuit_rounds,
-                seed=args.circuit_seed, seconds=args.circuit_seconds, log=log)
+                doc,
+                args.circuits,
+                rounds=args.circuit_rounds,
+                seed=args.circuit_seed,
+                seconds=args.circuit_seconds,
+                log=log,
+            )
         else:
             block, files, family = ca.generate(
-                doc, coords=args._coords, rounds=args.circuit_rounds,
-                seed=args.circuit_seed, max_candidates=args.circuit_candidates,
-                seconds=args.circuit_seconds, log=log)
+                doc,
+                coords=args._coords,
+                rounds=args.circuit_rounds,
+                seed=args.circuit_seed,
+                max_candidates=args.circuit_candidates,
+                seconds=args.circuit_seconds,
+                log=log,
+            )
     except ca.CircuitUnavailable as e:
         if args.circuits:
             raise SystemExit(f"--circuits: {e}")
@@ -1338,28 +1396,31 @@ def attach_circuit_tier(doc, args):
     trial["schema_version"] = schema_version_for(trial)
     with tempfile.TemporaryDirectory(prefix="qldpc-circuits-") as tmp:
         for name, text in files.items():
-            with open(os.path.join(tmp, name), "w", encoding="utf-8",
-                      newline="\n") as f:
+            with open(os.path.join(tmp, name), "w", encoding="utf-8", newline="\n") as f:
                 f.write(text)
         report = verify_circuit(trial, tmp)
-    problems = [f"{c['check']}: {c['detail']}" for c in report["checks"]
-                if not c["ok"]] + structure_errors(trial)
+    problems = [f"{c['check']}: {c['detail']}" for c in report["checks"] if not c["ok"]] + structure_errors(trial)
     if problems or not report["ok"]:
         for p in problems:
             print(f"    FAIL  {p}")
         if args.circuits:
-            raise SystemExit("--circuits: the supplied circuits did not pass "
-                             "verify/circuit_verify.py; nothing written.")
-        print("  circuit tier skipped: the generated circuits did not verify "
-              "(a generator bug; please report it with this output). The "
-              "code tier is unaffected.")
+            raise SystemExit(
+                "--circuits: the supplied circuits did not pass verify/circuit_verify.py; nothing written."
+            )
+        print(
+            "  circuit tier skipped: the generated circuits did not verify "
+            "(a generator bug; please report it with this output). The "
+            "code tier is unaffected."
+        )
         return None
     doc["circuit"] = block
     doc["schema_version"] = trial["schema_version"]
     dc = block["d_circ"]
-    print(f"  OK  circuit tier verified: d_circ <= "
-          f"{min(dc['X']['value'], dc['Z']['value'])} (X {dc['X']['value']}, "
-          f"Z {dc['Z']['value']}), rounds {block['rounds']}, {family}")
+    print(
+        f"  OK  circuit tier verified: d_circ <= "
+        f"{min(dc['X']['value'], dc['Z']['value'])} (X {dc['X']['value']}, "
+        f"Z {dc['Z']['value']}), rounds {block['rounds']}, {family}"
+    )
     return files
 
 
@@ -1408,14 +1469,24 @@ def _peer_audit_check(doc, report, args, res, slug):
             return 1
     args._d_only_peers, args._peer_audit = peers, audit
     res["d_only_peers"] = list(peers)
-    res["peer_audit"] = None if audit is None else {
-        "path": path, "decision": audit.get("decision"),
-        "trials": audit.get("trials"), "seeds": audit.get("seeds"),
-        "pair_depth": audit.get("pair_depth"), "peers": audit.get("peers")}
+    res["peer_audit"] = (
+        None
+        if audit is None
+        else {
+            "path": path,
+            "decision": audit.get("decision"),
+            "trials": audit.get("trials"),
+            "seeds": audit.get("seeds"),
+            "pair_depth": audit.get("pair_depth"),
+            "peers": audit.get("peers"),
+        }
+    )
     if not peers:
         if audit is not None:
-            print("  note: --peer-audit given, but no board entry is beaten on d "
-                  "alone; the audit is recorded in the result and not required")
+            print(
+                "  note: --peer-audit given, but no board entry is beaten on d "
+                "alone; the audit is recorded in the result and not required"
+            )
         return 0
     trials, pair_depth = _claim_depth(args)
     staged = None
@@ -1423,19 +1494,23 @@ def _peer_audit_check(doc, report, args, res, slug):
         # the pair command needs a submission-shaped file; stage the verified
         # document where the kit stages candidates (gitignored), so the
         # refusal names a path that exists
-        staged = coordination.unique_path(
-            os.path.join(coordination.staging_dir(), f"{slug}.json"), doc)
+        staged = coordination.unique_path(os.path.join(coordination.staging_dir(), f"{slug}.json"), doc)
         with open(staged, "w", encoding="utf-8", newline="\n") as f:
             json.dump(doc, f, indent=1)
             f.write("\n")
     problems = peer_audit.blockers(
-        peers, audit, required_trials=trials, required_pair_depth=pair_depth,
-        candidate_path=staged or "<the verified document; --dry-run --json prints "
-                                 "it under doc>",
-        attach="re-run submit with --peer-audit <that file>")
+        peers,
+        audit,
+        required_trials=trials,
+        required_pair_depth=pair_depth,
+        candidate_path=staged or "<the verified document; --dry-run --json prints it under doc>",
+        attach="re-run submit with --peer-audit <that file>",
+    )
     if not problems:
-        print(f"  OK  gain over {', '.join(peers)} is on d alone and the "
-              f"matched-depth peer audit covers it: {peer_audit.summary(audit)}")
+        print(
+            f"  OK  gain over {', '.join(peers)} is on d alone and the "
+            f"matched-depth peer audit covers it: {peer_audit.summary(audit)}"
+        )
         return 0
     if args.dry_run:
         res["would_refuse"] = problems
@@ -1471,7 +1546,7 @@ def _code_axes_doc(doc):
 
 
 def _same_code_doc(new, old):
-    return (new.get("checks") == old.get("checks"))
+    return new.get("checks") == old.get("checks")
 
 
 def _strictly_improves_doc(new, old):
@@ -1479,8 +1554,9 @@ def _strictly_improves_doc(new, old):
     n_o, k_o, d_o, w_o = _code_axes_doc(old)
     if w_n is None or w_o is None:
         return False
-    return (n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o
-            and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o))
+    return (
+        n_n <= n_o and k_n >= k_o and d_n >= d_o and w_n <= w_o and (n_n < n_o or k_n > k_o or d_n > d_o or w_n < w_o)
+    )
 
 
 def _compare_status_doc(new, old):
@@ -1521,8 +1597,7 @@ def _revision_check(doc, report, args, res, slug=None):
         with open(code_path, encoding="utf-8") as fh:
             old_doc = json.load(fh)
     except (OSError, ValueError):
-        res["revision"] = {"is_revision": True, "is_overwrite": True,
-                           "unreadable": True}
+        res["revision"] = {"is_revision": True, "is_overwrite": True, "unreadable": True}
         return 0
     old_slug = os.path.basename(code_path)
     same = _same_code_doc(doc, old_doc)
@@ -1530,13 +1605,17 @@ def _revision_check(doc, report, args, res, slug=None):
     if same:
         n_n, k_n, d_n, w_n = _code_axes_doc(doc)
         n_o, k_o, d_o, w_o = _code_axes_doc(old_doc)
-        if (n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o):
+        if n_n == n_o and k_n == k_o and w_n == w_o and d_n <= d_o:
             allowed = True
     status = _compare_status_doc(doc, old_doc)
-    res["revision"] = {"is_revision": True, "is_overwrite": True,
-                       "existing": code_path, "same_code": same,
-                       "comparison": status if same else "distinct code",
-                       "strictly_better": allowed}
+    res["revision"] = {
+        "is_revision": True,
+        "is_overwrite": True,
+        "existing": code_path,
+        "same_code": same,
+        "comparison": status if same else "distinct code",
+        "strictly_better": allowed,
+    }
     res["is_revision"] = True
     res["is_overwrite"] = True
     res["overwrites"] = code_path
@@ -1548,18 +1627,22 @@ def _revision_check(doc, report, args, res, slug=None):
     status = _compare_status_doc(doc, old_doc)
     if not same:
         suggested = _suggested_slug_doc(slug, out_dir)
-        problems = [f"{code_path} overwrites existing entry {old_slug}; "
-                    f"new version is {status}; does not advance over the "
-                    f"version it replaces; distinct code collides with the "
-                    f"existing entry; file it as a suffixed slug "
-                    f"({suggested}) instead of overwriting (re-run with "
-                    f"--slug {suggested})"]
+        problems = [
+            f"{code_path} overwrites existing entry {old_slug}; "
+            f"new version is {status}; does not advance over the "
+            f"version it replaces; distinct code collides with the "
+            f"existing entry; file it as a suffixed slug "
+            f"({suggested}) instead of overwriting (re-run with "
+            f"--slug {suggested})"
+        ]
     else:
-        problems = [f"{code_path} overwrites existing entry {old_slug}; "
-                    f"new version is {status}; does not advance over the "
-                    f"version it replaces (re-run with --slug "
-                    f"{_suggested_slug_doc(slug, out_dir)} to file it as a "
-                    f"new entry)"]
+        problems = [
+            f"{code_path} overwrites existing entry {old_slug}; "
+            f"new version is {status}; does not advance over the "
+            f"version it replaces (re-run with --slug "
+            f"{_suggested_slug_doc(slug, out_dir)} to file it as a "
+            f"new entry)"
+        ]
     if args.dry_run:
         res.setdefault("would_refuse", []).extend(problems)
         print("\n--dry-run: the real run would be refused as a revision/overwrite:")
@@ -1569,8 +1652,7 @@ def _revision_check(doc, report, args, res, slug=None):
     print("\nsubmission refused; nothing written to the board:")
     for p in problems:
         print(f"  {p}")
-    res["error"] = {"stage": "revision", "class": "revision",
-                    "message": "; ".join(problems)}
+    res["error"] = {"stage": "revision", "class": "revision", "message": "; ".join(problems)}
     return 1
 
 
@@ -1591,21 +1673,28 @@ def _frontier_check(doc, report, args, res):
     doms = frontier.dominators(_entry_for(doc, report), _load_board_entries())
     allowed = bool(getattr(args, "allow_non_frontier", False))
     args._non_frontier = list(doms) if (doms and allowed) else []
-    res["novelty"] = {"board_advancing": not doms, "dominated_by": list(doms),
-                      "filed_as_non_frontier": bool(doms and allowed)}
+    res["novelty"] = {
+        "board_advancing": not doms,
+        "dominated_by": list(doms),
+        "filed_as_non_frontier": bool(doms and allowed),
+    }
     if not doms:
         if allowed:
-            print("  note: --allow-non-frontier given, but no entry in its track "
-                  "cell dominates this code; the flag is not needed")
+            print(
+                "  note: --allow-non-frontier given, but no entry in its track "
+                "cell dominates this code; the flag is not needed"
+            )
         return 0
     if allowed:
-        print(f"  note: not board-advancing: dominated in its track cell by "
-              f"{', '.join(doms)}; filed as a non-frontier record "
-              f"(--allow-non-frontier), which the PR body says")
+        print(
+            f"  note: not board-advancing: dominated in its track cell by "
+            f"{', '.join(doms)}; filed as a non-frontier record "
+            f"(--allow-non-frontier), which the PR body says"
+        )
         return 0
     problems = frontier.blockers(
-        doms, False, attach="re-run submit with --allow-non-frontier to file "
-                            "it as a non-frontier record")
+        doms, False, attach="re-run submit with --allow-non-frontier to file it as a non-frontier record"
+    )
     if args.dry_run:
         res.setdefault("would_refuse", []).extend(problems)
         print("\n--dry-run: the real run would be refused as not board-advancing:")
@@ -1626,17 +1715,17 @@ def cmd_submit(args):
     if args.no_circuit and args.circuits:
         raise SystemExit("--no-circuit and --circuits contradict each other")
     HX, HZ, coords, _draft = load_checks(args.code)
-    if (getattr(args, "reuse_witnesses", False)
-            and not (isinstance(_draft, dict) and "checks" in _draft)):
-        raise SystemExit("--reuse-witnesses: the input carries no JSON draft "
-                         "to take witnesses from (only a .json draft carries "
-                         "distance witnesses); drop the flag")
+    if getattr(args, "reuse_witnesses", False) and not (isinstance(_draft, dict) and "checks" in _draft):
+        raise SystemExit(
+            "--reuse-witnesses: the input carries no JSON draft "
+            "to take witnesses from (only a .json draft carries "
+            "distance witnesses); drop the flag"
+        )
     _reuse_accelerator_requirement(args)
     _accelerator_requirement(args)
-    if args.coords:                      # explicit coords file overrides
+    if args.coords:  # explicit coords file overrides
         cz = np.load(args.coords) if args.coords.endswith(".npz") else None
-        coords = (_pick(cz, ("coords", "coordinates", "xy"))
-                  if cz is not None else np.loadtxt(args.coords))
+        coords = _pick(cz, ("coords", "coordinates", "xy")) if cz is not None else np.loadtxt(args.coords)
         coords = np.asarray(coords, dtype=float)
     args._coords = coords
     args._draft = _draft
@@ -1644,16 +1733,17 @@ def cmd_submit(args):
     stabilizer = (_draft or {}).get("code_type") == "stabilizer"
     if stabilizer:
         if args.circuits:
-            raise SystemExit("--circuits: the circuit tier is not available "
-                             "for stabilizer codes; drop the flag")
+            raise SystemExit("--circuits: the circuit tier is not available for stabilizer codes; drop the flag")
         if not args.no_circuit:
-            print("  circuit tier: not available for stabilizer codes (the "
-                  "memory experiments are per basis); submitting the code "
-                  "tier only", flush=True)
+            print(
+                "  circuit tier: not available for stabilizer codes (the "
+                "memory experiments are per basis); submitting the code "
+                "tier only",
+                flush=True,
+            )
             args.no_circuit = True
         doc = build_stabilizer_submission(HX, HZ, args)
-        print("  verifying (isotropy / k / weight / Pauli witness / locality)...",
-              flush=True)
+        print("  verifying (isotropy / k / weight / Pauli witness / locality)...", flush=True)
     else:
         doc = build_submission(HX, HZ, args)
         print("  verifying (CSS / k / weight / witnesses / locality)...", flush=True)
@@ -1664,18 +1754,25 @@ def cmd_submit(args):
             print(f"    FAIL  {c['check']}: {c['detail']}")
     if not report["ok"]:
         print("\nverification FAILED; nothing written. Fix the issues above.")
-        res["error"] = {"stage": "verify", "message": "verification failed",
-                        "failed_checks": [
-                            {"check": c["check"], "detail": c["detail"]}
-                            for c in report["checks"] if not c["ok"]]}
+        res["error"] = {
+            "stage": "verify",
+            "message": "verification failed",
+            "failed_checks": [{"check": c["check"], "detail": c["detail"]} for c in report["checks"] if not c["ok"]],
+        }
         return 1
     n, k, d = doc["n"], doc["k"], doc["distance"]["d"]
     print(f"  OK  verified. score kd^2/n = {round(k * d * d / n, 3)}")
 
     slug = getattr(args, "slug", "") or f"{n}-{k}-{d}"
-    res.update(slug=slug, n=n, k=k, d=d, code_type=doc.get("code_type", "CSS"),
-               score=round(k * d * d / n, 3),
-               earned_distance=report.get("earned_distance"))
+    res.update(
+        slug=slug,
+        n=n,
+        k=k,
+        d=d,
+        code_type=doc.get("code_type", "CSS"),
+        score=round(k * d * d / n, 3),
+        earned_distance=report.get("earned_distance"),
+    )
     rc = _revision_check(doc, report, args, res, slug=slug)
     if rc:
         return rc
@@ -1686,25 +1783,25 @@ def cmd_submit(args):
     if rc:
         return rc
     out = os.path.join(args.out, f"{slug}.json")
-    circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)),
-                                "circuits", slug)
+    circuits_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)), "circuits", slug)
     if not args.dry_run and not args.force:
-        for p in ([out] if args.no_circuit else [out, circuits_dir]):
+        for p in [out] if args.no_circuit else [out, circuits_dir]:
             if os.path.exists(p):
-                print(f"\n{p} already exists. Use --force to overwrite, or "
-                      f"rename.")
-                res["error"] = {"stage": "write", "message": f"{p} already "
-                                f"exists; use --force to overwrite, or rename"}
+                print(f"\n{p} already exists. Use --force to overwrite, or rename.")
+                res["error"] = {"stage": "write", "message": f"{p} already exists; use --force to overwrite, or rename"}
                 return 1
 
     circuit_files = None if args.no_circuit else attach_circuit_tier(doc, args)
 
     if args.dry_run:
-        print(f"\n--dry-run: would write {out}" +
-              (f" and {circuits_dir}/" if circuit_files else ""))
-        res.update(stage="dry-run", dry_run=True, would_write=out,
-                   would_write_circuits=circuits_dir if circuit_files else None,
-                   doc=doc)
+        print(f"\n--dry-run: would write {out}" + (f" and {circuits_dir}/" if circuit_files else ""))
+        res.update(
+            stage="dry-run",
+            dry_run=True,
+            would_write=out,
+            would_write_circuits=circuits_dir if circuit_files else None,
+            doc=doc,
+        )
         if not args.json:
             print(dry_run_summary(doc, report, out, novelty=res.get("novelty")))
         return 0
@@ -1718,8 +1815,7 @@ def cmd_submit(args):
     if circuit_files:
         os.makedirs(circuits_dir, exist_ok=True)
         for name, text in circuit_files.items():
-            with open(os.path.join(circuits_dir, name), "w",
-                      encoding="utf-8", newline="\n") as f:
+            with open(os.path.join(circuits_dir, name), "w", encoding="utf-8", newline="\n") as f:
                 f.write(text)
         print(f"  wrote {circuits_dir}/memory_{{x,z}}.{{stim,dem}}")
     else:
@@ -1736,8 +1832,7 @@ def cmd_submit(args):
             note_md = f.read()
         if len(note_md.encode()) > 10 * 1024:
             print(f"\n{args.note_file} exceeds the 10 KiB note cap; trim it.")
-            res["error"] = {"stage": "note", "message": f"{args.note_file} "
-                            f"exceeds the 10 KiB note cap"}
+            res["error"] = {"stage": "note", "message": f"{args.note_file} exceeds the 10 KiB note cap"}
             return 1
         note_out = os.path.join(_ROOT, "notes", f"{slug}.md")
         os.makedirs(os.path.dirname(note_out), exist_ok=True)
@@ -1745,10 +1840,12 @@ def cmd_submit(args):
             f.write(note_md)
         print(f"  wrote {note_out}")
     else:
-        print("\n  note: no --note-file given. Submissions should ship a "
-              "research note\n  (notes/{}.md) — the search story, sweep "
-              "sizes, ladder, dead ends.\n  See notes/TEMPLATE.md; the site "
-              "renders it beside your code.".format(slug))
+        print(
+            "\n  note: no --note-file given. Submissions should ship a "
+            "research note\n  (notes/{}.md) — the search story, sweep "
+            "sizes, ladder, dead ends.\n  See notes/TEMPLATE.md; the site "
+            "renders it beside your code.".format(slug)
+        )
 
     res["note_path"] = note_out
     res["stage"] = "draft"
@@ -1756,18 +1853,21 @@ def cmd_submit(args):
     # run is writing into the board's own directory the dedup is told to skip it:
     # the question the equivalence box asks is whether some OTHER entry already
     # carries this code, and the file this run just added is not an answer to it.
-    args._dedup = board_dedup(
-        report, exclude=_self_entry_name(args.out, out))
+    args._dedup = audit_wl_match(doc, board_dedup(
+        report, exclude=_self_entry_name(args.out, out)))
     title = pr_title(n, k, d, _descriptor(args))
     body_file = write_pr_body(slug, pr_body(doc, report, args, out, note_out))
     branch = f"submit-{slug}"
-    pr_author = next((a.lstrip("@") for a in args.authors
-                      if isinstance(a, str) and a.startswith("@")), None)
-    res.update(title=title, body_file=body_file, branch=branch,
-               pr_author=pr_author, dedup=args._dedup,
-               base_ref=args.base_ref or None)
-    files = [out] + ([note_out] if note_out else []) + \
-        ([circuits_dir] if circuits_dir else [])
+    pr_author = next((a.lstrip("@") for a in args.authors if isinstance(a, str) and a.startswith("@")), None)
+    res.update(
+        title=title,
+        body_file=body_file,
+        branch=branch,
+        pr_author=pr_author,
+        dedup=args._dedup,
+        base_ref=args.base_ref or None,
+    )
+    files = [out] + ([note_out] if note_out else []) + ([circuits_dir] if circuits_dir else [])
     steps = [
         f"git checkout -b {branch}" + (f" {args.base_ref}" if args.base_ref else ""),
         "git add " + " ".join(files),
@@ -1779,24 +1879,43 @@ def cmd_submit(args):
 
     if args.open_pr:
         res["stage"] = "open-pr"
-        return open_pr(slug, out, note_out, title, body_file,
-                       root=_ROOT, circuits_dir=circuits_dir,
-                       pr_author=pr_author, base_ref=args.base_ref or None,
-                       res=res)
-    print("\nnext: open a PR with " +
-          ("these files" if note_out or circuits_dir else "this file"))
+        return open_pr(
+            slug,
+            out,
+            note_out,
+            title,
+            body_file,
+            root=_ROOT,
+            circuits_dir=circuits_dir,
+            pr_author=pr_author,
+            base_ref=args.base_ref or None,
+            res=res,
+        )
+    print("\nnext: open a PR with " + ("these files" if note_out or circuits_dir else "this file"))
     for step in steps:
         print(f"  {step}")
-    print(f"\nthe PR body was drafted for you from the verified submission:"
-          f"\n  {body_file}"
-          f"\nit follows .github/pull_request_template.md — read it and fill"
-          f"\nin the 'what frontier does this advance?' section before review.")
+    print(
+        f"\nthe PR body was drafted for you from the verified submission:"
+        f"\n  {body_file}"
+        f"\nit follows .github/pull_request_template.md — read it and fill"
+        f"\nin the 'what frontier does this advance?' section before review."
+    )
     print("\nor re-run with --open-pr to do this automatically.")
     return 0
 
 
-def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
-            circuits_dir=None, pr_author=None, base_ref=None, res=None):
+def open_pr(
+    slug,
+    out,
+    note_out=None,
+    title=None,
+    body_file=None,
+    root=None,
+    circuits_dir=None,
+    pr_author=None,
+    base_ref=None,
+    res=None,
+):
     """Branch, commit, push, and open the PR; the result goes into `res`.
 
     `pr_author` feeds the prose pre-flight the same handle CI passes, so a
@@ -1816,25 +1935,35 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     if body_file:
         checker = os.path.join(root, "verify", "check_prose.py")
         if os.path.exists(checker):
-            files = [os.path.relpath(out, root)] + (
-                [os.path.relpath(note_out, root)] if note_out else [])
-            cmd = [sys.executable, os.path.relpath(checker, root),
-                   "--root", root, "--body-file", body_file, "--files", *files]
+            files = [os.path.relpath(out, root)] + ([os.path.relpath(note_out, root)] if note_out else [])
+            cmd = [
+                sys.executable,
+                os.path.relpath(checker, root),
+                "--root",
+                root,
+                "--body-file",
+                body_file,
+                "--files",
+                *files,
+            ]
             if pr_author:
                 cmd += ["--pr-author", pr_author]
             pre = subprocess.run(cmd, cwd=root, check=False)
             if pre.returncode != 0:
-                print(f"\nprose pre-flight FAILED ({pre.returncode}); no PR "
-                      f"was opened. Fix the issues above (the drafted body is "
-                      f"at {body_file}) and re-run with --open-pr.")
-                res["error"] = {"stage": "prose-preflight",
-                                "returncode": pre.returncode,
-                                "message": "the drafted body or staged files "
-                                           "fail verify/check_prose.py; fix "
-                                           "them and re-run with --open-pr"}
+                print(
+                    f"\nprose pre-flight FAILED ({pre.returncode}); no PR "
+                    f"was opened. Fix the issues above (the drafted body is "
+                    f"at {body_file}) and re-run with --open-pr."
+                )
+                res["error"] = {
+                    "stage": "prose-preflight",
+                    "returncode": pre.returncode,
+                    "message": "the drafted body or staged files "
+                    "fail verify/check_prose.py; fix "
+                    "them and re-run with --open-pr",
+                }
                 return 1
-    add = ["git", "add", out] + ([note_out] if note_out else []) + \
-        ([circuits_dir] if circuits_dir else [])
+    add = ["git", "add", out] + ([note_out] if note_out else []) + ([circuits_dir] if circuits_dir else [])
     # --title/--body-file rather than --fill: the body is the filled-in
     # pull request template, which the commit message does not carry (#404).
     create = ["gh", "pr", "create", "--title", title]
@@ -1844,8 +1973,7 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     # started from an earlier submit branch rather than from main carries that
     # branch's entry too, and the PR it opens is the multi-code PR issue #5700
     # saw (#5653). Caught here it costs a `git checkout`, not a review.
-    scope = [sys.executable, os.path.join("verify", "check_submission_scope.py"),
-             "--base", base_ref or "origin/main"]
+    scope = [sys.executable, os.path.join("verify", "check_submission_scope.py"), "--base", base_ref or "origin/main"]
     cmds = [
         checkout,
         add,
@@ -1856,50 +1984,52 @@ def open_pr(slug, out, note_out=None, title=None, body_file=None, root=None,
     ]
     previous = None
     if base_ref:
-        head = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                              cwd=_ROOT, capture_output=True, text=True,
-                              check=False)
+        head = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=_ROOT, capture_output=True, text=True, check=False
+        )
         previous = head.stdout.strip() if head.returncode == 0 else None
     res["commands"] = [" ".join(c) for c in cmds]
     for c in cmds:
         print(f"  $ {' '.join(c)}", flush=True)
-        r = subprocess.run(c, cwd=_ROOT, capture_output=True, text=True,
-                           check=False)
+        r = subprocess.run(c, cwd=_ROOT, capture_output=True, text=True, check=False)
         if r.stdout:
             print(r.stdout, end="" if r.stdout.endswith("\n") else "\n")
         if r.stderr:
-            print(r.stderr, end="" if r.stderr.endswith("\n") else "\n",
-                  file=sys.stderr)
+            print(r.stderr, end="" if r.stderr.endswith("\n") else "\n", file=sys.stderr)
         if r.returncode != 0:
-            print(f"  command failed ({r.returncode}); finish the remaining "
-                  f"steps by hand.")
+            print(f"  command failed ({r.returncode}); finish the remaining steps by hand.")
             if body_file:
                 print(f"  the drafted PR body is at {body_file}")
-            res["error"] = {"stage": "open-pr", "command": " ".join(c),
-                            "returncode": r.returncode,
-                            "message": (r.stderr or r.stdout or "").strip()[-2000:]}
+            res["error"] = {
+                "stage": "open-pr",
+                "command": " ".join(c),
+                "returncode": r.returncode,
+                "message": (r.stderr or r.stdout or "").strip()[-2000:],
+            }
             return r.returncode
         if c is create:
             m = re.search(r"https://\S+/pull/\d+", r.stdout or "")
             res["pr_url"] = m.group(0) if m else None
             res["pr_number"] = int(res["pr_url"].rsplit("/", 1)[1]) if m else None
     if previous and previous != "HEAD":
-        back = subprocess.run(["git", "checkout", previous], cwd=_ROOT,
-                              capture_output=True, text=True, check=False)
+        back = subprocess.run(["git", "checkout", previous], cwd=_ROOT, capture_output=True, text=True, check=False)
         res["returned_to"] = previous if back.returncode == 0 else None
         if back.returncode != 0:
             print(f"  note: could not return to {previous} ({back.stderr.strip()})")
-    print("\nthe PR body was drafted from the verified submission; fill in the"
-          "\n'what frontier does this advance?' section before review "
-          "(gh pr edit).")
+    print(
+        "\nthe PR body was drafted from the verified submission; fill in the"
+        "\n'what frontier does this advance?' section before review "
+        "(gh pr edit)."
+    )
     return 0
 
 
 def _history_is_shallow(root):
     """Return True when the clone's history is truncated, so a replay would misdate it."""
     try:
-        out = subprocess.run(["git", "rev-parse", "--is-shallow-repository"], cwd=root,
-                             capture_output=True, text=True, check=False)
+        out = subprocess.run(
+            ["git", "rev-parse", "--is-shallow-repository"], cwd=root, capture_output=True, text=True, check=False
+        )
     except OSError:
         return True
     return out.returncode != 0 or out.stdout.strip() != "false"
@@ -1919,17 +2049,17 @@ def _cell_staleness(entries, today=None):
     be replayed, so the answer there is None rather than a wrong date.
     """
     if _history_is_shallow(_ROOT):
-        print("  history is shallow (a truncated clone); cell staleness not computed",
-              file=sys.stderr)
+        print("  history is shallow (a truncated clone); cell staleness not computed", file=sys.stderr)
         return None, 0
-    classes = {f"codes/{e['slug']}.json": (e["locality_class"], e["weight_class"],
-                                           e.get("w"), e.get("code_type", "CSS"))
-               for e in entries if e.get("slug")}
+    classes = {
+        f"codes/{e['slug']}.json": (e["locality_class"], e["weight_class"], e.get("w"), e.get("code_type", "CSS"))
+        for e in entries
+        if e.get("slug")
+    }
     print("  replaying codes/ history for cell staleness...", file=sys.stderr)
     t0 = time.time()
     moves, landed = frontier_history.cell_moves(_ROOT, classes)
-    print(f"  replayed {_plural(landed, 'landing')} in {time.time() - t0:.1f}s",
-          file=sys.stderr)
+    print(f"  replayed {_plural(landed, 'landing')} in {time.time() - t0:.1f}s", file=sys.stderr)
     today = today or datetime.date.today()
     for cell in moves.values():
         for move in cell.values():
@@ -1942,20 +2072,26 @@ def _cell_staleness(entries, today=None):
 def _staleness_lines(cell):
     """Two lines per cell: when its frontier and its record last moved, or that neither did."""
     if not cell or not (cell.get("frontier") or cell.get("record")):
-        return ["never moved on record (no landing in codes/ history changed this "
-                "cell; entries no longer on the board are not classified)"]
+        return [
+            "never moved on record (no landing in codes/ history changed this "
+            "cell; entries no longer on the board are not classified)"
+        ]
 
     def when(move):
-        return (f"{move['date']} ({_plural(move['days'], 'day')} ago, "
-                f"{_plural(move['landings_ago'], 'landing')} ago): {move['what']} "
-                f"{move['kind']}")
+        return (
+            f"{move['date']} ({_plural(move['days'], 'day')} ago, "
+            f"{_plural(move['landings_ago'], 'landing')} ago): {move['what']} "
+            f"{move['kind']}"
+        )
 
     lines = []
     f, r = cell.get("frontier"), cell.get("record")
     lines.append("frontier last moved " + when(f) if f else "frontier never moved on record")
-    lines.append("record kd2/n last moved " + when(r)
-                 + (f" to {r['kd2_over_n']}" if r and "kd2_over_n" in r else "")
-                 if r else "record kd2/n never moved on record")
+    lines.append(
+        "record kd2/n last moved " + when(r) + (f" to {r['kd2_over_n']}" if r and "kd2_over_n" in r else "")
+        if r
+        else "record kd2/n never moved on record"
+    )
     return lines
 
 
@@ -2008,31 +2144,35 @@ def cmd_targets(args):
 
     rows = [(c, v) for c, v in sorted(by_cell.items()) if matches(*c)]
     if not rows:
-        raise SystemExit(f"no cell matched {args.cell!r}. Weight classes: "
-                         f"{sorted({c[1] for c in by_cell})}; locality classes: "
-                         f"{sorted({c[0] for c in by_cell})}")
+        raise SystemExit(
+            f"no cell matched {args.cell!r}. Weight classes: "
+            f"{sorted({c[1] for c in by_cell})}; locality classes: "
+            f"{sorted({c[0] for c in by_cell})}"
+        )
 
     stale = None
     if getattr(args, "staleness", True) or getattr(args, "stale", False):
         stale, landed = _cell_staleness(entries)
         if stale is not None:
-            res["staleness"] = {f"{W}/{L}": stale[(L, W)]
-                                for (L, W) in by_cell if (L, W) in stale}
+            res["staleness"] = {f"{W}/{L}": stale[(L, W)] for (L, W) in by_cell if (L, W) in stale}
             res["landings"] = landed
             if getattr(args, "stale", False):
                 # stalest first by the record, then the frontier: a cell with no
                 # dated move on record sorts before any dated one
                 def age(cv):
                     moves = stale.get(cv[0]) or {}
-                    return ((moves.get("record") or {}).get("date", ""),
-                            (moves.get("frontier") or {}).get("date", ""), cv[0])
+                    return (
+                        (moves.get("record") or {}).get("date", ""),
+                        (moves.get("frontier") or {}).get("date", ""),
+                        cv[0],
+                    )
+
                 rows.sort(key=age)
 
     for (L, W), peers in rows:
         front = [peers[i] for i in sorted(pareto(peers))]
         print(f"\n{LOCALITY_LABEL.get(L, L)} / {WEIGHT_LABEL.get(W, W)}")
-        print(f"  {len(peers)} codes, {len(front)} nondominated, "
-              f"best kd2/n {max(eff(e) for e in peers):.2f}")
+        print(f"  {len(peers)} codes, {len(front)} nondominated, best kd2/n {max(eff(e) for e in peers):.2f}")
         if stale is not None:
             for line in _staleness_lines(stale.get((L, W))):
                 print(f"  {line}")
@@ -2041,35 +2181,37 @@ def cmd_targets(args):
             who = held["session_id"]
             if held.get("campaign"):
                 who += f" ({held['campaign']})"
-            print(f"  claimed by {who}, expires {held['expires_at']} "
-                  f"-- advisory, not enforced")
+            print(f"  claimed by {who}, expires {held['expires_at']} -- advisory, not enforced")
         if args.n:
             near = [e for e in front if e["n"] <= args.n]
             if not near:
-                print(f"  nothing at n <= {args.n}: any verified code here "
-                      f"lands on the frontier")
+                print(f"  nothing at n <= {args.n}: any verified code here lands on the frontier")
             else:
                 print(f"  at n <= {args.n}, {len(near)} frontier entries:")
-                for e in sorted(near, key=eff, reverse=True)[:args.top]:
-                    print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} "
-                          f"kd2/n={eff(e):.2f}")
+                for e in sorted(near, key=eff, reverse=True)[: args.top]:
+                    print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} kd2/n={eff(e):.2f}")
                 continue
-        for e in sorted(front, key=eff, reverse=True)[:args.top]:
-            print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} "
-                  f"kd2/n={eff(e):.2f}")
+        for e in sorted(front, key=eff, reverse=True)[: args.top]:
+            print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} kd2/n={eff(e):.2f}")
         if len(front) > args.top:
             print(f"    ... {len(front) - args.top} more nondominated")
 
-    print(f"\n{len(entries)} codes across {len(by_cell)} populated cells. "
-          f"A code counts in every cell it qualifies for (the classes nest), "
-          f"so these counts overlap by design.")
-    print("Nondominated means no other code in the cell beats it on all of "
-          "n, k, d and check weight at once. That is the whole bar for a "
-          "submission: a nondominated code extends the frontier whether or not "
-          "it beats any particular entry, so there is no single rank to top.")
+    print(
+        f"\n{len(entries)} codes across {len(by_cell)} populated cells. "
+        f"A code counts in every cell it qualifies for (the classes nest), "
+        f"so these counts overlap by design."
+    )
+    print(
+        "Nondominated means no other code in the cell beats it on all of "
+        "n, k, d and check weight at once. That is the whole bar for a "
+        "submission: a nondominated code extends the frontier whether or not "
+        "it beats any particular entry, so there is no single rank to top."
+    )
     if claims:
-        print(f"\n{_plural(len(claims), 'live claim')}, advisory and expiring "
-              f"(nothing enforces them; see `qldpc targets --help`):")
+        print(
+            f"\n{_plural(len(claims), 'live claim')}, advisory and expiring "
+            f"(nothing enforces them; see `qldpc targets --help`):"
+        )
         for c in claims:
             what = f"  {c['cell']}: {c['session_id']}"
             if c.get("campaign"):
@@ -2080,10 +2222,24 @@ def cmd_targets(args):
 
 def _recent_code_rows(days, family):
     """Codes added to codes/ in the last `days` days whose slug, family, or
-    name mentions `family`."""
-    r = subprocess.run(["git", "log", "--diff-filter=A", f"--since={days} days ago",
-                        "--name-only", "--pretty=format:%as", "--", "codes/"],
-                       cwd=_ROOT, capture_output=True, text=True, check=False)
+    name mentions `family`.
+    """
+    r = subprocess.run(
+        [
+            "git",
+            "log",
+            "--diff-filter=A",
+            f"--since={days} days ago",
+            "--name-only",
+            "--pretty=format:%as",
+            "--",
+            "codes/",
+        ],
+        cwd=_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     rows, date = [], ""
     for line in r.stdout.splitlines():
         line = line.strip()
@@ -2112,7 +2268,8 @@ def cmd_brief(args):
     """One bounded snapshot before a search: the cell's frontier and best
     efficiency, what
     was screened there, what landed for the family, and the fieldnotes that
-    touch it (#2955, item 4). Composes targets, screened, recent."""
+    touch it (#2955, item 4). Composes targets, screened, recent.
+    """
     res = _result(args)
     entries = _load_board_entries()
     if not entries:
@@ -2132,23 +2289,37 @@ def cmd_brief(args):
 
     picked = [(c, v) for c, v in sorted(by_cell.items()) if matches(*c)]
     if not picked:
-        raise SystemExit(f"no cell matched {args.cell!r}. Weight classes: "
-                         f"{sorted({c[1] for c in by_cell})}; locality classes: "
-                         f"{sorted({c[0] for c in by_cell})}")
+        raise SystemExit(
+            f"no cell matched {args.cell!r}. Weight classes: "
+            f"{sorted({c[1] for c in by_cell})}; locality classes: "
+            f"{sorted({c[0] for c in by_cell})}"
+        )
     fam = args.family.lower()
     cells_out = []
     for (L, W), peers in picked:
         front = sorted((peers[i] for i in pareto(peers)), key=eff, reverse=True)
         members = [e for e in peers if fam and fam in (e.get("family") or "").lower()]
-        cells_out.append({
-            "cell": f"{W}/{L}", "codes": len(peers), "nondominated": len(front),
-            "bar_kd2_over_n": round(max(eff(e) for e in peers), 3),
-            "frontier": [{"n": e["n"], "k": e["k"], "d": e["d"], "w": e["w"],
-                          "kd2_over_n": round(eff(e), 3), "slug": e.get("slug")}
-                         for e in front[:args.top]],
-            "family_codes": len(members),
-            "family_best_kd2_over_n": round(max((eff(e) for e in members), default=0.0), 3),
-        })
+        cells_out.append(
+            {
+                "cell": f"{W}/{L}",
+                "codes": len(peers),
+                "nondominated": len(front),
+                "bar_kd2_over_n": round(max(eff(e) for e in peers), 3),
+                "frontier": [
+                    {
+                        "n": e["n"],
+                        "k": e["k"],
+                        "d": e["d"],
+                        "w": e["w"],
+                        "kd2_over_n": round(eff(e), 3),
+                        "slug": e.get("slug"),
+                    }
+                    for e in front[: args.top]
+                ],
+                "family_codes": len(members),
+                "family_best_kd2_over_n": round(max((eff(e) for e in members), default=0.0), 3),
+            }
+        )
     screened, quality, summaries = ([], [], 0)
     if args.family:
         screened, quality, summaries = screening_rows(family=args.family)
@@ -2163,42 +2334,56 @@ def cmd_brief(args):
             notes.append({"path": os.path.relpath(f, _ROOT), "title": title, "topics": topics})
     claims = []
     if hasattr(coordination, "live_claims"):
-        claims = [c for c in coordination.live_claims()
-                  if any(c.get("cell") == x["cell"] for x in cells_out)]
-    res.update(query={"cell": args.cell, "family": args.family, "days": args.days},
-               cells=cells_out, screened=screened[:args.limit], screened_total=len(screened),
-               summaries_read=summaries, screen_quality=quality,
-               recent=recent[:args.limit], recent_total=len(recent),
-               fieldnotes=notes[:args.limit], fieldnotes_total=len(notes), claims=claims)
+        claims = [c for c in coordination.live_claims() if any(c.get("cell") == x["cell"] for x in cells_out)]
+    res.update(
+        query={"cell": args.cell, "family": args.family, "days": args.days},
+        cells=cells_out,
+        screened=screened[: args.limit],
+        screened_total=len(screened),
+        summaries_read=summaries,
+        screen_quality=quality,
+        recent=recent[: args.limit],
+        recent_total=len(recent),
+        fieldnotes=notes[: args.limit],
+        fieldnotes_total=len(notes),
+        claims=claims,
+    )
 
     for c in cells_out:
-        print(f"{c['cell']}: {c['codes']} codes, {c['nondominated']} nondominated, "
-              f"best kd2/n {c['bar_kd2_over_n']}"
-              + (f"; {c['family_codes']} from {args.family}, best {c['family_best_kd2_over_n']}"
-                 if args.family else ""))
+        print(
+            f"{c['cell']}: {c['codes']} codes, {c['nondominated']} nondominated, "
+            f"best kd2/n {c['bar_kd2_over_n']}"
+            + (f"; {c['family_codes']} from {args.family}, best {c['family_best_kd2_over_n']}" if args.family else "")
+        )
         for e in c["frontier"]:
             print(f"    [[{e['n']},{e['k']},{e['d']}]] w={e['w']} kd2/n={e['kd2_over_n']}")
         if c["nondominated"] > args.top:
             print(f"    ... {c['nondominated'] - args.top} more nondominated")
     for cl in claims:
-        print(f"  claimed by {cl['session_id']}"
-              + (f" ({cl['campaign']})" if cl.get("campaign") else "")
-              + f", expires {cl['expires_at']} (advisory)")
+        print(
+            f"  claimed by {cl['session_id']}"
+            + (f" ({cl['campaign']})" if cl.get("campaign") else "")
+            + f", expires {cl['expires_at']} (advisory)"
+        )
     if args.family:
-        print(f"\nscreened, {args.family}: {len(screened)} record(s) across {summaries} "
-              f"campaign summaries" + ("" if screened else " (nothing recorded: screen before you ladder)"))
-        for r in screened[:args.limit]:
-            depth = (f"d<={r['screened_d']} at {r['trials']} trials" if r["screened_d"] is not None
-                     else "depth not recorded")
+        print(
+            f"\nscreened, {args.family}: {len(screened)} record(s) across {summaries} "
+            f"campaign summaries" + ("" if screened else " (nothing recorded: screen before you ladder)")
+        )
+        for r in screened[: args.limit]:
+            depth = (
+                f"d<={r['screened_d']} at {r['trials']} trials" if r["screened_d"] is not None else "depth not recorded"
+            )
             pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
-            print(f"    {r['campaign_id']}  {pretty or '(no params)'}  {depth}"
-                  + (f"  {r['verdict']}" if r.get("verdict") else ""))
-    print(f"\nlanded in {args.days} days" + (f" for {args.family}" if args.family else "")
-          + f": {len(recent)} code(s)")
-    for r in recent[:args.limit]:
+            print(
+                f"    {r['campaign_id']}  {pretty or '(no params)'}  {depth}"
+                + (f"  {r['verdict']}" if r.get("verdict") else "")
+            )
+    print(f"\nlanded in {args.days} days" + (f" for {args.family}" if args.family else "") + f": {len(recent)} code(s)")
+    for r in recent[: args.limit]:
         print(f"    {r['date']}  {r['slug']}  {r['family']}")
     print(f"\nfieldnotes touching this: {len(notes)}")
-    for nrow in notes[:args.limit]:
+    for nrow in notes[: args.limit]:
         print(f"    {nrow['path']}  {nrow['title'][:70]}")
     return 0
 
@@ -2218,25 +2403,24 @@ def _claim_action(args):
     cell = _claim_cell(args.claim or args.release)
     res = _result(args)
     if args.claim:
-        rec = coordination.claim(cell, campaign=args.campaign,
-                                 note=args.note, minutes=args.ttl)
+        rec = coordination.claim(cell, campaign=args.campaign, note=args.note, minutes=args.ttl)
         res["claim"] = rec
-        print(f"claimed {rec['cell']} for {rec['expires_at']} "
-              f"({rec['session_id']})")
+        print(f"claimed {rec['cell']} for {rec['expires_at']} ({rec['session_id']})")
         gone = rec.get("displaced")
         if gone:
-            print(f"  note: {gone['session_id']} had a live claim on this cell"
-                  + (f" ({gone['campaign']})" if gone.get("campaign") else "")
-                  + ". Nothing blocks either of you; it is your call whether "
-                    "two ladders on one cell are worth paying for.")
+            print(
+                f"  note: {gone['session_id']} had a live claim on this cell"
+                + (f" ({gone['campaign']})" if gone.get("campaign") else "")
+                + ". Nothing blocks either of you; it is your call whether "
+                "two ladders on one cell are worth paying for."
+            )
         return 0
     dropped = coordination.release(cell)
     res["released"] = {"cell": cell, "by_this_session": dropped}
     if dropped:
         print(f"released {cell}")
     else:
-        print(f"no live claim of this session's on {cell} "
-              f"(already expired, held by another session, or never made)")
+        print(f"no live claim of this session's on {cell} (already expired, held by another session, or never made)")
     return 0
 
 
@@ -2257,7 +2441,8 @@ def _claim_cell(name):
         raise SystemExit(
             f"{name!r} is not a cell. A cell is <weight>/<locality>:\n"
             f"  weight:   {', '.join(WEIGHT_LABEL)}\n"
-            f"  locality: {', '.join(LOCALITY_LABEL)}")
+            f"  locality: {', '.join(LOCALITY_LABEL)}"
+        )
     return f"{weight[0]}/{local[0]}"
 
 
@@ -2287,9 +2472,7 @@ def _fieldnote_meta(path):
                 if head.startswith("title:"):
                     title = head[6:].strip().strip('"')
                 elif head.startswith("topics:"):
-                    topics = [t.strip().strip('"')
-                              for t in head[7:].strip().strip("[]").split(",")
-                              if t.strip()]
+                    topics = [t.strip().strip('"') for t in head[7:].strip().strip("[]").split(",") if t.strip()]
     except OSError:
         pass
     return title, topics
@@ -2312,9 +2495,11 @@ def cmd_recent(args):
 
     def added(path):
         r = subprocess.run(
-            ["git", "log", "--diff-filter=A", since, "--name-only",
-             "--pretty=format:%as", "--", path],
-            cwd=_ROOT, capture_output=True, text=True)
+            ["git", "log", "--diff-filter=A", since, "--name-only", "--pretty=format:%as", "--", path],
+            cwd=_ROOT,
+            capture_output=True,
+            text=True,
+        )
         out, date = [], ""
         for line in r.stdout.splitlines():
             if not line.strip():
@@ -2340,20 +2525,25 @@ def cmd_recent(args):
         except (OSError, ValueError):
             pass
         has_note = os.path.exists(os.path.join(_ROOT, "notes", slug + ".md"))
-        return {"date": date, "slug": slug, "family": fam, "name": name,
-                "note": has_note,
-                "hay": f"{slug} {fam} {name}".lower()}
+        return {
+            "date": date,
+            "slug": slug,
+            "family": fam,
+            "name": name,
+            "note": has_note,
+            "hay": f"{slug} {fam} {name}".lower(),
+        }
 
-    codes = [code_row(d, f) for d, f in added("codes/")
-             if f.endswith(".json")]
+    codes = [code_row(d, f) for d, f in added("codes/") if f.endswith(".json")]
     camps = campaign_rows(since)
     fnotes = []
     for d, f in added("fieldnotes/"):
         if not f.endswith(".md") or f.endswith("README.md"):
             continue
         title, topics = _fieldnote_meta(os.path.join(_ROOT, f))
-        fnotes.append({"date": d, "path": f, "title": title, "topics": topics,
-                       "hay": f"{f} {title} {' '.join(topics)}".lower()})
+        fnotes.append(
+            {"date": d, "path": f, "title": title, "topics": topics, "hay": f"{f} {title} {' '.join(topics)}".lower()}
+        )
 
     n_codes, n_fnotes, n_camps = len(codes), len(fnotes), len(camps)
     if want:
@@ -2366,23 +2556,29 @@ def cmd_recent(args):
         return [{k: v for k, v in r.items() if k != "hay"} for r in rows]
 
     _result(args).update(
-        days=args.days, filters=want,
-        counts={"codes": n_codes, "fieldnotes": n_fnotes,
-                "campaigns": n_camps, "codes_with_note": n_note},
-        codes=public(codes), fieldnotes=public(fnotes),
-        campaigns=public(camps))
+        days=args.days,
+        filters=want,
+        counts={"codes": n_codes, "fieldnotes": n_fnotes, "campaigns": n_camps, "codes_with_note": n_note},
+        codes=public(codes),
+        fieldnotes=public(fnotes),
+        campaigns=public(camps),
+    )
 
     lim = None if args.full else max(1, args.limit)
     filt = f" matching {' + '.join(want)}" if want else ""
-    print(f"board activity, last {args.days} days{filt}: "
-          f"{_plural(len(codes), 'code')} ({n_note} with a research note), "
-          f"{_plural(len(fnotes), 'fieldnote')}, "
-          f"{_plural(len(camps), 'campaign summary', 'campaign summaries')}")
+    print(
+        f"board activity, last {args.days} days{filt}: "
+        f"{_plural(len(codes), 'code')} ({n_note} with a research note), "
+        f"{_plural(len(fnotes), 'fieldnote')}, "
+        f"{_plural(len(camps), 'campaign summary', 'campaign summaries')}"
+    )
     if want:
-        print(f"  (of {_plural(n_codes, 'code')}, "
-              f"{_plural(n_fnotes, 'fieldnote')}, and "
-              f"{_plural(n_camps, 'campaign summary', 'campaign summaries')} "
-              f"in the window)")
+        print(
+            f"  (of {_plural(n_codes, 'code')}, "
+            f"{_plural(n_fnotes, 'fieldnote')}, and "
+            f"{_plural(n_camps, 'campaign summary', 'campaign summaries')} "
+            f"in the window)"
+        )
 
     shown = codes if lim is None else codes[:lim]
     if shown:
@@ -2412,20 +2608,20 @@ def cmd_recent(args):
         fams = f"  [{', '.join(c['families'])}]" if c["families"] else ""
         # A crash is not a result, so it is shown apart from the negatives
         # and only when there is one to show.
-        aborted = (f", {c['aborted_experiments']} aborted"
-                   if c["aborted_experiments"] else "")
+        aborted = f", {c['aborted_experiments']} aborted" if c["aborted_experiments"] else ""
         print(f"  {c['date']}  {c['path']}")
-        print(f"      {c['campaign_id']}: {c['status']}, "
-              f"{_plural(c['experiments'], 'experiment')}, "
-              f"{_plural(c['survivors'], 'survivor')}, "
-              f"{_plural(c['frontier_advances'], 'frontier advance')}, "
-              f"{_plural(c['negative_results'], 'negative result')}"
-              f"{aborted}{fams}")
+        print(
+            f"      {c['campaign_id']}: {c['status']}, "
+            f"{_plural(c['experiments'], 'experiment')}, "
+            f"{_plural(c['survivors'], 'survivor')}, "
+            f"{_plural(c['frontier_advances'], 'frontier advance')}, "
+            f"{_plural(c['negative_results'], 'negative result')}"
+            f"{aborted}{fams}"
+        )
     if lim is not None and len(camps) > lim:
         print(f"  ... {len(camps) - lim} more (--limit N, --full)")
 
-    print("full log: docs research-log page, or ls notes/ fieldnotes/ "
-          "research/campaigns/")
+    print("full log: docs research-log page, or ls notes/ fieldnotes/ research/campaigns/")
     return 0
 
 
@@ -2451,10 +2647,14 @@ def campaign_rows(since):
         rel = os.path.relpath(path, _ROOT)
         r = subprocess.run(
             ["git", "log", "-1", since, "--pretty=format:%as", "--", rel],
-            cwd=_ROOT, capture_output=True, text=True, check=False)
+            cwd=_ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
         date = r.stdout.strip()
         if not date:
-            continue                     # not committed, or not in the window
+            continue  # not committed, or not in the window
         try:
             with open(path, encoding="utf-8") as fh:
                 summ = json.load(fh)
@@ -2464,7 +2664,8 @@ def campaign_rows(since):
         fams = sorted({e.get("family") for e in exps if e.get("family")})
         stopped = summ.get("stopped_by") or {}
         row = {
-            "date": date, "path": rel,
+            "date": date,
+            "path": rel,
             "campaign_id": summ.get("campaign_id") or cid,
             "campaign_name": summ.get("campaign_name") or "",
             "status": summ.get("status") or "",
@@ -2478,12 +2679,10 @@ def campaign_rows(since):
             "budget_consumed": (summ.get("budget") or {}).get("consumed") or {},
             "report": summ.get("report") or "",
         }
-        row["hay"] = (f"{row['campaign_id']} {row['campaign_name']} "
-                      f"{' '.join(fams)} {row['report']}").lower()
+        row["hay"] = (f"{row['campaign_id']} {row['campaign_name']} {' '.join(fams)} {row['report']}").lower()
         rows.append(row)
     rows.sort(key=lambda r: r["date"], reverse=True)
     return rows
-
 
 
 # ---------------------------------------------------------------------------
@@ -2495,6 +2694,7 @@ def campaign_rows(since):
 # this is the reader over all of them: one call answers whether a family
 # member was screened, at what depth, and how it went. Advisory only -- the
 # gate remains the only thing that admits a code.
+
 
 def committed_summaries():
     """Yield (campaign id, repo-relative path, summary) per research/campaigns/<id>/summary.json.
@@ -2544,20 +2744,24 @@ def screening_rows(family="", params=None, verdicts=()):
             if any(got.get(k) != v for k, v in want.items()):
                 continue
             screened = exp.get("screened") or {}
-            rows.append({
-                "campaign_id": ident, "path": rel,
-                "backfilled": backfilled,
-                "family": exp.get("family") or "", "seed": exp.get("seed"),
-                "params": exp.get("params") or {},
-                "screened_d": screened.get("d"),
-                "trials": screened.get("trials"),
-                "backend": screened.get("backend") or "",
-                "rung": screened.get("rung"),
-                "verdict": exp.get("verdict") or "",
-                "mode": exp.get("mode") or "",
-                "survivors": exp.get("survivors") or 0,
-                "note": exp.get("note") or "",
-            })
+            rows.append(
+                {
+                    "campaign_id": ident,
+                    "path": rel,
+                    "backfilled": backfilled,
+                    "family": exp.get("family") or "",
+                    "seed": exp.get("seed"),
+                    "params": exp.get("params") or {},
+                    "screened_d": screened.get("d"),
+                    "trials": screened.get("trials"),
+                    "backend": screened.get("backend") or "",
+                    "rung": screened.get("rung"),
+                    "verdict": exp.get("verdict") or "",
+                    "mode": exp.get("mode") or "",
+                    "survivors": exp.get("survivors") or 0,
+                    "note": exp.get("note") or "",
+                }
+            )
     return rows, quality, summaries
 
 
@@ -2590,16 +2794,22 @@ def _print_registry_coverage(rows, quality):
     with_depth = sum(1 for r in rows if r["screened_d"] is not None)
     with_trials = sum(1 for r in rows if r["trials"])
     with_verdict = sum(1 for r in rows if r["verdict"])
-    print(f"  registry coverage: {with_depth} of {len(rows)} rows carry a screened "
-          f"weight ({with_trials} a trial count), {with_verdict} a verdict.")
+    print(
+        f"  registry coverage: {with_depth} of {len(rows)} rows carry a screened "
+        f"weight ({with_trials} a trial count), {with_verdict} a verdict."
+    )
     if len(rows) - with_depth:
-        print("    a row with no depth cannot tell you whether the member is worth "
-              "retrying deeper or was screened hard and dropped; check that "
-              "campaign's backfilled note before paying for it again.")
+        print(
+            "    a row with no depth cannot tell you whether the member is worth "
+            "retrying deeper or was screened hard and dropped; check that "
+            "campaign's backfilled note before paying for it again."
+        )
     if not quality:
-        print("    no screen-quality rows: nothing committed yet pairs a screened "
-              "distance with a gate verdict, so the screen's ordering is uncalibrated "
-              "against the gate for every family.")
+        print(
+            "    no screen-quality rows: nothing committed yet pairs a screened "
+            "distance with a gate verdict, so the screen's ordering is uncalibrated "
+            "against the gate for every family."
+        )
 
 
 def negative_rows(family="", params=None, match=""):
@@ -2634,20 +2844,26 @@ def negative_rows(family="", params=None, match=""):
             if want and (not got or any(got.get(k) != v for k, v in want.items())):
                 continue
             assumptions = [a for a in (neg.get("assumptions") or []) if isinstance(a, str)]
-            hay = " ".join([neg.get("what") or "", neg.get("detail") or "",
-                            " ".join(assumptions), neg.get("revisit_if") or ""]).lower()
+            hay = " ".join(
+                [neg.get("what") or "", neg.get("detail") or "", " ".join(assumptions), neg.get("revisit_if") or ""]
+            ).lower()
             if needle and needle not in hay:
                 continue
-            rows.append({
-                "campaign_id": ident, "path": rel,
-                "status": summ.get("status") or "",
-                "what": neg.get("what") or "", "detail": neg.get("detail") or "",
-                "assumptions": assumptions,
-                "revisit_if": neg.get("revisit_if") or "",
-                "family": own, "campaign_families": sorted(ran),
-                "params": neg.get("params") or {},
-                "what_a_negative_would_teach": card.get("what_a_negative_would_teach") or "",
-            })
+            rows.append(
+                {
+                    "campaign_id": ident,
+                    "path": rel,
+                    "status": summ.get("status") or "",
+                    "what": neg.get("what") or "",
+                    "detail": neg.get("detail") or "",
+                    "assumptions": assumptions,
+                    "revisit_if": neg.get("revisit_if") or "",
+                    "family": own,
+                    "campaign_families": sorted(ran),
+                    "params": neg.get("params") or {},
+                    "what_a_negative_would_teach": card.get("what_a_negative_would_teach") or "",
+                }
+            )
     return rows, summaries
 
 
@@ -2661,8 +2877,12 @@ def cmd_negatives(args):
     """
     params = dict(_kv_pairs(args.param))
     rows, summaries = negative_rows(family=args.family, params=params, match=args.match)
-    _result(args).update(query={"family": args.family, "params": params, "match": args.match},
-                         summaries_read=summaries, matches=len(rows), rows=rows)
+    _result(args).update(
+        query={"family": args.family, "params": params, "match": args.match},
+        summaries_read=summaries,
+        matches=len(rows),
+        rows=rows,
+    )
 
     what = args.family or "any family"
     if params:
@@ -2670,17 +2890,17 @@ def cmd_negatives(args):
     if args.match:
         what += f" matching {args.match!r}"
     if not rows:
-        print(f"{what}: no committed campaign summary records a negative result for it "
-              f"({summaries} read)")
+        print(f"{what}: no committed campaign summary records a negative result for it ({summaries} read)")
         return
     typed = sum(1 for r in rows if r["assumptions"] or r["revisit_if"])
-    print(f"{what}: {_plural(len(rows), 'negative result')} across "
-          f"{_plural(summaries, 'campaign summary', 'campaign summaries')}, "
-          f"{typed} with assumptions or a revisit condition")
+    print(
+        f"{what}: {_plural(len(rows), 'negative result')} across "
+        f"{_plural(summaries, 'campaign summary', 'campaign summaries')}, "
+        f"{typed} with assumptions or a revisit condition"
+    )
     lim = None if args.full else max(1, args.limit)
-    for r in (rows if lim is None else rows[:lim]):
-        fam = r["family"] or ("/".join(r["campaign_families"]) + " (the campaign's)"
-                              if r["campaign_families"] else "")
+    for r in rows if lim is None else rows[:lim]:
+        fam = r["family"] or ("/".join(r["campaign_families"]) + " (the campaign's)" if r["campaign_families"] else "")
         pretty = ", ".join(f"{k}={v}" for k, v in sorted(r["params"].items()))
         head = f"  {r['campaign_id']}  {r['what']}"
         if fam:
@@ -2695,9 +2915,11 @@ def cmd_negatives(args):
         if r["revisit_if"]:
             print(f"    revisit if: {r['revisit_if']}")
         if not r["assumptions"] and not r["revisit_if"]:
-            tail = (f"; its direction card says a negative would teach: "
-                    f"{r['what_a_negative_would_teach']}"
-                    if r["what_a_negative_would_teach"] else "")
+            tail = (
+                f"; its direction card says a negative would teach: {r['what_a_negative_would_teach']}"
+                if r["what_a_negative_would_teach"]
+                else ""
+            )
             print(f"    no assumptions or revisit condition recorded{tail}")
     if lim is not None and len(rows) > lim:
         print(f"  ... {len(rows) - lim} more (--limit N, --full)")
@@ -2717,29 +2939,34 @@ def cmd_screened(args):
         except ValueError as e:
             raise SystemExit(f"--params is not JSON: {e}") from None
     rows, quality, summaries = screening_rows(
-        family=args.family, params=params,
-        verdicts=tuple(args.verdict) if args.verdict else ())
+        family=args.family, params=params, verdicts=tuple(args.verdict) if args.verdict else ()
+    )
 
-    _result(args).update(query={"family": args.family, "params": params,
-                                "verdict": list(args.verdict or [])},
-                         summaries_read=summaries, matches=len(rows),
-                         rows=rows, screen_quality=quality)
+    _result(args).update(
+        query={"family": args.family, "params": params, "verdict": list(args.verdict or [])},
+        summaries_read=summaries,
+        matches=len(rows),
+        rows=rows,
+        screen_quality=quality,
+    )
 
     what = args.family or "any family"
     if params:
         what += " at " + ", ".join(f"{k}={v}" for k, v in sorted(params.items()))
     if not rows:
-        print(f"{what}: no committed campaign summary records screening it "
-              f"({summaries} read)")
+        print(f"{what}: no committed campaign summary records screening it ({summaries} read)")
         return
-    print(f"{what}: {_plural(len(rows), 'screening record')} across "
-          f"{_plural(summaries, 'campaign summary', 'campaign summaries')}")
+    print(
+        f"{what}: {_plural(len(rows), 'screening record')} across "
+        f"{_plural(summaries, 'campaign summary', 'campaign summaries')}"
+    )
     lim = None if args.full else max(1, args.limit)
-    for r in (rows if lim is None else rows[:lim]):
-        depth = (f"d<={r['screened_d']} at {r['trials']} trials"
-                 if r["screened_d"] is not None else
-                 (f"{r['trials']} trials, no weight recorded"
-                  if r["trials"] else "depth not recorded"))
+    for r in rows if lim is None else rows[:lim]:
+        depth = (
+            f"d<={r['screened_d']} at {r['trials']} trials"
+            if r["screened_d"] is not None
+            else (f"{r['trials']} trials, no weight recorded" if r["trials"] else "depth not recorded")
+        )
         if r["backend"]:
             depth += f" ({r['backend']})"
         tail = f"  {r['verdict']}" if r["verdict"] else "  verdict not recorded"
@@ -2754,12 +2981,16 @@ def cmd_screened(args):
     _print_registry_coverage(rows, quality)
     for q in quality:
         if q.get("spearman") is None:
-            print(f"screen quality, {q['family']}: undefined over "
-                  f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})")
+            print(
+                f"screen quality, {q['family']}: undefined over "
+                f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})"
+            )
         else:
-            print(f"screen quality, {q['family']}: Spearman "
-                  f"{q['spearman']:+.2f} over "
-                  f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})")
+            print(
+                f"screen quality, {q['family']}: Spearman "
+                f"{q['spearman']:+.2f} over "
+                f"{_plural(q.get('pairs') or 0, 'pair')} ({q['campaign_id']})"
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -2772,6 +3003,7 @@ def cmd_screened(args):
 # the bar. Derived from the rows a campaign already commits; it measures
 # nothing.
 
+
 def _cell_bar(cell_query):
     """Best kd^2/n on the board in the named cell, using the site's own cells."""
     entries = _load_board_entries()
@@ -2781,8 +3013,7 @@ def _cell_bar(cell_query):
     best, label = None, None
     for e in entries:
         for L, W in cells(e):
-            hay = (f"{L} {W} {LOCALITY_LABEL.get(L, L)} "
-                   f"{WEIGHT_LABEL.get(W, W)}").lower()
+            hay = (f"{L} {W} {LOCALITY_LABEL.get(L, L)} {WEIGHT_LABEL.get(W, W)}").lower()
             if not all(t in hay for t in toks):
                 continue
             if best is None or (e.get("eff") or 0) > best:
@@ -2792,17 +3023,18 @@ def _cell_bar(cell_query):
 
 def _plot(curve, width=58, height=14):
     """Render the curve as text: '#' verified best-so-far, 'o' screened."""
-    pts = [(p["trials_cumulative"], p["screened_kd2_over_n"],
-            p["verified_best_kd2_over_n"])
-           for f in curve["families"] for p in f["points"]]
+    pts = [
+        (p["trials_cumulative"], p["screened_kd2_over_n"], p["verified_best_kd2_over_n"])
+        for f in curve["families"]
+        for p in f["points"]
+    ]
     ys = [v for _, s, v in pts for v in (s, v) if v is not None]
     bar = (curve.get("bar") or {}).get("kd2_over_n")
     if bar is not None:
         ys.append(bar)
     xs = [x for x, _, _ in pts if x > 0]
     if not ys or not xs:
-        return ["  (nothing to plot: no row carries both a reading and a "
-                "trial count)"]
+        return ["  (nothing to plot: no row carries both a reading and a trial count)"]
     lo_y, hi_y = min(ys), max(ys)
     if hi_y == lo_y:
         hi_y = lo_y + 1.0
@@ -2833,12 +3065,10 @@ def _plot(curve, width=58, height=14):
 
     out = []
     for i, row in enumerate(grid):
-        label = f"{hi_y:8.2f}" if i == 0 else (
-            f"{lo_y:8.2f}" if i == height - 1 else " " * 8)
+        label = f"{hi_y:8.2f}" if i == 0 else (f"{lo_y:8.2f}" if i == height - 1 else " " * 8)
         out.append(f"  {label} |{''.join(row)}")
     out.append(" " * 10 + f"  +{'-' * width}")
-    out.append(" " * 10 + f"   {_si(min(xs)):<{width - 10}}"
-                          f"{_si(max(xs)):>10}")
+    out.append(" " * 10 + f"   {_si(min(xs)):<{width - 10}}{_si(max(xs)):>10}")
     out.append(" " * 10 + "   cumulative trials (log scale)")
     return out
 
@@ -2853,11 +3083,9 @@ def _si(v):
 
 def cmd_curve(args):
     """Plot best-so-far verified efficiency against trials spent, per family."""
-    path = os.path.join(_ROOT, "research", "campaigns", args.campaign,
-                        "summary.json")
+    path = os.path.join(_ROOT, "research", "campaigns", args.campaign, "summary.json")
     if not os.path.exists(path):
-        raise SystemExit(f"no committed summary at "
-                         f"{os.path.relpath(path, _ROOT)}")
+        raise SystemExit(f"no committed summary at {os.path.relpath(path, _ROOT)}")
     with open(path, encoding="utf-8") as fh:
         summary = json.load(fh)
 
@@ -2884,29 +3112,36 @@ def cmd_curve(args):
         print(f"wrote {os.path.relpath(out, _ROOT)}")
 
     h = curve["headline"]
-    print(f"{curve['campaign_id']}: best verified kd^2/n "
-          f"{_fmt(h['best_verified_kd2_over_n'])} over "
-          f"{_si(h['trials_spent'])} trials")
+    print(
+        f"{curve['campaign_id']}: best verified kd^2/n "
+        f"{_fmt(h['best_verified_kd2_over_n'])} over "
+        f"{_si(h['trials_spent'])} trials"
+    )
     if bar is None:
-        print("  no bar: pass --bar, or --cell to take the board's best in a "
-              "cell, or give the campaign an objective.target")
+        print(
+            "  no bar: pass --bar, or --cell to take the board's best in a "
+            "cell, or give the campaign an objective.target"
+        )
     else:
         print(f"  bar {bar:g} ({source})")
         if h["reached_bar"]:
             print(f"  reached it after {_si(h['trials_to_bar'])} trials")
         elif h["screened_reached_bar_but_gate_did_not"]:
-            print("  never reached it, and the screen did: the ladder read "
-                  "above the bar and the gate admitted nothing there")
+            print(
+                "  never reached it, and the screen did: the ladder read "
+                "above the bar and the gate admitted nothing there"
+            )
         else:
             print("  never reached it, and neither did the screen")
     for line in _plot(curve):
         print(line)
     print("  # best verified so far, o each screened reading, - the bar")
     for f in curve["families"]:
-        print(f"  {f['family']}: {_fmt(f['best_verified_kd2_over_n'])} "
-              f"verified over {_si(f['trials_spent'])} trials"
-              + (f", bar at {_si(f['trials_to_bar'])}"
-                 if f["trials_to_bar"] is not None else ""))
+        print(
+            f"  {f['family']}: {_fmt(f['best_verified_kd2_over_n'])} "
+            f"verified over {_si(f['trials_spent'])} trials"
+            + (f", bar at {_si(f['trials_to_bar'])}" if f["trials_to_bar"] is not None else "")
+        )
 
 
 def _fmt(v):
@@ -2929,15 +3164,15 @@ REPRO_STAGES = ("verify", "circuits", "ler", "certify", "construction")
 # bit for bit" and "a Monte Carlo re-measurement landed inside the declared
 # interval" are different evidence, and collapsing them would overstate the
 # weaker one.
-ST_SKIPPED = "skipped"                      # flag not requested
-ST_NOT_APPLICABLE = "not_applicable"        # the entry makes no such claim
-ST_NOT_REPRODUCIBLE = "not_reproducible"    # the claim exists, nothing can re-derive it
-ST_BUDGET = "budget_exceeded"               # hit its declared bound
-ST_VERIFIED = "verified"                    # trusted gate passed at the declared seed
-ST_RECONSTRUCTED = "reconstructed"          # code object rebuilt and fingerprint matched
-ST_CERTIFIED = "certified"                  # certify.py re-run and agreed with certs/
-ST_BENCH = "benchmark_reproduced"           # circuits bit-exact / ler within its interval
-ST_FAILED = "failed"                        # ran, and disagreed
+ST_SKIPPED = "skipped"  # flag not requested
+ST_NOT_APPLICABLE = "not_applicable"  # the entry makes no such claim
+ST_NOT_REPRODUCIBLE = "not_reproducible"  # the claim exists, nothing can re-derive it
+ST_BUDGET = "budget_exceeded"  # hit its declared bound
+ST_VERIFIED = "verified"  # trusted gate passed at the declared seed
+ST_RECONSTRUCTED = "reconstructed"  # code object rebuilt and fingerprint matched
+ST_CERTIFIED = "certified"  # certify.py re-run and agreed with certs/
+ST_BENCH = "benchmark_reproduced"  # circuits bit-exact / ler within its interval
+ST_FAILED = "failed"  # ran, and disagreed
 
 
 def _repro_root():
@@ -2946,6 +3181,7 @@ def _repro_root():
 
 def _sha256_file(path):
     import hashlib
+
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
@@ -2976,6 +3212,7 @@ def _repro_environment():
     env = {"python": sys.version.split()[0]}
     try:
         import stim
+
         env["stim"] = stim.__version__
     except Exception:
         env["stim"] = None
@@ -2983,6 +3220,7 @@ def _repro_environment():
     env["uv_lock_sha256"] = _sha256_file(lock) if os.path.exists(lock) else None
     try:
         import validate_candidate as _vc
+
         env["validator_source_sha256"] = _vc.source_sha256()
     except Exception:
         env["validator_source_sha256"] = None
@@ -2992,8 +3230,9 @@ def _repro_environment():
 
 def _git_head():
     try:
-        out = subprocess.run(["git", "rev-parse", "HEAD"], cwd=_repro_root(),
-                             capture_output=True, text=True, check=False)
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=_repro_root(), capture_output=True, text=True, check=False
+        )
         return out.stdout.strip() or None
     except OSError:
         return None
@@ -3002,6 +3241,7 @@ def _git_head():
 def _repro_verify(doc, decl, seed):
     """Stage 1: the trusted gate, at the declared seed."""
     import validate_candidate as vc
+
     verdict = vc.validate_candidate(doc, seed=seed, refute=False)
     gates = verdict.get("gates", {})
     cand = verdict.get("candidate", {})
@@ -3009,13 +3249,16 @@ def _repro_verify(doc, decl, seed):
     return {
         "status": ST_VERIFIED if ok else ST_FAILED,
         "seed": verdict.get("validator", {}).get("seed", seed),
-        "computed": {"n": cand.get("n"), "k": cand.get("k"), "d": cand.get("d"),
-                     "fingerprint": cand.get("fingerprint"),
-                     "signature": cand.get("signature")},
+        "computed": {
+            "n": cand.get("n"),
+            "k": cand.get("k"),
+            "d": cand.get("d"),
+            "fingerprint": cand.get("fingerprint"),
+            "signature": cand.get("signature"),
+        },
         "detail": "structural checks and both witnesses re-checked"
-        if ok else "; ".join(c["detail"] for c in
-                             gates.get("verify", {}).get("checks", [])
-                             if not c.get("ok"))[:400],
+        if ok
+        else "; ".join(c["detail"] for c in gates.get("verify", {}).get("checks", []) if not c.get("ok"))[:400],
     }
 
 
@@ -3024,18 +3267,17 @@ def _repro_circuits(doc, slug, decl):
     if not doc.get("circuit"):
         return {"status": ST_NOT_APPLICABLE, "detail": "no circuit block"}
     from circuit_verify import verify_circuit
+
     cdir = os.path.join(_repro_root(), "circuits", slug)
     if not os.path.isdir(cdir):
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": f"circuits/{slug}/ is not in the tree"}
+        return {"status": ST_NOT_REPRODUCIBLE, "detail": f"circuits/{slug}/ is not in the tree"}
     rep = verify_circuit(doc, cdir)
     bad = [c["detail"] for c in rep.get("checks", []) if not c.get("ok")]
     return {
         "status": ST_BENCH if rep.get("ok") else ST_FAILED,
         "determinism": "bit_exact_under_pin",
         "stim_version": (doc.get("circuit") or {}).get("stim_version"),
-        "detail": "detector error model re-derived from the committed .stim"
-        if rep.get("ok") else "; ".join(bad)[:400],
+        "detail": "detector error model re-derived from the committed .stim" if rep.get("ok") else "; ".join(bad)[:400],
     }
 
 
@@ -3050,21 +3292,21 @@ def _repro_ler(doc, slug, decl):
     if not circ.get("ler"):
         return {"status": ST_NOT_APPLICABLE, "detail": "no circuit.ler block"}
     from ler_verify import verify_ler
+
     cdir = os.path.join(_repro_root(), "circuits", slug)
     if not os.path.isdir(cdir):
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": f"circuits/{slug}/ is not in the tree"}
+        return {"status": ST_NOT_REPRODUCIBLE, "detail": f"circuits/{slug}/ is not in the tree"}
     rep = verify_ler(doc, cdir)
     bad = [c["detail"] for c in rep.get("checks", []) if not c.get("ok")]
     if any("ldpc is not installed" in b for b in bad):
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": "the decoder is missing; install the research extra"}
+        return {"status": ST_NOT_REPRODUCIBLE, "detail": "the decoder is missing; install the research extra"}
     return {
         "status": ST_BENCH if rep.get("ok") else ST_FAILED,
         "determinism": "arithmetic_exact_remeasurement_within_ci95",
         "detail": "ler_per_round and ci95 recomputed, and re-measured on an "
-                  "independent seed inside the declared interval"
-        if rep.get("ok") else "; ".join(bad)[:400],
+        "independent seed inside the declared interval"
+        if rep.get("ok")
+        else "; ".join(bad)[:400],
     }
 
 
@@ -3079,23 +3321,24 @@ def _repro_certify(doc, slug, decl):
     try:
         from certify import certify
     except ImportError as e:
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": f"the certifier is unavailable: {e}"}
+        return {"status": ST_NOT_REPRODUCIBLE, "detail": f"the certifier is unavailable: {e}"}
     got = certify(doc, tlim=tlim)
     if not got.get("d_exact") and committed.get("d_exact"):
-        return {"status": ST_BUDGET,
-                "detail": f"the solver did not close both sides within "
-                          f"{tlim}s; the committed cert claims exact"}
-    same = (got.get("d_exact") == committed.get("d_exact")
-            and all(got.get("sides", {}).get(s, {}).get("value")
-                    == committed.get("sides", {}).get(s, {}).get("value")
-                    for s in ("X", "Z")))
+        return {
+            "status": ST_BUDGET,
+            "detail": f"the solver did not close both sides within {tlim}s; the committed cert claims exact",
+        }
+    same = got.get("d_exact") == committed.get("d_exact") and all(
+        got.get("sides", {}).get(s, {}).get("value") == committed.get("sides", {}).get(s, {}).get("value")
+        for s in ("X", "Z")
+    )
     return {
         "status": ST_CERTIFIED if same else ST_FAILED,
         "tlim_seconds": tlim,
         "solver": got.get("solver"),
         "detail": "re-certified and agreed with certs/" + slug + ".json"
-        if same else f"disagrees with the committed cert: {got.get('sides')}",
+        if same
+        else f"disagrees with the committed cert: {got.get('sides')}",
     }
 
 
@@ -3109,49 +3352,47 @@ def _repro_construction(doc, slug, decl):
     """
     status = decl.get("status")
     if status in (None, "not_reproducible"):
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": decl.get("reason")
-                or "no constructor recipe is declared for this entry"}
+        return {
+            "status": ST_NOT_REPRODUCIBLE,
+            "detail": decl.get("reason") or "no constructor recipe is declared for this entry",
+        }
     if status == "not_applicable":
         return {"status": ST_NOT_APPLICABLE, "detail": decl.get("reason", "")}
     script = decl.get("script")
     if not script:
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": "the manifest declares the stage applicable but "
-                          "names no script"}
+        return {
+            "status": ST_NOT_REPRODUCIBLE,
+            "detail": "the manifest declares the stage applicable but names no script",
+        }
     path = os.path.join(_repro_root(), script)
     if not os.path.exists(path):
-        return {"status": ST_NOT_REPRODUCIBLE,
-                "detail": f"{script} is not in this tree"}
+        return {"status": ST_NOT_REPRODUCIBLE, "detail": f"{script} is not in this tree"}
     cmd = [sys.executable, path] + [str(a) for a in decl.get("args", [])]
     budget = decl.get("budget_seconds", 900)
     try:
-        run = subprocess.run(cmd, cwd=_repro_root(), capture_output=True,
-                             text=True, timeout=budget, check=False)
+        run = subprocess.run(cmd, cwd=_repro_root(), capture_output=True, text=True, timeout=budget, check=False)
     except subprocess.TimeoutExpired:
-        return {"status": ST_BUDGET,
-                "detail": f"{script} exceeded {budget}s"}
+        return {"status": ST_BUDGET, "detail": f"{script} exceeded {budget}s"}
     if run.returncode != 0:
-        return {"status": ST_FAILED,
-                "detail": f"{script} exited {run.returncode}: "
-                          f"{run.stderr.strip()[:300]}"}
+        return {"status": ST_FAILED, "detail": f"{script} exited {run.returncode}: {run.stderr.strip()[:300]}"}
     # The recipe is matched by the fingerprint the verifier computes, not by
     # the bytes of a rebuilt file: two runs may order rows differently and
     # still be the same stabilizer code.
     from qldpc_verify import verify as _verify
+
     want = (_verify(doc) or {}).get("fingerprint")
     got = None
     for line in (run.stdout or "").splitlines():
         if line.strip().startswith("fingerprint="):
             got = line.strip().split("=", 1)[1].strip()
     if got is None:
-        return {"status": ST_FAILED,
-                "detail": f"{script} printed no 'fingerprint=' line to compare"}
+        return {"status": ST_FAILED, "detail": f"{script} printed no 'fingerprint=' line to compare"}
     return {
         "status": ST_RECONSTRUCTED if got == want else ST_FAILED,
         "script": script,
         "detail": "the recipe rebuilt this entry's stabilizer code"
-        if got == want else f"rebuilt a different code ({got} != {want})",
+        if got == want
+        else f"rebuilt a different code ({got} != {want})",
     }
 
 
@@ -3177,16 +3418,14 @@ def cmd_reproduce(args):
     want = {s: getattr(args, s) for s in REPRO_STAGES}
     if args.all:
         want = {s: True for s in REPRO_STAGES}
-    want["verify"] = True                     # the core is never skipped
+    want["verify"] = True  # the core is never skipped
 
     print(f"reproduce {slug}  sha256={digest[:16]}...")
     if manifest:
-        print(f"  manifest: repro/{slug}.json (version "
-              f"{manifest.get('manifest_version')})")
+        print(f"  manifest: repro/{slug}.json (version {manifest.get('manifest_version')})")
         declared = manifest.get("artifact_sha256")
         if declared and declared != digest:
-            print("  note: the entry has changed since the manifest was "
-                  "written; both digests are in the receipt")
+            print("  note: the entry has changed since the manifest was written; both digests are in the receipt")
     else:
         print("  manifest: none committed; stages derived from the entry")
 
@@ -3201,11 +3440,9 @@ def cmd_reproduce(args):
     for name in REPRO_STAGES:
         decl = _stage_decl(manifest, name)
         if not want[name]:
-            stages[name] = {"status": ST_SKIPPED,
-                            "detail": f"--{name} not requested"}
+            stages[name] = {"status": ST_SKIPPED, "detail": f"--{name} not requested"}
         elif decl.get("status") == "not_applicable":
-            stages[name] = {"status": ST_NOT_APPLICABLE,
-                            "detail": decl.get("reason", "declared not applicable")}
+            stages[name] = {"status": ST_NOT_APPLICABLE, "detail": decl.get("reason", "declared not applicable")}
         else:
             stages[name] = runners[name](decl)
         st = stages[name]
@@ -3216,20 +3453,21 @@ def cmd_reproduce(args):
     receipt = {
         "receipt_version": "1",
         "receipt_kind": "reproduction",
-        "artifact": {"slug": slug, "path": f"codes/{slug}.json",
-                     "sha256": digest,
-                     "manifest_sha256": (
-                         _sha256_file(os.path.join(_repro_root(), "repro",
-                                                   f"{slug}.json"))
-                         if manifest else None),
-                     "manifest_artifact_sha256": (manifest or {}).get(
-                         "artifact_sha256")},
+        "artifact": {
+            "slug": slug,
+            "path": f"codes/{slug}.json",
+            "sha256": digest,
+            "manifest_sha256": (
+                _sha256_file(os.path.join(_repro_root(), "repro", f"{slug}.json")) if manifest else None
+            ),
+            "manifest_artifact_sha256": (manifest or {}).get("artifact_sha256"),
+        },
         "environment": _repro_environment(),
         "stages": stages,
         "overall": overall,
         "authority": "non-authoritative: this receipt records a reproduction "
-                     "attempt and never changes an entry's verdict, tier, or "
-                     "ranking",
+        "attempt and never changes an entry's verdict, tier, or "
+        "ranking",
     }
     if args.out:
         with open(args.out, "w", encoding="utf-8", newline="\n") as f:
@@ -3241,21 +3479,20 @@ def cmd_reproduce(args):
 
 
 def cmd_preflight(args):
-    """Run the cheap pre-submission checks (scope, ruff, family tag, board tests,
-    prose) and exit non-zero on the first failure."""
+    """Run the cheap pre-submission checks and exit non-zero on the first failure.
+
+    The checks are: submission scope, ruff, family tag, board tests, prose.
+    """
     import subprocess as _sp
 
     base = args.base_ref or ""
     if not base:
         # prefer upstream/main when available, fall back to origin/main
         try:
-            _sp.run(["git", "remote", "get-url", "upstream"],
-                    check=True, capture_output=True)
+            _sp.run(["git", "remote", "get-url", "upstream"], check=True, capture_output=True)
             base = "upstream/main"
         except Exception:
             base = "origin/main"
-
-    steps = []
 
     def run(label, cmd):
         print(f"== {label} ==")
@@ -3264,27 +3501,43 @@ def cmd_preflight(args):
             print(f"preflight: FAILED at {label}", file=sys.stderr)
             raise SystemExit(r.returncode)
 
-    run("submission scope",
-        ["uv", "run", "python", "verify/check_submission_scope.py",
-         "--root", _ROOT, "--base", base])
+    run(
+        "submission scope",
+        ["uv", "run", "python", "verify/check_submission_scope.py", "--root", _ROOT, "--base", base],
+    )
 
     # ruff on added Python files
-    out = _sp.run(["git", "diff", "--name-only", "--no-renames",
-                   "--diff-filter=A", "-z", f"{base}...HEAD", "--", "*.py"],
-                  cwd=_ROOT, capture_output=True, text=True, check=False)
+    out = _sp.run(
+        ["git", "diff", "--name-only", "--no-renames", "--diff-filter=A", "-z", f"{base}...HEAD", "--", "*.py"],
+        cwd=_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     added = [f for f in out.stdout.split("\x00") if f]
     if added:
-        run("ruff check", ["uv", "run", "--frozen", "--only-group", "dev",
-                           "ruff", "check", *added])
-        run("ruff format", ["uv", "run", "--frozen", "--only-group", "dev",
-                            "ruff", "format", "--check", *added])
+        run("ruff check", ["uv", "run", "--frozen", "--only-group", "dev", "ruff", "check", *added])
+        run("ruff format", ["uv", "run", "--frozen", "--only-group", "dev", "ruff", "format", "--check", *added])
 
-    run("family-tag consistency",
-        ["uv", "run", "--frozen", "--extra", "research", "python", "-m",
-         "pytest", "-q", "verify/test_family_tag_consistency.py"])
-    run("board-marked tests",
-        ["uv", "run", "--frozen", "--extra", "research", "python",
-         "run_tests.py", "-m", "board"])
+    run(
+        "family-tag consistency",
+        [
+            "uv",
+            "run",
+            "--frozen",
+            "--extra",
+            "research",
+            "python",
+            "-m",
+            "pytest",
+            "-q",
+            "verify/test_family_tag_consistency.py",
+        ],
+    )
+    run(
+        "board-marked tests",
+        ["uv", "run", "--frozen", "--extra", "research", "python", "run_tests.py", "-m", "board"],
+    )
 
     if getattr(args, "body_file", ""):
         run("prose", ["verify/prepush_prose_check.sh", args.body_file])
@@ -3300,86 +3553,122 @@ def main(argv=None):
         if hasattr(stream, "reconfigure") and (stream.encoding or "").lower().replace("-", "") != "utf8":
             stream.reconfigure(encoding="utf-8", errors="replace")
 
-    p = argparse.ArgumentParser(
-        prog="qldpc", description="qLDPC challenge submission tool")
+    p = argparse.ArgumentParser(prog="qldpc", description="qLDPC challenge submission tool")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("submit", help="build, verify, and prepare a code submission")
-    s.add_argument("code", help=".npz with H_X/H_Z (+ optional coords) or a "
-                                ".json draft")
-    s.add_argument("--authors", nargs="+", required=True,
-                   help="one or more: @github-handle and/or 'First Last'")
-    s.add_argument("--anonymous", action="store_true",
-                   help="explicitly submit without a GitHub @handle; the "
-                        "entry will not be bound to an account")
-    s.add_argument("--construction", default="",
-                   help="how the code was built (family, polynomials, search)")
-    s.add_argument("--model", default="",
-                   help="self-reported model that produced it, named to a specific "
-                        "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'). If "
-                        "you do not know the exact model/version, omit this flag; "
-                        "do not use 'human' as a placeholder -- 'human' claims a "
-                        "person, not a model, produced the code. "
-                        "'human' is claimed, not verified; the verifier requires a "
-                        "version if a model is named)")
-    s.add_argument("--harness", default="",
-                   help="optional, self-reported agent harness or tooling that ran "
-                        "the model, e.g. 'OpenCode agent harness'. Recorded in "
-                        "provenance.harness, separate from --model so model "
-                        "attribution stays clean. Omit when no harness was involved "
-                        "or when the harness is already named inside --model. "
-                        "May be given without --model to credit tooling alone; "
-                        "provenance.harness is then recorded with no subject.")
+    s.add_argument("code", help=".npz with H_X/H_Z (+ optional coords) or a .json draft")
+    s.add_argument("--authors", nargs="+", required=True, help="one or more: @github-handle and/or 'First Last'")
+    s.add_argument(
+        "--anonymous",
+        action="store_true",
+        help="explicitly submit without a GitHub @handle; the entry will not be bound to an account",
+    )
+    s.add_argument("--construction", default="", help="how the code was built (family, polynomials, search)")
+    s.add_argument(
+        "--model",
+        default="",
+        help="self-reported model that produced it, named to a specific "
+        "version, e.g. 'Claude Opus 4.8' (not a bare 'Claude'). If "
+        "you do not know the exact model/version, omit this flag; "
+        "do not use 'human' as a placeholder -- 'human' claims a "
+        "person, not a model, produced the code. "
+        "'human' is claimed, not verified; the verifier requires a "
+        "version if a model is named)",
+    )
+    s.add_argument(
+        "--harness",
+        default="",
+        help="optional, self-reported agent harness or tooling that ran "
+        "the model, e.g. 'OpenCode agent harness'. Recorded in "
+        "provenance.harness, separate from --model so model "
+        "attribution stays clean. Omit when no harness was involved "
+        "or when the harness is already named inside --model. "
+        "May be given without --model to credit tooling alone; "
+        "provenance.harness is then recorded with no subject.",
+    )
     s.add_argument("--notes", default="")
-    s.add_argument("--note-file", default="",
-                   help="markdown research note staged as notes/<slug>.md and "
-                        "rendered publicly beside the code: the search story "
-                        "— hypothesis, sweep sizes, confirmation ladder, dead "
-                        "ends (see notes/TEMPLATE.md; 10 KiB cap)")
-    s.add_argument("--date", default="",
-                   help="submission date (YYYY-MM-DD); defaults to today")
+    s.add_argument(
+        "--note-file",
+        default="",
+        help="markdown research note staged as notes/<slug>.md and "
+        "rendered publicly beside the code: the search story "
+        "— hypothesis, sweep sizes, confirmation ladder, dead "
+        "ends (see notes/TEMPLATE.md; 10 KiB cap)",
+    )
+    s.add_argument("--date", default="", help="submission date (YYYY-MM-DD); defaults to today")
     s.add_argument("--name", default="")
-    s.add_argument("--family", choices=[
-                       "bivariate-bicycle", "generalized-bicycle", "2bga-coset",
-                       "hypergraph-product", "lifted-product", "balanced-product",
-                       "quantum-tanner", "tile", "topological", "other"],
-                   help="construction family tag (a filter, not a ranking; "
-                        "track membership is computed from H and the layout)")
-    s.add_argument("--coords", default="",
-                   help="coordinates file (.npz key coords, or whitespace .txt), "
-                        "one [x, y] or [x, y, z] row per qubit; the verifier "
-                        "derives the 2d-local class from a planar layout")
-    s.add_argument("--layers", type=int, default=1,
-                   help="physical layers for a 2d-local layout "
-                        "(1 = single layer, 2 = bilayer); default 1")
+    s.add_argument(
+        "--family",
+        choices=[
+            "bivariate-bicycle",
+            "generalized-bicycle",
+            "2bga-coset",
+            "hypergraph-product",
+            "lifted-product",
+            "balanced-product",
+            "quantum-tanner",
+            "tile",
+            "topological",
+            "other",
+        ],
+        help="construction family tag (a filter, not a ranking; track membership is computed from H and the layout)",
+    )
+    s.add_argument(
+        "--coords",
+        default="",
+        help="coordinates file (.npz key coords, or whitespace .txt), "
+        "one [x, y] or [x, y, z] row per qubit; the verifier "
+        "derives the 2d-local class from a planar layout",
+    )
+    s.add_argument(
+        "--layers",
+        type=int,
+        default=1,
+        help="physical layers for a 2d-local layout (1 = single layer, 2 = bilayer); default 1",
+    )
     b = s.add_argument_group(
         "search budget",
         "optional provenance.search_budget block (schema 0.3): what the search "
         "that produced this code cost. Self-reported and unchecked; recorded so "
         "cost per discovery is comparable across entries. Flags override keys "
-        "of --budget-json.")
-    b.add_argument("--budget-json", default="", metavar="FILE_OR_JSON",
-                   help="JSON object with any of: candidates_screened, "
-                        "ris_trials_per_side, cpu_hours, gpu_hours, llm_tokens "
-                        "(model -> tokens), wall_clock_hours, tool, notes; a "
-                        "file path or an inline '{...}'")
-    b.add_argument("--budget-candidates-screened", type=int, default=None,
-                   metavar="N", help="codes built and screened before this one")
-    b.add_argument("--budget-ris-trials-per-side", type=int, default=None,
-                   metavar="N", help="deepest RIS budget spent per side on this "
-                                     "code during the search")
+        "of --budget-json.",
+    )
+    b.add_argument(
+        "--budget-json",
+        default="",
+        metavar="FILE_OR_JSON",
+        help="JSON object with any of: candidates_screened, "
+        "ris_trials_per_side, cpu_hours, gpu_hours, llm_tokens "
+        "(model -> tokens), wall_clock_hours, tool, notes; a "
+        "file path or an inline '{...}'",
+    )
+    b.add_argument(
+        "--budget-candidates-screened",
+        type=int,
+        default=None,
+        metavar="N",
+        help="codes built and screened before this one",
+    )
+    b.add_argument(
+        "--budget-ris-trials-per-side",
+        type=int,
+        default=None,
+        metavar="N",
+        help="deepest RIS budget spent per side on this code during the search",
+    )
     b.add_argument("--budget-cpu-hours", type=float, default=None, metavar="H")
     b.add_argument("--budget-gpu-hours", type=float, default=None, metavar="H")
-    b.add_argument("--budget-llm-tokens", action="append", default=None,
-                   metavar="MODEL=COUNT",
-                   help="tokens consumed per model, repeatable, e.g. "
-                        "'Claude Opus 4.8=1800000'")
-    b.add_argument("--budget-wall-clock-hours", type=float, default=None,
-                   metavar="H")
-    b.add_argument("--budget-tool", default="",
-                   help="the search harness, e.g. 'research/kit/search.py + gf2_fast'")
-    b.add_argument("--budget-notes", default="",
-                   help="what the numbers cover and what they leave out")
+    b.add_argument(
+        "--budget-llm-tokens",
+        action="append",
+        default=None,
+        metavar="MODEL=COUNT",
+        help="tokens consumed per model, repeatable, e.g. 'Claude Opus 4.8=1800000'",
+    )
+    b.add_argument("--budget-wall-clock-hours", type=float, default=None, metavar="H")
+    b.add_argument("--budget-tool", default="", help="the search harness, e.g. 'research/kit/search.py + gf2_fast'")
+    b.add_argument("--budget-notes", default="", help="what the numbers cover and what they leave out")
     c = s.add_argument_group(
         "circuit tier",
         "memory_x and memory_z syndrome-extraction circuits (RFC 0001) are "
@@ -3387,264 +3676,330 @@ def main(argv=None):
         "circuits/<slug>/ by default: an interleaved two-block schedule for "
         "bicycle-type codes, a layout zigzag for surface patches, and a "
         "generic sequential schedule otherwise. d_circ is penalty-only, so a "
-        "circuit can discount an entry but never inflate it.")
-    c.add_argument("--no-circuit", action="store_true",
-                   help="submit the code tier only, no circuits")
-    c.add_argument("--circuits", default="", metavar="DIR",
-                   help="use your own memory_x.stim and memory_z.stim from DIR "
-                        "(canonical noise recipe, see verify/circuit_tools.py) "
-                        "instead of generating them; the .dem files are "
-                        "derived with the pinned stim and the witnesses "
-                        "searched for you")
-    c.add_argument("--circuit-rounds", type=int, default=None, metavar="R",
-                   help="extraction rounds per memory circuit (default d, the "
-                        "minimum the verifier accepts)")
-    c.add_argument("--circuit-candidates", type=int, default=6, metavar="N",
-                   help="schedules screened at two rounds before the deep "
-                        "search settles on one (default 6)")
-    c.add_argument("--circuit-seconds", type=float, default=180.0,
-                   metavar="S",
-                   help="wall-clock cap per basis for the deep witness search "
-                        "(default 180; the CI gate targets 120)")
+        "circuit can discount an entry but never inflate it.",
+    )
+    c.add_argument("--no-circuit", action="store_true", help="submit the code tier only, no circuits")
+    c.add_argument(
+        "--circuits",
+        default="",
+        metavar="DIR",
+        help="use your own memory_x.stim and memory_z.stim from DIR "
+        "(canonical noise recipe, see verify/circuit_tools.py) "
+        "instead of generating them; the .dem files are "
+        "derived with the pinned stim and the witnesses "
+        "searched for you",
+    )
+    c.add_argument(
+        "--circuit-rounds",
+        type=int,
+        default=None,
+        metavar="R",
+        help="extraction rounds per memory circuit (default d, the minimum the verifier accepts)",
+    )
+    c.add_argument(
+        "--circuit-candidates",
+        type=int,
+        default=6,
+        metavar="N",
+        help="schedules screened at two rounds before the deep search settles on one (default 6)",
+    )
+    c.add_argument(
+        "--circuit-seconds",
+        type=float,
+        default=180.0,
+        metavar="S",
+        help="wall-clock cap per basis for the deep witness search (default 180; the CI gate targets 120)",
+    )
     c.add_argument("--circuit-seed", type=int, default=0)
-    s.add_argument("--trials", type=int, default=20000,
-                   help="RIS trials for the distance witness search")
-    s.add_argument("--reuse-witnesses", action="store_true",
-                   help="start from the distance witnesses already present in "
-                   "a JSON draft instead of searching for them again: the "
-                   "witnesses are validated against the rebuilt matrices, "
-                   "their weight is taken from the witness (a draft whose "
-                   "value disagrees is reported), and the accelerator pass "
-                   "still runs and may tighten the claim. CSS drafts reuse "
-                   "distance.X/Z, stabilizer drafts reuse distance.P. A draft "
-                   "whose witness cannot be used is refused, never replaced "
-                   "by a search. Requires a JSON draft (rejected for .npz "
-                   "input) and the accelerator pass (rejected with "
-                   "--fast-trials 0). Preserves the witness and its weight, "
-                   "not an `exact` confidence label.")
-    s.add_argument("--peer-audit", default="", metavar="FILE",
-                   help="the record research/audits/leader_audit.py pair --json-out "
-                        "wrote for this candidate; required when the gain over a "
-                        "board entry is on d alone (same n, k, and check weight), "
-                        "and it must be credible, at least as deep as this run's "
-                        "search, and cover every such entry (issue #4236)")
-    s.add_argument("--allow-non-frontier", action="store_true",
-                   help="submit a code that an entry in its track cell dominates "
-                        "on (n, k, d, w). Without it such a code is refused with "
-                        "the entry named: it passes the gate and is a non-frontier "
-                        "result (AGENTS.md, The motto), and the greedy campaigns of "
-                        "issue #5700 filed dozens of them as frontier advances. "
-                        "With it the PR body names the dominators and calls the "
-                        "entry a record, not an advance")
-    s.add_argument("--fast-trials", type=int, default=2_000_000,
-                   help="gf2_fast trials used to tighten the claim. 0 disables "
-                        "the accelerator and the PR body says so; a positive "
-                        "budget is refused when the accelerator is not built, "
-                        "so the pass is never skipped silently")
-    s.add_argument("--min-fast-trials", type=int, default=REUSE_MIN_FAST_TRIALS,
-                   help="the accelerator budget a --reuse-witnesses run must "
-                        "have (default: research/kit/promote.py's floor); "
-                        "lower it to file a thinner claim knowingly")
+    s.add_argument("--trials", type=int, default=20000, help="RIS trials for the distance witness search")
+    s.add_argument(
+        "--reuse-witnesses",
+        action="store_true",
+        help="start from the distance witnesses already present in "
+        "a JSON draft instead of searching for them again: the "
+        "witnesses are validated against the rebuilt matrices, "
+        "their weight is taken from the witness (a draft whose "
+        "value disagrees is reported), and the accelerator pass "
+        "still runs and may tighten the claim. CSS drafts reuse "
+        "distance.X/Z, stabilizer drafts reuse distance.P. A draft "
+        "whose witness cannot be used is refused, never replaced "
+        "by a search. Requires a JSON draft (rejected for .npz "
+        "input) and the accelerator pass (rejected with "
+        "--fast-trials 0). Preserves the witness and its weight, "
+        "not an `exact` confidence label.",
+    )
+    s.add_argument(
+        "--peer-audit",
+        default="",
+        metavar="FILE",
+        help="the record research/audits/leader_audit.py pair --json-out "
+        "wrote for this candidate; required when the gain over a "
+        "board entry is on d alone (same n, k, and check weight), "
+        "and it must be credible, at least as deep as this run's "
+        "search, and cover every such entry (issue #4236)",
+    )
+    s.add_argument(
+        "--allow-non-frontier",
+        action="store_true",
+        help="submit a code that an entry in its track cell dominates "
+        "on (n, k, d, w). Without it such a code is refused with "
+        "the entry named: it passes the gate and is a non-frontier "
+        "result (AGENTS.md, The motto), and the greedy campaigns of "
+        "issue #5700 filed dozens of them as frontier advances. "
+        "With it the PR body names the dominators and calls the "
+        "entry a record, not an advance",
+    )
+    s.add_argument(
+        "--fast-trials",
+        type=int,
+        default=2_000_000,
+        help="gf2_fast trials used to tighten the claim. 0 disables "
+        "the accelerator and the PR body says so; a positive "
+        "budget is refused when the accelerator is not built, "
+        "so the pass is never skipped silently",
+    )
+    s.add_argument(
+        "--min-fast-trials",
+        type=int,
+        default=REUSE_MIN_FAST_TRIALS,
+        help="the accelerator budget a --reuse-witnesses run must "
+        "have (default: research/kit/promote.py's floor); "
+        "lower it to file a thinner claim knowingly",
+    )
     s.add_argument("--seed", type=int, default=0)
     s.add_argument("--out", default=os.path.join(_ROOT, "codes"))
-    s.add_argument("--slug", default="",
-                   help="override the board slug (default <n>-<k>-<d>) used for "
-                        "codes/<slug>.json, notes/<slug>.md, circuits/<slug>/, "
-                        "the PR branch, and the PR body. Use a suffixed slug "
-                        "(e.g. 32-14-4-b) when a distinct code collides with "
-                        "an existing entry on (n, k, d), instead of "
-                        "overwriting it (issue #5732).")
-    s.add_argument("--force", action="store_true",
-                   help="overwrite an existing codes/<slug>.json")
-    s.add_argument("--dry-run", action="store_true",
-                   help="build and verify but do not write the file")
-    s.add_argument("--json", action="store_true",
-                   help="print exactly one JSON object on stdout describing "
-                        "the result (stage, slug, code_path, note_path, "
-                        "title, body_file, branch, next_steps, pr_url, or "
-                        "error) and move the human-readable output to "
-                        "stderr; with --dry-run the object carries the full "
-                        "submission under `doc`")
-    s.add_argument("--open-pr", action="store_true",
-                   help="create the branch, commit, push, and open the PR")
-    s.add_argument("--base-ref", default="",
-                   help="start the submission branch from this ref (e.g. "
-                        "origin/main) and return to the current branch "
-                        "afterwards, so successive --open-pr runs from one "
-                        "checkout produce independent one-code PRs")
+    s.add_argument(
+        "--slug",
+        default="",
+        help="override the board slug (default <n>-<k>-<d>) used for "
+        "codes/<slug>.json, notes/<slug>.md, circuits/<slug>/, "
+        "the PR branch, and the PR body. Use a suffixed slug "
+        "(e.g. 32-14-4-b) when a distinct code collides with "
+        "an existing entry on (n, k, d), instead of "
+        "overwriting it (issue #5732).",
+    )
+    s.add_argument("--force", action="store_true", help="overwrite an existing codes/<slug>.json")
+    s.add_argument("--dry-run", action="store_true", help="build and verify but do not write the file")
+    s.add_argument(
+        "--json",
+        action="store_true",
+        help="print exactly one JSON object on stdout describing "
+        "the result (stage, slug, code_path, note_path, "
+        "title, body_file, branch, next_steps, pr_url, or "
+        "error) and move the human-readable output to "
+        "stderr; with --dry-run the object carries the full "
+        "submission under `doc`",
+    )
+    s.add_argument("--open-pr", action="store_true", help="create the branch, commit, push, and open the PR")
+    s.add_argument(
+        "--base-ref",
+        default="",
+        help="start the submission branch from this ref (e.g. "
+        "origin/main) and return to the current branch "
+        "afterwards, so successive --open-pr runs from one "
+        "checkout produce independent one-code PRs",
+    )
     s.set_defaults(func=cmd_submit)
 
-    pf = sub.add_parser("preflight", help="run pre-submission checks "
-                                 "(scope, ruff, family tag, board tests, prose)")
-    pf.add_argument("--body-file", default="",
-                    help="PR body file to also run the prose check against")
-    pf.add_argument("--base-ref", default="",
-                    help="base ref to diff against (default: upstream/main or origin/main)")
+    pf = sub.add_parser("preflight", help="run pre-submission checks (scope, ruff, family tag, board tests, prose)")
+    pf.add_argument("--body-file", default="", help="PR body file to also run the prose check against")
+    pf.add_argument("--base-ref", default="", help="base ref to diff against (default: upstream/main or origin/main)")
     pf.set_defaults(func=cmd_preflight)
 
-    r = sub.add_parser("recent", help="what landed recently: codes, research "
-                                      "notes, fieldnotes (read before you "
-                                      "search)")
+    r = sub.add_parser(
+        "recent", help="what landed recently: codes, research notes, fieldnotes (read before you search)"
+    )
     r.add_argument("--days", type=int, default=14)
-    r.add_argument("--limit", type=int, default=10,
-                   help="rows per section (default 10); --full for all")
-    r.add_argument("--full", action="store_true",
-                   help="print every row instead of the newest --limit")
-    r.add_argument("--family", default="",
-                   help="only rows mentioning this family tag, e.g. "
-                        "bivariate-bicycle")
-    r.add_argument("--topic", default="",
-                   help="only rows mentioning this topic, matched against "
-                        "fieldnote topics and titles and against code names")
-    r.add_argument("--json", action="store_true",
-                   help="print one JSON record on stdout (codes, fieldnotes, "
-                        "and campaign summaries in the window, with counts) "
-                        "instead of the listing")
+    r.add_argument("--limit", type=int, default=10, help="rows per section (default 10); --full for all")
+    r.add_argument("--full", action="store_true", help="print every row instead of the newest --limit")
+    r.add_argument("--family", default="", help="only rows mentioning this family tag, e.g. bivariate-bicycle")
+    r.add_argument(
+        "--topic",
+        default="",
+        help="only rows mentioning this topic, matched against fieldnote topics and titles and against code names",
+    )
+    r.add_argument(
+        "--json",
+        action="store_true",
+        help="print one JSON record on stdout (codes, fieldnotes, "
+        "and campaign summaries in the window, with counts) "
+        "instead of the listing",
+    )
     r.set_defaults(func=cmd_recent)
 
-    sc = sub.add_parser("screened",
-                        help="was this family at these parameters already "
-                             "screened, at what depth, and how did it go "
-                             "(committed campaign summaries only)")
-    sc.add_argument("--family", default="",
-                    help="family tag, e.g. generalized-bicycle")
-    sc.add_argument("--param", action="append", default=[], metavar="K=V",
-                    help="construction parameter to match, repeatable; "
-                         "matched as a subset, so --param ring=Z_341 finds "
-                         "every member screened over that ring")
-    sc.add_argument("--params", default="",
-                    help="the same as a JSON object")
-    sc.add_argument("--verdict", action="append", default=[],
-                    choices=["passed", "refuted", "duplicate", "dominated",
-                             "not_run"],
-                    help="only rows with this gate verdict, repeatable")
-    sc.add_argument("--limit", type=int, default=20,
-                    help="rows to print (default 20); --full for all")
+    sc = sub.add_parser(
+        "screened",
+        help="was this family at these parameters already "
+        "screened, at what depth, and how did it go "
+        "(committed campaign summaries only)",
+    )
+    sc.add_argument("--family", default="", help="family tag, e.g. generalized-bicycle")
+    sc.add_argument(
+        "--param",
+        action="append",
+        default=[],
+        metavar="K=V",
+        help="construction parameter to match, repeatable; "
+        "matched as a subset, so --param ring=Z_341 finds "
+        "every member screened over that ring",
+    )
+    sc.add_argument("--params", default="", help="the same as a JSON object")
+    sc.add_argument(
+        "--verdict",
+        action="append",
+        default=[],
+        choices=["passed", "refuted", "duplicate", "dominated", "not_run"],
+        help="only rows with this gate verdict, repeatable",
+    )
+    sc.add_argument("--limit", type=int, default=20, help="rows to print (default 20); --full for all")
     sc.add_argument("--full", action="store_true")
-    sc.add_argument("--json", action="store_true",
-                    help="print one JSON record on stdout instead of the "
-                         "listing")
+    sc.add_argument("--json", action="store_true", help="print one JSON record on stdout instead of the listing")
     sc.set_defaults(func=cmd_screened)
 
-    ng = sub.add_parser("negatives",
-                        help="what earlier campaigns closed and why, with the "
-                             "assumptions each negative depends on and the "
-                             "change that would make it worth retrying "
-                             "(committed campaign summaries only)")
-    ng.add_argument("--family", default="",
-                    help="family tag; a negative recorded outside an "
-                         "experiment stands for every family its campaign ran")
-    ng.add_argument("--param", action="append", default=[], metavar="K=V",
-                    help="parameter the negative must carry, repeatable; "
-                         "matched as a subset of the negative's own params")
-    ng.add_argument("--match", default="",
-                    help="text to find in what, detail, the assumptions, or "
-                         "revisit_if (case-insensitive)")
-    ng.add_argument("--limit", type=int, default=20,
-                    help="rows to print (default 20); --full for all")
+    ng = sub.add_parser(
+        "negatives",
+        help="what earlier campaigns closed and why, with the "
+        "assumptions each negative depends on and the "
+        "change that would make it worth retrying "
+        "(committed campaign summaries only)",
+    )
+    ng.add_argument(
+        "--family",
+        default="",
+        help="family tag; a negative recorded outside an experiment stands for every family its campaign ran",
+    )
+    ng.add_argument(
+        "--param",
+        action="append",
+        default=[],
+        metavar="K=V",
+        help="parameter the negative must carry, repeatable; matched as a subset of the negative's own params",
+    )
+    ng.add_argument(
+        "--match", default="", help="text to find in what, detail, the assumptions, or revisit_if (case-insensitive)"
+    )
+    ng.add_argument("--limit", type=int, default=20, help="rows to print (default 20); --full for all")
     ng.add_argument("--full", action="store_true")
-    ng.add_argument("--json", action="store_true",
-                    help="print one JSON record on stdout instead of the "
-                         "listing")
+    ng.add_argument("--json", action="store_true", help="print one JSON record on stdout instead of the listing")
     ng.set_defaults(func=cmd_negatives)
 
-    cv = sub.add_parser("curve",
-                        help="best-so-far verified efficiency against trials "
-                             "spent, per family, for one campaign")
-    cv.add_argument("campaign", help="campaign id, the directory under "
-                                     "research/campaigns/")
-    cv.add_argument("--bar", type=float, default=None,
-                    help="the reference kd^2/n the curve is compared against; "
-                         "defaults to the campaign's objective.target when it "
-                         "has one")
-    cv.add_argument("--cell", default="",
-                    help="take the bar from the board's best in this cell, "
-                         "e.g. 'unrestricted/weight-6'")
-    cv.add_argument("--write", action="store_true",
-                    help="also write research/campaigns/<id>/curve.json")
-    cv.add_argument("--json", action="store_true",
-                    help="print the curve as one JSON record on stdout")
+    cv = sub.add_parser(
+        "curve", help="best-so-far verified efficiency against trials spent, per family, for one campaign"
+    )
+    cv.add_argument("campaign", help="campaign id, the directory under research/campaigns/")
+    cv.add_argument(
+        "--bar",
+        type=float,
+        default=None,
+        help="the reference kd^2/n the curve is compared against; "
+        "defaults to the campaign's objective.target when it "
+        "has one",
+    )
+    cv.add_argument(
+        "--cell", default="", help="take the bar from the board's best in this cell, e.g. 'unrestricted/weight-6'"
+    )
+    cv.add_argument("--write", action="store_true", help="also write research/campaigns/<id>/curve.json")
+    cv.add_argument("--json", action="store_true", help="print the curve as one JSON record on stdout")
     cv.set_defaults(func=cmd_curve)
 
-    rp = sub.add_parser("reproduce",
-                        help="re-run one entry's evidence chain and write a "
-                             "reproduction receipt")
+    rp = sub.add_parser("reproduce", help="re-run one entry's evidence chain and write a reproduction receipt")
     rp.add_argument("slug", help="board entry, e.g. 25-1-5")
-    rp.add_argument("--verify", action="store_true",
-                    help="the trusted gate (always runs; the flag is for "
-                         "symmetry with the others)")
-    rp.add_argument("--circuits", action="store_true",
-                    help="re-derive the detector error model from the "
-                         "committed .stim under the pinned version")
-    rp.add_argument("--ler", action="store_true",
-                    help="recheck the ler arithmetic and re-measure on an "
-                         "independent seed (needs the research extra)")
-    rp.add_argument("--certify", action="store_true",
-                    help="re-run the bounded exact certifier and compare it "
-                         "with certs/<slug>.json")
-    rp.add_argument("--construction", action="store_true",
-                    help="re-derive the code from its committed recipe, when "
-                         "the manifest declares one")
-    rp.add_argument("--all", action="store_true",
-                    help="every applicable stage; expensive")
-    rp.add_argument("--seed", type=int, default=None,
-                    help="seed for the trusted gate")
-    rp.add_argument("--out", default="",
-                    help="write the reproduction receipt to this path")
+    rp.add_argument(
+        "--verify", action="store_true", help="the trusted gate (always runs; the flag is for symmetry with the others)"
+    )
+    rp.add_argument(
+        "--circuits",
+        action="store_true",
+        help="re-derive the detector error model from the committed .stim under the pinned version",
+    )
+    rp.add_argument(
+        "--ler",
+        action="store_true",
+        help="recheck the ler arithmetic and re-measure on an independent seed (needs the research extra)",
+    )
+    rp.add_argument(
+        "--certify",
+        action="store_true",
+        help="re-run the bounded exact certifier and compare it with certs/<slug>.json",
+    )
+    rp.add_argument(
+        "--construction",
+        action="store_true",
+        help="re-derive the code from its committed recipe, when the manifest declares one",
+    )
+    rp.add_argument("--all", action="store_true", help="every applicable stage; expensive")
+    rp.add_argument("--seed", type=int, default=None, help="seed for the trusted gate")
+    rp.add_argument("--out", default="", help="write the reproduction receipt to this path")
     rp.set_defaults(func=cmd_reproduce)
 
-    g = sub.add_parser("targets", help="which track cells are open: occupancy "
-                                       "and frontier per cell (read before you "
-                                       "build)")
-    g.add_argument("--cell", default=None,
-                   help="focus one cell, e.g. 'weight-6/unrestricted'")
-    g.add_argument("--n", type=int, default=None,
-                   help="what a code at this blocklength would need")
-    g.add_argument("--top", type=int, default=6,
-                   help="frontier entries to list per cell (default 6)")
-    g.add_argument("--claim", default="",
-                   metavar="CELL",
-                   help="note that this run is aiming at CELL, e.g. "
-                        "'weight-6/unrestricted'. CELL is checked against the "
-                        "board's axis names and written weight-first; a name "
-                        "that is not a cell is refused with the valid ones. "
-                        "Advisory and expiring: it is a note to other "
-                        "sessions, not a reservation, and nothing enforces "
-                        "it. Two runs may hold one cell at once; the second "
-                        "write says whose it displaced")
-    g.add_argument("--release", default="", metavar="CELL",
-                   help="drop this run's claim on CELL (expiry is the "
-                        "backstop; the same cell name is checked)")
-    g.add_argument("--campaign", default="",
-                   help="campaign id to record alongside a claim, so a reader "
-                        "knows who is spending what on this cell")
-    g.add_argument("--note", default="",
-                   help="one line of context for a claim, e.g. what rung the "
-                        "run is at")
-    g.add_argument("--ttl", type=int, default=coordination.DEFAULT_CLAIM_MINUTES,
-                   metavar="MINUTES",
-                   help=f"how long a claim lives (default "
-                        f"{coordination.DEFAULT_CLAIM_MINUTES}). Raise it for "
-                        f"a long ladder; a claim outliving its run is a squat")
-    g.add_argument("--prune", action="store_true",
-                   help="delete expired claims and report how many went")
-    g.add_argument("--staleness", action=argparse.BooleanOptionalAction, default=True,
-                   help="per cell, when its frontier and its best kd2/n last changed: "
-                        "the date, days since, board landings since, and the entry "
-                        "that moved it, from the first-parent history of codes/ "
-                        "(a few seconds; skipped in a shallow clone; issue #4238). "
-                        "--no-staleness leaves it out")
-    g.add_argument("--stale", action="store_true",
-                   help="sort cells stalest first, by the record date and then the "
-                        "frontier date")
-    g.add_argument("--json", action="store_true",
-                   help="print one JSON record on stdout instead of the "
-                        "listing; carries the live claims as data, and the "
-                        "staleness per cell when asked for")
+    g = sub.add_parser(
+        "targets", help="which track cells are open: occupancy and frontier per cell (read before you build)"
+    )
+    g.add_argument("--cell", default=None, help="focus one cell, e.g. 'weight-6/unrestricted'")
+    g.add_argument("--n", type=int, default=None, help="what a code at this blocklength would need")
+    g.add_argument("--top", type=int, default=6, help="frontier entries to list per cell (default 6)")
+    g.add_argument(
+        "--claim",
+        default="",
+        metavar="CELL",
+        help="note that this run is aiming at CELL, e.g. "
+        "'weight-6/unrestricted'. CELL is checked against the "
+        "board's axis names and written weight-first; a name "
+        "that is not a cell is refused with the valid ones. "
+        "Advisory and expiring: it is a note to other "
+        "sessions, not a reservation, and nothing enforces "
+        "it. Two runs may hold one cell at once; the second "
+        "write says whose it displaced",
+    )
+    g.add_argument(
+        "--release",
+        default="",
+        metavar="CELL",
+        help="drop this run's claim on CELL (expiry is the backstop; the same cell name is checked)",
+    )
+    g.add_argument(
+        "--campaign",
+        default="",
+        help="campaign id to record alongside a claim, so a reader knows who is spending what on this cell",
+    )
+    g.add_argument("--note", default="", help="one line of context for a claim, e.g. what rung the run is at")
+    g.add_argument(
+        "--ttl",
+        type=int,
+        default=coordination.DEFAULT_CLAIM_MINUTES,
+        metavar="MINUTES",
+        help=f"how long a claim lives (default "
+        f"{coordination.DEFAULT_CLAIM_MINUTES}). Raise it for "
+        f"a long ladder; a claim outliving its run is a squat",
+    )
+    g.add_argument("--prune", action="store_true", help="delete expired claims and report how many went")
+    g.add_argument(
+        "--staleness",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="per cell, when its frontier and its best kd2/n last changed: "
+        "the date, days since, board landings since, and the entry "
+        "that moved it, from the first-parent history of codes/ "
+        "(a few seconds; skipped in a shallow clone; issue #4238). "
+        "--no-staleness leaves it out",
+    )
+    g.add_argument(
+        "--stale", action="store_true", help="sort cells stalest first, by the record date and then the frontier date"
+    )
+    g.add_argument(
+        "--json",
+        action="store_true",
+        help="print one JSON record on stdout instead of the "
+        "listing; carries the live claims as data, and the "
+        "staleness per cell when asked for",
+    )
     g.set_defaults(func=cmd_targets)
 
-    b = sub.add_parser("brief", help="one snapshot before a search: a cell's frontier "
-                       "and best efficiency, what was screened there, what landed, the fieldnotes")
+    b = sub.add_parser(
+        "brief",
+        help="one snapshot before a search: a cell's frontier "
+        "and best efficiency, what was screened there, what landed, the fieldnotes",
+    )
     b.add_argument("--cell", required=True, help="e.g. 'weight-6/unrestricted'")
     b.add_argument("--family", default="", help="family tag to filter screening, recent codes, and notes")
     b.add_argument("--days", type=int, default=30, help="window for recent codes (default 30)")
@@ -3669,6 +4024,7 @@ def _run_json(args):
     2, so a caller never has to parse prose to learn what happened.
     """
     import contextlib
+
     res = _result(args)
     stdout = sys.stdout
     rc = 1

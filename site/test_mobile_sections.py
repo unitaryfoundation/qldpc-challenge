@@ -18,8 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_site_build():
-    spec = importlib.util.spec_from_file_location(
-        "site_build_mobile_sections", os.path.join(ROOT, "site", "build.py"))
+    spec = importlib.util.spec_from_file_location("site_build_mobile_sections", os.path.join(ROOT, "site", "build.py"))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -47,26 +46,41 @@ def _build_board(tmp_path, docs):
 
 def _ler_entry(i, rate):
     """The fields ler_frontier_panel reads, for one frontier row."""
-    return {"slug": f"c{i}", "n": 10 + i, "k": 1, "d": 3, "w": 4,
-            "ler": rate, "ler_key": (0.005, "bposd-cs-10"),
-            "ler_points": {"X": [{"ler_per_round": rate}],
-                           "Z": [{"ler_per_round": rate}]},
-            "ler_by_p": {0.005: rate}, "d_circ": None,
-            "authors_list": ["@someone"]}
+    return {
+        "slug": f"c{i}",
+        "n": 10 + i,
+        "k": 1,
+        "d": 3,
+        "w": 4,
+        "ler": rate,
+        "ler_key": (0.005, "bposd-cs-10"),
+        "ler_points": {"X": [{"ler_per_round": rate}], "Z": [{"ler_per_round": rate}]},
+        "ler_by_p": {0.005: rate},
+        "d_circ": None,
+        "authors_list": ["@someone"],
+    }
 
 
 def _with_ler(doc):
     """A CSS fixture with a measured tier: one gate point per side."""
     doc = copy.deepcopy(doc)
-    doc["schema_version"] = "0.5"   # the measured tier's curves need 0.5
-    point = {"p": 0.005, "shots": 10000, "failures": 100, "seed": 1,
-             "decoder": "bposd-cs-10", "ler_per_round": 0.01,
-             "ci95": [0.009, 0.011]}
-    side = {"value": 6, "confidence": "upper_bound",
-            "witness": [0, 1, 2, 3, 4, 5]}
-    doc["circuit"] = {"d_circ": {"X": side, "Z": dict(side)},
-                      "rounds": 6, "stim_version": "1.16.0",
-                      "ler": {"X": [point], "Z": [dict(point)]}}
+    doc["schema_version"] = "0.5"  # the measured tier's curves need 0.5
+    point = {
+        "p": 0.005,
+        "shots": 10000,
+        "failures": 100,
+        "seed": 1,
+        "decoder": "bposd-cs-10",
+        "ler_per_round": 0.01,
+        "ci95": [0.009, 0.011],
+    }
+    side = {"value": 6, "confidence": "upper_bound", "witness": [0, 1, 2, 3, 4, 5]}
+    doc["circuit"] = {
+        "d_circ": {"X": side, "Z": dict(side)},
+        "rounds": 6,
+        "stim_version": "1.16.0",
+        "ler": {"X": [point], "Z": [dict(point)]},
+    }
     return doc
 
 
@@ -81,8 +95,7 @@ def test_ler_frontier_gets_a_phone_cap_only_past_the_cap_rows():
     # the button only opens the section; the rows past the cap are hidden by
     # the stylesheet, on phones alone, until it does
     assert 'classList.add("open")' in html
-    assert (f".lerfront:not(.open) .latestlist li:nth-child(n+{cap + 1})"
-            "{display:none}") in build.CSS
+    assert (f".lerfront:not(.open) .latestlist li:nth-child(n+{cap + 1}){{display:none}}") in build.CSS
     assert ".lerfront.open .showall{display:none}" in build.CSS
 
     short = long[:cap]
@@ -92,23 +105,21 @@ def test_ler_frontier_gets_a_phone_cap_only_past_the_cap_rows():
 
 
 def test_stabilizer_card_precedes_the_ler_frontier(tmp_path):
-    _, index = _build_board(tmp_path, {
-        "72-6-6": _with_ler(_fixture("72-6-6.json")),
-        "5-1-3": _fixture("5-1-3.json")})
+    _, index = _build_board(tmp_path, {"72-6-6": _with_ler(_fixture("72-6-6.json")), "5-1-3": _fixture("5-1-3.json")})
     card = index.index("<div class=xboard>")
-    frontier = index.index("<section class=\"latest lerfront\" id=lerfront>")
+    frontier = index.index('<section class="latest lerfront" id=lerfront>')
     board = index.index("<section id=board>")
     assert card < frontier < board
     # the three steps still follow the board, and the newest codes close it
-    assert board < index.index("<div class=how>") < index.index(
-        "<section class=latest><h2 class=track>Recently added")
+    assert board < index.index("<div class=how>") < index.index("<section class=latest><h2 class=track>Recently added")
 
 
 def test_card_cap_keys_off_the_loaded_filters():
     """The weight slider loads at BOARD_DEFAULT_W, so "every row shown" is
     false at load and the #336 cap never applied; the loaded filter state is
     the baseline now, read from the inputs' defaultValue so a browser that
-    restores form state on reload does not move it."""
+    restores form state on reload does not move it.
+    """
     build = load_site_build()
     assert "function atdefault()" in build.JS
     assert "el.value===el.defaultValue" in build.JS

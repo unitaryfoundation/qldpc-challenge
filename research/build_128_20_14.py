@@ -15,6 +15,7 @@ pin the group: SmallGroup(64, i) prints as ((C4 x C2) : C4) : C2 for i in
 Run:  uv run python research/build_128_20_14.py
 Writes: research/candidates/128-20-14-rebuilt.json (gitignored staging).
 """
+
 import os
 import sys
 
@@ -42,21 +43,23 @@ def main():
     print(f"HX {HX.shape} HZ {HZ.shape}  k = {k}")
 
     doc = make_submission(
-        HX, HZ,
+        HX,
+        HZ,
         name="[[128,20,14]] 2BGA on ((C4xC2):C4):C2 (order 64)",
-        construction=("2BGA (arXiv:2306.16400) on GAP SmallGroup(64, 61), "
-                      "((C4 x C2) : C4) : C2, "
-                      "weight-8 supports a=[7,9,11,30,32,34,47,59] "
-                      "b=[3,6,23,27,41,46,47,56]."),
+        construction=(
+            "2BGA (arXiv:2306.16400) on GAP SmallGroup(64, 61), "
+            "((C4 x C2) : C4) : C2, "
+            "weight-8 supports a=[7,9,11,30,32,34,47,59] "
+            "b=[3,6,23,27,41,46,47,56]."
+        ),
         authors=["@mathysrennela"],
         family="generalized-bicycle",
         references=["arXiv:2306.16400"],
         confidence="upper_bound",
-        trials=8000, seed=7,
+        trials=8000,
+        seed=7,
     )
-    print("d =", doc["distance"]["d"],
-          "| X:", doc["distance"]["X"]["value"],
-          "| Z:", doc["distance"]["Z"]["value"])
+    print("d =", doc["distance"]["d"], "| X:", doc["distance"]["X"]["value"], "| Z:", doc["distance"]["Z"]["value"])
 
     out = os.path.join(_HERE, "candidates", "128-20-14-rebuilt.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)

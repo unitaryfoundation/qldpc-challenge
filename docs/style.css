@@ -362,6 +362,15 @@ background:var(--bg);box-shadow:0 2px 0 var(--ln)}
 font-variant-numeric:tabular-nums}
 .board td.auth{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 max-width:220px}
+/* the d cell holds a tier mark and a number; an interval mark ("24 &le; d &le;",
+   issue #4230) is wider than the fixed column, and a nowrap cell spills it
+   over kd2/n (issue #7117). Let the number drop under the mark instead. */
+.board td.col-d{white-space:normal;line-height:1.6;padding-left:.4rem;
+padding-right:.4rem}
+/* a four-digit n makes the code name wider than the code column's content
+   box and it ran under the type chips (same issue): tighter side padding
+   and a 13% column fit [[1000,200,29]] on one line */
+.board td.codecell{padding-left:.5rem;padding-right:.5rem}
 /* optional routing-cost column (issue #1847): off unless the table is
    filtered to an unrestricted cell with layouts or the swaps toggle is on */
 .board .col-route,.board col.colroute{display:none;width:0}
@@ -642,7 +651,7 @@ header.hero{padding:34px 0 30px}
 .stat-card{padding:14px 16px}.stat-card .v{font-size:27px}}
 .claimed{color:var(--mut);font-size:12px;font-style:italic}
 .b{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;
-border-radius:5px;font-family:ui-monospace,monospace}
+border-radius:5px;font-family:ui-monospace,monospace;white-space:nowrap}
 .b.exact{background:#d1fae5;color:var(--ex)}.b.ub{background:#eef2f7;
 color:var(--mut)}.b.ivl{background:#fef3c7;color:#92400e}
 footer.foot{margin-top:72px;border-top:1px solid var(--ln);

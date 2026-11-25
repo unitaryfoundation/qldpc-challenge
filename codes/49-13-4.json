@@ -1,5 +1,5 @@
 {
- "schema_version": "0.2",
+ "schema_version": "0.5",
  "name": "local-sat 7x7 G=18 w8 t3 model 0",
  "code_type": "CSS",
  "n": 49,
@@ -555,37 +555,90 @@
  },
  "circuit": {
   "d_circ": {
-   "X": {
-    "value": 4,
-    "confidence": "upper_bound",
-    "witness": [
-     7926,
-     7929,
-     10410,
-     10463
-    ]
-   },
    "Z": {
     "value": 4,
     "confidence": "upper_bound",
     "witness": [
-     10820,
-     10828,
-     10890,
-     10909
+     2593,
+     2595,
+     3299,
+     3570
+    ]
+   },
+   "X": {
+    "value": 4,
+    "confidence": "upper_bound",
+    "witness": [
+     1089,
+     1114,
+     1140,
+     1162
     ]
    }
   },
   "rounds": 4,
   "stim_version": "1.16.0",
-  "notes": "Johnson-coil + 4 span flags sequential extraction (max_flags=4 per check, 8 X + 8 Z edge-colored data CX layers per round); verified against stim 1.16.0; RIS DEM search found nothing lighter than the claimed d_circ (generator: seed 0xC18C, 12 s per basis; independent re-check: seeds 0x5EED01 and 0x5EED02 at 1.5x the gate's trial budget, 180 s cap per basis)",
+  "notes": "SAT-scheduled interleaved X+Z extraction with 2-flag-coil co-scheduled into idle ancilla slots (12 CX layers, 14 TICKs/round, 157 qubits total; replaces 64.2-TICK/round schedule); witnesses from RIS on ker(H_dem) at twice the gate trial budget.",
   "contributed_by": {
    "by": [
-    "@vprusso",
     "@FarLab"
    ],
-   "date": "2026-10-31",
-   "method": "Johnson-coil + 4 span flags sequential extraction (max_flags=4 per check, 8 X + 8 Z edge-colored data CX layers per round)"
+   "date": "2026-11-23",
+   "method": "SAT interleaved X+Z + co-scheduled minimal-flag schedule search, verified by verify/circuit_verify.py"
+  },
+  "ler": {
+   "X": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3471,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.128182887,
+     "ci95": [
+      0.122671018,
+      0.134026234
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 990,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.026833928,
+     "ci95": [
+      0.025161196,
+      0.028616446
+     ]
+    }
+   ],
+   "Z": [
+    {
+     "p": 0.002,
+     "shots": 10000,
+     "failures": 3175,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.111363827,
+     "ci95": [
+      0.106631792,
+      0.116352859
+     ]
+    },
+    {
+     "p": 0.001,
+     "shots": 10000,
+     "failures": 871,
+     "seed": 20261006,
+     "decoder": "bposd-cs-10",
+     "ler_per_round": 0.023361934,
+     "ci95": [
+      0.02181987,
+      0.025011555
+     ]
+    }
+   ]
   }
  }
 }

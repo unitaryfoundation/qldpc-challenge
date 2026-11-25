@@ -13,16 +13,17 @@ cert on any entry) is the weekly refute_board.py cron's job -- it re-checks ever
 entry with a fresh random seed each run. `--all` sweeps the full board the old way
 (tolerant of inconclusive verdicts on large codes) for manual audits.
 """
+
 import argparse
 import copy
 import glob
 import json
 import os
 import sys
-import numpy as np
 
 import gf2
 import heuristic_distance as H
+import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -46,8 +47,7 @@ def check_code(slug, trials, require_corroboration):
     exact_d = int(doc["distance"]["d"])  # the cert certifies this as exact
     res = H.estimate(doc, trials=trials, seed=0)
     dh, verdict = res["d_heuristic"], res["verdict"]
-    line = (f"  {slug:16s} exact_d={exact_d:2d} d_heur={dh} "
-            f"verdict={verdict} method={res['method']}")
+    line = f"  {slug:16s} exact_d={exact_d:2d} d_heur={dh} verdict={verdict} method={res['method']}"
     if dh is not None and dh < exact_d:
         return 1, line + "  <<< FOUND LIGHTER THAN EXACT (bug/bad cert)"
     if require_corroboration and verdict != "corroborated":
@@ -57,17 +57,20 @@ def check_code(slug, trials, require_corroboration):
 
 def main(argv):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--all", action="store_true",
-                    help="sweep every exact cert on the board (manual audit; "
-                         "inconclusive tolerated) instead of the pinned panel")
+    ap.add_argument(
+        "--all",
+        action="store_true",
+        help="sweep every exact cert on the board (manual audit; inconclusive tolerated) instead of the pinned panel",
+    )
     ap.add_argument("--trials", type=int, default=2500)
     args = ap.parse_args(argv)
 
     if args.all:
-        slugs = [os.path.basename(cf)[:-len(".json")]
-                 for cf in sorted(glob.glob(os.path.join(ROOT, "certs", "*.json")))
-                 if json.load(open(cf)).get("d_exact")
-                 and os.path.exists(os.path.join(ROOT, "codes", os.path.basename(cf)))]
+        slugs = [
+            os.path.basename(cf)[: -len(".json")]
+            for cf in sorted(glob.glob(os.path.join(ROOT, "certs", "*.json")))
+            if json.load(open(cf)).get("d_exact") and os.path.exists(os.path.join(ROOT, "codes", os.path.basename(cf)))
+        ]
         mode = f"full board ({len(slugs)} exact certs)"
     else:
         slugs = PANEL
@@ -76,8 +79,7 @@ def main(argv):
     failures = 0
     print(f"=== corroboration over {mode}, trials={args.trials} ===")
     for slug in slugs:
-        bad, line = check_code(slug, args.trials,
-                               require_corroboration=not args.all)
+        bad, line = check_code(slug, args.trials, require_corroboration=not args.all)
         failures += bad
         print(line)
 
@@ -87,8 +89,7 @@ def main(argv):
     over = copy.deepcopy(doc)
     over["distance"]["d"] = true_d + 3
     res = H.estimate(over, trials=4000, seed=0)
-    print(f"  16-2-4 claimed {true_d + 3} (true {true_d}) -> "
-          f"verdict={res['verdict']} d_heur={res['d_heuristic']}")
+    print(f"  16-2-4 claimed {true_d + 3} (true {true_d}) -> verdict={res['verdict']} d_heur={res['d_heuristic']}")
     ok = res["verdict"] == "refuted"
     print("  refutation", "OK" if ok else "FAILED")
     failures += 0 if ok else 1
@@ -96,6 +97,7 @@ def main(argv):
     print("\n=== fast-path gating (issue #290) ===")
     import contextlib
     import io
+
     doc = json.load(open(os.path.join(ROOT, "codes", "16-2-4.json")))
     # explicit fast_trials=0 is the deterministic-gate opt-out: no accelerator,
     # and no warning (refute_check relies on this staying silent in CI logs)
@@ -105,8 +107,10 @@ def main(argv):
     # the orbit-fold pass may annotate the method ("ris+orbit-fold(k)"); the
     # point here is that the accelerator did not run and nothing warned
     ok = "gf2_fast" not in res["method"] and err.getvalue() == ""
-    print(f"  fast_trials=0: method={res['method']} warned={bool(err.getvalue())}",
-          "OK" if ok else "  <<< explicit disable must stay silent")
+    print(
+        f"  fast_trials=0: method={res['method']} warned={bool(err.getvalue())}",
+        "OK" if ok else "  <<< explicit disable must stay silent",
+    )
     failures += 0 if ok else 1
     if H._fast is not None:
         # accelerator importable but out-budgeted: must warn on stderr
@@ -114,19 +118,16 @@ def main(argv):
         with contextlib.redirect_stderr(err):
             res = H.estimate(doc, trials=200, seed=0, fast_trials=100)
         ok = "gf2_fast is available but skipped" in err.getvalue()
-        print(f"  fast_trials<trials: warned={ok}",
-              "OK" if ok else "  <<< silent skip is issue #290")
+        print(f"  fast_trials<trials: warned={ok}", "OK" if ok else "  <<< silent skip is issue #290")
         failures += 0 if ok else 1
         # CLI default must scale the fast budget with --trials instead of
         # letting a deep --trials run silently drop to pure Python
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            H.main(os.path.join(ROOT, "codes", "16-2-4.json"),
-                   trials=200, seed=0)
+            H.main(os.path.join(ROOT, "codes", "16-2-4.json"), trials=200, seed=0)
         method = json.loads(out.getvalue())["method"]
         ok = method.endswith("+gf2_fast")
-        print(f"  CLI default: method={method}",
-              "OK" if ok else "  <<< CLI no longer engages the accelerator")
+        print(f"  CLI default: method={method}", "OK" if ok else "  <<< CLI no longer engages the accelerator")
         failures += 0 if ok else 1
     else:
         print("  gf2_fast not importable here; accelerator cases skipped")
@@ -136,9 +137,11 @@ def main(argv):
 
 
 def test_main():
-    """pytest entry point. main() takes argv and reports by calling sys.exit,
-    including on success, so the exit status is what gets asserted."""
+    """Pytest entry point. main() takes argv and reports by calling sys.exit,
+    including on success, so the exit status is what gets asserted.
+    """
     import pytest
+
     with pytest.raises(SystemExit) as exc:
         main([])
     assert not exc.value.code, f"panel run exited {exc.value.code}"
@@ -159,11 +162,10 @@ def test_accelerator_witness_is_recorded_and_valid():
         print("  gf2_fast unavailable; skipping")
         return
     res = H.estimate(doc, trials=200, seed=0, fast_trials=200_000)
-    assert res["method"].endswith("+gf2_fast")      # the fold pass may prefix it
+    assert res["method"].endswith("+gf2_fast")  # the fold pass may prefix it
     d = res["d_heuristic"]
     assert d is not None
-    backed = [s for s, blk in res["sides"].items()
-              if blk.get("witness") and blk.get("lightest_found") == d]
+    backed = [s for s, blk in res["sides"].items() if blk.get("witness") and blk.get("lightest_found") == d]
     assert backed, f"no witness recorded at the reported weight {d}: {res['sides']}"
     n = doc["n"]
     HX = H._matrix(doc["checks"]["X"], n)
@@ -202,14 +204,17 @@ def test_valid_logical_rejects_stabilizer_and_nonkernel():
 # and stay true whatever the board files say.
 # ---------------------------------------------------------------------------
 
+
 def _gb_from_symbols(L, a, b):
     """H_X = [circ(a) | circ(b)], H_Z = [circ(b)^T | circ(a)^T] over x^L - 1."""
+
     def circ(sym):
         M = np.zeros((L, L), dtype=np.int8)
         for i in range(L):
             for e in sym:
                 M[i, (e + i) % L] = 1
         return M
+
     A, B = circ(a), circ(b)
     return np.hstack([A, B]).astype(np.int8), np.hstack([B.T, A.T]).astype(np.int8)
 
@@ -230,19 +235,27 @@ def _doc175(claim):
     n = HX.shape[1]
     # genuine witnesses of the claimed weight are not needed by the search
     # functions under test; estimate() only reads n, checks and distance.d
-    return {"schema_version": "0.2", "name": f"[[{n},20,{claim}]] fixture",
-            "code_type": "CSS", "n": n, "k": 20,
-            "checks": {"X": _supports(HX), "Z": _supports(HZ)},
-            "distance": {"d": claim,
-                         "X": {"value": claim, "confidence": "upper_bound", "witness": []},
-                         "Z": {"value": claim, "confidence": "upper_bound", "witness": []}}}
+    return {
+        "schema_version": "0.2",
+        "name": f"[[{n},20,{claim}]] fixture",
+        "code_type": "CSS",
+        "n": n,
+        "k": 20,
+        "checks": {"X": _supports(HX), "Z": _supports(HZ)},
+        "distance": {
+            "d": claim,
+            "X": {"value": claim, "confidence": "upper_bound", "witness": []},
+            "Z": {"value": claim, "confidence": "upper_bound", "witness": []},
+        },
+    }
 
 
 def test_structural_automorphisms_from_matrices():
     """Symmetries are read from H, never from a family tag: a circulant GB
     code yields its block shift (order L) in both the contiguous and the
     interleaved qubit layouts, a 2-D (l x m) layout yields both shifts, and a
-    code with none of these yields nothing (so the fold pass is skipped)."""
+    code with none of these yields nothing (so the fold pass is skipped).
+    """
     HX, HZ = _gb_from_symbols(21, (0, 3, 6, 12), (0, 7))
     n = HX.shape[1]
     gens = H.structural_automorphisms([HX, HZ], n)
@@ -268,10 +281,11 @@ def test_structural_automorphisms_from_matrices():
 def test_structural_automorphisms_survive_dropped_rows():
     """Several board GB entries list only an independent subset of the shifts
     of their templates, so the permuted ROW SET is not the row set; the row
-    SPACE still is, and the shift must still be found (the span fallback)."""
+    SPACE still is, and the shift must still be found (the span fallback).
+    """
     HX, HZ = _gb_from_symbols(21, (0, 3, 6, 12), (0, 7))
     n = HX.shape[1]
-    HXr, _ = gf2.rref(HX)                 # a basis of the row space, not shifts
+    HXr, _ = gf2.rref(HX)  # a basis of the row space, not shifts
     assert HXr.shape[0] < HX.shape[0]
     inv = H._RowInvariance([HXr, HZ], n)
     shift = np.array([(j // 21) * 21 + (j % 21 + 1) % 21 for j in range(n)])
@@ -283,7 +297,8 @@ def test_structural_automorphisms_survive_dropped_rows():
 def test_orbit_fold_finds_symmetric_logical():
     """The failure mode of the audit: a lightest logical constant on the orbits
     of an order-5 shift, weight 40 on a code filed at 44. The fold finds it
-    within a few trials; every witness is re-validated on the full matrices."""
+    within a few trials; every witness is re-validated on the full matrices.
+    """
     HX, HZ = _gb_from_symbols(_L175, _A175, _B175)
     n = HX.shape[1]
     res = H.orbit_fold_min_logical(HX, HZ, trials=100, seed=0, max_seconds=30)
@@ -297,19 +312,18 @@ def test_orbit_fold_finds_symmetric_logical():
         shift = np.array([(j // _L175) * _L175 + (j % _L175 + 35) % _L175 for j in range(n)])
         assert (v[shift] == v).all()
 
-    ref, found, wit, searched = H.orbit_fold_refute(_doc175(44), seed=0, trials=100,
-                                                    max_seconds=30)
+    ref, found, wit, searched = H.orbit_fold_refute(_doc175(44), seed=0, trials=100, max_seconds=30)
     assert ref and found <= 40 and searched > 0
     assert isinstance(wit, list) and len(wit) == found
     # an honest claim at or below what the fold reaches is left alone
-    ref, found, wit, searched = H.orbit_fold_refute(_doc175(40), seed=0, trials=100,
-                                                    max_seconds=30)
+    ref, found, wit, searched = H.orbit_fold_refute(_doc175(40), seed=0, trials=100, max_seconds=30)
     assert not ref and wit is None and searched > 0
 
 
 def test_estimate_merges_fold_and_can_disable_it():
     """estimate() runs the fold first and takes the lighter of fold and RIS
-    per side; fold_trials=0 restores the pure RIS verdict and method string."""
+    per side; fold_trials=0 restores the pure RIS verdict and method string.
+    """
     doc = _doc175(44)
     res = H.estimate(doc, trials=20, seed=0, fast_trials=0, max_seconds=20)
     assert res["verdict"] == "refuted" and res["d_heuristic"] <= 40
@@ -330,7 +344,8 @@ def test_orbit_fold_stabilizer_path():
     """Non-CSS: Pauli folds on the labelled Tanner structure plus random
     single-qubit frames; the witness is a validated Pauli operator. The cyclic
     five-qubit and [[17,1,7]] fixtures expose the shift and reach their exact
-    distances; an inflated claim on them is refuted."""
+    distances; an inflated claim on them is refuted.
+    """
     for slug in ("5-1-3", "17-1-7"):
         doc = json.load(open(os.path.join(ROOT, "verify", "fixtures", slug + ".json")))
         A, B = H.stabilizer_matrices(doc)

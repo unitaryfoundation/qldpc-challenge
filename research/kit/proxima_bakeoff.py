@@ -21,6 +21,7 @@ circuits/. The decision gate the plan sets (proximity wins on at least 7 of
     uv run --extra research python research/kit/proxima_bakeoff.py 72-12-6 60-8-6 \
         --pool 12 --seconds 60 --ler-p 0.005 0.002 --ler-shots 20000 40000
 """
+
 from __future__ import annotations
 
 import argparse
@@ -84,8 +85,9 @@ def profile_candidate(HX, HZ, rounds, layers, size, seeds, seed_seconds, wits, h
             ro = ca.readout_witness(dem, HX, HZ, rounds, basis, support, getattr(layers, "flags", None))
             if ro is not None:
                 extra.append(ro)
-        out[basis] = px.dem_profile(dem, trials, size=size, seeds=seeds, max_seconds=seed_seconds,
-                                    extra_witnesses=extra, hook_limit=hook_limit)
+        out[basis] = px.dem_profile(
+            dem, trials, size=size, seeds=seeds, max_seconds=seed_seconds, extra_witnesses=extra, hook_limit=hook_limit
+        )
         out[basis]["mechanisms"] = dem.num_errors
         out[basis]["readout_seeded"] = bool(extra)
     return out
@@ -103,16 +105,39 @@ def ler_total(ler, p):
     return sum(vals) if len(vals) == 2 else None
 
 
-def run_entry(slug, *, pool, seed, seconds, seed_seconds, size, seeds, rates, shots, out_dir, rank_only=False,
-              hook_limit=px.DEFAULT_HOOK_LIMIT, log=print):
+def run_entry(
+    slug,
+    *,
+    pool,
+    seed,
+    seconds,
+    seed_seconds,
+    size,
+    seeds,
+    rates,
+    shots,
+    out_dir,
+    rank_only=False,
+    hook_limit=px.DEFAULT_HOOK_LIMIT,
+    log=print,
+):
     doc, circuits_dir = cs.load_entry(slug)
     HX, HZ = cs.matrices(doc)
     n, d = doc["n"], doc["distance"]["d"]
     base = cs.baseline(doc, circuits_dir)
     rounds = max(int(base["rounds"]), d)
     wits = {s: doc["distance"][s]["witness"] for s in ("X", "Z") if s in doc["distance"]}
-    rec = {"slug": slug, "n": n, "k": doc["k"], "d": d, "rounds": rounds, "committed": base,
-           "pool": [], "picks": {}, "arms": {}}
+    rec = {
+        "slug": slug,
+        "n": n,
+        "k": doc["k"],
+        "d": d,
+        "rounds": rounds,
+        "committed": base,
+        "pool": [],
+        "picks": {},
+        "arms": {},
+    }
     label, cands = pool_of(HX, HZ, rounds, seed, pool)
     if not cands:
         rec["skipped"] = "not a two-block code the generator can decompose"
@@ -126,9 +151,14 @@ def run_entry(slug, *, pool, seed, seconds, seed_seconds, size, seeds, rates, sh
         t0 = time.perf_counter()
         screen = cs.screen_candidate(HX, HZ, layers, seed)
         prof = profile_candidate(HX, HZ, rounds, layers, size, seeds, seed_seconds, wits, hook_limit)
-        row = {"index": i, "schedule": notes, "screen": screen,
-               "profiles": prof, "key": list(px.schedule_key(prof)) if prof else None,
-               "seconds": round(time.perf_counter() - t0, 1)}
+        row = {
+            "index": i,
+            "schedule": notes,
+            "screen": screen,
+            "profiles": prof,
+            "key": list(px.schedule_key(prof)) if prof else None,
+            "seconds": round(time.perf_counter() - t0, 1),
+        }
         rec["pool"].append(row)
         if screen is not None:
             found = [v for v in screen.values() if v is not None]
@@ -157,8 +187,10 @@ def run_entry(slug, *, pool, seed, seconds, seed_seconds, size, seeds, rates, sh
     for b in ("X", "Z"):
         with open(os.path.join(circuits_dir, SIDE_FILES[b] + ".stim"), encoding="utf-8") as f:
             committed_files[SIDE_FILES[b] + ".stim"] = f.read()
-    rec["arms"]["committed"] = {"d_circ": base["d_circ"],
-                                "ler": ler_of(committed_files, n, base["rounds"], rates, shots, seed)}
+    rec["arms"]["committed"] = {
+        "d_circ": base["d_circ"],
+        "ler": ler_of(committed_files, n, base["rounds"], rates, shots, seed),
+    }
     log(f"  committed: d_circ {base['d_circ']}, LER {rec['arms']['committed']['ler']}")
     done = {}
     for arm, idx in (("ris", ris_pick), ("proximity", prox_pick)):
@@ -176,15 +208,22 @@ def run_entry(slug, *, pool, seed, seconds, seed_seconds, size, seeds, rates, sh
             log(f"  {arm} (cand {idx}): {e}")
             continue
         block["notes"] = notes + f"; {arm} pick of research/kit/proxima_bakeoff.py (seed {seed})"
-        adir, verdict = cs.stage_attempt(run_dir, idx, doc, block, files,
-                                         f"# {slug} candidate {idx}: {arm} pick\n\n{notes}\n")
-        res = {"index": idx, "d_circ": {b: block["d_circ"][b]["value"] for b in ("X", "Z")},
-               "verdict_ok": bool(verdict["ok"]), "staged": os.path.relpath(adir, _ROOT),
-               "ler": ler_of(files, n, rounds, rates, shots, seed)}
+        adir, verdict = cs.stage_attempt(
+            run_dir, idx, doc, block, files, f"# {slug} candidate {idx}: {arm} pick\n\n{notes}\n"
+        )
+        res = {
+            "index": idx,
+            "d_circ": {b: block["d_circ"][b]["value"] for b in ("X", "Z")},
+            "verdict_ok": bool(verdict["ok"]),
+            "staged": os.path.relpath(adir, _ROOT),
+            "ler": ler_of(files, n, rounds, rates, shots, seed),
+        }
         rec["arms"][arm] = res
         done[idx] = res
-        log(f"  {arm} (cand {idx}): d_circ {res['d_circ']}, gate {'ok' if res['verdict_ok'] else 'FAILED'}, "
-            f"LER {res['ler']}")
+        log(
+            f"  {arm} (cand {idx}): d_circ {res['d_circ']}, gate {'ok' if res['verdict_ok'] else 'FAILED'}, "
+            f"LER {res['ler']}"
+        )
     low = min(rates)
     tot = {arm: ler_total(a.get("ler") or {}, low) for arm, a in rec["arms"].items() if "ler" in a}
     rec["ler_total_at_lowest_rate"] = tot
@@ -206,12 +245,20 @@ def main(argv=None):
     ap.add_argument("--pool", type=int, default=12, help="schedules drawn from the two-block family")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--seconds", type=float, default=60.0, help="deep RIS wall cap per basis")
-    ap.add_argument("--seed-seconds", type=float, default=10.0,
-                    help="RIS wall cap per basis for the witness sets that seed a profile")
+    ap.add_argument(
+        "--seed-seconds",
+        type=float,
+        default=10.0,
+        help="RIS wall cap per basis for the witness sets that seed a profile",
+    )
     ap.add_argument("--size", type=int, default=px.DEFAULT_HOOD, help="neighborhood size around the witness")
-    ap.add_argument("--seeds", type=int, default=0,
-                    help="RIS witness sets added to the readout seeds (0: readout seeds only, which is "
-                         "cheap on large models and the same seeds for every candidate)")
+    ap.add_argument(
+        "--seeds",
+        type=int,
+        default=0,
+        help="RIS witness sets added to the readout seeds (0: readout seeds only, which is "
+        "cheap on large models and the same seeds for every candidate)",
+    )
     ap.add_argument("--ler-p", type=float, nargs="+", default=[0.005, 0.002])
     ap.add_argument("--ler-shots", type=int, nargs="+", default=[20000, 40000])
     ap.add_argument("--hook-limit", type=int, default=16, help="hook-like seeds per basis")
@@ -220,18 +267,39 @@ def main(argv=None):
     a = ap.parse_args(argv)
     if len(a.ler_shots) != len(a.ler_p):
         ap.error("--ler-shots needs one value per --ler-p")
-    out = a.out or os.path.join(_ROOT, "research", "candidates",
-                                f"proxima-bakeoff-{datetime.datetime.now(datetime.timezone.utc):%Y%m%d}")
+    out = a.out or os.path.join(
+        _ROOT, "research", "candidates", f"proxima-bakeoff-{datetime.datetime.now(datetime.timezone.utc):%Y%m%d}"
+    )
     os.makedirs(out, exist_ok=True)
-    summary = {"date": datetime.datetime.now(datetime.timezone.utc).isoformat(), "head": cs._head(),
-               "pool": a.pool, "seconds": a.seconds, "seed_seconds": a.seed_seconds, "size": a.size, "seeds": a.seeds,
-               "hook_limit": a.hook_limit,
-               "rates": a.ler_p, "shots": a.ler_shots, "entries": []}
+    summary = {
+        "date": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "head": cs._head(),
+        "pool": a.pool,
+        "seconds": a.seconds,
+        "seed_seconds": a.seed_seconds,
+        "size": a.size,
+        "seeds": a.seeds,
+        "hook_limit": a.hook_limit,
+        "rates": a.ler_p,
+        "shots": a.ler_shots,
+        "entries": [],
+    }
     for slug in a.slugs:
         try:
-            rec = run_entry(slug, pool=a.pool, seed=a.seed, seconds=a.seconds, seed_seconds=a.seed_seconds,
-                            size=a.size, seeds=a.seeds, rank_only=a.rank_only, hook_limit=a.hook_limit,
-                            rates=a.ler_p, shots=a.ler_shots, out_dir=out)
+            rec = run_entry(
+                slug,
+                pool=a.pool,
+                seed=a.seed,
+                seconds=a.seconds,
+                seed_seconds=a.seed_seconds,
+                size=a.size,
+                seeds=a.seeds,
+                rank_only=a.rank_only,
+                hook_limit=a.hook_limit,
+                rates=a.ler_p,
+                shots=a.ler_shots,
+                out_dir=out,
+            )
         except Exception as e:  # noqa: BLE001
             rec = {"slug": slug, "error": repr(e)}
             print(f"{slug}: error {e!r}", flush=True)

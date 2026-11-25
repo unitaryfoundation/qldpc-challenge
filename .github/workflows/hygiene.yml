@@ -1,0 +1,28 @@
+name: hygiene
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - "codes/**"
+      - "circuits/**"
+      - "repro/**"
+      - "verify/check_orphans.py"
+      - "verify/check_size_budget.py"
+  push:
+    branches: [main]
+
+jobs:
+  orphans-and-size:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: orphan audit
+        run: python verify/check_orphans.py
+      - name: size budget audit
+        run: python verify/check_size_budget.py

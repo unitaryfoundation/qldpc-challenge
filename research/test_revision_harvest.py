@@ -9,6 +9,7 @@ handle, and the folded note has to keep the old note's body for
 verify/check_prose.py. Searches here are tiny; the ladder budget itself is
 pinned against reachability_campaign.screening_trials.
 """
+
 import base64
 import json
 import os
@@ -36,13 +37,22 @@ def shor_doc(d_x, wit_x, d_z, wit_z, *, name=None, notes="", schema="0.1"):
     return {
         "schema_version": schema,
         "name": name or f"[[9,1,{d}]] Shor",
-        "code_type": "CSS", "n": 9, "k": 1,
+        "code_type": "CSS",
+        "n": 9,
+        "k": 1,
         "checks": {"X": SHOR_X, "Z": SHOR_Z},
-        "distance": {"d": d,
-                     "X": {"value": d_x, "confidence": "upper_bound", "witness": wit_x},
-                     "Z": {"value": d_z, "confidence": "upper_bound", "witness": wit_z}},
-        "provenance": {"authors": ["@someone"], "construction": "Shor's nine-qubit code.",
-                       "references": [], "date": "2026-01-01", "notes": notes},
+        "distance": {
+            "d": d,
+            "X": {"value": d_x, "confidence": "upper_bound", "witness": wit_x},
+            "Z": {"value": d_z, "confidence": "upper_bound", "witness": wit_z},
+        },
+        "provenance": {
+            "authors": ["@someone"],
+            "construction": "Shor's nine-qubit code.",
+            "references": [],
+            "date": "2026-01-01",
+            "notes": notes,
+        },
         "family": "other",
     }
 
@@ -62,8 +72,19 @@ def _run(tmp_path, doc, **kw):
     codes.mkdir(exist_ok=True)
     path = _write(codes / ("9-1-%d.json" % doc["distance"]["d"]), doc)
     out = tmp_path / "out"
-    args = dict(out_dir=str(out), handle="harvester", date="2026-11-19", seeds=[1, 2], scale=1.0,
-                min_trials=200, max_trials=400, threads=1, pair_depth=10, codes_dir=str(codes), log=lambda *a: None)
+    args = dict(
+        out_dir=str(out),
+        handle="harvester",
+        date="2026-11-19",
+        seeds=[1, 2],
+        scale=1.0,
+        min_trials=200,
+        max_trials=400,
+        threads=1,
+        pair_depth=10,
+        codes_dir=str(codes),
+        log=lambda *a: None,
+    )
     args.update(kw)
     return path, RH.harvest_one(path, **args)
 
@@ -84,8 +105,9 @@ def test_an_over_claim_is_refuted_and_emitted(tmp_path):
     assert new["distance"]["d"] == 3
     for side in row["sides"]:
         assert new["distance"][side]["value"] == 3
-        assert new["distance"][side]["witness_provenance"]["tool"].endswith("gf2_fast pair depth 10") or \
-            new["distance"][side]["witness_provenance"]["tool"].endswith("numpy pair depth 10")
+        assert new["distance"][side]["witness_provenance"]["tool"].endswith("gf2_fast pair depth 10") or new[
+            "distance"
+        ][side]["witness_provenance"]["tool"].endswith("numpy pair depth 10")
     for side in ("X", "Z"):
         if side not in row["sides"]:
             assert new["distance"][side] == OVERCLAIM["distance"][side], "an unreported side is untouched"
@@ -142,15 +164,16 @@ def test_one_sided_tightening_keeps_the_other_witness(tmp_path):
     doc = shor_doc(3, [0, 1, 2], 5, [0, 1, 2, 3, 6])
     path, row = _run(tmp_path, doc, side_trials=300)
     assert row["verdict"] == "tightened" and set(row["sides"]) == {"Z"}
-    assert row["d_new"] == 3 and row["new_slug"] == "9-1-3-b", "d is unchanged, so the slug needs a suffix"
+    assert row["d_new"] == 3 and row["new_slug"] == "9-1-3", "d is unchanged, so the entry keeps its slug"
     assert row["title"] == "Distance revision: [[9,1,3]], Z side 5 -> 3"
     with open(row["revision"][:-5] + ".body.md", encoding="utf-8") as fh:
         body = fh.read()
     assert "d stays 3 (Z side 5 -> 3)" in body and "kd^2/n unchanged at 1.00" in body
     with open(row["revision"][:-5] + ".revision.json", encoding="utf-8") as fh:
         header = json.load(fh)["note_header"]
-    assert header.startswith("# [[9,1,3]]: distance revision, Z side 5 -> 3\n"
-                             "## Revision 2026-11-19: [[9,1,3]], Z side 5 -> 3")
+    assert header.startswith(
+        "# [[9,1,3]]: distance revision, Z side 5 -> 3\n## Revision 2026-11-19: [[9,1,3]], Z side 5 -> 3"
+    )
     with open(row["revision"], encoding="utf-8") as fh:
         new = json.load(fh)
     assert new["distance"]["X"] == doc["distance"]["X"], "the side that held is untouched"
@@ -178,6 +201,10 @@ def test_slug_choice_skips_an_occupied_slug_and_keeps_a_suffix(tmp_path):
     codes = tmp_path / "codes"
     codes.mkdir()
     assert RH.revision_slug(str(codes), "9-1-5", 9, 1, 3) == "9-1-3"
+    # a side-only tightening keeps the slug, suffix and all
+    _write(codes / "9-1-3.json", CORRECT)
+    assert RH.revision_slug(str(codes), "9-1-3", 9, 1, 3) == "9-1-3"
+    assert RH.revision_slug(str(codes), "9-1-3-b", 9, 1, 3) == "9-1-3-b"
     _write(codes / "9-1-3.json", CORRECT)
     assert RH.revision_slug(str(codes), "9-1-5", 9, 1, 3) == "9-1-3-b"
     assert RH.revision_slug(str(codes), "9-1-5-c", 9, 1, 3) == "9-1-3-c"
@@ -197,9 +224,11 @@ def test_apply_moves_the_entry_and_folds_the_note(tmp_path):
     (checkout / "codes").mkdir(parents=True)
     (checkout / "notes").mkdir()
     _write(checkout / "codes" / "9-1-5.json", OVERCLAIM)
-    old_note = ("---\nauthor: \"@someone\"\n---\n\n# [[9,1,5]]: Shor's code, seeded\n\n"
-                "The search behind `codes/9-1-5.json` stopped at 400 trials.\n\nSecond paragraph about the "
-                "construction.\nThird line that must survive the fold.\n")
+    old_note = (
+        '---\nauthor: "@someone"\n---\n\n# [[9,1,5]]: Shor\'s code, seeded\n\n'
+        "The search behind `codes/9-1-5.json` stopped at 400 trials.\n\nSecond paragraph about the "
+        "construction.\nThird line that must survive the fold.\n"
+    )
     (checkout / "notes" / "9-1-5.md").write_text(old_note)
     path, row = _run(tmp_path, OVERCLAIM, apply_to=str(checkout), codes_dir=str(checkout / "codes"))
     assert row["verdict"] == "refuted"
@@ -251,8 +280,23 @@ def test_state_skips_an_entry_already_probed_at_the_budget(tmp_path, monkeypatch
     path = _write(codes / "9-1-3.json", CORRECT)
     state = tmp_path / "state.json"
     out = tmp_path / "out"
-    argv = [path, "--handle", "h", "--out", str(out), "--seeds", "1", "--max-trials", "300",
-            "--state", str(state), "--threads", "1", "--codes-dir", str(codes)]
+    argv = [
+        path,
+        "--handle",
+        "h",
+        "--out",
+        str(out),
+        "--seeds",
+        "1",
+        "--max-trials",
+        "300",
+        "--state",
+        str(state),
+        "--threads",
+        "1",
+        "--codes-dir",
+        str(codes),
+    ]
     assert RH.main(argv) == 0
     saved = json.load(open(state))
     assert len(saved) == 1 and next(iter(saved.values()))["verdict"] == "holds"
@@ -275,13 +319,35 @@ def test_main_requires_a_handle(tmp_path):
 def test_skips_non_css_and_reports_unreadable(tmp_path):
     bad = tmp_path / "bad.json"
     bad.write_text("{not json")
-    row = RH.harvest_one(str(bad), out_dir=str(tmp_path / "o"), handle="h", date="2026-11-19", seeds=[1],
-                         scale=1.0, min_trials=1, max_trials=10, threads=1, pair_depth=10, codes_dir=str(tmp_path))
+    row = RH.harvest_one(
+        str(bad),
+        out_dir=str(tmp_path / "o"),
+        handle="h",
+        date="2026-11-19",
+        seeds=[1],
+        scale=1.0,
+        min_trials=1,
+        max_trials=10,
+        threads=1,
+        pair_depth=10,
+        codes_dir=str(tmp_path),
+    )
     assert row["verdict"] == "error" and "unreadable" in row["error"]
     stab = tmp_path / "s.json"
     stab.write_text(json.dumps({"code_type": "stabilizer", "n": 5, "k": 1, "stabilizers": [], "distance": {"d": 3}}))
-    row = RH.harvest_one(str(stab), out_dir=str(tmp_path / "o"), handle="h", date="2026-11-19", seeds=[1],
-                         scale=1.0, min_trials=1, max_trials=10, threads=1, pair_depth=10, codes_dir=str(tmp_path))
+    row = RH.harvest_one(
+        str(stab),
+        out_dir=str(tmp_path / "o"),
+        handle="h",
+        date="2026-11-19",
+        seeds=[1],
+        scale=1.0,
+        min_trials=1,
+        max_trials=10,
+        threads=1,
+        pair_depth=10,
+        codes_dir=str(tmp_path),
+    )
     assert row["verdict"] == "skipped"
 
 
@@ -310,12 +376,19 @@ def test_fetch_open_pr_codes_uses_an_explicit_get_and_skips_notes(tmp_path):
     def fake_gh(args):
         calls.append(list(args))
         if args[:2] == ["pr", "list"]:
-            return [{"number": 77, "headRefName": "feat/x", "headRepository": {"name": "r"},
-                     "headRepositoryOwner": {"login": "o"},
-                     "files": [{"path": "codes/9-1-5.json"}, {"path": "notes/9-1-5.md"}]}]
+            return [
+                {
+                    "number": 77,
+                    "headRefName": "feat/x",
+                    "headRepository": {"name": "r"},
+                    "headRepositoryOwner": {"login": "o"},
+                    "files": [{"path": "codes/9-1-5.json"}, {"path": "notes/9-1-5.md"}],
+                }
+            ]
         assert args[1:3] == ["--method", "GET"], args
         assert "repos/o/r/contents/codes/9-1-5.json" in args and "ref=feat/x" in args
         return {"content": base64.b64encode(json.dumps(OVERCLAIM).encode()).decode()}
+
     found = RH.fetch_open_pr_codes(str(tmp_path), gh=fake_gh)
     assert len(calls) == 2
     assert [(os.path.relpath(p, tmp_path), n) for p, n in found] == [("pr-77/9-1-5.json", 77)]
@@ -325,6 +398,7 @@ def test_fetch_open_pr_codes_uses_an_explicit_get_and_skips_notes(tmp_path):
 def test_fetch_open_pr_codes_survives_a_failing_gh(tmp_path, capsys):
     def failing(args):
         raise OSError("gh: command not found")
+
     assert RH.fetch_open_pr_codes(str(tmp_path), gh=failing) == []
     assert "none harvested" in capsys.readouterr().out
 
@@ -335,8 +409,47 @@ def test_max_minutes_leaves_entries_unopened(tmp_path, monkeypatch, capsys):
     paths = [_write(codes / f"9-1-3{s}.json", CORRECT) for s in ("", "-b", "-c")]
     clock = iter([0.0, 0.0, 10**6, 10**6, 10**6, 10**6, 10**6])
     monkeypatch.setattr(RH.time, "time", lambda: next(clock, 10**6))
-    rc = RH.main(paths + ["--handle", "h", "--out", str(tmp_path / "o"), "--seeds", "1", "--max-trials", "50",
-                          "--max-minutes", "1", "--threads", "1", "--codes-dir", str(codes)])
+    rc = RH.main(
+        paths
+        + [
+            "--handle",
+            "h",
+            "--out",
+            str(tmp_path / "o"),
+            "--seeds",
+            "1",
+            "--max-trials",
+            "50",
+            "--max-minutes",
+            "1",
+            "--threads",
+            "1",
+            "--codes-dir",
+            str(codes),
+        ]
+    )
     assert rc == 0
     out = capsys.readouterr().out
     assert "left unopened at 1 min" in out
+
+
+def test_apply_corrects_a_side_in_place_when_d_is_unchanged(tmp_path):
+    checkout = tmp_path / "repo"
+    (checkout / "codes").mkdir(parents=True)
+    (checkout / "notes").mkdir()
+    doc = shor_doc(3, [0, 1, 2], 5, [0, 1, 2, 3, 6])
+    _write(checkout / "codes" / "9-1-3.json", doc)
+    (checkout / "notes" / "9-1-3.md").write_text("# [[9,1,3]]: Shor\n\nBody line kept.\n")
+    path, row = _run(tmp_path, doc, side_trials=300, apply_to=str(checkout), codes_dir=str(checkout / "codes"))
+    assert row["verdict"] == "tightened" and row["new_slug"] == "9-1-3"
+    assert row["applied"] == ["codes/9-1-3.json", "notes/9-1-3.md"]
+    new = json.loads((checkout / "codes" / "9-1-3.json").read_text())
+    assert new["distance"]["Z"]["value"] == 3 and new["distance"]["d"] == 3
+    assert new["distance"]["X"] == doc["distance"]["X"]
+    note = (checkout / "notes" / "9-1-3.md").read_text()
+    assert note.startswith("# [[9,1,3]]: distance revision, Z side 5 -> 3")
+    assert "Body line kept." in note
+    with open(row["revision"][:-5] + ".body.md", encoding="utf-8") as fh:
+        body = fh.read()
+    assert "filed as" not in body and "`codes/9-1-3.json`" in body
+    assert CA.refutation_binding("harvester", doc, new)[0]

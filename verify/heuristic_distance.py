@@ -44,18 +44,18 @@ shape RIS cannot sample -- every 14th qubit of each block -- and it is how
 Usage: python verify/heuristic_distance.py codes/foo.json [--trials N] [--seed S]
        [--fold-trials F]; exit code 2 on a refuted claim (so it can gate if desired).
 """
+
 import argparse
 import itertools
 import json
 import sys
 import time
 
+import gf2
 import numpy as np
 
-import gf2
-
 try:
-    import gf2_fast as _fast            # optional C++ accelerator (weights only)
+    import gf2_fast as _fast  # optional C++ accelerator (weights only)
 except ImportError:
     _fast = None
 
@@ -76,8 +76,7 @@ def stabilizer_matrices(doc):
     """Return (A, B), int8, of a stabilizer submission, S = (A | B)."""
     n = doc["n"]
     gens = doc["checks"]["S"]
-    return (_matrix([g["X"] for g in gens], n),
-            _matrix([g["Z"] for g in gens], n))
+    return (_matrix([g["X"] for g in gens], n), _matrix([g["Z"] for g in gens], n))
 
 
 def doubled_matrices(A, B):
@@ -86,8 +85,7 @@ def doubled_matrices(A, B):
     H'_X = (A | B), H'_Z = (B | A), a CSS code on 2n qubits. Isotropy of S is
     exactly its CSS commutation.
     """
-    return (np.concatenate([A, B], axis=1).astype(np.int8),
-            np.concatenate([B, A], axis=1).astype(np.int8))
+    return (np.concatenate([A, B], axis=1).astype(np.int8), np.concatenate([B, A], axis=1).astype(np.int8))
 
 
 def pauli_weight_rows(rows, n):
@@ -109,15 +107,15 @@ def _pauli_from_doubled(v, side, n):
 def _rref_perm(K, perm):
     """RREF of K under a random column permutation, mapped back to original
     columns. Reduced rows are low-weight combinations of K's rows (candidate
-    low-weight logicals); the weight is permutation-invariant."""
+    low-weight logicals); the weight is permutation-invariant.
+    """
     R, _ = gf2.rref(K[:, perm])
     out = np.zeros_like(R)
     out[:, perm] = R
     return out
 
 
-def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None,
-                    capture=None):
+def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None, capture=None):
     """RIS upper-bound search for the lightest nontrivial X-type logical: a vector
     in ker(H_Z) that anticommutes with some Z-logical. Returns (weight, witness),
     or (None, None) if the code has no logicals of this type. Stops after `trials`
@@ -127,7 +125,8 @@ def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None,
     ``capture`` (a ``recapture.SideSink``, issue #2897) receives every
     nontrivial row ``consider`` sees at weight <= ``capture.threshold``. It
     reads what the search computed anyway and never touches ``best``, so the
-    result for a given seed is the same with or without it."""
+    result for a given seed is the same with or without it.
+    """
     n = HX.shape[1]
     K = gf2.kernel_basis(HZ)
     LZ = gf2.logical_basis(HX, HZ)
@@ -151,19 +150,18 @@ def ris_min_logical(HX, HZ, trials, seed, pair_depth=8, max_seconds=None,
     for t in range(trials):
         red = _rref_perm(K, rng.permutation(n))
         consider(red)
-        if pair_depth > 1 and red.shape[0] >= 2:        # short combinations
+        if pair_depth > 1 and red.shape[0] >= 2:  # short combinations
             w = red.sum(1)
-            light = np.argsort(w)[:min(pair_depth, red.shape[0])]
+            light = np.argsort(w)[: min(pair_depth, red.shape[0])]
             sub = red[light]
             for a in range(len(light) - 1):
-                consider(sub[a] ^ sub[a + 1:])
+                consider(sub[a] ^ sub[a + 1 :])
         if deadline and (t & 63) == 0 and time.monotonic() > deadline:
             break
     return best, wit
 
 
-def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None,
-                          capture=None):
+def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None, capture=None):
     """Search for the lightest nontrivial logical Pauli operator, by Pauli weight.
 
     RIS upper-bound search on the stabilizer code S = (A | B). Returns
@@ -175,12 +173,12 @@ def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None,
     ``capture`` is as in ris_min_logical, by Pauli weight.
     """
     n = A.shape[1]
-    S, SL = doubled_matrices(A, B)              # S = (A | B), S Lambda = (B | A)
+    S, SL = doubled_matrices(A, B)  # S = (A | B), S Lambda = (B | A)
     K = gf2.kernel_basis(SL)
-    L = gf2.logical_basis(SL, S)                # ker(S Lambda) reduced mod row(S)
+    L = gf2.logical_basis(SL, S)  # ker(S Lambda) reduced mod row(S)
     if K.shape[0] == 0 or L.shape[0] == 0:
         return None, None
-    LS = np.concatenate([L[:, n:], L[:, :n]], axis=1)   # L Lambda, so rows @ LS.T is the symplectic product
+    LS = np.concatenate([L[:, n:], L[:, :n]], axis=1)  # L Lambda, so rows @ LS.T is the symplectic product
     rng = np.random.default_rng(seed)
     best, wit = n + 1, None
     deadline = (time.monotonic() + max_seconds) if max_seconds else None
@@ -199,12 +197,12 @@ def ris_min_pauli_logical(A, B, trials, seed, pair_depth=8, max_seconds=None,
     for t in range(trials):
         red = _rref_perm(K, rng.permutation(2 * n))
         consider(red)
-        if pair_depth > 1 and red.shape[0] >= 2:        # short combinations
+        if pair_depth > 1 and red.shape[0] >= 2:  # short combinations
             w = pauli_weight_rows(red, n)
-            light = np.argsort(w)[:min(pair_depth, red.shape[0])]
+            light = np.argsort(w)[: min(pair_depth, red.shape[0])]
             sub = red[light]
             for a in range(len(light) - 1):
-                consider(sub[a] ^ sub[a + 1:])
+                consider(sub[a] ^ sub[a + 1 :])
         if deadline and (t & 63) == 0 and time.monotonic() > deadline:
             break
     return best, wit
@@ -236,8 +234,7 @@ def valid_pauli_logical(v, A, B):
 def pauli_witness(v, n):
     """Return the {"X": [...], "Z": [...]} form of a 2n Pauli vector (x | z)."""
     v = np.asarray(v)
-    return {"X": sorted(int(j) for j in np.nonzero(v[:n])[0]),
-            "Z": sorted(int(j) for j in np.nonzero(v[n:])[0])}
+    return {"X": sorted(int(j) for j in np.nonzero(v[:n])[0]), "Z": sorted(int(j) for j in np.nonzero(v[n:])[0])}
 
 
 # ---------------------------------------------------------------------------
@@ -269,8 +266,9 @@ def pauli_witness(v, n):
 # ---------------------------------------------------------------------------
 
 try:
-    from pynauty import Graph as _NautyGraph, autgrp as _nauty_autgrp
-except ImportError:                     # optional; structural detection remains
+    from pynauty import Graph as _NautyGraph
+    from pynauty import autgrp as _nauty_autgrp
+except ImportError:  # optional; structural detection remains
     _NautyGraph = None
 
 # RIS trials per folded code in estimate()/refute_check(). Folded codes have
@@ -288,7 +286,8 @@ FRAME_TRIALS_MAX = 1200
 
 def _fold_seconds(max_seconds):
     """Wall-clock cap for the fold pass inside estimate(): its own small slice,
-    so the RIS budget that follows is exactly what it was before this pass."""
+    so the RIS budget that follows is exactly what it was before this pass.
+    """
     if max_seconds is None:
         return None
     return min(30.0, max(3.0, 0.5 * max_seconds))
@@ -315,7 +314,8 @@ class _RowInvariance:
     permuted row lies in the row space -- the right notion when redundant
     rows were dropped, as several board GB entries did, at the cost of a
     reduction per test. For a labelled (non-CSS) matrix the span test reduces
-    the (x | z) symplectic rows, with the labels mapped alongside."""
+    the (x | z) symplectic rows, with the labels mapped alongside.
+    """
 
     def __init__(self, mats, n):
         self.mats = mats
@@ -336,7 +336,8 @@ class _RowInvariance:
     @staticmethod
     def _binary(Lab):
         """(x | z) binary form of a labelled matrix (label 1 = x, 2 = z, 3 = both);
-        a plain 0/1 matrix maps to itself."""
+        a plain 0/1 matrix maps to itself.
+        """
         if (Lab <= 1).all():
             return Lab.astype(np.int8)
         return np.concatenate([(Lab & 1), (Lab >> 1)], axis=1).astype(np.int8)
@@ -347,7 +348,7 @@ class _RowInvariance:
         for Lab, (R, piv) in zip(self.mats, self._rref):
             if len(piv) == 0:
                 continue
-            V = self._binary(Lab[:, np.argsort(perm)])     # permuted rows
+            V = self._binary(Lab[:, np.argsort(perm)])  # permuted rows
             V = V.copy()
             for i, c in enumerate(piv):
                 mask = V[:, c].astype(bool)
@@ -366,7 +367,8 @@ def _affine_multipliers(inv, M, cyc, blk, m, nb, build, max_multipliers):
     per-block offset) on top of a detected cyclic shift. The candidates come
     from one row: since the rows are all shifts of each other, the multiplied
     block-b part of row 0 must be a shift of row 0's block-b part, which pins
-    s_b down to a few values; each candidate is then verified in full."""
+    s_b down to a few values; each candidate is then verified in full.
+    """
     out = []
     r0 = np.flatnonzero(M[0])
     parts = [np.sort(cyc[r0[blk[r0] == b]]) for b in range(nb)]
@@ -406,7 +408,8 @@ def structural_automorphisms(mats, n, max_multipliers=8):
     pos -> u*pos + s_block on a shift that was found (_affine_multipliers).
     Returns a list of int64 permutations (maybe empty). A permutation is
     accepted when it maps every matrix's row set, or failing that its row
-    space, onto itself (_RowInvariance)."""
+    space, onto itself (_RowInvariance).
+    """
     inv = _RowInvariance(mats, n)
     idx = np.arange(n)
     gens = []
@@ -417,20 +420,19 @@ def structural_automorphisms(mats, n, max_multipliers=8):
         for layout in ("inner", "outer"):
             if layout == "inner":
                 cyc, blk, m, nb = idx % L, idx // L, L, blocks
-                build = lambda c, L=L: blk * L + c                 # noqa: E731
+                build = lambda c, L=L: blk * L + c  # noqa: E731
             else:
-                if blocks < 2 or L == n // 2:          # outer at L is inner at n/L
+                if blocks < 2 or L == n // 2:  # outer at L is inner at n/L
                     continue
                 cyc, blk, m, nb = idx // L, idx % L, blocks, L
-                build = lambda c, L=L: c * L + blk                 # noqa: E731
+                build = lambda c, L=L: c * L + blk  # noqa: E731
             shift = build((cyc + 1) % m)
             if inv(shift):
                 gens.append(shift)
-                gens += _affine_multipliers(inv, mats[0], cyc, blk, m, nb, build,
-                                            max_multipliers)
+                gens += _affine_multipliers(inv, mats[0], cyc, blk, m, nb, build, max_multipliers)
                 break
         else:
-            for rows_ in _divisors(L):              # 2-D shifts, inner layout only
+            for rows_ in _divisors(L):  # 2-D shifts, inner layout only
                 cols_ = L // rows_
                 if rows_ < 2 or cols_ < 2:
                     continue
@@ -492,7 +494,8 @@ def nauty_automorphisms(mats, n):
     """Generators of the Tanner-graph automorphism group restricted to qubits,
     via pynauty; [] when pynauty is not importable. Each matrix is a vertex
     colour; a labelled incidence (non-CSS) becomes an auxiliary vertex
-    coloured by its label so Pauli types are preserved."""
+    coloured by its label so Pauli types are preserved.
+    """
     if _NautyGraph is None:
         return []
     mats = _rebuild_symmetric_checks(mats, n)
@@ -518,8 +521,7 @@ def nauty_automorphisms(mats, n):
                     aux_colours.setdefault(int(r[j]), set()).add(a)
         colours.append(cls)
     colours += [c for _, c in sorted(aux_colours.items())]
-    g = _NautyGraph(nxt, directed=False, adjacency_dict=adj,
-                    vertex_coloring=colours)
+    g = _NautyGraph(nxt, directed=False, adjacency_dict=adj, vertex_coloring=colours)
     gens, *_ = _nauty_autgrp(g)
     return [np.array(p[:n], dtype=np.int64) for p in gens]
 
@@ -566,7 +568,8 @@ def _orbit_labels(p):
 def orbit_partitions(gens, n, rng, max_words=24, max_partitions=80, min_orbits=4):
     """Orbit partitions of cyclic subgroups <h^k>, for h among the generators
     and a few random words in them, k a proper divisor of ord(h). Each entry is
-    (labels, orbit_count, orbit_size_bound); coarsest first, deduplicated."""
+    (labels, orbit_count, orbit_size_bound); coarsest first, deduplicated.
+    """
     if not gens:
         return []
     elems = list(gens)
@@ -576,7 +579,7 @@ def orbit_partitions(gens, n, rng, max_words=24, max_partitions=80, min_orbits=4
         for _ in range(int(rng.integers(2, 5))):
             g = gens[int(rng.integers(len(gens)))]
             if rng.random() < 0.5:
-                g = np.argsort(g)                   # inverse
+                g = np.argsort(g)  # inverse
             w = g[w]
         elems.append(w)
     seen, out = set(), []
@@ -614,14 +617,22 @@ def _fold_search(F, Lf, sizes, trials, rng, best, pauli_c=None, deadline=None):
     the board's largest entries -- and in python otherwise. Either way the
     result is a PROPOSAL: the caller lifts it and re-validates on the full
     matrices before it counts. The accelerator draws its own seed from
-    ``rng`` so a run is reproducible from the printed seed."""
+    ``rng`` so a run is reproducible from the printed seed.
+    """
     if Lf.shape[0] == 0:
         return None, None
     if _fast is not None and hasattr(_fast, "fold_rand_witness"):
         w, sup = _fast.fold_rand_witness(
-            F.astype(np.int8), Lf.astype(np.int8), [int(v) for v in sizes],
-            int(pauli_c or 0), int(trials), int(rng.integers(2**62)), 8,
-            _FOLD_EXHAUSTIVE_DIM, FOLD_THREADS)
+            F.astype(np.int8),
+            Lf.astype(np.int8),
+            [int(v) for v in sizes],
+            int(pauli_c or 0),
+            int(trials),
+            int(rng.integers(2**62)),
+            8,
+            _FOLD_EXHAUSTIVE_DIM,
+            FOLD_THREADS,
+        )
         if w is None or w >= best:
             return None, None
         x = np.zeros(F.shape[1], dtype=np.int8)
@@ -657,7 +668,7 @@ def _fold_search(F, Lf, sizes, trials, rng, best, pauli_c=None, deadline=None):
             light = np.argsort(w)[:8]
             sub = red[light]
             for a in range(len(light) - 1):
-                consider(sub[a] ^ sub[a + 1:])
+                consider(sub[a] ^ sub[a + 1 :])
             if deadline and (t & 63) == 63 and time.monotonic() > deadline:
                 break
     return (best, wit) if wit is not None else (None, None)
@@ -667,7 +678,8 @@ def orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=None, gens=None):
     """Orbit-fold search for the lightest X- and Z-type logicals of a CSS code.
     Returns {"X": (w, witness) | None, "Z": ..., "partitions": k} where every
     witness has been re-validated on the full matrices (_valid_logical).
-    ``partitions`` is 0 when no symmetry was found (nothing searched)."""
+    ``partitions`` is 0 when no symmetry was found (nothing searched).
+    """
     n = HX.shape[1]
     rng = np.random.default_rng(seed)
     if gens is None:
@@ -676,7 +688,7 @@ def orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=None, gens=None):
     out = {"X": None, "Z": None, "partitions": 0}
     if not parts:
         return out
-    LZ = gf2.logical_basis(HX, HZ)              # anticommutation rows for X-type
+    LZ = gf2.logical_basis(HX, HZ)  # anticommutation rows for X-type
     LX = gf2.logical_basis(HZ, HX)
     best = {"X": n + 1, "Z": n + 1}
     deadline = (time.monotonic() + max_seconds) if max_seconds else None
@@ -700,15 +712,24 @@ def orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=None, gens=None):
     return out
 
 
-_FRAMES = [np.array(m, dtype=np.int64) for m in
-           ([[1, 0], [0, 1]], [[0, 1], [1, 0]], [[1, 1], [0, 1]],
-            [[1, 0], [1, 1]], [[1, 1], [1, 0]], [[0, 1], [1, 1]])]
+_FRAMES = [
+    np.array(m, dtype=np.int64)
+    for m in (
+        [[1, 0], [0, 1]],
+        [[0, 1], [1, 0]],
+        [[1, 1], [0, 1]],
+        [[1, 0], [1, 1]],
+        [[1, 1], [1, 0]],
+        [[0, 1], [1, 1]],
+    )
+]
 _FRAMES_INV = [np.array([[m[1, 1], m[0, 1]], [m[1, 0], m[0, 0]]]) % 2 for m in _FRAMES]
 
 
 def _apply_frame(M, fr, n, inverse=False):
     """Per-qubit symplectic frame on rows (x | z): a Y-heavy logical becomes
-    X- or Z-heavy in some frame, where RIS sees it as sparse."""
+    X- or Z-heavy in some frame, where RIS sees it as sparse.
+    """
     T = np.stack([(_FRAMES_INV if inverse else _FRAMES)[f] for f in fr])
     X, Z = M[:, :n].astype(np.int64), M[:, n:].astype(np.int64)
     Xn = (X * T[:, 0, 0] + Z * T[:, 0, 1]) % 2
@@ -720,7 +741,8 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
     """Stabilizer-code counterpart: orbit folds on Pauli vectors (x | z) plus
     RIS in ``frames`` random single-qubit Pauli frames. Returns
     {"P": (w, witness) | None, "partitions": k, "frames": f}; the witness is a
-    2n Pauli vector validated by valid_pauli_logical."""
+    2n Pauli vector validated by valid_pauli_logical.
+    """
     n = A.shape[1]
     rng = np.random.default_rng(seed)
     S, SL = doubled_matrices(A, B)
@@ -743,7 +765,7 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
         P2 = np.zeros((2 * n, 2 * c), dtype=np.int64)
         P2[:n, :c] = P
         P2[n:, c:] = P
-        F = ((SL.astype(np.int64) @ P2) % 2).astype(np.int8)     # (B P | A P)
+        F = ((SL.astype(np.int64) @ P2) % 2).astype(np.int8)  # (B P | A P)
         Lf = ((LS.astype(np.int64) @ P2) % 2).astype(np.int8)
         w, x = _fold_search(F, Lf, sizes, trials, rng, best, pauli_c=c, deadline=deadline)
         if x is None:
@@ -763,8 +785,8 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
             # bound on the Pauli weight); the find is unframed, re-scored by
             # Pauli weight and validated before it counts.
             d_fast, side, sup = _fast.distance_rand_witness(
-                HX2, SLf, min(4 * int(trials), FRAME_TRIALS_MAX),
-                int(rng.integers(2**62)), 8, FOLD_THREADS)
+                HX2, SLf, min(4 * int(trials), FRAME_TRIALS_MAX), int(rng.integers(2**62)), 8, FOLD_THREADS
+            )
             if side in ("X", "Z"):
                 v = np.zeros(2 * n, dtype=np.int8)
                 v[list(sup)] = 1
@@ -785,7 +807,7 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
             w = pauli_weight_rows(red, n)
             sub = red[np.argsort(w)[:8]]
             for a in range(len(sub) - 1):
-                cands.append(sub[a] ^ sub[a + 1:])
+                cands.append(sub[a] ^ sub[a + 1 :])
             for cand in cands:
                 arr = np.asarray(cand, dtype=np.int8)
                 w = pauli_weight_rows(arr, n)
@@ -800,11 +822,11 @@ def orbit_fold_min_pauli_logical(A, B, trials, seed, max_seconds=None, frames=12
     return out
 
 
-
 def _sat_available():
     try:
         import pycryptosat  # noqa: F401
         from pysat.card import CardEnc  # noqa: F401
+
         return True
     except Exception:
         return False
@@ -813,13 +835,15 @@ def _sat_available():
 def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
     """SAT fold on one side.  F is the folded check matrix (m x c), Lf the
     folded logical generators (k x c); ``sizes[j]`` is the orbit size of column
-    j.  Returns (weight, x) with weight < claimed, or None."""
+    j.  Returns (weight, x) with weight < claimed, or None.
+    """
     if not _sat_available():
         return None
     if Lf is None or Lf.shape[0] == 0:
         return None
     from pycryptosat import Solver
     from pysat.card import CardEnc, EncType
+
     _, c = F.shape
     W = int(claimed) - 1
     if W < 1:
@@ -843,8 +867,7 @@ def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
     if not selectors:
         return None
     s.add_clause(selectors)
-    card = CardEnc.atmost(lits=expanded, bound=W, top_id=top,
-                          encoding=EncType.seqcounter)
+    card = CardEnc.atmost(lits=expanded, bound=W, top_id=top, encoding=EncType.seqcounter)
     top = max(top, card.nv)
     for cl in card.clauses:
         s.add_clause(cl)
@@ -860,7 +883,8 @@ def _sat_fold_side(F, Lf, sizes, claimed, time_limit):
 
 def _sat_fold_partition(P, sizes, HX, HZ, claimed, time_budget):
     """Try both sides on one orbit partition.  Returns (side, weight, full_vector)
-    or None."""
+    or None.
+    """
     # X side: v in ker HZ, outside rowspace HX.
     Fx = (HZ @ P) % 2
     Lx = gf2.logical_basis(HX, HZ)
@@ -884,7 +908,8 @@ def _sat_fold_partition(P, sizes, HX, HZ, claimed, time_budget):
 
 def orbit_fold_sat_refute(doc, seed=0, max_seconds=60.0, gens=None):
     """SAT-fold refutation stage (optional; needs pycryptosat + python-sat).
-    Returns (refuted, d_found, witness, partitions) like orbit_fold_refute."""
+    Returns (refuted, d_found, witness, partitions) like orbit_fold_refute.
+    """
     if not _sat_available():
         return False, None, None, 0
     n = doc["n"]
@@ -932,7 +957,8 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
     witness, searched). ``searched`` is the number of orbit partitions (plus
     frames, for a stabilizer code) actually searched; 0 means the code showed
     no usable symmetry and nothing ran, so the caller leaves the mechanism out
-    of its method list rather than recording a meaningless null result."""
+    of its method list rather than recording a meaningless null result.
+    """
     n = doc["n"]
     claimed = int(doc["distance"]["d"])
     if _is_stabilizer(doc):
@@ -946,8 +972,7 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
     gens = structural_automorphisms([HX, HZ], n) + nauty_automorphisms([HX, HZ], n)
-    res = orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=max_seconds,
-                                 gens=gens)
+    res = orbit_fold_min_logical(HX, HZ, trials, seed, max_seconds=max_seconds, gens=gens)
     found = [res[s] for s in ("X", "Z") if res[s] is not None]
     if found:
         w, v = min(found, key=lambda t: t[0])
@@ -956,9 +981,9 @@ def orbit_fold_refute(doc, seed=0, trials=300, max_seconds=60.0):
             return True, w, wit, res["partitions"]
     # SAT fold fallback for large folded kernels (optional; needs python-sat).
     if _sat_available() and gens:
-        sref, sw, swit, sp = orbit_fold_sat_refute(doc, seed=seed + 97,
-                                                  max_seconds=max(5.0, 0.5 * max_seconds),
-                                                  gens=gens)
+        sref, sw, swit, sp = orbit_fold_sat_refute(
+            doc, seed=seed + 97, max_seconds=max(5.0, 0.5 * max_seconds), gens=gens
+        )
         if sref:
             return True, sw, swit, res["partitions"] + sp
     if found:
@@ -980,28 +1005,28 @@ def _merge_fold(sides, res, n):
             sides.setdefault(side, {"value": None})
             sides[side].update(
                 lightest_found=w,
-                witness=(pauli_witness(v, n) if side == "P"
-                         else sorted(int(j) for j in np.nonzero(v)[0])))
+                witness=(pauli_witness(v, n) if side == "P" else sorted(int(j) for j in np.nonzero(v)[0])),
+            )
 
 
-def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
-                         fold_trials=0, capture=None):
+def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds, fold_trials=0, capture=None):
     """Run estimate() for a stabilizer code: one Pauli-weight side, P. The
     orbit-fold + random-frame pass (orbit_fold_min_pauli_logical) runs first
-    when ``fold_trials`` > 0, under its own cap, as in the CSS path."""
+    when ``fold_trials`` > 0, under its own cap, as in the CSS path.
+    """
     n = doc["n"]
     A, B = stabilizer_matrices(doc)
     claimed = int(doc["distance"]["d"])
     sides = {}
     fold = None
     if fold_trials:
-        fold = orbit_fold_min_pauli_logical(A, B, fold_trials, seed + 5,
-                                            max_seconds=_fold_seconds(max_seconds))
+        fold = orbit_fold_min_pauli_logical(A, B, fold_trials, seed + 5, max_seconds=_fold_seconds(max_seconds))
         _merge_fold(sides, fold, n)
         if capture is not None and fold.get("P") is not None:
             capture.add_vector("P", fold["P"][1], fold["P"][0])
-    wP, witP = ris_min_pauli_logical(A, B, trials, seed, max_seconds=max_seconds,
-                                     capture=capture.side("P") if capture is not None else None)
+    wP, witP = ris_min_pauli_logical(
+        A, B, trials, seed, max_seconds=max_seconds, capture=capture.side("P") if capture is not None else None
+    )
     cur = sides.get("P", {}).get("lightest_found")
     if wP is not None and (cur is None or wP < cur):
         sides["P"] = {"lightest_found": wP, "witness": pauli_witness(witP, n)}
@@ -1013,10 +1038,13 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
     if fold is not None and (fold["partitions"] or fold["frames"]):
         method += f"+orbit-fold({fold['partitions']}+{fold['frames']}f)"
     if _fast is not None and 0 < fast_trials <= trials:
-        print(f"warning: gf2_fast is available but skipped "
-              f"(fast_trials={fast_trials} <= trials={trials}); raise "
-              f"--fast-trials or lower --trials to use the accelerator "
-              f"(fast_trials=0 disables it deliberately)", file=sys.stderr)
+        print(
+            f"warning: gf2_fast is available but skipped "
+            f"(fast_trials={fast_trials} <= trials={trials}); raise "
+            f"--fast-trials or lower --trials to use the accelerator "
+            f"(fast_trials=0 disables it deliberately)",
+            file=sys.stderr,
+        )
     if _fast is not None and fast_trials > trials:
         # The accelerator searches the doubled CSS code by Hamming weight over
         # 2n bits, an upper bound on the Pauli weight (a Y is two bits, one
@@ -1024,8 +1052,7 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
         # pinned python stack, and re-scored by Pauli weight; only then may
         # it tighten the verdict.
         HX2, HZ2 = doubled_matrices(A, B)
-        d_fast, side, sup = _fast.distance_rand_witness(HX2, HZ2, fast_trials,
-                                                        seed, 8, 8)
+        d_fast, side, sup = _fast.distance_rand_witness(HX2, HZ2, fast_trials, seed, 8, 8)
         if d_fast is not None and side in ("X", "Z"):
             v = np.zeros(2 * n, dtype=np.int8)
             v[list(sup)] = 1
@@ -1035,8 +1062,7 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
                 if d_heur is None or wp < d_heur:
                     d_heur = wp
                     sides.setdefault("P", {})
-                    sides["P"].update(lightest_found=wp,
-                                      witness=pauli_witness(v, n))
+                    sides["P"].update(lightest_found=wp, witness=pauli_witness(v, n))
         method += "+gf2_fast(doubled)"
         trials = max(trials, fast_trials)
 
@@ -1048,17 +1074,25 @@ def _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
         verdict = "corroborated"
     else:
         verdict = "inconclusive"
-    res = {"name": doc.get("name", ""), "claimed_d": claimed,
-           "d_heuristic": d_heur, "verdict": verdict,
-           "sides": sides, "trials": trials, "seed": seed, "method": method,
-           "fold_partitions": (fold["partitions"] + fold["frames"]) if fold else 0}
+    res = {
+        "name": doc.get("name", ""),
+        "claimed_d": claimed,
+        "d_heuristic": d_heur,
+        "verdict": verdict,
+        "sides": sides,
+        "trials": trials,
+        "seed": seed,
+        "method": method,
+        "fold_partitions": (fold["partitions"] + fold["frames"]) if fold else 0,
+    }
     if capture is not None:
         capture.result = res
     return res
 
 
-def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
-             fold_trials=FOLD_TRIALS_DEFAULT, capture=None):
+def estimate(
+    doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None, fold_trials=FOLD_TRIALS_DEFAULT, capture=None
+):
     """Heuristic distance verdict for a submission `doc`.
 
     ``trials`` is the pure-Python RIS budget per side; ``fast_trials`` is the
@@ -1081,10 +1115,12 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
     ``capture`` (a ``recapture.Capture``, issue #2897) collects every logical
     the RIS passes see at weight <= its threshold, plus the fold pass's
     validated find per side, and receives this function's report as
-    ``capture.result``. It changes nothing about the verdict."""
+    ``capture.result``. It changes nothing about the verdict.
+    """
     if _is_stabilizer(doc):
-        return _estimate_stabilizer(doc, trials, seed, fast_trials, max_seconds,
-                                    fold_trials=fold_trials, capture=capture)
+        return _estimate_stabilizer(
+            doc, trials, seed, fast_trials, max_seconds, fold_trials=fold_trials, capture=capture
+        )
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
     HZ = _matrix(doc["checks"]["Z"], n)
@@ -1093,23 +1129,21 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
     sides = {}
     fold = None
     if fold_trials:
-        fold = orbit_fold_min_logical(HX, HZ, fold_trials, seed + 5,
-                                      max_seconds=_fold_seconds(max_seconds))
+        fold = orbit_fold_min_logical(HX, HZ, fold_trials, seed + 5, max_seconds=_fold_seconds(max_seconds))
         _merge_fold(sides, fold, n)
         if capture is not None:
             for side in ("X", "Z"):
                 if fold.get(side) is not None:
                     capture.add_vector(side, fold[side][1], fold[side][0])
-    half = (max_seconds / 2) if max_seconds else None       # split budget per side
+    half = (max_seconds / 2) if max_seconds else None  # split budget per side
     sink_x = capture.side("X") if capture is not None else None
     sink_z = capture.side("Z") if capture is not None else None
-    wX, witX = ris_min_logical(HX, HZ, trials, seed, max_seconds=half, capture=sink_x)      # X (ker HZ)
+    wX, witX = ris_min_logical(HX, HZ, trials, seed, max_seconds=half, capture=sink_x)  # X (ker HZ)
     wZ, witZ = ris_min_logical(HZ, HX, trials, seed + 1, max_seconds=half, capture=sink_z)  # Z (ker HX)
     for side, w, wit in (("X", wX, witX), ("Z", wZ, witZ)):
         cur = sides.get(side, {}).get("lightest_found")
         if w is not None and (cur is None or w < cur):
-            sides[side] = {"lightest_found": w,
-                           "witness": sorted(int(j) for j in np.nonzero(wit)[0])}
+            sides[side] = {"lightest_found": w, "witness": sorted(int(j) for j in np.nonzero(wit)[0])}
     for side, block in sides.items():
         block["value"] = doc["distance"].get(side, {}).get("value")
     d_heur = min([b["lightest_found"] for b in sides.values()], default=None)
@@ -1118,10 +1152,13 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
     if fold is not None and fold["partitions"]:
         method += f"+orbit-fold({fold['partitions']})"
     if _fast is not None and 0 < fast_trials <= trials:
-        print(f"warning: gf2_fast is available but skipped "
-              f"(fast_trials={fast_trials} <= trials={trials}); raise "
-              f"--fast-trials or lower --trials to use the accelerator "
-              f"(fast_trials=0 disables it deliberately)", file=sys.stderr)
+        print(
+            f"warning: gf2_fast is available but skipped "
+            f"(fast_trials={fast_trials} <= trials={trials}); raise "
+            f"--fast-trials or lower --trials to use the accelerator "
+            f"(fast_trials=0 disables it deliberately)",
+            file=sys.stderr,
+        )
     # Optional C++ accelerator: a larger overall search (min over both sides).
     if _fast is not None and fast_trials > trials:
         # Take the witness straight from the accelerator rather than asking the
@@ -1129,8 +1166,7 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
         # accelerator is orders of magnitude faster per trial, so a budget that
         # lets it reach weight w leaves the Python pass far short of w, and the
         # tighter weight was recorded with no witness to back it.
-        d_fast, side, sup = _fast.distance_rand_witness(HX, HZ, fast_trials,
-                                                        seed, 8, 8)
+        d_fast, side, sup = _fast.distance_rand_witness(HX, HZ, fast_trials, seed, 8, 8)
         d_fast = int(d_fast) if d_fast is not None else None
         if d_fast is not None and (d_heur is None or d_fast < d_heur):
             d_heur = d_fast
@@ -1144,31 +1180,37 @@ def estimate(doc, trials=20000, seed=0, fast_trials=400000, max_seconds=None,
                 if _valid_logical(wit, H_ker, H_row):
                     sides.setdefault(side, {})
                     sides[side].update(
-                        lightest_found=int(wit.sum()),
-                        witness=sorted(int(j) for j in np.nonzero(wit)[0]))
+                        lightest_found=int(wit.sum()), witness=sorted(int(j) for j in np.nonzero(wit)[0])
+                    )
         method += "+gf2_fast"
         trials = max(trials, fast_trials)
 
     if d_heur is None:
         verdict = "inconclusive"
     elif d_heur < claimed:
-        verdict = "refuted"          # found a lighter logical -> claim over-stated
+        verdict = "refuted"  # found a lighter logical -> claim over-stated
     elif d_heur == claimed:
-        verdict = "corroborated"     # found exactly the claimed weight, none lighter
+        verdict = "corroborated"  # found exactly the claimed weight, none lighter
     else:
-        verdict = "inconclusive"     # budget too small to even reach the claimed weight
+        verdict = "inconclusive"  # budget too small to even reach the claimed weight
 
-    res = {"name": doc.get("name", ""), "claimed_d": claimed,
-           "d_heuristic": d_heur, "verdict": verdict,
-           "sides": sides, "trials": trials, "seed": seed, "method": method,
-           "fold_partitions": fold["partitions"] if fold else 0}
+    res = {
+        "name": doc.get("name", ""),
+        "claimed_d": claimed,
+        "d_heuristic": d_heur,
+        "verdict": verdict,
+        "sides": sides,
+        "trials": trials,
+        "seed": seed,
+        "method": method,
+        "fold_partitions": fold["partitions"] if fold else 0,
+    }
     if capture is not None:
         capture.result = res
     return res
 
 
-def refute_check(doc, seed=0, max_seconds=10.0, trials=None,
-                 fold_trials=FOLD_TRIALS_DEFAULT, capture=None):
+def refute_check(doc, seed=0, max_seconds=10.0, trials=None, fold_trials=FOLD_TRIALS_DEFAULT, capture=None):
     """CI gate. Run a bounded, time-capped RIS search and report whether it found a
     logical LIGHTER than the claimed distance. Returns (refuted, d_found, witness,
     trials). Sound (the witness is a checkable lighter logical) but not complete (a
@@ -1176,13 +1218,14 @@ def refute_check(doc, seed=0, max_seconds=10.0, trials=None,
     non-flaky. Budget is n-scaled trials under a wall-clock cap; pass ``trials`` to
     override the default target (the CI gate scales both with code size).
     ``capture`` is handed to estimate() unchanged (the weekly sweep's recapture
-    record, issue #2897); the gate never passes one."""
+    record, issue #2897); the gate never passes one.
+    """
     n = doc["n"]
     if trials is None:
         trials = min(8000, 2500 + 40 * n)
-    res = estimate(doc, trials=trials, seed=seed, fast_trials=0,
-                   max_seconds=max_seconds, fold_trials=fold_trials,
-                   capture=capture)
+    res = estimate(
+        doc, trials=trials, seed=seed, fast_trials=0, max_seconds=max_seconds, fold_trials=fold_trials, capture=capture
+    )
     claimed = int(doc["distance"]["d"])
     dh = res["d_heuristic"]
     refuted = dh is not None and dh < claimed
@@ -1202,8 +1245,7 @@ def main(path, trials, seed, fast_trials=None, fold_trials=FOLD_TRIALS_DEFAULT):
     # budget with the requested depth. --fast-trials 0 forces pure Python.
     if fast_trials is None:
         fast_trials = max(400000, 4 * trials)
-    res = estimate(doc, trials=trials, seed=seed, fast_trials=fast_trials,
-                   fold_trials=fold_trials)
+    res = estimate(doc, trials=trials, seed=seed, fast_trials=fast_trials, fold_trials=fold_trials)
     print(json.dumps(res, indent=2))
     return 2 if res["verdict"] == "refuted" else 0
 
@@ -1211,15 +1253,19 @@ def main(path, trials, seed, fast_trials=None, fold_trials=FOLD_TRIALS_DEFAULT):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("path")
-    ap.add_argument("--trials", type=int, default=20000,
-                    help="pure-Python RIS trials per side (default 20000)")
+    ap.add_argument("--trials", type=int, default=20000, help="pure-Python RIS trials per side (default 20000)")
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--fast-trials", type=int, default=None,
-                    help="gf2_fast overall trial budget (default: "
-                         "max(400000, 4*trials)); 0 disables the accelerator")
-    ap.add_argument("--fold-trials", type=int, default=FOLD_TRIALS_DEFAULT,
-                    help="orbit-fold RIS trials per folded code (default "
-                         f"{FOLD_TRIALS_DEFAULT}); 0 disables the fold pass")
+    ap.add_argument(
+        "--fast-trials",
+        type=int,
+        default=None,
+        help="gf2_fast overall trial budget (default: max(400000, 4*trials)); 0 disables the accelerator",
+    )
+    ap.add_argument(
+        "--fold-trials",
+        type=int,
+        default=FOLD_TRIALS_DEFAULT,
+        help=f"orbit-fold RIS trials per folded code (default {FOLD_TRIALS_DEFAULT}); 0 disables the fold pass",
+    )
     args = ap.parse_args()
-    sys.exit(main(args.path, args.trials, args.seed, args.fast_trials,
-                  args.fold_trials))
+    sys.exit(main(args.path, args.trials, args.seed, args.fast_trials, args.fold_trials))

@@ -1,0 +1,271 @@
+{
+ "schema_version": "0.2",
+ "name": "[[68,34,2]]",
+ "code_type": "CSS",
+ "n": 68,
+ "k": 34,
+ "checks": {
+  "X": [
+   [
+    0,
+    17,
+    34,
+    51
+   ],
+   [
+    1,
+    18,
+    35,
+    52
+   ],
+   [
+    2,
+    19,
+    36,
+    53
+   ],
+   [
+    3,
+    20,
+    37,
+    54
+   ],
+   [
+    4,
+    21,
+    38,
+    55
+   ],
+   [
+    5,
+    22,
+    39,
+    56
+   ],
+   [
+    6,
+    23,
+    40,
+    57
+   ],
+   [
+    7,
+    24,
+    41,
+    58
+   ],
+   [
+    8,
+    25,
+    42,
+    59
+   ],
+   [
+    9,
+    26,
+    43,
+    60
+   ],
+   [
+    10,
+    27,
+    44,
+    61
+   ],
+   [
+    11,
+    28,
+    45,
+    62
+   ],
+   [
+    12,
+    29,
+    46,
+    63
+   ],
+   [
+    13,
+    30,
+    47,
+    64
+   ],
+   [
+    14,
+    31,
+    48,
+    65
+   ],
+   [
+    15,
+    32,
+    49,
+    66
+   ],
+   [
+    16,
+    33,
+    50,
+    67
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    18,
+    34,
+    52
+   ],
+   [
+    1,
+    19,
+    35,
+    53
+   ],
+   [
+    2,
+    20,
+    36,
+    54
+   ],
+   [
+    3,
+    21,
+    37,
+    55
+   ],
+   [
+    4,
+    22,
+    38,
+    56
+   ],
+   [
+    5,
+    23,
+    39,
+    57
+   ],
+   [
+    6,
+    24,
+    40,
+    58
+   ],
+   [
+    7,
+    25,
+    41,
+    59
+   ],
+   [
+    8,
+    26,
+    42,
+    60
+   ],
+   [
+    9,
+    27,
+    43,
+    61
+   ],
+   [
+    10,
+    28,
+    44,
+    62
+   ],
+   [
+    11,
+    29,
+    45,
+    63
+   ],
+   [
+    12,
+    30,
+    46,
+    64
+   ],
+   [
+    13,
+    31,
+    47,
+    65
+   ],
+   [
+    14,
+    32,
+    48,
+    66
+   ],
+   [
+    15,
+    33,
+    49,
+    67
+   ],
+   [
+    16,
+    17,
+    50,
+    51
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    19,
+    53
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-11-23",
+    "found_at_samples": 8000,
+    "survived_samples": 8000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     0
+    ]
+   }
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    13,
+    47
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-11-23",
+    "found_at_samples": 8000,
+    "survived_samples": 8000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "cc v0.3.1 pair-partition arm; L-PAIR-PARTITION p=17 L=4 shifts all-zero/alternating, derived by the priced calculus.",
+  "origin": "submission",
+  "date": "2026-11-23",
+  "model": "Hy 4 flash",
+  "harness": "opencode"
+ },
+ "family": "pair-partition-cpm"
+}

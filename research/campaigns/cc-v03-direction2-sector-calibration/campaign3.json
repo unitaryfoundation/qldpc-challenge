@@ -1,0 +1,6035 @@
+{
+  "summary": {
+    "totals": {
+      "parents": 60,
+      "budget_used_total": 7680,
+      "improving_total": 4,
+      "exhausted": 60,
+      "swap_applied": 4,
+      "missing_n_hits": 0,
+      "seconds_total": 508.8790000000001
+    },
+    "by_family": {
+      "C-DELETE-CHECK": {
+        "enumerated": 9258,
+        "apply_fail": 0,
+        "bare_qubit": 0,
+        "disconnected": 0,
+        "derive_fail": 0,
+        "survived": 9258,
+        "improving_pre_budget": 0
+      },
+      "E-EXTEND": {
+        "enumerated": 20254,
+        "apply_fail": 20194,
+        "bare_qubit": 60,
+        "disconnected": 0,
+        "derive_fail": 0,
+        "survived": 0,
+        "improving_pre_budget": 0
+      },
+      "E-GRAFT": {
+        "enumerated": 20194,
+        "apply_fail": 172,
+        "bare_qubit": 0,
+        "disconnected": 0,
+        "derive_fail": 0,
+        "survived": 20022,
+        "improving_pre_budget": 0
+      },
+      "E-PEEL": {
+        "enumerated": 614,
+        "apply_fail": 0,
+        "bare_qubit": 0,
+        "disconnected": 1,
+        "derive_fail": 0,
+        "survived": 613,
+        "improving_pre_budget": 0
+      },
+      "E-PUNCTURE": {
+        "enumerated": 10097,
+        "apply_fail": 0,
+        "bare_qubit": 51,
+        "disconnected": 9,
+        "derive_fail": 0,
+        "survived": 10037,
+        "improving_pre_budget": 0
+      },
+      "P-REBASE": {
+        "enumerated": 0,
+        "apply_fail": 0,
+        "bare_qubit": 0,
+        "disconnected": 0,
+        "derive_fail": 0,
+        "survived": 0,
+        "improving_pre_budget": 0
+      }
+    },
+    "campaign": 3,
+    "budget": 128,
+    "limit": 60,
+    "missing_n_lo": 86,
+    "missing_n_hi": 400,
+    "n_missing_n": 35,
+    "parents": [
+      "100-2-15",
+      "102-20-10",
+      "104-6-14",
+      "108-8-14",
+      "112-20-9",
+      "118-14-8",
+      "120-24-10",
+      "124-4-16",
+      "126-26-9",
+      "128-22-10",
+      "136-38-8",
+      "140-10-15",
+      "144-16-12",
+      "144-8-15",
+      "148-2-19",
+      "152-42-8",
+      "160-24-14",
+      "161-12-10",
+      "166-2-21",
+      "168-28-10",
+      "176-4-20",
+      "179-12-10",
+      "180-20-15",
+      "183-12-10",
+      "186-14-18",
+      "188-4-21",
+      "192-4-22",
+      "196-2-22",
+      "202-2-23",
+      "205-12-12",
+      "210-28-16",
+      "216-6-23",
+      "224-22-16",
+      "232-62-12",
+      "240-13-15",
+      "240-22-18",
+      "242-12-12",
+      "252-18-20",
+      "256-10-24",
+      "268-12-14",
+      "270-54-10",
+      "280-24-16",
+      "286-2-29",
+      "288-24-18",
+      "288-6-28",
+      "294-12-14",
+      "294-8-19",
+      "300-32-15",
+      "42-2-9",
+      "52-2-10",
+      "56-4-10",
+      "62-10-9",
+      "66-6-10",
+      "71-1-11",
+      "78-4-12",
+      "80-9-8",
+      "84-4-13",
+      "90-10-11",
+      "92-2-14",
+      "96-4-14"
+    ]
+  },
+  "records": [
+    {
+      "slug": "100-2-15",
+      "n": 100,
+      "k": 2,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 15} is already at least as strong as the Z interval {'lower': 0, 'upper': 15}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 2.292,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 98,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 98,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 201,
+          "apply_fail": 200,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 200,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 200,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 100,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 100,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "102-20-10",
+      "n": 102,
+      "k": 20,
+      "d": 10,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 2.35,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 82,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 82,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 205,
+          "apply_fail": 204,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 204,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 204,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 2,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 2,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 102,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 102,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "104-6-14",
+      "n": 104,
+      "k": 6,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 2.858,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 98,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 98,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 209,
+          "apply_fail": 208,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 208,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 208,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 104,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 104,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "108-8-14",
+      "n": 108,
+      "k": 8,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.036,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 100,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 100,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 217,
+          "apply_fail": 216,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 216,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 216,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 108,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 108,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "112-20-9",
+      "n": 112,
+      "k": 20,
+      "d": 9,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 9} is already at least as strong as the Z interval {'lower': 0, 'upper': 9}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.075,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 92,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 92,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 225,
+          "apply_fail": 224,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 224,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 224,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 112,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 112,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "118-14-8",
+      "n": 118,
+      "k": 14,
+      "d": 8,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 8} is already at least as strong as the Z interval {'lower': 0, 'upper': 8}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.599,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 104,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 104,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 237,
+          "apply_fail": 236,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 236,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 236,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 14,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 14,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 118,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 118,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "120-24-10",
+      "n": 120,
+      "k": 24,
+      "d": 10,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.094,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 96,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 96,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 241,
+          "apply_fail": 240,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 240,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 240,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 1,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 1,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 120,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 120,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "124-4-16",
+      "n": 124,
+      "k": 4,
+      "d": 16,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 16} is already at least as strong as the Z interval {'lower': 0, 'upper': 16}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 4.151,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 120,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 120,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 249,
+          "apply_fail": 248,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 248,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 248,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 124,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 124,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "126-26-9",
+      "n": 126,
+      "k": 26,
+      "d": 9,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 9} is already at least as strong as the Z interval {'lower': 0, 'upper': 9}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.524,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 100,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 100,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 253,
+          "apply_fail": 252,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 252,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 252,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 8,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 8,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 126,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 126,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "128-22-10",
+      "n": 128,
+      "k": 22,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.711,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 106,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 106,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 257,
+          "apply_fail": 256,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 256,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 256,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 4,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 4,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 128,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 128,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "136-38-8",
+      "n": 136,
+      "k": 38,
+      "d": 8,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 8} is already at least as strong as the Z interval {'lower': 0, 'upper': 8}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 3.517,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 98,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 98,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 273,
+          "apply_fail": 272,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 272,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 272,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 2,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 2,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 136,
+          "apply_fail": 0,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 135,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "140-10-15",
+      "n": 140,
+      "k": 10,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 15} is already at least as strong as the Z interval {'lower': 0, 'upper': 15}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 5.111,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 130,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 130,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 281,
+          "apply_fail": 280,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 280,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 280,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 140,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 140,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "144-16-12",
+      "n": 144,
+      "k": 16,
+      "d": 12,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 12} is already at least as strong as the Z interval {'lower': 0, 'upper': 12}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 4.56,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 128,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 128,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 289,
+          "apply_fail": 288,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 288,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 288,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 12,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 12,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 144,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 144,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "144-8-15",
+      "n": 144,
+      "k": 8,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 15} is already at least as strong as the Z interval {'lower': 0, 'upper': 15}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 4.813,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 136,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 136,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 289,
+          "apply_fail": 288,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 288,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 288,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 144,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 144,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "148-2-19",
+      "n": 148,
+      "k": 2,
+      "d": 19,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 19} is already at least as strong as the Z interval {'lower': 0, 'upper': 19}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 5.528,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 146,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 146,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 297,
+          "apply_fail": 296,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 296,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 296,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 148,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 148,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "152-42-8",
+      "n": 152,
+      "k": 42,
+      "d": 8,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 8} is already at least as strong as the Z interval {'lower': 0, 'upper': 8}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 5.202,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 110,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 110,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 305,
+          "apply_fail": 304,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 304,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 304,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 2,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 2,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 152,
+          "apply_fail": 0,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 151,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "160-24-14",
+      "n": 160,
+      "k": 24,
+      "d": 14,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 7.48,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 136,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 136,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 321,
+          "apply_fail": 320,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 320,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 320,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 3,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 3,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 160,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 160,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "161-12-10",
+      "n": 161,
+      "k": 12,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 10.077,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 149,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 149,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 323,
+          "apply_fail": 322,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 322,
+          "apply_fail": 12,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 310,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 46,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 46,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 161,
+          "apply_fail": 0,
+          "bare_qubit": 4,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 157,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "166-2-21",
+      "n": 166,
+      "k": 2,
+      "d": 21,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 21} is already at least as strong as the Z interval {'lower': 0, 'upper': 21}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 10.279,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 164,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 164,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 333,
+          "apply_fail": 332,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 332,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 332,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 4,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 4,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 166,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 166,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "168-28-10",
+      "n": 168,
+      "k": 28,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 7.505,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 140,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 140,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 337,
+          "apply_fail": 336,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 336,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 336,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 16,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 16,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 168,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 168,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "176-4-20",
+      "n": 176,
+      "k": 4,
+      "d": 20,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 20} is already at least as strong as the Z interval {'lower': 0, 'upper': 20}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 8.43,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 172,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 172,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 353,
+          "apply_fail": 352,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 352,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 352,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 8,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 8,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 176,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 176,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "179-12-10",
+      "n": 179,
+      "k": 12,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 7.369,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 167,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 167,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 359,
+          "apply_fail": 358,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 358,
+          "apply_fail": 22,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 336,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 53,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 53,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 179,
+          "apply_fail": 0,
+          "bare_qubit": 3,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 176,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "180-20-15",
+      "n": 180,
+      "k": 20,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 15} is already at least as strong as the Z interval {'lower': 0, 'upper': 15}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 8.16,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 160,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 160,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 361,
+          "apply_fail": 360,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 360,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 360,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 180,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 180,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "183-12-10",
+      "n": 183,
+      "k": 12,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "survivors found",
+      "sector_swap": {
+        "applied": true,
+        "reason": "the carried Z interval {'lower': 0, 'upper': 11} is stronger than the X interval {'lower': 0, 'upper': 10}; the sectors are exchanged and the full distance is unchanged",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 1,
+      "improving_by_family": {
+        "E-LOCAL-HADAMARD": 1
+      },
+      "improving_child_n": [
+        183
+      ],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": true,
+        "statement": "survivors found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 8.13,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 171,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 171,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 367,
+          "apply_fail": 366,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 366,
+          "apply_fail": 24,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 342,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 56,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 56,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 183,
+          "apply_fail": 0,
+          "bare_qubit": 3,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 180,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "186-14-18",
+      "n": 186,
+      "k": 14,
+      "d": 18,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 18} is already at least as strong as the Z interval {'lower': 0, 'upper': 18}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 7.556,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 172,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 172,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 373,
+          "apply_fail": 372,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 372,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 372,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 4,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 4,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 186,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 186,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "188-4-21",
+      "n": 188,
+      "k": 4,
+      "d": 21,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 21} is already at least as strong as the Z interval {'lower': 0, 'upper': 21}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 7.974,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 184,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 184,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 377,
+          "apply_fail": 376,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 376,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 376,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 188,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 188,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "192-4-22",
+      "n": 192,
+      "k": 4,
+      "d": 22,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 22} is already at least as strong as the Z interval {'lower': 0, 'upper': 22}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 9.237,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 188,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 188,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 385,
+          "apply_fail": 384,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 384,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 384,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 192,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 192,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "196-2-22",
+      "n": 196,
+      "k": 2,
+      "d": 22,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 22} is already at least as strong as the Z interval {'lower': 0, 'upper': 22}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 8.787,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 194,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 194,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 393,
+          "apply_fail": 392,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 392,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 392,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 196,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 196,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "202-2-23",
+      "n": 202,
+      "k": 2,
+      "d": 23,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 23} is already at least as strong as the Z interval {'lower': 0, 'upper': 23}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 12.41,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 200,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 200,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 405,
+          "apply_fail": 404,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 404,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 404,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 4,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 4,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 202,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 202,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "205-12-12",
+      "n": 205,
+      "k": 12,
+      "d": 12,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 12} is already at least as strong as the Z interval {'lower': 0, 'upper': 12}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 13.738,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 193,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 193,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 411,
+          "apply_fail": 410,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 410,
+          "apply_fail": 18,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 392,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 48,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 48,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 205,
+          "apply_fail": 0,
+          "bare_qubit": 3,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 202,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "210-28-16",
+      "n": 210,
+      "k": 28,
+      "d": 16,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 16} is already at least as strong as the Z interval {'lower': 0, 'upper': 16}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 12.957,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 182,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 182,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 421,
+          "apply_fail": 420,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 420,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 420,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 1,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 1,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 210,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 210,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "216-6-23",
+      "n": 216,
+      "k": 6,
+      "d": 23,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 23} is already at least as strong as the Z interval {'lower': 0, 'upper': 23}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 12.569,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 210,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 210,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 433,
+          "apply_fail": 432,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 432,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 432,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 216,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 216,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "224-22-16",
+      "n": 224,
+      "k": 22,
+      "d": 16,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 16} is already at least as strong as the Z interval {'lower': 0, 'upper': 16}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 11.624,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 202,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 202,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 449,
+          "apply_fail": 448,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 448,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 448,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 3,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 3,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 224,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 224,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "232-62-12",
+      "n": 232,
+      "k": 62,
+      "d": 12,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 12} is already at least as strong as the Z interval {'lower': 0, 'upper': 12}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 9.49,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 170,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 170,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 465,
+          "apply_fail": 464,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 464,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 464,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 1,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 1,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 232,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 232,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "240-13-15",
+      "n": 240,
+      "k": 13,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "survivors found",
+      "sector_swap": {
+        "applied": true,
+        "reason": "the carried Z interval {'lower': 0, 'upper': 16} is stronger than the X interval {'lower': 0, 'upper': 15}; the sectors are exchanged and the full distance is unchanged",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 1,
+      "improving_by_family": {
+        "E-LOCAL-HADAMARD": 1
+      },
+      "improving_child_n": [
+        240
+      ],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": true,
+        "statement": "survivors found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 13.651,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 227,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 227,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 481,
+          "apply_fail": 480,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 480,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 480,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 1,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 1,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 240,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 240,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "240-22-18",
+      "n": 240,
+      "k": 22,
+      "d": 18,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 18} is already at least as strong as the Z interval {'lower': 0, 'upper': 18}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 12.614,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 218,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 218,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 481,
+          "apply_fail": 480,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 480,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 480,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 9,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 9,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 240,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 240,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "242-12-12",
+      "n": 242,
+      "k": 12,
+      "d": 12,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "survivors found",
+      "sector_swap": {
+        "applied": true,
+        "reason": "the carried Z interval {'lower': 0, 'upper': 13} is stronger than the X interval {'lower': 0, 'upper': 12}; the sectors are exchanged and the full distance is unchanged",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 1,
+      "improving_by_family": {
+        "E-LOCAL-HADAMARD": 1
+      },
+      "improving_child_n": [
+        242
+      ],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": true,
+        "statement": "survivors found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 17.19,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 230,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 230,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 485,
+          "apply_fail": 484,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 484,
+          "apply_fail": 30,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 454,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 66,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 66,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 242,
+          "apply_fail": 0,
+          "bare_qubit": 3,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 239,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "252-18-20",
+      "n": 252,
+      "k": 18,
+      "d": 20,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 20} is already at least as strong as the Z interval {'lower': 0, 'upper': 20}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 20.123,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 234,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 234,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 505,
+          "apply_fail": 504,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 504,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 504,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 252,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 252,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "256-10-24",
+      "n": 256,
+      "k": 10,
+      "d": 24,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 24} is already at least as strong as the Z interval {'lower': 0, 'upper': 24}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 19.059,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 246,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 246,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 513,
+          "apply_fail": 512,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 512,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 512,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 256,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 256,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "268-12-14",
+      "n": 268,
+      "k": 12,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 19.663,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 256,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 256,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 537,
+          "apply_fail": 536,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 536,
+          "apply_fail": 30,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 506,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 59,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 1,
+          "derive_fail": 0,
+          "survived": 58,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 268,
+          "apply_fail": 0,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 267,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "270-54-10",
+      "n": 270,
+      "k": 54,
+      "d": 10,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "survivors found",
+      "sector_swap": {
+        "applied": true,
+        "reason": "the carried Z interval {'lower': 0, 'upper': 12} is stronger than the X interval {'lower': 0, 'upper': 10}; the sectors are exchanged and the full distance is unchanged",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 1,
+      "improving_by_family": {
+        "E-LOCAL-HADAMARD": 1
+      },
+      "improving_child_n": [
+        270
+      ],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": true,
+        "statement": "survivors found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 14.756,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 216,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 216,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 541,
+          "apply_fail": 540,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 540,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 540,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 270,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 270,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "280-24-16",
+      "n": 280,
+      "k": 24,
+      "d": 16,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 16} is already at least as strong as the Z interval {'lower': 0, 'upper': 16}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 18.582,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 256,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 256,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 561,
+          "apply_fail": 560,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 560,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 560,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 68,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 68,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 280,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 280,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "286-2-29",
+      "n": 286,
+      "k": 2,
+      "d": 29,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 29} is already at least as strong as the Z interval {'lower': 0, 'upper': 29}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 19.73,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 284,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 284,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 573,
+          "apply_fail": 572,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 572,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 572,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 286,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 286,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "288-24-18",
+      "n": 288,
+      "k": 24,
+      "d": 18,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 18} is already at least as strong as the Z interval {'lower': 0, 'upper': 18}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 19.101,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 264,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 264,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 577,
+          "apply_fail": 576,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 576,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 576,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 8,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 8,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 288,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 288,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "288-6-28",
+      "n": 288,
+      "k": 6,
+      "d": 28,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 28} is already at least as strong as the Z interval {'lower': 0, 'upper': 28}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 21.317,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 282,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 282,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 577,
+          "apply_fail": 576,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 576,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 576,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 288,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 288,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "294-12-14",
+      "n": 294,
+      "k": 12,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 21.032,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 282,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 282,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 589,
+          "apply_fail": 588,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 588,
+          "apply_fail": 36,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 552,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 75,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 75,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 294,
+          "apply_fail": 0,
+          "bare_qubit": 3,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 291,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "294-8-19",
+      "n": 294,
+      "k": 8,
+      "d": 19,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 20} is already at least as strong as the Z interval {'lower': 0, 'upper': 19}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 20.425,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 286,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 286,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 589,
+          "apply_fail": 588,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 588,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 588,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 294,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 294,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "300-32-15",
+      "n": 300,
+      "k": 32,
+      "d": 15,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 15} is already at least as strong as the Z interval {'lower': 0, 'upper': 15}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 24.78,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 268,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 268,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 601,
+          "apply_fail": 600,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 600,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 600,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 3,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 3,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 300,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 300,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "42-2-9",
+      "n": 42,
+      "k": 2,
+      "d": 9,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 9} is already at least as strong as the Z interval {'lower': 0, 'upper': 9}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 0.321,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 40,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 40,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 85,
+          "apply_fail": 84,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 84,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 84,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 42,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 42,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "52-2-10",
+      "n": 52,
+      "k": 2,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 0.522,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 50,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 50,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 105,
+          "apply_fail": 104,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 104,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 104,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 4,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 4,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 52,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 52,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "56-4-10",
+      "n": 56,
+      "k": 4,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 0.611,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 52,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 52,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 113,
+          "apply_fail": 112,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 112,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 112,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 8,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 8,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 56,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 56,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "62-10-9",
+      "n": 62,
+      "k": 10,
+      "d": 9,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 9} is already at least as strong as the Z interval {'lower': 0, 'upper': 9}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 0.648,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 52,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 52,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 125,
+          "apply_fail": 124,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 124,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 124,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 62,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 62,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "66-6-10",
+      "n": 66,
+      "k": 6,
+      "d": 10,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 10} is already at least as strong as the Z interval {'lower': 0, 'upper': 10}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 0.879,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 60,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 60,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 133,
+          "apply_fail": 132,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 132,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 132,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 12,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 12,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 66,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 66,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "71-1-11",
+      "n": 71,
+      "k": 1,
+      "d": 11,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 11} is already at least as strong as the Z interval {'lower': 0, 'upper': 11}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.001,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 70,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 70,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 143,
+          "apply_fail": 142,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 142,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 142,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 6,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 6,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 71,
+          "apply_fail": 0,
+          "bare_qubit": 29,
+          "disconnected": 9,
+          "derive_fail": 0,
+          "survived": 33,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "78-4-12",
+      "n": 78,
+      "k": 4,
+      "d": 12,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 12} is already at least as strong as the Z interval {'lower': 0, 'upper': 12}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.182,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 74,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 74,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 157,
+          "apply_fail": 156,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 156,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 156,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 78,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 78,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "80-9-8",
+      "n": 80,
+      "k": 9,
+      "d": 8,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 9} is already at least as strong as the Z interval {'lower': 0, 'upper': 8}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.132,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 71,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 71,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 161,
+          "apply_fail": 160,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 160,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 160,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 1,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 1,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 80,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 80,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "84-4-13",
+      "n": 84,
+      "k": 4,
+      "d": 13,
+      "w": 9,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 13} is already at least as strong as the Z interval {'lower': 0, 'upper': 13}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.379,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 80,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 80,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 169,
+          "apply_fail": 168,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 168,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 168,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 84,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 84,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "90-10-11",
+      "n": 90,
+      "k": 10,
+      "d": 11,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 11} is already at least as strong as the Z interval {'lower': 0, 'upper': 11}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.463,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 80,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 80,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 181,
+          "apply_fail": 180,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 180,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 180,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 2,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 2,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 90,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 90,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "92-2-14",
+      "n": 92,
+      "k": 2,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.702,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 90,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 90,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 185,
+          "apply_fail": 184,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 184,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 184,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 92,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 92,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    },
+    {
+      "slug": "96-4-14",
+      "n": 96,
+      "k": 4,
+      "d": 14,
+      "w": 8,
+      "target_sector": "X",
+      "budget": 128,
+      "budget_used": 128,
+      "exhausted": true,
+      "search_status": "no survivor found",
+      "sector_swap": {
+        "applied": false,
+        "reason": "the carried X interval {'lower': 0, 'upper': 14} is already at least as strong as the Z interval {'lower': 0, 'upper': 14}",
+        "guard_name": null,
+        "refused_by": null,
+        "refusal_guard": null,
+        "unchanged": true
+      },
+      "improving_count": 0,
+      "improving_by_family": {},
+      "improving_child_n": [],
+      "improving_child_n_in_missing_set": [],
+      "heuristic_outcome": {
+        "claim_shape": "probabilistic",
+        "evidence_status": "empirical",
+        "event": {
+          "procedure": "bounded sector-targeted move search over the planner's candidates, interval transport only",
+          "universe": "planner candidate moves from the given state to depth 1, judged on sector X",
+          "evaluated": 128,
+          "budget": 128,
+          "exhausted": true,
+          "weight": null
+        },
+        "delta": 0.0,
+        "found": false,
+        "statement": "no survivor found",
+        "licenses": "no ledger endpoint; an unavailable claim stays unavailable and no lower bound is presented",
+        "source": "spec/CLAIMS.md, Admission (2026-11-11, issue #329): the probabilistic claim shape as the recorded form of a heuristic search outcome"
+      },
+      "seconds": 1.823,
+      "diagnosis": {
+        "C-DELETE-CHECK": {
+          "enumerated": 92,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 92,
+          "improving_pre_budget": 0
+        },
+        "E-EXTEND": {
+          "enumerated": 193,
+          "apply_fail": 192,
+          "bare_qubit": 1,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-GRAFT": {
+          "enumerated": 192,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 192,
+          "improving_pre_budget": 0
+        },
+        "E-PEEL": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        },
+        "E-PUNCTURE": {
+          "enumerated": 96,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 96,
+          "improving_pre_budget": 0
+        },
+        "P-REBASE": {
+          "enumerated": 0,
+          "apply_fail": 0,
+          "bare_qubit": 0,
+          "disconnected": 0,
+          "derive_fail": 0,
+          "survived": 0,
+          "improving_pre_budget": 0
+        }
+      }
+    }
+  ]
+}

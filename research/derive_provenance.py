@@ -58,6 +58,7 @@ gates a submission, it only reports.
     # check the committed table still describes codes/ (no index needed)
     python research/derive_provenance.py --check
 """
+
 import argparse
 import collections
 import csv
@@ -83,8 +84,7 @@ def load_sources():
 
 def board_slugs():
     d = os.path.join(ROOT, "codes")
-    return sorted(os.path.splitext(f)[0] for f in os.listdir(d)
-                  if f.endswith(".json"))
+    return sorted(os.path.splitext(f)[0] for f in os.listdir(d) if f.endswith(".json"))
 
 
 def stabilizer_slugs():
@@ -127,9 +127,7 @@ def derive(matches_csv, param_csv=None, covered=None):
             if src in not_lit:
                 continue
             if src in param_sources:
-                params_from_iso[r["board_slug"]].append(
-                    {"source": src, "ref": param_sources[src],
-                     "id": r["other_id"]})
+                params_from_iso[r["board_slug"]].append({"source": src, "ref": param_sources[src], "id": r["other_id"]})
                 continue
             if src not in lit_sources:
                 # An unclassified source is never promoted to literature; it is
@@ -139,8 +137,8 @@ def derive(matches_csv, param_csv=None, covered=None):
             if r["permutation_verified"] != "True":
                 continue
             hits[r["board_slug"]].append(
-                {"source": src, "ref": lit_sources[src], "id": r["other_id"],
-                 "xz_swapped": r["xz_swapped"] == "True"})
+                {"source": src, "ref": lit_sources[src], "id": r["other_id"], "xz_swapped": r["xz_swapped"] == "True"}
+            )
 
     # A same-(n, k, d) hit whose source ships no matrices cannot be decided
     # either way, so it lands in parameters_only rather than in either
@@ -154,16 +152,14 @@ def derive(matches_csv, param_csv=None, covered=None):
                     continue
                 if src in lit_sources or src in param_sources:
                     ref = lit_sources.get(src) or param_sources.get(src)
-                    params[r["slug"]].append(
-                        {"source": src, "ref": ref, "id": r.get("lit_id")})
+                    params[r["slug"]].append({"source": src, "ref": ref, "id": r.get("lit_id")})
 
     out = {}
     for slug in board_slugs():
         if slug in hits:
             out[slug] = {"bucket": "literature", "matches": hits[slug]}
         elif slug in params:
-            out[slug] = {"bucket": "parameters_only",
-                         "matches": params[slug][:4]}
+            out[slug] = {"bucket": "parameters_only", "matches": params[slug][:4]}
         elif covered is None or slug in covered:
             out[slug] = {"bucket": "no_match", "matches": []}
         else:
@@ -179,13 +175,17 @@ def counts(table):
 def write(table, unknown):
     payload = {
         "derivation_version": 1,
-        "method": ("permutation equivalence of the given generating sets, by "
-                   "nauty canonical form of the typed Tanner graph, every hit "
-                   "re-verified by mapping row spaces with the recovered "
-                   "permutation"),
-        "caveat": ("no_match means the index holds no match, not that the code "
-                   "is unpublished: two sparse generating sets of one "
-                   "stabilizer group can have non-isomorphic Tanner graphs"),
+        "method": (
+            "permutation equivalence of the given generating sets, by "
+            "nauty canonical form of the typed Tanner graph, every hit "
+            "re-verified by mapping row spaces with the recovered "
+            "permutation"
+        ),
+        "caveat": (
+            "no_match means the index holds no match, not that the code "
+            "is unpublished: two sparse generating sets of one "
+            "stabilizer group can have non-isomorphic Tanner graphs"
+        ),
         "counts": counts(table),
         "entries": table,
     }
@@ -224,14 +224,11 @@ def top_up():
     with open(DERIVED, "w", encoding="utf-8", newline="\n") as f:
         json.dump(payload, f, indent=1, sort_keys=True)
         f.write("\n")
-    print(f"topped up: +{len(added)} not_derived, -{len(gone)} departed, "
-          f"{len(table)} entries")
+    print(f"topped up: +{len(added)} not_derived, -{len(gone)} departed, {len(table)} entries")
     if added:
-        print("  added: " + " ".join(added[:12])
-              + (" ..." if len(added) > 12 else ""))
+        print("  added: " + " ".join(added[:12]) + (" ..." if len(added) > 12 else ""))
     if gone:
-        print("  dropped: " + " ".join(gone[:12])
-              + (" ..." if len(gone) > 12 else ""))
+        print("  dropped: " + " ".join(gone[:12]) + (" ..." if len(gone) > 12 else ""))
     return 0
 
 
@@ -330,8 +327,7 @@ def check():
     # corruption.
     stored = {b: (payload.get("counts") or {}).get(b, 0) for b in BUCKETS}
     if stored != counts(table):
-        broken.append(f"  counts block disagrees with the entries: "
-                      f"says {stored}, entries give {counts(table)}")
+        broken.append(f"  counts block disagrees with the entries: says {stored}, entries give {counts(table)}")
     if broken:
         print(f"derived provenance is BROKEN ({len(broken)} problems):")
         print("\n".join(broken[:40]))
@@ -343,23 +339,27 @@ def check():
     missing, departed = sorted(want - have), sorted(have - want)
     c = payload["counts"]
     if missing or departed:
-        print(f"derived provenance is STALE: {len(missing)} board entries "
-              f"absent from the table, {len(departed)} table rows no longer "
-              "on the board.")
+        print(
+            f"derived provenance is STALE: {len(missing)} board entries "
+            f"absent from the table, {len(departed)} table rows no longer "
+            "on the board."
+        )
         if missing:
-            print("  absent: " + " ".join(missing[:12])
-                  + (" ..." if len(missing) > 12 else ""))
+            print("  absent: " + " ".join(missing[:12]) + (" ..." if len(missing) > 12 else ""))
         if departed:
-            print("  departed: " + " ".join(departed[:12])
-                  + (" ..." if len(departed) > 12 else ""))
-        print("  run `python research/derive_provenance.py --top-up` to record "
-              "them as not_derived (no index needed), then --from-matches when "
-              "the index is next run.")
+            print("  departed: " + " ".join(departed[:12]) + (" ..." if len(departed) > 12 else ""))
+        print(
+            "  run `python research/derive_provenance.py --top-up` to record "
+            "them as not_derived (no index needed), then --from-matches when "
+            "the index is next run."
+        )
         return 0
-    print(f"ok: derived provenance covers {len(table)} entries "
-          f"({c['literature']} literature, {c['parameters_only']} "
-          f"parameters-only, {c['no_match']} no-match, "
-          f"{c.get('not_derived', 0)} not-derived)")
+    print(
+        f"ok: derived provenance covers {len(table)} entries "
+        f"({c['literature']} literature, {c['parameters_only']} "
+        f"parameters-only, {c['no_match']} no-match, "
+        f"{c.get('not_derived', 0)} not-derived)"
+    )
     return 0
 
 
@@ -367,16 +367,21 @@ def main(argv):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--from-matches", help="isomorphism_matches.csv from iso_check.py")
     ap.add_argument("--from-params", help="param_matches.csv from param_check.py")
-    ap.add_argument("--covered", help="JSON list of the slugs the index run "
-                                      "looked at; anything outside it is "
-                                      "not_derived rather than no_match")
+    ap.add_argument(
+        "--covered",
+        help="JSON list of the slugs the index run looked at; anything outside it is not_derived rather than no_match",
+    )
     ap.add_argument("--check", action="store_true")
-    ap.add_argument("--top-up", action="store_true",
-                    help="record new board entries as not_derived and drop "
-                         "departed ones; needs no index")
-    ap.add_argument("--residual", metavar="PATH",
-                    help="write the tracking-issue body listing the "
-                         "not_derived entries to PATH and print their count")
+    ap.add_argument(
+        "--top-up",
+        action="store_true",
+        help="record new board entries as not_derived and drop departed ones; needs no index",
+    )
+    ap.add_argument(
+        "--residual",
+        metavar="PATH",
+        help="write the tracking-issue body listing the not_derived entries to PATH and print their count",
+    )
     ap.add_argument("--run-url", help="workflow run to link from the --residual body")
     a = ap.parse_args(argv)
     if a.top_up:
@@ -392,8 +397,10 @@ def main(argv):
     table, unknown = derive(a.from_matches, a.from_params, covered)
     payload = write(table, unknown)
     c = payload["counts"]
-    print(f"wrote {DERIVED}: {c['literature']} literature, "
-          f"{c['parameters_only']} parameters-only, {c['no_match']} no-match")
+    print(
+        f"wrote {DERIVED}: {c['literature']} literature, "
+        f"{c['parameters_only']} parameters-only, {c['no_match']} no-match"
+    )
     return 0
 
 

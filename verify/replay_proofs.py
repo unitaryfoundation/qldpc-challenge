@@ -17,6 +17,7 @@ The sample excludes entries whose recorded solve and check time exceeds
 --max-secs, so a pull request pays for a few seconds of replay while the
 weekly run pays for all of it.
 """
+
 import argparse
 import glob
 import json
@@ -54,8 +55,7 @@ def replayable():
         except (OSError, ValueError):
             continue
         v = cert.get("verification") or {}
-        if v.get("level") == "proof_log" and v.get("replay") \
-                and v.get("cnf_sha256"):
+        if v.get("level") == "proof_log" and v.get("replay") and v.get("cnf_sha256"):
             out[slug] = cert
     return out
 
@@ -70,8 +70,7 @@ def recorded_secs():
             if not line.strip():
                 continue
             r = json.loads(line)
-            secs[r["slug"]] = sum((r.get(f"{s}_{k}") or 0) for s in "XZ"
-                                  for k in ("solve_secs", "check_secs"))
+            secs[r["slug"]] = sum((r.get(f"{s}_{k}") or 0) for s in "XZ" for k in ("solve_secs", "check_secs"))
     return secs
 
 
@@ -86,8 +85,7 @@ def _hashes(cert):
 
 def replay(slug, cert, work, tlim):
     """Regenerate, re-refute, and re-check one entry; return a report."""
-    with open(os.path.join(ROOT, "codes", slug + ".json"),
-              encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "codes", slug + ".json"), encoding="utf-8") as f:
         doc = json.load(f)
     n = doc["n"]
     HX = _matrix(doc["checks"]["X"], n)
@@ -111,24 +109,18 @@ def replay(slug, cert, work, tlim):
             # The recorded refutation was of a different formula than this
             # emitter now produces. That is a defect in the emitter or the
             # entry, not a proof of anything, so the side stops here.
-            blk["detail"] = (f"regenerated CNF hashes to {got[:16]}, the "
-                             f"certificate recorded {want[:16]}")
+            blk["detail"] = f"regenerated CNF hashes to {got[:16]}, the certificate recorded {want[:16]}"
             rep["ok"] = False
             rep["sides"][side] = blk
             continue
         try:
-            r = subprocess.run(["kissat", "-q", "--no-binary", cnf, proof],
-                               capture_output=True, text=True, timeout=tlim,
-                               check=False)
-            blk["kissat"] = {10: "SAT", 20: "UNSAT"}.get(
-                r.returncode, f"exit {r.returncode}")
+            r = subprocess.run(
+                ["kissat", "-q", "--no-binary", cnf, proof], capture_output=True, text=True, timeout=tlim, check=False
+            )
+            blk["kissat"] = {10: "SAT", 20: "UNSAT"}.get(r.returncode, f"exit {r.returncode}")
             if r.returncode == 20:
-                c = subprocess.run(["drat-trim", cnf, proof],
-                                   capture_output=True, text=True,
-                                   timeout=tlim, check=False)
-                blk["drat_trim"] = ("VERIFIED" if "s VERIFIED" in
-                                    (c.stdout or "") + (c.stderr or "")
-                                    else "NOT VERIFIED")
+                c = subprocess.run(["drat-trim", cnf, proof], capture_output=True, text=True, timeout=tlim, check=False)
+                blk["drat_trim"] = "VERIFIED" if "s VERIFIED" in (c.stdout or "") + (c.stderr or "") else "NOT VERIFIED"
         except subprocess.TimeoutExpired:
             blk["kissat"] = "TIMEOUT"
         blk["secs"] = round(time.time() - t0, 1)
@@ -171,27 +163,34 @@ def select_shard(items, spec, secs=None):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("slugs", nargs="*", help="entries to replay")
-    ap.add_argument("--all", action="store_true",
-                    help="replay every proof_log certificate")
-    ap.add_argument("--sample", type=int, default=0,
-                    help="replay this many entries chosen by --seed")
-    ap.add_argument("--seed", type=int, default=None,
-                    help="which rotating subset; defaults to the day number")
-    ap.add_argument("--max-secs", type=float, default=20.0,
-                    help="sample only entries whose recorded solve and check "
-                         "time is at most this (default 20)")
-    ap.add_argument("--tlim", type=int, default=900,
-                    help="per-solve and per-check time limit (default 900)")
-    ap.add_argument("--json", action="store_true",
-                    help="print one JSON report per entry")
-    ap.add_argument("--shard", default=None, metavar="I/K",
-                    help="replay only shard I of K of the chosen entries (every K-th "
-                         "of them in slug order from the I-th), so a run can be split "
-                         "across jobs (issue #5578)")
-    ap.add_argument("--max-minutes", type=float, default=None, metavar="M",
-                    help="stop opening entries after M minutes; what was opened is "
-                         "replayed to the end and the count left is reported (a budget "
-                         "stop is not a failure)")
+    ap.add_argument("--all", action="store_true", help="replay every proof_log certificate")
+    ap.add_argument("--sample", type=int, default=0, help="replay this many entries chosen by --seed")
+    ap.add_argument("--seed", type=int, default=None, help="which rotating subset; defaults to the day number")
+    ap.add_argument(
+        "--max-secs",
+        type=float,
+        default=20.0,
+        help="sample only entries whose recorded solve and check time is at most this (default 20)",
+    )
+    ap.add_argument("--tlim", type=int, default=900, help="per-solve and per-check time limit (default 900)")
+    ap.add_argument("--json", action="store_true", help="print one JSON report per entry")
+    ap.add_argument(
+        "--shard",
+        default=None,
+        metavar="I/K",
+        help="replay only shard I of K of the chosen entries (every K-th "
+        "of them in slug order from the I-th), so a run can be split "
+        "across jobs (issue #5578)",
+    )
+    ap.add_argument(
+        "--max-minutes",
+        type=float,
+        default=None,
+        metavar="M",
+        help="stop opening entries after M minutes; what was opened is "
+        "replayed to the end and the count left is reported (a budget "
+        "stop is not a failure)",
+    )
     a = ap.parse_args(argv)
 
     certs = replayable()
@@ -201,8 +200,7 @@ def main(argv=None):
     elif a.sample:
         pool = sorted(s for s in certs if secs.get(s, 0) <= a.max_secs)
         seed = a.seed if a.seed is not None else int(time.time() // 86400)
-        chosen = sorted(random.Random(seed).sample(pool,
-                                                   min(a.sample, len(pool))))
+        chosen = sorted(random.Random(seed).sample(pool, min(a.sample, len(pool))))
     else:
         chosen = a.slugs
     if a.shard is not None:
@@ -213,8 +211,7 @@ def main(argv=None):
             return 2
     missing = [s for s in chosen if s not in certs]
     if missing:
-        print(f"not replayable (no proof_log certificate with a replay "
-              f"recipe): {' '.join(missing)}")
+        print(f"not replayable (no proof_log certificate with a replay recipe): {' '.join(missing)}")
         return 2
     if not chosen:
         print("nothing to replay")
@@ -244,15 +241,18 @@ def main(argv=None):
             else:
                 sides = " ".join(
                     f"{s}:{'ok' if b.get('drat_trim') == 'VERIFIED' else 'FAIL'}"
-                    for s, b in sorted(rep["sides"].items()))  # noqa: E501
+                    for s, b in sorted(rep["sides"].items())
+                )  # noqa: E501
                 print(f"{slug}: {'ok' if rep['ok'] else 'FAILED'}  {sides}")
             if not rep["ok"]:
                 failed.append(rep)
     finally:
         shutil.rmtree(work, ignore_errors=True)
-    print(f"{len(chosen) - len(left)} replayed, {len(failed)} failed, "
-          + (f"{len(left)} left unopened at the {a.max_minutes:g} min budget, " if left else "")
-          + f"{round(time.time() - t0)}s")
+    print(
+        f"{len(chosen) - len(left)} replayed, {len(failed)} failed, "
+        + (f"{len(left)} left unopened at the {a.max_minutes:g} min budget, " if left else "")
+        + f"{round(time.time() - t0)}s"
+    )
     for rep in failed:
         print(json.dumps(rep, sort_keys=True))
     return 1 if failed else 0

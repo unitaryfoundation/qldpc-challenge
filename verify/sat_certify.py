@@ -69,6 +69,7 @@ stabilizer rows in the first block; RREF orders rows by pivot column, so the
 slice could keep stabilizers and drop logical classes. certify() now counts
 the classes the pairing set spans and refuses to solve unless it is all k.
 """
+
 import hashlib
 import json
 import os
@@ -158,9 +159,8 @@ def _solve_side(H_opp, L, W, tlim, use_symmetry=False, prefix=25):
         s.add_xor_clause(tidx + [top], False)
     if not selectors:
         return "UNSAT", None
-    s.add_clause(selectors)                 # at least one anticommutation
-    card = CardEnc.atmost(lits=list(range(1, n + 1)), bound=W,
-                          top_id=top, encoding=EncType.seqcounter)
+    s.add_clause(selectors)  # at least one anticommutation
+    card = CardEnc.atmost(lits=list(range(1, n + 1)), bound=W, top_id=top, encoding=EncType.seqcounter)
     top = max(top, card.nv)
     for cl in card.clauses:
         s.add_clause(cl)
@@ -191,7 +191,7 @@ def _solve_side(H_opp, L, W, tlim, use_symmetry=False, prefix=25):
 # instance, which is the stronger statement, and keeps the artifact free of
 # a constraint a checker would have to take on trust.
 
-XOR_CHUNK = 5          # XOR arity per chunk; 2^(c-1) clauses each
+XOR_CHUNK = 5  # XOR arity per chunk; 2^(c-1) clauses each
 
 
 def _xor_cnf(lits, parity, fresh):
@@ -205,11 +205,11 @@ def _xor_cnf(lits, parity, fresh):
     if not lits:
         return ([] if parity == 0 else [[]]), fresh
     while len(lits) > XOR_CHUNK:
-        head = lits[:XOR_CHUNK - 1]
+        head = lits[: XOR_CHUNK - 1]
         fresh += 1
         # aux carries the parity of the chunk it replaces: XOR(head, aux) = 0.
         out.extend(_xor_expand(head + [fresh], 0))
-        lits = [fresh] + lits[XOR_CHUNK - 1:]
+        lits = [fresh] + lits[XOR_CHUNK - 1 :]
     out.extend(_xor_expand(lits, parity))
     return out, fresh
 
@@ -252,8 +252,7 @@ def side_cnf(H_opp, L, W):
     if not selectors:
         return None, 0
     clauses.append(list(selectors))
-    card = CardEnc.atmost(lits=list(range(1, n + 1)), bound=W,
-                          top_id=fresh, encoding=EncType.seqcounter)
+    card = CardEnc.atmost(lits=list(range(1, n + 1)), bound=W, top_id=fresh, encoding=EncType.seqcounter)
     clauses.extend([list(c) for c in card.clauses])
     fresh = max(fresh, card.nv)
     return clauses, fresh
@@ -281,8 +280,7 @@ def _tool_version(cmd, args, pattern):
     and "drat-trim" alone does not say which drat-trim checked the proof.
     """
     try:
-        r = subprocess.run([cmd, *args], capture_output=True, text=True,
-                           timeout=30, check=False)
+        r = subprocess.run([cmd, *args], capture_output=True, text=True, timeout=30, check=False)
     except (OSError, subprocess.SubprocessError):
         return None
     text = (r.stdout or "") + (r.stderr or "")
@@ -321,46 +319,53 @@ def prove_side(H_opp, L, W, outdir, tag, *, tlim=600, keep_proof=False):
 
     clauses, nvars = side_cnf(H_opp, L, W)
     if clauses is None:
-        return {"status": "NO_PAIRING", "proved": False,
-                "detail": "no pairing generator, so there is nothing to ask"}
+        return {"status": "NO_PAIRING", "proved": False, "detail": "no pairing generator, so there is nothing to ask"}
     t0 = time.time()
     cnf_sha = write_dimacs(clauses, nvars, cnf_path)
-    rec = {"cnf": {"path": cnf_path, "sha256": cnf_sha, "vars": nvars,
-                   "clauses": len(clauses),
-                   "bytes": os.path.getsize(cnf_path)},
-           "xor_chunk": XOR_CHUNK}
+    rec = {
+        "cnf": {
+            "path": cnf_path,
+            "sha256": cnf_sha,
+            "vars": nvars,
+            "clauses": len(clauses),
+            "bytes": os.path.getsize(cnf_path),
+        },
+        "xor_chunk": XOR_CHUNK,
+    }
     try:
-        r = subprocess.run(["kissat", "-q", "--no-binary", cnf_path,
-                            proof_path],
-                           capture_output=True, text=True, timeout=tlim,
-                           check=False)
+        r = subprocess.run(
+            ["kissat", "-q", "--no-binary", cnf_path, proof_path],
+            capture_output=True,
+            text=True,
+            timeout=tlim,
+            check=False,
+        )
     except subprocess.TimeoutExpired:
-        rec.update(status="TIMEOUT", proved=False,
-                   detail=f"kissat did not finish in {tlim}s")
+        rec.update(status="TIMEOUT", proved=False, detail=f"kissat did not finish in {tlim}s")
         return rec
     except OSError as e:
         rec.update(status="NO_SOLVER", proved=False, detail=str(e))
         return rec
     rec["solve_secs"] = round(time.time() - t0, 1)
     if r.returncode == 10:
-        rec.update(status="SAT", proved=False,
-                   detail="satisfiable: a logical under the bound exists")
+        rec.update(status="SAT", proved=False, detail="satisfiable: a logical under the bound exists")
         return rec
     if r.returncode != 20:
-        rec.update(status="UNKNOWN", proved=False,
-                   detail=f"kissat exit {r.returncode}")
+        rec.update(status="UNKNOWN", proved=False, detail=f"kissat exit {r.returncode}")
         return rec
     rec["proof"] = {"path": proof_path, "bytes": os.path.getsize(proof_path)}
 
     t1 = time.time()
     try:
-        c = subprocess.run(["drat-trim", cnf_path, proof_path, "-l",
-                            trim_path],
-                           capture_output=True, text=True, timeout=tlim,
-                           check=False)
+        c = subprocess.run(
+            ["drat-trim", cnf_path, proof_path, "-l", trim_path],
+            capture_output=True,
+            text=True,
+            timeout=tlim,
+            check=False,
+        )
     except subprocess.TimeoutExpired:
-        rec.update(status="UNSAT", proved=False,
-                   detail=f"drat-trim did not finish in {tlim}s")
+        rec.update(status="UNSAT", proved=False, detail=f"drat-trim did not finish in {tlim}s")
         return rec
     except OSError as e:
         rec.update(status="UNSAT", proved=False, detail=str(e))
@@ -369,11 +374,9 @@ def prove_side(H_opp, L, W, outdir, tag, *, tlim=600, keep_proof=False):
     rec["check_secs"] = round(time.time() - t1, 1)
     rec["verified"] = "s VERIFIED" in out
     if os.path.exists(trim_path):
-        rec["trimmed"] = {"path": trim_path,
-                          "bytes": os.path.getsize(trim_path)}
+        rec["trimmed"] = {"path": trim_path, "bytes": os.path.getsize(trim_path)}
     if not rec["verified"]:
-        rec.update(status="UNSAT", proved=False,
-                   detail="drat-trim did not verify the proof")
+        rec.update(status="UNSAT", proved=False, detail="drat-trim did not verify the proof")
         return rec
     rec.update(status="UNSAT", proved=True)
     if not keep_proof and os.path.exists(proof_path):
@@ -401,12 +404,12 @@ def _rung(H_opp, L, W, tlim, sym, proof_dir, tag):
         # path running out of budget where the proof path finishes is the
         # proof path being faster, which on this encoding it sometimes is.
         verdicts = {"SAT", "UNSAT"}
-        if (pr.get("status") in verdicts and status in verdicts
-                and pr["status"] != status):
+        if pr.get("status") in verdicts and status in verdicts and pr["status"] != status:
             raise ValueError(
                 f"W = {W}: the XOR encoding says {status} and the pure-CNF "
                 f"encoding says {pr['status']}; one of the two is wrong and "
-                f"neither verdict is usable until that is found")
+                f"neither verdict is usable until that is found"
+            )
         # A refutation drat-trim has checked is stronger evidence than the
         # incumbent path produces, so it settles a rung the incumbent left
         # open rather than being discarded for not matching it.
@@ -415,8 +418,7 @@ def _rung(H_opp, L, W, tlim, sym, proof_dir, tag):
     return status, wit, pr, settled
 
 
-def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
-            budget=None, start=1):
+def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False, budget=None, start=1):
     """Certify a submission doc's distance exactly, mirroring certify.certify.
 
     Returns per-side ``exact`` flags and an overall ``d_exact``. A SAT result
@@ -441,9 +443,15 @@ def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
     HZ = _matrix(doc["checks"]["Z"], n)
     d = int(doc["distance"]["d"])
     k = n - gf2.rank(HX) - gf2.rank(HZ)
-    out = {"name": doc.get("name"), "d": d, "solver": "CryptoMiniSat 5.14 SAT",
-           "encoding": "selector", "sides": {}, "tlim_per_solve": tlim,
-           "logical_classes": int(k)}
+    out = {
+        "name": doc.get("name"),
+        "d": d,
+        "solver": "CryptoMiniSat 5.14 SAT",
+        "encoding": "selector",
+        "sides": {},
+        "tlim_per_solve": tlim,
+        "logical_classes": int(k),
+    }
     rungs = list(range(max(1, int(start)), d)) if ladder else [d - 1]
     if not rungs:
         rungs = [d - 1]
@@ -452,8 +460,7 @@ def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
     # Symmetry breaking is applied only when the rotation is checked to fix
     # both row spaces, so a non-circulant entry degrades to the plain encoding
     # instead of being pruned by a constraint that does not hold for it.
-    sym = (n % 2 == 0 and _perm_fixes(HX, _shift_perm(n))
-           and _perm_fixes(HZ, _shift_perm(n)))
+    sym = n % 2 == 0 and _perm_fixes(HX, _shift_perm(n)) and _perm_fixes(HZ, _shift_perm(n))
     out["symmetry"] = bool(sym)
     for side, H_same, H_opp in (("X", HX, HZ), ("Z", HZ, HX)):
         t0 = time.time()
@@ -466,42 +473,36 @@ def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
         # what it has to be independent of. The check holds at every rung:
         # an UNSAT from a deficient pairing set is as meaningless at W = 5
         # as at W = d - 1.
-        spanned = (gf2.rank(np.vstack([H_opp, L])) - gf2.rank(H_opp)
-                   if len(L) else 0)
+        spanned = gf2.rank(np.vstack([H_opp, L])) - gf2.rank(H_opp) if len(L) else 0
         if spanned != k:
             raise ValueError(
                 f"{side} side: pairing set spans {spanned} of {k} logical "
-                f"classes, so UNSAT here would not mean no light logical")
+                f"classes, so UNSAT here would not mean no light logical"
+            )
         history, proved, decider, last_pr = [], 1, None, None
         status, wit, stopped_at = None, None, None
         for W in rungs:
             if budget is not None and history and time.time() - t0 > budget:
                 stopped_at = W
                 break
-            tag = (f"{n}-{k}-{d}-{side}-W{W}" if ladder
-                   else f"{n}-{k}-{d}-{side}")
+            tag = f"{n}-{k}-{d}-{side}-W{W}" if ladder else f"{n}-{k}-{d}-{side}"
             r0 = time.time()
-            status, wit, pr, settled = _rung(H_opp, L, W, tlim, sym,
-                                             proof_dir, tag)
-            rung = {"W": W, "status": status,
-                    "secs": round(time.time() - r0, 1)}
+            status, wit, pr, settled = _rung(H_opp, L, W, tlim, sym, proof_dir, tag)
+            rung = {"W": W, "status": status, "secs": round(time.time() - r0, 1)}
             if pr is not None:
-                rung["proof"] = ("verified" if pr.get("proved")
-                                 else pr.get("detail") or pr.get("status") or "?")
+                rung["proof"] = "verified" if pr.get("proved") else pr.get("detail") or pr.get("status") or "?"
                 if (pr.get("cnf") or {}).get("sha256"):
                     # Which formula this rung refuted, so a raised ladder
                     # can carry the rung's proof forward without the block.
                     rung["cnf_sha256"] = pr["cnf"]["sha256"]
                 if settled:
-                    rung["note"] = ("the XOR encoding timed out and the "
-                                    "checked pure-CNF refutation settled it")
+                    rung["note"] = "the XOR encoding timed out and the checked pure-CNF refutation settled it"
             history.append(rung)
             last_pr = pr
             if status != "UNSAT":
                 break
             proved, decider = W + 1, pr
-        blk = {"value": d, "exact": proved >= d, "status": status,
-               "secs": round(time.time() - t0, 1)}
+        blk = {"value": d, "exact": proved >= d, "status": status, "secs": round(time.time() - t0, 1)}
         if ladder:
             blk["proved_min"] = proved
             blk["ladder"] = history
@@ -512,28 +513,25 @@ def certify(doc, tlim=600, proof_dir=None, slug=None, *, ladder=False,
         if status == "UNSAT":
             blk["note"] = f"no logical < {proved} exists"
             if stopped_at is not None:
-                blk["note"] += (f"; the {budget:g} s budget was spent before "
-                                f"W = {stopped_at}")
+                blk["note"] += f"; the {budget:g} s budget was spent before W = {stopped_at}"
         elif status == "SAT":
             blk["note"] = f"REFUTED: logical of weight <= {history[-1]['W']} exists"
             blk["witness"] = wit
         elif proved > 1:
-            blk["note"] = (f"no logical < {proved} exists; W = "
-                           f"{history[-1]['W']} {status}")
+            blk["note"] = f"no logical < {proved} exists; W = {history[-1]['W']} {status}"
         out["sides"][side] = blk
         if status == "SAT":
             break
-    out["d_exact"] = all(b.get("exact") for b in out["sides"].values()) \
-        and len(out["sides"]) == 2
+    out["d_exact"] = all(b.get("exact") for b in out["sides"].values()) and len(out["sides"]) == 2
     if ladder:
         out["d_lower"] = min(b["proved_min"] for b in out["sides"].values())
     if proof_dir is not None or ladder:
-        out["verification"] = _verification_block(
-            out, slug=slug or f"{n}-{k}-{d}")
+        out["verification"] = _verification_block(out, slug=slug or f"{n}-{k}-{d}")
         if ladder and not out["d_exact"]:
             # A partial certificate is about these matrices, whatever the
             # entry claims later; the hash is what the site honors it by.
             from check_certs import checks_sha256
+
             out["verification"]["checks_sha256"] = checks_sha256(doc)
     return out
 
@@ -555,25 +553,21 @@ def _verification_block(out, *, slug=None):
     proofs = [b.get("proof") or {} for b in out["sides"].values()]
     partial = not out.get("d_exact") and (out.get("d_lower") or 1) >= 2
     if not (out.get("d_exact") or partial):
-        return {"level": "solver",
-                "note": "no exact verdict, so there is nothing to carry a "
-                        "proof for"}
+        return {"level": "solver", "note": "no exact verdict, so there is nothing to carry a proof for"}
     if not any(proofs):
-        return {"level": "solver",
-                "note": "no proof path was run; a solver verdict with no "
-                        "artifact a third party can check"}
+        return {
+            "level": "solver",
+            "note": "no proof path was run; a solver verdict with no artifact a third party can check",
+        }
     if not all(p.get("proved") for p in proofs):
-        why = "; ".join(sorted({p.get("detail") or p.get("status") or "?"
-                                for p in proofs if not p.get("proved")}))
-        return {"level": "solver",
-                "note": f"proof path did not complete: {why}"[:500]}
+        why = "; ".join(sorted({p.get("detail") or p.get("status") or "?" for p in proofs if not p.get("proved")}))
+        return {"level": "solver", "note": f"proof path did not complete: {why}"[:500]}
     tools = tool_versions()
     sides = {side: blk["proof"] for side, blk in out["sides"].items()}
     return {
         "level": "proof_log",
         "checker": f"drat-trim {tools['drat_trim'] or 'unknown'}",
-        "cnf_sha256": ";".join(f"{side}={rec['cnf']['sha256']}"
-                               for side, rec in sorted(sides.items())),
+        "cnf_sha256": ";".join(f"{side}={rec['cnf']['sha256']}" for side, rec in sorted(sides.items())),
         # The recipe rather than the refutation. The trimmed cores run to
         # tens of megabytes apiece, nothing in CI can audit a committed
         # blob, and a formula regenerated from this entry and re-checked is
@@ -584,15 +578,15 @@ def _verification_block(out, *, slug=None):
         # exact certificate.
         "replay": {
             "emit": f"python verify/replay_proofs.py {slug}",
-            "check": "kissat --no-binary <side>.cnf <side>.proof; "
-                     "drat-trim <side>.cnf <side>.proof",
-            "emitter": f"verify/sat_certify.py side_cnf, XOR chunk arity "
-                       f"{XOR_CHUNK}, no symmetry prefix",
+            "check": "kissat --no-binary <side>.cnf <side>.proof; drat-trim <side>.cnf <side>.proof",
+            "emitter": f"verify/sat_certify.py side_cnf, XOR chunk arity {XOR_CHUNK}, no symmetry prefix",
         },
-        "note": (f"pure-CNF re-encoding refuted by kissat "
-                 f"{tools['kissat'] or '?'} and checked by drat-trim; the "
-                 f"XOR path agrees. Confirms the CNF is unsatisfiable, not "
-                 f"that it asks the distance question")[:500],
+        "note": (
+            f"pure-CNF re-encoding refuted by kissat "
+            f"{tools['kissat'] or '?'} and checked by drat-trim; the "
+            f"XOR path agrees. Confirms the CNF is unsatisfiable, not "
+            f"that it asks the distance question"
+        )[:500],
     }
 
 
@@ -610,26 +604,34 @@ def _cli(argv=None):
 
     ap = argparse.ArgumentParser(
         description="Exact distance certification. With --proof, also emit a "
-                    "pure-CNF re-encoding, refute it with kissat, and check "
-                    "the refutation with drat-trim.")
+        "pure-CNF re-encoding, refute it with kissat, and check "
+        "the refutation with drat-trim."
+    )
     ap.add_argument("codes", nargs="+", help="code JSON files")
-    ap.add_argument("--proof", metavar="DIR", default=None,
-                    help="working directory for the CNF, the proof, and the "
-                         "trimmed core")
-    ap.add_argument("--tlim", type=int, default=600,
-                    help="per-solve time limit in seconds (default 600)")
-    ap.add_argument("--json", action="store_true",
-                    help="print the certificate instead of a summary line")
-    ap.add_argument("--ladder", action="store_true",
-                    help="ask W = 1, 2, ... up to d - 1 instead of d - 1 "
-                         "alone, so a timeout still leaves a proven lower "
-                         "bound d_lower (issue #4230)")
-    ap.add_argument("--budget", type=float, default=None,
-                    help="with --ladder: seconds per side before the ladder "
-                         "stops opening rungs (default: until a rung times out)")
-    ap.add_argument("--start", type=int, default=1,
-                    help="with --ladder: the first W to ask, to resume a "
-                         "ladder a previous certificate left at start - 1")
+    ap.add_argument(
+        "--proof", metavar="DIR", default=None, help="working directory for the CNF, the proof, and the trimmed core"
+    )
+    ap.add_argument("--tlim", type=int, default=600, help="per-solve time limit in seconds (default 600)")
+    ap.add_argument("--json", action="store_true", help="print the certificate instead of a summary line")
+    ap.add_argument(
+        "--ladder",
+        action="store_true",
+        help="ask W = 1, 2, ... up to d - 1 instead of d - 1 "
+        "alone, so a timeout still leaves a proven lower "
+        "bound d_lower (issue #4230)",
+    )
+    ap.add_argument(
+        "--budget",
+        type=float,
+        default=None,
+        help="with --ladder: seconds per side before the ladder stops opening rungs (default: until a rung times out)",
+    )
+    ap.add_argument(
+        "--start",
+        type=int,
+        default=1,
+        help="with --ladder: the first W to ask, to resume a ladder a previous certificate left at start - 1",
+    )
     args = ap.parse_args(argv)
 
     rc = 0
@@ -637,21 +639,29 @@ def _cli(argv=None):
         with open(path, encoding="utf-8") as f:
             doc = json.load(f)
         slug = os.path.splitext(os.path.basename(path))[0]
-        out = certify(doc, tlim=args.tlim, proof_dir=args.proof, slug=slug,
-                      ladder=args.ladder, budget=args.budget, start=args.start)
+        out = certify(
+            doc,
+            tlim=args.tlim,
+            proof_dir=args.proof,
+            slug=slug,
+            ladder=args.ladder,
+            budget=args.budget,
+            start=args.start,
+        )
         if args.json:
             print(json.dumps(out, indent=2, sort_keys=True))
             continue
         v = out.get("verification") or {}
-        line = (f"{os.path.basename(path)}: d_exact={out['d_exact']}"
-                + (f" d_lower={out['d_lower']}" if "d_lower" in out else "")
-                + f" level={v.get('level', 'solver')}")
+        line = (
+            f"{os.path.basename(path)}: d_exact={out['d_exact']}"
+            + (f" d_lower={out['d_lower']}" if "d_lower" in out else "")
+            + f" level={v.get('level', 'solver')}"
+        )
         for side, blk in out["sides"].items():
             pr = blk.get("proof") or {}
             bits = [blk["status"]]
             if pr:
-                bits.append("proof " + ("verified" if pr.get("proved")
-                                        else pr.get("detail") or "no"))
+                bits.append("proof " + ("verified" if pr.get("proved") else pr.get("detail") or "no"))
                 if pr.get("trimmed"):
                     bits.append(f"{pr['trimmed']['bytes']}B trimmed")
                 if pr.get("solve_secs") is not None:

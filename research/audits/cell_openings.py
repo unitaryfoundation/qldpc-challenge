@@ -19,6 +19,7 @@ so it is recorded here and never shown as a badge, ranked, or scored.
     uv run python research/audits/cell_openings.py
     uv run python research/audits/cell_openings.py --out research/audits/cell_openings-<date>.json --markdown
 """
+
 import argparse
 import datetime
 import importlib.util
@@ -40,21 +41,31 @@ def load_site_build():
 
 def _head():
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True,
-                                       stderr=subprocess.DEVNULL).strip()
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, stderr=subprocess.DEVNULL
+        ).strip()
     except (OSError, subprocess.CalledProcessError):
         return None
 
 
 def _row(e):
-    return {"slug": e["slug"], "date": e.get("date") or None, "family": e["family"], "origin": e["origin"],
-            "n": e["n"], "k": e["k"], "d": e["d"]}
+    return {
+        "slug": e["slug"],
+        "date": e.get("date") or None,
+        "family": e["family"],
+        "origin": e["origin"],
+        "n": e["n"],
+        "k": e["k"],
+        "d": e["d"],
+    }
 
 
 def openings(entries, cells_by_key):
     """Per cell: the first entry, the first per declared family, and the first modular and 3D entries."""
+
     def order(i):
         return (entries[i].get("date") or "~", entries[i]["slug"])
+
     out = {}
     for cell, idxs in cells_by_key.items():
         ranked = sorted(idxs, key=order)
@@ -68,9 +79,13 @@ def openings(entries, cells_by_key):
             if three_d is None and e.get("geo_dim") == 3:
                 three_d = _row(e)
         key = "~".join(str(c) for c in cell)
-        out[key] = {"members": len(idxs), "first": _row(first),
-                    "first_by_declared_family": dict(sorted(fams.items())),
-                    "first_modular": modular, "first_3d_layout": three_d}
+        out[key] = {
+            "members": len(idxs),
+            "first": _row(first),
+            "first_by_declared_family": dict(sorted(fams.items())),
+            "first_modular": modular,
+            "first_3d_layout": three_d,
+        }
     return dict(sorted(out.items()))
 
 
@@ -78,36 +93,52 @@ def record(entries, cells_by_key):
     table = openings(entries, cells_by_key)
     openers = {v["first"]["slug"] for v in table.values()}
     fam_openers = {r["slug"] for v in table.values() for r in v["first_by_declared_family"].values()}
-    return {"audit_version": 1, "issue": 4029,
-            "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(), "head": _head(),
-            "definitions": {
-                "cell": "a populated primary-track cell key: locality class, weight class, and code type for a "
-                        "stabilizer entry (site/build.py cells_by_key); cells nest, so an entry is in every "
-                        "cell it qualifies for",
-                "first": "the member with the earliest provenance.date, ties broken by slug; a seeded baseline "
-                         "carries its publication date, a submission its submission date",
-                "family": "the entry's declared family tag, the board's one self-declared label",
-                "modular": "the verifier's modular-layout flag", "3d_layout": "the verifier's layout dimension"},
-            "caveat": ("first arrival is a fact about the board's history, not a property of a code; nothing "
-                       "here is a flag, a rank, or a score (decision on issue #4029)"),
-            "counts": {"cells": len(table), "entries": len(entries), "distinct_cell_openers": len(openers),
-                       "distinct_family_in_cell_openers": len(fam_openers)},
-            "cells": table}
+    return {
+        "audit_version": 1,
+        "issue": 4029,
+        "date": datetime.datetime.now(datetime.timezone.utc).date().isoformat(),
+        "head": _head(),
+        "definitions": {
+            "cell": "a populated primary-track cell key: locality class, weight class, and code type for a "
+            "stabilizer entry (site/build.py cells_by_key); cells nest, so an entry is in every "
+            "cell it qualifies for",
+            "first": "the member with the earliest provenance.date, ties broken by slug; a seeded baseline "
+            "carries its publication date, a submission its submission date",
+            "family": "the entry's declared family tag, the board's one self-declared label",
+            "modular": "the verifier's modular-layout flag",
+            "3d_layout": "the verifier's layout dimension",
+        },
+        "caveat": (
+            "first arrival is a fact about the board's history, not a property of a code; nothing "
+            "here is a flag, a rank, or a score (decision on issue #4029)"
+        ),
+        "counts": {
+            "cells": len(table),
+            "entries": len(entries),
+            "distinct_cell_openers": len(openers),
+            "distinct_family_in_cell_openers": len(fam_openers),
+        },
+        "cells": table,
+    }
 
 
 def markdown(rec):
     c = rec["counts"]
-    lines = [f"{c['cells']} cells, {c['entries']} entries; {c['distinct_cell_openers']} distinct entries opened "
-             f"a cell, {c['distinct_family_in_cell_openers']} opened a declared family within a cell.", "",
-             "| cell | members | first entry (date, family, origin) | declared families | first modular "
-             "| first 3D |",
-             "|---|---|---|---|---|---|"]
+    lines = [
+        f"{c['cells']} cells, {c['entries']} entries; {c['distinct_cell_openers']} distinct entries opened "
+        f"a cell, {c['distinct_family_in_cell_openers']} opened a declared family within a cell.",
+        "",
+        "| cell | members | first entry (date, family, origin) | declared families | first modular | first 3D |",
+        "|---|---|---|---|---|---|",
+    ]
     for key, v in rec["cells"].items():
         f = v["first"]
-        lines.append(f"| {key} | {v['members']:,} | {f['slug']} ({f['date']}, {f['family']}, {f['origin']}) | "
-                     f"{len(v['first_by_declared_family'])} | "
-                     f"{(v['first_modular'] or {}).get('slug', '-')} | "
-                     f"{(v['first_3d_layout'] or {}).get('slug', '-')} |")
+        lines.append(
+            f"| {key} | {v['members']:,} | {f['slug']} ({f['date']}, {f['family']}, {f['origin']}) | "
+            f"{len(v['first_by_declared_family'])} | "
+            f"{(v['first_modular'] or {}).get('slug', '-')} | "
+            f"{(v['first_3d_layout'] or {}).get('slug', '-')} |"
+        )
     return "\n".join(lines)
 
 

@@ -1,0 +1,295 @@
+{
+ "schema_version": "0.2",
+ "name": "[[76,38,2]]",
+ "code_type": "CSS",
+ "n": 76,
+ "k": 38,
+ "checks": {
+  "X": [
+   [
+    0,
+    19,
+    38,
+    57
+   ],
+   [
+    1,
+    20,
+    39,
+    58
+   ],
+   [
+    2,
+    21,
+    40,
+    59
+   ],
+   [
+    3,
+    22,
+    41,
+    60
+   ],
+   [
+    4,
+    23,
+    42,
+    61
+   ],
+   [
+    5,
+    24,
+    43,
+    62
+   ],
+   [
+    6,
+    25,
+    44,
+    63
+   ],
+   [
+    7,
+    26,
+    45,
+    64
+   ],
+   [
+    8,
+    27,
+    46,
+    65
+   ],
+   [
+    9,
+    28,
+    47,
+    66
+   ],
+   [
+    10,
+    29,
+    48,
+    67
+   ],
+   [
+    11,
+    30,
+    49,
+    68
+   ],
+   [
+    12,
+    31,
+    50,
+    69
+   ],
+   [
+    13,
+    32,
+    51,
+    70
+   ],
+   [
+    14,
+    33,
+    52,
+    71
+   ],
+   [
+    15,
+    34,
+    53,
+    72
+   ],
+   [
+    16,
+    35,
+    54,
+    73
+   ],
+   [
+    17,
+    36,
+    55,
+    74
+   ],
+   [
+    18,
+    37,
+    56,
+    75
+   ]
+  ],
+  "Z": [
+   [
+    0,
+    20,
+    38,
+    58
+   ],
+   [
+    1,
+    21,
+    39,
+    59
+   ],
+   [
+    2,
+    22,
+    40,
+    60
+   ],
+   [
+    3,
+    23,
+    41,
+    61
+   ],
+   [
+    4,
+    24,
+    42,
+    62
+   ],
+   [
+    5,
+    25,
+    43,
+    63
+   ],
+   [
+    6,
+    26,
+    44,
+    64
+   ],
+   [
+    7,
+    27,
+    45,
+    65
+   ],
+   [
+    8,
+    28,
+    46,
+    66
+   ],
+   [
+    9,
+    29,
+    47,
+    67
+   ],
+   [
+    10,
+    30,
+    48,
+    68
+   ],
+   [
+    11,
+    31,
+    49,
+    69
+   ],
+   [
+    12,
+    32,
+    50,
+    70
+   ],
+   [
+    13,
+    33,
+    51,
+    71
+   ],
+   [
+    14,
+    34,
+    52,
+    72
+   ],
+   [
+    15,
+    35,
+    53,
+    73
+   ],
+   [
+    16,
+    36,
+    54,
+    74
+   ],
+   [
+    17,
+    37,
+    55,
+    75
+   ],
+   [
+    18,
+    19,
+    56,
+    57
+   ]
+  ]
+ },
+ "distance": {
+  "d": 2,
+  "X": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    5,
+    63
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-11-23",
+    "found_at_samples": 8000,
+    "survived_samples": 8000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     0
+    ]
+   }
+  },
+  "Z": {
+   "value": 2,
+   "confidence": "upper_bound",
+   "witness": [
+    26,
+    45
+   ],
+   "witness_provenance": {
+    "found_by": [
+     "@mathysrennela"
+    ],
+    "date": "2026-11-23",
+    "found_at_samples": 8000,
+    "survived_samples": 8000,
+    "tool": "research/kit/surrogate.lightest_logical",
+    "seeds": [
+     1
+    ]
+   }
+  }
+ },
+ "provenance": {
+  "authors": [
+   "@mathysrennela"
+  ],
+  "construction": "cc v0.3.1 pair-partition arm; L-PAIR-PARTITION p=19 L=4 shifts all-zero/alternating, derived by the priced calculus.",
+  "origin": "submission",
+  "date": "2026-11-23",
+  "model": "Hy 4 flash",
+  "harness": "opencode"
+ },
+ "family": "pair-partition-cpm"
+}

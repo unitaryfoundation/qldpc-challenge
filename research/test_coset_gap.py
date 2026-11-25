@@ -21,7 +21,6 @@ Run: uv run --extra research python -m pytest research/test_coset_gap.py
 
 import os
 import shutil
-import subprocess
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +29,6 @@ sys.path.insert(0, os.path.join(_HERE, "kit"))
 sys.path.insert(0, os.path.join(_HERE, "..", "verify"))
 
 import pytest
-
 from coset_gap import PAPER_INSTANCES, build
 from css import compute_k, verify_css
 from surrogate import distance_rand
@@ -60,6 +58,6 @@ def test_distance_upper_bounds_agree_with_the_paper():
 
 def test_paper_instance_table_is_wellformed():
     """The transcription is internally consistent per entry."""
-    for (n, k, d, ell, m, s, ahat, bhat) in PAPER_INSTANCES:
+    for n, k, d, ell, m, s, ahat, bhat in PAPER_INSTANCES:
         assert ell > 0 and s >= 1 and len(ahat) == len(bhat), (n, k)
         assert 1 <= k <= n // 2 and d <= n, (n, k, d)

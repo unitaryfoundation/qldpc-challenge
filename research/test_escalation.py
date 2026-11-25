@@ -16,6 +16,7 @@ below the 106.11 bar. 5.3M trials went into it because nothing forced the
 early hold/abandon call; the fence tests assert the gate fires on that
 ladder, in both directions.
 """
+
 import json
 import os
 import sys
@@ -25,24 +26,22 @@ import escalation as E
 
 
 def _verdict(action, confidence, escaped=False):
-    return {"recommendation": {"selected": action, "confidence": confidence,
-                               "escaped": escaped}}
+    return {"recommendation": {"selected": action, "confidence": confidence, "escaped": escaped}}
 
 
 def _note_ladder():
     """The 2026-09-20 ladder: screen 22, then four fresh deep rungs flat 20."""
-    return [(20_000, 22), (100_000, 20), (200_000, 20),
-            (1_000_000, 20), (4_000_000, 20)]
+    return [(20_000, 22), (100_000, 20), (200_000, 20), (1_000_000, 20), (4_000_000, 20)]
 
 
 def _below_bar_brief(**kw):
-    base = dict(n=904, k=230, rungs=_note_ladder(), bar=106.11,
-                family="pair-partition", spec={"P": 113})
+    base = dict(n=904, k=230, rungs=_note_ladder(), bar=106.11, family="pair-partition", spec={"P": 113})
     base.update(kw)
     return E.rung_brief(**base)
 
 
 # ---------------------------------------------------------------- the facts
+
 
 def test_brief_facts_match_the_fieldnote_arithmetic():
     """Every fact must be recomputable by hand from the raw ladder.
@@ -72,8 +71,7 @@ def test_brief_flags_a_descending_ladder():
     inflation is unbounded, so nothing may certify it as finished. The flag
     is informational; the flat-tail fence is what actually blocks abandon.
     """
-    b = E.rung_brief(n=904, k=230, rungs=[(20_000, 22), (100_000, 20)],
-                     bar=106.11)
+    b = E.rung_brief(n=904, k=230, rungs=[(20_000, 22), (100_000, 20)], bar=106.11)
     assert b["facts"]["ladder_still_descending"] is True
     assert b["facts"]["flat_fresh_rungs_at_best"] == 1
 
@@ -94,6 +92,7 @@ def test_efficiency_never_drifts_from_the_search_metric():
     relative to the bar, so the agreement is pinned over a grid.
     """
     import search
+
     for n in (72, 904, 1000):
         for k in (1, 12, 230):
             for d in (2, 6, 20, 38):
@@ -107,12 +106,15 @@ def test_jev_request_stays_inside_the_tool_limits():
     ``python -O``; this test re-checks the real brief explicitly.
     """
     big_spec = {"note": "x" * 400, "params": list(range(50))}
-    rungs = [(t, d) for t, d in zip((400, 2_000, 20_000, 200_000,
-                                     1_000_000, 4_000_000, 8_000_000,
-                                     16_000_000), (40, 34, 30, 28, 27, 27, 26, 26))]
-    b = E.rung_brief(n=960, k=14, rungs=rungs, bar=30.48,
-                     spec=big_spec, family="2bga-metacyclic",
-                     context={"frontier": False})
+    rungs = [
+        (t, d)
+        for t, d in zip(
+            (400, 2_000, 20_000, 200_000, 1_000_000, 4_000_000, 8_000_000, 16_000_000), (40, 34, 30, 28, 27, 27, 26, 26)
+        )
+    ]
+    b = E.rung_brief(
+        n=960, k=14, rungs=rungs, bar=30.48, spec=big_spec, family="2bga-metacyclic", context={"frontier": False}
+    )
     req = b["jev_request"]
     for key in ("decision", "evidence", "priorities"):
         assert len(req[key]) <= E.JEV_LIMITS[key], key
@@ -150,6 +152,7 @@ def test_rung_inputs_are_validated():
 
 # ------------------------------------------------------------ the fences
 
+
 def test_missing_verdict_holds():
     """No judgment available -> hold and deepen. Never guess."""
     d = E.apply_verdict(_below_bar_brief(), None)
@@ -159,27 +162,26 @@ def test_missing_verdict_holds():
 
 def test_malformed_verdict_holds():
     """Anything unparsable holds; the journal shows why."""
-    for bad in ({}, {"recommendation": "abandon"},
-                {"recommendation": {"selected": "abandon-ladder",
-                                    "confidence": "high"}},
-                {"recommendation": {"selected": "abandon-ladder",
-                                    "confidence": True}}):
+    for bad in (
+        {},
+        {"recommendation": "abandon"},
+        {"recommendation": {"selected": "abandon-ladder", "confidence": "high"}},
+        {"recommendation": {"selected": "abandon-ladder", "confidence": True}},
+    ):
         d = E.apply_verdict(_below_bar_brief(), bad)
         assert d["action"] == "abandon-ladder" and d["advisories"] == ["no-verdict"]
 
 
 def test_escaped_verdict_holds():
     """The tool declining to rank is a hold, whatever it leaned toward."""
-    d = E.apply_verdict(_below_bar_brief(),
-                        _verdict("abandon-ladder", 0.95, escaped=True))
+    d = E.apply_verdict(_below_bar_brief(), _verdict("abandon-ladder", 0.95, escaped=True))
     assert d["action"] == "hold-deepen"
     assert "escaped-verdict" in d["advisories"]
 
 
 def test_low_confidence_verdict_holds():
     """Below HOLD_CONFIDENCE the harness keeps the decision itself."""
-    d = E.apply_verdict(_below_bar_brief(),
-                        _verdict("promote-next-rung", E.HOLD_CONFIDENCE - 0.01))
+    d = E.apply_verdict(_below_bar_brief(), _verdict("promote-next-rung", E.HOLD_CONFIDENCE - 0.01))
     assert d["action"] == "hold-deepen"
     assert "low-confidence" in d["advisories"]
 
@@ -227,8 +229,7 @@ def test_above_bar_ladder_cannot_be_abandoned_at_any_confidence():
 
 def test_frontier_flag_blocks_abandon():
     """Frontier membership is worth protecting; the verdict does not outweigh it."""
-    d = E.apply_verdict(_below_bar_brief(context={"frontier": True}),
-                        _verdict("abandon-ladder", 1.0))
+    d = E.apply_verdict(_below_bar_brief(context={"frontier": True}), _verdict("abandon-ladder", 1.0))
     assert d["action"] == "hold-deepen"
     assert "abandon-unproven" in d["advisories"]
 
@@ -244,14 +245,12 @@ def test_promote_needs_budget_and_honors_a_fresh_budget():
     assert d["action"] == "hold-deepen" and "budget-exhausted" in d["advisories"]
 
     brief = _below_bar_brief(next_rung_trials=4_000_000, budget_remaining=100)
-    d = E.apply_verdict(brief, _verdict("promote-next-rung", 0.9),
-                        budget_remaining=4_000_000)
+    d = E.apply_verdict(brief, _verdict("promote-next-rung", 0.9), budget_remaining=4_000_000)
     assert d["action"] == "promote-next-rung" and d["advisories"] == []
 
 
 def test_promote_within_budget_is_honored():
-    b = E.rung_brief(n=72, k=12, rungs=[(20_000, 8)], bar=5.0,
-                     next_rung_trials=100_000, budget_remaining=200_000)
+    b = E.rung_brief(n=72, k=12, rungs=[(20_000, 8)], bar=5.0, next_rung_trials=100_000, budget_remaining=200_000)
     d = E.apply_verdict(b, _verdict("promote-next-rung", 0.9))
     assert d["action"] == "promote-next-rung" and d["advisories"] == []
 
@@ -267,6 +266,7 @@ def test_promote_with_unknown_budget_is_honored():
 
 
 # -------------------------------------------------------------- the journal
+
 
 def test_journal_records_brief_and_decision(tmp_path):
     """One JSONL line per decision, parseable independently, gitignored home.
@@ -299,15 +299,16 @@ def test_decision_never_mutates_the_brief():
     """
     brief = _below_bar_brief(budget_remaining=1_000_000)
     before = dict(brief["facts"])
-    E.apply_verdict(brief, _verdict("promote-next-rung", 0.9),
-                    budget_remaining=5_000_000)
+    E.apply_verdict(brief, _verdict("promote-next-rung", 0.9), budget_remaining=5_000_000)
     assert brief["facts"] == before
 
 
 # -- exact before the first deep rung (issue #2955, item 5) --------------------
 
+
 def test_exact_first_applies_only_to_small_css_low_d():
     from escalation import exact_first_applies
+
     assert exact_first_applies(49, 4)
     assert exact_first_applies(90, 8)
     assert not exact_first_applies(91, 4)
@@ -318,6 +319,7 @@ def test_exact_first_applies_only_to_small_css_low_d():
 def test_exact_first_certifies_the_steane_code_and_passes_on_large_codes():
     import numpy as np
     from escalation import exact_first
+
     H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
     res = exact_first(H, H, 3, tlim=30)
     assert res is not None and res["outcome"] == "exact" and res["d_exact"]
@@ -337,8 +339,10 @@ def test_exact_first_certifies_the_steane_code_and_passes_on_large_codes():
 # is faked here; what is pinned is the band, the no-op without the build, the
 # reading of each answer, and the dispatch that keeps the certifier the decider.
 
+
 def test_cc_first_applies_to_the_calibrated_band():
     from escalation import cc_first_applies
+
     assert cc_first_applies(937, 12) and cc_first_applies(91, 9)
     assert not cc_first_applies(938, 12) and not cc_first_applies(937, 13)
     assert not cc_first_applies(100, 10, css=False)
@@ -346,6 +350,7 @@ def test_cc_first_applies_to_the_calibrated_band():
 
 def test_cc_caps_point_at_the_calibration_record():
     import escalation as E
+
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(E.__file__))))
     path = os.path.join(root, E.CC_FIRST_CALIBRATION)
     assert os.path.exists(path), E.CC_FIRST_CALIBRATION
@@ -357,6 +362,7 @@ def test_cc_caps_point_at_the_calibration_record():
 
 def _mid_code():
     import numpy as np
+
     H = np.zeros((1, 200), dtype=np.int8)
     H[0, :4] = 1
     return H, H
@@ -364,6 +370,7 @@ def _mid_code():
 
 def test_cc_first_is_a_no_op_without_the_build(monkeypatch):
     import escalation as E
+
     monkeypatch.setattr(E, "cc_available", lambda: False)
     HX, HZ = _mid_code()
     res = E.cc_first(HX, HZ, 10)
@@ -372,6 +379,7 @@ def test_cc_first_is_a_no_op_without_the_build(monkeypatch):
     # outside the band nothing runs, with or without the build
     assert E.cc_first(HX, HZ, 13) is None
     import numpy as np
+
     big = np.zeros((1, 1000), dtype=np.int8)
     big[0, :4] = 1
     assert E.cc_first(big, big, 5) is None
@@ -379,6 +387,7 @@ def test_cc_first_is_a_no_op_without_the_build(monkeypatch):
 
 def test_cc_first_reads_each_answer_and_never_ends_the_ladder(monkeypatch):
     import escalation as E
+
     monkeypatch.setattr(E, "cc_available", lambda: True)
     HX, HZ = _mid_code()
     calls = []
@@ -389,7 +398,7 @@ def test_cc_first_reads_each_answer_and_never_ends_the_ladder(monkeypatch):
 
     monkeypatch.setattr(E._kit_distance(), "qubitserf_distance", fake)
     fake.answer = 10
-    res = E.cc_first(HX, HZ, 12, k=8, bar=4.5)          # kd^2/n at d = 10 is 4.0, under a 4.5 bar
+    res = E.cc_first(HX, HZ, 12, k=8, bar=4.5)  # kd^2/n at d = 10 is 4.0, under a 4.5 bar
     assert res["outcome"] == "screen_inflated" and res["d"] == 10 and "weight-10" in res["advice"]
     assert res["efficiency_at_cc"] == round(8 * 100 / 200, 4) and res["below_bar"] is True
     assert res["ends_ladder"] is False and calls[-1] == ("cc", "min", 30.0)
@@ -412,10 +421,14 @@ def test_cc_first_reads_each_answer_and_never_ends_the_ladder(monkeypatch):
 def test_exact_or_cc_first_keeps_the_certifier_the_decider(monkeypatch):
     import escalation as E
     import numpy as np
+
     H = np.array([[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]], dtype=np.int8)
     monkeypatch.setattr(E, "cc_available", lambda: True)
-    monkeypatch.setattr(E._kit_distance(), "qubitserf_distance",
-                        lambda *a, **k: (_ for _ in ()).throw(AssertionError("cc must not run inside the MILP band")))
+    monkeypatch.setattr(
+        E._kit_distance(),
+        "qubitserf_distance",
+        lambda *a, **k: (_ for _ in ()).throw(AssertionError("cc must not run inside the MILP band")),
+    )
     res = E.exact_or_cc_first(H, H, 3, tlim_exact=30)
     assert res["method"] == "certify" and res["outcome"] == "exact" and res["ends_ladder"] is True
     monkeypatch.setattr(E._kit_distance(), "qubitserf_distance", lambda *a, **k: 9)

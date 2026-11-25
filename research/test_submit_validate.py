@@ -5,6 +5,7 @@ Before this the schema path pointed one directory too high, at
 ``except Exception: return []`` hid it, so the kit's schema check passed every
 document since the kit moved into ``research/kit/``.
 """
+
 import json
 import os
 import sys
@@ -28,8 +29,13 @@ GOOD = {
         "X": {"value": 2, "confidence": "upper_bound", "witness": [0, 1]},
         "Z": {"value": 2, "confidence": "upper_bound", "witness": [0, 2]},
     },
-    "provenance": {"authors": ["@tester"], "construction": "a test fixture",
-                   "date": "2026-10-17", "references": [], "notes": ""},
+    "provenance": {
+        "authors": ["@tester"],
+        "construction": "a test fixture",
+        "date": "2026-10-17",
+        "references": [],
+        "notes": "",
+    },
 }
 
 
