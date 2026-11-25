@@ -79,10 +79,11 @@ def test_the_workflow_list_is_the_import_closure():
     assert len(listed) == len(set(listed)), f"LER_STACK repeats an entry: {listed}"
 
 
-def test_both_diff_rules_read_the_list():
+def test_every_diff_rule_reads_the_list():
     _, text = workflow_ler_stack()
-    assert text.count("...HEAD -- $LER_STACK; then") == 2, (
-        "the pull_request and push diff rules in verify.yml must both diff against $LER_STACK"
+    assert text.count("...HEAD -- $LER_STACK; then") == 3, (
+        "the pull_request and push diff rules in `verify` and the closure detection in "
+        "`compat-sweep` must all diff against $LER_STACK"
     )
 
 
