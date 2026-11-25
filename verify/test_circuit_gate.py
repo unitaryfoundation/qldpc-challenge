@@ -19,6 +19,9 @@ Run: uv run --extra research pytest verify/test_circuit_gate.py
 import copy
 import json
 import os
+import shutil
+import subprocess
+import sys
 import time
 
 import circuit_tools as ct
@@ -455,3 +458,49 @@ def test_sisyphus_that_hangs_is_killed_with_its_workers(surface3, tmp_path, monk
         time.sleep(0.1)
     else:
         pytest.fail("the proposer's worker outlived the kill")
+
+
+def _group_members(pgid):
+    """Return the pids in process group pgid, as pgrep lists them."""
+    # pgrep exits 1 when the group is empty, which is an answer and not an error
+    out = subprocess.run(["pgrep", "-g", str(pgid)], capture_output=True, text=True, check=False).stdout
+    return [int(x) for x in out.split()]
+
+
+def test_group_kill_reaches_a_real_sisyphus_pool(surface3):
+    """The kill the gate uses stops Sisyphus's own worker processes.
+
+    The test above uses a stand-in proposer. This one starts the real one the
+    way _sisyphus_propose does, on a search that cannot finish early (nothing
+    is lighter than 3 on this circuit), waits for its pool to exist, and
+    checks that _kill_group leaves the group empty. It runs wherever the
+    self-tests run, so it covers the CI runner's process model and not only
+    a developer's (vprusso's review of #7264).
+    """
+    pytest.importorskip("sisyphus_qec")
+    if shutil.which("pgrep") is None:
+        pytest.skip("pgrep is needed to list the proposer's process group")
+    d, _ = surface3
+    cmd = [sys.executable, gc.SISYPHUS_SCRIPT, os.path.join(d, "memory_x.stim")]
+    cmd += ["--below", "3", "--seconds", "300", "--seed", "0"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        most = []
+        deadline = time.monotonic() + 180  # a cold runner compiles the kernels first
+        while time.monotonic() < deadline and proc.poll() is None:
+            now = _group_members(proc.pid)
+            most = max(most, now, key=len)
+            if len(now) >= 3:  # the proposer and at least two workers
+                break
+            time.sleep(0.25)
+        assert proc.poll() is None, "the proposer exited before it could be killed"
+        assert len(most) >= 3, f"no worker pool appeared in the proposer's group: {most}"
+    finally:
+        gc._kill_group(proc)
+    assert proc.returncode is not None
+    for _ in range(100):
+        if not _group_members(proc.pid):
+            break
+        time.sleep(0.1)
+    else:
+        pytest.fail(f"processes outlived the group kill: {_group_members(proc.pid)}")

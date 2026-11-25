@@ -72,6 +72,7 @@ import glob
 import json
 import os
 import secrets
+import signal
 import subprocess
 import sys
 import time
@@ -596,11 +597,18 @@ def _circuits_diffed(base, code_root, slug):
 # the figures are a starting point to revise once a board-wide sweep shows
 # how long a refutation takes when there is one. The limit bounds the
 # search alone. Building the matrices and loading the compiled kernels came
-# to 2 to 20 s more per basis, and SISYPHUS_GRACE is the room the hard kill
-# leaves for that on a slower runner with a cold kernel cache.
+# to 2 to 20 s more per basis on that machine, and SISYPHUS_GRACE is the
+# room the hard kill leaves for it. 120 s is an estimate, not a measurement
+# on the runner: 20 s at the mechanism cap, a runner about twice as slow on
+# the one search compared, the 20 to 65 s of set-up Sisyphus's own README
+# reports at this size on a Xeon, and a first call in a job that also
+# compiles the kernels, come to about 95 s. It was 240 s, which let a
+# proposer that hangs hold the job for 5 minutes per entry (vprusso's
+# review of #7264); a hang fails the entry on the basis where it happens,
+# so it is paid once per entry, 3 minutes at the cap now.
 SISYPHUS_MIN_SECONDS = 15.0
 SISYPHUS_MAX_SECONDS = 60.0
-SISYPHUS_GRACE = 240.0
+SISYPHUS_GRACE = 120.0
 SISYPHUS_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sisyphus_propose.py")
 SISYPHUS_MARKER = "SISYPHUS_RESULT "
 
@@ -609,6 +617,29 @@ def _sisyphus_seconds(m):
     """Return the Sisyphus search limit, in seconds, for a DEM of m mechanisms."""
     share = min(1.0, max(0.0, m / MAX_DEM_MECHANISMS))
     return SISYPHUS_MIN_SECONDS + (SISYPHUS_MAX_SECONDS - SISYPHUS_MIN_SECONDS) * share
+
+
+def _kill_group(proc):
+    """Kill the process group that proc leads, and reap proc.
+
+    proc must have been started with start_new_session=True, so that it leads
+    a group of its own holding every process it started: for the Sisyphus
+    proposer, its pool of workers. Killing proc alone would leave those
+    running, and holding its output pipes open, so the read of those pipes
+    is bounded too: if the group could not be signalled and a worker
+    survives, this returns after 10 s and does not wait on it.
+    """
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        proc.kill()
+    try:
+        proc.communicate(timeout=10)
+    except subprocess.TimeoutExpired:
+        for pipe in (proc.stdout, proc.stderr):
+            if pipe is not None:
+                pipe.close()
+        proc.wait()
 
 
 def _sisyphus_propose(stim_path, claim, seconds, seed):
@@ -639,11 +670,7 @@ def _sisyphus_propose(stim_path, claim, seconds, seed):
     try:
         out, err = proc.communicate(timeout=float(seconds) + SISYPHUS_GRACE)
     except subprocess.TimeoutExpired:
-        try:
-            os.killpg(proc.pid, 9)
-        except (ProcessLookupError, PermissionError):
-            proc.kill()
-        proc.communicate()
+        _kill_group(proc)
         raise RuntimeError(f"sisyphus search outlived {float(seconds) + SISYPHUS_GRACE:.0f} s and was killed") from None
     if proc.returncode != 0:
         tail = " | ".join((err or "").strip().splitlines()[-3:])
