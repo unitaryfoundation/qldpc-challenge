@@ -4,6 +4,27 @@ permissions:
   contents: read
   pull-requests: read   # check_pr_duplicates.py lists the open PRs (issue #4107)
 
+env:
+  PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
+  # The files whose change can alter a measured circuit.ler rate: the
+  # measured-rate tier of verify_all.py, ler_verify.py and the modules it
+  # imports (ler_tools.py, circuit_tools.py, gf2.py), the optional
+  # accelerator those load (gf2_fast.cpp, built by setup_gf2_fast.py
+  # through the Makefile), the decoder pin under decode/ that ler_tools
+  # mirrors, and the dependency pins. verify/test_ler_stack.py pins this
+  # list to the import closure of ler_verify.py, so a new import in the
+  # LER code fails the suite until the list names it. Workflow-level
+  # because two jobs diff against it: `verify` and `compat-sweep`.
+  LER_STACK: verify/verify_all.py verify/ler_verify.py verify/ler_tools.py verify/circuit_tools.py verify/gf2.py verify/gf2_fast.cpp verify/setup_gf2_fast.py decode pyproject.toml uv.lock Makefile
+  # The validator closure: everything verify/check_validator_integrity.py
+  # pins (verify/, the schemas, the decoder pin, the dependency pins, the
+  # accelerator's Makefile, and the workflows), as pathspecs. A pull
+  # request that changes any of it has the whole board re-verified under
+  # its verifier by the compat-sweep job below, in parallel shards, and
+  # not inline in `verify` (issue #7252). verify/test_verify_all.py pins
+  # the list to cover every CIRCUIT_STACK file and every manifest entry.
+  CLOSURE: verify schema decode pyproject.toml uv.lock Makefile .github/workflows
+
 on:
   pull_request:
     paths:
@@ -112,16 +133,6 @@ jobs:
     # + margin. Hitting this means a hang or a bug, not a large code.
     timeout-minutes: 130
     env:
-      PYTHONUNBUFFERED: "1"   # a killed step still leaves its log
-      # The files whose change can alter a measured circuit.ler rate: the
-      # measured-rate tier of verify_all.py, ler_verify.py and the modules it
-      # imports (ler_tools.py, circuit_tools.py, gf2.py), the optional
-      # accelerator those load (gf2_fast.cpp, built by setup_gf2_fast.py
-      # through the Makefile), the decoder pin under decode/ that ler_tools
-      # mirrors, and the dependency pins. verify/test_ler_stack.py pins this
-      # list to the import closure of ler_verify.py, so a new import in the
-      # LER code fails the suite until the list names it.
-      LER_STACK: verify/verify_all.py verify/ler_verify.py verify/ler_tools.py verify/circuit_tools.py verify/gf2.py verify/gf2_fast.cpp verify/setup_gf2_fast.py decode pyproject.toml uv.lock Makefile
       # The directories that hold submitted data rather than code: an entry,
       # its circuit tier, its note or fieldnote, its repro manifest, its
       # certificate. This is check_submission_scope.py's SUBMISSION_SURFACE,
@@ -336,10 +347,22 @@ jobs:
           else
             ler_stack_changed=true
           fi
+          # A pull request that changes the validator closure ($CLOSURE in
+          # the workflow env) has the whole board re-verified under its
+          # verifier by the compat-sweep job, which makes the same diff for
+          # itself; here the answer only keeps the inline sweep below from
+          # paying that pass a second time (issue #5578, change E). A diff
+          # that cannot be computed counts as a change (fail closed).
+          if git diff --quiet "$base"...HEAD -- $CLOSURE; then
+            closure_changed=false
+          else
+            closure_changed=true
+          fi
           echo "codes_changed=$codes_changed" >> "$GITHUB_OUTPUT"
           echo "data_only=$data_only" >> "$GITHUB_OUTPUT"
           echo "slug_tests=$slug_tests" >> "$GITHUB_OUTPUT"
           echo "ler_stack_changed=$ler_stack_changed" >> "$GITHUB_OUTPUT"
+          echo "closure_changed=$closure_changed" >> "$GITHUB_OUTPUT"
       - name: detect what the merge changed (push to main)
         if: github.event_name == 'push'
         id: merge
@@ -559,7 +582,7 @@ jobs:
           rm -rf "$QLDPC_BOARD_CACHE"
           uv run --frozen --extra research python verify/verify_all.py --root ../submitted --ler-base "$BASE_REF" --circuit-base "$BASE_REF" --jobs 0 --circuit-jobs 0
       - name: verify all submissions (LER stack unchanged)
-        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
+        if: github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed != 'true' && steps.changes.outputs.closure_changed != 'true' && steps.verdict.outputs.cache-hit != 'true'
         working-directory: submitted
         # A non-code PR that leaves verify/, decode/ and the pinned dependencies
         # alone cannot have changed what any existing ler claim measures, so it
@@ -567,12 +590,14 @@ jobs:
         #
         # This step runs the PR's own verifier, and --circuit-base is only
         # sound while that verifier is the base branch's. verify_all decides
-        # that itself, from the diff of its CIRCUIT_STACK against the base:
-        # a PR that edits the verifier, the schema, a dependency pin or
-        # this file has the tier run on every entry, which is the case it
-        # exists for, and a PR that edits a test, the site or research/
-        # does not repeat the base branch's run. It used to: the flag was
-        # withheld from every PR that was not data-only.
+        # that itself, from the diff of its CIRCUIT_STACK against the base.
+        # A PR that edits a test, the site, cli/ or research/ reaches this
+        # step and does not repeat the base branch's run; a PR that edits
+        # the verifier, the schema, a dependency pin or this file does not
+        # reach it at all: its whole-board sweep is the compat-sweep job
+        # below, in parallel shards (issue #5578, change E). The flag used
+        # to be withheld from every PR that was not data-only, and the
+        # closure sweep used to run here, inline, with the self-tests.
         #
         # --board-base: no gate follows this sweep, so an entry the PR did
         # not change keeps the base branch's structural verdict and only
@@ -630,53 +655,45 @@ jobs:
         # everything (its own fail-open rule), so a skip is never silent.
         run: uv run --frozen --extra research python verify/verify_all.py --ler-base ${{ github.event.before }} --circuit-record ../circuit-record/record.json --jobs 0 --circuit-jobs 0
       - name: verify all submissions (LER stack changed, or the weekly run)
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true') || (github.event_name == 'pull_request' && steps.changes.outputs.codes_changed != 'true' && steps.changes.outputs.ler_stack_changed == 'true' && steps.verdict.outputs.cache-hit != 'true')
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.merge.outputs.ler_stack_changed == 'true')
         working-directory: submitted
-        # Four kinds of run reach this step, and the circuit tier is scoped
-        # for each as the steps above scope it. A pull request gets
-        # --circuit-base, which verify_all voids when the verifier stack
-        # differs from the base (nearly every file of the LER stack is in
-        # that stack, so in practice this is the whole tier). A run on main
-        # gets the record: a push restored it above, and a scheduled or
+        # Three kinds of run reach this step, all on main, and all get the
+        # circuit record: a push restored it above, and a scheduled or
         # dispatched run finds none, checks everything and writes a new one.
+        # A pull request that changed the LER stack used to reach it too,
+        # with --circuit-base and --board-base, both void under a changed
+        # stack, so it paid the whole board inline beside an hour of
+        # self-tests; that sweep is now the compat-sweep job's, in parallel
+        # shards, with the same LER sample (issue #5578, change E).
         #
-        # The measured-rate tier is scoped by kind as well. The scheduled run
-        # and a manual dispatch pass no LER flag and re-measure every claim.
-        # That is the weekly re-derivation every skip in this file leans on,
-        # and a dispatch on a branch is how a maintainer asks for it before
-        # merging a change that warrants it (a stim bump). A pull request or
-        # a push that changed the LER stack re-measures LER_SAMPLE claims and
-        # whatever its own diff touched. Both used to re-measure every claim,
-        # 26 entries and 55 to 65 minutes on 2026-11-12, once on the pull
-        # request and again on the push, and beside an hour of self-tests
-        # three of the five such runs that week were cancelled at this job's
-        # cap with no failure in any of them (issue #5578). verify_all.py's
-        # docstring says what a sample shows and what it leaves to the weekly
-        # runs. The seed is the pull request's number, so every run of one
-        # pull request draws the same claims and a re-run cannot re-roll a
-        # failing one; a push draws its own with its run id. Closing a pull
-        # request and opening another does draw again: the sample is a smoke
-        # test, not a lottery an author cannot enter twice. A push with no
-        # `before` to diff against (empty, or all zeros) passes no LER flag
-        # and re-measures everything, as it always did; one whose `before`
-        # is set but cannot be diffed passes the flags, and verify_all
-        # re-measures everything on its own rule. A push that is superseded
-        # while queued never runs, as was already true of the full
-        # re-measure, so the pull request's run is the one to count on.
+        # The measured-rate tier is scoped by kind. The scheduled run and a
+        # manual dispatch pass no LER flag and re-measure every claim. That
+        # is the weekly re-derivation every skip in this file leans on, and
+        # a dispatch on a branch is how a maintainer asks for it before
+        # merging a change that warrants it (a stim bump). A push that
+        # changed the LER stack re-measures LER_SAMPLE claims and whatever
+        # its own diff touched. It used to re-measure every claim, 26
+        # entries and 55 to 65 minutes on 2026-11-12, and beside an hour of
+        # self-tests three of the five such runs that week were cancelled
+        # at this job's cap with no failure in any of them (issue #5578).
+        # verify_all.py's docstring says what a sample shows and what it
+        # leaves to the weekly runs. A push draws its sample with its run
+        # id. A push with no `before` to diff against (empty, or all zeros)
+        # passes no LER flag and re-measures everything, as it always did;
+        # one whose `before` is set but cannot be diffed passes the flags,
+        # and verify_all re-measures everything on its own rule. A push that
+        # is superseded while queued never runs, as was already true of the
+        # full re-measure, so the pull request's run is the one to count on.
         # verify/test_verify_all.py runs this script for each kind and reads
         # the flags and this step's `if:` back.
         env:
           EVENT_NAME: ${{ github.event_name }}
-          BASE_REF: origin/${{ github.base_ref }}
           BEFORE: ${{ github.event.before }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           RUN_ID: ${{ github.run_id }}
           LER_SAMPLE: "3"
         run: |
           record="--circuit-record ../circuit-record/record.json"
           case "$EVENT_NAME" in
-            pull_request)
-              scope="--ler-base $BASE_REF --ler-sample $LER_SAMPLE --ler-seed $PR_NUMBER --circuit-base $BASE_REF --board-base $BASE_REF" ;;
             push)
               scope="$record"
               if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
@@ -770,3 +787,109 @@ jobs:
         with:
           path: passed-verdict
           key: verify-passed-${{ github.event.pull_request.number }}-${{ steps.digest.outputs.digest }}
+
+  # The compatibility sweep (issue #5578 finding 5 and change E, issue
+  # #7252). Every entry on the board already passes, so verifying the whole
+  # board under a pull request's verifier can only fail where the new
+  # verifier rejects an existing entry: it is a compatibility check, worth
+  # having before a rule-tightening change merges because it names the
+  # entries the new rule would reject, and it is not a safety check (the
+  # validation-gate battery, the self-tests, the manifest pin and code-owner
+  # review are). It used to run inline in `verify`, beside an hour of
+  # self-tests, and grew with the board (about 2 minutes of structural work
+  # on four cores and 8 to 16 for the circuit tier). It runs here instead,
+  # as SHARDS parallel jobs of verify_all.py --shard I/K: shard I verifies
+  # entries I, I+K, I+2K, ... of the board in path order in full and scans
+  # the rest by their identity keys, so the shards together verify every
+  # entry once and each one's duplicate scan still reads the whole tree. A
+  # pull request that leaves the closure alone makes one cheap job per
+  # shard that detects that and stops. When a shard runs past its budget,
+  # add one here (the matrix list and SHARDS must agree).
+  #
+  # The job runs the pull request's own verifier over the pull request's
+  # own tree, as the inline sweep did: that is the verifier being judged. It
+  # is the one pull-request sweep that passes --shard, it passes
+  # --circuit-base and --ler-base like every other pull-request sweep
+  # (verify_all voids the first under a changed stack and prints why), and
+  # it is never handed the circuit record. A pull request that changed the
+  # LER stack re-measures the LER_SAMPLE claims the pull request's number
+  # draws, each by the shard that holds the entry, so the sample is the one
+  # the `verify` job used to measure. verify/test_verify_all.py reads these
+  # conditions and this script back.
+  compat-sweep:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    env:
+      SHARDS: "4"
+    steps:
+      - name: check out submitted tree
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0          # the closure diff is against the base branch
+          filter: blob:none
+          path: submitted
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+      - name: detect a verifier closure change
+        id: closure
+        working-directory: submitted
+        # The same two diffs `verify`'s change detection makes, made again
+        # here because a job cannot read another job's step outputs without
+        # waiting for it, and this job runs beside `verify`, not after it.
+        # A diff that cannot be computed counts as a change (fail closed).
+        run: |
+          base=origin/${{ github.base_ref }}
+          if git diff --quiet "$base"...HEAD -- $CLOSURE; then
+            closure_changed=false
+          else
+            closure_changed=true
+          fi
+          if git diff --quiet "$base"...HEAD -- $LER_STACK; then
+            ler_stack_changed=false
+          else
+            ler_stack_changed=true
+          fi
+          echo "closure_changed=$closure_changed" >> "$GITHUB_OUTPUT"
+          echo "ler_stack_changed=$ler_stack_changed" >> "$GITHUB_OUTPUT"
+          if [ "$closure_changed" != true ]; then
+            echo "the validator closure is unchanged; no compatibility sweep to run" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: build optional refutation accelerator (submitted tree)
+        if: steps.closure.outputs.closure_changed == 'true'
+        working-directory: submitted
+        continue-on-error: true
+        run: make fast
+      - name: verify all submissions (compatibility sweep, one shard)
+        if: steps.closure.outputs.closure_changed == 'true'
+        working-directory: submitted
+        env:
+          BASE_REF: origin/${{ github.base_ref }}
+          SHARD: ${{ matrix.shard }}
+          LER_STACK_CHANGED: ${{ steps.closure.outputs.ler_stack_changed }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LER_SAMPLE: "3"
+        run: |
+          scope="--ler-base $BASE_REF --circuit-base $BASE_REF --shard $SHARD/$SHARDS"
+          if [ "$LER_STACK_CHANGED" = true ]; then
+            scope="$scope --ler-sample $LER_SAMPLE --ler-seed $PR_NUMBER"
+          fi
+          uv run --frozen --extra research python verify/verify_all.py $scope --jobs 0 --circuit-jobs 0
+
+  # One check for the shards, as refute-weekly.yml has: it fails unless every
+  # shard completed clean, and it is the name to require of a pull request.
+  compat-summary:
+    needs: compat-sweep
+    if: always() && github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: every shard completed clean
+        env:
+          RESULT: ${{ needs.compat-sweep.result }}
+        run: |
+          echo "compatibility sweep shards: $RESULT"
+          [ "$RESULT" = success ]
