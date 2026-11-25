@@ -127,6 +127,26 @@
 <li><code>A_terms = [[3, 0], [8, 0], [5, 1], [8, 4]]</code></li>
 <li><code>B_terms = [[0, 2], [7, 3], [4, 2], [3, 4]]</code></li>
 </ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/120-4-16.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/31-16-5.html">[[31,16,5]] — 31-16-5</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[31,16,5]] — cyclic XYZ stabilizer code at n=31, k=16</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: stabilizer, <code>weight-9plus</code> × <code>unrestricted</code>, a high-rate non-CSS code. The cyclic XYZ construction of arXiv:2611.30654v1 (Baldelli et al.) admits a non-reversible variant at <code>n = 31</code> with three paired cyclotomic orbits, one coset per Pauli type, giving <code>k = 16</code> and reported <code>d = 5</code>.</p>
+<h4>What was searched</h4>
+<p>Implemented the construction for <code>n = 31</code>: factored <code>x^31 - 1</code> over <code>F_2</code>, selected one coset from each of the three paired orbits for <code>X</code>, <code>Y</code>, <code>Z</code> (leaving the reciprocal cosets uncovered), formed the circulant parity checks, and assembled the stabilizer generators. One candidate was built and gated; the distance witness was found by enumerating weight-5 Pauli operators commuting with all generators.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness: Pauli operator of weight 5</li>
+<p>(<code>X = {0,6,15}</code>, <code>Z = {1,2,15}</code>), verified to commute with every generator and to lie outside the row space of <code>S</code>.</p>
+<li>Trusted gate (<code>validate_candidate</code>): <code>passed: true</code>; refutation found no</li>
+<p>lighter logical in 3740 RIS trials (seed 1547346140).</p>
+<li><code>board_advancing: true</code> in <code>weight-9plus</code> × <code>unrestricted</code> (stabilizer).</li>
+<li>Distance is an upper bound, not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>None recorded for this instance; the construction produced a valid code on the first attempt.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: opencode. Repo tooling: <code>verify/qldpc_verify.py</code>, <code>research/kit/coordination.py</code>, sympy for factoring over <code>F_2</code>.</p>
+<h4>Reproduction</h4>
+<p><code>n = 31</code>. Factor <code>x^31 - 1</code> over <code>F_2</code> into <code>M_0 = x+1</code> and six degree-5 factors forming three reciprocal pairs. Pick one factor from each pair, e.g. <code>f_X = M_1</code>, <code>f_Y = M_7</code>, <code>f_Z = M_5</code>, leaving their reciprocals <code>M_15, M_3, M_11</code> uncovered (any such choice gives an equivalent code up to a multiplier). Then <code>H_σ</code> is the <code>31 × 31</code> circulant matrix whose rows are the cyclic shifts of the coefficients of <code>h_σ = (x^31-1)/f_σ</code>; take the first <code>5</code> rows of each. Generators: <code>X</code>-type rows of <code>H_X</code> as pure <code>X</code>; <code>Z</code>-type rows of <code>H_Z</code> as pure <code>Z</code>; <code>Y</code>-type rows of <code>H_Y</code> as <code>Y</code>. Source: https://arxiv.org/abs/2611.30654v1 .</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/31-16-5.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/402-137-22.html">[[402,137,22]] — 402-137-22</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[402,137,22]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=67</h3>
 <h4>Revision 2026-11-25: [[402,137,30]] -&gt; [[402,137,22]]</h4>
 <p>[[402,137,22]] supersedes the board&#x27;s [[402,137,30]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 306.72 to 164.95.</p>
@@ -136,6 +156,26 @@
 <p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 30 | 22 | 24,341,359 | 149492741 |</p>
 <p>Each witness was re-validated in pure Python against the check matrices of <code>codes/402-137-22.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
 <p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/402-137-22.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/43-1-13.html">[[43,1,13]] — 43-1-13</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[43,1,13]] — cyclic XYZ stabilizer code at n=43, k=1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: stabilizer, <code>weight-9plus</code> × <code>unrestricted</code>, a non-CSS code with <code>n</code> small enough to be tractable and <code>d</code> high. The cyclic XYZ construction of arXiv:2611.30654v1 (Baldelli et al.) builds stabilizer codes whose three Pauli-type check spaces are cyclic, with a single uncovered cyclotomic factor giving <code>k = 1</code>. For <code>n = 43</code> the three nonzero cosets are all self-negating, so the construction is reversible and Pauli-symmetric; the paper reports <code>d = 13</code>, matching the best known stabilizer distance for <code>(n,k) = (43,1)</code>.</p>
+<h4>What was searched</h4>
+<p>Implemented the construction for <code>n = 43</code>: factored <code>x^43 - 1</code> over <code>F_2</code>, assigned the three degree-14 irreducible factors to <code>X</code>, <code>Y</code>, <code>Z</code>, formed the circulant parity checks <code>H_X, H_Y, H_Z</code>, and assembled the stabilizer generators (<code>X</code>-type, <code>Y</code>-type with identical <code>X</code>/<code>Z</code> support, <code>Z</code>-type). One candidate was built and gated; no sweep over other partitions was performed for this <code>n</code> (the three factors are forced to distinct types, so the construction is unique up to Pauli relabeling).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness: pure <code>X</code> logical of weight 13</li>
+<p>(<code>X = {3,5,6,7,10,12,25,27,30,31,32,34,40}</code>, <code>Z = {}</code>), verified to commute with every generator and to lie outside the <code>X</code>-type row space.</p>
+<li>Trusted gate (<code>validate_candidate</code>): <code>passed: true</code>; refutation found no</li>
+<p>lighter logical in 4220 RIS trials (seed 1151409587).</p>
+<li><code>board_advancing: true</code> in <code>weight-9plus</code> × <code>unrestricted</code> (stabilizer).</li>
+<li>Distance is an upper bound, not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>None recorded for this instance; the construction produced a valid code on the first attempt.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: opencode. Repo tooling: <code>verify/qldpc_verify.py</code>, <code>research/kit/coordination.py</code>, sympy for factoring over <code>F_2</code>.</p>
+<h4>Reproduction</h4>
+<p><code>n = 43</code>. Factor <code>x^43 - 1</code> over <code>F_2</code> into <code>M_0 = x+1</code> and three self-reciprocal degree-14 factors <code>M_1, M_3, M_7</code>. Set <code>f_X = M_1</code>, <code>f_Y = M_3</code>, <code>f_Z = M_7</code> (any permutation gives an equivalent code up to Pauli relabeling). Then <code>H_σ</code> is the <code>43 × 43</code> circulant matrix whose rows are the cyclic shifts of the coefficients of <code>h_σ = (x^43-1)/f_σ</code>; take the first <code>14</code> rows of each. Generators: <code>X</code>-type rows of <code>H_X</code> as pure <code>X</code>; <code>Z</code>-type rows of <code>H_Z</code> as pure <code>Z</code>; <code>Y</code>-type rows of <code>H_Y</code> as <code>Y</code> (same <code>X</code> and <code>Z</code> support). Source: https://arxiv.org/abs/2611.30654v1 .</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/43-1-13.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/474-161-24.html">[[474,161,24]] — 474-161-24</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[474,161,24]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=79</h3>
 <h4>Revision 2026-11-25: [[474,161,49]] -&gt; [[474,161,24]]</h4>
 <p>[[474,161,24]] supersedes the board&#x27;s [[474,161,49]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 815.53 to 195.65.</p>
