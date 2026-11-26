@@ -1409,7 +1409,7 @@
   "origin": "submission",
   "date": "2026-09-22",
   "model": "Claude Fable 5.1",
-  "notes": "Found by a random trinomial-pair sweep over tori Z_l x Z_m with 100 <= n <= 360 aimed at the weight-6 x local-2d-bilayer cell. Distance is a witness-backed upper bound; RIS ladder (verify/gf2_fast.cpp, pair depth 8): 200000 trials seed 101 -> 16, 1000000 trials seed 102 -> 16, 1000000 trials seed 103 -> 16. Advances the weight-6 x local-2d-bilayer board; novelty vs the literature unverified. GPU RIS pass (verify/ris_gpu.py, 300,000,000 trials per side, seed 2026): lightest logical X 16, Z 16.",
+  "notes": "Found by a random trinomial-pair sweep over tori Z_l x Z_m with 100 <= n <= 360 aimed at the weight-6 x local-2d-bilayer cell. Distance is a witness-backed upper bound; RIS ladder (verify/gf2_fast.cpp, pair depth 8): 200000 trials seed 101 -> 16, 1000000 trials seed 102 -> 16, 1000000 trials seed 103 -> 16. Advances the weight-6 x local-2d-bilayer board; novelty vs the literature unverified. GPU RIS pass (verify/ris_gpu.py, 300,000,000 trials per side, seed 2026): lightest logical X 16, Z 16. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 15 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "search_budget": {
    "candidates_screened": 29988,
    "ris_trials_per_side": 300000000,
@@ -2120,25 +2120,24 @@
     ]
    },
    "X": {
-    "value": 16,
+    "value": 15,
     "confidence": "upper_bound",
     "witness": [
-     123486,
-     123488,
-     123501,
-     123520,
-     123522,
-     123540,
-     123542,
-     123548,
-     123549,
-     123552,
-     123570,
-     123628,
-     123632,
-     123635,
-     123636,
-     123645
+     1714,
+     1761,
+     1933,
+     1969,
+     2449,
+     2457,
+     2654,
+     2954,
+     3444,
+     3704,
+     3793,
+     3808,
+     4068,
+     4157,
+     5832
     ]
    }
   },
