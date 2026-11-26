@@ -9,12 +9,20 @@ The over-claim fixture is organic: the default greedy schedule on the
 shallow 1-trial search returns a heavier valid witness -- exactly the
 under-searched submission the gate exists to catch.
 
-Run: uv run pytest verify/test_circuit_gate.py
+The Sisyphus half of the gate is tested on circuits stim generates, with
+ris_dem stubbed out, so that what is asserted is that layer alone and no
+board entry's value. Those tests need the research extra.
+
+Run: uv run --extra research pytest verify/test_circuit_gate.py
 """
 
 import copy
 import json
 import os
+import shutil
+import subprocess
+import sys
+import time
 
 import circuit_tools as ct
 import gate_changed as gc
@@ -63,7 +71,7 @@ def test_overclaim_refuted(greedy):
         deep[basis], _ = ct.ris_dem(H, L, trials=60, seed=9)
     over = [s for s in ("Z", "X") if doc["circuit"]["d_circ"][s]["value"] > deep[s]]
     assert over, "1-trial search matched the 60-trial bound; fixture is moot"
-    hits, _ = gc._circuit_refute(doc, d, seed=9, trials_override=60)
+    hits, _ = gc._circuit_refute(doc, d, seed=9, trials_override=60, sisyphus_seconds=0)
     for s in over:
         assert s in hits
         w, wit, claim = hits[s]
@@ -83,7 +91,7 @@ def test_honest_claim_survives(greedy):
         H, L = ct.dem_matrices(ct.derive_dem(circuit))
         w, wit = ct.ris_dem(H, L, trials=60, seed=9)
         doc["circuit"]["d_circ"][basis] = {"value": w, "confidence": "upper_bound", "witness": wit}
-    hits, notes = gc._circuit_refute(doc, d, seed=9, trials_override=60)
+    hits, notes = gc._circuit_refute(doc, d, seed=9, trials_override=60, sisyphus_seconds=0)
     assert hits == {} and len(notes) == 2
 
 
@@ -278,3 +286,230 @@ def test_dem_wall_cap_stops_after_opener(monkeypatch):
     L[0, 7] = 1
     ct.ris_dem(H, L, trials=20000, seed=3, max_seconds=0.001)
     assert calls == [8], f"expected only the opener chunk, got {calls}"
+
+
+# ---------------------------------------------------------------- Sisyphus
+#
+# The second searcher (gate_changed._sisyphus_propose, verify/sisyphus_propose.py).
+# The fixture is a rotated surface-code memory that stim generates: distance 3,
+# so no undetected logical fault set is lighter than 3 and one of weight 3
+# exists. Nothing here reads a board entry.
+
+
+@pytest.fixture(scope="module")
+def surface3(tmp_path_factory):
+    """Return (circuits_dir, doc_for) for a distance-3 surface-code memory pair.
+
+    doc_for(claim) is the least a document needs for _circuit_refute: the
+    claimed d_circ per basis.
+    """
+    d = tmp_path_factory.mktemp("surface3")
+    for basis in ("x", "z"):
+        circuit = stim.Circuit.generated(
+            f"surface_code:rotated_memory_{basis}",
+            distance=3,
+            rounds=3,
+            after_clifford_depolarization=0.001,
+            before_measure_flip_probability=0.001,
+            after_reset_flip_probability=0.001,
+        )
+        open(os.path.join(d, f"memory_{basis}.stim"), "w").write(str(circuit) + "\n")
+
+    def doc_for(claim):
+        return {"circuit": {"d_circ": {s: {"value": claim} for s in ("X", "Z")}}}
+
+    return str(d), doc_for
+
+
+def _no_ris(monkeypatch):
+    """Make ris_dem find nothing, so a hit can only be Sisyphus's."""
+    monkeypatch.setattr(ct, "ris_dem", lambda H, L, trials, **kw: (None, None))
+
+
+def test_sisyphus_budget_shape():
+    from circuit_verify import MAX_DEM_MECHANISMS
+
+    assert gc._sisyphus_seconds(0) == gc.SISYPHUS_MIN_SECONDS
+    assert gc._sisyphus_seconds(MAX_DEM_MECHANISMS) == gc.SISYPHUS_MAX_SECONDS
+    assert gc._sisyphus_seconds(10 * MAX_DEM_MECHANISMS) == gc.SISYPHUS_MAX_SECONDS  # clamped
+    assert gc._sisyphus_seconds(20_000) < gc._sisyphus_seconds(40_000) < gc.SISYPHUS_MAX_SECONDS
+    # from SISYPHUS_LARGE_DEM up the search gets the whole limit, whatever the size
+    assert gc._sisyphus_seconds(gc.SISYPHUS_LARGE_DEM - 1) < gc.SISYPHUS_MAX_SECONDS
+    assert gc._sisyphus_seconds(gc.SISYPHUS_LARGE_DEM) == gc._sisyphus_seconds(100_000) == gc.SISYPHUS_MAX_SECONDS
+
+
+def test_sisyphus_refutes_an_overclaim_ris_missed(surface3, monkeypatch):
+    """With ris_dem silenced, an over-stated claim is still refuted.
+
+    The fault set that refutes it passes the pinned witness check.
+    """
+    pytest.importorskip("sisyphus_qec")
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+    hits, notes = gc._circuit_refute(doc_for(5), d, seed=4, sisyphus_seconds=10)
+    assert set(hits) == {"X", "Z"} and notes == []
+    for side, (w, wit, claim) in hits.items():
+        assert claim == 5 and 3 <= w < 5
+        circuit = stim.Circuit(open(os.path.join(d, f"memory_{side.lower()}.stim")).read())
+        assert ct.witness_errors(ct.derive_dem(circuit), wit, w) == []
+
+
+def test_sisyphus_leaves_an_honest_claim_alone(surface3, monkeypatch):
+    """Nothing lighter than the distance exists, so nothing is reported.
+
+    The note says the search ran and what it found.
+    """
+    pytest.importorskip("sisyphus_qec")
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+    hits, notes = gc._circuit_refute(doc_for(3), d, seed=4, sisyphus_seconds=2)
+    assert hits == {}
+    assert len(notes) == 2 and all("sisyphus" in n and "lightest 3" in n for n in notes)
+
+
+def test_sisyphus_skipped_where_nothing_can_be_lighter(surface3, monkeypatch):
+    """A claim of 1 cannot be undercut, so the process is not started."""
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+
+    def boom(*a, **kw):
+        raise AssertionError("the proposer must not run for a claim of 1")
+
+    monkeypatch.setattr(gc, "_sisyphus_propose", boom)
+    hits, notes = gc._circuit_refute(doc_for(1), d, seed=0)
+    assert hits == {} and len(notes) == 2 and not any("sisyphus" in n for n in notes)
+
+
+@pytest.mark.parametrize(
+    "proposal",
+    [
+        {"lightest": 2, "witness": [0, 1]},  # not an undetected logical fault set
+        {"lightest": 2, "witness": [0, 1, 2]},  # weight does not match the fault set
+        {"lightest": 2, "witness": [5, 5]},  # a repeated fault
+        {"lightest": 2, "witness": [0, 10**9]},  # out of range
+    ],
+)
+def test_sisyphus_proposal_counts_only_if_the_witness_check_accepts_it(surface3, monkeypatch, proposal):
+    """A proposal the pinned witness check rejects is dropped.
+
+    The searcher is not trusted, so the claim stands.
+    """
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+    monkeypatch.setattr(gc, "_sisyphus_propose", lambda *a, **kw: dict(proposal))
+    hits, notes = gc._circuit_refute(doc_for(3), d, seed=0)
+    assert hits == {} and len(notes) == 2
+    # the note says the proposal was rejected, and does not print it as the lightest fault set found
+    assert all("witness_errors rejected" in n and "lightest 2" not in n for n in notes)
+
+
+def _fake_proposer(tmp_path, monkeypatch, body):
+    script = tmp_path / "fake_propose.py"
+    script.write_text(body)
+    monkeypatch.setattr(gc, "SISYPHUS_SCRIPT", str(script))
+
+
+@pytest.mark.parametrize(
+    "body, message",
+    [
+        ("import sys\nsys.stderr.write('some other failure\\n')\nsys.exit(1)\n", "exited 1: some other failure$"),
+        (
+            "import sys\nsys.stderr.write(\"No module named 'sisyphus_qec'\\n\")\nsys.exit(1)\n",
+            "uv run --extra research",
+        ),
+        ("print('nothing useful')\n", "0 result lines"),
+        ("print('SISYPHUS_RESULT {}')\nprint('SISYPHUS_RESULT {}')\n", "2 result lines"),
+        ("print('SISYPHUS_RESULT not json')\n", "declared shape"),
+        ("print('SISYPHUS_RESULT {\"lightest\": 2}')\n", "declared shape"),
+        ('print(\'SISYPHUS_RESULT {"lightest": "2", "witness": [0, 1]}\')\n', "declared shape"),
+        ('print(\'SISYPHUS_RESULT {"lightest": 2, "witness": [0, "1"]}\')\n', "declared shape"),
+    ],
+)
+def test_sisyphus_that_cannot_answer_fails_closed(surface3, tmp_path, monkeypatch, body, message):
+    """A search that did not run is not a search that found nothing.
+
+    The gate raises, and its caller fails the entry closed.
+    """
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+    _fake_proposer(tmp_path, monkeypatch, body)
+    with pytest.raises(RuntimeError, match=message):
+        gc._circuit_refute(doc_for(3), d, seed=0, sisyphus_seconds=1)
+
+
+def test_sisyphus_that_hangs_is_killed_with_its_workers(surface3, tmp_path, monkeypatch):
+    """The wall cap kills the whole process group.
+
+    A worker the proposer started does not outlive it.
+    """
+    d, doc_for = surface3
+    _no_ris(monkeypatch)
+    pidfile = tmp_path / "child.pid"
+    _fake_proposer(
+        tmp_path,
+        monkeypatch,
+        "import subprocess, sys, time\n"
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(600)'])\n"
+        f"open({str(pidfile)!r}, 'w').write(str(child.pid))\n"
+        "time.sleep(600)\n",
+    )
+    monkeypatch.setattr(gc, "SISYPHUS_GRACE", 2.0)
+    t0 = time.monotonic()
+    with pytest.raises(RuntimeError, match="was killed"):
+        gc._circuit_refute(doc_for(3), d, seed=0, sisyphus_seconds=1)
+    assert time.monotonic() - t0 < 60
+    pid = int(pidfile.read_text())
+    for _ in range(50):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            break
+        time.sleep(0.1)
+    else:
+        pytest.fail("the proposer's worker outlived the kill")
+
+
+def _group_members(pgid):
+    """Return the pids in process group pgid, as pgrep lists them."""
+    # pgrep exits 1 when the group is empty, which is an answer and not an error
+    out = subprocess.run(["pgrep", "-g", str(pgid)], capture_output=True, text=True, check=False).stdout
+    return [int(x) for x in out.split()]
+
+
+def test_group_kill_reaches_a_real_sisyphus_pool(surface3):
+    """The kill the gate uses stops Sisyphus's own worker processes.
+
+    The test above uses a stand-in proposer. This one starts the real one the
+    way _sisyphus_propose does, on a search that cannot finish early (nothing
+    is lighter than 3 on this circuit), waits for its pool to exist, and
+    checks that _kill_group leaves the group empty. It runs wherever the
+    self-tests run, so it covers the CI runner's process model and not only
+    a developer's (vprusso's review of #7264).
+    """
+    pytest.importorskip("sisyphus_qec")
+    if shutil.which("pgrep") is None:
+        pytest.skip("pgrep is needed to list the proposer's process group")
+    d, _ = surface3
+    cmd = [sys.executable, gc.SISYPHUS_SCRIPT, os.path.join(d, "memory_x.stim")]
+    cmd += ["--below", "3", "--seconds", "300", "--seed", "0"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        most = []
+        deadline = time.monotonic() + 180  # a cold runner compiles the kernels first
+        while time.monotonic() < deadline and proc.poll() is None:
+            now = _group_members(proc.pid)
+            most = max(most, now, key=len)
+            if len(now) >= 3:  # the proposer and at least two workers
+                break
+            time.sleep(0.25)
+        assert proc.poll() is None, "the proposer exited before it could be killed"
+        assert len(most) >= 3, f"no worker pool appeared in the proposer's group: {most}"
+    finally:
+        gc._kill_group(proc)
+    assert proc.returncode is not None
+    for _ in range(100):
+        if not _group_members(proc.pid):
+            break
+        time.sleep(0.1)
+    else:
+        pytest.fail(f"processes outlived the group kill: {_group_members(proc.pid)}")

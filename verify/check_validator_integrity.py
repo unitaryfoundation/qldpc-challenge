@@ -71,6 +71,7 @@ TRUSTED = (
     "verify/replay_proofs.py",
     "verify/refutation_cache.py",
     "verify/refute_board.py",
+    "verify/sisyphus_propose.py",
     "verify/transversal_gates.py",
     "verify/validate_candidate.py",
     "verify/validation_gate.py",

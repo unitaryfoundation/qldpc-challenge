@@ -46,10 +46,13 @@ to the full existing behavior. Classification is recomputed from the git
 diff, never taken from the PR's framing.
 
 Entries with a circuit block (RFC 0001, issue #505) additionally face the
-circuit-tier refutation (_circuit_refute): a bounded RIS search on each memory
-circuit's re-derived DEM, hunting an undetected logical fault set lighter than
-the claimed d_circ. The circuit search is priced by the same diff principle
-(circuit_gate_needed): it runs when the circuit claim surface changed -- the
+circuit-tier refutation (_circuit_refute): two bounded searches on each memory
+circuit's re-derived DEM, RIS (circuit_tools.ris_dem) and then Sisyphus
+(sisyphus_propose.py, in its own process), hunting an undetected logical fault
+set lighter than the claimed d_circ; a find from either counts only once
+circuit_tools.witness_errors confirms it. The circuit search is priced by the
+same diff principle (circuit_gate_needed): it runs when the circuit claim
+surface changed -- the
 JSON's circuit block, or anything under circuits/<slug>/, whose diffs
 map_changed routes here even when the JSON is untouched -- or when the entry
 is new; an untouched circuit claim already survived its own gate. In
@@ -69,6 +72,7 @@ import glob
 import json
 import os
 import secrets
+import signal
 import subprocess
 import sys
 import time
@@ -565,15 +569,165 @@ def _circuits_diffed(base, code_root, slug):
         return True
 
 
-def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
-    """RFC 0001 step 6: independent bounded RIS on the DEM of each committed
-    memory circuit, hunting an undetected logical fault set lighter than the
-    claimed d_circ. The DEM is RE-DERIVED from the .stim with the pinned stim
-    -- the search substrate is never the committed .dem taken on faith -- and
-    a find only counts after the pinned witness check confirms it, exactly
-    the layering the code-distance gate uses. Returns (hits, notes): hits
-    maps basis -> (found_weight, witness, claimed); notes are per-basis "ok"
-    summaries. Raises on unreadable artifacts (caller fails closed).
+# Second searcher of the circuit tier: Sisyphus (sisyphus-qec, pinned in
+# pyproject.toml), run by verify/sisyphus_propose.py in its own process.
+#
+# Why a second searcher. ris_dem draws independent information sets on the
+# whole DEM, and its trial cost grows as detectors^2 * mechanisms. Measured
+# 2026-11-23 on 28 board circuits (X memory, 4 threads, one machine, the
+# budget above): on the 12 DEMs under 40,000 mechanisms it reached the
+# claimed weight within 5 s; on all 16 from 50,000 mechanisms up it ran 12
+# to 231 trials and its lightest fault set weighed 19 to 354 against claims
+# of 8 to 19, so at that size it could not have refuted any claim. Sisyphus
+# (0.2.0) reached the claimed weight on all 28 and went below it on 7, in
+# under a second of search each: an over-stated d_circ that ris_dem passes.
+# It learns which columns to keep out of the information set and searches
+# windows of whole rounds, so its cost does not grow the same way.
+#
+# What it may decide: nothing. It proposes a fault set; _circuit_refute
+# re-derives the DEM itself and counts the proposal only if
+# circuit_tools.witness_errors accepts it, the layering gf2_fast sits
+# under. A wrong proposal is dropped, so the searcher can miss a refutation
+# and cannot invent one.
+#
+# The budget is added to ris_dem's, which is left as it was. From
+# SISYPHUS_LARGE_DEM mechanisms up the search runs SISYPHUS_MAX_SECONDS;
+# below that it runs 15 s on the smallest DEMs and rises linearly, at the
+# rate that would reach 60 s at the mechanism cap.
+#
+# What the large-DEM figure rests on: the sweep of 2026-11-25
+# (research/audits/sisyphus_circuit_sweep-2026-11-25.json): Sisyphus 0.2.1,
+# 60 s per basis, both bases of the 349 entries with 50,000 mechanisms or
+# more, on four 4-core 15.6 GB Linux machines. 97 searches on 59 entries
+# ended below the claim. The first lighter fault set appeared after a
+# median of 0.42 s, 32 s at the 90th percentile, and 59 s at most, and 5 of
+# the 97 came later than the linear rule alone would have allowed, which is
+# why a large DEM gets the full 60 s. Nothing measures what a search longer
+# than 60 s would add, and 5 searches in that sweep ended above a claim
+# that is known to be reachable, so surviving this search proves nothing.
+# Below SISYPHUS_LARGE_DEM there is no sweep: the linear rule stands on the
+# 12 small DEMs of the 2026-11-23 sample, where Sisyphus held a fault set
+# at the claimed weight within 5 s of the call.
+#
+# The limit bounds the search alone. Set-up (matrices, kernels, windows)
+# took a median of 12.5 s in the sweep and 68.8 s at most, the largest
+# figures being first calls on a machine, which also compile the kernels.
+# SISYPHUS_GRACE, 120 s, is the room the hard kill leaves for it. It was
+# 240 s, which let a proposer that hangs hold the job for 5 minutes per
+# entry (vprusso's review of #7264); a hang fails the entry on the basis
+# where it happens, so it is paid once per entry, 3 minutes now. The peak
+# memory of the proposer's process group in the sweep was 1.18 GB at the
+# median and 3.38 GB at most.
+SISYPHUS_MIN_SECONDS = 15.0
+SISYPHUS_MAX_SECONDS = 60.0
+SISYPHUS_LARGE_DEM = 50_000
+SISYPHUS_GRACE = 120.0
+SISYPHUS_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sisyphus_propose.py")
+SISYPHUS_MARKER = "SISYPHUS_RESULT "
+
+
+def _sisyphus_seconds(m):
+    """Return the Sisyphus search limit, in seconds, for a DEM of m mechanisms."""
+    if m >= SISYPHUS_LARGE_DEM:
+        return SISYPHUS_MAX_SECONDS
+    share = max(0.0, m / MAX_DEM_MECHANISMS)
+    return SISYPHUS_MIN_SECONDS + (SISYPHUS_MAX_SECONDS - SISYPHUS_MIN_SECONDS) * share
+
+
+def _kill_group(proc):
+    """Kill the process group that proc leads, and reap proc.
+
+    proc must have been started with start_new_session=True, so that it leads
+    a group of its own holding every process it started: for the Sisyphus
+    proposer, its pool of workers. Killing proc alone would leave those
+    running, and holding its output pipes open, so the read of those pipes
+    is bounded too: if the group could not be signalled and a worker
+    survives, this returns after 10 s and does not wait on it.
+    """
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        proc.kill()
+    try:
+        proc.communicate(timeout=10)
+    except subprocess.TimeoutExpired:
+        for pipe in (proc.stdout, proc.stderr):
+            if pipe is not None:
+                pipe.close()
+        proc.wait()
+
+
+def _sisyphus_propose(stim_path, claim, seconds, seed):
+    """Run the Sisyphus proposer on one memory circuit and return its record.
+
+    The record is sisyphus_propose's: `lightest` (None when it found no fault
+    set), `witness` (error indices of the flattened DEM), and the run's own
+    figures. Raises RuntimeError when the search cannot be run or does not
+    answer: the package is missing, the process exits non-zero, it outlives
+    seconds + SISYPHUS_GRACE (the whole process group is then killed, worker
+    processes included), or its output is not the one line it promises. The
+    caller fails closed on that, as it does on an unreadable circuit: a gate
+    that quietly fell back to ris_dem would pass exactly the claims this
+    search exists to catch.
+    """
+    cmd = [
+        sys.executable,
+        SISYPHUS_SCRIPT,
+        stim_path,
+        "--below",
+        str(int(claim)),
+        "--seconds",
+        f"{float(seconds):.1f}",
+        "--seed",
+        str(int(seed)),
+    ]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        out, err = proc.communicate(timeout=float(seconds) + SISYPHUS_GRACE)
+    except subprocess.TimeoutExpired:
+        _kill_group(proc)
+        raise RuntimeError(f"sisyphus search outlived {float(seconds) + SISYPHUS_GRACE:.0f} s and was killed") from None
+    if proc.returncode != 0:
+        tail = " | ".join((err or "").strip().splitlines()[-3:])
+        hint = ""
+        if "No module named 'sisyphus_qec'" in (err or ""):
+            hint = " (sisyphus-qec is in the research extra: run the gate with `uv run --extra research`)"
+        raise RuntimeError(f"sisyphus search exited {proc.returncode}: {tail}{hint}")
+    lines = [ln for ln in out.splitlines() if ln.startswith(SISYPHUS_MARKER)]
+    if len(lines) != 1:
+        raise RuntimeError(f"sisyphus search printed {len(lines)} result lines, expected 1")
+    try:
+        rec = json.loads(lines[0][len(SISYPHUS_MARKER) :])
+        lightest, wit = rec["lightest"], rec["witness"]
+        ok = lightest is None or (
+            isinstance(lightest, int)
+            and not isinstance(lightest, bool)
+            and isinstance(wit, list)
+            and all(isinstance(i, int) and not isinstance(i, bool) for i in wit)
+        )
+    except (ValueError, KeyError, TypeError):
+        ok = False
+    if not ok:
+        raise RuntimeError("sisyphus search printed a result that is not in its declared shape")
+    return rec
+
+
+def _circuit_refute(doc, circuits_dir, seed, trials_override=None, sisyphus_seconds=None):
+    """RFC 0001 step 6: two independent bounded searches on the DEM of each
+    committed memory circuit, hunting an undetected logical fault set lighter
+    than the claimed d_circ: ris_dem, then Sisyphus when ris_dem found nothing
+    lighter (see the comment above _sisyphus_seconds). The DEM is RE-DERIVED
+    from the .stim with the pinned stim -- the search substrate is never the
+    committed .dem taken on faith -- and a find from either search only
+    counts after the pinned witness check confirms it, exactly the layering
+    the code-distance gate uses. Returns (hits, notes): hits maps basis ->
+    (found_weight, witness, claimed); notes are per-basis "ok" summaries.
+    Raises on unreadable artifacts and on a Sisyphus search that could not
+    run (caller fails closed).
+
+    sisyphus_seconds is the Sisyphus search limit per basis; None takes it
+    from the DEM's size, which is what the gate does. 0 skips that search and
+    is for callers that want ris_dem alone, such as the tests of that layer.
     """
     import stim
 
@@ -595,10 +749,27 @@ def _circuit_refute(doc, circuits_dir, seed, trials_override=None):
         if trials_override:
             trials = trials_override
         w, wit = CT.ris_dem(Hd, L, trials, seed=seed, max_seconds=cap)
+        del Hd, L  # up to 1.7 GB at the mechanism cap; the proposer builds its own
         if w is not None and w < claim and not CT.witness_errors(dem, wit, w):
             hits[side] = (w, wit, claim)
-        else:
-            notes.append(f"{side} ok (m={m}, {trials} trials, lightest {w} vs claimed {claim})")
+            continue
+        note = f"{side} ok (m={m}, {trials} trials, lightest {w} vs claimed {claim}"
+        seconds = _sisyphus_seconds(m) if sisyphus_seconds is None else float(sisyphus_seconds)
+        if seconds > 0 and claim > 1:
+            rec = _sisyphus_propose(base + ".stim", claim, seconds, seed)
+            sw, swit = rec["lightest"], rec["witness"]
+            found = f"lightest {sw}"
+            if sw is not None and sw < claim:
+                if not CT.witness_errors(dem, swit, sw):
+                    hits[side] = (sw, swit, claim)
+                    continue
+                # Say so: "lightest 4 vs claimed 5" beside "ok" would read as a refutation that was let through.
+                found = f"a proposal of weight {sw} that witness_errors rejected, so nothing lighter than the claim"
+            note += (
+                f"; sisyphus {rec.get('version')}: {rec.get('search_seconds')} s of {seconds:.0f}, "
+                f"{rec.get('steps')} steps, {found}"
+            )
+        notes.append(note + ")")
     return hits, notes
 
 
@@ -845,7 +1016,7 @@ def main(argv):
         seed = secrets.randbelow(2**31)
     print(
         f"refutation seed = {seed}  "
-        f"(reproduce: python verify/gate_changed.py --seed {seed} <files>; "
+        f"(reproduce: uv run --extra research python verify/gate_changed.py --seed {seed} <files>; "
         f"the fast pass is also wall-clock capped, see fast_trials in the "
         f"receipt)\n"
     )

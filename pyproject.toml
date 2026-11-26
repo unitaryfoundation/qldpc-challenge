@@ -22,7 +22,21 @@ certify = ["scipy>=1.11", "python-sat>=1.8"]
 # research/ distance confirmation: exact_distance needs scipy (MILP), and
 # decoder_distance needs ldpc (BP+OSD). The constructors/surrogate/search and
 # submission packaging in research/ are numpy-only and need none of this.
-research = ["scipy>=1.11", "ldpc>=2.0", "pycryptosat>=5.11", "python-sat>=1.8", "pynauty>=2.8"]
+#
+# sisyphus-qec is the second searcher of the circuit-tier refutation gate
+# (verify/sisyphus_propose.py, run by gate_changed._circuit_refute). It lives
+# in this extra because every CI step that runs the gate already installs it.
+# Exact pin: the gate runs whatever this resolves to on every changed circuit
+# claim, and uv.lock records the artifact hashes. It proposes fault sets and
+# nothing more; circuit_tools.witness_errors decides whether one counts.
+research = [
+    "scipy>=1.11",
+    "ldpc>=2.0",
+    "pycryptosat>=5.11",
+    "python-sat>=1.8",
+    "pynauty>=2.8",
+    "sisyphus-qec==0.2.1",
+]
 
 [tool.uv]
 # scripts-only repo: manage the environment, do not try to build/install it
