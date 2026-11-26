@@ -1246,7 +1246,7 @@
   "construction": "Generalized bicycle code (arXiv:2306.16400, Renyu Wang & Leonid P. Pryadko) from github.com/QEC-pages/GB-codes, gb-codes.zip, codes/GB_118_w8_X.mtx and _Z.mtx.",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published generalized bicycle code (arXiv:2306.16400, Renyu Wang & Leonid P. Pryadko), from github.com/QEC-pages/GB-codes gb-codes.zip. Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published generalized bicycle code (arXiv:2306.16400, Renyu Wang & Leonid P. Pryadko), from github.com/QEC-pages/GB-codes gb-codes.zip. Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 16 in its committed detector error model (claimed 17). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -1277,26 +1277,25 @@
     ]
    },
    "X": {
-    "value": 17,
+    "value": 16,
     "confidence": "upper_bound",
     "witness": [
-     128622,
-     128627,
-     128635,
-     128639,
-     128656,
-     128675,
-     128688,
-     128689,
-     128703,
-     128706,
-     128709,
-     128711,
-     128715,
-     128720,
-     128728,
-     128732,
-     128735
+     18432,
+     18448,
+     19373,
+     19539,
+     19557,
+     19880,
+     20278,
+     20355,
+     20370,
+     20614,
+     21181,
+     21393,
+     21427,
+     21538,
+     27468,
+     28107
     ]
    }
   },
