@@ -1437,7 +1437,7 @@
    "arXiv:2607.14091"
   ],
   "novelty": "known_parameters",
-  "notes": "Literature baseline, seeded 2026-08-14. Listed as PPS184 [[184,50,10]] in the contributed-codes section (Jong Yeon Lee, 19 CPM-PP codes) of the Okada-Kasai pair-partition CPM catalogue (arXiv:2607.14091; catalogue page updated 2026-08-13), which reports the distance as exact. Unlike the catalogue's primary instances, no public machine-verified distance certificate bundle covers this code (checked master_manifest.json of certificate_bundles_20260805), so it is recorded here strictly as a witness-backed upper bound: d<=10 on both sides from this repo's own 150k-trial RIS search (seed 7). Reproduction was validated end to end: the published .cpm file expanded with the authors' own script gives a CSS-orthogonal (3,8)-regular pair with GF(2) ranks 67/67 (k=50). Best weight-8 kd^2/n (27.17) below n=472 on the board, and the highest k of any weight-8 entry below n=472."
+  "notes": "Literature baseline, seeded 2026-08-14. Listed as PPS184 [[184,50,10]] in the contributed-codes section (Jong Yeon Lee, 19 CPM-PP codes) of the Okada-Kasai pair-partition CPM catalogue (arXiv:2607.14091; catalogue page updated 2026-08-13), which reports the distance as exact. Unlike the catalogue's primary instances, no public machine-verified distance certificate bundle covers this code (checked master_manifest.json of certificate_bundles_20260805), so it is recorded here strictly as a witness-backed upper bound: d<=10 on both sides from this repo's own 150k-trial RIS search (seed 7). Reproduction was validated end to end: the published .cpm file expanded with the authors' own script gives a CSS-orthogonal (3,8)-regular pair with GF(2) ranks 67/67 (k=50). Best weight-8 kd^2/n (27.17) below n=472 on the board, and the highest k of any weight-8 entry below n=472. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 10); the Z-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 10). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "pair-partition-cpm",
  "locality": {
@@ -2192,35 +2192,33 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 10,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     109454,
-     109455,
-     109462,
-     109465,
-     109476,
-     109477,
-     109548,
-     109552,
-     109604,
-     109605
+     25658,
+     25672,
+     25702,
+     31819,
+     31824,
+     31854,
+     32248,
+     32255,
+     32336
     ]
    },
    "X": {
-    "value": 10,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     109482,
-     109485,
-     109566,
-     109567,
-     109570,
-     109573,
-     109577,
-     109583,
-     109603,
-     109607
+     106080,
+     106095,
+     106119,
+     108803,
+     108805,
+     109462,
+     109483,
+     109486,
+     109613
     ]
    }
   },
