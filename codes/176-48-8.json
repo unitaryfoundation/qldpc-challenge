@@ -1760,37 +1760,33 @@
   "construction": "One amplification of [[40,24,4]] base by flagged [[4,2,2]] amplifier (arXiv:2609.37231).",
   "origin": "submission",
   "date": "2026-10-18",
-  "model": "Beam 1.0"
+  "model": "Beam 1.0",
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 8); the Z-memory circuit has an undetected logical fault set of weight 5 in its committed detector error model (claimed 8). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "other",
  "circuit": {
   "d_circ": {
    "X": {
-    "value": 8,
+    "value": 6,
     "confidence": "upper_bound",
     "witness": [
-     101925,
-     101932,
-     101945,
-     101952,
-     101969,
-     101972,
-     101989,
-     101992
+     4199,
+     4238,
+     4299,
+     4348,
+     16160,
+     16982
     ]
    },
    "Z": {
-    "value": 8,
+    "value": 5,
     "confidence": "upper_bound",
     "witness": [
-     101867,
-     101868,
-     101870,
-     101871,
-     101887,
-     101888,
-     101890,
-     101891
+     7550,
+     7552,
+     8331,
+     8338,
+     10154
     ]
    }
   },
