@@ -1575,7 +1575,7 @@
   "origin": "baseline",
   "date": "2026-10-12",
   "model": "Claude Fable 5.1 (Claude Code)",
-  "notes": "Literature reconstruction. The paper states d = 15 exactly (d_X: ladder in the screen (frontier mode, exact_on_accept; cluster engine, symmetry roots); d_Z: ladder in the screen (frontier mode, exact_on_accept; cluster engine, symmetry roots); verification record: one engine). Readings here: qldpc submit's RIS (20,000 NumPy trials per side) and its 2,000,000-trial accelerator pass, plus the verifier's refutation search; witnessed upper bound, see notes/168-12-15.md.",
+  "notes": "Literature reconstruction. The paper states d = 15 exactly (d_X: ladder in the screen (frontier mode, exact_on_accept; cluster engine, symmetry roots); d_Z: ladder in the screen (frontier mode, exact_on_accept; cluster engine, symmetry roots); verification record: one engine). Readings here: qldpc submit's RIS (20,000 NumPy trials per side) and its 2,000,000-trial accelerator pass, plus the verifier's refutation search; witnessed upper bound, see notes/168-12-15.md. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 15); the Z-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 15). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "novelty": "known_parameters",
   "references": [
    "arXiv:2610.13880"
@@ -1585,45 +1585,39 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 15,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     122251,
-     122262,
-     122265,
-     122270,
-     122280,
-     122314,
-     122322,
-     122325,
-     122385,
-     122409,
-     122413,
-     122422,
-     122438,
-     122447,
-     122471
+     121990,
+     121993,
+     122102,
+     122106,
+     122218,
+     122290,
+     122298,
+     122366,
+     122439,
+     122448,
+     122462,
+     122467
     ]
    },
    "X": {
-    "value": 15,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     122232,
-     122233,
-     122242,
-     122246,
-     122261,
-     122263,
-     122290,
-     122327,
-     122328,
-     122335,
-     122342,
-     122344,
-     122372,
-     122374,
-     122386
+     4738,
+     4739,
+     4963,
+     4974,
+     5187,
+     5213,
+     5224,
+     5383,
+     11309,
+     11661,
+     11989,
+     12261
     ]
    }
   },
