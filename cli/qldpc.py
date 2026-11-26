@@ -3487,12 +3487,26 @@ def cmd_preflight(args):
 
     base = args.base_ref or ""
     if not base:
-        # prefer upstream/main when available, fall back to origin/main
+        # prefer upstream/main when available, fall back to origin/main (only
+        # when origin is the canonical repository, matching prepush_prose_check.sh)
         try:
-            _sp.run(["git", "remote", "get-url", "upstream"], check=True, capture_output=True)
+            _sp.run(["git", "remote", "get-url", "upstream"], check=True, capture_output=True, cwd=_ROOT)
             base = "upstream/main"
         except Exception:
-            base = "origin/main"
+            origin_url = ""
+            try:
+                r = _sp.run(["git", "remote", "get-url", "origin"], check=True, capture_output=True, text=True, cwd=_ROOT)
+                origin_url = r.stdout.strip()
+            except Exception:
+                pass
+            if "unitaryfoundation/qldpc-challenge" in origin_url:
+                base = "origin/main"
+            else:
+                print(
+                    "preflight: no upstream remote and origin is not the canonical "
+                    "repository; add upstream or pass --base-ref", file=sys.stderr,
+                )
+                raise SystemExit(2)
 
     def run(label, cmd):
         print(f"== {label} ==")
@@ -3503,7 +3517,7 @@ def cmd_preflight(args):
 
     run(
         "submission scope",
-        ["uv", "run", "python", "verify/check_submission_scope.py", "--root", _ROOT, "--base", base],
+        ["uv", "run", "--frozen", "python", "verify/check_submission_scope.py", "--root", _ROOT, "--base", base],
     )
 
     # ruff on added Python files
@@ -3539,8 +3553,8 @@ def cmd_preflight(args):
         ["uv", "run", "--frozen", "--extra", "research", "python", "run_tests.py", "-m", "board"],
     )
 
-    if getattr(args, "body_file", ""):
-        run("prose", ["verify/prepush_prose_check.sh", args.body_file])
+    body = getattr(args, "body_file", "") or "/dev/null"
+    run("prose", ["verify/prepush_prose_check.sh", body])
 
     print("preflight: OK")
 
