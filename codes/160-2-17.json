@@ -1347,7 +1347,7 @@
   "origin": "submission",
   "date": "2026-09-18",
   "model": "DeepSeek V4 Flash 0731",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry."
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-25 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 16 in its committed detector error model (claimed 17); the Z-memory circuit has an undetected logical fault set of weight 15 in its committed detector error model (claimed 17). Found by Sisyphus (sisyphus-qec 0.2.0, github.com/varunmenon1310/sisyphus), in searches run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "generalized-bicycle",
  "locality": {
@@ -2006,49 +2006,46 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 17,
+    "value": 15,
     "confidence": "upper_bound",
     "witness": [
-     124924,
-     124925,
-     124934,
-     124935,
-     124950,
-     124951,
-     124974,
-     124976,
-     124994,
-     124998,
-     125000,
-     125001,
-     125009,
-     125058,
-     125059,
-     125074,
-     125079
+     21394,
+     21399,
+     22206,
+     22210,
+     26994,
+     26995,
+     27509,
+     27511,
+     27580,
+     27688,
+     34866,
+     35002,
+     35007,
+     35116,
+     35141
     ]
    },
    "X": {
-    "value": 17,
+    "value": 16,
     "confidence": "upper_bound",
     "witness": [
-     124934,
-     124937,
-     124940,
-     124942,
-     124950,
-     124951,
-     124965,
-     124966,
-     124994,
-     125027,
-     125028,
-     125035,
-     125040,
-     125060,
-     125063,
-     125071,
-     125073
+     8676,
+     8688,
+     9820,
+     9832,
+     10554,
+     10564,
+     10810,
+     10841,
+     10860,
+     10867,
+     11890,
+     11998,
+     12078,
+     12580,
+     12944,
+     13184
     ]
    }
   },

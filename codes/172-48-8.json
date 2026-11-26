@@ -1640,7 +1640,7 @@
    "https://arxiv.org/abs/2306.16400"
   ],
   "date": "2026-10-03",
-  "notes": "Known tensor construction; literature novelty unverified. Final duplicate and WL-signature checks use upstream da1f2c0a1611b215376b249c139f4951e2394418. Neither check constitutes exhaustive equivalence testing. X and Z distances remain witnessed upper bounds.",
+  "notes": "Known tensor construction; literature novelty unverified. Final duplicate and WL-signature checks use upstream da1f2c0a1611b215376b249c139f4951e2394418. Neither check constitutes exhaustive equivalence testing. X and Z distances remain witnessed upper bounds. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 8); the Z-memory circuit has an undetected logical fault set of weight 6 in its committed detector error model (claimed 8). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "GPT-6",
   "origin": "submission",
   "novelty": "unknown",
@@ -2357,31 +2357,27 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 8,
+    "value": 6,
     "confidence": "upper_bound",
     "witness": [
+     181,
      183,
-     262,
-     1896,
-     3989,
-     4083,
-     4321,
-     4345,
-     10278
+     1821,
+     1853,
+     4320,
+     4342
     ]
    },
    "X": {
-    "value": 8,
+    "value": 6,
     "confidence": "upper_bound",
     "witness": [
-     62792,
-     62796,
-     62983,
-     62985,
-     63025,
-     63028,
-     73667,
-     74047
+     98030,
+     98052,
+     98057,
+     99867,
+     99882,
+     99909
     ]
    }
   },

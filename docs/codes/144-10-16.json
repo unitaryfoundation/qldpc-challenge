@@ -1505,7 +1505,7 @@
   "origin": "submission",
   "date": "2026-09-09",
   "model": "Omen Alpha 1.0",
-  "notes": "New parameters (submitter claim). Distance: RIS upper bound d<=16 (20k trials), corroborated by BP+OSD at 200k trials/side (weight-16 logicals, nothing lighter); exact certification not run.",
+  "notes": "New parameters (submitter claim). Distance: RIS upper bound d<=16 (20k trials), corroborated by BP+OSD at 200k trials/side (weight-16 logicals, nothing lighter); exact certification not run. Circuit fault distance corrected on 2026-11-25 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 11 in its committed detector error model (claimed 16); the Z-memory circuit has an undetected logical fault set of weight 9 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.0, github.com/varunmenon1310/sisyphus), in searches run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "novelty": "new_parameters"
  },
  "family": "bivariate-bicycle",
@@ -2101,47 +2101,35 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 16,
+    "value": 9,
     "confidence": "upper_bound",
     "witness": [
-     131544,
-     131556,
-     131570,
-     131620,
-     131627,
-     131661,
-     131664,
-     131666,
-     131671,
-     131707,
-     131737,
-     131749,
-     131806,
-     131810,
-     131824,
-     131828
+     131420,
+     131421,
+     131444,
+     131445,
+     131466,
+     131467,
+     131545,
+     131577,
+     131605
     ]
    },
    "X": {
-    "value": 16,
+    "value": 11,
     "confidence": "upper_bound",
     "witness": [
-     131638,
-     131642,
-     131650,
-     131672,
-     131673,
-     131683,
-     131684,
-     131705,
-     131708,
-     131719,
-     131727,
-     131728,
-     131736,
-     131737,
-     131747,
-     131752
+     9,
+     133,
+     363,
+     2295,
+     2299,
+     2381,
+     2503,
+     3180,
+     3775,
+     5323,
+     5405
     ]
    }
   },

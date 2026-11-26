@@ -1689,7 +1689,7 @@
    "https://github.com/QEC-pages/2BGA-codes"
   ],
   "date": "2023",
-  "notes": "Literature baseline (arXiv:2306.16400, Lin and Pryadko, 28 Jun 2023), seeded for issue #3658 as the 2BGA archive row that dominates 200-8-9 at equal n, k, and check weight. Reconstructed here from the archive row with the group table exported by research/kit/groups/cayley_table.g; n, k, and the check weight match the row, and the reconstruction convention was checked by rebuilding five archive rows already on the board and finding each permutation-equivalent to its entry. The archive's d = 14 is a QDistRnd upper bound; this entry claims d <= 14 from its own witnesses (40,000 RIS trials per side on the NumPy backend, seed 20261017, X 14, Z 14), and 2 x 2,000,000 gf2_fast trials found nothing lighter than 14.",
+  "notes": "Literature baseline (arXiv:2306.16400, Lin and Pryadko, 28 Jun 2023), seeded for issue #3658 as the 2BGA archive row that dominates 200-8-9 at equal n, k, and check weight. Reconstructed here from the archive row with the group table exported by research/kit/groups/cayley_table.g; n, k, and the check weight match the row, and the reconstruction convention was checked by rebuilding five archive rows already on the board and finding each permutation-equivalent to its entry. The archive's d = 14 is a QDistRnd upper bound; this entry claims d <= 14 from its own witnesses (40,000 RIS trials per side on the NumPy backend, seed 20261017, X 14, Z 14), and 2 x 2,000,000 gf2_fast trials found nothing lighter than 14. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 14). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "origin": "baseline",
   "novelty": "known_parameters"
  },
@@ -1717,23 +1717,21 @@
     ]
    },
    "X": {
-    "value": 14,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     128209,
-     128210,
-     128215,
-     128216,
-     128288,
-     128290,
-     128296,
-     128298,
-     128300,
-     128324,
-     128354,
-     128373,
-     128375,
-     128383
+     960,
+     983,
+     3623,
+     3659,
+     4781,
+     4920,
+     4944,
+     5454,
+     12948,
+     13156,
+     13395,
+     13971
     ]
    }
   },

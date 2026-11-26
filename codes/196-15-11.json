@@ -1639,7 +1639,7 @@
    "arXiv:2504.08887"
   ],
   "date": "2026-09-11",
-  "notes": "Derived from codes/201-15-11.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[201,15,11]], [[214,15,11]], [[216,15,11]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 6.08276, against 5.38516 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified.",
+  "notes": "Derived from codes/201-15-11.json, not an independent construction; that entry is my own earlier reduction, and this one goes further with a larger move set. The gate reports no exact duplicate and no WL-equivalent entry. It dominates [[201,15,11]], [[214,15,11]], [[216,15,11]] on (n, k, d, w), which therefore leave the frontier of every cell they share with it. The measured interaction radius is 6.08276, against 5.38516 for the source: unlike the graft and the cleanup, the merge-graft can widen a check, and it is capped by the locality class rather than by the source's own radius, so the reduced code is less local even though it stays in the same cell. Distance is a witness-backed upper bound: the deepest null result is 20000000 fresh-seed RIS trials. Literature novelty is unverified. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 10 in its committed detector error model (claimed 11); the Z-memory circuit has an undetected logical fault set of weight 10 in its committed detector error model (claimed 11). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "Claude Opus 5 (Claude Code)",
   "origin": "submission",
   "novelty": "unknown"
@@ -2438,37 +2438,35 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 11,
+    "value": 10,
     "confidence": "upper_bound",
     "witness": [
-     123833,
-     123834,
-     123842,
-     123843,
-     123848,
-     123855,
-     123884,
-     123892,
-     123927,
-     123968,
-     123987
+     1396,
+     1487,
+     3620,
+     3622,
+     3644,
+     6149,
+     6841,
+     6855,
+     6895,
+     7356
     ]
    },
    "X": {
-    "value": 11,
+    "value": 10,
     "confidence": "upper_bound",
     "witness": [
-     123798,
-     123801,
-     123844,
-     123848,
-     123852,
-     123856,
-     123878,
-     123889,
-     123891,
-     123977,
-     123982
+     4843,
+     4856,
+     4870,
+     15094,
+     15099,
+     15819,
+     15934,
+     16490,
+     16823,
+     16852
     ]
    }
   },

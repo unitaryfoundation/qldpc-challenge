@@ -1304,7 +1304,7 @@
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(62,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, nonabelian.zip, diswtnonabelian_wt8wtL4_order62_k4.txt, line 10. nonidentity supports a=[2, 3, 12], b=[3, 7, 45].",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 14 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -1843,25 +1843,23 @@
     ]
    },
    "X": {
-    "value": 16,
+    "value": 14,
     "confidence": "upper_bound",
     "witness": [
-     126668,
-     126673,
-     126674,
-     126676,
-     126680,
-     126682,
-     126692,
-     126694,
-     126702,
-     126708,
-     126710,
-     126718,
-     126734,
-     126738,
-     126774,
-     126780
+     19561,
+     19570,
+     20204,
+     20210,
+     20456,
+     20466,
+     21194,
+     21296,
+     21418,
+     21776,
+     22317,
+     22873,
+     28455,
+     30588
     ]
    }
   },

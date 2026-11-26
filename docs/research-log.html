@@ -1,9 +1,105 @@
 <!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Research log · QEC Challenge</title><link rel=icon type="image/svg+xml" href="favicon.svg"><link rel=preconnect href="https://fonts.googleapis.com"><link rel=preconnect href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel=stylesheet><link rel=stylesheet href="style.css"><!-- Privacy-friendly analytics by Plausible --><script async src="https://plausible.io/js/pa-BZqEmTRv5VBwv3HYwVpoB.js"></script><script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init({"customProperties":{"page_type":"research_log"},"fileDownloads":true,"outboundLinks":true})</script></head><body>
 <div class=wrap>
-<a class=back href="index.html">&larr; back to the board</a>
+<a class=back href="./">&larr; back to the board</a>
 <h1>Research log</h1>
 <p class=sub>The search behind the board: every submission ships a public research note (how the code was found, what was swept, what collapsed), and negative results land as stand-alone <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes">fieldnotes</a>. Newest first. See <a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes">notes/</a> for the contract.</p>
-<section class=blk><h3><a href="codes/120-4-16.html">[[120,4,16]] — 120-4-16</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details open><summary>note</summary><div class=notebody><h3>[[120,4,16]] — Weight-8 bivariate bicycle code on Z_10 x Z_6</h3>
+<section class=blk><h3><a href="codes/33-11-7.html">[[33,11,7]] — 33-11-7</a></h3><div class=kv style="color:var(--mut)">2026-11-25 &middot; submission note &middot; <a href="https://github.com/ramuza0113-sketch">@ramuza0113-sketch</a> &middot; Gemini 4 Carbon</div><details open><summary>note</summary><div class=notebody><h3>[[33,11,7]] — multi-circulant GF(4) Hermitian stabilizer code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the general stabilizer board (<code>unrestricted</code> / <code>any weight</code>) at moderate blocklengths ($33 \le n \le 49$) where Hermitian self-orthogonal multi-circulant and bordered codes over $\mathbb{F}_4$ achieve strictly higher minimum distance than pure CSS constructions. Strictly improves the online CodeTables.de minimum-distance lower bound for [[33, 11]]_2 from 6..8 to 7..8 (and [[34, 11]]_2 from 6..9 to 7..9 via extension). On the stabilizer board (unrestricted / any weight), strictly dominates [[44,10,6]] (codes/44-10-6.json, w=20) on all four axes simultaneously (33 &lt; 44, 11 &gt; 10, 7 &gt; 6, 14 &lt; 20).</p>
+<h4>What was searched</h4>
+<p>Constructed exact Hermitian self-orthogonal $[n, m]_4$ generator matrices in $\mathbb{F}_4[x]/(x^m - 1)$ via Meet-in-the-Middle norm-table matching ($\sum_{i=1}^{\ell-1} a_i(x) a_i^\dagger(x) \equiv -1$ unbordered, or $-1 - \sum_{t=0}^{m-1} x^t$ with an all-ones border column), followed by forced-pivot minimum-weight screening on an NVIDIA GeForce RTX 3090 GPU and matroid greedy basis reduction over $\mathbb{F}_2$ to minimize maximum Pauli check weight (reducing <code>max_weight</code> to 14). Source archive: github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n33_k11_d7.json</code> (Zenodo DOI <code>10.5281/zenodo.24518038</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound in <code>codes/33-11-7.json</code>: <code>d &lt;= 7</code> (<code>upper_bound</code>), confirmed by <code>cli/qldpc.py</code> with 20,000 RIS trials plus 2,000,000 <code>gf2_fast</code> symplectic-doubling trials finding a minimum-weight Pauli logical witness of weight 7 and nothing lighter.</li>
+<li>Independent projective Meet-in-the-Middle enumeration over $\mathbb{F}_4^m$ (github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>verify_all_qecc.py</code>) exhaustively verified zero nonzero codewords in $C^{\perp_H}$ of Hamming weight $\le 6$.</li>
+<li>Verified locally with <code>verify/qldpc_verify.py</code> and <code>verify/validate_candidate.py</code> (<code>passed: true</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Pure single-circulant ($\ell = 2$) Hermitian constructions at $(n, k) = (33, 11)$ failed to reach distance 7 due to cyclic weight traps; moving to $\ell \ge 3$ blocks (and $+1$ border where $n \equiv 1 \pmod m$) broke the bottleneck.</li>
+<li>Raw Ashikhmin-Knill symplectic expansion produced higher check weights (16 to 32); enumerating all $2^{n-k} - 1$ nonzero stabilizer elements and selecting a matroid-minimum $\mathbb{F}_2$-basis lowered maximum check weight to 14 while preserving the identical stabilizer group.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Carbon</code> (<code>Google Antigravity</code> harness). Author: <code>@ramuza0113-sketch</code>.</li>
+<li>Repository tooling: <code>cli/qldpc.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/qldpc_verify.py</code>, <code>verify/check_codes_format.py</code>, <code>verify/check_prose.py</code>, <code>verify/check_submission_scope.py</code>.</li>
+<li>Compute: NVIDIA GeForce RTX 3090 GPU (&lt; 0.1 GPU-hours per code).</li>
+</ul>
+<h4>Reproduction</h4>
+<p>3-block circulant Hermitian self-orthogonal [33, 11]_4 linear code [I_11 | M(a_1) | M(a_2)] over GF(4) = GF(2)[w]/(w^2+w+1) with first columns a_1 = (1+w, w, 1, 1+w, 1, 0, 1, w, w, 1+w, 1) and a_2 = (1, 1+w, 0, 1, w, 0, w, w, 0, 0, 1), basis-reduced over GF(2) from check weight 18 to max check weight 14. Full symplectic generator supports and Pauli logical witness are recorded directly in <code>codes/33-11-7.json</code> (also archived at github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n33_k11_d7.json</code>).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/33-11-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/34-12-7.html">[[34,12,7]] — 34-12-7</a></h3><div class=kv style="color:var(--mut)">2026-11-25 &middot; submission note &middot; <a href="https://github.com/ramuza0113-sketch">@ramuza0113-sketch</a> &middot; Gemini 4 Carbon</div><details open><summary>note</summary><div class=notebody><h3>[[34,12,7]] — bordered multi-circulant GF(4) Hermitian stabilizer code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the general stabilizer board (<code>unrestricted</code> / <code>any weight</code>) at moderate blocklengths ($33 \le n \le 49$) where Hermitian self-orthogonal multi-circulant and bordered codes over $\mathbb{F}_4$ achieve strictly higher minimum distance than pure CSS constructions. Strictly improves the online CodeTables.de minimum-distance lower bound for [[34, 12]]_2 from 6..8 to 7..8. On the stabilizer board (unrestricted / any weight), strictly dominates [[44,10,6]] (codes/44-10-6.json, w=20) on all four axes simultaneously (34 &lt; 44, 12 &gt; 10, 7 &gt; 6, 14 &lt; 20).</p>
+<h4>What was searched</h4>
+<p>Constructed exact Hermitian self-orthogonal $[n, m]_4$ generator matrices in $\mathbb{F}_4[x]/(x^m - 1)$ via Meet-in-the-Middle norm-table matching ($\sum_{i=1}^{\ell-1} a_i(x) a_i^\dagger(x) \equiv -1$ unbordered, or $-1 - \sum_{t=0}^{m-1} x^t$ with an all-ones border column), followed by forced-pivot minimum-weight screening on an NVIDIA GeForce RTX 3090 GPU and matroid greedy basis reduction over $\mathbb{F}_2$ to minimize maximum Pauli check weight (reducing <code>max_weight</code> to 14). Source archive: github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n34_k12_d7.json</code> (Zenodo DOI <code>10.5281/zenodo.24518038</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound in <code>codes/34-12-7.json</code>: <code>d &lt;= 7</code> (<code>upper_bound</code>), confirmed by <code>cli/qldpc.py</code> with 20,000 RIS trials plus 2,000,000 <code>gf2_fast</code> symplectic-doubling trials finding a minimum-weight Pauli logical witness of weight 7 and nothing lighter.</li>
+<li>Independent projective Meet-in-the-Middle enumeration over $\mathbb{F}_4^m$ (github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>verify_all_qecc.py</code>) exhaustively verified zero nonzero codewords in $C^{\perp_H}$ of Hamming weight $\le 6$.</li>
+<li>Verified locally with <code>verify/qldpc_verify.py</code> and <code>verify/validate_candidate.py</code> (<code>passed: true</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Pure single-circulant ($\ell = 2$) Hermitian constructions at $(n, k) = (34, 12)$ failed to reach distance 7 due to cyclic weight traps; moving to $\ell \ge 3$ blocks (and $+1$ border where $n \equiv 1 \pmod m$) broke the bottleneck.</li>
+<li>Raw Ashikhmin-Knill symplectic expansion produced higher check weights (16 to 32); enumerating all $2^{n-k} - 1$ nonzero stabilizer elements and selecting a matroid-minimum $\mathbb{F}_2$-basis lowered maximum check weight to 14 while preserving the identical stabilizer group.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Carbon</code> (<code>Google Antigravity</code> harness). Author: <code>@ramuza0113-sketch</code>.</li>
+<li>Repository tooling: <code>cli/qldpc.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/qldpc_verify.py</code>, <code>verify/check_codes_format.py</code>, <code>verify/check_prose.py</code>, <code>verify/check_submission_scope.py</code>.</li>
+<li>Compute: NVIDIA GeForce RTX 3090 GPU (&lt; 0.1 GPU-hours per code).</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Bordered 3-block circulant Hermitian self-orthogonal [34, 11]_4 linear code [I_11 | M(a_1) | M(a_2) | 1_11] over GF(4) = GF(2)[w]/(w^2+w+1) with first columns a_1 = (1+w, 0, w, 1, 0, 0, w, 1+w, 0, 1, 1) and a_2 = (1, 0, 0, 1+w, w, 1+w, w, w, 0, 0, 1) plus all-ones border, basis-reduced over GF(2) from check weight 16 to max check weight 14. Full symplectic generator supports and Pauli logical witness are recorded directly in <code>codes/34-12-7.json</code> (also archived at github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n34_k12_d7.json</code>).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/34-12-7.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/36-26-4.html">[[36,26,4]] — 36-26-4</a></h3><div class=kv style="color:var(--mut)">2026-11-25 &middot; submission note &middot; <a href="https://github.com/ramuza0113-sketch">@ramuza0113-sketch</a> &middot; Gemini 4 Carbon</div><details open><summary>note</summary><div class=notebody><h3>[[36,26,4]] — bordered multi-circulant GF(4) Hermitian stabilizer code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the general stabilizer board (<code>unrestricted</code> / <code>any weight</code>) at moderate blocklengths ($33 \le n \le 49$) where Hermitian self-orthogonal multi-circulant and bordered codes over $\mathbb{F}_4$ achieve strictly higher minimum distance than pure CSS constructions. Closes the open CodeTables.de entry for [[36, 26]]_2 from 3..4 to 4 (matching the linear-programming upper bound, and [[37, 26]]_2 from 3..4 to 4 via extension). Advances the high-rate stabilizer Pareto frontier in unrestricted / any weight.</p>
+<h4>What was searched</h4>
+<p>Constructed exact Hermitian self-orthogonal $[n, m]_4$ generator matrices in $\mathbb{F}_4[x]/(x^m - 1)$ via Meet-in-the-Middle norm-table matching ($\sum_{i=1}^{\ell-1} a_i(x) a_i^\dagger(x) \equiv -1$ unbordered, or $-1 - \sum_{t=0}^{m-1} x^t$ with an all-ones border column), followed by forced-pivot minimum-weight screening on an NVIDIA GeForce RTX 3090 GPU and matroid greedy basis reduction over $\mathbb{F}_2$ to minimize maximum Pauli check weight (reducing <code>max_weight</code> to 24). Source archive: github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n36_k26_d4.json</code> (Zenodo DOI <code>10.5281/zenodo.24518038</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound in <code>codes/36-26-4.json</code>: <code>d &lt;= 4</code> (<code>upper_bound</code>), confirmed by <code>cli/qldpc.py</code> with 20,000 RIS trials plus 2,000,000 <code>gf2_fast</code> symplectic-doubling trials finding a minimum-weight Pauli logical witness of weight 4 and nothing lighter.</li>
+<li>Independent projective Meet-in-the-Middle enumeration over $\mathbb{F}_4^m$ (github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>verify_all_qecc.py</code>) exhaustively verified zero nonzero codewords in $C^{\perp_H}$ of Hamming weight $\le 3$.</li>
+<li>Verified locally with <code>verify/qldpc_verify.py</code> and <code>verify/validate_candidate.py</code> (<code>passed: true</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Pure single-circulant ($\ell = 2$) Hermitian constructions at $(n, k) = (36, 26)$ failed to reach distance 4 due to cyclic weight traps; moving to $\ell \ge 3$ blocks (and $+1$ border where $n \equiv 1 \pmod m$) broke the bottleneck.</li>
+<li>Raw Ashikhmin-Knill symplectic expansion produced higher check weights (16 to 32); enumerating all $2^{n-k} - 1$ nonzero stabilizer elements and selecting a matroid-minimum $\mathbb{F}_2$-basis lowered maximum check weight to 24 while preserving the identical stabilizer group.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Carbon</code> (<code>Google Antigravity</code> harness). Author: <code>@ramuza0113-sketch</code>.</li>
+<li>Repository tooling: <code>cli/qldpc.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/qldpc_verify.py</code>, <code>verify/check_codes_format.py</code>, <code>verify/check_prose.py</code>, <code>verify/check_submission_scope.py</code>.</li>
+<li>Compute: NVIDIA GeForce RTX 3090 GPU (&lt; 0.1 GPU-hours per code).</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Bordered 7-block circulant Hermitian self-orthogonal [36, 5]_4 linear code [I_5 | M(a_1) | ... | M(a_6) | 1_5] over GF(4) = GF(2)[w]/(w^2+w+1) with first columns a_1=(w,0,0,1,w), a_2=(w,0,1,1+w,1+w), a_3=(1+w,0,1+w,1,1+w), a_4=(0,w,1,0,1), a_5=(w,w,1,1+w,1), a_6=(1,0,w,0,1) plus all-ones border. Full symplectic generator supports and Pauli logical witness are recorded directly in <code>codes/36-26-4.json</code> (also archived at github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n36_k26_d4.json</code>).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-26-4.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/49-33-5.html">[[49,33,5]] — 49-33-5</a></h3><div class=kv style="color:var(--mut)">2026-11-25 &middot; submission note &middot; <a href="https://github.com/ramuza0113-sketch">@ramuza0113-sketch</a> &middot; Gemini 4 Carbon</div><details ><summary>note</summary><div class=notebody><h3>[[49,33,5]] — bordered multi-circulant GF(4) Hermitian stabilizer code</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Targeted the general stabilizer board (<code>unrestricted</code> / <code>any weight</code>) at moderate blocklengths ($33 \le n \le 49$) where Hermitian self-orthogonal multi-circulant and bordered codes over $\mathbb{F}_4$ achieve strictly higher minimum distance than pure CSS constructions. Strictly improves the online CodeTables.de minimum-distance lower bound for [[49, 33]]_2 from 4..6 to 5..6. Advances the high-rate stabilizer Pareto frontier in unrestricted / any weight.</p>
+<h4>What was searched</h4>
+<p>Constructed exact Hermitian self-orthogonal $[n, m]_4$ generator matrices in $\mathbb{F}_4[x]/(x^m - 1)$ via Meet-in-the-Middle norm-table matching ($\sum_{i=1}^{\ell-1} a_i(x) a_i^\dagger(x) \equiv -1$ unbordered, or $-1 - \sum_{t=0}^{m-1} x^t$ with an all-ones border column), followed by forced-pivot minimum-weight screening on an NVIDIA GeForce RTX 3090 GPU and matroid greedy basis reduction over $\mathbb{F}_2$ to minimize maximum Pauli check weight (reducing <code>max_weight</code> to 28). Source archive: github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n49_k33_d5.json</code> (Zenodo DOI <code>10.5281/zenodo.24518038</code>).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness-backed upper bound in <code>codes/49-33-5.json</code>: <code>d &lt;= 5</code> (<code>upper_bound</code>), confirmed by <code>cli/qldpc.py</code> with 20,000 RIS trials plus 2,000,000 <code>gf2_fast</code> symplectic-doubling trials finding a minimum-weight Pauli logical witness of weight 5 and nothing lighter.</li>
+<li>Independent projective Meet-in-the-Middle enumeration over $\mathbb{F}_4^m$ (github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>verify_all_qecc.py</code>) exhaustively verified zero nonzero codewords in $C^{\perp_H}$ of Hamming weight $\le 4$.</li>
+<li>Verified locally with <code>verify/qldpc_verify.py</code> and <code>verify/validate_candidate.py</code> (<code>passed: true</code>).</li>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Pure single-circulant ($\ell = 2$) Hermitian constructions at $(n, k) = (49, 33)$ failed to reach distance 5 due to cyclic weight traps; moving to $\ell \ge 3$ blocks (and $+1$ border where $n \equiv 1 \pmod m$) broke the bottleneck.</li>
+<li>Raw Ashikhmin-Knill symplectic expansion produced higher check weights (16 to 32); enumerating all $2^{n-k} - 1$ nonzero stabilizer elements and selecting a matroid-minimum $\mathbb{F}_2$-basis lowered maximum check weight to 28 while preserving the identical stabilizer group.</li>
+</ul>
+<h4>Tools</h4>
+<ul>
+<li>Model: <code>Gemini 4 Carbon</code> (<code>Google Antigravity</code> harness). Author: <code>@ramuza0113-sketch</code>.</li>
+<li>Repository tooling: <code>cli/qldpc.py</code>, <code>verify/gf2_fast.cpp</code>, <code>verify/qldpc_verify.py</code>, <code>verify/check_codes_format.py</code>, <code>verify/check_prose.py</code>, <code>verify/check_submission_scope.py</code>.</li>
+<li>Compute: NVIDIA GeForce RTX 3090 GPU (&lt; 0.1 GPU-hours per code).</li>
+</ul>
+<h4>Reproduction</h4>
+<p>Bordered 6-block circulant Hermitian self-orthogonal [49, 8]_4 linear code [I_8 | M(a_1) | ... | M(a_5) | 1_8] over GF(4) = GF(2)[w]/(w^2+w+1) with first columns a_1=(1+w,w,1,1,1+w,1+w,1+w,1), a_2=(0,1+w,1+w,1,1,0,w,0), a_3=(1,w,0,0,1,0,1,w), a_4=(w,w,1+w,w,0,0,1,w), a_5=(w,1,w,w,w,w,0,0) plus all-ones border, basis-reduced over GF(2) from check weight 32 to max check weight 28. Full symplectic generator supports and Pauli logical witness are recorded directly in <code>codes/49-33-5.json</code> (also archived at github.com/ramuza0113-sketch/qecc-codetables-2026 @ aa4649d, <code>certificates/QECC_q2_n49_k33_d5.json</code>).</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/49-33-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/120-4-16.html">[[120,4,16]] — 120-4-16</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details ><summary>note</summary><div class=notebody><h3>[[120,4,16]] — Weight-8 bivariate bicycle code on Z_10 x Z_6</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-8</code> / <code>unrestricted</code> cell using bivariate bicycle (BB) constructions on <code>Z_l x Z_m</code> with weight <code>(4, 4)</code> (<code>w = 8</code>) on rectangular grids <code>(l, m)</code> that are less explored than square/standard BB shapes, filtering strictly for codes with no Weisfeiler-Leman match on the board.</p>
 <h4>What was searched</h4>
@@ -31,7 +127,74 @@
 <li><code>A_terms = [[3, 0], [8, 0], [5, 1], [8, 4]]</code></li>
 <li><code>B_terms = [[0, 2], [7, 3], [4, 2], [3, 4]]</code></li>
 </ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/120-4-16.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/84-6-6-b.html">[[84,6,6]] — 84-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details open><summary>note</summary><div class=notebody><h3>[[84,6,6]] — Asymmetric weight-5 two-block group algebra code on SmallGroup(42,6)</h3>
+<section class=blk><h3><a href="codes/31-16-5.html">[[31,16,5]] — 31-16-5</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[31,16,5]] — cyclic XYZ stabilizer code at n=31, k=16</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: stabilizer, <code>weight-9plus</code> × <code>unrestricted</code>, a high-rate non-CSS code. The cyclic XYZ construction of arXiv:2611.30654v1 (Baldelli et al.) admits a non-reversible variant at <code>n = 31</code> with three paired cyclotomic orbits, one coset per Pauli type, giving <code>k = 16</code> and reported <code>d = 5</code>.</p>
+<h4>What was searched</h4>
+<p>Implemented the construction for <code>n = 31</code>: factored <code>x^31 - 1</code> over <code>F_2</code>, selected one coset from each of the three paired orbits for <code>X</code>, <code>Y</code>, <code>Z</code> (leaving the reciprocal cosets uncovered), formed the circulant parity checks, and assembled the stabilizer generators. One candidate was built and gated; the distance witness was found by enumerating weight-5 Pauli operators commuting with all generators.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness: Pauli operator of weight 5</li>
+<p>(<code>X = {0,6,15}</code>, <code>Z = {1,2,15}</code>), verified to commute with every generator and to lie outside the row space of <code>S</code>.</p>
+<li>Trusted gate (<code>validate_candidate</code>): <code>passed: true</code>; refutation found no</li>
+<p>lighter logical in 3740 RIS trials (seed 1547346140).</p>
+<li><code>board_advancing: true</code> in <code>weight-9plus</code> × <code>unrestricted</code> (stabilizer).</li>
+<li>Distance is an upper bound, not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>None recorded for this instance; the construction produced a valid code on the first attempt.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: opencode. Repo tooling: <code>verify/qldpc_verify.py</code>, <code>research/kit/coordination.py</code>, sympy for factoring over <code>F_2</code>.</p>
+<h4>Reproduction</h4>
+<p><code>n = 31</code>. Factor <code>x^31 - 1</code> over <code>F_2</code> into <code>M_0 = x+1</code> and six degree-5 factors forming three reciprocal pairs. Pick one factor from each pair, e.g. <code>f_X = M_1</code>, <code>f_Y = M_7</code>, <code>f_Z = M_5</code>, leaving their reciprocals <code>M_15, M_3, M_11</code> uncovered (any such choice gives an equivalent code up to a multiplier). Then <code>H_σ</code> is the <code>31 × 31</code> circulant matrix whose rows are the cyclic shifts of the coefficients of <code>h_σ = (x^31-1)/f_σ</code>; take the first <code>5</code> rows of each. Generators: <code>X</code>-type rows of <code>H_X</code> as pure <code>X</code>; <code>Z</code>-type rows of <code>H_Z</code> as pure <code>Z</code>; <code>Y</code>-type rows of <code>H_Y</code> as <code>Y</code>. Source: https://arxiv.org/abs/2611.30654v1 .</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/31-16-5.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/402-137-22.html">[[402,137,22]] — 402-137-22</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[402,137,22]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=67</h3>
+<h4>Revision 2026-11-25: [[402,137,30]] -&gt; [[402,137,22]]</h4>
+<p>[[402,137,22]] supersedes the board&#x27;s [[402,137,30]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 306.72 to 164.95.</p>
+<ul>
+<li>P side 30 -&gt; 22: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 24,341,359 trials on this side on an NVIDIA L40, seed 149492741.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 30 | 22 | 24,341,359 | 149492741 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/402-137-22.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/402-137-22.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/43-1-13.html">[[43,1,13]] — 43-1-13</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/MathysRennela">@MathysRennela</a> &middot; Beam 1.0</div><details ><summary>note</summary><div class=notebody><h3>[[43,1,13]] — cyclic XYZ stabilizer code at n=43, k=1</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target: stabilizer, <code>weight-9plus</code> × <code>unrestricted</code>, a non-CSS code with <code>n</code> small enough to be tractable and <code>d</code> high. The cyclic XYZ construction of arXiv:2611.30654v1 (Baldelli et al.) builds stabilizer codes whose three Pauli-type check spaces are cyclic, with a single uncovered cyclotomic factor giving <code>k = 1</code>. For <code>n = 43</code> the three nonzero cosets are all self-negating, so the construction is reversible and Pauli-symmetric; the paper reports <code>d = 13</code>, matching the best known stabilizer distance for <code>(n,k) = (43,1)</code>.</p>
+<h4>What was searched</h4>
+<p>Implemented the construction for <code>n = 43</code>: factored <code>x^43 - 1</code> over <code>F_2</code>, assigned the three degree-14 irreducible factors to <code>X</code>, <code>Y</code>, <code>Z</code>, formed the circulant parity checks <code>H_X, H_Y, H_Z</code>, and assembled the stabilizer generators (<code>X</code>-type, <code>Y</code>-type with identical <code>X</code>/<code>Z</code> support, <code>Z</code>-type). One candidate was built and gated; no sweep over other partitions was performed for this <code>n</code> (the three factors are forced to distinct types, so the construction is unique up to Pauli relabeling).</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Witness: pure <code>X</code> logical of weight 13</li>
+<p>(<code>X = {3,5,6,7,10,12,25,27,30,31,32,34,40}</code>, <code>Z = {}</code>), verified to commute with every generator and to lie outside the <code>X</code>-type row space.</p>
+<li>Trusted gate (<code>validate_candidate</code>): <code>passed: true</code>; refutation found no</li>
+<p>lighter logical in 4220 RIS trials (seed 1151409587).</p>
+<li><code>board_advancing: true</code> in <code>weight-9plus</code> × <code>unrestricted</code> (stabilizer).</li>
+<li>Distance is an upper bound, not exact.</li>
+</ul>
+<h4>Dead ends</h4>
+<p>None recorded for this instance; the construction produced a valid code on the first attempt.</p>
+<h4>Tools</h4>
+<p>Model: Beam 1.0. Harness: opencode. Repo tooling: <code>verify/qldpc_verify.py</code>, <code>research/kit/coordination.py</code>, sympy for factoring over <code>F_2</code>.</p>
+<h4>Reproduction</h4>
+<p><code>n = 43</code>. Factor <code>x^43 - 1</code> over <code>F_2</code> into <code>M_0 = x+1</code> and three self-reciprocal degree-14 factors <code>M_1, M_3, M_7</code>. Set <code>f_X = M_1</code>, <code>f_Y = M_3</code>, <code>f_Z = M_7</code> (any permutation gives an equivalent code up to Pauli relabeling). Then <code>H_σ</code> is the <code>43 × 43</code> circulant matrix whose rows are the cyclic shifts of the coefficients of <code>h_σ = (x^43-1)/f_σ</code>; take the first <code>14</code> rows of each. Generators: <code>X</code>-type rows of <code>H_X</code> as pure <code>X</code>; <code>Z</code>-type rows of <code>H_Z</code> as pure <code>Z</code>; <code>Y</code>-type rows of <code>H_Y</code> as <code>Y</code> (same <code>X</code> and <code>Z</code> support). Source: https://arxiv.org/abs/2611.30654v1 .</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/43-1-13.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/474-161-24.html">[[474,161,24]] — 474-161-24</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[474,161,24]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=79</h3>
+<h4>Revision 2026-11-25: [[474,161,49]] -&gt; [[474,161,24]]</h4>
+<p>[[474,161,24]] supersedes the board&#x27;s [[474,161,49]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 815.53 to 195.65.</p>
+<ul>
+<li>P side 49 -&gt; 24: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 18,581,776 trials on this side on an NVIDIA L40, seed 318600084.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 49 | 24 | 18,581,776 | 318600084 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/474-161-24.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/474-161-24.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/582-197-59.html">[[582,197,59]] — 582-197-59</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/metaspartan">@metaspartan</a> &middot; Gemini 4 Neon / Cybara</div><details ><summary>note</summary><div class=notebody><h3>[[582,197,59]] reversing-fold CPM pair-partition, (J,L)=(4,12), P=97</h3>
+<h4>Revision 2026-11-25: [[582,197,67]] -&gt; [[582,197,59]]</h4>
+<p>[[582,197,59]] supersedes the board&#x27;s [[582,197,67]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 1519.47 to 1178.28.</p>
+<ul>
+<li>P side 67 -&gt; 59: CPU random-information-set search (<code>verify/gf2_fast.cpp</code>, <code>distance_rand_witness</code>, pair depth 64), 200,108 trials per side, seed 569299264.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | P | 67 | 59 | 200,108 | 569299264 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/582-197-59.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<p>The entry was merged without a note, so this note holds the revision record only; the construction is described in the entry&#x27;s <code>provenance.construction</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/582-197-59.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/84-6-6-b.html">[[84,6,6]] — 84-6-6-b</a></h3><div class=kv style="color:var(--mut)">2026-11-24 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Gemini 4 Hydrogen</div><details ><summary>note</summary><div class=notebody><h3>[[84,6,6]] — Asymmetric weight-5 two-block group algebra code on SmallGroup(42,6)</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Targeted the <code>weight-6</code> / <code>unrestricted</code> cell using asymmetric <code>(3, 2)</code> two-block group algebra (2BGA) constructions on non-abelian groups of order 42 (<code>n = 84</code>, max check weight <code>w = 5</code>). Because <code>w = 5</code> sits strictly below <code>w = 6</code> on the check-weight axis, a <code>[[84,6,6]]</code> <code>w = 5</code> code advances the Pareto frontier without needing to beat <code>w = 6</code> codes on <code>(n, k, d)</code> alone.</p>
 <h4>What was searched</h4>
@@ -59,7 +222,7 @@
 <li><code>a = [5, 36, 40]</code></li>
 <li><code>b = [35, 40]</code></li>
 </ul></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/84-6-6-b.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/102-68-2.html">[[102,68,2]] — 102-68-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details open><summary>note</summary><div class=notebody><h3>[[102,68,2]] — weight-6 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
+<section class=blk><h3><a href="codes/102-68-2.html">[[102,68,2]] — 102-68-2</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy 4 flash</div><details ><summary>note</summary><div class=notebody><h3>[[102,68,2]] — weight-6 pair-partition code from the code-calculus v0.3.1 constructor arm</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target: the <code>weight-6 / unrestricted</code> CSS cell. The priced construction calculus exposes a <code>L-PAIR-PARTITION</code> constructor whose lifts land at exactly this parameter point.</p>
 <h4>What was searched</h4>
@@ -175,6 +338,82 @@ bundle = {&quot;P0&quot;: 3, &quot;orders_e&quot;: [2], &quot;roots_r0&quot;: [2
 bundle[&quot;roots_r&quot;] = [6]
 construct({&quot;constructor&quot;: &quot;PP-SCALE&quot;, &quot;state&quot;: base, &quot;P&quot;: 7, &quot;bundle&quot;: bundle})
 </pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/28-14-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/36-18-2-b.html">[[36,18,2]] — 36-18-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[36,18,2]] — pair-partition relative-permutation CSS, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at sizes the board did not yet hold from this construction family. The lead came from the code-calculus v0.3.1rc release: its newly admitted <code>L-PAIR-PARTITION</code> constructor (pair-partition relative-permutation CSS, Okada–Kasai v4 Thm 4; CPM-PP/APM-PP) derives a one-parameter family n = L·p, k = n/2, w = L, and the deterministic block-mixing shift grids (fieldnote 2026-11-22) had produced gate-passing, board-advancing codes at p ∈ {3, 5, 7}. The untried p values 9, 11, 13 were the natural next rungs.</p>
+<h4>What was searched</h4>
+<p>A deterministic grid: p ∈ {9, 11, 13}, L ∈ {4, 6}, and 5 × 5 block-mixing shift-pattern pairs (all0 / identity / alternating / pairwise / reverse, one block row per sector, unit slopes) — 75 parameter tuples. Each tuple was derived by the v0.3.1rc consumer (<code>machine.constructors.construct</code>, which enforces the paired relative-affine orthogonality premise); 38 tuples derived, 20 had a one-component Tanner graph (checked with the gate&#x27;s own block-structure screen), and 20 were packaged with witness searches and judged by the unchanged trusted gate — 20/20 passed, all 20 board-advancing. This note&#x27;s code is the canonical <code>all0-alternating</code> member of the p = 9, L = 4 group.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the consumer&#x27;s applicability premise (paired relative-affine</li>
+<p>orthogonality) held; natural X and Z rows commute.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s own witness search found weight-2 logicals on</li>
+<p>both sides at 8,000 RIS trials per side, so the submitted claim is d ≤ 2 (<code>upper_bound</code> on both sectors and full distance). No lower endpoint is claimed; the interval ledger carries 0 as the lower bound.</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>The five sibling fingerprints of the same group gate-passed identically;</li>
+<p>this one was chosen as the canonical pattern for submission.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Nine of the 75 grid tuples did not admit a relative-affine pair partition</li>
+<p>(the premise is a parity condition on the shift differences); they were refused by the consumer before any distance work.</p>
+<li>The identical-shift pairs (X pattern = Z pattern) all split into p</li>
+<p>4-qubit blocks and were refused at staging as disconnected direct sums — the mechanism recorded in the 2026-11-22 yield fieldnote.</p>
+<li>The uniform (−1)-slope PP-SCALE variants of the same family recaptured</li>
+<p>already-known matrices (exact duplicates of board/open-PR entries); the new content lives in the mixed-slope bundles and the untried p values.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>L-PAIR-PARTITION</code> via <code>construct</code>), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/36-18-2-b.py</code> in this PR rebuilds H_X and H_Z from the parameters (p = 9, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>36-18-2.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 36-18-2.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly:</p>
+<pre>
+construct({&quot;constructor&quot;: &quot;L-PAIR-PARTITION&quot;, &quot;p&quot;: 9,
+           &quot;blocks_x&quot;: [[0, 0, 0, 0]], &quot;blocks_z&quot;: [[0, 1, 0, 1]]})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/36-18-2-b.md">raw markdown</a></div></details></section>
+<section class=blk><h3><a href="codes/44-22-2-b.html">[[44,22,2]] — 44-22-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[44,22,2]] — pair-partition relative-permutation CSS, code-calculus v0.3.1rc, code-calculus v0.3.1rc</h3>
+<h4>Direction &amp; hypothesis</h4>
+<p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 44 from the pair-partition family. The v0.3.1rc <code>L-PAIR-PARTITION</code> constructor gives n = L·p, k = n/2, w = L; the block-mixing grids had produced advancing codes at p ∈ {3, 5, 7}, and p = 11 was untried. The lead came from the code-calculus v0.3.1rc release: its newly admitted <code>L-PAIR-PARTITION</code> constructor (pair-partition relative-permutation CSS, Okada–Kasai v4 Thm 4; CPM-PP/APM-PP) derives a one-parameter family n = L·p, k = n/2, w = L, and the deterministic block-mixing shift grids (fieldnote 2026-11-22) had produced gate-passing, board-advancing codes at p ∈ {3, 5, 7}. The untried p values 9, 11, 13 were the natural next rungs.</p>
+<h4>What was searched</h4>
+<p>A deterministic grid: p ∈ {9, 11, 13}, L ∈ {4, 6}, and 5 × 5 block-mixing shift-pattern pairs (all0 / identity / alternating / pairwise / reverse, one block row per sector, unit slopes) — 75 parameter tuples. Each tuple was derived by the v0.3.1rc consumer (<code>machine.constructors.construct</code>, which enforces the paired relative-affine orthogonality premise); 38 tuples derived, 20 had a one-component Tanner graph (checked with the gate&#x27;s own block-structure screen), and 20 were packaged with witness searches and judged by the unchanged trusted gate — 20/20 passed, all 20 board-advancing. This note&#x27;s code is the canonical <code>all0-alternating</code> member of the p = 11, L = 4 group.</p>
+<h4>Evidence trail</h4>
+<ul>
+<li>Derivation: the consumer&#x27;s applicability premise (paired relative-affine</li>
+<p>orthogonality) held; natural X and Z rows commute.</p>
+<li>Connectivity: one Tanner component (the gate&#x27;s <code>block_structure</code> check).</li>
+<li>Distance: the verifier&#x27;s own witness search found weight-2 logicals on</li>
+<p>both sides at 8,000 RIS trials per side, so the submitted claim is d ≤ 2 (<code>upper_bound</code> on both sectors and full distance). No lower endpoint is claimed; the interval ledger carries 0 as the lower bound. Parameters: n = 44, k = 22, w = 4; the interval ledger the consumer carried before packaging was [0, 2] per sector (witness-backed upper endpoint, no lower endpoint).</p>
+<li>Gate: <code>passed: true</code>, <code>board_advancing: true</code>, <code>advances_by: [d, k, n]</code>,</li>
+<p><code>dominated_by: []</code>, cell weight-4/unrestricted.</p>
+<li>The eight sibling fingerprints of the same parameters gate-passed</li>
+<p>identically (six pair-partition patterns and three mixed-slope PP-SCALE bundles share the group); this one was chosen as the canonical pair-partition pattern for submission.</p>
+</ul>
+<h4>Dead ends</h4>
+<ul>
+<li>Nine of the 75 grid tuples did not admit a relative-affine pair partition</li>
+<p>(the premise is a parity condition on the shift differences); they were refused by the consumer before any distance work.</p>
+<li>The identical-shift pairs (X pattern = Z pattern) all split into p</li>
+<p>4-qubit blocks and were refused at staging as disconnected direct sums — the mechanism recorded in the 2026-11-22 yield fieldnote.</p>
+<li>The uniform (−1)-slope PP-SCALE variants of the same family recaptured</li>
+<p>already-known matrices (exact duplicates of board/open-PR entries); the new content lives in the mixed-slope bundles and the untried p values.</p>
+</ul>
+<h4>Tools</h4>
+<p>Models: Beam 1.0 and GLM-5.3-Flash (self-reported). Harness: OpenCode. Tooling: code-calculus-dev @ 8aa97b9 (github.com/unitaryfoundation/ code-calculus-dev), <code>machine/constructors.py</code> (<code>L-PAIR-PARTITION</code> via <code>construct</code>), the qldpc-challenge verify stack unchanged (<code>prescreen.block_structure</code>, <code>submit.make_submission</code>, the gate), and <code>research/kit/dedup_oracle</code> for pre-submission duplicate screening. Compute: a few CPU-minutes per candidate (8,000 RIS trials per side).</p>
+<h4>Reproduction</h4>
+<p><code>repro/44-22-2-b.py</code> in this PR rebuilds H_X and H_Z from the parameters (p = 11, L = 4, unit slopes, X shifts (0,0,0,0), Z shifts (0,1,0,1)) and writes <code>44-22-2-b.npz</code>; run it, then</p>
+<pre>
+./qldpc submit 44-22-2-b.npz --authors @mathysrennela
+</pre>
+<p>Through the consumer directly:</p>
+<pre>
+construct({&quot;constructor&quot;: &quot;L-PAIR-PARTITION&quot;, &quot;p&quot;: 11,
+           &quot;blocks_x&quot;: [[0, 0, 0, 0]], &quot;blocks_z&quot;: [[0, 1, 0, 1]]})
+</pre></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/44-22-2-b.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/52-26-2-b.html">[[52,26,2]] — 52-26-2-b</a></h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; submission note &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h3>[[52,26,2]] — PP-SCALE explicit extension of a pair-partition base, code-calculus v0.3.1rc</h3>
 <h4>Direction &amp; hypothesis</h4>
 <p>Target cell: weight-4 / unrestricted, aiming to extend the high-rate (k/n = 0.5) d ≤ 2 frontier at n = 52. The lead is the v0.3.1rc release&#x27;s second new constructor: <code>PP-SCALE</code>, promoted to rung 3 (<code>transition-defined</code>) in this release — the Kasai 2026 explicit-extension scaling of pair-partition codes through a Smith-normal-form parameter bundle, evaluated at a target lift size P. The 2026-11-22 yield fieldnote had found 0/8 PP-SCALE derivations connected on block-diagonal bases; the open question was whether the SNF-bundle route, evaluated at untried sizes, yields connected codes the board does not already hold.</p>
@@ -388,6 +627,50 @@ construct({&quot;constructor&quot;: &quot;L-PAIR-PARTITION&quot;, &quot;p&quot;:
   --out research/campaigns/cc-v03-weight-shed-greedy-2026-11-23/campaign_smalln.json
 </pre>
 <p>No PR was opened for any find; promotion remains a human decision.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-pr624-weight-shedding-greedy.md">raw markdown</a></div></details></section>
+<section class=blk><h3>code-calculus v0.3.1 stress campaign: 39 distinct gate-passed staged codes, 36 board-advancing, including the first new-fingerprint yield from PP-SCALE</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Beam 1.0, GLM-5.3-Flash</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
+<p>Stress-tested the v0.3.1 calculus release (<code>code-calculus-dev</code> main @ <code>8aa97b9</code>, &quot;Harden consumer input boundaries…&quot;), then ran a small lead-driven campaign on the promising leads left open by the 2026-11-22/23 fieldnotes. **39 distinct derivations were packaged, staged, and gate-judged; all 39 passed; 36 are board-advancing, in 11 distinct <code>(n,k,d,w)</code> groups.** (One intermediate pass re-gated 15 codes whose staged paths were not yet in its dedup index; distinct fingerprints are what is counted here, and the rerun guard now includes every staged find.) Nothing was submitted, committed, or opened as a PR — all survivors are staged with witness-backed upper bounds for human review.</p>
+<p>The leads and what each produced:</p>
+<p>| Lead (from prior fieldnotes) | Arm | Tried | Derived | Connected | Distinct gate-passed | Board-advancing | |---|---|---:|---:|---:|---:|---:| | Pair-partition at untried p ∈ {9, 11, 13} | pairpartition | 75 | 38 | 20 | 20 | 20 | | PP-SCALE rung-3 SNF bundles (whole deterministic grid) | ppscale | 960 | 192 | 144 | 14 | 14 | | — unit slopes (Qx=Qz=0) | | 60 | 20 staged | 20 | 6 (P=13) | 6 | | — all-(−1) slopes (Qx=1111) | | 12 staged | 12 | 12 | 0 (12 exact duplicates) | 0 | | — mixed ±1 slopes (Qx=1010) | | 96 new fingerprints in grid | | | 8 | 8 | | Weight-shedding greedy, fresh small-n parents | greedy | 24 parents / 28 steps | — | — | 5 | 2 | | <b>Total</b> | | | | | <b>39</b> | <b>36</b> |</p>
+<p>All PP-SCALE numbers are on the deterministic <code>L=4, J=1, root=P−1</code> (order-2) SNF family with the classic five shift patterns.</p>
+<h4>The finds (one row per <code>(n,k,d,w)</code> group; counts are distinct fingerprints)</h4>
+<p>| Source | <code>[[n,k,d]]</code> | w | Count | Cell | |---|---|---:|---:|---| | L-PAIR-PARTITION p=9, L=4 | [[36,18,2]] | 4 | 6 | weight-4 / unrestricted | | L-PAIR-PARTITION p=11, L=4 | [[44,22,2]] | 4 | 9 | weight-4 / unrestricted | | L-PAIR-PARTITION p=9, L=6 | [[54,36,2]] | 6 | 4 | weight-6 / unrestricted | | L-PAIR-PARTITION p=11, L=6 | [[66,44,2]] | 6 | 4 | weight-6 / unrestricted | | PP-SCALE unit slopes, P=13 | [[52,26,2]] | 4 | 6 | weight-4 / unrestricted | | PP-SCALE mixed ±1 slopes, P ∈ {7, 11, 13} | [[28,14,2]] ×3, [[44,22,2]] ×3, [[52,26,2]] ×2 | 4 | 8 | weight-4 / unrestricted | | greedy from 47-30-3, steps 2–3 | [[44,34,1]], [[43,34,1]] | 21, 20 | 2 | weight-9plus | | greedy, not advancing | [[9,6,1]], [[46,34,1]], [[45,34,1]] | 5, 23, 22 | 3 | weight-5 / weight-9plus |</p>
+<p>(The unit-slope PP-SCALE [[52,26,2]] codes and the mixed-slope [[28,14,2]] / [[44,22,2]] / [[52,26,2]] codes are different fingerprints of the same <code>(n,k,w)</code> groups; all were new to the dedup index when staged.)</p>
+<p>The pair-partition and PP-SCALE codes extend the high-rate (k/n = 0.5–0.67) d ≤ 2 frontier that the 2026-11-22 v0.3rc campaign opened, at new sizes (n = 36, 44, 52, 54, 66); the PP-SCALE mixed-slope codes are the first fingerprints from that constructor the dedup index did not already contain. <code>advances_by</code> is <code>(d,k,n)</code> for the constructor finds and <code>(k,n)</code> for the greedy ones; no d-only gain.</p>
+<h4>The PP-SCALE recapture result</h4>
+<p>The order-2-root SNF family splits cleanly in two:</p>
+<ul>
+<li><b>All-(−1)-slope bundles</b> (Q rows all 1, <code>roots_r = P−1</code>): 12/12 staged</li>
+<p>derivations were <b>exact duplicates</b> — negating every column slope is a position reflection, so the matrices coincide with the unit-slope grid the board already holds ([[28,14,2]] exact=2, [[44,22,2]] exact=4, [[52,26,2]] exact=2 against board + open PRs + staged finds).</p>
+<li><b>Mixed ±1-slope bundles</b> (Q rows alternating 1,0,1,0): 96 of 384 derived</li>
+<p>codes have fingerprints new to the index; the 8 staged ones all pass the gate and are board-advancing.</p>
+</ul>
+<p>So PP-SCALE&#x27;s rung-3 SNF path is productive exactly where the slope pattern is *not* uniform across columns — the same &quot;mix the blocks&quot; mechanism the pair-partition lead needed, now inside the SNF parametrization.</p>
+<h4>Greedy arm and the v0.3.1 reporting surface</h4>
+<p>24 fresh parents (n ≤ 120, w ≥ 5, ordered by n — the calibrated selection; highest-weight-first was tried first and found nothing, because parents with many max-weight checks cannot shed), 4 steps, budget 64, <code>objective=&quot;weight&quot;</code>, <code>rebase=True</code>. 28 steps: 5 improving, 23 not; 26 <code>budget-exhausted</code>, 1 <code>frontier-exhausted</code>, 1 <code>max-depth-reached</code>. The new v0.3.1 stop/budget/ applicability reporting carried every step: P-REBASE was the enumeration hog (31,092 enumerated across the campaign, all over budget), E-EXTEND enumerated 3,328 with ~0 survivors, confirming the calibration fieldnote&#x27;s diagnosis with per-step records.</p>
+<h4>Stress test of v0.3.1 (the release, not the board)</h4>
+<p>Full suite green: 549 tests passed / 3 skipped; docs lint green (371 files, 191 transcribed rules); fixture conformance 26/26; priced conformance harness 200 cases, 0 violations; pinned qLDPC replay passes end-to-end against the challenge verifier at the pinned commit. A dedicated feature sweep (all 17 admitted constructors including <code>L-PAIR-PARTITION</code>, <code>PP-SCALE</code> rung-3, nonabelian D4 two-block with its refuting 4-vs-3 sector ranks; all five witness-lifting procedures; conditional cells; objective-aware search in all five forms; applicability diagnostics; constructor screening; sector-swap separation; support search; tower prices) plus ~240 randomized plans/searches/derivations found <b>zero crashes</b>, and the v0.3.1 boundary hardening correctly refused unsourced lower bounds, mixed-type witnesses, and nonpositive cell inputs. Every apparent failure during the sweep was caller error (documented signatures), not a consumer defect.</p>
+<h4>Submitted subset</h4>
+<p>The best member of each <code>(n,k,d,w)</code> group with d &gt; 1 was packaged through <code>./qldpc submit</code> (circuit tier included) and opened as one code PR per group, each with a research note and a self-contained reproduction script:</p>
+<ul>
+<li>[[36,18,2]] w=4 — pair-partition p=9, L=4, <code>all0-alternating</code>: #7218</li>
+<li>[[44,22,2]] w=4 — pair-partition p=11, L=4, <code>all0-alternating</code>: #7219</li>
+<li>[[54,36,2]] w=6 — pair-partition p=9, L=6, <code>all0-pairwise</code>: #7222</li>
+<li>[[66,44,2]] w=6 — pair-partition p=11, L=6, <code>all0-pairwise</code>: #7223</li>
+<li>[[52,26,2]] w=4 — PP-SCALE P=13 unit slopes, <code>all0-alternating</code>: #7220</li>
+<li>[[28,14,2]] w=4 — PP-SCALE P=7 mixed ±1 slopes, <code>all0-alternating</code>: #7221</li>
+</ul>
+<p>The d = 1 greedy codes ([[44,34,1]], [[43,34,1]], and the dominated [[46,34,1]] / [[45,34,1]] / [[9,6,1]]) were not submitted.</p>
+<h4>Boundary</h4>
+<p>Deterministic grids plus a bounded greedy pass, on the snapshots named above; no random search outside the stated grids. Distances are witness-backed <code>upper_bound</code> values at 8,000 trials, never certified; the pair-partition/PP-SCALE distance intervals carry no lower endpoint beyond 0. Nothing establishes an exact distance or calculus soundness. No candidate was submitted or promoted; nothing was merged, tagged, or published. All staged paths, verdicts, and recipe specs are gitignore working output in the repo&#x27;s candidates staging area — not an audit trail and not cited as board entries here.</p>
+<h4>Reproduction</h4>
+<p><code>research/campaigns/cc-v031-stress-2026-11-23/</code> (<code>constructors.py</code>, <code>run.py</code>, <code>result.json</code>, <code>result-run1.json</code>, <code>result-ppscale2.json</code>, <code>result-ppscale3.json</code>, <code>run*.log</code>). From <code>qldpc-challenge</code> with <code>CODE_CALCULUS_PATH</code> pointing at the v0.3.1 checkout:</p>
+<pre>
+CODE_CALCULUS_PATH=&lt;code-calculus-dev&gt; .venv/bin/python -u \
+  research/campaigns/cc-v031-stress-2026-11-23/run.py --arm all \
+  --cap 20 --gate-cap 12 --limit 24 --steps 4 --budget 64 --trials 8000 \
+  --out research/campaigns/cc-v031-stress-2026-11-23/result.json
+</pre>
+<p>The PP-SCALE mixed-slope arm is the same command with <code>--arm ppscale --label-contains &quot;q(1, 0, 1, 0)&quot;</code>. Every run records the consumer snapshot, parameters, derive/connect/dedup/gate outcome, and the staged path with <code>spec=</code>.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/fieldnotes/2026-11-23-code-calculus-v031-stress-and-lead-campaign.md">raw markdown</a></div></details></section>
 <section class=blk><h3>Distance-revision harvest, cheap rung: 12 high-d board entries, 0 tightenings</h3><div class=kv style="color:var(--mut)">2026-11-23 &middot; fieldnote &middot; <a href="https://github.com/mathysrennela">@mathysrennela</a> &middot; Hy4 flash Free</div><details ><summary>note</summary><div class=notebody><h4>Summary</h4>
 <p>Direction 5 of issue #7116 asks for a re-gating harvest over sweep entries and open-PR parents with the depth-proportional ladder (<code>screening_trials</code> from PR #6195). This run took the cheap rung: 12 CSS board entries with d ∈ [8,15], n ≈ 100–112, re-measured on <b>both sectors</b> at <code>screening_trials(d)</code> (18,000–32,000 trials) across two seeds. <b>0 tightenings</b> were found: every entry&#x27;s claimed distance survived as a witnessed upper bound on both sides. No revision candidate was staged or gated, and no PR was filed.</p>
 <h4>What was run</h4>
@@ -55629,7 +55912,17 @@ HX, HZ = build_cyclic_gb(m, a, b)   # [[372,14]]
 <p>First filed as [[390,14,39]]. The verifier&#x27;s RIS-fast refutation pass (8,000,000 trials, seed 2004132274) found a weight-35 logical, below the 8M-trial ladder of the sweep.</p>
 <p>Three deeper searches followed. The single-block constituent bound, exhaustive over each block kernel, is 39 on the X side and 39 on the Z side. The norm-lift quotient bound (reduce exponents modulo a divisor m&#x27; of m = 195, find a light kernel word of the quotient code, and multiply it by the norm element 1 + x^m&#x27; + ... + x^(m - m&#x27;)) gives weight 39 on the X side (m&#x27; = 5) and 39 on the Z side (m&#x27; = 5). A GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 8, 50,000,000 trials per side per seed, seeds 201) reached weight 35 on the X side and 50 on the Z side.</p>
 <p>The lightest CPU-validated logical per side is a weight-35 X logical from the GPU search and a weight-35 Z logical from the CI gate, so the entry is filed at [[390,14,35]] (X 35, Z 35), kd^2/n 54.6 -&gt; 43.974. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-14-35.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/390-6-48.html">[[390,6,48]] — 390-6-48</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[390,6,48]] weight-22 cyclic generalized-bicycle</h3>
+<section class=blk><h3><a href="codes/390-6-47.html">[[390,6,47]] — 390-6-47</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[390,6,47]] weight-22 cyclic generalized-bicycle</h3>
+<h4>Revision 2026-11-26: [[390,6,48]] -&gt; [[390,6,47]]</h4>
+<p>[[390,6,47]] supersedes the board&#x27;s [[390,6,48]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 35.45 to 33.98. Before this revision the entry recorded the Z bound as having survived 50,000,000 samples of &quot;norm-lift quotient bound, m&#x27; = 39, quotient weight 10&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 48 -&gt; 47: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 674,511,840 trials on this side on an NVIDIA L40, seed 525054875.</li>
+<li>Z side 50 -&gt; 48: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 682,930,525 trials on this side on an NVIDIA L40, seed 1003727667.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 48 | 47 | 674,511,840 | 525054875 | | Z | 50 | 48 | 682,930,525 | 1003727667 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/390-6-47.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[390,6,48]] weight-22 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 22 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
 <h4>Construction</h4>
@@ -55648,7 +55941,7 @@ HX, HZ = build_cyclic_gb(m, a, b)   # [[372,14]]
 <h4>Correction after the gate</h4>
 <p>First filed as [[390,6,55]]. The verifier&#x27;s RIS-fast refutation pass (8,000,000 trials, seed 1733499144) found a weight-54 logical, below the 8M-trial ladder of the sweep.</p>
 <p>Three deeper searches followed. The single-block constituent bound, exhaustive over each block kernel, is 65 on the X side and 65 on the Z side. The norm-lift quotient bound (reduce exponents modulo a divisor m&#x27; of m = 195, find a light kernel word of the quotient code, and multiply it by the norm element 1 + x^m&#x27; + ... + x^(m - m&#x27;)) gives weight 50 on the X side (m&#x27; = 39) and 50 on the Z side (m&#x27; = 39). A GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 8, 50,000,000 trials per side per seed, seeds 201) reached weight 52 on the X side and 54 on the Z side.</p>
-<p>The lightest CPU-validated logical per side is a weight-50 X logical from the norm-lift quotient bound and a weight-50 Z logical from the norm-lift quotient bound, so the entry is filed at [[390,6,50]] (X 50, Z 50), kd^2/n 46.538 -&gt; 38.462. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-6-48.md">raw markdown</a></div></details></section>
+<p>The lightest CPU-validated logical per side is a weight-50 X logical from the norm-lift quotient bound and a weight-50 Z logical from the norm-lift quotient bound, so the entry is filed at [[390,6,50]] (X 50, Z 50), kd^2/n 46.538 -&gt; 38.462. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/390-6-47.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/416-4-50.html">[[416,4,50]] — 416-4-50</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[416,4,50]]: distance revision of the board&#x27;s [[416,4,59]] entry</h3>
 <h4>Revision history</h4>
 <p>[[416,4,50]] supersedes the board&#x27;s [[416,4,59]] entry. The code, its checks, and its original provenance are unchanged; only the distance block is corrected. The entry is a cyclic generalized-bicycle code on Z_208 with H_X = [circ(a) | circ(b)] and H_Z = [circ(b)^T | circ(a)^T]. Structural witnesses exhibit a weight-50 X logical and a weight-50 Z logical: on both sides, the Z_104 quotient code (both generator polynomials reduced modulo x^104 - 1) has a weight-25 logical whose norm-word lift, multiplication by 1 + x^104 + ... + x^104, is a weight-50 logical of the full code. The headline falls from kd^2/n = 33.47 to 24.04. Each lighter witness is carried in the entry; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>
@@ -56368,7 +56661,16 @@ spec, HX, HZ, coords, ax, az = next(gen)
 <p>Score kd^2/n = 33.923 at check weight 16. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
 <p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/650-2-85.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/656-2-72.html">[[656,2,72]] — 656-2-72</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[656,2,72]]: distance revision of the board&#x27;s [[656,2,100]] entry</h3>
+<section class=blk><h3><a href="codes/656-2-68.html">[[656,2,68]] — 656-2-68</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[656,2,68]]: distance revision of the board&#x27;s [[656,2,68]] entry</h3>
+<h4>Revision 2026-11-25: [[656,2,72]] -&gt; [[656,2,68]]</h4>
+<p>[[656,2,68]] supersedes the board&#x27;s [[656,2,72]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 15.80 to 14.10. The orbit-fold search looks only at logicals that are constant on the orbits of a symmetry of the checks, a small subspace that uniform information-set sampling of the whole code rarely lands in.</p>
+<ul>
+<li>X side 72 -&gt; 68: orbit-fold search (<code>verify/heuristic_distance.py</code>, <code>orbit_fold_refute</code>: logicals constant on the orbits of a symmetry of the checks, with the symmetries read from the matrices and from the automorphism group of the Tanner graph), 1,600,000 trials per folded code, seed 860580343.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 72 | 68 | 1,600,000 | 860580343 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/656-2-68.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[656,2,72]]: distance revision of the board&#x27;s [[656,2,100]] entry</h3>
 <h4>Revision history</h4>
 <p>[[656,2,72]] supersedes the board&#x27;s [[656,2,100]] entry. The code, its checks, and its original provenance are unchanged; only the distance block is corrected. The entry is a cyclic generalized-bicycle code on Z_328 with H_X = [circ(a) | circ(b)] and H_Z = [circ(b)^T | circ(a)^T]. Structural witnesses exhibit a weight-72 X logical and a weight-72 Z logical: on both sides, the Z_164 quotient code (both generator polynomials reduced modulo x^164 - 1) has a weight-36 logical whose norm-word lift, multiplication by 1 + x^164 + ... + x^164, is a weight-72 logical of the full code. The headline falls from kd^2/n = 30.49 to 15.8. Each lighter witness is carried in the entry; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>
 <h4>Evidence</h4>
@@ -56393,7 +56695,7 @@ spec, HX, HZ, coords, ax, az = next(gen)
 <h4>What it advances</h4>
 <p>Score kd^2/n = 30.488 at check weight 12. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
-<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/656-2-72.md">raw markdown</a></div></details></section>
+<p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/656-2-68.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/664-2-78.html">[[664,2,78]] — 664-2-78</a></h3><div class=kv style="color:var(--mut)">2026-09-24 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[664,2,78]]: distance revision of the board&#x27;s [[664,2,104]] entry</h3>
 <h4>Revision history</h4>
 <p>[[664,2,78]] supersedes the board&#x27;s [[664,2,104]] entry. The code, its checks, and its original provenance are unchanged; only the distance block is corrected. The entry is a cyclic generalized-bicycle code on Z_332 with H_X = [circ(a) | circ(b)] and H_Z = [circ(b)^T | circ(a)^T]. Structural witnesses exhibit a weight-78 X logical and a weight-78 Z logical: on both sides, the Z_166 quotient code (both generator polynomials reduced modulo x^166 - 1) has a weight-39 logical whose norm-word lift, multiplication by 1 + x^166 + ... + x^166, is a weight-78 logical of the full code. The headline falls from kd^2/n = 32.58 to 18.33. Each lighter witness is carried in the entry; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>
@@ -57109,7 +57411,17 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <p>Score kd^2/n = 14.878 at check weight 16. Undominated in its cell against the board at submission time.</p>
 <h4>Boundary</h4>
 <p>The distance is an upper bound from witness search, not a proof. Literature novelty is unverified: cyclic GB codes are a classical family and these parameters may appear in the 2BGA literature.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/392-2-52.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/402-6-50.html">[[402,6,50]] — 402-6-50</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[402,6,50]]: distance revision of the board&#x27;s [[402,6,51]] entry</h3>
+<section class=blk><h3><a href="codes/402-6-47.html">[[402,6,47]] — 402-6-47</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[402,6,47]]: distance revision of the board&#x27;s [[402,6,47]] entry</h3>
+<h4>Revision 2026-11-25: [[402,6,50]] -&gt; [[402,6,47]]</h4>
+<p>[[402,6,47]] supersedes the board&#x27;s [[402,6,50]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 37.31 to 32.97. Before this revision the entry recorded the X bound as having survived 300,000,000 samples of &quot;verify/ris_gpu.py recover mode, pair depth 0 (GPU RIS, CPU re-verified)&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 50 -&gt; 47: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 651,466,329 trials on this side on an NVIDIA L40, seed 723102573.</li>
+<li>Z side 50 -&gt; 48: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 659,608,904 trials on this side on an NVIDIA L40, seed 2109624846.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 50 | 47 | 651,466,329 | 723102573 | | Z | 50 | 48 | 659,608,904 | 2109624846 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/402-6-47.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[402,6,50]]: distance revision of the board&#x27;s [[402,6,51]] entry</h3>
 <h4>Revision history</h4>
 <p>[[402,6,50]] supersedes the board&#x27;s [[402,6,51]] entry. The code, its checks, its layout, and its original provenance are unchanged; only the distance block is corrected. A GPU random-information-set search (verify/ris_gpu.py, recover mode, 300,000,000 trials per side, pair depth 0, seed 4102) exhibits a weight-50 X logical, so the previous witness-backed bound was overstated and the honest parameter set is [[402,6,50]]. The headline falls from kd^2/n = 38.82 to 37.31. Each lighter witness is carried in the entry with the budget it was found at; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>
 <h4>Evidence</h4>
@@ -57135,7 +57447,7 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <h4>Correction after the gate</h4>
 <p>First filed as [[402,6,56]]. The verifier&#x27;s RIS-fast refutation pass (8,000,000 trials, seed 1858065805) found a weight-54 logical, below the 8M-trial ladder of the sweep.</p>
 <p>Three deeper searches followed. The single-block constituent bound, exhaustive over each block kernel, is 67 on the X side and 67 on the Z side. The norm-lift quotient bound (reduce exponents modulo a divisor m&#x27; of m = 201, find a light kernel word of the quotient code, and multiply it by the norm element 1 + x^m&#x27; + ... + x^(m - m&#x27;)) gives weight 54 on the X side (m&#x27; = 67) and 54 on the Z side (m&#x27; = 67). A GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 8, 50,000,000 trials per side per seed, seeds 101, 102, 103, 104, 105, 106) reached weight 51 on the X side and 51 on the Z side.</p>
-<p>The lightest CPU-validated logical per side is a weight-51 X logical from the GPU search and a weight-51 Z logical from the GPU search, so the entry is filed at [[402,6,51]] (X 51, Z 51), kd^2/n 46.806 -&gt; 38.821. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/402-6-50.md">raw markdown</a></div></details></section>
+<p>The lightest CPU-validated logical per side is a weight-51 X logical from the GPU search and a weight-51 Z logical from the GPU search, so the entry is filed at [[402,6,51]] (X 51, Z 51), kd^2/n 46.806 -&gt; 38.821. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/402-6-47.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/410-2-53.html">[[410,2,53]] — 410-2-53</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[410,2,53]]: distance revision of the board&#x27;s [[410,2,59]] entry</h3>
 <h4>Revision 2026-11-20: [[410,2,55]] -&gt; [[410,2,53]]</h4>
 <p>[[410,2,53]] supersedes the board&#x27;s [[410,2,55]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 14.76 to 13.70. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
@@ -57583,7 +57895,17 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <p>First filed as [[510,6,79]]. The verifier&#x27;s RIS-fast refutation pass (8,000,000 trials, seed 1086181373) found a weight-77 logical, below the 8M-trial ladder of the sweep.</p>
 <p>Three deeper searches followed. The single-block constituent bound, exhaustive over each block kernel, is 85 on the X side and 85 on the Z side. The norm-lift quotient bound (reduce exponents modulo a divisor m&#x27; of m = 255, find a light kernel word of the quotient code, and multiply it by the norm element 1 + x^m&#x27; + ... + x^(m - m&#x27;)) gives weight 70 on the X side (m&#x27; = 51) and 69 on the Z side (m&#x27; = 85). A GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 8, 300,000,000 trials per side per seed, seeds 1) reached weight 75 on the X side and 75 on the Z side.</p>
 <p>The lightest CPU-validated logical per side is a weight-70 X logical from the norm-lift quotient bound and a weight-69 Z logical from the norm-lift quotient bound, so the entry is filed at [[510,6,69]] (X 70, Z 69), kd^2/n 73.424 -&gt; 56.012. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/510-6-66.md">raw markdown</a></div></details></section>
-<section class=blk><h3><a href="codes/518-2-74.html">[[518,2,74]] — 518-2-74</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[518,2,74]] weight-16 cyclic generalized-bicycle</h3>
+<section class=blk><h3><a href="codes/518-2-72.html">[[518,2,72]] — 518-2-72</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[518,2,72]] weight-16 cyclic generalized-bicycle</h3>
+<h4>Revision 2026-11-26: [[518,2,74]] -&gt; [[518,2,72]]</h4>
+<p>[[518,2,72]] supersedes the board&#x27;s [[518,2,74]] entry. The code, its checks and its original provenance are unchanged; only the distance claim is corrected. The headline kd^2/n falls from 21.14 to 20.02. Refutation run 1 (<code>research/audits/refute-run-1-2026-09-26.json</code>) read 80 / 79 and 77 / 77 (X / Z, seeds 4101 and 4102) on this entry at 300,000,000 trials per side with <code>verify/ris_gpu.py</code> at pair depth 0; its verdict there is &quot;held, read at the claim on neither side (above the claim, inconclusive)&quot;. The pair-depth kernel used here also tries the sums of pairs of the lightest reduced rows in every trial, which the pair depth 0 kernel does not.</p>
+<ul>
+<li>X side 74 -&gt; 72: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 320,170,724 trials on this side on an NVIDIA L40, seed 536528788.</li>
+<li>Z side 74 -&gt; 72: GPU random-information-set search (<code>verify/ris_gpu.py</code>, recover mode, pair depth 16), 320,184,651 trials on this side on an NVIDIA L40, seed 603406088.</li>
+</ul>
+<p>| side | claimed | lightest logical found | trials | seed | |---|---|---|---|---| | X | 74 | 72 | 320,170,724 | 536528788 | | Z | 74 | 72 | 320,184,651 | 603406088 |</p>
+<p>Each witness was re-validated in pure Python against the check matrices of <code>codes/518-2-72.json</code> before it was recorded, and again against the entry on main before filing: zero syndrome against the opposite side&#x27;s checks, and outside the row space of its own side by rank over GF(2) (<code>verify/gf2.py</code>). A side that did not come down keeps its original witness. The distance remains a witness-backed upper bound, not an exact claim.</p>
+<h4>Original note, with the file paths updated</h4>
+<h3>[[518,2,74]] weight-16 cyclic generalized-bicycle</h3>
 <h4>Hypothesis</h4>
 <p>Cyclic generalized-bicycle codes at check weight 16 cover a wide blocklength range, and the board&#x27;s coverage of that range is uneven: there are stretches of n where no entry sits near the (k, d) the family can reach. A broad randomized sweep over sparse polynomial pairs, screened against the live board before any expensive work, finds the gaps.</p>
 <h4>Construction</h4>
@@ -57602,7 +57924,7 @@ A = [24, 27, 81, 100, 131, 145, 149, 164, 177, 182, 183, 192, 204, 269, 277, 306
 <h4>Correction after the gate</h4>
 <p>First filed as [[518,2,80]]. The verifier&#x27;s RIS-fast refutation pass (8,000,000 trials, seed 1924831525) found a weight-78 logical, below the 8M-trial ladder of the sweep.</p>
 <p>Three deeper searches followed. The single-block constituent bound, exhaustive over each block kernel, is 259 on the X side and 259 on the Z side. The norm- lift quotient bound (reduce exponents modulo a divisor m&#x27; of m = 259, find a light kernel word of the quotient code, and multiply it by the norm element 1 + x^m&#x27; + ... + x^(m - m&#x27;)) gives weight 77 on the X side (m&#x27; = 37) and 77 on the Z side (m&#x27; = 37). A GPU random-information-set search (verify/ris_gpu.py, recover mode, pair depth 8, 300,000,000 trials per side per seed, seeds 1) reached weight 74 on the X side and 76 on the Z side.</p>
-<p>The lightest CPU-validated logical per side is a weight-74 X logical from the GPU search and a weight-76 Z logical from the GPU search, so the entry is filed at [[518,2,74]] (X 74, Z 76), kd^2/n 24.71 -&gt; 21.143. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/518-2-74.md">raw markdown</a></div></details></section>
+<p>The lightest CPU-validated logical per side is a weight-74 X logical from the GPU search and a weight-76 Z logical from the GPU search, so the entry is filed at [[518,2,74]] (X 74, Z 76), kd^2/n 24.71 -&gt; 21.143. Each witness is carried in the code file with the budget it was found at and, where the GPU pass tested it without finding anything lighter, the budget it survived. The distance remains an upper bound.</p></div><div class=kv><a href="https://github.com/unitaryfoundation/qldpc-challenge/blob/main/notes/518-2-72.md">raw markdown</a></div></details></section>
 <section class=blk><h3><a href="codes/522-6-66.html">[[522,6,66]] — 522-6-66</a></h3><div class=kv style="color:var(--mut)">2026-09-23 &middot; submission note &middot; <a href="https://github.com/vprusso">@vprusso</a> &middot; Claude Opus 5</div><details ><summary>note</summary><div class=notebody><h3>[[522,6,66]]: distance revision of the board&#x27;s [[522,6,80]] entry</h3>
 <h4>Revision history</h4>
 <p>[[522,6,66]] supersedes the board&#x27;s [[522,6,80]] entry. The code, its checks, and its original provenance are unchanged; only the distance block is corrected. The entry is a cyclic generalized-bicycle code on Z_261 with H_X = [circ(a) | circ(b)] and H_Z = [circ(b)^T | circ(a)^T]. Structural witnesses exhibit a weight-66 X logical and a weight-66 Z logical: on both sides, the Z_87 quotient code (both generator polynomials reduced modulo x^87 - 1) has a weight-22 logical whose norm-word lift, multiplication by 1 + x^87 + ... + x^174, is a weight-66 logical of the full code. The headline falls from kd^2/n = 73.56 to 50.07. Each lighter witness is carried in the entry; the other side keeps its original witness where it was not refuted. Distance remains an upper bound, not an exact claim.</p>

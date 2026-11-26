@@ -1605,7 +1605,7 @@
    "arXiv:2503.03827"
   ],
   "date": "2025",
-  "notes": "Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d>20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery.",
+  "notes": "Reconstructed baseline from Liang, Liu, Song, Chen, Generalized toric codes on twisted tori for quantum error correction (PRX Quantum 6, 020357, 2025), arXiv:2503.03827. The [[n,k,d]] parameter set and stabilizer polynomials are published in that paper; this entry reproduces them. Distance is an upper bound per the paper (probabilistic for d>20); the witness is the surrogate logical of that weight. Seeded to fill a board coverage gap at this block size, not a discovery. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 14 in its committed detector error model (claimed 16); the Z-memory circuit has an undetected logical fault set of weight 14 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "origin": "baseline",
   "novelty": "known_parameters",
   "model": "human"
@@ -2395,47 +2395,43 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 16,
+    "value": 14,
     "confidence": "upper_bound",
     "witness": [
-     121581,
-     121584,
-     121594,
-     121597,
-     121601,
-     121619,
-     121628,
-     121657,
-     121659,
-     121701,
-     121756,
-     121781,
+     121605,
+     121611,
+     121631,
+     121634,
+     121651,
+     121725,
+     121757,
+     121774,
+     121775,
+     121784,
      121795,
-     121799,
-     121809,
-     121812
+     121796,
+     121801,
+     121810
     ]
    },
    "X": {
-    "value": 16,
+    "value": 14,
     "confidence": "upper_bound",
     "witness": [
-     121783,
-     121784,
-     121802,
-     121825,
-     121840,
-     121841,
-     121846,
-     121850,
-     121851,
-     121861,
-     121870,
-     121880,
-     121881,
-     121894,
-     121900,
-     121919
+     156,
+     172,
+     303,
+     329,
+     558,
+     1350,
+     1418,
+     1419,
+     1854,
+     1925,
+     4185,
+     4213,
+     4236,
+     4645
     ]
    }
   },
