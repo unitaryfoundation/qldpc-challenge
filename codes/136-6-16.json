@@ -1424,7 +1424,7 @@
   "construction": "2BGA (arXiv:2306.16400) on SmallGroup(68,1), from github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c, nonabelian.zip, diswtnonabelian_wt8wtL2_order68_k6.txt, line 9. nonidentity supports a=[4], b=[2, 4, 20, 29, 39].",
   "references": [],
   "date": "2026-09-19",
-  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry.",
+  "notes": "Literature reproduction of a published 2BGA code (arXiv:2306.16400; github.com/QEC-pages/2BGA-codes @ 403d194c3f98f0cadc236aecbc4a8b6139ccf23c). Checked against the live board: not equivalent to any existing entry. Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 16); the Z-memory circuit has an undetected logical fault set of weight 12 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved.",
   "model": "DeepSeek V4 Flash 0731",
   "origin": "submission"
  },
@@ -1432,47 +1432,39 @@
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 16,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     124784,
-     124785,
-     124831,
-     124834,
-     124838,
-     124840,
-     124864,
-     124873,
-     124900,
-     124907,
-     124928,
+     124786,
+     124788,
+     124794,
+     124797,
+     124812,
+     124829,
+     124921,
      124935,
+     124936,
      124940,
-     124950,
-     124954,
-     124960
+     124969,
+     124972
     ]
    },
    "X": {
-    "value": 16,
+    "value": 12,
     "confidence": "upper_bound",
     "witness": [
-     124962,
-     124963,
-     124965,
-     124967,
-     124989,
-     124993,
-     124994,
-     124998,
-     125003,
-     125014,
-     125021,
-     125022,
-     125026,
-     125036,
-     125038,
-     125048
+     581,
+     703,
+     1194,
+     1198,
+     1880,
+     2005,
+     2577,
+     2616,
+     4114,
+     4994,
+     5542,
+     6072
     ]
    }
   },
