@@ -1504,7 +1504,8 @@
   "novelty": "known_parameters",
   "references": [
    "arXiv:2511.13560 (Table 7)"
-  ]
+  ],
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 13 in its committed detector error model (claimed 14). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "bivariate-bicycle",
  "circuit": {
@@ -1530,23 +1531,22 @@
     ]
    },
    "X": {
-    "value": 14,
+    "value": 13,
     "confidence": "upper_bound",
     "witness": [
-     128451,
-     128453,
-     128466,
-     128470,
-     128472,
-     128476,
-     128481,
-     128484,
-     128491,
-     128492,
-     128496,
-     128523,
-     128563,
-     128569
+     30352,
+     30364,
+     33472,
+     33480,
+     34451,
+     34719,
+     34735,
+     35117,
+     35241,
+     35347,
+     35353,
+     35440,
+     43545
     ]
    }
   },
