@@ -1318,53 +1318,37 @@
    "ris_trials_per_side": 30000000,
    "cpu_hours": 3,
    "tool": "research/kit 2BGA sweep + gf2_fast on Brev n2d-highcpu-64"
-  }
+  },
+  "notes": " Circuit fault distance corrected on 2026-11-26 by @FarLab: the X-memory circuit has an undetected logical fault set of weight 7 in its committed detector error model (claimed 16); the Z-memory circuit has an undetected logical fault set of weight 8 in its committed detector error model (claimed 16). Found by Sisyphus (sisyphus-qec 0.2.1, github.com/varunmenon1310/sisyphus) in the sweep recorded in research/audits/sisyphus_circuit_sweep-2026-11-25.json (60 s per basis), run by Claude Fable 5.2 (Claude Code) for @FarLab, and re-verified in the committed detector error model with verify/circuit_tools.witness_errors. Each value is an upper bound from a randomized search; no lower bound is proved."
  },
  "family": "bivariate-bicycle",
  "circuit": {
   "d_circ": {
    "Z": {
-    "value": 16,
+    "value": 8,
     "confidence": "upper_bound",
     "witness": [
-     123583,
-     123585,
-     123587,
-     123590,
-     123621,
-     123622,
-     123623,
-     123627,
-     123635,
-     123640,
-     123647,
-     123657,
-     123661,
-     123675,
-     123678,
-     123679
+     203,
+     307,
+     1359,
+     1537,
+     3046,
+     3337,
+     3587,
+     4573
     ]
    },
    "X": {
-    "value": 16,
+    "value": 7,
     "confidence": "upper_bound",
     "witness": [
-     123275,
-     123281,
-     123331,
-     123368,
-     123398,
-     123407,
-     123446,
-     123499,
-     123539,
-     123543,
-     123671,
-     123686,
-     123690,
-     123694,
-     123695,
-     123696
+     123309,
+     123312,
+     123379,
+     123405,
+     123523,
+     123598,
+     123643
     ]
    }
   },
